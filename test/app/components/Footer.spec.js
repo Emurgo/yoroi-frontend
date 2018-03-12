@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import ShallowRenderer from 'react-test-renderer/shallow';
 import Footer from '../../../app/components/Footer';
 
 function setup(propOverrides) {
@@ -8,7 +8,7 @@ function setup(propOverrides) {
     ...propOverrides
   };
 
-  const renderer = TestUtils.createRenderer();
+  const renderer = new ShallowRenderer();
   renderer.render(<Footer {...props} />);
   const output = renderer.getRenderOutput();
 

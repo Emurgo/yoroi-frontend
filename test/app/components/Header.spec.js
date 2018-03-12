@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import ShallowRenderer from 'react-test-renderer/shallow';
 import Header from '../../../app/components/Header';
 
 function setup() {
   const props = {};
 
-  const renderer = TestUtils.createRenderer();
+  const renderer = new ShallowRenderer();
   renderer.render(<Header {...props} />);
   const output = renderer.getRenderOutput();
 

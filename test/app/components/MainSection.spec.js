@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import ShallowRenderer from 'react-test-renderer/shallow';
 import MainSection from '../../../app/components/MainSection';
 
 function setup(/*propOverrides*/) {
   const props = {};
 
-  const renderer = TestUtils.createRenderer();
+  const renderer = new ShallowRenderer();
   renderer.render(<MainSection {...props} />);
   const output = renderer.getRenderOutput();
 
