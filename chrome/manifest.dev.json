@@ -1,10 +1,10 @@
 {
   "version": "0.0.0",
-  "name": "react-chrome-extension-example",
+  "name": "icarus-light-cardano-wallet-poc",
   "manifest_version": 2,
-  "description": "Example for react-chrome-extension-boilerplate",
+  "description": "Icarus light Cardano wallet - PoC",
   "browser_action": {
-    "default_title": "React Chrome Extension Example",
+    "default_title": "Icarus light Cardano wallet - PoC",
     "default_popup": "popup.html"
   },
   "icons": {
