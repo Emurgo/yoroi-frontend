@@ -12,7 +12,7 @@
 
 ### Prerequisites
 
-- node v8.9.4
+- node v8.9.4 (if you are using nvm, just execute: `$ nvm use`)
 
 ```bash
 # clone it
