@@ -1,0 +1,3 @@
+[submodule "rust-cardano-crypto"]
+	path = rust-cardano-crypto
+	url = git@github.com:atixlabs/rust-cardano-crypto.git

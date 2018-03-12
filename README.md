@@ -13,13 +13,20 @@
 ### Prerequisites
 
 - node v8.9.4 (if you are using nvm, just execute: `$ nvm use`)
+- [rust version used by rust-cardano-crypto](https://github.com/input-output-hk/rust-cardano-crypto#installation)
 
 ```bash
-# clone it
-$ git clone git@github.com:input-output-hk/icarus-poc.git
+# clone the repository with the submodule rust-cardano-crypto
+$ git clone --recursive git@github.com:input-output-hk/icarus-poc.git
+# or
+$ git submodule update --init --recursive git@github.com:input-output-hk/icarus-poc.git
 
 # Install dependencies
 $ npm install
+
+# Generate and copy into node_modules the rust-cardano-crypto module
+$ chmod +x ./init-rust-cardano-crypto-node-module.sh 
+$ ./init-rust-cardano-crypto-node-module.sh 
 ```
 
 ## Development
