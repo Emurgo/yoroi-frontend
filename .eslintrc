@@ -18,7 +18,8 @@
     "comma-dangle": 0,
     "spaced-comment": 0,
     "global-require": 0,
-    "arrow-body-style": 0
+    "arrow-body-style": 0,
+    "func-names": 0
   },
   "plugins": [
     "react"
