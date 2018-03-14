@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CardanoCrypto from 'rust-cardano-crypto';
+import { loadRustModule } from 'rust-cardano-crypto';
 import App from './App';
 
 export default class Root extends Component {
@@ -15,7 +15,7 @@ export default class Root extends Component {
     /* (!) Attention: Before use any method from CardanoCrypto
            we must load the RustModule first.
     */
-    CardanoCrypto.loadRustModule().then(() => {
+    loadRustModule().then(() => {
       this.setState({ loading: false });
     });
   }
