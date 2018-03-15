@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { HdWallet } from 'rust-cardano-crypto';
-import { Buffer } from 'safe-buffer';
+import { toPublicHex } from '../utils/crypto/cryptoUtils';
 
 const WalletInfo = (props) => {
   const showAddress = function (wallet) {
-    const pk = HdWallet.toPublic(wallet);
-    const pkHex = Buffer.from(pk).toString('hex');
-    return `0x${pkHex}`;
+    return toPublicHex(wallet);
   };
 
   return (

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { HdWallet } from 'rust-cardano-crypto';
-import { mnemonicToSeedImpl } from '../crypto/BIP39';
+import { generateWallet } from '../utils/crypto/cryptoUtils';
 import WalletStorage from '../state/WalletStorage';
 import ImportWalletForm from '../components/ImportWalletForm';
 import WalletInfo from '../components/WalletInfo';
@@ -16,9 +15,7 @@ class Wallet extends Component {
   }
 
   importWallet = (secretWords) => {
-    console.log('importWallet-secretWords:', secretWords);
-    const seed = mnemonicToSeedImpl(secretWords);
-    const wallet = HdWallet.fromSeed(seed);
+    const wallet = generateWallet(secretWords);
     WalletStorage.setWallet(wallet);
     this.setState({
       hasWallet: WalletStorage.hasWallet(),

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { validateMnemonic } from '../crypto/BIP39';
+import { validateMnemonic } from '../utils/crypto/BIP39';
 
 class ImportWalletForm extends Component {
 
