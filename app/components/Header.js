@@ -3,7 +3,7 @@ import React from 'react';
 const Header = () => {
   return (
     <header>
-      Header
+      Icarus light Cardano wallet - PoC
     </header>
   );
 };

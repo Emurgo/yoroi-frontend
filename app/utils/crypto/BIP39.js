@@ -2,7 +2,9 @@
 
 import bip39 from 'bip39';
 import { Buffer } from 'safe-buffer';
-import CardanoCrypto from 'rust-cardano-crypto';
+import { Blake2b } from 'rust-cardano-crypto';
+
+export const validateMnemonic = bip39.validateMnemonic;
 
 export const generateMnemonicImpl = function () {
   return bip39.generateMnemonic(128);
@@ -11,7 +13,7 @@ export const generateMnemonicImpl = function () {
 export const mnemonicToSeedImpl = function (m) {
   try {
     const e = bip39.mnemonicToEntropy(m);
-    return CardanoCrypto.Blake2b.blake2b_256(e);
+    return Blake2b.blake2b_256(e);
   } catch (e) {
     console.error('BIP39 mnemonicToSeed error:', e);
     return null;
