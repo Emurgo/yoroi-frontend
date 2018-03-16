@@ -1,6 +1,6 @@
 import {
-    serializeUint8Array
-  , deserializeUint8Array
+  serializeUint8Array,
+  deserializeUint8Array
 } from '../utils/serializer';
 
 const WalletStorage = {};

@@ -1,20 +1,29 @@
-import React, { Component } from "react";
-import WalletStorage from "../state/WalletStorage";
-import WalletInfo from "../components/WalletInfo";
-import { Tabs, Tab } from "material-ui/Tabs";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Tabs, Tab } from 'material-ui/Tabs';
+import WalletInfo from '../components/WalletInfo';
+import { toPublicHex } from '../utils/crypto/cryptoUtils';
 
 class Wallet extends Component {
   constructor(props) {
     super(props);
-    //FIXME: This can be passed using props
-    this.wallet = WalletStorage.getWallet();
+    //TODO: Fetch walletInfo!
   }
+
+  getAddress = (wallet) => {
+    return toPublicHex(wallet);
+  };
+
   render() {
     return (
       <Tabs>
         <Tab label="Receive">
           <div>
-            <WalletInfo wallet={this.wallet} />
+            <WalletInfo
+              address={this.getAddress(this.props.wallet)}
+              balance={0}
+              txs={[]}
+            />
           </div>
         </Tab>
         <Tab label="Send">
@@ -27,8 +36,8 @@ class Wallet extends Component {
   }
 }
 
-export default Wallet;
+Wallet.propTypes = {
+  wallet: PropTypes.object
+};
 
-/*if (this.state.hasWallet) {
-  return (<WalletInfo wallet={this.state.wallet} />);
-}*/
+export default Wallet;

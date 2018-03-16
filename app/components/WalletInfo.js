@@ -1,39 +1,31 @@
-import React from "react";
-import PropTypes from "prop-types";
-import QRCode from "qrcode.react";
+import React from 'react';
+import PropTypes from 'prop-types';
+import QRCode from 'qrcode.react';
 import {
   Card,
-  CardActions,
   CardHeader,
   CardMedia,
-  CardTitle,
-  CardText
-} from "material-ui/Card";
+  CardTitle
+} from 'material-ui/Card';
 
-import { toPublicHex } from "../utils/crypto/cryptoUtils";
-
-const WalletInfo = props => {
-  const showAddress = function(wallet) {
-    return toPublicHex(wallet);
-  };
-
-  const address = showAddress(props.wallet);
-
+const WalletInfo = (props) => {
   return (
     <Card>
       <CardHeader title="My Wallet" />
       <CardMedia>
         <div>
-          <QRCode value={address} />
+          <QRCode value={props.address} />
         </div>
       </CardMedia>
-      <CardTitle title="" subtitle={address} />
+      <CardTitle title="" subtitle={props.address} />
     </Card>
   );
 };
 
 WalletInfo.propTypes = {
-  wallet: PropTypes.object
+  address: PropTypes.string,
+  balance: PropTypes.number,
+  txs: PropTypes.array
 };
 
 export default WalletInfo;

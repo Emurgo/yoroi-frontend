@@ -1,38 +1,31 @@
-import React, { Component } from "react";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import { Tabs, Tab } from "material-ui/Tabs";
-import FontIcon from "material-ui/FontIcon";
-import MapsPersonPin from "material-ui/svg-icons/maps/person-pin";
-import WalletSetup from "../containers/WalletSetup";
-import Wallet from "../containers/Wallet";
-
-import WalletStorage from "../state/WalletStorage";
-
-const Receive = () => {
-  return <h1>Receive</h1>;
-};
-const Send = () => {
-  return <h1>Send</h1>;
-};
+import React, { Component } from 'react';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import WalletSetup from '../components/WalletSetup';
+import Wallet from '../containers/Wallet';
+import WalletStorage from '../state/WalletStorage';
 
 class App extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     WalletStorage.initWallet();
     this.state = {
-      hasWallet: WalletStorage.hasWallet()
+      hasWallet: WalletStorage.hasWallet(),
+      wallet: WalletStorage.getWallet()
     };
   }
 
+  onWalletCreated = () => {
+    this.setState({
+      hasWallet: true,
+      wallet: WalletStorage.getWallet()
+    });
+  };
+
   renderContent = () => {
     if (this.state.hasWallet) {
-      return <Wallet />;
-    } else
-      return (
-        <WalletSetup
-          onWalletCreated={() => this.setState({ hasWallet: true })}
-        />
-      );
+      return <Wallet wallet={this.state.wallet} />;
+    }
+    return (<WalletSetup onWalletCreated={this.onWalletCreated} />);
   };
 
   render() {
