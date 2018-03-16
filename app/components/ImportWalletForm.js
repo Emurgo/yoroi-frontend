@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import TextField from 'material-ui/TextField';
+import RaisedButton from 'material-ui/RaisedButton';
+
 import { validateMnemonic } from '../utils/crypto/BIP39';
 
 class ImportWalletForm extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -13,7 +15,7 @@ class ImportWalletForm extends Component {
 
   handleChange = (event) => {
     this.setState({ secretWords: event.target.value });
-  }
+  };
 
   handleSubmit = (event) => {
     event.preventDefault();
@@ -23,23 +25,21 @@ class ImportWalletForm extends Component {
       // TODO: Improve validate 12 words error
       alert('Invalid words');
     }
-  }
+  };
 
   render() {
     return (
-      <form>
-        <label>
-          Please insert your 12 words:
-          <br />
-          <input
-            type="text"
-            value={this.state.secretWords}
-            placeholder="legal winner thank year wave sausage worth useful legal winner thank yellow"
-            onChange={this.handleChange}
-          />
-        </label>
-        <button onClick={this.handleSubmit}> Import </button>
-      </form>
+      <div>
+        <TextField
+          hintText="legal winner thank year wave sausage worth useful legal winner thank yellow"
+          floatingLabelText="Please insert your 12 words"
+          multiLine
+          rows={2}
+          onChange={this.handleChange}
+        />
+        <br />
+        <RaisedButton label="Import" primary onClick={this.handleSubmit} />
+      </div>
     );
   }
 }

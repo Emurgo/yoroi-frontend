@@ -1,38 +1,43 @@
 import React, { Component } from 'react';
-import { generateWallet } from '../utils/crypto/cryptoUtils';
-import WalletStorage from '../state/WalletStorage';
-import ImportWalletForm from '../components/ImportWalletForm';
+import PropTypes from 'prop-types';
+import { Tabs, Tab } from 'material-ui/Tabs';
 import WalletInfo from '../components/WalletInfo';
+import { toPublicHex } from '../utils/crypto/cryptoUtils';
 
 class Wallet extends Component {
   constructor(props) {
     super(props);
-    WalletStorage.initWallet();
-    this.state = {
-      hasWallet: WalletStorage.hasWallet(),
-      wallet: WalletStorage.getWallet()
-    };
+    //TODO: Fetch walletInfo!
   }
 
-  importWallet = (secretWords) => {
-    const wallet = generateWallet(secretWords);
-    WalletStorage.setWallet(wallet);
-    this.setState({
-      hasWallet: WalletStorage.hasWallet(),
-      wallet: WalletStorage.getWallet()
-    });
-  }
+  getAddress = (wallet) => {
+    return toPublicHex(wallet);
+  };
 
   render() {
-    if (this.state.hasWallet) {
-      return (<WalletInfo wallet={this.state.wallet} />);
-    }
     return (
-      <ImportWalletForm
-        onSubmit={this.importWallet}
-      />
+      <Tabs>
+        <Tab label="Receive">
+          <div>
+            <WalletInfo
+              address={this.getAddress(this.props.wallet)}
+              balance={0}
+              txs={[]}
+            />
+          </div>
+        </Tab>
+        <Tab label="Send">
+          <div>
+            <h1>Send FORM</h1>
+          </div>
+        </Tab>
+      </Tabs>
     );
   }
 }
+
+Wallet.propTypes = {
+  wallet: PropTypes.object
+};
 
 export default Wallet;
