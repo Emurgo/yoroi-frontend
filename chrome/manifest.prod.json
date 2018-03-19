@@ -18,6 +18,6 @@
   "background": {
     "page": "background.html"
   },
-  "permissions": [ "contextMenus", "tabs", "storage", "https://github.com/*" ],
-  "content_security_policy": "default-src 'self'; script-src 'self'; style-src * 'unsafe-inline'; img-src 'self' data:;"
+  "permissions": [ "contextMenus", "tabs", "storage", "https://github.com/*", "https://explorer.iohkdev.io/*" ],
+  "content_security_policy": "default-src 'self'; script-src 'self'; connect-src https://explorer.iohkdev.io; style-src * 'unsafe-inline'; img-src 'self' data:;"
 }

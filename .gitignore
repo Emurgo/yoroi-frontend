@@ -9,3 +9,4 @@ dev/
 *.crx
 *.pem
 update.xml
+.vscode/
