@@ -4,7 +4,11 @@ import { mnemonicToSeedImpl } from './BIP39';
 
 export const generateWallet = function (secretWords) {
   const seed = mnemonicToSeedImpl(secretWords);
-  return HdWallet.fromSeed(seed);
+  // We need to derive twice a hardened wallet before using a
+  // non-hardned
+  const xprv = HdWallet.fromSeed(seed);
+  const d1 = HdWallet.derivePrivate(xprv, 0);
+  return HdWallet.derivePrivate(d1, 1);
 };
 
 export const toPublicHex = function (wallet) {
