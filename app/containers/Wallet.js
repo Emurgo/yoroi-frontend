@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import WalletInfo from '../components/WalletInfo';
+import SendAdaForm from '../components/SendAdaForm';
 import API from '../api/API';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
 
@@ -40,6 +41,11 @@ class Wallet extends Component {
     return caTxList;
   }
 
+  onSendTransaction = (inputs) => {
+    // Here we will need to call create transaction endpoint
+    alert(`OnSendTransaction ${JSON.stringify(inputs)}`);
+  };
+
   render() {
     return (
       <Tabs>
@@ -54,7 +60,7 @@ class Wallet extends Component {
         </Tab>
         <Tab label="Send">
           <div>
-            <h1>Send FORM</h1>
+            <SendAdaForm onSubmit={inputs => this.onSendTransaction(inputs)} />
           </div>
         </Tab>
       </Tabs>
