@@ -4,7 +4,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 
 class SendAdaForm extends Component {
-  
+
   handleChange = field => (event) => {
     this.setState({ [field]: event.target.value });
   };
