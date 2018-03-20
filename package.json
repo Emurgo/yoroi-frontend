@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Icarus light Cardano wallet - PoC",
   "scripts": {
+    "setup": "./setup-environment.sh",
     "dev": "node scripts/dev",
     "build": "node scripts/build",
     "compress": "node scripts/compress",

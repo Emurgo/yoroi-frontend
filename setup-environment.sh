@@ -1,5 +1,6 @@
 #!/bin/bash
 
+npm install;
 cd rust-cardano-crypto;
 npm install;
 ./build;
