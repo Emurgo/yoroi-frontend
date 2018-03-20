@@ -15,7 +15,7 @@ function setup(propOverrides) {
   return { props, output };
 }
 
-describe('todoapp Footer component', () => {
+describe('icaruspoc Footer component', () => {
   it('should render correctly', () => {
     const { output } = setup();
     expect(output.type).to.equal('footer');
