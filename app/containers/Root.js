@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
+import {
+  MuiThemeProvider,
+  createMuiTheme
+} from 'material-ui/styles';
+import Loading from '../components/ui/Loading';
 import { loadRustModule } from 'rust-cardano-crypto';
 import App from './App';
+
+const theme = createMuiTheme();
 
 export default class Root extends Component {
 
@@ -21,9 +28,13 @@ export default class Root extends Component {
   }
 
   render() {
-    if (this.state.loading) {
-      return 'loading...';
-    }
-    return (<App />);
+    return (
+      <MuiThemeProvider theme={theme}>
+        {this.state.loading &&
+          <Loading />
+        }
+        {!this.state.loading && <App />}
+      </MuiThemeProvider>
+    );
   }
 }

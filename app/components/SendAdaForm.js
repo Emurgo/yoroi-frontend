@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'material-ui/Button';
+import Grid from 'material-ui/Grid';
 
 class SendAdaForm extends Component {
 
@@ -15,19 +16,27 @@ class SendAdaForm extends Component {
 
   render() {
     return (
-      <div>
-        <TextField
-          hintText=""
-          floatingLabelText="To"
-          onChange={this.handleChange('to')}
-        />
-        <TextField
-          hintText=""
-          floatingLabelText="Amount"
-          onChange={this.handleChange('amount')}
-        />
-        <RaisedButton label="Import" primary onClick={this.handleSubmit(this.props.onSubmit)} />
-      </div>
+      <Grid container justify="center" alignItems="baseline">
+        <Grid item>
+          <TextField
+            label="To"
+            margin="normal"
+            onChange={this.handleChange('to')}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            label="Amount"
+            margin="normal"
+            onChange={this.handleChange('amount')}
+          />
+        </Grid>
+        <Grid item>
+          <Button variant="raised" color="primary" onClick={this.handleSubmit(this.props.onSubmit)}>
+            Send
+          </Button>
+        </Grid>
+      </Grid>
     );
   }
 }

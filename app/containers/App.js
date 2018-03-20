@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Toolbar from 'material-ui/Toolbar';
+import AppBar from 'material-ui/AppBar';
+import Typography from 'material-ui/Typography';
 import WalletSetup from '../components/WalletSetup';
 import Wallet from '../containers/Wallet';
 import WalletStorage from '../state/WalletStorage';
@@ -31,7 +33,14 @@ class App extends Component {
   render() {
     return (
       <div>
-        <MuiThemeProvider>{this.renderContent()}</MuiThemeProvider>
+        <AppBar position="static" color="default">
+          <Toolbar>
+            <Typography variant="title" color="inherit">
+              Icarus Ligth Cardano Wallet - PoC
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        {this.renderContent()}
       </div>
     );
   }

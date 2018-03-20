@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-
+import Button from 'material-ui/Button';
+import Grid from 'material-ui/Grid';
 import { validateMnemonic } from '../utils/crypto/BIP39';
 
 class ImportWalletForm extends Component {
@@ -19,6 +19,7 @@ class ImportWalletForm extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
+    console.log("importWallet", this.state.secretWords)
     if (validateMnemonic(this.state.secretWords)) {
       this.props.onSubmit(this.state.secretWords);
     } else {
@@ -29,17 +30,20 @@ class ImportWalletForm extends Component {
 
   render() {
     return (
-      <div>
-        <TextField
-          hintText="legal winner thank year wave sausage worth useful legal winner thank yellow"
-          floatingLabelText="Please insert your 12 words"
-          multiLine
-          rows={2}
-          onChange={this.handleChange}
-        />
-        <br />
-        <RaisedButton label="Import" primary onClick={this.handleSubmit} />
-      </div>
+      <Grid container justify="center" alignItems="baseline">
+        <Grid item>
+          <TextField
+            helperText="ex: legal winner thank year wave sausage worth useful legal winner thank yellow"
+            label="Please insert your 12 words"
+            rows={2}
+            margin="normal"
+            onChange={this.handleChange}
+          />
+        </Grid>
+        <Grid item>
+          <Button variant="raised" color="primary" onClick={this.handleSubmit}> Import </Button>
+        </Grid>
+      </Grid>
     );
   }
 }
