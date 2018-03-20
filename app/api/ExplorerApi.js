@@ -1,6 +1,6 @@
-const API = {};
+const ExplorerApi = {};
 
-API.config = {
+ExplorerApi.config = {
   serverRoute: 'https://explorer.iohkdev.io/api'
 };
 
@@ -10,17 +10,17 @@ const parseResponse = function (response) {
 
 const handleErrors = function (responseJson) {
   if (responseJson.error) {
-    console.error(`[API.handleErrors] error[${responseJson.error.name}]`);
+    console.error(`[ExplorerApi.handleErrors] error[${responseJson.error.name}]`);
     throw responseJson.error;
   } else {
     return Promise.resolve(responseJson);
   }
 };
 
-API.wallet = {};
+ExplorerApi.wallet = {};
 
-API.wallet.getInfo = function (walletId) {
-  return fetch(`${API.config.serverRoute}/addresses/summary/${walletId}`, {
+ExplorerApi.wallet.getInfo = function (walletId) {
+  return fetch(`${ExplorerApi.config.serverRoute}/addresses/summary/${walletId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -30,4 +30,4 @@ API.wallet.getInfo = function (walletId) {
   .then(handleErrors);
 };
 
-export default API;
+export default ExplorerApi;

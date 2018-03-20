@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import WalletInfo from '../components/WalletInfo';
 import SendAdaForm from '../components/SendAdaForm';
-import API from '../api/API';
+import ExplorerApi from '../api/ExplorerApi';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
 
 class Wallet extends Component {
@@ -17,17 +17,19 @@ class Wallet extends Component {
   }
 
   componentWillMount() {
-    // TODO: Swap lines
-    // API.wallet.getInfo(this.props.wallet)
-    API.wallet.getInfo('DdzFFzCqrhsq3S51xpvLmBZrtBCHNbRQX8q3eiaR6HPLJpSakXQXrczPRiqCvLMMdNhdKBmoU7ovjyMcVDngBsuLHA66qPnYUvvJVveL')
-    .then((walletInfo) => {
-      this.setState({
-        address: this.getAddress(walletInfo),
-        balance: this.getBalance(walletInfo),
-        txsHistory: this.getTxsHistory(walletInfo)
-      });
+    this.setState({
+      intervalId: this.updateWalletInfo()
     });
   }
+
+  componentWillUnmount() {
+    clearInterval(this.state.intervalId);
+  }
+
+  onSendTransaction = (inputs) => {
+    // Here we will need to call create transaction endpoint
+    alert(`OnSendTransaction ${JSON.stringify(inputs)}`);
+  };
 
   getAddress = ({ Right: { caAddress } }) => {
     return caAddress;
@@ -41,10 +43,22 @@ class Wallet extends Component {
     return caTxList;
   }
 
-  onSendTransaction = (inputs) => {
-    // Here we will need to call create transaction endpoint
-    alert(`OnSendTransaction ${JSON.stringify(inputs)}`);
-  };
+  updateWalletInfo = () => {
+    function run() {
+      console.log('[Wallet.updateWalletInfo.run] Running');
+      // TODO: Swap lines
+      // ExplorerApi.wallet.getInfo(this.props.wallet)
+      ExplorerApi.wallet.getInfo('DdzFFzCqrhsq3S51xpvLmBZrtBCHNbRQX8q3eiaR6HPLJpSakXQXrczPRiqCvLMMdNhdKBmoU7ovjyMcVDngBsuLHA66qPnYUvvJVveL')
+      .then((walletInfo) => {
+        this.setState({
+          address: this.getAddress(walletInfo),
+          balance: this.getBalance(walletInfo),
+          txsHistory: this.getTxsHistory(walletInfo)
+        });
+      });
+    }
+    return setInterval(run.bind(this), 1000);
+  }
 
   render() {
     return (
