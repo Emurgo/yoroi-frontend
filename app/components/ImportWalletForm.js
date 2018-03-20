@@ -30,7 +30,7 @@ class ImportWalletForm extends Component {
 
   render() {
     return (
-      <Grid container justify="center" alignItems="baseline">
+      <Grid container direction="column" justify="justify" alignItems="center">
         <Grid item>
           <TextField
             helperText="ex: legal winner thank year wave sausage worth useful legal winner thank yellow"

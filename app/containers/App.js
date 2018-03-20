@@ -33,7 +33,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <AppBar position="static" color="default">
+        <AppBar position="static" color="primary">
           <Toolbar>
             <Typography variant="title" color="inherit">
               Icarus Ligth Cardano Wallet - PoC

@@ -16,7 +16,7 @@ class SendAdaForm extends Component {
 
   render() {
     return (
-      <Grid container justify="center" alignItems="baseline">
+      <Grid container direction="column" justify="center" alignItems="center">
         <Grid item>
           <TextField
             label="To"
