@@ -21,7 +21,7 @@ CardanoNodeApi.transactions.buildTx = function ({ to, from, amount }) {
     },
     body: { groupingPolicy: 'OptimizeForHighThroughput' },
     // data: '{"groupingPolicy":"OptimizeForHighThroughput"}',
-    mode: 'cors'
+    // mode: 'cors'
   })
   .then(parseResponse)
   .then(handleErrors);

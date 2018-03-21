@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
-import SwipeableViews from 'react-swipeable-views';
-import { FormGroup } from 'material-ui/Form';
+import Card, { CardContent } from 'material-ui/Card';
+import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
-import Loading from '../components/ui/loading/Loading';
+// import Loading from '../components/ui/loading/Loading'; // TODO: Fix styling!
 import ExplorerApi from '../api/ExplorerApi';
 import CardanoNodeApi from '../api/CardanoNodeApi';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
@@ -78,6 +78,7 @@ class Wallet extends Component {
   }
 
   HISTORY_TAB_INDEX = 0;
+  SEND_TAB_INDEX = 1;
 
   swapToHistoryTab = () => {
     this.setState({
@@ -102,33 +103,38 @@ class Wallet extends Component {
   render() {
     return (
       <div>
-        <FormGroup>
-          <Button onClick={() => openAddress(this.state.address)} >
-            Address: {!this.state.loading ? formatCID(this.state.address) : '...'}
-          </Button>
-          <Button disabled> Balance: {!this.state.loading ? this.state.balance : '...'} </Button>
-        </FormGroup>
+        <Card>
+          <CardContent>
+            <Typography variant="headline">
+              <Button onClick={() => openAddress(this.state.address)} >
+                Address: {!this.state.loading ? formatCID(this.state.address) : '...'}
+              </Button>
+            </Typography>
+            <Typography variant="subheading" color="textSecondary">
+              <Button disabled>
+                Balance: {!this.state.loading ? this.state.balance : '...'}
+              </Button>
+            </Typography>
+          </CardContent>
+        </Card>
         <AppBar position="static" color="default">
           <Tabs value={this.state.swapIndex} onChange={this.onTabChange} fullWidth>
             <Tab label="History" />
             <Tab label="Send" />
           </Tabs>
         </AppBar>
-        <SwipeableViews
-          axis="x-reverse"
-          index={this.state.swapIndex}
-          onChangeIndex={this.onSwipChange}
-        >
-          {
-            !this.state.loading ?
-              <WalletHistory
-                txs={this.state.txsHistory}
-              />
-            :
-              <Loading />
-          }
+        { this.state.swapIndex === this.HISTORY_TAB_INDEX &&
+          (!this.state.loading ?
+            <WalletHistory
+              txs={this.state.txsHistory}
+            />
+          :
+            ''
+          )
+        }
+        { this.state.swapIndex === this.SEND_TAB_INDEX &&
           <SendAdaForm onSubmit={inputs => this.onSendTransaction(inputs)} />
-        </SwipeableViews>
+        }
       </div>
     );
   }

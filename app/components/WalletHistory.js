@@ -5,7 +5,8 @@ import List, {
   ListItem,
   ListItemText
 } from 'material-ui/List';
-import { FormGroup } from 'material-ui/Form';
+import Card, { CardContent } from 'material-ui/Card';
+import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import {
   formatCID,
@@ -20,18 +21,21 @@ const WalletHistory = (props) => {
 
   const getTransactionItem = (tx) => {
     return (
-      <Grid item xs={12}>
+      <Grid item>
         <Button onClick={() => openTx(tx.ctbId)}>
-          <ListItem >
-            <FormGroup>
-              <ListItemText primary={`Tx Hash: ${formatCID(tx.ctbId)}`} />
-              <p>
-                <span> Timestamp: { formatTimestamp(tx.ctbTimeIssued) }</span>
-                <br />
-                <span> Amount: { getAmount(tx) } </span>
-              </p>
-            </FormGroup>
-          </ListItem>
+          <Card>
+            <CardContent>
+              <Typography align="left">
+                Tx Hash: { formatCID(tx.ctbId) }
+              </Typography>
+              <Typography align="left" variant="body2" color="textSecondary" >
+                Timestamp: { formatTimestamp(tx.ctbTimeIssued) }
+              </Typography>
+              <Typography align="left" variant="body1" color="textSecondary">
+                Amount: { getAmount(tx) }
+              </Typography>
+            </CardContent>
+          </Card>
         </Button>
       </Grid>
     );
