@@ -7,6 +7,7 @@ import { FormGroup } from 'material-ui/Form';
 import Button from 'material-ui/Button';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
+import Loading from '../components/ui/loading/Loading';
 import ExplorerApi from '../api/ExplorerApi';
 import CardanoNodeApi from '../api/CardanoNodeApi';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
@@ -21,13 +22,18 @@ class Wallet extends Component {
       swapIndex: this.HISTORY_TAB_INDEX,
       address: toPublicHex(this.props.wallet), // TODO: Change to a correct format
       balance: -1,
-      txsHistory: []
+      txsHistory: [],
+      loading: true
     };
   }
 
   componentWillMount() {
-    this.setState({
-      intervalId: this.updateWalletInfo()
+    this.updateWalletInfo()
+    .then(() => {
+      this.setState({
+        intervalId: setInterval(this.updateWalletInfo, 15 * 1000),
+        loading: false
+      });
     });
   }
 
@@ -80,20 +86,17 @@ class Wallet extends Component {
   }
 
   updateWalletInfo = () => {
-    function run() {
-      console.log('[Wallet.updateWalletInfo.run] Running');
-      // TODO: Swap lines
-      // ExplorerApi.wallet.getInfo(this.props.wallet)
-      ExplorerApi.wallet.getInfo('DdzFFzCqrhsq3S51xpvLmBZrtBCHNbRQX8q3eiaR6HPLJpSakXQXrczPRiqCvLMMdNhdKBmoU7ovjyMcVDngBsuLHA66qPnYUvvJVveL')
-      .then((walletInfo) => {
-        this.setState({
-          address: this.getAddress(walletInfo),
-          balance: this.getBalance(walletInfo),
-          txsHistory: this.getTxsHistory(walletInfo)
-        });
+    console.log('[Wallet.updateWalletInfo.run] Running');
+    // ExplorerApi.wallet.getInfo(this.props.wallet)
+    return ExplorerApi.wallet.getInfo('DdzFFzCqrhsq3S51xpvLmBZrtBCHNbRQX8q3eiaR6HPLJpSakXQXrczPRiqCvLMMdNhdKBmoU7ovjyMcVDngBsuLHA66qPnYUvvJVveL')
+    .then((walletInfo) => {
+      this.setState({
+        address: this.getAddress(walletInfo),
+        balance: this.getBalance(walletInfo),
+        txsHistory: this.getTxsHistory(walletInfo)
       });
-    }
-    return setInterval(run.bind(this), 15 * 1000);
+      return Promise.resolve();
+    });
   }
 
   render() {
@@ -101,9 +104,9 @@ class Wallet extends Component {
       <div>
         <FormGroup>
           <Button onClick={() => openAddress(this.state.address)} >
-            Address: {formatCID(this.state.address)}
+            Address: {!this.state.loading ? formatCID(this.state.address) : '...'}
           </Button>
-          <Button disabled> Balance: {this.state.balance} </Button>
+          <Button disabled> Balance: {!this.state.loading ? this.state.balance : '...'} </Button>
         </FormGroup>
         <AppBar position="static" color="default">
           <Tabs value={this.state.swapIndex} onChange={this.onTabChange} fullWidth>
@@ -116,9 +119,14 @@ class Wallet extends Component {
           index={this.state.swapIndex}
           onChangeIndex={this.onSwipChange}
         >
-          <WalletHistory
-            txs={this.state.txsHistory}
-          />
+          {
+            !this.state.loading ?
+              <WalletHistory
+                txs={this.state.txsHistory}
+              />
+            :
+              <Loading />
+          }
           <SendAdaForm onSubmit={inputs => this.onSendTransaction(inputs)} />
         </SwipeableViews>
       </div>
