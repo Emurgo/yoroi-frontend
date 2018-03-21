@@ -3,7 +3,7 @@ import {
   MuiThemeProvider,
   createMuiTheme
 } from 'material-ui/styles';
-import Loading from '../components/ui/Loading';
+import Loading from '../components/ui/loading/Loading';
 import { loadRustModule } from 'rust-cardano-crypto';
 import App from './App';
 

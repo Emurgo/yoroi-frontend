@@ -8,15 +8,17 @@ import Button from 'material-ui/Button';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
 import ExplorerApi from '../api/ExplorerApi';
+import CardanoNodeApi from '../api/CardanoNodeApi';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
 import { formatCID } from '../utils/formatter';
 import { openAddress } from '../utils/explorerLinks';
 
 class Wallet extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
-      swapIndex: 0,
+      swapIndex: this.HISTORY_TAB_INDEX,
       address: toPublicHex(this.props.wallet), // TODO: Change to a correct format
       balance: -1,
       txsHistory: []
@@ -35,7 +37,17 @@ class Wallet extends Component {
 
   onSendTransaction = (inputs) => {
     // Here we will need to call create transaction endpoint
-    alert(`OnSendTransaction ${JSON.stringify(inputs)}`);
+    const payload = {
+      to: inputs.to,
+      from: this.state.address,
+      amount: inputs.amount
+    };
+    return CardanoNodeApi.transactions.buildTx(payload)
+    .then((result) => {
+      console.log('[Wallet.onSendTransaction] Ok!', result);
+      this.swapToHistoryTab();
+      return Promise.resolve();
+    });
   };
 
   onSwipChange = (index) => {
@@ -57,6 +69,14 @@ class Wallet extends Component {
 
   getTxsHistory = ({ Right: { caTxList } }) => {
     return caTxList;
+  }
+
+  HISTORY_TAB_INDEX = 0;
+
+  swapToHistoryTab = () => {
+    this.setState({
+      swapIndex: this.HISTORY_TAB_INDEX
+    });
   }
 
   updateWalletInfo = () => {
