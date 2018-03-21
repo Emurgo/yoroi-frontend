@@ -4,7 +4,7 @@ import { parseResponse, handleErrors } from './apiUtils';
 const CardanoNodeApi = {};
 
 CardanoNodeApi.config = {
-  serverRoute: 'https://localhost:8090/api'
+  serverRoute: 'https://localhost:8080/api'
 };
 
 CardanoNodeApi.transactions = {};
@@ -16,10 +16,11 @@ CardanoNodeApi.transactions.buildTx = function ({ to, from, amount }) {
   amount = 5;
   return fetch(`${CardanoNodeApi.config.serverRoute}/txs/unsigned/${from}/${to}/${amount}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: { groupingPolicy: 'OptimizeForHighThroughput' },
+    headers: new Headers({
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }),
+    body: JSON.stringify({ groupingPolicy: 'OptimizeForHighThroughput' }),
     // data: '{"groupingPolicy":"OptimizeForHighThroughput"}',
     // mode: 'cors'
   })
