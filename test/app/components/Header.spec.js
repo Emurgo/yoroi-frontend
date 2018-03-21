@@ -13,7 +13,7 @@ function setup() {
   return { props, output, renderer };
 }
 
-describe('todoapp Header component', () => {
+describe('icaruspoc Header component', () => {
   it('should render correctly', () => {
     const { output } = setup();
     expect(output.type).to.equal('header');

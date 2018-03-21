@@ -57,7 +57,7 @@ class Wallet extends Component {
         });
       });
     }
-    return setInterval(run.bind(this), 1000);
+    return setInterval(run.bind(this), 15 * 1000);
   }
 
   render() {
