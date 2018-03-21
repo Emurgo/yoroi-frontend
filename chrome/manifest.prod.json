@@ -12,12 +12,9 @@
     "48": "img/icon-48.png",
     "128": "img/icon-128.png"
   },
-  "web_accessible_resources": [
-    "inject.html"
-  ],
   "background": {
     "page": "background.html"
   },
-  "permissions": [ "contextMenus", "tabs", "storage", "https://github.com/*", "https://explorer.iohkdev.io/*" ],
+  "permissions": [ "contextMenus", "tabs", "storage", "https://explorer.iohkdev.io/*" ],
   "content_security_policy": "default-src 'self'; script-src 'self'; connect-src https://explorer.iohkdev.io; style-src * 'unsafe-inline'; img-src 'self' data:;"
 }
