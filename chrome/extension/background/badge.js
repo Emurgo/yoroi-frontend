@@ -8,6 +8,6 @@ chrome.storage.local.get('todos', (obj) => {
     }
   } else {
     // Initial
-    chrome.browserAction.setBadgeText({ text: '1' });
+    //chrome.browserAction.setBadgeText({ text: '1' });
   }
 });
