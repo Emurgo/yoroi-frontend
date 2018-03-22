@@ -1,6 +1,9 @@
 
 import CardanoNodeApi from '../api/CardanoNodeApi';
 import { decodeTx } from './cborCodec';
+import  base58 from 'bs58';
+import { Buffer } from 'safe-buffer';
+import cbor from 'cbor';
 
 /*
 const txJsonExample = {
@@ -30,6 +33,11 @@ export const validate = function (encodedTx, rawTx) {
   encodedTx = 'g5+CANgYWCSCWCB4g7YtdrLfYo2Y0+0UczCsnNCtknH0ju4ECGQFIm9hVAH/n4KC2BhYIYNYHPj8vY0S5G6sIuIcZ9L4ZUberlHazG4Y0DG4PRegABr0/HxwGgXzUWyCgtgYWCGDWBz4/L2NEuRurCLiHGfS+GVG3q5R2sxuGNAxuD0XoAAa9Px8cAr/oA==';
   const tx = decodeTx(encodedTx);
   // TODO: Validate tx vs rawTx
+  // const val = tx[0][1][0][0][0].value;
+  const someAddress = cbor.encode(tx[0][1][0][0]);
+  console.log("someAddress:", someAddress);
+  const someAddressBase58 = base58.encode(someAddress);
+  console.log("someAddress base58", someAddressBase58);
   return true;
 };
 
