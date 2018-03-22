@@ -20,7 +20,7 @@ class Wallet extends Component {
     super(props);
     this.state = {
       swapIndex: this.HISTORY_TAB_INDEX,
-      address: toPublicHex(this.props.wallet), // TODO: Change to a correct format
+      address: toPublicHex(this.props.wallet.address), // TODO: Change to a correct format
       balance: -1,
       txsHistory: [],
       loading: true
@@ -75,8 +75,7 @@ class Wallet extends Component {
 
   updateWalletInfo = () => {
     console.log('[Wallet.updateWalletInfo.run] Running');
-    // ExplorerApi.wallet.getInfo(this.props.wallet)
-    return ExplorerApi.wallet.getInfo('DdzFFzCqrhsq3S51xpvLmBZrtBCHNbRQX8q3eiaR6HPLJpSakXQXrczPRiqCvLMMdNhdKBmoU7ovjyMcVDngBsuLHA66qPnYUvvJVveL')
+    return ExplorerApi.wallet.getInfo(this.props.wallet.address)
     .then((walletInfo) => {
       this.setState({
         address: this.getAddress(walletInfo),

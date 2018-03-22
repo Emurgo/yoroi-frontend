@@ -1,6 +1,5 @@
 import {
-  serializeUint8Array,
-  deserializeUint8Array
+  serializeWallet, deserializeWallet
 } from '../utils/serializer';
 
 const WalletStorage = {};
@@ -11,8 +10,7 @@ WalletStorage.initWallet = function () {
   if (!this.sk) {
     if (window.localStorage) {
       try {
-        const walletJson = localStorage.getItem(WALLET_STORAGE_SK_KEY);
-        this.sk = deserializeUint8Array(walletJson);
+        this.sk = deserializeWallet(localStorage.getItem(WALLET_STORAGE_SK_KEY));
       } catch (e) {
         console.warn('[WalletStorage - initWallet] Unable to return Wallet info');
       }
@@ -34,7 +32,7 @@ WalletStorage.setWallet = function (wallet) {
   this.sk = wallet;
   if (window.localStorage) {
     console.log('[WalletStorage - SetWallet] saving wallet..');
-    const walletJson = serializeUint8Array(this.sk);
+    const walletJson = serializeWallet(wallet);
     localStorage.setItem(WALLET_STORAGE_SK_KEY, walletJson);
   } else {
     console.warn('[WalletStorage - SetWallet] The browser doesn\'t support local storage');
