@@ -15,14 +15,12 @@ CardanoNodeApi.transactions.buildTx = function ({ to, from, amount }) {
   to = 'DdzFFzCqrht4wFnWC5TJA5UUVE54JC9xZWq589iKyCrWa6hek3KKevyaXzQt6FsdunbkZGzBFQhwZi1MDpijwRoC7kj1MkEPh2Uu5Ssz';
   amount = 5;
   return fetch(`${CardanoNodeApi.config.serverRoute}/txs/unsigned/${from}/${to}/${amount}`, {
-    method: 'GET',
+    method: 'POST',
     headers: new Headers({
       Accept: 'application/json',
       'Content-Type': 'application/json'
     }),
     body: JSON.stringify({ groupingPolicy: 'OptimizeForHighThroughput' }),
-    // data: '{"groupingPolicy":"OptimizeForHighThroughput"}',
-    // mode: 'cors'
   })
   .then(parseResponse)
   .then(handleErrors);
