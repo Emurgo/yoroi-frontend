@@ -1,6 +1,7 @@
 
 import CardanoNodeApi from '../api/CardanoNodeApi';
 import { decodeTx } from './cborCodec';
+import { signTransaction, derivePublic } from './crypto/cryptoUtils';
 import  base58 from 'bs58';
 import { Buffer } from 'safe-buffer';
 import cbor from 'cbor';
@@ -41,21 +42,56 @@ export const validate = function (encodedTx, rawTx) {
   return true;
 };
 
-const sendTx = function (rawTx) {
-  return CardanoNodeApi.transactions.buildTx(rawTx)
-  .then(({ encodedTx }) => {
-    console.log('encodedTx', encodedTx);
-    if (validate(encodedTx, rawTx)) {
-      return Promise.resolve(encodedTx);
+const parsedTx = function (encodedTx) {
+  return {
+    "_txInputs": [
+      "TxInUtxo_7883b62d76b2df628d98d3ed147330ac9cd0ad9271f48eee04086405226f6154_1"
+    ],
+    "_txOutputs": [
+      {
+        "coin": 99832172,
+        "address": "Ae2tdPwUPEZMeiDfNHZ45V7RoaSqd4oSMuG4jo7asvmNHS193EEad1tUkeT"
+      },
+      {
+        "coin": 10,
+        "address": "Ae2tdPwUPEZMeiDfNHZ45V7RoaSqd4oSMuG4jo7asvmNHS193EEad1tUkeT"
+      }
+    ],
+    "_txAttributes": {
+      "attrData": [],
+      "attrRemain": {}
     }
+  }
+}
+
+const sendTx = async function (rawTx, xprv) {
+  debugger;
+  const encodedTx = await CardanoNodeApi.transactions.buildTx(rawTx);
+  const decoded = parsedTx(encodedTx);
+  if (!decoded) {
     throw new Error('Invalid Tx');
-  })
-  .then(({ encodeValidTx }) => {
-    console.log('encodeValidTx', encodeValidTx);
-    // TODO: sign encodeValidTx and send it!
-    //return CardanoNodeApi.transactions.sendTx();
-    return Promise.resolve();
+  }
+  // We currently sign with a single private key for this PoC
+  const witnesses = decoded._txInputs.map(() => {
+    const pub = derivePublic(xprv);
+    const key = Buffer.from(pub).toString('base64');
+    const sig = Buffer.from(signTransaction(encodedTx, xprv)).toString('hex');
+
+    return {
+      tag: 'PkWitness',
+      key,
+      sig,
+    };
   });
+
+  const toSend = {
+    encodedTx,
+    witnesses
+  };
+  // TODO: Send it!
+  //const result = await CardanoNodeApi.transactions.sendTx(signed);
+  //return result;
+  return true;
 };
 
 export default sendTx;

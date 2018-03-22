@@ -42,11 +42,13 @@ class Wallet extends Component {
   }
 
   onSendTransaction = (inputs) => {
-    return sendTx({
+    sendTx({
       to: inputs.to,
       from: this.state.address,
       amount: inputs.amount
-    });
+    }, this.props.wallet.xprv)
+    .then(r => console.log('Transaction sent', r))
+    .catch(err => console.log(err));
   };
 
   onSwipChange = (index) => {

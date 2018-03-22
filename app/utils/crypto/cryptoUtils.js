@@ -1,4 +1,4 @@
-import { HdWallet, Payload } from 'rust-cardano-crypto';
+import { HdWallet, Payload, Blake2b } from 'rust-cardano-crypto';
 import { Buffer } from 'safe-buffer';
 import bs58 from 'bs58';
 import { mnemonicToSeedImpl } from './BIP39';
@@ -23,6 +23,13 @@ export const generateWallet = function (secretWords) {
     xprv: d2,
     address: bs58.encode(address)
   };
+};
+
+export const derivePublic = HdWallet.toPublic;
+
+export const signTransaction = function (encodedTransaction, xprv) {
+  const hashed = Blake2b.blake2b_256(encodedTransaction);
+  return HdWallet.sign(hashed, xprv);
 };
 
 export const toPublicHex = function (address) {
