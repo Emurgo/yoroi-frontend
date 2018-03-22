@@ -9,10 +9,10 @@ import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
 // import Loading from '../components/ui/loading/Loading'; // TODO: Fix styling!
 import ExplorerApi from '../api/ExplorerApi';
-import CardanoNodeApi from '../api/CardanoNodeApi';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
 import { formatCID } from '../utils/formatter';
 import { openAddress } from '../utils/explorerLinks';
+import sendTx from '../utils/txSender';
 
 class Wallet extends Component {
 
@@ -42,17 +42,10 @@ class Wallet extends Component {
   }
 
   onSendTransaction = (inputs) => {
-    // Here we will need to call create transaction endpoint
-    const payload = {
+    return sendTx({
       to: inputs.to,
       from: this.state.address,
       amount: inputs.amount
-    };
-    return CardanoNodeApi.transactions.buildTx(payload)
-    .then((result) => {
-      console.log('[Wallet.onSendTransaction] Ok!', result);
-      this.swapToHistoryTab();
-      return Promise.resolve();
     });
   };
 
@@ -79,12 +72,6 @@ class Wallet extends Component {
 
   HISTORY_TAB_INDEX = 0;
   SEND_TAB_INDEX = 1;
-
-  swapToHistoryTab = () => {
-    this.setState({
-      swapIndex: this.HISTORY_TAB_INDEX
-    });
-  }
 
   updateWalletInfo = () => {
     console.log('[Wallet.updateWalletInfo.run] Running');

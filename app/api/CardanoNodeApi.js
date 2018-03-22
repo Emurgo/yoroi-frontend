@@ -26,4 +26,8 @@ CardanoNodeApi.transactions.buildTx = function ({ to, from, amount }) {
   .then(handleErrors);
 };
 
+CardanoNodeApi.transactions.sendTx = function () {
+  // TODO: Implement it!
+};
+
 export default CardanoNodeApi;
