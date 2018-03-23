@@ -15,6 +15,6 @@
   "background": {
     "page": "background.html"
   },
-  "permissions": [ "contextMenus", "management", "tabs", "storage", "https://explorer.iohkdev.io/*"],
-  "content_security_policy": "default-src 'self'; script-src 'self' http://localhost:3000 https://localhost:3000 'unsafe-eval'; connect-src http://localhost:3000 https://localhost:3000 https://explorer.iohkdev.io; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "permissions": [ "contextMenus", "management", "tabs", "storage", "https://explorer.iohkdev.io/* http://localhost:8080 https://localhost:8080 'unsafe-eval'; connect-src http://localhost:3000 https://localhost:3000 http://localhost:8080/* https://localhost:8080/*"],
+  "content_security_policy": "default-src 'self'; script-src 'self' http://localhost:3000 https://localhost:3000 http://localhost:8080 https://localhost:8080 'unsafe-eval'; connect-src http://localhost:3000 https://localhost:3000 http://localhost:8080 https://localhost:8080 https://explorer.iohkdev.io; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
 }

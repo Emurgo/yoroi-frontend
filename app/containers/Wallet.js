@@ -2,30 +2,38 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
-import SwipeableViews from 'react-swipeable-views';
-import { FormGroup } from 'material-ui/Form';
+import Card, { CardContent } from 'material-ui/Card';
+import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
+// import Loading from '../components/ui/loading/Loading'; // TODO: Fix styling!
 import ExplorerApi from '../api/ExplorerApi';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
 import { formatCID } from '../utils/formatter';
 import { openAddress } from '../utils/explorerLinks';
+import sendTx from '../cardanoWallet/txSender';
 
 class Wallet extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
-      swapIndex: 0,
-      address: toPublicHex(this.props.wallet), // TODO: Change to a correct format
+      swapIndex: this.HISTORY_TAB_INDEX,
+      address: toPublicHex(this.props.wallet.address), // TODO: Change to a correct format
       balance: -1,
-      txsHistory: []
+      txsHistory: [],
+      loading: true
     };
   }
 
   componentWillMount() {
-    this.setState({
-      intervalId: this.updateWalletInfo()
+    this.updateWalletInfo()
+    .then(() => {
+      this.setState({
+        intervalId: setInterval(this.updateWalletInfo, 15 * 1000),
+        loading: false
+      });
     });
   }
 
@@ -34,8 +42,11 @@ class Wallet extends Component {
   }
 
   onSendTransaction = (inputs) => {
-    // Here we will need to call create transaction endpoint
-    alert(`OnSendTransaction ${JSON.stringify(inputs)}`);
+    return sendTx({
+      to: inputs.to,
+      from: this.state.address,
+      amount: inputs.amount
+    }, this.props.wallet.xprv);
   };
 
   onSwipChange = (index) => {
@@ -59,48 +70,57 @@ class Wallet extends Component {
     return caTxList;
   }
 
+  HISTORY_TAB_INDEX = 0;
+  SEND_TAB_INDEX = 1;
+
   updateWalletInfo = () => {
-    function run() {
-      console.log('[Wallet.updateWalletInfo.run] Running');
-      // TODO: Swap lines
-      // ExplorerApi.wallet.getInfo(this.props.wallet)
-      ExplorerApi.wallet.getInfo('DdzFFzCqrhsq3S51xpvLmBZrtBCHNbRQX8q3eiaR6HPLJpSakXQXrczPRiqCvLMMdNhdKBmoU7ovjyMcVDngBsuLHA66qPnYUvvJVveL')
-      .then((walletInfo) => {
-        this.setState({
-          address: this.getAddress(walletInfo),
-          balance: this.getBalance(walletInfo),
-          txsHistory: this.getTxsHistory(walletInfo)
-        });
+    console.log('[Wallet.updateWalletInfo.run] Running');
+    return ExplorerApi.wallet.getInfo(this.props.wallet.address)
+    .then((walletInfo) => {
+      this.setState({
+        address: this.getAddress(walletInfo),
+        balance: this.getBalance(walletInfo),
+        txsHistory: this.getTxsHistory(walletInfo)
       });
-    }
-    return setInterval(run.bind(this), 15 * 1000);
+      return Promise.resolve();
+    });
   }
 
   render() {
     return (
       <div>
-        <FormGroup>
-          <Button onClick={() => openAddress(this.state.address)} >
-            Address: {formatCID(this.state.address)}
-          </Button>
-          <Button disabled> Balance: {this.state.balance} </Button>
-        </FormGroup>
+        <Card>
+          <CardContent>
+            <Typography variant="headline">
+              <Button onClick={() => openAddress(this.state.address)} >
+                Address: {!this.state.loading ? formatCID(this.state.address) : '...'}
+              </Button>
+            </Typography>
+            <Typography variant="subheading" color="textSecondary">
+              <Button disabled>
+                Balance: {!this.state.loading ? this.state.balance : '...'}
+              </Button>
+            </Typography>
+          </CardContent>
+        </Card>
         <AppBar position="static" color="default">
           <Tabs value={this.state.swapIndex} onChange={this.onTabChange} fullWidth>
             <Tab label="History" />
             <Tab label="Send" />
           </Tabs>
         </AppBar>
-        <SwipeableViews
-          axis="x-reverse"
-          index={this.state.swapIndex}
-          onChangeIndex={this.onSwipChange}
-        >
-          <WalletHistory
-            txs={this.state.txsHistory}
-          />
-          <SendAdaForm onSubmit={inputs => this.onSendTransaction(inputs)} />
-        </SwipeableViews>
+        { this.state.swapIndex === this.HISTORY_TAB_INDEX &&
+          (!this.state.loading ?
+            <WalletHistory
+              txs={this.state.txsHistory}
+            />
+          :
+            ''
+          )
+        }
+        { this.state.swapIndex === this.SEND_TAB_INDEX &&
+          <SendAdaForm submitPromise={inputs => this.onSendTransaction(inputs)} />
+        }
       </div>
     );
   }

@@ -6,5 +6,5 @@ export const formatCID = function (id) {
 };
 
 export const formatTimestamp = function (timestamp) {
-  return moment.unix(timestamp).format('MMMM Do YYYY, h:mm:ss a');
+  return moment.unix(timestamp).format('YYYY-MM-DD, h:mm:ss a');
 };

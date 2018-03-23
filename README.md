@@ -19,7 +19,7 @@
 # clone the repository with the submodule rust-cardano-crypto
 $ git clone --recursive git@github.com:input-output-hk/icarus-poc.git
 # or
-$ git submodule update --init --recursive git@github.com:input-output-hk/icarus-poc.git
+$ git submodule update --init --recursive git@github.com:atixlabs/rust-cardano-crypto.git
 
 # Install dependencies
 $ npm run setup
