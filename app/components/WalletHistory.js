@@ -1,43 +1,49 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Grid from 'material-ui/Grid';
 import List, {
   ListItem,
   ListItemText
 } from 'material-ui/List';
 import Card, { CardContent } from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
-import Button from 'material-ui/Button';
+import Avatar from 'material-ui/Avatar';
+// import Button from 'material-ui/Button';
+// import { openTx } from '../utils/explorerLinks';
 import {
-  formatCID,
+  formatTransactionID,
   formatTimestamp
 } from '../utils/formatter';
-import { openTx } from '../utils/explorerLinks';
+import style from './WalletHistory.css';
 
 const WalletHistory = (props) => {
   const getAmount = ({ ctbOutputSum: { getCoin } }) => {
-    return Number(getCoin);
+    return Number(getCoin) / 1000000;
   };
-
+  // TODO: Choose between send or receive
+  const getSendReceivIconPath = (tx) => {
+    console.log("tc", tx);
+    if (Math.random() > 0.5) {
+      return 'img/send-ic.svg';
+    }
+    return 'img/receive-ic.svg';
+  };
   const getTransactionItem = (tx) => {
     return (
-      <Grid item>
-        <Button onClick={() => openTx(tx.ctbId)}>
-          <Card>
-            <CardContent>
-              <Typography align="left">
-                Tx Hash: { formatCID(tx.ctbId) }
-              </Typography>
-              <Typography align="left" variant="body2" color="textSecondary" >
-                Timestamp: { formatTimestamp(tx.ctbTimeIssued) }
-              </Typography>
-              <Typography align="left" variant="body1" color="textSecondary">
-                Amount: { getAmount(tx) }
-              </Typography>
-            </CardContent>
-          </Card>
-        </Button>
-      </Grid>
+      <Card>
+        <CardContent className={style.cardContent}>
+          <Avatar src={getSendReceivIconPath(tx)} />
+          <div className={style.itemBody}>
+            <Typography variant="title">Ada received</Typography>
+            <Typography variant="body2" color="textSecondary">{formatTimestamp(tx.ctbTimeIssued)}</Typography>
+            <Typography variant="subheading">Transaction ID</Typography>
+            <Typography variant="body2" color="textSecondary">{formatTransactionID(tx.ctbId)}</Typography>
+          </div>
+          <div className={style.amount}>
+            <Typography variant="subheading"> {getAmount(tx)} </Typography>
+            <Avatar className={style.symbol} src="img/ada-symbol-smallest-dark.inline.svg" />
+          </div>
+        </CardContent>
+      </Card>
     );
   };
 
@@ -58,14 +64,12 @@ const WalletHistory = (props) => {
   );
 
   return (
-    <Grid container justify="center">
-      <List>
-        {
-          (props.txs && props.txs.length !== 0) ?
-          getTransactionHistoryComponent() : getNoTransactionHistoryComponent()
-        }
-      </List>
-    </Grid>
+    <List className={style.listContainer}>
+      {
+        (props.txs && props.txs.length !== 0) ?
+        getTransactionHistoryComponent() : getNoTransactionHistoryComponent()
+      }
+    </List>
   );
 };
 

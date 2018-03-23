@@ -1,0 +1,25 @@
+.listContainer {
+  margin: 0px !important;
+  padding: 0px !important;
+}
+.itemBody {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 10;
+  margin-left: 5%;
+}
+.amount {
+  display: flex;
+  flex-direction: row;
+  align-self: flex-start;
+  align-items: center;
+}
+.symbol {
+  margin-left: 5%;
+}
+.cardContent {
+  display: flex;
+  flex-direction: row;
+  padding: 1%;
+  margin: 1%;
+}

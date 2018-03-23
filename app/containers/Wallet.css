@@ -1,0 +1,18 @@
+.headerContent {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: #3f51b5;
+  color: white;
+  padding: 15%;
+}
+.symbol {
+  margin-left: 5%;
+}
+.header {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  color: white;
+}

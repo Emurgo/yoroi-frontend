@@ -2,17 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
-import Card, { CardContent } from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
-import Button from 'material-ui/Button';
+// import Button from 'material-ui/Button';
+import Avatar from 'material-ui/Avatar';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
 // import Loading from '../components/ui/loading/Loading'; // TODO: Fix styling!
 import ExplorerApi from '../api/ExplorerApi';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
 import { formatCID } from '../utils/formatter';
-import { openAddress } from '../utils/explorerLinks';
+// import { openAddress } from '../utils/explorerLinks';
 import sendTx from '../cardanoWallet/txSender';
+import style from './Wallet.css';
 
 class Wallet extends Component {
 
@@ -20,7 +21,6 @@ class Wallet extends Component {
     super(props);
     this.state = {
       swapIndex: this.HISTORY_TAB_INDEX,
-      address: toPublicHex(this.props.wallet.address), // TODO: Change to a correct format
       balance: -1,
       txsHistory: [],
       loading: true
@@ -75,7 +75,8 @@ class Wallet extends Component {
 
   updateWalletInfo = () => {
     console.log('[Wallet.updateWalletInfo.run] Running');
-    return ExplorerApi.wallet.getInfo(this.props.wallet.address)
+    return ExplorerApi.wallet.getInfo('DdzFFzCqrhtBUjWqcccfjojeiX8M8usSCi6U9N8eeh74qB5nTVZmE3U6iDQnnoxB8Xg6jrCFS1wtByQi7Mn4bhCQrg7GESfM2EcGyUmG')
+    // return ExplorerApi.wallet.getInfo(this.props.wallet.address)
     .then((walletInfo) => {
       this.setState({
         address: this.getAddress(walletInfo),
@@ -89,20 +90,17 @@ class Wallet extends Component {
   render() {
     return (
       <div>
-        <Card>
-          <CardContent>
-            <Typography variant="headline">
-              <Button onClick={() => openAddress(this.state.address)} >
-                Address: {!this.state.loading ? formatCID(this.state.address) : '...'}
-              </Button>
+        <div className={style.headerContent}>
+          <div className={style.header}>
+            <Typography variant="display2" color="inherit">
+              {!this.state.loading ? this.state.balance : '...'}
             </Typography>
-            <Typography variant="subheading" color="textSecondary">
-              <Button disabled>
-                Balance: {!this.state.loading ? this.state.balance : '...'}
-              </Button>
-            </Typography>
-          </CardContent>
-        </Card>
+            {!this.state.loading && <Avatar className={style.symbol} src="img/ada-symbol-smallest-white.inline.svg" /> }
+          </div>
+          <Typography variant="body1" color="inherit">
+            {!this.state.loading ? formatCID(this.state.address) : '...'}
+          </Typography>
+        </div>
         <AppBar position="static" color="default">
           <Tabs value={this.state.swapIndex} onChange={this.onTabChange} fullWidth>
             <Tab label="History" />
