@@ -37,9 +37,9 @@ class SendAdaForm extends Component {
     this.setState({ [field]: event.target.value });
   };
 
-  handleSubmit = submitCb => () => {
+  handleSubmit = submitPromise => () => {
     if (this.state && this.state.to && this.state.amount) {
-      submitCb(this.state)
+      submitPromise(this.state)
       .then(() => {
         this.clearFields();
         this.showNotification('Transaction Sent ok!');
@@ -78,7 +78,7 @@ class SendAdaForm extends Component {
           />
         </Grid>
         <Grid item>
-          <Button variant="raised" color="primary" onClick={this.handleSubmit(this.props.onSubmit)}>
+          <Button variant="raised" color="primary" onClick={this.handleSubmit(this.props.submitPromise)}>
             Send
           </Button>
         </Grid>
@@ -96,7 +96,7 @@ class SendAdaForm extends Component {
 }
 
 SendAdaForm.propTypes = {
-  onSubmit: PropTypes.func
+  submitPromise: PropTypes.func
 };
 
 export default SendAdaForm;

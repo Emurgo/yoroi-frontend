@@ -12,7 +12,7 @@ import ExplorerApi from '../api/ExplorerApi';
 import { toPublicHex } from '../utils/crypto/cryptoUtils';
 import { formatCID } from '../utils/formatter';
 import { openAddress } from '../utils/explorerLinks';
-import sendTx from '../utils/txSender';
+import sendTx from '../cardanoWallet/txSender';
 
 class Wallet extends Component {
 
@@ -42,13 +42,11 @@ class Wallet extends Component {
   }
 
   onSendTransaction = (inputs) => {
-    sendTx({
+    return sendTx({
       to: inputs.to,
       from: this.state.address,
       amount: inputs.amount
-    }, this.props.wallet.xprv)
-    .then(r => console.log('Transaction sent', r))
-    .catch(err => console.log(err));
+    }, this.props.wallet.xprv);
   };
 
   onSwipChange = (index) => {
@@ -121,7 +119,7 @@ class Wallet extends Component {
           )
         }
         { this.state.swapIndex === this.SEND_TAB_INDEX &&
-          <SendAdaForm onSubmit={inputs => this.onSendTransaction(inputs)} />
+          <SendAdaForm submitPromise={inputs => this.onSendTransaction(inputs)} />
         }
       </div>
     );
