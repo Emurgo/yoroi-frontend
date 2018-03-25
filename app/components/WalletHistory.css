@@ -1,6 +1,6 @@
 .listContainer {
-  margin: 0px !important;
-  padding: 0px !important;
+  /*margin: 0px !important;*/
+  /*padding: 0px !important;*/
 }
 .itemBody {
   display: flex;
@@ -10,9 +10,9 @@
 }
 .amount {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-self: flex-start;
-  align-items: center;
+  align-items: flex-end;
 }
 .symbol {
   margin-left: 5%;
