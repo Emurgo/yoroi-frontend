@@ -9,7 +9,7 @@ import Typography from 'material-ui/Typography';
 import Avatar from 'material-ui/Avatar';
 import NumberFormat from 'react-number-format';
 // import Button from 'material-ui/Button';
-// import { openTx } from '../utils/explorerLinks';
+import { openTx } from '../utils/explorerLinks';
 import {
   formatTransactionID,
   formatTimestamp
@@ -30,7 +30,7 @@ const WalletHistory = (props) => {
     return (
       <Card>
         <CardContent className={style.cardContent}>
-          <Avatar src={getSendReceivIconPath(tx)} />
+          <Avatar src={getSendReceivIconPath(tx)} onClick={() => openTx(tx.ctbId)} />
           <div className={style.itemBody}>
             <Typography variant="title">Ada {getSendReceiveText(tx)}</Typography>
             <Typography variant="body2" color="textSecondary">{formatTimestamp(tx.ctbTimeIssued)}</Typography>
