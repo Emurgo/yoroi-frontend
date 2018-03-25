@@ -58,15 +58,15 @@ class Wallet extends Component {
     event.preventDefault();
   };
 
-  getAddress = ({ Right: { caAddress } }) => {
+  getAddress = ({ caAddress }) => {
     return caAddress;
   };
 
-  getBalance = ({ Right: { caBalance: { getCoin } } }) => {
+  getBalance = ({ caBalance: { getCoin } }) => {
     return Number(getCoin);
   }
 
-  getTxsHistory = ({ Right: { caTxList } }) => {
+  getTxsHistory = ({ caTxList }) => {
     return caTxList;
   }
 

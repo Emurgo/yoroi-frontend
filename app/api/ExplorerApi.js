@@ -16,7 +16,7 @@ ExplorerApi.wallet.getInfo = function (walletId) {
       'Content-Type': 'application/json;charset=utf-8',
     },
   })
-  .then(parseResponse)
+  .then(parseResponse(walletId))
   .then(handleErrors);
 };
 
