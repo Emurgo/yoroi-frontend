@@ -80,6 +80,7 @@
     "react": "16.2.0",
     "react-dock": "0.2.3",
     "react-dom": "16.2.0",
+    "react-number-format": "^3.3.0",
     "safe-buffer": "5.1.1"
   }
 }

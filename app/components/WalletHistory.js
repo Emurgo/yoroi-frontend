@@ -7,6 +7,7 @@ import List, {
 import Card, { CardContent } from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
 import Avatar from 'material-ui/Avatar';
+import NumberFormat from 'react-number-format';
 // import Button from 'material-ui/Button';
 // import { openTx } from '../utils/explorerLinks';
 import {
@@ -39,8 +40,9 @@ const WalletHistory = (props) => {
             <Typography variant="body2" color="textSecondary">{formatTransactionID(tx.ctbId)}</Typography>
           </div>
           <div className={style.amount}>
-            <Typography variant="subheading"> {getAmount(tx)} </Typography>
-            <Avatar className={style.symbol} src="img/ada-symbol-smallest-dark.inline.svg" />
+            <Typography variant="subheading">
+              <NumberFormat thousandSeparator value={getAmount(tx)} displayType="text" suffix=" ADA" />
+            </Typography>
           </div>
         </CardContent>
       </Card>

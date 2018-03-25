@@ -10,5 +10,5 @@ export const formatTransactionID = function (id) {
 };
 
 export const formatTimestamp = function (timestamp) {
-  return moment.unix(timestamp).format('YYYY-MM-DD, h:mm:ss a');
+  return moment.unix(timestamp).fromNow();
 };
