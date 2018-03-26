@@ -3,15 +3,15 @@ import PropTypes from 'prop-types';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
 import Typography from 'material-ui/Typography';
-// import Button from 'material-ui/Button';
+import OpenInNew from 'material-ui-icons/OpenInNew';
+import IconButton from 'material-ui/IconButton';
 import Avatar from 'material-ui/Avatar';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
 // import Loading from '../components/ui/loading/Loading'; // TODO: Fix styling!
 import ExplorerApi from '../api/ExplorerApi';
-import { toPublicHex } from '../utils/crypto/cryptoUtils';
 import { formatCID } from '../utils/formatter';
-// import { openAddress } from '../utils/explorerLinks';
+import { openAddress } from '../utils/explorerLinks';
 import sendTx from '../cardanoWallet/txSender';
 import style from './Wallet.css';
 
@@ -97,9 +97,14 @@ class Wallet extends Component {
             </Typography>
             {!this.state.loading && <Avatar className={style.symbol} src="img/ada-symbol-smallest-white.inline.svg" /> }
           </div>
-          <Typography variant="body1" color="inherit">
-            {!this.state.loading ? formatCID(this.state.address) : '...'}
-          </Typography>
+          {!this.state.loading &&
+            <div className={style.link}>
+              <Typography variant="body1" color="inherit">
+                {!this.state.loading ? formatCID(this.state.address) : '...'}
+              </Typography>
+              <IconButton onClick={() => openAddress(this.state.address)}><OpenInNew style={{ fontSize: 20, color: 'white' }} /></IconButton>
+            </div>
+          }
         </div>
         <AppBar position="static" color="default">
           <Tabs value={this.state.swapIndex} onChange={this.onTabChange} fullWidth>

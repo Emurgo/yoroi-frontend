@@ -16,3 +16,8 @@
   align-items: center;
   color: white;
 }
+.link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
