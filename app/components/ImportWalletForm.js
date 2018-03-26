@@ -4,6 +4,7 @@ import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
 import { validateMnemonic } from '../utils/crypto/BIP39';
+import Bip39Autocomplete from '../components/ui/autocomplete/autocomplete';
 
 class ImportWalletForm extends Component {
   constructor(props) {
@@ -13,32 +14,25 @@ class ImportWalletForm extends Component {
     };
   }
 
-  handleChange = (event) => {
-    this.setState({ secretWords: event.target.value });
+  handleChange = (secretWords) => {
+    this.setState({ secretWords });
   };
 
   handleSubmit = (event) => {
     event.preventDefault();
-    console.log("importWallet", this.state.secretWords)
-    if (validateMnemonic(this.state.secretWords)) {
-      this.props.onSubmit(this.state.secretWords);
+    const words = this.state.secretWords.split(',').join(' ');
+    if (validateMnemonic(words)) {
+      this.props.onSubmit(words);
     } else {
-      // TODO: Improve validate 12 words error
-      alert('Invalid words');
+      this.setState({ error: 'Invalid words' });
     }
   };
 
   render() {
     return (
-      <Grid container direction="column" justify="justify" alignItems="center">
-        <Grid item>
-          <TextField
-            helperText="ex: legal winner thank year wave sausage worth useful legal winner thank yellow"
-            label="Please insert your 12 words"
-            rows={2}
-            margin="normal"
-            onChange={this.handleChange}
-          />
+      <Grid container>
+        <Grid item xs={12}>
+          <Bip39Autocomplete error={this.state.error} words={this.state.secretWords} onChange={this.handleChange} />
         </Grid>
         <Grid item>
           <Button variant="raised" color="primary" onClick={this.handleSubmit}> Import </Button>
