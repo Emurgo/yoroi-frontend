@@ -39,7 +39,7 @@ const sendTx = async function (rawTx, xprv) {
   const txWitness = decodedTx.txInputs.map(() => {
     const pub = derivePublic(xprv);
     const key = Buffer.from(pub).toString('base64');
-    const sig = Buffer.from(signTransaction(toSign, xprv)).toString('hex');
+    const sig = Buffer.from(signTransaction(xprv, toSign)).toString('hex');
 
     return {
       tag: 'PkWitness',
@@ -52,9 +52,7 @@ const sendTx = async function (rawTx, xprv) {
     encodedTx,
     txWitness
   };
-  const result = await CardanoNodeApi.transactions.sendTx(toSend);
-  debugger;
-  return Promise.reject("Error");
+  return CardanoNodeApi.transactions.sendTx(toSend);
 };
 
 export default sendTx;
