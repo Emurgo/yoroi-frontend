@@ -1,0 +1,30 @@
+.formContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  background: white;
+}
+
+.stepper {
+  padding: 5% 0% 0% 0% !important /* Fixme */
+}
+
+.container {
+  padding:  0% !important; /* Fixme */
+}
+
+.formSubContainer {
+  margin: 0% 10%;
+}
+
+.sendButton {
+  display: flex;
+  justify-content: flex-end;
+  padding: 5%;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+}
