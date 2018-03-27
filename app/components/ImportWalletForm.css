@@ -6,15 +6,18 @@
   background-color: #3f51b5;
   color: white;
   padding: 15%;
+  height: 100px;
 }
 
 .logo {
-  margin: 0% 5% 0% 0%;
+  margin: 0% 0% 5% 0%;
 }
 
 .title {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .header {
@@ -31,7 +34,7 @@
   flex-direction: column;
   justify-content: center;
   background: white;
-  min-height: 59vh;
+  min-height: 53vh;
 }
 
 .formButton {

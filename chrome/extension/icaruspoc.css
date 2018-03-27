@@ -1,7 +1,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  width: 400px;
+  width: 350px;
   height: 550px;
 }
 
@@ -32,6 +32,9 @@ body {
   -ms-font-smoothing: antialiased;
   font-smoothing: antialiased;
   font-weight: 300;
+  overflow-y: auto;    /* Trigger vertical scroll    */
+  overflow-x: hidden; 
+  display: block;
 }
 
 button,

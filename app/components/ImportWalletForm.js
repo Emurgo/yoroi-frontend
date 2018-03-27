@@ -37,13 +37,12 @@ class ImportWalletForm extends Component {
     return (
       <div>
         <div className={style.headerContent}>
-          <div className={style.header}>
-            <Avatar className={style.logo} src="img/cardano-logo-white.inline.svg" />
             <div className={style.title}>
+            <Avatar className={style.logo} src="img/cardano-logo-white.inline.svg" />
+
               <Typography color="inherit" variant="headline"> Icarus Wallet </Typography>
               <Typography color="inherit" variant="subHeading"> Proof of concept</Typography>
             </div>
-          </div>
         </div>
         <AppBar position="static" color="default">
           <Toolbar>

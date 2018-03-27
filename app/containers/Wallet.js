@@ -77,7 +77,6 @@ class Wallet extends Component {
 
   updateWalletInfo = () => {
     console.log('[Wallet.updateWalletInfo.run] Running');
-    //return ExplorerApi.wallet.getInfo('DdzFFzCqrhtBUjWqcccfjojeiX8M8usSCi6U9N8eeh74qB5nTVZmE3U6iDQnnoxB8Xg6jrCFS1wtByQi7Mn4bhCQrg7GESfM2EcGyUmG')
     return ExplorerApi.wallet.getInfo(this.props.wallet.address)
     .then((walletInfo) => {
       this.setState({
@@ -127,9 +126,10 @@ class Wallet extends Component {
         </AppBar>
         { this.state.swapIndex === this.HISTORY_TAB_INDEX &&
           (!this.state.loading ?
-            <WalletHistory
+            <div className={style.body}> 
+              <WalletHistory
               txs={this.state.txsHistory}
-            />
+            /></div>
           :
             this.getLoadingComponent()
           )

@@ -5,11 +5,11 @@
   background-color: #3f51b5;
   color: white;
   padding: 15%;
-
+  height: 100px;
 }
 
 .symbol {
-  margin-left: 5%;
+  margin-left: 3%;
 }
 
 .header {
@@ -18,6 +18,10 @@
   flex-direction: row;
   align-items: center;
   color: white;
+}
+.body {
+  overflow-y: scroll;
+  height: 320px;
 }
 
 .link {

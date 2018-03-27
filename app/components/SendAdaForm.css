@@ -33,9 +33,13 @@
 }
 
 .formButton {
-    display: flex;
-    justify-content: flex-end;
-    padding: 5%;
+  display: flex;
+  justify-content: flex-end;
+  padding: 5%;
+}
+
+.formRightButton {
+  padding-left: 5%;
 }
 
 .loading {
@@ -48,6 +52,6 @@
 .title {
   display: flex;
   justify-content: center;
-  margin: 5%;
-  padding: 9% 0%;
+  margin: 6%;
+  padding: 10% 0%;
 }

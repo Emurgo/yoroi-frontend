@@ -130,8 +130,8 @@ class SendAdaForm extends Component {
             <Check />
           </Button>
         </div>
-        <div>
-          <Button color="link" onClick={this.goBackTo(this.CREATE_STEP)}>
+        <div className={style.formRightButton}>
+          <Button size="small" variant="raised" color="link" onClick={this.goBackTo(this.CREATE_STEP)}>
             Back
           </Button>
         </div>
