@@ -4,6 +4,7 @@
   flex-direction: column;
   justify-content: center;
   background: white;
+  min-height: 53vh;
 }
 
 .stepper {
@@ -11,14 +12,20 @@
 }
 
 .container {
+  min-height: 53vh !important;
   padding:  0% !important; /* Fixme */
 }
 
-.formSubContainer {
+.createSubContainer {
   margin: 0% 10%;
 }
 
-.sendButton {
+.confirmSubContainer {
+  margin: 0% 10%;
+  padding: 3% 0% 0% 0%;
+}
+
+.formButton {
   display: flex;
   justify-content: flex-end;
   padding: 5%;
@@ -27,4 +34,13 @@
 .loading {
   display: flex;
   justify-content: center;
+  padding: 14% 10%;
+  margin: 10%;
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin: 5%;
+  padding: 9% 0%;
 }

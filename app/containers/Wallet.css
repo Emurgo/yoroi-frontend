@@ -5,10 +5,13 @@
   background-color: #3f51b5;
   color: white;
   padding: 15%;
+
 }
+
 .symbol {
   margin-left: 5%;
 }
+
 .header {
   display: flex;
   justify-content: center;
@@ -16,8 +19,16 @@
   align-items: center;
   color: white;
 }
+
 .link {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 14% 10%;
+  margin: 10%;
 }

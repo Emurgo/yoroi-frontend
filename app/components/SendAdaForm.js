@@ -9,6 +9,8 @@ import Send from 'material-ui-icons/Send';
 import Check from 'material-ui-icons/Check';
 import Refresh from 'material-ui-icons/Refresh';
 import NumberFormat from 'react-number-format';
+import { CircularProgress } from 'material-ui/Progress';
+import { formatCID } from '../utils/formatter';
 import style from './SendAdaForm.css';
 
 class SendAdaForm extends Component {
@@ -74,7 +76,7 @@ class SendAdaForm extends Component {
 
   getCreatePage = () => {
     return ([
-      <div className={style.formSubContainer}>
+      <div className={style.createSubContainer}>
         <div>
           <TextField
             label="To"
@@ -94,29 +96,29 @@ class SendAdaForm extends Component {
           />
         </div>
       </div>,
-      <div className={style.sendButton}>
-        <Button variant="fab" color="primary" onClick={() => this.onCreateTransaction()}>
+      <div className={style.formButton}>
+        <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onCreateTransaction()}>
           <Send />
         </Button>
       </div>
     ]);
   }
 
-  getConfirmPage = (submitPromise) => {
+  getConfirmPage = (submitPromise, fromAddress) => {
     // FIXME: From param is wrong!
     return ([
-      <div className={style.formSubContainer}>
-        <Typography variant="subheading">To</Typography>
-        <Typography variant="body2" color="textSecondary">{this.state.to}</Typography>
-        <Typography variant="subheading">From</Typography>
-        <Typography variant="body2" color="textSecondary">{this.state.to}</Typography>
-        <Typography variant="subheading">Amount</Typography>
+      <div className={style.confirmSubContainer}>
+        <Typography variant="body1">To</Typography>
+        <Typography variant="body2" color="textSecondary">{formatCID(this.state.to)}</Typography>
+        <Typography variant="body1">From</Typography>
+        <Typography variant="body2" color="textSecondary">{formatCID(fromAddress)}</Typography>
+        <Typography variant="body1">Amount</Typography>
         <Typography variant="body2" color="textSecondary">
           <NumberFormat thousandSeparator value={this.state.amount} displayType="text" suffix=" ADA" />
         </Typography>
       </div>,
-      <div className={style.sendButton} >
-        <Button className={style.sendButton} variant="fab" color="primary" onClick={() => this.onConfirm(submitPromise)()}>
+      <div className={style.formButton} >
+        <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onConfirm(submitPromise)()}>
           <Check />
         </Button>
       </div>
@@ -126,18 +128,18 @@ class SendAdaForm extends Component {
   getLoadingComponent = () => {
     return (
       <div className={style.loading}>
-        <Typography variant="display3">...</Typography>
+        <CircularProgress />
       </div>
     );
   }
 
   getTransactionErrorPage = () => {
     return ([
-      <div className={style.loading}>
-        <Typography variant="subheading">An Error occurred</Typography>
+      <div className={style.title}>
+        <Typography variant="headline">An Error occurred.</Typography>
       </div>,
-      <div className={style.sendButton} >
-        <Button className={style.sendButton} variant="fab" color="primary" onClick={() => this.onFinish()}>
+      <div className={style.formButton} >
+        <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onFinish()}>
           <Refresh />
         </Button>
       </div>
@@ -146,11 +148,11 @@ class SendAdaForm extends Component {
 
   getTransactionOkPage = () => {
     return ([
-      <div className={style.loading}>
-        <Typography variant="subheading">Transaction successfully sent!</Typography>
+      <div className={style.title}>
+        <Typography variant="headline">Transaction successfully sent!</Typography>
       </div>,
-      <div className={style.sendButton} >
-        <Button className={style.sendButton} variant="fab" color="primary" onClick={() => this.onFinish()}>
+      <div className={style.formButton} >
+        <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onFinish()}>
           <Check />
         </Button>
       </div>
@@ -177,7 +179,7 @@ class SendAdaForm extends Component {
               this.getCreatePage()}
 
             { this.state.activeStep === this.CONFIRM_STEP &&
-              this.getConfirmPage(this.props.submitPromise)}
+              this.getConfirmPage(this.props.submitPromise, this.props.fromAddress)}
 
             { this.state.activeStep === this.FINISH_STEP &&
               this.state.loading && this.getLoadingComponent() }
@@ -195,7 +197,8 @@ class SendAdaForm extends Component {
 }
 
 SendAdaForm.propTypes = {
-  submitPromise: PropTypes.func
+  submitPromise: PropTypes.func,
+  fromAddress: PropTypes.string
 };
 
 export default SendAdaForm;

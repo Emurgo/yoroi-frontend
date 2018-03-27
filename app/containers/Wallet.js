@@ -8,7 +8,7 @@ import IconButton from 'material-ui/IconButton';
 import Avatar from 'material-ui/Avatar';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
-// import Loading from '../components/ui/loading/Loading'; // TODO: Fix styling!
+import { CircularProgress } from 'material-ui/Progress';
 import ExplorerApi from '../api/ExplorerApi';
 import { formatCID } from '../utils/formatter';
 import { openAddress } from '../utils/explorerLinks';
@@ -87,6 +87,14 @@ class Wallet extends Component {
     });
   }
 
+  getLoadingComponent = () => {
+    return (
+      <div className={style.loading}>
+        <CircularProgress />
+      </div>
+    );
+  }
+
   render() {
     return (
       <div>
@@ -118,11 +126,14 @@ class Wallet extends Component {
               txs={this.state.txsHistory}
             />
           :
-            ''
+            this.getLoadingComponent()
           )
         }
         { this.state.swapIndex === this.SEND_TAB_INDEX &&
-          <SendAdaForm submitPromise={inputs => this.onSendTransaction(inputs)} />
+          <SendAdaForm
+            submitPromise={inputs => this.onSendTransaction(inputs)}
+            fromAddress={this.state.address}
+          />
         }
       </div>
     );

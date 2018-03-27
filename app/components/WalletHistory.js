@@ -85,7 +85,7 @@ class WalletHistory extends Component {
 
   getNoTransactionHistoryComponent = () => (
     <ListItem>
-      <ListItemText primary="No Transactions History" />
+      <ListItemText align="center" primary="No Transactions History" />
     </ListItem>
   );
 
