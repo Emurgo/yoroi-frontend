@@ -6,11 +6,13 @@ import Typography from 'material-ui/Typography';
 import OpenInNew from 'material-ui-icons/OpenInNew';
 import IconButton from 'material-ui/IconButton';
 import Avatar from 'material-ui/Avatar';
+import NumberFormat from 'react-number-format';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
 import { CircularProgress } from 'material-ui/Progress';
 import ExplorerApi from '../api/ExplorerApi';
 import { formatCID } from '../utils/formatter';
+import copyToClipboard from '../utils/copyToClipboard';
 import { openAddress } from '../utils/explorerLinks';
 import sendTx from '../cardanoWallet/txSender';
 import style from './Wallet.css';
@@ -46,7 +48,7 @@ class Wallet extends Component {
       to: inputs.to,
       from: this.state.address,
       amount: inputs.amount
-    }, this.props.wallet.xprv);
+    }, this.props.wallet.xprv).then(this.updateWalletInfo);
   };
 
   onSwipChange = (index) => {
@@ -75,8 +77,8 @@ class Wallet extends Component {
 
   updateWalletInfo = () => {
     console.log('[Wallet.updateWalletInfo.run] Running');
-    return ExplorerApi.wallet.getInfo('DdzFFzCqrhtBUjWqcccfjojeiX8M8usSCi6U9N8eeh74qB5nTVZmE3U6iDQnnoxB8Xg6jrCFS1wtByQi7Mn4bhCQrg7GESfM2EcGyUmG')
-    // return ExplorerApi.wallet.getInfo(this.props.wallet.address)
+    //return ExplorerApi.wallet.getInfo('DdzFFzCqrhtBUjWqcccfjojeiX8M8usSCi6U9N8eeh74qB5nTVZmE3U6iDQnnoxB8Xg6jrCFS1wtByQi7Mn4bhCQrg7GESfM2EcGyUmG')
+    return ExplorerApi.wallet.getInfo(this.props.wallet.address)
     .then((walletInfo) => {
       this.setState({
         address: this.getAddress(walletInfo),
@@ -101,13 +103,16 @@ class Wallet extends Component {
         <div className={style.headerContent}>
           <div className={style.header}>
             <Typography variant="display2" color="inherit">
-              {!this.state.loading ? this.state.balance : '...'}
+              {!this.state.loading ? 
+                (<NumberFormat thousandSeparator value={this.state.balance} displayType="text" />) :
+                '...'
+              }
             </Typography>
             {!this.state.loading && <Avatar className={style.symbol} src="img/ada-symbol-smallest-white.inline.svg" /> }
           </div>
           {!this.state.loading &&
             <div className={style.link}>
-              <Typography variant="body1" color="inherit">
+              <Typography variant="body1" color="inherit" onClick={() => copyToClipboard(this.state.address)}>
                 {!this.state.loading ? formatCID(this.state.address) : '...'}
               </Typography>
               <IconButton onClick={() => openAddress(this.state.address)}><OpenInNew style={{ fontSize: 20, color: 'white' }} /></IconButton>
