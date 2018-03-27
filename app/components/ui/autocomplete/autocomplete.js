@@ -4,7 +4,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Typography from 'material-ui/Typography';
-import Input from 'material-ui/Input';
 import TextField from 'material-ui/TextField';
 import { FormControl, FormHelperText } from 'material-ui/Form';
 import { MenuItem } from 'material-ui/Menu';
@@ -13,8 +12,9 @@ import CancelIcon from 'material-ui-icons/Cancel';
 import ArrowDropUpIcon from 'material-ui-icons/ArrowDropUp';
 import ClearIcon from 'material-ui-icons/Clear';
 import Chip from 'material-ui/Chip';
-import Select from "react-virtualized-select";
-import 'react-select/dist/react-select.css';
+import Select from 'react-virtualized-select';
+import style from './autocomplete.css';
+
 
 //FIXME: this is temporal, just for the PoC
 import WordLists from 'bip39/wordlists/english.json';
@@ -25,7 +25,7 @@ const suggestions = WordLists.map(word => ({
 }));
 
 class Option extends React.Component {
-  handleClick = event => {
+  handleClick = (event) => {
     this.props.onSelect(this.props.option, event);
   };
 
@@ -55,14 +55,14 @@ function SelectWrapped(props) {
     <Select
       optionComponent={Option}
       noResultsText={<Typography>{'No results found'}</Typography>}
-      arrowRenderer={arrowProps => {
+      arrowRenderer={(arrowProps) => {
         return arrowProps.isOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />;
       }}
       clearRenderer={() => <ClearIcon />}
-      valueComponent={valueProps => {
+      valueComponent={(valueProps) => {
         const { value, children, onRemove } = valueProps;
 
-        const onDelete = event => {
+        const onDelete = (event) => {
           event.preventDefault();
           event.stopPropagation();
           onRemove(value);
@@ -87,7 +87,7 @@ function SelectWrapped(props) {
   );
 }
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 12;
 
 const styles = theme => ({
   root: {
@@ -202,12 +202,12 @@ class Bip39Autocomplete extends React.Component {
     const { classes } = this.props;
 
     return (
-      <FormControl error={this.props.error}>
+      <FormControl className={style.formContainer} error={this.props.error}>
         <TextField
           fullWidth
           value={this.props.words}
           onChange={this.props.onChange}
-          placeholder="Select multiple countries"
+          placeholder="Select 12 words"
           name="react-select-chip-label"
           label="Passphrase words"
           error={this.props.error}

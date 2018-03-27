@@ -1,0 +1,41 @@
+.headerContent {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-direction: column;
+  background-color: #3f51b5;
+  color: white;
+  padding: 15%;
+}
+
+.logo {
+  margin: 0% 5% 0% 0%;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  color: white;
+}
+
+.formContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  background: white;
+  min-height: 59vh;
+}
+
+.formButton {
+  display: flex;
+  justify-content: flex-end;
+  padding: 5%;
+}

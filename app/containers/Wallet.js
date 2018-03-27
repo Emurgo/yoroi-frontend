@@ -103,7 +103,7 @@ class Wallet extends Component {
         <div className={style.headerContent}>
           <div className={style.header}>
             <Typography variant="display2" color="inherit">
-              {!this.state.loading ? 
+              {!this.state.loading ?
                 (<NumberFormat thousandSeparator value={this.state.balance} displayType="text" />) :
                 '...'
               }
