@@ -45,6 +45,13 @@ class SendAdaForm extends Component {
     }
   }
 
+  goBackTo = step => () => {
+    this.setState({
+      activeStep: step,
+      loading: false
+    });
+  }
+
   onConfirm = submitPromise => () => {
     this.setState({
       activeStep: this.FINISH_STEP,
@@ -96,7 +103,7 @@ class SendAdaForm extends Component {
           />
         </div>
       </div>,
-      <div className={style.formButton}>
+      <div className={style.formButtons}>
         <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onCreateTransaction()}>
           <Send />
         </Button>
@@ -117,10 +124,17 @@ class SendAdaForm extends Component {
           <NumberFormat thousandSeparator value={this.state.amount} displayType="text" suffix=" ADA" />
         </Typography>
       </div>,
-      <div className={style.formButton} >
-        <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onConfirm(submitPromise)()}>
-          <Check />
-        </Button>
+      <div className={style.formButtons}>
+        <div className={style.formButton} >
+          <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onConfirm(submitPromise)()}>
+            <Check />
+          </Button>
+        </div>
+        <div className={style.backButton} >
+          <Button className={style.backButton} color="link" onClick={this.goBackTo(this.CREATE_STEP)}>
+            Back
+          </Button>
+        </div>
       </div>
     ]);
   }

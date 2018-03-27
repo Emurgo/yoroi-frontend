@@ -25,10 +25,19 @@
   padding: 3% 0% 0% 0%;
 }
 
-.formButton {
+.formButtons {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: row-reverse;
   padding: 5%;
+}
+
+.formButton {
+  justify-content: flex-end;
+}
+
+.backButton {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .loading {
