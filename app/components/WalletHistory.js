@@ -95,7 +95,7 @@ class WalletHistory extends Component {
   }
 
   render() {
-    const txs = this.props;
+    const txs = this.props.txs;
     return (
       <List>
         {
