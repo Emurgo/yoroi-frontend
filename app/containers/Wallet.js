@@ -46,7 +46,7 @@ class Wallet extends Component {
       to: inputs.to,
       from: this.state.address,
       amount: inputs.amount
-    }, this.props.wallet.xprv);
+    }, this.props.wallet.xprv).then(this.updateWalletInfo);
   };
 
   onSwipChange = (index) => {
@@ -75,8 +75,8 @@ class Wallet extends Component {
 
   updateWalletInfo = () => {
     console.log('[Wallet.updateWalletInfo.run] Running');
-    return ExplorerApi.wallet.getInfo('DdzFFzCqrhtBUjWqcccfjojeiX8M8usSCi6U9N8eeh74qB5nTVZmE3U6iDQnnoxB8Xg6jrCFS1wtByQi7Mn4bhCQrg7GESfM2EcGyUmG')
-    // return ExplorerApi.wallet.getInfo(this.props.wallet.address)
+    //return ExplorerApi.wallet.getInfo('DdzFFzCqrhtBUjWqcccfjojeiX8M8usSCi6U9N8eeh74qB5nTVZmE3U6iDQnnoxB8Xg6jrCFS1wtByQi7Mn4bhCQrg7GESfM2EcGyUmG')
+    return ExplorerApi.wallet.getInfo(this.props.wallet.address)
     .then((walletInfo) => {
       this.setState({
         address: this.getAddress(walletInfo),
