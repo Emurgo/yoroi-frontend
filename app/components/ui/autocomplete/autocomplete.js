@@ -87,7 +87,7 @@ function SelectWrapped(props) {
   );
 }
 
-const ITEM_HEIGHT = 12;
+const ITEM_HEIGHT = 18;
 
 const styles = theme => ({
   root: {

@@ -28,16 +28,14 @@
 .formButtons {
   display: flex;
   flex-direction: row-reverse;
+  justify-content: space-between;
   padding: 5%;
 }
 
 .formButton {
-  justify-content: flex-end;
-}
-
-.backButton {
-  display: flex;
-  justify-content: flex-start;
+    display: flex;
+    justify-content: flex-end;
+    padding: 5%;
 }
 
 .loading {

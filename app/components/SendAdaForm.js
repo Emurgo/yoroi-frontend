@@ -125,13 +125,13 @@ class SendAdaForm extends Component {
         </Typography>
       </div>,
       <div className={style.formButtons}>
-        <div className={style.formButton} >
-          <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onConfirm(submitPromise)()}>
+        <div>
+          <Button variant="fab" color="primary" onClick={() => this.onConfirm(submitPromise)()}>
             <Check />
           </Button>
         </div>
-        <div className={style.backButton} >
-          <Button className={style.backButton} color="link" onClick={this.goBackTo(this.CREATE_STEP)}>
+        <div>
+          <Button color="link" onClick={this.goBackTo(this.CREATE_STEP)}>
             Back
           </Button>
         </div>
