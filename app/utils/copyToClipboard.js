@@ -1,5 +1,5 @@
 const copyToClipboard = (text) => {
-  if (!text) return;
+  if (!text) return false;
   const copyFrom = document.createElement('textarea');
   copyFrom.textContent = text;
   const body = document.getElementsByTagName('body')[0];
@@ -7,6 +7,7 @@ const copyToClipboard = (text) => {
   copyFrom.select();
   document.execCommand('copy');
   body.removeChild(copyFrom);
+  return true;
 };
 
 export default copyToClipboard;

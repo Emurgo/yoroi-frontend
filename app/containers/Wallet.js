@@ -10,6 +10,7 @@ import NumberFormat from 'react-number-format';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
 import { CircularProgress } from 'material-ui/Progress';
+import Snackbar from 'material-ui/Snackbar';
 import ExplorerApi from '../api/ExplorerApi';
 import { formatCID } from '../utils/formatter';
 import copyToClipboard from '../utils/copyToClipboard';
@@ -74,6 +75,7 @@ class Wallet extends Component {
 
   HISTORY_TAB_INDEX = 0;
   SEND_TAB_INDEX = 1;
+  HIDE_SNACKBAR_TIME = 3 * 1000; // 3 seconds
 
   updateWalletInfo = () => {
     console.log('[Wallet.updateWalletInfo.run] Running');
@@ -96,6 +98,17 @@ class Wallet extends Component {
     );
   }
 
+  onCopyToClipboard = () => {
+    const copied = copyToClipboard(this.state.address)    
+    if (copied) {
+      this.setState({
+        showSnackbar: true,
+        snackbarText: 'Address Copied to Clipboard!',
+      });
+      setTimeout(() => this.setState({ showSnackbar: false }), this.HIDE_SNACKBAR_TIME);
+    }
+  }
+
   render() {
     return (
       <div>
@@ -111,7 +124,7 @@ class Wallet extends Component {
           </div>
           {!this.state.loading &&
             <div className={style.link}>
-              <Typography variant="body1" color="inherit" onClick={() => copyToClipboard(this.state.address)}>
+              <Typography variant="body1" color="inherit" onClick={this.onCopyToClipboard}>
                 {!this.state.loading ? formatCID(this.state.address) : '...'}
               </Typography>
               <IconButton onClick={() => openAddress(this.state.address)}><OpenInNew style={{ fontSize: 20, color: 'white' }} /></IconButton>
@@ -126,10 +139,9 @@ class Wallet extends Component {
         </AppBar>
         { this.state.swapIndex === this.HISTORY_TAB_INDEX &&
           (!this.state.loading ?
-            <div className={style.body}> 
-              <WalletHistory
-              txs={this.state.txsHistory}
-            /></div>
+            <div className={style.body}>
+              <WalletHistory txs={this.state.txsHistory} />
+            </div>
           :
             this.getLoadingComponent()
           )
@@ -140,6 +152,14 @@ class Wallet extends Component {
             fromAddress={this.state.address}
           />
         }
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          open={this.state.showSnackbar}
+          SnackbarContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.snackbarText}</span>}
+        />
       </div>
     );
   }
