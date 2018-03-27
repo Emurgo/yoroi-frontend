@@ -11,6 +11,7 @@ import SendAdaForm from '../components/SendAdaForm';
 // import Loading from '../components/ui/loading/Loading'; // TODO: Fix styling!
 import ExplorerApi from '../api/ExplorerApi';
 import { formatCID } from '../utils/formatter';
+import copyToClipboard from '../utils/copyToClipboard';
 import { openAddress } from '../utils/explorerLinks';
 import sendTx from '../cardanoWallet/txSender';
 import style from './Wallet.css';
@@ -99,7 +100,7 @@ class Wallet extends Component {
           </div>
           {!this.state.loading &&
             <div className={style.link}>
-              <Typography variant="body1" color="inherit">
+              <Typography variant="body1" color="inherit" onClick={() => copyToClipboard(this.state.address)}>
                 {!this.state.loading ? formatCID(this.state.address) : '...'}
               </Typography>
               <IconButton onClick={() => openAddress(this.state.address)}><OpenInNew style={{ fontSize: 20, color: 'white' }} /></IconButton>
