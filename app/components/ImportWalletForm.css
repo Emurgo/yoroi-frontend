@@ -42,3 +42,39 @@
   justify-content: flex-end;
   padding: 5%;
 }
+
+.createContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: white;
+  min-height: 53vh;
+}
+
+.formButtons {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  padding: 5%;
+}
+
+.formRightButton {
+  padding-left: 5%;
+}
+
+.wordsContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 5% 10%;
+}
+
+.description {
+  padding: 1% 5% 0% 5%;
+}
+
+.word {
+  margin: 1%;
+  padding: 5%;
+}

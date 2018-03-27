@@ -126,10 +126,11 @@ class Wallet extends Component {
         </AppBar>
         { this.state.swapIndex === this.HISTORY_TAB_INDEX &&
           (!this.state.loading ?
-            <div className={style.body}> 
+            <div className={style.body}>
               <WalletHistory
-              txs={this.state.txsHistory}
-            /></div>
+                txs={this.state.txsHistory}
+              />
+            </div>
           :
             this.getLoadingComponent()
           )
