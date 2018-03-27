@@ -6,6 +6,7 @@ import Typography from 'material-ui/Typography';
 import OpenInNew from 'material-ui-icons/OpenInNew';
 import IconButton from 'material-ui/IconButton';
 import Avatar from 'material-ui/Avatar';
+import NumberFormat from 'react-number-format';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
 // import Loading from '../components/ui/loading/Loading'; // TODO: Fix styling!
@@ -94,7 +95,10 @@ class Wallet extends Component {
         <div className={style.headerContent}>
           <div className={style.header}>
             <Typography variant="display2" color="inherit">
-              {!this.state.loading ? this.state.balance : '...'}
+              {!this.state.loading ? 
+                (<NumberFormat thousandSeparator value={this.state.balance} displayType="text" />) :
+                '...'
+              }
             </Typography>
             {!this.state.loading && <Avatar className={style.symbol} src="img/ada-symbol-smallest-white.inline.svg" /> }
           </div>
