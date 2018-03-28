@@ -26,7 +26,7 @@ const sendTx = async function (rawTx, xprv) {
   const txResponse = await CardanoNodeApi.transactions.buildTx(rawTx);
   const encodedTx = txResponse.Right;
   const decodedTx = decodeTx(encodedTx);
-  if (!decodedTx || (decodedTx && validateSimpleTx(decodedTx, rawTx))) {
+  if (!decodedTx || (decodedTx && !validateSimpleTx(decodedTx, rawTx))) {
     throw new Error('Invalid Tx');
   }
 
