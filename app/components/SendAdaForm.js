@@ -10,6 +10,7 @@ import Check from 'material-ui-icons/Check';
 import Refresh from 'material-ui-icons/Refresh';
 import NumberFormat from 'react-number-format';
 import { CircularProgress } from 'material-ui/Progress';
+import AdaAmount from '../components/AdaAmount';
 import { formatCID } from '../utils/formatter';
 import style from './SendAdaForm.css';
 
@@ -81,7 +82,10 @@ class SendAdaForm extends Component {
     });
   }
 
+  onValueChange = ({ floatValue }) => this.setState({ amount: floatValue * 1000000 });
+
   getCreatePage = () => {
+    const amount = this.state.amount ? this.state.amount / 1000000 : undefined;
     return ([
       <div className={style.createSubContainer}>
         <div>
@@ -94,11 +98,13 @@ class SendAdaForm extends Component {
           />
         </div>
         <div>
-          <TextField
+          <NumberFormat
+            thousandSeparator
+            customInput={TextField}
             label="Amount"
-            margin="normal"
-            value={this.state.amount}
-            onChange={this.handleChange('amount')}
+            value={amount}
+            allowNegative={false}
+            onValueChange={this.onValueChange}
             fullWidth
           />
         </div>
@@ -121,7 +127,7 @@ class SendAdaForm extends Component {
         <Typography variant="body2" color="textSecondary">{formatCID(fromAddress)}</Typography>
         <Typography variant="body1">Amount</Typography>
         <Typography variant="body2" color="textSecondary">
-          <NumberFormat thousandSeparator value={this.state.amount} displayType="text" suffix=" ADA" />
+          <AdaAmount amount={this.state.amount} />
         </Typography>
       </div>,
       <div className={style.formButtons}>
