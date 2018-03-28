@@ -4,13 +4,14 @@ import Tabs, { Tab } from 'material-ui/Tabs';
 import AppBar from 'material-ui/AppBar';
 import Typography from 'material-ui/Typography';
 import OpenInNew from 'material-ui-icons/OpenInNew';
+import ExitToApp from 'material-ui-icons/ExitToApp';
 import IconButton from 'material-ui/IconButton';
 import Avatar from 'material-ui/Avatar';
+import { CircularProgress } from 'material-ui/Progress';
+import Snackbar from 'material-ui/Snackbar';
 import AdaAmount from '../components/AdaAmount';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
-import { CircularProgress } from 'material-ui/Progress';
-import Snackbar from 'material-ui/Snackbar';
 import ExplorerApi from '../api/ExplorerApi';
 import { formatCID } from '../utils/formatter';
 import copyToClipboard from '../utils/copyToClipboard';
@@ -113,6 +114,9 @@ class Wallet extends Component {
     return (
       <div>
         <div className={style.headerContent}>
+          <IconButton className={style.logout} onClick={() => this.props.onLogout()}>
+            <ExitToApp style={{ fontSize: 20, color: 'white' }} />
+          </IconButton>
           <div className={style.header}>
             <Typography variant="display2" color="inherit">
               { !this.state.loading ? (<AdaAmount amount={this.state.balance} showSuffix={false} />) : '...' }
@@ -163,7 +167,8 @@ class Wallet extends Component {
 }
 
 Wallet.propTypes = {
-  wallet: PropTypes.object
+  wallet: PropTypes.object,
+  onLogout: PropTypes.func
 };
 
 export default Wallet;

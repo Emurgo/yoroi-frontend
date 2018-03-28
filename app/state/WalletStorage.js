@@ -39,5 +39,15 @@ WalletStorage.setWallet = function (wallet) {
   }
 };
 
+WalletStorage.removeWallet = function () {
+  this.sk = undefined;
+  if (window.localStorage) {
+    console.log('[WalletStorage - removeWallet] removing wallet..');
+    localStorage.removeItem(WALLET_STORAGE_SK_KEY);
+  } else {
+    console.warn('[WalletStorage - removeWallet] The browser doesn\'t support local storage');
+  }
+};
+
 // Always initWallet, before use WalletStorage.
 export default WalletStorage;

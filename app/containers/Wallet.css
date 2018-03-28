@@ -12,6 +12,13 @@
   margin-left: 3%;
 }
 
+.logout {
+  z-index: 1000;
+  position: absolute !important;
+  top: 1px;
+  right: 1px;
+}
+
 .header {
   display: flex;
   justify-content: center;
@@ -19,6 +26,7 @@
   align-items: center;
   color: white;
 }
+
 .body {
   overflow-y: scroll;
   height: 320px;
