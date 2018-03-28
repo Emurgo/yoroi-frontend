@@ -150,7 +150,7 @@ class SendAdaForm extends Component {
   getTransactionErrorPage = () => {
     return ([
       <div className={style.title}>
-        <Typography variant="headline">An Error occurred.</Typography>
+        <Typography variant="subheading">An Error occurred.</Typography>
       </div>,
       <div className={style.formButton} >
         <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onFinish()}>
@@ -163,7 +163,7 @@ class SendAdaForm extends Component {
   getTransactionOkPage = () => {
     return ([
       <div className={style.title}>
-        <Typography variant="headline">Transaction successfully sent!</Typography>
+        <Typography variant="subheading">Transaction successfully sent!</Typography>
       </div>,
       <div className={style.formButton} >
         <Button className={style.formButton} variant="fab" color="primary" onClick={() => this.onFinish()}>
