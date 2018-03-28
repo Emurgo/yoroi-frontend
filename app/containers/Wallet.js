@@ -6,7 +6,7 @@ import Typography from 'material-ui/Typography';
 import OpenInNew from 'material-ui-icons/OpenInNew';
 import IconButton from 'material-ui/IconButton';
 import Avatar from 'material-ui/Avatar';
-import NumberFormat from 'react-number-format';
+import AdaAmount from '../components/AdaAmount';
 import WalletHistory from '../components/WalletHistory';
 import SendAdaForm from '../components/SendAdaForm';
 import { CircularProgress } from 'material-ui/Progress';
@@ -115,10 +115,7 @@ class Wallet extends Component {
         <div className={style.headerContent}>
           <div className={style.header}>
             <Typography variant="display2" color="inherit">
-              {!this.state.loading ?
-                (<NumberFormat thousandSeparator value={this.state.balance} displayType="text" />) :
-                '...'
-              }
+              { !this.state.loading ? (<AdaAmount amount={this.state.balance} showSuffix={false} />) : '...' }
             </Typography>
             {!this.state.loading && <Avatar className={style.symbol} src="img/ada-symbol-smallest-white.inline.svg" /> }
           </div>

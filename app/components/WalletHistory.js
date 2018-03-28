@@ -6,7 +6,6 @@ import List, {
 } from 'material-ui/List';
 import Typography from 'material-ui/Typography';
 import Avatar from 'material-ui/Avatar';
-import NumberFormat from 'react-number-format';
 import OpenInNew from 'material-ui-icons/OpenInNew';
 import IconButton from 'material-ui/IconButton';
 import ExpansionPanel, {
@@ -19,6 +18,7 @@ import {
   formatTimestamp,
   formatRawTimestamp
 } from '../utils/formatter';
+import AdaAmount from '../components/AdaAmount';
 import style from './WalletHistory.css';
 
 class WalletHistory extends Component {
@@ -27,10 +27,6 @@ class WalletHistory extends Component {
     super();
     this.state = {};
   }
-
-  getAmount = ({ ctbOutputSum: { getCoin } }) => {
-    return Number(getCoin) / 1000000;
-  };
 
   getSendReceivIconPath = (tx) => {
     return tx.isOutgoing ? 'img/send-ic.svg' : 'img/receive-ic.svg';
@@ -50,7 +46,7 @@ class WalletHistory extends Component {
           <div className={style.amount}>
             <div>
               <Typography variant="subheading">
-                <NumberFormat thousandSeparator value={this.getAmount(tx)} displayType="text" suffix=" ADA" />
+                <AdaAmount amount={tx.amount} />
               </Typography>
             </div>
             <div>
@@ -65,7 +61,10 @@ class WalletHistory extends Component {
             <IconButton onClick={() => openTx(tx.ctbId)}><OpenInNew color="disabled" style={{ fontSize: 20 }} /></IconButton>
           </div>
           <Typography variant="subheading">Timestamp</Typography>
-          <Typography variant="body2" color="textSecondary">{formatRawTimestamp(tx.ctbTimeIssued)}
+          <Typography variant="body2" color="textSecondary">{formatRawTimestamp(tx.ctbTimeIssued)}</Typography>
+          <Typography variant="subheading">Fee</Typography>
+          <Typography variant="body2" color="textSecondary">
+            <AdaAmount amount={tx.ctbInputSum.getCoin - tx.ctbOutputSum.getCoin} />
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
