@@ -9,7 +9,7 @@ const AdaAmount = ({ amount, showSuffix = true }) => {
       thousandSeparator
       value={Number(amount) / 1000000}
       fixedDecimalScale
-      decimalScale="6"
+      decimalScale={6}
       displayType="text"
       suffix={suffix}
     />
