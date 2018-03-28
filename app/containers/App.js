@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import Toolbar from 'material-ui/Toolbar';
 import AppBar from 'material-ui/AppBar';
-import Typography from 'material-ui/Typography';
 import WalletSetup from '../components/WalletSetup';
 import Wallet from '../containers/Wallet';
 import WalletStorage from '../state/WalletStorage';
@@ -23,9 +21,17 @@ class App extends Component {
     });
   };
 
+  onLogout = () => {
+    WalletStorage.removeWallet();
+    this.setState({
+      hasWallet: WalletStorage.hasWallet(),
+      wallet: WalletStorage.getWallet()
+    });
+  }
+
   renderContent = () => {
     if (this.state.hasWallet) {
-      return <Wallet wallet={this.state.wallet} />;
+      return <Wallet wallet={this.state.wallet} onLogout={() => this.onLogout()} />;
     }
     return (<WalletSetup onWalletCreated={this.onWalletCreated} />);
   };
