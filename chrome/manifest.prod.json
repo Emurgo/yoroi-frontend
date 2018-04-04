@@ -5,7 +5,6 @@
   "description": "Example for react-chrome-extension-boilerplate",
   "browser_action": {
     "default_title": "React Chrome Extension Example",
-    "default_popup": "popup.html"
   },
   "icons": {
     "16": "img/icon-16.png",
