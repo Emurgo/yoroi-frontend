@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
+import { observer, inject } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import {BigNumber} from 'bignumber.js';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
@@ -21,6 +21,7 @@ export const messages = defineMessages({
   }
 });
 
+@inject('stores', 'actions') @observer
 export default class WalletSummaryPage extends Component {
   static defaultProps = { actions: null, stores: null };
 
@@ -36,17 +37,8 @@ export default class WalletSummaryPage extends Component {
       totalAvailable,
       recent,
       recentTransactionsRequest,
-      unconfirmedAmount
-    } = {
-      hasAny: false,
-      totalAvailable: undefined,
-      recent: undefined,
-      recentTransactionsRequest: {},
-      unconfirmedAmount: {
-        incoming: new BigNumber(10),
-        outgoing: new BigNumber(0),
-      }
-    };
+      unconfirmedAmount,
+    } = transactions;
     const wallet = wallets.active;
     // Guard against potential null values
     if (!wallet)

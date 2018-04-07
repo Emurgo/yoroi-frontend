@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Provider } from 'mobx-react';
 import { ThemeProvider } from 'react-css-themr';
 import { loadRustModule } from 'rust-cardano-crypto';
 import Wallet from './containers/wallet/Wallet';
@@ -8,7 +9,7 @@ import { daedalusTheme } from './themes/daedalus';
 import translations from './i18n/translations';
 import ThemeManager from './ThemeManager';
 import { getFakeStores } from './stores/FakeStores';
-import actions from './actions';
+import actions from './actions/index';
 
 export default class Root extends Component {
   constructor(props) {
@@ -39,15 +40,15 @@ export default class Root extends Component {
     return (
       <div>
         <ThemeManager variables={theme} />
-        <div id="provider">
+        <Provider stores={stores} actions={actions}>
           <ThemeProvider theme={daedalusTheme}>
             <IntlProvider {...{ locale, key: locale, messages: translations[locale] }}>
               <div style={{ height: '100%' }} >
-                <Wallet actions={actions} stores={stores} />
+                <Wallet />
               </div>
             </IntlProvider>
           </ThemeProvider>
-        </div>
+        </Provider>
       </div>
     );
   }

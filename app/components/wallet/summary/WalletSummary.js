@@ -60,14 +60,14 @@ export default class WalletSummary extends Component<Props> {
             {amount}
             <SvgInline svg={adaSymbolBig} className={styles.currencySymbolBig} />
           </div>
-          {pendingAmount.incoming.isGreaterThan(0) &&
+          {pendingAmount.incoming.greaterThan(0) &&
             <div className={styles.pendingConfirmation}>
               {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
               : {pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}
               <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
             </div>
           }
-          {pendingAmount.outgoing.isGreaterThan(0) &&
+          {pendingAmount.outgoing.greaterThan(0) &&
             <div className={styles.pendingConfirmation}>
               {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
               : {pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}

@@ -1,19 +1,20 @@
 // @flow
 import React, { Component } from 'react';
+import { observer, inject } from 'mobx-react';
 import resolver from '../../utils/imports';
-
 import MainLayout from '../MainLayout';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 
 const WalletSummaryPage = resolver('containers/wallet/WalletSummaryPage');
-//const WalletSendPage = resolver('containers/wallet/WalletSendPage');
+const WalletSendPage = resolver('containers/wallet/WalletSendPage');
 //const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
 /*const WalletTransactionsPage = resolver(
   'containers/wallet/WalletTransactionsPage'
 );
 const WalletSettingsPage = resolver('containers/wallet/WalletSettingsPage');*/
 
+@inject('stores', 'actions') @observer
 export default class Wallet extends Component {
   constructor() {
     super();
@@ -31,7 +32,9 @@ export default class Wallet extends Component {
   getChild = stores => {
     switch (this.state.selected) {
       case 'summary':
-        return <WalletSummaryPage stores={stores} />;
+        return <WalletSummaryPage />;
+      case 'send':
+        return <WalletSendPage />;
       default:
         return <h1>{this.state.selected}</h1>;
     }
