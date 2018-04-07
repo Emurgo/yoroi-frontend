@@ -1,19 +1,51 @@
 // @flow
 import React, { Component } from 'react';
+import resolver from '../../utils/imports';
+
 import MainLayout from '../MainLayout';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 
+const WalletSummaryPage = resolver('containers/wallet/WalletSummaryPage');
+//const WalletSendPage = resolver('containers/wallet/WalletSendPage');
+//const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
+/*const WalletTransactionsPage = resolver(
+  'containers/wallet/WalletTransactionsPage'
+);
+const WalletSettingsPage = resolver('containers/wallet/WalletSettingsPage');*/
+
 export default class Wallet extends Component {
+  constructor() {
+    super();
+    this.state = {
+      selected: 'summary'
+    };
+  }
+
+  handleWalletNavItemClick = tab => {
+    this.setState({
+      selected: tab
+    });
+  };
+
+  getChild = stores => {
+    switch (this.state.selected) {
+      case 'summary':
+        return <WalletSummaryPage stores={stores} />;
+      default:
+        return <h1>{this.state.selected}</h1>;
+    }
+  };
+
   render() {
-    const { actions } = this.props;
+    const { actions, stores } = this.props;
     return (
-      <MainLayout>
+      <MainLayout actions={actions} stores={stores}>
         <WalletWithNavigation
           isActiveScreen={() => true}
           onWalletNavItemClick={this.handleWalletNavItemClick}
         >
-          {this.props.children}
+          {this.getChild(stores)}
         </WalletWithNavigation>
       </MainLayout>
     );

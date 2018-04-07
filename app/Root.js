@@ -7,6 +7,8 @@ import './themes/index.global.scss';
 import { daedalusTheme } from './themes/daedalus';
 import translations from './i18n/translations';
 import ThemeManager from './ThemeManager';
+import { getFakeStores } from './stores/FakeStores';
+import actions from './actions';
 
 export default class Root extends Component {
   constructor(props) {
@@ -33,6 +35,7 @@ export default class Root extends Component {
     if (this.state.loading) {
       return <h1>Loading</h1>;
     }
+    const stores = getFakeStores();
     return (
       <div>
         <ThemeManager variables={theme} />
@@ -40,7 +43,7 @@ export default class Root extends Component {
           <ThemeProvider theme={daedalusTheme}>
             <IntlProvider {...{ locale, key: locale, messages: translations[locale] }}>
               <div style={{ height: '100%' }} >
-                <Wallet />
+                <Wallet actions={actions} stores={stores} />
               </div>
             </IntlProvider>
           </ThemeProvider>

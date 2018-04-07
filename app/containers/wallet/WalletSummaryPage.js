@@ -30,13 +30,7 @@ export default class WalletSummaryPage extends Component {
 
   render() {
     const { intl } = this.context;
-    const { wallets, transactions } = {
-      wallets: {
-        active: {
-          amount: new BigNumber(123.4567),
-        }
-      }
-    };
+    const { wallets, transactions } = this.props.stores.ada;
     const {
       hasAny,
       totalAvailable,

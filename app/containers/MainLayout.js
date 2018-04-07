@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 //import { observer, inject } from 'mobx-react';
 //import Sidebar from '../components/sidebar/Sidebar';
-//import TopBarContainer from './TopBarContainer';
+import TopBarContainer from './TopBarContainer';
 import SidebarLayout from '../components/layout/SidebarLayout';
 //import StatusMessagesNotification from '../components/notifications/StatusMessagesNotification';
 // import NodeUpdatePage from './notifications/NodeUpdatePage';
@@ -71,11 +71,9 @@ export default class MainLayout extends Component<InjectedContainerProps> {
     return (
       <SidebarLayout
         sidebar={<div />}
-        topbar={<h1>Top Bar</h1>}
+        topbar={<TopBarContainer actions={actions} stores={stores} />}
         notification={<div />}
-        contentDialogs={[
-          <WalletAddPage key="WalletAddPage" />
-        ]}
+        contentDialogs={[<WalletAddPage key="WalletAddPage" />]}
       >
         {this.props.children}
       </SidebarLayout>

@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-/*import SvgInline from 'react-svg-inline';
+import SvgInline from 'react-svg-inline';
 import type { Node } from 'react';
 import classNames from 'classnames';
-import { observer } from 'mobx-react';
+// import { observer } from 'mobx-react';
 import Wallet from '../../domain/Wallet';
 import menuIconOpened from '../../assets/images/menu-opened-ic.inline.svg';
 import menuIconClosed from '../../assets/images/menu-ic.inline.svg';
@@ -18,12 +18,12 @@ type Props = {
   currentRoute: string,
   showSubMenus?: ?boolean,
   formattedWalletAmount?: Function,
-};*/
+};
 
 //@observer
 export default class TopBar extends Component /*Component<Props>*/ {
   render() {
-    /*const {
+    const {
       onToggleSidebar, activeWallet, currentRoute,
       showSubMenus, formattedWalletAmount
     } = this.props;
@@ -63,7 +63,6 @@ export default class TopBar extends Component /*Component<Props>*/ {
         <div className={styles.topBarTitle}>{topBarTitle}</div>
         {this.props.children}
       </header>
-    );*/
-    return <h1>Top Bar</h1>;
+    );
   }
 }
