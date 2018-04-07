@@ -1,8 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-/*import WalletAddDialog from '../../components/wallet/WalletAddDialog';
+import { inject, observer } from 'mobx-react';
+import WalletAddDialog from '../../components/wallet/WalletAddDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
-import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
+/*import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletFileImportDialog from '../../components/wallet/file-import/WalletFileImportDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 import WalletFileImportDialogContainer from '../wallet/dialogs/WalletFileImportDialogContainer';
@@ -15,6 +16,7 @@ import type { InjectedProps } from '../../types/injectedPropsType';
 
 type Props = InjectedProps;
 
+@inject('actions', 'stores') @observer
 export default class WalletAddPage extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null };
@@ -30,7 +32,7 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    /*const { uiDialogs } = this.props.stores;
+    const { uiDialogs } = this.props.stores;
     let activeDialog = null;
 
     if (uiDialogs.isOpen(WalletAddDialog)) {
@@ -51,10 +53,9 @@ export default class WalletAddPage extends Component<Props> {
 
     if (uiDialogs.isOpen(WalletFileImportDialog)) {
       activeDialog = <WalletFileImportDialogContainer onClose={this.onClose} />;
-    }
+    }*/
 
-    return activeDialog;*/
-    return <h1>Wallet Add Page</h1>;
+    return activeDialog;
   }
 
 }

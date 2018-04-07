@@ -43,7 +43,7 @@ export default class Wallet extends Component {
   render() {
     const { actions, stores } = this.props;
     return (
-      <MainLayout actions={actions} stores={stores}>
+      <MainLayout>
         <WalletWithNavigation
           isActiveScreen={() => true}
           onWalletNavItemClick={this.handleWalletNavItemClick}

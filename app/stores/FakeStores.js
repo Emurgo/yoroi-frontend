@@ -1,25 +1,6 @@
-import { BigNumber } from 'bignumber.js';
 import UiDialogsStore from './UiDialogsStore';
 import WalletTransaction from '../domain/WalletTransaction';
-
-const ada = {
-  wallets: {
-    active: {
-      amount: new BigNumber(1000)
-    },
-    assurance: 'NORMAL'
-  },
-  transactions: {
-    hasAny: false,
-    totalAvailable: 10,
-    recent: [],
-    recentTransactionsRequest: 0,
-    unconfirmedAmount: {
-      incoming: new BigNumber(0),
-      outgoing: new BigNumber(100)
-    }
-  }
-};
+import AdaStore from './ada/index';
 
 const sidebar = {
   isShowingSubMenus: false
@@ -34,7 +15,7 @@ const uiDialogs = {
 }
 
 const stores = {
-  ada,
+  ada: AdaStore,
   app,
   sidebar,
   uiDialogs: new UiDialogsStore()
