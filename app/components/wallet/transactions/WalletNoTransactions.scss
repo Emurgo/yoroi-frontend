@@ -1,0 +1,14 @@
+.component {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  opacity: 0.5;
+  font-size: 16px;
+  line-height: 1.38;
+  font-family: var(--font-regular);
+  color: var(--theme-main-body-messages-color);
+}
