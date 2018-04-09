@@ -189,15 +189,16 @@ export default class WalletSendForm extends Component<Props, State> {
     },
   }, {
     options: {
-      //FIXME:
-      /*validateOnBlur: false,
+      validateOnBlur: false,
       validateOnChange: true,
-      validationDebounceWait: 250,*/
+      validationDebounceWait: 250,
     },
   });
 
   render() {
+
     const { form } = this;
+    
     const { intl } = this.context;
     const {
       currencyUnit, currencyMaxIntegerDigits, currencyMaxFractionalDigits,

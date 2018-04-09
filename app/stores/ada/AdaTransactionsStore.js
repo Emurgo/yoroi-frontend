@@ -19,8 +19,9 @@ export default class AdaTransactionsStore extends TransactionsStore {
   }
 
   calculateTransactionFee = (walletId: string, receiver: string, amount: string) => {
-    const accountId = this.stores.ada.addresses._getAccountIdByWalletId(walletId);
-    if (!accountId) throw new Error('Active account required before calculating transaction fees.');
+    //FIXME: Complete this
+    const accountId = 'CHANGE_ME'; // this.stores.ada.addresses._getAccountIdByWalletId(walletId);
+    //if (!accountId) throw new Error('Active account required before calculating transaction fees.');
     return this.api.ada.calculateTransactionFee({ sender: accountId, receiver, amount });
   };
 

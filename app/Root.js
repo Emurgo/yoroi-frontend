@@ -8,7 +8,8 @@ import './themes/index.global.scss';
 import { daedalusTheme } from './themes/daedalus';
 import translations from './i18n/translations';
 import ThemeManager from './ThemeManager';
-import { getFakeStores } from './stores/FakeStores';
+import { setupApi } from './api/index';
+import createStores from './stores/index';
 import actions from './actions/index';
 
 export default class Root extends Component {
@@ -24,6 +25,8 @@ export default class Root extends Component {
            we must load the RustModule first.
     */
     loadRustModule().then(() => {
+      const api = setupApi();
+      this.stores = createStores(api, actions, undefined);
       this.setState({ loading: false });
     });
   }
@@ -34,13 +37,12 @@ export default class Root extends Component {
     const theme = require(`./themes/daedalus/${currentTheme}.js`); // eslint-disable-line
 
     if (this.state.loading) {
-      return <h1>Loading</h1>;
+      return <div />;
     }
-    const stores = getFakeStores();
     return (
       <div>
         <ThemeManager variables={theme} />
-        <Provider stores={stores} actions={actions}>
+        <Provider stores={this.stores} actions={actions}>
           <ThemeProvider theme={daedalusTheme}>
             <IntlProvider {...{ locale, key: locale, messages: translations[locale] }}>
               <div style={{ height: '100%' }} >
