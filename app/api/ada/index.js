@@ -236,7 +236,7 @@ export default class AdaApi {
           cwUnit: unit
         },
         cwBackupPhrase: {
-          bpToList: split(mnemonic) // array of mnemonic words
+          bpToList: mnemonic, // array of mnemonic words
         }
       };
       const wallet: AdaWallet = await newAdaWallet({
@@ -356,7 +356,6 @@ export default class AdaApi {
     const { accountId, password } = request;
     try {
       const response: AdaAddress = await newAdaWalletAddress({
-        ca,
         password,
         accountId
       });
@@ -422,7 +421,7 @@ export default class AdaApi {
         cwUnit: unit
       },
       cwBackupPhrase: {
-        bpToList: split(recoveryPhrase) // array of mnemonic words
+        bpToList: recoveryPhrase // array of mnemonic words
       }
     };
 
@@ -805,7 +804,7 @@ const _createWalletFromServerData = action(
 
 const _createAddressFromServerData = action(
   'AdaApi::_createAddressFromServerData',
-  (data: AdaAddress) =>
+  (data: AdaAddress) => 
     new WalletAddress({
       id: data.cadId,
       amount: new BigNumber(data.cadAmount.getCCoin).dividedBy(

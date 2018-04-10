@@ -1,9 +1,5 @@
 // @flow
 // FIXME: Implement the API using Rust + LocalStorage
-import bip39 from 'bip39';
-import { Buffer } from 'safe-buffer';
-import bs58 from 'bs58';
-import { HdWallet, Payload, Blake2b } from 'rust-cardano-crypto';
 import type {
   AdaWallet,
   AdaWallets,
@@ -13,7 +9,12 @@ import type {
   RestoreAdaWalletParams
 } from './types';
 
-import { toWallet } from './lib/ada-wallet';
+import {
+  toWallet,
+  generateAccount,
+  isValidAdaMnemonic,
+  generateAdaMnemonic
+} from './lib/ada-wallet';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const ACCOUNT_KEY = 'ACCOUNT'; // single account atm
@@ -33,16 +34,15 @@ export const isValidAdaAddress = ({
 }: IsValidAdaAddressParams): Promise<boolean> => Promise.resolve(true);
 
 export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
-  phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
+  isValidAdaMnemonic(phrase, numberOfWords);
 
 export async function newAdaWallet({
   password, // Password is not used yet
   walletInitData
 }: NewAdaWalletParams): Promise<AdaWallet> {
-  debugger;
   const toSave = toWallet(walletInitData);
   saveInStorage(WALLET_KEY, toSave);
-  const account = _generateAccount(toSave.mnemonic);
+  const account = generateAccount(toSave.mnemonic);
   saveInStorage(ACCOUNT_KEY, account);
   return Promise.resolve(toSave.wallet);
 }
@@ -60,7 +60,7 @@ export const getAdaWallets = (): Promise<AdaWallets> => {
 };
 
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
-  bip39.generateMnemonic(128).split(' ');
+  generateAdaMnemonic();
 
 export type GetAdaWalletAccountsParams = {
   walletId: string
@@ -72,8 +72,18 @@ export const getAdaWalletAccounts = ({
   const account = getFromStorage(ACCOUNT_KEY);
   if (!account) return Promise.resolve([]);
   const adaAccount = {
-    caAddresses: [account],
-    caAmount: 0,
+    caAddresses: [
+      {
+        cadAmount: {
+          getCCoin: 0
+        }, // FIXME: Fetch data from the server
+        cadId: account.address,
+        cadIsUsed: false
+      }
+    ],
+    caAmount: {
+      getCCoin: 0
+    },
     caId: 'caId',
     caMeta: {
       caName: 'caName'
@@ -90,27 +100,4 @@ function getFromStorage(key: string): any {
   const result = localStorage.getItem(key);
   if (result) return JSON.parse(result);
   return undefined;
-}
-
-function _generateAccount(secretWords) {
-  const DERIVATION_PATH = [0, 1];
-
-  const seed = bip39.mnemonicToSeed(secretWords.split(' '));
-
-  const prv = HdWallet.fromSeed(seed);
-  const d1 = HdWallet.derivePrivate(prv, DERIVATION_PATH[0]);
-  const d2 = HdWallet.derivePrivate(d1, DERIVATION_PATH[1]);
-  const d2Pub = HdWallet.toPublic(d2);
-
-  const xpub = HdWallet.toPublic(prv);
-  const hdpKey = Payload.initialise(xpub);
-  const derivationPath = Payload.encrypt_derivation_path(
-    hdpKey,
-    new Uint32Array(DERIVATION_PATH)
-  );
-  const address = HdWallet.publicKeyToAddress(d2Pub, derivationPath);
-  return {
-    //xprv: d2, // FIXME: we need this
-    address: bs58.encode(address)
-  };
 }

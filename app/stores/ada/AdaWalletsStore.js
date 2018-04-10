@@ -83,7 +83,7 @@ export default class AdaWalletsStore extends WalletStore {
       }
     });
     // FIXME: We need to take care of this as well
-    /* runInAction('refresh address data', () => {
+    runInAction('refresh address data', () => {
       const walletIds = result.map((wallet: Wallet) => wallet.id);
       this.stores.ada.addresses.addressesRequests = walletIds.map(walletId => ({
         walletId,
@@ -91,7 +91,7 @@ export default class AdaWalletsStore extends WalletStore {
       }));
       this.stores.ada.addresses._refreshAddresses();
     });
-    runInAction('refresh transaction data', () => {
+    /*runInAction('refresh transaction data', () => {
       const walletIds = result.map((wallet: Wallet) => wallet.id);
       this.stores.ada.transactions.transactionsRequests = walletIds.map(walletId => ({
         walletId,
