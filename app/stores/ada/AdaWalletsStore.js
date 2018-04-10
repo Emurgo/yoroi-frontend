@@ -73,32 +73,34 @@ export default class AdaWalletsStore extends WalletStore {
   isValidPrivateKey = () => { return true; }; // eslint-disable-line
 
   @action refreshWalletsData = async () => {
-    /*if (this.stores.networkStatus.isConnected) {
-      const result = await this.walletsRequest.execute().promise;
-      if (!result) return;
-      runInAction('refresh active wallet', () => {
-        if (this.active) {
-          this._setActiveWallet({ walletId: this.active.id });
-        }
-      });
-      runInAction('refresh address data', () => {
-        const walletIds = result.map((wallet: Wallet) => wallet.id);
-        this.stores.ada.addresses.addressesRequests = walletIds.map(walletId => ({
-          walletId,
-          allRequest: this.stores.ada.addresses._getAddressesAllRequest(walletId),
-        }));
-        this.stores.ada.addresses._refreshAddresses();
-      });
-      runInAction('refresh transaction data', () => {
-        const walletIds = result.map((wallet: Wallet) => wallet.id);
-        this.stores.ada.transactions.transactionsRequests = walletIds.map(walletId => ({
-          walletId,
-          recentRequest: this.stores.ada.transactions._getTransactionsRecentRequest(walletId),
-          allRequest: this.stores.ada.transactions._getTransactionsAllRequest(walletId),
-        }));
-        this.stores.ada.transactions._refreshTransactionData();
-      });
-    }*/
+    // FIXME: We don't care about network status
+    // if (this.stores.networkStatus.isConnected) {
+    const result = await this.walletsRequest.execute().promise;
+    if (!result) return;
+    runInAction('refresh active wallet', () => {
+      if (this.active) {
+        this._setActiveWallet({ walletId: this.active.id });
+      }
+    });
+    // FIXME: We need to take care of this as well
+    /* runInAction('refresh address data', () => {
+      const walletIds = result.map((wallet: Wallet) => wallet.id);
+      this.stores.ada.addresses.addressesRequests = walletIds.map(walletId => ({
+        walletId,
+        allRequest: this.stores.ada.addresses._getAddressesAllRequest(walletId),
+      }));
+      this.stores.ada.addresses._refreshAddresses();
+    });
+    runInAction('refresh transaction data', () => {
+      const walletIds = result.map((wallet: Wallet) => wallet.id);
+      this.stores.ada.transactions.transactionsRequests = walletIds.map(walletId => ({
+        walletId,
+        recentRequest: this.stores.ada.transactions._getTransactionsRecentRequest(walletId),
+        allRequest: this.stores.ada.transactions._getTransactionsAllRequest(walletId),
+      }));
+      this.stores.ada.transactions._refreshTransactionData();
+    });*/
+    //}
   };
 
   @action _setIsRestoreActive = (active: boolean) => {

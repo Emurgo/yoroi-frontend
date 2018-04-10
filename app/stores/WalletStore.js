@@ -121,8 +121,7 @@ export default class WalletsStore extends Store {
   }
 
   @computed get hasLoadedWallets(): boolean {
-    // FIXME: Check this
-    return true; //this.walletsRequest.wasExecuted;
+    return this.walletsRequest.wasExecuted;
   }
 
   @computed get hasAnyWallets(): boolean {
@@ -158,6 +157,7 @@ export default class WalletsStore extends Store {
   // ACTIONS
 
   @action refreshWalletsData = async () => {
+    debugger;
     //if (!this.stores.networkStatus.isConnected) return;
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;

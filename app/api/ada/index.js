@@ -141,7 +141,6 @@ const stringifyError = o => o.toString();
 export default class AdaApi {
 
   async getWallets(): Promise<GetWalletsResponse> {
-    debugger;
     Logger.debug('AdaApi::getWallets called');
     try {
       const response: AdaWallets = await getAdaWallets();
