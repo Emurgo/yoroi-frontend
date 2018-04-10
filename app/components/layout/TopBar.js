@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import SvgInline from 'react-svg-inline';
 import type { Node } from 'react';
 import classNames from 'classnames';
-// import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import Wallet from '../../domain/Wallet';
 import menuIconOpened from '../../assets/images/menu-opened-ic.inline.svg';
 import menuIconClosed from '../../assets/images/menu-ic.inline.svg';
@@ -20,8 +20,9 @@ type Props = {
   formattedWalletAmount?: Function,
 };
 
-//@observer
-export default class TopBar extends Component /*Component<Props>*/ {
+@observer
+export default class TopBar extends Component<Props> {
+
   render() {
     const {
       onToggleSidebar, activeWallet, currentRoute,
