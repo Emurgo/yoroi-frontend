@@ -6,7 +6,7 @@ import SidebarActions from './sidebar-actions';
 import WalletBackupActions from './wallet-backup-actions';
 //import ProfileActions from './profile-actions';
 import DialogsActions from './dialogs-actions';
-//import NotificationsActions from './notifications-actions';
+import NotificationsActions from './notifications-actions';
 import adaActionsMap from './ada/index';
 //import etcActionsMap from './etc/index';
 import type { AdaActionsMap } from './ada/index';
@@ -20,7 +20,7 @@ export type ActionsMap = {
   walletBackup: WalletBackupActions,
   /*profile: ProfileActions,*/
   dialogs: DialogsActions,
-  /*notifications: NotificationsActions,*/
+  notifications: NotificationsActions,
   ada: AdaActionsMap
   /*etc: EtcActionsMap,*/
 };
@@ -33,7 +33,7 @@ const actionsMap: ActionsMap = {
   walletBackup: new WalletBackupActions(),
   /*profile: new ProfileActions(),*/
   dialogs: new DialogsActions(),
-  /*notifications: new NotificationsActions(),*/
+  notifications: new NotificationsActions(),
   ada: adaActionsMap
   /*etc: etcActionsMap,*/
 };

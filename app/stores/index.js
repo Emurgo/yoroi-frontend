@@ -3,6 +3,7 @@ import { observable, action } from 'mobx';
 import AppStore from './AppStore';
 import WalletBackupStore from './WalletBackupStore';
 import UiDialogsStore from './UiDialogsStore';
+import UiNotificationsStore from './UiNotificationsStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
@@ -10,6 +11,7 @@ import environment from '../environment';
 export const storeClasses = {
   app: AppStore,
   uiDialogs: UiDialogsStore,
+  uiNotifications: UiNotificationsStore,
   walletBackup: WalletBackupStore,
 };
 
@@ -19,6 +21,7 @@ export type StoresMap = {
   walletBackup: WalletBackupStore,
   router: Object,
   uiDialogs: UiDialogsStore,
+  uiNotifications: UiNotificationsStore,
   ada: AdaStoresMap,
 };
 
@@ -31,6 +34,7 @@ const stores = observable({
   walletBackup: null,
   router: null,
   uiDialogs: null,
+  uiNotifications: null,
   ada: null,
 });
 

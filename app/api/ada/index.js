@@ -18,7 +18,8 @@ import {
   newAdaWallet,
   restoreAdaWallet,
   getAdaAccountRecoveryPhrase,
-  getAdaWallets
+  getAdaWallets,
+  getAdaWalletAccounts, 
 } from './ada-methods';
 
 import type {
@@ -166,7 +167,6 @@ export default class AdaApi {
     const { walletId } = request;
     try {
       const response: AdaAccounts = await getAdaWalletAccounts({
-        ca,
         walletId
       });
       Logger.debug('AdaApi::getAddresses success: ' + stringifyData(response));
