@@ -3,15 +3,16 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import WalletAddDialog from '../../components/wallet/WalletAddDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
+// FIXME: Check this imports
 /*import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
-import WalletFileImportDialog from '../../components/wallet/file-import/WalletFileImportDialog';
+import WalletFileImportDialog from '../../components/wallet/file-import/WalletFileImportDialog';*/
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-import WalletFileImportDialogContainer from '../wallet/dialogs/WalletFileImportDialogContainer';
-import WalletRestoreDialogContainer from '../wallet/dialogs/WalletRestoreDialogContainer';
+/*import WalletFileImportDialogContainer from '../wallet/dialogs/WalletFileImportDialogContainer';
+import WalletRestoreDialogContainer from '../wallet/dialogs/WalletRestoreDialogContainer';*/
 import WalletBackupDialogContainer from '../wallet/dialogs/WalletBackupDialogContainer';
 import WalletCreateDialogContainer from '../wallet/dialogs/WalletCreateDialogContainer';
 import WalletAddDialogContainer from '../wallet/dialogs/WalletAddDialogContainer';
-import environment from '../../environment';*/
+/*import environment from '../../environment';*/
 import type { InjectedProps } from '../../types/injectedPropsType';
 
 type Props = InjectedProps;
@@ -43,11 +44,11 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = <WalletCreateDialogContainer onClose={this.onClose} />;
     }
 
-    /*if (uiDialogs.isOpen(WalletBackupDialog)) {
+    if (uiDialogs.isOpen(WalletBackupDialog)) {
       activeDialog = <WalletBackupDialogContainer onClose={this.onClose} />;
     }
 
-    if (uiDialogs.isOpen(WalletRestoreDialog)) {
+    /*if (uiDialogs.isOpen(WalletRestoreDialog)) {
       activeDialog = <WalletRestoreDialogContainer onClose={this.onClose} />;
     }
 

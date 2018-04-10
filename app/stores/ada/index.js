@@ -16,6 +16,7 @@ export type AdaStoresMap = {
 const adaStores = observable({
   wallets: null,
   transactions: null,
+  addresses: []
 });
 
 // Set up and return the stores and reset all stores to defaults

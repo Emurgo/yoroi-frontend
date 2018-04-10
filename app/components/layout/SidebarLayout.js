@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-// import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import styles from './SidebarLayout.scss';
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
   contentDialogs?: ?Array<Node>,
 };
 
-// @observer
+@observer
 export default class SidebarLayout extends Component<Props> {
 
   static defaultProps = {

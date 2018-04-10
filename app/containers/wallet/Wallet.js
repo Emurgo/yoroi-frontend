@@ -1,54 +1,49 @@
 // @flow
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import resolver from '../../utils/imports';
 import MainLayout from '../MainLayout';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import { buildRoute } from '../../utils/routing';
+import { ROUTES } from '../../routes-config';
+import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
-const WalletSummaryPage = resolver('containers/wallet/WalletSummaryPage');
-const WalletSendPage = resolver('containers/wallet/WalletSendPage');
-//const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
-/*const WalletTransactionsPage = resolver(
-  'containers/wallet/WalletTransactionsPage'
-);
-const WalletSettingsPage = resolver('containers/wallet/WalletSettingsPage');*/
+type Props = InjectedContainerProps;
 
 @inject('stores', 'actions') @observer
-export default class Wallet extends Component {
-  constructor() {
-    super();
-    this.state = {
-      selected: 'summary'
-    };
-  }
+export default class Wallet extends Component<Props> {
 
-  handleWalletNavItemClick = tab => {
-    this.setState({
-      selected: tab
+  static defaultProps = { actions: null, stores: null };
+
+  isActiveScreen = (page: string) => {
+    const { app } = this.props.stores;
+    const { wallets } = this.props.stores.ada;
+    if (!wallets.active) return false;
+    const screenRoute = buildRoute(ROUTES.WALLETS.PAGE, { id: wallets.active.id, page });
+    return app.currentRoute === screenRoute;
+  };
+
+  handleWalletNavItemClick = (page: string) => {
+    const { wallets } = this.props.stores.ada;
+    if (!wallets.active) return;
+    this.props.actions.router.goToRoute.trigger({
+      route: ROUTES.WALLETS.PAGE,
+      params: { id: wallets.active.id, page },
     });
   };
 
-  getChild = stores => {
-    switch (this.state.selected) {
-      case 'summary':
-        return <WalletSummaryPage />;
-      case 'send':
-        return <WalletSendPage />;
-      default:
-        return <h1>{this.state.selected}</h1>;
-    }
-  };
-
   render() {
-    const { actions, stores } = this.props;
+    const { wallets, adaRedemption } = this.props.stores.ada;
+    const { actions } = this.props;
+    const { showAdaRedemptionSuccessMessage, amountRedeemed } = adaRedemption;
+    if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;
     return (
       <MainLayout>
         <WalletWithNavigation
-          isActiveScreen={() => true}
+          isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
         >
-          {this.getChild(stores)}
+          {this.props.children}
         </WalletWithNavigation>
       </MainLayout>
     );

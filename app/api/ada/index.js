@@ -7,10 +7,11 @@ import Wallet from '../../domain/Wallet';
 import WalletTransaction, { transactionTypes } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
-import environment from '../../environment';
+//import environment from '../../environment';
 
 import { isValidAdaAddress } from './isValidAdaAddress';
 import { adaTxFee } from './adaTxFee';
+import { newAdaWallet, getAdaAccountRecoveryPhrase, getAdaWallets } from './ada-methods';
 
 import type {
   AdaLocalTimeDifference,
@@ -140,9 +141,10 @@ const stringifyError = o => o.toString();
 export default class AdaApi {
 
   async getWallets(): Promise<GetWalletsResponse> {
+    debugger;
     Logger.debug('AdaApi::getWallets called');
     try {
-      const response: AdaWallets = await getAdaWallets({ ca });
+      const response: AdaWallets = await getAdaWallets();
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(response));
       return response.map(data => _createWalletFromServerData(data));
     } catch (error) {
@@ -207,7 +209,7 @@ export default class AdaApi {
           bpToList: split(mnemonic), // array of mnemonic words
         }
       };
-      const wallet: AdaWallet = await newAdaWallet({ ca, password, walletInitData });
+      const wallet: AdaWallet = await newAdaWallet({ password, walletInitData });
       Logger.debug('AdaApi::createWallet success');
       return _createWalletFromServerData(wallet);
     } catch (error) {

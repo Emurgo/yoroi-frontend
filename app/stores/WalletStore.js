@@ -39,7 +39,7 @@ export default class WalletsStore extends Store {
   setup() {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     this.registerReactions([
-      // this._updateActiveWalletOnRouteChanges,
+      this._updateActiveWalletOnRouteChanges,
       this._toggleAddWalletDialogOnWalletsLoaded,
     ]);
   }
@@ -121,7 +121,8 @@ export default class WalletsStore extends Store {
   }
 
   @computed get hasLoadedWallets(): boolean {
-    return this.walletsRequest.wasExecuted;
+    // FIXME: Check this
+    return true; //this.walletsRequest.wasExecuted;
   }
 
   @computed get hasAnyWallets(): boolean {
@@ -157,7 +158,7 @@ export default class WalletsStore extends Store {
   // ACTIONS
 
   @action refreshWalletsData = async () => {
-    if (!this.stores.networkStatus.isConnected) return;
+    //if (!this.stores.networkStatus.isConnected) return;
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {

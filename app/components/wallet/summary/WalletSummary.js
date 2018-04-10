@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import adaSymbolBig from '../../../assets/images/ada-symbol-big-dark.inline.svg';
@@ -36,7 +36,7 @@ type Props = {
   isLoadingTransactions: boolean,
 };
 
-// @observer
+@observer
 export default class WalletSummary extends Component<Props> {
 
   static contextTypes = {

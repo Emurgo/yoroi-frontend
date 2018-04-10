@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-// import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import WalletNavigation from '../navigation/WalletNavigation';
 import styles from './WalletWithNavigation.scss';
 
@@ -11,7 +11,7 @@ type Props = {
   onWalletNavItemClick: Function,
 };
 
-// @observer
+@observer
 export default class WalletWithNavigation extends Component<Props> {
 
   render() {

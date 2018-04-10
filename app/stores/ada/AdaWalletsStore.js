@@ -20,13 +20,13 @@ export default class AdaWalletsStore extends WalletStore {
 
   // REQUESTS
   /* eslint-disable max-len */
-  @observable walletsRequest: Request<GetWalletsResponse> = new Request(() => {});
+  @observable walletsRequest: Request<GetWalletsResponse> = new Request(this.api.ada.getWallets);
   @observable importFromFileRequest: Request<ImportWalletFromFileResponse> = new Request(() => {});
-  @observable createWalletRequest: Request<CreateWalletResponse> = new Request(() => {});
+  @observable createWalletRequest: Request<CreateWalletResponse> = new Request(this.api.ada.createWallet);
   @observable deleteWalletRequest: Request<DeleteWalletResponse> = new Request(() => {});
   @observable sendMoneyRequest: Request<CreateTransactionResponse> = new Request(() => {});
-  @observable getWalletRecoveryPhraseRequest: Request<GetWalletRecoveryPhraseResponse> = new Request(() => {});
-  @observable restoreRequest: Request<RestoreWalletResponse> = new Request(() => {});
+  @observable getWalletRecoveryPhraseRequest: Request<GetWalletRecoveryPhraseResponse> = new Request(this.api.ada.getWalletRecoveryPhrase);
+  @observable restoreRequest: Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
   /* eslint-enable max-len */
 
   @observable walletExportType: walletExportTypeChoices = 'paperWallet';
@@ -42,9 +42,8 @@ export default class AdaWalletsStore extends WalletStore {
     wallets.restoreWallet.listen(this._restoreWallet);
     wallets.importWalletFromFile.listen(this._importWalletFromFile);
     wallets.chooseWalletExportType.listen(this._chooseWalletExportType);
-    // FIXME
-    // router.goToRoute.listen(this._onRouteChange);
-    // walletBackup.finishWalletBackup.listen(this._finishCreation);
+    router.goToRoute.listen(this._onRouteChange);
+    walletBackup.finishWalletBackup.listen(this._finishCreation);
   }
 
   _sendMoney = async (transactionDetails: {
