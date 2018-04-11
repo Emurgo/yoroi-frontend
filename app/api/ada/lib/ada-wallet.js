@@ -48,7 +48,8 @@ export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
 export function generateAccount(secretWords) {
   const DERIVATION_PATH = [0, 1];
 
-  const seed = bip39.mnemonicToSeed(secretWords);
+  const entropy = bip39.mnemonicToEntropy(secretWords);
+  const seed = Blake2b.blake2b_256(entropy);
 
   const prv = HdWallet.fromSeed(seed);
   const d1 = HdWallet.derivePrivate(prv, DERIVATION_PATH[0]);
@@ -63,7 +64,7 @@ export function generateAccount(secretWords) {
   );
   const address = HdWallet.publicKeyToAddress(d2Pub, derivationPath);
   return {
-    xprv: d2, // FIXME: we need this
+    xprv: d2,
     address: bs58.encode(address)
   };
 }

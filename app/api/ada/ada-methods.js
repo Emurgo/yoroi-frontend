@@ -16,8 +16,13 @@ import {
   generateAdaMnemonic
 } from './lib/ada-wallet';
 
+import { getInfo } from './lib/explorer-api';
+
+import { request } from './lib/request';
+
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const ACCOUNT_KEY = 'ACCOUNT'; // single account atm
+const TX_KEY = 'TXS'; // single txs list atm
 
 export type NewAdaWalletParams = {
   password: ?string,
@@ -27,6 +32,10 @@ export type NewAdaWalletParams = {
 export type IsValidAdaAddressParams = {
   /*ca: string,*/
   address: string
+};
+
+export type GetAdaWalletAccountsParams = {
+  walletId: string
 };
 
 export const isValidAdaAddress = ({
@@ -56,15 +65,25 @@ export const restoreAdaWallet = ({
 export const getAdaWallets = (): Promise<AdaWallets> => {
   const persistentWallet = getFromStorage(WALLET_KEY);
   if (!persistentWallet) return Promise.resolve([]);
-  return Promise.resolve([persistentWallet.wallet]);
+
+  const account = getFromStorage(ACCOUNT_KEY);
+  return getInfo(account.address).then(response => {
+    const updatedWallet = Object.assign({}, persistentWallet.wallet, {
+      cwAmount: {
+        getCCoin: response.caBalance.getCoin
+      }
+    });
+    saveInStorage(WALLET_KEY, {
+      mnemonic: persistentWallet.mnemonic,
+      wallet: updatedWallet,
+    });
+    saveInStorage(TX_KEY, response.caTxList);
+    return Promise.resolve([updatedWallet]);
+  });
 };
 
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
   generateAdaMnemonic();
-
-export type GetAdaWalletAccountsParams = {
-  walletId: string
-};
 
 export const getAdaWalletAccounts = ({
   walletId
@@ -91,6 +110,10 @@ export const getAdaWalletAccounts = ({
   };
   return Promise.resolve([adaAccount]);
 };
+
+/**
+ * Private method helpers
+ */
 
 function saveInStorage(key: string, toSave: any): void {
   localStorage.setItem(key, JSON.stringify(toSave));
