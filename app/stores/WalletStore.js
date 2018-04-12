@@ -38,6 +38,7 @@ export default class WalletsStore extends Store {
 
   setup() {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
+    this._pollRefresh(); // I added this but it wasn't originally in Daedalus
     this.registerReactions([
       this._updateActiveWalletOnRouteChanges,
       this._toggleAddWalletDialogOnWalletsLoaded,

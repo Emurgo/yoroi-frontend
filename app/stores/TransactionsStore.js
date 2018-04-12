@@ -47,10 +47,9 @@ export default class TransactionsStore extends Store {
   };
 
   @computed get recentTransactionsRequest(): CachedRequest<GetTransactionsResponse> {
-    // FIXME: Wrap this
-    const wallet = undefined; //this.stores[environment.API].wallets.active;
+    const wallet = this.stores[environment.API].wallets.active;
     // TODO: Do not return new request here
-    if (!wallet) return new CachedRequest(() => {}); // (this.api[environment.API].getTransactions);
+    if (!wallet) return new CachedRequest(this.api[environment.API].getTransactions);
     return this._getTransactionsRecentRequest(wallet.id);
   }
 
@@ -93,32 +92,28 @@ export default class TransactionsStore extends Store {
   }
 
   @computed get recent(): Array<WalletTransaction> {
-    // FIXME: Wrap this
-    const wallet = undefined; // this.stores[environment.API].wallets.active;
+    const wallet = this.stores[environment.API].wallets.active;
     if (!wallet) return [];
     const result = this._getTransactionsRecentRequest(wallet.id).result;
     return result ? result.transactions.slice(0, this.RECENT_TRANSACTIONS_LIMIT) : [];
   }
 
   @computed get hasAnyFiltered(): boolean {
-    // FIXME: Wrap this
-    const wallet = undefined; // this.stores[environment.API].wallets.active;
+    const wallet = this.stores[environment.API].wallets.active;
     if (!wallet) return false;
     const result = this._getTransactionsAllRequest(wallet.id).result;
     return result ? result.transactions.length > 0 : false;
   }
 
   @computed get hasAny(): boolean {
-    // FIXME: Wrap this
-    const wallet = undefined; // this.stores[environment.API].wallets.active;
+    const wallet = this.stores[environment.API].wallets.active;
     if (!wallet) return false;
     const result = this._getTransactionsRecentRequest(wallet.id).result;
     return result ? result.transactions.length > 0 : false;
   }
 
   @computed get totalAvailable(): number {
-    // FIXME: Wrap this
-    const wallet = undefined; // this.stores[environment.API].wallets.active;
+    const wallet = this.stores[environment.API].wallets.active;
     if (!wallet) return 0;
     const result = this._getTransactionsAllRequest(wallet.id).result;
     return result ? result.transactions.length : 0;
@@ -132,23 +127,23 @@ export default class TransactionsStore extends Store {
   }
 
   @action _refreshTransactionData = () => {
-    if (this.stores.networkStatus.isConnected) {
-      const allWallets = this.stores[environment.API].wallets.all;
-      for (const wallet of allWallets) {
-        const requestParams = {
-          walletId: wallet.id,
-          limit: this.RECENT_TRANSACTIONS_LIMIT,
-          skip: 0,
-          searchTerm: '',
-        };
-        const recentRequest = this._getTransactionsRecentRequest(wallet.id);
-        recentRequest.invalidate({ immediately: false });
-        recentRequest.execute(requestParams);
-        const allRequest = this._getTransactionsAllRequest(wallet.id);
-        allRequest.invalidate({ immediately: false });
-        allRequest.execute(requestParams);
-      }
+    //if (this.stores.networkStatus.isConnected) {
+    const allWallets = this.stores[environment.API].wallets.all;
+    for (const wallet of allWallets) {
+      const requestParams = {
+        walletId: wallet.id,
+        limit: this.RECENT_TRANSACTIONS_LIMIT,
+        skip: 0,
+        searchTerm: '',
+      };
+      const recentRequest = this._getTransactionsRecentRequest(wallet.id);
+      recentRequest.invalidate({ immediately: false });
+      recentRequest.execute(requestParams);
+      const allRequest = this._getTransactionsAllRequest(wallet.id);
+      allRequest.invalidate({ immediately: false });
+      allRequest.execute(requestParams);
     }
+    //}
   };
 
   _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {

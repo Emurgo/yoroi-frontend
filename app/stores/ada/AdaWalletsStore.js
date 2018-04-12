@@ -91,7 +91,7 @@ export default class AdaWalletsStore extends WalletStore {
       }));
       this.stores.ada.addresses._refreshAddresses();
     });
-    /*runInAction('refresh transaction data', () => {
+    runInAction('refresh transaction data', () => {
       const walletIds = result.map((wallet: Wallet) => wallet.id);
       this.stores.ada.transactions.transactionsRequests = walletIds.map(walletId => ({
         walletId,
@@ -99,8 +99,7 @@ export default class AdaWalletsStore extends WalletStore {
         allRequest: this.stores.ada.transactions._getTransactionsAllRequest(walletId),
       }));
       this.stores.ada.transactions._refreshTransactionData();
-    });*/
-    //}
+    });
   };
 
   @action _setIsRestoreActive = (active: boolean) => {

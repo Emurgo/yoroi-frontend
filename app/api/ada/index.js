@@ -19,7 +19,8 @@ import {
   restoreAdaWallet,
   getAdaAccountRecoveryPhrase,
   getAdaWallets,
-  getAdaWalletAccounts, 
+  getAdaWalletAccounts,
+  getAdaHistoryByWallet,
 } from './ada-methods';
 
 import type {
@@ -201,7 +202,6 @@ export default class AdaApi {
     const { walletId, skip, limit } = request;
     try {
       const history: AdaTransactions = await getAdaHistoryByWallet({
-        ca,
         walletId,
         skip,
         limit

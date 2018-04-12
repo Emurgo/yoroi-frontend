@@ -56,11 +56,13 @@ export default class TopBar extends Component<Props> {
 
     return (
       <header className={topBarStyles}>
-        {walletRoutesMatch && (
-          <button className={styles.leftIcon} onClick={onToggleSidebar}>
+        {/*{walletRoutesMatch && (
+           FIXME: We have a single wallet
+            <button className={styles.leftIcon} onClick={onToggleSidebar}>
             {sidebarToggleIcon}
           </button>
-        )}
+          
+        )}*/}
         <div className={styles.topBarTitle}>{topBarTitle}</div>
         {this.props.children}
       </header>
