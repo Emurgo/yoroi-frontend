@@ -24,6 +24,7 @@ export const isValidAdaMnemonic = (
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
 
 export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
+  const {cwAssurance, cwName, cwUnit} = walletInitData.cwInitMeta;
   const wallet = {
     cwAccountsNumber: 1,
     cwAmount: {
@@ -32,9 +33,9 @@ export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
     cwHasPassphrase: false, // We should use password here
     cwId: '1111111111111111',
     cwMeta: {
-      cwAssurance: walletInitData.cwAssurance,
-      cwName: walletInitData.cwName,
-      csUnit: walletInitData.cwUnit
+      cwAssurance,
+      cwName,
+      cwUnit,
     },
     cwPassphraseLU: new Date()
   };
