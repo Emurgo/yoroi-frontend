@@ -29,7 +29,7 @@ export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
     cwAmount: {
       getCCoin: 0
     },
-    cwHasPassphrase: true,
+    cwHasPassphrase: false, // We should use password here
     cwId: '1111111111111111',
     cwMeta: {
       cwAssurance: walletInitData.cwAssurance,

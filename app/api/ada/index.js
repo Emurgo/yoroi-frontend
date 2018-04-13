@@ -21,6 +21,7 @@ import {
   getAdaWallets,
   getAdaWalletAccounts,
   getAdaHistoryByWallet,
+  newAdaPayment, 
 } from './ada-methods';
 
 import type {
@@ -276,7 +277,6 @@ export default class AdaApi {
       // default value. Select (OptimizeForSecurity | OptimizeForSize) will be implemented
       const groupingPolicy = 'OptimizeForSecurity';
       const response: AdaTransaction = await newAdaPayment({
-        ca,
         sender,
         receiver,
         amount,

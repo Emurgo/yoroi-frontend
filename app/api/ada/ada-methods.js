@@ -48,6 +48,21 @@ export type GetAdaHistoryByWalletParams = {
   limit: number
 };
 
+export type RestoreAdaWalletParams = {
+  walletPassword: ?string,
+  walletInitData: AdaWalletInitData
+};
+
+export type NewAdaPaymentParams = {
+  sender: string,
+  receiver: string,
+  amount: string,
+  password: ?string,
+  // "groupingPolicy" - Spend everything from the address
+  // "OptimizeForSize" for no grouping
+  groupingPolicy: ?'OptimizeForSecurity' | 'OptimizeForSize',
+};
+
 export const isValidAdaAddress = ({
   /*ca, */ address
 }: IsValidAdaAddressParams): Promise<boolean> => Promise.resolve(true);
@@ -56,7 +71,7 @@ export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
   isValidAdaMnemonic(phrase, numberOfWords);
 
 export async function newAdaWallet({
-  password, // Password is not used yet
+  password, 
   walletInitData
 }: NewAdaWalletParams): Promise<AdaWallet> {
   const toSave = toWallet(walletInitData);
@@ -148,6 +163,13 @@ export const getAdaHistoryByWallet = ({
 
   return Promise.resolve([transactions, transactions.length]);
 };
+
+export const newAdaPayment = (
+  { ca, sender, receiver, amount, groupingPolicy, password }: NewAdaPaymentParams
+): Promise<AdaTransaction> => {
+  // FIXME: do the magic here
+  return Promise.resolve(false); 
+}
 
 /**
  * Private method helpers

@@ -24,7 +24,7 @@ export default class AdaWalletsStore extends WalletStore {
   @observable importFromFileRequest: Request<ImportWalletFromFileResponse> = new Request(() => {});
   @observable createWalletRequest: Request<CreateWalletResponse> = new Request(this.api.ada.createWallet);
   @observable deleteWalletRequest: Request<DeleteWalletResponse> = new Request(() => {});
-  @observable sendMoneyRequest: Request<CreateTransactionResponse> = new Request(() => {});
+  @observable sendMoneyRequest: Request<CreateTransactionResponse> = new Request(this.api.ada.createTransaction);
   @observable getWalletRecoveryPhraseRequest: Request<GetWalletRecoveryPhraseResponse> = new Request(this.api.ada.getWalletRecoveryPhrase);
   @observable restoreRequest: Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
   /* eslint-enable max-len */

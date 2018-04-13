@@ -14,14 +14,6 @@ export type AdaTxFeeParams = {
 export const adaTxFee = (
 { sender, receiver, amount, groupingPolicy }: AdaTxFeeParams
 ): Promise<AdaTransactionFee> => (
-  //FIXME: Do this method
-  /*request({
-    hostname: 'localhost',
-    method: 'POST',
-    path: `/api/txs/fee/${sender}/${receiver}/${amount}`,
-    port: 8090,
-    ca,
-  }, {}, { groupingPolicy })*/
   Promise.resolve({
     getCCoin: 2323
   })
