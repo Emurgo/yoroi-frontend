@@ -20,8 +20,8 @@ import {
   generateAdaMnemonic
 } from './lib/ada-wallet';
 
-import { getInfo } from './lib/explorer-api';
-import { debug } from 'util';
+import { getInfo, getTxInfo } from './lib/explorer-api';
+import { syncStatus } from './lib/cardano-sl-api';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const ACCOUNT_KEY = 'ACCOUNT'; // single account atm
@@ -90,9 +90,19 @@ export const getAdaWallets = async (): Promise<AdaWallets> => {
   });
 
   if (accountResponse.caTxList.length > 0) {
+    const txRequests = accountResponse.caTxList.map(({ ctbId }) =>
+      getTxInfo(ctbId)
+    );
+    const [syncStatusResponse, ...txsResponse] = await Promise.all(
+      [syncStatus()].concat(txRequests)
+    );
+
+    const latestBlockNumber =
+      syncStatusResponse._spNetworkCD.getChainDifficulty.getBlockCount;
+
     saveInStorage(
       TX_KEY,
-      mapTransactions(accountResponse.caTxList, account.address)
+      mapTransactions(txsResponse, account.address, latestBlockNumber)
     );
   }
 
@@ -155,7 +165,8 @@ function getFromStorage(key: string): any {
 
 function mapTransactions(
   transactions: [],
-  accountAddress
+  accountAddress,
+  latestBlockNumber
 ): Array<AdaTransaction> {
   return transactions.map(tx => {
     const { isOutgoing, amount } = spenderData(tx, accountAddress);
@@ -163,17 +174,17 @@ function mapTransactions(
       ctAmount: {
         getCCoin: amount
       },
-      ctConfirmations: 0,
-      ctId: tx.ctbId,
-      ctInputs: tx.ctbInputs.map(mapInputOutput),
+      ctConfirmations: latestBlockNumber - tx.ctsBlockHeight,
+      ctId: tx.ctsId,
+      ctInputs: tx.ctsInputs.map(mapInputOutput),
       ctIsOutgoing: isOutgoing,
       ctMeta: {
-        ctmDate: tx.ctbTimeIssued,
+        ctmDate: tx.ctsTxTimeIssued,
         ctmDescription: undefined,
         ctmTitle: undefined
       },
-      ctOutputs: tx.ctbOutputs.map(mapInputOutput),
-      ctCondition: 'CPtxApplying' // FIXME: What's this?
+      ctOutputs: tx.ctsOutputs.map(mapInputOutput),
+      ctCondition: 'CPtxInBlocks' // FIXME: What's this?
     };
   });
 }
@@ -203,14 +214,16 @@ function spenderData(tx, address) {
       }
     );
 
-  const incoming = sum(tx.ctbOutputs);
-  const outgoing = sum(tx.ctbInputs);
+  const incoming = sum(tx.ctsOutputs);
+  const outgoing = sum(tx.ctsInputs);
 
-  const isOutgoing = outgoing.totalAmount.greaterThanOrEqualTo(incoming.totalAmount);
+  const isOutgoing = outgoing.totalAmount.greaterThanOrEqualTo(
+    incoming.totalAmount
+  );
 
   const isLocal =
-    incoming.length === tx.ctbInputs.length &&
-    outgoing.length === tx.ctbOutputs.length;
+    incoming.length === tx.ctsInputs.length &&
+    outgoing.length === tx.ctsOutputs.length;
 
   let amount;
   if (isLocal) amount = outgoing.totalAmount;

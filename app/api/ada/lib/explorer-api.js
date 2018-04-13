@@ -10,3 +10,11 @@ export const getInfo = address =>
     path: `/api/addresses/summary/${address}`,
     port: ExplorerApiPort
   });
+
+export const getTxInfo = txId =>
+  request({
+    hostname: ExplorerApiRoute,
+    method: 'GET',
+    path: `/api/txs/summary/${txId}`,
+    port: ExplorerApiPort
+  });
