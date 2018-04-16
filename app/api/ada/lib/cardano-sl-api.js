@@ -10,3 +10,23 @@ export const syncStatus = () =>
     path: '/api/settings/sync/progress',
     port: BackendApiPort
   });
+
+export const getUTXOsOfAddress = address =>
+  request({
+    hostname: BackendApiRoute,
+    method: 'GET',
+    path: `/api/txs/utxoForAddress/${address}`,
+    port: BackendApiPort
+  });
+
+export const sendTx = signedTx =>
+  request(
+    {
+      hostname: BackendApiRoute,
+      method: 'POST',
+      path: '/api/txs/signed',
+      port: BackendApiPort
+    },
+    undefined,
+    signedTx
+  );
