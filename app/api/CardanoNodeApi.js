@@ -9,14 +9,14 @@ CardanoNodeApi.config = {
 
 CardanoNodeApi.transactions = {};
 
-CardanoNodeApi.transactions.buildTx = function ({ to, from, amount }) {
-  return fetch(`${CardanoNodeApi.config.serverRoute}/txs/unsigned/${from}/${to}/${amount}`, {
-    method: 'POST',
+CardanoNodeApi.transactions.getUTXOsOfAddress = function (address) {
+  return fetch(`${CardanoNodeApi.config.serverRoute}/txs/utxoForAddress/${address}`, {
+    method: 'GET',
     headers: new Headers({
       Accept: 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Content-Length': 0
     }),
-    body: JSON.stringify({ groupingPolicy: 'OptimizeForHighThroughput' }),
   })
   .then(parseResponse)
   .then(handleErrors);
