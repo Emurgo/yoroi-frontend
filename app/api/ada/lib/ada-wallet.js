@@ -227,17 +227,14 @@ export function buildSignedRequest(
   if (withChange) {
     const changeOut = Tx.newTxOut(base58.decode(sender), remainingAmount - fee);
     const tempEncodedTx = Tx.addOutput(txWithoutChange, changeOut);
-    //const decoder = new TextDecoder('utf8');
-    //const encodedTx = btoa(String.fromCharCode.apply(null, tempEncodedTx));
-    encodedTx = tempEncodedTx;
+    encodedTx = btoa(String.fromCharCode.apply(null, tempEncodedTx));
   } else {
     encodedTx = txWithoutChange;
   }
 
-  const encodedTxBuffer = Buffer.from(encodedTx)
+  const encodedTxBuffer = Buffer.from(encodedTx);
   const txHash = Buffer.from(
-    //hashTransaction(Buffer.from(encodedTx, 'base64'))
-    hashTransaction(encodedTxBuffer)
+    hashTransaction(Buffer.from(encodedTx, 'base64'))
   ).toString('hex');
   const signTag = '01';
   const protocolMagic = '1A25C00FA9';
@@ -257,7 +254,7 @@ export function buildSignedRequest(
   });
 
   return {
-    encodedTx: encodedTxBuffer.toString('hex'),
+    encodedTx,
     txWitness
   };
 }
