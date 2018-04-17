@@ -5,13 +5,22 @@ const autoprefixer = require('autoprefixer');
 const host = 'localhost';
 const port = 3000;
 const customPath = path.join(__dirname, './customPublicPath');
-const hotScript = 'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
+const hotScript =
+  'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
 const baseDevConfig = () => ({
   devtool: 'eval-cheap-module-source-map',
   entry: {
-    icaruspoc: [customPath, hotScript, path.join(__dirname, '../chrome/extension/icaruspoc')],
-    background: [customPath, hotScript, path.join(__dirname, '../chrome/extension/background')],
+    icaruspoc: [
+      customPath,
+      hotScript,
+      path.join(__dirname, '../chrome/extension/icaruspoc')
+    ],
+    background: [
+      customPath,
+      hotScript,
+      path.join(__dirname, '../chrome/extension/background')
+    ]
   },
   devMiddleware: {
     publicPath: `http://${host}:${port}/js`,
@@ -45,31 +54,49 @@ const baseDevConfig = () => ({
     extensions: ['*', '.js']
   },
   module: {
-    rules: [{
-      test: /\.js$/,
-      loader: 'babel-loader',
-      exclude: /node_modules/,
-      options: {
-        presets: ['react-hmre']
-      }
-    }, {
-      test: /\.css$/,
-      use: [
-        'style-loader',
-        'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
-        {
-          loader: 'postcss-loader',
-          options: {
-            plugins: () => [autoprefixer]
-          }
+    rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        options: {
+          presets: ['react-hmre']
         }
-      ]
-    }]
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: () => [autoprefixer]
+            }
+          }
+        ]
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'style-loader?sourceMap',
+          //'url-loader',
+          'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+          'sass-loader?sourceMap'
+        ]
+      },
+      {
+        test: /\.svg$/,
+        loader: 'raw-loader'
+      },
+      {
+        test: /\.(eot|otf|ttf|woff|woff2)$/,
+        loader: 'file-loader'
+      }
+    ]
   }
 });
 
 const appConfig = baseDevConfig();
 
-module.exports = [
-  appConfig
-];
+module.exports = [appConfig];

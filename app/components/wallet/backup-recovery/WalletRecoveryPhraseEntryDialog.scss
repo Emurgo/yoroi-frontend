@@ -1,0 +1,29 @@
+@import '../../../themes/mixins/loading-spinner';
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.checkbox {
+  margin-top: 30px;
+
+  & + .checkbox {
+    margin-top: 20px;
+  }
+}
+
+.component{
+  :global {
+    .WalletRecoveryInstructions_component {
+      text-align: center;
+    }
+  }
+}
+
+.isSubmitting {
+  @include loading-spinner("../../../assets/images/spinner-light.svg");
+}
