@@ -269,14 +269,14 @@ export default class AdaApi {
 
   async createTransaction(
     request: CreateTransactionRequest
-  ): Promise<CreateTransactionResponse> {
+  ): Promise<Boolean> {
     Logger.debug('AdaApi::createTransaction called');
     const { sender, receiver, amount, password } = request;
     // sender must be set as accountId (account.caId) and not walletId
     try {
       // default value. Select (OptimizeForSecurity | OptimizeForSize) will be implemented
       const groupingPolicy = 'OptimizeForSecurity';
-      const response: AdaTransaction = await newAdaPayment({
+      const response = await newAdaPayment({
         sender,
         receiver,
         amount,
@@ -286,7 +286,7 @@ export default class AdaApi {
       Logger.debug(
         'AdaApi::createTransaction success: ' + stringifyData(response)
       );
-      return _createTransactionFromServerData(response);
+      return response; //_createTransactionFromServerData(response);
     } catch (error) {
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
       // eslint-disable-next-line max-len

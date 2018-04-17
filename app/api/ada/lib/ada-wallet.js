@@ -109,11 +109,10 @@ function txRemainingAmount(inputsUTxO, outputs) {
 function parseTxInUtxo(txInUtxoString) {
   const prefixSize = 8;
   const txHashSize = 64;
+  const start = prefixSize + 1;
+  const end = start + txHashSize;
 
-  const txHash = txInUtxoString.slice(
-    prefixSize + 1,
-    prefixSize + 1 + txHashSize
-  );
+  const txHash = txInUtxoString.slice(start, end);
   const txIndex = Number(txInUtxoString.slice(prefixSize + 1 + txHashSize + 1));
   return {
     txHash,
@@ -156,7 +155,6 @@ function createTx(inputsUTxO, outputs) {
  * @throws if there's not enough balance in the sender account
  */
 function feeForTx(senderAddress, remainingAmount, txWithoutChange, inputsNum) {
-  const fakeSignerXPrv = HdWallet.fromSeed('patakbardaqskovoroda228pva1488kk');
 
   // Obtain tx with fake change (change size is fixed)
   // FIXME: For fake change it is assumed that no there will be no fee
@@ -176,27 +174,6 @@ function feeForTx(senderAddress, remainingAmount, txWithoutChange, inputsNum) {
     return [txFeeStxWithChange, true];
   }
   throw new Error('Not enough balance on sender');
-}
-
-function receiverIsValid(decodedTx, receiver, amount) {
-  const receivers = decodedTx.txOutputs.filter(output => {
-    return output.address === receiver && output.coin === amount;
-  });
-  return receivers.length === 1;
-}
-
-function senderIsValid(decodedTx, sender) {
-  const senders = decodedTx.txOutputs.filter(output => {
-    return output.address === sender;
-  });
-  return senders.length > 0;
-}
-
-function validateSimpleTx(decodedTx, sender, receiver, amount) {
-  return (
-    receiverIsValid(decodedTx, receiver, amount) &&
-    senderIsValid(decodedTx, sender)
-  );
 }
 
 export function buildSignedRequest(
@@ -232,7 +209,6 @@ export function buildSignedRequest(
     encodedTx = txWithoutChange;
   }
 
-  const encodedTxBuffer = Buffer.from(encodedTx);
   const txHash = Buffer.from(
     hashTransaction(Buffer.from(encodedTx, 'base64'))
   ).toString('hex');
@@ -241,10 +217,11 @@ export function buildSignedRequest(
   const tag = `${signTag}${protocolMagic}5820`;
   const toSign = Buffer.from(`${tag}${txHash}`, 'hex');
   // We currently sign with a single private key for this PoC
+  const xprvArray = hexToUInt8Array(xprv);
   const txWitness = utxosInputs.map(() => {
-    const pub = derivePublic(hexToUInt8Array(xprv));
+    const pub = derivePublic(xprvArray);
     const key = Buffer.from(pub).toString('base64');
-    const sig = Buffer.from(signTransaction(xprv, toSign)).toString('hex');
+    const sig = Buffer.from(signTransaction(xprvArray, toSign)).toString('hex');
 
     return {
       tag: 'PkWitness',
