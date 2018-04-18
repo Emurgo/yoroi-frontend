@@ -1,11 +1,12 @@
 import { HdWallet, Payload, Blake2b } from 'rust-cardano-crypto';
+import aesjs from 'aes-js';
 import { Buffer } from 'safe-buffer';
 import bs58 from 'bs58';
 import { mnemonicToSeedImpl } from './BIP39';
 
 const DERIVATION_PATH = [0, 1];
 
-export const generateWallet = function(secretWords) {
+export const generateWallet = function (secretWords) {
   const seed = mnemonicToSeedImpl(secretWords);
 
   const prv = HdWallet.fromSeed(seed);
@@ -32,7 +33,28 @@ export const hashTransaction = Blake2b.blake2b_256;
 
 export const signTransaction = HdWallet.sign;
 
-export const toPublicHex = function(address) {
+export const toPublicHex = function (address) {
   const pkHex = Buffer.from(address).toString('hex');
   return `0x${pkHex}`;
+};
+
+const iv = Buffer.alloc(16); // it's iv = 0 simply
+const getCipher = (key) => new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv)); // eslint-disable-line
+
+const getAesKeyFrom = (password) => Buffer.from((Blake2b.blake2b_256(password)));
+
+export const encryptWithPassword = function (password, data) {
+  const aesKey = getAesKeyFrom(password);
+  const bytes = aesjs.utils.utf8.toBytes(data);
+  const encryptedBytes = getCipher(aesKey).encrypt(bytes);
+  const encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
+  return encryptedHex;
+};
+
+export const decryptWithPassword = function (password, encryptedHex) {
+  const aesKey = getAesKeyFrom(password);
+  const encryptedBytes = aesjs.utils.hex.toBytes(encryptedHex);
+  const decryptedBytes = getCipher(aesKey).decrypt(encryptedBytes);
+  const decryptData = aesjs.utils.utf8.fromBytes(decryptedBytes);
+  return decryptData;
 };

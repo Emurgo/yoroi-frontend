@@ -6,7 +6,9 @@ import { decodeTx } from '../../../utils/cborCodec';
 import {
   hashTransaction,
   signTransaction,
-  derivePublic
+  derivePublic,
+  encryptWithPassword,
+  decryptWithPassword
 } from '../../../utils/crypto/cryptoUtils';
 import hexToUInt8Array from '../../../utils/hexToUInt8Array';
 
@@ -67,7 +69,8 @@ export function generateAccount(secretWords) {
   );
   const address = HdWallet.publicKeyToAddress(d2Pub, derivationPath);
   return {
-    xprv: Buffer.from(d2).toString('hex'),
+    // TODO: Use the wallet password instead
+    xprv: encryptWithPassword('put wallet password', Buffer.from(d2).toString('hex')),
     address: base58.encode(address)
   };
 }
@@ -181,7 +184,7 @@ export function buildSignedRequest(
   receiver,
   amount,
   utxosInputs,
-  xprv
+  encryptedXprv
 ) {
   // FIXME: All utxos corresponding to the sender are selected as the inputs of the tx
   //        This possibly increases the tx fee
@@ -217,6 +220,8 @@ export function buildSignedRequest(
   const tag = `${signTag}${protocolMagic}5820`;
   const toSign = Buffer.from(`${tag}${txHash}`, 'hex');
   // We currently sign with a single private key for this PoC
+  // TODO: Use the wallet password instead
+  const xprv = decryptWithPassword('put wallet password', encryptedXprv);
   const xprvArray = hexToUInt8Array(xprv);
   const txWitness = utxosInputs.map(() => {
     const pub = derivePublic(xprvArray);
