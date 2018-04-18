@@ -289,6 +289,9 @@ export default class WalletSendForm extends Component<Props, State> {
     this._resetTransactionFee();
     const amount = formattedAmountToNaturalUnits(amountValue);
     try {
+      this.setState({
+        transactionFeeError: 'Calculating fee...'
+      });
       const fee = await this.props.calculateTransactionFee(receiver, amount);
       if (this._isMounted) {
         this.setState({

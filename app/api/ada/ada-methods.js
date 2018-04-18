@@ -18,8 +18,11 @@ import {
   generateAccount,
   isValidAdaMnemonic,
   generateAdaMnemonic,
-  buildSignedRequest
+  buildSignedRequest,
+  calculateTxFee
 } from './lib/ada-wallet';
+
+import { AdaTxFeeParams } from './adaTxFee'
 
 import { getInfo, getTxInfo } from './lib/explorer-api';
 import { syncStatus, getUTXOsOfAddress, sendTx } from './lib/cardano-sl-api';
@@ -165,6 +168,24 @@ export const getAdaHistoryByWallet = ({
   return Promise.resolve([transactions, transactions.length]);
 };
 
+export const getPaymentFee = ({
+  sender,
+  receiver,
+  amount,
+  groupingPolicy
+}: AdaTxFeeParams): Promise<Number> => {
+  const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
+  // Get UTXOs for source address.
+  return getUTXOsOfAddress(sender)
+    .then(utxoResponse =>
+      calculateTxFee(
+        sender,
+        utxoResponse,
+        outputs
+      )
+    );
+};
+
 export const newAdaPayment = ({
   sender,
   receiver,
@@ -173,14 +194,14 @@ export const newAdaPayment = ({
   password
 }: NewAdaPaymentParams): Promise<AdaTransaction> => {
   const account = getFromStorage(ACCOUNT_KEY);
+  const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
   // Get UTXOs for source address.
   return getUTXOsOfAddress(sender)
     .then(utxoResponse =>
       buildSignedRequest(
         sender,
-        receiver,
-        parseInt(amount, 10),
         utxoResponse,
+        outputs,
         account.xprv
       )
     )
