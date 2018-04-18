@@ -208,11 +208,12 @@ function mapTransactions(
 ): Array<AdaTransaction> {
   return transactions.map(tx => {
     const { isOutgoing, amount } = spenderData(tx, accountAddress);
+    const isPending = tx.ctsBlockHeight == null;
     return {
       ctAmount: {
         getCCoin: amount
       },
-      ctConfirmations: latestBlockNumber - tx.ctsBlockHeight,
+      ctConfirmations: isPending ? 0 : latestBlockNumber - tx.ctsBlockHeight,
       ctId: tx.ctsId,
       ctInputs: tx.ctsInputs.map(mapInputOutput),
       ctIsOutgoing: isOutgoing,
@@ -222,7 +223,7 @@ function mapTransactions(
         ctmTitle: undefined
       },
       ctOutputs: tx.ctsOutputs.map(mapInputOutput),
-      ctCondition: 'CPtxInBlocks' // FIXME: What's this?
+      ctCondition: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
     };
   });
 }
