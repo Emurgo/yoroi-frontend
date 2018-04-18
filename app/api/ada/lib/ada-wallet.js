@@ -155,6 +155,8 @@ function createTx(inputsUTxO, outputs) {
  * @throws if there's not enough balance in the sender account
  */
 function feeAndChangeForTx(senderAddress, inputsUTxO, outputs, txWithoutChange) {
+  const remainingAmount = txRemainingAmount(inputsUTxO, outputs);
+
   // Obtain tx with fake change (change size is fixed)
   // FIXME: For fake change it is assumed that no there will be no fee
   //        This possibly increases the fee of the tx
@@ -164,7 +166,6 @@ function feeAndChangeForTx(senderAddress, inputsUTxO, outputs, txWithoutChange) 
   const txFeeStxWithChange = feeForEncodedStx(txWithChange, inputsUTxO.length);
   const txFeeStxWithoutChange = feeForEncodedStx(txWithoutChange, inputsUTxO.length);
 
-  const remainingAmount = txRemainingAmount(inputsUTxO, outputs);
   if (
     txFeeStxWithoutChange <= remainingAmount &&
     remainingAmount <= txFeeStxWithChange
