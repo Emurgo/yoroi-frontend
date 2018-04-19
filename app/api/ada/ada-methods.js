@@ -18,10 +18,13 @@ import {
   generateAccount,
   isValidAdaMnemonic,
   generateAdaMnemonic,
-  buildSignedRequest
+  buildSignedRequest,
+  calculateTxFee
 } from './lib/ada-wallet';
 
 import { decryptWithPassword } from '../../utils/crypto/cryptoUtils';
+
+import { AdaTxFeeParams } from './adaTxFee';
 
 import { getInfo, getTxInfo } from './lib/explorer-api';
 import { syncStatus, getUTXOsOfAddress, sendTx } from './lib/cardano-sl-api';
@@ -164,6 +167,24 @@ export const getAdaHistoryByWallet = ({
   return Promise.resolve([transactions, transactions.length]);
 };
 
+export const getPaymentFee = ({
+  sender,
+  receiver,
+  amount,
+  groupingPolicy
+}: AdaTxFeeParams): Promise<Number> => {
+  const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
+  // Get UTXOs for source address.
+  return getUTXOsOfAddress(sender)
+    .then(utxoResponse =>
+      calculateTxFee(
+        sender,
+        utxoResponse,
+        outputs
+      )
+    );
+};
+
 export const newAdaPayment = ({
   sender,
   receiver,
@@ -173,15 +194,15 @@ export const newAdaPayment = ({
 }: NewAdaPaymentParams): Promise<AdaTransaction> => {
   const account = getFromStorage(ACCOUNT_KEY);
   const xprv = password ? decryptWithPassword(password, account.xprv) : account.xprv;
+  const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
   // Get UTXOs for source address.
   return getUTXOsOfAddress(sender)
     .then(utxoResponse =>
       buildSignedRequest(
         sender,
-        receiver,
-        parseInt(amount, 10),
         utxoResponse,
-        xprv
+        outputs,
+        account.xprv
       )
     )
     .then(toSend => sendTx(toSend));
@@ -208,11 +229,12 @@ function mapTransactions(
 ): Array<AdaTransaction> {
   return transactions.map(tx => {
     const { isOutgoing, amount } = spenderData(tx, accountAddress);
+    const isPending = tx.ctsBlockHeight == null;
     return {
       ctAmount: {
         getCCoin: amount
       },
-      ctConfirmations: latestBlockNumber - tx.ctsBlockHeight,
+      ctConfirmations: isPending ? 0 : latestBlockNumber - tx.ctsBlockHeight,
       ctId: tx.ctsId,
       ctInputs: tx.ctsInputs.map(mapInputOutput),
       ctIsOutgoing: isOutgoing,
@@ -222,7 +244,7 @@ function mapTransactions(
         ctmTitle: undefined
       },
       ctOutputs: tx.ctsOutputs.map(mapInputOutput),
-      ctCondition: 'CPtxInBlocks' // FIXME: What's this?
+      ctCondition: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
     };
   });
 }

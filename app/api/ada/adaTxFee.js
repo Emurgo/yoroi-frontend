@@ -1,6 +1,6 @@
 // @flow
 import type { AdaTransactionFee } from './types';
-import { request } from './lib/request';
+import { getPaymentFee } from './ada-methods';
 
 export type AdaTxFeeParams = {
   sender: string,
@@ -11,10 +11,9 @@ export type AdaTxFeeParams = {
   groupingPolicy: ?'OptimizeForSecurity' | 'OptimizeForSize',
 };
 
-export const adaTxFee = (
-{ sender, receiver, amount, groupingPolicy }: AdaTxFeeParams
-): Promise<AdaTransactionFee> => (
-  Promise.resolve({
-    getCCoin: 2323
-  })
+export const adaTxFee = (feeParams: AdaTxFeeParams): Promise<AdaTransactionFee> => (
+  getPaymentFee(feeParams)
+  .then(fee => Promise.resolve({
+    getCCoin: fee
+  }))
 );
