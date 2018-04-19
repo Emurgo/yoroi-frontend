@@ -28,7 +28,7 @@ export const isValidAdaMnemonic = (
 
 export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
-  const wallet = {
+  return {
     cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
@@ -41,11 +41,6 @@ export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
       cwUnit
     },
     cwPassphraseLU: new Date()
-  };
-
-  return {
-    wallet,
-    mnemonic: walletInitData.cwBackupPhrase.bpToList
   };
 }
 

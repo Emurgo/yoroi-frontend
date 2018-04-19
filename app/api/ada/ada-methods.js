@@ -75,12 +75,12 @@ export async function newAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
-  // FIXME: We should remove the plain mnemonic from the local storage
-  const toSave = toWallet(walletInitData);
-  saveInStorage(WALLET_KEY, toSave);
-  const account = generateAccount(toSave.mnemonic, walletPassword);
+  const wallet = toWallet(walletInitData);
+  saveInStorage(WALLET_KEY, wallet);
+  const mnemonic = walletInitData.cwBackupPhrase.bpToList;
+  const account = generateAccount(mnemonic, walletPassword);
   saveInStorage(ACCOUNT_KEY, account);
-  return Promise.resolve(toSave.wallet);
+  return Promise.resolve(wallet);
 }
 
 export const restoreAdaWallet = ({
@@ -96,16 +96,12 @@ export const getAdaWallets = async (): Promise<AdaWallets> => {
   const account = getFromStorage(ACCOUNT_KEY);
   const accountResponse = await getInfo(account.address);
 
-  const updatedWallet = Object.assign({}, persistentWallet.wallet, {
+  const updatedWallet = Object.assign({}, persistentWallet, {
     cwAmount: {
       getCCoin: accountResponse.caBalance.getCoin
     }
   });
-  // FIXME: We should remove the plain mnemonic from the local storage
-  saveInStorage(WALLET_KEY, {
-    mnemonic: persistentWallet.mnemonic,
-    wallet: updatedWallet
-  });
+  saveInStorage(WALLET_KEY, updatedWallet);
 
   if (accountResponse.caTxList.length > 0) {
     const txRequests = accountResponse.caTxList.map(({ ctbId }) =>
