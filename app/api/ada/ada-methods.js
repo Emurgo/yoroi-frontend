@@ -24,7 +24,7 @@ import {
 
 import { decryptWithPassword } from '../../utils/crypto/cryptoUtils';
 
-import { AdaTxFeeParams } from './adaTxFee';
+import type { AdaTxFeeParams } from './adaTxFee';
 
 import { getInfo, getTxInfo } from './lib/explorer-api';
 import { syncStatus, getUTXOsOfAddress, sendTx } from './lib/cardano-sl-api';
@@ -75,7 +75,7 @@ export async function newAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
-  const wallet = toWallet(walletInitData);
+  const wallet = toWallet({ walletPassword, walletInitData });
   saveInStorage(WALLET_KEY, wallet);
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const account = generateAccount(mnemonic, walletPassword);
