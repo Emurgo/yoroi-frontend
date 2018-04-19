@@ -21,6 +21,8 @@ import {
   buildSignedRequest
 } from './lib/ada-wallet';
 
+import { decryptWithPassword } from '../../utils/crypto/cryptoUtils';
+
 import { getInfo, getTxInfo } from './lib/explorer-api';
 import { syncStatus, getUTXOsOfAddress, sendTx } from './lib/cardano-sl-api';
 
@@ -28,8 +30,8 @@ const WALLET_KEY = 'WALLET'; // single wallet atm
 const ACCOUNT_KEY = 'ACCOUNT'; // single account atm
 const TX_KEY = 'TXS'; // single txs list atm
 
-export type NewAdaWalletParams = {
-  password: ?string,
+export type AdaWalletParams = {
+  walletPassword: ?string,
   walletInitData: AdaWalletInitData
 };
 
@@ -47,11 +49,6 @@ export type GetAdaHistoryByWalletParams = {
   walletId: string,
   skip: number,
   limit: number
-};
-
-export type RestoreAdaWalletParams = {
-  walletPassword: ?string,
-  walletInitData: AdaWalletInitData
 };
 
 export type NewAdaPaymentParams = {
@@ -72,12 +69,13 @@ export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
   isValidAdaMnemonic(phrase, numberOfWords);
 
 export async function newAdaWallet({
-  password,
+  walletPassword,
   walletInitData
-}: NewAdaWalletParams): Promise<AdaWallet> {
+}: AdaWalletParams): Promise<AdaWallet> {
+  // FIXME: We should remove the plain mnemonic from the local storage
   const toSave = toWallet(walletInitData);
   saveInStorage(WALLET_KEY, toSave);
-  const account = generateAccount(toSave.mnemonic);
+  const account = generateAccount(toSave.mnemonic, walletPassword);
   saveInStorage(ACCOUNT_KEY, account);
   return Promise.resolve(toSave.wallet);
 }
@@ -85,7 +83,7 @@ export async function newAdaWallet({
 export const restoreAdaWallet = ({
   walletPassword,
   walletInitData
-}: RestoreAdaWalletParams): Promise<AdaWallet> =>
+}: AdaWalletParams): Promise<AdaWallet> =>
   newAdaWallet({ walletPassword, walletInitData });
 
 export const getAdaWallets = async (): Promise<AdaWallets> => {
@@ -100,6 +98,7 @@ export const getAdaWallets = async (): Promise<AdaWallets> => {
       getCCoin: accountResponse.caBalance.getCoin
     }
   });
+  // FIXME: We should remove the plain mnemonic from the local storage
   saveInStorage(WALLET_KEY, {
     mnemonic: persistentWallet.mnemonic,
     wallet: updatedWallet
@@ -173,6 +172,7 @@ export const newAdaPayment = ({
   password
 }: NewAdaPaymentParams): Promise<AdaTransaction> => {
   const account = getFromStorage(ACCOUNT_KEY);
+  const xprv = password ? decryptWithPassword(password, account.xprv) : account.xprv;
   // Get UTXOs for source address.
   return getUTXOsOfAddress(sender)
     .then(utxoResponse =>
@@ -181,7 +181,7 @@ export const newAdaPayment = ({
         receiver,
         parseInt(amount, 10),
         utxoResponse,
-        account.xprv
+        xprv
       )
     )
     .then(toSend => sendTx(toSend));

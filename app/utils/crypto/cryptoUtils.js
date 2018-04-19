@@ -40,7 +40,6 @@ export const toPublicHex = function (address) {
 
 const iv = Buffer.alloc(16); // it's iv = 0 simply
 const getCipher = (key) => new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv)); // eslint-disable-line
-
 const getAesKeyFrom = (password) => Buffer.from((Blake2b.blake2b_256(password)));
 
 export const encryptWithPassword = function (password, data) {

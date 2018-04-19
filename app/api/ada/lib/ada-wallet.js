@@ -7,8 +7,7 @@ import {
   hashTransaction,
   signTransaction,
   derivePublic,
-  encryptWithPassword,
-  decryptWithPassword
+  encryptWithPassword
 } from '../../../utils/crypto/cryptoUtils';
 import hexToUInt8Array from '../../../utils/hexToUInt8Array';
 
@@ -50,7 +49,7 @@ export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
   };
 }
 
-export function generateAccount(secretWords) {
+export function generateAccount(secretWords, password) {
   const DERIVATION_PATH = [0, 1];
 
   const entropy = bip39.mnemonicToEntropy(secretWords);
@@ -68,10 +67,10 @@ export function generateAccount(secretWords) {
     new Uint32Array(DERIVATION_PATH)
   );
   const address = HdWallet.publicKeyToAddress(d2Pub, derivationPath);
+  const xprv = Buffer.from(d2).toString('hex');
   return {
-    // TODO: Use the wallet password instead
-    xprv: encryptWithPassword('put wallet password', Buffer.from(d2).toString('hex')),
-    address: base58.encode(address)
+    address: base58.encode(address),
+    xprv: password ? encryptWithPassword(password, xprv) : xprv
   };
 }
 
@@ -184,7 +183,7 @@ export function buildSignedRequest(
   receiver,
   amount,
   utxosInputs,
-  encryptedXprv
+  xprv
 ) {
   // FIXME: All utxos corresponding to the sender are selected as the inputs of the tx
   //        This possibly increases the tx fee
@@ -220,8 +219,6 @@ export function buildSignedRequest(
   const tag = `${signTag}${protocolMagic}5820`;
   const toSign = Buffer.from(`${tag}${txHash}`, 'hex');
   // We currently sign with a single private key for this PoC
-  // TODO: Use the wallet password instead
-  const xprv = decryptWithPassword('put wallet password', encryptedXprv);
   const xprvArray = hexToUInt8Array(xprv);
   const txWitness = utxosInputs.map(() => {
     const pub = derivePublic(xprvArray);
