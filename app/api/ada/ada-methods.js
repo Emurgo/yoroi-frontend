@@ -198,7 +198,7 @@ export const newAdaPayment = ({
         sender,
         utxoResponse,
         outputs,
-        account.xprv
+        xprv
       )
     )
     .then(toSend => sendTx(toSend));
