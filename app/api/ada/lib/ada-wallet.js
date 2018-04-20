@@ -6,16 +6,13 @@ import { decodeTx } from '../../../utils/cborCodec';
 import {
   hashTransaction,
   signTransaction,
-  derivePublic
+  derivePublic,
+  encryptWithPassword
 } from '../../../utils/crypto/cryptoUtils';
 import hexToUInt8Array from '../../../utils/hexToUInt8Array';
 
-import type { AdaWallet, AdaWalletInitData } from '../types';
-
-export type PersistentWallet = {
-  wallet: AdaWallet,
-  mnemonic: []
-};
+import type { AdaWallet } from '../types';
+import type { AdaWalletParams } from '../ada-methods';
 
 export const generateAdaMnemonic = () => bip39.generateMnemonic(128).split(' ');
 
@@ -25,14 +22,14 @@ export const isValidAdaMnemonic = (
 ) =>
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
 
-export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
+export function toWallet({ walletPassword, walletInitData }: AdaWalletParams): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
-  const wallet = {
+  return {
     cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
     },
-    cwHasPassphrase: false, // We should use password here
+    cwHasPassphrase: !!walletPassword,
     cwId: '1111111111111111',
     cwMeta: {
       cwAssurance,
@@ -41,14 +38,9 @@ export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
     },
     cwPassphraseLU: new Date()
   };
-
-  return {
-    wallet,
-    mnemonic: walletInitData.cwBackupPhrase.bpToList
-  };
 }
 
-export function generateAccount(secretWords) {
+export function generateAccount(secretWords, password) {
   const DERIVATION_PATH = [0, 1];
 
   const entropy = bip39.mnemonicToEntropy(secretWords);
@@ -66,9 +58,16 @@ export function generateAccount(secretWords) {
     new Uint32Array(DERIVATION_PATH)
   );
   const address = HdWallet.publicKeyToAddress(d2Pub, derivationPath);
+  const xprv = Buffer.from(d2).toString('hex');
+  /*
+    TODO: For this release is ok but, in order to not to forget about this,
+    in future releases we need to keep track of the mnemonic.
+    Actually, if we wanted to, we would only need to encrypt the mnemonic.
+    xprv can be easily derived from mnemonic and derivation path so maybe we could avoid storing it.
+  */
   return {
-    xprv: Buffer.from(d2).toString('hex'),
-    address: base58.encode(address)
+    address: base58.encode(address),
+    xprv: password ? encryptWithPassword(password, xprv) : xprv
   };
 }
 
