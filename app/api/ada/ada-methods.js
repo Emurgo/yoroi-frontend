@@ -18,8 +18,13 @@ import {
   generateAccount,
   isValidAdaMnemonic,
   generateAdaMnemonic,
-  buildSignedRequest
+  buildSignedRequest,
+  calculateTxFee
 } from './lib/ada-wallet';
+
+import { decryptWithPassword } from '../../utils/crypto/cryptoUtils';
+
+import type { AdaTxFeeParams } from './adaTxFee';
 
 import { getInfo, getTxInfo } from './lib/explorer-api';
 import { syncStatus, getUTXOsOfAddress, sendTx } from './lib/cardano-sl-api';
@@ -28,8 +33,8 @@ const WALLET_KEY = 'WALLET'; // single wallet atm
 const ACCOUNT_KEY = 'ACCOUNT'; // single account atm
 const TX_KEY = 'TXS'; // single txs list atm
 
-export type NewAdaWalletParams = {
-  password: ?string,
+export type AdaWalletParams = {
+  walletPassword: ?string,
   walletInitData: AdaWalletInitData
 };
 
@@ -47,11 +52,6 @@ export type GetAdaHistoryByWalletParams = {
   walletId: string,
   skip: number,
   limit: number
-};
-
-export type RestoreAdaWalletParams = {
-  walletPassword: ?string,
-  walletInitData: AdaWalletInitData
 };
 
 export type NewAdaPaymentParams = {
@@ -72,20 +72,21 @@ export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
   isValidAdaMnemonic(phrase, numberOfWords);
 
 export async function newAdaWallet({
-  password,
+  walletPassword,
   walletInitData
-}: NewAdaWalletParams): Promise<AdaWallet> {
-  const toSave = toWallet(walletInitData);
-  saveInStorage(WALLET_KEY, toSave);
-  const account = generateAccount(toSave.mnemonic);
+}: AdaWalletParams): Promise<AdaWallet> {
+  const wallet = toWallet({ walletPassword, walletInitData });
+  saveInStorage(WALLET_KEY, wallet);
+  const mnemonic = walletInitData.cwBackupPhrase.bpToList;
+  const account = generateAccount(mnemonic, walletPassword);
   saveInStorage(ACCOUNT_KEY, account);
-  return Promise.resolve(toSave.wallet);
+  return Promise.resolve(wallet);
 }
 
 export const restoreAdaWallet = ({
   walletPassword,
   walletInitData
-}: RestoreAdaWalletParams): Promise<AdaWallet> =>
+}: AdaWalletParams): Promise<AdaWallet> =>
   newAdaWallet({ walletPassword, walletInitData });
 
 export const getAdaWallets = async (): Promise<AdaWallets> => {
@@ -95,15 +96,12 @@ export const getAdaWallets = async (): Promise<AdaWallets> => {
   const account = getFromStorage(ACCOUNT_KEY);
   const accountResponse = await getInfo(account.address);
 
-  const updatedWallet = Object.assign({}, persistentWallet.wallet, {
+  const updatedWallet = Object.assign({}, persistentWallet, {
     cwAmount: {
       getCCoin: accountResponse.caBalance.getCoin
     }
   });
-  saveInStorage(WALLET_KEY, {
-    mnemonic: persistentWallet.mnemonic,
-    wallet: updatedWallet
-  });
+  saveInStorage(WALLET_KEY, updatedWallet);
 
   if (accountResponse.caTxList.length > 0) {
     const txRequests = accountResponse.caTxList.map(({ ctbId }) =>
@@ -165,6 +163,24 @@ export const getAdaHistoryByWallet = ({
   return Promise.resolve([transactions, transactions.length]);
 };
 
+export const getPaymentFee = ({
+  sender,
+  receiver,
+  amount,
+  groupingPolicy
+}: AdaTxFeeParams): Promise<Number> => {
+  const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
+  // Get UTXOs for source address.
+  return getUTXOsOfAddress(sender)
+    .then(utxoResponse =>
+      calculateTxFee(
+        sender,
+        utxoResponse,
+        outputs
+      )
+    );
+};
+
 export const newAdaPayment = ({
   sender,
   receiver,
@@ -173,15 +189,16 @@ export const newAdaPayment = ({
   password
 }: NewAdaPaymentParams): Promise<AdaTransaction> => {
   const account = getFromStorage(ACCOUNT_KEY);
+  const xprv = password ? decryptWithPassword(password, account.xprv) : account.xprv;
+  const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
   // Get UTXOs for source address.
   return getUTXOsOfAddress(sender)
     .then(utxoResponse =>
       buildSignedRequest(
         sender,
-        receiver,
-        parseInt(amount, 10),
         utxoResponse,
-        account.xprv
+        outputs,
+        xprv
       )
     )
     .then(toSend => sendTx(toSend));
@@ -208,11 +225,12 @@ function mapTransactions(
 ): Array<AdaTransaction> {
   return transactions.map(tx => {
     const { isOutgoing, amount } = spenderData(tx, accountAddress);
+    const isPending = tx.ctsBlockHeight == null;
     return {
       ctAmount: {
         getCCoin: amount
       },
-      ctConfirmations: latestBlockNumber - tx.ctsBlockHeight,
+      ctConfirmations: isPending ? 0 : latestBlockNumber - tx.ctsBlockHeight,
       ctId: tx.ctsId,
       ctInputs: tx.ctsInputs.map(mapInputOutput),
       ctIsOutgoing: isOutgoing,
@@ -222,7 +240,7 @@ function mapTransactions(
         ctmTitle: undefined
       },
       ctOutputs: tx.ctsOutputs.map(mapInputOutput),
-      ctCondition: 'CPtxInBlocks' // FIXME: What's this?
+      ctCondition: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
     };
   });
 }

@@ -241,7 +241,7 @@ export default class AdaApi {
         }
       };
       const wallet: AdaWallet = await newAdaWallet({
-        password,
+        walletPassword: password,
         walletInitData
       });
       Logger.debug('AdaApi::createWallet success');
@@ -355,6 +355,7 @@ export default class AdaApi {
     Logger.debug('AdaApi::createAddress called');
     const { accountId, password } = request;
     try {
+      // FIXME: This is broken, maybe we should remove all the entire functionality
       const response: AdaAddress = await newAdaWalletAddress({
         password,
         accountId

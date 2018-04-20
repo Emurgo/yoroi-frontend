@@ -6,16 +6,13 @@ import { decodeTx } from '../../../utils/cborCodec';
 import {
   hashTransaction,
   signTransaction,
-  derivePublic
+  derivePublic,
+  encryptWithPassword
 } from '../../../utils/crypto/cryptoUtils';
 import hexToUInt8Array from '../../../utils/hexToUInt8Array';
 
-import type { AdaWallet, AdaWalletInitData } from '../types';
-
-export type PersistentWallet = {
-  wallet: AdaWallet,
-  mnemonic: []
-};
+import type { AdaWallet } from '../types';
+import type { AdaWalletParams } from '../ada-methods';
 
 export const generateAdaMnemonic = () => bip39.generateMnemonic(128).split(' ');
 
@@ -25,14 +22,14 @@ export const isValidAdaMnemonic = (
 ) =>
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
 
-export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
+export function toWallet({ walletPassword, walletInitData }: AdaWalletParams): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
-  const wallet = {
+  return {
     cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
     },
-    cwHasPassphrase: false, // We should use password here
+    cwHasPassphrase: !!walletPassword,
     cwId: '1111111111111111',
     cwMeta: {
       cwAssurance,
@@ -41,14 +38,9 @@ export function toWallet(walletInitData: AdaWalletInitData): PersistentWallet {
     },
     cwPassphraseLU: new Date()
   };
-
-  return {
-    wallet,
-    mnemonic: walletInitData.cwBackupPhrase.bpToList
-  };
 }
 
-export function generateAccount(secretWords) {
+export function generateAccount(secretWords, password) {
   const DERIVATION_PATH = [0, 1];
 
   const entropy = bip39.mnemonicToEntropy(secretWords);
@@ -66,9 +58,16 @@ export function generateAccount(secretWords) {
     new Uint32Array(DERIVATION_PATH)
   );
   const address = HdWallet.publicKeyToAddress(d2Pub, derivationPath);
+  const xprv = Buffer.from(d2).toString('hex');
+  /*
+    TODO: For this release is ok but, in order to not to forget about this,
+    in future releases we need to keep track of the mnemonic.
+    Actually, if we wanted to, we would only need to encrypt the mnemonic.
+    xprv can be easily derived from mnemonic and derivation path so maybe we could avoid storing it.
+  */
   return {
-    xprv: Buffer.from(d2).toString('hex'),
-    address: base58.encode(address)
+    address: base58.encode(address),
+    xprv: password ? encryptWithPassword(password, xprv) : xprv
   };
 }
 
@@ -85,7 +84,7 @@ function calculateSTxSize(encodedTx, inputsNum) {
 // Calculates the fee for and encoded signed tx
 function feeForEncodedStx(encodedTx, inputsNum) {
   const txSize = calculateSTxSize(encodedTx, inputsNum);
-  return 155381 + 43.946 * txSize;
+  return Math.ceil(155381 + 43.946 * txSize);
 }
 
 // Returns the remaining amount of creating a tx with the passed inputs and outputs
@@ -154,7 +153,8 @@ function createTx(inputsUTxO, outputs) {
  * @returns (txFee, shouldHaveChange)
  * @throws if there's not enough balance in the sender account
  */
-function feeForTx(senderAddress, remainingAmount, txWithoutChange, inputsNum) {
+function feeAndChangeForTx(senderAddress, inputsUTxO, outputs, txWithoutChange) {
+  const remainingAmount = txRemainingAmount(inputsUTxO, outputs);
 
   // Obtain tx with fake change (change size is fixed)
   // FIXME: For fake change it is assumed that no there will be no fee
@@ -162,52 +162,54 @@ function feeForTx(senderAddress, remainingAmount, txWithoutChange, inputsNum) {
   const fakeChange = Tx.newTxOut(base58.decode(senderAddress), remainingAmount);
   const txWithChange = Tx.addOutput(txWithoutChange, fakeChange);
 
-  const txFeeStxWithChange = feeForEncodedStx(txWithChange, inputsNum);
-  const txFeeStxWithoutChange = feeForEncodedStx(txWithoutChange, inputsNum);
+  const txFeeStxWithChange = feeForEncodedStx(txWithChange, inputsUTxO.length);
+  const txFeeStxWithoutChange = feeForEncodedStx(txWithoutChange, inputsUTxO.length);
 
   if (
     txFeeStxWithoutChange <= remainingAmount &&
     remainingAmount <= txFeeStxWithChange
   ) {
-    return [txFeeStxWithoutChange, false];
+    return [txFeeStxWithoutChange, 0];
   } else if (remainingAmount > txFeeStxWithChange) {
-    return [txFeeStxWithChange, true];
+    return [txFeeStxWithChange, remainingAmount - txFeeStxWithChange];
   }
-  throw new Error('Not enough balance on sender');
+  throw new Error('not enough money');
+}
+
+export function calculateTxFee(
+  sender,
+  senderUtxos,
+  outputs
+) {
+  // FIXME: All utxos corresponding to the sender are selected as the inputs of the tx
+  //        This possibly increases the tx fee
+  const txWithoutChange = createTx(senderUtxos, outputs);
+
+  const feeAndChange = feeAndChangeForTx(sender, senderUtxos, outputs, txWithoutChange);
+  return feeAndChange[0];
 }
 
 export function buildSignedRequest(
   sender,
-  receiver,
-  amount,
-  utxosInputs,
+  senderUtxos,
+  outputs,
   xprv
 ) {
   // FIXME: All utxos corresponding to the sender are selected as the inputs of the tx
   //        This possibly increases the tx fee
-  const outputs = [{ address: receiver, coin: amount }];
+  const txWithoutChange = createTx(senderUtxos, outputs);
 
-  const txWithoutChange = createTx(utxosInputs, outputs);
+  const feeAndChange = feeAndChangeForTx(sender, senderUtxos, outputs, txWithoutChange);
+  const change = feeAndChange[1];
 
-  const remainingAmount = txRemainingAmount(utxosInputs, outputs);
-  const feeResponse = feeForTx(
-    sender,
-    remainingAmount,
-    txWithoutChange,
-    utxosInputs.length
-  );
-  const fee = feeResponse[0];
-  const withChange = feeResponse[1];
-
-  let encodedTx;
-
-  if (withChange) {
-    const changeOut = Tx.newTxOut(base58.decode(sender), remainingAmount - fee);
-    const tempEncodedTx = Tx.addOutput(txWithoutChange, changeOut);
-    encodedTx = btoa(String.fromCharCode.apply(null, tempEncodedTx));
+  let tempEncodedTx;
+  if (change !== 0) {
+    const changeOut = Tx.newTxOut(base58.decode(sender), change);
+    tempEncodedTx = Tx.addOutput(txWithoutChange, changeOut);
   } else {
-    encodedTx = txWithoutChange;
+    tempEncodedTx = txWithoutChange;
   }
+  const encodedTx = btoa(String.fromCharCode.apply(null, tempEncodedTx));
 
   const txHash = Buffer.from(
     hashTransaction(Buffer.from(encodedTx, 'base64'))
@@ -218,7 +220,7 @@ export function buildSignedRequest(
   const toSign = Buffer.from(`${tag}${txHash}`, 'hex');
   // We currently sign with a single private key for this PoC
   const xprvArray = hexToUInt8Array(xprv);
-  const txWitness = utxosInputs.map(() => {
+  const txWitness = senderUtxos.map(() => {
     const pub = derivePublic(xprvArray);
     const key = Buffer.from(pub).toString('base64');
     const sig = Buffer.from(signTransaction(xprvArray, toSign)).toString('hex');
