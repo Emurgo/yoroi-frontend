@@ -23,7 +23,7 @@ $ git submodule update --init --recursive
 
 # Install dependencies
 $ npm run build-js-cardano-wasm 
-$ npm run setup
+$ npm install
 ```
 
 ## Development
