@@ -1,7 +1,7 @@
-// Reference taken from: https://github.com/input-output-hk/rust-cardano-crypto/blob/5957bc489c6ddc02431ba400add952f3e29a12b2/js-example/src/Components/Bindings/BIP39.js
+// Reference taken from: https://github.com/input-output-hk/cardano-crypto/blob/5957bc489c6ddc02431ba400add952f3e29a12b2/js-example/src/Components/Bindings/BIP39.js
 import bip39 from 'bip39';
 import { Buffer } from 'safe-buffer';
-import { Blake2b } from 'rust-cardano-crypto';
+import { Blake2b } from 'cardano-crypto';
 
 export const validateMnemonic = bip39.validateMnemonic;
 

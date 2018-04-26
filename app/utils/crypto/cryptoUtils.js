@@ -1,4 +1,4 @@
-import { HdWallet, Payload, Blake2b } from 'rust-cardano-crypto';
+import { HdWallet, Payload, Blake2b } from 'cardano-crypto';
 import aesjs from 'aes-js';
 import { Buffer } from 'safe-buffer';
 import bs58 from 'bs58';

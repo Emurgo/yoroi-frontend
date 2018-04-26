@@ -1,7 +1,7 @@
 import bip39 from 'bip39';
 import { Buffer } from 'safe-buffer';
 import base58 from 'bs58';
-import { HdWallet, Payload, Blake2b, Tx } from 'rust-cardano-crypto';
+import { HdWallet, Payload, Blake2b, Tx } from 'cardano-crypto';
 import { decodeTx } from '../../../utils/cborCodec';
 import {
   hashTransaction,

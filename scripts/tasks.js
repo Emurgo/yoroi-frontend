@@ -16,7 +16,9 @@ exports.copyAssets = (type) => {
   const env = type === 'build' ? 'prod' : type;
   rm('-rf', type);
   mkdir(type);
+  mkdir(`${type}/js`);
   cp(`chrome/manifest.${env}.json`, `${type}/manifest.json`);
   cp('-R', 'chrome/assets/*', type);
+  cp('-R', 'dll/*', `${type}/js/`);
   exec(`pug -O "{ env: '${env}' }" -o ${type} chrome/views/`);
 };
