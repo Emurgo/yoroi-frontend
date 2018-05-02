@@ -18,11 +18,10 @@ import {
   generateAccount,
   isValidAdaMnemonic,
   generateAdaMnemonic,
-  buildSignedRequest,
-  calculateTxFee
 } from './lib/ada-wallet';
 
 import { decryptWithPassword } from '../../utils/crypto/cryptoUtils';
+import { Wallet } from 'cardano-crypto';
 
 import type { AdaTxFeeParams } from './adaTxFee';
 
@@ -163,22 +162,34 @@ export const getAdaHistoryByWallet = ({
   return Promise.resolve([transactions, transactions.length]);
 };
 
+/*
+  FIXME: Change current logic to:
+  1- Get mnemonic from account.seed (you should use the password if is it needed)
+  2- wallet = Wallet.fromSeed(mnemonicAsSeed).result
+  3- getUTXOsOfAddress
+  4- Wallet.spend
+  5- get fee from Wallet.spend response (result.tx.tx)
+*/
 export const getPaymentFee = ({
   sender,
   receiver,
   amount,
   groupingPolicy
 }: AdaTxFeeParams): Promise<Number> => {
+  // FIXME: Manage multiple sender addresses
   const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
   // Get UTXOs for source address.
   return getUTXOsOfAddress(sender)
-    .then(utxoResponse =>
-      calculateTxFee(
+    .then((utxoResponse) => {
+      // FIXME: Get fee from Wallet.spend response (result.tx.tx)
+      // @throws if there's not enough balance in the sender account
+      /*calculateTxFee(
         sender,
         utxoResponse,
         outputs
-      )
-    );
+      )*/
+      return 0;
+    });
 };
 
 export const newAdaPayment = ({
@@ -189,19 +200,28 @@ export const newAdaPayment = ({
   password
 }: NewAdaPaymentParams): Promise<AdaTransaction> => {
   const account = getFromStorage(ACCOUNT_KEY);
-  const xprv = password ? decryptWithPassword(password, account.xprv) : account.xprv;
+  const seed = password ? decryptWithPassword(password, account.seed) : account.seed;
+  const wallet = Wallet.fromSeed(seed);
+  // TODO: Choose correct feeAddr ?
+  const feeAddr = sender;
+  const changeAddr = sender;
   const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
   // Get UTXOs for source address.
-  return getUTXOsOfAddress(sender)
-    .then(utxoResponse =>
-      buildSignedRequest(
-        sender,
-        utxoResponse,
+  return getUTXOsOfAddress(sender) // TODO: Manage multiple sender addresses
+    .then(senderUtxos =>
+      Wallet.spend(
+        wallet,
+        senderUtxos,
         outputs,
-        xprv
+        feeAddr,
+        changeAddr
       )
     )
-    .then(toSend => sendTx(toSend));
+    .then((toSend) => {
+      console.log('SignedTx', toSend);
+      // TODO: Target to icaraus-backend-service method
+      sendTx(toSend);
+    });
 };
 
 /**
