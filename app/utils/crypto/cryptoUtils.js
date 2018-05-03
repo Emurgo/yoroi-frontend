@@ -42,9 +42,8 @@ const iv = Buffer.alloc(16); // it's iv = 0 simply
 const getCipher = (key) => new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv)); // eslint-disable-line
 const getAesKeyFrom = (password) => Buffer.from((Blake2b.blake2b_256(password)));
 
-export const encryptWithPassword = function (password, data) {
+export const encryptWithPassword = function (password, bytes) {
   const aesKey = getAesKeyFrom(password);
-  const bytes = aesjs.utils.utf8.toBytes(data);
   const encryptedBytes = getCipher(aesKey).encrypt(bytes);
   const encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
   return encryptedHex;
@@ -54,6 +53,5 @@ export const decryptWithPassword = function (password, encryptedHex) {
   const aesKey = getAesKeyFrom(password);
   const encryptedBytes = aesjs.utils.hex.toBytes(encryptedHex);
   const decryptedBytes = getCipher(aesKey).decrypt(encryptedBytes);
-  const decryptData = aesjs.utils.utf8.fromBytes(decryptedBytes);
-  return decryptData;
+  return decryptedBytes;
 };
