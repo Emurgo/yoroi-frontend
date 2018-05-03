@@ -58,6 +58,15 @@ export function generateAccount(secretWords, password) {
   };
 }
 
+// Check documentation: https://cardanodocs.com/cardano/transaction-fees/
+const A_SPECIAL_CONSTANT = 155381;
+const B_SPECIAL_CONSTANT = 43.946;
+
+export function getFeeFromSignedEncodedTx(signedEncodedTx) {
+  const txSize = signedEncodedTx.length;
+  return Math.ceil(A_SPECIAL_CONSTANT + B_SPECIAL_CONSTANT * txSize);
+}
+
 export function getWalletFromAccount(account, password) {
   const seed = password ? decryptWithPassword(password, account.seed) : account.seed;
   const seedAsArray = Object.values(seed);

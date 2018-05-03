@@ -21,7 +21,10 @@ import {
 } from './lib/ada-wallet';
 
 import { Wallet } from 'cardano-crypto';
-import { getWalletFromAccount } from './lib/ada-wallet';
+import { 
+  getWalletFromAccount,
+  getFeeFromSignedEncodedTx
+} from './lib/ada-wallet';
 
 import type { AdaTxFeeParams } from './adaTxFee';
 
@@ -167,8 +170,47 @@ export const getPaymentFee = ({
   amount,
   groupingPolicy
 }: AdaTxFeeParams): Promise<Number> => {
-  // FIXME: get the correct fee
-  return Promise.resolve(0);
+  const account = getFromStorage(ACCOUNT_KEY);
+  const password = 'FakePassword';
+  const wallet = getWalletFromAccount(account, password);
+  // FIXME: Remove feeAddr
+  const feeAddr = sender;
+  const changeAddr = sender;
+  const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
+  return getUTXOsOfAddress(sender) // TODO: Manage multiple sender addresses
+    .then((senderUtxos) => {
+      // FIXME: Use senderUtxos combine it with the sender addresses that corresponds
+      // const inputs = [];
+      const inputs = [{ // Hardcoded input example
+        ptr: {
+          index: 42,
+          id: "1c7b178c1655628ca87c7da6a5d9d13c1e0a304094ac88770768d565e3d20e0b"
+        },
+        value: {
+          address: "DdzFFzCqrhtCUjHyzgvgigwA5soBgDxpc8WfnG1RGhrsRrWMV8uKdpgVfCXGgNuXhdN4qxPMvRUtbUnWhPzxSdxJrWzPqACZeh6scCH5",
+          value: 92837348
+        },
+        addressing: {
+          account: 0,
+          change: 0,
+          index: 9
+        }
+      }];
+      const result = Wallet.spend(
+        wallet,
+        inputs,
+        outputs,
+        feeAddr,
+        changeAddr
+      );
+      // TODO: Improve Rust error handling
+      if (result.failed) {
+        if (result.msg === 'FeeCalculationError(NotEnoughInput)') {
+          throw new Error('not enough money');
+        }
+      }
+      return getFeeFromSignedEncodedTx(result.result.cbor_encoded_tx);
+    });
 };
 
 export const newAdaPayment = ({
@@ -186,15 +228,32 @@ export const newAdaPayment = ({
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsOfAddress(sender) // TODO: Manage multiple sender addresses
     .then((senderUtxos) => {
-      const signedTx = Wallet.spend(
+      // FIXME: Use senderUtxos combine it with the sender addresses that corresponds
+      // const inputs = [];
+      const inputs = [{ // Hardcoded input example
+        ptr: {
+          index: 42,
+          id: "1c7b178c1655628ca87c7da6a5d9d13c1e0a304094ac88770768d565e3d20e0b"
+        },
+        value: {
+          address: "DdzFFzCqrhtCUjHyzgvgigwA5soBgDxpc8WfnG1RGhrsRrWMV8uKdpgVfCXGgNuXhdN4qxPMvRUtbUnWhPzxSdxJrWzPqACZeh6scCH5",
+          value: 92837348
+        },
+        addressing: {
+          account: 0,
+          change: 0,
+          index: 9
+        }
+      }];
+      const { result: { cbor_encoded_tx } } = Wallet.spend(
         wallet,
-        senderUtxos,
+        inputs,
         outputs,
         feeAddr,
         changeAddr
-      ).result.cbor_encoded_tx;
+      );
       // TODO: Target to icaraus-backend-service method
-      return sendTx(signedTx);
+      return sendTx(cbor_encoded_tx);
     });
 };
 
