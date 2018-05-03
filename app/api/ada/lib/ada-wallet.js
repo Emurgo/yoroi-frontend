@@ -1,11 +1,10 @@
 import bip39 from 'bip39';
-import { Buffer } from 'safe-buffer';
 import base58 from 'bs58';
-import { HdWallet, Payload, Blake2b } from 'cardano-crypto';
+import { HdWallet, Payload, Blake2b, Wallet } from 'cardano-crypto';
 import {
-  encryptWithPassword
+  encryptWithPassword,
+  decryptWithPassword
 } from '../../../utils/crypto/cryptoUtils';
-
 import type { AdaWallet } from '../types';
 import type { AdaWalletParams } from '../ada-methods';
 
@@ -57,4 +56,10 @@ export function generateAccount(secretWords, password) {
     address: base58.encode(address),
     seed: password ? encryptWithPassword(password, seed) : seed
   };
+}
+
+export function getWalletFromAccount(account, password) {
+  const seed = password ? decryptWithPassword(password, account.seed) : account.seed;
+  const seedAsArray = Object.values(seed);
+  return Wallet.fromSeed(seedAsArray).result;
 }

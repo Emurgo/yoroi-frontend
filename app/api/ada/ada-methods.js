@@ -20,8 +20,8 @@ import {
   generateAdaMnemonic,
 } from './lib/ada-wallet';
 
-import { decryptWithPassword } from '../../utils/crypto/cryptoUtils';
 import { Wallet } from 'cardano-crypto';
+import { getWalletFromAccount } from './lib/ada-wallet';
 
 import type { AdaTxFeeParams } from './adaTxFee';
 
@@ -101,7 +101,6 @@ export const getAdaWallets = async (): Promise<AdaWallets> => {
     }
   });
   saveInStorage(WALLET_KEY, updatedWallet);
-
   if (accountResponse.caTxList.length > 0) {
     const txRequests = accountResponse.caTxList.map(({ ctbId }) =>
       getTxInfo(ctbId)
@@ -162,34 +161,14 @@ export const getAdaHistoryByWallet = ({
   return Promise.resolve([transactions, transactions.length]);
 };
 
-/*
-  FIXME: Change current logic to:
-  1- Get mnemonic from account.seed (you should use the password if is it needed)
-  2- wallet = Wallet.fromSeed(mnemonicAsSeed).result
-  3- getUTXOsOfAddress
-  4- Wallet.spend
-  5- get fee from Wallet.spend response (result.tx.tx)
-*/
 export const getPaymentFee = ({
   sender,
   receiver,
   amount,
   groupingPolicy
 }: AdaTxFeeParams): Promise<Number> => {
-  // FIXME: Manage multiple sender addresses
-  const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
-  // Get UTXOs for source address.
-  return getUTXOsOfAddress(sender)
-    .then((utxoResponse) => {
-      // FIXME: Get fee from Wallet.spend response (result.tx.tx)
-      // @throws if there's not enough balance in the sender account
-      /*calculateTxFee(
-        sender,
-        utxoResponse,
-        outputs
-      )*/
-      return 0;
-    });
+  // FIXME: get the correct fee
+  return Promise.resolve(0);
 };
 
 export const newAdaPayment = ({
@@ -200,27 +179,22 @@ export const newAdaPayment = ({
   password
 }: NewAdaPaymentParams): Promise<AdaTransaction> => {
   const account = getFromStorage(ACCOUNT_KEY);
-  const seed = password ? decryptWithPassword(password, account.seed) : account.seed;
-  const wallet = Wallet.fromSeed(seed);
-  // TODO: Choose correct feeAddr ?
+  const wallet = getWalletFromAccount(account, password);
+  // FIXME: Remove feeAddr
   const feeAddr = sender;
   const changeAddr = sender;
-  const outputs = [{ address: receiver, coin: parseInt(amount, 10) }];
-  // Get UTXOs for source address.
+  const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsOfAddress(sender) // TODO: Manage multiple sender addresses
-    .then(senderUtxos =>
-      Wallet.spend(
+    .then((senderUtxos) => {
+      const signedTx = Wallet.spend(
         wallet,
         senderUtxos,
         outputs,
         feeAddr,
         changeAddr
-      )
-    )
-    .then((toSend) => {
-      console.log('SignedTx', toSend);
+      ).result.cbor_encoded_tx;
       // TODO: Target to icaraus-backend-service method
-      sendTx(toSend);
+      return sendTx(signedTx);
     });
 };
 
