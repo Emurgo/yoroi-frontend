@@ -21,7 +21,8 @@ import {
   getAdaWallets,
   getAdaWalletAccounts,
   getAdaHistoryByWallet,
-  newAdaPayment, 
+  newAdaPayment,
+  newAdaWalletAddress,
 } from './ada-methods';
 
 import type {
@@ -149,6 +150,9 @@ const Logger = console;
 const stringifyData = JSON.stringify;
 const stringifyError = o => o.toString();
 
+// TODO - this should be stored on LocalStorage
+const addresses = [];
+
 export default class AdaApi {
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
@@ -180,7 +184,7 @@ export default class AdaApi {
       // For now only the first wallet account is used
       const firstAccount = response[0];
       const firstAccountId = firstAccount.caId;
-      const firstAccountAddresses = firstAccount.caAddresses;
+      const firstAccountAddresses = firstAccount.caAddresses.concat(addresses);
 
       return new Promise(resolve =>
         resolve({
@@ -355,11 +359,8 @@ export default class AdaApi {
     Logger.debug('AdaApi::createAddress called');
     const { accountId, password } = request;
     try {
-      // FIXME: This is broken, maybe we should remove all the entire functionality
-      const response: AdaAddress = await newAdaWalletAddress({
-        password,
-        accountId
-      });
+      const response: AdaAddress = await newAdaWalletAddress(addresses.length);
+      addresses.push(response);
       Logger.debug('AdaApi::createAddress success: ' + stringifyData(response));
       return _createAddressFromServerData(response);
     } catch (error) {

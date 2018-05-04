@@ -67,7 +67,8 @@ export function generateAccount(secretWords, password) {
   */
   return {
     address: base58.encode(address),
-    xprv: password ? encryptWithPassword(password, xprv) : xprv
+    xprv: password ? encryptWithPassword(password, xprv) : xprv,
+    seed: password ? encryptWithPassword(password, seed) : seed
   };
 }
 

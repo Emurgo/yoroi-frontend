@@ -215,7 +215,6 @@ export default class WalletReceive extends Component<Props, State> {
                 {intl.formatMessage(messages.walletAddressLabel)}
               </div>
 
-              { /*
               <div className={styles.instructionsText}>
                 {intl.formatMessage(messages.walletReceiveInstructions)}
               </div>
@@ -223,13 +222,11 @@ export default class WalletReceive extends Component<Props, State> {
               {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
 
               {generateAddressForm }
-              
-              FIXME: Addresses cannot be generated now */}
 
             </div>
           </div>
 
-          {/*<div className={styles.generatedAddresses}>
+          <div className={styles.generatedAddresses}>
             <h2>
               {intl.formatMessage(messages.generatedAddressesSectionTitle)}
               <button onClick={this.toggleUsedAddresses}>
@@ -263,7 +260,7 @@ export default class WalletReceive extends Component<Props, State> {
                 </div>
               );
             })}
-          </div>*/}
+          </div>
 
         </BorderedBox>
 
