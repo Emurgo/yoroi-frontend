@@ -22,6 +22,8 @@ import {
   calculateTxFee
 } from './lib/ada-wallet';
 
+import { Wallet } from 'cardano-crypto';
+
 import { decryptWithPassword } from '../../utils/crypto/cryptoUtils';
 
 import type { AdaTxFeeParams } from './adaTxFee';
@@ -290,4 +292,19 @@ function spenderData(tx, address) {
     isOutgoing,
     amount
   };
+}
+
+export function newAdaWalletAddress(addressCount: number) {
+  // FIXME - This will be better done with getWalletFromAccount when available
+  // Also, it's bound to change in the near future to use master public instead of private
+  const { seed } = getFromStorage(ACCOUNT_KEY);
+  const wallet = Wallet.fromSeed(Object.values(seed)).result;
+  const { result } = Wallet.generateAddresses(wallet, new Uint32Array([1])[0], 'External', [addressCount]);
+  const address = {
+    cadAmount: {
+      getCCoin: '0'
+    },
+    cadId: result[0]
+  };
+  return address;
 }
