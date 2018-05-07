@@ -21,6 +21,7 @@ import {
 } from './lib/ada-wallet';
 
 import { Wallet } from 'cardano-crypto';
+
 import { 
   getWalletFromAccount,
   getFeeFromSignedEncodedTx
@@ -28,8 +29,11 @@ import {
 
 import type { AdaTxFeeParams } from './adaTxFee';
 
-import { getInfo, getTxInfo } from './lib/explorer-api';
-import { syncStatus, getUTXOsOfAddress, sendTx } from './lib/cardano-sl-api';
+import {
+  getTransactionsHistoryForAddresses,
+  getUTXOsForAddresses,
+  sendTx
+} from './lib/icarus-backend-api';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const ACCOUNT_KEY = 'ACCOUNT'; // single account atm
@@ -94,33 +98,24 @@ export const restoreAdaWallet = ({
 export const getAdaWallets = async (): Promise<AdaWallets> => {
   const persistentWallet = getFromStorage(WALLET_KEY);
   if (!persistentWallet) return Promise.resolve([]);
-
   const account = getFromStorage(ACCOUNT_KEY);
-  const accountResponse = await getInfo(account.address);
-
+  // TODO: Manage multiple addresses from the storage
+  const addresses = [account.address];
+  // Update wallet balance
   const updatedWallet = Object.assign({}, persistentWallet, {
     cwAmount: {
-      getCCoin: accountResponse.caBalance.getCoin
+      getCCoin: await getBalance(addresses)
     }
   });
   saveInStorage(WALLET_KEY, updatedWallet);
-  if (accountResponse.caTxList.length > 0) {
-    const txRequests = accountResponse.caTxList.map(({ ctbId }) =>
-      getTxInfo(ctbId)
-    );
-    const [syncStatusResponse, ...txsResponse] = await Promise.all(
-      [syncStatus()].concat(txRequests)
-    );
-
-    const latestBlockNumber =
-      syncStatusResponse._spNetworkCD.getChainDifficulty.getBlockCount;
-
+  // Update Wallet Txs History
+  const history = await getTransactionsHistoryForAddresses(addresses);
+  if (history.length > 0) {
     saveInStorage(
       TX_KEY,
-      mapTransactions(txsResponse, account.address, latestBlockNumber)
+      mapTransactions(history, addresses[0]) // FIXME: Manage multiple addresses 
     );
   }
-
   return Promise.resolve([updatedWallet]);
 };
 
@@ -171,31 +166,16 @@ export const getPaymentFee = ({
   groupingPolicy
 }: AdaTxFeeParams): Promise<Number> => {
   const account = getFromStorage(ACCOUNT_KEY);
+  // FIXME: If user didn't set a password, we shouldn't pass any password.
   const password = 'FakePassword';
   const wallet = getWalletFromAccount(account, password);
   // FIXME: Remove feeAddr
   const feeAddr = sender;
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsOfAddress(sender) // TODO: Manage multiple sender addresses
+  return getUTXOsForAddresses([sender]) // TODO: Get multiple sender addresses
     .then((senderUtxos) => {
-      // FIXME: Use senderUtxos combine it with the sender addresses that corresponds
-      // const inputs = [];
-      const inputs = [{ // Hardcoded input example
-        ptr: {
-          index: 42,
-          id: "1c7b178c1655628ca87c7da6a5d9d13c1e0a304094ac88770768d565e3d20e0b"
-        },
-        value: {
-          address: "DdzFFzCqrhtCUjHyzgvgigwA5soBgDxpc8WfnG1RGhrsRrWMV8uKdpgVfCXGgNuXhdN4qxPMvRUtbUnWhPzxSdxJrWzPqACZeh6scCH5",
-          value: 92837348
-        },
-        addressing: {
-          account: 0,
-          change: 0,
-          index: 9
-        }
-      }];
+      const inputs = mapUTXOsToInputs(senderUtxos);
       const result = Wallet.spend(
         wallet,
         inputs,
@@ -226,25 +206,9 @@ export const newAdaPayment = ({
   const feeAddr = sender;
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsOfAddress(sender) // TODO: Manage multiple sender addresses
+  return getUTXOsForAddresses([sender]) // TODO: Get multiple sender addresses
     .then((senderUtxos) => {
-      // FIXME: Use senderUtxos combine it with the sender addresses that corresponds
-      // const inputs = [];
-      const inputs = [{ // Hardcoded input example
-        ptr: {
-          index: 42,
-          id: "1c7b178c1655628ca87c7da6a5d9d13c1e0a304094ac88770768d565e3d20e0b"
-        },
-        value: {
-          address: "DdzFFzCqrhtCUjHyzgvgigwA5soBgDxpc8WfnG1RGhrsRrWMV8uKdpgVfCXGgNuXhdN4qxPMvRUtbUnWhPzxSdxJrWzPqACZeh6scCH5",
-          value: 92837348
-        },
-        addressing: {
-          account: 0,
-          change: 0,
-          index: 9
-        }
-      }];
+      const inputs = mapUTXOsToInputs(senderUtxos);
       const { result: { cbor_encoded_tx } } = Wallet.spend(
         wallet,
         inputs,
@@ -252,8 +216,8 @@ export const newAdaPayment = ({
         feeAddr,
         changeAddr
       );
-      // TODO: Target to icaraus-backend-service method
-      return sendTx(cbor_encoded_tx);
+      const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
+      return sendTx(signedTx);
     });
 };
 
@@ -271,10 +235,10 @@ function getFromStorage(key: string): any {
   return undefined;
 }
 
+// FIXME: Transform data given the new endpoints
 function mapTransactions(
   transactions: [],
   accountAddress,
-  latestBlockNumber
 ): Array<AdaTransaction> {
   return transactions.map(tx => {
     const { isOutgoing, amount } = spenderData(tx, accountAddress);
@@ -283,7 +247,7 @@ function mapTransactions(
       ctAmount: {
         getCCoin: amount
       },
-      ctConfirmations: isPending ? 0 : latestBlockNumber - tx.ctsBlockHeight,
+      ctConfirmations: tx.latestBlockNumber,
       ctId: tx.ctsId,
       ctInputs: tx.ctsInputs.map(mapInputOutput),
       ctIsOutgoing: isOutgoing,
@@ -343,4 +307,34 @@ function spenderData(tx, address) {
     isOutgoing,
     amount
   };
+}
+
+async function getBalance(addresses) {
+  const utxos = await getUTXOsForAddresses(addresses);
+  return new BigNumber(utxos.reduce((acc, utxo) => acc + utxo.value, 0));
+}
+
+function mapUTXOsToInputs(utxos) {
+  // FIXME: Manage addressing for HD wallet.
+  // Hardcoded addressing, used only for simple wallets
+  const masterAddressing = {
+    addressing: {
+      account: 0,
+      change: 0,
+      index: 0
+    }
+  };
+  return utxos.map((utxo) => {
+    const utxoAsInput = {
+      ptr: {
+        index: utxo.tx_index,
+        id: utxo.tx_hash
+      },
+      value: {
+        address: utxo.receiver,
+        value: utxo.value
+      }
+    };
+    return Object.assign(utxoAsInput, masterAddressing);
+  });
 }
