@@ -22,9 +22,8 @@ import {
 
 import { Wallet } from 'cardano-crypto';
 
-import { 
-  getWalletFromAccount,
-  getFeeFromSignedEncodedTx
+import {
+  getWalletFromAccount
 } from './lib/ada-wallet';
 
 import type { AdaTxFeeParams } from './adaTxFee';
@@ -169,8 +168,6 @@ export const getPaymentFee = ({
   // FIXME: If user didn't set a password, we shouldn't pass any password.
   const password = 'FakePassword';
   const wallet = getWalletFromAccount(account, password);
-  // FIXME: Remove feeAddr
-  const feeAddr = sender;
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsForAddresses([sender]) // TODO: Get multiple sender addresses
@@ -180,7 +177,6 @@ export const getPaymentFee = ({
         wallet,
         inputs,
         outputs,
-        feeAddr,
         changeAddr
       );
       // TODO: Improve Rust error handling
@@ -189,7 +185,7 @@ export const getPaymentFee = ({
           throw new Error('not enough money');
         }
       }
-      return getFeeFromSignedEncodedTx(result.result.cbor_encoded_tx);
+      return result.result.fee;
     });
 };
 
@@ -202,8 +198,6 @@ export const newAdaPayment = ({
 }: NewAdaPaymentParams): Promise<AdaTransaction> => {
   const account = getFromStorage(ACCOUNT_KEY);
   const wallet = getWalletFromAccount(account, password);
-  // FIXME: Remove feeAddr
-  const feeAddr = sender;
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsForAddresses([sender]) // TODO: Get multiple sender addresses
@@ -213,7 +207,6 @@ export const newAdaPayment = ({
         wallet,
         inputs,
         outputs,
-        feeAddr,
         changeAddr
       );
       const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
