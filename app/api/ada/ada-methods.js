@@ -311,7 +311,7 @@ function spenderData(tx, address) {
 
 async function getBalance(addresses) {
   const utxos = await getUTXOsForAddresses(addresses);
-  return new BigNumber(utxos.reduce((acc, utxo) => acc + utxo.value, 0));
+  return utxos.reduce((acc, utxo) => acc.plus(new BigNumber(utxo.amount)), new BigNumber(0));
 }
 
 function mapUTXOsToInputs(utxos) {
@@ -332,7 +332,8 @@ function mapUTXOsToInputs(utxos) {
       },
       value: {
         address: utxo.receiver,
-        value: utxo.value
+        // FIXME: Currently js-wasm-module support Js Number, but amounts could be BigNumber's.
+        value: Number(utxo.amount)
       }
     };
     return Object.assign(utxoAsInput, masterAddressing);
