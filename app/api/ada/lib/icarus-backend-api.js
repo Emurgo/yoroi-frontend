@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-const BackendApiRoute = 'localhost';
-const BackendApiPort = 8080;
+const BackendApiRoute = '18.206.30.1';
+const BackendApiPort = 443;
 
 // TODO: Refactor service call in order to re-use common parameters
 // TODO: Map errors in a more specific way
 
 export const getUTXOsForAddresses = addresses =>
-  axios(`http://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoForAddresses`,
+  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoForAddresses`,
     {
       method: 'post',
       responseType: 'application/json',
@@ -18,7 +18,7 @@ export const getUTXOsForAddresses = addresses =>
   ).then(response => response.data);
 
 export const getTransactionsHistoryForAddresses = addresses =>
-  axios(`http://${BackendApiRoute}:${BackendApiPort}/api/txs/history`,
+  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/history`,
     {
       method: 'post',
       responseType: 'application/json',
@@ -29,7 +29,7 @@ export const getTransactionsHistoryForAddresses = addresses =>
   ).then(response => response.data);
 
 export const sendTx = signedTx =>
-  axios(`http://${BackendApiRoute}:${BackendApiPort}/api/txs/signed`,
+  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/signed`,
     {
       method: 'post',
       responseType: 'application/json',
