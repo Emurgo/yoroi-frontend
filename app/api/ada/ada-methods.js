@@ -172,8 +172,8 @@ export const getPaymentFee = ({
   groupingPolicy
 }: AdaTxFeeParams): Promise<Number> => {
   const account = getFromStorage(ACCOUNT_KEY);
-  // FIXME: If user didn't set a password, we shouldn't pass any password.
-  const password = 'FakePassword';
+  const walletFromStorage = getFromStorage(WALLET_KEY);
+  const password = walletFromStorage.cwHasPassphrase ? 'FakePassword' : undefined;
   const wallet = getWalletFromAccount(account, password);
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
