@@ -21,7 +21,10 @@ import {
   getAdaWallets,
   getAdaWalletAccounts,
   getAdaHistoryByWallet,
-  newAdaPayment, 
+  newAdaPayment,
+  createNextAdaAddress,
+  saveNewAdaAddress,
+  getAdaAddressByIndex
 } from './ada-methods';
 
 import type {
@@ -162,32 +165,23 @@ export default class AdaApi {
     }
   }
 
+  // FIXME: Now is just getting the first address, and is no longer async
   async getAddresses(
     request: GetAddressesRequest
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
-    const { walletId } = request;
     try {
-      const response: AdaAccounts = await getAdaWalletAccounts({
-        walletId
-      });
-      Logger.debug('AdaApi::getAddresses success: ' + stringifyData(response));
-      if (!response.length) {
+      const address = getAdaAddressByIndex(0);
+      Logger.debug('AdaApi::getAddresses success: ' + stringifyData(address));
+      if (!address) {
         return new Promise(resolve =>
           resolve({ accountId: null, addresses: [] })
         );
       }
-      // For now only the first wallet account is used
-      const firstAccount = response[0];
-      const firstAccountId = firstAccount.caId;
-      const firstAccountAddresses = firstAccount.caAddresses;
-
       return new Promise(resolve =>
         resolve({
-          accountId: firstAccountId,
-          addresses: firstAccountAddresses.map(data =>
-            _createAddressFromServerData(data)
-          )
+          accountId: address.cadId,
+          addresses: [_createAddressFromServerData(address)]
         })
       );
     } catch (error) {
@@ -349,19 +343,18 @@ export default class AdaApi {
     }
   }
 
+  // FIXME: This in no longer async
   async createAddress(
     request: CreateAddressRequest
   ): Promise<CreateAddressResponse> {
     Logger.debug('AdaApi::createAddress called');
-    const { accountId, password } = request;
+    const { password } = request;
     try {
-      // FIXME: This is broken, maybe we should remove all the entire functionality
-      const response: AdaAddress = await newAdaWalletAddress({
-        password,
-        accountId
-      });
-      Logger.debug('AdaApi::createAddress success: ' + stringifyData(response));
-      return _createAddressFromServerData(response);
+      // FIXME: This in no longer async
+      const newAddress: AdaAddress = createNextAdaAddress(password);
+      saveNewAdaAddress(newAddress);
+      Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
+      return _createAddressFromServerData(newAddress);
     } catch (error) {
       Logger.error('AdaApi::createAddress error: ' + stringifyError(error));
       if (error.message.includes("Passphrase doesn't match")) {

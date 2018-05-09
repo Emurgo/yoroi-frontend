@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js';
 import type {
   AdaWallet,
   AdaWallets,
+  AdaAddress,
   AdaWalletInitData,
   AdaWalletRecoveryPhraseResponse,
   AdaAccounts,
@@ -36,6 +37,7 @@ import {
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const ACCOUNT_KEY = 'ACCOUNT'; // single account atm
+const ADDRESSES_KEY = 'ADDRESSES';
 const TX_KEY = 'TXS'; // single txs list atm
 
 export type AdaWalletParams = {
@@ -331,4 +333,38 @@ function mapUTXOsToInputs(utxos) {
     };
     return Object.assign(utxoAsInput, masterAddressing);
   });
+}
+
+export function createNextAdaAddress(password: ?string): AdaAddress {
+  // TODO: it's bound to change in the near future to use master public instead of private
+  const addresses = getFromStorage(ADDRESSES_KEY);
+  const addressIndex = addresses ? addresses.length : 0;
+  const account = getFromStorage(ACCOUNT_KEY);
+  const wallet = getWalletFromAccount(account, password);
+  const { result } = Wallet.generateAddresses(wallet, 0, 'External', [addressIndex]);
+  const address: AdaAddress = {
+    cadAmount: {
+      getCCoin: 0
+    },
+    cadId: result[0],
+    cadIsUsed: false
+  };
+  return address;
+}
+
+export function saveNewAdaAddress(address: AdaAddress) {
+  const addresses = getFromStorage(ADDRESSES_KEY);
+  if (addresses) {
+    saveInStorage(ADDRESSES_KEY, addresses.concat(address));
+  } else {
+    saveInStorage(ADDRESSES_KEY, [address]);
+  }
+}
+
+export function getAdaAddressByIndex(index: number): ?AdaAddress {
+  const addresses = getFromStorage(ADDRESSES_KEY);
+  if (addresses) {
+    return addresses[index];
+  }
+  return undefined;
 }
