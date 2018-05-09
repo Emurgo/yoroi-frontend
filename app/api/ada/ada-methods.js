@@ -349,7 +349,6 @@ export function createNextAdaAddress(password: ?string): AdaAddress {
   // TODO: Store in the localstorage 'publicWallet' in order to avoid insert password each time
   const publicWallet = Wallet.newAccount(wallet, 0).result;
   const { result } = Wallet.generateAddresses(publicWallet, 'External', [addressIndex]);
-  debugger
   const address: AdaAddress = {
     cadAmount: {
       getCCoin: 0
