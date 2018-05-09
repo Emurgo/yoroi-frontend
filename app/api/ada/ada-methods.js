@@ -82,11 +82,17 @@ export async function newAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
+
   const wallet = toWallet({ walletPassword, walletInitData });
   saveInStorage(WALLET_KEY, wallet);
+
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const account = generateAccount(mnemonic, walletPassword);
   saveInStorage(ACCOUNT_KEY, account);
+
+  const newAddress: AdaAddress = createNextAdaAddress(walletPassword);
+  saveNewAdaAddress(newAddress);
+
   return Promise.resolve(wallet);
 }
 
@@ -98,10 +104,9 @@ export const restoreAdaWallet = ({
 
 export const getAdaWallets = async (): Promise<AdaWallets> => {
   const persistentWallet = getFromStorage(WALLET_KEY);
-  if (!persistentWallet) return Promise.resolve([]);
-  const account = getFromStorage(ACCOUNT_KEY);
-  // TODO: Manage multiple addresses from the storage
-  const addresses = [account.address];
+  const persistentAddresses = getFromStorage(ADDRESSES_KEY);
+  if (!persistentWallet || !persistentAddresses) return Promise.resolve([]);
+  const addresses = persistentAddresses.map(adaAddress => adaAddress.cadId);
   // Update wallet balance
   const updatedWallet = Object.assign({}, persistentWallet, {
     cwAmount: {
@@ -341,7 +346,10 @@ export function createNextAdaAddress(password: ?string): AdaAddress {
   const addressIndex = addresses ? addresses.length : 0;
   const account = getFromStorage(ACCOUNT_KEY);
   const wallet = getWalletFromAccount(account, password);
-  const { result } = Wallet.generateAddresses(wallet, 0, 'External', [addressIndex]);
+  // TODO: Store in the localstorage 'publicWallet' in order to avoid insert password each time
+  const publicWallet = Wallet.newAccount(wallet, 0).result;
+  const { result } = Wallet.generateAddresses(publicWallet, 'External', [addressIndex]);
+  debugger
   const address: AdaAddress = {
     cadAmount: {
       getCCoin: 0
