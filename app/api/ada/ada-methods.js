@@ -175,7 +175,6 @@ export const getPaymentFee = ({
   const walletFromStorage = getFromStorage(WALLET_KEY);
   const password = walletFromStorage.cwHasPassphrase ? 'FakePassword' : undefined;
   const wallet = getWalletFromAccount(account, password);
-  wallet.config.protocol_magic = 633343913;
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsForAddresses([sender]) // TODO: Get multiple sender addresses
@@ -206,7 +205,6 @@ export const newAdaPayment = ({
 }: NewAdaPaymentParams): Promise<AdaTransaction> => {
   const account = getFromStorage(ACCOUNT_KEY);
   const wallet = getWalletFromAccount(account, password);
-  wallet.config.protocol_magic = 633343913;
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsForAddresses([sender]) // TODO: Get multiple sender addresses
@@ -348,9 +346,8 @@ export function createNextAdaAddress(password: ?string): AdaAddress {
   const addressIndex = addresses ? addresses.length : 0;
   const account = getFromStorage(ACCOUNT_KEY);
   const wallet = getWalletFromAccount(account, password);
-  wallet.config.protocol_magic = 633343913;
   // TODO: Store in the localstorage 'publicWallet' in order to avoid insert password each time
-  const publicWallet = Wallet.newAccount(wallet, 0).result;
+  const publicWallet = Wallet.newAccount(wallet, 0).result.Ok;
   const { result } = Wallet.generateAddresses(publicWallet, 'External', [addressIndex]);
   const address: AdaAddress = {
     cadAmount: {

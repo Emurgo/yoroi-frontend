@@ -1,9 +1,15 @@
+// @flow
+
 import bip39 from 'bip39';
 import { Blake2b, Wallet } from 'cardano-crypto';
 import {
   encryptWithPassword,
   decryptWithPassword
 } from '../../../utils/crypto/cryptoUtils';
+import {
+  blockchainNetworkConfig,
+  NETWORK_MODE,
+} from '../../../config/blockchainNetworkConfig';
 import type { AdaWallet } from '../types';
 import type { AdaWalletParams } from '../ada-methods';
 
@@ -41,9 +47,10 @@ export function generateAccount(secretWords, password) {
   };
 }
 
-// FIXME: Currently in all the places where the method is use, we need a way to know
 export function getWalletFromAccount(account, password) {
   const seed = password ? decryptWithPassword(password, account.seed) : account.seed;
   const seedAsArray = Object.values(seed);
-  return Wallet.fromSeed(seedAsArray).result;
+  const wallet = Wallet.fromSeed(seedAsArray).result;
+  wallet.config.protocol_magic = blockchainNetworkConfig[NETWORK_MODE].PROTOCOL_MAGIC;
+  return wallet;
 }
