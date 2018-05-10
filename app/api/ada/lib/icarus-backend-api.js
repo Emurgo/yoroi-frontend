@@ -10,7 +10,6 @@ export const getUTXOsForAddresses = addresses =>
   axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoForAddresses`,
     {
       method: 'post',
-      responseType: 'application/json',
       data: {
         addresses
       }
@@ -21,7 +20,6 @@ export const getTransactionsHistoryForAddresses = addresses =>
   axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/history`,
     {
       method: 'post',
-      responseType: 'application/json',
       data: {
         addresses
       }
@@ -32,7 +30,6 @@ export const sendTx = signedTx =>
   axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/signed`,
     {
       method: 'post',
-      responseType: 'application/json',
       data: {
         signedTx
       }
