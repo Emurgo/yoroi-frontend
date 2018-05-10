@@ -90,8 +90,7 @@ export async function newAdaWallet({
   const account = generateAccount(mnemonic, walletPassword);
   saveInStorage(ACCOUNT_KEY, account);
 
-  const newAddress: AdaAddress = createNextAdaAddress(walletPassword);
-  saveNewAdaAddress(newAddress);
+  newAdaAddress(walletPassword);
 
   return Promise.resolve(wallet);
 }
@@ -221,6 +220,21 @@ export const newAdaPayment = ({
     });
 };
 
+export function newAdaAddress(password: ?string): AdaAddress {
+  const address: AdaAddress = createAdaAddress(password);
+  saveAdaAddress(address);
+  return address;
+}
+
+export function getAdaAddressByIndex(index: number): ?AdaAddress {
+  const addresses = getFromStorage(ADDRESSES_KEY);
+  if (addresses) {
+    return addresses[index];
+  }
+  return undefined;
+}
+
+
 /**
  * Private method helpers
  */
@@ -340,7 +354,7 @@ function mapUTXOsToInputs(utxos) {
   });
 }
 
-export function createNextAdaAddress(password: ?string): AdaAddress {
+function createAdaAddress(password: ?string): AdaAddress {
   // TODO: it's bound to change in the near future to use master public instead of private
   const addresses = getFromStorage(ADDRESSES_KEY);
   const addressIndex = addresses ? addresses.length : 0;
@@ -359,19 +373,11 @@ export function createNextAdaAddress(password: ?string): AdaAddress {
   return address;
 }
 
-export function saveNewAdaAddress(address: AdaAddress) {
+function saveAdaAddress(address: AdaAddress) {
   const addresses = getFromStorage(ADDRESSES_KEY);
   if (addresses) {
     saveInStorage(ADDRESSES_KEY, addresses.concat(address));
   } else {
     saveInStorage(ADDRESSES_KEY, [address]);
   }
-}
-
-export function getAdaAddressByIndex(index: number): ?AdaAddress {
-  const addresses = getFromStorage(ADDRESSES_KEY);
-  if (addresses) {
-    return addresses[index];
-  }
-  return undefined;
 }

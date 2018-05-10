@@ -22,8 +22,7 @@ import {
   getAdaWalletAccounts,
   getAdaHistoryByWallet,
   newAdaPayment,
-  createNextAdaAddress,
-  saveNewAdaAddress,
+  newAdaAddress,
   getAdaAddressByIndex
 } from './ada-methods';
 
@@ -351,8 +350,7 @@ export default class AdaApi {
     const { password } = request;
     try {
       // FIXME: This in no longer async
-      const newAddress: AdaAddress = createNextAdaAddress(password);
-      saveNewAdaAddress(newAddress);
+      const newAddress: AdaAddress = newAdaAddress(password);
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
