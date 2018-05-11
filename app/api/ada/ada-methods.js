@@ -8,10 +8,11 @@ import type {
   AdaAddress,
   AdaWalletInitData,
   AdaWalletRecoveryPhraseResponse,
-  AdaAccounts,
   AdaTransactions,
   AdaTransaction,
-  AdaTransactionInputOutput
+  AdaTransactionInputOutput,
+  AdaTransactionFee,
+  AdaTxFeeParams
 } from './types';
 
 import {
@@ -26,8 +27,6 @@ import { Wallet } from 'cardano-crypto';
 import {
   getCryptoWalletFromSeed
 } from './lib/ada-wallet';
-
-import type { AdaTxFeeParams } from './adaTxFee';
 
 import {
   getTransactionsHistoryForAddresses,
@@ -140,12 +139,12 @@ export const getAdaHistoryByWallet = ({
   return Promise.resolve([transactions, transactions.length]);
 };
 
-export const getPaymentFee = ({
+export const getAdaTransactionFee = ({
   sender,
   receiver,
   amount,
   groupingPolicy
-}: AdaTxFeeParams): Promise<Number> => {
+}: AdaTxFeeParams): Promise<AdaTransactionFee> => {
   const seed = getFromStorage(WALLET_SEED_KEY);
   const walletFromStorage = getFromStorage(WALLET_KEY);
   const password = walletFromStorage.cwHasPassphrase ? 'FakePassword' : undefined;
@@ -167,7 +166,9 @@ export const getPaymentFee = ({
           throw new Error('not enough money');
         }
       }
-      return result.result.fee;
+      return {
+        getCCoin: result.result.fee
+      };
     });
 };
 

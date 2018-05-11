@@ -9,9 +9,7 @@ import WalletTransaction, {
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
-//import environment from '../../environment';
 
-import { adaTxFee } from './adaTxFee';
 import {
   isValidAdaAddress,
   isValidMnemonic,
@@ -20,6 +18,7 @@ import {
   getAdaAccountRecoveryPhrase,
   getAdaWallets,
   getAdaHistoryByWallet,
+  getAdaTransactionFee,
   newAdaPayment,
   newAdaAddress,
   getSingleAccount,
@@ -30,7 +29,6 @@ import type {
   AdaLocalTimeDifference,
   AdaSyncProgressResponse,
   AdaAddress,
-  AdaAccounts,
   AdaTransaction,
   AdaTransactionFee,
   AdaTransactions,
@@ -42,7 +40,6 @@ import type {
 import type {
   CreateWalletRequest,
   CreateWalletResponse,
-  CreateTransactionResponse,
   DeleteWalletRequest,
   DeleteWalletResponse,
   GetLocalTimeDifferenceResponse,
@@ -313,7 +310,7 @@ export default class AdaApi {
     try {
       // default value. Select (OptimizeForSecurity | OptimizeForSize) will be implemented
       const groupingPolicy = 'OptimizeForSecurity';
-      const response: adaTxFee = await adaTxFee({
+      const response: AdaTransactionFee = await getAdaTransactionFee({
         sender,
         receiver,
         amount,
