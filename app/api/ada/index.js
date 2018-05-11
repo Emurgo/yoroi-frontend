@@ -16,7 +16,7 @@ import {
   newAdaWallet,
   restoreAdaWallet,
   getAdaAccountRecoveryPhrase,
-  getAdaWallets,
+  updateAdaWallets,
   getAdaHistoryByWallet,
   getAdaTransactionFee,
   newAdaTransaction,
@@ -152,7 +152,7 @@ export default class AdaApi {
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
     try {
-      const response: AdaWallets = await getAdaWallets();
+      const response: AdaWallets = await updateAdaWallets();
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(response));
       return response.map(data => _createWalletFromServerData(data));
     } catch (error) {

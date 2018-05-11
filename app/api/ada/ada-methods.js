@@ -103,7 +103,7 @@ export const restoreAdaWallet = ({
 }: AdaWalletParams): Promise<AdaWallet> =>
   newAdaWallet({ walletPassword, walletInitData });
 
-export const getAdaWallets = async (): Promise<AdaWallets> => {
+export const updateAdaWallets = async (): Promise<AdaWallets> => {
   const persistentWallet = getFromStorage(WALLET_KEY);
   const persistentAddresses = getFromStorage(ADDRESSES_KEY);
   if (!persistentWallet || !persistentAddresses) return Promise.resolve([]);
@@ -146,15 +146,17 @@ export const getAdaTransactionFee = ({
   amount,
   groupingPolicy
 }: AdaTxFeeParams): Promise<AdaTransactionFee> => {
-  // FIXME: Get multiple sender addresses
+  const senders = getSenderAddresses();
   const seed = getFromStorage(WALLET_SEED_KEY);
   const walletFromStorage = getFromStorage(WALLET_KEY);
   const password = walletFromStorage.cwHasPassphrase ? 'FakePassword' : undefined;
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  const changeAddr = sender;
+  // FIXME: ChangeAddr should be an 'internal' address
+  const changeAddr = senders[0];
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses([sender])
+  return getUTXOsForAddresses(senders)
     .then((senderUtxos) => {
+      // FIXME! mapUTXOsToInputs
       const inputs = mapUTXOsToInputs(senderUtxos);
       const result = Wallet.spend(
         cryptoWallet,
@@ -181,13 +183,15 @@ export const newAdaTransaction = ({
   groupingPolicy,
   password
 }: NewAdaTransactionParams): Promise<AdaTransaction> => {
-  // FIXME: Get multiple sender addresses
+  const senders = getSenderAddresses();
   const seed = getFromStorage(WALLET_SEED_KEY);
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  const changeAddr = sender;
+  // FIXME: ChangeAddr should be an 'internal' address
+  const changeAddr = senders[0];
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses([sender])
+  return getUTXOsForAddresses(senders)
     .then((senderUtxos) => {
+      // FIXME! mapUTXOsToInputs
       const inputs = mapUTXOsToInputs(senderUtxos);
       const { result: { cbor_encoded_tx } } = Wallet.spend(
         cryptoWallet,
@@ -373,6 +377,8 @@ function createAdaAddress(account, addressType): AdaAddress {
   return address;
 }
 
+/* FIXME: We should change the structure in order to map addresses
+   with its correspond indexes (<=> mapUTXOsToInputs) */
 function saveAdaAddress(address: AdaAddress) {
   const addresses = getFromStorage(ADDRESSES_KEY);
   if (addresses) {
@@ -380,4 +386,8 @@ function saveAdaAddress(address: AdaAddress) {
   } else {
     saveInStorage(ADDRESSES_KEY, [address]);
   }
+}
+
+function getSenderAddresses() {
+  return getFromStorage(ADDRESSES_KEY).map(adaAddress => adaAddress.cadId);
 }
