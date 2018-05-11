@@ -19,10 +19,10 @@ import {
   getAdaWallets,
   getAdaHistoryByWallet,
   getAdaTransactionFee,
-  newAdaPayment,
+  newAdaTransaction,
   newAdaAddress,
   getSingleAccount,
-  getAdaAddressByIndex
+  getAdaAddresses
 } from './ada-methods';
 
 import type {
@@ -161,23 +161,24 @@ export default class AdaApi {
     }
   }
 
-  // FIXME: Now is just getting the first address, and is no longer async
+  // FIXME: Now is no longer async
   async getAddresses(
     request: GetAddressesRequest
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
     try {
-      const address = getAdaAddressByIndex(0);
-      Logger.debug('AdaApi::getAddresses success: ' + stringifyData(address));
-      if (!address) {
+      const adaAddresses = getAdaAddresses();
+      Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
+      if (!adaAddresses) {
         return new Promise(resolve =>
           resolve({ accountId: null, addresses: [] })
         );
       }
+      const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
       return new Promise(resolve =>
         resolve({
-          accountId: address.cadId,
-          addresses: [_createAddressFromServerData(address)]
+          accountId: '0', /* We are using a SINGLE account */
+          addresses
         })
       );
     } catch (error) {
@@ -259,14 +260,14 @@ export default class AdaApi {
 
   async createTransaction(
     request: CreateTransactionRequest
-  ): Promise<Boolean> {
+  ): Promise<AdaTransaction> {
     Logger.debug('AdaApi::createTransaction called');
     const { sender, receiver, amount, password } = request;
     // sender must be set as accountId (account.caId) and not walletId
     try {
       // default value. Select (OptimizeForSecurity | OptimizeForSize) will be implemented
       const groupingPolicy = 'OptimizeForSecurity';
-      const response = await newAdaPayment({
+      const response: AdaTransaction = await newAdaTransaction({
         sender,
         receiver,
         amount,
@@ -276,7 +277,7 @@ export default class AdaApi {
       Logger.debug(
         'AdaApi::createTransaction success: ' + stringifyData(response)
       );
-      return response; //_createTransactionFromServerData(response);
+      return response;
     } catch (error) {
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
       // eslint-disable-next-line max-len

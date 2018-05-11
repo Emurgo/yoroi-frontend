@@ -6,6 +6,7 @@ import type {
   AdaWallet,
   AdaWallets,
   AdaAddress,
+  AdaAddresses,
   AdaWalletInitData,
   AdaWalletRecoveryPhraseResponse,
   AdaTransactions,
@@ -60,7 +61,7 @@ export type GetAdaHistoryByWalletParams = {
   limit: number
 };
 
-export type NewAdaPaymentParams = {
+export type NewAdaTransactionParams = {
   sender: string,
   receiver: string,
   amount: string,
@@ -145,13 +146,14 @@ export const getAdaTransactionFee = ({
   amount,
   groupingPolicy
 }: AdaTxFeeParams): Promise<AdaTransactionFee> => {
+  // FIXME: Get multiple sender addresses
   const seed = getFromStorage(WALLET_SEED_KEY);
   const walletFromStorage = getFromStorage(WALLET_KEY);
   const password = walletFromStorage.cwHasPassphrase ? 'FakePassword' : undefined;
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses([sender]) // TODO: Get multiple sender addresses
+  return getUTXOsForAddresses([sender])
     .then((senderUtxos) => {
       const inputs = mapUTXOsToInputs(senderUtxos);
       const result = Wallet.spend(
@@ -172,18 +174,19 @@ export const getAdaTransactionFee = ({
     });
 };
 
-export const newAdaPayment = ({
+export const newAdaTransaction = ({
   sender,
   receiver,
   amount,
   groupingPolicy,
   password
-}: NewAdaPaymentParams): Promise<AdaTransaction> => {
+}: NewAdaTransactionParams): Promise<AdaTransaction> => {
+  // FIXME: Get multiple sender addresses
   const seed = getFromStorage(WALLET_SEED_KEY);
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   const changeAddr = sender;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses([sender]) // TODO: Get multiple sender addresses
+  return getUTXOsForAddresses([sender])
     .then((senderUtxos) => {
       const inputs = mapUTXOsToInputs(senderUtxos);
       const { result: { cbor_encoded_tx } } = Wallet.spend(
@@ -213,6 +216,11 @@ export function newAdaAddress(account): AdaAddress {
   return address;
 }
 
+/* Just return all existing addresses because we are using a SINGLE account */
+export function getAdaAddresses(): ?AdaAddresses {
+  return getFromStorage(ADDRESSES_KEY);
+}
+
 /**
  * Temporally method helpers
  */
@@ -221,14 +229,6 @@ export function getSingleAccount(password: ?string) {
   const seed = getFromStorage(WALLET_SEED_KEY);
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   return createAdaAccount(cryptoWallet);
-}
-
-export function getAdaAddressByIndex(index: number): ?AdaAddress {
-  const addresses = getFromStorage(ADDRESSES_KEY);
-  if (addresses) {
-    return addresses[index];
-  }
-  return undefined;
 }
 
 /**
