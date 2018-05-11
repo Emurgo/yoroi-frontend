@@ -19,10 +19,10 @@ import {
   restoreAdaWallet,
   getAdaAccountRecoveryPhrase,
   getAdaWallets,
-  getAdaWalletAccounts,
   getAdaHistoryByWallet,
   newAdaPayment,
   newAdaAddress,
+  getSingleAccount,
   getAdaAddressByIndex
 } from './ada-methods';
 
@@ -349,8 +349,10 @@ export default class AdaApi {
     Logger.debug('AdaApi::createAddress called');
     const { password } = request;
     try {
-      // FIXME: This in no longer async
-      const newAddress: AdaAddress = newAdaAddress(password);
+      /* TODO: We should return the account previously saved
+         in the local storage (password it won't be necessary anymore) */
+      const account = getSingleAccount(password);
+      const newAddress: AdaAddress = newAdaAddress(account);
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
