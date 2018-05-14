@@ -39,6 +39,9 @@ export type AdaAddress = {
   cadAmount: AdaAmount,
   cadId: string,
   cadIsUsed: boolean,
+  account: number,
+  change: number,
+  index: number
 };
 
 export type AdaAddresses = Array<AdaAddress>;

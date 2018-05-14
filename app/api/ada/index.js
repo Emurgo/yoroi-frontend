@@ -29,6 +29,7 @@ import type {
   AdaLocalTimeDifference,
   AdaSyncProgressResponse,
   AdaAddress,
+  AdaAddresses,
   AdaTransaction,
   AdaTransactionFee,
   AdaTransactions,
@@ -167,13 +168,8 @@ export default class AdaApi {
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
     try {
-      const adaAddresses = getAdaAddresses();
+      const adaAddresses: AdaAddresses = getAdaAddresses();
       Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
-      if (!adaAddresses) {
-        return new Promise(resolve =>
-          resolve({ accountId: null, addresses: [] })
-        );
-      }
       const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
       return new Promise(resolve =>
         resolve({

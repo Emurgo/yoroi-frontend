@@ -105,9 +105,9 @@ export const restoreAdaWallet = ({
 
 export const updateAdaWallets = async (): Promise<AdaWallets> => {
   const persistentWallet = getFromStorage(WALLET_KEY);
-  const persistentAddresses = getFromStorage(ADDRESSES_KEY);
-  if (!persistentWallet || !persistentAddresses) return Promise.resolve([]);
-  const addresses = persistentAddresses.map(adaAddress => adaAddress.cadId);
+  const persistentAddresses: AdaAddresses = getAdaAddresses();
+  if (!persistentWallet) return Promise.resolve([]);
+  const addresses = persistentAddresses.map(addr => addr.cadId);
   // Update wallet balance
   const updatedWallet = Object.assign({}, persistentWallet, {
     cwAmount: {
@@ -146,18 +146,17 @@ export const getAdaTransactionFee = ({
   amount,
   groupingPolicy
 }: AdaTxFeeParams): Promise<AdaTransactionFee> => {
-  const senders = getSenderAddresses();
+  const senders = getAdaAddresses();
   const seed = getFromStorage(WALLET_SEED_KEY);
   const walletFromStorage = getFromStorage(WALLET_KEY);
   const password = walletFromStorage.cwHasPassphrase ? 'FakePassword' : undefined;
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   // FIXME: ChangeAddr should be an 'internal' address
-  const changeAddr = senders[0];
+  const changeAddr = senders[0].cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses(senders)
+  return getUTXOsForAddresses(senders.map(addr => addr.cadId))
     .then((senderUtxos) => {
-      // FIXME! mapUTXOsToInputs
-      const inputs = mapUTXOsToInputs(senderUtxos);
+      const inputs = mapUTXOsToInputs(senderUtxos, getFromStorage(ADDRESSES_KEY));
       const result = Wallet.spend(
         cryptoWallet,
         inputs,
@@ -183,16 +182,15 @@ export const newAdaTransaction = ({
   groupingPolicy,
   password
 }: NewAdaTransactionParams): Promise<AdaTransaction> => {
-  const senders = getSenderAddresses();
+  const senders = getAdaAddresses();
   const seed = getFromStorage(WALLET_SEED_KEY);
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   // FIXME: ChangeAddr should be an 'internal' address
-  const changeAddr = senders[0];
+  const changeAddr = senders[0].cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses(senders)
+  return getUTXOsForAddresses(senders.map(addr => addr.cadId))
     .then((senderUtxos) => {
-      // FIXME! mapUTXOsToInputs
-      const inputs = mapUTXOsToInputs(senderUtxos);
+      const inputs = mapUTXOsToInputs(senderUtxos, getFromStorage(ADDRESSES_KEY));
       const { result: { cbor_encoded_tx } } = Wallet.spend(
         cryptoWallet,
         inputs,
@@ -221,8 +219,9 @@ export function newAdaAddress(account): AdaAddress {
 }
 
 /* Just return all existing addresses because we are using a SINGLE account */
-export function getAdaAddresses(): ?AdaAddresses {
-  return getFromStorage(ADDRESSES_KEY);
+export function getAdaAddresses(): AdaAddresses {
+  const addresses = getFromStorage(ADDRESSES_KEY);
+  return Object.values(addresses ? addresses : {});
 }
 
 /**
@@ -328,18 +327,9 @@ async function getBalance(addresses) {
   return utxos.reduce((acc, utxo) => acc.plus(new BigNumber(utxo.amount)), new BigNumber(0));
 }
 
-function mapUTXOsToInputs(utxos) {
-  // FIXME: Manage addressing for HD wallet.
-  // Hardcoded addressing, used only for simple wallets
-  const masterAddressing = {
-    addressing: {
-      account: 0,
-      change: 0,
-      index: 0
-    }
-  };
+function mapUTXOsToInputs(utxos, adaAddressesMap) {
   return utxos.map((utxo) => {
-    const utxoAsInput = {
+    return {
       ptr: {
         index: utxo.tx_index,
         id: utxo.tx_hash
@@ -348,9 +338,13 @@ function mapUTXOsToInputs(utxos) {
         address: utxo.receiver,
         // FIXME: Currently js-wasm-module support Js Number, but amounts could be BigNumber's.
         value: Number(utxo.amount)
+      },
+      addressing: {
+        account: adaAddressesMap[utxo.receiver].account,
+        change: adaAddressesMap[utxo.receiver].change,
+        index: adaAddressesMap[utxo.receiver].index
       }
     };
-    return Object.assign(utxoAsInput, masterAddressing);
   });
 }
 
@@ -364,7 +358,7 @@ function createAdaAccount(wallet) {
 // function saveAdaAccount(account)
 
 function createAdaAddress(account, addressType): AdaAddress {
-  const addresses = getFromStorage(ADDRESSES_KEY);
+  const addresses = getAdaAddresses();
   const addressIndex = addresses ? addresses.length : 0;
   const { result } = Wallet.generateAddresses(account, addressType, [addressIndex]);
   const address: AdaAddress = {
@@ -372,22 +366,19 @@ function createAdaAddress(account, addressType): AdaAddress {
       getCCoin: 0
     },
     cadId: result[0],
-    cadIsUsed: false
+    cadIsUsed: false,
+    account: 0,
+    change: 0, // TODO: Should be configurable
+    index: addressIndex
   };
   return address;
 }
 
-/* FIXME: We should change the structure in order to map addresses
-   with its correspond indexes (<=> mapUTXOsToInputs) */
 function saveAdaAddress(address: AdaAddress) {
-  const addresses = getFromStorage(ADDRESSES_KEY);
-  if (addresses) {
-    saveInStorage(ADDRESSES_KEY, addresses.concat(address));
-  } else {
-    saveInStorage(ADDRESSES_KEY, [address]);
+  let addresses = getFromStorage(ADDRESSES_KEY);
+  if (!addresses) {
+    addresses = {};
   }
-}
-
-function getSenderAddresses() {
-  return getFromStorage(ADDRESSES_KEY).map(adaAddress => adaAddress.cadId);
+  addresses[address.cadId] = address;
+  saveInStorage(ADDRESSES_KEY, addresses);
 }
