@@ -116,7 +116,8 @@ export const updateAdaWallets = async (): Promise<AdaWallets> => {
   });
   saveInStorage(WALLET_KEY, updatedWallet);
   // Update Wallet Txs History
-  const history = await getTransactionsHistoryForAddresses(addresses);
+  //const history = await getTransactionsHistoryForAddresses(addresses);
+  const history = [];
   if (history.length > 0) {
     saveInStorage(
       TX_KEY,
