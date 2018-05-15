@@ -195,7 +195,7 @@ export function getAdaAddresses(): AdaAddresses {
 }
 
 /**
- * Temporally method helpers
+ * Temporary method helpers
  */
 
 export function getSingleAccount(password: ?string) {
