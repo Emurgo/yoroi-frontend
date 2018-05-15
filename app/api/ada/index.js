@@ -9,28 +9,27 @@ import WalletTransaction, {
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
-//import environment from '../../environment';
 
-import { adaTxFee } from './adaTxFee';
 import {
   isValidAdaAddress,
   isValidMnemonic,
   newAdaWallet,
   restoreAdaWallet,
   getAdaAccountRecoveryPhrase,
-  getAdaWallets,
-  getAdaWalletAccounts,
+  updateAdaWallet,
   getAdaHistoryByWallet,
-  newAdaPayment,
+  getAdaTransactionFee,
+  newAdaTransaction,
   newAdaAddress,
-  getAdaAddressByIndex
+  getSingleAccount,
+  getAdaAddresses
 } from './ada-methods';
 
 import type {
   AdaLocalTimeDifference,
   AdaSyncProgressResponse,
   AdaAddress,
-  AdaAccounts,
+  AdaAddresses,
   AdaTransaction,
   AdaTransactionFee,
   AdaTransactions,
@@ -42,7 +41,6 @@ import type {
 import type {
   CreateWalletRequest,
   CreateWalletResponse,
-  CreateTransactionResponse,
   DeleteWalletRequest,
   DeleteWalletResponse,
   GetLocalTimeDifferenceResponse,
@@ -155,32 +153,29 @@ export default class AdaApi {
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
     try {
-      const response: AdaWallets = await getAdaWallets();
-      Logger.debug('AdaApi::getWallets success: ' + stringifyData(response));
-      return response.map(data => _createWalletFromServerData(data));
+      const wallet = await updateAdaWallet();
+      const wallets: AdaWallets = wallet ? [wallet] : [];
+      Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
+      return wallets.map(data => _createWalletFromServerData(data));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
 
-  // FIXME: Now is just getting the first address, and is no longer async
+  // FIXME: Now is no longer async
   async getAddresses(
     request: GetAddressesRequest
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
     try {
-      const address = getAdaAddressByIndex(0);
-      Logger.debug('AdaApi::getAddresses success: ' + stringifyData(address));
-      if (!address) {
-        return new Promise(resolve =>
-          resolve({ accountId: null, addresses: [] })
-        );
-      }
+      const adaAddresses: AdaAddresses = getAdaAddresses();
+      Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
+      const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
       return new Promise(resolve =>
         resolve({
-          accountId: address.cadId,
-          addresses: [_createAddressFromServerData(address)]
+          accountId: '0', /* We are using a SINGLE account */
+          addresses
         })
       );
     } catch (error) {
@@ -262,14 +257,14 @@ export default class AdaApi {
 
   async createTransaction(
     request: CreateTransactionRequest
-  ): Promise<Boolean> {
+  ): Promise<AdaTransaction> {
     Logger.debug('AdaApi::createTransaction called');
     const { sender, receiver, amount, password } = request;
     // sender must be set as accountId (account.caId) and not walletId
     try {
       // default value. Select (OptimizeForSecurity | OptimizeForSize) will be implemented
       const groupingPolicy = 'OptimizeForSecurity';
-      const response = await newAdaPayment({
+      const response: AdaTransaction = await newAdaTransaction({
         sender,
         receiver,
         amount,
@@ -279,7 +274,7 @@ export default class AdaApi {
       Logger.debug(
         'AdaApi::createTransaction success: ' + stringifyData(response)
       );
-      return response; //_createTransactionFromServerData(response);
+      return response;
     } catch (error) {
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
       // eslint-disable-next-line max-len
@@ -313,7 +308,7 @@ export default class AdaApi {
     try {
       // default value. Select (OptimizeForSecurity | OptimizeForSize) will be implemented
       const groupingPolicy = 'OptimizeForSecurity';
-      const response: adaTxFee = await adaTxFee({
+      const response: AdaTransactionFee = await getAdaTransactionFee({
         sender,
         receiver,
         amount,
@@ -349,8 +344,10 @@ export default class AdaApi {
     Logger.debug('AdaApi::createAddress called');
     const { password } = request;
     try {
-      // FIXME: This in no longer async
-      const newAddress: AdaAddress = newAdaAddress(password);
+      /* TODO: We should return the account previously saved
+         in the local storage (password it won't be necessary anymore) */
+      const account = getSingleAccount(password);
+      const newAddress: AdaAddress = newAdaAddress(account, 'External');
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
@@ -683,13 +680,9 @@ export default class AdaApi {
       cwAssurance: assurance,
       cwUnit: unit
     };
-
     try {
-      const wallet: AdaWallet = await updateAdaWallet({
-        ca,
-        walletId,
-        walletMeta
-      });
+      const wallet: ?AdaWallet = await updateAdaWallet();
+      if (!wallet) throw new Error('not persistent wallet');
       Logger.debug('AdaApi::updateWallet success: ' + stringifyData(wallet));
       return _createWalletFromServerData(wallet);
     } catch (error) {

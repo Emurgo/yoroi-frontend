@@ -21,7 +21,8 @@ export const isValidAdaMnemonic = (
 ) =>
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
 
-export function toWallet({ walletPassword, walletInitData }: AdaWalletParams): AdaWallet {
+/* @note: Ada wallet is the abstraction for Daedalus */
+export function toAdaWallet({ walletPassword, walletInitData }: AdaWalletParams): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
     cwAccountsNumber: 1,
@@ -39,7 +40,7 @@ export function toWallet({ walletPassword, walletInitData }: AdaWalletParams): A
   };
 }
 
-export function generateAccount(secretWords, password) {
+export function generateWalletSeed(secretWords, password) {
   const entropy = bip39.mnemonicToEntropy(secretWords);
   const seed = Blake2b.blake2b_256(entropy);
   return {
@@ -47,8 +48,9 @@ export function generateAccount(secretWords, password) {
   };
 }
 
-export function getWalletFromAccount(account, password) {
-  const seed = password ? decryptWithPassword(password, account.seed) : account.seed;
+/* @note: Crypto wallet is the abstraction provide for JS-wasm-cardano module */
+export function getCryptoWalletFromSeed(walletSeed, password) {
+  const seed = password ? decryptWithPassword(password, walletSeed.seed) : walletSeed.seed;
   const seedAsArray = Object.values(seed);
   const wallet = Wallet.fromSeed(seedAsArray).result;
   wallet.config.protocol_magic = blockchainNetworkConfig[NETWORK_MODE].PROTOCOL_MAGIC;

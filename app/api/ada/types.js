@@ -39,6 +39,9 @@ export type AdaAddress = {
   cadAmount: AdaAmount,
   cadId: string,
   cadIsUsed: boolean,
+  account: number,
+  change: number,
+  index: number
 };
 
 export type AdaAddresses = Array<AdaAddress>;
@@ -79,6 +82,15 @@ export type AdaTransactionInputOutput = [
 ];
 
 export type AdaTransactionFee = AdaAmount;
+
+export type AdaTxFeeParams = {
+  sender: string,
+  receiver: string,
+  amount: string,
+  // "groupingPolicy" - Spend everything from the address
+  // "OptimizeForSize" for no grouping
+  groupingPolicy: ?'OptimizeForSecurity' | 'OptimizeForSize',
+};
 
 export type AdaWallet = {
   cwAccountsNumber: number,
