@@ -17,26 +17,22 @@ import type {
 } from './types';
 
 import {
-  toWallet,
+  toAdaWallet,
   generateWalletSeed,
   isValidAdaMnemonic,
   generateAdaMnemonic,
+  getCryptoWalletFromSeed
 } from './lib/ada-wallet';
 
 import { Wallet } from 'cardano-crypto';
 
 import {
-  getCryptoWalletFromSeed
-} from './lib/ada-wallet';
-
-import {
-  getTransactionsHistoryForAddresses,
   getUTXOsForAddresses,
   sendTx
 } from './lib/icarus-backend-api';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
-const WALLET_SEED_KEY = 'SEED'; 
+const WALLET_SEED_KEY = 'SEED';
 const ADDRESSES_KEY = 'ADDRESSES';
 const TX_KEY = 'TXS'; // single txs list atm
 
@@ -84,17 +80,17 @@ export async function newAdaWallet({
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
 
-  const wallet = toWallet({ walletPassword, walletInitData });
-  saveInStorage(WALLET_KEY, wallet);
+  const adaWallet = toAdaWallet({ walletPassword, walletInitData });
+  saveInStorage(WALLET_KEY, adaWallet);
 
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const seed = generateWalletSeed(mnemonic, walletPassword);
   saveInStorage(WALLET_SEED_KEY, seed);
 
   const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);
-  newAdaAccount(cryptoWallet);
+  newCryptoAccount(cryptoWallet);
 
-  return Promise.resolve(wallet);
+  return Promise.resolve(adaWallet);
 }
 
 export const restoreAdaWallet = ({
@@ -103,10 +99,10 @@ export const restoreAdaWallet = ({
 }: AdaWalletParams): Promise<AdaWallet> =>
   newAdaWallet({ walletPassword, walletInitData });
 
-export const updateAdaWallets = async (): Promise<AdaWallets> => {
+export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   const persistentWallet = getFromStorage(WALLET_KEY);
+  if (!persistentWallet) return Promise.resolve();
   const persistentAddresses: AdaAddresses = getAdaAddresses();
-  if (!persistentWallet) return Promise.resolve([]);
   const addresses = persistentAddresses.map(addr => addr.cadId);
   // Update wallet balance
   const updatedWallet = Object.assign({}, persistentWallet, {
@@ -116,7 +112,6 @@ export const updateAdaWallets = async (): Promise<AdaWallets> => {
   });
   saveInStorage(WALLET_KEY, updatedWallet);
   // Update Wallet Txs History
-  //const history = await getTransactionsHistoryForAddresses(addresses);
   const history = [];
   if (history.length > 0) {
     saveInStorage(
@@ -124,7 +119,7 @@ export const updateAdaWallets = async (): Promise<AdaWallets> => {
       mapTransactions(history, addresses[0]) // FIXME: Manage multiple addresses 
     );
   }
-  return Promise.resolve([updatedWallet]);
+  return updatedWallet;
 };
 
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
@@ -147,24 +142,11 @@ export const getAdaTransactionFee = ({
   amount,
   groupingPolicy
 }: AdaTxFeeParams): Promise<AdaTransactionFee> => {
-  const senders = getAdaAddresses();
-  const seed = getFromStorage(WALLET_SEED_KEY);
-  const walletFromStorage = getFromStorage(WALLET_KEY);
-  const password = walletFromStorage.cwHasPassphrase ? 'FakePassword' : undefined;
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  // FIXME: ChangeAddr should be an 'internal' address
-  const changeAddr = senders[0].cadId;
-  const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses(senders.map(addr => addr.cadId))
-    .then((senderUtxos) => {
-      const inputs = mapUTXOsToInputs(senderUtxos, getFromStorage(ADDRESSES_KEY));
-      const result = Wallet.spend(
-        cryptoWallet,
-        inputs,
-        outputs,
-        changeAddr
-      );
-      // TODO: Improve Rust error handling
+  const adaWallet = getFromStorage(WALLET_KEY);
+  const password = adaWallet.cwHasPassphrase ? 'FakePassword' : undefined;
+  return getAdaTransaction(receiver, amount, password)
+    .then((result) => {
+      // TODO: Improve Js-Wasm-cardano error handling 
       if (result.failed) {
         if (result.msg === 'FeeCalculationError(NotEnoughInput)') {
           throw new Error('not enough money');
@@ -183,46 +165,33 @@ export const newAdaTransaction = ({
   groupingPolicy,
   password
 }: NewAdaTransactionParams): Promise<AdaTransaction> => {
-  const senders = getAdaAddresses();
-  const seed = getFromStorage(WALLET_SEED_KEY);
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  // FIXME: ChangeAddr should be an 'internal' address
-  const changeAddr = senders[0].cadId;
-  const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses(senders.map(addr => addr.cadId))
-    .then((senderUtxos) => {
-      const inputs = mapUTXOsToInputs(senderUtxos, getFromStorage(ADDRESSES_KEY));
-      const { result: { cbor_encoded_tx } } = Wallet.spend(
-        cryptoWallet,
-        inputs,
-        outputs,
-        changeAddr
-      );
+  return getAdaTransaction(receiver, amount, password)
+    .then(({ result: { cbor_encoded_tx } }) => {
+      // TODO: Handle Js-Wasm-cardano errors 
       const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
       return sendTx(signedTx);
     });
 };
 
 /* Create a SINGLE account with one address */
-export function newAdaAccount(cryptoWallet) {
-  const account = createAdaAccount(cryptoWallet);
-  // TODO: account should be stored in the localstorage in order to avoid insert password each time.
-  // saveAdaAccount(account);
-  newAdaAddress(account);
-  return account;
+export function newCryptoAccount(cryptoWallet) {
+  const cryptoAccount = createCryptoAccount(cryptoWallet);
+  /* TODO: crypto account should be stored in the localstorage
+     in order to avoid insert password each time the user creates a new address
+  */
+  newAdaAddress(cryptoAccount, 'External');
+  return cryptoAccount;
 }
 
 /* Create and save the next address for the given account */
-export function newAdaAddress(account): AdaAddress {
-  const address: AdaAddress = createAdaAddress(account, 'External');
+export function newAdaAddress(cryptoAccount, addressType): AdaAddress {
+  const address: AdaAddress = createAdaAddress(cryptoAccount, addressType);
   saveAdaAddress(address);
   return address;
 }
 
-/* Just return all existing addresses because we are using a SINGLE account */
 export function getAdaAddresses(): AdaAddresses {
-  const addresses = getFromStorage(ADDRESSES_KEY);
-  return Object.values(addresses ? addresses : {});
+  return adaAddressesToList(getAdaAddressesMap());
 }
 
 /**
@@ -232,7 +201,7 @@ export function getAdaAddresses(): AdaAddresses {
 export function getSingleAccount(password: ?string) {
   const seed = getFromStorage(WALLET_SEED_KEY);
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  return createAdaAccount(cryptoWallet);
+  return createCryptoAccount(cryptoWallet);
 }
 
 /**
@@ -247,6 +216,29 @@ function getFromStorage(key: string): any {
   const result = localStorage.getItem(key);
   if (result) return JSON.parse(result);
   return undefined;
+}
+
+function getAdaTransaction(
+  receiver,
+  amount,
+  password
+) {
+  const seed = getFromStorage(WALLET_SEED_KEY);
+  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  const addressesMap = getAdaAddressesMap();
+  const addresses = adaAddressesToList(addressesMap);
+  const changeAddr = addresses[0].cadId;
+  const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
+  return getUTXOsForAddresses(addresses.map(addr => addr.cadId))
+    .then((senderUtxos) => {
+      const inputs = mapUTXOsToInputs(senderUtxos, addressesMap);
+      return Wallet.spend(
+        cryptoWallet,
+        inputs,
+        outputs,
+        changeAddr
+      );
+    });
 }
 
 // FIXME: Transform data given the new endpoints
@@ -349,14 +341,10 @@ function mapUTXOsToInputs(utxos, adaAddressesMap) {
   });
 }
 
-function createAdaAccount(wallet) {
+function createCryptoAccount(cryptoWallet) {
   const accountIndex = 0; /* Because we only provide a SINGLE account */
-  return Wallet.newAccount(wallet, accountIndex).result.Ok;
+  return Wallet.newAccount(cryptoWallet, accountIndex).result.Ok;
 }
-
-// TODO: Implement it
-// We should track the last account index created
-// function saveAdaAccount(account)
 
 function createAdaAddress(account, addressType): AdaAddress {
   const addresses = getAdaAddresses();
@@ -368,18 +356,31 @@ function createAdaAddress(account, addressType): AdaAddress {
     },
     cadId: result[0],
     cadIsUsed: false,
-    account: 0,
-    change: 0, // TODO: Should be configurable
+    account: account.account,
+    change: getAddressTypeIndex(addressType),
     index: addressIndex
   };
   return address;
 }
 
+function getAddressTypeIndex(addressType) {
+  if (addressType === 'External') return 0;
+  return 1; // addressType === 'Internal;
+}
+
 function saveAdaAddress(address: AdaAddress) {
-  let addresses = getFromStorage(ADDRESSES_KEY);
-  if (!addresses) {
-    addresses = {};
-  }
-  addresses[address.cadId] = address;
-  saveInStorage(ADDRESSES_KEY, addresses);
+  const addressesMap = getAdaAddressesMap();
+  addressesMap[address.cadId] = address;
+  saveInStorage(ADDRESSES_KEY, addressesMap);
+}
+
+/* Just return all existing addresses because we are using a SINGLE account */
+function getAdaAddressesMap() {
+  const addresses = getFromStorage(ADDRESSES_KEY);
+  if (!addresses) return {};
+  return addresses;
+}
+
+function adaAddressesToList(adaAddressesMap) {
+  return Object.values(adaAddressesMap);
 }

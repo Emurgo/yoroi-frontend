@@ -16,7 +16,7 @@ import {
   newAdaWallet,
   restoreAdaWallet,
   getAdaAccountRecoveryPhrase,
-  updateAdaWallets,
+  updateAdaWallet,
   getAdaHistoryByWallet,
   getAdaTransactionFee,
   newAdaTransaction,
@@ -153,9 +153,10 @@ export default class AdaApi {
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
     try {
-      const response: AdaWallets = await updateAdaWallets();
-      Logger.debug('AdaApi::getWallets success: ' + stringifyData(response));
-      return response.map(data => _createWalletFromServerData(data));
+      const wallet = await updateAdaWallet();
+      const wallets: AdaWallets = wallet ? [wallet] : [];
+      Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
+      return wallets.map(data => _createWalletFromServerData(data));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -346,7 +347,7 @@ export default class AdaApi {
       /* TODO: We should return the account previously saved
          in the local storage (password it won't be necessary anymore) */
       const account = getSingleAccount(password);
-      const newAddress: AdaAddress = newAdaAddress(account);
+      const newAddress: AdaAddress = newAdaAddress(account, 'External');
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
@@ -679,13 +680,9 @@ export default class AdaApi {
       cwAssurance: assurance,
       cwUnit: unit
     };
-
     try {
-      const wallet: AdaWallet = await updateAdaWallet({
-        ca,
-        walletId,
-        walletMeta
-      });
+      const wallet: ?AdaWallet = await updateAdaWallet();
+      if (!wallet) throw new Error('not persistent wallet');
       Logger.debug('AdaApi::updateWallet success: ' + stringifyData(wallet));
       return _createWalletFromServerData(wallet);
     } catch (error) {
