@@ -21,7 +21,8 @@ import {
   getAdaTransactionFee,
   newAdaTransaction,
   newAdaAddress,
-  getSingleAccount,
+  getWalletSeed,
+  getSingleCryptoAccount,
   getAdaAddresses
 } from './ada-methods';
 
@@ -259,18 +260,13 @@ export default class AdaApi {
     request: CreateTransactionRequest
   ): Promise<AdaTransaction> {
     Logger.debug('AdaApi::createTransaction called');
-    const { sender, receiver, amount, password } = request;
-    // sender must be set as accountId (account.caId) and not walletId
+    const { receiver, amount, password } = request;
     try {
-      // default value. Select (OptimizeForSecurity | OptimizeForSize) will be implemented
-      const groupingPolicy = 'OptimizeForSecurity';
-      const response: AdaTransaction = await newAdaTransaction({
-        sender,
+      const response: AdaTransaction = await newAdaTransaction(
         receiver,
         amount,
-        groupingPolicy,
         password
-      });
+      );
       Logger.debug(
         'AdaApi::createTransaction success: ' + stringifyData(response)
       );
@@ -346,8 +342,8 @@ export default class AdaApi {
     try {
       /* TODO: We should return the account previously saved
          in the local storage (password it won't be necessary anymore) */
-      const account = getSingleAccount(password);
-      const newAddress: AdaAddress = newAdaAddress(account, 'External');
+      const cryptoAccount = getSingleCryptoAccount(getWalletSeed(), password);
+      const newAddress: AdaAddress = newAdaAddress(cryptoAccount, 'External');
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
@@ -360,7 +356,7 @@ export default class AdaApi {
   }
 
   isValidAddress(address: string): Promise<boolean> {
-    return isValidAdaAddress({ address });
+    return isValidAdaAddress(address);
   }
 
   isValidMnemonic(mnemonic: string): Promise<boolean> {
