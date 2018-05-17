@@ -16,6 +16,16 @@ export const getUTXOsForAddresses = addresses =>
     }
   ).then(response => response.data);
 
+export const getUTXOsSumsForAddresses = addresses =>
+  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoSumForAddresses`,
+    {
+      method: 'post',
+      data: {
+        addresses
+      }
+    }
+  ).then(response => response.data);
+
 export const getTransactionsHistoryForAddresses = addresses =>
   axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/history`,
     {
