@@ -300,16 +300,10 @@ export default class AdaApi {
     request: TransactionFeeRequest
   ): Promise<TransactionFeeResponse> {
     Logger.debug('AdaApi::calculateTransactionFee called');
-    const { sender, receiver, amount } = request;
+    const { receiver, amount } = request;
     try {
-      // default value. Select (OptimizeForSecurity | OptimizeForSize) will be implemented
-      const groupingPolicy = 'OptimizeForSecurity';
-      const response: AdaTransactionFee = await getAdaTransactionFee({
-        sender,
-        receiver,
-        amount,
-        groupingPolicy
-      });
+      const response: AdaTransactionFee = await
+        getAdaTransactionFee(receiver, amount);
       Logger.debug(
         'AdaApi::calculateTransactionFee success: ' + stringifyData(response)
       );
