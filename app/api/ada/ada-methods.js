@@ -1,11 +1,12 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
+import range from 'lodash.range';
 import moment from 'moment';
+import BigNumber from 'bignumber.js';
+import { Wallet } from 'cardano-crypto';
 
 import type {
   AdaWallet,
-  AdaWallets,
   AdaAddress,
   AdaAddresses,
   AdaWalletInitData,
@@ -14,43 +15,40 @@ import type {
   AdaTransaction,
   AdaTransactionInputOutput,
   AdaTransactionFee,
-  AdaTxFeeParams
 } from './types';
 
 import {
   toAdaWallet,
+  toAdaAddress
+} from './lib/crypto-to-cardano';
+
+import {
   generateWalletSeed,
   isValidAdaMnemonic,
   generateAdaMnemonic,
   getCryptoWalletFromSeed
-} from './lib/ada-wallet';
-
-import { Wallet } from 'cardano-crypto';
+} from './lib/crypto-wallet';
 
 import {
   getTransactionsHistoryForAddresses,
   getUTXOsForAddresses,
   getUTXOsSumsForAddresses,
-  sendTx
+  sendTx,
+  checkAddressesInUse
 } from './lib/icarus-backend-api';
+
+import {
+  mapToList
+} from './lib/utils';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const WALLET_SEED_KEY = 'SEED';
-const ADDRESSES_KEY = 'ADDRESSES';
+const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
 const TX_KEY = 'TXS'; // single txs list atm
 
 export type AdaWalletParams = {
   walletPassword: ?string,
   walletInitData: AdaWalletInitData
-};
-
-export type IsValidAdaAddressParams = {
-  /*ca: string,*/
-  address: string
-};
-
-export type GetAdaWalletAccountsParams = {
-  walletId: string
 };
 
 export type GetAdaHistoryByWalletParams = {
@@ -60,19 +58,10 @@ export type GetAdaHistoryByWalletParams = {
   limit: number
 };
 
-export type NewAdaTransactionParams = {
-  sender: string,
-  receiver: string,
-  amount: string,
-  password: ?string,
-  // "groupingPolicy" - Spend everything from the address
-  // "OptimizeForSize" for no grouping
-  groupingPolicy: ?'OptimizeForSecurity' | 'OptimizeForSize'
-};
-
-export const isValidAdaAddress = ({
-  /*ca, */ address
-}: IsValidAdaAddressParams): Promise<boolean> => Promise.resolve(true);
+// TODO: Implement it!
+export function isValidAdaAddress(address: string): Promise<boolean> {
+  return Promise.resolve(true);
+}
 
 export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
   isValidAdaMnemonic(phrase, numberOfWords);
@@ -83,24 +72,46 @@ export async function newAdaWallet({
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
 
-  const adaWallet = toAdaWallet({ walletPassword, walletInitData });
-  saveInStorage(WALLET_KEY, adaWallet);
+  const [adaWallet, seed] = createWallet({ walletPassword, walletInitData });
+  const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
 
-  const mnemonic = walletInitData.cwBackupPhrase.bpToList;
-  const seed = generateWalletSeed(mnemonic, walletPassword);
-  saveInStorage(WALLET_SEED_KEY, seed);
+  newAdaAddress(cryptoAccount, 'External');
 
-  const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);
-  newCryptoAccount(cryptoWallet);
-
+  saveWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);
 }
 
-export const restoreAdaWallet = ({
+export async function restoreAdaWallet({
   walletPassword,
   walletInitData
-}: AdaWalletParams): Promise<AdaWallet> =>
-  newAdaWallet({ walletPassword, walletInitData });
+}: AdaWalletParams): Promise<AdaWallet> {
+
+  const [adaWallet, seed] = createWallet({ walletPassword, walletInitData });
+  const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
+
+  let addressesToSave = [];
+  let fromIndex = 0;
+  while (fromIndex >= 0) {
+    // TODO: Make offset configurable
+    const [newIndex, addressesRecovered] =
+      await discoverAddressesFrom(cryptoAccount, 'External', fromIndex, 20);
+    fromIndex = newIndex;
+    addressesToSave = addressesToSave.concat(addressesRecovered);
+  }
+  if (addressesToSave.length !== 0) {
+    // TODO: Store all at once
+    addressesToSave.forEach((hash, index) => {
+      const adaAddress: AdaAddress =
+        toAdaAddress(cryptoAccount.account, 'External', index, hash);
+      saveAdaAddress(adaAddress);
+    });
+  } else {
+    newAdaAddress(cryptoAccount, 'External');
+  }
+
+  saveWallet(adaWallet, seed);
+  return Promise.resolve(adaWallet);
+}
 
 export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   const persistentWallet = getFromStorage(WALLET_KEY);
@@ -145,12 +156,10 @@ export const getAdaTxsHistoryByWallet = ({
   return Promise.resolve([transactions, transactions.length]);
 };
 
-export const getAdaTransactionFee = ({
-  sender,
-  receiver,
-  amount,
-  groupingPolicy
-}: AdaTxFeeParams): Promise<AdaTransactionFee> => {
+export const getAdaTransactionFee = (
+  receiver: string,
+  amount: string
+): Promise<AdaTransactionFee> => {
   const adaWallet = getFromStorage(WALLET_KEY);
   const password = adaWallet.cwHasPassphrase ? 'FakePassword' : undefined;
   return getAdaTransaction(receiver, amount, password)
@@ -167,13 +176,11 @@ export const getAdaTransactionFee = ({
     });
 };
 
-export const newAdaTransaction = ({
-  sender,
-  receiver,
-  amount,
-  groupingPolicy,
-  password
-}: NewAdaTransactionParams): Promise<AdaTransaction> => {
+export const newAdaTransaction = (
+  receiver: string,
+  amount: string,
+  password: ?string
+): Promise<AdaTransaction> => {
   return getAdaTransaction(receiver, amount, password)
     .then(({ result: { cbor_encoded_tx } }) => {
       // TODO: Handle Js-Wasm-cardano errors 
@@ -181,16 +188,6 @@ export const newAdaTransaction = ({
       return sendTx(signedTx);
     });
 };
-
-/* Create a SINGLE account with one address */
-export function newCryptoAccount(cryptoWallet) {
-  const cryptoAccount = createCryptoAccount(cryptoWallet);
-  /* TODO: crypto account should be stored in the localstorage
-     in order to avoid insert password each time the user creates a new address
-  */
-  newAdaAddress(cryptoAccount, 'External');
-  return cryptoAccount;
-}
 
 /* Create and save the next address for the given account */
 export function newAdaAddress(cryptoAccount, addressType): AdaAddress {
@@ -200,16 +197,19 @@ export function newAdaAddress(cryptoAccount, addressType): AdaAddress {
 }
 
 export function getAdaAddresses(): AdaAddresses {
-  return adaAddressesToList(getAdaAddressesMap());
+  return mapToList(getAdaAddressesMap());
+}
+
+export function getWalletSeed() {
+  return getFromStorage(WALLET_SEED_KEY);
 }
 
 /**
  * Temporary method helpers
  */
 
-export function getSingleAccount(password: ?string) {
-  const seed = getFromStorage(WALLET_SEED_KEY);
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+export function getSingleCryptoAccount(seed, walletPassword: ?string) {
+  const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);
   return createCryptoAccount(cryptoWallet);
 }
 
@@ -235,7 +235,7 @@ function getAdaTransaction(
   const seed = getFromStorage(WALLET_SEED_KEY);
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   const addressesMap = getAdaAddressesMap();
-  const addresses = adaAddressesToList(addressesMap);
+  const addresses = mapToList(addressesMap);
   const changeAddr = addresses[0].cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsForAddresses(addresses.map(addr => addr.cadId))
@@ -346,34 +346,38 @@ function mapUTXOsToInputs(utxos, adaAddressesMap) {
   });
 }
 
+function createWallet({
+  walletPassword,
+  walletInitData
+}: AdaWalletParams) {
+  const adaWallet = toAdaWallet({ walletPassword, walletInitData });
+  const mnemonic = walletInitData.cwBackupPhrase.bpToList;
+  const seed = generateWalletSeed(mnemonic, walletPassword);
+  return [adaWallet, seed];
+}
+
+function saveWallet(adaWallet, seed): void {
+  saveInStorage(WALLET_KEY, adaWallet);
+  saveInStorage(WALLET_SEED_KEY, seed);
+}
+
+/* TODO: crypto account should be stored in the localstorage
+   in order to avoid insert password each time the user creates a new address
+   (implement method: saveCryptoAccount)
+*/
 function createCryptoAccount(cryptoWallet) {
   const accountIndex = 0; /* Because we only provide a SINGLE account */
   return Wallet.newAccount(cryptoWallet, accountIndex).result.Ok;
 }
 
-function createAdaAddress(account, addressType): AdaAddress {
+function createAdaAddress(cryptoAccount, addressType): AdaAddress {
   const addresses = getAdaAddresses();
   const addressIndex = addresses ? addresses.length : 0;
-  const { result } = Wallet.generateAddresses(account, addressType, [addressIndex]);
-  const address: AdaAddress = {
-    cadAmount: {
-      getCCoin: 0
-    },
-    cadId: result[0],
-    cadIsUsed: false,
-    account: account.account,
-    change: getAddressTypeIndex(addressType),
-    index: addressIndex
-  };
-  return address;
+  const { result } = Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]);
+  return toAdaAddress(cryptoAccount.account, addressType, addressIndex, result[0]);
 }
 
-function getAddressTypeIndex(addressType) {
-  if (addressType === 'External') return 0;
-  return 1; // addressType === 'Internal;
-}
-
-function saveAdaAddress(address: AdaAddress) {
+function saveAdaAddress(address: AdaAddress): void {
   const addressesMap = getAdaAddressesMap();
   addressesMap[address.cadId] = address;
   saveInStorage(ADDRESSES_KEY, addressesMap);
@@ -390,6 +394,29 @@ function getAdaAddressesMap() {
   return addresses;
 }
 
-function adaAddressesToList(adaAddressesMap) {
-  return Object.values(adaAddressesMap);
+async function discoverAddressesFrom(cryptoAccount, addressType, fromIndex, offset) {
+  const addressesIndex = range(fromIndex, fromIndex + offset);
+  const addresses = Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex).result;
+  const addressIndexesMap = toAddressIndexesMap(addresses);
+  const usedAddresses = await checkAddressesInUse(addresses);
+  const lastIndex = usedAddresses.reduce((maxIndex, address) => {
+    const index = addressIndexesMap[address];
+    if (index && index > maxIndex) {
+      return index;
+    }
+    return maxIndex;
+  }, -1);
+  if (lastIndex >= 0) {
+    const nextIndex = lastIndex + 1;
+    return Promise.resolve([nextIndex, addresses.slice(0, nextIndex - fromIndex)]);
+  }
+  return Promise.resolve([lastIndex, []]);
+}
+
+function toAddressIndexesMap(addresses) {
+  const map = {};
+  addresses.forEach((address, index) => {
+    map[address] = index;
+  });
+  return map;
 }

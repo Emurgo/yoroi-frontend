@@ -10,8 +10,6 @@ import {
   blockchainNetworkConfig,
   NETWORK_MODE,
 } from '../../../config/blockchainNetworkConfig';
-import type { AdaWallet } from '../types';
-import type { AdaWalletParams } from '../ada-methods';
 
 export const generateAdaMnemonic = () => bip39.generateMnemonic(128).split(' ');
 
@@ -20,25 +18,6 @@ export const isValidAdaMnemonic = (
   numberOfWords: number = 12
 ) =>
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
-
-/* @note: Ada wallet is the abstraction for Daedalus */
-export function toAdaWallet({ walletPassword, walletInitData }: AdaWalletParams): AdaWallet {
-  const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
-  return {
-    cwAccountsNumber: 1,
-    cwAmount: {
-      getCCoin: 0
-    },
-    cwHasPassphrase: !!walletPassword,
-    cwId: '1111111111111111',
-    cwMeta: {
-      cwAssurance,
-      cwName,
-      cwUnit
-    },
-    cwPassphraseLU: new Date()
-  };
-}
 
 export function generateWalletSeed(secretWords, password) {
   const entropy = bip39.mnemonicToEntropy(secretWords);

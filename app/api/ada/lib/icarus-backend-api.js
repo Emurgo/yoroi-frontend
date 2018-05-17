@@ -47,3 +47,13 @@ export const sendTx = signedTx =>
       }
     }
   ).then(response => response.data);
+
+export const checkAddressesInUse = addresses =>
+  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/addresses/filterUsed`,
+    {
+      method: 'post',
+      data: {
+        addresses
+      }
+    }
+  ).then(response => response.data);

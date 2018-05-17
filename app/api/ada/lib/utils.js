@@ -1,4 +1,9 @@
 // @flow
 export const unixTimestampToDate = (timestamp: number) => new Date(timestamp * 1000);
 
-export const localeDateToUnixTimestamp = (localeDate: string) => new Date(localeDate).getTime();
+export const localeDateToUnixTimestamp =
+  (localeDate: string) => new Date(localeDate).getTime();
+
+export function mapToList(map) {
+  return Object.values(map);
+}

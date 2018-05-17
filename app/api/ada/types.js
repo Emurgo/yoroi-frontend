@@ -83,15 +83,6 @@ export type AdaTransactionInputOutput = [
 
 export type AdaTransactionFee = AdaAmount;
 
-export type AdaTxFeeParams = {
-  sender: string,
-  receiver: string,
-  amount: string,
-  // "groupingPolicy" - Spend everything from the address
-  // "OptimizeForSize" for no grouping
-  groupingPolicy: ?'OptimizeForSecurity' | 'OptimizeForSize',
-};
-
 export type AdaWallet = {
   cwAccountsNumber: number,
   cwAmount: AdaAmount,
