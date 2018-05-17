@@ -30,6 +30,7 @@ import { Wallet } from 'cardano-crypto';
 import {
   getTransactionsHistoryForAddresses,
   getUTXOsForAddresses,
+  getUTXOsSumsForAddresses,
   sendTx
 } from './lib/icarus-backend-api';
 
@@ -320,8 +321,8 @@ function spenderData(txInputs, txOutputs, addresses) {
 }
 
 async function getBalance(addresses) {
-  const utxos = await getUTXOsForAddresses(addresses);
-  return utxos.reduce((acc, utxo) => acc.plus(new BigNumber(utxo.amount)), new BigNumber(0));
+  const utxoSum = await getUTXOsSumsForAddresses(addresses);
+  return utxoSum.sum ? new BigNumber(utxoSum.sum) : new BigNumber(0);
 }
 
 function mapUTXOsToInputs(utxos, adaAddressesMap) {
