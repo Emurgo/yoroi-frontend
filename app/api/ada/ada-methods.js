@@ -1,6 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
+import moment from 'moment';
 
 import type {
   AdaWallet,
@@ -27,6 +28,7 @@ import {
 import { Wallet } from 'cardano-crypto';
 
 import {
+  getTransactionsHistoryForAddresses,
   getUTXOsForAddresses,
   getUTXOsSumsForAddresses,
   sendTx
@@ -112,28 +114,34 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
     }
   });
   saveInStorage(WALLET_KEY, updatedWallet);
-  // Update Wallet Txs History
-  const history = [];
-  if (history.length > 0) {
-    saveInStorage(
-      TX_KEY,
-      mapTransactions(history, addresses[0]) // FIXME: Manage multiple addresses 
-    );
-  }
+  const availableHistory = getAdaTxsHistory();
+  await updateAdaTxsHistory(availableHistory, addresses);
   return updatedWallet;
+};
+
+const updateAdaTxsHistory = async (availableHistory, addresses) => {
+  const mostRecentTx = availableHistory.shift();
+  const dateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : moment(new Date(0));
+  const history = await getTransactionsHistoryForAddresses(addresses, dateFrom);
+  if (history.length > 0) {
+    const transactions = mapTransactions(history, addresses).concat(availableHistory);
+    if (history.length === 20) { // FIXME: This should be a configurable variable
+      await updateAdaTxsHistory(transactions, addresses);
+    } else {
+      saveInStorage(TX_KEY, transactions);
+    }
+  }
 };
 
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
   generateAdaMnemonic();
 
-export const getAdaHistoryByWallet = ({
+export const getAdaTxsHistoryByWallet = ({
   walletId,
   skip,
   limit
 }: GetAdaHistoryByWalletParams): Promise<AdaTransactions> => {
-  const transactions = getFromStorage(TX_KEY);
-  if (!transactions) return Promise.resolve([[], 0]);
-
+  const transactions = getAdaTxsHistory();
   return Promise.resolve([transactions, transactions.length]);
 };
 
@@ -242,49 +250,45 @@ function getAdaTransaction(
     });
 }
 
-// FIXME: Transform data given the new endpoints
 function mapTransactions(
   transactions: [],
-  accountAddress,
+  accountAddresses,
 ): Array<AdaTransaction> {
   return transactions.map(tx => {
-    const { isOutgoing, amount } = spenderData(tx, accountAddress);
-    const isPending = tx.ctsBlockHeight == null;
+    const inputs = mapInputOutput(tx.inputs_address, tx.inputs_amount);
+    const outputs = mapInputOutput(tx.outputs_address, tx.outputs_amount);
+    const { isOutgoing, amount } = spenderData(inputs, outputs, accountAddresses);
+    const isPending = tx.block_num === null;
     return {
       ctAmount: {
         getCCoin: amount
       },
-      ctConfirmations: tx.latestBlockNumber,
-      ctId: tx.ctsId,
-      ctInputs: tx.ctsInputs.map(mapInputOutput),
+      ctConfirmations: tx.best_block_num - tx.block_num,
+      ctId: tx.hash,
+      ctInputs: inputs,
       ctIsOutgoing: isOutgoing,
       ctMeta: {
-        ctmDate: tx.ctsTxTimeIssued,
+        ctmDate: tx.time,
         ctmDescription: undefined,
         ctmTitle: undefined
       },
-      ctOutputs: tx.ctsOutputs.map(mapInputOutput),
+      ctOutputs: outputs,
       ctCondition: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
     };
   });
 }
 
-function mapInputOutput(txInput): AdaTransactionInputOutput {
-  return [
-    txInput[0],
-    {
-      getCCoin: txInput[1].getCoin
-    }
-  ];
+function mapInputOutput(addresses, amounts): AdaTransactionInputOutput {
+  return addresses.map((address, index) => [address, { getCCoin: amounts[index] }]);
 }
 
-function spenderData(tx, address) {
+function spenderData(txInputs, txOutputs, addresses) {
   const sum = toSum =>
     toSum.reduce(
-      ({ totalAmount, count }, val) => {
-        if (val[0] !== address) return { totalAmount, count };
+      ({ totalAmount, count }, [address, { getCCoin }]) => {
+        if (addresses.indexOf(address) < 0) return { totalAmount, count };
         return {
-          totalAmount: totalAmount.plus(new BigNumber(val[1].getCoin)),
+          totalAmount: totalAmount.plus(new BigNumber(getCCoin)),
           count: count + 1
         };
       },
@@ -294,16 +298,16 @@ function spenderData(tx, address) {
       }
     );
 
-  const incoming = sum(tx.ctsOutputs);
-  const outgoing = sum(tx.ctsInputs);
+  const incoming = sum(txOutputs);
+  const outgoing = sum(txInputs);
 
   const isOutgoing = outgoing.totalAmount.greaterThanOrEqualTo(
     incoming.totalAmount
   );
 
   const isLocal =
-    incoming.length === tx.ctsInputs.length &&
-    outgoing.length === tx.ctsOutputs.length;
+    incoming.count === txInputs.length &&
+    outgoing.count === txOutputs.length;
 
   let amount;
   if (isLocal) amount = outgoing.totalAmount;
@@ -373,6 +377,10 @@ function saveAdaAddress(address: AdaAddress) {
   const addressesMap = getAdaAddressesMap();
   addressesMap[address.cadId] = address;
   saveInStorage(ADDRESSES_KEY, addressesMap);
+}
+
+function getAdaTxsHistory() {
+  return getFromStorage(TX_KEY) || [];
 }
 
 /* Just return all existing addresses because we are using a SINGLE account */
