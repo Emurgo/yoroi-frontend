@@ -27,7 +27,8 @@ import {
   newAdaAddress,
   getWalletSeed,
   getSingleCryptoAccount,
-  getAdaAddressesMap
+  getAdaAddressesMap,
+  filterAdaAddressesByType
 } from './ada-methods';
 
 import {
@@ -174,7 +175,10 @@ export default class AdaApi {
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
     try {
-      const adaAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
+      const adaAddresses: AdaAddresses = filterAdaAddressesByType(
+        mapToList(getAdaAddressesMap()),
+        'External'
+      );
       Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
       return new Promise(resolve =>

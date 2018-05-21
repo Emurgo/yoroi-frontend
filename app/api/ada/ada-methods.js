@@ -92,22 +92,16 @@ export async function restoreAdaWallet({
   const [adaWallet, seed] = createWallet({ walletPassword, walletInitData });
   const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
 
-  let addressesToSave = [];
-  let fromIndex = 0;
-  while (fromIndex >= 0) {
-    // TODO: Make offset configurable
-    const [newIndex, addressesRecovered] =
-      await discoverAddressesFrom(cryptoAccount, 'External', fromIndex, 20);
-    fromIndex = newIndex;
-    addressesToSave = addressesToSave.concat(addressesRecovered);
-  }
-  if (addressesToSave.length !== 0) {
+  // TODO: Receive offset from params or use a constant config value
+  const externalAddressesToSave = await
+    discoverAllAddressesFrom(cryptoAccount, 'External', 0, 20);
+  const internalAddressesToSave = await
+    discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, 20);
+
+  if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
     // TODO: Store all at once
-    addressesToSave.forEach((hash, index) => {
-      const adaAddress: AdaAddress =
-        toAdaAddress(cryptoAccount.account, 'External', index, hash);
-      saveAdaAddress(adaAddress);
-    });
+    saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
+    saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal');
   } else {
     newAdaAddress(cryptoAccount, [], 'External');
   }
@@ -166,7 +160,8 @@ export const getAdaTransactionFee = (
   const adaWallet = getFromStorage(WALLET_KEY);
   const password = adaWallet.cwHasPassphrase ? 'FakePassword' : undefined;
   return getAdaTransaction(receiver, amount, password)
-    .then((result) => {
+    .then((response) => {
+      const result = response[0];
       // TODO: Improve Js-Wasm-cardano error handling 
       if (result.failed) {
         if (result.msg === 'FeeCalculationError(NotEnoughInput)') {
@@ -185,10 +180,15 @@ export const newAdaTransaction = (
   password: ?string
 ): Promise<AdaTransaction> => {
   return getAdaTransaction(receiver, amount, password)
-    .then(({ result: { cbor_encoded_tx } }) => {
+    .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
       // TODO: Handle Js-Wasm-cardano errors 
       const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-      return sendTx(signedTx);
+      return Promise.all([changeAdaAddr, sendTx(signedTx)]);
+    })
+    .then(([backendResponse, changeAdaAddr]) => {
+      // Only if the tx was send, we should track the change Address.
+      saveAdaAddress(changeAdaAddr);
+      return backendResponse;
     });
 };
 
@@ -248,25 +248,27 @@ function getFromStorage(key: string): any {
 function getAdaTransaction(
   receiver: string,
   amount: string,
-  password: string
+  password: ?string
 ) {
   const seed = getFromStorage(WALLET_SEED_KEY);
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   const cryptoAccount = getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
   const addressesMap = getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
-  const changeAdaAddr = newAdaAddress(cryptoAccount, addresses, 'Internal');
+  const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsForAddresses(addresses.map(addr => addr.cadId))
     .then((senderUtxos) => {
       const inputs = mapUTXOsToInputs(senderUtxos, addressesMap);
-      return Wallet.spend(
-        cryptoWallet,
-        inputs,
-        outputs,
-        changeAddr
-      );
+      return [
+        Wallet.spend(
+          cryptoWallet,
+          inputs,
+          outputs,
+          changeAddr),
+        changeAdaAddr
+      ];
     });
 }
 
@@ -406,8 +408,37 @@ function saveAdaAddress(address: AdaAddress): void {
   saveInStorage(ADDRESSES_KEY, addressesMap);
 }
 
+function saveAsAdaAddresses(
+  cryptoAccount,
+  addresses: Array<string>,
+  addressType: AddressType
+): void {
+  addresses.forEach((hash, index) => {
+    const adaAddress: AdaAddress =
+      toAdaAddress(cryptoAccount.account, addressType, index, hash);
+    saveAdaAddress(adaAddress);
+  });
+}
+
 function getAdaTxsHistory() {
   return getFromStorage(TX_KEY) || [];
+}
+
+async function discoverAllAddressesFrom(
+  cryptoAccount,
+  addressType: AddressType,
+  initialIndex: number,
+  offset: number
+) {
+  let addressesDiscovered = [];
+  let fromIndex = initialIndex;
+  while (fromIndex >= 0) {
+    const [newIndex, addressesRecovered] =
+      await discoverAddressesFrom(cryptoAccount, addressType, fromIndex, offset);
+    fromIndex = newIndex;
+    addressesDiscovered = addressesDiscovered.concat(addressesRecovered);
+  }
+  return addressesDiscovered;
 }
 
 async function discoverAddressesFrom(
