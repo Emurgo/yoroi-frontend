@@ -4,7 +4,6 @@ import { action } from 'mobx';
 import BigNumber from 'bignumber.js';
 import {
   unixTimestampToDate,
-  localeDateToUnixTimestamp,
   mapToList
 } from './lib/utils';
 import Wallet from '../../domain/Wallet';
@@ -814,7 +813,6 @@ const _createTransactionFromServerData = action(
   (data: AdaTransaction) => {
     const coins = data.ctAmount.getCCoin;
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
-    const ctmTimestamp = localeDateToUnixTimestamp(ctmDate);
     return new WalletTransaction({
       id: data.ctId,
       title: ctmTitle || data.ctIsOutgoing ? 'Ada sent' : 'Ada received',
@@ -824,7 +822,7 @@ const _createTransactionFromServerData = action(
       amount: new BigNumber(data.ctIsOutgoing ? -1 * coins : coins).dividedBy(
         LOVELACES_PER_ADA
       ),
-      date: unixTimestampToDate(ctmTimestamp),
+      date: new Date(ctmDate),
       description: ctmDescription || '',
       numberOfConfirmations: data.ctConfirmations,
       addresses: {
