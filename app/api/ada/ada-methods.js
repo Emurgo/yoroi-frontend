@@ -4,6 +4,7 @@ import range from 'lodash.range';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { Wallet } from 'cardano-crypto';
+import _ from 'lodash';
 
 import type {
   AdaWallet,
@@ -321,8 +322,13 @@ function spenderData(txInputs, txOutputs, addresses) {
 }
 
 async function getBalance(addresses) {
-  const utxoSum = await getUTXOsSumsForAddresses(addresses);
-  return utxoSum.sum ? new BigNumber(utxoSum.sum) : new BigNumber(0);
+  const groupsOfAddresses = _.chunk(addresses, 20);
+  const totalBalance = groupsOfAddresses.reduce(async (previousPromise, groupOfAddresses) => {
+    const previousUtxoSum = await previousPromise;
+    const utxoSum = await getUTXOsSumsForAddresses(groupOfAddresses);
+    return previousUtxoSum + (utxoSum.sum ? new BigNumber(utxoSum.sum) : new BigNumber(0));
+  }, Promise.resolve([]));
+  return totalBalance;
 }
 
 function mapUTXOsToInputs(utxos, adaAddressesMap) {
