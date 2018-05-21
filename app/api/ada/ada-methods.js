@@ -397,7 +397,7 @@ function createAdaAddress(
   addressType: AddressType
 ): AdaAddress {
   const filteredAddresses = filterAdaAddressesByType(addresses, addressType);
-  const addressIndex = filteredAddresses ? filteredAddresses.length : 0;
+  const addressIndex = filteredAddresses.length;
   const result = Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]);
   return toAdaAddress(cryptoAccount.account, addressType, addressIndex, result.result[0]);
 }
@@ -453,7 +453,7 @@ async function discoverAddressesFrom(
   const usedAddresses = await checkAddressesInUse(addresses);
   const lastIndex = usedAddresses.reduce((maxIndex, address) => {
     const index = addressIndexesMap[address];
-    if (index && index > maxIndex) {
+    if (index > maxIndex) {
       return index;
     }
     return maxIndex;
