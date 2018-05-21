@@ -38,7 +38,8 @@ import {
 } from './lib/icarus-backend-api';
 
 import {
-  mapToList
+  mapToList,
+  getAddressInHex
 } from './lib/utils';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
@@ -58,9 +59,8 @@ export type GetAdaHistoryByWalletParams = {
   limit: number
 };
 
-// TODO: Implement it!
-export function isValidAdaAddress(address: string): Promise<boolean> {
-  return Promise.resolve(true);
+export function isValidAdaAddress(address: String): Promise<boolean> {
+  return Promise.resolve(!Wallet.checkAddress(getAddressInHex(address)).failed);
 }
 
 export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
