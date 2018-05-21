@@ -1,7 +1,8 @@
 // @flow
 import type {
   AdaWallet,
-  AdaAddress
+  AdaAddress,
+  AddressType
 } from '../types';
 import type { AdaWalletParams } from '../ada-methods';
 
@@ -26,7 +27,7 @@ export function toAdaWallet({ walletPassword, walletInitData }: AdaWalletParams)
 
 export function toAdaAddress(
   accountIndex: number,
-  addressType: string,
+  addressType: AddressType,
   addressIndex: number,
   addresHash: string
 ): AdaAddress {
@@ -42,7 +43,7 @@ export function toAdaAddress(
   };
 }
 
-function getAddressTypeIndex(addressType) {
+export function getAddressTypeIndex(addressType: AddressType): number {
   if (addressType === 'External') return 0;
   return 1; // addressType === 'Internal;
 }

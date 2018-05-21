@@ -15,11 +15,13 @@ import type {
   AdaTransaction,
   AdaTransactionInputOutput,
   AdaTransactionFee,
+  AddressType
 } from './types';
 
 import {
   toAdaWallet,
-  toAdaAddress
+  toAdaAddress,
+  getAddressTypeIndex
 } from './lib/crypto-to-cardano';
 
 import {
@@ -43,6 +45,7 @@ import {
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const WALLET_SEED_KEY = 'SEED';
+const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */
 const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
 const TX_KEY = 'TXS'; // single txs list atm
 
@@ -75,7 +78,7 @@ export async function newAdaWallet({
   const [adaWallet, seed] = createWallet({ walletPassword, walletInitData });
   const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
 
-  newAdaAddress(cryptoAccount, 'External');
+  newAdaAddress(cryptoAccount, [], 'External');
 
   saveWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);
@@ -106,7 +109,7 @@ export async function restoreAdaWallet({
       saveAdaAddress(adaAddress);
     });
   } else {
-    newAdaAddress(cryptoAccount, 'External');
+    newAdaAddress(cryptoAccount, [], 'External');
   }
 
   saveWallet(adaWallet, seed);
@@ -116,7 +119,7 @@ export async function restoreAdaWallet({
 export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   const persistentWallet = getFromStorage(WALLET_KEY);
   if (!persistentWallet) return Promise.resolve();
-  const persistentAddresses: AdaAddresses = getAdaAddresses();
+  const persistentAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
   const addresses = persistentAddresses.map(addr => addr.cadId);
   // Update wallet balance
   const updatedWallet = Object.assign({}, persistentWallet, {
@@ -190,14 +193,22 @@ export const newAdaTransaction = (
 };
 
 /* Create and save the next address for the given account */
-export function newAdaAddress(cryptoAccount, addressType): AdaAddress {
-  const address: AdaAddress = createAdaAddress(cryptoAccount, addressType);
+export function newAdaAddress(
+  cryptoAccount,
+  addresses: AdaAddresses,
+  addressType: AddressType
+): AdaAddress {
+  const address: AdaAddress = createAdaAddress(cryptoAccount, addresses, addressType);
   saveAdaAddress(address);
   return address;
 }
 
-export function getAdaAddresses(): AdaAddresses {
-  return mapToList(getAdaAddressesMap());
+export function filterAdaAddressesByType(
+  addresses: AdaAddresses,
+  addressType: AddressType
+): AdaAddresses {
+  return addresses.filter((address: AdaAddress) =>
+      address.change === getAddressTypeIndex(addressType));
 }
 
 export function getWalletSeed() {
@@ -208,9 +219,16 @@ export function getWalletSeed() {
  * Temporary method helpers
  */
 
+/* Just return all existing addresses because we are using a SINGLE account */
+export function getAdaAddressesMap() {
+  const addresses = getFromStorage(ADDRESSES_KEY);
+  if (!addresses) return {};
+  return addresses;
+}
+
 export function getSingleCryptoAccount(seed, walletPassword: ?string) {
   const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);
-  return createCryptoAccount(cryptoWallet);
+  return getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
 }
 
 /**
@@ -228,15 +246,17 @@ function getFromStorage(key: string): any {
 }
 
 function getAdaTransaction(
-  receiver,
-  amount,
-  password
+  receiver: string,
+  amount: string,
+  password: string
 ) {
   const seed = getFromStorage(WALLET_SEED_KEY);
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  const cryptoAccount = getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
   const addressesMap = getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
-  const changeAddr = addresses[0].cadId;
+  const changeAdaAddr = newAdaAddress(cryptoAccount, addresses, 'Internal');
+  const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
   return getUTXOsForAddresses(addresses.map(addr => addr.cadId))
     .then((senderUtxos) => {
@@ -365,16 +385,19 @@ function saveWallet(adaWallet, seed): void {
    in order to avoid insert password each time the user creates a new address
    (implement method: saveCryptoAccount)
 */
-function createCryptoAccount(cryptoWallet) {
-  const accountIndex = 0; /* Because we only provide a SINGLE account */
+function getCryptoAccount(cryptoWallet, accountIndex: number) {
   return Wallet.newAccount(cryptoWallet, accountIndex).result.Ok;
 }
 
-function createAdaAddress(cryptoAccount, addressType): AdaAddress {
-  const addresses = getAdaAddresses();
-  const addressIndex = addresses ? addresses.length : 0;
-  const { result } = Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]);
-  return toAdaAddress(cryptoAccount.account, addressType, addressIndex, result[0]);
+function createAdaAddress(
+  cryptoAccount,
+  addresses: AdaAddresses,
+  addressType: AddressType
+): AdaAddress {
+  const filteredAddresses = filterAdaAddressesByType(addresses, addressType);
+  const addressIndex = filteredAddresses ? filteredAddresses.length : 0;
+  const result = Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]);
+  return toAdaAddress(cryptoAccount.account, addressType, addressIndex, result.result[0]);
 }
 
 function saveAdaAddress(address: AdaAddress): void {
@@ -387,14 +410,12 @@ function getAdaTxsHistory() {
   return getFromStorage(TX_KEY) || [];
 }
 
-/* Just return all existing addresses because we are using a SINGLE account */
-function getAdaAddressesMap() {
-  const addresses = getFromStorage(ADDRESSES_KEY);
-  if (!addresses) return {};
-  return addresses;
-}
-
-async function discoverAddressesFrom(cryptoAccount, addressType, fromIndex, offset) {
+async function discoverAddressesFrom(
+  cryptoAccount,
+  addressType: AddressType,
+  fromIndex: number,
+  offset: number
+) {
   const addressesIndex = range(fromIndex, fromIndex + offset);
   const addresses = Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex).result;
   const addressIndexesMap = toAddressIndexesMap(addresses);
@@ -413,7 +434,7 @@ async function discoverAddressesFrom(cryptoAccount, addressType, fromIndex, offs
   return Promise.resolve([lastIndex, []]);
 }
 
-function toAddressIndexesMap(addresses) {
+function toAddressIndexesMap(addresses: Array<string>) {
   const map = {};
   addresses.forEach((address, index) => {
     map[address] = index;

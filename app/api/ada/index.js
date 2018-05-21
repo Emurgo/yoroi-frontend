@@ -2,7 +2,11 @@
 import { split, get } from 'lodash';
 import { action } from 'mobx';
 import BigNumber from 'bignumber.js';
-import { unixTimestampToDate, localeDateToUnixTimestamp } from './lib/utils';
+import {
+  unixTimestampToDate,
+  localeDateToUnixTimestamp,
+  mapToList
+} from './lib/utils';
 import Wallet from '../../domain/Wallet';
 import WalletTransaction, {
   transactionTypes
@@ -23,8 +27,15 @@ import {
   newAdaAddress,
   getWalletSeed,
   getSingleCryptoAccount,
-  getAdaAddresses
+  getAdaAddressesMap
 } from './ada-methods';
+
+import {
+  GenericApiError,
+  IncorrectWalletPasswordError,
+  WalletAlreadyRestoredError,
+  ReportRequestError
+} from '../common';
 
 import type {
   AdaLocalTimeDifference,
@@ -57,13 +68,6 @@ import type {
   UpdateWalletResponse,
   UpdateWalletPasswordRequest,
   UpdateWalletPasswordResponse
-} from '../common';
-
-import {
-  GenericApiError,
-  IncorrectWalletPasswordError,
-  WalletAlreadyRestoredError,
-  ReportRequestError
 } from '../common';
 
 import {
@@ -170,7 +174,7 @@ export default class AdaApi {
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
     try {
-      const adaAddresses: AdaAddresses = getAdaAddresses();
+      const adaAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
       Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
       return new Promise(resolve =>
@@ -337,7 +341,8 @@ export default class AdaApi {
       /* TODO: We should return the account previously saved
          in the local storage (password it won't be necessary anymore) */
       const cryptoAccount = getSingleCryptoAccount(getWalletSeed(), password);
-      const newAddress: AdaAddress = newAdaAddress(cryptoAccount, 'External');
+      const addresses: AdaAddresses = mapToList(getAdaAddressesMap());
+      const newAddress: AdaAddress = newAdaAddress(cryptoAccount, addresses, 'External');
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {

@@ -91,10 +91,12 @@ export type AdaWallet = {
   cwMeta: {
     cwAssurance: AdaAssurance,
     cwName: string,
-    csUnit: number,
+    cwUnit: number,
   },
   cwPassphraseLU: Date,
 };
 
 export type AdaWallets = Array<AdaWallet>;
 export type AdaLocalTimeDifference = number;
+
+export type AddressType = "External" | "Internal";
