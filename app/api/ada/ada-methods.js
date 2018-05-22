@@ -178,19 +178,18 @@ export const newAdaTransaction = (
   receiver: string,
   amount: string,
   password: ?string
-): Promise<AdaTransaction> => {
-  return getAdaTransaction(receiver, amount, password)
+): Promise<any> =>
+  getAdaTransaction(receiver, amount, password)
     .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
       // TODO: Handle Js-Wasm-cardano errors 
       const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-      return Promise.all([changeAdaAddr, sendTx(signedTx)]);
+      return Promise.all([sendTx(signedTx), changeAdaAddr]);
     })
     .then(([backendResponse, changeAdaAddr]) => {
       // Only if the tx was send, we should track the change Address.
       saveAdaAddress(changeAdaAddr);
       return backendResponse;
     });
-};
 
 /* Create and save the next address for the given account */
 export function newAdaAddress(

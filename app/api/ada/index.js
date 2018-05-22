@@ -265,11 +265,11 @@ export default class AdaApi {
 
   async createTransaction(
     request: CreateTransactionRequest
-  ): Promise<AdaTransaction> {
+  ): Promise<any> {
     Logger.debug('AdaApi::createTransaction called');
     const { receiver, amount, password } = request;
     try {
-      const response: AdaTransaction = await newAdaTransaction(
+      const response = await newAdaTransaction(
         receiver,
         amount,
         password
