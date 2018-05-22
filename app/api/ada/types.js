@@ -59,7 +59,7 @@ export type AdaAccounts = Array<AdaAccount>;
 
 export type AdaTransaction = {
   ctAmount: AdaAmount,
-  ctConfirmations: number,
+  ctBlockNumber: number,
   ctId: string,
   ctInputs: AdaTransactionInputOutput,
   ctIsOutgoing: boolean,

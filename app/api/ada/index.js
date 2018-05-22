@@ -23,7 +23,8 @@ import {
   newAdaAddress,
   getWalletSeed,
   getSingleCryptoAccount,
-  getAdaAddresses
+  getAdaAddresses,
+  getLastBlockNumber
 } from './ada-methods';
 
 import type {
@@ -797,7 +798,6 @@ const _conditionToTxState = (condition: string) => {
       return 'failed';
     default:
       return 'ok'; // CPtxInBlocks && CPtxNotTracked
-  }
 };
 
 const _createTransactionFromServerData = action(
@@ -816,7 +816,7 @@ const _createTransactionFromServerData = action(
       ),
       date: new Date(ctmDate),
       description: ctmDescription || '',
-      numberOfConfirmations: data.ctConfirmations,
+      numberOfConfirmations: getLastBlockNumber() - data.ctBlockNumber,
       addresses: {
         from: data.ctInputs.map(address => address[0]),
         to: data.ctOutputs.map(address => address[0])
