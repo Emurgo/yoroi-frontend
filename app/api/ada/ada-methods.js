@@ -225,7 +225,7 @@ function getAdaTransaction(
   const addresses = mapToList(addressesMap);
   const changeAddr = addresses[0].cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses(addresses.map(addr => addr.cadId))
+  return getAllUTXOsForAddresses(addresses)
     .then((senderUtxos) => {
       const inputs = mapUTXOsToInputs(senderUtxos, addressesMap);
       return Wallet.spend(
@@ -235,6 +235,14 @@ function getAdaTransaction(
         changeAddr
       );
     });
+}
+
+async function getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
+  const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
+  const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
+    getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
+  return Promise.all(promises).then(groupsOfUTXOs =>
+    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
 }
 
 function mapTransactions(

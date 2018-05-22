@@ -1,5 +1,3 @@
-const bs58 = require('bs58');
-
 // @flow
 import bs58 from 'bs58';
 
