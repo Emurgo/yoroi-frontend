@@ -48,6 +48,7 @@ const WALLET_KEY = 'WALLET'; // single wallet atm
 const WALLET_SEED_KEY = 'SEED';
 const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
 const TX_KEY = 'TXS'; // single txs list atm
+const LAST_BLOCK_NUMBER_KEY = 'LAST_BLOCK_NUMBER'; // stores de last block number
 
 export type AdaWalletParams = {
   walletPassword: ?string,
@@ -191,6 +192,10 @@ export function getWalletSeed() {
   return getFromStorage(WALLET_SEED_KEY);
 }
 
+export function getLastBlockNumber() {
+  return getFromStorage(LAST_BLOCK_NUMBER_KEY);
+}
+
 /**
  * Temporary method helpers
  */
@@ -246,11 +251,14 @@ function mapTransactions(
     const outputs = mapInputOutput(tx.outputs_address, tx.outputs_amount);
     const { isOutgoing, amount } = spenderData(inputs, outputs, accountAddresses);
     const isPending = tx.block_num === null;
+    if (!getLastBlockNumber() || tx.best_block_num > getLastBlockNumber()) {
+      saveInStorage(LAST_BLOCK_NUMBER_KEY, tx.best_block_num);
+    }
     return {
       ctAmount: {
         getCCoin: amount
       },
-      ctConfirmations: tx.best_block_num - tx.block_num,
+      ctBlockNumber: tx.block_num,
       ctId: tx.hash,
       ctInputs: inputs,
       ctIsOutgoing: isOutgoing,
