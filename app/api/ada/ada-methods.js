@@ -127,8 +127,7 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
     }
   });
   saveInStorage(WALLET_KEY, updatedWallet);
-  const availableHistory = getAdaTxsHistory();
-  await updateAdaTxsHistory(availableHistory, addresses);
+  await updateAdaTxsHistory(getAdaTransactions(), addresses);
   return updatedWallet;
 };
 
@@ -140,7 +139,7 @@ export const getAdaTxsHistoryByWallet = ({
   skip,
   limit
 }: GetAdaHistoryByWalletParams): Promise<AdaTransactions> => {
-  const transactions = getAdaTxsHistory();
+  const transactions = getAdaTransactions();
   return Promise.resolve([transactions, transactions.length]);
 };
 
@@ -380,7 +379,7 @@ function saveAdaAddress(address: AdaAddress): void {
   saveInStorage(ADDRESSES_KEY, addressesMap);
 }
 
-function getAdaTxsHistory() {
+function getAdaTransactions() {
   return getFromStorage(TX_KEY) || [];
 }
 
@@ -418,30 +417,38 @@ function toAddressIndexesMap(addresses) {
   return map;
 }
 
-const updateAdaTxsHistory = async (availableHistory, addresses) => {
-  const mostRecentTx = availableHistory.shift();
-  const dateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : moment(new Date(0));
+const updateAdaTxsHistory = async (existedTransactions, addresses) => {
+  const mostRecentTx = existedTransactions.shift();
+  const dateFrom = mostRecentTx ? 
+    moment(mostRecentTx.ctMeta.ctmDate) : 
+    moment(new Date(0));
   const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-  const transactionsPromises = groupsOfAddresses.map(groupOfAddresses =>
+  const promises = groupsOfAddresses.map(groupOfAddresses =>
     updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom)
   );
-  return Promise.all(transactionsPromises).then((groupsOfTransactions) => {
-    const groupedTransactions = groupsOfTransactions.reduce((acc, groupOfTransactions) =>
-      (acc.concat(groupOfTransactions)), []).concat(availableHistory);
-    const transactions = sortTransactionsByDate(groupedTransactions);
-    saveInStorage(TX_KEY, transactions);
-    return transactions;
+  return Promise.all(promises)
+  .then((groupsOfTransactions) => {
+    const groupedTransactions = groupsOfTransactions
+      .reduce((acc, groupOfTransactions) => acc.concat(groupOfTransactions), []);
+    const newTransactions = sortTransactionsByDate(groupedTransactions);
+    const updatedTransactions = newTransactions.concat(existedTransactions);
+    saveInStorage(TX_KEY, updatedTransactions);
+    return updatedTransactions;
   });
 };
 
-const updateAdaTxsHistoryForGroupOfAddresses = async (previousTransactions, addresses,
-  dateFrom) => {
+const updateAdaTxsHistoryForGroupOfAddresses = async (
+  previousTransactions,
+  addresses,
+  dateFrom
+) => {
   const history = await getTransactionsHistoryForAddresses(addresses, dateFrom);
   if (history.length > 0) {
     const latestTransactions = mapTransactions(history, addresses);
     const transactions = latestTransactions.concat(previousTransactions);
     if (history.length === transactionsLimit) {
-      return await updateAdaTxsHistoryForGroupOfAddresses(transactions, addresses, dateFrom);
+      return await 
+        updateAdaTxsHistoryForGroupOfAddresses(transactions, addresses, dateFrom);
     }
     return Promise.resolve(transactions);
   }
