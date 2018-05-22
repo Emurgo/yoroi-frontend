@@ -1,6 +1,8 @@
 const bs58 = require('bs58');
 
 // @flow
+import bs58 from 'bs58';
+
 export const unixTimestampToDate = (timestamp: number) => new Date(timestamp * 1000);
 
 export const localeDateToUnixTimestamp =
