@@ -1,10 +1,9 @@
 // @flow
 
-import range from 'lodash.range';
+import _ from 'lodash';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { Wallet } from 'cardano-crypto';
-import _ from 'lodash';
 
 import type {
   AdaWallet,
@@ -35,11 +34,14 @@ import {
   getUTXOsForAddresses,
   getUTXOsSumsForAddresses,
   sendTx,
-  checkAddressesInUse
+  checkAddressesInUse,
+  transactionsLimit,
+  addressesLimit
 } from './lib/icarus-backend-api';
 
 import {
-  mapToList
+  mapToList,
+  getAddressInHex
 } from './lib/utils';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
@@ -59,9 +61,8 @@ export type GetAdaHistoryByWalletParams = {
   limit: number
 };
 
-// TODO: Implement it!
-export function isValidAdaAddress(address: string): Promise<boolean> {
-  return Promise.resolve(true);
+export function isValidAdaAddress(address: String): Promise<boolean> {
+  return Promise.resolve(!Wallet.checkAddress(getAddressInHex(address)).failed);
 }
 
 export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
@@ -95,7 +96,7 @@ export async function restoreAdaWallet({
   while (fromIndex >= 0) {
     // TODO: Make offset configurable
     const [newIndex, addressesRecovered] =
-      await discoverAddressesFrom(cryptoAccount, 'External', fromIndex, 20);
+      await discoverAddressesFrom(cryptoAccount, 'External', fromIndex, addressesLimit);
     fromIndex = newIndex;
     addressesToSave = addressesToSave.concat(addressesRecovered);
   }
@@ -129,20 +130,6 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   const availableHistory = getAdaTxsHistory();
   await updateAdaTxsHistory(availableHistory, addresses);
   return updatedWallet;
-};
-
-const updateAdaTxsHistory = async (availableHistory, addresses) => {
-  const mostRecentTx = availableHistory.shift();
-  const dateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : moment(new Date(0));
-  const history = await getTransactionsHistoryForAddresses(addresses, dateFrom);
-  if (history.length > 0) {
-    const transactions = mapTransactions(history, addresses).concat(availableHistory);
-    if (history.length === 20) { // FIXME: This should be a configurable variable
-      await updateAdaTxsHistory(transactions, addresses);
-    } else {
-      saveInStorage(TX_KEY, transactions);
-    }
-  }
 };
 
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
@@ -322,13 +309,17 @@ function spenderData(txInputs, txOutputs, addresses) {
 }
 
 async function getBalance(addresses) {
-  const groupsOfAddresses = _.chunk(addresses, 20);
-  const totalBalance = groupsOfAddresses.reduce(async (previousPromise, groupOfAddresses) => {
-    const previousUtxoSum = await previousPromise;
-    const utxoSum = await getUTXOsSumsForAddresses(groupOfAddresses);
-    return previousUtxoSum + (utxoSum.sum ? new BigNumber(utxoSum.sum) : new BigNumber(0));
-  }, Promise.resolve([]));
-  return totalBalance;
+  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+  const promises =
+    groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
+  return Promise.all(promises)
+  .then(partialAmounts =>
+    partialAmounts.reduce(
+      (acc, partialAmount) =>
+        acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
+      new BigNumber(0)
+    )
+  );
 }
 
 function mapUTXOsToInputs(utxos, adaAddressesMap) {
@@ -401,7 +392,7 @@ function getAdaAddressesMap() {
 }
 
 async function discoverAddressesFrom(cryptoAccount, addressType, fromIndex, offset) {
-  const addressesIndex = range(fromIndex, fromIndex + offset);
+  const addressesIndex = _.range(fromIndex, fromIndex + offset);
   const addresses = Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex).result;
   const addressIndexesMap = toAddressIndexesMap(addresses);
   const usedAddresses = await checkAddressesInUse(addresses);
@@ -425,4 +416,44 @@ function toAddressIndexesMap(addresses) {
     map[address] = index;
   });
   return map;
+}
+
+const updateAdaTxsHistory = async (availableHistory, addresses) => {
+  const mostRecentTx = availableHistory.shift();
+  const dateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : moment(new Date(0));
+  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+  const transactionsPromises = groupsOfAddresses.map(groupOfAddresses =>
+    updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom)
+  );
+  return Promise.all(transactionsPromises).then((groupsOfTransactions) => {
+    const groupedTransactions = groupsOfTransactions.reduce((acc, groupOfTransactions) =>
+      (acc.concat(groupOfTransactions)), []).concat(availableHistory);
+    const transactions = sortTransactionsByDate(groupedTransactions);
+    saveInStorage(TX_KEY, transactions);
+    return transactions;
+  });
+};
+
+const updateAdaTxsHistoryForGroupOfAddresses = async (previousTransactions, addresses,
+  dateFrom) => {
+  const history = await getTransactionsHistoryForAddresses(addresses, dateFrom);
+  if (history.length > 0) {
+    const latestTransactions = mapTransactions(history, addresses);
+    const transactions = latestTransactions.concat(previousTransactions);
+    if (history.length === transactionsLimit) {
+      return await updateAdaTxsHistoryForGroupOfAddresses(transactions, addresses, dateFrom);
+    }
+    return Promise.resolve(transactions);
+  }
+  return Promise.resolve(previousTransactions);
+};
+
+function sortTransactionsByDate(transactions) {
+  return transactions.sort((txA, txB) => {
+    const txADate = new Date(txA.ctMeta.ctmDate);
+    const txBDate = new Date(txB.ctMeta.ctmDate);
+    if (txADate > txBDate) return -1;
+    if (txADate < txBDate) return 1;
+    return 0;
+  });
 }
