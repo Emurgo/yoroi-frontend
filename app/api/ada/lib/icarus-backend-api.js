@@ -3,6 +3,8 @@ import axios from 'axios';
 const BackendApiRoute = '18.206.30.1';
 const BackendApiPort = 443;
 const order = 'DESC';
+export const transactionsLimit = 20;
+export const addressesLimit = 20;
 
 // TODO: Refactor service call in order to re-use common parameters
 // TODO: Map errors in a more specific way

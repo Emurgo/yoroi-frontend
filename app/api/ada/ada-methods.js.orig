@@ -90,19 +90,37 @@ export async function restoreAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
+
   const [adaWallet, seed] = createWallet({ walletPassword, walletInitData });
   const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
+
+<<<<<<< HEAD
+  // TODO: Receive offset from params or use a constant config value
   const externalAddressesToSave = await
-    discoverAllAddressesFrom(cryptoAccount, 'External', 0, addressesLimit);
+    discoverAllAddressesFrom(cryptoAccount, 'External', 0, 20);
   const internalAddressesToSave = await
-    discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, addressesLimit);
+    discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, 20);
+
   if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
+=======
+  let addressesToSave = [];
+  let fromIndex = 0;
+  while (fromIndex >= 0) {
+    // TODO: Make offset configurable
+    const [newIndex, addressesRecovered] =
+      await discoverAddressesFrom(cryptoAccount, 'External', fromIndex, addressesLimit);
+    fromIndex = newIndex;
+    addressesToSave = addressesToSave.concat(addressesRecovered);
+  }
+  if (addressesToSave.length !== 0) {
+>>>>>>> f3a7dfa81227860eed04bb6449dd9063c052cff4
     // TODO: Store all at once
     saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
     saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal');
   } else {
     newAdaAddress(cryptoAccount, [], 'External');
   }
+
   saveWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);
 }
@@ -398,6 +416,7 @@ function saveAdaAddress(address: AdaAddress): void {
   saveInStorage(ADDRESSES_KEY, addressesMap);
 }
 
+<<<<<<< HEAD
 function saveAsAdaAddresses(
   cryptoAccount,
   addresses: Array<string>,
@@ -410,7 +429,10 @@ function saveAsAdaAddresses(
   });
 }
 
+function getAdaTxsHistory() {
+=======
 function getAdaTransactions() {
+>>>>>>> f3a7dfa81227860eed04bb6449dd9063c052cff4
   return getFromStorage(TX_KEY) || [];
 }
 
@@ -431,13 +453,18 @@ async function discoverAllAddressesFrom(
   return addressesDiscovered;
 }
 
+<<<<<<< HEAD
 async function discoverAddressesFrom(
   cryptoAccount,
   addressType: AddressType,
   fromIndex: number,
   offset: number
 ) {
+  const addressesIndex = range(fromIndex, fromIndex + offset);
+=======
+async function discoverAddressesFrom(cryptoAccount, addressType, fromIndex, offset) {
   const addressesIndex = _.range(fromIndex, fromIndex + offset);
+>>>>>>> f3a7dfa81227860eed04bb6449dd9063c052cff4
   const addresses = Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex).result;
   const addressIndexesMap = toAddressIndexesMap(addresses);
   const usedAddresses = await checkAddressesInUse(addresses);
@@ -493,7 +520,7 @@ const updateAdaTxsHistoryForGroupOfAddresses = async (
     const latestTransactions = mapTransactions(history, addresses);
     const transactions = latestTransactions.concat(previousTransactions);
     if (history.length === transactionsLimit) {
-      return await
+      return await 
         updateAdaTxsHistoryForGroupOfAddresses(transactions, addresses, dateFrom);
     }
     return Promise.resolve(transactions);
