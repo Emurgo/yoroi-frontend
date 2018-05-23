@@ -439,26 +439,29 @@ async function discoverAddressesFrom(
 ) {
   const addressesIndex = _.range(fromIndex, fromIndex + offset);
   const addresses = Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex).result;
-  const addressIndexesMap = toAddressIndexesMap(addresses);
+  const addressIndexesMap = generateAddressIndexesMap(addresses, addressesIndex);
   const usedAddresses = await checkAddressesInUse(addresses);
-  const lastIndex = usedAddresses.reduce((maxIndex, address) => {
+  const highestIndex = usedAddresses.reduce((currentHighestIndex, address) => {
     const index = addressIndexesMap[address];
-    if (index > maxIndex) {
+    if (index > currentHighestIndex) {
       return index;
     }
-    return maxIndex;
+    return currentHighestIndex;
   }, -1);
-  if (lastIndex >= 0) {
-    const nextIndex = lastIndex + 1;
+  if (highestIndex >= 0) {
+    const nextIndex = highestIndex + 1;
     return Promise.resolve([nextIndex, addresses.slice(0, nextIndex - fromIndex)]);
   }
-  return Promise.resolve([lastIndex, []]);
+  return Promise.resolve([highestIndex, []]);
 }
 
-function toAddressIndexesMap(addresses: Array<string>) {
+function generateAddressIndexesMap(
+  addresses: Array<string>,
+  addressesIndex: Array<number>
+) {
   const map = {};
-  addresses.forEach((address, index) => {
-    map[address] = index;
+  addresses.forEach((address, position) => {
+    map[address] = addressesIndex[position];
   });
   return map;
 }
