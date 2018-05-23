@@ -2,7 +2,10 @@
 import { split, get } from 'lodash';
 import { action } from 'mobx';
 import BigNumber from 'bignumber.js';
-import { unixTimestampToDate } from './lib/utils';
+import {
+  unixTimestampToDate,
+  mapToList
+} from './lib/utils';
 import Wallet from '../../domain/Wallet';
 import WalletTransaction, {
   transactionTypes
@@ -23,9 +26,17 @@ import {
   newAdaAddress,
   getWalletSeed,
   getSingleCryptoAccount,
-  getAdaAddresses,
+  getAdaAddressesMap,
+  filterAdaAddressesByType,
   getLastBlockNumber
 } from './ada-methods';
+
+import {
+  GenericApiError,
+  IncorrectWalletPasswordError,
+  WalletAlreadyRestoredError,
+  ReportRequestError
+} from '../common';
 
 import type {
   AdaLocalTimeDifference,
@@ -58,13 +69,6 @@ import type {
   UpdateWalletResponse,
   UpdateWalletPasswordRequest,
   UpdateWalletPasswordResponse
-} from '../common';
-
-import {
-  GenericApiError,
-  IncorrectWalletPasswordError,
-  WalletAlreadyRestoredError,
-  ReportRequestError
 } from '../common';
 
 import {
@@ -171,7 +175,10 @@ export default class AdaApi {
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
     try {
-      const adaAddresses: AdaAddresses = getAdaAddresses();
+      const adaAddresses: AdaAddresses = filterAdaAddressesByType(
+        mapToList(getAdaAddressesMap()),
+        'External'
+      );
       Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
       return new Promise(resolve =>
@@ -259,11 +266,11 @@ export default class AdaApi {
 
   async createTransaction(
     request: CreateTransactionRequest
-  ): Promise<AdaTransaction> {
+  ): Promise<any> {
     Logger.debug('AdaApi::createTransaction called');
     const { receiver, amount, password } = request;
     try {
-      const response: AdaTransaction = await newAdaTransaction(
+      const response = await newAdaTransaction(
         receiver,
         amount,
         password
@@ -338,7 +345,8 @@ export default class AdaApi {
       /* TODO: We should return the account previously saved
          in the local storage (password it won't be necessary anymore) */
       const cryptoAccount = getSingleCryptoAccount(getWalletSeed(), password);
-      const newAddress: AdaAddress = newAdaAddress(cryptoAccount, 'External');
+      const addresses: AdaAddresses = mapToList(getAdaAddressesMap());
+      const newAddress: AdaAddress = newAdaAddress(cryptoAccount, addresses, 'External');
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
@@ -798,6 +806,7 @@ const _conditionToTxState = (condition: string) => {
       return 'failed';
     default:
       return 'ok'; // CPtxInBlocks && CPtxNotTracked
+  }
 };
 
 const _createTransactionFromServerData = action(

@@ -51,7 +51,6 @@ const WALLET_SEED_KEY = 'SEED';
 const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */
 const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
 const TX_KEY = 'TXS'; // single txs list atm
-const LAST_BLOCK_NUMBER_KEY = 'LAST_BLOCK_NUMBER'; // stores de last block number
 
 export type AdaWalletParams = {
   walletPassword: ?string,
@@ -91,19 +90,37 @@ export async function restoreAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
+
   const [adaWallet, seed] = createWallet({ walletPassword, walletInitData });
   const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
+
+<<<<<<< HEAD
+  // TODO: Receive offset from params or use a constant config value
   const externalAddressesToSave = await
-    discoverAllAddressesFrom(cryptoAccount, 'External', 0, addressesLimit);
+    discoverAllAddressesFrom(cryptoAccount, 'External', 0, 20);
   const internalAddressesToSave = await
-    discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, addressesLimit);
+    discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, 20);
+
   if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
+=======
+  let addressesToSave = [];
+  let fromIndex = 0;
+  while (fromIndex >= 0) {
+    // TODO: Make offset configurable
+    const [newIndex, addressesRecovered] =
+      await discoverAddressesFrom(cryptoAccount, 'External', fromIndex, addressesLimit);
+    fromIndex = newIndex;
+    addressesToSave = addressesToSave.concat(addressesRecovered);
+  }
+  if (addressesToSave.length !== 0) {
+>>>>>>> f3a7dfa81227860eed04bb6449dd9063c052cff4
     // TODO: Store all at once
     saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
     saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal');
   } else {
     newAdaAddress(cryptoAccount, [], 'External');
   }
+
   saveWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);
 }
@@ -197,10 +214,6 @@ export function getWalletSeed() {
   return getFromStorage(WALLET_SEED_KEY);
 }
 
-export function getLastBlockNumber() {
-  return getFromStorage(LAST_BLOCK_NUMBER_KEY);
-}
-
 /**
  * Temporary method helpers
  */
@@ -244,7 +257,7 @@ function getAdaTransaction(
   const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getAllUTXOsForAddresses(addresses)
+  return getUTXOsForAddresses(addresses.map(addr => addr.cadId))
     .then((senderUtxos) => {
       const inputs = mapUTXOsToInputs(senderUtxos, addressesMap);
       return [
@@ -258,14 +271,6 @@ function getAdaTransaction(
     });
 }
 
-async function getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
-  const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
-  const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
-    getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
-  return Promise.all(promises).then(groupsOfUTXOs =>
-    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
-}
-
 function mapTransactions(
   transactions: [],
   accountAddresses,
@@ -275,14 +280,11 @@ function mapTransactions(
     const outputs = mapInputOutput(tx.outputs_address, tx.outputs_amount);
     const { isOutgoing, amount } = spenderData(inputs, outputs, accountAddresses);
     const isPending = tx.block_num === null;
-    if (!getLastBlockNumber() || tx.best_block_num > getLastBlockNumber()) {
-      saveInStorage(LAST_BLOCK_NUMBER_KEY, tx.best_block_num);
-    }
     return {
       ctAmount: {
         getCCoin: amount
       },
-      ctBlockNumber: tx.block_num,
+      ctConfirmations: tx.best_block_num - tx.block_num,
       ctId: tx.hash,
       ctInputs: inputs,
       ctIsOutgoing: isOutgoing,
@@ -414,6 +416,7 @@ function saveAdaAddress(address: AdaAddress): void {
   saveInStorage(ADDRESSES_KEY, addressesMap);
 }
 
+<<<<<<< HEAD
 function saveAsAdaAddresses(
   cryptoAccount,
   addresses: Array<string>,
@@ -426,7 +429,10 @@ function saveAsAdaAddresses(
   });
 }
 
+function getAdaTxsHistory() {
+=======
 function getAdaTransactions() {
+>>>>>>> f3a7dfa81227860eed04bb6449dd9063c052cff4
   return getFromStorage(TX_KEY) || [];
 }
 
@@ -447,37 +453,39 @@ async function discoverAllAddressesFrom(
   return addressesDiscovered;
 }
 
+<<<<<<< HEAD
 async function discoverAddressesFrom(
   cryptoAccount,
   addressType: AddressType,
   fromIndex: number,
   offset: number
 ) {
+  const addressesIndex = range(fromIndex, fromIndex + offset);
+=======
+async function discoverAddressesFrom(cryptoAccount, addressType, fromIndex, offset) {
   const addressesIndex = _.range(fromIndex, fromIndex + offset);
+>>>>>>> f3a7dfa81227860eed04bb6449dd9063c052cff4
   const addresses = Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex).result;
-  const addressIndexesMap = generateAddressIndexesMap(addresses, addressesIndex);
+  const addressIndexesMap = toAddressIndexesMap(addresses);
   const usedAddresses = await checkAddressesInUse(addresses);
-  const highestIndex = usedAddresses.reduce((currentHighestIndex, address) => {
+  const lastIndex = usedAddresses.reduce((maxIndex, address) => {
     const index = addressIndexesMap[address];
-    if (index > currentHighestIndex) {
+    if (index > maxIndex) {
       return index;
     }
-    return currentHighestIndex;
+    return maxIndex;
   }, -1);
-  if (highestIndex >= 0) {
-    const nextIndex = highestIndex + 1;
+  if (lastIndex >= 0) {
+    const nextIndex = lastIndex + 1;
     return Promise.resolve([nextIndex, addresses.slice(0, nextIndex - fromIndex)]);
   }
-  return Promise.resolve([highestIndex, []]);
+  return Promise.resolve([lastIndex, []]);
 }
 
-function generateAddressIndexesMap(
-  addresses: Array<string>,
-  addressesIndex: Array<number>
-) {
+function toAddressIndexesMap(addresses: Array<string>) {
   const map = {};
-  addresses.forEach((address, position) => {
-    map[address] = addressesIndex[position];
+  addresses.forEach((address, index) => {
+    map[address] = index;
   });
   return map;
 }
@@ -512,7 +520,7 @@ const updateAdaTxsHistoryForGroupOfAddresses = async (
     const latestTransactions = mapTransactions(history, addresses);
     const transactions = latestTransactions.concat(previousTransactions);
     if (history.length === transactionsLimit) {
-      return await
+      return await 
         updateAdaTxsHistoryForGroupOfAddresses(transactions, addresses, dateFrom);
     }
     return Promise.resolve(transactions);

@@ -61,7 +61,7 @@ export class ReportRequestError extends LocalizableError {
   }
 }
 
-export type CreateTransactionResponse = WalletTransaction;
+export type CreateTransactionResponse = any;
 export type CreateWalletResponse = Wallet;
 export type DeleteWalletResponse = boolean;
 export type GetLocalTimeDifferenceResponse = number;
