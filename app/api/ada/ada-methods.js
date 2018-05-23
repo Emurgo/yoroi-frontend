@@ -482,38 +482,56 @@ function generateAddressIndexesMap(
   return map;
 }
 
+/* FIXME: uniqWith should be applied only to the newTransactions and the most recent
+   transactions, considering that recent transactions shouldn't be stored again . */
 const updateAdaTxsHistory = async (existedTransactions, addresses) => {
-  const mostRecentTx = existedTransactions.shift();
-  const dateFrom = mostRecentTx ? 
-    moment(mostRecentTx.ctMeta.ctmDate) : 
+  const mostRecentTx = existedTransactions[0];
+  const dateFrom = mostRecentTx ?
+    moment(mostRecentTx.ctMeta.ctmDate) :
     moment(new Date(0));
   const groupsOfAddresses = _.chunk(addresses, addressesLimit);
   const promises = groupsOfAddresses.map(groupOfAddresses =>
-    updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom)
+    updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
   );
   return Promise.all(promises)
   .then((groupsOfTransactions) => {
     const groupedTransactions = groupsOfTransactions
       .reduce((acc, groupOfTransactions) => acc.concat(groupOfTransactions), []);
     const newTransactions = sortTransactionsByDate(groupedTransactions);
-    const updatedTransactions = newTransactions.concat(existedTransactions);
+    const updatedTransactions = _.uniqWith(
+      newTransactions.concat(existedTransactions),
+      (txA, txB) => txA.ctId === txB.ctId
+    );
     saveInStorage(TX_KEY, updatedTransactions);
     return updatedTransactions;
   });
 };
 
+// FIXME: refactor the repeated code from updateAdaTxsHistory
 const updateAdaTxsHistoryForGroupOfAddresses = async (
   previousTransactions,
-  addresses,
-  dateFrom
+  groupOfAddresses,
+  dateFrom,
+  allAddresses
 ) => {
-  const history = await getTransactionsHistoryForAddresses(addresses, dateFrom);
+  const mostRecentTx = previousTransactions[0];
+  const updatedDateFrom = mostRecentTx ?
+    moment(mostRecentTx.ctMeta.ctmDate) :
+    dateFrom;
+  const history = await getTransactionsHistoryForAddresses(groupOfAddresses, updatedDateFrom);
   if (history.length > 0) {
-    const latestTransactions = mapTransactions(history, addresses);
-    const transactions = latestTransactions.concat(previousTransactions);
+    const latestTransactions = mapTransactions(history, allAddresses);
+    const transactions = _.uniqWith(
+      latestTransactions.concat(previousTransactions),
+      (txA, txB) => txA.ctId === txB.ctId
+    );
     if (history.length === transactionsLimit) {
-      return await
-        updateAdaTxsHistoryForGroupOfAddresses(transactions, addresses, dateFrom);
+      return await updateAdaTxsHistoryForGroupOfAddresses(
+        transactions,
+        groupOfAddresses,
+        dateFrom,
+        allAddresses
+      );
     }
     return Promise.resolve(transactions);
   }
