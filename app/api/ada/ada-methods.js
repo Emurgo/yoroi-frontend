@@ -51,6 +51,7 @@ const WALLET_SEED_KEY = 'SEED';
 const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */
 const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
 const TX_KEY = 'TXS'; // single txs list atm
+const LAST_BLOCK_NUMBER_KEY = 'LAST_BLOCK_NUMBER'; // stores de last block number
 
 export type AdaWalletParams = {
   walletPassword: ?string,
@@ -196,6 +197,10 @@ export function getWalletSeed() {
   return getFromStorage(WALLET_SEED_KEY);
 }
 
+export function getLastBlockNumber() {
+  return getFromStorage(LAST_BLOCK_NUMBER_KEY);
+}
+
 /**
  * Temporary method helpers
  */
@@ -239,7 +244,7 @@ function getAdaTransaction(
   const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return getUTXOsForAddresses(addresses.map(addr => addr.cadId))
+  return getAllUTXOsForAddresses(addresses)
     .then((senderUtxos) => {
       const inputs = mapUTXOsToInputs(senderUtxos, addressesMap);
       return [
@@ -253,6 +258,14 @@ function getAdaTransaction(
     });
 }
 
+async function getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
+  const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
+  const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
+    getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
+  return Promise.all(promises).then(groupsOfUTXOs =>
+    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
+}
+
 function mapTransactions(
   transactions: [],
   accountAddresses,
@@ -262,11 +275,14 @@ function mapTransactions(
     const outputs = mapInputOutput(tx.outputs_address, tx.outputs_amount);
     const { isOutgoing, amount } = spenderData(inputs, outputs, accountAddresses);
     const isPending = tx.block_num === null;
+    if (!getLastBlockNumber() || tx.best_block_num > getLastBlockNumber()) {
+      saveInStorage(LAST_BLOCK_NUMBER_KEY, tx.best_block_num);
+    }
     return {
       ctAmount: {
         getCCoin: amount
       },
-      ctConfirmations: tx.best_block_num - tx.block_num,
+      ctBlockNumber: tx.block_num,
       ctId: tx.hash,
       ctInputs: inputs,
       ctIsOutgoing: isOutgoing,
