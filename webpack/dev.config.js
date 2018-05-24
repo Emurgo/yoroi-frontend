@@ -36,9 +36,13 @@ const baseDevConfig = () => ({
   output: {
     path: path.join(__dirname, '../dev/js'),
     filename: '[name].bundle.js',
-    chunkFilename: '[id].chunk.js'
+    //chunkFilename: '[id].chunk.js'
   },
   plugins: [
+    new webpack.DllReferencePlugin({
+      context: path.join(__dirname, '..', 'dll'),
+      manifest: require('../dll/vendor-manifest.json') // eslint-disable-line
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.prod$/),

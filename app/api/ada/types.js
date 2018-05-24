@@ -39,6 +39,9 @@ export type AdaAddress = {
   cadAmount: AdaAmount,
   cadId: string,
   cadIsUsed: boolean,
+  account: number,
+  change: number,
+  index: number
 };
 
 export type AdaAddresses = Array<AdaAddress>;
@@ -56,7 +59,7 @@ export type AdaAccounts = Array<AdaAccount>;
 
 export type AdaTransaction = {
   ctAmount: AdaAmount,
-  ctConfirmations: number,
+  ctBlockNumber: number,
   ctId: string,
   ctInputs: AdaTransactionInputOutput,
   ctIsOutgoing: boolean,
@@ -88,10 +91,12 @@ export type AdaWallet = {
   cwMeta: {
     cwAssurance: AdaAssurance,
     cwName: string,
-    csUnit: number,
+    cwUnit: number,
   },
   cwPassphraseLU: Date,
 };
 
 export type AdaWallets = Array<AdaWallet>;
 export type AdaLocalTimeDifference = number;
+
+export type AddressType = "External" | "Internal";

@@ -13,23 +13,25 @@
 ### Prerequisites
 
 - node v8.9.4 (if you are using nvm, just execute: `$ nvm use`)
-- [rust version used by rust-cardano-crypto](https://github.com/input-output-hk/rust-cardano-crypto#installation)
+- Install rust tools as mentioned in [js-cardano-wasm](https://github.com/input-output-hk/js-cardano-wasm#installation)
 
 ```bash
-# clone the repository with the submodule rust-cardano-crypto
+# clone the repository with the submodule js-cardano-wasm
 $ git clone --recursive git@github.com:input-output-hk/icarus-poc.git
 # or
-$ git submodule update --init --recursive git@github.com:atixlabs/rust-cardano-crypto.git
+$ git submodule update --init --recursive
 
 # Install dependencies
-$ npm run setup
-
+$ npm run build-js-cardano-wasm 
+$ npm install
 ```
 
 ## Development
 
 * Run script
 ```bash
+# build dll dependencies
+$ npm run build-dll
 # build files to './dev'
 # start webpack development server
 $ npm run dev
