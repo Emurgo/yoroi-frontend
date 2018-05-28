@@ -1,3 +1,5 @@
+// @flow
+
 import { Blake2b } from 'cardano-crypto';
 import aesjs from 'aes-js';
 import { Buffer } from 'safe-buffer';

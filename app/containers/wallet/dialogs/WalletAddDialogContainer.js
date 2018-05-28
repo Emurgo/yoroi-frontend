@@ -24,9 +24,7 @@ export default class WalletAddDialogContainer extends Component<Props> {
         onRestore={() => actions.dialogs.open.trigger({
           dialog: WalletRestoreDialog,
         })}
-        onImportFile={() => actions.dialogs.open.trigger({
-          dialog: undefined, //WalletFileImportDialog,
-        })}
+        onImportFile={() => undefined}
         onCancel={actions.dialogs.closeActiveDialog.trigger}
         canClose={stores[environment.API].wallets.hasAnyWallets}
       />

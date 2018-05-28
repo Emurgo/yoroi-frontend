@@ -17,7 +17,6 @@ export const storeClasses = {
 
 export type StoresMap = {
   app: AppStore,
-  sidebar: SidebarStore,
   walletBackup: WalletBackupStore,
   router: Object,
   uiDialogs: UiDialogsStore,
@@ -28,9 +27,6 @@ export type StoresMap = {
 // Constant that does never change during lifetime
 const stores = observable({
   app: null,
-  sidebar: {
-    isShowingSubMenus: false
-  },
   walletBackup: null,
   router: null,
   uiDialogs: null,
@@ -39,7 +35,7 @@ const stores = observable({
 });
 
 // Set up and return the stores for this app -> also used to reset all stores to defaults
-export default action((api,   actions, router): StoresMap => {
+export default action((api, actions, router): StoresMap => {
   // Assign mobx-react-router only once
   if (stores.router == null) stores.router = router;
   // All other stores have our lifecycle

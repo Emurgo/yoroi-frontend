@@ -127,11 +127,7 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
   generateAdaMnemonic();
 
-export const getAdaTxsHistoryByWallet = ({
-  walletId,
-  skip,
-  limit
-}: GetAdaHistoryByWalletParams): Promise<AdaTransactions> => {
+export const getAdaTxsHistoryByWallet = (): Promise<AdaTransactions> => {
   const transactions = getAdaTransactions();
   return Promise.resolve([transactions, transactions.length]);
 };

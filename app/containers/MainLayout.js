@@ -21,8 +21,8 @@ export default class MainLayout extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores } = this.props;
-    //const { sidebar } = stores;
-    /*const wallets = stores.ada.wallets;
+    /* const { sidebar } = stores;
+    const wallets = stores.ada.wallets;
     const activeWallet = wallets.active;
     const activeWalletId = activeWallet ? activeWallet.id : null;
     const isNodeUpdateAvailable = this.props.stores.ada.nodeUpdate.isUpdateAvailable;
