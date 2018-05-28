@@ -98,5 +98,3 @@ export type AdaWallet = {
 
 export type AdaWallets = Array<AdaWallet>;
 export type AdaLocalTimeDifference = number;
-
-export type AddressType = "External" | "Internal";

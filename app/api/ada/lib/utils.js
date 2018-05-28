@@ -10,7 +10,7 @@ export function mapToList(map) {
   return Object.values(map);
 }
 
-export function getAddressInHex(address) {
+export function getAddressInHex(address: string): string {
   const bytes = bs58.decode(address);
   return bytes.toString('hex');
 }

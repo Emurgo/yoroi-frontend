@@ -354,7 +354,7 @@ export default class AdaApi {
     }
   }
 
-  isValidAddress(address: String): Promise<boolean> {
+  isValidAddress(address: string): Promise<boolean> {
     return isValidAdaAddress(address);
   }
 
