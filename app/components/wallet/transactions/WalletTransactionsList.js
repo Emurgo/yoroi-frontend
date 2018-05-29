@@ -51,6 +51,7 @@ export default class WalletTransactionsList extends Component<Props> {
   loadingSpinner: ?LoadingSpinner;
   localizedDateFormat: 'MM/DD/YYYY';
 
+  // FIXME: This method it will be removed, so ignore this flow warning.
   groupTransactionsByDay(transactions: Array<WalletTransaction>) {
     const groups = [];
     for (const transaction of transactions) {

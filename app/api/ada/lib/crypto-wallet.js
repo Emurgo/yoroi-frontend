@@ -12,7 +12,8 @@ import {
 } from '../../../config/blockchainNetworkConfig';
 
 export type WalletSeed = {
-  seed: string | Uint8Array; // Encrypted seed or Plain seed array
+  seed: ?Uint8Array,
+  encryptedSeed: ?string
 };
 
 export const generateAdaMnemonic = () => bip39.generateMnemonic(128).split(' ');
@@ -27,13 +28,21 @@ export function generateWalletSeed(secretWords: string, password: ?string): Wall
   const entropy = bip39.mnemonicToEntropy(secretWords);
   const seed: Uint8Array = Blake2b.blake2b_256(entropy);
   return {
-    seed: password ? encryptWithPassword(password, seed) : seed
+    seed: password ? undefined : seed,
+    encryptedSeed: password ? encryptWithPassword(password, seed) : undefined
   };
 }
 
-/* @note: Crypto wallet is the abstraction provide for JS-wasm-cardano module */
-export function getCryptoWalletFromSeed(walletSeed: WalletSeed, password: ?string) {
-  const seed = password ? decryptWithPassword(password, walletSeed.seed) : walletSeed.seed;
+export function getCryptoWalletFromSeed(
+  walletSeed: WalletSeed,
+  password: ?string
+): CryptoWallet {
+  let seed;
+  if (password && walletSeed.encryptedSeed) {
+    seed = decryptWithPassword(password, walletSeed.encryptedSeed);
+  } else {
+    seed = walletSeed.seed;
+  }
   const seedAsArray = Object.values(seed);
   const wallet = Wallet.fromSeed(seedAsArray).result;
   wallet.config.protocol_magic = blockchainNetworkConfig[NETWORK_MODE].PROTOCOL_MAGIC;

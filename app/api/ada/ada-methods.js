@@ -30,6 +30,8 @@ import {
   getCryptoWalletFromSeed
 } from './lib/crypto-wallet';
 
+import type { WalletSeed } from './lib/crypto-wallet';
+
 import {
   getTransactionsHistoryForAddresses,
   getUTXOsForAddresses,
@@ -207,7 +209,10 @@ export function getAdaAddressesMap() {
   return addresses;
 }
 
-export function getSingleCryptoAccount(seed, walletPassword: ?string) {
+export function getSingleCryptoAccount(
+  seed: WalletSeed,
+  walletPassword: ?string
+): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);
   return getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
 }
