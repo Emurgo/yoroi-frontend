@@ -2,7 +2,6 @@
 import type {
   AdaWallet,
   AdaAddress,
-  AddressType
 } from '../types';
 import type { AdaWalletParams } from '../ada-methods';
 

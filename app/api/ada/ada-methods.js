@@ -15,7 +15,6 @@ import type {
   AdaTransaction,
   AdaTransactionInputOutput,
   AdaTransactionFee,
-  AddressType
 } from './types';
 
 import {
@@ -30,6 +29,8 @@ import {
   generateAdaMnemonic,
   getCryptoWalletFromSeed
 } from './lib/crypto-wallet';
+
+import type { WalletSeed } from './lib/crypto-wallet';
 
 import {
   getTransactionsHistoryForAddresses,
@@ -65,7 +66,7 @@ export type GetAdaHistoryByWalletParams = {
   limit: number
 };
 
-export function isValidAdaAddress(address: String): Promise<boolean> {
+export function isValidAdaAddress(address: string): Promise<boolean> {
   return Promise.resolve(!Wallet.checkAddress(getAddressInHex(address)).failed);
 }
 
@@ -127,11 +128,7 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
   generateAdaMnemonic();
 
-export const getAdaTxsHistoryByWallet = ({
-  walletId,
-  skip,
-  limit
-}: GetAdaHistoryByWalletParams): Promise<AdaTransactions> => {
+export const getAdaTxsHistoryByWallet = (): Promise<AdaTransactions> => {
   const transactions = getAdaTransactions();
   return Promise.resolve([transactions, transactions.length]);
 };
@@ -176,7 +173,7 @@ export const newAdaTransaction = (
 
 /* Create and save the next address for the given account */
 export function newAdaAddress(
-  cryptoAccount,
+  cryptoAccount: CryptoAccount,
   addresses: AdaAddresses,
   addressType: AddressType
 ): AdaAddress {
@@ -212,7 +209,10 @@ export function getAdaAddressesMap() {
   return addresses;
 }
 
-export function getSingleCryptoAccount(seed, walletPassword: ?string) {
+export function getSingleCryptoAccount(
+  seed: WalletSeed,
+  walletPassword: ?string
+): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);
   return getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
 }
@@ -398,7 +398,7 @@ function getCryptoAccount(cryptoWallet, accountIndex: number) {
 }
 
 function createAdaAddress(
-  cryptoAccount,
+  cryptoAccount: CryptoAccount,
   addresses: AdaAddresses,
   addressType: AddressType
 ): AdaAddress {
@@ -415,7 +415,7 @@ function saveAdaAddress(address: AdaAddress): void {
 }
 
 function saveAsAdaAddresses(
-  cryptoAccount,
+  cryptoAccount: CryptoAccount,
   addresses: Array<string>,
   addressType: AddressType
 ): void {
@@ -431,7 +431,7 @@ function getAdaTransactions() {
 }
 
 async function discoverAllAddressesFrom(
-  cryptoAccount,
+  cryptoAccount: CryptoAccount,
   addressType: AddressType,
   initialIndex: number,
   offset: number
@@ -448,7 +448,7 @@ async function discoverAllAddressesFrom(
 }
 
 async function discoverAddressesFrom(
-  cryptoAccount,
+  cryptoAccount: CryptoAccount,
   addressType: AddressType,
   fromIndex: number,
   offset: number

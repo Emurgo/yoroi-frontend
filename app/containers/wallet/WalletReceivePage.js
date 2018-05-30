@@ -65,7 +65,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   render() {
     const { copiedAddress } = this.state;
     const actions = this.props.actions;
-    const { sidebar, uiNotifications } = this.props.stores;
+    const { uiNotifications } = this.props.stores;
     const { wallets, addresses } = this.props.stores.ada;
     const wallet = wallets.active;
 
@@ -102,7 +102,7 @@ export default class WalletReceivePage extends Component<Props, State> {
               duration: notification.duration,
             });
           }}
-          isSidebarExpanded={sidebar.isShowingSubMenus}
+          isSidebarExpanded={false}
           walletHasPassword={wallet.hasPassword}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}

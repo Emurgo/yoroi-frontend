@@ -25,7 +25,7 @@ export default class WalletBackupStore extends Store {
 
   setup() {
     const a = this.actions.walletBackup;
-    a.initiateWalletBackup.listen(this._initiateWalletBackup);
+    // a.initiateWalletBackup.listen(this._initiateWalletBackup);
     a.acceptPrivacyNoticeForWalletBackup.listen(this._acceptPrivacyNoticeForWalletBackup);
     a.continueToRecoveryPhraseForWalletBackup.listen(this._continueToRecoveryPhraseForWalletBackup);
     a.startWalletBackup.listen(this._startWalletBackup);
@@ -38,7 +38,8 @@ export default class WalletBackupStore extends Store {
     a.finishWalletBackup.listen(this._finishWalletBackup);
   }
 
-  @action _initiateWalletBackup = (params: { recoveryPhrase: Array<string> }) => {
+  // FIXME: Figure out if we should use this in some place
+  /* @action _initiateWalletBackup = (params: { recoveryPhrase: Array<string> }) => {
     this.recoveryPhrase = params.recoveryPhrase;
     this.inProgress = true;
     this.currentStep = 'privacyWarning';
@@ -64,7 +65,7 @@ export default class WalletBackupStore extends Store {
     this.actions.dialogs.open.trigger({
       dialog: WalletBackupDialog,
     });
-  };
+  };*/
 
   @action _acceptPrivacyNoticeForWalletBackup = () => {
     this.isPrivacyNoticeAccepted = true;
