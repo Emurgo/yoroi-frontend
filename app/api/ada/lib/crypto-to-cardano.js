@@ -2,8 +2,8 @@
 import type {
   AdaWallet,
   AdaAddress,
-} from '../types';
-import type { AdaWalletParams } from '../ada-methods';
+  AdaWalletParams
+} from '../adaTypes';
 
 /* @note: Ada wallet is the abstraction for Daedalus */
 export function toAdaWallet({ walletPassword, walletInitData }: AdaWalletParams): AdaWallet {

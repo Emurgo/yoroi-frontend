@@ -1,5 +1,4 @@
 // @flow
-
 // ========= Response Types =========
 export type AdaAssurance = 'CWANormal' | 'CWAStrict';
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
@@ -98,3 +97,8 @@ export type AdaWallet = {
 
 export type AdaWallets = Array<AdaWallet>;
 export type AdaLocalTimeDifference = number;
+
+export type AdaWalletParams = {
+  walletPassword: ?string,
+  walletInitData: AdaWalletInitData
+};
