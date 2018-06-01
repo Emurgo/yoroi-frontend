@@ -36,12 +36,12 @@ export async function newAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
-  const [adaWallet, seed] = createWallet({ walletPassword, walletInitData });
+  const [adaWallet, seed] = createAdaWallet({ walletPassword, walletInitData });
   const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
 
   newAdaAddress(cryptoAccount, [], 'External');
 
-  saveWallet(adaWallet, seed);
+  saveAdaWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);
 }
 
@@ -61,7 +61,7 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   return updatedWallet;
 };
 
-export function createWallet({
+export function createAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams) {
@@ -71,7 +71,7 @@ export function createWallet({
   return [adaWallet, seed];
 }
 
-export function saveWallet(
+export function saveAdaWallet(
   adaWallet: AdaWallet,
   seed: WalletSeed
 ): void {

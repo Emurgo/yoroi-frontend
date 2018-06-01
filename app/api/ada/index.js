@@ -27,7 +27,7 @@ import {
 } from './adaAddress';
 import {
   restoreAdaWallet
-} from './importAdaWallet';
+} from './restoreAdaWallet';
 import {
   getAdaTxsHistoryByWallet,
   getAdaTransactionFee,

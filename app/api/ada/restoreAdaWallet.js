@@ -2,8 +2,8 @@
 import _ from 'lodash';
 import { Wallet } from 'cardano-crypto';
 import {
-  createWallet,
-  saveWallet
+  createAdaWallet,
+  saveAdaWallet
 } from './adaWallet';
 import { getSingleCryptoAccount } from './adaAccount';
 import {
@@ -23,7 +23,7 @@ export async function restoreAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
-  const [adaWallet, seed] = createWallet({ walletPassword, walletInitData });
+  const [adaWallet, seed] = createAdaWallet({ walletPassword, walletInitData });
   const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
   const externalAddressesToSave = await
     _discoverAllAddressesFrom(cryptoAccount, 'External', 0, addressesLimit);
@@ -36,7 +36,7 @@ export async function restoreAdaWallet({
   } else {
     newAdaAddress(cryptoAccount, [], 'External');
   }
-  saveWallet(adaWallet, seed);
+  saveAdaWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);
 }
 
