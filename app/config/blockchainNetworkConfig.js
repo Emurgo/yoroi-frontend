@@ -6,7 +6,7 @@ import type {
 } from '../types/blockchainNetworkTypes';
 
 const TESTNET: BlockchainNetworkType = 'TESTNET';
-const MAINNET: BlockchainNetworkType = 'MAINNET';
+// const MAINNET: BlockchainNetworkType = 'MAINNET';
 
 // TODO: Set the node by configuration settings
 export const NETWORK_MODE: BlockchainNetworkType = TESTNET;

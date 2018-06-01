@@ -285,22 +285,20 @@ function _spenderData(txInputs, txOutputs, addresses) {
 }
 
 function _mapUTXOsToInputs(utxos, adaAddressesMap) {
-  return utxos.map((utxo) => {
-    return {
-      ptr: {
-        index: utxo.tx_index,
-        id: utxo.tx_hash
-      },
-      value: {
-        address: utxo.receiver,
-        // FIXME: Currently js-wasm-module support Js Number, but amounts could be BigNumber's.
-        value: Number(utxo.amount)
-      },
-      addressing: {
-        account: adaAddressesMap[utxo.receiver].account,
-        change: adaAddressesMap[utxo.receiver].change,
-        index: adaAddressesMap[utxo.receiver].index
-      }
-    };
-  });
+  return utxos.map((utxo) => ({
+    ptr: {
+      index: utxo.tx_index,
+      id: utxo.tx_hash
+    },
+    value: {
+      address: utxo.receiver,
+      // FIXME: Currently js-wasm-module support Js Number, but amounts could be BigNumber's.
+      value: Number(utxo.amount)
+    },
+    addressing: {
+      account: adaAddressesMap[utxo.receiver].account,
+      change: adaAddressesMap[utxo.receiver].change,
+      index: adaAddressesMap[utxo.receiver].index
+    }
+  }));
 }

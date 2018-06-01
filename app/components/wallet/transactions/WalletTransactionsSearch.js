@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
@@ -18,7 +18,7 @@ type Props = {
   onChange: Function,
 };
 
-//@observer
+@observer
 export default class WalletTransactionsSearch extends Component<Props> {
 
   static contextTypes = {

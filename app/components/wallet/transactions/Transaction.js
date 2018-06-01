@@ -166,7 +166,8 @@ export default class Transaction extends Component<Props, State> {
 
     const status = intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
-    const symbol = environment.isAdaApi() ? adaSymbol : etcSymbol;
+    // const symbol = environment.isAdaApi() ? adaSymbol : 'etcSymbol';
+    const symbol = adaSymbol;
 
     return (
       <div className={componentStyles}>

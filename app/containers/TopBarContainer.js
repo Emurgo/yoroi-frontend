@@ -5,6 +5,7 @@ import TopBar from '../components/layout/TopBar';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
 import resolver from '../utils/imports';
+
 const { formattedWalletAmount } = resolver('utils/formatters');
 
 type Props = InjectedProps;

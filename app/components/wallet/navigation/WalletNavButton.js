@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import SvgInline from 'react-svg-inline';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './WalletNavButton.scss';
 
@@ -13,7 +13,7 @@ type Props = {
   className?: string,
 };
 
-//@observer
+@observer
 export default class WalletNavButton extends Component<Props> {
 
   render() {

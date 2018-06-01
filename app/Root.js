@@ -43,13 +43,17 @@ export default class Root extends Component {
     /* (!) Attention: Before use any method from CardanoCrypto
            we must load the RustModule first.
     */
-    loadRustModule().then(() => {
+    loadRustModule()
+    .then(() => {
       const api = setupApi();
       const router = new RouterStore();
       this.history = syncHistoryWithStore(hashHistory, router);
       this.stores = createStores(api, actions, router);
       this.setState({ loading: false });
       this._redirectToWallet();
+      return true;
+    }).catch(() => {
+      console.error('Root::loadRustModule unable to load cardano crypto module');
     });
   }
 

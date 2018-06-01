@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-//import Sidebar from '../components/sidebar/Sidebar';
+// import Sidebar from '../components/sidebar/Sidebar';
 import TopBarContainer from './TopBarContainer';
 import SidebarLayout from '../components/layout/SidebarLayout';
-//import StatusMessagesNotification from '../components/notifications/StatusMessagesNotification';
+// import StatusMessagesNotification from '../components/notifications/StatusMessagesNotification';
 // import NodeUpdatePage from './notifications/NodeUpdatePage';
 import WalletAddPage from './wallet/WalletAddPage';
 // import WalletSupportRequestPage from './wallet/WalletSupportRequestPage';

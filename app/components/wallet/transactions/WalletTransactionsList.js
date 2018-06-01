@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import moment from 'moment';
 import styles from './WalletTransactionsList.scss';
@@ -33,7 +33,7 @@ type Props = {
   formattedWalletAmount: Function,
 };
 
-//@observer
+@observer
 export default class WalletTransactionsList extends Component<Props> {
 
   static contextTypes = {

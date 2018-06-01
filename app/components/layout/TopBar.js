@@ -1,12 +1,12 @@
 // @flow
 import React, { Component } from 'react';
-import SvgInline from 'react-svg-inline';
+// import SvgInline from 'react-svg-inline';
 import type { Node } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import Wallet from '../../domain/Wallet';
-import menuIconOpened from '../../assets/images/menu-opened-ic.inline.svg';
-import menuIconClosed from '../../assets/images/menu-ic.inline.svg';
+// import menuIconOpened from '../../assets/images/menu-opened-ic.inline.svg';
+// import menuIconClosed from '../../assets/images/menu-ic.inline.svg';
 import styles from './TopBar.scss';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -25,8 +25,8 @@ export default class TopBar extends Component<Props> {
 
   render() {
     const {
-      onToggleSidebar, activeWallet, currentRoute,
-      showSubMenus, formattedWalletAmount
+      /* onToggleSidebar,*/ activeWallet, currentRoute,
+      /* showSubMenus,*/ formattedWalletAmount
     } = this.props;
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
     const showWalletInfo = walletRoutesMatch && activeWallet != null;
@@ -47,21 +47,20 @@ export default class TopBar extends Component<Props> {
       </div>
     ) : null;
 
-    const sidebarToggleIcon = (
+    /* const sidebarToggleIcon = (
       <SvgInline
         svg={showSubMenus ? menuIconOpened : menuIconClosed}
         className={styles.sidebarIcon}
       />
-    );
+    );*/
 
     return (
       <header className={topBarStyles}>
-        {/*{walletRoutesMatch && (
+        {/* {walletRoutesMatch && (
            FIXME: We have a single wallet
             <button className={styles.leftIcon} onClick={onToggleSidebar}>
             {sidebarToggleIcon}
           </button>
-          
         )}*/}
         <div className={styles.topBarTitle}>{topBarTitle}</div>
         {this.props.children}

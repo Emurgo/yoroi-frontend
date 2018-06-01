@@ -18,10 +18,16 @@ crx.load('build')
     fs.writeFile(`${name}.zip`, archiveBuffer);
 
     if (!argv.codebase || !existsKey) return;
-    crx.pack(archiveBuffer).then((crxBuffer) => {
+    return crx.pack(archiveBuffer);
+  })
+  .then((crxBuffer) => {
+    if (crxBuffer) {
       const updateXML = crx.generateUpdateXML();
-
       fs.writeFile('update.xml', updateXML);
       fs.writeFile(`${name}.crx`, crxBuffer);
-    });
+    }
+    return;
+  })
+  .catch((error) => {
+    console.error('compress::build unable to load', error);
   });

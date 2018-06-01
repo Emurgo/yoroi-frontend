@@ -8,7 +8,7 @@ import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import SystemTimeErrorOverlay from './SystemTimeErrorOverlay';
 import LoadingSpinner from '../widgets/LoadingSpinner';
-import daedalusLogo from '../../assets/images/daedalus-logo-loading-grey.inline.svg';
+// import daedalusLogo from '../../assets/images/daedalus-logo-loading-grey.inline.svg';
 import styles from './Loading.scss';
 import type { ReactIntlMessage } from '../../types/i18nTypes';
 import environment from '../../environment';
@@ -144,10 +144,10 @@ export default class Loading extends Component<Props, State> {
       isConnecting ? styles['is-connecting'] : null,
       isSyncing ? styles['is-syncing'] : null,
     ]);
-    const daedalusLogoStyles = classNames([
+    /* const daedalusLogoStyles = classNames([
       styles.daedalusLogo,
       isConnecting ? styles.connectingLogo : styles.syncingLogo,
-    ]);
+    ]);*/
     const currencyLogoStyles = classNames([
       styles[`${environment.API}-logo`],
       isConnecting ? styles.connectingLogo : styles.syncingLogo,
@@ -157,7 +157,7 @@ export default class Loading extends Component<Props, State> {
       isConnecting ? styles.connectingLogo : styles.syncingLogo,
     ]);
 
-    const daedalusLoadingLogo = daedalusLogo;
+    // const daedalusLoadingLogo = daedalusLogo;
     const currencyLoadingLogo = currencyIcon;
     const apiLoadingLogo = apiIcon;
 
@@ -199,7 +199,7 @@ export default class Loading extends Component<Props, State> {
         )}
         <div className={styles.logos}>
           <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} />
-          {/*<SvgInline svg={daedalusLoadingLogo} className={daedalusLogoStyles} />*/}
+          {/* <SvgInline svg={daedalusLoadingLogo} className={daedalusLogoStyles} />*/}
           <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} />
         </div>
         {hasLoadedCurrentLocale && (
