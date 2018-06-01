@@ -63,6 +63,7 @@
     "flowtype"
   ],
   "globals": {
+    "chrome": true,
     "API": true,
     "NETWORK": true,
     "MOBX_DEV_TOOLS": true,

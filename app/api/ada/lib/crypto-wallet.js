@@ -5,7 +5,7 @@ import { Blake2b, Wallet } from 'cardano-crypto';
 import {
   encryptWithPassword,
   decryptWithPassword
-} from '../../../utils/crypto/cryptoUtils';
+} from '../../../utils/passwordCipher';
 import {
   blockchainNetworkConfig,
   NETWORK_MODE,

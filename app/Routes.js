@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { Route, IndexRedirect } from 'react-router';
+import { Route /* s, IndexRedirect*/ } from 'react-router';
 import { ROUTES } from './routes-config';
 import resolver from './utils/imports';
 

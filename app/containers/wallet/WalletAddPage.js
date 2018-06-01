@@ -4,9 +4,12 @@ import { inject, observer } from 'mobx-react';
 import WalletAddDialog from '../../components/wallet/WalletAddDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
-/*import WalletFileImportDialog from '../../components/wallet/file-import/WalletFileImportDialog';*/
+/* import WalletFileImportDialog
+  from '../../components/wallet/file-import/WalletFileImportDialog';*/
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-/*import WalletFileImportDialogContainer from '../wallet/dialogs/WalletFileImportDialogContainer';*/
+/* import
+  WalletFileImportDialogContainer
+from '../wallet/dialogs/WalletFileImportDialogContainer';*/
 import WalletRestoreDialogContainer from '../wallet/dialogs/WalletRestoreDialogContainer';
 import WalletBackupDialogContainer from '../wallet/dialogs/WalletBackupDialogContainer';
 import WalletCreateDialogContainer from '../wallet/dialogs/WalletCreateDialogContainer';

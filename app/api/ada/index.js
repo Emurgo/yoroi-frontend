@@ -1,5 +1,4 @@
 // @flow
-import { split, get } from 'lodash';
 import { action } from 'mobx';
 import BigNumber from 'bignumber.js';
 import {
@@ -12,35 +11,35 @@ import WalletTransaction, {
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
-
+import {
+  isValidMnemonic,
+  getAdaAccountRecoveryPhrase,
+  newAdaWallet,
+  getWalletSeed,
+  updateAdaWallet
+} from './adaWallet';
+import { getSingleCryptoAccount } from './adaAccount';
 import {
   isValidAdaAddress,
-  isValidMnemonic,
-  newAdaWallet,
-  restoreAdaWallet,
-  getAdaAccountRecoveryPhrase,
-  updateAdaWallet,
+  newAdaAddress,
+  getAdaAddressesMap,
+  filterAdaAddressesByType
+} from './adaAddress';
+import {
+  restoreAdaWallet
+} from './restoreAdaWallet';
+import {
   getAdaTxsHistoryByWallet,
   getAdaTransactionFee,
   newAdaTransaction,
-  newAdaAddress,
-  getWalletSeed,
-  getSingleCryptoAccount,
-  getAdaAddressesMap,
-  filterAdaAddressesByType,
-  getLastBlockNumber
-} from './ada-methods';
-
+} from './adaTransactions';
+import { getLastBlockNumber } from './getAdaLastBlockNumber';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
-  ReportRequestError
 } from '../common';
-
 import type {
-  AdaLocalTimeDifference,
-  AdaSyncProgressResponse,
   AdaAddress,
   AdaAddresses,
   AdaTransaction,
@@ -49,37 +48,22 @@ import type {
   AdaWallet,
   AdaWallets,
   AdaWalletRecoveryPhraseResponse
-} from './types';
-
+} from './adaTypes';
 import type {
   CreateWalletRequest,
   CreateWalletResponse,
-  DeleteWalletRequest,
-  DeleteWalletResponse,
-  GetLocalTimeDifferenceResponse,
-  GetSyncProgressResponse,
-  GetTransactionsRequest,
   GetTransactionsResponse,
   GetWalletRecoveryPhraseResponse,
   GetWalletsResponse,
   RestoreWalletRequest,
   RestoreWalletResponse,
-  SendBugReportRequest,
-  SendBugReportResponse,
-  UpdateWalletResponse,
-  UpdateWalletPasswordRequest,
-  UpdateWalletPasswordResponse
 } from '../common';
-
 import {
   AllFundsAlreadyAtReceiverAddressError,
   NotAllowedToSendMoneyToRedeemAddressError,
   NotAllowedToSendMoneyToSameAddressError,
   NotEnoughFundsForTransactionFeesError,
   NotEnoughMoneyToSendError,
-  RedeemAdaError,
-  WalletAlreadyImportedError,
-  WalletFileImportError
 } from './errors';
 
 // ADA specific Request / Response params
@@ -95,7 +79,6 @@ export type CreateAddressRequest = {
   accountId: string,
   password: ?string
 };
-
 export type CreateTransactionRequest = {
   sender: string,
   receiver: string,
@@ -136,7 +119,6 @@ export type NextUpdateResponse = ?{
 };
 export type PostponeUpdateResponse = Promise<void>;
 export type ApplyUpdateResponse = Promise<void>;
-
 export type TransactionFeeRequest = {
   sender: string,
   receiver: string,
@@ -697,7 +679,7 @@ const _createWalletFromServerData = action(
 
 const _createAddressFromServerData = action(
   'AdaApi::_createAddressFromServerData',
-  (data: AdaAddress) => 
+  (data: AdaAddress) =>
     new WalletAddress({
       id: data.cadId,
       amount: new BigNumber(data.cadAmount.getCCoin).dividedBy(

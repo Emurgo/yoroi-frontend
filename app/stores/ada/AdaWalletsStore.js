@@ -1,5 +1,5 @@
 // @flow
-import {BigNumber} from 'bignumber.js';
+// import { BigNumber } from 'bignumber.js';
 import { observable, action, runInAction } from 'mobx';
 import WalletStore from '../WalletStore';
 import Wallet from '../../domain/Wallet';

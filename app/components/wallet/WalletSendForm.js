@@ -196,9 +196,7 @@ export default class WalletSendForm extends Component<Props, State> {
   });
 
   render() {
-
     const { form } = this;
-    
     const { intl } = this.context;
     const {
       currencyUnit, currencyMaxIntegerDigits, currencyMaxFractionalDigits,

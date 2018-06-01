@@ -158,7 +158,7 @@ export default class WalletsStore extends Store {
   // ACTIONS
 
   @action refreshWalletsData = async () => {
-    //if (!this.stores.networkStatus.isConnected) return;
+    // if (!this.stores.networkStatus.isConnected) return;
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {
@@ -208,8 +208,8 @@ export default class WalletsStore extends Store {
   };
 
   _pollRefresh = async () => (
-    //FIXME: Network status won't be used
-    /*this.stores.networkStatus.isSynced &&*/ await this.refreshWalletsData()
+    // FIXME: Network status won't be used
+    /* this.stores.networkStatus.isSynced &&*/ await this.refreshWalletsData()
   );
 
   _toggleAddWalletDialogOnWalletsLoaded = () => {
