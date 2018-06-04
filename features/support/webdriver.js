@@ -1,4 +1,4 @@
-import { setWorldConstructor } from 'cucumber';
+import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
 import seleniumWebdriver, { By } from 'selenium-webdriver';
 import path from 'path';
 
@@ -29,3 +29,6 @@ function CustomWorld() {
 }
 
 setWorldConstructor(CustomWorld);
+// I'm setting this timeout to 10 seconds as usually it takes about 5 seconds
+// to startup
+setDefaultTimeout(60 * 10000);
