@@ -2,113 +2,30 @@
 import _ from 'lodash';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
-import { Wallet } from 'cardano-crypto';
 import {
   getTransactionsHistoryForAddresses,
-  getUTXOsForAddresses,
-  getUTXOsSumsForAddresses,
   transactionsLimit,
-  addressesLimit,
-  sendTx
-} from './lib/icarus-backend-api';
+  addressesLimit
+} from '../lib/icarus-backend-api';
 import {
-  mapToList,
-  getFromStorage,
   saveInStorage
-} from './lib/utils';
+} from '../lib/utils';
 import {
   getLastBlockNumber,
   saveLastBlockNumber
-} from './getAdaLastBlockNumber';
-import {
-  getWalletSeed,
-  getAdaWallet
-} from './adaWallet';
-import {
-  getCryptoAccount,
-  ACCOUNT_INDEX
-} from './adaAccount';
-import {
-  saveAdaAddress,
-  createAdaAddress,
-  getAdaAddressesMap
-} from './adaAddress';
-import { getCryptoWalletFromSeed } from './lib/crypto-wallet';
-import type {
-  AdaAddresses,
-  AdaTransactions,
-  AdaTransaction,
-  AdaTransactionFee,
-  AdaTransactionInputOutput
-} from './adaTypes';
+} from '../getAdaLastBlockNumber';
+import { getAdaTransactions } from './adaTransactions';
 
 const TX_KEY = 'TXS'; // single txs list atm
-
-export function getAdaTransactions() {
-  return getFromStorage(TX_KEY) || [];
-}
 
 export const getAdaTxsHistoryByWallet = (): Promise<AdaTransactions> => {
   const transactions = getAdaTransactions();
   return Promise.resolve([transactions, transactions.length]);
 };
 
-export const getAdaTransactionFee = (
-  receiver: string,
-  amount: string
-): Promise<AdaTransactionFee> => {
-  const adaWallet = getAdaWallet();
-  const password = adaWallet.cwHasPassphrase ? 'FakePassword' : undefined;
-  return _getAdaTransaction(receiver, amount, password)
-    .then((response) => {
-      const result = response[0];
-      // TODO: Improve Js-Wasm-cardano error handling
-      if (result.failed) {
-        if (result.msg === 'FeeCalculationError(NotEnoughInput)') {
-          throw new Error('not enough money');
-        }
-      }
-      return {
-        getCCoin: result.result.fee
-      };
-    });
-};
-
-export const newAdaTransaction = (
-  receiver: string,
-  amount: string,
-  password: ?string
-): Promise<any> =>
-  _getAdaTransaction(receiver, amount, password)
-    .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
-      // TODO: Handle Js-Wasm-cardano errors
-      const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-      return Promise.all([sendTx(signedTx), changeAdaAddr]);
-    })
-    .then(([backendResponse, changeAdaAddr]) => {
-      // Only if the tx was send, we should track the change Address.
-      saveAdaAddress(changeAdaAddr);
-      return backendResponse;
-    });
-
-export async function getBalance(
-  addresses: Array<string>
-): Promise<BigNumber> {
-  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-  const promises =
-    groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
-  return Promise.all(promises)
-  .then(partialAmounts =>
-    partialAmounts.reduce(
-      (acc, partialAmount) =>
-        acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
-      new BigNumber(0)
-    )
-  );
-}
-
 /* FIXME: uniqWith should be applied only to the newTransactions and the most recent
    transactions, considering that recent transactions shouldn't be stored again . */
+
 export async function updateAdaTxsHistory(
   existedTransactions: Array<AdaTransaction>,
   addresses: Array<string>
@@ -133,33 +50,6 @@ export async function updateAdaTxsHistory(
     saveInStorage(TX_KEY, updatedTransactions);
     return updatedTransactions;
   });
-}
-
-function _getAdaTransaction(
-  receiver: string,
-  amount: string,
-  password: ?string
-) {
-  const seed = getWalletSeed();
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  const cryptoAccount = getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
-  const addressesMap = getAdaAddressesMap();
-  const addresses = mapToList(addressesMap);
-  const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
-  const changeAddr = changeAdaAddr.cadId;
-  const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return _getAllUTXOsForAddresses(addresses)
-    .then((senderUtxos) => {
-      const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-      return [
-        Wallet.spend(
-          cryptoWallet,
-          inputs,
-          outputs,
-          changeAddr),
-        changeAdaAddr
-      ];
-    });
 }
 
 // FIXME: refactor the repeated code from updateAdaTxsHistory
@@ -203,13 +93,6 @@ function _sortTransactionsByDate(transactions) {
   });
 }
 
-async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
-  const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
-  const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
-    getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
-  return Promise.all(promises).then(groupsOfUTXOs =>
-    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
-}
 
 function _mapTransactions(
   transactions: [],
@@ -245,6 +128,7 @@ function _mapTransactions(
 function _mapInputOutput(addresses, amounts): AdaTransactionInputOutput {
   return addresses.map((address, index) => [address, { getCCoin: amounts[index] }]);
 }
+
 
 function _spenderData(txInputs, txOutputs, addresses) {
   const sum = toSum =>
@@ -282,23 +166,4 @@ function _spenderData(txInputs, txOutputs, addresses) {
     isOutgoing,
     amount
   };
-}
-
-function _mapUTXOsToInputs(utxos, adaAddressesMap) {
-  return utxos.map((utxo) => ({
-    ptr: {
-      index: utxo.tx_index,
-      id: utxo.tx_hash
-    },
-    value: {
-      address: utxo.receiver,
-      // FIXME: Currently js-wasm-module support Js Number, but amounts could be BigNumber's.
-      value: Number(utxo.amount)
-    },
-    addressing: {
-      account: adaAddressesMap[utxo.receiver].account,
-      change: adaAddressesMap[utxo.receiver].change,
-      index: adaAddressesMap[utxo.receiver].index
-    }
-  }));
 }

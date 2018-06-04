@@ -12,14 +12,16 @@ import {
 import { toAdaWallet } from './lib/crypto-to-cardano';
 import {
   getAdaAddressesMap,
-  newAdaAddress
+  newAdaAddress,
+  getBalance
 } from './adaAddress';
 import { getSingleCryptoAccount } from './adaAccount';
 import {
-  getAdaTransactions,
-  updateAdaTxsHistory,
-  getBalance
-} from './adaTransactions';
+  getAdaTransactions
+} from './adaTransactions/adaTransactions';
+import {
+  updateAdaTxsHistory
+} from './adaTransactions/adaTransactionsHistory';
 import type {
   AdaWallet,
   AdaWalletParams,
