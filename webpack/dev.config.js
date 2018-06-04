@@ -36,12 +36,11 @@ const baseDevConfig = () => ({
   output: {
     path: path.join(__dirname, '../dev/js'),
     filename: '[name].bundle.js',
-    // chunkFilename: '[id].chunk.js'
   },
   plugins: [
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
-      manifest: require('../dll/vendor-manifest.json') // eslint-disable-line
+      manifest: require('../dll/vendor-manifest.json')
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
@@ -84,7 +83,6 @@ const baseDevConfig = () => ({
         test: /\.global\.scss$/,
         use: [
           'style-loader?sourceMap',
-          // 'url-loader',
           'css-loader?sourceMap',
           'sass-loader?sourceMap'
         ]
@@ -93,9 +91,7 @@ const baseDevConfig = () => ({
         test: /^((?!\.global).)*\.scss$/,
         use: [
           'style-loader?sourceMap',
-          // 'url-loader',
-          //'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
-          'css-loader?sourceMap&modules&localIdentName=[name]_[local]&importLoaders=1', 
+          'css-loader?sourceMap&modules&localIdentName=[name]_[local]&importLoaders=1',
           'sass-loader?sourceMap'
         ]
       },
