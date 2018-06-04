@@ -25,7 +25,6 @@ const baseDevConfig = () => ({
   output: {
     path: path.join(__dirname, '../dev/js'),
     filename: '[name].bundle.js',
-    //chunkFilename: '[id].chunk.js'
   },
   plugins: [
     new webpack.DllReferencePlugin({
@@ -73,7 +72,6 @@ const baseDevConfig = () => ({
         test: /\.scss$/,
         use: [
           'style-loader?sourceMap',
-          //'url-loader',
           'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
           'sass-loader?sourceMap'
         ]
