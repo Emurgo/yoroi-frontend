@@ -1,4 +1,9 @@
-import { Given, After } from 'cucumber';
+import { Before, Given, After } from 'cucumber';
+import { createServer } from '../support/mockServer';
+
+Before(function () {
+  createServer();
+});
 
 After(async function () {
   await this.driver.quit();
