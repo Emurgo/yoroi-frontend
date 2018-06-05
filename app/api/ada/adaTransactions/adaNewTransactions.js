@@ -28,14 +28,6 @@ import type {
   AdaTransactionFee,
 } from '../adaTypes';
 
-async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
-  const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
-  const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
-    getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
-  return Promise.all(promises).then(groupsOfUTXOs =>
-    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
-}
-
 export const getAdaTransactionFee = (
   receiver: string,
   amount: string
@@ -73,6 +65,14 @@ export const newAdaTransaction = (
       saveAdaAddress(changeAdaAddr);
       return backendResponse;
     });
+
+async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
+  const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
+  const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
+    getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
+  return Promise.all(promises).then(groupsOfUTXOs =>
+    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
+}
 
 function _getAdaTransaction(
   receiver: string,

@@ -12,6 +12,7 @@ import { daedalusTheme } from './themes/daedalus';
 import translations from './i18n/translations';
 import ThemeManager from './ThemeManager';
 import { setupApi } from './api/index';
+import { loadLovefieldDB } from './api/ada/lib/lovefieldDatabase';
 import createStores from './stores/index';
 import actions from './actions/index';
 
@@ -41,10 +42,12 @@ export default class Root extends Component {
 
   componentDidMount() {
     /* (!) Attention: Before use any method from CardanoCrypto
-           we must load the RustModule first.
+           we must load the RustModule and Lovefield DB first.
     */
-    loadRustModule()
-    .then(() => {
+    const promises = [];
+    promises.push(loadRustModule());
+    promises.push(loadLovefieldDB());
+    Promise.all(promises).then(() => {
       const api = setupApi();
       const router = new RouterStore();
       this.history = syncHistoryWithStore(hashHistory, router);

@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const BackendApiRoute = '18.206.30.1';
 const BackendApiPort = 443;
-const order = 'DESC';
 export const transactionsLimit = 20;
 export const addressesLimit = 20;
 
@@ -30,7 +29,7 @@ export const getUTXOsSumsForAddresses = addresses =>
   ).then(response => response.data);
 
 export const getTransactionsHistoryForAddresses = (addresses, dateFrom) =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/history?order=${order}`,
+  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/history`,
     {
       method: 'post',
       data: {

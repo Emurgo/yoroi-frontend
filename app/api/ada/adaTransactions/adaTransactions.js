@@ -1,10 +1,13 @@
 // @flow
-import {
-  getFromStorage,
-} from '../lib/utils';
+import LovefieldDB from '../lib/lovefieldDatabase';
 
-const TX_KEY = 'TXS'; // single txs list atm
-
-export function getAdaTransactions() {
-  return getFromStorage(TX_KEY) || [];
+export async function getAdaTransactions() {
+  const db = LovefieldDB.db;
+  const txsTable = db.getSchema().table('Txs');
+  return await db.select()
+    .from(txsTable)
+    .orderBy(txsTable[LovefieldDB.txsTableFields.CTM_DATE], LovefieldDB.orders.DESC)
+    .exec()
+    .then(rows => rows);
 }
+

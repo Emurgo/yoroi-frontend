@@ -7,96 +7,82 @@ import {
   transactionsLimit,
   addressesLimit
 } from '../lib/icarus-backend-api';
-import {
-  saveInStorage
-} from '../lib/utils';
+import LovefieldDB from '../lib/lovefieldDatabase';
 import {
   getLastBlockNumber,
   saveLastBlockNumber
 } from '../getAdaLastBlockNumber';
 import { getAdaTransactions } from './adaTransactions';
 
-const TX_KEY = 'TXS'; // single txs list atm
-
-export const getAdaTxsHistoryByWallet = (): Promise<AdaTransactions> => {
-  const transactions = getAdaTransactions();
+export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
+  const transactions = await getAdaTransactions();
   return Promise.resolve([transactions, transactions.length]);
 };
-
-/* FIXME: uniqWith should be applied only to the newTransactions and the most recent
-   transactions, considering that recent transactions shouldn't be stored again . */
 
 export async function updateAdaTxsHistory(
   existedTransactions: Array<AdaTransaction>,
   addresses: Array<string>
 ) {
-  const mostRecentTx = existedTransactions[0];
-  const dateFrom = mostRecentTx ?
+  const db = LovefieldDB.db;
+  const txsTable = db.getSchema().table('Txs');
+  const mostRecentTx = db.select()
+    .from(txsTable)
+    .limit(1)
+    .orderBy(txsTable[LovefieldDB.txsTableFields.CTM_DATE], LovefieldDB.orders.DESC)
+    .exec();
+  const dateFrom = mostRecentTx && mostRecentTx.ctMeta ?
     moment(mostRecentTx.ctMeta.ctmDate) :
     moment(new Date(0));
   const groupsOfAddresses = _.chunk(addresses, addressesLimit);
   const promises = groupsOfAddresses.map(groupOfAddresses =>
-    _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
+    _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses, txsTable)
   );
   return Promise.all(promises)
-  .then((groupsOfTransactions) => {
-    const groupedTransactions = groupsOfTransactions
-      .reduce((acc, groupOfTransactions) => acc.concat(groupOfTransactions), []);
-    const newTransactions = _sortTransactionsByDate(groupedTransactions);
-    const updatedTransactions = _.uniqWith(
-      newTransactions.concat(existedTransactions),
-      (txA, txB) => txA.ctId === txB.ctId
+    .then((groupsOfTransactionsRows) =>
+      groupsOfTransactionsRows.map(groupOfTransactionsRows =>
+        db.insertOrReplace()
+        .into(txsTable)
+        .values(groupOfTransactionsRows)
+        .exec()
+        .catch(err => err)
+      )
     );
-    saveInStorage(TX_KEY, updatedTransactions);
-    return updatedTransactions;
-  });
 }
 
-// FIXME: refactor the repeated code from updateAdaTxsHistory
 async function _updateAdaTxsHistoryForGroupOfAddresses(
-  previousTransactions,
+  previousTxsRows,
   groupOfAddresses,
   dateFrom,
-  allAddresses
+  allAddresses,
+  txsTable
 ) {
-  const mostRecentTx = previousTransactions[0];
-  const updatedDateFrom = mostRecentTx ?
-    moment(mostRecentTx.ctMeta.ctmDate) :
-    dateFrom;
+  const previousTxsRowsLth = previousTxsRows.length;
+  const mostRecentTx = previousTxsRows[previousTxsRowsLth - 1] ?
+    previousTxsRows[previousTxsRowsLth - 1].m :
+    previousTxsRows[previousTxsRowsLth - 1];
+  const updatedDateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : dateFrom;
   const history = await getTransactionsHistoryForAddresses(groupOfAddresses, updatedDateFrom);
   if (history.length > 0) {
-    const latestTransactions = _mapTransactions(history, allAddresses);
-    const transactions = _.uniqWith(
-      latestTransactions.concat(previousTransactions),
-      (txA, txB) => txA.ctId === txB.ctId
-    );
+    const transactionsRows = previousTxsRows.concat(
+      _mapTransactions(history, allAddresses, txsTable));
     if (history.length === transactionsLimit) {
       return await _updateAdaTxsHistoryForGroupOfAddresses(
-        transactions,
+        transactionsRows,
         groupOfAddresses,
         dateFrom,
-        allAddresses
+        allAddresses,
+        txsTable
       );
     }
-    return Promise.resolve(transactions);
+    return Promise.resolve(transactionsRows);
   }
-  return Promise.resolve(previousTransactions);
+  return Promise.resolve(previousTxsRows);
 }
-
-function _sortTransactionsByDate(transactions) {
-  return transactions.sort((txA, txB) => {
-    const txADate = new Date(txA.ctMeta.ctmDate);
-    const txBDate = new Date(txB.ctMeta.ctmDate);
-    if (txADate > txBDate) return -1;
-    if (txADate < txBDate) return 1;
-    return 0;
-  });
-}
-
 
 function _mapTransactions(
   transactions: [],
   accountAddresses,
+  txsTable
 ): Array<AdaTransaction> {
   return transactions.map(tx => {
     const inputs = _mapInputOutput(tx.inputs_address, tx.inputs_amount);
@@ -106,29 +92,30 @@ function _mapTransactions(
     if (!getLastBlockNumber() || tx.best_block_num > getLastBlockNumber()) {
       saveLastBlockNumber(tx.best_block_num);
     }
-    return {
-      ctAmount: {
+    const newtx = {
+      [LovefieldDB.txsTableFields.CT_AMOUNT]: {
         getCCoin: amount
       },
-      ctBlockNumber: tx.block_num,
-      ctId: tx.hash,
-      ctInputs: inputs,
-      ctIsOutgoing: isOutgoing,
-      ctMeta: {
+      [LovefieldDB.txsTableFields.CT_BLOCK_NUMBER]: tx.block_num,
+      [LovefieldDB.txsTableFields.CT_ID]: tx.hash,
+      [LovefieldDB.txsTableFields.CT_INPUTS]: { newInputs: inputs },
+      [LovefieldDB.txsTableFields.CT_IS_OUTGOING]: isOutgoing,
+      [LovefieldDB.txsTableFields.CT_META]: {
         ctmDate: tx.time,
         ctmDescription: undefined,
         ctmTitle: undefined
       },
-      ctOutputs: outputs,
-      ctCondition: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
+      [LovefieldDB.txsTableFields.CTM_DATE]: new Date(tx.time),
+      [LovefieldDB.txsTableFields.CT_OUTPUTS]: { newOutputs: outputs },
+      [LovefieldDB.txsTableFields.CT_CONDITION]: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
     };
+    return txsTable.createRow(newtx);
   });
 }
 
 function _mapInputOutput(addresses, amounts): AdaTransactionInputOutput {
   return addresses.map((address, index) => [address, { getCCoin: amounts[index] }]);
 }
-
 
 function _spenderData(txInputs, txOutputs, addresses) {
   const sum = toSum =>

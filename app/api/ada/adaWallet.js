@@ -59,7 +59,7 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
     }
   });
   saveInStorage(WALLET_KEY, updatedWallet);
-  await updateAdaTxsHistory(getAdaTransactions(), addresses);
+  await updateAdaTxsHistory(await getAdaTransactions(), addresses);
   return updatedWallet;
 };
 
