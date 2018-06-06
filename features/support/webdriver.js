@@ -23,8 +23,24 @@ function CustomWorld() {
     return this.driver.wait(condition);
   };
 
-  this.getElement = (locator) => {
-    return this.driver.findElement(By.css(locator));
+  this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
+
+  const clickElement = async (locator, method) => {
+    const clickable = await this.getElementBy(locator, method);
+    await clickable.click();
+  };
+
+  this.click = async (locator) => {
+    await clickElement(locator);
+  };
+
+  this.clickByXpath = async (locator) => {
+    await clickElement(locator, By.xpath);
+  };
+
+  this.input = async (locator, value) => {
+    const input = await this.getElementBy(locator);
+    await input.sendKeys(value);
   };
 }
 

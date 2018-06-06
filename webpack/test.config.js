@@ -22,6 +22,17 @@ const baseDevConfig = () => ({
       path.join(__dirname, '../chrome/extension/background')
     ]
   },
+  devMiddleware: {
+    publicPath: `http://${host}:${port}/js`,
+    stats: {
+      colors: true
+    },
+    noInfo: true,
+    headers: { 'Access-Control-Allow-Origin': '*' }
+  },
+  hotMiddleware: {
+    path: '/js/__webpack_hmr'
+  },
   output: {
     path: path.join(__dirname, '../dev/js'),
     filename: '[name].bundle.js',
@@ -29,7 +40,7 @@ const baseDevConfig = () => ({
   plugins: [
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
-      manifest: require('../dll/vendor-manifest.json') // eslint-disable-line
+      manifest: require('../dll/vendor-manifest.json')
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
@@ -69,16 +80,30 @@ const baseDevConfig = () => ({
         ]
       },
       {
-        test: /\.scss$/,
+        test: /\.global\.scss$/,
         use: [
           'style-loader?sourceMap',
-          'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+          'css-loader?sourceMap',
+          'sass-loader?sourceMap'
+        ]
+      },
+      {
+        test: /^((?!\.global).)*\.scss$/,
+        use: [
+          'style-loader?sourceMap',
+          'css-loader?sourceMap&modules&localIdentName=[name]_[local]&importLoaders=1',
           'sass-loader?sourceMap'
         ]
       },
       {
         test: /\.svg$/,
-        loader: 'raw-loader'
+        issuer: /\.scss$/,
+        loader: 'url-loader'
+      },
+      {
+        test: /\.inline\.svg$/,
+        issuer: /\.js$/,
+        loader: 'raw-loader',
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2)$/,

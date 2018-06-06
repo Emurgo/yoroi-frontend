@@ -1,7 +1,11 @@
 import axios from 'axios';
 
-const BackendApiRoute = '18.206.30.1';
-const BackendApiPort = 443;
+// FIXME: Should be improved to allow multiple evironments
+const isTest = process.env.NODE_ENV === 'test';
+const BackendApiProtocol = isTest ? 'http' : 'https';
+const BackendApiRoute = isTest ? 'localhost' : '18.206.30.1';
+const BackendApiPort = isTest ? 8080 : 443;
+
 const order = 'DESC';
 export const transactionsLimit = 20;
 export const addressesLimit = 20;
@@ -10,7 +14,7 @@ export const addressesLimit = 20;
 // TODO: Map errors in a more specific way
 
 export const getUTXOsForAddresses = addresses =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoForAddresses`,
+  axios(`${BackendApiProtocol}://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoForAddresses`,
     {
       method: 'post',
       data: {
@@ -20,7 +24,7 @@ export const getUTXOsForAddresses = addresses =>
   ).then(response => response.data);
 
 export const getUTXOsSumsForAddresses = addresses =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoSumForAddresses`,
+  axios(`${BackendApiProtocol}://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoSumForAddresses`,
     {
       method: 'post',
       data: {
@@ -30,7 +34,7 @@ export const getUTXOsSumsForAddresses = addresses =>
   ).then(response => response.data);
 
 export const getTransactionsHistoryForAddresses = (addresses, dateFrom) =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/history?order=${order}`,
+  axios(`${BackendApiProtocol}://${BackendApiRoute}:${BackendApiPort}/api/txs/history?order=${order}`,
     {
       method: 'post',
       data: {
@@ -41,7 +45,7 @@ export const getTransactionsHistoryForAddresses = (addresses, dateFrom) =>
   ).then(response => response.data);
 
 export const sendTx = signedTx =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/signed`,
+  axios(`${BackendApiProtocol}://${BackendApiRoute}:${BackendApiPort}/api/txs/signed`,
     {
       method: 'post',
       data: {
@@ -51,7 +55,7 @@ export const sendTx = signedTx =>
   ).then(response => response.data);
 
 export const checkAddressesInUse = addresses =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/addresses/filterUsed`,
+  axios(`${BackendApiProtocol}://${BackendApiRoute}:${BackendApiPort}/api/addresses/filterUsed`,
     {
       method: 'post',
       data: {

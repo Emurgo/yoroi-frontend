@@ -1,0 +1,17 @@
+Feature: Restore Wallet
+
+  Background:
+    Given I have opened the chrome extension
+    And There is no wallet stored
+
+  Scenario: Successfully restoring a wallet
+    When I click the restore button
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                 |
+    | forum salon region tent laugh agree spirit share damage observe captain suffer |
+    And I enter the wallet password:
+    | password  | repeatedPassword |
+    | Secret123 | Secret123        |
+    And I click the "Restore Wallet" button
+    Then I should see the restored wallet
