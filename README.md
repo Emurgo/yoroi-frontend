@@ -82,18 +82,13 @@ See [autoupdate guide](https://developer.chrome.com/extensions/autoupdate) for m
 
 ## Test
 
-* `test/app`: React components.
-* `test/e2e`: E2E tests (use [chromedriver](https://www.npmjs.com/package/chromedriver), [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver))
+* `features`: E2E tests (use [chromedriver](https://www.npmjs.com/package/chromedriver), [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver))
 
 ```bash
 # lint
 $ npm run lint
-# test/app
+# features
 $ npm test
-$ npm test -- --watch  # watch files
-# test/e2e
-$ npm run build
-$ npm run test-e2e
 ```
 
 ## LICENSE
