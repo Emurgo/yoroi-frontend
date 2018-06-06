@@ -1,6 +1,4 @@
 // @flow
-import _ from 'lodash';
-import BigNumber from 'bignumber.js';
 import { Wallet } from 'cardano-crypto';
 import {
   toAdaAddress,
@@ -15,10 +13,6 @@ import type {
   AdaAddresses,
   AdaAddress
 } from './adaTypes';
-import {
-  getUTXOsSumsForAddresses,
-  addressesLimit
-} from './lib/icarus-backend-api';
 
 const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
 
@@ -80,20 +74,3 @@ export function saveAsAdaAddresses(
     saveAdaAddress(adaAddress);
   });
 }
-
-export async function getBalance(
-  addresses: Array<string>
-): Promise<BigNumber> {
-  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-  const promises =
-    groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
-  return Promise.all(promises)
-  .then(partialAmounts =>
-    partialAmounts.reduce(
-      (acc, partialAmount) =>
-        acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
-      new BigNumber(0)
-    )
-  );
-}
-

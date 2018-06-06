@@ -720,8 +720,8 @@ const _createTransactionFromServerData = action(
       description: ctmDescription || '',
       numberOfConfirmations: getLastBlockNumber() - data.ctBlockNumber,
       addresses: {
-        from: data.ctInputs.newInputs.map(address => address[0]),
-        to: data.ctOutputs.newOutputs.map(address => address[0])
+        from: data.ctInputs.map(address => address[0]),
+        to: data.ctOutputs.map(address => address[0])
       },
       state: _conditionToTxState(data.ctCondition)
     });
