@@ -31,9 +31,8 @@ export function createServer() {
   });
 
   server.post('/api/addresses/filterUsed', (req, res) => {
-    const usedAddresses = mockData.usedAddresses.filter((address) => {
-      return req.body.addresses.includes(address);
-    });
+    const usedAddresses = mockData.usedAddresses.filter((address) =>
+      req.body.addresses.includes(address));
     res.send(usedAddresses);
   });
 

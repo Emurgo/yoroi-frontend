@@ -23,9 +23,7 @@ function CustomWorld() {
     return this.driver.wait(condition);
   };
 
-  this.getElementBy = (locator, method = By.css) => {
-    return this.driver.findElement(method(locator));
-  };
+  this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
 
   const clickElement = async (locator, method) => {
     const clickable = await this.getElementBy(locator, method);

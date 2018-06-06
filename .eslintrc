@@ -7,6 +7,8 @@
     "node": true
   },
   "rules": {
+    "func-names": "off",
+    "new-cap": "off",
     "arrow-parens": ["off"],
     "consistent-return": "off",
     "comma-dangle": "off",

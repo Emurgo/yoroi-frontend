@@ -8,7 +8,7 @@
     "compress": "node scripts/compress",
     "compress-keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx dll/",
-    "lint": "eslint app chrome test scripts webpack/*.js",
+    "lint": "eslint app chrome test features/*/*.js scripts webpack/*.js",
     "test-e2e": "cross-env NODE_ENV=test mocha -r ./test/setup-app test/e2e",
     "test": "NODE_ENV=test; concurrently --success first --kill-others 'node scripts/test' 'wait-on http-get://localhost:3000/js/background.bundle.js && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature'",
     "build-dll": "rimraf ./dll && webpack --config=webpack/dll.config.js",

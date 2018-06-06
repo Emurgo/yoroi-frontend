@@ -1,7 +1,7 @@
 import { Before, Given, After } from 'cucumber';
 import { createServer } from '../support/mockServer';
 
-Before(function () {
+Before(() => {
   createServer();
 });
 
