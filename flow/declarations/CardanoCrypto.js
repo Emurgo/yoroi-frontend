@@ -1,4 +1,4 @@
-declare module 'cardano-crypto' {
+declare module 'rust-cardano-crypto' {
   declare module.exports: {
     Blake2b: {
       blake2b_256(entropy: string): Uint8Array;

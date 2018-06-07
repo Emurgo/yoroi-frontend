@@ -1,7 +1,7 @@
 // @flow
 
 import bip39 from 'bip39';
-import { Blake2b, Wallet } from 'cardano-crypto';
+import { Blake2b, Wallet } from 'rust-cardano-crypto';
 import {
   encryptWithPassword,
   decryptWithPassword

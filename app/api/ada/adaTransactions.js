@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
-import { Wallet } from 'cardano-crypto';
+import { Wallet } from 'rust-cardano-crypto';
 import {
   getTransactionsHistoryForAddresses,
   getUTXOsForAddresses,

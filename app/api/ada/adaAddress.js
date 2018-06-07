@@ -1,5 +1,5 @@
 // @flow
-import { Wallet } from 'cardano-crypto';
+import { Wallet } from 'rust-cardano-crypto';
 import {
   toAdaAddress,
   getAddressTypeIndex
