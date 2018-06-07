@@ -4,6 +4,7 @@ const order = 'DESC';
 export const transactionsLimit = 20;
 export const addressesLimit = 20;
 
+declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
 
 // TODO: Refactor service call in order to re-use common parameters
