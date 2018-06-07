@@ -18,7 +18,6 @@ module.exports = {
   output: {
     path: path.join(__dirname, '../build/js'),
     filename: '[name].bundle.js'
-    //chunkFilename: '[id].chunk.js'
   },
   plugins: [
     new webpack.DllReferencePlugin({
@@ -68,7 +67,6 @@ module.exports = {
         test: /\.scss$/,
         use: [
           'style-loader?sourceMap',
-          //'url-loader',
           'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
           'sass-loader?sourceMap'
         ]
