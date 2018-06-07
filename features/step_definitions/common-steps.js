@@ -1,7 +1,7 @@
-import { Before, Given, After } from 'cucumber';
+import { BeforeAll, Given, After } from 'cucumber';
 import { createServer } from '../support/mockServer';
 
-Before(() => {
+BeforeAll(() => {
   createServer();
 });
 
