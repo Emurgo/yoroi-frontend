@@ -26,6 +26,23 @@ $ npm run build-js-cardano-wasm
 $ npm install
 ```
 
+In order to update it:
+
+```bash
+#### Update js-cardano-wasm
+```cd js-cardano-wasm;
+git checkout master;
+git pull origin master;
+cd ..;
+
+# Commit the update
+git add .
+git commit -S -m "${youCommitMessage}"
+git push ...
+
+# Repeat process from `$npm run build-js-cardano-wasm`
+```
+
 ## Development
 
 * Run script
@@ -85,10 +102,12 @@ See [autoupdate guide](https://developer.chrome.com/extensions/autoupdate) for m
 * `features`: E2E tests (use [chromedriver](https://www.npmjs.com/package/chromedriver), [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver))
 
 ```bash
+# flow
+$ npm run flow
 # lint
-$ npm run lint
+$ npm run eslint
 # features
-$ npm test
+$ npm run test-e2e
 ```
 
 ## LICENSE

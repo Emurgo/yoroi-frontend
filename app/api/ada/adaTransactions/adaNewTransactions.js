@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { Wallet } from 'cardano-crypto';
+import { Wallet } from 'rust-cardano-crypto';
 import {
   getUTXOsForAddresses,
   addressesLimit,

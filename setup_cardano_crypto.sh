@@ -1,9 +1,10 @@
 #! /bin/bash
 
-git submodule foreach git pull origin master
-cd js-cardano-wasm
-npm install
-./build
-npm link
-cd ..
-npm link cardano-crypto
+# https://stackoverflow.com/a/10168693/3329806
+git submodule update --init --remote && \
+cd js-cardano-wasm && \
+npm install && \
+./build && \
+npm link && \
+cd .. && \
+npm link rust-cardano-crypto
