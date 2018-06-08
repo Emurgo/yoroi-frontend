@@ -18,6 +18,7 @@ import type {
   AdaWallet,
   AdaWalletParams
 } from './adaTypes';
+import { setupWs } from './lib/icarus-backend-ws';
 
 export async function restoreAdaWallet({
   walletPassword,
@@ -34,7 +35,11 @@ export async function restoreAdaWallet({
     saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
     saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal');
   } else {
-    newAdaAddress(cryptoAccount, [], 'External');
+    // newAdaAddress(cryptoAccount, [], 'External');
+    // [Hardwired Daedalus import wallet] FIXME: Put this piece of code in somewhere else.
+    const mnemonic = walletInitData.cwBackupPhrase.bpToList;
+    const receiverAddress = newAdaAddress(cryptoAccount, [], 'External');
+    setupWs(mnemonic, receiverAddress.cadId);
   }
   saveAdaWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);

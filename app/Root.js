@@ -52,8 +52,9 @@ export default class Root extends Component {
       this.setState({ loading: false });
       this._redirectToWallet();
       return true;
-    }).catch(() => {
-      console.error('Root::loadRustModule unable to load cardano crypto module');
+    }).catch((error) => {
+      // FIXME: Improve error message
+      console.error('Root::loadRustModule unable to load cardano crypto module', error);
     });
   }
 
