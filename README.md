@@ -85,10 +85,12 @@ See [autoupdate guide](https://developer.chrome.com/extensions/autoupdate) for m
 * `features`: E2E tests (use [chromedriver](https://www.npmjs.com/package/chromedriver), [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver))
 
 ```bash
+# flow
+$ npm run flow
 # lint
-$ npm run lint
+$ npm run eslint
 # features
-$ npm test
+$ npm run test-e2e
 ```
 
 ## LICENSE
