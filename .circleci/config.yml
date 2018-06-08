@@ -30,7 +30,7 @@ jobs:
       - run: npm run build-dll
       
       # code checks // FIXME: Not runnning on this branch :/
-      # - run: npm run flow
+      - run: npm run flow
       - run: npm run eslint
 
       # run tests!
