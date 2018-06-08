@@ -63,7 +63,12 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
 ) {
   const mostRecentTx = getMostRecentTxFromRows(previousTxsRows);
   const updatedDateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : dateFrom;
-  const history = await getTransactionsHistoryForAddresses(groupOfAddresses, updatedDateFrom);
+  const txHash = mostRecentTx ? mostRecentTx.ctId : mostRecentTx;
+  const history = await getTransactionsHistoryForAddresses(
+    groupOfAddresses,
+    updatedDateFrom,
+    txHash
+  );
   if (history.length > 0) {
     const transactionsRows = previousTxsRows.concat(
       _mapTransactions(history, allAddresses));

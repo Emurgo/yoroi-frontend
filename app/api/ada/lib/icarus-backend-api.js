@@ -31,13 +31,14 @@ export const getUTXOsSumsForAddresses = addresses =>
     }
   ).then(response => response.data);
 
-export const getTransactionsHistoryForAddresses = (addresses, dateFrom) =>
+export const getTransactionsHistoryForAddresses = (addresses, dateFrom, txHash) =>
   axios(`${BackendApiProtocol}://${BackendApiRoute}:${BackendApiPort}/api/txs/history`,
     {
       method: 'post',
       data: {
         addresses,
-        dateFrom
+        dateFrom,
+        txHash
       }
     }
   ).then(response => response.data);
