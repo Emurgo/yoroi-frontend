@@ -83,7 +83,7 @@ $ npm run build
 ```bash
 # compress build folder to {manifest.name}.zip and crx
 $ npm run build
-$ npm run compress -- [options]
+$ npm run compress -- --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx"
 ```
 
 #### Options
