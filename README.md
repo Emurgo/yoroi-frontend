@@ -26,6 +26,23 @@ $ npm run build-js-cardano-wasm
 $ npm install
 ```
 
+In order to update it:
+
+```bash
+#### Update js-cardano-wasm
+```cd js-cardano-wasm;
+git checkout master;
+git pull origin master;
+cd ..;
+
+# Commit the update
+git add .
+git commit -S -m "${youCommitMessage}"
+git push ...
+
+# Repeat process from `$npm run build-js-cardano-wasm`
+```
+
 ## Development
 
 * Run script
