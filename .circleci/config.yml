@@ -14,13 +14,6 @@ jobs:
     steps:
       - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
       # install rustup
       - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
       - run: echo 'export PATH=$HOME/.cargo/bin/:$PATH' >> $BASH_ENV
@@ -35,12 +28,6 @@ jobs:
       - run: npm run build-js-cardano-wasm
       - run: npm install
       - run: npm run build-dll
-
-      - save_cache:
-          paths:
-            - ~/.cargo
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
       
       # code checks // FIXME: Not runnning on this branch :/
       # - run: npm run flow
