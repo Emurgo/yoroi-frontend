@@ -1,0 +1,37 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8-browsers
+      
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # install rustup
+      - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
+      - run: echo 'export PATH=$HOME/.cargo/bin/:$PATH' >> $BASH_ENV
+      # use nightly version. 
+      # // FIXME: This is hardcoded but taken from js-cardano-wasm repo
+      # which is checked out later
+      - run: rustup install nightly-2018-06-05
+      - run: rustup target add wasm32-unknown-unknown --toolchain nightly-2018-06-05
+
+      # Because npm link will write in this path
+      - run: sudo chown -R "$(whoami):$(whoami)" /usr/local/lib/node_modules
+      - run: npm run build-js-cardano-wasm
+      - run: npm install
+      - run: npm run build-dll
+      
+      # code checks // FIXME: Not runnning on this branch :/
+      # - run: npm run flow
+      - run: npm run eslint
+
+      # run tests!
+      - run: npm run test-e2e

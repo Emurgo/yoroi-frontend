@@ -1,8 +1,8 @@
 // @flow
 import { observable, action, computed } from 'mobx';
 import Store from './lib/Store';
-// import environment from '../environment';
-// import WalletBackupDialog from '../components/wallet/WalletBackupDialog';
+import environment from '../environment';
+import WalletBackupDialog from '../components/wallet/WalletBackupDialog';
 
 export type walletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
@@ -21,11 +21,11 @@ export default class WalletBackupStore extends Store {
   @observable isTermRecoveryAccepted = false;
   @observable countdownRemaining = 0;
 
-  countdownTimerInterval: ?number = null;
+  countdownTimerInterval: ?IntervalID = null;
 
   setup() {
     const a = this.actions.walletBackup;
-    // a.initiateWalletBackup.listen(this._initiateWalletBackup);
+    a.initiateWalletBackup.listen(this._initiateWalletBackup);
     a.acceptPrivacyNoticeForWalletBackup.listen(this._acceptPrivacyNoticeForWalletBackup);
     a.continueToRecoveryPhraseForWalletBackup.listen(this._continueToRecoveryPhraseForWalletBackup);
     a.startWalletBackup.listen(this._startWalletBackup);
@@ -38,8 +38,7 @@ export default class WalletBackupStore extends Store {
     a.finishWalletBackup.listen(this._finishWalletBackup);
   }
 
-  // FIXME: Figure out if we should use this in some place
-  /* @action _initiateWalletBackup = (params: { recoveryPhrase: Array<string> }) => {
+  @action _initiateWalletBackup = (params: { recoveryPhrase: Array<string> }) => {
     this.recoveryPhrase = params.recoveryPhrase;
     this.inProgress = true;
     this.currentStep = 'privacyWarning';
@@ -65,7 +64,7 @@ export default class WalletBackupStore extends Store {
     this.actions.dialogs.open.trigger({
       dialog: WalletBackupDialog,
     });
-  };*/
+  };
 
   @action _acceptPrivacyNoticeForWalletBackup = () => {
     this.isPrivacyNoticeAccepted = true;

@@ -1,12 +1,15 @@
 import { Before, Given, After } from 'cucumber';
 import { createServer } from '../support/mockServer';
 
+let server;
+
 Before(() => {
-  createServer();
+  server = createServer();
 });
 
 After(async function () {
   await this.driver.quit();
+  server.close();
 });
 
 Given(/^I have opened the chrome extension$/, async function () {
