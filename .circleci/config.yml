@@ -44,7 +44,7 @@ jobs:
       
       # code checks // FIXME: Not runnning on this branch :/
       # - run: npm run flow
-      #- run: npm run eslint
+      - run: npm run eslint
 
       # run tests!
       - run: npm run test-e2e
