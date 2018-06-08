@@ -6,15 +6,15 @@ import {
   encryptWithPassword,
   decryptWithPassword
 } from '../../../utils/passwordCipher';
-import {
-  blockchainNetworkConfig,
-  NETWORK_MODE,
-} from '../../../config/blockchainNetworkConfig';
 
-export type WalletSeed = {
-  seed: ?Uint8Array,
-  encryptedSeed: ?string
-};
+import type {
+  ConfigType,
+  NetworkConfigType,
+} from '../../../../config/config-types';
+
+declare var CONFIG: ConfigType;
+
+const protocolMagic = CONFIG.network.protocolMagic;
 
 export const generateAdaMnemonic = () => bip39.generateMnemonic(128).split(' ');
 
@@ -45,6 +45,6 @@ export function getCryptoWalletFromSeed(
   }
   const seedAsArray = Object.values(seed);
   const wallet = Wallet.fromSeed(seedAsArray).result;
-  wallet.config.protocol_magic = blockchainNetworkConfig[NETWORK_MODE].PROTOCOL_MAGIC;
+  wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }
