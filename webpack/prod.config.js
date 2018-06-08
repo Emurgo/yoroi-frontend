@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
+const ConfigWebpackPlugin = require('config-webpack');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
@@ -20,6 +21,7 @@ module.exports = {
     filename: '[name].bundle.js'
   },
   plugins: [
+    new ConfigWebpackPlugin(),
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
       manifest: require('../dll/vendor-manifest.json') // eslint-disable-line

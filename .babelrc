@@ -5,6 +5,10 @@
     "react"
   ],
   "plugins": [
+    ["transform-runtime", {
+      "polyfill": false,
+      "regenerator": true
+    }],
     "add-module-exports",
     "transform-decorators-legacy"
   ],
