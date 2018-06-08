@@ -1,5 +1,5 @@
 // @flow
-import { Wallet } from 'cardano-crypto';
+import { Wallet } from 'rust-cardano-crypto';
 import { getCryptoWalletFromSeed } from './lib/crypto-wallet';
 import type { WalletSeed } from './lib/crypto-wallet';
 

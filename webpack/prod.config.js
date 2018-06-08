@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
+const ConfigWebpackPlugin = require('config-webpack');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
@@ -17,10 +18,14 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, '../build/js'),
-    filename: '[name].bundle.js',
-    chunkFilename: '[id].chunk.js'
+    filename: '[name].bundle.js'
   },
   plugins: [
+    new ConfigWebpackPlugin(),
+    new webpack.DllReferencePlugin({
+      context: path.join(__dirname, '..', 'dll'),
+      manifest: require('../dll/vendor-manifest.json') // eslint-disable-line
+    }),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
     new webpack.optimize.UglifyJsPlugin({
@@ -44,15 +49,14 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
-        query: {
-          presets: ['react-optimize']
+        options: {
         }
       },
       {
         test: /\.css$/,
         use: [
           'style-loader',
-          'css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+          'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
           {
             loader: 'postcss-loader',
             options: {
@@ -60,13 +64,23 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'style-loader?sourceMap',
+          'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+          'sass-loader?sourceMap'
+        ]
+      },
+      {
+        test: /\.svg$/,
+        loader: 'raw-loader'
+      },
+      {
+        test: /\.(eot|otf|ttf|woff|woff2)$/,
+        loader: 'file-loader'
       }
-    ],
-    plugins: [
-      new webpack.DllReferencePlugin({
-        context: path.join(__dirname, '..', 'dll'),
-        manifest: require('../dll/vendor-manifest.json') // eslint-disable-line
-      })
     ]
   }
 };

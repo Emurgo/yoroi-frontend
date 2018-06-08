@@ -4,10 +4,9 @@ import mockData from './mockData.json';
 const middlewares = [...defaults(), bodyParser];
 
 const port = 8080;
-let server;
 
 export function createServer() {
-  server = create();
+  const server = create();
   server.use(middlewares);
 
   server.post('/api/txs/utxoForAddresses', (req, res) => {
@@ -36,7 +35,7 @@ export function createServer() {
     res.send(usedAddresses);
   });
 
-  server.listen(port, () => {
+  return server.listen(port, () => {
     console.log(`JSON Server is running at ${port}`);
   });
 }

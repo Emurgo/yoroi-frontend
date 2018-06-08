@@ -3,7 +3,7 @@ import { Provider } from 'mobx-react';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { hashHistory, Router } from 'react-router';
 import { ThemeProvider } from 'react-css-themr';
-import { loadRustModule } from 'cardano-crypto';
+import { loadRustModule } from 'rust-cardano-crypto';
 import { IntlProvider } from 'react-intl';
 import { Routes } from './Routes';
 import { ROUTES } from './routes-config';
