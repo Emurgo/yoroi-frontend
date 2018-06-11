@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
+const ConfigWebpackPlugin = require('config-webpack');
 
 const host = 'localhost';
 const port = 3000;
@@ -38,6 +39,7 @@ const baseDevConfig = () => ({
     filename: '[name].bundle.js',
   },
   plugins: [
+    new ConfigWebpackPlugin(),
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
       manifest: require('../dll/vendor-manifest.json')

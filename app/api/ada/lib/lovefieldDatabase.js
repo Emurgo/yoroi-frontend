@@ -27,6 +27,8 @@ const LovefieldDB = {
 export default LovefieldDB;
 
 // Ensure we are only creating a single instance of the lovefield database
+/* TODO: Create only one column of type Object to save the whole Tx. Only
+  ctId and ctmDate should be in separate columns */
 export const loadLovefieldDB = async() => {
   if (LovefieldDB.db) {
     return Promise.resolve(LovefieldDB.db);

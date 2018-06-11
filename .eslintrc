@@ -56,6 +56,7 @@
     "no-multiple-empty-lines": 1,
     "react/jsx-indent": 1,
     "flowtype/define-flow-type": 1,
+    "flowtype/use-flow-type": 1,
     "global-require": "off"
   },
   "plugins": [
@@ -69,6 +70,7 @@
     "API": true,
     "NETWORK": true,
     "MOBX_DEV_TOOLS": true,
-    "DAEDALUS_VERSION": true
+    "DAEDALUS_VERSION": true,
+    "CONFIG": true
   }
 }
