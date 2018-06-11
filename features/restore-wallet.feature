@@ -10,8 +10,8 @@ Feature: Restore Wallet
     And I enter the recovery phrase:
     | recoveryPhrase                                                                 |
     | forum salon region tent laugh agree spirit share damage observe captain suffer |
-    And I enter the wallet password:
+    And I enter the restored wallet password:
     | password  | repeatedPassword |
     | Secret123 | Secret123        |
     And I click the "Restore Wallet" button
-    Then I should see the restored wallet
+    Then I should see the opened wallet

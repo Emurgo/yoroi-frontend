@@ -7,10 +7,12 @@ import {
   decryptWithPassword
 } from '../../../utils/passwordCipher';
 
-import type {
-  ConfigType,
-  NetworkConfigType,
-} from '../../../../config/config-types';
+import type { ConfigType } from '../../../../config/config-types';
+
+export type WalletSeed = {
+  seed: ?Uint8Array,
+  encryptedSeed: ?string,
+};
 
 declare var CONFIG: ConfigType;
 
