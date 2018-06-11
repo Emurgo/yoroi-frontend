@@ -1,11 +1,14 @@
 // @flow
 import { importDaedalusWallet } from '../importDaedalusWallet';
+import type { ConfigType } from '../../../../config/config-types';
+
+declare var CONFIG: ConfigType;
+const websocketUrl = CONFIG.network.websocketUrl;
 
 const MSG_TYPE_RESTORE = 'RESTORE';
 
 export function setupWs(secretWords: string, receiverAddress: string): WebSocket {
-  // FIXME: Use config files
-  const ws = new WebSocket('ws://localhost:8080');
+  const ws = new WebSocket(websocketUrl);
 
   ws.addEventListener('open', () => {
     console.log('[ws::connected]');
@@ -25,7 +28,7 @@ export function setupWs(secretWords: string, receiverAddress: string): WebSocket
     console.log(`[ws::message] on: ${data.msg}`);
     switch (data.msg) {
       case MSG_TYPE_RESTORE:
-        // console.log(`[ws::message] ${MSG_TYPE_RESTORE} - step ${data.step}`, data.addresses);
+        console.log(`[ws::message] ${MSG_TYPE_RESTORE} - step ${data.step}`);
         importDaedalusWallet(secretWords, receiverAddress, data.addresses);
         break;
       default:

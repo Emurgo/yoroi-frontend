@@ -2,7 +2,7 @@
 import {
   HdWallet,
   RandomAddressChecker
-} from 'cardano-crypto';
+} from 'rust-cardano-crypto';
 import {
   generateDaedalusSeed
 } from './lib/crypto-wallet';
