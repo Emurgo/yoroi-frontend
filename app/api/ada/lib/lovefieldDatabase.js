@@ -42,7 +42,8 @@ export const loadLovefieldDB = async() => {
     .addColumn(txsTableFields.CTM_DATE, lf.Type.DATE_TIME)
     .addColumn(txsTableFields.CT_OUTPUTS, lf.Type.OBJECT)
     .addColumn(txsTableFields.CT_CONDITION, lf.Type.STRING)
-    .addPrimaryKey([txsTableFields.CT_ID]);
+    .addPrimaryKey([txsTableFields.CT_ID])
+    .addIndex('idxCtmDate', [txsTableFields.CTM_DATE], false, LovefieldDB.orders.DESC);
   return await schemaBuilder.connect().then(db => {
     LovefieldDB.db = db;
     return db;
@@ -93,8 +94,7 @@ export const getAllTxsFromTxsTable = async function () {
   return LovefieldDB.db.select()
     .from(_getTxsTable())
     .orderBy(_getTxsTable()[LovefieldDB.txsTableFields.CTM_DATE], LovefieldDB.orders.DESC)
-    .exec()
-    .then(rows => rows);
+    .exec();
 };
 
 export const convertFromDBToAdaTransaction = function (txDB) {

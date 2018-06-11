@@ -44,10 +44,7 @@ export default class Root extends Component {
     /* (!) Attention: Before use any method from CardanoCrypto
            we must load the RustModule and Lovefield DB first.
     */
-    const promises = [];
-    promises.push(loadRustModule());
-    promises.push(loadLovefieldDB());
-    Promise.all(promises).then(() => {
+    Promise.all([loadRustModule(), loadLovefieldDB()]).then(() => {
       const api = setupApi();
       const router = new RouterStore();
       this.history = syncHistoryWithStore(hashHistory, router);
