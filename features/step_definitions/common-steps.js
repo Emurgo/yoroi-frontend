@@ -1,5 +1,6 @@
 import { BeforeAll, Given, After, AfterAll } from 'cucumber';
 import { createServer } from '../support/mockServer';
+import mockData from '../support/mockData.json';
 
 let server;
 
@@ -24,5 +25,8 @@ Given(/^There is no wallet stored$/, async function () {
 });
 
 Given(/^There is a wallet stored$/, async function () {
-  this.saveToLocalStorage('asd', '1');
+  const { addresses, seed, wallet } = mockData;
+  this.saveToLocalStorage('ADDRESSES', addresses);
+  this.saveToLocalStorage('SEED', seed);
+  this.saveToLocalStorage('WALLET', wallet);
 });

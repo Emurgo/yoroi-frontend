@@ -10,8 +10,13 @@ export function createServer() {
   server.use(middlewares);
 
   server.post('/api/txs/utxoForAddresses', (req, res) => {
-    // TODO: Implement
-    res.send();
+    const sumUtxos = mockData.utxos.reduce((sum, utxo) => {
+      if (req.body.addresses.includes(utxo.receiver)) {
+        return sum + utxo.amount;
+      }
+      return sum;
+    }, 0);
+    res.send(sumUtxos);
   });
 
   server.post('/api/txs/utxoSumForAddresses', (req, res) => {
