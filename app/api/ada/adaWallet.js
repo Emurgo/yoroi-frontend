@@ -1,4 +1,6 @@
 // @flow
+import _ from 'lodash';
+import BigNumber from 'bignumber.js';
 import {
   saveInStorage,
   getFromStorage,
@@ -17,9 +19,8 @@ import {
 import { getSingleCryptoAccount } from './adaAccount';
 import {
   getAdaTransactions,
-  updateAdaTxsHistory,
-  getBalance
-} from './adaTransactions';
+  updateAdaTxsHistory
+} from './adaTransactions/adaTransactionsHistory';
 import type {
   AdaWallet,
   AdaWalletParams,
@@ -27,6 +28,10 @@ import type {
   AdaWalletRecoveryPhraseResponse
 } from './adaTypes';
 import type { WalletSeed } from './lib/crypto-wallet';
+import {
+  getUTXOsSumsForAddresses,
+  addressesLimit
+} from './lib/icarus-backend-api';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const WALLET_SEED_KEY = 'SEED';
@@ -53,11 +58,11 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   // Update wallet balance
   const updatedWallet = Object.assign({}, persistentWallet, {
     cwAmount: {
-      getCCoin: await getBalance(addresses)
+      getCCoin: await _getBalance(addresses)
     }
   });
   saveInStorage(WALLET_KEY, updatedWallet);
-  await updateAdaTxsHistory(getAdaTransactions(), addresses);
+  await updateAdaTxsHistory(await getAdaTransactions(), addresses);
   return updatedWallet;
 };
 
@@ -92,3 +97,19 @@ export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
 
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
   generateAdaMnemonic();
+
+async function _getBalance(
+  addresses: Array<string>
+): Promise<BigNumber> {
+  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+  const promises =
+    groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
+  return Promise.all(promises)
+  .then(partialAmounts =>
+    partialAmounts.reduce(
+      (acc, partialAmount) =>
+        acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
+      new BigNumber(0)
+    )
+  );
+}

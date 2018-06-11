@@ -30,9 +30,11 @@ import {
 } from './restoreAdaWallet';
 import {
   getAdaTxsHistoryByWallet,
+} from './adaTransactions/adaTransactionsHistory';
+import {
   getAdaTransactionFee,
-  newAdaTransaction,
-} from './adaTransactions';
+  newAdaTransaction
+} from './adaTransactions/adaNewTransactions';
 import { getLastBlockNumber } from './getAdaLastBlockNumber';
 import {
   GenericApiError,

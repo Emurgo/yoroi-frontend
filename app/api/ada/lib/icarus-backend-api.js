@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-const order = 'DESC';
 export const transactionsLimit = 20;
 export const addressesLimit = 20;
 
@@ -30,13 +29,14 @@ export const getUTXOsSumsForAddresses = addresses =>
     }
   ).then(response => response.data);
 
-export const getTransactionsHistoryForAddresses = (addresses, dateFrom) =>
-  axios(`${backendUrl}/api/txs/history?order=${order}`,
+export const getTransactionsHistoryForAddresses = (addresses, dateFrom, txHash) =>
+  axios(`${backendUrl}/api/txs/history`,
     {
       method: 'post',
       data: {
         addresses,
-        dateFrom
+        dateFrom,
+        txHash
       }
     }
   ).then(response => response.data);
