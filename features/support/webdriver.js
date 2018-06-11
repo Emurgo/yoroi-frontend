@@ -47,7 +47,7 @@ function CustomWorld() {
 
   this.getFromLocalStorage = key => executeLocalStorageScript(`getItem("${key}")`);
 
-  this.saveToLocalStorage = (key, value) => executeLocalStorageScript(`setItem("${key}", ${JSON.stringify(value)})`);
+  this.saveToLocalStorage = (key, value) => executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 }
 
 setWorldConstructor(CustomWorld);

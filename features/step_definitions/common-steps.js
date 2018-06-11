@@ -1,5 +1,6 @@
 import { BeforeAll, Given, After, AfterAll } from 'cucumber';
 import { createServer } from '../support/mockServer';
+import mockData from '../support/mockData.json';
 
 let server;
 
@@ -21,4 +22,11 @@ Given(/^I have opened the chrome extension$/, async function () {
 
 Given(/^There is no wallet stored$/, async function () {
   await this.waitForElement('.WalletAddDialog');
+});
+
+Given(/^There is a wallet stored$/, async function () {
+  const { addresses, seed, wallet } = mockData;
+  this.saveToLocalStorage('ADDRESSES', addresses);
+  this.saveToLocalStorage('SEED', seed);
+  this.saveToLocalStorage('WALLET', wallet);
 });

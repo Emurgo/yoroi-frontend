@@ -1,4 +1,33 @@
 {
+  "addresses": {
+    "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod": {
+      "cadAmount": {
+        "getCCoin": 0
+      },
+      "cadId": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+      "cadIsUsed": false,
+      "account": 0,
+      "change": 0,
+      "index": 0
+    }
+  },
+  "seed": {
+    "encryptedSeed": "db05c50d0dbd3ed0de72879fa701211a597781faa593a2927fcdd3a7edb92ab2"
+  },
+  "wallet": {
+    "cwAccountsNumber": 1,
+    "cwAmount": {
+      "getCCoin": "0"
+    },
+    "cwHasPassphrase": true,
+    "cwId": "1111111111111111",
+    "cwMeta": {
+      "cwAssurance": "CWANormal",
+      "cwName": "Test Wallet",
+      "cwUnit": 0
+    },
+    "cwPassphraseLU": "2018-06-11T18:38:43.339Z"
+  },
   "usedAddresses": [
     "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
     "Ae2tdPwUPEZFS55qLkW2sApaWnWFdRyEh1MKwqBNnXMH89K9XaaVRH2Mxro"
