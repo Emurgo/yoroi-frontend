@@ -1,15 +1,18 @@
-import { Before, Given, After } from 'cucumber';
+import { BeforeAll, Given, After, AfterAll } from 'cucumber';
 import { createServer } from '../support/mockServer';
 
 let server;
 
-Before(() => {
+BeforeAll(() => {
   server = createServer();
+});
+
+AfterAll(() => {
+  server.close();
 });
 
 After(async function () {
   await this.driver.quit();
-  server.close();
 });
 
 Given(/^I have opened the chrome extension$/, async function () {

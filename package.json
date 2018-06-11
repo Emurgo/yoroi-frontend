@@ -10,7 +10,7 @@
     "clean": "rimraf build/ dev/ *.zip *.crx dll/",
     "flow": "flow .",
     "eslint": "eslint app chrome test scripts webpack/*.js",
-    "test-e2e": "NODE_ENV=test; concurrently --success first --kill-others 'npm run dev' 'wait-on http-get://localhost:3000/js/background.bundle.js && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature'",
+    "test-e2e": "NODE_ENV=test; concurrently --success first --kill-others 'node scripts/test' 'wait-on http-get://localhost:3000/js/background.bundle.js && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature'",
     "build-dll": "rimraf ./dll && webpack --config=webpack/dll.config.js",
     "build-js-cardano-wasm": "./setup_cardano_crypto.sh"
   },
