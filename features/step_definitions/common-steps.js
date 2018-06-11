@@ -12,7 +12,7 @@ AfterAll(() => {
 });
 
 After(async function () {
-  await this.driver.quit();
+  // await this.driver.quit();
 });
 
 Given(/^I have opened the chrome extension$/, async function () {
@@ -21,4 +21,8 @@ Given(/^I have opened the chrome extension$/, async function () {
 
 Given(/^There is no wallet stored$/, async function () {
   await this.waitForElement('.WalletAddDialog');
+});
+
+Given(/^There is a wallet stored$/, async function () {
+  this.saveToLocalStorage('asd', '1');
 });
