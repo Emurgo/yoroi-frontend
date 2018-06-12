@@ -10,13 +10,12 @@ export function createServer() {
   server.use(middlewares);
 
   server.post('/api/txs/utxoForAddresses', (req, res) => {
-    // TODO: Implement
-    res.send();
+    const { utxos } = mockData;
+    res.send(utxos);
   });
 
   server.post('/api/txs/utxoSumForAddresses', (req, res) => {
-    // TODO: Implement
-    res.send();
+    res.send({ sum: 1000000 });
   });
 
   server.post('/api/txs/history', (req, res) => {
@@ -25,7 +24,6 @@ export function createServer() {
   });
 
   server.post('/api/txs/signed', (req, res) => {
-    // TODO: Implement
     res.send();
   });
 

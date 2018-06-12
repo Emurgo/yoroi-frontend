@@ -18,8 +18,18 @@ function CustomWorld() {
     .build();
 
   // Returns a promise that resolves to the element
-  this.waitForElement = (locator) => {
-    const condition = seleniumWebdriver.until.elementLocated(By.css(locator));
+  this.waitForElement = (locator, method = By.css) => {
+    const condition = seleniumWebdriver.until.elementLocated(method(locator));
+    return this.driver.wait(condition);
+  };
+
+  this.waitForContent = (locator) => {
+    return this.waitForElement(locator, By.xpath);
+  };
+
+  this.waitEnable = async (locator) => {
+    const element = this.getElementBy(locator);
+    const condition = seleniumWebdriver.until.elementIsEnabled(element);
     return this.driver.wait(condition);
   };
 
@@ -43,9 +53,12 @@ function CustomWorld() {
     await input.sendKeys(value);
   };
 
-  const executeLocalStorageScript = (script) => this.driver.executeScript(`window.localStorage.${script}`);
+  const executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
 
-  this.getFromLocalStorage = key => executeLocalStorageScript(`getItem("${key}")`);
+  this.getFromLocalStorage = async (key) => {
+    const result = await executeLocalStorageScript(`getItem("${key}")`);
+    return JSON.parse(result);
+  };
 
   this.saveToLocalStorage = (key, value) => executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 }

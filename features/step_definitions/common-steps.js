@@ -29,4 +29,5 @@ Given(/^There is a wallet stored$/, async function () {
   this.saveToLocalStorage('ADDRESSES', addresses);
   this.saveToLocalStorage('SEED', seed);
   this.saveToLocalStorage('WALLET', wallet);
+  await this.waitForElement('.TopBar_walletName');
 });
