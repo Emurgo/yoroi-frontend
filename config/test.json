@@ -1,0 +1,6 @@
+{
+  "network": {
+    "protocolMagic": 633343913,
+    "backendUrl": "http://localhost:8080"
+  }
+}
