@@ -34,6 +34,13 @@ declare module 'rust-cardano-crypto' {
         failed: boolean,
         msg: ?string
       },
+      newCheckerFromMnemonics(
+        secretWords: string
+      ): {
+        result: CryptoAddressChecker,
+        failed: boolean,
+        msg: ?string
+      },
       checkAddresses(
         checker: CryptoAddressChecker,
         addresses: Array<string>

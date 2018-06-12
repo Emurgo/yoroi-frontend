@@ -35,13 +35,6 @@ export function generateWalletSeed(secretWords: string, password: ?string): Wall
   };
 }
 
-export function generateDaedalusSeed(secretWords: string): Uint8Array {
-  const entropy = bip39.mnemonicToEntropy(secretWords);
-  const daedalusEntropy = '50' + entropy;
-  const seed = Blake2b.blake2b_256(daedalusEntropy);
-  return seed;
-}
-
 export function getCryptoWalletFromSeed(
   walletSeed: WalletSeed,
   password: ?string
