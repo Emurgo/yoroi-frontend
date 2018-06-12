@@ -45,6 +45,7 @@ export default class Root extends Component {
            we must load the RustModule and Lovefield DB first.
     */
     Promise.all([loadRustModule(), loadLovefieldDB()]).then(() => {
+      console.debug('Root::componentDidMount Async modules loaded');
       const api = setupApi();
       const router = new RouterStore();
       this.history = syncHistoryWithStore(hashHistory, router);
@@ -53,8 +54,7 @@ export default class Root extends Component {
       this._redirectToWallet();
       return true;
     }).catch((error) => {
-      // FIXME: Improve error message
-      console.error('Root::loadRustModule unable to load cardano crypto module', error);
+      console.error('Root::componentDidMount Unable to load async modules', error);
     });
   }
 
