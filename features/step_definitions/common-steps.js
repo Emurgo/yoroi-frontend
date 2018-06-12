@@ -14,7 +14,7 @@ AfterAll(() => {
 });
 
 After(async function () {
-  // await this.driver.quit();
+  await this.driver.quit();
 });
 
 Given(/^I have opened the chrome extension$/, async function () {

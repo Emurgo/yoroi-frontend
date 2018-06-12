@@ -7,7 +7,7 @@ const port = 8080;
 
 export function createServer() {
   const server = create();
-  
+
   server.use(middlewares);
 
   function validateAddressesReq({ addresses } = {}) {

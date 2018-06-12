@@ -19,11 +19,17 @@ import {
   getLastBlockNumber,
   saveLastBlockNumber
 } from '../getAdaLastBlockNumber';
-import type {
+import { updateAdaTxsHistoryError } from '../errors';
+import type
+ {
   AdaTransaction,
   AdaTransactions,
   AdaTransactionInputOutput
 } from '../adaTypes';
+
+// FIXME: Extract to another file
+const Logger = console;
+const stringifyError = o => o.toString();
 
 export async function getAdaTransactions() {
   const adaTransactionsFromDB = await getAllTxsFromTxsTable();
@@ -40,19 +46,25 @@ export async function updateAdaTxsHistory(
   existingTransactions: Array<AdaTransaction>,
   addresses: Array<string>
 ) {
-  const mostRecentTx = Object.assign({}, existingTransactions[0]);
-  const dateFrom = mostRecentTx && mostRecentTx.ctMeta ?
-    moment(mostRecentTx.ctMeta.ctmDate) :
-    moment(new Date(0));
-  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-  const promises = groupsOfAddresses.map(groupOfAddresses =>
-    _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
-  );
-  return Promise.all(promises)
-    .then((groupsOfTransactionsRows) =>
-      groupsOfTransactionsRows.map(groupOfTransactionsRows =>
-        insertOrReplaceToTxsTable(groupOfTransactionsRows))
+  try {
+    const mostRecentTx = Object.assign({}, existingTransactions[0]);
+    const dateFrom = mostRecentTx && mostRecentTx.ctMeta ?
+      moment(mostRecentTx.ctMeta.ctmDate) :
+      moment(new Date(0));
+    const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+    const promises = groupsOfAddresses.map(groupOfAddresses =>
+      _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
     );
+    const updateTxHistoryResult = await Promise.all(promises)
+      .then((groupsOfTransactionsRows) =>
+        groupsOfTransactionsRows.map(groupOfTransactionsRows =>
+          insertOrReplaceToTxsTable(groupOfTransactionsRows))
+      );
+    return updateTxHistoryResult;
+  } catch (error) {
+    Logger.error('adaTransactionsHistory::updateAdaTxsHistory error: ' + stringifyError(error));
+    throw new updateAdaTxsHistoryError();
+  }
 }
 
 async function _updateAdaTxsHistoryForGroupOfAddresses(

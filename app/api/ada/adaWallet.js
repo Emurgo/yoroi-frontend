@@ -32,9 +32,14 @@ import {
   getUTXOsSumsForAddresses,
   addressesLimit
 } from './lib/icarus-backend-api';
+import { UpdateAdaWalletError, getBalanceError } from './errors';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const WALLET_SEED_KEY = 'SEED';
+
+// FIXME: Extract to another file
+const Logger = console;
+const stringifyError = o => o.toString();
 
 /* Create and save a wallet with your seed, and a SINGLE account with one address */
 export async function newAdaWallet({
@@ -56,14 +61,19 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   const persistentAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
   const addresses: Array<string> = persistentAddresses.map(addr => addr.cadId);
   // Update wallet balance
-  const updatedWallet = Object.assign({}, persistentWallet, {
-    cwAmount: {
-      getCCoin: await _getBalance(addresses)
-    }
-  });
-  saveInStorage(WALLET_KEY, updatedWallet);
-  await updateAdaTxsHistory(await getAdaTransactions(), addresses);
-  return updatedWallet;
+  try {
+    const updatedWallet = Object.assign({}, persistentWallet, {
+      cwAmount: {
+        getCCoin: await _getBalance(addresses)
+      }
+    });
+    saveInStorage(WALLET_KEY, updatedWallet);
+    await updateAdaTxsHistory(await getAdaTransactions(), addresses);
+    return updatedWallet;
+  } catch (error) {
+    Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
+    throw new UpdateAdaWalletError();
+  }
 };
 
 export function createAdaWallet({
@@ -101,15 +111,21 @@ export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =
 async function _getBalance(
   addresses: Array<string>
 ): Promise<BigNumber> {
-  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-  const promises =
-    groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
-  return Promise.all(promises)
-  .then(partialAmounts =>
-    partialAmounts.reduce(
-      (acc, partialAmount) =>
-        acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
-      new BigNumber(0)
-    )
-  );
+  try {
+    const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+    const promises =
+      groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
+    const balance = await Promise.all(promises)
+      .then(partialAmounts =>
+        partialAmounts.reduce(
+          (acc, partialAmount) =>
+            acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
+          new BigNumber(0)
+        )
+      );
+    return balance;
+  } catch (error) {
+    Logger.error('adaWallet::getBalance error: ' + stringifyError(error));
+    throw new getBalanceError();
+  }
 }

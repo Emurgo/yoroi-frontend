@@ -47,6 +47,21 @@ const messages = defineMessages({
     defaultMessage: '!!!Not enough Ada for fees. Try sending a smaller amount.',
     description: '"Not enough Ada for fees. Try sending a smaller amount." error message'
   },
+  updateAdaWalletError: {
+    id: 'api.errors.updateAdaWalletError',
+    defaultMessage: '!!!Error while updating ada wallet.',
+    description: '"Error while updating ada wallet." error message'
+  },
+  getBalanceError: {
+    id: 'api.errors.getBalanceError',
+    defaultMessage: '!!!Error while getting Balance.',
+    description: '"Error while getting Balance." error message'
+  },
+  updateAdaTxsHistoryError: {
+    id: 'api.errors.updateAdaTxsHistoryError',
+    defaultMessage: '!!!Error while updating ada transactions history.',
+    description: '"Error while updating ada transactions history." error message'
+  }
 });
 
 export class ApiMethodNotYetImplementedError extends LocalizableError {
@@ -129,3 +144,31 @@ export class NotEnoughFundsForTransactionFeesError extends LocalizableError {
     });
   }
 }
+
+export class UpdateAdaWalletError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.updateAdaWalletError.id,
+      defaultMessage: messages.updateAdaWalletError.defaultMessage,
+    });
+  }
+}
+
+export class getBalanceError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getBalanceError.id,
+      defaultMessage: messages.getBalanceError.defaultMessage,
+    });
+  }
+}
+
+export class updateAdaTxsHistoryError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.updateAdaTxsHistoryError.id,
+      defaultMessage: messages.updateAdaTxsHistoryError.defaultMessage,
+    });
+  }
+}
+
