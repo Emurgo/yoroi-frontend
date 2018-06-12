@@ -5,7 +5,9 @@
 .*/node_modules/oboe/.*
 .*/dist/.*
 .*/release/.*
-.*/git/.*
+.*/.git/.*
+.*/.vscode/.*
+.*/.circleci/.*
 
 [include]
 
