@@ -1,7 +1,6 @@
 #! /bin/bash
 
-# https://stackoverflow.com/a/10168693/3329806
-git submodule update --init --remote && \
+git submodule update --init --recursive && \
 cd js-cardano-wasm && \
 npm install && \
 ./build && \
