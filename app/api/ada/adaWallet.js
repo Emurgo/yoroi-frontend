@@ -80,7 +80,7 @@ export function createAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams) {
-  const adaWallet = toAdaWallet({ walletPassword, walletInitData });
+  const adaWallet = toAdaWallet(walletInitData);
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const seed = generateWalletSeed(mnemonic, walletPassword);
   return [adaWallet, seed];

@@ -103,7 +103,6 @@ export default class WalletReceivePage extends Component<Props, State> {
             });
           }}
           isSidebarExpanded={false}
-          walletHasPassword={wallet.hasPassword}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
         />
