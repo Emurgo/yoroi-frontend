@@ -16,7 +16,7 @@ import {
   getAdaAddressesMap,
   newAdaAddress
 } from './adaAddress';
-import { getSingleCryptoAccount } from './adaAccount';
+import { newCryptoAccount } from './adaAccount';
 import {
   getAdaTransactions,
   updateAdaTxsHistory
@@ -42,10 +42,8 @@ export async function newAdaWallet({
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
   const [adaWallet, seed] = createAdaWallet({ walletPassword, walletInitData });
-  const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
-
+  const cryptoAccount = newCryptoAccount(seed, walletPassword);
   newAdaAddress(cryptoAccount, [], 'External');
-
   saveAdaWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);
 }

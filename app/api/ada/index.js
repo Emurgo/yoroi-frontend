@@ -15,7 +15,6 @@ import {
   isValidMnemonic,
   getAdaAccountRecoveryPhrase,
   newAdaWallet,
-  getWalletSeed,
   updateAdaWallet
 } from './adaWallet';
 import { getSingleCryptoAccount } from './adaAccount';
@@ -77,10 +76,6 @@ export type GetAddressesRequest = {
   walletId: string
 };
 export type CreateAddressResponse = WalletAddress;
-export type CreateAddressRequest = {
-  accountId: string,
-  password: ?string
-};
 export type CreateTransactionRequest = {
   sender: string,
   receiver: string,
@@ -316,15 +311,12 @@ export default class AdaApi {
   }
 
   // FIXME: This in no longer async
-  async createAddress(
-    request: CreateAddressRequest
-  ): Promise<CreateAddressResponse> {
+  async createAddress(): Promise<CreateAddressResponse> {
     Logger.debug('AdaApi::createAddress called');
-    const { password } = request;
     try {
       /* TODO: We should return the account previously saved
          in the local storage (password it won't be necessary anymore) */
-      const cryptoAccount = getSingleCryptoAccount(getWalletSeed(), password);
+      const cryptoAccount = getSingleCryptoAccount();
       const addresses: AdaAddresses = mapToList(getAdaAddressesMap());
       const newAddress: AdaAddress = newAdaAddress(cryptoAccount, addresses, 'External');
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));

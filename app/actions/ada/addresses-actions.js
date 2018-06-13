@@ -4,6 +4,6 @@ import Action from '../lib/Action';
 // ======= ADDRESSES ACTIONS =======
 
 export default class AddressesActions {
-  createAddress: Action<{ walletId: string, password: ?string }> = new Action();
+  createAddress: Action<any> = new Action();
   resetErrors: Action<any> = new Action();
 }
