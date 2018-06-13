@@ -28,13 +28,9 @@ export default class AddressesStore extends Store {
     actions.resetErrors.listen(this._resetErrors);
   }
 
-  _createAddress = async (params: { walletId: string, password: ?string }) => {
+  _createAddress = async () => {
     try {
-      const { walletId, password } = params;
-      const accountId = this._getAccountIdByWalletId(walletId);
-      const address: ?CreateAddressResponse = await this.createAddressRequest.execute({
-        accountId, password
-      }).promise;
+      const address: ?CreateAddressResponse = await this.createAddressRequest.execute().promise;
       if (address != null) {
         this._refreshAddresses();
         runInAction('set last generated address and reset error', () => {

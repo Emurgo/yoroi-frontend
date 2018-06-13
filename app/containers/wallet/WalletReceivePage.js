@@ -40,8 +40,8 @@ export default class WalletReceivePage extends Component<Props, State> {
 
   handleGenerateAddress = () => {
     const { wallets } = this.props.stores.ada;
-    const wallet = wallets.active;
-    if (wallet) {
+    const walletIsActive = !!wallets.active;
+    if (walletIsActive) {
       this.props.actions.ada.addresses.createAddress.trigger();
     }
   };
