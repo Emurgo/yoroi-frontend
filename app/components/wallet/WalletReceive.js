@@ -70,7 +70,6 @@ type Props = {
   onGenerateAddress: Function,
   onCopyAddress: Function,
   isSidebarExpanded: boolean,
-  walletHasPassword: boolean,
   isSubmitting: boolean,
   error?: ?LocalizableError,
 };
@@ -102,7 +101,7 @@ export default class WalletReceive extends Component<Props, State> {
         placeholder: this.context.intl.formatMessage(messages.spendingPasswordPlaceholder),
         value: '',
         validators: [({ field }) => {
-          if (this.props.walletHasPassword && field.value === '') {
+          if (field.value === '') {
             return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
           }
           return [true];
@@ -120,10 +119,8 @@ export default class WalletReceive extends Component<Props, State> {
   submit() {
     this.form.submit({
       onSuccess: (form) => {
-        const { walletHasPassword } = this.props;
         const { spendingPassword } = form.values();
-        const password = walletHasPassword ? spendingPassword : null;
-        this.props.onGenerateAddress(password);
+        this.props.onGenerateAddress(spendingPassword);
         form.clear();
       },
       onError: () => {}
@@ -135,8 +132,8 @@ export default class WalletReceive extends Component<Props, State> {
     const {
       walletAddress, walletAddresses,
       onCopyAddress, isSidebarExpanded,
-      walletHasPassword, isSubmitting,
-      error, isWalletAddressUsed,
+      isSubmitting, error,
+      isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -154,14 +151,14 @@ export default class WalletReceive extends Component<Props, State> {
     const generateAddressButtonClasses = classnames([
       'primary',
       'generateAddressButton',
-      walletHasPassword ? styles.submitWithPasswordButton : styles.submitButton,
+      styles.submitWithPasswordButton,
       isSubmitting ? styles.spinning : null,
     ]);
 
     const passwordField = form.$('spendingPassword');
     const generateAddressForm = (
       <div className={generateAddressWrapperClasses}>
-        {walletHasPassword &&
+        {
           <Input
             className={styles.spendingPassword}
             {...passwordField.bind()}

@@ -10,8 +10,7 @@ import {
   mapToList
 } from '../lib/utils';
 import {
-  getWalletSeed,
-  getAdaWallet
+  getWalletSeed
 } from '../adaWallet';
 import {
   getCryptoAccount,
@@ -32,8 +31,7 @@ export const getAdaTransactionFee = (
   receiver: string,
   amount: string
 ): Promise<AdaTransactionFee> => {
-  const adaWallet = getAdaWallet();
-  const password = adaWallet.cwHasPassphrase ? 'FakePassword' : undefined;
+  const password = 'FakePassword';
   return _getAdaTransaction(receiver, amount, password)
     .then((response) => {
       const result = response[0];

@@ -85,7 +85,6 @@ export type AdaTransactionFee = AdaAmount;
 export type AdaWallet = {
   cwAccountsNumber: number,
   cwAmount: AdaAmount,
-  cwHasPassphrase: boolean,
   cwId: string,
   cwMeta: {
     cwAssurance: AdaAssurance,

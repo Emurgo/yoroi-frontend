@@ -674,7 +674,6 @@ const _createWalletFromServerData = action(
       ),
       name: data.cwMeta.cwName,
       assurance: data.cwMeta.cwAssurance,
-      hasPassword: data.cwHasPassphrase,
       passwordUpdateDate: unixTimestampToDate(data.cwPassphraseLU)
     })
 );

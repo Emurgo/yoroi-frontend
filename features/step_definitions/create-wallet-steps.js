@@ -6,7 +6,6 @@ When(/^I click the create button$/, async function () {
 });
 
 When(/^I enter the created wallet password:$/, async function (table) {
-  await this.click('.SimpleSwitch_switch'); // FIXME: This should be removed when password is made mandatory
   const fields = table.hashes()[0];
   await this.input('.WalletCreateDialog .walletPassword input', fields.password);
   await this.input('.WalletCreateDialog .repeatedPassword input', fields.repeatedPassword);

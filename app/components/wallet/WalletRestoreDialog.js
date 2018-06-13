@@ -5,10 +5,8 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
-import Checkbox from 'react-polymorph/lib/components/Checkbox';
 import Autocomplete from 'react-polymorph/lib/components/Autocomplete';
 import SimpleAutocompleteSkin from 'react-polymorph/lib/skins/simple/raw/AutocompleteSkin';
-import SimpleSwitchSkin from 'react-polymorph/lib/skins/simple/raw/SwitchSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -59,16 +57,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Invalid recovery phrase',
     description: 'Error message shown when invalid recovery phrase was entered.'
   },
-  passwordSwitchPlaceholder: {
-    id: 'wallet.restore.dialog.passwordSwitchPlaceholder',
-    defaultMessage: '!!!Activate to create password',
-    description: 'Text for the "Activate to create password" switch in the wallet restore dialog.',
-  },
-  passwordSwitchLabel: {
-    id: 'wallet.restore.dialog.passwordSwitchLabel',
-    defaultMessage: '!!!Password',
-    description: 'Label for the "Activate to create password" switch in the wallet restore dialog.',
-  },
   walletPasswordLabel: {
     id: 'wallet.restore.dialog.walletPasswordLabel',
     defaultMessage: '!!!Wallet password',
@@ -97,19 +85,11 @@ type Props = {
   suggestedMnemonics: Array<string>,
 };
 
-type State = {
-  createPassword: boolean,
-};
-
 @observer
-export default class WalletRestoreDialog extends Component<Props, State> {
+export default class WalletRestoreDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
-  };
-
-  state = {
-    createPassword: false,
   };
 
   form = new ReactToolboxMobxForm({
@@ -144,7 +124,6 @@ export default class WalletRestoreDialog extends Component<Props, State> {
         placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
-          if (!this.state.createPassword) return [true];
           const repeatPasswordField = form.$('repeatPassword');
           if (repeatPasswordField.value.length > 0) repeatPasswordField.validate(form);
           return [
@@ -159,7 +138,6 @@ export default class WalletRestoreDialog extends Component<Props, State> {
         placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
-          if (!this.state.createPassword) return [true];
           const walletPassword = form.$('walletPassword').value;
           if (walletPassword.length === 0) return [true];
           return [
@@ -176,19 +154,14 @@ export default class WalletRestoreDialog extends Component<Props, State> {
     },
   });
 
-  handlePasswordSwitchToggle = (value: boolean) => {
-    this.setState({ createPassword: value });
-  };
-
   submit = () => {
     this.form.submit({
       onSuccess: (form) => {
-        const { createPassword } = this.state;
         const { recoveryPhrase, walletName, walletPassword } = form.values();
         const walletData = {
           recoveryPhrase: join(recoveryPhrase, ' '),
           walletName,
-          walletPassword: createPassword ? walletPassword : null,
+          walletPassword,
         };
         this.props.onSubmit(walletData);
       },
@@ -200,7 +173,6 @@ export default class WalletRestoreDialog extends Component<Props, State> {
     const { intl } = this.context;
     const { form } = this;
     const { suggestedMnemonics, isSubmitting, error, onCancel } = this.props;
-    const { createPassword } = this.state;
 
     const dialogClasses = classnames([
       styles.component,
@@ -214,7 +186,7 @@ export default class WalletRestoreDialog extends Component<Props, State> {
 
     const walletPasswordFieldsClasses = classnames([
       styles.walletPasswordFields,
-      createPassword ? styles.show : null,
+      styles.show,
     ]);
 
     const walletNameField = form.$('walletName');
@@ -260,18 +232,6 @@ export default class WalletRestoreDialog extends Component<Props, State> {
         />
 
         <div className={styles.walletPassword}>
-          <div className={styles.walletPasswordSwitch}>
-            <div className={styles.passwordLabel}>
-              {intl.formatMessage(messages.passwordSwitchLabel)}
-            </div>
-            <Checkbox
-              onChange={this.handlePasswordSwitchToggle}
-              label={intl.formatMessage(messages.passwordSwitchPlaceholder)}
-              checked={createPassword}
-              skin={<SimpleSwitchSkin />}
-            />
-          </div>
-
           <div className={walletPasswordFieldsClasses}>
             <Input
               className="walletPassword"

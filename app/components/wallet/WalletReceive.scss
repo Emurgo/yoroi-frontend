@@ -88,15 +88,6 @@
       word-break: break-word;
     }
 
-    .submitButton {
-      display: block !important;
-      max-width: 360px;
-      width: 100%;
-      &.spinning {
-        @include loading-spinner("../../assets/images/spinner-light.svg");
-      }
-    }
-
     .submitWithPasswordButton {
       max-width: 310px;
       width: calc(50% - 10px);

@@ -6,14 +6,13 @@ import type {
 } from '../adaTypes';
 
 /* @note: Ada wallet is the abstraction for Daedalus */
-export function toAdaWallet({ walletPassword, walletInitData }: AdaWalletParams): AdaWallet {
+export function toAdaWallet({ walletInitData }: AdaWalletParams): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
     cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
     },
-    cwHasPassphrase: !!walletPassword,
     cwId: '1111111111111111',
     cwMeta: {
       cwAssurance,
