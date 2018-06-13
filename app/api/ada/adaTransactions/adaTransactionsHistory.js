@@ -19,7 +19,7 @@ import {
   getLastBlockNumber,
   saveLastBlockNumber
 } from '../getAdaLastBlockNumber';
-import { updateAdaTxsHistoryError } from '../errors';
+import { UpdateAdaTxsHistoryError } from '../errors';
 import type
  {
   AdaTransaction,
@@ -63,7 +63,7 @@ export async function updateAdaTxsHistory(
     return updateTxHistoryResult;
   } catch (error) {
     Logger.error('adaTransactionsHistory::updateAdaTxsHistory error: ' + stringifyError(error));
-    throw new updateAdaTxsHistoryError();
+    throw new UpdateAdaTxsHistoryError();
   }
 }
 

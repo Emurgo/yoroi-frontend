@@ -1,4 +1,4 @@
-function getAddresses(addressAmount) {
+export function getAddresses(addressAmount) {
   const addressPrefix = 'Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo';
   const addresses = [];
   // Generates addresses ending with A-Z
@@ -23,9 +23,3 @@ function getAddresses(addressAmount) {
     return newAddresses;
   }, {});
 }
-
-const mockDataFunctions = {
-  getAddresses
-};
-
-export default mockDataFunctions;

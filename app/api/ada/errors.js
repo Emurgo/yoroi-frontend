@@ -154,7 +154,7 @@ export class UpdateAdaWalletError extends LocalizableError {
   }
 }
 
-export class getBalanceError extends LocalizableError {
+export class GetBalanceError extends LocalizableError {
   constructor() {
     super({
       id: messages.getBalanceError.id,
@@ -163,7 +163,7 @@ export class getBalanceError extends LocalizableError {
   }
 }
 
-export class updateAdaTxsHistoryError extends LocalizableError {
+export class UpdateAdaTxsHistoryError extends LocalizableError {
   constructor() {
     super({
       id: messages.updateAdaTxsHistoryError.id,

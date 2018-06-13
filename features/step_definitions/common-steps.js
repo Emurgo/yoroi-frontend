@@ -1,7 +1,7 @@
 import { BeforeAll, Given, After, AfterAll } from 'cucumber';
 import { createServer } from '../support/mockServer';
 import mockData from '../support/mockData.json';
-import mockDataFunctions from '../support/mockDataFunctions';
+import { getAddresses } from '../support/mockDataFunctions';
 
 let server;
 
@@ -25,17 +25,10 @@ Given(/^There is no wallet stored$/, async function () {
   await this.waitForElement('.WalletAddDialog');
 });
 
-Given('There is a wallet stored with {int} addresses', async function (int) {
+Given(/^There is a wallet stored with ([^"]*) addresses$/, async function (addressAmount) {
   const { seed, wallet } = mockData;
-  const addresses = mockDataFunctions.getAddresses(int);
+  const addresses = getAddresses(addressAmount);
   this.saveToLocalStorage('ADDRESSES', addresses);
   this.saveToLocalStorage('SEED', seed);
   this.saveToLocalStorage('WALLET', wallet);
 });
-
-Given('There is a wallet stored without addresses', async function () {
-  const { seed, wallet } = mockData;
-  this.saveToLocalStorage('SEED', seed);
-  this.saveToLocalStorage('WALLET', wallet);
-});
-

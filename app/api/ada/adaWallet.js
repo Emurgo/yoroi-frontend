@@ -32,7 +32,7 @@ import {
   getUTXOsSumsForAddresses,
   addressesLimit
 } from './lib/icarus-backend-api';
-import { UpdateAdaWalletError, getBalanceError } from './errors';
+import { UpdateAdaWalletError, GetBalanceError } from './errors';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const WALLET_SEED_KEY = 'SEED';
@@ -126,6 +126,6 @@ async function _getBalance(
     return balance;
   } catch (error) {
     Logger.error('adaWallet::getBalance error: ' + stringifyError(error));
-    throw new getBalanceError();
+    throw new GetBalanceError();
   }
 }
