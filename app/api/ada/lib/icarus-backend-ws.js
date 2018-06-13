@@ -28,7 +28,6 @@ export function setupWs(secretWords: string, receiverAddress: string): WebSocket
     console.log(`[ws::message] on: ${data.msg}`);
     switch (data.msg) {
       case MSG_TYPE_RESTORE:
-        console.log(`[ws::message] ${MSG_TYPE_RESTORE} - step ${data.step}`);
         importDaedalusWallet(secretWords, receiverAddress, data.addresses);
         break;
       default:
