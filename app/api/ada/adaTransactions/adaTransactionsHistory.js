@@ -55,12 +55,9 @@ export async function updateAdaTxsHistory(
     const promises = groupsOfAddresses.map(groupOfAddresses =>
       _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
     );
-    const updateTxHistoryResult = await Promise.all(promises)
-      .then((groupsOfTransactionsRows) =>
-        groupsOfTransactionsRows.map(groupOfTransactionsRows =>
-          insertOrReplaceToTxsTable(groupOfTransactionsRows))
-      );
-    return updateTxHistoryResult;
+    const groupsOfTransactionsRows = await Promise.all(promises);
+    return groupsOfTransactionsRows.map(groupOfTransactionsRows =>
+      insertOrReplaceToTxsTable(groupOfTransactionsRows));
   } catch (error) {
     Logger.error('adaTransactionsHistory::updateAdaTxsHistory error: ' + stringifyError(error));
     throw new UpdateAdaTxsHistoryError();

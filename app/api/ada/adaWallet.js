@@ -115,15 +115,11 @@ async function _getBalance(
     const groupsOfAddresses = _.chunk(addresses, addressesLimit);
     const promises =
       groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
-    const balance = await Promise.all(promises)
-      .then(partialAmounts =>
-        partialAmounts.reduce(
-          (acc, partialAmount) =>
-            acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
-          new BigNumber(0)
-        )
-      );
-    return balance;
+    const partialAmounts = await Promise.all(promises);
+    return partialAmounts.reduce((acc, partialAmount) =>
+      acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
+      new BigNumber(0)
+    );
   } catch (error) {
     Logger.error('adaWallet::getBalance error: ' + stringifyError(error));
     throw new GetBalanceError();
