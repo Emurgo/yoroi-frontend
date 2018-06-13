@@ -2,11 +2,11 @@
 import type {
   AdaWallet,
   AdaAddress,
-  AdaWalletParams
+  AdaWalletInitData
 } from '../adaTypes';
 
 /* @note: Ada wallet is the abstraction for Daedalus */
-export function toAdaWallet({ walletInitData }: AdaWalletParams): AdaWallet {
+export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
     cwAccountsNumber: 1,
