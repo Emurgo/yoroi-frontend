@@ -98,6 +98,6 @@ export type AdaWallets = Array<AdaWallet>;
 export type AdaLocalTimeDifference = number;
 
 export type AdaWalletParams = {
-  walletPassword: ?string,
+  walletPassword: string,
   walletInitData: AdaWalletInitData
 };

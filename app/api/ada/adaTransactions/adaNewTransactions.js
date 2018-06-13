@@ -50,7 +50,7 @@ export const getAdaTransactionFee = (
 export const newAdaTransaction = (
   receiver: string,
   amount: string,
-  password: ?string
+  password: string
 ): Promise<any> =>
   _getAdaTransaction(receiver, amount, password)
     .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
@@ -75,7 +75,7 @@ async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
 function _getAdaTransaction(
   receiver: string,
   amount: string,
-  password: ?string
+  password: string
 ) {
   const seed = getWalletSeed();
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);

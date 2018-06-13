@@ -79,13 +79,13 @@ export type GetAddressesRequest = {
 export type CreateAddressResponse = WalletAddress;
 export type CreateAddressRequest = {
   accountId: string,
-  password: ?string
+  password: string
 };
 export type CreateTransactionRequest = {
   sender: string,
   receiver: string,
   amount: string,
-  password: ?string
+  password: string
 };
 export type UpdateWalletRequest = {
   walletId: string,
