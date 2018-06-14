@@ -21,7 +21,7 @@ export function newCryptoAccount(
 
 export function createCryptoAccount(
   seed: WalletSeed,
-  walletPassword: ?string,
+  walletPassword: string,
   accountIndex: number = ACCOUNT_INDEX
 ): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);

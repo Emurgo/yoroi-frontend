@@ -29,9 +29,10 @@ Given(/^There is no wallet stored$/, async function () {
 });
 
 Given(/^There is a wallet stored( with ([^"]*) addresses)?$/, async function (addressAmount) {
-  const { seed, wallet } = getMockData();
+  const { seed, cryptoAccount, wallet } = getMockData();
   const addresses = getAddresses(addressAmount);
   this.saveToLocalStorage('ADDRESSES', addresses);
+  this.saveToLocalStorage('ACCOUNT', cryptoAccount);
   this.saveToLocalStorage('SEED', seed);
   this.saveToLocalStorage('WALLET', wallet);
   await this.waitForElement('.TopBar_walletName');

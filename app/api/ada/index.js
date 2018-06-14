@@ -314,8 +314,6 @@ export default class AdaApi {
   async createAddress(): Promise<CreateAddressResponse> {
     Logger.debug('AdaApi::createAddress called');
     try {
-      /* TODO: We should return the account previously saved
-         in the local storage (password it won't be necessary anymore) */
       const cryptoAccount = getSingleCryptoAccount();
       const addresses: AdaAddresses = mapToList(getAdaAddressesMap());
       const newAddress: AdaAddress = newAdaAddress(cryptoAccount, addresses, 'External');
