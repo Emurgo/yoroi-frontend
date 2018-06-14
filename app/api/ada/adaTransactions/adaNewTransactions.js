@@ -10,8 +10,7 @@ import {
   mapToList
 } from '../lib/utils';
 import {
-  getWalletSeed,
-  getAdaWallet
+  getWalletSeed
 } from '../adaWallet';
 import {
   getCryptoAccount,
@@ -33,8 +32,7 @@ export const getAdaTransactionFee = (
   receiver: string,
   amount: string
 ): Promise<AdaTransactionFee> => {
-  const adaWallet = getAdaWallet();
-  const password = adaWallet.cwHasPassphrase ? 'FakePassword' : undefined;
+  const password = 'FakePassword';
   return _getAdaTransaction(receiver, amount, password)
     .then((response) => {
       const result = response[0];
@@ -55,7 +53,7 @@ export const getAdaTransactionFee = (
 export const newAdaTransaction = (
   receiver: string,
   amount: string,
-  password: ?string
+  password: string
 ): Promise<any> =>
   _getAdaTransaction(receiver, amount, password)
     .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
@@ -80,7 +78,7 @@ async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
 function _getAdaTransaction(
   receiver: string,
   amount: string,
-  password: ?string
+  password: string
 ) {
   const seed = getWalletSeed();
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);

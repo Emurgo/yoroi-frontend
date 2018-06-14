@@ -79,13 +79,13 @@ export type GetAddressesRequest = {
 export type CreateAddressResponse = WalletAddress;
 export type CreateAddressRequest = {
   accountId: string,
-  password: ?string
+  password: string
 };
 export type CreateTransactionRequest = {
   sender: string,
   receiver: string,
   amount: string,
-  password: ?string
+  password: string
 };
 export type UpdateWalletRequest = {
   walletId: string,
@@ -674,7 +674,6 @@ const _createWalletFromServerData = action(
       ),
       name: data.cwMeta.cwName,
       assurance: data.cwMeta.cwAssurance,
-      hasPassword: data.cwHasPassphrase,
       passwordUpdateDate: unixTimestampToDate(data.cwPassphraseLU)
     })
 );

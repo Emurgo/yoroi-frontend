@@ -3521,12 +3521,6 @@
         "end": {
           "column": 3,
           "line": 42
-        },
-        "file": "app/components/wallet/WalletCreateDialog.js",
-        "id": "wallet.create.dialog.passwordSwitchPlaceholder",
-        "start": {
-          "column": 29,
-          "line": 38
         }
       },
       {
@@ -3535,12 +3529,6 @@
         "end": {
           "column": 3,
           "line": 47
-        },
-        "file": "app/components/wallet/WalletCreateDialog.js",
-        "id": "wallet.create.dialog.passwordSwitchLabel",
-        "start": {
-          "column": 23,
-          "line": 43
         }
       },
       {
@@ -3825,12 +3813,6 @@
         "end": {
           "column": 3,
           "line": 66
-        },
-        "file": "app/components/wallet/WalletRestoreDialog.js",
-        "id": "wallet.restore.dialog.passwordSwitchPlaceholder",
-        "start": {
-          "column": 29,
-          "line": 62
         }
       },
       {
@@ -3839,12 +3821,6 @@
         "end": {
           "column": 3,
           "line": 71
-        },
-        "file": "app/components/wallet/WalletRestoreDialog.js",
-        "id": "wallet.restore.dialog.passwordSwitchLabel",
-        "start": {
-          "column": 23,
-          "line": 67
         }
       },
       {

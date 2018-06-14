@@ -8,7 +8,7 @@ export const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */
 
 export function getSingleCryptoAccount(
   seed: WalletSeed,
-  walletPassword: ?string
+  walletPassword: string
 ): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);
   return getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
