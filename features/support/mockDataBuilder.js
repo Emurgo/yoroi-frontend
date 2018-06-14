@@ -1,4 +1,16 @@
-export function getAddresses(addressAmount) {
+import mockData from './mockData.json';
+
+let builtMockData;
+
+export function getMockData() {
+  return builtMockData;
+}
+
+export function buildMockData(feature) {
+  builtMockData = Object.assign({}, mockData.default, mockData[feature]);
+}
+
+function buildAddresses() {
   const addressPrefix = 'Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo';
   const addresses = [];
   // Generates addresses ending with A-Z
@@ -9,6 +21,14 @@ export function getAddresses(addressAmount) {
   for (let i = 97; i < 122; i++) {
     addresses.push(addressPrefix + String.fromCharCode(i));
   }
+  return addresses;
+}
+
+export function getAddresses(addressAmount) {
+  if (!addressAmount) {
+    return builtMockData.addresses;
+  }
+  const addresses = buildAddresses();
   return addresses.slice(0, addressAmount).reduce((newAddresses, address) => {
     newAddresses[address] = {
       cadAmount: {

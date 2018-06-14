@@ -1,5 +1,5 @@
 import { create, bodyParser, defaults } from 'json-server';
-import mockData from './mockData.json';
+import { getMockData } from './mockDataBuilder';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -19,13 +19,13 @@ export function createServer() {
   }
 
   server.post('/api/txs/utxoForAddresses', (req, res) => {
-    const { utxos } = mockData;
+    const { utxos } = getMockData();
     res.send(utxos);
   });
 
   server.post('/api/txs/utxoSumForAddresses', (req, res) => {
     validateAddressesReq(req.body);
-    const sumUtxos = mockData.utxos.reduce((sum, utxo) => {
+    const sumUtxos = getMockData().utxos.reduce((sum, utxo) => {
       if (req.body.addresses.includes(utxo.receiver)) {
         return sum + utxo.amount;
       }
@@ -44,7 +44,7 @@ export function createServer() {
   });
 
   server.post('/api/addresses/filterUsed', (req, res) => {
-    const usedAddresses = mockData.usedAddresses.filter((address) =>
+    const usedAddresses = getMockData().usedAddresses.filter((address) =>
       req.body.addresses.includes(address));
     res.send(usedAddresses);
   });

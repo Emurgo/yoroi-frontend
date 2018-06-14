@@ -1,6 +1,7 @@
 Feature: Get balance
 
   Background:
+    Given I am testing "Get balance"
     Given I have opened the chrome extension
 
   Scenario: Get balance with 1 address
