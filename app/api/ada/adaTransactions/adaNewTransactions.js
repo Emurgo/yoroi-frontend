@@ -27,6 +27,7 @@ import type {
   AdaAddresses,
   AdaTransactionFee,
 } from '../adaTypes';
+import { NotEnoughMoneyToSendError } from '../errors';
 
 export const getAdaTransactionFee = (
   receiver: string,
@@ -39,8 +40,10 @@ export const getAdaTransactionFee = (
       const result = response[0];
       // TODO: Improve Js-Wasm-cardano error handling
       if (result.failed) {
-        if (result.msg === 'FeeCalculationError(NotEnoughInput)') {
-          throw new Error('not enough money');
+        const notEnoughFunds = result.msg === 'FeeCalculationError(NotEnoughInput)' ||
+          result.msg === 'FeeCalculationError(NoInputs)';
+        if (notEnoughFunds) {
+          throw new NotEnoughMoneyToSendError();
         }
       }
       return {
