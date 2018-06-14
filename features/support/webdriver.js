@@ -25,6 +25,8 @@ function CustomWorld() {
 
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
 
+  this.getText = async (locator) => this.getElementBy(locator).getText();
+
   const clickElement = async (locator, method) => {
     const clickable = await this.getElementBy(locator, method);
     await clickable.click();
@@ -42,6 +44,12 @@ function CustomWorld() {
     const input = await this.getElementBy(locator);
     await input.sendKeys(value);
   };
+
+  const executeLocalStorageScript = (script) => this.driver.executeScript(`window.localStorage.${script}`);
+
+  this.getFromLocalStorage = key => executeLocalStorageScript(`getItem("${key}")`);
+
+  this.saveToLocalStorage = (key, value) => executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 }
 
 setWorldConstructor(CustomWorld);

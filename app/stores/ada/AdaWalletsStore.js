@@ -109,7 +109,7 @@ export default class AdaWalletsStore extends WalletStore {
   @action _restoreWallet = async (params: {
     recoveryPhrase: string,
     walletName: string,
-    walletPassword: ?string,
+    walletPassword: string,
   }) => {
     this.restoreRequest.reset();
     this._setIsRestoreActive(true);

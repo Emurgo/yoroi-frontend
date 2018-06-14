@@ -74,9 +74,10 @@ export type UpdateWalletPasswordResponse = boolean;
 export type CreateWalletRequest = {
   name: string,
   mnemonic: string,
-  password: ?string,
+  password: string,
 };
 
+// FIXME: When adding the ability to change password we should check whether ? is needed
 export type UpdateWalletPasswordRequest = {
   walletId: string,
   oldPassword: ?string,
@@ -90,7 +91,7 @@ export type DeleteWalletRequest = {
 export type RestoreWalletRequest = {
   recoveryPhrase: string,
   walletName: string,
-  walletPassword: ?string,
+  walletPassword: string,
 };
 
 export type GetSyncProgressResponse = {

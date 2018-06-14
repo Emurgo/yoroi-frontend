@@ -10,8 +10,7 @@ import {
 import type { ConfigType } from '../../../../config/config-types';
 
 export type WalletSeed = {
-  seed: ?Uint8Array,
-  encryptedSeed: ?string,
+  encryptedSeed: string,
 };
 
 declare var CONFIG: ConfigType;
@@ -26,25 +25,19 @@ export const isValidAdaMnemonic = (
 ) =>
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
 
-export function generateWalletSeed(secretWords: string, password: ?string): WalletSeed {
+export function generateWalletSeed(secretWords: string, password: string): WalletSeed {
   const entropy = bip39.mnemonicToEntropy(secretWords);
   const seed: Uint8Array = Blake2b.blake2b_256(entropy);
   return {
-    seed: password ? undefined : seed,
-    encryptedSeed: password ? encryptWithPassword(password, seed) : undefined
+    encryptedSeed: encryptWithPassword(password, seed)
   };
 }
 
 export function getCryptoWalletFromSeed(
   walletSeed: WalletSeed,
-  password: ?string
+  password: string
 ): CryptoWallet {
-  let seed;
-  if (password && walletSeed.encryptedSeed) {
-    seed = decryptWithPassword(password, walletSeed.encryptedSeed);
-  } else {
-    seed = walletSeed.seed;
-  }
+  const seed = decryptWithPassword(password, walletSeed.encryptedSeed);
   const seedAsArray = Object.values(seed);
   const wallet = Wallet.fromSeed(seedAsArray).result;
   wallet.config.protocol_magic = protocolMagic;

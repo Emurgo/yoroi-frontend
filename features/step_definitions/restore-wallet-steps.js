@@ -15,7 +15,6 @@ When(/^I enter the recovery phrase:$/, async function (table) {
 });
 
 When(/^I enter the restored wallet password:$/, async function (table) {
-  await this.click('.SimpleSwitch_switch'); // FIXME: This should be removed when password is made mandatory
   const fields = table.hashes()[0];
   await this.input('#walletPassword--3', fields.password);
   await this.input('#repeatPassword--4', fields.repeatedPassword);

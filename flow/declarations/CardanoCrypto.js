@@ -3,6 +3,53 @@ declare module 'rust-cardano-crypto' {
     Blake2b: {
       blake2b_256(entropy: string): Uint8Array;
     },
+    HdWallet: {
+      fromSeed(seed: Uint8Array): Uint8Array,
+      toPublic(xprv: Uint8Array): Uint8Array,
+      derivePrivate(
+        xprv: Uint8Array,
+        index: Array<number>
+      ): Uint8Array,
+      derivePublic(
+        xprv: Uint8Array,
+        index: Array<number>
+      ): Uint8Array,
+      sign(
+        xprv: Uint8Array,
+        msg: any // TODO: Complete with specific type
+      ): any, // TODO: Complete with specific type
+      publicKeyToAddress(
+        xpub: Uint8Array,
+        payload: CryptoAddressPayload
+      ): CryptoAddress,
+      addressGetPayload(
+        address: CryptoAddress
+      ): CryptoAddressPayload
+    },
+    RandomAddressChecker: {
+      newChecker(
+        xprv: string
+      ): {
+        result: CryptoAddressChecker,
+        failed: boolean,
+        msg: ?string
+      },
+      newCheckerFromMnemonics(
+        secretWords: string
+      ): {
+        result: CryptoAddressChecker,
+        failed: boolean,
+        msg: ?string
+      },
+      checkAddresses(
+        checker: CryptoAddressChecker,
+        addresses: Array<string>
+      ): {
+        result: Array<string>,
+        failed: boolean,
+        msg: ?string
+      }
+    },
     Wallet: {
       fromSeed(seed: Array<mixed>): {
         result: CryptoWallet,
@@ -69,6 +116,15 @@ declare type CryptoTransaction = {
     witnesses: Array<TxWitness>
   }
 }
+
+declare type CryptoAddress = any // TODO: Complete with specific type
+declare type CryptoAddressPayload = any // TODO: Complete with specific type
+
+declare type CryptoAddressChecker = {
+  root_key: string,
+  payload_key: Array<number>
+}
+
 
 declare type TxInput = {
   ptr: TxInputPtr,

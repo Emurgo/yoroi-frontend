@@ -63,7 +63,6 @@ export const messages = defineMessages({
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
-  isWalletPasswordSet: boolean,
   amount: string,
   receiver: string,
   totalAmount: string,
@@ -91,7 +90,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         placeholder: this.context.intl.formatMessage(messages.walletPasswordFieldPlaceholder),
         value: '',
         validators: [({ field }) => {
-          if (this.props.isWalletPasswordSet && field.value === '') {
+          if (field.value === '') {
             return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
           }
           return [true];
@@ -108,12 +107,12 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
   submit() {
     this.form.submit({
       onSuccess: (form) => {
-        const { isWalletPasswordSet, receiver, amount, amountToNaturalUnits } = this.props;
+        const { receiver, amount, amountToNaturalUnits } = this.props;
         const { walletPassword } = form.values();
         const transactionData = {
           receiver,
           amount: amountToNaturalUnits(amount),
-          password: isWalletPasswordSet ? walletPassword : null,
+          password: walletPassword,
         };
         this.props.onSubmit(transactionData);
       },
@@ -127,7 +126,6 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     const walletPasswordField = form.$('walletPassword');
     const {
       onCancel,
-      isWalletPasswordSet,
       amount,
       receiver,
       totalAmount,
@@ -196,7 +194,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             </div>
           </div>
 
-          {isWalletPasswordSet ? (
+          {
             <Input
               type="password"
               className={styles.walletPassword}
@@ -204,7 +202,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               error={walletPasswordField.error}
               skin={<SimpleInputSkin />}
             />
-          ) : null}
+          }
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

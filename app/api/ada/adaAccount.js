@@ -12,7 +12,7 @@ const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */
 
 export function newCryptoAccount(
   seed: WalletSeed,
-  walletPassword: ?string
+  walletPassword: string
 ): CryptoAccount {
   const cryptoAccount = createCryptoAccount(seed, walletPassword);
   saveCryptoAccount(cryptoAccount);
