@@ -20,7 +20,6 @@
       "cwAmount": {
         "getCCoin": "0"
       },
-      "cwHasPassphrase": true,
       "cwId": "1111111111111111",
       "cwMeta": {
         "cwAssurance": "CWANormal",
