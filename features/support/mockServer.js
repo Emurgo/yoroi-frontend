@@ -7,7 +7,16 @@ const port = 8080;
 
 export function createServer() {
   const server = create();
+
   server.use(middlewares);
+
+  function validateAddressesReq({ addresses } = {}) {
+    if (!addresses || addresses.length > 20 || addresses.length === 0) {
+      throw new Error('Addresses request length should be (0, 20]');
+    }
+    // TODO: Add address validation
+    return true;
+  }
 
   server.post('/api/txs/utxoForAddresses', (req, res) => {
     const { utxos } = mockData;
@@ -15,7 +24,14 @@ export function createServer() {
   });
 
   server.post('/api/txs/utxoSumForAddresses', (req, res) => {
-    res.send({ sum: 1000000 });
+    validateAddressesReq(req.body);
+    const sumUtxos = mockData.utxos.reduce((sum, utxo) => {
+      if (req.body.addresses.includes(utxo.receiver)) {
+        return sum + utxo.amount;
+      }
+      return sum;
+    }, 0);
+    res.send({ sum: sumUtxos });
   });
 
   server.post('/api/txs/history', (req, res) => {
