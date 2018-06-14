@@ -61,6 +61,11 @@ const messages = defineMessages({
     id: 'api.errors.updateAdaTxsHistoryError',
     defaultMessage: '!!!Error while updating ada transactions history.',
     description: '"Error while updating ada transactions history." error message'
+  },
+  transactionError: {
+    id: 'api.errors.transactionError',
+    defaultMessage: '!!!Error while creating transaction.',
+    description: '"Error while creating transaction." error message'
   }
 });
 
@@ -172,3 +177,11 @@ export class UpdateAdaTxsHistoryError extends LocalizableError {
   }
 }
 
+export class TransactionError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.transactionError.id,
+      defaultMessage: messages.transactionError.defaultMessage,
+    });
+  }
+}
