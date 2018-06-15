@@ -23,9 +23,7 @@ function CustomWorld() {
     return this.driver.wait(condition);
   };
 
-  this.waitForContent = (locator) => {
-    return this.waitForElement(locator, By.xpath);
-  };
+  this.waitForContent = (locator) => this.waitForElement(locator, By.xpath);
 
   this.waitEnable = async (locator) => {
     const element = this.getElementBy(locator);

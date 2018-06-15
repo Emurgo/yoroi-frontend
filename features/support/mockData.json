@@ -52,6 +52,17 @@
       "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"
     ]
   },
+  "Generate addresses": {
+    "utxos": [
+      {
+        "utxo_id": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f64290",
+        "tx_hash": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f6429",
+        "tx_index": 0,
+        "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "amount": "1000000"
+      }
+    ]
+  },
   "Get balance": {
     "utxos": [
       {

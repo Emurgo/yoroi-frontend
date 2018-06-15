@@ -1,6 +1,6 @@
 import { BeforeAll, Given, After, AfterAll } from 'cucumber';
 import { createServer } from '../support/mockServer';
-import { buildMockData, getMockData, getAddresses } from '../support/mockDataBuilder';
+import { buildMockData, getMockData, getFakeAddresses } from '../support/mockDataBuilder';
 
 let server;
 
@@ -29,11 +29,16 @@ Given(/^There is no wallet stored$/, async function () {
 });
 
 Given(/^There is a wallet stored( with ([^"]*) addresses)?$/, async function (addressAmount) {
-  const { seed, cryptoAccount, wallet } = getMockData();
-  const addresses = getAddresses(addressAmount);
-  this.saveToLocalStorage('ADDRESSES', addresses);
-  this.saveToLocalStorage('ACCOUNT', cryptoAccount);
+  const { seed, wallet, cryptoAccount, addresses } = getMockData();
   this.saveToLocalStorage('SEED', seed);
   this.saveToLocalStorage('WALLET', wallet);
+  this.saveToLocalStorage('ACCOUNT', cryptoAccount);
+  /* Obs: If "with $number addresses" is include in the sentence,
+     we overide the wallet with fake addresses" */
+  if (addressAmount) {
+    this.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount));
+  } else {
+    this.saveToLocalStorage('ADDRESSES', addresses);
+  }
   await this.waitForElement('.TopBar_walletName');
 });
