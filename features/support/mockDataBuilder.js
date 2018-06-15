@@ -24,10 +24,7 @@ function buildAddresses() {
   return addresses;
 }
 
-export function getAddresses(addressAmount) {
-  if (!addressAmount) {
-    return builtMockData.addresses;
-  }
+export function getFakeAddresses(addressAmount) {
   const addresses = buildAddresses();
   return addresses.slice(0, addressAmount).reduce((newAddresses, address) => {
     newAddresses[address] = {

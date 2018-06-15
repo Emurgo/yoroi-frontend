@@ -5,7 +5,10 @@ import {
   createAdaWallet,
   saveAdaWallet
 } from './adaWallet';
-import { getSingleCryptoAccount } from './adaAccount';
+import {
+  createCryptoAccount,
+  saveCryptoAccount
+} from './adaAccount';
 import {
   saveAsAdaAddresses,
   newAdaAddress
@@ -25,7 +28,7 @@ export async function restoreAdaWallet({
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
   const [adaWallet, seed] = createAdaWallet({ walletPassword, walletInitData });
-  const cryptoAccount = getSingleCryptoAccount(seed, walletPassword);
+  const cryptoAccount = createCryptoAccount(seed, walletPassword);
   const externalAddressesToSave = await
     _discoverAllAddressesFrom(cryptoAccount, 'External', 0, addressesLimit);
   const internalAddressesToSave = await
@@ -41,6 +44,7 @@ export async function restoreAdaWallet({
     // const receiverAddress = newAdaAddress(cryptoAccount, [], 'External');
     // setupWs(mnemonic, receiverAddress.cadId);
   }
+  saveCryptoAccount(cryptoAccount);
   saveAdaWallet(adaWallet, seed);
   return Promise.resolve(adaWallet);
 }

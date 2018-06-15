@@ -12,10 +12,7 @@ import {
 import {
   getWalletSeed
 } from '../adaWallet';
-import {
-  getCryptoAccount,
-  ACCOUNT_INDEX
-} from '../adaAccount';
+import { getSingleCryptoAccount } from '../adaAccount';
 import {
   saveAdaAddress,
   createAdaAddress,
@@ -86,7 +83,7 @@ function _getAdaTransaction(
 ) {
   const seed = getWalletSeed();
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  const cryptoAccount = getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
+  const cryptoAccount = getSingleCryptoAccount();
   const addressesMap = getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
   const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');

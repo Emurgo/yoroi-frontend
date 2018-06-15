@@ -8,9 +8,6 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import QRCode from 'qrcode.react';
 import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
-import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
@@ -48,11 +45,6 @@ const messages = defineMessages({
     id: 'wallet.receive.page.showUsedLabel',
     defaultMessage: '!!!show used',
     description: 'Label for "show used" wallet addresses link on the wallet "Receive page"',
-  },
-  spendingPasswordPlaceholder: {
-    id: 'wallet.receive.page.spendingPasswordPlaceholder',
-    defaultMessage: '!!!Password',
-    description: 'Placeholder for "spending password" on the wallet "Receive page"',
   },
   copyAddressLabel: {
     id: 'wallet.receive.page.copyAddressLabel',
@@ -93,47 +85,15 @@ export default class WalletReceive extends Component<Props, State> {
     this.setState({ showUsed: !this.state.showUsed });
   };
 
-  form = new ReactToolboxMobxForm({
-    fields: {
-      spendingPassword: {
-        type: 'password',
-        label: ' ',
-        placeholder: this.context.intl.formatMessage(messages.spendingPasswordPlaceholder),
-        value: '',
-        validators: [({ field }) => {
-          if (field.value === '') {
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
-          }
-          return [true];
-        }],
-      },
-    },
-  }, {
-    options: {
-      validationDebounceWait: 0, // Disable debounce to avoid error state after clearing
-      validateOnChange: true,
-      showErrorsOnClear: false,
-    },
-  });
-
   submit() {
-    this.form.submit({
-      onSuccess: (form) => {
-        const { spendingPassword } = form.values();
-        this.props.onGenerateAddress(spendingPassword);
-        form.clear();
-      },
-      onError: () => {}
-    });
+    this.props.onGenerateAddress();
   }
 
   render() {
-    const { form } = this;
     const {
       walletAddress, walletAddresses,
       onCopyAddress, isSidebarExpanded,
-      isSubmitting, error,
-      isWalletAddressUsed,
+      isSubmitting, error, isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -144,29 +104,18 @@ export default class WalletReceive extends Component<Props, State> {
     ]);
 
     const generateAddressWrapperClasses = classnames([
-      styles.generateAddressWrapper,
       isSidebarExpanded ? styles.fullWidthOnSmallScreen : null,
     ]);
 
     const generateAddressButtonClasses = classnames([
       'primary',
       'generateAddressButton',
-      styles.submitWithPasswordButton,
+      styles.submitButton,
       isSubmitting ? styles.spinning : null,
     ]);
 
-    const passwordField = form.$('spendingPassword');
     const generateAddressForm = (
       <div className={generateAddressWrapperClasses}>
-        {
-          <Input
-            className={styles.spendingPassword}
-            {...passwordField.bind()}
-            error={passwordField.error}
-            skin={<SimpleInputSkin />}
-          />
-        }
-
         <Button
           className={generateAddressButtonClasses}
           label={intl.formatMessage(messages.generateNewAddressButtonLabel)}

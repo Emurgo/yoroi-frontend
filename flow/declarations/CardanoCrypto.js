@@ -103,7 +103,8 @@ declare type CryptoWallet = {
 
 declare type CryptoAccount = {
   account: number,
-  cached_account_key: string
+  cached_account_key: string,
+  derivation_scheme: string
 }
 
 declare type CryptoTransaction = {
