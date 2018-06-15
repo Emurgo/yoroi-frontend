@@ -321,9 +321,6 @@ export default class AdaApi {
       return _createAddressFromServerData(newAddress);
     } catch (error) {
       Logger.error('AdaApi::createAddress error: ' + stringifyError(error));
-      if (error.message.includes("Passphrase doesn't match")) {
-        throw new IncorrectWalletPasswordError();
-      }
       throw new GenericApiError();
     }
   }
