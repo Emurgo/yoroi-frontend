@@ -119,7 +119,6 @@ export default class WalletReceive extends Component<Props, State> {
     ]);
 
     const generateAddressWrapperClasses = classnames([
-      styles.generateAddressWrapper,
       isSidebarExpanded ? styles.fullWidthOnSmallScreen : null,
     ]);
 
