@@ -2,6 +2,7 @@
 import { observable, action } from 'mobx';
 import AppStore from './AppStore';
 import WalletBackupStore from './WalletBackupStore';
+import SidebarStore from './SidebarStore';
 import UiDialogsStore from './UiDialogsStore';
 import UiNotificationsStore from './UiNotificationsStore';
 import setupAdaStores from './ada/index';
@@ -10,6 +11,7 @@ import environment from '../environment';
 
 export const storeClasses = {
   app: AppStore,
+  sidebar: SidebarStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
   walletBackup: WalletBackupStore,
@@ -17,6 +19,7 @@ export const storeClasses = {
 
 export type StoresMap = {
   app: AppStore,
+  sidebar: SidebarStore,
   walletBackup: WalletBackupStore,
   router: Object,
   uiDialogs: UiDialogsStore,
@@ -27,6 +30,7 @@ export type StoresMap = {
 // Constant that does never change during lifetime
 const stores = observable({
   app: null,
+  sidebar: null,
   walletBackup: null,
   router: null,
   uiDialogs: null,

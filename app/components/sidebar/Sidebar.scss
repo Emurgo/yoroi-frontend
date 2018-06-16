@@ -1,0 +1,15 @@
+@import './sidebarConfig';
+
+.component {
+  background-color: var(--theme-sidebar-background-color);
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  transition: width 200ms ease;
+  width: $sidebar-width;
+}
+
+.minimized {
+  flex-shrink: 0;
+  width: 84px;
+}
