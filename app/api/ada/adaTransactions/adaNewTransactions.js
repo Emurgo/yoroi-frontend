@@ -76,7 +76,17 @@ async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
     groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
 }
 
-function _getAdaTransaction(
+export function _getAdaTransaction(
+  receiver: string,
+  amount: string,
+  password: string,
+) {
+  const senders = mapToList(getAdaAddressesMap());
+  return getAdaTransactionFromSenders(senders, receiver, amount, password);
+}
+
+export function getAdaTransactionFromSenders(
+  senders: AdaAddresses,
   receiver: string,
   amount: string,
   password: string
@@ -89,7 +99,7 @@ function _getAdaTransaction(
   const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return _getAllUTXOsForAddresses(addresses)
+  return _getAllUTXOsForAddresses(senders)
     .then((senderUtxos) => {
       const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
       return [

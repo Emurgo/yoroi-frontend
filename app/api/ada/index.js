@@ -77,7 +77,6 @@ export type GetAddressesRequest = {
 };
 export type CreateAddressResponse = WalletAddress;
 export type CreateTransactionRequest = {
-  sender: string,
   receiver: string,
   amount: string,
   password: string
