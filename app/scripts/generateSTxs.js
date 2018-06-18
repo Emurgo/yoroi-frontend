@@ -12,12 +12,14 @@ const AMOUNT_TO_BE_SENT = '1';       // 0.000001 ada. Amount transfered on the g
 
 /**
  * Generates 'numberOfTxs' signed txs. The generated txs can be executed in any order,
- * given that the loaded wallet is not used.
- * The process of generating the signed txs requires having 'numberOfTxs * 0.36' ada.
+ * given that the loaded wallet is not used after the stxs have been generated.
  *
  * @param {*} password of the loaded address
  * @param {*} numberOfTxs to be generated
  * @param {*} debugging, whether the function should be executed in debugging mode
+ * @requires being called in a context where the Rust module has been loaded
+ * @requires being called in a context where a wallet has been stored on local storage,
+ *           with it having 'numberOfTxs * 0.36' ada.
  */
 export async function generateSTxs(password: string,
                                    numberOfTxs: number,
@@ -66,8 +68,6 @@ export async function generateSTxs(password: string,
   log(`[generateSTxs] Generated ${numberOfTxs} stxs`);
 }
 
-
-/** Helper functions **/
 
 function _logIfDebugging(debugging) {
   function printMsg(msg) {
