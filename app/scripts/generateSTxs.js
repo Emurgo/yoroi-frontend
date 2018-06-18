@@ -1,10 +1,8 @@
 // @flow
 
-import { getWalletSeed } from '../api/ada/adaWallet';
-import { getCryptoWalletFromSeed } from '../api/ada/lib/crypto-wallet';
 import { mapToList } from '../api/ada/lib/utils';
 import { newAdaAddress, getAdaAddressesMap } from '../api/ada/adaAddress';
-import { ACCOUNT_INDEX, getCryptoAccount } from '../api/ada/adaAccount';
+import { getSingleCryptoAccount } from '../api/ada/adaAccount';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
 
 const CONFIRMATION_TIME = 60 * 1000; // 60 seconds
@@ -25,10 +23,7 @@ export async function generateSTxs(password: string,
                                    numberOfTxs: number,
                                    debugging: boolean = false) {
   const log = _logIfDebugging(debugging);
-
-  const seed = getWalletSeed();
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  const cryptoAccount = getCryptoAccount(cryptoWallet, ACCOUNT_INDEX);
+  const cryptoAccount = getSingleCryptoAccount();
 
   log('[generateSTxs] Starting generating stxs');
 
