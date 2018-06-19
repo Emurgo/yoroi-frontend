@@ -2,12 +2,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { intlShape } from 'react-intl';
+import validWords from 'bip39/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import globalMessages from '../../i18n/global-messages';
 import MainLayout from '../MainLayout';
+import DaedalusTransferForm from '../../components/daedalusTransfer/DaedalusTransferForm';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import WalletSendForm from '../../components/wallet/WalletSendForm';
-import { DECIMAL_PLACES_IN_ADA, MAX_INTEGER_PLACES_IN_ADA } from '../../config/numbersConfig';
+import environment from '../../environment';
 
 @inject('stores', 'actions') @observer
 export default class DaedalusTransferPage extends Component<InjectedProps> {
@@ -18,30 +18,36 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
+  onSubmit = (values: { recoveryPhrase: string, walletName: string, walletPassword: string }) => {
+    this.props.actions[environment.API].wallets.restoreWallet.trigger(values);
+  };
+
+  onCancel = () => {
+    // Restore request should be reset only in case restore is finished/errored
+    const { restoreRequest } = this._getWalletsStore();
+    if (!restoreRequest.isExecuting) restoreRequest.reset();
+  };
+
   render() {
-    const { intl } = this.context;
-    const { uiDialogs } = this.props.stores;
-    const { wallets, transactions } = this.props.stores.ada;
-    const { actions } = this.props;
-    const { isValidAddress } = wallets;
-    const { calculateTransactionFee, validateAmount } = transactions;
+    const wallets = this._getWalletsStore();
+    const { restoreRequest } = wallets;
     /* TODO: Replace with Daedalus transfer workflow */
     if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;
     return (
       <MainLayout>
-        <WalletSendForm
-          currencyUnit={intl.formatMessage(globalMessages.unitAda)}
-          currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
-          currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
-          validateAmount={validateAmount}
-          calculateTransactionFee={(receiver, amount) => (
-            calculateTransactionFee(wallets.active.id, receiver, amount)
-          )}
-          addressValidator={isValidAddress}
-          isDialogOpen={uiDialogs.isOpen}
-          openDialogAction={actions.dialogs.open.trigger}
+        <DaedalusTransferForm
+          mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
+          suggestedMnemonics={validWords}
+          isSubmitting={restoreRequest.isExecuting}
+          onSubmit={this.onSubmit}
+          onCancel={this.onCancel}
+          error={restoreRequest.error}
         />
       </MainLayout>
     );
+  }
+
+  _getWalletsStore() {
+    return this.props.stores[environment.API].wallets;
   }
 }

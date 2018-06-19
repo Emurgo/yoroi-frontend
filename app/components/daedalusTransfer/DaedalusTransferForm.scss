@@ -1,0 +1,47 @@
+@import '../../themes/mixins/loading-spinner';
+@import '../../themes/mixins/error-message';
+
+.component {
+  padding: 20px;
+}
+
+.nextButton {
+  display: block !important;
+  margin: 30px auto 0;
+}
+
+.instructions {
+  color: var(--theme-bordered-box-text-color);
+  font-family: var(--font-regular);
+  font-size: 14px;
+  line-height: 19px;
+
+  .instructionsTitle {
+    font-size: 19px;
+    font-family: var(--font-medium);
+    line-height: 23px;
+    margin-bottom: 6px;
+    word-break: break-all;
+  }
+
+  .instructionsText {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 12px;
+    word-break: break-word;
+  }
+
+  .submitWithPasswordButton {
+    max-width: 310px;
+    width: calc(50% - 10px);
+    &.spinning {
+      @include loading-spinner("../../assets/images/spinner-light.svg");
+    }
+  }
+
+  .error {
+    @include error-message;
+    text-align: left;
+  }
+}
+

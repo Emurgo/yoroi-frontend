@@ -246,12 +246,13 @@ export default class WalletsStore extends Store {
         }
         if (this.active) {
           /* FIXME: Improve this hardwired condition */
+          const walletId = this.active.id;
           const matchDaedalusTrasferRoute = testRoute(ROUTES.DAEDALUS_TRANFER.ROOT, currentRoute);
           if (matchDaedalusTrasferRoute) {
-            const route = buildRoute(ROUTES.DAEDALUS_TRANFER.ROOT, { id: this.active.id });
+            const route = buildRoute(ROUTES.DAEDALUS_TRANFER.ROOT, { id: walletId });
             this.actions.router.goToRoute.trigger({ route });
           } else {
-            this.goToWalletRoute(this.active.id);
+            this.goToWalletRoute(walletId);
           }
         }
       }
