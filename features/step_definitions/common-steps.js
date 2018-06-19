@@ -28,17 +28,18 @@ Given(/^There is no wallet stored$/, async function () {
   await this.waitForElement('.WalletAddDialog');
 });
 
-Given(/^There is a wallet stored( with ([^"]*) addresses)?$/, async function (addressAmount) {
-  const { seed, wallet, cryptoAccount, addresses } = getMockData();
-  this.saveToLocalStorage('SEED', seed);
-  this.saveToLocalStorage('WALLET', wallet);
-  this.saveToLocalStorage('ACCOUNT', cryptoAccount);
-  /* Obs: If "with $number addresses" is include in the sentence,
-     we overide the wallet with fake addresses" */
-  if (addressAmount) {
-    this.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount));
-  } else {
-    this.saveToLocalStorage('ADDRESSES', addresses);
-  }
-  await this.waitForElement('.TopBar_walletName');
-});
+Given(/^There is a wallet stored( with ([^"]*) addresses)?( starting with ([^"]*))?$/,
+  async function (addressAmount, addressPrefix) {
+    const { seed, wallet, cryptoAccount, addresses } = getMockData();
+    this.saveToLocalStorage('SEED', seed);
+    this.saveToLocalStorage('WALLET', wallet);
+    this.saveToLocalStorage('ACCOUNT', cryptoAccount);
+    /* Obs: If "with $number addresses" is include in the sentence,
+      we overide the wallet with fake addresses" */
+    if (addressAmount) {
+      this.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount, addressPrefix));
+    } else {
+      this.saveToLocalStorage('ADDRESSES', addresses);
+    }
+    await this.waitForElement('.TopBar_walletName');
+  });

@@ -1,5 +1,6 @@
 import { create, bodyParser, defaults } from 'json-server';
-import { getMockData } from './mockDataBuilder';
+import moment from 'moment';
+import { getMockData, getTxs } from './mockDataBuilder';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -15,6 +16,13 @@ export function createServer() {
       throw new Error('Addresses request length should be (0, 20]');
     }
     // TODO: Add address validation
+    return true;
+  }
+
+  function validateDatetimeReq({ dateFrom } = {}) {
+    if (!dateFrom || !moment(dateFrom).isValid()) {
+      throw new Error('DateFrom should be a valid datetime');
+    }
     return true;
   }
 
@@ -35,8 +43,39 @@ export function createServer() {
   });
 
   server.post('/api/txs/history', (req, res) => {
-    // TODO: Implement
-    res.send();
+    // FIXME: This method shouldn't make test cases that don't need it fail
+    if (!getMockData().addressesMapper) {
+      return res.send();
+    }
+    validateAddressesReq(req.body);
+    validateDatetimeReq(req.body);
+    // FIXME: Simplify logic
+    const firstAddress = req.body.addresses[0];
+    const addressPrefix = firstAddress.slice(0, firstAddress.length - 1);
+    const addressMap = getMockData().addressesMapper
+      .find((address => address.prefix === addressPrefix));
+    // Filters all txs according to hash and date
+    const txsMapList = addressMap && addressMap.hashPrefix && addressMap.txsAmount ?
+      getTxs(addressMap.txsAmount, addressPrefix, addressMap.hashPrefix) :
+      getMockData().txs[addressPrefix];
+    const filteredTxs = txsMapList.filter(txMap => {
+      const extraFilter = req.body.txHash ?
+        txMap.tx.hash > req.body.txHash :
+        !req.body.txHash;
+      return req.body.addresses.includes(txMap.address) &&
+        moment(txMap.tx.time) >= moment(req.body.dateFrom) &&
+        extraFilter;
+    }).map(txMap => txMap.tx);
+    // Returns a chunk of 20 txs and sorted
+    const txsChunk = filteredTxs.slice(0, 20);
+    const txs = txsChunk.sort((txA, txB) => {
+      if (moment(txA.time) < moment(txB.time)) return -1;
+      if (moment(txA.time) > moment(txB.time)) return 1;
+      if (txA.hash < txB.hash) return -1;
+      if (txA.hash > txB.hash) return 1;
+      return 0;
+    });
+    res.send(txs);
   });
 
   server.post('/api/txs/signed', (req, res) => {
