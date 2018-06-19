@@ -97,10 +97,10 @@ export default class DaedalusTransferForm extends Component<Props> {
     this.form.submit({
       onSuccess: (form) => {
         const { recoveryPhrase } = form.values();
-        const walletData = {
+        const payload = {
           recoveryPhrase: join(recoveryPhrase, ' '),
         };
-        this.props.onSubmit(walletData);
+        this.props.onSubmit(payload);
       },
       onError: () => {}
     });
@@ -148,7 +148,6 @@ export default class DaedalusTransferForm extends Component<Props> {
               className={buttonClasses}
               label={intl.formatMessage(messages.nextButtonLabel)}
               onClick={this.submit}
-              /* disabled={}*/
               skin={<SimpleButtonSkin />}
             />
 

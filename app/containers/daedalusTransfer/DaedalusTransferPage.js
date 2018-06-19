@@ -18,8 +18,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
-  onSubmit = (values: { recoveryPhrase: string, walletName: string, walletPassword: string }) => {
-    this.props.actions[environment.API].wallets.restoreWallet.trigger(values);
+  onSubmit = (payload: { recoveryPhrase: string }) => {
+    this.props.actions[environment.API].daedalusTransfer.restoreAddresses.trigger(payload);
   };
 
   onCancel = () => {
