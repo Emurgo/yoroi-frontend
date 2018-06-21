@@ -209,7 +209,8 @@
         {
           "txType": "ADA sent",
           "txAmount": "-0.000200",
-          "txTime": "ADA transaction, 10:51:33 AM",
+          "txTimeTitle": "ADA transaction,",
+          "txTime": "2018-05-10T13:51:33.000Z",
           "txStatus": "HIGH",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
@@ -219,7 +220,8 @@
         {
           "txType": "ADA received",
           "txAmount": "0.000100",
-          "txTime": "ADA transaction, 10:51:33 AM",
+          "txTimeTitle": "ADA transaction,",
+          "txTime": "2018-05-10T13:51:33.000Z",
           "txStatus": "HIGH",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
@@ -229,7 +231,8 @@
         {
           "txType": "ADA sent",
           "txAmount": "-0.000160",
-          "txTime": "ADA transaction, 10:51:33 AM",
+          "txTimeTitle": "ADA transaction,",
+          "txTime": "2018-05-10T13:51:33.000Z",
           "txStatus": "HIGH",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
@@ -241,7 +244,8 @@
         {
           "txType": "ADA sent",
           "txAmount": "-0.001600",
-          "txTime": "ADA transaction, 10:51:33 AM",
+          "txTimeTitle": "ADA transaction,",
+          "txTime": "2018-05-10T13:51:33.000Z",
           "txStatus": "HIGH",
           "txFrom": [
             "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW",

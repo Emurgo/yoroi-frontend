@@ -74,7 +74,8 @@ export function getLovefieldTxs(txsAmount, addressPrefix, hashPrefix) {
       {
         txType: 'ADA received',
         txAmount: '0.000200',
-        txTime: 'ADA transaction, 10:51:33 AM',
+        txTimeTitle: 'ADA transaction,',
+        txTime: '2018-05-10T13:51:33.000Z',
         txStatus: 'HIGH',
         txFrom: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
         txTo: [addressPrefix + 'W'],
@@ -82,4 +83,21 @@ export function getLovefieldTxs(txsAmount, addressPrefix, hashPrefix) {
         txId: txHash
       }
     ));
+}
+
+export function getAddressMapper(addressPrefix) {
+  if (!getMockData().addressesMapper) {
+    return {};
+  }
+  return getMockData().addressesMapper.find((address => address.prefix === addressPrefix));
+}
+
+export function getTxsMapList(addressMap, addressPrefix) {
+  if (addressMap && addressMap.hashPrefix && addressMap.txsAmount) {
+    return getTxs(addressMap.txsAmount, addressPrefix, addressMap.hashPrefix);
+  }
+  if (!getMockData().txs) {
+    return [];
+  }
+  return getMockData().txs[addressPrefix];
 }

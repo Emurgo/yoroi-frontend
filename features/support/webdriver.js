@@ -41,10 +41,6 @@ function CustomWorld() {
     await clickable.click();
   };
 
-  this.clickDriverElement = async (clickable) => {
-    await clickable.click();
-  };
-
   this.click = async (locator) => {
     await clickElement(locator);
   };

@@ -1,6 +1,6 @@
 import { Given, Then, When } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import chai from 'chai';
+import moment from 'moment';
 import { getLovefieldTxs, getMockData } from '../support/mockDataBuilder';
 
 Given(/^The lovefield db has transactions$/, async function () {
@@ -8,8 +8,7 @@ Given(/^The lovefield db has transactions$/, async function () {
 });
 
 Then(/^I go to Txs History tab$/, async function () {
-  const transactions = await this.getElementBy("//*[contains(text(), 'Transactions')]", By.xpath);
-  await transactions.click();
+  await this.clickByXpath("//*[contains(text(), 'Transactions')]");
 });
 
 When(/^I see the transactions summary$/, async function () {
@@ -31,12 +30,13 @@ Then(/^I should see the txs corresponding to prefix ([^"]*)$/, async function (a
     getMockData().lovefieldTxs[addressPrefix];
   if (txsList.length > 1) {
     for (let i = 0; i < txsList.length; i++) {
-      await this.clickDriverElement(txsList[i]);
+      await txsList[i].click();
       const txData = await txsList[i].getText();
       const txDataArray = txData.split('\n');
       chai.expect(txDataArray[0]).to.equal(lovefieldTxs[i].txType);
       chai.expect(txDataArray[1].split(' ')[0]).to.equal(lovefieldTxs[i].txAmount);
-      chai.expect(txDataArray[2]).to.equal(lovefieldTxs[i].txTime);
+      chai.expect(txDataArray[2]).to.equal(lovefieldTxs[i].txTimeTitle + ' ' +
+        moment(lovefieldTxs[i].txTime).format('hh:mm:ss A'));
       chai.expect(txDataArray[3]).to.equal(lovefieldTxs[i].txStatus);
       chai.expect(txDataArray[5]).to.equal(lovefieldTxs[i].txFrom[0]);
       chai.expect(txDataArray[7]).to.equal(lovefieldTxs[i].txTo[0]);
@@ -45,12 +45,13 @@ Then(/^I should see the txs corresponding to prefix ([^"]*)$/, async function (a
     }
   } else if (txsList.length > 0) {
     const tx = txsList[0];
-    this.clickDriverElement(tx);
+    await tx.click();
     const txData = await tx.getText();
     const txDataArray = txData.split('\n');
     chai.expect(txDataArray[0]).to.equal(lovefieldTxs[0].txType);
     chai.expect(txDataArray[1].split(' ')[0]).to.equal(lovefieldTxs[0].txAmount);
-    chai.expect(txDataArray[2]).to.equal(lovefieldTxs[0].txTime);
+    chai.expect(txDataArray[2]).to.equal(lovefieldTxs[0].txTimeTitle + ' ' +
+      moment(lovefieldTxs[0].txTime).format('hh:mm:ss A'));
     chai.expect(txDataArray[3]).to.equal(lovefieldTxs[0].txStatus);
     chai.expect(txDataArray[5]).to.equal(lovefieldTxs[0].txFrom[0]);
     chai.expect(txDataArray[6]).to.equal(lovefieldTxs[0].txFrom[1]);
