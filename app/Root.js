@@ -59,7 +59,7 @@ export default class Root extends Component {
   }
 
   render() {
-    const currentTheme = 'cardano';
+    const currentTheme = 'icarus';
     const locale = 'en-US';
     const theme = require(`./themes/daedalus/${currentTheme}.js`); // eslint-disable-line
 

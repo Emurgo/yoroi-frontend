@@ -52,7 +52,6 @@
 }
 
 .pendingLabel, .failedLabel, .low, .medium, .high {
-  border-radius: 3px;
   color: var(--theme-transactions-priority-color);
   display: inline-block;
   font-family: var(--font-bold);
@@ -123,7 +122,7 @@
 
 .content {
   border-bottom: 1px solid var(--theme-separation-border-color);
-  margin-left: 84px;
+  margin-left: 64px;
   margin-right: 20px;
 }
 

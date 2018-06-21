@@ -34,7 +34,8 @@ export default class Sidebar extends Component<Props> {
     } = this.props;
 
     const sidebarStyles = classNames([
-      styles.component, styles.minimized
+      styles.component,
+      styles.minimized,
     ]);
 
     return (
@@ -59,7 +60,6 @@ export default class Sidebar extends Component<Props> {
             active={false /* FIXME: isDialogOpen(BugReportDialog)*/}
             onClick={this.handleSupportRequestClick}
           />
-
         </div>
       </div>
     );

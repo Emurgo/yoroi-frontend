@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { uniq } from 'lodash';
 import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
@@ -22,9 +23,10 @@ export default class SidebarCategory extends Component<Props> {
       className === 'supportRequest' ? styles.supportRequest : className
     ]);
 
-    const iconStyles = classNames([
+    const iconStyles = classNames(uniq([
+      className === 'wallets' ? styles.walletsIcon : styles.icon,
       className === 'supportRequest' ? styles.supportRequestIcon : styles.icon
-    ]);
+    ]));
 
     return (
       <button className={componentStyles} onClick={onClick}>
