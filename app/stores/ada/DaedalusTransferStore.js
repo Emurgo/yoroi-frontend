@@ -99,6 +99,9 @@ export default class DaedalusTransferStore extends Store {
         and Rust new functionality, creates the transfer Tx ("store" the data
         using DaedalusTransferStore state)
     */
+    setTimeout(() => {
+      this.status = 'aboutToSend';
+    }, 1000);
   }
 }
 

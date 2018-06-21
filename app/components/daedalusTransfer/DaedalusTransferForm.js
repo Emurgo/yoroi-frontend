@@ -18,22 +18,22 @@ const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.form.instructions.title.label',
     defaultMessage: '!!!Transfer funds from Daedalus wallet',
-    description: 'Label "Transfer funds from Daedalus wallet" on the Daedalus transfer page.'
+    description: 'Label "Transfer funds from Daedalus wallet" on the Daedalus transfer form page.'
   },
   instructions: {
     id: 'daedalusTransfer.form.instructions.description.text',
     defaultMessage: '!!!Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    description: 'Text instructions on the Daedalus transfer page.'
+    description: 'Text instructions on the Daedalus transfer form page.'
   },
   recoveryPhraseInputLabel: {
     id: 'daedalusTransfer.form.recovery.phrase.input.label',
     defaultMessage: '!!!Recovery phrase',
-    description: 'Label for the recovery phrase input on the Daedalus transfer page.'
+    description: 'Label for the recovery phrase input on the Daedalus transfer form page.'
   },
   recoveryPhraseInputHint: {
     id: 'daedalusTransfer.form.recovery.phrase.input.hint',
     defaultMessage: '!!!Enter recovery phrase',
-    description: 'Hint "Enter recovery phrase" for the recovery phrase input on the Daedalus transfer page.'
+    description: 'Hint "Enter recovery phrase" for the recovery phrase input on the Daedalus transfer form page.'
   },
   recoveryPhraseNoResults: {
     id: 'daedalusTransfer.form.recovery.phrase.input.noResults',
@@ -48,7 +48,7 @@ const messages = defineMessages({
   nextButtonLabel: {
     id: 'daedalusTransfer.form.next',
     defaultMessage: '!!!Next',
-    description: 'Label for the next button on the Daedalus transfer page.'
+    description: 'Label for the next button on the Daedalus transfer form page.'
   },
 });
 
@@ -122,13 +122,13 @@ export default class DaedalusTransferForm extends Component<Props> {
       <div className={styles.component}>
         <BorderedBox>
 
-          <div className={styles.instructions}>
+          <div className={styles.body}>
 
-            <div className={styles.instructionsTitle}>
+            <div className={styles.title}>
               {intl.formatMessage(messages.title)}
             </div>
 
-            <div className={styles.instructionsText}>
+            <div className={styles.text}>
               {intl.formatMessage(messages.instructions)}
             </div>
 

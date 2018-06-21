@@ -6,6 +6,8 @@ import validWords from 'bip39/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import MainLayout from '../MainLayout';
 import DaedalusTransferForm from '../../components/daedalusTransfer/DaedalusTransferForm';
+import DaedalusTransferWaitingPage from '../../components/daedalusTransfer/DaedalusTransferWaitingPage';
+import DaedalusTransferSummaryPage from '../../components/daedalusTransfer/DaedalusTransferSummaryPage';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import environment from '../../environment';
 
@@ -22,32 +24,50 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this.props.actions[environment.API].daedalusTransfer.restoreAddresses.trigger(payload);
   };
 
-  onCancel = () => {
-    // Restore request should be reset only in case restore is finished/errored
-    const { restoreRequest } = this._getWalletsStore();
-    if (!restoreRequest.isExecuting) restoreRequest.reset();
-  };
+  onCancel = () => {};
 
   render() {
     const wallets = this._getWalletsStore();
-    const { restoreRequest } = wallets;
-    /* TODO: Replace with Daedalus transfer workflow */
+    const daedalusTransfer = this._getDaedalusTransferStore();
     if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;
-    return (
-      <MainLayout>
-        <DaedalusTransferForm
-          mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
-          suggestedMnemonics={validWords}
-          isSubmitting={restoreRequest.isExecuting}
-          onSubmit={this.onSubmit}
-          onCancel={this.onCancel}
-          error={restoreRequest.error}
-        />
-      </MainLayout>
-    );
+    switch (daedalusTransfer.status) {
+      case 'uninitialized':
+        return (
+          <MainLayout>
+            <DaedalusTransferForm
+              mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
+              suggestedMnemonics={validWords}
+              isSubmitting={false}
+              onSubmit={this.onSubmit}
+              onCancel={this.onCancel}
+              error={undefined}
+            />
+          </MainLayout>
+        );
+      case 'restoringAddresses':
+      case 'checkingAddresses':
+      case 'generatingTx':
+        return (
+          <MainLayout>
+            <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
+          </MainLayout>
+        );
+      case 'aboutToSend':
+        return (
+          <MainLayout>
+            <DaedalusTransferSummaryPage />
+          </MainLayout>
+        );
+      default:
+        return null;
+    }
   }
 
   _getWalletsStore() {
     return this.props.stores[environment.API].wallets;
+  }
+
+  _getDaedalusTransferStore() {
+    return this.props.stores[environment.API].daedalusTransfer;
   }
 }

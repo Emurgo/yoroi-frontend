@@ -26,6 +26,6 @@ export const ROUTES = {
     DISPLAY: '/settings/display',
   },
   DAEDALUS_TRANFER: {
-    ROOT: '/daedalus-tranfer',
+    ROOT: '/daedalus-transfer',
   }
 };
