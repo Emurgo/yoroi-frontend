@@ -38,7 +38,9 @@ export type TransferTx = {
   recoveredBalance: BigNumber,
   fee: number,
   cbor_encoded_tx: Array<number>,
-  changeAddr: AdaAddress
+  changeAddr: AdaAddress,
+  senders: Array<string>,
+  receiver: string
 }
 
 export default class DaedalusTransferStore extends Store {
@@ -127,12 +129,13 @@ export default class DaedalusTransferStore extends Store {
 
     const addressesMap = getAdaAddressesMap();
     const addresses = mapToList(addressesMap);
+    // TODO: get _getAllUTXOsForAddresses in order format the inputs for the tx
 
     // Get outputs - At least should exist one address
-    const receiverAdaAddr: AdaAddress = filterAdaAddressesByType(addresses, 'External')[0];
+    const receiverAddr: string = filterAdaAddressesByType(addresses, 'External')[0].cadId;
 
     // TODO: Check that the conversion is right: parseInt(recoveredBalance, 10)
-    const outputs = [{ address: receiverAdaAddr.cadId, value: parseInt(recoveredBalance, 10) }];
+    const outputs = [{ address: receiverAddr, value: parseInt(recoveredBalance, 10) }];
 
     // Get change addr
     const cryptoAccount = getSingleCryptoAccount();
@@ -151,7 +154,9 @@ export default class DaedalusTransferStore extends Store {
       recoveredBalance,
       fee: tx.fee,
       cbor_encoded_tx: tx.cbor_encoded_tx,
-      changeAddr: tx.changeAddr
+      changeAddr: tx.changeAddr,
+      senders: addresses,
+      receiver: receiverAddr
     };
     this.status = 'aboutToSend';
   }

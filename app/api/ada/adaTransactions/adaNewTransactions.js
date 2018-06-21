@@ -28,10 +28,10 @@ import {
   TransactionError
 } from '../errors';
 
-export const getAdaTransactionFee = (
+export function getAdaTransactionFee(
   receiver: string,
   amount: string
-): Promise<AdaTransactionFee> => {
+): Promise<AdaTransactionFee> {
   const password = 'FakePassword';
   return _getAdaTransaction(receiver, amount, password)
     .then((response) => {
@@ -49,40 +49,33 @@ export const getAdaTransactionFee = (
         getCCoin: result.result.fee
       };
     });
-};
+}
 
-export const newAdaTransaction = (
+export function newAdaTransaction(
   receiver: string,
   amount: string,
   password: string
-): Promise<any> =>
-  _getAdaTransaction(receiver, amount, password)
-    .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
-      // TODO: Handle Js-Wasm-cardano errors
-      const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-      return Promise.all([sendTx(signedTx), changeAdaAddr]);
-    })
-    .then(([backendResponse, changeAdaAddr]) => {
-      // Only if the tx was send, we should track the change Address.
-      saveAdaAddress(changeAdaAddr);
-      return backendResponse;
-    });
+): Promise<any> {
+  return _getAdaTransaction(receiver, amount, password)
+  .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
+    // TODO: Handle Js-Wasm-cardano errors
+    const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
+    return Promise.all([sendTx(signedTx), changeAdaAddr]);
+  })
+  .then(([backendResponse, changeAdaAddr]) => {
+    // Only if the tx was send, we should track the change Address.
+    saveAdaAddress(changeAdaAddr);
+    return backendResponse;
+  });
+}
 
+/* TODO: Make this method public, and refactor it in order to receive Array<string> as addresses */
 async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
   const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
   const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
     getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
   return Promise.all(promises).then(groupsOfUTXOs =>
     groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
-}
-
-export function _getAdaTransaction(
-  receiver: string,
-  amount: string,
-  password: string,
-) {
-  const senders = mapToList(getAdaAddressesMap());
-  return getAdaTransactionFromSenders(senders, receiver, amount, password);
 }
 
 export function getAdaTransactionFromSenders(
@@ -111,6 +104,15 @@ export function getAdaTransactionFromSenders(
         changeAdaAddr
       ];
     });
+}
+
+function _getAdaTransaction(
+  receiver: string,
+  amount: string,
+  password: string,
+) {
+  const senders = mapToList(getAdaAddressesMap());
+  return getAdaTransactionFromSenders(senders, receiver, amount, password);
 }
 
 function _mapUTXOsToInputs(utxos, adaAddressesMap) {
