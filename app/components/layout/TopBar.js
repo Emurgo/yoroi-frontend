@@ -42,7 +42,7 @@ export default class TopBar extends Component<Props> {
           {
             // show currency and use long format (e.g. in ETC show all decimal places)
             formattedWalletAmount(activeWallet.amount, true, true)
-          }
+          } ADA
         </div>
       </div>
     ) : null;

@@ -3,7 +3,6 @@
 }
 
 .list {
-  border-radius: 4px;
   background-color: var(--theme-transactions-list-background-color);
   background-blend-mode: lighten;
   border: solid 1px var(--theme-transactions-list-border-color);
@@ -28,9 +27,10 @@
 
 .groupDate {
   font-family: var(--font-regular);
-  font-size: 16px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--theme-transactions-list-group-date-color);
-  opacity: 0.5;
   margin-bottom: 10px;
   margin-left: 20px;
+  text-transform: uppercase;
 }
