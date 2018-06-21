@@ -11,6 +11,13 @@ export function createServer() {
 
   server.use(middlewares);
 
+  function _getTxsMapList(addresses) {
+    const firstAddress = addresses[0];
+    const addressPrefix = firstAddress.slice(0, firstAddress.length - 1);
+    const addressMap = getAddressMapper(addressPrefix);
+    return getTxsMapList(addressMap, addressPrefix);
+  }
+
   function validateAddressesReq({ addresses } = {}) {
     if (!addresses || addresses.length > 20 || addresses.length === 0) {
       throw new Error('Addresses request length should be (0, 20]');
@@ -45,10 +52,7 @@ export function createServer() {
   server.post('/api/txs/history', (req, res) => {
     validateAddressesReq(req.body);
     validateDatetimeReq(req.body);
-    const firstAddress = req.body.addresses[0];
-    const addressPrefix = firstAddress.slice(0, firstAddress.length - 1);
-    const addressMap = getAddressMapper(addressPrefix);
-    const txsMapList = getTxsMapList(addressMap, addressPrefix);
+    const txsMapList = _getTxsMapList(req.body.addresses[0]);
     // Filters all txs according to hash and date
     const filteredTxs = txsMapList.filter(txMap => {
       const extraFilter = req.body.txHash ?
@@ -73,7 +77,13 @@ export function createServer() {
   });
 
   server.post('/api/txs/pending', (req, res) => {
-    res.send([]);
+    validateAddressesReq(req.body);
+    const txsMapList = _getTxsMapList(req.body.addresses[0]);
+    const txs = txsMapList.filter(txMap => (
+      req.body.addresses.includes(txMap.address) &&
+        !txMap.tx.block_num
+    )).map(txMap => txMap.tx);
+    res.send(txs);
   });
 
   return server.listen(port, () => {
