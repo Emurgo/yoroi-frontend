@@ -60,3 +60,13 @@ export const checkAddressesInUse = addresses =>
       }
     }
   ).then(response => response.data);
+
+export const getPendingTxsForAddresses = addresses =>
+  axios(`${backendUrl}/api/txs/pending`,
+    {
+      method: 'post',
+      data: {
+        addresses
+      }
+    }
+  ).then(response => response.data);
