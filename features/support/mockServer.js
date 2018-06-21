@@ -11,8 +11,8 @@ export function createServer() {
   server.use(middlewares);
 
   function validateAddressesReq({ addresses } = {}) {
-    if (!addresses || addresses.length > 20 || addresses.length === 0) {
-      throw new Error('Addresses request length should be (0, 20]');
+    if (!addresses || addresses.length > 50 || addresses.length === 0) {
+      throw new Error('Addresses request length should be (0, 50]');
     }
     // TODO: Add address validation
     return true;
