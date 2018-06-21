@@ -223,7 +223,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         <Autocomplete
           options={suggestedMnemonics}
-          maxSelections={12}
+          maxSelections={15}
           {...recoveryPhraseField.bind()}
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
