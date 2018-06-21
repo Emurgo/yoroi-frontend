@@ -1,11 +1,26 @@
 // @flow
 import { observable, action, computed, runInAction, untracked } from 'mobx';
+import BigNumber from 'bignumber.js';
 import Store from '../lib/Store';
 import environment from '../../environment';
 import {
   RandomAddressChecker
 } from 'rust-cardano-crypto';
 import type { ConfigType } from '../../../config/config-types';
+import type {
+  AdaAddress
+} from '../../api/ada/adaTypes';
+import { getBalance } from '../../api/ada/adaWallet';
+import {
+  mapToList
+} from '../../api/ada/lib/utils';
+import { getSingleCryptoAccount } from '../../api/ada/adaAccount';
+import {
+  saveAdaAddress,
+  createAdaAddress,
+  getAdaAddressesMap,
+  filterAdaAddressesByType
+} from '../../api/ada/adaAddress';
 
 declare var CONFIG: ConfigType;
 
@@ -19,9 +34,17 @@ export type TransferStatus =
   | 'generatingTx'
   | 'aboutToSend'
 
+export type TransferTx = {
+  recoveredBalance: BigNumber,
+  fee: number,
+  cbor_encoded_tx: Array<number>,
+  changeAddr: AdaAddress
+}
+
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatus = 'uninitialized';
+  @observable transferTx: ?TransferTx = null;
   @observable ws: any = null;
 
   setup() {
@@ -90,18 +113,47 @@ export default class DaedalusTransferStore extends Store {
     this.actions.ada.daedalusTransfer.generateTransferTx.trigger({ addressesWithFunds });
   }
 
-  _generateTransferTx = (payload: {
+  _generateTransferTx = async (payload: {
     addressesWithFunds: Array<string>
   }) => {
+    const { addressesWithFunds } = payload;
     this.status = 'generatingTx';
     console.log(`[DaedalusTransferStore::_generateTransferTx] status: ${this.status}`, payload);
-    /*  TODO: Using the addresses with funds, the Icarus CryptoWallet,
-        and Rust new functionality, creates the transfer Tx ("store" the data
-        using DaedalusTransferStore state)
-    */
-    setTimeout(() => {
-      this.status = 'aboutToSend';
-    }, 1000);
+    // Get balance
+    const recoveredBalance = await getBalance(addressesWithFunds);
+
+    // TODO: Get Daedalus crypto wallet using the seed
+    // TODO: Get inputs from addressesWithFunds
+
+    const addressesMap = getAdaAddressesMap();
+    const addresses = mapToList(addressesMap);
+
+    // Get outputs - At least should exist one address
+    const receiverAdaAddr: AdaAddress = filterAdaAddressesByType(addresses, 'External')[0];
+
+    // TODO: Check that the conversion is right: parseInt(recoveredBalance, 10)
+    const outputs = [{ address: receiverAdaAddr.cadId, value: parseInt(recoveredBalance, 10) }];
+
+    // Get change addr
+    const cryptoAccount = getSingleCryptoAccount();
+    const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
+
+    // Generate Tx
+    // TODO: Use Rust for generate the Tx.
+    const tx = await Promise.resolve({
+      fee: 10,
+      cbor_encoded_tx: [1, 0, 1, 0],
+      changeAddr: changeAdaAddr
+    });
+
+    // Save Transfer Tx as a DaedalusTransferStore value
+    this.transferTx = {
+      recoveredBalance,
+      fee: tx.fee,
+      cbor_encoded_tx: tx.cbor_encoded_tx,
+      changeAddr: tx.changeAddr
+    };
+    this.status = 'aboutToSend';
   }
 }
 

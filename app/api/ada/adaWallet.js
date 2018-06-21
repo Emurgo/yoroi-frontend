@@ -62,7 +62,7 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   try {
     const updatedWallet = Object.assign({}, persistentWallet, {
       cwAmount: {
-        getCCoin: await _getBalance(addresses)
+        getCCoin: await getBalance(addresses)
       }
     });
     saveInStorage(WALLET_KEY, updatedWallet);
@@ -106,7 +106,7 @@ export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
   generateAdaMnemonic();
 
-async function _getBalance(
+export async function getBalance(
   addresses: Array<string>
 ): Promise<BigNumber> {
   try {
