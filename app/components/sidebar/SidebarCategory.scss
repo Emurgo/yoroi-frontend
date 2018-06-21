@@ -62,7 +62,6 @@
       }
     }
   }
-
 }
 
 .active {
@@ -91,6 +90,10 @@
   }
 }
 
+.wallets {
+  background: red;
+}
+
 .supportRequest {
   bottom: 0;
   position: absolute;
@@ -103,6 +106,19 @@
   & > svg {
     width: 24px;
     height: 24px;
+  }
+}
+
+.walletsIcon {
+  flex-shrink: 0;
+  margin: 0 24px;
+  & > svg {
+    width: 36px;
+    height: 42.5px;
+
+    path {
+      stroke: #daa49a;
+    }
   }
 }
 

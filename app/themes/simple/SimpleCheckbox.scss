@@ -15,4 +15,8 @@
 
 .label {
   color: var(--theme-checkbox-label-color);
+
+  strong {
+    font-family: var(--font-medium);
+  }
 }

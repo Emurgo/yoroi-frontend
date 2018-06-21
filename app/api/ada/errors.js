@@ -66,6 +66,11 @@ const messages = defineMessages({
     id: 'api.errors.transactionError',
     defaultMessage: '!!!Error while creating transaction.',
     description: '"Error while creating transaction." error message'
+  },
+  pendingTransactionError: {
+    id: 'api.errors.pendingTransactionError',
+    defaultMessage: '!!!Error while updating pending transactions.',
+    description: '"Error while updating pending transactions." error message'
   }
 });
 
@@ -182,6 +187,15 @@ export class TransactionError extends LocalizableError {
     super({
       id: messages.transactionError.id,
       defaultMessage: messages.transactionError.defaultMessage,
+    });
+  }
+}
+
+export class PendingTransactionError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.pendingTransactionError.id,
+      defaultMessage: messages.pendingTransactionError.defaultMessage,
     });
   }
 }

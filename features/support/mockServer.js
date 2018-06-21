@@ -72,6 +72,10 @@ export function createServer() {
     res.send(usedAddresses);
   });
 
+  server.post('/api/txs/pending', (req, res) => {
+    res.send([]);
+  });
+
   return server.listen(port, () => {
     console.log(`JSON Server is running at ${port}`);
   });
