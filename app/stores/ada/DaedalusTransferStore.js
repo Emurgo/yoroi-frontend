@@ -1,25 +1,20 @@
 // @flow
-import { observable, action, computed, runInAction, untracked } from 'mobx';
+import { observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../lib/Store';
 import environment from '../../environment';
+import Request from '.././lib/LocalizedRequest';
 import {
   RandomAddressChecker,
   Wallet
 } from 'rust-cardano-crypto';
 import type { ConfigType } from '../../../config/config-types';
-import type {
-  AdaAddress
-} from '../../api/ada/adaTypes';
 import { getBalance } from '../../api/ada/adaWallet';
 import {
   mapToList
 } from '../../api/ada/lib/utils';
 import { getCryptoDaedalusWalletFromMnemonics } from '../../api/ada/lib/crypto-wallet';
-import { getSingleCryptoAccount } from '../../api/ada/adaAccount';
 import {
-  saveAdaAddress,
-  createAdaAddress,
   getAdaAddressesMap,
   filterAdaAddressesByType
 } from '../../api/ada/adaAddress';
@@ -29,12 +24,14 @@ import {
 import {
   sendTx
 } from '../../api/ada/lib/icarus-backend-api';
+import LocalizableError from '../../i18n/LocalizableError';
 
 declare var CONFIG: ConfigType;
 
 const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
 
+// FIXME: Define a place for these types
 export type TransferStatus =
     'uninitialized'
   | 'restoringAddresses'
@@ -44,10 +41,20 @@ export type TransferStatus =
 
 export type TransferTx = {
   recoveredBalance: BigNumber,
-  fee: number,
+  fee: BigNumber,
   cbor_encoded_tx: Array<number>,
   senders: Array<string>,
   receiver: string
+}
+
+// FIXME: Define a place for these errors
+export class NoTransferTxError extends LocalizableError {
+  constructor() {
+    super({
+      id: 'daedalusTransfer.error.NoTransferTxError',
+      defaultMessage: '!!! There is no transfer transaction to send',
+    });
+  }
 }
 
 export default class DaedalusTransferStore extends Store {
@@ -55,6 +62,7 @@ export default class DaedalusTransferStore extends Store {
   @observable status: TransferStatus = 'uninitialized';
   @observable transferTx: ?TransferTx = null;
   @observable ws: any = null;
+  @observable transferFundsRequest: Request<any> = new Request(this._transferFundsRequest);
 
   setup() {
     console.log(`[DaedalusTransferStore::setup] status: ${this.status}`);
@@ -62,12 +70,14 @@ export default class DaedalusTransferStore extends Store {
     actions.restoreAddresses.listen(this._restoreAddresses);
     actions.getAddressesWithFunds.listen(this._getAddressesWithFunds);
     actions.generateTransferTx.listen(this._generateTransferTx);
+    actions.transferFunds.listen(this._transferFunds);
   }
 
   teardown() {
     super.teardown();
     this.status = 'uninitialized';
     console.log(`[DaedalusTransferStore::teardown] ${this.status}`);
+    this.transferFundsRequest.reset();
     if (this.ws) {
       console.log('[DaedalusTransferStore::teardown] Closing open ws connection');
       this.ws.close();
@@ -106,6 +116,7 @@ export default class DaedalusTransferStore extends Store {
     });
   }
 
+  // FIXME: Handle rust errors
   _getAddressesWithFunds = (payload: {
     secretWords: string,
     allAddresses: Array<string>
@@ -123,6 +134,7 @@ export default class DaedalusTransferStore extends Store {
       .trigger({ addressesWithFunds, secretWords });
   }
 
+  // FIXME: Handle rust and backend errors
   _generateTransferTx = async (payload: {
     addressesWithFunds: CryptoDaedalusAddressRecovered,
     secretWords: string
@@ -136,23 +148,41 @@ export default class DaedalusTransferStore extends Store {
     const recoveredBalance = await getBalance(senders);
 
     const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
-    const inputs = getInputs(senderUtxos, addressesWithFunds);
-    const output = getReceiverAddress();
+    const inputs = _getInputs(senderUtxos, addressesWithFunds);
+    const output = _getReceiverAddress();
 
     const tx = Wallet.move(wallet, inputs, output).result;
 
-    // TODO: Delele this!
-    /* const signedTx = Buffer.from(tx.cbor_encoded_tx).toString('base64');
-    await sendTx(signedTx); */
-
     this.transferTx = {
       recoveredBalance,
-      fee: tx.fee,
+      fee: new BigNumber(tx.fee),
       cbor_encoded_tx: tx.cbor_encoded_tx,
       senders,
       receiver: output
     };
     this.status = 'aboutToSend';
+  }
+
+  _transferFundsRequest = async (payload: {
+    cborEncodedTx: Array<number>
+  }) => {
+    const { cborEncodedTx } = payload;
+    const signedTx = Buffer.from(cborEncodedTx).toString('base64');
+    return sendTx(signedTx);
+  }
+
+  // FIXME: Handle backend errors
+  _transferFunds = async (payload: {
+    next: Function
+  }) => {
+    const { next } = payload;
+    if (!this.transferTx) {
+      throw new NoTransferTxError();
+    }
+    await this.transferFundsRequest.execute({ cborEncodedTx: this.transferTx.cbor_encoded_tx });
+    next();
+    // FIXME: We should reset all the store state in a more elegant/correct way
+    this.teardown();
   }
 }
 
@@ -165,13 +195,13 @@ function _fromMessage(data: mixed) {
 
 const _toMessage = JSON.stringify;
 
-function getReceiverAddress(): string {
+function _getReceiverAddress(): string {
   const addressesMap = getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
   return filterAdaAddressesByType(addresses, 'External')[0].cadId;
 }
 
-function getInputs(utxos, addressesWithFunds) {
+function _getInputs(utxos, addressesWithFunds) {
   const addressingByAddress = {};
   addressesWithFunds.forEach(a => {
     addressingByAddress[a.address] = a.addressing;

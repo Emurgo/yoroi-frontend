@@ -3,25 +3,95 @@
   padding: 20px;
 }
 
+.transferButton {
+  display: block !important;
+  margin: 30px auto 0;
+}
+
 .body {
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
   font-size: 14px;
   line-height: 19px;
-
-  .title {
-    font-size: 19px;
-    font-family: var(--font-medium);
-    line-height: 23px;
-    margin-bottom: 6px;
-    word-break: break-all;
+  
+  .currencySymbol {
+    font-family: var(--font-light);
+    text-transform: uppercase;
   }
 
-  .text {
-    font-size: 16px;
-    line-height: 22px;
-    margin-bottom: 12px;
+  .addressLabelWrapper,
+  .amountFeesWrapper {
+    margin-bottom: 20px;
+  }
+
+  .addressLabel,
+  .addressSubLabel {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+  }
+
+  .addressLabel {
+    text-transform: uppercase;
+  }
+
+  .address {
+    font-family: var(--font-light);
+    line-height: 1.38;
+    margin-top: 6px;
+    opacity: 0.5;
+    word-wrap: break-word;
+  }
+
+  .amountFeesWrapper {
+    display: flex;
+    flex-direction: row;
+    .amountWrapper,
+    .feesWrapper {
+      width: 50%;
+    }
+    .amountWrapper {
+      margin-right: 10px;
+    }
+    .feesWrapper {
+      margin-left: 10px;
+    }
+    .amountLabel,
+    .feesLabel {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      line-height: 1.38;
+      text-transform: uppercase;
+    }
+    .amount,
+    .fees {
+      color: var(--theme-send-confirmation-dialog-send-values-color);
+      line-height: 1.38;
+      margin-top: 6px;
+      word-break: break-word;
+    }
+    .fees {
+      opacity: 0.5;
+    }
+  }
+
+  .totalAmountLabel {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+    text-transform: uppercase;
+  }
+
+  .totalAmount {
+    color: var(--theme-send-confirmation-dialog-send-values-color);
+    line-height: 1.38;
+    margin-top: 6px;
     word-break: break-word;
   }
+
+
 
 }

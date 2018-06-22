@@ -54,10 +54,9 @@ const messages = defineMessages({
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
+// FIXME: Handle submiting and error transitions
 type Props = {
   onSubmit: Function,
-  onCancel: Function,
-  isSubmitting: boolean,
   mnemonicValidator: Function,
   error?: ?LocalizableError,
   suggestedMnemonics: Array<string>,

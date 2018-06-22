@@ -1,12 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './DaedalusTransferWaitingPage.scss';
 
+// FIXME: Add translations in i18n files
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.waiting.title.label',

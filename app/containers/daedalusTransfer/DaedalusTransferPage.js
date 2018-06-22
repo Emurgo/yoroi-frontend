@@ -10,6 +10,9 @@ import DaedalusTransferWaitingPage from '../../components/daedalusTransfer/Daeda
 import DaedalusTransferSummaryPage from '../../components/daedalusTransfer/DaedalusTransferSummaryPage';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import environment from '../../environment';
+import resolver from '../../utils/imports';
+
+const { formattedWalletAmount } = resolver('utils/formatters');
 
 @inject('stores', 'actions') @observer
 export default class DaedalusTransferPage extends Component<InjectedProps> {
@@ -20,12 +23,22 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
-  onSubmit = (payload: { recoveryPhrase: string }) => {
+  onTransfer = (payload: { recoveryPhrase: string }) => {
     this.props.actions[environment.API].daedalusTransfer.restoreAddresses.trigger(payload);
   };
 
-  onCancel = () => {};
+  onConfirmTransfer = () => {
+    const backToWallet = () => {
+      this.props.actions.router.goToRoute.trigger({
+        route: this._getWalletsStore().activeWalletRoute
+      });
+    };
+    this.props.actions[environment.API].daedalusTransfer.transferFunds.trigger({
+      next: backToWallet
+    });
+  }
 
+  // FIXME: Handle transfer restoring errors
   render() {
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
@@ -37,9 +50,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferForm
               mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
               suggestedMnemonics={validWords}
-              isSubmitting={false}
-              onSubmit={this.onSubmit}
-              onCancel={this.onCancel}
+              onSubmit={this.onTransfer}
               error={undefined}
             />
           </MainLayout>
@@ -55,7 +66,11 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
       case 'aboutToSend':
         return (
           <MainLayout>
-            <DaedalusTransferSummaryPage />
+            <DaedalusTransferSummaryPage
+              formattedWalletAmount={formattedWalletAmount}
+              transferTx={daedalusTransfer.transferTx}
+              onSubmit={this.onConfirmTransfer}
+            />
           </MainLayout>
         );
       default:
