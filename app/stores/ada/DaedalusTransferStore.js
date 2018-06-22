@@ -4,7 +4,8 @@ import BigNumber from 'bignumber.js';
 import Store from '../lib/Store';
 import environment from '../../environment';
 import {
-  RandomAddressChecker
+  RandomAddressChecker,
+  Wallet
 } from 'rust-cardano-crypto';
 import type { ConfigType } from '../../../config/config-types';
 import type {
@@ -14,6 +15,7 @@ import { getBalance } from '../../api/ada/adaWallet';
 import {
   mapToList
 } from '../../api/ada/lib/utils';
+import { getCryptoDaedalusWalletFromMnemonics } from '../../api/ada/lib/crypto-wallet';
 import { getSingleCryptoAccount } from '../../api/ada/adaAccount';
 import {
   saveAdaAddress,
@@ -21,6 +23,12 @@ import {
   getAdaAddressesMap,
   filterAdaAddressesByType
 } from '../../api/ada/adaAddress';
+import {
+  getAllUTXOsForAddresses
+} from '../../api/ada/adaTransactions/adaNewTransactions';
+import {
+  sendTx
+} from '../../api/ada/lib/icarus-backend-api';
 
 declare var CONFIG: ConfigType;
 
@@ -38,7 +46,6 @@ export type TransferTx = {
   recoveredBalance: BigNumber,
   fee: number,
   cbor_encoded_tx: Array<number>,
-  changeAddr: AdaAddress,
   senders: Array<string>,
   receiver: string
 }
@@ -112,51 +119,38 @@ export default class DaedalusTransferStore extends Store {
       '[DaedalusTransferStore::_getAddressesWithFunds] Daedalues wallet addresses:',
       addressesWithFunds
     );
-    this.actions.ada.daedalusTransfer.generateTransferTx.trigger({ addressesWithFunds });
+    this.actions.ada.daedalusTransfer.generateTransferTx
+      .trigger({ addressesWithFunds, secretWords });
   }
 
   _generateTransferTx = async (payload: {
-    addressesWithFunds: Array<string>
+    addressesWithFunds: CryptoDaedalusAddressRecovered,
+    secretWords: string
   }) => {
-    const { addressesWithFunds } = payload;
     this.status = 'generatingTx';
     console.log(`[DaedalusTransferStore::_generateTransferTx] status: ${this.status}`, payload);
-    // Get balance
-    const recoveredBalance = await getBalance(addressesWithFunds);
+    const { addressesWithFunds, secretWords } = payload;
 
-    // TODO: Get Daedalus crypto wallet using the seed
-    // TODO: Get inputs from addressesWithFunds
+    const senders = addressesWithFunds.map(a => a.address);
+    const senderUtxos = await getAllUTXOsForAddresses(senders);
+    const recoveredBalance = await getBalance(senders);
 
-    const addressesMap = getAdaAddressesMap();
-    const addresses = mapToList(addressesMap);
-    // TODO: get _getAllUTXOsForAddresses in order format the inputs for the tx
+    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
+    const inputs = getInputs(senderUtxos, addressesWithFunds);
+    const output = getReceiverAddress();
 
-    // Get outputs - At least should exist one address
-    const receiverAddr: string = filterAdaAddressesByType(addresses, 'External')[0].cadId;
+    const tx = Wallet.move(wallet, inputs, output).result;
 
-    // TODO: Check that the conversion is right: parseInt(recoveredBalance, 10)
-    const outputs = [{ address: receiverAddr, value: parseInt(recoveredBalance, 10) }];
+    // TODO: Delele this!
+    /* const signedTx = Buffer.from(tx.cbor_encoded_tx).toString('base64');
+    await sendTx(signedTx); */
 
-    // Get change addr
-    const cryptoAccount = getSingleCryptoAccount();
-    const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
-
-    // Generate Tx
-    // TODO: Use Rust for generate the Tx.
-    const tx = await Promise.resolve({
-      fee: 10,
-      cbor_encoded_tx: [1, 0, 1, 0],
-      changeAddr: changeAdaAddr
-    });
-
-    // Save Transfer Tx as a DaedalusTransferStore value
     this.transferTx = {
       recoveredBalance,
       fee: tx.fee,
       cbor_encoded_tx: tx.cbor_encoded_tx,
-      changeAddr: tx.changeAddr,
-      senders: addresses,
-      receiver: receiverAddr
+      senders,
+      receiver: output
     };
     this.status = 'aboutToSend';
   }
@@ -170,3 +164,26 @@ function _fromMessage(data: mixed) {
 }
 
 const _toMessage = JSON.stringify;
+
+function getReceiverAddress(): string {
+  const addressesMap = getAdaAddressesMap();
+  const addresses = mapToList(addressesMap);
+  return filterAdaAddressesByType(addresses, 'External')[0].cadId;
+}
+
+function getInputs(utxos, addressesWithFunds) {
+  const addressingByAddress = {};
+  addressesWithFunds.forEach(a => {
+    addressingByAddress[a.address] = a.addressing;
+  });
+  return utxos.map(utxo => {
+    return {
+      ptr: {
+        index: utxo.tx_index,
+        id: utxo.tx_hash
+      },
+      value: utxo.amount,
+      addressing: addressingByAddress[utxo.receiver]
+    };
+  });
+}

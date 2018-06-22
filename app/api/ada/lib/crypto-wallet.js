@@ -43,3 +43,12 @@ export function getCryptoWalletFromSeed(
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }
+
+/* FIXME: Should be pass a encrypted mnemonic and also the password to decrypt it*/
+export function getCryptoDaedalusWalletFromMnemonics(
+  secretWords: string,
+): CryptoDaedalusWallet {
+  const wallet = Wallet.fromDaedalusMnemonic(secretWords).result;
+  wallet.config.protocol_magic = protocolMagic;
+  return wallet;
+}

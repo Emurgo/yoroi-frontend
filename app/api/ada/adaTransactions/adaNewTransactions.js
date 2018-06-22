@@ -69,11 +69,10 @@ export function newAdaTransaction(
   });
 }
 
-/* TODO: Make this method public, and refactor it in order to receive Array<string> as addresses */
-async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
-  const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
-  const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
-    getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
+export async function getAllUTXOsForAddresses(addresses: Array<string>) {
+  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+  const promises = groupsOfAddresses.map(groupOfAddresses =>
+    getUTXOsForAddresses(groupOfAddresses));
   return Promise.all(promises).then(groupsOfUTXOs =>
     groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
 }
@@ -92,7 +91,7 @@ export function getAdaTransactionFromSenders(
   const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return _getAllUTXOsForAddresses(senders)
+  return getAllUTXOsForAddresses(_getPlainAddresses(senders))
     .then((senderUtxos) => {
       const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
       return [
@@ -113,6 +112,10 @@ function _getAdaTransaction(
 ) {
   const senders = mapToList(getAdaAddressesMap());
   return getAdaTransactionFromSenders(senders, receiver, amount, password);
+}
+
+function _getPlainAddresses(adaAddresses: AdaAddresses) {
+  return adaAddresses.map(addr => addr.cadId);
 }
 
 function _mapUTXOsToInputs(utxos, adaAddressesMap) {
