@@ -1,16 +1,12 @@
 // @flow
-import { action, observable, computed, toJS } from 'mobx';
-import { size } from 'lodash';
+import { observable, computed } from 'mobx';
 import BigNumber from 'bignumber.js';
 import moment from 'moment/moment';
 import Store from './lib/Store';
 import Request from './lib/LocalizedRequest';
 import environment from '../environment';
-import { THEMES } from '../themes/index';
 import { ROUTES } from '../routes-config';
-import LocalizableError from '../i18n/LocalizableError';
 import globalMessages from '../i18n/global-messages';
-import { WalletSupportRequestLogsCompressError } from '../i18n/errors';
 
 export default class SettingsStore extends Store {
 
@@ -35,7 +31,6 @@ export default class SettingsStore extends Store {
   @observable setTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.setTermsOfUseAcceptance);
   @observable getSendLogsChoiceRequest: Request<boolean> = new Request(this.api.localStorage.getSendLogsChoice);
   @observable setSendLogsChoiceRequest: Request = new Request(this.api.localStorage.setSendLogsChoice);
-  @observable error: ?LocalizableError = null;
   /* eslint-enable max-len */
 
   setup() {
@@ -148,7 +143,6 @@ export default class SettingsStore extends Store {
   _reloadAboutWindowOnLocaleChange = () => {
     // register mobx observer for currentLocale in order to trigger reaction on change
     this.currentLocale; // eslint-disable-line
-    //window.location.reload();
   };
 
   _isOnTermsOfUsePage = () => this.stores.app.currentRoute === ROUTES.PROFILE.TERMS_OF_USE;
