@@ -207,10 +207,12 @@ export default class WalletsStore extends Store {
     });
   };
 
-  _pollRefresh = async () => (
-    // FIXME: Network status won't be used
-    /* this.stores.networkStatus.isSynced &&*/ await this.refreshWalletsData()
-  );
+  _pollRefresh = async () => {
+    // Do not update if screen not active
+    if (!document.hidden) {
+      return await this.refreshWalletsData();
+    }
+  };
 
   _toggleAddWalletDialogOnWalletsLoaded = () => {
     if (this.hasLoadedWallets && !this.hasAnyWallets) {
