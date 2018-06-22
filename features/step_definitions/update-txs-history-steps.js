@@ -21,6 +21,7 @@ Then(/^I should see that the number of transactions is ([^"]*)$/, async function
   chai.expect(txsNumber).to.equal('Number of transactions: ' + txsAmount);
 });
 
+// FIXME
 Then(/^I should see the txs corresponding to prefix ([^"]*)$/, async function (addressPrefix) {
   const txsList = await this.getElementsBy('.Transaction_component');
   const addressMap = getMockData().addressesMapper
@@ -40,8 +41,13 @@ Then(/^I should see the txs corresponding to prefix ([^"]*)$/, async function (a
       chai.expect(txDataArray[3]).to.equal(lovefieldTxs[i].txStatus);
       chai.expect(txDataArray[5]).to.equal(lovefieldTxs[i].txFrom[0]);
       chai.expect(txDataArray[7]).to.equal(lovefieldTxs[i].txTo[0]);
-      chai.expect(txDataArray[9]).to.equal(lovefieldTxs[i].txConfirmations);
-      chai.expect(txDataArray[11]).to.equal(lovefieldTxs[i].txId);
+      // FIXME: fix the pending condition
+      if (lovefieldTxs[i].txStatus !== 'TRANSACTION PENDING') {
+        chai.expect(txDataArray[9]).to.equal(lovefieldTxs[i].txConfirmations);
+        chai.expect(txDataArray[11]).to.equal(lovefieldTxs[i].txId);
+      } else {
+        chai.expect(txDataArray[10]).to.equal(lovefieldTxs[i].txId);
+      }
     }
   } else if (txsList.length > 0) {
     const tx = txsList[0];

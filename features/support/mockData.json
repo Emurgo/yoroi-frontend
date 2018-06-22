@@ -287,100 +287,100 @@
         "amount": 20000
       }
     ],
-    "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
-      {
-        "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "tx": {
-          "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
-          "time": "2018-05-12T13:51:33.000Z",
-          "inputs_address": [
-            "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
-          ],
-          "inputs_amount": [200],
-          "outputs_address": [
-            "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
-          ],
-          "outputs_amount": [100, 100],
-          "block_num": 89,
-          "best_block_num": 101
+    "txs": {
+      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
+        {
+          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
+          "tx": {
+            "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
+            "time": "2018-05-12T13:51:33.000Z",
+            "inputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
+            ],
+            "inputs_amount": [200],
+            "outputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
+            ],
+            "outputs_amount": [100, 100],
+            "best_block_num": 101
+          }
+        },
+        {
+          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
+          "tx": {
+            "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Y",
+            "time": "2018-05-11T13:51:33.000Z",
+            "inputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"
+            ],
+            "inputs_amount": [100],
+            "outputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
+            ],
+            "outputs_amount": [100],
+            "block_num": 89,
+            "best_block_num": 101
+          }
+        },
+        {
+          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
+          "tx": {
+            "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
+            "time": "2018-05-10T13:51:33.000Z",
+            "inputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
+            ],
+            "inputs_amount": [160],
+            "outputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
+            ],
+            "outputs_amount": [160],
+            "block_num": 90,
+            "best_block_num": 101
+          }
         }
-      },
+      ]
+    },
+    "addressesMapper": [
       {
-        "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "tx": {
-          "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Y",
-          "time": "2018-05-11T13:51:33.000Z",
-          "inputs_address": [
-            "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"
-          ],
-          "inputs_amount": [100],
-          "outputs_address": [
-            "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
-          ],
-          "outputs_amount": [100],
-          "block_num": 89,
-          "best_block_num": 101
-        }
-      },
-      {
-        "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "tx": {
-          "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
-          "time": "2018-05-10T13:51:33.000Z",
-          "inputs_address": [
-            "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
-          ],
-          "inputs_amount": [160],
-          "outputs_address": [
-            "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
-          ],
-          "outputs_amount": [160],
-          "block_num": 90,
-          "best_block_num": 101
-        }
+        "prefix": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo"
       }
-    ]
-  },
-  "addressesMapper": [
-    {
-      "prefix": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo"
+    ],
+    "lovefieldTxs": {
+      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
+        {
+          "txType": "ADA sent",
+          "txAmount": "-0.000200",
+          "txTimeTitle": "ADA transaction,",
+          "txTime": "2018-05-10T13:51:33.000Z",
+          "txStatus": "TRANSACTION PENDING",
+          "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
+          "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
+          "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z"
+        },
+        {
+          "txType": "ADA received",
+          "txAmount": "0.000100",
+          "txTimeTitle": "ADA transaction,",
+          "txTime": "2018-05-10T13:51:33.000Z",
+          "txStatus": "HIGH",
+          "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"],
+          "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
+          "txConfirmations": "High. 12 confirmations.",
+          "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Y"
+        },
+        {
+          "txType": "ADA sent",
+          "txAmount": "-0.000160",
+          "txTimeTitle": "ADA transaction,",
+          "txTime": "2018-05-10T13:51:33.000Z",
+          "txStatus": "HIGH",
+          "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
+          "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
+          "txConfirmations": "High. 11 confirmations.",
+          "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X"
+        }
+      ]
     }
-  ],
-  "lovefieldTxs": {
-    "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
-      {
-        "txType": "ADA sent",
-        "txAmount": "-0.000200",
-        "txTimeTitle": "ADA transaction,",
-        "txTime": "2018-05-10T13:51:33.000Z",
-        "txStatus": "HIGH",
-        "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
-        "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
-        "txConfirmations": "High. 9 confirmations.",
-        "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z"
-      },
-      {
-        "txType": "ADA received",
-        "txAmount": "0.000100",
-        "txTimeTitle": "ADA transaction,",
-        "txTime": "2018-05-10T13:51:33.000Z",
-        "txStatus": "HIGH",
-        "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"],
-        "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
-        "txConfirmations": "High. 12 confirmations.",
-        "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Y"
-      },
-      {
-        "txType": "ADA sent",
-        "txAmount": "-0.000160",
-        "txTimeTitle": "ADA transaction,",
-        "txTime": "2018-05-10T13:51:33.000Z",
-        "txStatus": "HIGH",
-        "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
-        "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
-        "txConfirmations": "High. 11 confirmations.",
-        "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X"
-      }
-    ]
   }
 }

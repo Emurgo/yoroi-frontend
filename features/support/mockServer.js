@@ -52,7 +52,7 @@ export function createServer() {
   server.post('/api/txs/history', (req, res) => {
     validateAddressesReq(req.body);
     validateDatetimeReq(req.body);
-    const txsMapList = _getTxsMapList(req.body.addresses[0]);
+    const txsMapList = _getTxsMapList(req.body.addresses);
     // Filters all txs according to hash and date
     const filteredTxs = txsMapList.filter(txMap => {
       const extraFilter = req.body.txHash ?
@@ -78,7 +78,7 @@ export function createServer() {
 
   server.post('/api/txs/pending', (req, res) => {
     validateAddressesReq(req.body);
-    const txsMapList = _getTxsMapList(req.body.addresses[0]);
+    const txsMapList = _getTxsMapList(req.body.addresses);
     const txs = txsMapList.filter(txMap => (
       req.body.addresses.includes(txMap.address) &&
         !txMap.tx.block_num
