@@ -3,53 +3,38 @@ const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ConfigWebpackPlugin = require('config-webpack');
 
-const host = 'localhost';
-const port = 3000;
 const customPath = path.join(__dirname, './customPublicPath');
-const hotScript =
-  'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
-const baseDevConfig = () => ({
-  devtool: 'eval-cheap-module-source-map',
+module.exports = {
   entry: {
     icaruspoc: [
       customPath,
-      hotScript,
       path.join(__dirname, '../chrome/extension/icaruspoc')
     ],
     background: [
       customPath,
-      hotScript,
       path.join(__dirname, '../chrome/extension/background')
     ]
   },
-  devMiddleware: {
-    publicPath: `http://${host}:${port}/js`,
-    stats: {
-      colors: true
-    },
-    noInfo: true,
-    headers: { 'Access-Control-Allow-Origin': '*' }
-  },
-  hotMiddleware: {
-    path: '/js/__webpack_hmr'
-  },
   output: {
-    path: path.join(__dirname, '../dev/js'),
-    filename: '[name].bundle.js',
+    path: path.join(__dirname, '../build/js'),
+    filename: '[name].bundle.js'
   },
   plugins: [
     new ConfigWebpackPlugin(),
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
-      manifest: require('../dll/vendor-manifest.json')
+      manifest: require('../dll/vendor-manifest.json') // eslint-disable-line
     }),
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.IgnorePlugin(/[^/]+\/[\S]+.prod$/),
+    new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
+    new webpack.optimize.UglifyJsPlugin({
+      comments: false,
+      compressor: {
+        warnings: false
+      }
+    }),
     new webpack.DefinePlugin({
-      __HOST__: `'${host}'`,
-      __PORT__: port,
       'process.env': {
         NODE_ENV: JSON.stringify('test')
       }
@@ -65,7 +50,7 @@ const baseDevConfig = () => ({
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
-          presets: ['react-hmre']
+          presets: []
         }
       },
       {
@@ -120,8 +105,4 @@ const baseDevConfig = () => ({
       },
     ]
   }
-});
-
-const appConfig = baseDevConfig();
-
-module.exports = [appConfig];
+};

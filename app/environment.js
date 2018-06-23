@@ -7,7 +7,7 @@ declare var CONFIG: ConfigType;
 const environment = Object.assign({
   DEVELOPMENT: 'development',
   TEST: 'test',
-  PRODUCTION: 'production',
+  PRODUCTION: 'prod',
   NETWORK: CONFIG.network.name,
   API: process.env.API || 'ada',
   MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,

@@ -1,4 +1,4 @@
-import { BeforeAll, Before, Given, After, AfterAll } from 'cucumber';
+import { BeforeAll, Given, After, AfterAll } from 'cucumber';
 import { createServer } from '../support/mockServer';
 import { buildMockData, getMockData, getFakeAddresses } from '../support/mockDataBuilder';
 import { setActiveLanguage } from '../support/helpers/i18n-helpers';
@@ -11,10 +11,6 @@ BeforeAll(() => {
 
 AfterAll(() => {
   server.close();
-});
-
-Before(async function () {
-  await this.driver.get('chrome-extension://bflmcienanhdibafopagdcaaenkmoago/main_window.html');
 });
 
 After(async function () {

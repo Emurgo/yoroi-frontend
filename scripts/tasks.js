@@ -13,7 +13,7 @@ exports.replaceWebpack = () => {
 };
 
 exports.copyAssets = (type) => {
-  const env = type === 'build' ? 'prod' : type;
+  const env = process.env.NODE_ENV;
   rm('-rf', type);
   mkdir(type);
   mkdir(`${type}/js`);

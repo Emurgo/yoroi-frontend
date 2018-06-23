@@ -36,7 +36,7 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('production')
+        NODE_ENV: JSON.stringify('prod')
       }
     })
   ],
@@ -50,6 +50,7 @@ module.exports = {
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
+          presets: []
         }
       },
       {
@@ -66,16 +67,30 @@ module.exports = {
         ]
       },
       {
-        test: /\.scss$/,
+        test: /\.global\.scss$/,
         use: [
           'style-loader?sourceMap',
-          'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+          'css-loader?sourceMap',
+          'sass-loader?sourceMap'
+        ]
+      },
+      {
+        test: /^((?!\.global).)*\.scss$/,
+        use: [
+          'style-loader?sourceMap',
+          'css-loader?sourceMap&modules&localIdentName=[name]_[local]&importLoaders=1',
           'sass-loader?sourceMap'
         ]
       },
       {
         test: /\.svg$/,
-        loader: 'raw-loader'
+        issuer: /\.scss$/,
+        loader: 'url-loader'
+      },
+      {
+        test: /\.inline\.svg$/,
+        issuer: /\.js$/,
+        loader: 'raw-loader',
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2)$/,
