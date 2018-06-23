@@ -45,7 +45,7 @@ declare module 'rust-cardano-crypto' {
         checker: CryptoAddressChecker,
         addresses: Array<string>
       ): {
-        result: CryptoDaedalusAddressRecovered,
+        result: Array<CryptoDaedalusAddressRestored>,
         failed: boolean,
         msg: ?string
       }
@@ -151,7 +151,7 @@ declare type CryptoAddressChecker = {
   payload_key: Array<number>
 }
 
-declare type CryptoDaedalusAddressRecovered = {
+declare type CryptoDaedalusAddressRestored = {
   address: string,
   addressing: Array<number>
 }

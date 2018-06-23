@@ -23,11 +23,11 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
-  onTransfer = (payload: { recoveryPhrase: string }) => {
-    this.props.actions[environment.API].daedalusTransfer.restoreAddresses.trigger(payload);
+  setupTransferFunds = (payload: { recoveryPhrase: string }) => {
+    this.props.actions[environment.API].daedalusTransfer.setupTransferFunds.trigger(payload);
   };
 
-  onConfirmTransfer = () => {
+  tranferFunds = () => {
     const backToWallet = () => {
       this.props.actions.router.goToRoute.trigger({
         route: this._getWalletsStore().activeWalletRoute
@@ -50,7 +50,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferForm
               mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
               suggestedMnemonics={validWords}
-              onSubmit={this.onTransfer}
+              onSubmit={this.setupTransferFunds}
               error={undefined}
             />
           </MainLayout>
@@ -63,13 +63,13 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
           </MainLayout>
         );
-      case 'aboutToSend':
+      case 'readyToTransfer':
         return (
           <MainLayout>
             <DaedalusTransferSummaryPage
               formattedWalletAmount={formattedWalletAmount}
               transferTx={daedalusTransfer.transferTx}
-              onSubmit={this.onConfirmTransfer}
+              onSubmit={this.tranferFunds}
             />
           </MainLayout>
         );
