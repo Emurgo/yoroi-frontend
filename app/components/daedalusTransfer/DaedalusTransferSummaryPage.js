@@ -7,7 +7,7 @@ import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import styles from './DaedalusTransferSummaryPage.scss';
-import type { TransferTx } from '../../stores/ada/DaedalusTransferStore';
+import type { TransferTx } from '../../types/daedalusTransferTypes';
 
 // FIXME: Add translations in i18n files
 const messages = defineMessages({
@@ -40,6 +40,10 @@ const messages = defineMessages({
     id: 'daedalusTransfer.summary.finalBalance.label',
     defaultMessage: 'Final balance'
   },
+  cancelTransferButtonLabel: {
+    id: 'daedalusTransfer.summary.cancelTransferButton.label',
+    defaultMessage: 'Cancel'
+  },
   transferButtonLabel: {
     id: 'daedalusTransfer.summary.transferButton.label',
     defaultMessage: 'Transfer Funds'
@@ -50,7 +54,8 @@ const messages = defineMessages({
 type Props = {
   formattedWalletAmount: Function,
   transferTx: TransferTx,
-  onSubmit: Function
+  onSubmit: Function,
+  onCancel: Function
 };
 
 @observer
@@ -72,8 +77,13 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
       transferTx.recoveredBalance.minus(transferTx.fee)
     );
 
-    const buttonClasses = classnames([
+    const nextButtonClasses = classnames([
       'primary',
+      styles.transferButton,
+    ]);
+
+    const cancelButtonClasses = classnames([
+      'flat',
       styles.transferButton,
     ]);
 
@@ -133,12 +143,21 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
               </div>
             </div>
 
-            <Button
-              className={buttonClasses}
-              label={intl.formatMessage(messages.transferButtonLabel)}
-              onClick={this.props.onSubmit}
-              skin={<SimpleButtonSkin />}
-            />
+            <div className={styles.buttonsWrapper}>
+              <Button
+                className={cancelButtonClasses}
+                label={intl.formatMessage(messages.cancelTransferButtonLabel)}
+                onClick={this.props.onCancel}
+                skin={<SimpleButtonSkin />}
+              />
+
+              <Button
+                className={nextButtonClasses}
+                label={intl.formatMessage(messages.transferButtonLabel)}
+                onClick={this.props.onSubmit}
+                skin={<SimpleButtonSkin />}
+              />
+            </div>
 
           </div>
 

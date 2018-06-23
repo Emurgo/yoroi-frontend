@@ -38,6 +38,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     });
   }
 
+  cancelTransferFunds = () => {
+    this.props.actions[environment.API].daedalusTransfer.cancelTransferFunds.trigger();
+  }
+
   // FIXME: Handle transfer restoring errors
   render() {
     const wallets = this._getWalletsStore();
@@ -70,6 +74,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               formattedWalletAmount={formattedWalletAmount}
               transferTx={daedalusTransfer.transferTx}
               onSubmit={this.tranferFunds}
+              onCancel={this.cancelTransferFunds}
             />
           </MainLayout>
         );

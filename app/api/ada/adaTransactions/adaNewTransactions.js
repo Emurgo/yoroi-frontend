@@ -22,6 +22,7 @@ import { getCryptoWalletFromSeed } from '../lib/crypto-wallet';
 import type {
   AdaAddresses,
   AdaTransactionFee,
+  UTXO
 } from '../adaTypes';
 import {
   NotEnoughMoneyToSendError,
@@ -69,7 +70,9 @@ export function newAdaTransaction(
   });
 }
 
-export async function getAllUTXOsForAddresses(addresses: Array<string>) {
+export async function getAllUTXOsForAddresses(
+  addresses: Array<string>
+): Promise<Array<UTXO>> {
   const groupsOfAddresses = _.chunk(addresses, addressesLimit);
   const promises = groupsOfAddresses.map(groupOfAddresses =>
     getUTXOsForAddresses(groupOfAddresses));

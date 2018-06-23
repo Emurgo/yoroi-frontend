@@ -4,8 +4,7 @@
 }
 
 .transferButton {
-  display: block !important;
-  margin: 30px auto 0;
+  margin: 20px auto 0;
 }
 
 .body {
@@ -92,6 +91,10 @@
     word-break: break-word;
   }
 
-
+  .buttonsWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
 
 }

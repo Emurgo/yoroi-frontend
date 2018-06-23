@@ -5,6 +5,7 @@ import {
   RandomAddressChecker,
   Wallet
 } from 'rust-cardano-crypto';
+import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import Store from '../lib/Store';
 import Request from '.././lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
@@ -26,29 +27,19 @@ import {
   sendTx
 } from '../../api/ada/lib/icarus-backend-api';
 import LocalizableError from '../../i18n/LocalizableError';
+import type { 
+  TransferStatus,
+  TransferTx
+} from '../../types/daedalusTransferTypes';
+import type {
+  UTXO
+} from '../../api/ada/adaTypes';
 
 declare var CONFIG: ConfigType;
-
 const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
 
-// FIXME: Define a place for these types
-export type TransferStatus =
-    'uninitialized'
-  | 'restoringAddresses'
-  | 'checkingAddresses'
-  | 'generatingTx'
-  | 'readyToTransfer'
-
-export type TransferTx = {
-  recoveredBalance: BigNumber,
-  fee: BigNumber,
-  cbor_encoded_tx: Array<number>,
-  senders: Array<string>,
-  receiver: string
-}
-
-// FIXME: Define a place for these errors
+// FIXME: Define a place for these type of errors
 export class NoTransferTxError extends LocalizableError {
   constructor() {
     super({
@@ -69,17 +60,12 @@ export default class DaedalusTransferStore extends Store {
     const actions = this.actions.ada.daedalusTransfer;
     actions.setupTransferFunds.listen(this._setupTransferFunds);
     actions.transferFunds.listen(this._transferFunds);
+    actions.cancelTransferFunds.listen(this._reset);
   }
 
   teardown() {
     super.teardown();
-    this.status = 'uninitialized';
-    this.transferTx = null;
-    this.transferFundsRequest.reset();
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
-    }
+    this._reset();
   }
 
   /* TODO: Handle WS connection errors */
@@ -153,9 +139,9 @@ export default class DaedalusTransferStore extends Store {
 
     const tx = Wallet.move(wallet, inputs, output).result;
     return {
-      recoveredBalance,
-      fee: new BigNumber(tx.fee),
-      cbor_encoded_tx: tx.cbor_encoded_tx,
+      recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
+      fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),
+      cborEncodedTx: tx.cbor_encoded_tx,
       senders,
       receiver: output
     };
@@ -168,9 +154,9 @@ export default class DaedalusTransferStore extends Store {
   }
 
   _getInputs(
-    utxos,
+    utxos: Array<UTXO>,
     addressesWithFunds: Array<CryptoDaedalusAddressRestored>
-  ) {
+  ): Array<TxDaedalusInput> {
     const addressingByAddress = {};
     addressesWithFunds.forEach(a => {
       addressingByAddress[a.address] = a.addressing;
@@ -203,10 +189,21 @@ export default class DaedalusTransferStore extends Store {
     if (!this.transferTx) {
       throw new NoTransferTxError();
     }
-    await this.transferFundsRequest.execute({
-      cborEncodedTx: this.transferTx.cbor_encoded_tx
-    });
+    /* await this.transferFundsRequest.execute({
+      cborEncodedTx: this.transferTx.cborEncodedTx
+    });*/
     next();
-    this.teardown();
+    this._reset();
+  }
+
+  @action.bound
+  _reset() {
+    this.status = 'uninitialized';
+    this.transferTx = null;
+    this.transferFundsRequest.reset();
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
   }
 }
