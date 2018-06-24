@@ -4,14 +4,23 @@ import {
   RandomAddressChecker,
   Wallet
 } from 'rust-cardano-crypto';
+import {
+  Logger,
+  stringifyError,
+} from '../../utils/logging';
+import { getOrFail } from '../ada/lib//cardanoCrypto/cryptoUtils';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import { getBalance } from './adaWallet';
+import {
+  GetAddressesWithFundsError,
+  GenerateTransferTxError
+} from './errors';
 import {
   mapToList
 } from './lib/utils';
 import {
   getCryptoDaedalusWalletFromMnemonics
-} from './lib/crypto-wallet';
+} from './lib/cardanoCrypto/cryptoWallet';
 import {
   getAdaAddressesMap,
   filterAdaAddressesByType
@@ -26,39 +35,47 @@ import type {
   TransferTx
 } from '../../types/daedalusTransferTypes';
 
-// FIXME: Handle rust errors
 export function getAddressesWithFunds(payload: {
   secretWords: string,
   addresses: Array<string>
 }): Array<CryptoDaedalusAddressRestored> {
-  const { secretWords, addresses } = payload;
-  const checker =
-    RandomAddressChecker.newCheckerFromMnemonics(secretWords).result;
-  const addressesWithFunds =
-    RandomAddressChecker.checkAddresses(checker, addresses).result;
-  return addressesWithFunds;
+  try {
+    const { secretWords, addresses } = payload;
+    const checker =
+      getOrFail(RandomAddressChecker.newCheckerFromMnemonics(secretWords));
+    const addressesWithFunds =
+      getOrFail(RandomAddressChecker.checkAddresses(checker, addresses));
+    return addressesWithFunds;
+  } catch (error) {
+    Logger.error(`daedalusTransfer::getAddressesWithFunds ${stringifyError(error)}`);
+    throw new GetAddressesWithFundsError();
+  }
 }
 
-// FIXME: Handle rust and backend errors
 export async function generateTransferTx(payload: {
   secretWords: string,
   addressesWithFunds: Array<CryptoDaedalusAddressRestored>
 }): Promise<TransferTx> {
-  const { secretWords, addressesWithFunds } = payload;
-  const senders = addressesWithFunds.map(a => a.address);
-  const senderUtxos = await getAllUTXOsForAddresses(senders);
-  const recoveredBalance = await getBalance(senders);
-  const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
-  const inputs = _getInputs(senderUtxos, addressesWithFunds);
-  const output = _getReceiverAddress();
-  const tx = Wallet.move(wallet, inputs, output).result;
-  return {
-    recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
-    fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),
-    cborEncodedTx: tx.cbor_encoded_tx,
-    senders,
-    receiver: output
-  };
+  try {
+    const { secretWords, addressesWithFunds } = payload;
+    const senders = addressesWithFunds.map(a => a.address);
+    const senderUtxos = await getAllUTXOsForAddresses(senders);
+    const recoveredBalance = await getBalance(senders);
+    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
+    const inputs = _getInputs(senderUtxos, addressesWithFunds);
+    const output = _getReceiverAddress();
+    const tx = getOrFail(Wallet.move(wallet, inputs, output));
+    return {
+      recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
+      fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),
+      cborEncodedTx: tx.cbor_encoded_tx,
+      senders,
+      receiver: output
+    };
+  } catch (error) {
+    Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
+    throw new GenerateTransferTxError();
+  }
 }
 
 function _getReceiverAddress(): string {

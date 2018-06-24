@@ -2,6 +2,10 @@
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
+import {
   saveInStorage,
   getFromStorage,
   mapToList
@@ -10,8 +14,8 @@ import {
   generateWalletSeed,
   generateAdaMnemonic,
   isValidAdaMnemonic
-} from './lib/crypto-wallet';
-import { toAdaWallet } from './lib/crypto-to-cardano';
+} from './lib/cardanoCrypto/cryptoWallet';
+import { toAdaWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
   getAdaAddressesMap,
   newAdaAddress
@@ -27,7 +31,7 @@ import type {
   AdaAddresses,
   AdaWalletRecoveryPhraseResponse
 } from './adaTypes';
-import type { WalletSeed } from './lib/crypto-wallet';
+import type { WalletSeed } from './lib/cardanoCrypto/cryptoWallet';
 import {
   getUTXOsSumsForAddresses,
   addressesLimit
@@ -36,10 +40,6 @@ import { UpdateAdaWalletError, GetBalanceError } from './errors';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 const WALLET_SEED_KEY = 'SEED';
-
-// FIXME: Extract to another file
-const Logger = console;
-const stringifyError = o => o.toString();
 
 /* Create and save a wallet with your seed, and a SINGLE account with one address */
 export async function newAdaWallet({

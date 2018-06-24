@@ -18,7 +18,7 @@ import {
   createAdaAddress,
   getAdaAddressesMap
 } from '../adaAddress';
-import { getCryptoWalletFromSeed } from '../lib/crypto-wallet';
+import { getCryptoWalletFromSeed } from '../lib/cardanoCrypto/cryptoWallet';
 import type {
   AdaAddresses,
   AdaTransactionFee,

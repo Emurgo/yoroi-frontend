@@ -66,6 +66,16 @@ const messages = defineMessages({
     id: 'api.errors.transactionError',
     defaultMessage: '!!!Error while creating transaction.',
     description: '"Error while creating transaction." error message'
+  },
+  cannotGetAddressesWithFundsError: {
+    id: 'api.errors.cannotGetAddressesWithFundsError',
+    defaultMessage: '!!!Error while getting addresses with funds.',
+    description: '"Error while getting addresses with funds." error message'
+  },
+  cannotGenerateTransferTxError: {
+    id: 'api.errors.cannotGenerateTransferTxError',
+    defaultMessage: '!!!Error while generating transfer transacion.',
+    description: 'Error while generating transfer transacion. error message'
   }
 });
 
@@ -182,6 +192,24 @@ export class TransactionError extends LocalizableError {
     super({
       id: messages.transactionError.id,
       defaultMessage: messages.transactionError.defaultMessage,
+    });
+  }
+}
+
+export class GetAddressesWithFundsError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.cannotGetAddressesWithFundsError.id,
+      defaultMessage: messages.cannotGetAddressesWithFundsError.defaultMessage
+    });
+  }
+}
+
+export class GenerateTransferTxError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.cannotGenerateTransferTxError.id,
+      defaultMessage: messages.cannotGenerateTransferTxError.defaultMessage
     });
   }
 }

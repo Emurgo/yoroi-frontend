@@ -5,9 +5,9 @@ import { Blake2b, Wallet } from 'rust-cardano-crypto';
 import {
   encryptWithPassword,
   decryptWithPassword
-} from '../../../utils/passwordCipher';
+} from '../../../../utils/passwordCipher';
 
-import type { ConfigType } from '../../../../config/config-types';
+import type { ConfigType } from '../../../../../config/config-types';
 
 export type WalletSeed = {
   encryptedSeed: string,

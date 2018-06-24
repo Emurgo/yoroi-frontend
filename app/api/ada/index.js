@@ -2,6 +2,11 @@
 import { action } from 'mobx';
 import BigNumber from 'bignumber.js';
 import {
+  Logger,
+  stringifyError,
+  stringifyData
+} from '../../utils/logging';
+import {
   unixTimestampToDate,
   mapToList
 } from './lib/utils';
@@ -127,11 +132,6 @@ export type ExportWalletToFileRequest = {
   password: ?string
 };
 export type ExportWalletToFileResponse = [];
-
-// FIXME: Extract to another file
-const Logger = console;
-const stringifyData = JSON.stringify;
-const stringifyError = o => o.toString();
 
 export default class AdaApi {
   async getWallets(): Promise<GetWalletsResponse> {

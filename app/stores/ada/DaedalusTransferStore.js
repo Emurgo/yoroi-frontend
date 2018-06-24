@@ -1,5 +1,9 @@
 // @flow
 import { observable, action, runInAction } from 'mobx';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
 import Store from '../lib/Store';
 import Request from '.././lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
@@ -19,16 +23,6 @@ import {
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
-
-// FIXME: Define a place for these type of errors
-export class NoTransferTxError extends LocalizableError {
-  constructor() {
-    super({
-      id: 'daedalusTransfer.error.NoTransferTxError',
-      defaultMessage: '!!! There is no transfer transaction to send',
-    });
-  }
-}
 
 export default class DaedalusTransferStore extends Store {
 
@@ -64,23 +58,28 @@ export default class DaedalusTransferStore extends Store {
         There is an open issue with this https://github.com/facebook/flow/issues/3116
     */
     this.ws.addEventListener('message', async (event: any) => {
-      const data = JSON.parse(event.data);
-      console.log(`[ws::message] on: ${data.msg}`);
-      if (data.msg === MSG_TYPE_RESTORE) {
-        this._updateStatus('checkingAddresses');
-        const addressesWithFunds = getAddressesWithFunds({
-          secretWords,
-          addresses: data.addresses
-        });
-        this._updateStatus('generatingTx');
-        const transferTx = await generateTransferTx({
-          secretWords,
-          addressesWithFunds
-        });
-        runInAction(() => {
-          this.transferTx = transferTx;
-        });
-        this._updateStatus('readyToTransfer');
+      try {
+        const data = JSON.parse(event.data);
+        console.log(`[ws::message] on: ${data.msg}`);
+        if (data.msg === MSG_TYPE_RESTORE) {
+          this._updateStatus('checkingAddresses');
+          const addressesWithFunds = getAddressesWithFunds({
+            secretWords,
+            addresses: data.addresses
+          });
+          this._updateStatus('generatingTx');
+          const transferTx = await generateTransferTx({
+            secretWords,
+            addressesWithFunds
+          });
+          runInAction(() => {
+            this.transferTx = transferTx;
+          });
+          this._updateStatus('readyToTransfer');
+        }
+      } catch (error) {
+        Logger.error(`DaedalusTransferStore::setupTransferFunds ${stringifyError(error)}`);
+        throw new SetupTransferFundsError();
       }
     });
   }
@@ -98,19 +97,23 @@ export default class DaedalusTransferStore extends Store {
     return sendTx(signedTx);
   }
 
-  // FIXME: Handle backend errors
   _transferFunds = async (payload: {
     next: Function
   }) => {
-    const { next } = payload;
-    if (!this.transferTx) {
-      throw new NoTransferTxError();
+    try {
+      const { next } = payload;
+      if (!this.transferTx) {
+        throw new NoTransferTxError();
+      }
+      await this.transferFundsRequest.execute({
+        cborEncodedTx: this.transferTx.cborEncodedTx
+      });
+      next();
+      this._reset();
+    } catch (error) {
+      Logger.error(`DaedalusTransferStore::transferFunds ${stringifyError(error)}`);
+      throw new TransferFundsError();
     }
-    /* await this.transferFundsRequest.execute({
-      cborEncodedTx: this.transferTx.cborEncodedTx
-    });*/
-    next();
-    this._reset();
   }
 
   @action.bound
@@ -122,5 +125,36 @@ export default class DaedalusTransferStore extends Store {
       this.ws.close();
       this.ws = null;
     }
+  }
+}
+
+// FIXME: Define a place for these type of errors
+export class SetupTransferFundsError extends LocalizableError {
+  constructor() {
+    super({
+      id: 'daedalusTransfer.error.setupTransferFundsError',
+      defaultMessage: 'Unable to setup transfer funds transacion.',
+      description: '"Unable to setup transfer funds transacion." error message',
+    });
+  }
+}
+
+export class TransferFundsError extends LocalizableError {
+  constructor() {
+    super({
+      id: 'daedalusTransfer.error.transferFundsError',
+      defaultMessage: '!!!Unable to transfer funds.',
+      description: '"Unable to transfer funds." eror message',
+    });
+  }
+}
+
+export class NoTransferTxError extends LocalizableError {
+  constructor() {
+    super({
+      id: 'daedalusTransfer.error.noTransferTxError',
+      defaultMessage: '!!!There is no transfer transaction to send.',
+      description: '"There is no transfer transaction to send." error message'
+    });
   }
 }
