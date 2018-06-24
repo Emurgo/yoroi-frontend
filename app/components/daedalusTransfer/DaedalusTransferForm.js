@@ -17,8 +17,8 @@ import styles from './DaedalusTransferForm.scss';
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.form.instructions.title.label',
-    defaultMessage: '!!!Transfer funds from Daedalus wallet',
-    description: 'Label "Transfer funds from Daedalus wallet" on the Daedalus transfer form page.'
+    defaultMessage: 'Instructions',
+    description: 'Label "Instructions" on the Daedalus transfer form page.'
   },
   instructions: {
     id: 'daedalusTransfer.form.instructions.description.text',
@@ -27,27 +27,27 @@ const messages = defineMessages({
   },
   recoveryPhraseInputLabel: {
     id: 'daedalusTransfer.form.recovery.phrase.input.label',
-    defaultMessage: '!!!Recovery phrase',
+    defaultMessage: 'Recovery phrase',
     description: 'Label for the recovery phrase input on the Daedalus transfer form page.'
   },
   recoveryPhraseInputHint: {
     id: 'daedalusTransfer.form.recovery.phrase.input.hint',
-    defaultMessage: '!!!Enter recovery phrase',
+    defaultMessage: 'Enter recovery phrase',
     description: 'Hint "Enter recovery phrase" for the recovery phrase input on the Daedalus transfer form page.'
   },
   recoveryPhraseNoResults: {
     id: 'daedalusTransfer.form.recovery.phrase.input.noResults',
-    defaultMessage: '!!!No results',
+    defaultMessage: 'No results',
     description: '"No results" message for the recovery phrase input search results.'
   },
   invalidRecoveryPhrase: {
     id: 'daedalusTransfer.form.errors.invalidRecoveryPhrase',
-    defaultMessage: '!!!Invalid recovery phrase',
+    defaultMessage: 'Invalid recovery phrase',
     description: 'Error message shown when invalid recovery phrase was entered.'
   },
   nextButtonLabel: {
     id: 'daedalusTransfer.form.next',
-    defaultMessage: '!!!Next',
+    defaultMessage: 'Next',
     description: 'Label for the next button on the Daedalus transfer form page.'
   },
 });
@@ -69,6 +69,7 @@ export default class DaedalusTransferForm extends Component<Props> {
     intl: intlShape.isRequired
   };
 
+  // FIXME: Mnemonic validation error is not displaying in the UI
   form = new ReactToolboxMobxForm({
     fields: {
       recoveryPhrase: {
@@ -112,7 +113,7 @@ export default class DaedalusTransferForm extends Component<Props> {
 
     const buttonClasses = classnames([
       'primary',
-      styles.nextButton,
+      styles.button,
     ]);
 
     const recoveryPhraseField = form.$('recoveryPhrase');

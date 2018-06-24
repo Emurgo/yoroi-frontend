@@ -11,11 +11,6 @@ import type { TransferTx } from '../../types/daedalusTransferTypes';
 
 // FIXME: Add translations in i18n files
 const messages = defineMessages({
-  title: {
-    id: 'daedalusTransfer.summary.title.label',
-    defaultMessage: '!!!Transfer funds from Daedalus wallet',
-    description: 'Label "Transfer funds from Daedalus wallet" on the Daedalus transfer summary page.'
-  },
   addressFromLabel: {
     id: 'daedalusTransfer.summary.addressFrom.label',
     defaultMessage: 'From'
@@ -79,12 +74,12 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
 
     const nextButtonClasses = classnames([
       'primary',
-      styles.transferButton,
+      styles.button,
     ]);
 
     const cancelButtonClasses = classnames([
       'flat',
-      styles.transferButton,
+      styles.button,
     ]);
 
     return (

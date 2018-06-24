@@ -7,6 +7,7 @@ export type TransferStatus =
   | 'checkingAddresses'
   | 'generatingTx'
   | 'readyToTransfer'
+  | 'error'
 
 export type TransferTx = {
   recoveredBalance: BigNumber,

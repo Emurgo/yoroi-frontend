@@ -1,7 +1,16 @@
 // @flow
 import ExtendableError from 'es6-error';
+import { defineMessages } from 'react-intl';
 
-export default class LocalizableError extends ExtendableError {
+const messages = defineMessages({
+  unknowError: {
+    id: 'app.errors.unknowError',
+    defaultMessage: '!!!Unknow error',
+    description: 'Unknow error message.'
+  },
+});
+
+class LocalizableError extends ExtendableError {
   constructor(
     { id, defaultMessage, values = {} }:
     { id: string, defaultMessage: string, values?: Object}
@@ -14,3 +23,22 @@ export default class LocalizableError extends ExtendableError {
     this.values = values;
   }
 }
+
+class UnknowError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.unknowError.id,
+      defaultMessage: messages.unknowError.defaultMessage,
+    });
+  }
+}
+
+/* TODO: All displayed errors should use this util */
+export function localizedError(error: any): LocalizableError {
+  if (error instanceof LocalizableError) {
+    return error;
+  }
+  return new UnknowError();
+}
+
+export default LocalizableError;

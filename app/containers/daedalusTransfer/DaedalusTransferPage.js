@@ -8,6 +8,7 @@ import MainLayout from '../MainLayout';
 import DaedalusTransferForm from '../../components/daedalusTransfer/DaedalusTransferForm';
 import DaedalusTransferWaitingPage from '../../components/daedalusTransfer/DaedalusTransferWaitingPage';
 import DaedalusTransferSummaryPage from '../../components/daedalusTransfer/DaedalusTransferSummaryPage';
+import DaedalusTransferErrorPage from '../../components/daedalusTransfer/DaedalusTransferErrorPage';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
@@ -74,6 +75,15 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               formattedWalletAmount={formattedWalletAmount}
               transferTx={daedalusTransfer.transferTx}
               onSubmit={this.tranferFunds}
+              onCancel={this.cancelTransferFunds}
+            />
+          </MainLayout>
+        );
+      case 'error':
+        return (
+          <MainLayout>
+            <DaedalusTransferErrorPage
+              error={daedalusTransfer.error}
               onCancel={this.cancelTransferFunds}
             />
           </MainLayout>

@@ -10,7 +10,9 @@ import type { ConfigType } from '../../../config/config-types';
 import {
   sendTx
 } from '../../api/ada/lib/icarus-backend-api';
-import LocalizableError from '../../i18n/LocalizableError';
+import LocalizableError, {
+  localizedError
+} from '../../i18n/LocalizableError';
 import type {
   TransferStatus,
   TransferTx
@@ -27,6 +29,7 @@ const MSG_TYPE_RESTORE = 'RESTORE';
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatus = 'uninitialized';
+  @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable transferFundsRequest: Request<any> = new Request(this._transferFundsRequest);
   @observable ws: any = null;
@@ -79,7 +82,10 @@ export default class DaedalusTransferStore extends Store {
         }
       } catch (error) {
         Logger.error(`DaedalusTransferStore::setupTransferFunds ${stringifyError(error)}`);
-        throw new SetupTransferFundsError();
+        runInAction(() => {
+          this.status = 'error';
+          this.error = localizedError(error);
+        });
       }
     });
   }
@@ -111,6 +117,7 @@ export default class DaedalusTransferStore extends Store {
       next();
       this._reset();
     } catch (error) {
+      // TODO: Manage this error in the UI
       Logger.error(`DaedalusTransferStore::transferFunds ${stringifyError(error)}`);
       throw new TransferFundsError();
     }
@@ -119,6 +126,7 @@ export default class DaedalusTransferStore extends Store {
   @action.bound
   _reset() {
     this.status = 'uninitialized';
+    this.error = null;
     this.transferTx = null;
     this.transferFundsRequest.reset();
     if (this.ws) {
@@ -129,22 +137,12 @@ export default class DaedalusTransferStore extends Store {
 }
 
 // FIXME: Define a place for these type of errors
-export class SetupTransferFundsError extends LocalizableError {
-  constructor() {
-    super({
-      id: 'daedalusTransfer.error.setupTransferFundsError',
-      defaultMessage: 'Unable to setup transfer funds transacion.',
-      description: '"Unable to setup transfer funds transacion." error message',
-    });
-  }
-}
-
 export class TransferFundsError extends LocalizableError {
   constructor() {
     super({
       id: 'daedalusTransfer.error.transferFundsError',
       defaultMessage: '!!!Unable to transfer funds.',
-      description: '"Unable to transfer funds." eror message',
+      description: '"Unable to transfer funds." error message',
     });
   }
 }
