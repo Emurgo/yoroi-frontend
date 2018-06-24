@@ -11,7 +11,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
-import LocalizableError from '../../i18n/LocalizableError';
 import styles from './DaedalusTransferForm.scss';
 
 const messages = defineMessages({
@@ -58,7 +57,6 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 type Props = {
   onSubmit: Function,
   mnemonicValidator: Function,
-  error?: ?LocalizableError,
   suggestedMnemonics: Array<string>,
 };
 
@@ -109,7 +107,7 @@ export default class DaedalusTransferForm extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { suggestedMnemonics, error } = this.props;
+    const { suggestedMnemonics } = this.props;
 
     const buttonClasses = classnames([
       'primary',
@@ -141,8 +139,6 @@ export default class DaedalusTransferForm extends Component<Props> {
               noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
               skin={<SimpleAutocompleteSkin />}
             />
-
-            {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
             <Button
               className={buttonClasses}

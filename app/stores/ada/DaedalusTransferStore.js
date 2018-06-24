@@ -117,9 +117,10 @@ export default class DaedalusTransferStore extends Store {
       next();
       this._reset();
     } catch (error) {
-      // TODO: Manage this error in the UI
       Logger.error(`DaedalusTransferStore::transferFunds ${stringifyError(error)}`);
-      throw new TransferFundsError();
+      runInAction(() => {
+        this.error = localizedError(new TransferFundsError());
+      });
     }
   }
 

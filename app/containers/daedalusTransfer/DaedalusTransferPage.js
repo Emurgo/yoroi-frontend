@@ -53,10 +53,9 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         return (
           <MainLayout>
             <DaedalusTransferForm
+              onSubmit={this.setupTransferFunds}
               mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
               suggestedMnemonics={validWords}
-              onSubmit={this.setupTransferFunds}
-              error={undefined}
             />
           </MainLayout>
         );
@@ -75,7 +74,9 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               formattedWalletAmount={formattedWalletAmount}
               transferTx={daedalusTransfer.transferTx}
               onSubmit={this.tranferFunds}
+              isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
               onCancel={this.cancelTransferFunds}
+              error={daedalusTransfer.error}
             />
           </MainLayout>
         );

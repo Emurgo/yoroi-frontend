@@ -8,6 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import styles from './DaedalusTransferSummaryPage.scss';
 import type { TransferTx } from '../../types/daedalusTransferTypes';
+import LocalizableError from '../../i18n/LocalizableError';
 
 // FIXME: Add translations in i18n files
 const messages = defineMessages({
@@ -50,7 +51,9 @@ type Props = {
   formattedWalletAmount: Function,
   transferTx: TransferTx,
   onSubmit: Function,
-  onCancel: Function
+  isSubmitting: boolean,
+  onCancel: Function,
+  error: LocalizableError
 };
 
 @observer
@@ -62,7 +65,7 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { transferTx } = this.props;
+    const { transferTx, isSubmitting, error } = this.props;
 
     const receiver = transferTx.receiver;
     // FIXME: formattedWalletAmount is not accurate for this amounts!
@@ -73,7 +76,7 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
     );
 
     const nextButtonClasses = classnames([
-      'primary',
+      isSubmitting ? styles.isSubmitting : 'primary',
       styles.button,
     ]);
 
@@ -138,11 +141,19 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
               </div>
             </div>
 
+            <div className={styles.errorWrapper}>
+              {
+                error && !isSubmitting &&
+                  <p className={styles.error}>{intl.formatMessage(error)}</p>
+              }
+            </div>
+
             <div className={styles.buttonsWrapper}>
               <Button
                 className={cancelButtonClasses}
                 label={intl.formatMessage(messages.cancelTransferButtonLabel)}
                 onClick={this.props.onCancel}
+                disabled={isSubmitting}
                 skin={<SimpleButtonSkin />}
               />
 
@@ -150,6 +161,7 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
                 className={nextButtonClasses}
                 label={intl.formatMessage(messages.transferButtonLabel)}
                 onClick={this.props.onSubmit}
+                disabled={isSubmitting}
                 skin={<SimpleButtonSkin />}
               />
             </div>
