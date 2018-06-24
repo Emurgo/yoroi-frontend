@@ -1,39 +1,20 @@
 // @flow
 import { observable, action, runInAction } from 'mobx';
-import BigNumber from 'bignumber.js';
-import {
-  RandomAddressChecker,
-  Wallet
-} from 'rust-cardano-crypto';
-import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import Store from '../lib/Store';
 import Request from '.././lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
-import { getBalance } from '../../api/ada/adaWallet';
-import {
-  mapToList
-} from '../../api/ada/lib/utils';
-import {
-  getCryptoDaedalusWalletFromMnemonics
-} from '../../api/ada/lib/crypto-wallet';
-import {
-  getAdaAddressesMap,
-  filterAdaAddressesByType
-} from '../../api/ada/adaAddress';
-import {
-  getAllUTXOsForAddresses
-} from '../../api/ada/adaTransactions/adaNewTransactions';
 import {
   sendTx
 } from '../../api/ada/lib/icarus-backend-api';
 import LocalizableError from '../../i18n/LocalizableError';
-import type { 
+import type {
   TransferStatus,
   TransferTx
 } from '../../types/daedalusTransferTypes';
-import type {
-  UTXO
-} from '../../api/ada/adaTypes';
+import {
+  getAddressesWithFunds,
+  generateTransferTx
+} from '../../api/ada/daedalusTransfer';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -87,12 +68,12 @@ export default class DaedalusTransferStore extends Store {
       console.log(`[ws::message] on: ${data.msg}`);
       if (data.msg === MSG_TYPE_RESTORE) {
         this._updateStatus('checkingAddresses');
-        const addressesWithFunds = this._getAddressesWithFunds({
+        const addressesWithFunds = getAddressesWithFunds({
           secretWords,
           addresses: data.addresses
         });
         this._updateStatus('generatingTx');
-        const transferTx = await this._generateTransferTx({
+        const transferTx = await generateTransferTx({
           secretWords,
           addressesWithFunds
         });
@@ -107,70 +88,6 @@ export default class DaedalusTransferStore extends Store {
   @action.bound
   _updateStatus(s: TransferStatus) {
     this.status = s;
-  }
-
-  // FIXME: Handle rust errors
-  _getAddressesWithFunds = (payload: {
-    secretWords: string,
-    addresses: Array<string>
-  }): Array<CryptoDaedalusAddressRestored> => {
-    const { secretWords, addresses } = payload;
-    const checker =
-      RandomAddressChecker.newCheckerFromMnemonics(secretWords).result;
-    const addressesWithFunds =
-      RandomAddressChecker.checkAddresses(checker, addresses).result;
-    return addressesWithFunds;
-  }
-
-  // FIXME: Handle rust and backend errors
-  _generateTransferTx = async (payload: {
-    secretWords: string,
-    addressesWithFunds: Array<CryptoDaedalusAddressRestored>
-  }): Promise<TransferTx> => {
-    const { secretWords, addressesWithFunds } = payload;
-
-    const senders = addressesWithFunds.map(a => a.address);
-    const senderUtxos = await getAllUTXOsForAddresses(senders);
-    const recoveredBalance = await getBalance(senders);
-
-    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
-    const inputs = this._getInputs(senderUtxos, addressesWithFunds);
-    const output = this._getReceiverAddress();
-
-    const tx = Wallet.move(wallet, inputs, output).result;
-    return {
-      recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
-      fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),
-      cborEncodedTx: tx.cbor_encoded_tx,
-      senders,
-      receiver: output
-    };
-  }
-
-  _getReceiverAddress(): string {
-    const addressesMap = getAdaAddressesMap();
-    const addresses = mapToList(addressesMap);
-    return filterAdaAddressesByType(addresses, 'External')[0].cadId;
-  }
-
-  _getInputs(
-    utxos: Array<UTXO>,
-    addressesWithFunds: Array<CryptoDaedalusAddressRestored>
-  ): Array<TxDaedalusInput> {
-    const addressingByAddress = {};
-    addressesWithFunds.forEach(a => {
-      addressingByAddress[a.address] = a.addressing;
-    });
-    return utxos.map(utxo => {
-      return {
-        ptr: {
-          index: utxo.tx_index,
-          id: utxo.tx_hash
-        },
-        value: utxo.amount,
-        addressing: addressingByAddress[utxo.receiver]
-      };
-    });
   }
 
   _transferFundsRequest = async (payload: {
