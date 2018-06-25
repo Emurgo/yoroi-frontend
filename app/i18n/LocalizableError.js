@@ -5,7 +5,7 @@ import { defineMessages } from 'react-intl';
 const messages = defineMessages({
   unknowError: {
     id: 'app.errors.unknowError',
-    defaultMessage: '!!!Unknow error',
+    defaultMessage: '!!!Unknow error.',
     description: 'Unknow error message.'
   },
 });

@@ -20,9 +20,31 @@ const messages = defineMessages({
     description: 'Label "Instructions" on the Daedalus transfer form page.'
   },
   instructions: {
-    id: 'daedalusTransfer.form.instructions.description.text',
-    defaultMessage: '!!!Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    description: 'Text instructions on the Daedalus transfer form page.'
+    step1: {
+      id: 'daedalusTransfer.form.instructions.step1.text',
+      defaultMessage: 'Find you Daedalus mnemonics and prepare it',
+      description: 'Text for instructions step 1 on the Daedalus transfer form page.'
+    },
+    step2: {
+      id: 'daedalusTransfer.form.instructions.step2.text',
+      defaultMessage: 'Enter mnemonics',
+      description: 'Text for instructions step 2 on the Daedalus transfer form page.'
+    },
+    step3: {
+      id: 'daedalusTransfer.form.instructions.step3.text',
+      defaultMessage: 'Click Next button',
+      description: 'Text for instructions step 3 on the Daedalus transfer form page.'
+    },
+    step4: {
+      id: 'daedalusTransfer.form.instructions.step4.text',
+      defaultMessage: 'Wait until wallet is synced',
+      description: 'Text for instructions step 4 on the Daedalus transfer form page.'
+    },
+    step5: {
+      id: 'daedalusTransfer.form.instructions.step5.text',
+      defaultMessage: 'Accept "transfer funds" transaction between Daedalus and Icarus wallets.',
+      description: 'Text for instructions step 5 on the Daedalus transfer form page.'
+    },
   },
   recoveryPhraseInputLabel: {
     id: 'daedalusTransfer.form.recovery.phrase.input.label',
@@ -122,12 +144,21 @@ export default class DaedalusTransferForm extends Component<Props> {
 
           <div className={styles.body}>
 
-            <div className={styles.title}>
-              {intl.formatMessage(messages.title)}
-            </div>
+            <div>
+              <div className={styles.title}>
+                {intl.formatMessage(messages.title)}
+              </div>
 
-            <div className={styles.text}>
-              {intl.formatMessage(messages.instructions)}
+              <ul className={styles.instructionsList}>
+                {
+                  Object.values(messages.instructions)
+                  .map(step =>
+                    <li className={styles.text}>
+                      {intl.formatMessage(step)}
+                    </li>
+                  )
+                }
+              </ul>
             </div>
 
             <Autocomplete

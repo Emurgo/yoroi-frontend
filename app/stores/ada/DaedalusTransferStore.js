@@ -34,20 +34,20 @@ export default class DaedalusTransferStore extends Store {
   @observable transferFundsRequest: Request<any> = new Request(this._transferFundsRequest);
   @observable ws: any = null;
 
-  setup() {
+  setup(): void {
     const actions = this.actions.ada.daedalusTransfer;
     actions.setupTransferFunds.listen(this._setupTransferFunds);
     actions.transferFunds.listen(this._transferFunds);
     actions.cancelTransferFunds.listen(this._reset);
   }
 
-  teardown() {
+  teardown(): void {
     super.teardown();
     this._reset();
   }
 
   /* TODO: Handle WS connection errors */
-  _setupTransferFunds = (payload: { recoveryPhrase: string }) => {
+  _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
     this.status = 'restoringAddresses';
     this.ws = new WebSocket(websocketUrl);
@@ -91,13 +91,13 @@ export default class DaedalusTransferStore extends Store {
   }
 
   @action.bound
-  _updateStatus(s: TransferStatus) {
+  _updateStatus(s: TransferStatus): void {
     this.status = s;
   }
 
   _transferFundsRequest = async (payload: {
     cborEncodedTx: Array<number>
-  }) => {
+  }): Promise<any> => {
     const { cborEncodedTx } = payload;
     const signedTx = Buffer.from(cborEncodedTx).toString('base64');
     return sendTx(signedTx);
@@ -105,7 +105,7 @@ export default class DaedalusTransferStore extends Store {
 
   _transferFunds = async (payload: {
     next: Function
-  }) => {
+  }): Promise<void> => {
     try {
       const { next } = payload;
       if (!this.transferTx) {
@@ -125,7 +125,7 @@ export default class DaedalusTransferStore extends Store {
   }
 
   @action.bound
-  _reset() {
+  _reset(): void {
     this.status = 'uninitialized';
     this.error = null;
     this.transferTx = null;
