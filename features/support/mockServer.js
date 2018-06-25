@@ -33,7 +33,8 @@ export function createServer() {
 
   server.post('/api/txs/utxoSumForAddresses', (req, res) => {
     validateAddressesReq(req.body);
-    const sumUtxos = getMockData().utxos.reduce((sum, utxo) => {
+    const utxos = getMockData().utxos;
+    const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
       if (req.body.addresses.includes(utxo.receiver)) {
         return sum + utxo.amount;
       }

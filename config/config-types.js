@@ -7,5 +7,6 @@ export type ConfigType = {
 export type NetworkConfigType = {
   protocolMagic: 633343913 | 764824073,
   backendUrl: string,
-  websocketUrl: string
+  websocketUrl: string,
+  name: string,
 };

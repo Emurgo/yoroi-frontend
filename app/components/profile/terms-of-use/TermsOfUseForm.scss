@@ -1,0 +1,45 @@
+@import '../../../themes/mixins/loading-spinner';
+@import '../../../themes/mixins/error-message';
+
+.component {
+  padding: 20px;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: overlay;
+  &::-webkit-scrollbar-button {
+    height: 7px;
+    display: block;
+  }
+}
+
+.centeredBox {
+  background-color: var(--theme-bordered-box-background-color);
+  border: var(--theme-bordered-box-border);
+  border-radius: 4px;
+  padding: 30px 30px 20px;
+}
+
+.submitButton,
+.submitButtonSpinning {
+  display: block !important;
+  margin: 0 auto;
+}
+
+.submitButtonSpinning {
+  @include loading-spinner("../../../assets/images/spinner-light.svg");
+}
+
+.error {
+  @include error-message;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.checkbox {
+  margin-bottom: 30px;
+  padding-top: 10px;
+
+  :global .SimpleCheckbox_label {
+    font-family: var(--font-regular);
+  }
+}
