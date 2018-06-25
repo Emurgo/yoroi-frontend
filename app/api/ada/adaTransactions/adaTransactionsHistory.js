@@ -49,7 +49,7 @@ export async function updateAdaPendingTxs(addresses: Array<string>) {
       addresses,
       getPendingTxsForAddresses
     );
-    const mappedPendingTxs = _mapTransactions(txs, addresses);
+    const mappedPendingTxs = _mapToTxRow(txs, addresses);
     return updatePendingTxs(mappedPendingTxs);
   } catch (error) {
     Logger.error('adaTransactionsHistory::updateAdaPendingTxs error: ' + stringifyError(error));
@@ -98,8 +98,15 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
     txHash
   );
   if (history.length > 0) {
+    // FIXME: Add an endpoint for querying the best_block_num
+    // Update last block, done for one tx as all the best_block_num of a request are the same
+    const lastKnownBlockNumber = getLastBlockNumber();
+    if (!lastKnownBlockNumber || history[0].best_block_num > lastKnownBlockNumber) {
+      saveLastBlockNumber(history[0].best_block_num);
+    }
+
     const transactionsRows = previousTxsRows.concat(
-      _mapTransactions(history, allAddresses));
+      _mapToTxRow(history, allAddresses));
     if (history.length === transactionsLimit) {
       return await _updateAdaTxsHistoryForGroupOfAddresses(
         transactionsRows,
@@ -113,17 +120,14 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
   return Promise.resolve(previousTxsRows);
 }
 
-function _mapTransactions(
-  transactions: [],
+function _mapToTxRow(
+  transactions,
   accountAddresses
-): Array<AdaTransaction> {
+) {
   return transactions.map(tx => {
     const inputs = _mapInputOutput(tx.inputs_address, tx.inputs_amount);
     const outputs = _mapInputOutput(tx.outputs_address, tx.outputs_amount);
     const { isOutgoing, amount } = _spenderData(inputs, outputs, accountAddresses);
-    if (!getLastBlockNumber() || tx.best_block_num > getLastBlockNumber()) {
-      saveLastBlockNumber(tx.best_block_num);
-    }
     const time = tx.time || tx.created_time;
     const newtx = getTxWithDBSchema(amount, tx, inputs, isOutgoing, outputs, time);
     return getDBRow(newtx);
