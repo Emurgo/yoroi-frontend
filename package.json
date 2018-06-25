@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Icarus light Cardano wallet - PoC",
   "scripts": {
-    "dev": "NODE_ENV=development; node scripts/dev",
+    "dev": "export NODE_ENV=development; node scripts/dev",
     "build": "node scripts/build",
     "compress": "node scripts/compress",
     "compres-e2e-tests": "npm run compress -- --app-id 'icarus-light-cardano-wallet-poc' --codebase 'https://www.iohk.io/dw/icarus-extension.crx' --key ./e2etest-key.pem",
