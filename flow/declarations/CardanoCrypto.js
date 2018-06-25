@@ -85,8 +85,7 @@ declare module 'rust-cardano-crypto' {
       ): {
         result: {
           cbor_encoded_tx: Array<number>,
-          fee: number,
-          tx: CryptoTransaction
+          fee: number
         },
         failed: boolean,
         msg: ?string
@@ -105,16 +104,6 @@ declare type CryptoAccount = {
   account: number,
   cached_account_key: string,
   derivation_scheme: string
-}
-
-declare type CryptoTransaction = {
-  tx: {
-    tx: {
-      inputs: Array<TxInputPtr>,
-      outputs: Array<TxOutput>
-    },
-    witnesses: Array<TxWitness>
-  }
 }
 
 declare type CryptoAddress = any // TODO: Complete with specific type
@@ -138,7 +127,7 @@ declare type TxInput = {
 
 declare type TxOutput = {
   address: string,
-  value: number
+  value: string
 }
 
 declare type AddressType = "External" | "Internal";
