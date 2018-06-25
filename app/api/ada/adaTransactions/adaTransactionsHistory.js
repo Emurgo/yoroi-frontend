@@ -100,7 +100,8 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
   if (history.length > 0) {
     // FIXME: Add an endpoint for querying the best_block_num
     // Update last block, done for one tx as all the best_block_num of a request are the same
-    if (!getLastBlockNumber() || history[0].best_block_num > getLastBlockNumber()) {
+    const lastKnownBlockNumber = getLastBlockNumber();
+    if (!lastKnownBlockNumber || history[0].best_block_num > lastKnownBlockNumber) {
       saveLastBlockNumber(history[0].best_block_num);
     }
 
