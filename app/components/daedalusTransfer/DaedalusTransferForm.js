@@ -150,8 +150,8 @@ export default class DaedalusTransferForm extends Component<Props> {
               <ul className={styles.instructionsList}>
                 {
                   Object.values(messages.instructions)
-                  .map(step =>
-                    <li className={styles.text}>
+                  .map((step, idx) =>
+                    <li key={idx} className={styles.text}>
                       {intl.formatMessage(step)}
                     </li>
                   )
