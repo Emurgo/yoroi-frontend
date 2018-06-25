@@ -29,6 +29,13 @@ Given(/^I have completed the basic setup$/, async function () {
   });
 });
 
+Given(/^I have opened the chrome extension$/, async function () {
+  // Extension id is determinisitically calculated based on pubKey used to generate the crx file
+  // so we can just hardcode this value if we keep e2etest-key.pem file
+  // https://stackoverflow.com/a/10089780/3329806
+  await this.driver.get('chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg/main_window.html');
+});
+
 Given(/^There is no wallet stored$/, async function () {
   await this.waitForElement('.WalletAddDialog');
 });

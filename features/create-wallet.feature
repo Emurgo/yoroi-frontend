@@ -1,7 +1,8 @@
 Feature: Create wallet
 
   Background:
-    Given I have completed the basic setup
+    Given I have opened the chrome extension
+    And I have completed the basic setup
     And There is no wallet stored
 
   Scenario: Successfully creating a wallet

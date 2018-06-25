@@ -1,6 +1,7 @@
 Feature: Generate Addresses
   Background:
-    Given I have completed the basic setup
+    Given I have opened the chrome extension
+    And I have completed the basic setup
     And I am testing "Generate addresses"
     And There is a wallet stored
 
