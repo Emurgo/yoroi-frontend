@@ -92,7 +92,7 @@ export function getAdaTransactionFromSenders(
   const addresses = mapToList(addressesMap);
   const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
-  const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
+  const outputs = [{ address: receiver, value: amount }];
   return getAllUTXOsForAddresses(_getPlainAddresses(senders))
     .then((senderUtxos) => {
       const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
@@ -129,7 +129,7 @@ function _mapUTXOsToInputs(utxos, adaAddressesMap) {
     value: {
       address: utxo.receiver,
       // FIXME: Currently js-wasm-module support Js Number, but amounts could be BigNumber's.
-      value: Number(utxo.amount)
+      value: utxo.amount
     },
     addressing: {
       account: adaAddressesMap[utxo.receiver].account,

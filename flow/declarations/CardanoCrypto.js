@@ -174,7 +174,7 @@ declare type TxDaedalusInput = {
 
 declare type TxOutput = {
   address: string,
-  value: number
+  value: string
 }
 
 declare type AddressType = "External" | "Internal";

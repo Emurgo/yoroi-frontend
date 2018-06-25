@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const transactionsLimit = 20;
-export const addressesLimit = 20;
+export const addressesLimit = 50;
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
@@ -53,6 +53,16 @@ export const sendTx = signedTx =>
 
 export const checkAddressesInUse = addresses =>
   axios(`${backendUrl}/api/addresses/filterUsed`,
+    {
+      method: 'post',
+      data: {
+        addresses
+      }
+    }
+  ).then(response => response.data);
+
+export const getPendingTxsForAddresses = addresses =>
+  axios(`${backendUrl}/api/txs/pending`,
     {
       method: 'post',
       data: {

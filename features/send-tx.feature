@@ -1,8 +1,8 @@
 Feature: Send transaction
 
   Background:
-    Given I am testing "Send transaction"
-    And I have opened the chrome extension
+    Given I have completed the basic setup
+    And I am testing "Send transaction"
     And There is a wallet stored
 
   Scenario: Sending a Tx to a valid address

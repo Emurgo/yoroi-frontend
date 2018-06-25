@@ -60,22 +60,22 @@ export const insertOrReplaceToTxsTable = function (rows) {
   .catch(err => err);
 };
 
-export const getTxWithDBSchema = function (amount, tx, inputs, isOutgoing, outputs) {
-  const isPending = tx.block_num === null;
+export const getTxWithDBSchema = function (amount, tx, inputs, isOutgoing, outputs, time) {
+  const isPending = !tx.block_num;
   return {
     [LovefieldDB.txsTableFields.CT_AMOUNT]: {
       getCCoin: amount
     },
-    [LovefieldDB.txsTableFields.CT_BLOCK_NUMBER]: tx.block_num,
+    [LovefieldDB.txsTableFields.CT_BLOCK_NUMBER]: tx.block_num || '',
     [LovefieldDB.txsTableFields.CT_ID]: tx.hash,
     [LovefieldDB.txsTableFields.CT_INPUTS]: { newInputs: inputs },
     [LovefieldDB.txsTableFields.CT_IS_OUTGOING]: isOutgoing,
     [LovefieldDB.txsTableFields.CT_META]: {
-      ctmDate: tx.time,
+      ctmDate: time,
       ctmDescription: undefined,
       ctmTitle: undefined
     },
-    [LovefieldDB.txsTableFields.CTM_DATE]: new Date(tx.time),
+    [LovefieldDB.txsTableFields.CTM_DATE]: new Date(time),
     [LovefieldDB.txsTableFields.CT_OUTPUTS]: { newOutputs: outputs },
     [LovefieldDB.txsTableFields.CT_CONDITION]: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
   };
@@ -92,20 +92,47 @@ export const getMostRecentTxFromRows = function (previousTxsRows) {
     previousTxsRows[previousTxsRowsLth - 1];
 };
 
-export const getAllTxsFromTxsTable = async function () {
-  return LovefieldDB.db.select()
-    .from(_getTxsTable())
-    .orderBy(_getTxsTable()[LovefieldDB.txsTableFields.CTM_DATE], LovefieldDB.orders.DESC)
+export const getConfirmedTxsFromDB = async function () {
+  const txsTable = _getTxsTable();
+  const rows = await LovefieldDB.db.select()
+    .from(txsTable)
+    .where(txsTable[LovefieldDB.txsTableFields.CT_CONDITION].eq('CPtxInBlocks'))
+    .orderBy(txsTable[LovefieldDB.txsTableFields.CTM_DATE], LovefieldDB.orders.DESC)
     .exec();
+  return _mapRowsToTxs(rows);
 };
 
-export const convertFromDBToAdaTransaction = function (txDB) {
-  const newTx = Object.assign({}, txDB);
-  newTx.ctInputs = txDB.ctInputs.newInputs.map(address => (address[0] ? address : [address]));
-  newTx.ctOutputs = txDB.ctOutputs.newOutputs.map(address => (address[0] ? address : [address]));
-  newTx.ctAmount = Object.assign({}, newTx.ctAmount);
-  newTx.ctAmount.getCCoin = txDB.ctAmount.getCCoin.c[0];
-  return newTx;
+export const getAllTxsFromTxsTable = async function () {
+  const txsTable = _getTxsTable();
+  const rows = await LovefieldDB.db.select()
+    .from(txsTable)
+    .orderBy(txsTable[LovefieldDB.txsTableFields.CTM_DATE], LovefieldDB.orders.DESC)
+    .exec();
+  return _mapRowsToTxs(rows);
+};
+
+export const updatePendingTxs = async function (pendingTxs) {
+  await _deletePendingTxs();
+  await insertOrReplaceToTxsTable(pendingTxs);
+};
+
+const _mapRowsToTxs = function (rows) {
+  return rows.map(txDB => {
+    const newTx = Object.assign({}, txDB);
+    newTx.ctInputs = txDB.ctInputs.newInputs.map(address => (address[0] ? address : [address]));
+    newTx.ctOutputs = txDB.ctOutputs.newOutputs.map(address => (address[0] ? address : [address]));
+    newTx.ctAmount = Object.assign({}, newTx.ctAmount);
+    newTx.ctAmount.getCCoin = txDB.ctAmount.getCCoin.c[0];
+    return newTx;
+  });
+};
+
+const _deletePendingTxs = async function () {
+  const txsTable = _getTxsTable();
+  return LovefieldDB.db.delete()
+    .from(txsTable)
+    .where(txsTable[LovefieldDB.txsTableFields.CT_CONDITION].eq('CPtxApplying'))
+    .exec();
 };
 
 const _getTxsTable = function () {

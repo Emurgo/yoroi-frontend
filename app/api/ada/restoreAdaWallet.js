@@ -15,12 +15,15 @@ import {
 } from './adaAddress';
 import {
   checkAddressesInUse,
-  addressesLimit
 } from './lib/icarus-backend-api';
 import type {
   AdaWallet,
   AdaWalletParams
 } from './adaTypes';
+
+// We will query the backend for 20 addresses window
+// FIXME: Improve this to decouple requests and BIP-44 unused window parsing
+const ADDRESS_REQUEST_SIZE = 20;
 
 export async function restoreAdaWallet({
   walletPassword,
@@ -29,9 +32,9 @@ export async function restoreAdaWallet({
   const [adaWallet, seed] = createAdaWallet({ walletPassword, walletInitData });
   const cryptoAccount = createCryptoAccount(seed, walletPassword);
   const externalAddressesToSave = await
-    _discoverAllAddressesFrom(cryptoAccount, 'External', 0, addressesLimit);
+    _discoverAllAddressesFrom(cryptoAccount, 'External', 0, ADDRESS_REQUEST_SIZE);
   const internalAddressesToSave = await
-    _discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, addressesLimit);
+    _discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, ADDRESS_REQUEST_SIZE);
   if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
     // TODO: Store all at once
     saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');

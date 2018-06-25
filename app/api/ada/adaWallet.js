@@ -22,8 +22,9 @@ import {
 } from './adaAddress';
 import { newCryptoAccount } from './adaAccount';
 import {
-  getAdaTransactions,
-  updateAdaTxsHistory
+  getAdaConfirmedTxs,
+  updateAdaTxsHistory,
+  updateAdaPendingTxs
 } from './adaTransactions/adaTransactionsHistory';
 import type {
   AdaWallet,
@@ -66,7 +67,8 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
       }
     });
     saveInStorage(WALLET_KEY, updatedWallet);
-    await updateAdaTxsHistory(await getAdaTransactions(), addresses);
+    await updateAdaPendingTxs(addresses);
+    await updateAdaTxsHistory(await getAdaConfirmedTxs(), addresses);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
