@@ -80,7 +80,14 @@ module.exports = {
       {
         test: /\.(eot|otf|ttf|woff|woff2)$/,
         loader: 'file-loader'
-      }
+      },
+      {
+        test: /\.md$/,
+        use: [
+          'html-loader',
+          'markdown-loader',
+        ]
+      },
     ]
   }
 };

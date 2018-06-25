@@ -227,7 +227,10 @@ export default class WalletsStore extends Store {
     const hasAnyWalletLoaded = this.hasAnyLoaded;
     runInAction('WalletsStore::_updateActiveWalletOnRouteChanges', () => {
       // There are not wallets loaded (yet) -> unset active and return
-      if (!hasAnyWalletLoaded) return this._unsetActiveWallet();
+      if (!hasAnyWalletLoaded) {
+        this.actions.router.goToRoute.trigger({ route: ROUTES.NO_WALLETS });
+        return this._unsetActiveWallet();
+      }
       const match = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
       if (match) {
         // We have a route for a specific wallet -> lets try to find it

@@ -18,9 +18,20 @@ function CustomWorld() {
     .build();
 
   // Returns a promise that resolves to the element
-  this.waitForElement = (locator, method = By.css) => {
+  // FIXME: We should move this to driver object, not `this`
+  this.waitForElement = this.driver.waitForElement = (locator, method = By.css) => {
     const condition = seleniumWebdriver.until.elementLocated(method(locator));
     return this.driver.wait(condition);
+  };
+
+  // FIXME: We should move this to driver object, not `this`
+  this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (locator, method = By.css) => {
+    try {
+      await this.getElementBy(locator, method);
+      throw Error('Element shouldn\'t be present');
+    } catch (err) {
+      return Promise.resolve(true);
+    }
   };
 
   this.waitForContent = (locator) => this.waitForElement(locator, By.xpath);
@@ -34,6 +45,8 @@ function CustomWorld() {
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
 
   this.getText = async (locator) => this.getElementBy(locator).getText();
+
+  this.getValue = this.driver.getValue = async (locator) => this.getElementBy(locator).getAttribute('value');
 
   const clickElement = async (locator, method) => {
     const clickable = await this.getElementBy(locator, method);
@@ -53,14 +66,15 @@ function CustomWorld() {
     await input.sendKeys(value);
   };
 
-  const executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
+  this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
 
   this.getFromLocalStorage = async (key) => {
-    const result = await executeLocalStorageScript(`getItem("${key}")`);
+    const result = await this.executeLocalStorageScript(`getItem("${key}")`);
     return JSON.parse(result);
   };
 
-  this.saveToLocalStorage = (key, value) => executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
+  this.saveToLocalStorage = (key, value) => this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
+
 }
 
 setWorldConstructor(CustomWorld);
