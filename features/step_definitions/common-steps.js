@@ -49,17 +49,20 @@ Given(/^There is a wallet stored( with ([^"]*) addresses)?( starting with ([^"]*
   await storeWallet(this, addressAmount, addressPrefix);
 });
 
-async function storeWallet(driver, addressAmount, addressPrefix) {
+async function storeWallet(client, addressAmount, addressPrefix) {
   const { seed, wallet, cryptoAccount, addresses } = getMockData();
-  driver.saveToLocalStorage('SEED', seed);
-  driver.saveToLocalStorage('WALLET', wallet);
-  driver.saveToLocalStorage('ACCOUNT', cryptoAccount);
+  client.saveToLocalStorage('SEED', seed);
+  client.saveToLocalStorage('WALLET', wallet);
+  client.saveToLocalStorage('ACCOUNT', cryptoAccount);
   /* Obs: If "with $number addresses" is include in the sentence,
      we override the wallet with fake addresses" */
   if (addressAmount) {
-    driver.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount, addressPrefix));
+    client.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount, addressPrefix));
   } else {
-    driver.saveToLocalStorage('ADDRESSES', addresses);
+    client.saveToLocalStorage('ADDRESSES', addresses);
   }
-  await driver.waitForElement('.TopBar_walletName');
+  client.driver.executeScript(() => {
+    window.icarus.stores.ada.wallets.refreshWalletsData();
+  });
+  await client.waitForElement('.TopBar_walletName');
 }
