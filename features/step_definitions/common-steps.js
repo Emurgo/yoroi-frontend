@@ -42,11 +42,11 @@ Given(/^There is a default wallet stored$/, async function () {
   await storeWallet(this);
 });
 
-Given(/^There is a wallet stored( with ([^"]*) addresses)?$/, async function (addressAmount) {
-  await storeWallet(this, addressAmount);
+Given(/^There is a wallet stored( with ([^"]*) addresses)?( starting with ([^"]*))?$/, async function (addressAmount, addressPrefix) {
+  await storeWallet(this, addressAmount, addressPrefix);
 });
 
-async function storeWallet(driver, addressAmount) {
+async function storeWallet(driver, addressAmount, addressPrefix) {
   const { seed, wallet, cryptoAccount, addresses } = getMockData();
   driver.saveToLocalStorage('SEED', seed);
   driver.saveToLocalStorage('WALLET', wallet);
@@ -54,7 +54,7 @@ async function storeWallet(driver, addressAmount) {
   /* Obs: If "with $number addresses" is include in the sentence,
      we override the wallet with fake addresses" */
   if (addressAmount) {
-    driver.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount));
+    driver.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount, addressPrefix));
   } else {
     driver.saveToLocalStorage('ADDRESSES', addresses);
   }
