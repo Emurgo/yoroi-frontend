@@ -43,8 +43,9 @@ function CustomWorld() {
   };
 
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
+  this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
 
-  this.getText = async (locator) => this.getElementBy(locator).getText();
+  this.getText = (locator) => this.getElementBy(locator).getText();
 
   this.getValue = this.driver.getValue = async (locator) => this.getElementBy(locator).getAttribute('value');
 
