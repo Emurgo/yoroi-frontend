@@ -33,7 +33,6 @@ class UnknowError extends LocalizableError {
   }
 }
 
-/* TODO: All displayed errors should use this util */
 export function localizedError(error: any): LocalizableError {
   if (error instanceof LocalizableError) {
     return error;

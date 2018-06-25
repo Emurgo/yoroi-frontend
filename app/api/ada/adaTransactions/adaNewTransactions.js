@@ -59,7 +59,6 @@ export function newAdaTransaction(
 ): Promise<any> {
   return _getAdaTransaction(receiver, amount, password)
   .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
-    // TODO: Handle Js-Wasm-cardano errors
     const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
     return Promise.all([sendTx(signedTx), changeAdaAddr]);
   })

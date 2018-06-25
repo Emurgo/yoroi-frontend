@@ -1,7 +1,6 @@
 // @flow
 import CardanoCryptoError from './cryptoErrors';
 
-/* TODO: All cardano crypto methods should use this util */
 export function getOrFail(
   result: any
 ): any {

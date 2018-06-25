@@ -75,7 +75,6 @@ const messages = defineMessages({
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
-// FIXME: Handle submiting and error transitions
 type Props = {
   onSubmit: Function,
   mnemonicValidator: Function,
@@ -89,7 +88,6 @@ export default class DaedalusTransferForm extends Component<Props> {
     intl: intlShape.isRequired
   };
 
-  // FIXME: Mnemonic validation error is not displaying in the UI
   form = new ReactToolboxMobxForm({
     fields: {
       recoveryPhrase: {

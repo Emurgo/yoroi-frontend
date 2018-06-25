@@ -238,6 +238,7 @@ export default class AdaApi {
     }
   }*/
 
+  // TODO: Improve error handling
   async createTransaction(
     request: CreateTransactionRequest
   ): Promise<any> {

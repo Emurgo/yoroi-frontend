@@ -6,7 +6,6 @@ import BorderedBox from '../widgets/BorderedBox';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './DaedalusTransferWaitingPage.scss';
 
-// FIXME: Add translations in i18n files
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.waiting.title.label',

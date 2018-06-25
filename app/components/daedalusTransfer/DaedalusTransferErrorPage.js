@@ -9,7 +9,6 @@ import BorderedBox from '../widgets/BorderedBox';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './DaedalusTransferErrorPage.scss';
 
-// FIXME: Add translations in i18n files
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.errorPage.title.label',

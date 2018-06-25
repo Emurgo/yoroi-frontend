@@ -10,7 +10,6 @@ import styles from './DaedalusTransferSummaryPage.scss';
 import type { TransferTx } from '../../types/daedalusTransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 
-// FIXME: Add translations in i18n files
 const messages = defineMessages({
   addressFromLabel: {
     id: 'daedalusTransfer.summary.addressFrom.label',
@@ -46,7 +45,6 @@ const messages = defineMessages({
   }
 });
 
-// FIXME: Handle submiting and error transitions
 type Props = {
   formattedWalletAmount: Function,
   transferTx: TransferTx,
@@ -68,7 +66,6 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
     const { transferTx, isSubmitting, error } = this.props;
 
     const receiver = transferTx.receiver;
-    // FIXME: formattedWalletAmount is not accurate for this amounts!
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
     const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
     const finalBalance = this.props.formattedWalletAmount(

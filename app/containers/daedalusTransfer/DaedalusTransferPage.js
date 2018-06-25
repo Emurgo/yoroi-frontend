@@ -43,7 +43,6 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this.props.actions[environment.API].daedalusTransfer.cancelTransferFunds.trigger();
   }
 
-  // FIXME: Handle transfer restoring errors
   render() {
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
