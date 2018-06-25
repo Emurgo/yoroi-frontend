@@ -28,10 +28,15 @@ import {
 } from './adaTransactions/adaTransactionsHistory';
 import type {
   AdaWallet,
-  AdaWalletParams,
   AdaAddresses,
-  AdaWalletRecoveryPhraseResponse
+  UpdateAdaWalletParams,
 } from './adaTypes';
+import type {
+  AdaWalletParams,
+  ChangeAdaWalletPassphraseParams,
+  AdaWalletRecoveryPhraseResponse,
+} from './index';
+
 import type { WalletSeed } from './lib/cardanoCrypto/cryptoWallet';
 import {
   getUTXOsSumsForAddresses,
@@ -54,7 +59,22 @@ export async function newAdaWallet({
   return Promise.resolve(adaWallet);
 }
 
-export const updateAdaWallet = async (): Promise<?AdaWallet> => {
+export const updateAdaWallet = async (
+  { walletMeta }: UpdateAdaWalletParams
+): Promise<?AdaWallet> => {
+  const persistentWallet = getAdaWallet();
+  if (!persistentWallet) return Promise.resolve();
+  try {
+    const updatedWallet = Object.assign({}, persistentWallet, { cwMeta: walletMeta });
+    saveInStorage(WALLET_KEY, updatedWallet);
+    return updatedWallet;
+  } catch (error) {
+    Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
+    throw new UpdateAdaWalletError();
+  }
+};
+
+export const refreshAdaWallet = async (): Promise<?AdaWallet> => {
   const persistentWallet = getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
   const persistentAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
@@ -125,3 +145,9 @@ export async function getBalance(
     throw new GetBalanceError();
   }
 }
+
+export const changeAdaWalletPassphrase = (
+  { oldPassword, newPassword }: ChangeAdaWalletPassphraseParams
+): Promise<AdaWallet> => {
+  return Promise.resolve(getAdaWallet());
+};

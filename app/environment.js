@@ -21,6 +21,7 @@ const environment = Object.assign({
   isEtcApi: () => environment.API === 'etc',
   build: process.env.DAEDALUS_VERSION || 'dev',
   platform: os.platform(),
+  walletRefreshInterval: CONFIG.app.walletRefreshInterval,
 }, process.env);
 
 export default environment;

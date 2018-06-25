@@ -20,7 +20,10 @@ import {
   isValidMnemonic,
   getAdaAccountRecoveryPhrase,
   newAdaWallet,
-  updateAdaWallet
+  updateAdaWallet,
+  getAdaWallet,
+  refreshAdaWallet,
+  changeAdaWalletPassphrase
 } from './adaWallet';
 import { getSingleCryptoAccount } from './adaAccount';
 import {
@@ -43,6 +46,7 @@ import { getLastBlockNumber } from './getAdaLastBlockNumber';
 import {
   GenericApiError,
   WalletAlreadyRestoredError,
+  UpdateWalletResponse
 } from '../common';
 import type {
   AdaAddress,
@@ -52,7 +56,8 @@ import type {
   AdaTransactions,
   AdaWallet,
   AdaWallets,
-  AdaWalletRecoveryPhraseResponse
+  AdaAssurance,
+  AdaWalletInitData,
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -81,7 +86,7 @@ export type CreateTransactionRequest = {
 export type UpdateWalletRequest = {
   walletId: string,
   name: string,
-  assurance: string
+  assurance: AdaAssurance
 };
 export type RedeemAdaRequest = {
   redemptionCode: string,
@@ -125,12 +130,35 @@ export type ExportWalletToFileRequest = {
 };
 export type ExportWalletToFileResponse = [];
 
+export type UpdateWalletPasswordRequest = {
+  oldPassword: ?string,
+  newPassword: ?string,
+};
+
+export type AdaWalletParams = {
+  walletPassword: string,
+  walletInitData: AdaWalletInitData
+};
+
+export type ChangeAdaWalletPassphraseParams = {
+  oldPassword: ?string,
+  newPassword: ?string,
+};
+
+export type UpdateWalletPasswordResponse = boolean;
+
+export type AdaWalletRecoveryPhraseResponse = Array<string>;
+
 export default class AdaApi {
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
     try {
-      const wallet = await updateAdaWallet();
+      const wallet = await getAdaWallet();
+      if (wallet) {
+        await refreshAdaWallet();
+      }
       const wallets: AdaWallets = wallet ? [wallet] : [];
+      // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
       return wallets.map(data => _createWalletFromServerData(data));
     } catch (error) {
@@ -162,6 +190,24 @@ export default class AdaApi {
       throw new GenericApiError();
     }
   }
+
+  async refreshTransactions(): Promise<GetTransactionsResponse> {
+    try {
+      const history: AdaTransactions = await getAdaTxsHistoryByWallet();
+      Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
+      return new Promise(resolve =>
+        resolve({
+          transactions: history[0].map(data =>
+            _createTransactionFromServerData(data)
+          ),
+          total: history[1]
+        })
+      );
+    } catch (error) {
+      Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  } 
 
   async getTransactions(): Promise<GetTransactionsResponse> {
     // FIXME: Sync with TransactionStore skip and limit indexes
@@ -504,12 +550,11 @@ export default class AdaApi {
     }
   }*/
 
-  // FIXME: Figure out if we should use this in some place
-  /* async updateWallet(
+  async updateWallet(
     request: UpdateWalletRequest
   ): Promise<UpdateWalletResponse> {
     Logger.debug('AdaApi::updateWallet called: ' + stringifyData(request));
-    const { walletId, name, assurance } = request;
+    const { name, assurance } = request;
     const unit = 0;
 
     const walletMeta = {
@@ -518,7 +563,7 @@ export default class AdaApi {
       cwUnit: unit
     };
     try {
-      const wallet: ?AdaWallet = await updateAdaWallet();
+      const wallet: ?AdaWallet = await updateAdaWallet({ walletMeta });
       if (!wallet) throw new Error('not persistent wallet');
       Logger.debug('AdaApi::updateWallet success: ' + stringifyData(wallet));
       return _createWalletFromServerData(wallet);
@@ -526,18 +571,15 @@ export default class AdaApi {
       Logger.error('AdaApi::updateWallet error: ' + stringifyError(error));
       throw new GenericApiError();
     }
-  }*/
+  }
 
-  // FIXME: Use when we will re-add the settings page
-  /* async updateWalletPassword(
+  async updateWalletPassword(
     request: UpdateWalletPasswordRequest
   ): Promise<UpdateWalletPasswordResponse> {
     Logger.debug('AdaApi::updateWalletPassword called');
-    const { walletId, oldPassword, newPassword } = request;
+    const { oldPassword, newPassword } = request;
     try {
       await changeAdaWalletPassphrase({
-        ca,
-        walletId,
         oldPassword,
         newPassword
       });
@@ -552,7 +594,7 @@ export default class AdaApi {
       }
       throw new GenericApiError();
     }
-  }*/
+  }
 
   // FIXME: Use when we will re-add the settings page
   /* async exportWalletToFile(

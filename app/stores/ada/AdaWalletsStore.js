@@ -76,8 +76,6 @@ export default class AdaWalletsStore extends WalletStore {
   isValidPrivateKey = () => { return true; }; // eslint-disable-line
 
   @action refreshWalletsData = async () => {
-    // FIXME: We don't care about network status
-    // if (this.stores.networkStatus.isConnected) {
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {
@@ -98,7 +96,7 @@ export default class AdaWalletsStore extends WalletStore {
       const walletIds = result.map((wallet: Wallet) => wallet.id);
       this.stores.ada.transactions.transactionsRequests = walletIds.map(walletId => ({
         walletId,
-        recentRequest: this.stores.ada.transactions._getTransactionsRecentRequest(walletId),
+        // recentRequest: this.stores.ada.transactions._getTransactionsRecentRequest(walletId),
         allRequest: this.stores.ada.transactions._getTransactionsAllRequest(walletId),
       }));
       this.stores.ada.transactions._refreshTransactionData();

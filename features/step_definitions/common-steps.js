@@ -38,6 +38,7 @@ Given(/^I have opened the chrome extension$/, async function () {
 });
 
 Given(/^There is no wallet stored$/, async function () {
+  await refreshWallet(this);
   await this.waitForElement('.WalletAddDialog');
 });
 
@@ -46,16 +47,26 @@ Given(/^There is a default wallet stored$/, async function () {
   await storeWallet(this);
 });
 
-Given(/^There is a wallet stored( with the name ([^"]*))?$/,
-  async function (walletName) {
-    await storeWallet(this, walletName);
-  });
+Given(/^There is a wallet stored( named ([^"]*))?( with ([^"]*) addresses)?( starting with ([^"]*))?$/, async function (walletName, addressAmount, addressPrefix) {
+  await storeWallet(this, walletName, addressAmount, addressPrefix);
+});
 
-async function storeWallet(client, walletName) {
+function refreshWallet(client) {
+  return client.driver.executeAsyncScript((done) => { 
+    window.icarus.stores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
+  });
+}
+
+async function storeWallet(client, walletName, addressAmount, addressPrefix) {
   const { seed, wallet, cryptoAccount, addresses, walletInitialData } = getMockData();
-  client.saveToLocalStorage('SEED', seed);
-  client.saveToLocalStorage('WALLET', wallet);
-  client.saveToLocalStorage('ACCOUNT', cryptoAccount);
+  if (walletName) {
+    wallet.cwMeta.cwName = walletName;
+  }
+
+  await client.saveToLocalStorage('SEED', seed);
+  await client.saveToLocalStorage('WALLET', wallet);
+  await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
+
   /* Obs: If "with $number addresses" is include in the sentence,
      we override the wallet with fake addresses" */
   if (walletName && walletInitialData[walletName] && walletInitialData[walletName].totalAddresses) {
@@ -66,8 +77,6 @@ async function storeWallet(client, walletName) {
   } else {
     client.saveToLocalStorage('ADDRESSES', addresses);
   }
-  client.driver.executeScript(() => {
-    window.icarus.stores.ada.wallets.refreshWalletsData();
-  });
+  await refreshWallet(client);
   await client.waitForElement('.TopBar_walletName');
 }

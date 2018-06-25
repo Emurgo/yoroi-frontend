@@ -46,6 +46,17 @@ function CustomWorld() {
 
   this.getText = (locator) => this.getElementBy(locator).getText();
 
+  this.waitUntilText = async (locator, text, timeout = 60000) => {
+    await this.driver.wait(async () => {
+      try {
+        const value = await this.getText(locator);
+        return value === text;
+      } catch (err) {
+        return false;
+      }
+    }, timeout);
+  };
+
   this.getValue = this.driver.getValue = async (locator) => this.getElementBy(locator).getAttribute('value');
 
   const clickElement = async (locator, method) => {
@@ -66,6 +77,11 @@ function CustomWorld() {
     await input.sendKeys(value);
   };
 
+  this.clearInput = async (locator) => {
+    const input = await this.getElementBy(locator);
+    await input.clear();
+  };
+
   this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
 
   this.getFromLocalStorage = async (key) => {
@@ -80,4 +96,4 @@ function CustomWorld() {
 setWorldConstructor(CustomWorld);
 // I'm setting this timeout to 10 seconds as usually it takes about 5 seconds
 // to startup
-setDefaultTimeout(60 * 10000);
+setDefaultTimeout(60 * 1000);
