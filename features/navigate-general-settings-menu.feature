@@ -1,7 +1,8 @@
 Feature: General Settings
 
   Background:
-    Given I have completed the basic setup
+    Given I have opened the chrome extension
+    And I have completed the basic setup
     And There is a default wallet stored
 
   Scenario Outline: Navigating through General Settings secondary menu

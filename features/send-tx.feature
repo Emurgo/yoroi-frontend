@@ -1,7 +1,8 @@
 Feature: Send transaction
 
   Background:
-    Given I have completed the basic setup
+    Given I have opened the chrome extension
+    And I have completed the basic setup
     And I am testing "Send transaction"
     And There is a wallet stored
 
