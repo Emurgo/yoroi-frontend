@@ -22,6 +22,7 @@ Given(/^I am testing "([^"]*)"$/, feature => {
 });
 
 Given(/^I have completed the basic setup$/, async function () {
+  await this.waitForElement('.LanguageSelectionForm_submitButton');
   // Default Profile Configs
   await setActiveLanguage(this.driver);
   await this.driver.executeScript(() => { 
