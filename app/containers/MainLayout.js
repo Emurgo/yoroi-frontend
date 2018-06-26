@@ -5,19 +5,29 @@ import Sidebar from '../components/sidebar/Sidebar';
 import TopBarContainer from './TopBarContainer';
 import SidebarLayout from '../components/layout/SidebarLayout';
 import WalletAddPage from './wallet/WalletAddPage';
-import type { InjectedContainerProps } from '../types/injectedPropsType';
+import type { StoresMap } from '../stores/index';
+import type { ActionsMap } from '../actions/index';
+import type { Node } from 'react';
+
+export type MainLayoutProps = {
+  stores: any | StoresMap,
+  actions: any | ActionsMap,
+  children: Node,
+  topbar: ?any
+};
 
 @inject('stores', 'actions') @observer
-export default class MainLayout extends Component<InjectedContainerProps> {
+export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     actions: null,
     stores: null,
     children: null,
+    topbar: null,
     onClose: () => {}
   };
 
   render() {
-    const { actions, stores } = this.props;
+    const { actions, stores, topbar } = this.props;
     const { sidebar } = stores;
 
     const sidebarComponent = (
@@ -33,10 +43,13 @@ export default class MainLayout extends Component<InjectedContainerProps> {
         isDialogOpen={stores.uiDialogs.isOpen}
       />
     );
+
+    const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
+
     return (
       <SidebarLayout
         sidebar={sidebarComponent}
-        topbar={<TopBarContainer actions={actions} stores={stores} />}
+        topbar={topbarComponent}
         notification={<div />}
         contentDialogs={[<WalletAddPage key="WalletAddPage" />]}
       >

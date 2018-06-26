@@ -1,14 +1,11 @@
 // @flow
 import React, { Component } from 'react';
-// import SvgInline from 'react-svg-inline';
 import type { Node } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import Wallet from '../../domain/Wallet';
-// import menuIconOpened from '../../assets/images/menu-opened-ic.inline.svg';
-// import menuIconClosed from '../../assets/images/menu-ic.inline.svg';
 import styles from './TopBar.scss';
-import { matchRoute, testRoute } from '../../utils/routing';
+import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 
 type Props = {
@@ -25,47 +22,29 @@ export default class TopBar extends Component<Props> {
 
   render() {
     const {
-      /* onToggleSidebar,*/ activeWallet, currentRoute,
-      /* showSubMenus,*/ formattedWalletAmount
+      activeWallet, currentRoute, formattedWalletAmount
     } = this.props;
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-    /* FIXME: Improve this hardwired condition */
-    const daedalusTransferRoutesMatch = testRoute(ROUTES.DAEDALUS_TRANFER.ROOT, currentRoute);
-    const showWalletInfo =
-      (walletRoutesMatch || daedalusTransferRoutesMatch) && activeWallet != null;
+    const showWalletInfo = walletRoutesMatch && activeWallet != null;
     const topBarStyles = classNames([
       styles.topBar,
       showWalletInfo ? styles.withWallet : styles.withoutWallet,
     ]);
 
-    const topBarTitle = (walletRoutesMatch || daedalusTransferRoutesMatch) &&
-      activeWallet != null && formattedWalletAmount ? (
-        <div className={styles.walletInfo}>
-          <div className={styles.walletName}>{activeWallet.name}</div>
-          <div className={styles.walletAmount}>
-            {
-              // show currency and use long format (e.g. in ETC show all decimal places)
-              formattedWalletAmount(activeWallet.amount, true, true)
-            } ADA
-          </div>
+    const topBarTitle = walletRoutesMatch && activeWallet != null && formattedWalletAmount ? (
+      <div className={styles.walletInfo}>
+        <div className={styles.walletName}>{activeWallet.name}</div>
+        <div className={styles.walletAmount}>
+          {
+            // show currency and use long format (e.g. in ETC show all decimal places)
+            formattedWalletAmount(activeWallet.amount, true, true)
+          } ADA
         </div>
+      </div>
     ) : null;
-
-    /* const sidebarToggleIcon = (
-      <SvgInline
-        svg={showSubMenus ? menuIconOpened : menuIconClosed}
-        className={styles.sidebarIcon}
-      />
-    );*/
 
     return (
       <header className={topBarStyles}>
-        {/* {walletRoutesMatch && (
-           FIXME: We have a single wallet
-            <button className={styles.leftIcon} onClick={onToggleSidebar}>
-            {sidebarToggleIcon}
-          </button>
-        )}*/}
         <div className={styles.topBarTitle}>{topBarTitle}</div>
         {this.props.children}
       </header>

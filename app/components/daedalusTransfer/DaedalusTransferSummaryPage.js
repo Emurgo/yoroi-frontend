@@ -13,35 +13,43 @@ import LocalizableError from '../../i18n/LocalizableError';
 const messages = defineMessages({
   addressFromLabel: {
     id: 'daedalusTransfer.summary.addressFrom.label',
-    defaultMessage: 'From'
+    defaultMessage: '!!!From',
+    description: 'Label showing addresses where the tx will be from',
   },
   addressFromSubLabel: {
     id: 'daedalusTransfer.summary.addressFrom.subLabel',
-    defaultMessage: 'Daedalus wallet Addresses'
+    defaultMessage: '!!!Daedalus wallet Addresses',
+    description: 'SubLabel showing addresses where the tx will be from', 
   },
   addressToLabel: {
     id: 'daedalusTransfer.summary.addressTo.label',
-    defaultMessage: 'To'
+    defaultMessage: '!!!To',
+    description: 'Label showing addresses where the tx will be sent',
   },
   recoveredBalanceLabel: {
     id: 'daedalusTransfer.summary.recoveredBalance.label',
-    defaultMessage: 'Recovered balance'
+    defaultMessage: '!!!Recovered balance',
+    description: 'Label showing total recovered balance',
   },
   transactionFeeLabel: {
     id: 'daedalusTransfer.summary.transactionFee.label',
-    defaultMessage: 'Transaction fees'
+    defaultMessage: '!!!Transaction fees',
+    description: 'Label showing transaction fees when transferring',
   },
   finalBalanceLabel: {
     id: 'daedalusTransfer.summary.finalBalance.label',
-    defaultMessage: 'Final balance'
+    defaultMessage: '!!!Final balance',
+    description: 'Label showing final balance',
   },
   cancelTransferButtonLabel: {
     id: 'daedalusTransfer.summary.cancelTransferButton.label',
-    defaultMessage: 'Cancel'
+    defaultMessage: '!!!Cancel',
+    description: 'Cancel button text',
   },
   transferButtonLabel: {
     id: 'daedalusTransfer.summary.transferButton.label',
-    defaultMessage: 'Transfer Funds'
+    defaultMessage: '!!!Transfer Funds',
+    description: 'Do tansfer button text',
   }
 });
 
