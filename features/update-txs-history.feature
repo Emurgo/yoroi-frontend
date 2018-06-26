@@ -1,8 +1,8 @@
 Feature: Update Txs History
 
   Scenario Outline: Update Txs History
-    Given I am testing "Update transaction history"
-    And I have opened the chrome extension
+    Given I have completed the basic setup
+    And I am testing "Update transaction history"
     And There is a wallet stored with <addressNumber> addresses starting with <addressPrefix>
     When I see the transactions summary
     Then I should see that the number of transactions is <txsNumber>

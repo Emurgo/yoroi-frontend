@@ -19,8 +19,8 @@ export function createServer() {
   }
 
   function validateAddressesReq({ addresses } = {}) {
-    if (!addresses || addresses.length > 20 || addresses.length === 0) {
-      throw new Error('Addresses request length should be (0, 20]');
+    if (!addresses || addresses.length > 50 || addresses.length === 0) {
+      throw new Error('Addresses request length should be (0, 50]');
     }
     // TODO: Add address validation
     return true;
@@ -40,7 +40,8 @@ export function createServer() {
 
   server.post('/api/txs/utxoSumForAddresses', (req, res) => {
     validateAddressesReq(req.body);
-    const sumUtxos = getMockData().utxos.reduce((sum, utxo) => {
+    const utxos = getMockData().utxos;
+    const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
       if (req.body.addresses.includes(utxo.receiver)) {
         return sum + utxo.amount;
       }

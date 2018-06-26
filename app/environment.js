@@ -1,11 +1,14 @@
 // @flow
 import os from 'os';
+import type { ConfigType } from '../config/config-types';
+
+declare var CONFIG: ConfigType;
 
 const environment = Object.assign({
   DEVELOPMENT: 'development',
   TEST: 'test',
   PRODUCTION: 'production',
-  NETWORK: process.env.NETWORK,
+  NETWORK: CONFIG.network.name,
   API: process.env.API || 'ada',
   MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
   current: process.env.NODE_ENV,

@@ -17,7 +17,7 @@ import environment from '../environment';
 
 export default class WalletsStore extends Store {
 
-  WALLET_REFRESH_INTERVAL = 5000;
+  WALLET_REFRESH_INTERVAL = 1000 * 20;
   WAIT_FOR_SERVER_ERROR_TIME = 2000;
   MIN_NOTIFICATION_TIME = 500;
 
@@ -207,10 +207,12 @@ export default class WalletsStore extends Store {
     });
   };
 
-  _pollRefresh = async () => (
-    // FIXME: Network status won't be used
-    /* this.stores.networkStatus.isSynced &&*/ await this.refreshWalletsData()
-  );
+  _pollRefresh = async () => {
+    // Do not update if screen not active
+    if (!document.hidden) {
+      return await this.refreshWalletsData();
+    }
+  };
 
   _toggleAddWalletDialogOnWalletsLoaded = () => {
     if (this.hasLoadedWallets && !this.hasAnyWallets) {
@@ -225,7 +227,10 @@ export default class WalletsStore extends Store {
     const hasAnyWalletLoaded = this.hasAnyLoaded;
     runInAction('WalletsStore::_updateActiveWalletOnRouteChanges', () => {
       // There are not wallets loaded (yet) -> unset active and return
-      if (!hasAnyWalletLoaded) return this._unsetActiveWallet();
+      if (!hasAnyWalletLoaded) {
+        this.actions.router.goToRoute.trigger({ route: ROUTES.NO_WALLETS });
+        return this._unsetActiveWallet();
+      }
       const match = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
       if (match) {
         // We have a route for a specific wallet -> lets try to find it
