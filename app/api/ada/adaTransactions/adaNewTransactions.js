@@ -52,21 +52,18 @@ export function getAdaTransactionFee(
     });
 }
 
-export function newAdaTransaction(
+export async function newAdaTransaction(
   receiver: string,
   amount: string,
   password: string
 ): Promise<any> {
-  return _getAdaTransaction(receiver, amount, password)
-  .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
-    const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-    return Promise.all([sendTx(signedTx), changeAdaAddr]);
-  })
-  .then(([backendResponse, changeAdaAddr]) => {
-    // Only if the tx was send, we should track the change Address.
-    saveAdaAddress(changeAdaAddr);
-    return backendResponse;
-  });
+  const [{ result: { cbor_encoded_tx } }, changeAdaAddr] =
+    await _getAdaTransaction(receiver, amount, password);
+  const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
+  const backendResponse = await sendTx(signedTx);
+  // Only if the tx was send, we should track the change Address.
+  saveAdaAddress(changeAdaAddr);
+  return backendResponse;
 }
 
 export async function getAllUTXOsForAddresses(
@@ -93,7 +90,7 @@ export function getAdaTransactionFromSenders(
   const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: amount }];
-  return getAllUTXOsForAddresses(_getPlainAddresses(senders))
+  return getAllUTXOsForAddresses(_getAddresses(senders))
     .then((senderUtxos) => {
       const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
       return [
@@ -116,7 +113,9 @@ function _getAdaTransaction(
   return getAdaTransactionFromSenders(senders, receiver, amount, password);
 }
 
-function _getPlainAddresses(adaAddresses: AdaAddresses) {
+function _getAddresses(
+  adaAddresses: AdaAddresses
+): Array<string> {
   return adaAddresses.map(addr => addr.cadId);
 }
 
