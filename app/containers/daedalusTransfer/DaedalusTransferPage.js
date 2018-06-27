@@ -25,22 +25,20 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   };
 
   setupTransferFunds = (payload: { recoveryPhrase: string }) => {
-    this.props.actions[environment.API].daedalusTransfer.setupTransferFunds.trigger(payload);
+    this._getDaedalusTransferActions().setupTransferFunds.trigger(payload);
   };
 
   tranferFunds = () => {
-    const backToWallet = () => {
+    this._getDaedalusTransferActions().transferFunds.trigger(() => {
+      this._getWalletsStore().refreshWalletsData();
       this.props.actions.router.goToRoute.trigger({
         route: this._getWalletsStore().activeWalletRoute
       });
-    };
-    this.props.actions[environment.API].daedalusTransfer.transferFunds.trigger({
-      next: backToWallet
     });
   }
 
   cancelTransferFunds = () => {
-    this.props.actions[environment.API].daedalusTransfer.cancelTransferFunds.trigger();
+    this._getDaedalusTransferActions().cancelTransferFunds.trigger();
   }
 
   render() {
@@ -99,5 +97,9 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   _getDaedalusTransferStore() {
     return this.props.stores[environment.API].daedalusTransfer;
+  }
+
+  _getDaedalusTransferActions() {
+    return this.props.actions[environment.API].daedalusTransfer;
   }
 }
