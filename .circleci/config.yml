@@ -27,7 +27,6 @@ jobs:
       - run: sudo chown -R "$(whoami):$(whoami)" /usr/local/lib/node_modules
       - run: npm run build-js-cardano-wasm
       - run: npm install
-      - run: npm run build-dll
       
       # code checks // FIXME: Not runnning on this branch :/
       - run: npm run flow

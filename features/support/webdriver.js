@@ -1,20 +1,19 @@
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
 import seleniumWebdriver, { By } from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome';
 import path from 'path';
 
 function CustomWorld() {
-  const extPath = path.resolve('dev');
-
   this.driver = new seleniumWebdriver.Builder()
     .withCapabilities({
       chromeOptions: {
         args: [
-          `load-extension=${extPath}`,
           'start-maximized'
         ]
       }
     })
     .forBrowser('chrome')
+    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../icarus-light-cardano-wallet-poc-test.crx')))
     .build();
 
   // Returns a promise that resolves to the element

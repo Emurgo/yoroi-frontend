@@ -1,7 +1,8 @@
 Feature: Accept "Terms of use"
 
   Background:
-    Given I have selected English language
+    Given I have opened the chrome extension
+    And I have selected English language
 
   Scenario: User accepts "Terms of use"
     Given I am on the "Terms of use" screen
