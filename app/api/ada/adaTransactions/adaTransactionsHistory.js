@@ -3,6 +3,10 @@ import _ from 'lodash';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import {
+  Logger,
+  stringifyError
+} from '../../../utils/logging';
+import {
   getTransactionsHistoryForAddresses,
   transactionsLimit,
   addressesLimit,
@@ -31,10 +35,6 @@ import type
   AdaTransactions,
   AdaTransactionInputOutput
 } from '../adaTypes';
-
-// FIXME: Extract to another file
-const Logger = console;
-const stringifyError = o => o.toString();
 
 export const getAdaConfirmedTxs = getConfirmedTxsFromDB;
 

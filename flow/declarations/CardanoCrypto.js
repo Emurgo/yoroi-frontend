@@ -45,7 +45,7 @@ declare module 'rust-cardano-crypto' {
         checker: CryptoAddressChecker,
         addresses: Array<string>
       ): {
-        result: Array<string>,
+        result: Array<CryptoDaedalusAddressRestored>,
         failed: boolean,
         msg: ?string
       }
@@ -53,6 +53,11 @@ declare module 'rust-cardano-crypto' {
     Wallet: {
       fromSeed(seed: Array<mixed>): {
         result: CryptoWallet,
+        failed: boolean,
+        msg: ?string
+      },
+      fromDaedalusMnemonic(mnemonis: string): {
+        result: CryptoDaedalusWallet,
         failed: boolean,
         msg: ?string
       },
@@ -85,7 +90,21 @@ declare module 'rust-cardano-crypto' {
       ): {
         result: {
           cbor_encoded_tx: Array<number>,
-          fee: number
+          fee: number,
+          tx: CryptoTransaction
+        },
+        failed: boolean,
+        msg: ?string
+      },
+      move(
+        w: CryptoDaedalusWallet,
+        inputs: Array<TxDaedalusInput>,
+        output: string
+      ): {
+        result: {
+          cbor_encoded_tx: Array<number>,
+          fee: number,
+          tx: CryptoTransaction
         },
         failed: boolean,
         msg: ?string
@@ -100,10 +119,28 @@ declare type CryptoWallet = {
   selection_policy: SelectionPolicy
 }
 
+declare type CryptoDaedalusWallet = {
+  root_key: string,
+  cached_root_key: string,
+  config: CryptoConfig,
+  selection_policy: SelectionPolicy,
+  derivation_scheme: DerivationScheme
+}
+
 declare type CryptoAccount = {
   account: number,
   cached_account_key: string,
   derivation_scheme: string
+}
+
+declare type CryptoTransaction = {
+  tx: {
+    tx: {
+      inputs: Array<TxInputPtr>,
+      outputs: Array<TxOutput>
+    },
+    witnesses: Array<TxWitness>
+  }
 }
 
 declare type CryptoAddress = any // TODO: Complete with specific type
@@ -114,6 +151,10 @@ declare type CryptoAddressChecker = {
   payload_key: Array<number>
 }
 
+declare type CryptoDaedalusAddressRestored = {
+  address: string,
+  addressing: Array<number>
+}
 
 declare type TxInput = {
   ptr: TxInputPtr,
@@ -123,6 +164,12 @@ declare type TxInput = {
     change: number,
     index: number
   }
+}
+
+declare type TxDaedalusInput = {
+  ptr: TxInputPtr,
+  value: string,
+  addressing: Array<number>
 }
 
 declare type TxOutput = {
@@ -146,3 +193,5 @@ declare type CryptoConfig = {
 };
 
 declare type SelectionPolicy = 'FirstMatchFirst';
+
+declare type DerivationScheme = 'V1' | 'V2';

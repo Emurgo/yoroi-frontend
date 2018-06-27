@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Store from './lib/Store';
 import Wallet from '../domain/Wallet';
 import Request from './lib/LocalizedRequest';
-import { buildRoute, matchRoute } from '../utils/routing';
+import { buildRoute, matchRoute, testRoute } from '../utils/routing';
 import { ROUTES } from '../routes-config';
 import WalletAddDialog from '../components/wallet/WalletAddDialog';
 import type { GetWalletRecoveryPhraseResponse } from '../api/common';
@@ -197,7 +197,8 @@ export default class WalletsStore extends Store {
     const currentRoute = this.stores.app.currentRoute;
     const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute);
     const isNoWalletsRoute = matchRoute(ROUTES.NO_WALLETS, currentRoute);
-    return isRootRoute || isNoWalletsRoute;
+    const isDaedalusTransferRoute = testRoute(ROUTES.DAEDALUS_TRANFER.ROOT, currentRoute);
+    return isRootRoute || isNoWalletsRoute || isDaedalusTransferRoute;
   }
 
   _patchWalletRequestWithNewWallet = async (wallet: Wallet) => {
@@ -231,10 +232,10 @@ export default class WalletsStore extends Store {
         this.actions.router.goToRoute.trigger({ route: ROUTES.NO_WALLETS });
         return this._unsetActiveWallet();
       }
-      const match = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-      if (match) {
+      const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
+      if (matchWalletRoute) {
         // We have a route for a specific wallet -> lets try to find it
-        const walletForCurrentRoute = this.all.find(w => w.id === match.id);
+        const walletForCurrentRoute = this.all.find(w => w.id === matchWalletRoute.id);
         if (walletForCurrentRoute) {
           // The wallet exists, we are done
           this._setActiveWallet({ walletId: walletForCurrentRoute.id });
@@ -248,7 +249,17 @@ export default class WalletsStore extends Store {
         if (!this.hasActiveWallet && hasAnyWalletLoaded) {
           this._setActiveWallet({ walletId: this.all[0].id });
         }
-        if (this.active) this.goToWalletRoute(this.active.id);
+        if (this.active) {
+          /* FIXME: Improve this hardwired condition */
+          const walletId = this.active.id;
+          const matchDaedalusTrasferRoute = testRoute(ROUTES.DAEDALUS_TRANFER.ROOT, currentRoute);
+          if (matchDaedalusTrasferRoute) {
+            const route = buildRoute(ROUTES.DAEDALUS_TRANFER.ROOT, { id: walletId });
+            this.actions.router.goToRoute.trigger({ route });
+          } else {
+            this.goToWalletRoute(walletId);
+          }
+        }
       }
     });
   };

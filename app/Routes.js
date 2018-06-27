@@ -19,6 +19,7 @@ const WalletSummaryPage = resolver('containers/wallet/WalletSummaryPage');
 const WalletSendPage = resolver('containers/wallet/WalletSendPage');
 const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
 const WalletTransactionsPage = resolver('containers/wallet/WalletTransactionsPage');
+const DaedalusTransferPage = resolver('containers/daedalusTransfer/DaedalusTransferPage');
 
 export const Routes = (
   <div>
@@ -37,5 +38,6 @@ export const Routes = (
       <Route path="general" component={GeneralSettingsPage} />
       <Route path="terms-of-use" component={TermsOfUseSettingsPage} />
     </Route>
+    <Route path={ROUTES.DAEDALUS_TRANFER.ROOT} component={DaedalusTransferPage} />
   </div>
 );

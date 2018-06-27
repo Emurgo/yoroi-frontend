@@ -2,6 +2,8 @@ import RouteParser from 'route-parser';
 
 export const matchRoute = (pattern, path) => new RouteParser(pattern).match(path);
 
+export const testRoute = (pattern, path) => RegExp(`${pattern}*`).test(path);
+
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
  * by calling it with the pattern + params:

@@ -8,7 +8,7 @@ import Wallet from '../../domain/Wallet';
 // import menuIconOpened from '../../assets/images/menu-opened-ic.inline.svg';
 // import menuIconClosed from '../../assets/images/menu-ic.inline.svg';
 import styles from './TopBar.scss';
-import { matchRoute } from '../../utils/routing';
+import { matchRoute, testRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 
 type Props = {
@@ -29,22 +29,26 @@ export default class TopBar extends Component<Props> {
       /* showSubMenus,*/ formattedWalletAmount
     } = this.props;
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-    const showWalletInfo = walletRoutesMatch && activeWallet != null;
+    /* FIXME: Improve this hardwired condition */
+    const daedalusTransferRoutesMatch = testRoute(ROUTES.DAEDALUS_TRANFER.ROOT, currentRoute);
+    const showWalletInfo =
+      (walletRoutesMatch || daedalusTransferRoutesMatch) && activeWallet != null;
     const topBarStyles = classNames([
       styles.topBar,
       showWalletInfo ? styles.withWallet : styles.withoutWallet,
     ]);
 
-    const topBarTitle = walletRoutesMatch && activeWallet != null && formattedWalletAmount ? (
-      <div className={styles.walletInfo}>
-        <div className={styles.walletName}>{activeWallet.name}</div>
-        <div className={styles.walletAmount}>
-          {
-            // show currency and use long format (e.g. in ETC show all decimal places)
-            formattedWalletAmount(activeWallet.amount, true, true)
-          } ADA
+    const topBarTitle = (walletRoutesMatch || daedalusTransferRoutesMatch) &&
+      activeWallet != null && formattedWalletAmount ? (
+        <div className={styles.walletInfo}>
+          <div className={styles.walletName}>{activeWallet.name}</div>
+          <div className={styles.walletAmount}>
+            {
+              // show currency and use long format (e.g. in ETC show all decimal places)
+              formattedWalletAmount(activeWallet.amount, true, true)
+            } ADA
+          </div>
         </div>
-      </div>
     ) : null;
 
     /* const sidebarToggleIcon = (
