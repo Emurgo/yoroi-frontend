@@ -29,11 +29,13 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   };
 
   tranferFunds = () => {
-    this._getDaedalusTransferActions().transferFunds.trigger(() => {
-      this._getWalletsStore().refreshWalletsData();
-      this.props.actions.router.goToRoute.trigger({
-        route: this._getWalletsStore().activeWalletRoute
-      });
+    this._getDaedalusTransferActions().transferFunds.trigger({
+      next: () => {
+        this._getWalletsStore().refreshWalletsData();
+        this.props.actions.router.goToRoute.trigger({
+          route: this._getWalletsStore().activeWalletRoute
+        });
+      }
     });
   }
 
