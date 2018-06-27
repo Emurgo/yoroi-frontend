@@ -10,19 +10,6 @@ export function buildMockData(feature) {
   builtMockData = Object.assign({}, mockData.default, mockData[feature]);
 }
 
-function _generateListOfStrings(prefix) {
-  const strings = [];
-  // Generates strings ending with A-Z
-  for (let i = 65; i < 90; i++) {
-    strings.push(prefix + String.fromCharCode(i));
-  }
-  // Generates strings ending with a-z
-  for (let i = 97; i < 122; i++) {
-    strings.push(prefix + String.fromCharCode(i));
-  }
-  return strings;
-}
-
 export function getFakeAddresses(
   addressAmount,
   addressPrefix = 'Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo'
@@ -43,40 +30,78 @@ export function getFakeAddresses(
   }, {});
 }
 
-export function getTxs(txsAmount, addressPrefix, hashPrefix) {
-  if (!txsAmount) {
-    return builtMockData.txs;
-  }
-  return _generateListOfStrings(hashPrefix)
-    .slice(0, txsAmount).map(txHash => (
-      {
-        address: addressPrefix + 'W',
-        tx: {
-          hash: txHash,
-          time: '2018-05-10T13:51:33.000Z',
-          inputs_address: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
-          inputs_amount: [70],
-          outputs_address: [addressPrefix + 'W'],
-          outputs_amount: [200],
-          block_num: 56,
-          best_block_num: 101
-        }
-      }
-    ));
+export function getLovefieldTxs(addressPrefix) {
+  const addressMap = getMockData().addressesMapper
+      .find((address => address.prefix === addressPrefix));
+  return addressMap && addressMap.hashPrefix && addressMap.txsAmount ?
+    _getLovefieldTxs(
+      addressMap.txsAmount,
+      addressPrefix,
+      addressMap.hashPrefix,
+      addressMap.pendingTxsAmount
+    ) :
+    getMockData().lovefieldTxs[addressPrefix];
 }
 
-export function getLovefieldTxs(txsAmount, addressPrefix, hashPrefix) {
+export function getTxsMapList(addresses) {
+  const firstAddress = addresses[0];
+  const addressPrefix = firstAddress.slice(0, firstAddress.length - 1);
+  const addressMap = _getAddressMapper(addressPrefix);
+  return _getTxsMapList(addressMap, addressPrefix);
+}
+
+function _generateListOfStrings(prefix) {
+  const strings = [];
+  // Generates strings ending with A-Z
+  for (let i = 65; i < 90; i++) {
+    strings.push(prefix + String.fromCharCode(i));
+  }
+  // Generates strings ending with a-z
+  for (let i = 97; i < 122; i++) {
+    strings.push(prefix + String.fromCharCode(i));
+  }
+  return strings;
+}
+
+function _getTxs(txsAmount, addressPrefix, hashPrefix, pendingTxsAmount) {
   if (!txsAmount) {
     return builtMockData.txs;
   }
+  const pendingAmount = pendingTxsAmount || 0;
   return _generateListOfStrings(hashPrefix)
-    .slice(0, txsAmount).map(txHash => (
+    .slice(0, txsAmount + pendingAmount)
+    .map((txHash, index) => {
+      const newTx = Object.assign({}, {
+        hash: txHash,
+        time: '2018-05-10T13:51:33.000Z',
+        inputs_address: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
+        inputs_amount: [70],
+        outputs_address: [addressPrefix + 'W'],
+        outputs_amount: [200],
+        best_block_num: 101
+      });
+      const txMap = Object.assign({}, { address: addressPrefix + 'W', tx: newTx } );
+      if (index >= pendingAmount) {
+        txMap.tx.block_num = 56;
+      }
+      return txMap;
+    });
+}
+
+function _getLovefieldTxs(txsAmount, addressPrefix, hashPrefix, pendingTxsAmount) {
+  if (!txsAmount) {
+    return builtMockData.txs;
+  }
+  const pendingAmount = pendingTxsAmount || 0;
+  return _generateListOfStrings(hashPrefix)
+    .slice(0, txsAmount + pendingAmount)
+    .map((txHash, index) => (
       {
         txType: 'ADA received',
         txAmount: '0.000200',
         txTimeTitle: 'ADA transaction,',
         txTime: '2018-05-10T13:51:33.000Z',
-        txStatus: 'HIGH',
+        txStatus: index < pendingAmount ? 'TRANSACTION PENDING' : 'HIGH',
         txFrom: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
         txTo: [addressPrefix + 'W'],
         txConfirmations: 'High. 45 confirmations.',
@@ -85,16 +110,21 @@ export function getLovefieldTxs(txsAmount, addressPrefix, hashPrefix) {
     ));
 }
 
-export function getAddressMapper(addressPrefix) {
+function _getAddressMapper(addressPrefix) {
   if (!getMockData().addressesMapper) {
     return {};
   }
   return getMockData().addressesMapper.find((address => address.prefix === addressPrefix));
 }
 
-export function getTxsMapList(addressMap, addressPrefix) {
+export function _getTxsMapList(addressMap, addressPrefix) {
   if (addressMap && addressMap.hashPrefix && addressMap.txsAmount) {
-    return getTxs(addressMap.txsAmount, addressPrefix, addressMap.hashPrefix);
+    return _getTxs(
+      addressMap.txsAmount,
+      addressPrefix,
+      addressMap.hashPrefix,
+      addressMap.pendingTxsAmount
+    );
   }
   if (!getMockData().txs) {
     return [];

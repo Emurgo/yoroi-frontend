@@ -1,6 +1,6 @@
 import { create, bodyParser, defaults } from 'json-server';
 import moment from 'moment';
-import { getAddressMapper, getMockData, getTxsMapList } from './mockDataBuilder';
+import { getMockData, getTxsMapList } from './mockDataBuilder';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -10,13 +10,6 @@ export function createServer() {
   const server = create();
 
   server.use(middlewares);
-
-  function _getTxsMapList(addresses) {
-    const firstAddress = addresses[0];
-    const addressPrefix = firstAddress.slice(0, firstAddress.length - 1);
-    const addressMap = getAddressMapper(addressPrefix);
-    return getTxsMapList(addressMap, addressPrefix);
-  }
 
   function validateAddressesReq({ addresses } = {}) {
     if (!addresses || addresses.length > 50 || addresses.length === 0) {
@@ -53,7 +46,7 @@ export function createServer() {
   server.post('/api/txs/history', (req, res) => {
     validateAddressesReq(req.body);
     validateDatetimeReq(req.body);
-    const txsMapList = _getTxsMapList(req.body.addresses);
+    const txsMapList = getTxsMapList(req.body.addresses);
     // Filters all txs according to hash and date
     const filteredTxs = txsMapList.filter(txMap => {
       const extraFilter = req.body.txHash ?
@@ -79,7 +72,7 @@ export function createServer() {
 
   server.post('/api/txs/pending', (req, res) => {
     validateAddressesReq(req.body);
-    const txsMapList = _getTxsMapList(req.body.addresses);
+    const txsMapList = getTxsMapList(req.body.addresses);
     const txs = txsMapList.filter(txMap => (
       req.body.addresses.includes(txMap.address) &&
         !txMap.tx.block_num
