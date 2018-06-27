@@ -197,7 +197,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(messages.importButtonLabel),
+        label: intl.formatMessage(messages.importButtonLabel),
         primary: true,
         disabled: isSubmitting,
         onClick: this.submit,

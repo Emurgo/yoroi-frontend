@@ -1,6 +1,6 @@
 const tasks = require('./tasks');
 const createWebpackServer = require('webpack-httpolyglot-server');
-const devConfig = require('../webpack/dev.config');
+const devConfig = require('../webpack/development.config');
 
 tasks.replaceWebpack();
 console.log('[Copy assets]');

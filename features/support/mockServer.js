@@ -1,5 +1,6 @@
 import { create, bodyParser, defaults } from 'json-server';
-import { getMockData } from './mockDataBuilder';
+import moment from 'moment';
+import { getAddressMapper, getMockData, getTxsMapList } from './mockDataBuilder';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -11,10 +12,17 @@ export function createServer() {
   server.use(middlewares);
 
   function validateAddressesReq({ addresses } = {}) {
-    if (!addresses || addresses.length > 20 || addresses.length === 0) {
-      throw new Error('Addresses request length should be (0, 20]');
+    if (!addresses || addresses.length > 50 || addresses.length === 0) {
+      throw new Error('Addresses request length should be (0, 50]');
     }
     // TODO: Add address validation
+    return true;
+  }
+
+  function validateDatetimeReq({ dateFrom } = {}) {
+    if (!dateFrom || !moment(dateFrom).isValid()) {
+      throw new Error('DateFrom should be a valid datetime');
+    }
     return true;
   }
 
@@ -25,7 +33,8 @@ export function createServer() {
 
   server.post('/api/txs/utxoSumForAddresses', (req, res) => {
     validateAddressesReq(req.body);
-    const sumUtxos = getMockData().utxos.reduce((sum, utxo) => {
+    const utxos = getMockData().utxos;
+    const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
       if (req.body.addresses.includes(utxo.receiver)) {
         return sum + utxo.amount;
       }
@@ -35,8 +44,23 @@ export function createServer() {
   });
 
   server.post('/api/txs/history', (req, res) => {
-    // TODO: Implement
-    res.send();
+    validateAddressesReq(req.body);
+    validateDatetimeReq(req.body);
+    const firstAddress = req.body.addresses[0];
+    const addressPrefix = firstAddress.slice(0, firstAddress.length - 1);
+    const addressMap = getAddressMapper(addressPrefix);
+    const txsMapList = getTxsMapList(addressMap, addressPrefix);
+    // Filters all txs according to hash and date
+    const filteredTxs = txsMapList.filter(txMap => {
+      const extraFilter = req.body.txHash ?
+        txMap.tx.hash > req.body.txHash :
+        !req.body.txHash;
+      return req.body.addresses.includes(txMap.address) &&
+        moment(txMap.tx.time) >= moment(req.body.dateFrom) &&
+        extraFilter;
+    }).map(txMap => txMap.tx);
+    // Returns a chunk of 20 txs
+    res.send(filteredTxs.slice(0, 20));
   });
 
   server.post('/api/txs/signed', (req, res) => {

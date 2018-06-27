@@ -29,7 +29,7 @@ crx
   .then(crxBuffer => {
     const updateXML = crx.generateUpdateXML();
     fs.writeFileSync('update.xml', updateXML);
-    fs.writeFileSync(`${name}.crx`, crxBuffer);
+    fs.writeFileSync(`${name}-${process.env.NODE_ENV}.crx`, crxBuffer);
     fs.unlinkSync(`${name}.zip`);
     return;
   })

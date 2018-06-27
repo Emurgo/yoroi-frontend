@@ -1,8 +1,9 @@
 Feature: Restore Wallet
 
   Background:
-    Given I am testing "Restore wallet"
-    And I have opened the chrome extension
+    Given I have opened the chrome extension
+    And I have completed the basic setup
+    And I am testing "Restore wallet"
     And There is no wallet stored
 
   Scenario: Successfully restoring a wallet

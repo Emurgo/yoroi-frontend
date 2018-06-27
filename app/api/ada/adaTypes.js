@@ -101,3 +101,11 @@ export type AdaWalletParams = {
   walletPassword: string,
   walletInitData: AdaWalletInitData
 };
+
+export type UTXO = {
+  utxo_id: string,
+  tx_hash: string,
+  tx_index: number,
+  receiver: string,
+  amount: string
+}

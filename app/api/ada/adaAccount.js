@@ -1,11 +1,11 @@
 // @flow
 import { Wallet } from 'rust-cardano-crypto';
-import { getCryptoWalletFromSeed } from './lib/crypto-wallet';
+import { getCryptoWalletFromSeed } from './lib/cardanoCrypto/cryptoWallet';
 import {
   getFromStorage,
   saveInStorage
 } from './lib/utils';
-import type { WalletSeed } from './lib/crypto-wallet';
+import type { WalletSeed } from './lib/cardanoCrypto/cryptoWallet';
 
 const ACCOUNT_KEY = 'ACCOUNT'; // single wallet atm
 const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */

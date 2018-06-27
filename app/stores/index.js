@@ -1,6 +1,7 @@
 // @flow
 import { observable, action } from 'mobx';
 import AppStore from './AppStore';
+import ProfileStore from './ProfileStore';
 import WalletBackupStore from './WalletBackupStore';
 import SidebarStore from './SidebarStore';
 import UiDialogsStore from './UiDialogsStore';
@@ -10,6 +11,7 @@ import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
 
 export const storeClasses = {
+  profile: ProfileStore,
   app: AppStore,
   sidebar: SidebarStore,
   uiDialogs: UiDialogsStore,
@@ -18,6 +20,7 @@ export const storeClasses = {
 };
 
 export type StoresMap = {
+  profile: ProfileStore,
   app: AppStore,
   sidebar: SidebarStore,
   walletBackup: WalletBackupStore,
@@ -29,6 +32,7 @@ export type StoresMap = {
 
 // Constant that does never change during lifetime
 const stores = observable({
+  profile: null,
   app: null,
   sidebar: null,
   walletBackup: null,

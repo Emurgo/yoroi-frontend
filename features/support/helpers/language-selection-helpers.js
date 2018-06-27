@@ -3,9 +3,12 @@ import i18n from './i18n-helpers';
 const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
 
 const languageSelection = {
-  waitForVisible: async (client, { isHidden } = {}) => (
-    client.waitForVisible(LANGUAGE_SELECTION_FORM, null, isHidden)
-  ),
+  waitForVisible: async (client, { isHidden } = {}) => {
+    if (isHidden) {
+      return client.waitForElementNotPresent(LANGUAGE_SELECTION_FORM);
+    } 
+    return client.waitForElement(LANGUAGE_SELECTION_FORM);
+  },
   ensureLanguageIsSelected: async (client, { language } = {}) => {
     await languageSelection.waitForVisible(client);
     i18n.setActiveLanguage(client, { language });
