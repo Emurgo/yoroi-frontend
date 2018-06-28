@@ -1,10 +1,11 @@
 // @flow
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import validWords from 'bip39/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import MainLayout from '../MainLayout';
+import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import DaedalusTransferForm from '../../components/daedalusTransfer/DaedalusTransferForm';
 import DaedalusTransferWaitingPage from '../../components/daedalusTransfer/DaedalusTransferWaitingPage';
 import DaedalusTransferSummaryPage from '../../components/daedalusTransfer/DaedalusTransferSummaryPage';
@@ -14,6 +15,14 @@ import environment from '../../environment';
 import resolver from '../../utils/imports';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
+
+const messages = defineMessages({
+  title: {
+    id: 'daedalusTransfer.title',
+    defaultMessage: '!!!Transfer From Daedalus',
+    description: 'Transfer from Daedalus Title.'
+  },
+});
 
 @inject('stores', 'actions') @observer
 export default class DaedalusTransferPage extends Component<InjectedProps> {
@@ -44,13 +53,14 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   }
 
   render() {
+    const topBar = (<TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />);
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
     if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
-          <MainLayout>
+          <MainLayout topbar={topBar}>
             <DaedalusTransferForm
               onSubmit={this.setupTransferFunds}
               mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
@@ -62,13 +72,13 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
       case 'checkingAddresses':
       case 'generatingTx':
         return (
-          <MainLayout>
+          <MainLayout topbar={topBar}>
             <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
           </MainLayout>
         );
       case 'readyToTransfer':
         return (
-          <MainLayout>
+          <MainLayout topbar={topBar}>
             <DaedalusTransferSummaryPage
               formattedWalletAmount={formattedWalletAmount}
               transferTx={daedalusTransfer.transferTx}
@@ -81,7 +91,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case 'error':
         return (
-          <MainLayout>
+          <MainLayout topbar={topBar}>
             <DaedalusTransferErrorPage
               error={daedalusTransfer.error}
               onCancel={this.cancelTransferFunds}

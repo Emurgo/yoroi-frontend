@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Store from './lib/Store';
 import Wallet from '../domain/Wallet';
 import Request from './lib/LocalizedRequest';
-import { buildRoute, matchRoute, testRoute } from '../utils/routing';
+import { buildRoute, matchRoute } from '../utils/routing';
 import { ROUTES } from '../routes-config';
 import WalletAddDialog from '../components/wallet/WalletAddDialog';
 import type { GetWalletRecoveryPhraseResponse } from '../api/common';
@@ -197,8 +197,7 @@ export default class WalletsStore extends Store {
     const currentRoute = this.stores.app.currentRoute;
     const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute);
     const isNoWalletsRoute = matchRoute(ROUTES.NO_WALLETS, currentRoute);
-    const isDaedalusTransferRoute = testRoute(ROUTES.DAEDALUS_TRANFER.ROOT, currentRoute);
-    return isRootRoute || isNoWalletsRoute || isDaedalusTransferRoute;
+    return isRootRoute || isNoWalletsRoute;
   }
 
   _patchWalletRequestWithNewWallet = async (wallet: Wallet) => {
@@ -250,15 +249,8 @@ export default class WalletsStore extends Store {
           this._setActiveWallet({ walletId: this.all[0].id });
         }
         if (this.active) {
-          /* FIXME: Improve this hardwired condition */
           const walletId = this.active.id;
-          const matchDaedalusTrasferRoute = testRoute(ROUTES.DAEDALUS_TRANFER.ROOT, currentRoute);
-          if (matchDaedalusTrasferRoute) {
-            const route = buildRoute(ROUTES.DAEDALUS_TRANFER.ROOT, { id: walletId });
-            this.actions.router.goToRoute.trigger({ route });
-          } else {
-            this.goToWalletRoute(walletId);
-          }
+          this.goToWalletRoute(walletId);
         }
       }
     });
