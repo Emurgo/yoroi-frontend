@@ -231,10 +231,10 @@ export default class WalletsStore extends Store {
         this.actions.router.goToRoute.trigger({ route: ROUTES.NO_WALLETS });
         return this._unsetActiveWallet();
       }
-      const match = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-      if (match) {
+      const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
+      if (matchWalletRoute) {
         // We have a route for a specific wallet -> lets try to find it
-        const walletForCurrentRoute = this.all.find(w => w.id === match.id);
+        const walletForCurrentRoute = this.all.find(w => w.id === matchWalletRoute.id);
         if (walletForCurrentRoute) {
           // The wallet exists, we are done
           this._setActiveWallet({ walletId: walletForCurrentRoute.id });
@@ -248,7 +248,10 @@ export default class WalletsStore extends Store {
         if (!this.hasActiveWallet && hasAnyWalletLoaded) {
           this._setActiveWallet({ walletId: this.all[0].id });
         }
-        if (this.active) this.goToWalletRoute(this.active.id);
+        if (this.active) {
+          const walletId = this.active.id;
+          this.goToWalletRoute(walletId);
+        }
       }
     });
   };

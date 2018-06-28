@@ -5,9 +5,9 @@ import { Blake2b, Wallet } from 'rust-cardano-crypto';
 import {
   encryptWithPassword,
   decryptWithPassword
-} from '../../../utils/passwordCipher';
+} from '../../../../utils/passwordCipher';
 
-import type { ConfigType } from '../../../../config/config-types';
+import type { ConfigType } from '../../../../../config/config-types';
 
 export type WalletSeed = {
   encryptedSeed: string,
@@ -40,6 +40,15 @@ export function getCryptoWalletFromSeed(
   const seed = decryptWithPassword(password, walletSeed.encryptedSeed);
   const seedAsArray = Object.values(seed);
   const wallet = Wallet.fromSeed(seedAsArray).result;
+  wallet.config.protocol_magic = protocolMagic;
+  return wallet;
+}
+
+/* FIXME: Should be pass a encrypted mnemonic and also the password to decrypt it*/
+export function getCryptoDaedalusWalletFromMnemonics(
+  secretWords: string,
+): CryptoDaedalusWallet {
+  const wallet = Wallet.fromDaedalusMnemonic(secretWords).result;
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }

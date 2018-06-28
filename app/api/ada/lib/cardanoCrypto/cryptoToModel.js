@@ -3,7 +3,7 @@ import type {
   AdaWallet,
   AdaAddress,
   AdaWalletInitData
-} from '../adaTypes';
+} from '../../adaTypes';
 
 /* @note: Ada wallet is the abstraction for Daedalus */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
