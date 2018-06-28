@@ -1,10 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import type { Node } from 'react';
 import classNames from 'classnames';
-import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import Wallet from '../../domain/Wallet';
 import styles from './TextOnlyTopbar.scss';
 
 type Props = {
@@ -12,10 +8,6 @@ type Props = {
 };
 
 export default class TextOnlyTopBar extends Component<Props> {
-
-  static contextTypes = {
-    intl: intlShape.isRequired,
-  };
 
   render() {
     const { title } = this.props;

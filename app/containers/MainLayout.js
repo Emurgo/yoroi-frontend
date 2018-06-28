@@ -1,13 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import type { Node } from 'react';
 import Sidebar from '../components/sidebar/Sidebar';
 import TopBarContainer from './TopBarContainer';
 import SidebarLayout from '../components/layout/SidebarLayout';
 import WalletAddPage from './wallet/WalletAddPage';
 import type { StoresMap } from '../stores/index';
 import type { ActionsMap } from '../actions/index';
-import type { Node } from 'react';
 
 export type MainLayoutProps = {
   stores: any | StoresMap,
