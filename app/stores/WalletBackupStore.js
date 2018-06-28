@@ -21,7 +21,7 @@ export default class WalletBackupStore extends Store {
   @observable isTermRecoveryAccepted = false;
   @observable countdownRemaining = 0;
 
-  countdownTimerInterval: ?number = null;
+  countdownTimerInterval: ?IntervalID = null;
 
   setup() {
     const a = this.actions.walletBackup;

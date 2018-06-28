@@ -5,6 +5,7 @@ import TransactionsActions from './transactions-actions';
 import NodeUpdateActions from './node-update-actions';
 import WalletSettingsActions from './wallet-settings-actions';
 import AddressesActions from './addresses-actions';
+import DaedalusTransferActions from './daedalus-transfer-actions';
 
 export type AdaActionsMap = {
   wallets: WalletsActions,
@@ -13,6 +14,7 @@ export type AdaActionsMap = {
   nodeUpdate: NodeUpdateActions,
   walletSettings: WalletSettingsActions,
   addresses: AddressesActions,
+  daedalusTransfer: DaedalusTransferActions,
 };
 
 const adaActionsMap: AdaActionsMap = {
@@ -22,6 +24,7 @@ const adaActionsMap: AdaActionsMap = {
   nodeUpdate: new NodeUpdateActions(),
   walletSettings: new WalletSettingsActions(),
   addresses: new AddressesActions(),
+  daedalusTransfer: new DaedalusTransferActions()
 };
 
 export default adaActionsMap;

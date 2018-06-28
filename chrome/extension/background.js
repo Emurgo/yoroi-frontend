@@ -24,5 +24,3 @@ promisifyAll(chrome.storage, ['local']);
 chrome.browserAction.onClicked.addListener(() => {
   chrome.tabs.create({ url: 'main_window.html' });
 });
-
-require('./background/badge');

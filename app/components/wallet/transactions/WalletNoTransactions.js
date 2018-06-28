@@ -1,13 +1,13 @@
 // @flow
 import React, { Component } from 'react';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import styles from './WalletNoTransactions.scss';
 
 type Props = {
   label: string,
 };
 
-//@observer
+@observer
 export default class WalletNoTransactions extends Component<Props> {
 
   render() {

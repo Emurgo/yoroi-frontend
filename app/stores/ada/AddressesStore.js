@@ -28,13 +28,9 @@ export default class AddressesStore extends Store {
     actions.resetErrors.listen(this._resetErrors);
   }
 
-  _createAddress = async (params: { walletId: string, password: ?string }) => {
+  _createAddress = async () => {
     try {
-      const { walletId, password } = params;
-      const accountId = this._getAccountIdByWalletId(walletId);
-      const address: ?CreateAddressResponse = await this.createAddressRequest.execute({
-        accountId, password
-      }).promise;
+      const address: ?CreateAddressResponse = await this.createAddressRequest.execute().promise;
       if (address != null) {
         this._refreshAddresses();
         runInAction('set last generated address and reset error', () => {
@@ -77,14 +73,14 @@ export default class AddressesStore extends Store {
   }
 
   @action _refreshAddresses = () => {
-    //if (this.stores.networkStatus.isConnected) {
+    // if (this.stores.networkStatus.isConnected) {
     const allWallets = this.stores.ada.wallets.all;
     for (const wallet of allWallets) {
       const allRequest = this._getAddressesAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
       allRequest.execute({ walletId: wallet.id });
     }
-    //}
+    // }
   };
 
   @action _resetErrors = () => {

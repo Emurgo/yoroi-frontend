@@ -26,6 +26,23 @@ $ npm run build-js-cardano-wasm
 $ npm install
 ```
 
+In order to update it:
+
+```bash
+#### Update js-cardano-wasm
+```cd js-cardano-wasm;
+git checkout master;
+git pull origin master;
+cd ..;
+
+# Commit the update
+git add .
+git commit -S -m "${youCommitMessage}"
+git push ...
+
+# Repeat process from `$npm run build-js-cardano-wasm`
+```
+
 ## Development
 
 * Run script
@@ -66,7 +83,7 @@ $ npm run build
 ```bash
 # compress build folder to {manifest.name}.zip and crx
 $ npm run build
-$ npm run compress -- [options]
+$ npm run compress -- --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx"
 ```
 
 #### Options
@@ -82,17 +99,14 @@ See [autoupdate guide](https://developer.chrome.com/extensions/autoupdate) for m
 
 ## Test
 
-* `test/app`: React components.
-* `test/e2e`: E2E tests (use [chromedriver](https://www.npmjs.com/package/chromedriver), [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver))
+* `features`: E2E tests (use [chromedriver](https://www.npmjs.com/package/chromedriver), [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver))
 
 ```bash
+# flow
+$ npm run flow
 # lint
-$ npm run lint
-# test/app
-$ npm test
-$ npm test -- --watch  # watch files
-# test/e2e
-$ npm run build
+$ npm run eslint
+# features
 $ npm run test-e2e
 ```
 

@@ -4,7 +4,9 @@ import { observer, inject } from 'mobx-react';
 import WalletAddDialog from '../../../components/wallet/WalletAddDialog';
 import WalletCreateDialog from '../../../components/wallet/WalletCreateDialog';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
-// import WalletFileImportDialog from '../../../components/wallet/file-import/WalletFileImportDialog';
+/* import
+  WalletFileImportDialog
+from '../../../components/wallet/file-import/WalletFileImportDialog';*/
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 
@@ -24,9 +26,7 @@ export default class WalletAddDialogContainer extends Component<Props> {
         onRestore={() => actions.dialogs.open.trigger({
           dialog: WalletRestoreDialog,
         })}
-        onImportFile={() => actions.dialogs.open.trigger({
-          dialog: undefined, //WalletFileImportDialog,
-        })}
+        onImportFile={() => undefined}
         onCancel={actions.dialogs.closeActiveDialog.trigger}
         canClose={stores[environment.API].wallets.hasAnyWallets}
       />

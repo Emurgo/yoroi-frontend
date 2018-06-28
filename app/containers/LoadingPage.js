@@ -20,12 +20,12 @@ export const messages = defineMessages({
 export default class LoadingPage extends Component<InjectedProps> {
 
   render() {
-    const { stores } = this.props;
+    // const { stores } = this.props;
     const {
       isConnecting, isSyncing, syncPercentage, isLoadingWallets,
       hasBeenConnected, hasBlockSyncingStarted, localTimeDifference,
       ALLOWED_TIME_DIFFERENCE,
-    } = { 
+    } = {
       isConnecting: false,
       isSyncing: false,
       syncPercentage: 100,
@@ -66,6 +66,6 @@ export default class LoadingPage extends Component<InjectedProps> {
 
   handleReportIssue = () => {}
 
-  handleProblemSolutionClick = (link: string) => {
+  handleProblemSolutionClick = (/* link: string*/) => {
   }
 }

@@ -8,6 +8,7 @@
 }
 
 .modal {
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   max-height: 90%;
@@ -22,6 +23,11 @@
         color: var(--theme-dialog-choice-tabs-text-color-active);
         border-bottom: 2px solid var(--theme-dialog-choice-tabs-bottom-border-color-active);
       }
+    }
+
+    .SimpleInput_input,
+    .SimpleAutocomplete_autocompleteContent {
+      background-color: transparent !important;
     }
   }
 }

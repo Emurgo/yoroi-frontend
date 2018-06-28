@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+import type { InjectedContainerProps } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
@@ -9,8 +10,9 @@ import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import resolver from '../../utils/imports';
 
-
 const { formattedWalletAmount } = resolver('utils/formatters');
+
+type Props = InjectedContainerProps
 
 export const messages = defineMessages({
   noTransactions: {
@@ -22,7 +24,7 @@ export const messages = defineMessages({
 });
 
 @inject('stores', 'actions') @observer
-export default class WalletSummaryPage extends Component {
+export default class WalletSummaryPage extends Component<Props> {
   static defaultProps = { actions: null, stores: null };
 
   static contextTypes = {
@@ -41,8 +43,9 @@ export default class WalletSummaryPage extends Component {
     } = transactions;
     const wallet = wallets.active;
     // Guard against potential null values
-    if (!wallet)
+    if (!wallet) {
       throw new Error('Active wallet required for WalletSummaryPage.');
+    }
 
     let walletTransactions = null;
     const noTransactionsLabel = intl.formatMessage(messages.noTransactions);

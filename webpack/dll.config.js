@@ -3,9 +3,7 @@ const webpack = require('webpack');
 
 const dependencies = Object.keys(
   require('../package.json').dependencies
-).filter(dep => {
-  return dep !== 'react-polymorph' && dep !== 'node-sass'
-});
+).filter(dep => dep !== 'react-polymorph' && dep !== 'node-sass');
 
 module.exports = {
   context: process.cwd(),
