@@ -24,5 +24,6 @@ Feature: Update Txs History
       | Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo |     3     |       45      |
       | C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo |     30    |       45      |
       | B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo |     45    |       45      |
+      | EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo |     1     |       1       |
 
   # TODO: Make tests for existing / non-existing txs in lovefield db 

@@ -16,8 +16,8 @@ When(/^I fill the form:$/, async function (table) {
   await this.input('#amount--3', fields.amount);
 });
 
-When(/^The transaction fees are calculated$/, async function () {
-  await this.waitForContent("//span[contains(text(), '+ 0.167950 of fees')]");
+When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
+  await this.waitForContent(`//span[contains(text(), '+ ${fee} of fees')]`);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
