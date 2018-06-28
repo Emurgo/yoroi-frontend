@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './WalletNavigation.scss';
 import WalletNavButton from './WalletNavButton';
@@ -43,7 +43,7 @@ type Props = {
   onNavItemClick: Function,
 };
 
-//@observer
+@observer
 export default class WalletNavigation extends Component<Props> {
 
   static contextTypes = {

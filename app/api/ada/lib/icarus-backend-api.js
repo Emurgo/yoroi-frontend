@@ -1,16 +1,16 @@
 import axios from 'axios';
 
-const BackendApiRoute = '18.206.30.1';
-const BackendApiPort = 443;
-const order = 'DESC';
 export const transactionsLimit = 20;
-export const addressesLimit = 20;
+export const addressesLimit = 50;
+
+declare var CONFIG: ConfigType;
+const backendUrl = CONFIG.network.backendUrl;
 
 // TODO: Refactor service call in order to re-use common parameters
 // TODO: Map errors in a more specific way
 
 export const getUTXOsForAddresses = addresses =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoForAddresses`,
+  axios(`${backendUrl}/api/txs/utxoForAddresses`,
     {
       method: 'post',
       data: {
@@ -20,7 +20,7 @@ export const getUTXOsForAddresses = addresses =>
   ).then(response => response.data);
 
 export const getUTXOsSumsForAddresses = addresses =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/utxoSumForAddresses`,
+  axios(`${backendUrl}/api/txs/utxoSumForAddresses`,
     {
       method: 'post',
       data: {
@@ -29,19 +29,20 @@ export const getUTXOsSumsForAddresses = addresses =>
     }
   ).then(response => response.data);
 
-export const getTransactionsHistoryForAddresses = (addresses, dateFrom) =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/history?order=${order}`,
+export const getTransactionsHistoryForAddresses = (addresses, dateFrom, txHash) =>
+  axios(`${backendUrl}/api/txs/history`,
     {
       method: 'post',
       data: {
         addresses,
-        dateFrom
+        dateFrom,
+        txHash
       }
     }
   ).then(response => response.data);
 
 export const sendTx = signedTx =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/txs/signed`,
+  axios(`${backendUrl}/api/txs/signed`,
     {
       method: 'post',
       data: {
@@ -51,7 +52,17 @@ export const sendTx = signedTx =>
   ).then(response => response.data);
 
 export const checkAddressesInUse = addresses =>
-  axios(`https://${BackendApiRoute}:${BackendApiPort}/api/addresses/filterUsed`,
+  axios(`${backendUrl}/api/addresses/filterUsed`,
+    {
+      method: 'post',
+      data: {
+        addresses
+      }
+    }
+  ).then(response => response.data);
+
+export const getPendingTxsForAddresses = addresses =>
+  axios(`${backendUrl}/api/txs/pending`,
     {
       method: 'post',
       data: {

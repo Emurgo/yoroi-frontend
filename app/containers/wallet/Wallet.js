@@ -33,8 +33,7 @@ export default class Wallet extends Component<Props> {
   };
 
   render() {
-    const { wallets, adaRedemption } = this.props.stores.ada;
-    const { actions } = this.props;
+    const { wallets } = this.props.stores.ada;
     if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;
     return (
       <MainLayout>

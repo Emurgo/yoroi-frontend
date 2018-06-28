@@ -1,5 +1,5 @@
 // @flow
-import {BigNumber} from 'bignumber.js';
+// import { BigNumber } from 'bignumber.js';
 import { observable, action, runInAction } from 'mobx';
 import WalletStore from '../WalletStore';
 import Wallet from '../../domain/Wallet';
@@ -109,7 +109,7 @@ export default class AdaWalletsStore extends WalletStore {
   @action _restoreWallet = async (params: {
     recoveryPhrase: string,
     walletName: string,
-    walletPassword: ?string,
+    walletPassword: string,
   }) => {
     this.restoreRequest.reset();
     this._setIsRestoreActive(true);

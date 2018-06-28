@@ -8,7 +8,7 @@ export default class UiDialogsStore extends Store {
   @observable secondsSinceActiveDialogIsOpen: number = 0;
   @observable dataForActiveDialog: Object = {};
 
-  _secondsTimerInterval: ?number = null;
+  _secondsTimerInterval: ?IntervalID = null;
 
   setup() {
     this.actions.dialogs.open.listen(this._onOpen);

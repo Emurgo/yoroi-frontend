@@ -1,19 +1,31 @@
 import React, { Component } from 'react';
-import { Provider } from 'mobx-react';
+import { action } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
-import { hashHistory, Router } from 'react-router';
-import { ThemeProvider } from 'react-css-themr';
-import { loadRustModule } from 'cardano-crypto';
-import { IntlProvider } from 'react-intl';
-import { Routes } from './Routes';
-import { ROUTES } from './routes-config';
+import { hashHistory } from 'react-router';
+import { loadRustModule } from 'rust-cardano-crypto';
 import './themes/index.global.scss';
-import { daedalusTheme } from './themes/daedalus';
-import translations from './i18n/translations';
-import ThemeManager from './ThemeManager';
 import { setupApi } from './api/index';
+import { loadLovefieldDB } from './api/ada/lib/lovefieldDatabase';
 import createStores from './stores/index';
+import translations from './i18n/translations';
 import actions from './actions/index';
+import Action from './actions/lib/Action';
+import App from './App';
+
+const api = setupApi();
+const router = new RouterStore();
+const history = syncHistoryWithStore(hashHistory, router);
+const stores = createStores(api, actions, router);
+window.icarus = {
+  api,
+  actions,
+  translations,
+  stores,
+  reset: action(() => {
+    Action.resetAllActions();
+    createStores(api, actions, router);
+  }),
+};
 
 export default class Root extends Component {
   constructor(props) {
@@ -23,59 +35,23 @@ export default class Root extends Component {
     };
   }
 
-  _redirectToWallet = () => {
-    const { app } = this.stores;
-    const { wallets } = this.stores.ada;
-    // TODO: introduce smarter way to bootsrap initial screens
-    if (app.currentRoute === ROUTES.ROOT) {
-      if (wallets.first) {
-        this.actions.router.goToRoute.trigger({
-          route: ROUTES.WALLETS.SUMMARY,
-          params: { id: wallets.first.id }
-        });
-      } else {
-        actions.router.goToRoute.trigger({ route: ROUTES.NO_WALLETS });
-      }
-    }
-  };
-
   componentDidMount() {
     /* (!) Attention: Before use any method from CardanoCrypto
-           we must load the RustModule first.
+           we must load the RustModule and Lovefield DB first.
     */
-    loadRustModule().then(() => {
-      const api = setupApi();
-      const router = new RouterStore();
-      this.history = syncHistoryWithStore(hashHistory, router);
-      this.stores = createStores(api, actions, router);
+    Promise.all([loadRustModule(), loadLovefieldDB()]).then(() => {
+      console.debug('Root::componentDidMount Async modules loaded');
       this.setState({ loading: false });
-      this._redirectToWallet();
+      return true;
+    }).catch((error) => {
+      console.error('Root::componentDidMount Unable to load async modules', error);
     });
   }
 
   render() {
-    const currentTheme = 'cardano';
-    const locale = 'en-US';
-    const theme = require(`./themes/daedalus/${currentTheme}.js`); // eslint-disable-line
-
     if (this.state.loading) {
       return <div />;
     }
-    return (
-      <div>
-        <ThemeManager variables={theme} />
-        <Provider stores={this.stores} actions={actions}>
-          <ThemeProvider theme={daedalusTheme}>
-            <IntlProvider
-              {...{ locale, key: locale, messages: translations[locale] }}
-            >
-              <div style={{ height: '100%' }}>
-                <Router history={this.history} routes={Routes} />
-              </div>
-            </IntlProvider>
-          </ThemeProvider>
-        </Provider>
-      </div>
-    );
+    return (<App stores={stores} actions={actions} history={history} />);
   }
 }

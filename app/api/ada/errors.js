@@ -47,6 +47,41 @@ const messages = defineMessages({
     defaultMessage: '!!!Not enough Ada for fees. Try sending a smaller amount.',
     description: '"Not enough Ada for fees. Try sending a smaller amount." error message'
   },
+  updateAdaWalletError: {
+    id: 'api.errors.updateAdaWalletError',
+    defaultMessage: '!!!Error while updating ada wallet.',
+    description: '"Error while updating ada wallet." error message'
+  },
+  getBalanceError: {
+    id: 'api.errors.getBalanceError',
+    defaultMessage: '!!!Error while getting Balance.',
+    description: '"Error while getting Balance." error message'
+  },
+  updateAdaTxsHistoryError: {
+    id: 'api.errors.updateAdaTxsHistoryError',
+    defaultMessage: '!!!Error while updating ada transactions history.',
+    description: '"Error while updating ada transactions history." error message'
+  },
+  transactionError: {
+    id: 'api.errors.transactionError',
+    defaultMessage: '!!!Error while creating transaction.',
+    description: '"Error while creating transaction." error message'
+  },
+  pendingTransactionError: {
+    id: 'api.errors.pendingTransactionError',
+    defaultMessage: '!!!Error while updating pending transactions.',
+    description: '"Error while updating pending transactions." error message'
+  },
+  getAddressesWithFundsError: {
+    id: 'api.errors.getAddressesWithFundsError',
+    defaultMessage: '!!!Error while getting addresses with funds.',
+    description: '"Error while getting addresses with funds." error message'
+  },
+  generateTransferTxError: {
+    id: 'api.errors.generateTransferTxError',
+    defaultMessage: '!!!Error while generating transfer transacion.',
+    description: '"Error while generating transfer transacion." error message'
+  }
 });
 
 export class ApiMethodNotYetImplementedError extends LocalizableError {
@@ -126,6 +161,69 @@ export class NotEnoughFundsForTransactionFeesError extends LocalizableError {
     super({
       id: messages.notEnoughFundsForTransactionFeesError.id,
       defaultMessage: messages.notEnoughFundsForTransactionFeesError.defaultMessage,
+    });
+  }
+}
+
+export class UpdateAdaWalletError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.updateAdaWalletError.id,
+      defaultMessage: messages.updateAdaWalletError.defaultMessage,
+    });
+  }
+}
+
+export class GetBalanceError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getBalanceError.id,
+      defaultMessage: messages.getBalanceError.defaultMessage,
+    });
+  }
+}
+
+export class UpdateAdaTxsHistoryError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.updateAdaTxsHistoryError.id,
+      defaultMessage: messages.updateAdaTxsHistoryError.defaultMessage,
+    });
+  }
+}
+
+export class TransactionError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.transactionError.id,
+      defaultMessage: messages.transactionError.defaultMessage,
+    });
+  }
+}
+
+export class PendingTransactionError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.pendingTransactionError.id,
+      defaultMessage: messages.pendingTransactionError.defaultMessage,
+    });
+  }
+}
+
+export class GetAddressesWithFundsError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getAddressesWithFundsError.id,
+      defaultMessage: messages.getAddressesWithFundsError.defaultMessage
+    });
+  }
+}
+
+export class GenerateTransferTxError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.generateTransferTxError.id,
+      defaultMessage: messages.generateTransferTxError.defaultMessage
     });
   }
 }

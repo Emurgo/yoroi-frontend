@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import moment from 'moment';
 import styles from './WalletTransactionsList.scss';
@@ -33,7 +33,7 @@ type Props = {
   formattedWalletAmount: Function,
 };
 
-//@observer
+@observer
 export default class WalletTransactionsList extends Component<Props> {
 
   static contextTypes = {
@@ -51,7 +51,8 @@ export default class WalletTransactionsList extends Component<Props> {
   loadingSpinner: ?LoadingSpinner;
   localizedDateFormat: 'MM/DD/YYYY';
 
-  groupTransactionsByDay(transactions: Array<WalletTransaction>) {
+  groupTransactionsByDay(transactions: Array<WalletTransaction>)
+      : Array<{date: string, transactions: Array<WalletTransaction>}> {
     const groups = [];
     for (const transaction of transactions) {
       const date = moment(transaction.date).format(dateFormat);

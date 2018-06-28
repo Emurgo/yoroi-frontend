@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import styles from './TopBarLayout.scss';
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
   notification?: ?Node,
 };
 
-//@observer
+@observer
 export default class TopBarLayout extends Component<Props> {
 
   render() {

@@ -1,5 +1,4 @@
 .component {
-  border-radius: 10px;
   background-color: var(--theme-dialog-big-button-background-color);
   border: solid 4px var(--theme-dialog-big-button-border-color);
   display: flex;
@@ -13,7 +12,7 @@
 }
 
 .disabled {
-  opacity: 0.3;
+  opacity: 0.6;
   cursor: default;
 }
 

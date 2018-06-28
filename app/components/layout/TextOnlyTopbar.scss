@@ -1,0 +1,31 @@
+.topBar {
+  align-items: center;
+  background: var(--theme-topbar-background-color);
+  display: flex;
+  height: 84px;
+  padding: 0 26px;
+  position: relative;
+  z-index: 100;
+
+  .topbarTitleContainer {
+    color: var(--theme-topbar-wallet-info-color);
+    font-family: var(--font-regular);
+    letter-spacing: 0.5px;
+    line-height: 23px;
+    text-align: center;
+    text-transform: uppercase;
+
+    .topbarTitleText {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--theme-topbar-wallet-name-color);
+    }
+
+  }
+
+  .topBarTitle {
+    flex-grow: 1;
+    margin-right: 24px;
+  }
+}
+

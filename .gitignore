@@ -10,3 +10,7 @@ dev/
 *.pem
 update.xml
 .vscode/
+
+# Generated translation files
+translations/messages
+translations/reports

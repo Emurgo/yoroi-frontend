@@ -7,6 +7,8 @@
     "node": true
   },
   "rules": {
+    "func-names": "off",
+    "new-cap": "off",
     "arrow-parens": ["off"],
     "consistent-return": "off",
     "comma-dangle": "off",
@@ -53,17 +55,23 @@
     "no-multi-spaces": 1,
     "no-multiple-empty-lines": 1,
     "react/jsx-indent": 1,
+    "flowtype/define-flow-type": 1,
+    "flowtype/use-flow-type": 1,
     "global-require": "off"
   },
   "plugins": [
     "import",
     "promise",
-    "react"
+    "react",
+    "flowtype"
   ],
   "globals": {
+    "chrome": true,
     "API": true,
     "NETWORK": true,
     "MOBX_DEV_TOOLS": true,
-    "DAEDALUS_VERSION": true
+    "DAEDALUS_VERSION": true,
+    "CONFIG": true,
+    "icarus": true,
   }
 }

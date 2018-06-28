@@ -1,14 +1,14 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-//import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import styles from './CenteredLayout.scss';
 
 type Props = {
   children: Node,
 };
 
-//@observer
+@observer
 export default class CenteredLayout extends Component<Props> {
 
   static defaultProps = {
