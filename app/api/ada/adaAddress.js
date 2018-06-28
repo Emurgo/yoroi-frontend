@@ -63,6 +63,12 @@ export function saveAdaAddress(address: AdaAddress): void {
   saveInStorage(ADDRESSES_KEY, addressesMap);
 }
 
+export function removeAdaAddress(address: AdaAddress): void {
+  const addressesMap = getAdaAddressesMap();
+  delete addressesMap[address.cadId];
+  saveInStorage(ADDRESSES_KEY, addressesMap);
+}
+
 export function saveAsAdaAddresses(
   cryptoAccount: CryptoAccount,
   addresses: Array<string>,
