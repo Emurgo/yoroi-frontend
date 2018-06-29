@@ -14,7 +14,7 @@ import type {
   AdaAddress
 } from './adaTypes';
 
-const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
+export const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
 
 export function isValidAdaAddress(address: string): Promise<boolean> {
   return Promise.resolve(!Wallet.checkAddress(getAddressInHex(address)).failed);
