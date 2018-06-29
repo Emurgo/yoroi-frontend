@@ -19,32 +19,30 @@ const messages = defineMessages({
     defaultMessage: 'Instructions',
     description: 'Label "Instructions" on the Daedalus transfer form page.'
   },
-  instructions: {
-    step1: {
-      id: 'daedalusTransfer.form.instructions.step1.text',
-      defaultMessage: 'Find you Daedalus mnemonics and prepare it',
-      description: 'Text for instructions step 1 on the Daedalus transfer form page.'
-    },
-    step2: {
-      id: 'daedalusTransfer.form.instructions.step2.text',
-      defaultMessage: 'Enter mnemonics',
-      description: 'Text for instructions step 2 on the Daedalus transfer form page.'
-    },
-    step3: {
-      id: 'daedalusTransfer.form.instructions.step3.text',
-      defaultMessage: 'Click Next button',
-      description: 'Text for instructions step 3 on the Daedalus transfer form page.'
-    },
-    step4: {
-      id: 'daedalusTransfer.form.instructions.step4.text',
-      defaultMessage: 'Wait until wallet is synced',
-      description: 'Text for instructions step 4 on the Daedalus transfer form page.'
-    },
-    step5: {
-      id: 'daedalusTransfer.form.instructions.step5.text',
-      defaultMessage: 'Accept "transfer funds" transaction between Daedalus and Icarus wallets.',
-      description: 'Text for instructions step 5 on the Daedalus transfer form page.'
-    },
+  step0: {
+    id: 'daedalusTransfer.form.instructions.step0.text',
+    defaultMessage: 'Find you Daedalus mnemonics and prepare it',
+    description: 'Text for instructions step 1 on the Daedalus transfer form page.'
+  },
+  step1: {
+    id: 'daedalusTransfer.form.instructions.step1.text',
+    defaultMessage: 'Enter mnemonics',
+    description: 'Text for instructions step 2 on the Daedalus transfer form page.'
+  },
+  step2: {
+    id: 'daedalusTransfer.form.instructions.step2.text',
+    defaultMessage: 'Click Next button',
+    description: 'Text for instructions step 3 on the Daedalus transfer form page.'
+  },
+  step3: {
+    id: 'daedalusTransfer.form.instructions.step3.text',
+    defaultMessage: 'Wait until wallet is synced',
+    description: 'Text for instructions step 4 on the Daedalus transfer form page.'
+  },
+  step4: {
+    id: 'daedalusTransfer.form.instructions.step4.text',
+    defaultMessage: 'Accept "transfer funds" transaction between Daedalus and Icarus wallets.',
+    description: 'Text for instructions step 5 on the Daedalus transfer form page.'
   },
   recoveryPhraseInputLabel: {
     id: 'daedalusTransfer.form.recovery.phrase.input.label',
@@ -149,10 +147,9 @@ export default class DaedalusTransferForm extends Component<Props> {
 
               <ul className={styles.instructionsList}>
                 {
-                  Object.values(messages.instructions)
-                  .map((step, idx) =>
-                    <li key={idx} className={styles.text}>
-                      {intl.formatMessage(step)}
+                  Array(5).fill().map((_, idx) =>
+                    <li key={`step${idx}`} className={styles.text}>
+                      {intl.formatMessage({ id: messages[`step${idx}`].id })}
                     </li>
                   )
                 }
