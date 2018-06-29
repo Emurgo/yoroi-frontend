@@ -81,6 +81,11 @@ const messages = defineMessages({
     id: 'api.errors.generateTransferTxError',
     defaultMessage: '!!!Error while generating transfer transacion.',
     description: '"Error while generating transfer transacion." error message'
+  },
+  sendTransactionApiError: {
+    id: 'api.errors.sendTransactionApiError',
+    defaultMessage: '!!!Error received from server while sending tx.',
+    description: '"Error received from server while sending tx." error message'
   }
 });
 
@@ -224,6 +229,15 @@ export class GenerateTransferTxError extends LocalizableError {
     super({
       id: messages.generateTransferTxError.id,
       defaultMessage: messages.generateTransferTxError.defaultMessage
+    });
+  }
+}
+
+export class SendTransactionApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.sendTransactionApiError.id,
+      defaultMessage: messages.sendTransactionApiError.defaultMessage
     });
   }
 }

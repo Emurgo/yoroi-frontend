@@ -10,11 +10,16 @@ import {
   mapToList
 } from '../lib/utils';
 import {
+  Logger,
+  stringifyError
+} from '../../../utils/logging';
+import {
   getWalletSeed
 } from '../adaWallet';
 import { getSingleCryptoAccount } from '../adaAccount';
 import {
   saveAdaAddress,
+  removeAdaAddress,
   createAdaAddress,
   getAdaAddressesMap
 } from '../adaAddress';
@@ -26,7 +31,8 @@ import type {
 } from '../adaTypes';
 import {
   NotEnoughMoneyToSendError,
-  TransactionError
+  TransactionError,
+  SendTransactionApiError
 } from '../errors';
 
 export function getAdaTransactionFee(
@@ -60,10 +66,16 @@ export async function newAdaTransaction(
   const [{ result: { cbor_encoded_tx } }, changeAdaAddr] =
     await _getAdaTransaction(receiver, amount, password);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-  const backendResponse = await sendTx(signedTx);
-  // Only if the tx was send, we should track the change Address.
   saveAdaAddress(changeAdaAddr);
-  return backendResponse;
+  try {
+    const backendResponse = await sendTx(signedTx);
+    return backendResponse;
+  } catch (sendTxError) {
+    removeAdaAddress(changeAdaAddr);
+    Logger.error('adaNewTransactions::newAdaTransaction error: ' +
+      stringifyError(sendTxError));
+    throw new SendTransactionApiError();
+  }
 }
 
 export async function getAllUTXOsForAddresses(
