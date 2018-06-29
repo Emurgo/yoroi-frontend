@@ -17,13 +17,16 @@
   }
 
   .addressToLabelWrapper,
-  .amountFeesWrapper{
+  .amountFeesWrapper {
     margin-bottom: 20px;
   }
 
   .addressToLabel {
-    font-size: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     line-height: 1.38;
+    text-transform: uppercase;
   }
 
   .addressTo {
@@ -49,7 +52,11 @@
     }
     .amountLabel,
     .feesLabel {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
       line-height: 1.38;
+      text-transform: uppercase;
     }
     .amount,
     .fees {
@@ -64,7 +71,11 @@
   }
 
   .totalAmountLabel {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     line-height: 1.38;
+    text-transform: uppercase;
   }
 
   .totalAmount {

@@ -3,7 +3,7 @@ import { Wallet } from 'rust-cardano-crypto';
 import {
   toAdaAddress,
   getAddressTypeIndex
-} from './lib/crypto-to-cardano';
+} from './lib/cardanoCrypto/cryptoToModel';
 import {
   getAddressInHex,
   saveInStorage,

@@ -63,20 +63,20 @@ export default class WalletSummary extends Component<Props> {
           {pendingAmount.incoming.greaterThan(0) &&
             <div className={styles.pendingConfirmation}>
               {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
-              : {pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}
+              : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
               <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
             </div>
           }
           {pendingAmount.outgoing.greaterThan(0) &&
             <div className={styles.pendingConfirmation}>
               {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
-              : {pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}
+              : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
               <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
             </div>
           }
           {!isLoadingTransactions ? (
             <div className={styles.numberOfTransactions}>
-              {intl.formatMessage(messages.transactionsLabel)}: {numberOfTransactions}
+              {intl.formatMessage(messages.transactionsLabel)}: <span>{numberOfTransactions}</span>
             </div>
           ) : null}
         </BorderedBox>

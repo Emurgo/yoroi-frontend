@@ -1,7 +1,8 @@
 Feature: Generate Addresses
   Background:
-    Given I am testing "Generate addresses"
-    And I have opened the chrome extension
+    Given I have opened the chrome extension
+    And I have completed the basic setup
+    And I am testing "Generate addresses"
     And There is a wallet stored
 
   Scenario: Show my initial receive address

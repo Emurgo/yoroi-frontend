@@ -18,20 +18,21 @@ import {
   createAdaAddress,
   getAdaAddressesMap
 } from '../adaAddress';
-import { getCryptoWalletFromSeed } from '../lib/crypto-wallet';
+import { getCryptoWalletFromSeed } from '../lib/cardanoCrypto/cryptoWallet';
 import type {
   AdaAddresses,
   AdaTransactionFee,
+  UTXO
 } from '../adaTypes';
 import {
   NotEnoughMoneyToSendError,
   TransactionError
 } from '../errors';
 
-export const getAdaTransactionFee = (
+export function getAdaTransactionFee(
   receiver: string,
   amount: string
-): Promise<AdaTransactionFee> => {
+): Promise<AdaTransactionFee> {
   const password = 'FakePassword';
   return _getAdaTransaction(receiver, amount, password)
     .then((response) => {
@@ -49,40 +50,30 @@ export const getAdaTransactionFee = (
         getCCoin: result.result.fee
       };
     });
-};
+}
 
-export const newAdaTransaction = (
+export async function newAdaTransaction(
   receiver: string,
   amount: string,
   password: string
-): Promise<any> =>
-  _getAdaTransaction(receiver, amount, password)
-    .then(([{ result: { cbor_encoded_tx } }, changeAdaAddr]) => {
-      // TODO: Handle Js-Wasm-cardano errors
-      const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-      return Promise.all([sendTx(signedTx), changeAdaAddr]);
-    })
-    .then(([backendResponse, changeAdaAddr]) => {
-      // Only if the tx was send, we should track the change Address.
-      saveAdaAddress(changeAdaAddr);
-      return backendResponse;
-    });
-
-async function _getAllUTXOsForAddresses(adaAddresses: AdaAddresses) {
-  const groupsOfAdaAddresses = _.chunk(adaAddresses, addressesLimit);
-  const promises = groupsOfAdaAddresses.map(groupOfAdaAddresses =>
-    getUTXOsForAddresses(groupOfAdaAddresses.map(addr => addr.cadId)));
-  return Promise.all(promises).then(groupsOfUTXOs =>
-    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
+): Promise<any> {
+  const [{ result: { cbor_encoded_tx } }, changeAdaAddr] =
+    await _getAdaTransaction(receiver, amount, password);
+  const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
+  const backendResponse = await sendTx(signedTx);
+  // Only if the tx was send, we should track the change Address.
+  saveAdaAddress(changeAdaAddr);
+  return backendResponse;
 }
 
-export function _getAdaTransaction(
-  receiver: string,
-  amount: string,
-  password: string,
-) {
-  const senders = mapToList(getAdaAddressesMap());
-  return getAdaTransactionFromSenders(senders, receiver, amount, password);
+export async function getAllUTXOsForAddresses(
+  addresses: Array<string>
+): Promise<Array<UTXO>> {
+  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+  const promises = groupsOfAddresses.map(groupOfAddresses =>
+    getUTXOsForAddresses(groupOfAddresses));
+  return Promise.all(promises).then(groupsOfUTXOs =>
+    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
 }
 
 export function getAdaTransactionFromSenders(
@@ -98,8 +89,8 @@ export function getAdaTransactionFromSenders(
   const addresses = mapToList(addressesMap);
   const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
-  const outputs = [{ address: receiver, value: parseInt(amount, 10) }];
-  return _getAllUTXOsForAddresses(senders)
+  const outputs = [{ address: receiver, value: amount }];
+  return getAllUTXOsForAddresses(_getAddresses(senders))
     .then((senderUtxos) => {
       const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
       return [
@@ -113,6 +104,21 @@ export function getAdaTransactionFromSenders(
     });
 }
 
+function _getAdaTransaction(
+  receiver: string,
+  amount: string,
+  password: string,
+) {
+  const senders = mapToList(getAdaAddressesMap());
+  return getAdaTransactionFromSenders(senders, receiver, amount, password);
+}
+
+function _getAddresses(
+  adaAddresses: AdaAddresses
+): Array<string> {
+  return adaAddresses.map(addr => addr.cadId);
+}
+
 function _mapUTXOsToInputs(utxos, adaAddressesMap) {
   return utxos.map((utxo) => ({
     ptr: {
@@ -122,7 +128,7 @@ function _mapUTXOsToInputs(utxos, adaAddressesMap) {
     value: {
       address: utxo.receiver,
       // FIXME: Currently js-wasm-module support Js Number, but amounts could be BigNumber's.
-      value: Number(utxo.amount)
+      value: utxo.amount
     },
     addressing: {
       account: adaAddressesMap[utxo.receiver].account,
