@@ -224,6 +224,20 @@
           "column": 27,
           "line": 80
         }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while sending tx.",
+        "description": "\"Error received from server while sending tx.\" error message",
+        "end": {
+          "column": 3,
+          "line": 89
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.sendTransactionApiError",
+        "start": {
+          "column": 27,
+          "line": 85
+        }
       }
     ],
     "path": "app/api/ada/errors.json"

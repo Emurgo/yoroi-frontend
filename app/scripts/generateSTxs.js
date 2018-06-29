@@ -1,11 +1,11 @@
 // @flow
 
-import { mapToList } from '../api/ada/lib/utils';
-import { newAdaAddress, getAdaAddressesMap } from '../api/ada/adaAddress';
+import { mapToList, saveInStorage } from '../api/ada/lib/utils';
+import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, ADDRESSES_KEY } from '../api/ada/adaAddress';
 import { getSingleCryptoAccount } from '../api/ada/adaAccount';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
 
-const CONFIRMATION_TIME = 60 * 1000; // 60 seconds
+const CONFIRMATION_TIME = 40 * 1000; // 40 seconds
 const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be bigger than
                                      //           the fee of the txs (In general ≃0.17)
 const AMOUNT_TO_BE_SENT = '1';       // 0.000001 ada. Amount transfered on the generated stxs.
@@ -29,27 +29,34 @@ export async function generateSTxs(password: string,
 
   log('[generateSTxs] Starting generating stxs');
 
-  const wallets = [];
+  const adaAddresses = [];
   for (let i = 0; i < numberOfTxs; i++) {
     const newAddress = _generateNewAddress(cryptoAccount);
-    wallets.push(newAddress);
+    adaAddresses.push(newAddress);
     log(`[generateSTxs] Generated the address ${newAddress.cadId}`);
   }
   log('[generateSTxs] Generated addresses');
 
+  // Delete addresses so that their funds are not used for any of the txs sent
+  _removeAdaAddresses(cryptoAccount, adaAddresses);
+
   for (let i = 0; i < numberOfTxs; i++) {
-    const newWalletAddr = wallets[i].cadId;
+    const newWalletAddr = adaAddresses[i].cadId;
     await newAdaTransaction(newWalletAddr, AMOUNT_SENT, password);
-    log(`[generateSTxs] Gave funds to ${newWalletAddr}`);
+    log(`[generateSTxs] Giving funds to ${newWalletAddr}`);
+
+    // Wait fot the tx to be confirmed so that its inputs are not used by the next txs
+    // FIXME: Improve querying the explorer or using the tx history
+    await new Promise(resolve => setTimeout(resolve, CONFIRMATION_TIME));
+    log('[generateSTxs] Tx that provided funds was confirmed');
   }
 
-  log('[generateSTxs] Waiting for the txs that provide funds to be confirmed');
-  await new Promise(resolve => setTimeout(resolve, CONFIRMATION_TIME));
+  _saveAdaAddresses(cryptoAccount, adaAddresses);
 
   log('[generateSTxs] Starting generating stxs');
   const newAddress = _generateNewAddress(cryptoAccount).cadId;
   for (let i = 0; i < numberOfTxs; i++) {
-    const sender = wallets[i];
+    const sender = adaAddresses[i];
     const createSTxResult = await getAdaTransactionFromSenders(
       [sender],
       newAddress,
@@ -81,4 +88,17 @@ function _logIfDebugging(debugging) {
 function _generateNewAddress(cryptoAccount) {
   const addresses = mapToList(getAdaAddressesMap());
   return newAdaAddress(cryptoAccount, addresses, 'External');
+}
+
+function _removeAdaAddresses(cryptoAccount, addresses) {
+  const addressesMap = getAdaAddressesMap();
+  addresses.forEach((addr) => {
+    delete addressesMap[addr.cadId];
+  });
+  saveInStorage(ADDRESSES_KEY, addressesMap);
+}
+
+// The same index from the AdaAddresses is used when saving them
+function _saveAdaAddresses(cryptoAccount, adaAddresses) {
+  adaAddresses.forEach(saveAdaAddress);
 }
