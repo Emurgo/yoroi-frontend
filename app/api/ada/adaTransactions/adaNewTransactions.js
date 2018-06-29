@@ -139,7 +139,6 @@ function _mapUTXOsToInputs(utxos, adaAddressesMap) {
     },
     value: {
       address: utxo.receiver,
-      // FIXME: Currently js-wasm-module support Js Number, but amounts could be BigNumber's.
       value: utxo.amount
     },
     addressing: {
