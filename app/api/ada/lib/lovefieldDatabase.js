@@ -122,7 +122,7 @@ const _mapRowsToTxs = function (rows) {
     newTx.ctInputs = txDB.ctInputs.newInputs.map(address => (address[0] ? address : [address]));
     newTx.ctOutputs = txDB.ctOutputs.newOutputs.map(address => (address[0] ? address : [address]));
     newTx.ctAmount = Object.assign({}, newTx.ctAmount);
-    newTx.ctAmount.getCCoin = txDB.ctAmount.getCCoin.c[0];
+    newTx.ctAmount.getCCoin = txDB.ctAmount.getCCoin;
     return newTx;
   });
 };

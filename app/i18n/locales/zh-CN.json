@@ -16,6 +16,7 @@
   "api.errors.getAddressesWithFundsError": "!!!Error while getting addresses with funds.",
   "api.errors.getBalanceError": "!!!Error while getting Balance.",
   "api.errors.pendingTransactionError": "!!!Error while updating pending transactions.",
+  "api.errors.sendTransactionApiError": "!!!Error received from server while sending tx.",
   "api.errors.transactionError": "!!!Error while creating transaction.",
   "api.errors.updateAdaTxsHistoryError": "!!!Error while updating ada transactions history.",
   "api.errors.updateAdaWalletError": "!!!Error while updating ada wallet.",

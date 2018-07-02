@@ -42,7 +42,7 @@
         "tx_hash": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f6429",
         "tx_index": 0,
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
-        "amount": "1000000"
+        "amount": "9007199254720698"
       }
     ]
   },
@@ -64,6 +64,18 @@
     ]
   },
   "Get balance": {
+    "addresses": {
+      "Be2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod": {
+        "cadAmount": {
+          "getCCoin": 0
+        },
+        "cadId": "Be2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "cadIsUsed": false,
+        "account": 0,
+        "change": 0,
+        "index": 0
+      }
+    },
     "utxos": [
       {
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
@@ -80,6 +92,10 @@
       {
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxos",
         "amount": 20000
+      },
+      {
+        "receiver": "Be2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "amount": 9007199254720698
       }
     ]
   },
@@ -100,6 +116,9 @@
         "addressesStartingWith": "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
         "txHashesStartingWith": "na7je9b63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
         "txsNumber": 45
+      },
+      "Wallet-5": {
+ 	      "addressesStartingWith": "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo"
       }
     },
     "usedAddresses": [
@@ -125,10 +144,6 @@
       }
     ],
     "txs": {
-      "usedAddresses": [
-        "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
-        "Ae2tdPwUPEZFS55qLkW2sApaWnWFdRyEh1MKwqBNnXMH89K9XaaVRH2Mxro"
-      ],
       "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
         {
           "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
@@ -181,8 +196,7 @@
             "best_block_num": 101
           }
         }
-      ]
-      ,
+      ],
       "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo": [
         {
           "address": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW",
@@ -202,6 +216,39 @@
               "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoC"
             ],
             "outputs_amount": [20, 100, 290, 100],
+            "block_num": 70,
+            "best_block_num": 101
+          }
+        }
+      ],
+      "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo": [
+        {
+          "address": "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
+          "tx": {
+            "hash": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
+            "time": "2018-01-01T13:51:33.000Z",
+            "inputs_address": [
+              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU",
+              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoV",
+              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW"
+            ],
+            "inputs_amount": [
+              "9007199254720699",
+              "1",
+              "1"
+            ],
+            "outputs_address": [
+              "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
+              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoX",
+              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoY",
+              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoZ"
+            ],
+            "outputs_amount": [
+              "9007199254720698",
+              "1",
+              "1",
+              "1"
+            ],
             "block_num": 70,
             "best_block_num": 101
           }
@@ -261,6 +308,28 @@
             "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkzyxwA",
             "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
             "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoC"
+          ],
+          "txConfirmations": "High. 31 confirmations.",
+          "txId": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X"
+        }
+      ],
+      "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo": [
+        {
+          "txType": "ADA received",
+          "txAmount": "9,007,199,254.720698",
+          "txTimeTitle": "ADA transaction,",
+          "txTime": "2018-05-10T13:51:33.000Z",
+          "txStatus": "HIGH",
+          "txFrom": [
+            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU",
+            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoV",
+            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW"
+          ],
+          "txTo": [
+            "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
+            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoX",
+            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoY",
+            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoZ"
           ],
           "txConfirmations": "High. 31 confirmations.",
           "txId": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X"

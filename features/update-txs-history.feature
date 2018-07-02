@@ -21,5 +21,6 @@ Feature: Update Txs History
       | Wallet-2   |     3     |       45       |
       | Wallet-3   |     30    |       45       |
       | Wallet-4   |     45    |       45       |
+      | Wallet-5   |     1     |       45       |
 
   # TODO: Make tests for existing / non-existing txs in lovefield db 
