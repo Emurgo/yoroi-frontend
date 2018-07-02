@@ -3,14 +3,22 @@ import chai from 'chai';
 import moment from 'moment';
 import { getLovefieldTxs } from '../support/mockDataBuilder';
 
-function checkTxField(actualDataIndexes, txDataArray, lovefieldTx, fieldName, expectedDataIndexes) {
-  for (let i = 0; i < actualDataIndexes.length; i++) {
-    if (!expectedDataIndexes) {
-      chai.expect(txDataArray[actualDataIndexes[i]]).to.equal(lovefieldTx[fieldName]);
-    } else {
-      chai.expect(txDataArray[actualDataIndexes[i]]).to
-        .equal(lovefieldTx[fieldName][expectedDataIndexes[i]]);
-    }
+function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFromList, txToList,
+  txId, expectedTx, txConfirmations) {
+  chai.expect(txType).to.equal(expectedTx.txType);
+  chai.expect(txAmount.split(' ')[0]).to.equal(expectedTx.txAmount);
+  chai.expect(txTime).to.equal(expectedTx.txTimeTitle + ' ' +
+    moment(expectedTx.txTime).format('hh:mm:ss A'));
+  chai.expect(txStatus).to.equal(expectedTx.txStatus);
+  for (let i = 0; i < txFromList.length; i++) {
+    chai.expect(txFromList[i]).to.equal(expectedTx.txFrom[i]);
+  }
+  for (let i = 0; i < txToList.length; i++) {
+    chai.expect(txToList[i]).to.equal(expectedTx.txTo[i]);
+  }
+  chai.expect(txId).to.equal(expectedTx.txId);
+  if (txConfirmations) {
+    chai.expect(txConfirmations).to.equal(expectedTx.txConfirmations);
   }
 }
 
@@ -31,34 +39,36 @@ async function (expectedTxsNumber) {
 
 Then(/^I should see the txs corresponding to the wallet with the name ([^"]*)$/,
 async function (walletName) {
-  const txsList = await this.getElementsBy('.Transaction_component');
-  const lovefieldTxs = getLovefieldTxs(walletName);
-  for (let i = 0; i < txsList.length; i++) {
-    await txsList[i].click();
-    const txData = await txsList[i].getText();
-    const txDataArray = txData.split('\n');
-    chai.expect(txDataArray[0]).to.equal(lovefieldTxs[i].txType);
-    chai.expect(txDataArray[1].split(' ')[0]).to.equal(lovefieldTxs[i].txAmount);
-    chai.expect(txDataArray[2]).to.equal(lovefieldTxs[i].txTimeTitle + ' ' +
-      moment(lovefieldTxs[i].txTime).format('hh:mm:ss A'));
-    chai.expect(txDataArray[3]).to.equal(lovefieldTxs[i].txStatus);
-
-    // Checks whether it belongs to a single tx or a tx list
-    const txFromIndexes = txsList.length === 1 ? [5, 6, 7] : [5];
-    const txToIndexes = txsList.length === 1 ? [9, 10, 11, 12] : [7];
-    const txConfirmationIndexes = txsList.length === 1 ? [14] : [9];
-
-    checkTxField(txFromIndexes, txDataArray, lovefieldTxs[i], 'txFrom', [0, 1, 2]);
-    checkTxField(txToIndexes, txDataArray, lovefieldTxs[i], 'txTo', [0, 1, 2, 3]);
-
-    // Checks whether the tx is pending or not
-    if (lovefieldTxs[i].txStatus !== 'TRANSACTION PENDING') {
-      const txIdIndexes = txsList.length === 1 ? [16] : [11];
-      checkTxField(txConfirmationIndexes, txDataArray, lovefieldTxs[i], 'txConfirmations');
-      checkTxField(txIdIndexes, txDataArray, lovefieldTxs[i], 'txId');
+  const actualTxsList = await this.getElementsBy('.Transaction_component');
+  const expectedTxsList = getLovefieldTxs(walletName);
+  const txsNumber = actualTxsList.length;
+  const isSingleTx = txsNumber === 1;
+  for (let i = 0; i < txsNumber; i++) {
+    await actualTxsList[i].click();
+    const txData = await actualTxsList[i].getText();
+    const txDataFields = txData.split('\n');
+    const shouldBePendingTx = expectedTxsList[i].txStatus === 'TRANSACTION PENDING';
+    if (isSingleTx) {
+      if (shouldBePendingTx) {
+        const [txType, txAmount, txTime, txStatus,, txFrom1, txFrom2, txFrom3,,
+          txTo1, txTo2, txTo3, txTo4,,, txId] = txDataFields;
+        verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom1, txFrom2, txFrom3],
+          [txTo1, txTo2, txTo3, txTo4], txId, expectedTxsList[i]);
+      } else {
+        const [txType, txAmount, txTime, txStatus,, txFrom1, txFrom2, txFrom3,,
+          txTo1, txTo2, txTo3, txTo4,, txConfirmations,, txId] = txDataFields;
+        verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom1, txFrom2, txFrom3],
+          [txTo1, txTo2, txTo3, txTo4], txId, expectedTxsList[i], txConfirmations);
+      }
+    } else if (shouldBePendingTx) {
+      const [txType, txAmount, txTime, txStatus,, txFrom,, txTo,,, txId] = txDataFields;
+      verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom], [txTo], txId,
+        expectedTxsList[i]);
     } else {
-      const txIdIndexes = txsList.length === 1 ? [15] : [10];
-      checkTxField(txIdIndexes, txDataArray, lovefieldTxs[i], 'txId');
+      const [txType, txAmount, txTime, txStatus,, txFrom,, txTo,,
+        txConfirmations,, txId] = txDataFields;
+      verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom], [txTo], txId,
+        expectedTxsList[i], txConfirmations);
     }
   }
 });
