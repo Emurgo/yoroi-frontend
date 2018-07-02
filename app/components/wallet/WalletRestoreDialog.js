@@ -109,14 +109,14 @@ export default class WalletRestoreDialog extends Component<Props> {
         label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
         placeholder: this.context.intl.formatMessage(messages.recoveryPhraseInputHint),
         value: '',
-        validators: ({ field }) => {
+        validators: [({ field }) => {
           const value = join(field.value, ' ');
           if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
           return [
             this.props.mnemonicValidator(value),
             this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
           ];
-        },
+        }],
       },
       walletPassword: {
         type: 'password',
