@@ -6,6 +6,7 @@ import {
   encryptWithPassword,
   decryptWithPassword
 } from '../../../../utils/passwordCipher';
+import { getOrFail } from './cryptoUtils';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
@@ -39,7 +40,7 @@ export function getCryptoWalletFromSeed(
 ): CryptoWallet {
   const seed = decryptWithPassword(password, walletSeed.encryptedSeed);
   const seedAsArray = Object.values(seed);
-  const wallet = Wallet.fromSeed(seedAsArray).result;
+  const wallet = getOrFail(Wallet.fromSeed(seedAsArray));
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }
@@ -48,7 +49,7 @@ export function getCryptoWalletFromSeed(
 export function getCryptoDaedalusWalletFromMnemonics(
   secretWords: string,
 ): CryptoDaedalusWallet {
-  const wallet = Wallet.fromDaedalusMnemonic(secretWords).result;
+  const wallet = getOrFail(Wallet.fromDaedalusMnemonic(secretWords));
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }
