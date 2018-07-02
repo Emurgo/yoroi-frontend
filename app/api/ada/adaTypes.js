@@ -1,4 +1,6 @@
 // @flow
+import BigNumber from 'bignumber.js';
+
 // ========= Response Types =========
 export type AdaAssurance = 'CWANormal' | 'CWAStrict';
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
@@ -30,7 +32,7 @@ export type AdaWalletInitData = {
 };
 
 export type AdaAmount = {
-  getCCoin: number,
+  getCCoin: BigNumber,
 };
 export type AdaTransactionTag = 'CTIn' | 'CTOut';
 

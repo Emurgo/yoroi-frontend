@@ -1,6 +1,7 @@
 import { create, bodyParser, defaults } from 'json-server';
 import moment from 'moment';
 import { getAddressMapper, getMockData, getTxsMapList } from './mockDataBuilder';
+import BigNumber from 'bignumber.js';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -28,7 +29,8 @@ export function createServer() {
 
   server.post('/api/txs/utxoForAddresses', (req, res) => {
     const { utxos } = getMockData();
-    res.send(utxos);
+    const filteredUtxos = utxos.filter(utxo => req.body.addresses.includes(utxo.receiver));
+    res.send(filteredUtxos);
   });
 
   server.post('/api/txs/utxoSumForAddresses', (req, res) => {
@@ -36,11 +38,11 @@ export function createServer() {
     const utxos = getMockData().utxos;
     const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
       if (req.body.addresses.includes(utxo.receiver)) {
-        return sum + utxo.amount;
+        return new BigNumber(utxo.amount).plus(sum);
       }
       return sum;
-    }, 0);
-    res.send({ sum: sumUtxos });
+    }, new BigNumber(0));
+    res.send({ sum: sumUtxos.toString() });
   });
 
   server.post('/api/txs/history', (req, res) => {
