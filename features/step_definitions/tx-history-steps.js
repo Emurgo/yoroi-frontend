@@ -1,4 +1,4 @@
-import { Given, Then, When } from 'cucumber';
+import { Then, When } from 'cucumber';
 import chai from 'chai';
 import moment from 'moment';
 import { getLovefieldTxs } from '../support/mockDataBuilder';
@@ -14,10 +14,6 @@ function checkTxField(actualDataIndexes, txDataArray, lovefieldTx, fieldName, ex
   }
 }
 
-Given(/^The lovefield db has transactions$/, async function () {
-  // TODO: Initialize Lovefield with some transactions stored
-});
-
 Then(/^I go to Txs History tab$/, async function () {
   await this.clickByXpath("//*[contains(text(), 'Transactions')]");
 });
@@ -26,15 +22,17 @@ When(/^I see the transactions summary$/, async function () {
   await this.waitForElement('.WalletSummary_numberOfTransactions');
 });
 
-Then(/^I should see that the number of transactions is ([^"]*)$/, async function (txsAmount) {
+Then(/^I should see that the number of transactions is ([^"]*)$/,
+async function (expectedTxsNumber) {
   await this.waitForElement('.WalletSummary_numberOfTransactions');
   const txsNumber = await this.getText('.WalletSummary_numberOfTransactions');
-  chai.expect(txsNumber).to.equal('Number of transactions: ' + txsAmount);
+  chai.expect(txsNumber).to.equal('Number of transactions: ' + expectedTxsNumber);
 });
 
-Then(/^I should see the txs corresponding to prefix ([^"]*)$/, async function (addressPrefix) {
+Then(/^I should see the txs corresponding to the wallet with the name ([^"]*)$/,
+async function (walletName) {
   const txsList = await this.getElementsBy('.Transaction_component');
-  const lovefieldTxs = getLovefieldTxs(addressPrefix);
+  const lovefieldTxs = getLovefieldTxs(walletName);
   for (let i = 0; i < txsList.length; i++) {
     await txsList[i].click();
     const txData = await txsList[i].getText();

@@ -84,6 +84,24 @@
     ]
   },
   "Update transaction history": {
+    "wallets": {
+      "Wallet-1": {
+        "addressesStartingWith": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo"
+      },
+      "Wallet-2": {
+        "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo"
+      },
+      "Wallet-3": {
+        "addressesStartingWith": "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "txHashesStartingWith": "p27Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
+        "txsNumber": 30
+      },
+      "Wallet-4": {
+        "addressesStartingWith": "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "txHashesStartingWith": "na7je9b63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
+        "txsNumber": 45
+      }
+    },
     "usedAddresses": [
       "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
       "Ae2tdPwUPEZFS55qLkW2sApaWnWFdRyEh1MKwqBNnXMH89K9XaaVRH2Mxro"
@@ -190,24 +208,6 @@
         }
       ]
     },
-    "addressesMapper": [
-      {
-        "prefix": "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
-        "hashPrefix": "p27Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
-        "txsAmount": 30
-      },
-      {
-        "prefix": "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
-        "hashPrefix": "na7je9b63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
-        "txsAmount": 45
-      },
-      {
-        "prefix": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo"
-      },
-      {
-        "prefix": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo"
-      }
-    ],
     "lovefieldTxs": {
       "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
         {
@@ -269,6 +269,26 @@
     }
   },
   "Get Pending Txs": {
+    "wallets": {
+      "Wallet-1": {
+        "addressesStartingWith": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo"
+      },
+      "Wallet-2": {
+        "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo"
+      },
+      "Wallet-3": {
+        "addressesStartingWith": "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "txHashesStartingWith": "p27Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
+        "txsNumber": 1,
+        "pendingTxsNumber": 29
+      },
+      "Wallet-4": {
+        "addressesStartingWith": "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "txHashesStartingWith": "na7je9b63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
+        "txsNumber": 44,
+        "pendingTxsNumber": 1
+      }
+    },
     "utxos": [
       {
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
@@ -364,26 +384,6 @@
         }
       ]
     },
-    "addressesMapper": [
-      {
-        "prefix": "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
-        "hashPrefix": "p27Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
-        "txsAmount": 1,
-        "pendingTxsAmount": 29
-      },
-      {
-        "prefix": "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
-        "hashPrefix": "na7je9b63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
-        "txsAmount": 44,
-        "pendingTxsAmount": 1
-      },
-      {
-        "prefix": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo"
-      },
-      {
-        "prefix": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo"
-      }
-    ],
     "lovefieldTxs": {
       "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
         {
