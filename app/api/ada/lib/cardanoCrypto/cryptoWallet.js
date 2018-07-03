@@ -17,11 +17,11 @@ declare var CONFIG: ConfigType;
 
 const protocolMagic = CONFIG.network.protocolMagic;
 
-export const generateAdaMnemonic = () => bip39.generateMnemonic(128).split(' ');
+export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
 
 export const isValidAdaMnemonic = (
   phrase: string,
-  numberOfWords: number = 12
+  numberOfWords: ?number = 15
 ) =>
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
 

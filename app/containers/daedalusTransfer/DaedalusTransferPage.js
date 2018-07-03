@@ -63,7 +63,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           <MainLayout topbar={topBar}>
             <DaedalusTransferForm
               onSubmit={this.setupTransferFunds}
-              mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
+              mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic, 12)}
               suggestedMnemonics={validWords}
             />
           </MainLayout>

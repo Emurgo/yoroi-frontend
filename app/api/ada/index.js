@@ -329,8 +329,8 @@ export default class AdaApi {
     return isValidAdaAddress(address);
   }
 
-  isValidMnemonic(mnemonic: string): Promise<boolean> {
-    return Promise.resolve(isValidMnemonic(mnemonic, 12));
+  isValidMnemonic(mnemonic: string, numberOfWords: ?number): boolean {
+    return isValidMnemonic(mnemonic, numberOfWords);
   }
 
   getWalletRecoveryPhrase(): Promise<GetWalletRecoveryPhraseResponse> {
