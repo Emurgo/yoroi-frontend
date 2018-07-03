@@ -24,6 +24,7 @@ import {
   getAdaAddressesMap
 } from '../adaAddress';
 import { getCryptoWalletFromSeed } from '../lib/cardanoCrypto/cryptoWallet';
+import { getOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {
   AdaAddresses,
   AdaTransactionFee,
@@ -41,20 +42,15 @@ export function getAdaTransactionFee(
 ): Promise<AdaTransactionFee> {
   const password = 'FakePassword';
   return _getAdaTransaction(receiver, amount, password)
-    .then((response) => {
-      const result = response[0];
-      if (result.failed) {
-        const notEnoughFunds = result.msg === 'FeeCalculationError(NotEnoughInput)' ||
-          result.msg === 'FeeCalculationError(NoInputs)';
-        if (notEnoughFunds) {
-          throw new NotEnoughMoneyToSendError();
-        } else {
-          throw new TransactionError();
-        }
-      }
-      return {
-        getCCoin: result.result.fee
-      };
+    .then(response => {
+      const [{ fee }] = response;
+      return { getCCoin: fee };
+    })
+    .catch(err => {
+      const notEnoughFunds = err.message === 'FeeCalculationError(NotEnoughInput)' ||
+        err.message === 'FeeCalculationError(NoInputs)';
+      if (notEnoughFunds) throw new NotEnoughMoneyToSendError();
+      throw new TransactionError(err.message);
     });
 }
 
@@ -63,8 +59,7 @@ export async function newAdaTransaction(
   amount: string,
   password: string
 ): Promise<any> {
-  const [{ result: { cbor_encoded_tx } }, changeAdaAddr] =
-    await _getAdaTransaction(receiver, amount, password);
+  const [{ cbor_encoded_tx }, changeAdaAddr] = await _getAdaTransaction(receiver, amount, password);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
   saveAdaAddress(changeAdaAddr);
   try {
@@ -105,14 +100,8 @@ export function getAdaTransactionFromSenders(
   return getAllUTXOsForAddresses(_getAddresses(senders))
     .then((senderUtxos) => {
       const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-      return [
-        Wallet.spend(
-          cryptoWallet,
-          inputs,
-          outputs,
-          changeAddr),
-        changeAdaAddr
-      ];
+      const result = getOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
+      return [result, changeAdaAddr];
     });
 }
 
