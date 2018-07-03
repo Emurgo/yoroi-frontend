@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { action } from 'mobx';
+import { action, useStrict } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { hashHistory } from 'react-router';
 import { loadRustModule } from 'rust-cardano-crypto';
@@ -11,6 +11,9 @@ import translations from './i18n/translations';
 import actions from './actions/index';
 import Action from './actions/lib/Action';
 import App from './App';
+
+// run MobX in strict mode
+useStrict(true);
 
 const api = setupApi();
 const router = new RouterStore();

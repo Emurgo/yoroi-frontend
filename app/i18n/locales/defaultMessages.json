@@ -902,6 +902,25 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Add wallet",
+        "description": "Label for the \"Add wallet\" button in wallet sidebar menu.",
+        "end": {
+          "column": 3,
+          "line": 17
+        },
+        "file": "app/components/sidebar/wallets/SidebarWalletsMenu.js",
+        "id": "sidebar.wallets.addWallet",
+        "start": {
+          "column": 16,
+          "line": 13
+        }
+      }
+    ],
+    "path": "app/components/sidebar/wallets/SidebarWalletsMenu.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!On the following screen, you will see a set of X random words. This is\n    your wallet backup phrase. It can be entered in any version of Daedalus application in order\n    to back up or restore your wallet’s funds and private key.",
         "description": "Instructions for backing up wallet recovery phrase on dialog that displays wallet recovery phrase.",
         "end": {
@@ -1517,6 +1536,165 @@
       }
     ],
     "path": "app/components/wallet/transactions/WalletTransactionsSearch.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Add wallet",
+        "description": "Label for the \"Add wallet\" title on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 20
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.title.label",
+        "start": {
+          "column": 9,
+          "line": 16
+        }
+      },
+      {
+        "defaultMessage": "!!!Create",
+        "description": "Label for the \"Create\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 25
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.create.label",
+        "start": {
+          "column": 15,
+          "line": 21
+        }
+      },
+      {
+        "defaultMessage": "!!!Create a new wallet",
+        "description": "Description for the \"Create\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 30
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.create.description",
+        "start": {
+          "column": 21,
+          "line": 26
+        }
+      },
+      {
+        "defaultMessage": "!!!Join",
+        "description": "Label for the \"Join\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 35
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.join.label",
+        "start": {
+          "column": 13,
+          "line": 31
+        }
+      },
+      {
+        "defaultMessage": "!!!Join a shared wallet with up to 5 people",
+        "description": "Description for the \"Join\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 40
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.join.description",
+        "start": {
+          "column": 19,
+          "line": 36
+        }
+      },
+      {
+        "defaultMessage": "!!!Restore",
+        "description": "Label for the \"Restore\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 45
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.restore.label",
+        "start": {
+          "column": 16,
+          "line": 41
+        }
+      },
+      {
+        "defaultMessage": "!!!Restore wallet from backup",
+        "description": "Description for the \"Restore\" button without paper wallet certificate on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 50
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.restore.withoutCertificate.description",
+        "start": {
+          "column": 40,
+          "line": 46
+        }
+      },
+      {
+        "defaultMessage": "!!!Import",
+        "description": "Label for the \"Import\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 55
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.import.label",
+        "start": {
+          "column": 15,
+          "line": 51
+        }
+      },
+      {
+        "defaultMessage": "!!!Import wallet from a file",
+        "description": "Description for the \"Import\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 60
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.import.description",
+        "start": {
+          "column": 21,
+          "line": 56
+        }
+      },
+      {
+        "defaultMessage": "!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.",
+        "description": "Restore notification message shown during async wallet restore on the wallet add screen.",
+        "end": {
+          "column": 3,
+          "line": 65
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.restoreNotificationMessage",
+        "start": {
+          "column": 30,
+          "line": 61
+        }
+      },
+      {
+        "defaultMessage": "!!!You have reached the maximum of 50 wallets.<br>No more wallets can be added.",
+        "description": "\"Maximum number of wallets reached\" notification message shown on the wallet add screen if user has 50 wallets.",
+        "end": {
+          "column": 3,
+          "line": 70
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.maxNumberOfWalletsNotificationMessage",
+        "start": {
+          "column": 41,
+          "line": 66
+        }
+      }
+    ],
+    "path": "app/components/wallet/WalletAdd.json"
   },
   {
     "descriptors": [
