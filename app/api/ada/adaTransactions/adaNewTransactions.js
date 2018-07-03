@@ -32,7 +32,7 @@ import type {
 import {
   NotEnoughMoneyToSendError,
   TransactionError,
-  SendTransactionApiError
+  SendTransactionError
 } from '../errors';
 
 export function getAdaTransactionFee(
@@ -74,7 +74,7 @@ export async function newAdaTransaction(
     removeAdaAddress(changeAdaAddr);
     Logger.error('adaNewTransactions::newAdaTransaction error: ' +
       stringifyError(sendTxError));
-    throw new SendTransactionApiError();
+    throw new SendTransactionError();
   }
 }
 

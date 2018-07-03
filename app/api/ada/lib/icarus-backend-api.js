@@ -2,6 +2,18 @@
 import axios from 'axios';
 import type Moment from 'moment';
 import type { ConfigType } from '../../../../config/config-types';
+import {
+  Logger,
+  stringifyError
+} from '../../../utils/logging';
+import {
+  GetUtxosForAddressesApiError,
+  GetUtxosSumsForAddressesApiError,
+  GetTxHistoryForAddressesApiError,
+  SendTransactionApiError,
+  CheckAdressesInUseApiError,
+  GetPendingTxsForAddressesApiError
+} from '../errors';
 
 export const transactionsLimit = 20;
 export const addressesLimit = 50;
@@ -20,7 +32,11 @@ export const getUTXOsForAddresses = (addresses: Array<string>) =>
         addresses
       }
     }
-  ).then(response => response.data);
+  ).then(response => response.data)
+  .catch((error) => {
+    Logger.error('icarus-backend-api::getUTXOsForAddresses error: ' + stringifyError(error));
+    throw new GetUtxosForAddressesApiError();
+  });
 
 export const getUTXOsSumsForAddresses = (addresses: Array<string>) =>
   axios(`${backendUrl}/api/txs/utxoSumForAddresses`,
@@ -30,7 +46,11 @@ export const getUTXOsSumsForAddresses = (addresses: Array<string>) =>
         addresses
       }
     }
-  ).then(response => response.data);
+  ).then(response => response.data)
+  .catch((error) => {
+    Logger.error('icarus-backend-api::getUTXOsSumsForAddresses error: ' + stringifyError(error));
+    throw new GetUtxosSumsForAddressesApiError();
+  });
 
 export const getTransactionsHistoryForAddresses = (addresses: Array<string>,
   dateFrom: Moment, txHash: string) =>
@@ -43,7 +63,11 @@ export const getTransactionsHistoryForAddresses = (addresses: Array<string>,
         txHash
       }
     }
-  ).then(response => response.data);
+  ).then(response => response.data)
+  .catch((error) => {
+    Logger.error('icarus-backend-api::getTransactionsHistoryForAddresses error: ' + stringifyError(error));
+    throw new GetTxHistoryForAddressesApiError();
+  });
 
 export const sendTx = (signedTx: string) =>
   axios(`${backendUrl}/api/txs/signed`,
@@ -53,7 +77,11 @@ export const sendTx = (signedTx: string) =>
         signedTx
       }
     }
-  ).then(response => response.data);
+  ).then(response => response.data)
+  .catch((error) => {
+    Logger.error('icarus-backend-api::sendTx error: ' + stringifyError(error));
+    throw new SendTransactionApiError();
+  });
 
 export const checkAddressesInUse = (addresses: Array<string>) =>
   axios(`${backendUrl}/api/addresses/filterUsed`,
@@ -63,7 +91,11 @@ export const checkAddressesInUse = (addresses: Array<string>) =>
         addresses
       }
     }
-  ).then(response => response.data);
+  ).then(response => response.data)
+  .catch((error) => {
+    Logger.error('icarus-backend-api::checkAddressesInUse error: ' + stringifyError(error));
+    throw new CheckAdressesInUseApiError();
+  });
 
 export const getPendingTxsForAddresses = (addresses: Array<string>) =>
   axios(`${backendUrl}/api/txs/pending`,
@@ -73,4 +105,8 @@ export const getPendingTxsForAddresses = (addresses: Array<string>) =>
         addresses
       }
     }
-  ).then(response => response.data);
+  ).then(response => response.data)
+  .catch((error) => {
+    Logger.error('icarus-backend-api::getPendingTxsForAddresses error: ' + stringifyError(error));
+    throw new GetPendingTxsForAddressesApiError();
+  });

@@ -82,10 +82,40 @@ const messages = defineMessages({
     defaultMessage: '!!!Error while generating transfer transacion.',
     description: '"Error while generating transfer transacion." error message'
   },
+  sendTransactionError: {
+    id: 'api.errors.sendTransactionError',
+    defaultMessage: '!!!Error received from api method call while sending tx.',
+    description: '"Error received from api method call while sending tx." error message'
+  },
+  getUtxosForAddressesApiError: {
+    id: 'api.errors.getUtxosForAddressesApiError',
+    defaultMessage: '!!!Error received from server while getting UTXOs.',
+    description: '"Error received from server while getting UTXOs." error message'
+  },
+  getUtxosSumsForAddressesApiError: {
+    id: 'api.errors.getUtxosSumsForAddressesApiError',
+    defaultMessage: '!!!Error received from server while getting balance.',
+    description: '"Error received from server while getting balance." error message'
+  },
+  getTxHistoryForAddressesApiError: {
+    id: 'api.errors.getTxHistoryForAddressesApiError',
+    defaultMessage: '!!!Error received from server while getting txs.',
+    description: '"Error received from server while getting txs." error message'
+  },
   sendTransactionApiError: {
     id: 'api.errors.sendTransactionApiError',
     defaultMessage: '!!!Error received from server while sending tx.',
     description: '"Error received from server while sending tx." error message'
+  },
+  checkAdressesInUseApiError: {
+    id: 'api.errors.checkAdressesInUseApiError',
+    defaultMessage: '!!!Error received from server while checking used addresses.',
+    description: '"Error received from server while checking used addresses." error message'
+  },
+  getPendingTxsForAddressesApiError: {
+    id: 'api.errors.getPendingTxsForAddressesApiError',
+    defaultMessage: '!!!Error received from server while getting pending txs.',
+    description: '"Error received from server while getting pending txs." error message'
   }
 });
 
@@ -233,11 +263,65 @@ export class GenerateTransferTxError extends LocalizableError {
   }
 }
 
+export class SendTransactionError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.sendTransactionError.id,
+      defaultMessage: messages.sendTransactionError.defaultMessage
+    });
+  }
+}
+
+export class GetUtxosForAddressesApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getUtxosForAddressesApiError.id,
+      defaultMessage: messages.getUtxosForAddressesApiError.defaultMessage
+    });
+  }
+}
+
+export class GetUtxosSumsForAddressesApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getUtxosSumsForAddressesApiError.id,
+      defaultMessage: messages.getUtxosSumsForAddressesApiError.defaultMessage
+    });
+  }
+}
+
+export class GetTxHistoryForAddressesApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getTxHistoryForAddressesApiError.id,
+      defaultMessage: messages.getTxHistoryForAddressesApiError.defaultMessage
+    });
+  }
+}
+
 export class SendTransactionApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.sendTransactionApiError.id,
       defaultMessage: messages.sendTransactionApiError.defaultMessage
+    });
+  }
+}
+
+export class CheckAdressesInUseApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.checkAdressesInUseApiError.id,
+      defaultMessage: messages.checkAdressesInUseApiError.defaultMessage
+    });
+  }
+}
+
+export class GetPendingTxsForAddressesApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getPendingTxsForAddressesApiError.id,
+      defaultMessage: messages.getPendingTxsForAddressesApiError.defaultMessage
     });
   }
 }
