@@ -12,7 +12,7 @@ export function buildMockData(feature) {
 
 export function getFakeAddresses(
   totalAddresses,
-  addressesStartingWith = 'Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo'
+  addressesStartingWith
 ) {
   const addresses = _generateListOfStrings(addressesStartingWith);
   return addresses.slice(0, totalAddresses).reduce((newAddresses, address) => {
@@ -40,7 +40,7 @@ export function getLovefieldTxs(walletName) {
       wallet.txHashesStartingWith,
       wallet.pendingTxsNumber
     ) :
-    lovefieldTxs[wallet.addressesStartingWith];
+    lovefieldTxs[walletName];
 }
 
 export function getTxsMapList(addresses) {
@@ -131,5 +131,8 @@ function _getTxsMapList(wallet) {
   if (!getMockData().txs) {
     return [];
   }
-  return getMockData().txs[wallet.addressesStartingWith];
+  const { wallets } = getMockData();
+  const selectedWalletName = Object.keys(wallets).find(walletName =>
+    wallets[walletName].addressesStartingWith === wallet.addressesStartingWith);
+  return getMockData().txs[selectedWalletName];
 }

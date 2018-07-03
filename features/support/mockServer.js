@@ -7,14 +7,18 @@ const middlewares = [...defaults(), bodyParser];
 
 const port = 8080;
 
+// MockData should always be consistent with the following values
+const addressesLimit = 50;
+const txsLimit = 20;
+
 export function createServer() {
   const server = create();
 
   server.use(middlewares);
 
   function validateAddressesReq({ addresses } = {}) {
-    if (!addresses || addresses.length > 50 || addresses.length === 0) {
-      throw new Error('Addresses request length should be (0, 50]');
+    if (!addresses || addresses.length > addressesLimit || addresses.length === 0) {
+      throw new Error('Addresses request length should be (0, ' + addressesLimit + ']');
     }
     // TODO: Add address validation
     return true;
@@ -58,8 +62,8 @@ export function createServer() {
         moment(txMap.tx.time) >= moment(req.body.dateFrom) &&
         extraFilter;
     }).map(txMap => txMap.tx);
-    // Returns a chunk of 20 txs
-    res.send(filteredTxs.slice(0, 20));
+    // Returns a chunk of txs
+    res.send(filteredTxs.slice(0, txsLimit));
   });
 
   server.post('/api/txs/signed', (req, res) => {

@@ -37,38 +37,53 @@ async function (expectedTxsNumber) {
   chai.expect(txsNumber).to.equal('Number of transactions: ' + expectedTxsNumber);
 });
 
-Then(/^I should see the txs corresponding to the wallet with the name ([^"]*)$/,
-async function (walletName) {
+Then(/^I should see no transactions$/, async function () {
   const actualTxsList = await this.getElementsBy('.Transaction_component');
-  const expectedTxsList = getLovefieldTxs(walletName);
-  const txsNumber = actualTxsList.length;
-  const isSingleTx = txsNumber === 1;
-  for (let i = 0; i < txsNumber; i++) {
+  chai.expect(actualTxsList.length).to.equal(0);
+});
+
+Then(/^I should see ([^"]*) pending transactions in simple-wallet$/,
+async function (pendingTxsNumber) {
+  const actualTxsList = await this.getElementsBy('.Transaction_component');
+  const expectedTxsList = getLovefieldTxs('simple-wallet');
+  for (let i = 0; i < parseInt(pendingTxsNumber, 10); i++) {
     await actualTxsList[i].click();
     const txData = await actualTxsList[i].getText();
     const txDataFields = txData.split('\n');
-    const shouldBePendingTx = expectedTxsList[i].txStatus === 'TRANSACTION PENDING';
-    if (isSingleTx) {
-      if (shouldBePendingTx) {
-        const [txType, txAmount, txTime, txStatus,, txFrom1, txFrom2, txFrom3,,
-          txTo1, txTo2, txTo3, txTo4,,, txId] = txDataFields;
-        verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom1, txFrom2, txFrom3],
-          [txTo1, txTo2, txTo3, txTo4], txId, expectedTxsList[i]);
-      } else {
-        const [txType, txAmount, txTime, txStatus,, txFrom1, txFrom2, txFrom3,,
-          txTo1, txTo2, txTo3, txTo4,, txConfirmations,, txId] = txDataFields;
-        verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom1, txFrom2, txFrom3],
-          [txTo1, txTo2, txTo3, txTo4], txId, expectedTxsList[i], txConfirmations);
-      }
-    } else if (shouldBePendingTx) {
-      const [txType, txAmount, txTime, txStatus,, txFrom,, txTo,,, txId] = txDataFields;
-      verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom], [txTo], txId,
-        expectedTxsList[i]);
-    } else {
-      const [txType, txAmount, txTime, txStatus,, txFrom,, txTo,,
-        txConfirmations,, txId] = txDataFields;
-      verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom], [txTo], txId,
-        expectedTxsList[i], txConfirmations);
-    }
+    const [txType, txAmount, txTime, txStatus, , txFrom, , txTo, , , txId] = txDataFields;
+    verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom],
+        [txTo], txId, expectedTxsList[i]);
   }
 });
+
+Then(/^I should see ([^"]*) confirmed transactions in ([^"]*)$/,
+async function (txsNumber, walletName) {
+  const actualTxsList = await this.getElementsBy('.Transaction_component');
+  const expectedTxsList = getLovefieldTxs(walletName);
+  const initialTxValue = actualTxsList.length - parseInt(txsNumber, 10);
+  for (let i = initialTxValue; i < actualTxsList.length; i++) {
+    await actualTxsList[i].click();
+    const txData = await actualTxsList[i].getText();
+    const txDataFields = txData.split('\n');
+    const [txType, txAmount, txTime, txStatus, , txFrom, , txTo, ,
+      txConfirmations, , txId] = txDataFields;
+    verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom],
+      [txTo], txId, expectedTxsList[i], txConfirmations);
+  }
+});
+
+Then(/^I should see a confirmed transactions in tx-big-input-wallet$/,
+  async function () {
+    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    const totalTxsNumber = actualTxsList.length;
+    const expectedTxsList = getLovefieldTxs('tx-big-input-wallet');
+    for (let i = 0; i < totalTxsNumber; i++) {
+      await actualTxsList[i].click();
+      const txData = await actualTxsList[i].getText();
+      const txDataFields = txData.split('\n');
+      const [txType, txAmount, txTime, txStatus, , txFrom1, txFrom2, txFrom3, , txTo1, txTo2,
+        txTo3, txTo4, , txConfirmations, , txId] = txDataFields;
+      verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom1, txFrom2, txFrom3],
+        [txTo1, txTo2, txTo3, txTo4], txId, expectedTxsList[i], txConfirmations);
+    }
+  });
