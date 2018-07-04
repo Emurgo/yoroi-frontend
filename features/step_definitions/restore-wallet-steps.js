@@ -1,4 +1,4 @@
-import { When } from 'cucumber';
+import { When, Then } from 'cucumber';
 
 When(/^I click the restore button$/, async function () {
   await this.click('.restoreWalletButton');
@@ -22,4 +22,8 @@ When(/^I enter the restored wallet password:$/, async function (table) {
 
 When(/^I click the "Restore Wallet" button$/, async function () {
   await this.click('.WalletRestoreDialog .primary');
+});
+
+Then(/^I should see an "Invalid recovery phrase" error message$/, async function () {
+  await this.waitForElement('.SimpleAutocomplete_errored');
 });

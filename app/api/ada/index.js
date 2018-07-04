@@ -42,7 +42,6 @@ import {
 import { getLastBlockNumber } from './getAdaLastBlockNumber';
 import {
   GenericApiError,
-  IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
 } from '../common';
 import type {
@@ -64,13 +63,6 @@ import type {
   RestoreWalletRequest,
   RestoreWalletResponse,
 } from '../common';
-import {
-  AllFundsAlreadyAtReceiverAddressError,
-  NotAllowedToSendMoneyToRedeemAddressError,
-  NotAllowedToSendMoneyToSameAddressError,
-  NotEnoughFundsForTransactionFeesError,
-  NotEnoughMoneyToSendError,
-} from './errors';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -238,7 +230,6 @@ export default class AdaApi {
     }
   }*/
 
-  // TODO: Improve error handling
   async createTransaction(
     request: CreateTransactionRequest
   ): Promise<any> {
@@ -256,25 +247,6 @@ export default class AdaApi {
       return response;
     } catch (error) {
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
-      // eslint-disable-next-line max-len
-      if (
-        error.message.includes(
-          "It's not allowed to send money to the same address you are sending from"
-        )
-      ) {
-        throw new NotAllowedToSendMoneyToSameAddressError();
-      }
-      if (
-        error.message.includes("Destination address can't be redeem address")
-      ) {
-        throw new NotAllowedToSendMoneyToRedeemAddressError();
-      }
-      if (error.message.includes('Not enough money')) {
-        throw new NotEnoughMoneyToSendError();
-      }
-      if (error.message.includes("Passphrase doesn't match")) {
-        throw new IncorrectWalletPasswordError();
-      }
       throw new GenericApiError();
     }
   }
@@ -295,17 +267,7 @@ export default class AdaApi {
       Logger.error(
         'AdaApi::calculateTransactionFee error: ' + stringifyError(error)
       );
-      // eslint-disable-next-line max-len
-      if (
-        error.message.includes(
-          'not enough money on addresses which are not included in output addresses set'
-        )
-      ) {
-        throw new AllFundsAlreadyAtReceiverAddressError();
-      }
-      if (error.message.includes('not enough money')) {
-        throw new NotEnoughFundsForTransactionFeesError();
-      }
+      if (error.id.includes('NotEnoughMoneyToSendError')) throw error;
       throw new GenericApiError();
     }
   }
@@ -329,8 +291,8 @@ export default class AdaApi {
     return isValidAdaAddress(address);
   }
 
-  isValidMnemonic(mnemonic: string): Promise<boolean> {
-    return Promise.resolve(isValidMnemonic(mnemonic, 12));
+  isValidMnemonic(mnemonic: string, numberOfWords: ?number): boolean {
+    return isValidMnemonic(mnemonic, numberOfWords);
   }
 
   getWalletRecoveryPhrase(): Promise<GetWalletRecoveryPhraseResponse> {

@@ -6,6 +6,7 @@ import {
   encryptWithPassword,
   decryptWithPassword
 } from '../../../../utils/passwordCipher';
+import { getOrFail } from './cryptoUtils';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
@@ -17,11 +18,11 @@ declare var CONFIG: ConfigType;
 
 const protocolMagic = CONFIG.network.protocolMagic;
 
-export const generateAdaMnemonic = () => bip39.generateMnemonic(128).split(' ');
+export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
 
 export const isValidAdaMnemonic = (
   phrase: string,
-  numberOfWords: number = 12
+  numberOfWords: ?number = 15
 ) =>
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
 
@@ -39,7 +40,7 @@ export function getCryptoWalletFromSeed(
 ): CryptoWallet {
   const seed = decryptWithPassword(password, walletSeed.encryptedSeed);
   const seedAsArray = Object.values(seed);
-  const wallet = Wallet.fromSeed(seedAsArray).result;
+  const wallet = getOrFail(Wallet.fromSeed(seedAsArray));
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }
@@ -48,7 +49,7 @@ export function getCryptoWalletFromSeed(
 export function getCryptoDaedalusWalletFromMnemonics(
   secretWords: string,
 ): CryptoDaedalusWallet {
-  const wallet = Wallet.fromDaedalusMnemonic(secretWords).result;
+  const wallet = getOrFail(Wallet.fromDaedalusMnemonic(secretWords));
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }

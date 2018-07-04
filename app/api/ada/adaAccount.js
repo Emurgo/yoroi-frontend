@@ -1,6 +1,7 @@
 // @flow
 import { Wallet } from 'rust-cardano-crypto';
 import { getCryptoWalletFromSeed } from './lib/cardanoCrypto/cryptoWallet';
+import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
   getFromStorage,
   saveInStorage
@@ -25,7 +26,9 @@ export function createCryptoAccount(
   accountIndex: number = ACCOUNT_INDEX
 ): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromSeed(seed, walletPassword);
-  return Wallet.newAccount(cryptoWallet, accountIndex).result.Ok;
+  // This Ok object is the crypto account
+  const { Ok } = getOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
+  return Ok;
 }
 
 export function saveCryptoAccount(
