@@ -1,11 +1,15 @@
 import { create, bodyParser, defaults } from 'json-server';
 import moment from 'moment';
-import { getAddressMapper, getMockData, getTxsMapList } from './mockDataBuilder';
+import { getMockData, getTxsMapList } from './mockDataBuilder';
 import BigNumber from 'bignumber.js';
 
 const middlewares = [...defaults(), bodyParser];
 
 const port = 8080;
+
+// MockData should always be consistent with the following values
+const addressesLimit = 50;
+const txsLimit = 20;
 
 export function createServer() {
   const server = create();
@@ -13,8 +17,8 @@ export function createServer() {
   server.use(middlewares);
 
   function validateAddressesReq({ addresses } = {}) {
-    if (!addresses || addresses.length > 50 || addresses.length === 0) {
-      throw new Error('Addresses request length should be (0, 50]');
+    if (!addresses || addresses.length > addressesLimit || addresses.length === 0) {
+      throw new Error('Addresses request length should be (0, ' + addressesLimit + ']');
     }
     // TODO: Add address validation
     return true;
@@ -48,10 +52,7 @@ export function createServer() {
   server.post('/api/txs/history', (req, res) => {
     validateAddressesReq(req.body);
     validateDatetimeReq(req.body);
-    const firstAddress = req.body.addresses[0];
-    const addressPrefix = firstAddress.slice(0, firstAddress.length - 1);
-    const addressMap = getAddressMapper(addressPrefix);
-    const txsMapList = getTxsMapList(addressMap, addressPrefix);
+    const txsMapList = getTxsMapList(req.body.addresses);
     // Filters all txs according to hash and date
     const filteredTxs = txsMapList.filter(txMap => {
       const extraFilter = req.body.txHash ?
@@ -61,8 +62,8 @@ export function createServer() {
         moment(txMap.tx.time) >= moment(req.body.dateFrom) &&
         extraFilter;
     }).map(txMap => txMap.tx);
-    // Returns a chunk of 20 txs
-    res.send(filteredTxs.slice(0, 20));
+    // Returns a chunk of txs
+    res.send(filteredTxs.slice(0, txsLimit));
   });
 
   server.post('/api/txs/signed', (req, res) => {
@@ -76,7 +77,13 @@ export function createServer() {
   });
 
   server.post('/api/txs/pending', (req, res) => {
-    res.send([]);
+    validateAddressesReq(req.body);
+    const txsMapList = getTxsMapList(req.body.addresses);
+    const txs = txsMapList.filter(txMap => (
+      req.body.addresses.includes(txMap.address) &&
+        !txMap.tx.block_num
+    )).map(txMap => txMap.tx);
+    res.send(txs);
   });
 
   return server.listen(port, () => {
