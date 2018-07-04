@@ -161,13 +161,12 @@ function _spenderData(txInputs, txOutputs, addresses) {
     incoming.totalAmount
   );
 
-  const isLocal =
+  const isSelfTransaction =
     incoming.count === txInputs.length &&
     outgoing.count === txOutputs.length;
 
   let amount;
-  if (isLocal) amount = outgoing.totalAmount;
-  else if (isOutgoing) amount = outgoing.totalAmount.minus(incoming.totalAmount);
+  if (isOutgoing || isSelfTransaction) amount = outgoing.totalAmount.minus(incoming.totalAmount);
   else amount = incoming.totalAmount.minus(outgoing.totalAmount);
 
   return {
