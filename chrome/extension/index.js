@@ -2,10 +2,8 @@ import React from 'react';
 import { render } from 'react-dom';
 import { action, useStrict } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
-import { loadRustModule } from 'rust-cardano-crypto';
 import { hashHistory } from 'react-router';
 import { setupApi } from '../../app/api/index';
-import { loadLovefieldDB } from '../../app/api/ada/lib/lovefieldDatabase';
 import createStores from '../../app/stores/index';
 import translations from '../../app/i18n/translations';
 import actions from '../../app/actions/index';
@@ -32,14 +30,6 @@ const initializeIcarus = async () => {
       createStores(api, actions, router);
     })
   };
-
-  // FIXME: Create an AsyncLibrariesStore ?) in order to initialize these
-  try {
-    await Promise.all([loadRustModule(), loadLovefieldDB()]);
-    console.debug('index::initializeIcarus Async modules loaded');
-  } catch (error) {
-    console.error('index::initializeIcarus Unable to load async modules', error);
-  }
 
   render(
     <App stores={stores} actions={actions} history={history} />,

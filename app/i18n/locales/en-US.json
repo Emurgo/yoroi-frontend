@@ -76,7 +76,7 @@
   "global.unit.ada": "Ada",
   "global.unit.etc": "Etc",
   "loading.screen.connectingToNetworkMessage": "Connecting to network",
-  "loading.screen.loadingWalletData": "Loading wallet data",
+  "loading.screen.loadingLibraries": "!!!Loading libraries",
   "loading.screen.reconnectingToNetworkMessage": "Network connection lost - reconnecting",
   "loading.screen.reportIssue.buttonLabel": "Report an issue",
   "loading.screen.reportIssue.connecting.text": "Having trouble connecting to network?",

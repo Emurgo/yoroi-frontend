@@ -71,7 +71,7 @@ export default class Loading extends Component<Props, State> {
         {hasLoadedCurrentLocale && (
           <div>
             {isLoadingDataForNextScreen && (
-              <div className={styles.syncing}>
+              <div className={styles.loading}>
                 <h1 className={styles.headline}>
                   {intl.formatMessage(loadingDataForNextScreenMessage)}
                 </h1>

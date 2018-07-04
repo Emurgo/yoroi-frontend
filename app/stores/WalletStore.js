@@ -1,12 +1,11 @@
 // @flow
-import { observable, action, computed, runInAction, untracked } from 'mobx';
+import { observable, action, computed, runInAction } from 'mobx';
 import _ from 'lodash';
 import Store from './lib/Store';
 import Wallet from '../domain/Wallet';
 import Request from './lib/LocalizedRequest';
 import { buildRoute, matchRoute } from '../utils/routing';
 import { ROUTES } from '../routes-config';
-import WalletAddDialog from '../components/wallet/WalletAddDialog';
 import type { GetWalletRecoveryPhraseResponse } from '../api/common';
 import environment from '../environment';
 
@@ -124,6 +123,7 @@ export default class WalletsStore extends Store {
   }
 
   @computed get hasAnyWallets(): boolean {
+    debugger
     if (this.walletsRequest.result == null) return false;
     return this.walletsRequest.wasExecuted && this.walletsRequest.result.length > 0;
   }
@@ -250,8 +250,7 @@ export default class WalletsStore extends Store {
           this._setActiveWallet({ walletId: this.all[0].id });
         }
         if (this.active) {
-          const walletId = this.active.id;
-          this.goToWalletRoute(walletId);
+          this.goToWalletRoute(this.active.id);
         }
       }
     });

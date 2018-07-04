@@ -9,10 +9,10 @@ import cardanoLogo from '../assets/images/cardano-logo.inline.svg';
 import type { InjectedProps } from '../types/injectedPropsType';
 
 export const messages = defineMessages({
-  loadingWalletData: {
-    id: 'loading.screen.loadingWalletData',
-    defaultMessage: '!!!Loading wallet data',
-    description: 'Message "Loading wallet data" on the loading screen.'
+  loadingLibraries: {
+    id: 'loading.screen.loadingLibraries',
+    defaultMessage: '!!!Loading libraries',
+    description: 'Message "Loading libraries" on the loading screen.'
   },
 });
 
@@ -20,20 +20,8 @@ export const messages = defineMessages({
 export default class LoadingPage extends Component<InjectedProps> {
 
   render() {
-    /* const { stores } = this.props;
-    const { app } = stores;
-    const { wallets } = stores[environment.API];
-    if (app.currentRoute === ROUTES.ROOT) {
-      if (wallets.first) {
-        actions.router.goToRoute.trigger({
-          route: ROUTES.WALLETS.SUMMARY,
-          params: { id: wallets.first.id }
-        });
-      } else {
-        actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-      }
-    }*/
-
+    const { stores } = this.props;
+    const { libs } = stores;
     const { hasLoadedCurrentLocale, hasLoadedCurrentTheme } = {
       hasLoadedCurrentLocale: true,
       hasLoadedCurrentTheme: true,
@@ -45,8 +33,8 @@ export default class LoadingPage extends Component<InjectedProps> {
           apiIcon={cardanoLogo}
           hasLoadedCurrentLocale={hasLoadedCurrentLocale}
           hasLoadedCurrentTheme={hasLoadedCurrentTheme}
-          isLoadingDataForNextScreen={true}
-          loadingDataForNextScreenMessage={messages.loadingWalletData}
+          isLoadingDataForNextScreen={libs.loading}
+          loadingDataForNextScreenMessage={messages.loadingLibraries}
         />
       </CenteredLayout>
     );

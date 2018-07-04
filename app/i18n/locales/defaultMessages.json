@@ -2532,16 +2532,16 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Loading wallet data",
-        "description": "Message \"Loading wallet data\" on the loading screen.",
+        "defaultMessage": "!!!Loading libraries",
+        "description": "Message \"Loading libraries\" on the loading screen.",
         "end": {
           "column": 3,
           "line": 16
         },
         "file": "app/containers/LoadingPage.js",
-        "id": "loading.screen.loadingWalletData",
+        "id": "loading.screen.loadingLibraries",
         "start": {
-          "column": 21,
+          "column": 20,
           "line": 12
         }
       }

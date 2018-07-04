@@ -6,6 +6,7 @@ import WalletBackupStore from './WalletBackupStore';
 import SidebarStore from './SidebarStore';
 import UiDialogsStore from './UiDialogsStore';
 import UiNotificationsStore from './UiNotificationsStore';
+import AsyncLibrariesStore from './AsyncLibrariesStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
@@ -17,6 +18,7 @@ export const storeClasses = {
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
   walletBackup: WalletBackupStore,
+  libs: AsyncLibrariesStore,
 };
 
 export type StoresMap = {
@@ -28,6 +30,7 @@ export type StoresMap = {
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
   ada: AdaStoresMap,
+  libs: AsyncLibrariesStore,
 };
 
 // Constant that does never change during lifetime
@@ -40,6 +43,7 @@ const stores = observable({
   uiDialogs: null,
   uiNotifications: null,
   ada: null,
+  libs: null,
 });
 
 // Set up and return the stores for this app -> also used to reset all stores to defaults
