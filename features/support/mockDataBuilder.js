@@ -31,8 +31,8 @@ export function getFakeAddresses(
 }
 
 export function getLovefieldTxs(walletName) {
-  const { wallets, lovefieldTxs } = getMockData();
-  const wallet = wallets[walletName];
+  const { walletInitialData, lovefieldTxs } = getMockData();
+  const wallet = walletInitialData[walletName];
   return wallet && wallet.txHashesStartingWith && wallet.txsNumber ?
     _getLovefieldTxs(
       wallet.txsNumber,
@@ -112,11 +112,11 @@ function _getLovefieldTxs(txsNumber, addressesStartingWith, txHashesStartingWith
 }
 
 function _getWallet(addressesStartingWith) {
-  if (!getMockData().wallets) {
+  if (!getMockData().walletInitialData) {
     return {};
   }
-  return Object.values(getMockData().wallets).find(wallet =>
-    wallet.addressesStartingWith === addressesStartingWith);
+  return Object.values(getMockData().walletInitialData).find(walletData =>
+    walletData.addressesStartingWith === addressesStartingWith);
 }
 
 function _getTxsMapList(wallet) {
@@ -131,8 +131,8 @@ function _getTxsMapList(wallet) {
   if (!getMockData().txs) {
     return [];
   }
-  const { wallets } = getMockData();
-  const selectedWalletName = Object.keys(wallets).find(walletName =>
-    wallets[walletName].addressesStartingWith === wallet.addressesStartingWith);
+  const { walletInitialData } = getMockData();
+  const selectedWalletName = Object.keys(walletInitialData).find(walletName =>
+    walletInitialData[walletName].addressesStartingWith === wallet.addressesStartingWith);
   return getMockData().txs[selectedWalletName];
 }

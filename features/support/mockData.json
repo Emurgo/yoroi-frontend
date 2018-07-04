@@ -64,7 +64,7 @@
     ]
   },
   "Get balance": {
-    "wallets": {
+    "walletInitialData": {
       "simple-wallet": {
         "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
         "totalAddresses": 1
@@ -112,7 +112,7 @@
     ]
   },
   "Transaction History": {
-    "wallets": {
+    "walletInitialData": {
       "empty-wallet": {
         "addressesStartingWith": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo",
         "totalAddresses": 1
@@ -214,26 +214,16 @@
             "hash": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
             "time": "2018-01-01T13:51:33.000Z",
             "inputs_address": [
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoV",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW"
+              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU"
             ],
             "inputs_amount": [
-              "9007199254720699",
-              "1",
-              "1"
+              "9007199254720699"
             ],
             "outputs_address": [
-              "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoX",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoY",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoZ"
+              "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA"
             ],
             "outputs_amount": [
-              "9007199254720698",
-              "1",
-              "1",
-              "1"
+              "9007199254720698"
             ],
             "block_num": 70,
             "best_block_num": 101
@@ -284,15 +274,10 @@
           "txTime": "2018-05-10T13:51:33.000Z",
           "txStatus": "HIGH",
           "txFrom": [
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoV",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW"
+            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU"
           ],
           "txTo": [
-            "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoX",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoY",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoZ"
+            "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA"
           ],
           "txConfirmations": "High. 31 confirmations.",
           "txId": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X"
