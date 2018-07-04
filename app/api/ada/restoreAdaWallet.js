@@ -20,6 +20,13 @@ import type {
   AdaWallet,
   AdaWalletParams
 } from './adaTypes';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
+import {
+  DiscoverAddressesError
+} from './errors';
 
 // We will query the backend for 20 addresses window
 // FIXME: Improve this to decouple requests and BIP-44 unused window parsing
@@ -31,16 +38,22 @@ export async function restoreAdaWallet({
 }: AdaWalletParams): Promise<AdaWallet> {
   const [adaWallet, seed] = createAdaWallet({ walletPassword, walletInitData });
   const cryptoAccount = createCryptoAccount(seed, walletPassword);
-  const externalAddressesToSave = await
-    _discoverAllAddressesFrom(cryptoAccount, 'External', 0, ADDRESS_REQUEST_SIZE);
-  const internalAddressesToSave = await
-    _discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, ADDRESS_REQUEST_SIZE);
-  if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
-    // TODO: Store all at once
-    saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
-    saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal');
-  } else {
-    newAdaAddress(cryptoAccount, [], 'External');
+  try {
+    const externalAddressesToSave = await
+      _discoverAllAddressesFrom(cryptoAccount, 'External', 0, ADDRESS_REQUEST_SIZE);
+    const internalAddressesToSave = await
+      _discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, ADDRESS_REQUEST_SIZE);
+    if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
+      // TODO: Store all at once
+      saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
+      saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal');
+    } else {
+      newAdaAddress(cryptoAccount, [], 'External');
+    }
+  } catch (discoverAddressesError) {
+    Logger.error('restoreAdaWallet::restoreAdaWallet error: ' +
+      stringifyError(discoverAddressesError));
+    throw new DiscoverAddressesError();
   }
   saveCryptoAccount(cryptoAccount);
   saveAdaWallet(adaWallet, seed);
