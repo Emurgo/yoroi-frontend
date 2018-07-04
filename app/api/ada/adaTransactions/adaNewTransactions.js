@@ -33,7 +33,8 @@ import type {
 import {
   NotEnoughMoneyToSendError,
   TransactionError,
-  SendTransactionApiError
+  SendTransactionError,
+  GetAllUTXOsForAddressesError
 } from '../errors';
 
 export function getAdaTransactionFee(
@@ -69,18 +70,24 @@ export async function newAdaTransaction(
     removeAdaAddress(changeAdaAddr);
     Logger.error('adaNewTransactions::newAdaTransaction error: ' +
       stringifyError(sendTxError));
-    throw new SendTransactionApiError();
+    throw new SendTransactionError();
   }
 }
 
 export async function getAllUTXOsForAddresses(
   addresses: Array<string>
 ): Promise<Array<UTXO>> {
-  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-  const promises = groupsOfAddresses.map(groupOfAddresses =>
-    getUTXOsForAddresses(groupOfAddresses));
-  return Promise.all(promises).then(groupsOfUTXOs =>
-    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
+  try {
+    const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+    const promises = groupsOfAddresses.map(groupOfAddresses =>
+      getUTXOsForAddresses(groupOfAddresses));
+    return Promise.all(promises).then(groupsOfUTXOs =>
+      groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
+  } catch (getUtxosError) {
+    Logger.error('adaNewTransactions::getAllUTXOsForAddresses error: ' +
+      stringifyError(getUtxosError));
+    throw new GetAllUTXOsForAddressesError();
+  }
 }
 
 export function getAdaTransactionFromSenders(

@@ -170,17 +170,129 @@
         }
       },
       {
-        "defaultMessage": "!!!Error received from server while sending tx.",
-        "description": "\"Error received from server while sending tx.\" error message",
+        "defaultMessage": "!!!Error received from api method call while sending tx.",
+        "description": "\"Error received from api method call while sending tx.\" error message",
         "end": {
           "column": 3,
           "line": 69
         },
         "file": "app/api/ada/errors.js",
+        "id": "api.errors.sendTransactionError",
+        "start": {
+          "column": 24,
+          "line": 65
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from api method call while getting utxos.",
+        "description": "\"Error received from api method call while getting utxos.\" error message",
+        "end": {
+          "column": 3,
+          "line": 74
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getAllUTXOsForAddressesError",
+        "start": {
+          "column": 32,
+          "line": 70
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from api method call while discovering addresses.",
+        "description": "\"Error received from api method call while discovering addresses.\" error message",
+        "end": {
+          "column": 3,
+          "line": 79
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.discoverAddressesError",
+        "start": {
+          "column": 26,
+          "line": 75
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while getting UTXOs.",
+        "description": "\"Error received from server while getting UTXOs.\" error message",
+        "end": {
+          "column": 3,
+          "line": 84
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getUtxosForAddressesApiError",
+        "start": {
+          "column": 32,
+          "line": 80
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while getting balance.",
+        "description": "\"Error received from server while getting balance.\" error message",
+        "end": {
+          "column": 3,
+          "line": 89
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getUtxosSumsForAddressesApiError",
+        "start": {
+          "column": 36,
+          "line": 85
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while getting txs.",
+        "description": "\"Error received from server while getting txs.\" error message",
+        "end": {
+          "column": 3,
+          "line": 94
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getTxHistoryForAddressesApiError",
+        "start": {
+          "column": 36,
+          "line": 90
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while sending tx.",
+        "description": "\"Error received from server while sending tx.\" error message",
+        "end": {
+          "column": 3,
+          "line": 99
+        },
+        "file": "app/api/ada/errors.js",
         "id": "api.errors.sendTransactionApiError",
         "start": {
           "column": 27,
-          "line": 65
+          "line": 95
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while checking used addresses.",
+        "description": "\"Error received from server while checking used addresses.\" error message",
+        "end": {
+          "column": 3,
+          "line": 104
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.checkAdressesInUseApiError",
+        "start": {
+          "column": 30,
+          "line": 100
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while getting pending txs.",
+        "description": "\"Error received from server while getting pending txs.\" error message",
+        "end": {
+          "column": 3,
+          "line": 109
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getPendingTxsForAddressesApiError",
+        "start": {
+          "column": 37,
+          "line": 105
         }
       }
     ],
