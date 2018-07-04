@@ -15,7 +15,7 @@ const baseDevConfig = () => ({
     icaruspoc: [
       customPath,
       hotScript,
-      path.join(__dirname, '../chrome/extension/icaruspoc')
+      path.join(__dirname, '../chrome/extension/index')
     ],
     background: [
       customPath,

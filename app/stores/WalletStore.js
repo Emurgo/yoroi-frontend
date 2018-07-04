@@ -161,7 +161,6 @@ export default class WalletsStore extends Store {
   // ACTIONS
 
   @action refreshWalletsData = async () => {
-    // if (!this.stores.networkStatus.isConnected) return;
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {

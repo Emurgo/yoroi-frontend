@@ -73,14 +73,12 @@ export default class AddressesStore extends Store {
   }
 
   @action _refreshAddresses = () => {
-    // if (this.stores.networkStatus.isConnected) {
     const allWallets = this.stores.ada.wallets.all;
     for (const wallet of allWallets) {
       const allRequest = this._getAddressesAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
       allRequest.execute({ walletId: wallet.id });
     }
-    // }
   };
 
   @action _resetErrors = () => {

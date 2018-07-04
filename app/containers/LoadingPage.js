@@ -20,52 +20,35 @@ export const messages = defineMessages({
 export default class LoadingPage extends Component<InjectedProps> {
 
   render() {
-    // const { stores } = this.props;
-    const {
-      isConnecting, isSyncing, syncPercentage, isLoadingWallets,
-      hasBeenConnected, hasBlockSyncingStarted, localTimeDifference,
-      ALLOWED_TIME_DIFFERENCE,
-    } = {
-      isConnecting: false,
-      isSyncing: false,
-      syncPercentage: 100,
-      isLoadingWallets: false,
-      hasBeenConnected: true,
-      hasBlockSyncingStarted: true,
-      localTimeDifference: 0,
-      ALLOWED_TIME_DIFFERENCE: 0,
-    }; // stores.networkStatus;
-    const { hasLoadedCurrentLocale, hasLoadedCurrentTheme, currentLocale } = {
+    /* const { stores } = this.props;
+    const { app } = stores;
+    const { wallets } = stores[environment.API];
+    if (app.currentRoute === ROUTES.ROOT) {
+      if (wallets.first) {
+        actions.router.goToRoute.trigger({
+          route: ROUTES.WALLETS.SUMMARY,
+          params: { id: wallets.first.id }
+        });
+      } else {
+        actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+      }
+    }*/
+
+    const { hasLoadedCurrentLocale, hasLoadedCurrentTheme } = {
       hasLoadedCurrentLocale: true,
       hasLoadedCurrentTheme: true,
-      currentLocale: 'en-US',
-    }; // stores.profile;
+    };
     return (
       <CenteredLayout>
         <Loading
           currencyIcon={adaLogo}
           apiIcon={cardanoLogo}
-          isSyncing={isSyncing}
-          localTimeDifference={localTimeDifference}
-          allowedTimeDifference={ALLOWED_TIME_DIFFERENCE}
-          isConnecting={isConnecting}
-          syncPercentage={syncPercentage}
-          isLoadingDataForNextScreen={isLoadingWallets}
-          loadingDataForNextScreenMessage={messages.loadingWalletData}
-          hasBeenConnected={hasBeenConnected}
-          hasBlockSyncingStarted={hasBlockSyncingStarted}
           hasLoadedCurrentLocale={hasLoadedCurrentLocale}
           hasLoadedCurrentTheme={hasLoadedCurrentTheme}
-          currentLocale={currentLocale}
-          handleReportIssue={this.handleReportIssue}
-          onProblemSolutionClick={this.handleProblemSolutionClick}
+          isLoadingDataForNextScreen={true}
+          loadingDataForNextScreenMessage={messages.loadingWalletData}
         />
       </CenteredLayout>
     );
-  }
-
-  handleReportIssue = () => {}
-
-  handleProblemSolutionClick = (/* link: string*/) => {
   }
 }
