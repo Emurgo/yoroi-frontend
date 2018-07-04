@@ -1,4 +1,5 @@
 import lf from 'lovefield';
+import BigNumber from 'bignumber.js';
 
 const txsTableName = 'Txs';
 const txsTableFields = {
@@ -35,7 +36,7 @@ export const loadLovefieldDB = async() => {
   }
   const schemaBuilder = lf.schema.create('icarus-schema', 1);
   schemaBuilder.createTable(LovefieldDB.txsTableName)
-    .addColumn(txsTableFields.CT_AMOUNT, lf.Type.NUMBER)
+    .addColumn(txsTableFields.CT_AMOUNT, lf.Type.OBJECT)
     .addColumn(txsTableFields.CT_BLOCK_NUMBER, lf.Type.STRING)
     .addColumn(txsTableFields.CT_ID, lf.Type.STRING)
     .addColumn(txsTableFields.CT_INPUTS, lf.Type.OBJECT)
@@ -64,7 +65,7 @@ export const getTxWithDBSchema = function (amount, tx, inputs, isOutgoing, outpu
   const isPending = !tx.block_num;
   return {
     [LovefieldDB.txsTableFields.CT_AMOUNT]: {
-      getCCoin: amount
+      getCCoin: amount.toString()
     },
     [LovefieldDB.txsTableFields.CT_BLOCK_NUMBER]: tx.block_num || '',
     [LovefieldDB.txsTableFields.CT_ID]: tx.hash,
@@ -122,7 +123,7 @@ const _mapRowsToTxs = function (rows) {
     newTx.ctInputs = txDB.ctInputs.newInputs.map(address => (address[0] ? address : [address]));
     newTx.ctOutputs = txDB.ctOutputs.newOutputs.map(address => (address[0] ? address : [address]));
     newTx.ctAmount = Object.assign({}, newTx.ctAmount);
-    newTx.ctAmount.getCCoin = txDB.ctAmount.getCCoin;
+    newTx.ctAmount.getCCoin = new BigNumber(txDB.ctAmount.getCCoin);
     return newTx;
   });
 };
