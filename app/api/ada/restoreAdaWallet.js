@@ -1,6 +1,7 @@
 // @flow
 import _ from 'lodash';
 import { Wallet } from 'rust-cardano-crypto';
+import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
   createAdaWallet,
   saveAdaWallet
@@ -84,7 +85,7 @@ async function _discoverAddressesFrom(
   offset: number
 ) {
   const addressesIndex = _.range(fromIndex, fromIndex + offset);
-  const addresses = Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex).result;
+  const addresses = getOrFail(Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex));
   const addressIndexesMap = _generateAddressIndexesMap(addresses, addressesIndex);
   const usedAddresses = await checkAddressesInUse(addresses);
   const highestIndex = usedAddresses.reduce((currentHighestIndex, address) => {

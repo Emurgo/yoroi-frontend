@@ -102,7 +102,7 @@ export function getWalletSeed() {
   return getFromStorage(WALLET_SEED_KEY);
 }
 
-export const isValidMnemonic = (phrase: string, numberOfWords: number = 12) =>
+export const isValidMnemonic = (phrase: string, numberOfWords: ?number) =>
   isValidAdaMnemonic(phrase, numberOfWords);
 
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>

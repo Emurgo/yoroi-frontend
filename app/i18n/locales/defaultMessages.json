@@ -72,73 +72,17 @@
         }
       },
       {
-        "defaultMessage": "!!!It's not allowed to send money to the same address you are sending from. Make sure you have enough addresses with money in this account or send to a different address.",
-        "description": "\"It's not allowed to send money to the same address you are sending from.\" error message.",
+        "defaultMessage": "!!!Error while updating ada wallet.",
+        "description": "\"Error while updating ada wallet.\" error message",
         "end": {
           "column": 3,
           "line": 34
         },
         "file": "app/api/ada/errors.js",
-        "id": "api.errors.NotAllowedToSendMoneyToSameAddressError",
-        "start": {
-          "column": 43,
-          "line": 30
-        }
-      },
-      {
-        "defaultMessage": "!!!It is not allowed to send money to Ada redemption address.",
-        "description": "\"It is not allowed to send money to Ada redemption address.\" error message.",
-        "end": {
-          "column": 3,
-          "line": 39
-        },
-        "file": "app/api/ada/errors.js",
-        "id": "api.errors.NotAllowedToSendMoneyToRedeemAddressError",
-        "start": {
-          "column": 45,
-          "line": 35
-        }
-      },
-      {
-        "defaultMessage": "!!!All your funds are already at the address you are trying send money to.",
-        "description": "\"All your funds are already at the address you are trying send money to.\" error message.",
-        "end": {
-          "column": 3,
-          "line": 44
-        },
-        "file": "app/api/ada/errors.js",
-        "id": "api.errors.AllFundsAlreadyAtReceiverAddressError",
-        "start": {
-          "column": 41,
-          "line": 40
-        }
-      },
-      {
-        "defaultMessage": "!!!Not enough Ada for fees. Try sending a smaller amount.",
-        "description": "\"Not enough Ada for fees. Try sending a smaller amount.\" error message",
-        "end": {
-          "column": 3,
-          "line": 49
-        },
-        "file": "app/api/ada/errors.js",
-        "id": "api.errors.NotEnoughFundsForTransactionFeesError",
-        "start": {
-          "column": 41,
-          "line": 45
-        }
-      },
-      {
-        "defaultMessage": "!!!Error while updating ada wallet.",
-        "description": "\"Error while updating ada wallet.\" error message",
-        "end": {
-          "column": 3,
-          "line": 54
-        },
-        "file": "app/api/ada/errors.js",
         "id": "api.errors.updateAdaWalletError",
         "start": {
           "column": 24,
-          "line": 50
+          "line": 30
         }
       },
       {
@@ -146,13 +90,13 @@
         "description": "\"Error while getting Balance.\" error message",
         "end": {
           "column": 3,
-          "line": 59
+          "line": 39
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.getBalanceError",
         "start": {
           "column": 19,
-          "line": 55
+          "line": 35
         }
       },
       {
@@ -160,13 +104,13 @@
         "description": "\"Error while updating ada transactions history.\" error message",
         "end": {
           "column": 3,
-          "line": 64
+          "line": 44
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.updateAdaTxsHistoryError",
         "start": {
           "column": 28,
-          "line": 60
+          "line": 40
         }
       },
       {
@@ -174,13 +118,13 @@
         "description": "\"Error while creating transaction.\" error message",
         "end": {
           "column": 3,
-          "line": 69
+          "line": 49
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.transactionError",
         "start": {
           "column": 20,
-          "line": 65
+          "line": 45
         }
       },
       {
@@ -188,13 +132,13 @@
         "description": "\"Error while updating pending transactions.\" error message",
         "end": {
           "column": 3,
-          "line": 74
+          "line": 54
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.pendingTransactionError",
         "start": {
           "column": 27,
-          "line": 70
+          "line": 50
         }
       },
       {
@@ -202,13 +146,13 @@
         "description": "\"Error while getting addresses with funds.\" error message",
         "end": {
           "column": 3,
-          "line": 79
+          "line": 59
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.getAddressesWithFundsError",
         "start": {
           "column": 30,
-          "line": 75
+          "line": 55
         }
       },
       {
@@ -216,13 +160,13 @@
         "description": "\"Error while generating transfer transacion.\" error message",
         "end": {
           "column": 3,
-          "line": 84
+          "line": 64
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.generateTransferTxError",
         "start": {
           "column": 27,
-          "line": 80
+          "line": 60
         }
       },
       {
@@ -230,13 +174,13 @@
         "description": "\"Error received from server while sending tx.\" error message",
         "end": {
           "column": 3,
-          "line": 89
+          "line": 69
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.sendTransactionApiError",
         "start": {
           "column": 27,
-          "line": 85
+          "line": 65
         }
       }
     ],
