@@ -22,7 +22,6 @@ declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
 
 // TODO: Refactor service call in order to re-use common parameters
-// TODO: Map errors in a more specific way
 
 export const getUTXOsForAddresses = (addresses: Array<string>) =>
   axios(`${backendUrl}/api/txs/utxoForAddresses`,
