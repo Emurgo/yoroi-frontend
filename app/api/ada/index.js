@@ -661,7 +661,7 @@ const _createTransactionFromServerData = action(
       type: data.ctIsOutgoing
         ? transactionTypes.EXPEND
         : transactionTypes.INCOME,
-      amount: new BigNumber(data.ctIsOutgoing ? -1 * coins : coins).dividedBy(
+      amount: (data.ctIsOutgoing ? coins.negated() : coins).dividedBy(
         LOVELACES_PER_ADA
       ),
       date: new Date(ctmDate),
