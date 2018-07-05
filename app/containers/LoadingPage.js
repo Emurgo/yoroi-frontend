@@ -9,10 +9,10 @@ import cardanoLogo from '../assets/images/cardano-logo.inline.svg';
 import type { InjectedProps } from '../types/injectedPropsType';
 
 export const messages = defineMessages({
-  loadingLibraries: {
-    id: 'loading.screen.loadingLibraries',
-    defaultMessage: '!!!Loading libraries',
-    description: 'Message "Loading libraries" on the loading screen.'
+  loading: {
+    id: 'loading.screen.loading',
+    defaultMessage: '!!!loading components',
+    description: 'Message "loading components" on the loading screen.'
   },
 });
 
@@ -34,7 +34,8 @@ export default class LoadingPage extends Component<InjectedProps> {
           hasLoadedCurrentLocale={hasLoadedCurrentLocale}
           hasLoadedCurrentTheme={hasLoadedCurrentTheme}
           isLoadingDataForNextScreen={loading.isLoading}
-          loadingDataForNextScreenMessage={messages.loadingLibraries}
+          loadingDataForNextScreenMessage={messages.loading}
+          error={loading.error}
         />
       </CenteredLayout>
     );

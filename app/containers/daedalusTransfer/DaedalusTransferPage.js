@@ -4,7 +4,6 @@ import { observer, inject } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import validWords from 'bip39/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import MainLayout from '../MainLayout';
 import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import DaedalusTransferForm from '../../components/daedalusTransfer/DaedalusTransferForm';
 import DaedalusTransferWaitingPage from '../../components/daedalusTransfer/DaedalusTransferWaitingPage';
@@ -15,6 +14,7 @@ import environment from '../../environment';
 import resolver from '../../utils/imports';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
+const MainLayout = resolver('containers/MainLayout');
 
 const messages = defineMessages({
   title: {
@@ -56,7 +56,13 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const topBar = (<TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />);
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
-    if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;
+    if (!wallets.active) {
+      return (
+        <MainLayout topbar={topBar}>
+          <LoadingSpinner />
+        </MainLayout>
+      );
+    }
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (

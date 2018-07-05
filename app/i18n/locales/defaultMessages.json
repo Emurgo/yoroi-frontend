@@ -2532,16 +2532,16 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Loading libraries",
-        "description": "Message \"Loading libraries\" on the loading screen.",
+        "defaultMessage": "!!!loading components",
+        "description": "Message \"loading components\" on the loading screen.",
         "end": {
           "column": 3,
           "line": 16
         },
         "file": "app/containers/LoadingPage.js",
-        "id": "loading.screen.loadingLibraries",
+        "id": "loading.screen.loading",
         "start": {
-          "column": 20,
+          "column": 11,
           "line": 12
         }
       }
@@ -2604,6 +2604,25 @@
       }
     ],
     "path": "app/containers/settings/Settings.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Add Wallet",
+        "description": "Add Wallet Title.",
+        "end": {
+          "column": 3,
+          "line": 26
+        },
+        "file": "app/containers/wallet/WalletAddPage.js",
+        "id": "wallet.add.page.title",
+        "start": {
+          "column": 9,
+          "line": 22
+        }
+      }
+    ],
+    "path": "app/containers/wallet/WalletAddPage.json"
   },
   {
     "descriptors": [

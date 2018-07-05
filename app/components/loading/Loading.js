@@ -2,15 +2,14 @@
 import React, { Component } from 'react';
 import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
-// import daedalusLogo from '../../assets/images/daedalus-logo-loading-grey.inline.svg';
+import icarusLogo from '../../assets/images/icarus-logo-loading.inline.svg';
 import styles from './Loading.scss';
 import type { ReactIntlMessage } from '../../types/i18nTypes';
 import environment from '../../environment';
-
-const messages = defineMessages({});
+import LocalizableError from '../../i18n/LocalizableError';
 
 type State = {};
 
@@ -21,6 +20,7 @@ type Props = {
   loadingDataForNextScreenMessage: ReactIntlMessage,
   hasLoadedCurrentLocale: boolean,
   hasLoadedCurrentTheme: boolean,
+  error: ?LocalizableError
 };
 
 @observer
@@ -39,6 +39,7 @@ export default class Loading extends Component<Props, State> {
       loadingDataForNextScreenMessage,
       hasLoadedCurrentLocale,
       hasLoadedCurrentTheme,
+      error
     } = this.props;
 
     const componentStyles = classNames([
@@ -47,9 +48,9 @@ export default class Loading extends Component<Props, State> {
       null,
       null,
     ]);
-    /* const daedalusLogoStyles = classNames([
-      styles.daedalusLogo
-    ]);*/
+    const icarusLogoStyles = classNames([
+      styles.icarusLogo
+    ]);
     const currencyLogoStyles = classNames([
       styles[`${environment.API}-logo`],
     ]);
@@ -57,7 +58,7 @@ export default class Loading extends Component<Props, State> {
       styles[`${environment.API}-apiLogo`],
     ]);
 
-    // const daedalusLoadingLogo = daedalusLogo;
+    const icarusLoadingLogo = icarusLogo;
     const currencyLoadingLogo = currencyIcon;
     const apiLoadingLogo = apiIcon;
 
@@ -65,7 +66,7 @@ export default class Loading extends Component<Props, State> {
       <div className={componentStyles}>
         <div className={styles.logos}>
           <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} />
-          {/* <SvgInline svg={daedalusLoadingLogo} className={daedalusLogoStyles} />*/}
+          <SvgInline svg={icarusLoadingLogo} className={icarusLogoStyles} />
           <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} />
         </div>
         {hasLoadedCurrentLocale && (
@@ -76,6 +77,13 @@ export default class Loading extends Component<Props, State> {
                   {intl.formatMessage(loadingDataForNextScreenMessage)}
                 </h1>
                 <LoadingSpinner />
+              </div>
+            )}
+            {error && (
+              <div className={styles.loading}>
+                <h1 className={styles.error}>
+                  {intl.formatMessage(error)}
+                </h1>
               </div>
             )}
           </div>

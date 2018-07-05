@@ -1,4 +1,5 @@
 @import "../../themes/mixins/animations";
+@import '../../themes/mixins/error-message';
 
 .component {
   height: 100%;
@@ -15,7 +16,7 @@
 }
 
 .loading {	
-  bottom: 60px;	
+  bottom: 10%;	
   position: absolute;	
   text-align: center;	
   width: 100%;	
@@ -47,7 +48,7 @@ $adaLogoWidth: 43px;
   margin-top: 7px; // aligning the icon visually in the middle
 }
 
-.daedalusLogo {
+.icarusLogo {
   & > svg {
     display: block;
     width: 173px;
@@ -60,6 +61,15 @@ $adaLogoWidth: 43px;
   font-size: 16px;
 }
 
-.component, .headline, .logo {
+.component, .headline, .logo, .error {
   -webkit-backface-visibility: hidden;
+}
+
+.error {
+  @include error-message;
+  font-family: var(--font-light);
+  font-size: 16px;
+  line-height: 22px;
+  word-break: break-word;
+  text-align: center;
 }

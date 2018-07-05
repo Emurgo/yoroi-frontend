@@ -5,7 +5,10 @@ import { loadLovefieldDB } from '../api/ada/lib/lovefieldDatabase';
 import Store from './lib/Store';
 import environment from '../environment';
 import { ROUTES } from '../routes-config';
-import LocalizableError from '../i18n/LocalizableError';
+import LocalizableError, {
+  localizedError
+} from '../i18n/LocalizableError';
+
 
 export default class LoadingStore extends Store {
 
@@ -26,7 +29,7 @@ export default class LoadingStore extends Store {
     .catch((error) => {
       console.error('LoadingStore::setup Unable to load libraries', error);
       runInAction(() => {
-        this.error = new UnableToLoadError();
+        this.error = localizedError(new UnableToLoadError());
         this._loading = false;
       });
     });
@@ -61,7 +64,7 @@ export default class LoadingStore extends Store {
 export class UnableToLoadError extends LocalizableError {
   constructor() {
     super({
-      id: 'asyncLibraries.error.unableToLoad',
+      id: 'app.errors.unableToLoad',
       defaultMessage: '!!!Unable to load',
       description: '"Unable to load" error message'
     });

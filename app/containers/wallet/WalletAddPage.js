@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
+import { intlShape, defineMessages } from 'react-intl';
 import WalletAdd from '../../components/wallet/WalletAdd';
 import WalletAddDialog from '../../components/wallet/WalletAddDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
@@ -9,18 +10,30 @@ import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 import WalletRestoreDialogContainer from '../wallet/dialogs/WalletRestoreDialogContainer';
 import WalletCreateDialogContainer from '../wallet/dialogs/WalletCreateDialogContainer';
 import WalletBackupDialogContainer from '../wallet/dialogs/WalletBackupDialogContainer';
+import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
 import type { InjectedProps } from '../../types/injectedPropsType';
 
 type Props = InjectedProps;
-const Layout = resolver('containers/MainLayout');
+const MainLayout = resolver('containers/MainLayout');
 
+const messages = defineMessages({
+  title: {
+    id: 'wallet.add.page.title',
+    defaultMessage: '!!!Add Wallet',
+    description: 'Add Wallet Title.'
+  },
+});
 
 @inject('actions', 'stores') @observer
 export default class WalletAddPage extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null };
+
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
 
   onClose = () => {
     if (this.props.stores[environment.API].wallets.hasAnyWallets) {
@@ -33,6 +46,7 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
+    const topBar = (<TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />);
     const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
@@ -56,7 +70,11 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     }
-    return <Layout>{content}</Layout>;
+    return (
+      <MainLayout topbar={topBar}>
+        {content}
+      </MainLayout>
+    );
   }
 
   _getWalletsStore() {
