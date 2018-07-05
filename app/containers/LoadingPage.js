@@ -21,7 +21,7 @@ export default class LoadingPage extends Component<InjectedProps> {
 
   render() {
     const { stores } = this.props;
-    const { libs } = stores;
+    const { loading } = stores;
     const { hasLoadedCurrentLocale, hasLoadedCurrentTheme } = {
       hasLoadedCurrentLocale: true,
       hasLoadedCurrentTheme: true,
@@ -33,7 +33,7 @@ export default class LoadingPage extends Component<InjectedProps> {
           apiIcon={cardanoLogo}
           hasLoadedCurrentLocale={hasLoadedCurrentLocale}
           hasLoadedCurrentTheme={hasLoadedCurrentTheme}
-          isLoadingDataForNextScreen={libs.loading}
+          isLoadingDataForNextScreen={loading.isLoading}
           loadingDataForNextScreenMessage={messages.loadingLibraries}
         />
       </CenteredLayout>

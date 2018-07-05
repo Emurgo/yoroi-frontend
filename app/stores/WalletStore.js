@@ -37,7 +37,7 @@ export default class WalletsStore extends Store {
 
   setup() {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
-    this._pollRefresh(); // I added this but it wasn't originally in Daedalus
+
     this.registerReactions([
       this._updateActiveWalletOnRouteChanges,
       this._showAddWalletPageWhenNoWallets,
@@ -123,7 +123,6 @@ export default class WalletsStore extends Store {
   }
 
   @computed get hasAnyWallets(): boolean {
-    debugger
     if (this.walletsRequest.result == null) return false;
     return this.walletsRequest.wasExecuted && this.walletsRequest.result.length > 0;
   }
@@ -223,13 +222,13 @@ export default class WalletsStore extends Store {
     }
   };
 
+  // This logic is really obscure, please be careful!
   _updateActiveWalletOnRouteChanges = () => {
     const currentRoute = this.stores.app.currentRoute;
     const hasAnyWalletLoaded = this.hasAnyLoaded;
-    const isWalletAddPage = matchRoute(ROUTES.WALLETS.ADD, currentRoute);
     runInAction('WalletsStore::_updateActiveWalletOnRouteChanges', () => {
       // There are not wallets loaded (yet) -> unset active and return
-      if (isWalletAddPage || !hasAnyWalletLoaded) {
+      if (!hasAnyWalletLoaded) {
         return this._unsetActiveWallet();
       }
       const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
