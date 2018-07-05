@@ -17,7 +17,7 @@ import {
 } from './lib/cardanoCrypto/cryptoWallet';
 import { toAdaWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
-  getAdaAddressesMap,
+  getAdaAddressesList,
   newAdaAddress
 } from './adaAddress';
 import { newCryptoAccount } from './adaAccount';
@@ -57,7 +57,7 @@ export async function newAdaWallet({
 export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   const persistentWallet = getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
-  const persistentAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
+  const persistentAddresses: AdaAddresses = await getAdaAddressesList();
   const addresses: Array<string> = persistentAddresses.map(addr => addr.cadId);
   // Update wallet balance
   try {

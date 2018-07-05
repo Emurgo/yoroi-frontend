@@ -7,8 +7,7 @@ import {
   stringifyData
 } from '../../utils/logging';
 import {
-  unixTimestampToDate,
-  mapToList
+  unixTimestampToDate
 } from './lib/utils';
 import Wallet from '../../domain/Wallet';
 import WalletTransaction, {
@@ -26,8 +25,8 @@ import { getSingleCryptoAccount } from './adaAccount';
 import {
   isValidAdaAddress,
   newAdaAddress,
-  getAdaAddressesMap,
-  filterAdaAddressesByType
+  getAdaAddressesList,
+  getAdaAddressesByType
 } from './adaAddress';
 import {
   restoreAdaWallet
@@ -139,16 +138,12 @@ export default class AdaApi {
     }
   }
 
-  // FIXME: Now is no longer async
   async getAddresses(
     request: GetAddressesRequest
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
     try {
-      const adaAddresses: AdaAddresses = filterAdaAddressesByType(
-        mapToList(getAdaAddressesMap()),
-        'External'
-      );
+      const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
       Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
       return new Promise(resolve =>
@@ -272,13 +267,12 @@ export default class AdaApi {
     }
   }
 
-  // FIXME: This in no longer async
   async createAddress(): Promise<CreateAddressResponse> {
     Logger.debug('AdaApi::createAddress called');
     try {
       const cryptoAccount = getSingleCryptoAccount();
-      const addresses: AdaAddresses = mapToList(getAdaAddressesMap());
-      const newAddress: AdaAddress = newAdaAddress(cryptoAccount, addresses, 'External');
+      const addresses: AdaAddresses = await getAdaAddressesList();
+      const newAddress: AdaAddress = await newAdaAddress(cryptoAccount, addresses, 'External');
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {

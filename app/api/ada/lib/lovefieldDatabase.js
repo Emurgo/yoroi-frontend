@@ -1,84 +1,124 @@
 import lf from 'lovefield';
 import BigNumber from 'bignumber.js';
 
-const txsTableName = 'Txs';
-const txsTableFields = {
-  CT_AMOUNT: 'ctAmount',
-  CT_BLOCK_NUMBER: 'ctBlockNumber',
-  CT_ID: 'ctId',
-  CT_INPUTS: 'ctInputs',
-  CT_IS_OUTGOING: 'ctIsOutgoing',
-  CT_META: 'ctMeta',
-  CTM_DATE: 'ctmDate',
-  CT_OUTPUTS: 'ctOutputs',
-  CT_CONDITION: 'ctCondition'
-};
-const orders = {
-  ASC: lf.Order.ASC,
-  DESC: lf.Order.DESC
+const addressesTableSchema = {
+  name: 'Addresses',
+  properties: {
+    id: 'id',
+    type: 'type',
+    value: 'value'
+  }
 };
 
-const LovefieldDB = {
-  db: null,
-  txsTableName,
-  txsTableFields,
-  orders
+const txsTableSchema = {
+  name: 'Txs',
+  properties: {
+    CT_AMOUNT: 'ctAmount',
+    CT_BLOCK_NUMBER: 'ctBlockNumber',
+    CT_ID: 'ctId',
+    CT_INPUTS: 'ctInputs',
+    CT_IS_OUTGOING: 'ctIsOutgoing',
+    CT_META: 'ctMeta',
+    CTM_DATE: 'ctmDate',
+    CT_OUTPUTS: 'ctOutputs',
+    CT_CONDITION: 'ctCondition'
+  }
 };
 
-export default LovefieldDB;
+let db;
 
 // Ensure we are only creating a single instance of the lovefield database
 /* TODO: Create only one column of type Object to save the whole Tx. Only
   ctId and ctmDate should be in separate columns */
-export const loadLovefieldDB = async() => {
-  if (LovefieldDB.db) {
-    return Promise.resolve(LovefieldDB.db);
-  }
+export const loadLovefieldDB = () => {
+  if (db) return Promise.resolve(db);
+
   const schemaBuilder = lf.schema.create('icarus-schema', 1);
-  schemaBuilder.createTable(LovefieldDB.txsTableName)
-    .addColumn(txsTableFields.CT_AMOUNT, lf.Type.OBJECT)
-    .addColumn(txsTableFields.CT_BLOCK_NUMBER, lf.Type.STRING)
-    .addColumn(txsTableFields.CT_ID, lf.Type.STRING)
-    .addColumn(txsTableFields.CT_INPUTS, lf.Type.OBJECT)
-    .addColumn(txsTableFields.CT_IS_OUTGOING, lf.Type.BOOLEAN)
-    .addColumn(txsTableFields.CT_META, lf.Type.OBJECT)
-    .addColumn(txsTableFields.CTM_DATE, lf.Type.DATE_TIME)
-    .addColumn(txsTableFields.CT_OUTPUTS, lf.Type.OBJECT)
-    .addColumn(txsTableFields.CT_CONDITION, lf.Type.STRING)
-    .addPrimaryKey([txsTableFields.CT_ID])
-    .addIndex('idxCtmDate', [txsTableFields.CTM_DATE], false, LovefieldDB.orders.DESC);
-  return await schemaBuilder.connect().then(db => {
-    LovefieldDB.db = db;
+
+  schemaBuilder.createTable(txsTableSchema.name)
+    .addColumn(txsTableSchema.properties.CT_AMOUNT, lf.Type.OBJECT)
+    .addColumn(txsTableSchema.properties.CT_BLOCK_NUMBER, lf.Type.STRING)
+    .addColumn(txsTableSchema.properties.CT_ID, lf.Type.STRING)
+    .addColumn(txsTableSchema.properties.CT_INPUTS, lf.Type.OBJECT)
+    .addColumn(txsTableSchema.properties.CT_IS_OUTGOING, lf.Type.BOOLEAN)
+    .addColumn(txsTableSchema.properties.CT_META, lf.Type.OBJECT)
+    .addColumn(txsTableSchema.properties.CTM_DATE, lf.Type.DATE_TIME)
+    .addColumn(txsTableSchema.properties.CT_OUTPUTS, lf.Type.OBJECT)
+    .addColumn(txsTableSchema.properties.CT_CONDITION, lf.Type.STRING)
+    .addPrimaryKey([txsTableSchema.properties.CT_ID])
+    .addIndex('idxCtmDate', [txsTableSchema.properties.CTM_DATE], false, lf.Order.DESC);
+
+  schemaBuilder.createTable(addressesTableSchema.name)
+    .addColumn(addressesTableSchema.properties.id, lf.Type.STRING)
+    .addColumn(addressesTableSchema.properties.type, lf.Type.STRING)
+    .addColumn(addressesTableSchema.properties.value, lf.Type.OBJECT)
+    .addPrimaryKey([addressesTableSchema.properties.id]);
+
+  return schemaBuilder.connect().then(newDb => {
+    db = newDb;
     return db;
   });
 };
 
-export const insertOrReplaceToTxsTable = function (rows) {
-  return LovefieldDB.db.insertOrReplace()
-  .into(_getTxsTable())
-  .values(rows)
-  .exec()
-  .catch(err => err);
+export const deleteAddress = (address) => {
+  const table = _getAddressesTable();
+  db.delete()
+    .from(table)
+    .where(table[addressesTableSchema.properties.id].eq(address))
+    .exec();
 };
+
+export const getAddresses = () => db.select().from(_getAddressesTable()).exec();
+
+export const getAddressesList = () => {
+  const addressesTable = _getAddressesTable();
+  return db.select()
+    .from(addressesTable)
+    .exec()
+    .then(rows => rows.map(row => row[addressesTableSchema.properties.value]));
+};
+
+export const getAddressesListByType = addressType => {
+  const addressesTable = _getAddressesTable();
+  return db.select()
+    .from(addressesTable)
+    .where(addressesTable[addressesTableSchema.properties.type].eq(addressType))
+    .exec()
+    .then(rows => rows.map(row => row[addressesTableSchema.properties.value]));
+};
+
+export const saveAddresses = (addresses, type) => {
+  const rows = addresses.map(address => _addressToRow(address, type));
+  _insertOrReplace(rows, _getAddressesTable());
+};
+
+const _addressToRow = (address, type) =>
+  _getAddressesTable().createRow({
+    id: address.cadId,
+    type,
+    value: address
+  });
+
+export const insertOrReplaceToTxsTable = (rows) => _insertOrReplace(rows, _getTxsTable());
 
 export const getTxWithDBSchema = function (amount, tx, inputs, isOutgoing, outputs, time) {
   const isPending = !tx.block_num;
   return {
-    [LovefieldDB.txsTableFields.CT_AMOUNT]: {
+    [txsTableSchema.properties.CT_AMOUNT]: {
       getCCoin: amount.toString()
     },
-    [LovefieldDB.txsTableFields.CT_BLOCK_NUMBER]: tx.block_num || '',
-    [LovefieldDB.txsTableFields.CT_ID]: tx.hash,
-    [LovefieldDB.txsTableFields.CT_INPUTS]: { newInputs: inputs },
-    [LovefieldDB.txsTableFields.CT_IS_OUTGOING]: isOutgoing,
-    [LovefieldDB.txsTableFields.CT_META]: {
+    [txsTableSchema.properties.CT_BLOCK_NUMBER]: tx.block_num || '',
+    [txsTableSchema.properties.CT_ID]: tx.hash,
+    [txsTableSchema.properties.CT_INPUTS]: { newInputs: inputs },
+    [txsTableSchema.properties.CT_IS_OUTGOING]: isOutgoing,
+    [txsTableSchema.properties.CT_META]: {
       ctmDate: time,
       ctmDescription: undefined,
       ctmTitle: undefined
     },
-    [LovefieldDB.txsTableFields.CTM_DATE]: new Date(time),
-    [LovefieldDB.txsTableFields.CT_OUTPUTS]: { newOutputs: outputs },
-    [LovefieldDB.txsTableFields.CT_CONDITION]: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
+    [txsTableSchema.properties.CTM_DATE]: new Date(time),
+    [txsTableSchema.properties.CT_OUTPUTS]: { newOutputs: outputs },
+    [txsTableSchema.properties.CT_CONDITION]: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
   };
 };
 
@@ -95,19 +135,19 @@ export const getMostRecentTxFromRows = function (previousTxsRows) {
 
 export const getConfirmedTxsFromDB = async function () {
   const txsTable = _getTxsTable();
-  const rows = await LovefieldDB.db.select()
+  const rows = await db.select()
     .from(txsTable)
-    .where(txsTable[LovefieldDB.txsTableFields.CT_CONDITION].eq('CPtxInBlocks'))
-    .orderBy(txsTable[LovefieldDB.txsTableFields.CTM_DATE], LovefieldDB.orders.DESC)
+    .where(txsTable[txsTableSchema.properties.CT_CONDITION].eq('CPtxInBlocks'))
+    .orderBy(txsTable[txsTableSchema.properties.CTM_DATE], lf.Order.DESC)
     .exec();
   return _mapRowsToTxs(rows);
 };
 
 export const getAllTxsFromTxsTable = async function () {
   const txsTable = _getTxsTable();
-  const rows = await LovefieldDB.db.select()
+  const rows = await db.select()
     .from(txsTable)
-    .orderBy(txsTable[LovefieldDB.txsTableFields.CTM_DATE], LovefieldDB.orders.DESC)
+    .orderBy(txsTable[txsTableSchema.properties.CTM_DATE], lf.Order.DESC)
     .exec();
   return _mapRowsToTxs(rows);
 };
@@ -130,12 +170,17 @@ const _mapRowsToTxs = function (rows) {
 
 const _deletePendingTxs = async function () {
   const txsTable = _getTxsTable();
-  return LovefieldDB.db.delete()
+  return db.delete()
     .from(txsTable)
-    .where(txsTable[LovefieldDB.txsTableFields.CT_CONDITION].eq('CPtxApplying'))
+    .where(txsTable[txsTableSchema.properties.CT_CONDITION].eq('CPtxApplying'))
     .exec();
 };
 
-const _getTxsTable = function () {
-  return LovefieldDB.db.getSchema().table(LovefieldDB.txsTableName);
-};
+const _insertOrReplace = (rows, table) =>
+  db.insertOrReplace().into(table).values(rows).exec();
+
+const _getTable = (name) => db.getSchema().table(name);
+
+const _getTxsTable = () => _getTable(txsTableSchema.name);
+
+const _getAddressesTable = () => _getTable(addressesTableSchema.name);

@@ -21,7 +21,8 @@ import {
   saveAdaAddress,
   removeAdaAddress,
   createAdaAddress,
-  getAdaAddressesMap
+  getAdaAddressesMap,
+  getAdaAddressesList
 } from '../adaAddress';
 import { getCryptoWalletFromSeed } from '../lib/cardanoCrypto/cryptoWallet';
 import { getOrFail } from '../lib/cardanoCrypto/cryptoUtils';
@@ -90,7 +91,7 @@ export async function getAllUTXOsForAddresses(
   }
 }
 
-export function getAdaTransactionFromSenders(
+export async function getAdaTransactionFromSenders(
   senders: AdaAddresses,
   receiver: string,
   amount: string,
@@ -99,25 +100,23 @@ export function getAdaTransactionFromSenders(
   const seed = getWalletSeed();
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   const cryptoAccount = getSingleCryptoAccount();
-  const addressesMap = getAdaAddressesMap();
+  const addressesMap = await getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
-  const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
+  const changeAdaAddr = await createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: amount }];
-  return getAllUTXOsForAddresses(_getAddresses(senders))
-    .then((senderUtxos) => {
-      const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-      const result = getOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
-      return [result, changeAdaAddr];
-    });
+  const senderUtxos = await getAllUTXOsForAddresses(_getAddresses(senders));
+  const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
+  const result = getOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
+  return [result, changeAdaAddr];
 }
 
-function _getAdaTransaction(
+async function _getAdaTransaction(
   receiver: string,
   amount: string,
   password: string,
 ) {
-  const senders = mapToList(getAdaAddressesMap());
+  const senders = await getAdaAddressesList();
   return getAdaTransactionFromSenders(senders, receiver, amount, password);
 }
 
