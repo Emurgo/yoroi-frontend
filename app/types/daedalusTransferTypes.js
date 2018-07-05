@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 
 export type TransferStatus =
     'uninitialized'
+  | 'gettingMnemonics'
   | 'restoringAddresses'
   | 'checkingAddresses'
   | 'generatingTx'

@@ -9,22 +9,22 @@ import styles from './DaedalusTransferWaitingPage.scss';
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.waiting.title.label',
-    defaultMessage: 'Daedalus wallet is being restored...',
+    defaultMessage: '!!!Daedalus wallet is being restored...',
     description: 'Label "Daedalus wallet is being restored..." on the Daedalus transfer waiting page.'
   },
   restoringAddresses: {
     id: 'daedalusTransfer.waiting.progressInfo.restoringAddresses',
-    defaultMessage: 'Fetching addresses',
+    defaultMessage: '!!!Fetching addresses',
     description: 'Progress info "Fetching addresses" on the Daedalus transfer waiting page.'
   },
   checkingAddresses: {
     id: 'daedalusTransfer.waiting.progressInfo.checkingAddresses',
-    defaultMessage: 'Checking addresses funds',
+    defaultMessage: '!!!Checking addresses funds',
     description: 'Progress info "Checking addresses funds" on the Daedalus transfer waiting page.'
   },
   generatingTx: {
     id: 'daedalusTransfer.waiting.checkingAddresses.generatingTx',
-    defaultMessage: 'Generating transfer transaction',
+    defaultMessage: '!!!Generating transfer transaction',
     description: 'Progress info "Generating transfer transaction" on the Daedalus transfer waiting page.'
   }
 });

@@ -21,6 +21,7 @@ import {
   getAddressesWithFunds,
   generateTransferTx
 } from '../../api/ada/daedalusTransfer';
+import environment from '../../environment';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -29,14 +30,20 @@ const MSG_TYPE_RESTORE = 'RESTORE';
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatus = 'uninitialized';
+  @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable transferFundsRequest: Request<any> = new Request(this._transferFundsRequest);
   @observable ws: any = null;
 
   setup(): void {
+    this.registerReactions([
+      this._enableDisableTransferFunds
+    ]);
     const actions = this.actions.ada.daedalusTransfer;
+    actions.startTransferFunds.listen(this._startTransferFunds);
     actions.setupTransferFunds.listen(this._setupTransferFunds);
+    actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._transferFunds);
     actions.cancelTransferFunds.listen(this._reset);
   }
@@ -44,6 +51,23 @@ export default class DaedalusTransferStore extends Store {
   teardown(): void {
     super.teardown();
     this._reset();
+  }
+
+  _startTransferFunds = (): void => {
+    this._updateStatus('gettingMnemonics');
+  }
+
+  _enableDisableTransferFunds = (): void => {
+    const { wallets } = this.stores && this.stores[environment.API];
+    if (wallets && wallets.hasActiveWallet) {
+      runInAction(() => {
+        this.disableTransferFunds = false;
+      });
+    } else {
+      runInAction(() => {
+        this.disableTransferFunds = true;
+      });
+    }
   }
 
   /* TODO: Handle WS connection errors */
@@ -88,6 +112,10 @@ export default class DaedalusTransferStore extends Store {
         });
       }
     });
+  }
+
+  _backToUninitialized = (): void => {
+    this._updateStatus('uninitialized');
   }
 
   @action.bound
