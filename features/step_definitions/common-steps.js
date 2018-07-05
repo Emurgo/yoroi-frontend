@@ -38,7 +38,7 @@ Given(/^I have opened the chrome extension$/, async function () {
 });
 
 Given(/^There is no wallet stored$/, async function () {
-  await this.waitForElement('.WalletAddDialog');
+  await this.waitForElement('.WalletAdd');
 });
 
 Given(/^There is a default wallet stored$/, async function () {

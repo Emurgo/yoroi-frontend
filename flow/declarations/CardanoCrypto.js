@@ -1,5 +1,6 @@
 declare module 'rust-cardano-crypto' {
   declare module.exports: {
+    loadRustModule(): Promise<void>,
     Blake2b: {
       blake2b_256(entropy: string): Uint8Array;
     },
