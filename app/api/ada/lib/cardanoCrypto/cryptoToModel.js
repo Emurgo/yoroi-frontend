@@ -1,9 +1,12 @@
 // @flow
+import moment from 'moment';
+
 import type {
   AdaWallet,
   AdaAddress,
   AdaWalletInitData
 } from '../../adaTypes';
+
 
 /* @note: Ada wallet is the abstraction for Daedalus */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
@@ -19,7 +22,7 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
       cwName,
       cwUnit
     },
-    cwPassphraseLU: new Date()
+    cwPassphraseLU: moment().format()
   };
 }
 

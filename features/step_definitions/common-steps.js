@@ -63,8 +63,7 @@ async function storeWallet(client, walletName, addressAmount, addressPrefix) {
     wallet.cwMeta.cwName = walletName;
   }
 
-  await client.saveToLocalStorage('SEED', seed);
-  await client.saveToLocalStorage('WALLET', wallet);
+  await client.saveToLocalStorage('WALLET', { adaWallet: wallet, seed });
   await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
 
   /* Obs: If "with $number addresses" is include in the sentence,

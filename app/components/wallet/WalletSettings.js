@@ -78,7 +78,6 @@ export default class WalletSettings extends Component<Props> {
       isSubmitting, isInvalid,
       lastUpdatedField,
     } = this.props;
-
     const passwordMessage = (
       intl.formatMessage(messages.passwordLastUpdated, {
         lastUpdated: moment(walletPasswordUpdateDate).fromNow(),

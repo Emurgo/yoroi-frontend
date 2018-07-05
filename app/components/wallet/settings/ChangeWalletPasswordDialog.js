@@ -51,20 +51,15 @@ const messages = defineMessages({
     defaultMessage: '!!!Type new password',
     description: 'Placeholder for the "New password" inputs in the change wallet password dialog.',
   },
+  newPasswordLabel: {
+    id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
+    defaultMessage: '!!!New password',
+    description: 'Label for the "New password" input in the change wallet password dialog.',
+  },
   repeatPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
     defaultMessage: '!!!Repeat new password',
     description: 'Placeholder for the "Repeat password" inputs in the change wallet password dialog.',
-  },
-  passwordSwitchLabel: {
-    id: 'wallet.settings.changePassword.dialog.passwordSwitchLabel',
-    defaultMessage: '!!!Remove password',
-    description: 'Label for the "Check to deactivate password" switch in the change wallet password dialog.',
-  },
-  passwordSwitchPlaceholder: {
-    id: 'wallet.settings.changePassword.dialog.passwordSwitchPlaceholder',
-    defaultMessage: '!!!Check to deactivate password',
-    description: 'Text for the "Check to deactivate password" switch in the change wallet password dialog.',
   },
 });
 
@@ -168,11 +163,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
     });
   };
 
-  handlePasswordSwitchToggle = (value: boolean) => {
-    this.setState({ removePassword: value });
-    this.props.onPasswordSwitchToggle();
-  };
-
   handleDataChange = (key: string, value: string) => {
     this.props.onDataChange({ [key]: value });
   };
@@ -232,18 +222,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
       >
 
         <div className={styles.walletPassword}>
-          <div className={styles.walletPasswordSwitch}>
-            <div className={styles.passwordLabel}>
-              {intl.formatMessage(messages.passwordSwitchLabel)}
-            </div>
-            <Checkbox
-              onChange={this.handlePasswordSwitchToggle}
-              label={intl.formatMessage(messages.passwordSwitchPlaceholder)}
-              checked={removePassword}
-              skin={<SimpleSwitchSkin />}
-            />
-          </div>
-
           <Input
             type="password"
             className="currentPassword"

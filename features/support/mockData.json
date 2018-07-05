@@ -13,9 +13,12 @@
       }
     },
     "seed": {
-      "encryptedSeed": "db05c50d0dbd3ed0de72879fa701211a597781faa593a2927fcdd3a7edb92ab2"
+      "encryptedSeed":
+        "66fff3af361a93a35149924a072e4c13bac6b6ee3d1118cef11ea494ad25987a",
+      "hmac":
+        "46b6a115c42cb611d7572dbb06e8023341784c649ec7b72fe816f1deb3408aeda9a62bedb51f7a98d0247f5114acb3935e9c5cf6f1e2bdf98d9f18bc0c019c78"
     },
-    "password": "Secret123",
+    "password": "TheBestWallet2018",
     "wallet": {
       "cwAccountsNumber": 1,
       "cwAmount": {
@@ -31,7 +34,7 @@
     },
     "cryptoAccount": {
       "account": 0,
-      "cached_account_key":"e0c9ce9d55b551ff11cab36fec1bbece53a836b6716a446d9d8619f5944c79215302a384b661114963e88678f663fe6be0af5ae27ce6c6e12f0ebcd3e8128b6a",
+      "cached_account_key": "aa3f222043b56d4bd7616abe44687db98a3b4ca6efc5bb2c806ca3b593d0e4c4218fe0d2481703ed883d19d62540fad4cfc32f0a763102bcfa2d69029d2d3545",
       "derivation_scheme": "V2"
     }
   },

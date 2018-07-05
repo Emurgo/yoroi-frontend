@@ -25,12 +25,11 @@ function CustomWorld() {
 
   // FIXME: We should move this to driver object, not `this`
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (locator, method = By.css) => {
-    try {
-      await this.getElementBy(locator, method);
+    const elements = await this.getElementsBy(locator, method);
+    if (elements.length > 0) { 
       throw Error('Element shouldn\'t be present');
-    } catch (err) {
-      return Promise.resolve(true);
-    }
+    } 
+    return true;
   };
 
   this.waitForContent = (locator) => this.waitForElement(locator, By.xpath);
@@ -90,6 +89,12 @@ function CustomWorld() {
   };
 
   this.saveToLocalStorage = (key, value) => this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
+
+  this.intl = (key, lang = 'en-US') => {
+    return this.driver.executeScript((k, l) => {
+      return window.icarus.translations[l][k];
+    }, key, lang);
+  };
 
 }
 

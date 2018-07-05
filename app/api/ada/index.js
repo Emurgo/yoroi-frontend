@@ -45,6 +45,7 @@ import {
 import { getLastBlockNumber } from './getAdaLastBlockNumber';
 import {
   GenericApiError,
+  IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
   UpdateWalletResponse
 } from '../common';
@@ -131,8 +132,8 @@ export type ExportWalletToFileRequest = {
 export type ExportWalletToFileResponse = [];
 
 export type UpdateWalletPasswordRequest = {
-  oldPassword: ?string,
-  newPassword: ?string,
+  oldPassword: string,
+  newPassword: string,
 };
 
 export type AdaWalletParams = {
@@ -141,8 +142,8 @@ export type AdaWalletParams = {
 };
 
 export type ChangeAdaWalletPassphraseParams = {
-  oldPassword: ?string,
-  newPassword: ?string,
+  oldPassword: string,
+  newPassword: string,
 };
 
 export type UpdateWalletPasswordResponse = boolean;
@@ -259,22 +260,6 @@ export default class AdaApi {
       throw new GenericApiError();
     }
   }
-
-  // FIXME: Use when we will re-add the settings page
-  /* async deleteWallet(
-    request: DeleteWalletRequest
-  ): Promise<DeleteWalletResponse> {
-    Logger.debug('AdaApi::deleteWallet called: ' + stringifyData(request));
-    try {
-      const { walletId } = request;
-      await deleteAdaWallet({ ca, walletId });
-      Logger.debug('AdaApi::deleteWallet success: ' + stringifyData(request));
-      return true;
-    } catch (error) {
-      Logger.error('AdaApi::deleteWallet error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }*/
 
   async createTransaction(
     request: CreateTransactionRequest
@@ -398,158 +383,6 @@ export default class AdaApi {
     }
   }
 
-  // FIXME: Use when we will re-add import wallet functionality
-  /* async importWalletFromKey(
-    request: ImportWalletFromKeyRequest
-  ): Promise<ImportWalletFromKeyResponse> {
-    Logger.debug('AdaApi::importWalletFromKey called');
-    const { filePath, walletPassword } = request;
-    try {
-      const importedWallet: AdaWallet = await importAdaWallet({
-        ca,
-        walletPassword,
-        filePath
-      });
-      Logger.debug('AdaApi::importWalletFromKey success');
-      return _createWalletFromServerData(importedWallet);
-    } catch (error) {
-      Logger.error(
-        'AdaApi::importWalletFromKey error: ' + stringifyError(error)
-      );
-      if (error.message.includes('already exists')) {
-        throw new WalletAlreadyImportedError();
-      }
-      throw new WalletFileImportError();
-    }
-  }*/
-
-  // FIXME: Use when we will re-add import wallet functionality
-  /* async importWalletFromFile(
-    request: ImportWalletFromFileRequest
-  ): Promise<ImportWalletFromFileResponse> {
-    Logger.debug('AdaApi::importWalletFromFile called');
-    const { filePath, walletPassword } = request;
-    const isKeyFile =
-      filePath
-        .split('.')
-        .pop()
-        .toLowerCase() === 'key';
-    try {
-      const importedWallet: AdaWallet = isKeyFile
-        ? await importAdaWallet({ ca, walletPassword, filePath })
-        : await importAdaBackupJSON({ ca, filePath });
-      Logger.debug('AdaApi::importWalletFromFile success');
-      return _createWalletFromServerData(importedWallet);
-    } catch (error) {
-      Logger.error(
-        'AdaApi::importWalletFromFile error: ' + stringifyError(error)
-      );
-      if (error.message.includes('already exists')) {
-        throw new WalletAlreadyImportedError();
-      }
-      throw new WalletFileImportError();
-    }
-  }*/
-
-  // FIXME: Figure out if we should use this in some place
-  /* async sendBugReport(
-    request: SendBugReportRequest
-  ): Promise<SendBugReportResponse> {
-    Logger.debug('AdaApi::sendBugReport called: ' + stringifyData(request));
-    try {
-      await sendAdaBugReport({
-        requestFormData: request,
-        application: 'cardano-node'
-      });
-      Logger.debug('AdaApi::sendBugReport success');
-      return true;
-    } catch (error) {
-      Logger.error('AdaApi::sendBugReport error: ' + stringifyError(error));
-      throw new ReportRequestError();
-    }
-  }*/
-
-  // FIXME: Figure out if we should use this in some place
-  /* async (): Promise<NextUpdateResponse> {
-    Logger.debug('AdaApi::nextUpdate called');
-    let nextUpdate = null;
-    try {
-      // TODO: add flow type definitions for nextUpdate response
-      const response: Promise<any> = await nextAdaUpdate({ ca });
-      Logger.debug('AdaApi::nextUpdate success: ' + stringifyData(response));
-      if (response && response.cuiSoftwareVersion) {
-        nextUpdate = {
-          version: get(response, ['cuiSoftwareVersion', 'svNumber'], null)
-        };
-      }
-    } catch (error) {
-      if (error.message.includes('No updates available')) {
-        Logger.debug('AdaApi::nextUpdate success: No updates available');
-      } else {
-        Logger.error('AdaApi::nextUpdate error: ' + stringifyError(error));
-      }
-      // throw new GenericApiError();
-    }
-    return nextUpdate;
-    // TODO: remove hardcoded response after node update is tested
-    // nextUpdate = {
-    //   cuiSoftwareVersion: {
-    //     svAppName: {
-    //       getApplicationName: 'cardano'
-    //     },
-    //     svNumber: 1
-    //   },
-    //   cuiBlockVesion: {
-    //     bvMajor: 0,
-    //     bvMinor: 1,
-    //     bvAlt: 0
-    //   },
-    //   cuiScriptVersion: 1,
-    //   cuiImplicit: false,
-    //   cuiVotesFor: 2,
-    //   cuiVotesAgainst: 0,
-    //   cuiPositiveStake: {
-    //     getCoin: 66666
-    //   },
-    //   cuiNegativeStake: {
-    //     getCoin: 0
-    //   }
-    // };
-    // if (nextUpdate && nextUpdate.cuiSoftwareVersion && nextUpdate.cuiSoftwareVersion.svNumber) {
-    //   return { version: nextUpdate.cuiSoftwareVersion.svNumber };
-    // } else if (nextUpdate) {
-    //   return { version: null };
-    // }
-    // return null;
-  }*/
-
-  // FIXME: Figure out if we should use this in some place
-  /* async postponeUpdate(): PostponeUpdateResponse {
-    Logger.debug('AdaApi::postponeUpdate called');
-    try {
-      const response: Promise<any> = await postponeAdaUpdate({ ca });
-      Logger.debug(
-        'AdaApi::postponeUpdate success: ' + stringifyData(response)
-      );
-    } catch (error) {
-      Logger.error('AdaApi::postponeUpdate error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }*/
-
-  // FIXME: Figure out if we should use this in some place
-  /* async applyUpdate(): ApplyUpdateResponse {
-    Logger.debug('AdaApi::applyUpdate called');
-    try {
-      const response: Promise<any> = await applyAdaUpdate({ ca });
-      Logger.debug('AdaApi::applyUpdate success: ' + stringifyData(response));
-      ipcRenderer.send('kill-process');
-    } catch (error) {
-      Logger.error('AdaApi::applyUpdate error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }*/
-
   async updateWallet(
     request: UpdateWalletRequest
   ): Promise<UpdateWalletResponse> {
@@ -596,61 +429,6 @@ export default class AdaApi {
     }
   }
 
-  // FIXME: Use when we will re-add the settings page
-  /* async exportWalletToFile(
-    request: ExportWalletToFileRequest
-  ): Promise<ExportWalletToFileResponse> {
-    const { walletId, filePath } = request;
-    Logger.debug('AdaApi::exportWalletToFile called');
-    try {
-      const response: Promise<[]> = await exportAdaBackupJSON({
-        ca,
-        walletId,
-        filePath
-      });
-      Logger.debug(
-        'AdaApi::exportWalletToFile success: ' + stringifyData(response)
-      );
-      return response;
-    } catch (error) {
-      Logger.error(
-        'AdaApi::exportWalletToFile error: ' + stringifyError(error)
-      );
-      throw new GenericApiError();
-    }
-  }*/
-
-  // FIXME: Figure out if we should use this in some place
-  /* async testReset(): Promise<void> {
-    Logger.debug('AdaApi::testReset called');
-    try {
-      const response: Promise<void> = await adaTestReset({ ca });
-      Logger.debug('AdaApi::testReset success: ' + stringifyData(response));
-      return response;
-    } catch (error) {
-      Logger.error('AdaApi::testReset error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }*/
-
-  // FIXME: Figure out if we should use this in some place
-  /* async getLocalTimeDifference(): Promise<GetLocalTimeDifferenceResponse> {
-    Logger.debug('AdaApi::getLocalTimeDifference called');
-    try {
-      const response: AdaLocalTimeDifference = await getAdaLocalTimeDifference({
-        ca
-      });
-      Logger.debug(
-        'AdaApi::getLocalTimeDifference success: ' + stringifyData(response)
-      );
-      return response;
-    } catch (error) {
-      Logger.error(
-        'AdaApi::getLocalTimeDifference error: ' + stringifyError(error)
-      );
-      throw new GenericApiError();
-    }
-  }*/
 }
 
 // ========== TRANSFORM SERVER DATA INTO FRONTEND MODELS =========
@@ -665,7 +443,7 @@ const _createWalletFromServerData = action(
       ),
       name: data.cwMeta.cwName,
       assurance: data.cwMeta.cwAssurance,
-      passwordUpdateDate: unixTimestampToDate(data.cwPassphraseLU)
+      passwordUpdateDate: data.cwPassphraseLU
     })
 );
 

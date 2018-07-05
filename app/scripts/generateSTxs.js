@@ -55,7 +55,7 @@ export async function generateSTxs(password: string,
 
   log('[generateSTxs] Starting generating stxs');
   const newAddress = _generateNewAddress(cryptoAccount).cadId;
-  for (let i = 0; i < numberOfTxs; i++) {
+  /*for (let i = 0; i < numberOfTxs; i++) {
     const sender = adaAddresses[i];
     const createSTxResult = await getAdaTransactionFromSenders(
       [sender],
@@ -70,7 +70,7 @@ export async function generateSTxs(password: string,
       console.log(`${bs64STx}`);
     }
     log(`[generateSTxs] Generated stx ${bs64STx} from ${sender.cadId} to ${newAddress}`);
-  }
+  }*/
 
   log(`[generateSTxs] Generated ${numberOfTxs} stxs`);
 }

@@ -19,8 +19,8 @@ Feature: Generate Addresses
     And I click on the Generate new address button
     Then I should see my latest address at the top
     | latestAddress                                               |
-    | Ae2tdPwUPEZ3vu63a1tJVMghcbu5CWSrybC2pzwzh6dvPx7uxngY36LQnVk |        
+    | Ae2tdPwUPEYyi3jN1dAR6CXbKY335oh8XxD6eLxqqaHMX8decXzuWDP91VX |        
     And I should see the addresses list them
     | address                                                     | index |
-    | Ae2tdPwUPEZ3vu63a1tJVMghcbu5CWSrybC2pzwzh6dvPx7uxngY36LQnVk | 1     |
+    | Ae2tdPwUPEYyi3jN1dAR6CXbKY335oh8XxD6eLxqqaHMX8decXzuWDP91VX | 1     |
     | Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod | 2     |
