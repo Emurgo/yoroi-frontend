@@ -6,7 +6,6 @@ import styles from './BigButtonForDialogs.scss';
 type Props = {
   label: string,
   description: string,
-  icon: string,
   onClick: Function,
   isDisabled: boolean,
   className: string,
@@ -27,7 +26,6 @@ export default class BigButtonForDialogs extends Component<Props> {
         onClick={onClick}
         disabled={isDisabled}
       >
-        <SvgInline svg={icon} className={styles.icon} />
         <div className={styles.label}>{label}</div>
         <div className={styles.description}>{description}</div>
       </button>

@@ -48,7 +48,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
 
     return (
       <SidebarLayout
-        sidebar={sidebarComponent}
+        /* sidebar={sidebarComponent} */
         topbar={topbarComponent}
         notification={<div />}
         contentDialogs={[<WalletAddPage key="WalletAddPage" />]}

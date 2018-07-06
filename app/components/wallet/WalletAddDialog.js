@@ -4,9 +4,10 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './WalletAddDialog.scss';
+import Button from 'react-polymorph/lib/components/Button';
+import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import BigButtonForDialogs from '../widgets/BigButtonForDialogs';
 import createIcon from '../../assets/images/create-ic.inline.svg';
 import importIcon from '../../assets/images/import-ic.inline.svg';
 import joinSharedIcon from '../../assets/images/join-shared-ic.inline.svg';
@@ -93,36 +94,17 @@ export default class WalletAddDialog extends Component<Props> {
       >
         <div className={styles.buttonsContainer}>
           <div className={styles.firstRow}>
-            <BigButtonForDialogs
-              className="createWalletButton"
-              onClick={onCreate}
-              icon={createIcon}
-              label={intl.formatMessage(messages.createLabel)}
-              description={intl.formatMessage(messages.createDescription)}
+            <Button
+              className="primary createWalletButton"
+              label={intl.formatMessage(messages.createDescription)}
+              onMouseUp={onCreate}
+              skin={<SimpleButtonSkin />}
             />
-            <BigButtonForDialogs
-              className="joinWalletButton"
-              icon={joinSharedIcon}
-              label={intl.formatMessage(messages.joinLabel)}
-              description={intl.formatMessage(messages.joinDescription)}
-              isDisabled
-            />
-          </div>
-          <div className={styles.secondRow}>
-            <BigButtonForDialogs
-              className="restoreWalletButton"
-              onClick={onRestore}
-              icon={restoreIcon}
-              label={intl.formatMessage(messages.restoreLabel)}
-              description={intl.formatMessage(messages.restoreDescription)}
-            />
-            <BigButtonForDialogs
-              className="importWalletButton"
-              onClick={onImportFile}
-              icon={importIcon}
-              label={intl.formatMessage(messages.importLabel)}
-              description={intl.formatMessage(messages.importDescription)}
-              isDisabled
+            <Button
+              className="primary restoreWalletButton"
+              label={intl.formatMessage(messages.restoreDescription)}
+              onMouseUp={onRestore}
+              skin={<SimpleButtonSkin />}
             />
           </div>
         </div>

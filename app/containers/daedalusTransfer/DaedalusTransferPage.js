@@ -53,7 +53,18 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   }
 
   render() {
-    const topBar = (<TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />);
+    const { stores, actions } = this.props;
+    const { sidebar } = stores;
+    const topBar = (
+      <TextOnlyTopBar
+        title={this.context.intl.formatMessage(messages.title)}
+        onCategoryClicked={category => {
+          actions.sidebar.activateSidebarCategory.trigger({ category });
+        }}
+        categories={sidebar.CATEGORIES}
+        activeSidebarCategory={sidebar.activeSidebarCategory}
+      />
+    );
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
     if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;

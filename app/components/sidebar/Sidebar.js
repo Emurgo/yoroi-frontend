@@ -53,13 +53,6 @@ export default class Sidebar extends Component<Props> {
               />
             );
           })}
-
-          <SidebarCategory
-            className="supportRequest"
-            icon={supportIcon}
-            active={false/* FIXME: isDialogOpen(BugReportDialog)*/}
-            onClick={this.handleSupportRequestClick}
-          />
         </div>
       </div>
     );

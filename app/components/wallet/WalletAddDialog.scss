@@ -1,11 +1,11 @@
 .buttonsContainer {
   display: flex;
   flex-direction: column;
-  width: 580px;
 }
 
 .firstRow {
   display: flex;
+  flex-direction: column;
 }
 
 .secondRow {
@@ -13,11 +13,20 @@
 }
 
 .component {
-  margin: 0 -20px -10px;
+  margin: 0;
+  width: 400px;
+
+  button {
+    width: 100%;
+
+    & + button {
+      margin-top: 20px;
+    }
+  }
 
   :global {
     .Dialog_title {
-      margin-bottom: 10px !important;
+      margin-bottom: 20px !important;
     }
 
     .DialogCloseButton_component {

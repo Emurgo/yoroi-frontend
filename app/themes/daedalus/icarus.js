@@ -113,10 +113,10 @@ export default {
   '--theme-modal-background-color': '#fafbfc',
 
   '--theme-nav-item-background-color': '#f3f3f5',
-  '--theme-nav-item-background-color-hover': 'rgba(218, 164, 154, 0.3)',
-  '--theme-nav-item-background-color-active': '#daa49a',
+  '--theme-nav-item-background-color-hover': '#f9f9fa',
+  '--theme-nav-item-background-color-active': '#fff',
   '--theme-nav-item-text-color': 'rgba(18, 19, 39, 0.6)',
-  '--theme-nav-item-text-color-active': '#ffffff',
+  '--theme-nav-item-text-color-active': '#121327',
 
   '--theme-node-update-background-color': '#ffffff',
   '--theme-node-update-title-color': '#121327',
@@ -135,7 +135,7 @@ export default {
   '--theme-notification-message-text-color': '#fafbfc',
 
   '--theme-receive-qr-code-background-color': 'transparent',
-  '--theme-receive-qr-code-foreground-color': '#000',
+  '--theme-receive-qr-code-foreground-color': '#121327',
 
   '--theme-send-confirmation-dialog-send-values-color': '#ea4c5b',
 
