@@ -107,6 +107,7 @@
     "mobx-react-form": "1.32.2",
     "mobx-react-router": "3.1.2",
     "moment": "2.21.0",
+    "pbkdf2": "3.0.16",
     "prop-types": "15.6.1",
     "qrcode.react": "0.8.0",
     "react": "15.4.2",

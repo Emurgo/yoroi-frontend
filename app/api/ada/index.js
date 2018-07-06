@@ -6,10 +6,7 @@ import {
   stringifyError,
   stringifyData
 } from '../../utils/logging';
-import {
-  unixTimestampToDate,
-  mapToList
-} from './lib/utils';
+import { mapToList } from './lib/utils';
 import Wallet from '../../domain/Wallet';
 import WalletTransaction, {
   transactionTypes
@@ -208,7 +205,7 @@ export default class AdaApi {
       Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));
       throw new GenericApiError();
     }
-  } 
+  }
 
   async getTransactions(): Promise<GetTransactionsResponse> {
     // FIXME: Sync with TransactionStore skip and limit indexes

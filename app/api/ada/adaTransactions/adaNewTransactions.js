@@ -23,10 +23,10 @@ import {
   createAdaAddress,
   getAdaAddressesMap
 } from '../adaAddress';
-import { 
+import {
   getCryptoWalletFromSeed,
   generateWalletSeed,
-  generateAdaMnemonic, 
+  generateAdaMnemonic,
 } from '../lib/cardanoCrypto/cryptoWallet';
 import { getOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {

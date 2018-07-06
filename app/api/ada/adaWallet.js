@@ -165,7 +165,7 @@ export const changeAdaWalletPassphrase = (
   } catch (err) {
     if (err.message.includes('Passphrase doesn\'t match')) {
       throw new Error('Invalid old passphrase given');
-    } 
+    }
     throw err;
   }
 };

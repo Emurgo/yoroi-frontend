@@ -4,8 +4,6 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
-import Checkbox from 'react-polymorph/lib/components/Checkbox';
-import SimpleSwitchSkin from 'react-polymorph/lib/skins/simple/raw/SwitchSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -103,12 +101,10 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
         label: this.context.intl.formatMessage(messages.currentPasswordLabel),
         placeholder: this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder),
         value: '',
-        validators: [({ field }) => {
-          return [
-            isValidWalletPassword(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidWalletPassword)
-          ];
-        }],
+        validators: [({ field }) => [
+          isValidWalletPassword(field.value),
+          this.context.intl.formatMessage(globalMessages.invalidWalletPassword)
+        ]],
       },
       walletPassword: {
         type: 'password',
@@ -232,7 +228,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
             skin={<SimpleInputSkin />}
           />
         </div>
-        
 
         <div className={walletPasswordFieldsClasses}>
           <Input

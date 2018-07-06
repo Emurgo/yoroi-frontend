@@ -14,9 +14,9 @@
     },
     "seed": {
       "encryptedSeed":
-        "66fff3af361a93a35149924a072e4c13bac6b6ee3d1118cef11ea494ad25987a",
-      "hmac":
-        "46b6a115c42cb611d7572dbb06e8023341784c649ec7b72fe816f1deb3408aeda9a62bedb51f7a98d0247f5114acb3935e9c5cf6f1e2bdf98d9f18bc0c019c78"
+        "f39f867c83c29c4a7098e939533d9ea46ef25fb143f2becaba7d246c77bead48",
+      "seedVerifier":
+        "917e14447ee3b1aa38aba9e23347e8d980383a693ecab6a33ffec32b91269f1d"
     },
     "password": "TheBestWallet2018",
     "wallet": {
