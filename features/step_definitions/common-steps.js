@@ -47,8 +47,8 @@ Given(/^There is a default wallet stored$/, async function () {
   await storeWallet(this);
 });
 
-Given(/^There is a wallet stored( named ([^"]*))?( with ([^"]*) addresses)?( starting with ([^"]*))?$/, async function (walletName, addressAmount, addressPrefix) {
-  await storeWallet(this, walletName, addressAmount, addressPrefix);
+Given(/^There is a wallet stored( named ([^"]*))?$/, async function (walletName) {
+  await storeWallet(this, walletName);
 });
 
 function refreshWallet(client) {
@@ -57,7 +57,7 @@ function refreshWallet(client) {
   });
 }
 
-async function storeWallet(client, walletName, addressAmount, addressPrefix) {
+async function storeWallet(client, walletName) {
   const { seed, wallet, cryptoAccount, addresses, walletInitialData } = getMockData();
   if (walletName) {
     wallet.cwMeta.cwName = walletName;
@@ -68,7 +68,7 @@ async function storeWallet(client, walletName, addressAmount, addressPrefix) {
 
   /* Obs: If "with $number addresses" is include in the sentence,
      we override the wallet with fake addresses" */
-  if (walletName && walletInitialData[walletName] && walletInitialData[walletName].totalAddresses) {
+  if (walletName && walletInitialData && walletInitialData[walletName] && walletInitialData[walletName].totalAddresses) {
     client.saveToLocalStorage('ADDRESSES', getFakeAddresses(
       walletInitialData[walletName].totalAddresses,
       walletInitialData[walletName].addressesStartingWith

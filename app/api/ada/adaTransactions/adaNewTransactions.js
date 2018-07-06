@@ -68,7 +68,7 @@ export async function newAdaTransaction(
 ): Promise<any> {
   const seed = getWalletSeed();
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
-  const [{ result: { cbor_encoded_tx } }, changeAdaAddr] =
+  const [{ cbor_encoded_tx }, changeAdaAddr] =
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
   saveAdaAddress(changeAdaAddr);

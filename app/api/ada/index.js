@@ -193,14 +193,13 @@ export default class AdaApi {
     try {
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
       Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
-      return new Promise(resolve =>
-        resolve({
-          transactions: history[0].map(data =>
-            _createTransactionFromServerData(data)
-          ),
-          total: history[1]
-        })
+      const transactions = history[0].map(data =>
+        _createTransactionFromServerData(data)
       );
+      return Promise.resolve({
+        transactions,
+        total: history[1]
+      });
     } catch (error) {
       Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -214,14 +213,13 @@ export default class AdaApi {
     try {
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
       Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
-      return new Promise(resolve =>
-        resolve({
-          transactions: history[0].map(data =>
-            _createTransactionFromServerData(data)
-          ),
-          total: history[1]
-        })
+      const transactions = history[0].map(data =>
+        _createTransactionFromServerData(data)
       );
+      return Promise.resolve({
+        transactions,
+        total: history[1],
+      });
     } catch (error) {
       Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));
       throw new GenericApiError();
