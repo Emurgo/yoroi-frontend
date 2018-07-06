@@ -46,6 +46,17 @@ function CustomWorld() {
 
   this.getText = (locator) => this.getElementBy(locator).getText();
 
+  this.waitUntilText = async (locator, text, timeout = 60000) => {
+    await this.driver.wait(async () => {
+      try {
+        const value = await this.getText(locator);
+        return value === text;
+      } catch (err) {
+        return false;
+      }
+    }, timeout);
+  };
+
   this.getValue = this.driver.getValue = async (locator) => this.getElementBy(locator).getAttribute('value');
 
   const clickElement = async (locator, method) => {
