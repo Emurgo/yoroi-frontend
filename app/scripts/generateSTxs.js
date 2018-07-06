@@ -1,6 +1,8 @@
 // @flow
 
 import { mapToList, saveInStorage } from '../api/ada/lib/utils';
+import { getWalletSeed } from '../api/ada/adaWallet';
+import { getCryptoWalletFromSeed } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, ADDRESSES_KEY } from '../api/ada/adaAddress';
 import { getSingleCryptoAccount } from '../api/ada/adaAccount';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
@@ -55,13 +57,15 @@ export async function generateSTxs(password: string,
 
   log('[generateSTxs] Starting generating stxs');
   const newAddress = _generateNewAddress(cryptoAccount).cadId;
-  /*for (let i = 0; i < numberOfTxs; i++) {
+  const seed = getWalletSeed();
+  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  for (let i = 0; i < numberOfTxs; i++) {
     const sender = adaAddresses[i];
     const createSTxResult = await getAdaTransactionFromSenders(
       [sender],
       newAddress,
       AMOUNT_TO_BE_SENT,
-      password
+      cryptoWallet
     );
     const cborEncodedStx = createSTxResult[0].result.cbor_encoded_tx;
     const bs64STx = Buffer.from(cborEncodedStx).toString('base64');
@@ -70,7 +74,7 @@ export async function generateSTxs(password: string,
       console.log(`${bs64STx}`);
     }
     log(`[generateSTxs] Generated stx ${bs64STx} from ${sender.cadId} to ${newAddress}`);
-  }*/
+  }
 
   log(`[generateSTxs] Generated ${numberOfTxs} stxs`);
 }
