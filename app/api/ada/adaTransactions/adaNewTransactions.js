@@ -63,7 +63,7 @@ export async function newAdaTransaction(
 ): Promise<any> {
   const [{ cbor_encoded_tx }, changeAdaAddr] = await _getAdaTransaction(receiver, amount, password);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-  saveAdaAddress(changeAdaAddr);
+  await saveAdaAddress(changeAdaAddr, 'Internal');
   try {
     const backendResponse = await sendTx(signedTx);
     return backendResponse;

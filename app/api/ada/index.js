@@ -647,7 +647,7 @@ const _conditionToTxState = (condition: string) => {
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
   (data: AdaTransaction) => {
-    const coins = data.ctAmount.getCCoin;
+    const coins = new BigNumber(data.ctAmount.getCCoin);
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,
@@ -662,8 +662,8 @@ const _createTransactionFromServerData = action(
       description: ctmDescription || '',
       numberOfConfirmations: getLastBlockNumber() - data.ctBlockNumber,
       addresses: {
-        from: data.ctInputs.map(address => address[0]),
-        to: data.ctOutputs.map(address => address[0])
+        from: data.ctInputs.newInputs.map(address => address[0]),
+        to: data.ctOutputs.newOutputs.map(address => address[0])
       },
       state: _conditionToTxState(data.ctCondition)
     });

@@ -7,8 +7,7 @@ import {
 } from '../../utils/logging';
 import {
   saveInStorage,
-  getFromStorage,
-  mapToList
+  getFromStorage
 } from './lib/utils';
 import {
   generateWalletSeed,
@@ -57,10 +56,10 @@ export async function newAdaWallet({
 export const updateAdaWallet = async (): Promise<?AdaWallet> => {
   const persistentWallet = getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
-  const persistentAddresses: AdaAddresses = await getAdaAddressesList();
-  const addresses: Array<string> = persistentAddresses.map(addr => addr.cadId);
-  // Update wallet balance
   try {
+    const persistentAddresses: AdaAddresses = await getAdaAddressesList();
+    const addresses: Array<string> = persistentAddresses.map(addr => addr.cadId);
+    // Update wallet balance
     const updatedWallet = Object.assign({}, persistentWallet, {
       cwAmount: {
         getCCoin: await getBalance(addresses)
@@ -68,7 +67,8 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
     });
     saveInStorage(WALLET_KEY, updatedWallet);
     await updateAdaPendingTxs(addresses);
-    await updateAdaTxsHistory(await getAdaConfirmedTxs(), addresses);
+    const confirmedTxs = await getAdaConfirmedTxs();
+    await updateAdaTxsHistory(confirmedTxs, addresses);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));

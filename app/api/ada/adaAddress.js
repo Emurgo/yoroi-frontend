@@ -37,7 +37,7 @@ export function getAdaAddressesMap() {
   return getAddresses().then(addresses => {
     const addressesMap = {};
     addresses.forEach(address => {
-      addressesMap[address.address] = address.value;
+      addressesMap[address.id] = address.value;
     });
     return addressesMap;
   });
@@ -58,7 +58,7 @@ export async function newAdaAddress(
   addressType: AddressType
 ): Promise<AdaAddress> {
   const address: AdaAddress = await createAdaAddress(cryptoAccount, addresses, addressType);
-  saveAdaAddress(address, addressType);
+  await saveAdaAddress(address, addressType);
   return address;
 }
 
@@ -73,8 +73,8 @@ export async function createAdaAddress(
   return toAdaAddress(cryptoAccount.account, addressType, addressIndex, address);
 }
 
-export function saveAdaAddress(address: AdaAddress, addressType: AddressType): void {
-  saveAddresses([address], addressType);
+export function saveAdaAddress(address: AdaAddress, addressType: AddressType): Promise<void> {
+  return saveAddresses([address], addressType);
 }
 
 export function removeAdaAddress(address: AdaAddress): void {

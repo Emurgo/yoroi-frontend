@@ -13,40 +13,28 @@ const addressesTableSchema = {
 const txsTableSchema = {
   name: 'Txs',
   properties: {
-    CT_AMOUNT: 'ctAmount',
-    CT_BLOCK_NUMBER: 'ctBlockNumber',
-    CT_ID: 'ctId',
-    CT_INPUTS: 'ctInputs',
-    CT_IS_OUTGOING: 'ctIsOutgoing',
-    CT_META: 'ctMeta',
-    CTM_DATE: 'ctmDate',
-    CT_OUTPUTS: 'ctOutputs',
-    CT_CONDITION: 'ctCondition'
+    id: 'id',
+    date: 'date',
+    value: 'value',
+    isPending: 'isPending'
   }
 };
 
 let db;
 
 // Ensure we are only creating a single instance of the lovefield database
-/* TODO: Create only one column of type Object to save the whole Tx. Only
-  ctId and ctmDate should be in separate columns */
 export const loadLovefieldDB = () => {
   if (db) return Promise.resolve(db);
 
   const schemaBuilder = lf.schema.create('icarus-schema', 1);
 
   schemaBuilder.createTable(txsTableSchema.name)
-    .addColumn(txsTableSchema.properties.CT_AMOUNT, lf.Type.OBJECT)
-    .addColumn(txsTableSchema.properties.CT_BLOCK_NUMBER, lf.Type.STRING)
-    .addColumn(txsTableSchema.properties.CT_ID, lf.Type.STRING)
-    .addColumn(txsTableSchema.properties.CT_INPUTS, lf.Type.OBJECT)
-    .addColumn(txsTableSchema.properties.CT_IS_OUTGOING, lf.Type.BOOLEAN)
-    .addColumn(txsTableSchema.properties.CT_META, lf.Type.OBJECT)
-    .addColumn(txsTableSchema.properties.CTM_DATE, lf.Type.DATE_TIME)
-    .addColumn(txsTableSchema.properties.CT_OUTPUTS, lf.Type.OBJECT)
-    .addColumn(txsTableSchema.properties.CT_CONDITION, lf.Type.STRING)
-    .addPrimaryKey([txsTableSchema.properties.CT_ID])
-    .addIndex('idxCtmDate', [txsTableSchema.properties.CTM_DATE], false, lf.Order.DESC);
+    .addColumn(txsTableSchema.properties.id, lf.Type.STRING)
+    .addColumn(txsTableSchema.properties.date, lf.Type.STRING)
+    .addColumn(txsTableSchema.properties.value, lf.Type.OBJECT)
+    .addColumn(txsTableSchema.properties.isPending, lf.Type.BOOLEAN)
+    .addPrimaryKey([txsTableSchema.properties.id])
+    .addIndex('idxDate', [txsTableSchema.properties.date], false, lf.Order.DESC);
 
   schemaBuilder.createTable(addressesTableSchema.name)
     .addColumn(addressesTableSchema.properties.id, lf.Type.STRING)
@@ -89,8 +77,52 @@ export const getAddressesListByType = addressType => {
 
 export const saveAddresses = (addresses, type) => {
   const rows = addresses.map(address => _addressToRow(address, type));
-  _insertOrReplace(rows, _getAddressesTable());
+  return _insertOrReplace(rows, _getAddressesTable());
 };
+
+export const saveTxs = (txs) => {
+  const rows = txs.map(tx => _txToRow(tx));
+  _insertOrReplace(rows, _getTxsTable());
+};
+
+export const getMostRecentTx = function (txs) {
+  return txs[txs.length - 1];
+};
+
+export const getConfirmedTxs = function () {
+  const txsTable = _getTxsTable();
+  return db.select()
+    .from(txsTable)
+    .where(txsTable[txsTableSchema.properties.isPending].eq(false))
+    .orderBy(txsTable[txsTableSchema.properties.date], lf.Order.DESC)
+    .exec()
+    .then(rows => rows.map(row => row[txsTableSchema.properties.value]));
+};
+
+export const getTxs = async function () {
+  const txsTable = _getTxsTable();
+  return db.select()
+    .from(txsTable)
+    .orderBy(txsTable[txsTableSchema.properties.date], lf.Order.DESC)
+    .exec()
+    .then(rows => rows.map(row => row[txsTableSchema.properties.value]));
+};
+
+export const deletePendingTxs = async function () {
+  const txsTable = _getTxsTable();
+  return db.delete()
+    .from(txsTable)
+    .where(txsTable[txsTableSchema.properties.isPending].eq(true))
+    .exec();
+};
+
+const _txToRow = (tx) =>
+  _getTxsTable().createRow({
+    id: tx.ctId,
+    date: tx.ctmDate,
+    value: tx,
+    isPending: !tx.ctBlockNumber
+  });
 
 const _addressToRow = (address, type) =>
   _getAddressesTable().createRow({
@@ -98,83 +130,6 @@ const _addressToRow = (address, type) =>
     type,
     value: address
   });
-
-export const insertOrReplaceToTxsTable = (rows) => _insertOrReplace(rows, _getTxsTable());
-
-export const getTxWithDBSchema = function (amount, tx, inputs, isOutgoing, outputs, time) {
-  const isPending = !tx.block_num;
-  return {
-    [txsTableSchema.properties.CT_AMOUNT]: {
-      getCCoin: amount.toString()
-    },
-    [txsTableSchema.properties.CT_BLOCK_NUMBER]: tx.block_num || '',
-    [txsTableSchema.properties.CT_ID]: tx.hash,
-    [txsTableSchema.properties.CT_INPUTS]: { newInputs: inputs },
-    [txsTableSchema.properties.CT_IS_OUTGOING]: isOutgoing,
-    [txsTableSchema.properties.CT_META]: {
-      ctmDate: time,
-      ctmDescription: undefined,
-      ctmTitle: undefined
-    },
-    [txsTableSchema.properties.CTM_DATE]: new Date(time),
-    [txsTableSchema.properties.CT_OUTPUTS]: { newOutputs: outputs },
-    [txsTableSchema.properties.CT_CONDITION]: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
-  };
-};
-
-export const getDBRow = function (newtx) {
-  return _getTxsTable().createRow(newtx);
-};
-
-export const getMostRecentTxFromRows = function (previousTxsRows) {
-  const previousTxsRowsLth = previousTxsRows.length;
-  return previousTxsRows[previousTxsRowsLth - 1] ?
-    previousTxsRows[previousTxsRowsLth - 1].m :
-    previousTxsRows[previousTxsRowsLth - 1];
-};
-
-export const getConfirmedTxsFromDB = async function () {
-  const txsTable = _getTxsTable();
-  const rows = await db.select()
-    .from(txsTable)
-    .where(txsTable[txsTableSchema.properties.CT_CONDITION].eq('CPtxInBlocks'))
-    .orderBy(txsTable[txsTableSchema.properties.CTM_DATE], lf.Order.DESC)
-    .exec();
-  return _mapRowsToTxs(rows);
-};
-
-export const getAllTxsFromTxsTable = async function () {
-  const txsTable = _getTxsTable();
-  const rows = await db.select()
-    .from(txsTable)
-    .orderBy(txsTable[txsTableSchema.properties.CTM_DATE], lf.Order.DESC)
-    .exec();
-  return _mapRowsToTxs(rows);
-};
-
-export const updatePendingTxs = async function (pendingTxs) {
-  await _deletePendingTxs();
-  await insertOrReplaceToTxsTable(pendingTxs);
-};
-
-const _mapRowsToTxs = function (rows) {
-  return rows.map(txDB => {
-    const newTx = Object.assign({}, txDB);
-    newTx.ctInputs = txDB.ctInputs.newInputs.map(address => (address[0] ? address : [address]));
-    newTx.ctOutputs = txDB.ctOutputs.newOutputs.map(address => (address[0] ? address : [address]));
-    newTx.ctAmount = Object.assign({}, newTx.ctAmount);
-    newTx.ctAmount.getCCoin = new BigNumber(txDB.ctAmount.getCCoin);
-    return newTx;
-  });
-};
-
-const _deletePendingTxs = async function () {
-  const txsTable = _getTxsTable();
-  return db.delete()
-    .from(txsTable)
-    .where(txsTable[txsTableSchema.properties.CT_CONDITION].eq('CPtxApplying'))
-    .exec();
-};
 
 const _insertOrReplace = (rows, table) =>
   db.insertOrReplace().into(table).values(rows).exec();
