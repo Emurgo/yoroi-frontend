@@ -3,6 +3,7 @@
 import bip39 from 'bip39';
 import pbkdf2 from 'pbkdf2';
 import aesjs from 'aes-js';
+import cryptoRandomString from 'crypto-random-string';
 
 import { Blake2b, Wallet } from 'rust-cardano-crypto';
 import { encryptWithPassword, decryptWithPassword } from '../../../../utils/passwordCipher';
@@ -13,15 +14,16 @@ from '../../../../../config/config-types';
 
 export type WalletSeed = {
   encryptedSeed: string,
-  seedVerifier: string
+  passwordVerifier: string,
+  passwordSalt: string,
 };
 
 declare var CONFIG : ConfigType;
 
 const protocolMagic = CONFIG.network.protocolMagic;
 
-function calculateSeedVerifier(password : string, seed : Uint8Array) : string {
-  const derivedKey = pbkdf2.pbkdf2Sync(password, new TextDecoder('utf-8').decode(seed), 1000, 32, 'sha512');
+function calculatePasswordVerifier(password : string, salt: string) : string {
+  const derivedKey = pbkdf2.pbkdf2Sync(password, salt, 5000, 32, 'sha512');
   return aesjs
     .utils
     .hex
@@ -29,18 +31,19 @@ function calculateSeedVerifier(password : string, seed : Uint8Array) : string {
 }
 
 function decryptSeed(walletSeed : WalletSeed, password : string) : Uint8Array {
-  const seed = decryptWithPassword(password, walletSeed.encryptedSeed);
-  const seedVerifier = calculateSeedVerifier(password, seed);
-  if (seedVerifier !== walletSeed.seedVerifier) {
+  const passwordVerifier = calculatePasswordVerifier(password, walletSeed.passwordSalt);
+  if (passwordVerifier !== walletSeed.passwordVerifier) {
     throw new Error('Passphrase doesn\'t match');
   }
-  return seed;
+  return decryptWithPassword(password, walletSeed.encryptedSeed);
 }
 
 function encryptWalletSeed(seed : Uint8Array, password : string) {
+  const passwordSalt = cryptoRandomString(32);
   return {
     encryptedSeed: encryptWithPassword(password, seed),
-    seedVerifier: calculateSeedVerifier(password, seed)
+    passwordVerifier: calculatePasswordVerifier(password, passwordSalt),
+    passwordSalt,
   };
 }
 

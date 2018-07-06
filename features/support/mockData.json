@@ -13,10 +13,9 @@
       }
     },
     "seed": {
-      "encryptedSeed":
-        "f39f867c83c29c4a7098e939533d9ea46ef25fb143f2becaba7d246c77bead48",
-      "seedVerifier":
-        "917e14447ee3b1aa38aba9e23347e8d980383a693ecab6a33ffec32b91269f1d"
+      "encryptedSeed": "33991c307591589867001a428443e171b29ed6f1ddd251ba6f581e399e10d8ba",
+      "passwordSalt": "158b2d940d510a77ce6f6c2dd6f83dac",
+      "passwordVerifier": "0081e3fb24560dd9c12f78622ccc7f1715e227001bb64925c61f933f0cd119b7"
     },
     "password": "TheBestWallet2018",
     "wallet": {
