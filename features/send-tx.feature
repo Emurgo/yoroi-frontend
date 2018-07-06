@@ -17,7 +17,7 @@ Feature: Send transaction
     And I see send money confirmation dialog
     And I enter the wallet password:
       | password  |
-      | TheBestWallet2018 |
+      | Secret123 |
     And I submit the wallet send form
     Then I should see the summary screen
 
@@ -51,6 +51,6 @@ Feature: Send transaction
     And I see send money confirmation dialog
     And I enter the wallet password:
       | password  |
-      | TheBestWallet2018 |
+      | Secret123 |
     And I submit the wallet send form
     Then I should see the summary screen

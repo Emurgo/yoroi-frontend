@@ -13,11 +13,11 @@
       }
     },
     "seed": {
-      "encryptedSeed": "33991c307591589867001a428443e171b29ed6f1ddd251ba6f581e399e10d8ba",
-      "passwordSalt": "158b2d940d510a77ce6f6c2dd6f83dac",
-      "passwordVerifier": "0081e3fb24560dd9c12f78622ccc7f1715e227001bb64925c61f933f0cd119b7"
+      "encryptedSeed": "d207774a43e617045acbff9ebca37c1748d656976398eb9b1117651e9198eae5",
+      "passwordSalt": "cd4a9a3753ddccb56f4d6e062b23e503",
+      "passwordVerifier": "b4e43f5698bb7f6e7883d9386de3e3fbf714d79f6c0f5be24e656bacc7fc20ce"
     },
-    "password": "TheBestWallet2018",
+    "password": "Secret123",
     "wallet": {
       "cwAccountsNumber": 1,
       "cwAmount": {

@@ -12,7 +12,7 @@ Feature: Wallet Settings
     And I should see the "change" wallet password dialog
     And I change wallet password:
     | currentPassword   | password | repeatedPassword |
-    | TheBestWallet2018 | secret   | secret           |
+    | Secret123 | secret   | secret           |
     And I submit the wallet password dialog
     Then I should see the following error messages:
     | message                             |
@@ -24,7 +24,7 @@ Feature: Wallet Settings
     And I should see the "change" wallet password dialog
     And I change wallet password:
     | currentPassword   | password     | repeatedPassword |
-    | TheBestWallet2018 | newSecret123 | newSecret123     |
+    | Secret123 | newSecret123 | newSecret123     |
     And I submit the wallet password dialog
     Then I should not see the change password dialog anymore
   
