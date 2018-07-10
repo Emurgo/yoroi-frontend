@@ -42,8 +42,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Restore',
     description: 'Label for the "Restore" button on the wallet add dialog.',
   },
-  restoreWithoutCertificateDescription: {
-    id: 'wallet.add.dialog.restore.withoutCertificate.description',
+  restoreDescription: {
+    id: 'wallet.add.dialog.restore.description',
     defaultMessage: '!!!Restore wallet from backup',
     description: 'Description for the "Restore" button without paper wallet certificate on the wallet add dialog.',
   },
@@ -85,8 +85,6 @@ export default class WalletAdd extends Component<Props> {
       isRestoreActive,
     } = this.props;
 
-    const restoreButtonDescription = messages.restoreWithoutCertificateDescription;
-
     const componentClasses = classnames([styles.component, 'WalletAdd']);
 
     let activeNotification = null;
@@ -119,7 +117,7 @@ export default class WalletAdd extends Component<Props> {
               onClick={onRestore}
               icon={restoreIcon}
               label={intl.formatMessage(messages.restoreLabel)}
-              description={intl.formatMessage(restoreButtonDescription)}
+              description={intl.formatMessage(messages.restoreDescription)}
               isDisabled={isRestoreActive}
             />
             <BigButtonForDialogs

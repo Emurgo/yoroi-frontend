@@ -170,17 +170,129 @@
         }
       },
       {
-        "defaultMessage": "!!!Error received from server while sending tx.",
-        "description": "\"Error received from server while sending tx.\" error message",
+        "defaultMessage": "!!!Error received from api method call while sending tx.",
+        "description": "\"Error received from api method call while sending tx.\" error message",
         "end": {
           "column": 3,
           "line": 69
         },
         "file": "app/api/ada/errors.js",
+        "id": "api.errors.sendTransactionError",
+        "start": {
+          "column": 24,
+          "line": 65
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from api method call while getting utxos.",
+        "description": "\"Error received from api method call while getting utxos.\" error message",
+        "end": {
+          "column": 3,
+          "line": 74
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getAllUTXOsForAddressesError",
+        "start": {
+          "column": 32,
+          "line": 70
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from api method call while discovering addresses.",
+        "description": "\"Error received from api method call while discovering addresses.\" error message",
+        "end": {
+          "column": 3,
+          "line": 79
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.discoverAddressesError",
+        "start": {
+          "column": 26,
+          "line": 75
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while getting UTXOs.",
+        "description": "\"Error received from server while getting UTXOs.\" error message",
+        "end": {
+          "column": 3,
+          "line": 84
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getUtxosForAddressesApiError",
+        "start": {
+          "column": 32,
+          "line": 80
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while getting balance.",
+        "description": "\"Error received from server while getting balance.\" error message",
+        "end": {
+          "column": 3,
+          "line": 89
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getUtxosSumsForAddressesApiError",
+        "start": {
+          "column": 36,
+          "line": 85
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while getting txs.",
+        "description": "\"Error received from server while getting txs.\" error message",
+        "end": {
+          "column": 3,
+          "line": 94
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getTxHistoryForAddressesApiError",
+        "start": {
+          "column": 36,
+          "line": 90
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while sending tx.",
+        "description": "\"Error received from server while sending tx.\" error message",
+        "end": {
+          "column": 3,
+          "line": 99
+        },
+        "file": "app/api/ada/errors.js",
         "id": "api.errors.sendTransactionApiError",
         "start": {
           "column": 27,
-          "line": 65
+          "line": 95
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while checking used addresses.",
+        "description": "\"Error received from server while checking used addresses.\" error message",
+        "end": {
+          "column": 3,
+          "line": 104
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.checkAdressesInUseApiError",
+        "start": {
+          "column": 30,
+          "line": 100
+        }
+      },
+      {
+        "defaultMessage": "!!!Error received from server while getting pending txs.",
+        "description": "\"Error received from server while getting pending txs.\" error message",
+        "end": {
+          "column": 3,
+          "line": 109
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.getPendingTxsForAddressesApiError",
+        "start": {
+          "column": 37,
+          "line": 105
         }
       }
     ],
@@ -250,7 +362,7 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Unable to restored Daedalus wallet",
+        "defaultMessage": "!!!Unable to restore Daedalus wallet",
         "description": "Label \"Unable to restore Daedalus wallet\" on the Daedalus transfer error page.",
         "end": {
           "column": 3,
@@ -1248,25 +1360,6 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Add wallet",
-        "description": "Label for the \"Add wallet\" button in wallet sidebar menu.",
-        "end": {
-          "column": 3,
-          "line": 17
-        },
-        "file": "app/components/sidebar/wallets/SidebarWalletsMenu.js",
-        "id": "sidebar.wallets.addWallet",
-        "start": {
-          "column": 16,
-          "line": 13
-        }
-      }
-    ],
-    "path": "app/components/sidebar/wallets/SidebarWalletsMenu.json"
-  },
-  {
-    "descriptors": [
-      {
         "defaultMessage": "!!!On the following screen, you will see a set of X random words. This is\n    your wallet backup phrase. It can be entered in any version of Daedalus application in order\n    to back up or restore your wallet’s funds and private key.",
         "description": "Instructions for backing up wallet recovery phrase on dialog that displays wallet recovery phrase.",
         "end": {
@@ -1493,6 +1586,137 @@
       }
     ],
     "path": "app/components/wallet/navigation/WalletNavigation.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Password",
+        "description": "Title for the \"Change wallet password\" dialog when there is no password set.",
+        "end": {
+          "column": 3,
+          "line": 21
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.title.setPassword",
+        "start": {
+          "column": 26,
+          "line": 17
+        }
+      },
+      {
+        "defaultMessage": "!!!Change password",
+        "description": "Title for the \"Change wallet password\" dialog when there is already password set.",
+        "end": {
+          "column": 3,
+          "line": 26
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.title.changePassword",
+        "start": {
+          "column": 29,
+          "line": 22
+        }
+      },
+      {
+        "defaultMessage": "!!!Wallet password",
+        "description": "Label for the \"Wallet password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 31
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.walletPasswordLabel",
+        "start": {
+          "column": 23,
+          "line": 27
+        }
+      },
+      {
+        "defaultMessage": "!!!Current password",
+        "description": "Label for the \"Current password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 36
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.currentPasswordLabel",
+        "start": {
+          "column": 24,
+          "line": 32
+        }
+      },
+      {
+        "defaultMessage": "!!!Repeat password",
+        "description": "Label for the \"Repeat password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 41
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.repeatPasswordLabel",
+        "start": {
+          "column": 23,
+          "line": 37
+        }
+      },
+      {
+        "defaultMessage": "!!!Type current password",
+        "description": "Placeholder for the \"Current password\" inputs in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 46
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder",
+        "start": {
+          "column": 35,
+          "line": 42
+        }
+      },
+      {
+        "defaultMessage": "!!!Type new password",
+        "description": "Placeholder for the \"New password\" inputs in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 51
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder",
+        "start": {
+          "column": 31,
+          "line": 47
+        }
+      },
+      {
+        "defaultMessage": "!!!New password",
+        "description": "Label for the \"New password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 56
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.newPasswordLabel",
+        "start": {
+          "column": 20,
+          "line": 52
+        }
+      },
+      {
+        "defaultMessage": "!!!Repeat new password",
+        "description": "Placeholder for the \"Repeat password\" inputs in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 61
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder",
+        "start": {
+          "column": 34,
+          "line": 57
+        }
+      }
+    ],
+    "path": "app/components/wallet/settings/ChangeWalletPasswordDialog.json"
   },
   {
     "descriptors": [
@@ -1977,9 +2201,9 @@
           "line": 49
         },
         "file": "app/components/wallet/WalletAdd.js",
-        "id": "wallet.add.dialog.restore.withoutCertificate.description",
+        "id": "wallet.add.dialog.restore.description",
         "start": {
-          "column": 40,
+          "column": 22,
           "line": 45
         }
       },
@@ -2838,9 +3062,131 @@
           "column": 23,
           "line": 82
         }
+      },
+      {
+        "defaultMessage": "!!!Calculating fee...",
+        "description": "Calculating fee...",
+        "end": {
+          "column": 3,
+          "line": 91
+        },
+        "file": "app/components/wallet/WalletSendForm.js",
+        "id": "wallet.send.form.calculatingFee",
+        "start": {
+          "column": 18,
+          "line": 87
+        }
       }
     ],
     "path": "app/components/wallet/WalletSendForm.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Name",
+        "description": "Label for the \"Name\" text input on the wallet settings page.",
+        "end": {
+          "column": 3,
+          "line": 20
+        },
+        "file": "app/components/wallet/WalletSettings.js",
+        "id": "wallet.settings.name.label",
+        "start": {
+          "column": 8,
+          "line": 16
+        }
+      },
+      {
+        "defaultMessage": "!!!Password",
+        "description": "Label for the \"Password\" field.",
+        "end": {
+          "column": 3,
+          "line": 25
+        },
+        "file": "app/components/wallet/WalletSettings.js",
+        "id": "wallet.settings.password",
+        "start": {
+          "column": 17,
+          "line": 21
+        }
+      },
+      {
+        "defaultMessage": "!!!Last updated",
+        "description": "Last updated X time ago message.",
+        "end": {
+          "column": 3,
+          "line": 30
+        },
+        "file": "app/components/wallet/WalletSettings.js",
+        "id": "wallet.settings.passwordLastUpdated",
+        "start": {
+          "column": 23,
+          "line": 26
+        }
+      },
+      {
+        "defaultMessage": "!!!Export wallet",
+        "description": "Label for the export button on wallet settings.",
+        "end": {
+          "column": 3,
+          "line": 35
+        },
+        "file": "app/components/wallet/WalletSettings.js",
+        "id": "wallet.settings.exportWalletButtonLabel",
+        "start": {
+          "column": 21,
+          "line": 31
+        }
+      }
+    ],
+    "path": "app/components/wallet/WalletSettings.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!change",
+        "description": "Label \"change\" on inline editing inputs in inactive state.",
+        "end": {
+          "column": 3,
+          "line": 16
+        },
+        "file": "app/components/widgets/forms/InlineEditingInput.js",
+        "id": "inline.editing.input.change.label",
+        "start": {
+          "column": 10,
+          "line": 12
+        }
+      },
+      {
+        "defaultMessage": "!!!cancel",
+        "description": "Label \"cancel\" on inline editing inputs in inactive state.",
+        "end": {
+          "column": 3,
+          "line": 21
+        },
+        "file": "app/components/widgets/forms/InlineEditingInput.js",
+        "id": "inline.editing.input.cancel.label",
+        "start": {
+          "column": 10,
+          "line": 17
+        }
+      },
+      {
+        "defaultMessage": "!!!Your changes have been saved",
+        "description": "Message \"Your changes have been saved\" for inline editing (eg. on Profile Settings page).",
+        "end": {
+          "column": 3,
+          "line": 26
+        },
+        "file": "app/components/widgets/forms/InlineEditingInput.js",
+        "id": "inline.editing.input.changesSaved",
+        "start": {
+          "column": 16,
+          "line": 22
+        }
+      }
+    ],
+    "path": "app/components/widgets/forms/InlineEditingInput.json"
   },
   {
     "descriptors": [

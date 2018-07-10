@@ -153,7 +153,7 @@ export default class TransactionsStore extends Store {
   _getTransactionsAllRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
-    return new CachedRequest(this.api[environment.API].getTransactions);
+    return new CachedRequest(this.api[environment.API].refreshTransactions);
   };
 
 }

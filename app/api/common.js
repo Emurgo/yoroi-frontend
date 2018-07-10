@@ -77,11 +77,10 @@ export type CreateWalletRequest = {
   password: string,
 };
 
-// FIXME: When adding the ability to change password we should check whether ? is needed
 export type UpdateWalletPasswordRequest = {
   walletId: string,
-  oldPassword: ?string,
-  newPassword: ?string,
+  oldPassword: string,
+  newPassword: string,
 };
 
 export type DeleteWalletRequest = {

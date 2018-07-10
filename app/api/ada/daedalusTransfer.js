@@ -92,14 +92,14 @@ function _getInputs(
   addressesWithFunds.forEach(a => {
     addressingByAddress[a.address] = a.addressing;
   });
-  return utxos.map(utxo => {
-    return {
+  return utxos.map(utxo => (
+    {
       ptr: {
         index: utxo.tx_index,
         id: utxo.tx_hash
       },
       value: utxo.amount,
       addressing: addressingByAddress[utxo.receiver]
-    };
-  });
+    }
+  ));
 }

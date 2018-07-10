@@ -38,6 +38,7 @@ Given(/^I have opened the chrome extension$/, async function () {
 });
 
 Given(/^There is no wallet stored$/, async function () {
+  await refreshWallet(this);
   await this.waitForElement('.WalletAdd');
 });
 
@@ -46,24 +47,35 @@ Given(/^There is a default wallet stored$/, async function () {
   await storeWallet(this);
 });
 
-Given(/^There is a wallet stored( with ([^"]*) addresses)?( starting with ([^"]*))?$/, async function (addressAmount, addressPrefix) {
-  await storeWallet(this, addressAmount, addressPrefix);
+Given(/^There is a wallet stored( named ([^"]*))?$/, async function (walletName) {
+  await storeWallet(this, walletName);
 });
 
-async function storeWallet(client, addressAmount, addressPrefix) {
-  const { seed, wallet, cryptoAccount, addresses } = getMockData();
-  client.saveToLocalStorage('SEED', seed);
-  client.saveToLocalStorage('WALLET', wallet);
-  client.saveToLocalStorage('ACCOUNT', cryptoAccount);
+function refreshWallet(client) {
+  return client.driver.executeAsyncScript((done) => { 
+    window.icarus.stores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
+  });
+}
+
+async function storeWallet(client, walletName) {
+  const { seed, wallet, cryptoAccount, addresses, walletInitialData } = getMockData();
+  if (walletName) {
+    wallet.cwMeta.cwName = walletName;
+  }
+
+  await client.saveToLocalStorage('WALLET', { adaWallet: wallet, seed });
+  await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
+
   /* Obs: If "with $number addresses" is include in the sentence,
      we override the wallet with fake addresses" */
-  if (addressAmount) {
-    client.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount, addressPrefix));
+  if (walletName && walletInitialData && walletInitialData[walletName] && walletInitialData[walletName].totalAddresses) {
+    client.saveToLocalStorage('ADDRESSES', getFakeAddresses(
+      walletInitialData[walletName].totalAddresses,
+      walletInitialData[walletName].addressesStartingWith
+    ));
   } else {
     client.saveToLocalStorage('ADDRESSES', addresses);
   }
-  client.driver.executeScript(() => {
-    window.icarus.stores.ada.wallets.refreshWalletsData();
-  });
+  await refreshWallet(client);
   await client.waitForElement('.TopBar_walletName');
 }

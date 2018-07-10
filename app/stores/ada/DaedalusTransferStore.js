@@ -151,7 +151,7 @@ export default class DaedalusTransferStore extends Store {
     } catch (error) {
       Logger.error(`DaedalusTransferStore::transferFunds ${stringifyError(error)}`);
       runInAction(() => {
-        this.error = localizedError(new TransferFundsError());
+        this.error = new TransferFundsError();
       });
     }
   }

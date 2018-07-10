@@ -83,6 +83,11 @@ export const messages = defineMessages({
     id: 'wallet.send.form.transactionFeeError',
     defaultMessage: '!!!Not enough Ada for fees. Try sending a smaller amount.',
     description: '"Not enough Ada for fees. Try sending a smaller amount." error message',
+  },
+  calculatingFee: {
+    id: 'wallet.send.form.calculatingFee',
+    defaultMessage: '!!!Calculating fee...',
+    description: 'Calculating fee...',
   }
 });
 
@@ -288,7 +293,7 @@ export default class WalletSendForm extends Component<Props, State> {
     const amount = formattedAmountToNaturalUnits(amountValue);
     try {
       this.setState({
-        transactionFeeError: 'Calculating fee...'
+        transactionFeeError: this.context.intl.formatMessage(messages.calculatingFee)
       });
       const fee = await this.props.calculateTransactionFee(receiver, amount);
       if (this._isMounted) {
