@@ -1,12 +1,12 @@
 import lf from 'lovefield';
-import BigNumber from 'bignumber.js';
 
 const addressesTableSchema = {
   name: 'Addresses',
   properties: {
     id: 'id',
     type: 'type',
-    value: 'value'
+    value: 'value',
+    isUsed: 'isUsed'
   }
 };
 
@@ -40,6 +40,7 @@ export const loadLovefieldDB = () => {
     .addColumn(addressesTableSchema.properties.id, lf.Type.STRING)
     .addColumn(addressesTableSchema.properties.type, lf.Type.STRING)
     .addColumn(addressesTableSchema.properties.value, lf.Type.OBJECT)
+    .addColumn(addressesTableSchema.properties.isUsed, lf.Type.BOOLEAN)
     .addPrimaryKey([addressesTableSchema.properties.id]);
 
   return schemaBuilder.connect().then(newDb => {
@@ -57,6 +58,18 @@ export const deleteAddress = (address) => {
 };
 
 export const getAddresses = () => db.select().from(_getAddressesTable()).exec();
+
+export const getUnusedExternalAddresses = () => {
+  const addressesTable = _getAddressesTable();
+  return db.select()
+    .from(addressesTable)
+    .where(lf.op.and(
+      addressesTable[addressesTableSchema.properties.isUsed].eq(false),
+      addressesTable[addressesTableSchema.properties.type].eq('External')
+    ))
+    .exec()
+    .then(rows => rows.map(row => row[addressesTableSchema.properties.value]));
+};
 
 export const getAddressesList = () => {
   const addressesTable = _getAddressesTable();
@@ -128,7 +141,8 @@ const _addressToRow = (address, type) =>
   _getAddressesTable().createRow({
     id: address.cadId,
     type,
-    value: address
+    value: address,
+    isUsed: address.cadIsUsed
   });
 
 const _insertOrReplace = (rows, table) =>

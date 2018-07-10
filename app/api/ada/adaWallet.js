@@ -17,7 +17,8 @@ import {
 import { toAdaWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
   getAdaAddressesList,
-  newAdaAddress
+  newAdaAddress,
+  updateUsedAddresses
 } from './adaAddress';
 import { newCryptoAccount } from './adaAccount';
 import {
@@ -69,6 +70,7 @@ export const updateAdaWallet = async (): Promise<?AdaWallet> => {
     await updateAdaPendingTxs(addresses);
     const confirmedTxs = await getAdaConfirmedTxs();
     await updateAdaTxsHistory(confirmedTxs, addresses);
+    await updateUsedAddresses();
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));

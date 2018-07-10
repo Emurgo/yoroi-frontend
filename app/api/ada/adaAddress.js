@@ -1,4 +1,5 @@
 // @flow
+import _ from 'lodash';
 import { Wallet } from 'rust-cardano-crypto';
 import {
   toAdaAddress
@@ -9,8 +10,13 @@ import {
   getAddresses,
   getAddressesList,
   getAddressesListByType,
-  deleteAddress
+  deleteAddress,
+  getUnusedExternalAddresses
 } from './lib/lovefieldDatabase';
+import {
+  checkAddressesInUse,
+  addressesLimit
+} from './lib/icarus-backend-api';
 import {
   getAddressInHex
 } from './lib/utils';
@@ -91,4 +97,20 @@ export function saveAsAdaAddresses(
     return toAdaAddress(cryptoAccount.account, addressType, index, hash, used);
   });
   saveAddresses(mappedAddresses, addressType);
+}
+
+export async function updateUsedAddresses() {
+  const adaAddresses = await getUnusedExternalAddresses();
+  const usedAddressesPromises = _.chunk(adaAddresses, addressesLimit).map(_getUsedAddresses);
+  const usedAddressesChunks = await Promise.all(usedAddressesPromises);
+  const usedAddresses = usedAddressesChunks.reduce((accum, chunk) => accum.concat(chunk), []);
+  await saveAddresses(usedAddresses, 'External');
+}
+
+async function _getUsedAddresses(adaAddresses) {
+  const addresses = adaAddresses.map(address => address.cadId);
+  const usedAddresses = await checkAddressesInUse(addresses);
+  const usedAdaAddresses = adaAddresses.filter(adaAddress =>
+    usedAddresses.includes(adaAddress.cadId));
+  return usedAdaAddresses.map(adaAddress => Object.assign({}, adaAddress, { cadIsUsed: true }));
 }
