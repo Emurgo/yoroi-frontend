@@ -84,10 +84,11 @@ export function removeAdaAddress(address: AdaAddress): void {
 export function saveAsAdaAddresses(
   cryptoAccount: CryptoAccount,
   addresses: Array<string>,
-  addressType: AddressType
+  addressType: AddressType,
+  used: ?boolean
 ): void {
   const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) => {
-    return toAdaAddress(cryptoAccount.account, addressType, index, hash);
+    return toAdaAddress(cryptoAccount.account, addressType, index, hash, used);
   });
   saveAddresses(mappedAddresses, addressType);
 }

@@ -27,14 +27,15 @@ export function toAdaAddress(
   accountIndex: number,
   addressType: AddressType,
   addressIndex: number,
-  addresHash: string
+  addresHash: string,
+  isUsed: ?boolean
 ): AdaAddress {
   return {
     cadAmount: {
       getCCoin: 0
     },
     cadId: addresHash,
-    cadIsUsed: false,
+    cadIsUsed: !!isUsed,
     account: accountIndex,
     change: getAddressTypeIndex(addressType),
     index: addressIndex
