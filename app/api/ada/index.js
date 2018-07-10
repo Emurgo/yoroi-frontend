@@ -34,6 +34,7 @@ import {
 } from './restoreAdaWallet';
 import {
   getAdaTxsHistoryByWallet,
+  refreshTxs,
 } from './adaTransactions/adaTransactionsHistory';
 import {
   getAdaTransactionFee,
@@ -191,6 +192,7 @@ export default class AdaApi {
 
   async refreshTransactions(): Promise<GetTransactionsResponse> {
     try {
+      await refreshTxs();
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
       Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
       const transactions = history[0].map(data =>
@@ -211,6 +213,7 @@ export default class AdaApi {
     // Logger.debug('AdaApi::searchHistory called: ' + stringifyData(request));
     // const { walletId, skip, limit } = request;
     try {
+      await refreshTxs();
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
       Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
       const transactions = history[0].map(data =>

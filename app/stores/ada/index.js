@@ -17,7 +17,7 @@ export const adaStoreClasses = {
 export type AdaStoresMap = {
   wallets: AdaWalletsStore,
   transactions: TransactionsStore,
-  walletSettings: AdaWalletSettingsStore, 
+  walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore
 };

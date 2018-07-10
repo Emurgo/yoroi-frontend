@@ -26,6 +26,9 @@ import {
   saveLastBlockNumber
 } from '../getAdaLastBlockNumber';
 import {
+  getAdaAddresses
+} from '../adaAddress';
+import {
   UpdateAdaTxsHistoryError,
   PendingTransactionError
 } from '../errors';
@@ -43,7 +46,18 @@ export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
   return Promise.resolve([transactions, transactions.length]);
 };
 
-export async function updateAdaPendingTxs(addresses: Array<string>) {
+export async function refreshTxs() {
+  try {
+    const addresses = await getAdaAddresses();
+    await _updateAdaPendingTxs(addresses);
+    await _updateAdaTxsHistory(await getAdaConfirmedTxs(), addresses);
+  } catch (error) {
+    Logger.error('adaTransactionsHistory::refreshTxs error: ' + JSON.stringify(error));
+    throw new UpdateAdaTxsHistoryError();
+  }
+}
+
+async function _updateAdaPendingTxs(addresses: Array<string>) {
   try {
     const txs = await _getTxsForChunksOfAddresses(
       addresses,
@@ -57,7 +71,7 @@ export async function updateAdaPendingTxs(addresses: Array<string>) {
   }
 }
 
-export async function updateAdaTxsHistory(
+async function _updateAdaTxsHistory(
   existingTransactions: Array<AdaTransaction>,
   addresses: Array<string>
 ) {

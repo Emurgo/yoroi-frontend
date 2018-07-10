@@ -9,7 +9,6 @@ import {
 import {
   saveInStorage,
   getFromStorage,
-  mapToList
 } from './lib/utils';
 import {
   generateWalletSeed,
@@ -19,18 +18,12 @@ import {
 } from './lib/cardanoCrypto/cryptoWallet';
 import { toAdaWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
-  getAdaAddressesMap,
+  getAdaAddresses,
   newAdaAddress
 } from './adaAddress';
 import { newCryptoAccount } from './adaAccount';
-import {
-  getAdaConfirmedTxs,
-  updateAdaTxsHistory,
-  updateAdaPendingTxs
-} from './adaTransactions/adaTransactionsHistory';
 import type {
   AdaWallet,
-  AdaAddresses,
   UpdateAdaWalletParams,
 } from './adaTypes';
 import type {
@@ -78,8 +71,7 @@ export const updateAdaWallet = async (
 export const refreshAdaWallet = async (): Promise<?AdaWallet> => {
   const persistentWallet = getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
-  const persistentAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
-  const addresses: Array<string> = persistentAddresses.map(addr => addr.cadId);
+  const addresses = getAdaAddresses();
   // Update wallet balance
   try {
     const updatedWallet = Object.assign({}, persistentWallet, {
@@ -88,8 +80,6 @@ export const refreshAdaWallet = async (): Promise<?AdaWallet> => {
       }
     });
     saveAdaWalletKeepingSeed(updatedWallet);
-    await updateAdaPendingTxs(addresses);
-    await updateAdaTxsHistory(await getAdaConfirmedTxs(), addresses);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
