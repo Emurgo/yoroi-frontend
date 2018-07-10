@@ -12,8 +12,8 @@ import styles from './DaedalusTransferErrorPage.scss';
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.errorPage.title.label',
-    defaultMessage: '!!!Unable to restored Daedalus wallet',
-    description: 'Label "Unable to restored Daedalus wallet" on the Daedalus transfer error page.'
+    defaultMessage: '!!!Unable to restore Daedalus wallet',
+    description: 'Label "Unable to restore Daedalus wallet" on the Daedalus transfer error page.'
   },
   backButtonLabel: {
     id: 'daedalusTransfer.errorPage.backButton.label',

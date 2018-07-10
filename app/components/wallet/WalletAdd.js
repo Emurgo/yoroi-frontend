@@ -61,12 +61,7 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Restore notification message shown during async wallet restore on the wallet add screen.',
-  },
-  maxNumberOfWalletsNotificationMessage: {
-    id: 'wallet.add.dialog.maxNumberOfWalletsNotificationMessage',
-    defaultMessage: '!!!You have reached the maximum of 50 wallets.<br>No more wallets can be added.',
-    description: '"Maximum number of wallets reached" notification message shown on the wallet add screen if user has 50 wallets.',
-  },
+  }
 });
 
 type Props = {
@@ -74,7 +69,6 @@ type Props = {
   onRestore: Function,
   onImportFile: Function,
   isRestoreActive: boolean,
-  isMaxNumberOfWalletsReached: boolean,
 };
 
 @observer
@@ -88,7 +82,7 @@ export default class WalletAdd extends Component<Props> {
     const { intl } = this.context;
     const {
       onCreate, onRestore, onImportFile,
-      isRestoreActive, isMaxNumberOfWalletsReached,
+      isRestoreActive,
     } = this.props;
 
     const restoreButtonDescription = messages.restoreWithoutCertificateDescription;
@@ -96,9 +90,7 @@ export default class WalletAdd extends Component<Props> {
     const componentClasses = classnames([styles.component, 'WalletAdd']);
 
     let activeNotification = null;
-    if (isMaxNumberOfWalletsReached) {
-      activeNotification = 'maxNumberOfWalletsNotificationMessage';
-    } else if (isRestoreActive) {
+    if (isRestoreActive) {
       activeNotification = 'restoreNotificationMessage';
     }
 
@@ -112,7 +104,6 @@ export default class WalletAdd extends Component<Props> {
               icon={createIcon}
               label={intl.formatMessage(messages.createLabel)}
               description={intl.formatMessage(messages.createDescription)}
-              isDisabled={isMaxNumberOfWalletsReached}
             />
             <BigButtonForDialogs
               className="joinWalletButton"
@@ -129,7 +120,7 @@ export default class WalletAdd extends Component<Props> {
               icon={restoreIcon}
               label={intl.formatMessage(messages.restoreLabel)}
               description={intl.formatMessage(restoreButtonDescription)}
-              isDisabled={isMaxNumberOfWalletsReached || isRestoreActive}
+              isDisabled={isRestoreActive}
             />
             <BigButtonForDialogs
               className="importWalletButton"

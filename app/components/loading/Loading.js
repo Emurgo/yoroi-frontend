@@ -44,9 +44,7 @@ export default class Loading extends Component<Props, State> {
 
     const componentStyles = classNames([
       styles.component,
-      hasLoadedCurrentTheme ? null : styles['is-loading-theme'],
-      null,
-      null,
+      hasLoadedCurrentTheme ? null : styles['is-loading-theme']
     ]);
     const icarusLogoStyles = classNames([
       styles.icarusLogo

@@ -57,6 +57,10 @@ export default class DaedalusTransferStore extends Store {
     this._updateStatus('gettingMnemonics');
   }
 
+  /* @Attention:
+      You should check wallets state outside of the runInAction,
+      because this method run as a reaction.
+  */
   _enableDisableTransferFunds = (): void => {
     const { wallets } = this.stores && this.stores[environment.API];
     if (wallets && wallets.hasActiveWallet) {
@@ -73,7 +77,7 @@ export default class DaedalusTransferStore extends Store {
   /* TODO: Handle WS connection errors */
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
-    this.status = 'restoringAddresses';
+    this._updateStatus('restoringAddresses');
     this.ws = new WebSocket(websocketUrl);
     this.ws.addEventListener('open', () => {
       console.log('[ws::connected]');

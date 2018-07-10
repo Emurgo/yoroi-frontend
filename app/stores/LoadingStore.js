@@ -19,7 +19,7 @@ export default class LoadingStore extends Store {
     when(this._isRefresh, this._redirectToLoading);
     Promise.all([loadRustModule(), loadLovefieldDB()])
     .then(async () => {
-      await this._whenLibrariesReady();
+      await this._checkingIfWalletsLoaded();
       runInAction(() => {
         this.error = null;
         this._loading = false;
@@ -44,7 +44,7 @@ export default class LoadingStore extends Store {
   _redirectToLoading = () =>
     this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
 
-  _whenLibrariesReady = async () => {
+  _checkingIfWalletsLoaded = async () => {
     const { app } = this.stores;
     const { wallets } = this.stores[environment.API];
     await wallets.refreshWalletsData();

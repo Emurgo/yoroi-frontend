@@ -216,13 +216,16 @@ export default class WalletsStore extends Store {
   };
 
   _showAddWalletPageWhenNoWallets = () => {
-    const isRouteThatNeedsWallets = this.isWalletRoute;
-    if (isRouteThatNeedsWallets && !this.hasAnyWallets) {
+    if (this.isWalletRoute && !this.hasAnyWallets) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
   };
 
-  // This logic is really obscure, please be careful!
+  /* @Attention:
+      This method has a really tricky logic because is in charge of some redirection rules
+      related to app urls and wallet status. Also, this behaviour is trigger by mobx reactions,
+      so it's hard to reason about all the scenarios could happend.
+  */
   _updateActiveWalletOnRouteChanges = () => {
     const currentRoute = this.stores.app.currentRoute;
     const hasAnyWalletLoaded = this.hasAnyLoaded;

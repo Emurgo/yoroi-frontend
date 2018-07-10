@@ -251,7 +251,7 @@
     "descriptors": [
       {
         "defaultMessage": "!!!Unable to restored Daedalus wallet",
-        "description": "Label \"Unable to restored Daedalus wallet\" on the Daedalus transfer error page.",
+        "description": "Label \"Unable to restore Daedalus wallet\" on the Daedalus transfer error page.",
         "end": {
           "column": 3,
           "line": 17
@@ -2023,20 +2023,6 @@
         "start": {
           "column": 30,
           "line": 60
-        }
-      },
-      {
-        "defaultMessage": "!!!You have reached the maximum of 50 wallets.<br>No more wallets can be added.",
-        "description": "\"Maximum number of wallets reached\" notification message shown on the wallet add screen if user has 50 wallets.",
-        "end": {
-          "column": 3,
-          "line": 69
-        },
-        "file": "app/components/wallet/WalletAdd.js",
-        "id": "wallet.add.dialog.maxNumberOfWalletsNotificationMessage",
-        "start": {
-          "column": 41,
-          "line": 65
         }
       }
     ],
