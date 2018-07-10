@@ -2440,6 +2440,20 @@
           "column": 23,
           "line": 82
         }
+      },
+      {
+        "defaultMessage": "!!!Calculating fee...",
+        "description": "Calculating fee...",
+        "end": {
+          "column": 3,
+          "line": 91
+        },
+        "file": "app/components/wallet/WalletSendForm.js",
+        "id": "wallet.send.form.calculatingFee",
+        "start": {
+          "column": 18,
+          "line": 87
+        }
       }
     ],
     "path": "app/components/wallet/WalletSendForm.json"
