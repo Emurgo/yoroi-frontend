@@ -24,14 +24,13 @@ function CustomWorld() {
   };
 
   // FIXME: We should move this to driver object, not `this`
-  this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (locator, method = By.css) => {
-    try {
-      await this.getElementBy(locator, method);
-      throw Error('Element shouldn\'t be present');
-    } catch (err) {
-      return Promise.resolve(true);
-    }
-  };
+  this.waitForElementNotPresent = this.driver.waitForElementNotPresent =
+    async (locator, method = By.css) => {
+      await this.driver.wait(async () => {
+        const elements = await this.getElementsBy(locator, method);
+        return elements.length === 0;
+      });
+    };
 
   this.waitForContent = (locator) => this.waitForElement(locator, By.xpath);
 
@@ -45,6 +44,17 @@ function CustomWorld() {
   this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
 
   this.getText = (locator) => this.getElementBy(locator).getText();
+
+  this.waitUntilText = async (locator, text, timeout = 60000) => {
+    await this.driver.wait(async () => {
+      try {
+        const value = await this.getText(locator);
+        return value === text;
+      } catch (err) {
+        return false;
+      }
+    }, timeout);
+  };
 
   this.getValue = this.driver.getValue = async (locator) => this.getElementBy(locator).getAttribute('value');
 
@@ -66,6 +76,11 @@ function CustomWorld() {
     await input.sendKeys(value);
   };
 
+  this.clearInput = async (locator) => {
+    const input = await this.getElementBy(locator);
+    await input.clear();
+  };
+
   this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
 
   this.getFromLocalStorage = async (key) => {
@@ -75,9 +90,13 @@ function CustomWorld() {
 
   this.saveToLocalStorage = (key, value) => this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 
+  this.intl = (key, lang = 'en-US') =>
+    this.driver.executeScript((k, l) =>
+        window.icarus.translations[l][k]
+    , key, lang);
 }
 
 setWorldConstructor(CustomWorld);
 // I'm setting this timeout to 10 seconds as usually it takes about 5 seconds
 // to startup
-setDefaultTimeout(60 * 10000);
+setDefaultTimeout(60 * 1000);

@@ -24,7 +24,11 @@ import {
   getAdaAddressesMap,
   getAdaAddressesList
 } from '../adaAddress';
-import { getCryptoWalletFromSeed } from '../lib/cardanoCrypto/cryptoWallet';
+import {
+  getCryptoWalletFromSeed,
+  generateWalletSeed,
+  generateAdaMnemonic,
+} from '../lib/cardanoCrypto/cryptoWallet';
 import { getOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {
   AdaAddresses,
@@ -38,12 +42,14 @@ import {
   GetAllUTXOsForAddressesError
 } from '../errors';
 
+const fakePassword = 'fake';
+
 export function getAdaTransactionFee(
   receiver: string,
   amount: string
 ): Promise<AdaTransactionFee> {
-  const password = 'FakePassword';
-  return _getAdaTransaction(receiver, amount, password)
+  const fakeWalletSeed = generateWalletSeed(generateAdaMnemonic().join(' '), fakePassword);
+  return _getAdaTransaction(receiver, amount, getCryptoWalletFromSeed(fakeWalletSeed, fakePassword))
     .then(response => {
       const [{ fee }] = response;
       return { getCCoin: fee };
@@ -61,7 +67,10 @@ export async function newAdaTransaction(
   amount: string,
   password: string
 ): Promise<any> {
-  const [{ cbor_encoded_tx }, changeAdaAddr] = await _getAdaTransaction(receiver, amount, password);
+  const seed = getWalletSeed();
+  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  const [{ cbor_encoded_tx }, changeAdaAddr] =
+    await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
   await saveAdaAddress(changeAdaAddr, 'Internal');
   try {
@@ -95,10 +104,8 @@ export async function getAdaTransactionFromSenders(
   senders: AdaAddresses,
   receiver: string,
   amount: string,
-  password: string
+  cryptoWallet: CryptoWallet
 ) {
-  const seed = getWalletSeed();
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   const cryptoAccount = getSingleCryptoAccount();
   const addressesMap = await getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
@@ -114,10 +121,10 @@ export async function getAdaTransactionFromSenders(
 async function _getAdaTransaction(
   receiver: string,
   amount: string,
-  password: string,
+  cryptoWallet: CryptoWallet,
 ) {
   const senders = await getAdaAddressesList();
-  return getAdaTransactionFromSenders(senders, receiver, amount, password);
+  return getAdaTransactionFromSenders(senders, receiver, amount, cryptoWallet);
 }
 
 function _getAddresses(
