@@ -60,7 +60,7 @@ export const updateAdaWallet = async (
   if (!persistentWallet) return Promise.resolve();
   try {
     const updatedWallet = Object.assign({}, persistentWallet, { cwMeta: walletMeta });
-    saveAdaWalletKeepingSeed(updatedWallet);
+    _saveAdaWalletKeepingSeed(updatedWallet);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
@@ -79,7 +79,7 @@ export const refreshAdaWallet = async (): Promise<?AdaWallet> => {
         getCCoin: await getBalance(addresses)
       }
     });
-    saveAdaWalletKeepingSeed(updatedWallet);
+    _saveAdaWalletKeepingSeed(updatedWallet);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
@@ -95,11 +95,6 @@ export function createAdaWallet({
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const seed = generateWalletSeed(mnemonic, walletPassword);
   return [adaWallet, seed];
-}
-
-function saveAdaWalletKeepingSeed(adaWallet: AdaWallet): void {
-  const seed = getWalletSeed();
-  saveAdaWallet(adaWallet, seed);
 }
 
 export function saveAdaWallet(
@@ -159,3 +154,8 @@ export const changeAdaWalletPassphrase = (
     throw err;
   }
 };
+
+function _saveAdaWalletKeepingSeed(adaWallet: AdaWallet): void {
+  const seed = getWalletSeed();
+  saveAdaWallet(adaWallet, seed);
+}
