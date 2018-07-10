@@ -2,8 +2,8 @@ import { Given, When, Then } from 'cucumber';
 import { expect } from 'chai';
 
 Given(/^I have a wallet with funds$/, async function () {
-  const wallet = await this.getFromLocalStorage('WALLET');
-  expect(wallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
+  const { adaWallet } = await this.getFromLocalStorage('WALLET');
+  expect(adaWallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
 });
 
 When(/^I go to the send transaction screen$/, async function () {

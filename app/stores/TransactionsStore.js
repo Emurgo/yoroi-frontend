@@ -127,7 +127,6 @@ export default class TransactionsStore extends Store {
   }
 
   @action _refreshTransactionData = () => {
-    // if (this.stores.networkStatus.isConnected) {
     const allWallets = this.stores[environment.API].wallets.all;
     for (const wallet of allWallets) {
       const requestParams = {
@@ -143,7 +142,6 @@ export default class TransactionsStore extends Store {
       allRequest.invalidate({ immediately: false });
       allRequest.execute(requestParams);
     }
-    // }
   };
 
   _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
@@ -155,7 +153,7 @@ export default class TransactionsStore extends Store {
   _getTransactionsAllRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
-    return new CachedRequest(this.api[environment.API].getTransactions);
+    return new CachedRequest(this.api[environment.API].refreshTransactions);
   };
 
 }

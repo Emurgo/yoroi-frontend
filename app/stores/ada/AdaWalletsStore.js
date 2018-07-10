@@ -76,8 +76,6 @@ export default class AdaWalletsStore extends WalletStore {
   isValidPrivateKey = () => { return true; }; // eslint-disable-line
 
   @action refreshWalletsData = async () => {
-    // FIXME: We don't care about network status
-    // if (this.stores.networkStatus.isConnected) {
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {

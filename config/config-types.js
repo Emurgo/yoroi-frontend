@@ -1,8 +1,13 @@
 // @flow
 
 export type ConfigType = {
-  network: NetworkConfigType
+  network: NetworkConfigType,
+  app: AppConfigType,
 };
+
+export type AppConfigType = {
+  walletRefreshInterval: number,
+}
 
 export type NetworkConfigType = {
   protocolMagic: 633343913 | 764824073,

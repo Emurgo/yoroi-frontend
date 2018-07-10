@@ -2,12 +2,14 @@
 import { observable, action } from 'mobx';
 import AdaWalletsStore from './AdaWalletsStore';
 import TransactionsStore from './AdaTransactionsStore';
+import AdaWalletSettingsStore from './AdaWalletSettingsStore';
 import AddressesStore from './AddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
 
 export const adaStoreClasses = {
   wallets: AdaWalletsStore,
   transactions: TransactionsStore,
+  walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore
 };
@@ -15,6 +17,7 @@ export const adaStoreClasses = {
 export type AdaStoresMap = {
   wallets: AdaWalletsStore,
   transactions: TransactionsStore,
+  walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore
 };
@@ -22,6 +25,7 @@ export type AdaStoresMap = {
 const adaStores = observable({
   wallets: null,
   transactions: null,
+  walletSettings: null,
   addresses: null,
   daedalusTransfer: null
 });

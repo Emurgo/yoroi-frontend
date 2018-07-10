@@ -7,9 +7,7 @@ Feature: Generate Addresses
 
   Scenario: Show my initial receive address
     When I go to the receive screen
-    Then I should see my latest address at the top
-    | latestAddress                                               |
-    | Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod |
+    Then I should see my latest address "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod" at the top
     And I should see the addresses list them
     | address                                                     | index |
     | Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod | 1     |
@@ -17,10 +15,8 @@ Feature: Generate Addresses
   Scenario: Generate a new receive address
     When I go to the receive screen
     And I click on the Generate new address button
-    Then I should see my latest address at the top
-    | latestAddress                                               |
-    | Ae2tdPwUPEZ3vu63a1tJVMghcbu5CWSrybC2pzwzh6dvPx7uxngY36LQnVk |        
+    Then I should see my latest address "Ae2tdPwUPEYyi3jN1dAR6CXbKY335oh8XxD6eLxqqaHMX8decXzuWDP91VX" at the top
     And I should see the addresses list them
     | address                                                     | index |
-    | Ae2tdPwUPEZ3vu63a1tJVMghcbu5CWSrybC2pzwzh6dvPx7uxngY36LQnVk | 1     |
+    | Ae2tdPwUPEYyi3jN1dAR6CXbKY335oh8XxD6eLxqqaHMX8decXzuWDP91VX | 1     |
     | Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod | 2     |

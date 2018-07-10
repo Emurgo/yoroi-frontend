@@ -8,7 +8,8 @@ import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
   getAddressInHex,
   saveInStorage,
-  getFromStorage
+  getFromStorage,
+  mapToList,
 } from './lib/utils';
 import type {
   AdaAddresses,
@@ -33,6 +34,11 @@ export function getAdaAddressesMap() {
   const addresses = getFromStorage(ADDRESSES_KEY);
   if (!addresses) return {};
   return addresses;
+}
+
+export function getAdaAddresses(): Array<string> {
+  const persistentAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
+  return persistentAddresses.map(addr => addr.cadId);
 }
 
 export function filterAdaAddressesByType(

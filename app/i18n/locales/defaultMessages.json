@@ -1244,6 +1244,165 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Password",
+        "description": "Title for the \"Change wallet password\" dialog when there is no password set.",
+        "end": {
+          "column": 3,
+          "line": 23
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.title.setPassword",
+        "start": {
+          "column": 26,
+          "line": 19
+        }
+      },
+      {
+        "defaultMessage": "!!!Change password",
+        "description": "Title for the \"Change wallet password\" dialog when there is already password set.",
+        "end": {
+          "column": 3,
+          "line": 28
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.title.changePassword",
+        "start": {
+          "column": 29,
+          "line": 24
+        }
+      },
+      {
+        "defaultMessage": "!!!Wallet password",
+        "description": "Label for the \"Wallet password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 33
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.walletPasswordLabel",
+        "start": {
+          "column": 23,
+          "line": 29
+        }
+      },
+      {
+        "defaultMessage": "!!!Current password",
+        "description": "Label for the \"Current password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 38
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.currentPasswordLabel",
+        "start": {
+          "column": 24,
+          "line": 34
+        }
+      },
+      {
+        "defaultMessage": "!!!New password",
+        "description": "Label for the \"New password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 43
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.newPasswordLabel",
+        "start": {
+          "column": 20,
+          "line": 39
+        }
+      },
+      {
+        "defaultMessage": "!!!Repeat password",
+        "description": "Label for the \"Repeat password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 48
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.repeatPasswordLabel",
+        "start": {
+          "column": 23,
+          "line": 44
+        }
+      },
+      {
+        "defaultMessage": "!!!Type current password",
+        "description": "Placeholder for the \"Current password\" inputs in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 53
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder",
+        "start": {
+          "column": 35,
+          "line": 49
+        }
+      },
+      {
+        "defaultMessage": "!!!Type new password",
+        "description": "Placeholder for the \"New password\" inputs in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 58
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder",
+        "start": {
+          "column": 31,
+          "line": 54
+        }
+      },
+      {
+        "defaultMessage": "!!!Repeat new password",
+        "description": "Placeholder for the \"Repeat password\" inputs in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 63
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder",
+        "start": {
+          "column": 34,
+          "line": 59
+        }
+      },
+      {
+        "defaultMessage": "!!!Remove password",
+        "description": "Label for the \"Check to deactivate password\" switch in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 68
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.passwordSwitchLabel",
+        "start": {
+          "column": 23,
+          "line": 64
+        }
+      },
+      {
+        "defaultMessage": "!!!Check to deactivate password",
+        "description": "Text for the \"Check to deactivate password\" switch in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 73
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.passwordSwitchPlaceholder",
+        "start": {
+          "column": 29,
+          "line": 69
+        }
+      }
+    ],
+    "path": "app/components/wallet/settings/ChangeWalletPasswordDialog.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!+ {amount} of fees",
         "description": "Label for the \"+ 12.042481 of fees\" message above amount input field.",
         "end": {
@@ -2457,6 +2616,114 @@
       }
     ],
     "path": "app/components/wallet/WalletSendForm.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Name",
+        "description": "Label for the \"Name\" text input on the wallet settings page.",
+        "end": {
+          "column": 3,
+          "line": 22
+        },
+        "file": "app/components/wallet/WalletSettings.js",
+        "id": "wallet.settings.name.label",
+        "start": {
+          "column": 8,
+          "line": 18
+        }
+      },
+      {
+        "defaultMessage": "!!!Password",
+        "description": "Label for the \"Password\" field.",
+        "end": {
+          "column": 3,
+          "line": 27
+        },
+        "file": "app/components/wallet/WalletSettings.js",
+        "id": "wallet.settings.password",
+        "start": {
+          "column": 17,
+          "line": 23
+        }
+      },
+      {
+        "defaultMessage": "!!!Last updated",
+        "description": "Last updated X time ago message.",
+        "end": {
+          "column": 3,
+          "line": 32
+        },
+        "file": "app/components/wallet/WalletSettings.js",
+        "id": "wallet.settings.passwordLastUpdated",
+        "start": {
+          "column": 23,
+          "line": 28
+        }
+      },
+      {
+        "defaultMessage": "!!!Export wallet",
+        "description": "Label for the export button on wallet settings.",
+        "end": {
+          "column": 3,
+          "line": 37
+        },
+        "file": "app/components/wallet/WalletSettings.js",
+        "id": "wallet.settings.exportWalletButtonLabel",
+        "start": {
+          "column": 21,
+          "line": 33
+        }
+      }
+    ],
+    "path": "app/components/wallet/WalletSettings.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!change",
+        "description": "Label \"change\" on inline editing inputs in inactive state.",
+        "end": {
+          "column": 3,
+          "line": 16
+        },
+        "file": "app/components/widgets/forms/InlineEditingInput.js",
+        "id": "inline.editing.input.change.label",
+        "start": {
+          "column": 10,
+          "line": 12
+        }
+      },
+      {
+        "defaultMessage": "!!!cancel",
+        "description": "Label \"cancel\" on inline editing inputs in inactive state.",
+        "end": {
+          "column": 3,
+          "line": 21
+        },
+        "file": "app/components/widgets/forms/InlineEditingInput.js",
+        "id": "inline.editing.input.cancel.label",
+        "start": {
+          "column": 10,
+          "line": 17
+        }
+      },
+      {
+        "defaultMessage": "!!!Your changes have been saved",
+        "description": "Message \"Your changes have been saved\" for inline editing (eg. on Profile Settings page).",
+        "end": {
+          "column": 3,
+          "line": 26
+        },
+        "file": "app/components/widgets/forms/InlineEditingInput.js",
+        "id": "inline.editing.input.changesSaved",
+        "start": {
+          "column": 16,
+          "line": 22
+        }
+      }
+    ],
+    "path": "app/components/widgets/forms/InlineEditingInput.json"
   },
   {
     "descriptors": [
