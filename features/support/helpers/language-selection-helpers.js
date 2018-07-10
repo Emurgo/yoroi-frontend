@@ -6,7 +6,7 @@ const languageSelection = {
   waitForVisible: async (client, { isHidden } = {}) => {
     if (isHidden) {
       return client.waitForElementNotPresent(LANGUAGE_SELECTION_FORM);
-    } 
+    }
     return client.waitForElement(LANGUAGE_SELECTION_FORM);
   },
   ensureLanguageIsSelected: async (client, { language } = {}) => {

@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+/* import { expect } from 'chai';
 
 export const getNameOfActiveWalletInSidebar = async function () {
   await this.client.waitForVisible('.SidebarWalletMenuItem_active');
@@ -68,3 +68,4 @@ export const importWalletWithFunds = async (client, { keyFilePath, password }) =
       .catch((error) => done(error));
   }, keyFilePath, password)
 );
+ */
