@@ -45,16 +45,18 @@ export default class Settings extends Component<InjectedContainerProps> {
       />
     );
     return (
-      <Layout topbar={
-        <TextOnlyTopBar
-          title={this.context.intl.formatMessage(messages.title)}
-          onCategoryClicked={category => {
-            actions.sidebar.activateSidebarCategory.trigger({ category });
-          }}
-          categories={sidebar.CATEGORIES}
-          activeSidebarCategory={sidebar.activeSidebarCategory}
-        />
-      }>
+      <Layout
+        topbar={
+          <TextOnlyTopBar
+            title={this.context.intl.formatMessage(messages.title)}
+            onCategoryClicked={category => {
+              actions.sidebar.activateSidebarCategory.trigger({ category });
+            }}
+            categories={sidebar.CATEGORIES}
+            activeSidebarCategory={sidebar.activeSidebarCategory}
+          />
+        }
+      >
         <SettingsLayout menu={menu}>
           {children}
         </SettingsLayout>

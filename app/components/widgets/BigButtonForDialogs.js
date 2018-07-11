@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import SvgInline from 'react-svg-inline';
 import classnames from 'classnames';
 import styles from './BigButtonForDialogs.scss';
 
@@ -14,7 +13,7 @@ type Props = {
 export default class BigButtonForDialogs extends Component<Props> {
 
   render() {
-    const { label, description, icon, onClick, isDisabled = false, className } = this.props;
+    const { label, description, onClick, isDisabled = false, className } = this.props;
     const componentClasses = classnames([
       className,
       styles.component,

@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import styles from './Sidebar.scss';
 import SidebarCategory from './SidebarCategory';
 // import BugReportDialog from '../../components/profile/bug-report/BugReportDialog';
-import supportIcon from '../../assets/images/sidebar/bug-report-ic.inline.svg';
+// import supportIcon from '../../assets/images/sidebar/bug-report-ic.inline.svg';
 
 type Props = {
   categories: Array<{
@@ -29,8 +29,11 @@ export default class Sidebar extends Component<Props> {
 
   render() {
     const {
-      categories, activeSidebarCategory,
-      onCategoryClicked, openDialogAction, isDialogOpen,
+      categories,
+      activeSidebarCategory,
+      onCategoryClicked,
+      /* openDialogAction,
+      isDialogOpen,*/
     } = this.props;
 
     const sidebarStyles = classNames([

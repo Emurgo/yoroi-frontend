@@ -39,7 +39,11 @@ export default class TextOnlyTopBar extends Component<Props> {
               className={categoryClassName}
               icon={category.icon}
               active={activeSidebarCategory === category.route}
-              onClick={() => onCategoryClicked(category.route)}
+              onClick={() => {
+                if (onCategoryClicked) {
+                  onCategoryClicked(category.route);
+                }
+              }}
             />
           );
         })}

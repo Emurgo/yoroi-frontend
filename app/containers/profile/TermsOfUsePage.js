@@ -31,7 +31,12 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
   render() {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
-    const topbar = <TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />;
+    const { sidebar } = this.props.stores;
+    const topbar = (
+      <TextOnlyTopBar
+        title={this.context.intl.formatMessage(messages.title)}
+        activeSidebarCategory={sidebar.activeSidebarCategory}
+      />);
     return (
       <TopBarLayout
         topbar={topbar}
