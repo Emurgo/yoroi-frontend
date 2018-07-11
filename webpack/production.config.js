@@ -9,7 +9,7 @@ module.exports = {
   entry: {
     icaruspoc: [
       customPath,
-      path.join(__dirname, '../chrome/extension/icaruspoc')
+      path.join(__dirname, '../chrome/extension/index')
     ],
     background: [
       customPath,

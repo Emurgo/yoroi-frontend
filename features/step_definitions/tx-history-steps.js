@@ -41,9 +41,10 @@ When(/^I see the transactions summary$/, async function () {
 
 Then(/^I should see that the number of transactions is ([^"]*)$/,
 async function (expectedTxsNumber) {
-  await this.waitForElement('.WalletSummary_numberOfTransactions');
-  const txsNumber = await this.getText('.WalletSummary_numberOfTransactions');
-  chai.expect(txsNumber).to.equal('Number of transactions: ' + expectedTxsNumber);
+  await this.waitUntilText(
+    '.WalletSummary_numberOfTransactions',
+    'Number of transactions: ' + expectedTxsNumber
+  );
 });
 
 Then(/^I should see no transactions$/, async function () {

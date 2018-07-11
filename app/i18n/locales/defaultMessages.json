@@ -362,8 +362,8 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "Unable to restored Daedalus wallet",
-        "description": "Label \"Unable to restored Daedalus wallet\" on the Daedalus transfer error page.",
+        "defaultMessage": "!!!Unable to restore Daedalus wallet",
+        "description": "Label \"Unable to restore Daedalus wallet\" on the Daedalus transfer error page.",
         "end": {
           "column": 3,
           "line": 17
@@ -376,7 +376,7 @@
         }
       },
       {
-        "defaultMessage": "Back",
+        "defaultMessage": "!!!Back",
         "description": "Label \"Back\" on the Daedalus transfer error page.",
         "end": {
           "column": 3,
@@ -554,6 +554,352 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Instructions",
+        "description": "Label \"Instructions\" on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 21
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.instructions.title.label",
+        "start": {
+          "column": 9,
+          "line": 17
+        }
+      },
+      {
+        "defaultMessage": "!!!Find you Daedalus mnemonics and prepare it",
+        "description": "Text for instructions step 1 on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 26
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.instructions.step0.text",
+        "start": {
+          "column": 9,
+          "line": 22
+        }
+      },
+      {
+        "defaultMessage": "!!!Enter mnemonics",
+        "description": "Text for instructions step 2 on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 31
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.instructions.step1.text",
+        "start": {
+          "column": 9,
+          "line": 27
+        }
+      },
+      {
+        "defaultMessage": "!!!Click Next button",
+        "description": "Text for instructions step 3 on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 36
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.instructions.step2.text",
+        "start": {
+          "column": 9,
+          "line": 32
+        }
+      },
+      {
+        "defaultMessage": "!!!Wait until wallet is synced",
+        "description": "Text for instructions step 4 on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 41
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.instructions.step3.text",
+        "start": {
+          "column": 9,
+          "line": 37
+        }
+      },
+      {
+        "defaultMessage": "!!!Accept \"transfer funds\" transaction between Daedalus and Icarus wallets.",
+        "description": "Text for instructions step 5 on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 46
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.instructions.step4.text",
+        "start": {
+          "column": 9,
+          "line": 42
+        }
+      },
+      {
+        "defaultMessage": "!!!Recovery phrase",
+        "description": "Label for the recovery phrase input on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 51
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.recovery.phrase.input.label",
+        "start": {
+          "column": 28,
+          "line": 47
+        }
+      },
+      {
+        "defaultMessage": "!!!Enter recovery phrase",
+        "description": "Hint \"Enter recovery phrase\" for the recovery phrase input on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 56
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.recovery.phrase.input.hint",
+        "start": {
+          "column": 27,
+          "line": 52
+        }
+      },
+      {
+        "defaultMessage": "!!!No results",
+        "description": "\"No results\" message for the recovery phrase input search results.",
+        "end": {
+          "column": 3,
+          "line": 61
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.recovery.phrase.input.noResults",
+        "start": {
+          "column": 27,
+          "line": 57
+        }
+      },
+      {
+        "defaultMessage": "!!!Invalid recovery phrase",
+        "description": "Error message shown when invalid recovery phrase was entered.",
+        "end": {
+          "column": 3,
+          "line": 66
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.errors.invalidRecoveryPhrase",
+        "start": {
+          "column": 25,
+          "line": 62
+        }
+      },
+      {
+        "defaultMessage": "!!!Back",
+        "description": "Label for the back button on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 71
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.back",
+        "start": {
+          "column": 19,
+          "line": 67
+        }
+      },
+      {
+        "defaultMessage": "!!!Next",
+        "description": "Label for the next button on the Daedalus transfer form page.",
+        "end": {
+          "column": 3,
+          "line": 76
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
+        "id": "daedalusTransfer.form.next",
+        "start": {
+          "column": 19,
+          "line": 72
+        }
+      }
+    ],
+    "path": "app/components/daedalusTransfer/DaedalusTransferFormPage.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Instructions",
+        "description": "Label \"Instructions\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 17
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.instructions.title.label",
+        "start": {
+          "column": 20,
+          "line": 13
+        }
+      },
+      {
+        "defaultMessage": "!!!Before you can transfer funds from your Daedalus wallet, you must create an Icarus wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Icarus wallet at any time.",
+        "description": "Instructions text on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 22
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.instructions.text",
+        "start": {
+          "column": 20,
+          "line": 18
+        }
+      },
+      {
+        "defaultMessage": "!!!Create Icarus wallet",
+        "description": "Label \"Create Icarus wallet\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 27
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.instructions.button.label",
+        "start": {
+          "column": 22,
+          "line": 23
+        }
+      },
+      {
+        "defaultMessage": "!!!Attention",
+        "description": "Label \"Attention\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 32
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.attention.title.label",
+        "start": {
+          "column": 18,
+          "line": 28
+        }
+      },
+      {
+        "defaultMessage": "!!!Icarus and Daedalus wallets use different key derivation scheme and they each have a separate format for addresses. For this reason, Daedalus wallets cannot be restored and continued to be used in Icarus and vice versa. This will change in the future. For now, to use funds from your Daedalus wallet, you need to transfer them to your Icarus wallet. Daedalus and Icarus wallets are fully compatible for transferring of funds. If you don’t have a working copy of Daedalus, you can use your 12-word recovery phrase used to restore and transfer the balance from Daedalus into Icarus.",
+        "description": "Attention text on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 37
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.attention.text",
+        "start": {
+          "column": 17,
+          "line": 33
+        }
+      },
+      {
+        "defaultMessage": "!!!Do you have access to a working copy of your Daedalus wallet?",
+        "description": "Label \"Do you have access to a working copy of your Daedalus wallet?\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 42
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.attention.question.label",
+        "start": {
+          "column": 12,
+          "line": 38
+        }
+      },
+      {
+        "defaultMessage": "!!!Yes",
+        "description": "Label \"Yes\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 47
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.attention.answer.yes.label",
+        "start": {
+          "column": 13,
+          "line": 43
+        }
+      },
+      {
+        "defaultMessage": "!!!Use the <receive screen> to generate a new address and use it to send funds from Daedalus.",
+        "description": "text related to answer \"Yes\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 52
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.attention.answer.yes.text",
+        "start": {
+          "column": 17,
+          "line": 48
+        }
+      },
+      {
+        "defaultMessage": "!!!Go to the Receive screen",
+        "description": "Label \"Go to the Receive screen\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 57
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.instructions.attention.answer.yes.button.label",
+        "start": {
+          "column": 19,
+          "line": 53
+        }
+      },
+      {
+        "defaultMessage": "!!!No",
+        "description": "Label \"No\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 62
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.attention.answer.no.label",
+        "start": {
+          "column": 12,
+          "line": 58
+        }
+      },
+      {
+        "defaultMessage": "!!!Use the 12-word recovery phrase to transfer all of the funds from your Daedalus wallet to Icarus.",
+        "description": "Label related to answer \"No\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 67
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instruction.attention.answer.no.text",
+        "start": {
+          "column": 16,
+          "line": 63
+        }
+      },
+      {
+        "defaultMessage": "!!!Transfer all funds from Daedalus wallet",
+        "description": "Label \"Transfer all funds from Daedalus wallet\" on the Daedalus transfer instructions page.",
+        "end": {
+          "column": 3,
+          "line": 72
+        },
+        "file": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.js",
+        "id": "daedalusTransfer.instructions.attention.answer.no.button.label",
+        "start": {
+          "column": 18,
+          "line": 68
+        }
+      }
+    ],
+    "path": "app/components/daedalusTransfer/DaedalusTransferInstructionsPage.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!From",
         "description": "Label showing addresses where the tx will be from",
         "end": {
@@ -671,7 +1017,7 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "Daedalus wallet is being restored...",
+        "defaultMessage": "!!!Daedalus wallet is being restored...",
         "description": "Label \"Daedalus wallet is being restored...\" on the Daedalus transfer waiting page.",
         "end": {
           "column": 3,
@@ -685,7 +1031,7 @@
         }
       },
       {
-        "defaultMessage": "Fetching addresses",
+        "defaultMessage": "!!!Fetching addresses",
         "description": "Progress info \"Fetching addresses\" on the Daedalus transfer waiting page.",
         "end": {
           "column": 3,
@@ -699,7 +1045,7 @@
         }
       },
       {
-        "defaultMessage": "Checking addresses funds",
+        "defaultMessage": "!!!Checking addresses funds",
         "description": "Progress info \"Checking addresses funds\" on the Daedalus transfer waiting page.",
         "end": {
           "column": 3,
@@ -713,7 +1059,7 @@
         }
       },
       {
-        "defaultMessage": "Generating transfer transaction",
+        "defaultMessage": "!!!Generating transfer transaction",
         "description": "Progress info \"Generating transfer transaction\" on the Daedalus transfer waiting page.",
         "end": {
           "column": 3,
@@ -1248,13 +1594,13 @@
         "description": "Title for the \"Change wallet password\" dialog when there is no password set.",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 21
         },
         "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
         "id": "wallet.settings.changePassword.dialog.title.setPassword",
         "start": {
           "column": 26,
-          "line": 19
+          "line": 17
         }
       },
       {
@@ -1262,13 +1608,13 @@
         "description": "Title for the \"Change wallet password\" dialog when there is already password set.",
         "end": {
           "column": 3,
-          "line": 28
+          "line": 26
         },
         "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
         "id": "wallet.settings.changePassword.dialog.title.changePassword",
         "start": {
           "column": 29,
-          "line": 24
+          "line": 22
         }
       },
       {
@@ -1276,13 +1622,13 @@
         "description": "Label for the \"Wallet password\" input in the change wallet password dialog.",
         "end": {
           "column": 3,
-          "line": 33
+          "line": 31
         },
         "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
         "id": "wallet.settings.changePassword.dialog.walletPasswordLabel",
         "start": {
           "column": 23,
-          "line": 29
+          "line": 27
         }
       },
       {
@@ -1290,27 +1636,13 @@
         "description": "Label for the \"Current password\" input in the change wallet password dialog.",
         "end": {
           "column": 3,
-          "line": 38
+          "line": 36
         },
         "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
         "id": "wallet.settings.changePassword.dialog.currentPasswordLabel",
         "start": {
           "column": 24,
-          "line": 34
-        }
-      },
-      {
-        "defaultMessage": "!!!New password",
-        "description": "Label for the \"New password\" input in the change wallet password dialog.",
-        "end": {
-          "column": 3,
-          "line": 43
-        },
-        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
-        "id": "wallet.settings.changePassword.dialog.newPasswordLabel",
-        "start": {
-          "column": 20,
-          "line": 39
+          "line": 32
         }
       },
       {
@@ -1318,13 +1650,13 @@
         "description": "Label for the \"Repeat password\" input in the change wallet password dialog.",
         "end": {
           "column": 3,
-          "line": 48
+          "line": 41
         },
         "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
         "id": "wallet.settings.changePassword.dialog.repeatPasswordLabel",
         "start": {
           "column": 23,
-          "line": 44
+          "line": 37
         }
       },
       {
@@ -1332,13 +1664,13 @@
         "description": "Placeholder for the \"Current password\" inputs in the change wallet password dialog.",
         "end": {
           "column": 3,
-          "line": 53
+          "line": 46
         },
         "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
         "id": "wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder",
         "start": {
           "column": 35,
-          "line": 49
+          "line": 42
         }
       },
       {
@@ -1346,13 +1678,27 @@
         "description": "Placeholder for the \"New password\" inputs in the change wallet password dialog.",
         "end": {
           "column": 3,
-          "line": 58
+          "line": 51
         },
         "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
         "id": "wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder",
         "start": {
           "column": 31,
-          "line": 54
+          "line": 47
+        }
+      },
+      {
+        "defaultMessage": "!!!New password",
+        "description": "Label for the \"New password\" input in the change wallet password dialog.",
+        "end": {
+          "column": 3,
+          "line": 56
+        },
+        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
+        "id": "wallet.settings.changePassword.dialog.newPasswordLabel",
+        "start": {
+          "column": 20,
+          "line": 52
         }
       },
       {
@@ -1360,41 +1706,13 @@
         "description": "Placeholder for the \"Repeat password\" inputs in the change wallet password dialog.",
         "end": {
           "column": 3,
-          "line": 63
+          "line": 61
         },
         "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
         "id": "wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder",
         "start": {
           "column": 34,
-          "line": 59
-        }
-      },
-      {
-        "defaultMessage": "!!!Remove password",
-        "description": "Label for the \"Check to deactivate password\" switch in the change wallet password dialog.",
-        "end": {
-          "column": 3,
-          "line": 68
-        },
-        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
-        "id": "wallet.settings.changePassword.dialog.passwordSwitchLabel",
-        "start": {
-          "column": 23,
-          "line": 64
-        }
-      },
-      {
-        "defaultMessage": "!!!Check to deactivate password",
-        "description": "Text for the \"Check to deactivate password\" switch in the change wallet password dialog.",
-        "end": {
-          "column": 3,
-          "line": 73
-        },
-        "file": "app/components/wallet/settings/ChangeWalletPasswordDialog.js",
-        "id": "wallet.settings.changePassword.dialog.passwordSwitchPlaceholder",
-        "start": {
-          "column": 29,
-          "line": 69
+          "line": 57
         }
       }
     ],
@@ -1788,6 +2106,151 @@
       }
     ],
     "path": "app/components/wallet/transactions/WalletTransactionsSearch.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Add wallet",
+        "description": "Label for the \"Add wallet\" title on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 19
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.title.label",
+        "start": {
+          "column": 9,
+          "line": 15
+        }
+      },
+      {
+        "defaultMessage": "!!!Create",
+        "description": "Label for the \"Create\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 24
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.create.label",
+        "start": {
+          "column": 15,
+          "line": 20
+        }
+      },
+      {
+        "defaultMessage": "!!!Create a new wallet",
+        "description": "Description for the \"Create\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 29
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.create.description",
+        "start": {
+          "column": 21,
+          "line": 25
+        }
+      },
+      {
+        "defaultMessage": "!!!Join",
+        "description": "Label for the \"Join\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 34
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.join.label",
+        "start": {
+          "column": 13,
+          "line": 30
+        }
+      },
+      {
+        "defaultMessage": "!!!Join a shared wallet with up to 5 people",
+        "description": "Description for the \"Join\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 39
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.join.description",
+        "start": {
+          "column": 19,
+          "line": 35
+        }
+      },
+      {
+        "defaultMessage": "!!!Restore",
+        "description": "Label for the \"Restore\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 44
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.restore.label",
+        "start": {
+          "column": 16,
+          "line": 40
+        }
+      },
+      {
+        "defaultMessage": "!!!Restore wallet from backup",
+        "description": "Description for the \"Restore\" button without paper wallet certificate on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 49
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.restore.description",
+        "start": {
+          "column": 22,
+          "line": 45
+        }
+      },
+      {
+        "defaultMessage": "!!!Import",
+        "description": "Label for the \"Import\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 54
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.import.label",
+        "start": {
+          "column": 15,
+          "line": 50
+        }
+      },
+      {
+        "defaultMessage": "!!!Import wallet from a file",
+        "description": "Description for the \"Import\" button on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 59
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.import.description",
+        "start": {
+          "column": 21,
+          "line": 55
+        }
+      },
+      {
+        "defaultMessage": "!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.",
+        "description": "Restore notification message shown during async wallet restore on the wallet add screen.",
+        "end": {
+          "column": 3,
+          "line": 64
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.restoreNotificationMessage",
+        "start": {
+          "column": 30,
+          "line": 60
+        }
+      }
+    ],
+    "path": "app/components/wallet/WalletAdd.json"
   },
   {
     "descriptors": [
@@ -2624,13 +3087,13 @@
         "description": "Label for the \"Name\" text input on the wallet settings page.",
         "end": {
           "column": 3,
-          "line": 22
+          "line": 20
         },
         "file": "app/components/wallet/WalletSettings.js",
         "id": "wallet.settings.name.label",
         "start": {
           "column": 8,
-          "line": 18
+          "line": 16
         }
       },
       {
@@ -2638,13 +3101,13 @@
         "description": "Label for the \"Password\" field.",
         "end": {
           "column": 3,
-          "line": 27
+          "line": 25
         },
         "file": "app/components/wallet/WalletSettings.js",
         "id": "wallet.settings.password",
         "start": {
           "column": 17,
-          "line": 23
+          "line": 21
         }
       },
       {
@@ -2652,13 +3115,13 @@
         "description": "Last updated X time ago message.",
         "end": {
           "column": 3,
-          "line": 32
+          "line": 30
         },
         "file": "app/components/wallet/WalletSettings.js",
         "id": "wallet.settings.passwordLastUpdated",
         "start": {
           "column": 23,
-          "line": 28
+          "line": 26
         }
       },
       {
@@ -2666,13 +3129,13 @@
         "description": "Label for the export button on wallet settings.",
         "end": {
           "column": 3,
-          "line": 37
+          "line": 35
         },
         "file": "app/components/wallet/WalletSettings.js",
         "id": "wallet.settings.exportWalletButtonLabel",
         "start": {
           "column": 21,
-          "line": 33
+          "line": 31
         }
       }
     ],
@@ -2728,17 +3191,17 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Transfer From Daedalus",
+        "defaultMessage": "!!!Transfer funds from Daedalus",
         "description": "Transfer from Daedalus Title.",
         "end": {
           "column": 3,
-          "line": 24
+          "line": 25
         },
         "file": "app/containers/daedalusTransfer/DaedalusTransferPage.js",
         "id": "daedalusTransfer.title",
         "start": {
           "column": 9,
-          "line": 20
+          "line": 21
         }
       }
     ],
@@ -2747,16 +3210,16 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Loading wallet data",
-        "description": "Message \"Loading wallet data\" on the loading screen.",
+        "defaultMessage": "!!!loading components",
+        "description": "Message \"loading components\" on the loading screen.",
         "end": {
           "column": 3,
           "line": 16
         },
         "file": "app/containers/LoadingPage.js",
-        "id": "loading.screen.loadingWalletData",
+        "id": "loading.screen.loading",
         "start": {
-          "column": 21,
+          "column": 11,
           "line": 12
         }
       }
@@ -2819,6 +3282,25 @@
       }
     ],
     "path": "app/containers/settings/Settings.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Add Wallet",
+        "description": "Add Wallet Title.",
+        "end": {
+          "column": 3,
+          "line": 26
+        },
+        "file": "app/containers/wallet/WalletAddPage.js",
+        "id": "wallet.add.page.title",
+        "start": {
+          "column": 9,
+          "line": 22
+        }
+      }
+    ],
+    "path": "app/containers/wallet/WalletAddPage.json"
   },
   {
     "descriptors": [
