@@ -5,7 +5,7 @@ import Store from '../lib/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
 import WalletAddress from '../../domain/WalletAddress';
-import LocalizableError from '../../i18n/LocalizableError';
+import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
 import type { GetAddressesResponse, CreateAddressResponse } from '../../api/ada/index';
 
 export default class AddressesStore extends Store {
@@ -39,7 +39,7 @@ export default class AddressesStore extends Store {
         });
       }
     } catch (error) {
-      runInAction('set error', () => { this.error = error; });
+      runInAction('set error', () => { this.error = localizedError(error); });
     }
   };
 
@@ -73,14 +73,12 @@ export default class AddressesStore extends Store {
   }
 
   @action _refreshAddresses = () => {
-    // if (this.stores.networkStatus.isConnected) {
     const allWallets = this.stores.ada.wallets.all;
     for (const wallet of allWallets) {
       const allRequest = this._getAddressesAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
       allRequest.execute({ walletId: wallet.id });
     }
-    // }
   };
 
   @action _resetErrors = () => {

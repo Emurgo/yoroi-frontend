@@ -11,62 +11,67 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
-import styles from './DaedalusTransferForm.scss';
+import styles from './DaedalusTransferFormPage.scss';
 
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.form.instructions.title.label',
-    defaultMessage: 'Instructions',
+    defaultMessage: '!!!Instructions',
     description: 'Label "Instructions" on the Daedalus transfer form page.'
   },
   step0: {
     id: 'daedalusTransfer.form.instructions.step0.text',
-    defaultMessage: 'Find you Daedalus mnemonics and prepare it',
+    defaultMessage: '!!!Find you Daedalus mnemonics and prepare it',
     description: 'Text for instructions step 1 on the Daedalus transfer form page.'
   },
   step1: {
     id: 'daedalusTransfer.form.instructions.step1.text',
-    defaultMessage: 'Enter mnemonics',
+    defaultMessage: '!!!Enter mnemonics',
     description: 'Text for instructions step 2 on the Daedalus transfer form page.'
   },
   step2: {
     id: 'daedalusTransfer.form.instructions.step2.text',
-    defaultMessage: 'Click Next button',
+    defaultMessage: '!!!Click Next button',
     description: 'Text for instructions step 3 on the Daedalus transfer form page.'
   },
   step3: {
     id: 'daedalusTransfer.form.instructions.step3.text',
-    defaultMessage: 'Wait until wallet is synced',
+    defaultMessage: '!!!Wait until wallet is synced',
     description: 'Text for instructions step 4 on the Daedalus transfer form page.'
   },
   step4: {
     id: 'daedalusTransfer.form.instructions.step4.text',
-    defaultMessage: 'Accept "transfer funds" transaction between Daedalus and Icarus wallets.',
+    defaultMessage: '!!!Accept "transfer funds" transaction between Daedalus and Icarus wallets.',
     description: 'Text for instructions step 5 on the Daedalus transfer form page.'
   },
   recoveryPhraseInputLabel: {
     id: 'daedalusTransfer.form.recovery.phrase.input.label',
-    defaultMessage: 'Recovery phrase',
+    defaultMessage: '!!!Recovery phrase',
     description: 'Label for the recovery phrase input on the Daedalus transfer form page.'
   },
   recoveryPhraseInputHint: {
     id: 'daedalusTransfer.form.recovery.phrase.input.hint',
-    defaultMessage: 'Enter recovery phrase',
+    defaultMessage: '!!!Enter recovery phrase',
     description: 'Hint "Enter recovery phrase" for the recovery phrase input on the Daedalus transfer form page.'
   },
   recoveryPhraseNoResults: {
     id: 'daedalusTransfer.form.recovery.phrase.input.noResults',
-    defaultMessage: 'No results',
+    defaultMessage: '!!!No results',
     description: '"No results" message for the recovery phrase input search results.'
   },
   invalidRecoveryPhrase: {
     id: 'daedalusTransfer.form.errors.invalidRecoveryPhrase',
-    defaultMessage: 'Invalid recovery phrase',
+    defaultMessage: '!!!Invalid recovery phrase',
     description: 'Error message shown when invalid recovery phrase was entered.'
+  },
+  backButtonLabel: {
+    id: 'daedalusTransfer.form.back',
+    defaultMessage: '!!!Back',
+    description: 'Label for the back button on the Daedalus transfer form page.'
   },
   nextButtonLabel: {
     id: 'daedalusTransfer.form.next',
-    defaultMessage: 'Next',
+    defaultMessage: '!!!Next',
     description: 'Label for the next button on the Daedalus transfer form page.'
   },
 });
@@ -75,12 +80,13 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   onSubmit: Function,
+  onBack: Function,
   mnemonicValidator: Function,
   suggestedMnemonics: Array<string>,
 };
 
 @observer
-export default class DaedalusTransferForm extends Component<Props> {
+export default class DaedalusTransferFormPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -92,14 +98,14 @@ export default class DaedalusTransferForm extends Component<Props> {
         label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
         placeholder: this.context.intl.formatMessage(messages.recoveryPhraseInputHint),
         value: '',
-        validators: ({ field }) => {
+        validators: [({ field }) => {
           const value = join(field.value, ' ');
           if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
           return [
             this.props.mnemonicValidator(value),
             this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
           ];
-        },
+        }],
       },
     },
   }, {
@@ -125,10 +131,14 @@ export default class DaedalusTransferForm extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { suggestedMnemonics } = this.props;
+    const { suggestedMnemonics, onBack } = this.props;
 
-    const buttonClasses = classnames([
+    const nextButtonClasses = classnames([
       'primary',
+      styles.button,
+    ]);
+    const backButtonClasses = classnames([
+      'flat',
       styles.button,
     ]);
 
@@ -166,12 +176,21 @@ export default class DaedalusTransferForm extends Component<Props> {
               skin={<SimpleAutocompleteSkin />}
             />
 
-            <Button
-              className={buttonClasses}
-              label={intl.formatMessage(messages.nextButtonLabel)}
-              onClick={this.submit}
-              skin={<SimpleButtonSkin />}
-            />
+            <div className={styles.buttonsWrapper}>
+              <Button
+                className={nextButtonClasses}
+                label={intl.formatMessage(messages.nextButtonLabel)}
+                onClick={this.submit}
+                skin={<SimpleButtonSkin />}
+              />
+
+              <Button
+                className={backButtonClasses}
+                label={intl.formatMessage(messages.backButtonLabel)}
+                onClick={onBack}
+                skin={<SimpleButtonSkin />}
+              />
+            </div>
 
           </div>
 

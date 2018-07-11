@@ -38,6 +38,12 @@
     margin-bottom: 20px;
   }
 
+  .buttonsWrapper {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+  }
+
   .submitWithPasswordButton {
     &.spinning {
       @include loading-spinner("../../assets/images/spinner-light.svg");

@@ -67,14 +67,15 @@ export default class AdaWalletsStore extends WalletStore {
 
   isValidAddress = (address: string) => this.api.ada.isValidAddress(address);
 
-  isValidMnemonic = (mnemonic: string) => this.api.ada.isValidMnemonic(mnemonic);
+  isValidMnemonic = (
+    mnemonic: string,
+    numberOfWords: ?number
+  ) => this.api.ada.isValidMnemonic(mnemonic, numberOfWords);
 
   // TODO - call endpoint to check if private key is valid
   isValidPrivateKey = () => { return true; }; // eslint-disable-line
 
   @action refreshWalletsData = async () => {
-    // FIXME: We don't care about network status
-    // if (this.stores.networkStatus.isConnected) {
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {

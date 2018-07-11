@@ -21,6 +21,7 @@ import {
   getAddressesWithFunds,
   generateTransferTx
 } from '../../api/ada/daedalusTransfer';
+import environment from '../../environment';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -29,14 +30,20 @@ const MSG_TYPE_RESTORE = 'RESTORE';
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatus = 'uninitialized';
+  @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable transferFundsRequest: Request<any> = new Request(this._transferFundsRequest);
   @observable ws: any = null;
 
   setup(): void {
+    this.registerReactions([
+      this._enableDisableTransferFunds
+    ]);
     const actions = this.actions.ada.daedalusTransfer;
+    actions.startTransferFunds.listen(this._startTransferFunds);
     actions.setupTransferFunds.listen(this._setupTransferFunds);
+    actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._transferFunds);
     actions.cancelTransferFunds.listen(this._reset);
   }
@@ -46,10 +53,31 @@ export default class DaedalusTransferStore extends Store {
     this._reset();
   }
 
+  _startTransferFunds = (): void => {
+    this._updateStatus('gettingMnemonics');
+  }
+
+  /* @Attention:
+      You should check wallets state outside of the runInAction,
+      because this method run as a reaction.
+  */
+  _enableDisableTransferFunds = (): void => {
+    const { wallets } = this.stores && this.stores[environment.API];
+    if (wallets && wallets.hasActiveWallet) {
+      runInAction(() => {
+        this.disableTransferFunds = false;
+      });
+    } else {
+      runInAction(() => {
+        this.disableTransferFunds = true;
+      });
+    }
+  }
+
   /* TODO: Handle WS connection errors */
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
-    this.status = 'restoringAddresses';
+    this._updateStatus('restoringAddresses');
     this.ws = new WebSocket(websocketUrl);
     this.ws.addEventListener('open', () => {
       console.log('[ws::connected]');
@@ -90,6 +118,10 @@ export default class DaedalusTransferStore extends Store {
     });
   }
 
+  _backToUninitialized = (): void => {
+    this._updateStatus('uninitialized');
+  }
+
   @action.bound
   _updateStatus(s: TransferStatus): void {
     this.status = s;
@@ -119,7 +151,7 @@ export default class DaedalusTransferStore extends Store {
     } catch (error) {
       Logger.error(`DaedalusTransferStore::transferFunds ${stringifyError(error)}`);
       runInAction(() => {
-        this.error = localizedError(new TransferFundsError());
+        this.error = new TransferFundsError();
       });
     }
   }

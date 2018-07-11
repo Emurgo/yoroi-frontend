@@ -6,6 +6,5 @@ When(/^I see the balance$/, async function () {
 });
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
-  const balance = await this.getText('.TopBar_walletAmount');
-  chai.expect(balance).to.equal(number);
+  await this.waitUntilText('.TopBar_walletAmount', number);
 });

@@ -4,10 +4,12 @@ import {
   toAdaAddress,
   getAddressTypeIndex
 } from './lib/cardanoCrypto/cryptoToModel';
+import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
   getAddressInHex,
   saveInStorage,
-  getFromStorage
+  getFromStorage,
+  mapToList,
 } from './lib/utils';
 import type {
   AdaAddresses,
@@ -17,7 +19,14 @@ import type {
 export const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
 
 export function isValidAdaAddress(address: string): Promise<boolean> {
-  return Promise.resolve(!Wallet.checkAddress(getAddressInHex(address)).failed);
+  try {
+    const result = getOrFail(Wallet.checkAddress(getAddressInHex(address)));
+    return Promise.resolve(result);
+  } catch (error) {
+    // This error means the address is not valid
+    if (error.message.includes('Expected(Array, UnsignedInteger)')) return Promise.resolve(false);
+    throw error;
+  }
 }
 
 /* Just return all existing addresses because we are using a SINGLE account */
@@ -25,6 +34,11 @@ export function getAdaAddressesMap() {
   const addresses = getFromStorage(ADDRESSES_KEY);
   if (!addresses) return {};
   return addresses;
+}
+
+export function getAdaAddresses(): Array<string> {
+  const persistentAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
+  return persistentAddresses.map(addr => addr.cadId);
 }
 
 export function filterAdaAddressesByType(
@@ -53,8 +67,8 @@ export function createAdaAddress(
 ): AdaAddress {
   const filteredAddresses = filterAdaAddressesByType(addresses, addressType);
   const addressIndex = filteredAddresses.length;
-  const result = Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]);
-  return toAdaAddress(cryptoAccount.account, addressType, addressIndex, result.result[0]);
+  const [address] = getOrFail(Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]));
+  return toAdaAddress(cryptoAccount.account, addressType, addressIndex, address);
 }
 
 export function saveAdaAddress(address: AdaAddress): void {

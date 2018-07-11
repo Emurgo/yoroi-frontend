@@ -23,7 +23,12 @@ import {
   createAdaAddress,
   getAdaAddressesMap
 } from '../adaAddress';
-import { getCryptoWalletFromSeed } from '../lib/cardanoCrypto/cryptoWallet';
+import {
+  getCryptoWalletFromSeed,
+  generateWalletSeed,
+  generateAdaMnemonic,
+} from '../lib/cardanoCrypto/cryptoWallet';
+import { getOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {
   AdaAddresses,
   AdaTransactionFee,
@@ -32,29 +37,27 @@ import type {
 import {
   NotEnoughMoneyToSendError,
   TransactionError,
-  SendTransactionApiError
+  SendTransactionError,
+  GetAllUTXOsForAddressesError
 } from '../errors';
+
+const fakePassword = 'fake';
 
 export function getAdaTransactionFee(
   receiver: string,
   amount: string
 ): Promise<AdaTransactionFee> {
-  const password = 'FakePassword';
-  return _getAdaTransaction(receiver, amount, password)
-    .then((response) => {
-      const result = response[0];
-      if (result.failed) {
-        const notEnoughFunds = result.msg === 'FeeCalculationError(NotEnoughInput)' ||
-          result.msg === 'FeeCalculationError(NoInputs)';
-        if (notEnoughFunds) {
-          throw new NotEnoughMoneyToSendError();
-        } else {
-          throw new TransactionError();
-        }
-      }
-      return {
-        getCCoin: result.result.fee
-      };
+  const fakeWalletSeed = generateWalletSeed(generateAdaMnemonic().join(' '), fakePassword);
+  return _getAdaTransaction(receiver, amount, getCryptoWalletFromSeed(fakeWalletSeed, fakePassword))
+    .then(response => {
+      const [{ fee }] = response;
+      return { getCCoin: fee };
+    })
+    .catch(err => {
+      const notEnoughFunds = err.message === 'FeeCalculationError(NotEnoughInput)' ||
+        err.message === 'FeeCalculationError(NoInputs)';
+      if (notEnoughFunds) throw new NotEnoughMoneyToSendError();
+      throw new TransactionError(err.message);
     });
 }
 
@@ -63,8 +66,10 @@ export async function newAdaTransaction(
   amount: string,
   password: string
 ): Promise<any> {
-  const [{ result: { cbor_encoded_tx } }, changeAdaAddr] =
-    await _getAdaTransaction(receiver, amount, password);
+  const seed = getWalletSeed();
+  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  const [{ cbor_encoded_tx }, changeAdaAddr] =
+    await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
   saveAdaAddress(changeAdaAddr);
   try {
@@ -74,28 +79,32 @@ export async function newAdaTransaction(
     removeAdaAddress(changeAdaAddr);
     Logger.error('adaNewTransactions::newAdaTransaction error: ' +
       stringifyError(sendTxError));
-    throw new SendTransactionApiError();
+    throw new SendTransactionError();
   }
 }
 
 export async function getAllUTXOsForAddresses(
   addresses: Array<string>
 ): Promise<Array<UTXO>> {
-  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-  const promises = groupsOfAddresses.map(groupOfAddresses =>
-    getUTXOsForAddresses(groupOfAddresses));
-  return Promise.all(promises).then(groupsOfUTXOs =>
-    groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
+  try {
+    const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+    const promises = groupsOfAddresses.map(groupOfAddresses =>
+      getUTXOsForAddresses(groupOfAddresses));
+    return Promise.all(promises).then(groupsOfUTXOs =>
+      groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
+  } catch (getUtxosError) {
+    Logger.error('adaNewTransactions::getAllUTXOsForAddresses error: ' +
+      stringifyError(getUtxosError));
+    throw new GetAllUTXOsForAddressesError();
+  }
 }
 
 export function getAdaTransactionFromSenders(
   senders: AdaAddresses,
   receiver: string,
   amount: string,
-  password: string
+  cryptoWallet: CryptoWallet
 ) {
-  const seed = getWalletSeed();
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   const cryptoAccount = getSingleCryptoAccount();
   const addressesMap = getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
@@ -105,24 +114,18 @@ export function getAdaTransactionFromSenders(
   return getAllUTXOsForAddresses(_getAddresses(senders))
     .then((senderUtxos) => {
       const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-      return [
-        Wallet.spend(
-          cryptoWallet,
-          inputs,
-          outputs,
-          changeAddr),
-        changeAdaAddr
-      ];
+      const result = getOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
+      return [result, changeAdaAddr];
     });
 }
 
 function _getAdaTransaction(
   receiver: string,
   amount: string,
-  password: string,
+  cryptoWallet: CryptoWallet,
 ) {
   const senders = mapToList(getAdaAddressesMap());
-  return getAdaTransactionFromSenders(senders, receiver, amount, password);
+  return getAdaTransactionFromSenders(senders, receiver, amount, cryptoWallet);
 }
 
 function _getAddresses(

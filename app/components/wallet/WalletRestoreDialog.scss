@@ -43,8 +43,8 @@
     }
 
     & > div {
-      margin-top: 20px;
-      width: 240px;
+      margin-top: 30px;
+      width: 350px;
     }
 
     @include place-form-field-error-below-input;
@@ -52,9 +52,8 @@
     .passwordInstructions {
       color: var(--theme-instructions-text-color);
       font-family: var(--font-light);
-      font-size: 14px;
       line-height: 1.38;
-      margin-top: 10px;
+      margin-top: 16px;
       opacity: 0.5;
     }
   }
