@@ -10,6 +10,7 @@ import WalletAddPage from './containers/wallet/WalletAddPage';
 import LanguageSelectionPage from './containers/profile/LanguageSelectionPage';
 import Settings from './containers/settings/Settings';
 import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
+import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
 
@@ -41,6 +42,7 @@ export const Routes = (
       <IndexRedirect to="general" />
       <Route path="general" component={GeneralSettingsPage} />
       <Route path="terms-of-use" component={TermsOfUseSettingsPage} />
+      <Route path="support" component={SupportSettingsPage} />
     </Route>
     <Route path={ROUTES.DAEDALUS_TRANFER.ROOT} component={DaedalusTransferPage} />
   </div>
