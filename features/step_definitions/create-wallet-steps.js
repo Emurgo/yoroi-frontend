@@ -1,4 +1,4 @@
-import { When } from 'cucumber';
+import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 
 When(/^I click the create button$/, async function () {
@@ -9,6 +9,10 @@ When(/^I enter the created wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
   await this.input('.WalletCreateDialog .walletPassword input', fields.password);
   await this.input('.WalletCreateDialog .repeatedPassword input', fields.repeatedPassword);
+});
+
+When(/^I clear the created wallet password ([^"]*)$/, async function (password) {
+  await this.clearInputUpdatingForm('.WalletCreateDialog .walletPassword input', password.length);
 });
 
 When(/^I click the "Create personal wallet" button$/, async function () {
@@ -35,4 +39,8 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
   const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
   checkboxes.forEach((box) => box.click());
   await this.click('.WalletRecoveryPhraseEntryDialog .primary');
+});
+
+Then(/^I should stay in the create wallet dialog$/, async function () {
+  await this.waitUntilText('.Dialog_title', 'CREATE A NEW WALLET', 2000);
 });

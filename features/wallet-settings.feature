@@ -48,3 +48,14 @@ Feature: Wallet Settings
     | first Edited |
     And I click outside "name" input field
     Then I should see new wallet name "first Edited"
+
+  Scenario: User fails to change password due to incomplete fields
+    Given I am on the wallet "settings" screen
+    And I click on the "change" password label
+    And I should see the "change" wallet password dialog
+    And I change wallet password:
+    | currentPassword   | password     | repeatedPassword |
+    | Secret123 | newSecret123 | newSecret123     |
+    And I clear the current wallet password Secret123
+    And I submit the wallet password dialog
+    Then I should stay in the change password dialog

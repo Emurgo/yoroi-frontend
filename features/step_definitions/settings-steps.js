@@ -34,6 +34,10 @@ When(/^I change wallet password:$/, async function (table) {
   await this.input('.changePasswordDialog .repeatedPassword input', fields.repeatedPassword);
 });
 
+When(/^I clear the current wallet password ([^"]*)$/, async function (password) {
+  await this.clearInputUpdatingForm('.changePasswordDialog .currentPassword input', password.length);
+});
+
 When(/^I submit the wallet password dialog$/, async function () {
   await this.click('.confirmButton');
 });
@@ -69,3 +73,8 @@ async function checkError(client, errorSelector, error) {
   const expectedError = await client.intl(error.message);
   expect(errorsOnScreen).to.equal(expectedError);
 }
+
+Then(/^I should stay in the change password dialog$/, async function () {
+  await this.waitUntilText('.Dialog_title', 'CHANGE PASSWORD', 2000);
+});
+
