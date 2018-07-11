@@ -36,6 +36,12 @@
     margin: 2%;
   }
 
+  .buttonsWrapper {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+  }
+
   .submitWithPasswordButton {
     max-width: 310px;
     width: calc(50% - 10px);

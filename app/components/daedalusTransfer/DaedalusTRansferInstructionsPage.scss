@@ -1,0 +1,64 @@
+@import '../../themes/mixins/loading-spinner';
+
+.component {
+  padding: 20px;
+}
+
+.button {
+  display: block !important;
+  margin: 30px auto 0;
+}
+
+.body {
+  color: var(--theme-bordered-box-text-color);
+  font-family: var(--font-regular);
+  font-size: 14px;
+  line-height: 19px;
+
+  .title {
+    font-size: 19px;
+    font-family: var(--font-medium);
+    line-height: 23px;
+    margin-bottom: 6px;
+    word-break: break-all;
+    text-transform: uppercase;
+  }
+
+  .text {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 12px;
+    word-break: break-word;
+  }
+
+  .answerLabel,
+  .questionLabel {
+    display: flex;
+    justify-content: center;
+    font-size: 19px;
+    font-family: var(--font-medium);
+    line-height: 23px;
+    word-break: break-all;
+  }
+
+  .questionLabel {
+    margin: 3%;
+  }
+
+  .answerLabel {
+    margin: 1%;
+    text-transform: uppercase;
+  }
+
+  .answerText {
+    padding: 0% 2%;
+  }
+
+  .tableWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+}
+

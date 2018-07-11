@@ -1,28 +1,39 @@
 // @flow
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
+import { intlShape, defineMessages } from 'react-intl';
+import WalletAdd from '../../components/wallet/WalletAdd';
 import WalletAddDialog from '../../components/wallet/WalletAddDialog';
-import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
-/* import WalletFileImportDialog
-  from '../../components/wallet/file-import/WalletFileImportDialog';*/
+import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-/* import
-  WalletFileImportDialogContainer
-from '../wallet/dialogs/WalletFileImportDialogContainer';*/
 import WalletRestoreDialogContainer from '../wallet/dialogs/WalletRestoreDialogContainer';
-import WalletBackupDialogContainer from '../wallet/dialogs/WalletBackupDialogContainer';
 import WalletCreateDialogContainer from '../wallet/dialogs/WalletCreateDialogContainer';
-import WalletAddDialogContainer from '../wallet/dialogs/WalletAddDialogContainer';
+import WalletBackupDialogContainer from '../wallet/dialogs/WalletBackupDialogContainer';
+import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import environment from '../../environment';
+import resolver from '../../utils/imports';
 import type { InjectedProps } from '../../types/injectedPropsType';
 
 type Props = InjectedProps;
+const MainLayout = resolver('containers/MainLayout');
+
+const messages = defineMessages({
+  title: {
+    id: 'wallet.add.page.title',
+    defaultMessage: '!!!Add Wallet',
+    description: 'Add Wallet Title.'
+  },
+});
 
 @inject('actions', 'stores') @observer
 export default class WalletAddPage extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null };
+
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
 
   onClose = () => {
     if (this.props.stores[environment.API].wallets.hasAnyWallets) {
@@ -35,30 +46,38 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { uiDialogs } = this.props.stores;
-    let activeDialog = null;
-
-    if (uiDialogs.isOpen(WalletAddDialog)) {
-      activeDialog = <WalletAddDialogContainer />;
-    }
+    const topBar = (<TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />);
+    const wallets = this._getWalletsStore();
+    const { actions, stores } = this.props;
+    const { uiDialogs } = stores;
+    const { isRestoreActive } = wallets;
+    let content = null;
 
     if (uiDialogs.isOpen(WalletCreateDialog)) {
-      activeDialog = <WalletCreateDialogContainer onClose={this.onClose} />;
+      content = <WalletCreateDialogContainer onClose={this.onClose} />;
+    } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
+      content = <WalletRestoreDialogContainer onClose={this.onClose} />;
+    } else if (uiDialogs.isOpen(WalletBackupDialog)) {
+      content = <WalletBackupDialogContainer onClose={this.onClose} />;
+    } else {
+      content = (
+        <WalletAdd
+          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onImportFile={() => {}}
+          isRestoreActive={isRestoreActive}
+        />
+      );
     }
+    return (
+      <MainLayout topbar={topBar}>
+        {content}
+      </MainLayout>
+    );
+  }
 
-    if (uiDialogs.isOpen(WalletBackupDialog)) {
-      activeDialog = <WalletBackupDialogContainer onClose={this.onClose} />;
-    }
-
-    if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      activeDialog = <WalletRestoreDialogContainer onClose={this.onClose} />;
-    }
-    /*
-    if (uiDialogs.isOpen(WalletFileImportDialog)) {
-      activeDialog = <WalletFileImportDialogContainer onClose={this.onClose} />;
-    }*/
-
-    return activeDialog;
+  _getWalletsStore() {
+    return this.props.stores[environment.API].wallets;
   }
 
 }

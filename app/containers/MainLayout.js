@@ -5,7 +5,6 @@ import type { Node } from 'react';
 import Sidebar from '../components/sidebar/Sidebar';
 import TopBarContainer from './TopBarContainer';
 import SidebarLayout from '../components/layout/SidebarLayout';
-import WalletAddPage from './wallet/WalletAddPage';
 import type { StoresMap } from '../stores/index';
 import type { ActionsMap } from '../actions/index';
 
@@ -51,7 +50,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
         sidebar={sidebarComponent}
         topbar={topbarComponent}
         notification={<div />}
-        contentDialogs={[<WalletAddPage key="WalletAddPage" />]}
+        contentDialogs={[]}
       >
         {this.props.children}
       </SidebarLayout>
