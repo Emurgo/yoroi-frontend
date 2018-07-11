@@ -67,7 +67,7 @@ export async function generateSTxs(password: string,
       AMOUNT_TO_BE_SENT,
       cryptoWallet
     );
-    const cborEncodedStx = createSTxResult[0].result.cbor_encoded_tx;
+    const cborEncodedStx = createSTxResult[0].cbor_encoded_tx;
     const bs64STx = Buffer.from(cborEncodedStx).toString('base64');
 
     if (!debugging) {
