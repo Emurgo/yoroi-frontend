@@ -1,5 +1,30 @@
-import { Given, When, Then } from 'cucumber';
+import { Given, When, Then, Before, After } from 'cucumber';
 import { expect } from 'chai';
+import { closeServer, initializeServer } from './common-steps';
+
+Before({ tags: '@invalidWitnessTest' }, () => {
+  closeServer();
+  initializeServer({ signedTransaction: (req, res) => {
+    res.status(400).jsonp({
+      message: 'Invalid witness'
+    });
+  } });
+});
+
+After({ tags: '@invalidWitnessTest' }, () => {
+  closeServer();
+  initializeServer({});
+});
+
+Given(/^I am testing the backend with invalid witness error$/, async function () {
+  closeServer();
+  initializeServer({ signedTransaction: (req, res) => {
+    console.log('aa');
+    res.status(400).jsonp({
+      message: 'Invalid witness'
+    });
+  } });
+});
 
 Given(/^I have a wallet with funds$/, async function () {
   const { adaWallet } = await this.getFromLocalStorage('WALLET');
@@ -53,4 +78,8 @@ Then(/^I should see a not enough ada error$/, async function () {
 
 Then(/^I should not be able to submit$/, async function () {
   await this.waitForElement('.primary.SimpleButton_disabled');
+});
+
+Then(/^I should see the error message "([^"]*)"$/, async function (errorMessage) {
+  await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
 });

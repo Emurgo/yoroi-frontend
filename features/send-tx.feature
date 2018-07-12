@@ -5,9 +5,9 @@ Feature: Send transaction
     And I have completed the basic setup
     And I am testing "Send transaction"
     And There is a wallet stored
+    And I have a wallet with funds
 
   Scenario: Sending a Tx to a valid address
-    Given I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -22,7 +22,6 @@ Feature: Send transaction
     Then I should see the summary screen
 
   Scenario: Sending a Tx to an invalid address
-    Given I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                    | amount   |
@@ -31,7 +30,6 @@ Feature: Send transaction
     And I should not be able to submit
 
   Scenario: Sending a Tx with less founds than needed
-    Given I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount     |
@@ -40,7 +38,6 @@ Feature: Send transaction
     And I should not be able to submit
 
   Scenario: Sending a Tx to a valid address with big amount
-    Given I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
     # The .. in amount is used to ensure the rational numbers input
@@ -54,3 +51,18 @@ Feature: Send transaction
       | Secret123 |
     And I submit the wallet send form
     Then I should see the summary screen
+
+  @invalidWitnessTest
+  Scenario: Sending a Tx and receiving Invalid Witness error
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
+    And The transaction fees are "0.167950"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password  |
+      | Secret123 |
+    And I submit the wallet send form
+    Then I should see the error message "!!!The signature is invalid."
