@@ -83,36 +83,31 @@ export default class WalletSettings extends Component<Props> {
     );
 
     return (
-      <div className={styles.component}>
+      <div>
+        <InlineEditingInput
+          className="walletName"
+          inputFieldLabel={intl.formatMessage(messages.name)}
+          inputFieldValue={walletName}
+          isActive={activeField === 'name'}
+          onStartEditing={() => onStartEditing('name')}
+          onStopEditing={onStopEditing}
+          onCancelEditing={onCancelEditing}
+          onSubmit={(value) => onFieldValueChange('name', value)}
+          isValid={nameValidator}
+          validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
+          successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
+        />
 
-        <BorderedBox>
+        <ReadOnlyInput
+          label={intl.formatMessage(messages.passwordLabel)}
+          value={passwordMessage}
+          isSet
+          onClick={() => openDialogAction({
+            dialog: ChangeWalletPasswordDialog,
+          })}
+        />
 
-          <InlineEditingInput
-            className="walletName"
-            inputFieldLabel={intl.formatMessage(messages.name)}
-            inputFieldValue={walletName}
-            isActive={activeField === 'name'}
-            onStartEditing={() => onStartEditing('name')}
-            onStopEditing={onStopEditing}
-            onCancelEditing={onCancelEditing}
-            onSubmit={(value) => onFieldValueChange('name', value)}
-            isValid={nameValidator}
-            validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
-            successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
-          />
-
-          <ReadOnlyInput
-            label={intl.formatMessage(messages.passwordLabel)}
-            value={passwordMessage}
-            isSet
-            onClick={() => openDialogAction({
-              dialog: ChangeWalletPasswordDialog,
-            })}
-          />
-
-          {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
-
-        </BorderedBox>
+        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
         {isDialogOpen(ChangeWalletPasswordDialog) ? (
           <ChangeWalletPasswordDialogContainer />

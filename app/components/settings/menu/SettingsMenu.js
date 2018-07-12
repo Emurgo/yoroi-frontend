@@ -12,6 +12,11 @@ const messages = defineMessages({
     defaultMessage: '!!!General',
     description: 'Label for the "General" link in the settings menu.',
   },
+  wallet: {
+    id: 'settings.menu.wallet.link.label',
+    defaultMessage: "!!!Wallet",
+    description: 'Label for the "Wallet" link in the settings menu.',
+  },
   support: {
     id: 'settings.menu.support.link.label',
     defaultMessage: '!!!Support',
@@ -47,6 +52,13 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}
             active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
             className="general"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.wallet)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.WALLET)}
+            active={isActiveItem(ROUTES.SETTINGS.WALLET)}
+            className="wallet"
           />
 
           <SettingsMenuItem
