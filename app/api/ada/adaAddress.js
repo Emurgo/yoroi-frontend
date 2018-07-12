@@ -93,9 +93,9 @@ export function saveAsAdaAddresses(
   addressType: AddressType,
   used: ?boolean
 ): void {
-  const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) => {
-    return toAdaAddress(cryptoAccount.account, addressType, index, hash, used);
-  });
+  const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) =>
+    toAdaAddress(cryptoAccount.account, addressType, index, hash, used)
+  );
   saveAddresses(mappedAddresses, addressType);
 }
 

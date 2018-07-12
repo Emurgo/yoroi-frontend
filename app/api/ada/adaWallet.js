@@ -23,11 +23,6 @@ import {
   updateUsedAddresses
 } from './adaAddress';
 import { newCryptoAccount } from './adaAccount';
-import {
-  getAdaConfirmedTxs,
-  updateAdaTxsHistory,
-  updateAdaPendingTxs
-} from './adaTransactions/adaTransactionsHistory';
 import type {
   AdaWallet,
   UpdateAdaWalletParams,

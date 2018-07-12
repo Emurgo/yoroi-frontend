@@ -2,6 +2,8 @@
 import bs58 from 'bs58';
 import BigNumber from 'bignumber.js';
 
+import type { AdaTransactionInputOutput } from '../adaTypes';
+
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();
 
@@ -26,10 +28,10 @@ export function getFromStorage(key: string): any {
 
 export const toAdaTx = function (
   amount: BigNumber,
-  tx,
-  inputs: Array<string>,
+  tx: any, // FIXME: add type for txs received from server
+  inputs: AdaTransactionInputOutput,
   isOutgoing: boolean,
-  outputs: Array<string>,
+  outputs: AdaTransactionInputOutput,
   time: string
 ) {
   const isPending = !tx.block_num;
@@ -39,9 +41,7 @@ export const toAdaTx = function (
     },
     ctBlockNumber: tx.block_num || '',
     ctId: tx.hash,
-    ctInputs: {
-      newInputs: inputs
-    },
+    ctInputs: inputs,
     ctIsOutgoing: isOutgoing,
     ctMeta: {
       ctmDate: time,
@@ -49,9 +49,7 @@ export const toAdaTx = function (
       ctmTitle: undefined
     },
     ctmDate: new Date(time),
-    ctOutputs: {
-      newOutputs: outputs
-    },
+    ctOutputs: outputs,
     ctCondition: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
   };
 };
