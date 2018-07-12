@@ -13,7 +13,12 @@ Feature: General Settings
     Examples:
     | FROM         | TO           |
     | general      | terms-of-use |
+    | general      | support      |
     | terms-of-use | general      |
+    | terms-of-use | support      |
+    | support      | general      |
+    | support      | terms-of-use |
+
 
   Scenario: Change language in General Settings
     Given I am on the General Settings "general" screen

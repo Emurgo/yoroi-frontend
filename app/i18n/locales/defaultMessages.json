@@ -1327,6 +1327,165 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Frequently asked questions",
+        "description": "Title \"Frequently asked questions\" on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 12
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.faq.title",
+        "start": {
+          "column": 12,
+          "line": 8
+        }
+      },
+      {
+        "defaultMessage": "!!!If you are experiencing issues, please see the {faqLink} for guidance on known issues.",
+        "description": "Content for the \"Frequently asked questions\" section on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 17
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.faq.content",
+        "start": {
+          "column": 14,
+          "line": 13
+        }
+      },
+      {
+        "defaultMessage": "!!!FAQ on Daedalus website",
+        "description": "\"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
+        "end": {
+          "column": 3,
+          "line": 22
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.faq.faqLink",
+        "start": {
+          "column": 11,
+          "line": 18
+        }
+      },
+      {
+        "defaultMessage": "!!!https://daedaluswallet.io/faq/",
+        "description": "URL for the \"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
+        "end": {
+          "column": 3,
+          "line": 27
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.faq.faqLinkURL",
+        "start": {
+          "column": 14,
+          "line": 23
+        }
+      },
+      {
+        "defaultMessage": "!!!Reporting a problem",
+        "description": "Title \"Reporting a problem\" on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 32
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.reportProblem.title",
+        "start": {
+          "column": 22,
+          "line": 28
+        }
+      },
+      {
+        "defaultMessage": "!!!If the FAQ does not solve the issue you are experiencing, please use our {supportRequestLink} feature.",
+        "description": "Content for the \"Reporting a problem\" section on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 37
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.reportProblem.content",
+        "start": {
+          "column": 24,
+          "line": 33
+        }
+      },
+      {
+        "defaultMessage": "!!!Support request",
+        "description": "\"Support request\" link in the \"Report a problem\" section on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 42
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.reportProblem.link",
+        "start": {
+          "column": 22,
+          "line": 38
+        }
+      },
+      {
+        "defaultMessage": "!!!https://zendesk.com/support/",
+        "description": "URL for the \"Support Request\" link in the Support section on the support settings page",
+        "end": {
+          "column": 3,
+          "line": 47
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.faq.supportRequestLinkURL",
+        "start": {
+          "column": 25,
+          "line": 43
+        }
+      },
+      {
+        "defaultMessage": "!!!Logs",
+        "description": "Title \"Logs\" on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 52
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.logs.title",
+        "start": {
+          "column": 13,
+          "line": 48
+        }
+      },
+      {
+        "defaultMessage": "!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.",
+        "description": "Content for the \"Logs\" section on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 57
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.logs.content",
+        "start": {
+          "column": 15,
+          "line": 53
+        }
+      },
+      {
+        "defaultMessage": "!!!download them here",
+        "description": "\"download them here\" link in the Logs section on the support settings page",
+        "end": {
+          "column": 3,
+          "line": 62
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.logs.downloadLogsLink",
+        "start": {
+          "column": 20,
+          "line": 58
+        }
+      }
+    ],
+    "path": "app/components/settings/categories/SupportSettings.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!General",
         "description": "Label for the \"General\" link in the settings menu.",
         "end": {
@@ -1341,17 +1500,31 @@
         }
       },
       {
-        "defaultMessage": "!!!Terms of use",
-        "description": "Label for the \"Terms of use\" link in the settings menu.",
+        "defaultMessage": "!!!Support",
+        "description": "Label for the \"Support\" link in the settings menu.",
         "end": {
           "column": 3,
           "line": 19
         },
         "file": "app/components/settings/menu/SettingsMenu.js",
+        "id": "settings.menu.support.link.label",
+        "start": {
+          "column": 11,
+          "line": 15
+        }
+      },
+      {
+        "defaultMessage": "!!!Terms of use",
+        "description": "Label for the \"Terms of use\" link in the settings menu.",
+        "end": {
+          "column": 3,
+          "line": 24
+        },
+        "file": "app/components/settings/menu/SettingsMenu.js",
         "id": "settings.menu.termsOfUse.link.label",
         "start": {
           "column": 14,
-          "line": 15
+          "line": 20
         }
       }
     ],
