@@ -1,7 +1,7 @@
 {
   "default": {
-    "addresses": {
-      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod": {
+    "addresses": [
+      {
         "cadAmount": {
           "getCCoin": 0
         },
@@ -11,7 +11,8 @@
         "change": 0,
         "index": 0
       }
-    },
+    ],
+    "usedAddresses": [],
     "seed": {
       "encryptedSeed": "d207774a43e617045acbff9ebca37c1748d656976398eb9b1117651e9198eae5",
       "passwordSalt": "cd4a9a3753ddccb56f4d6e062b23e503",
@@ -78,8 +79,8 @@
         "txsNumber": 45
       }
     },
-    "addresses": {
-      "Be2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod": {
+    "addresses": [
+      {
         "cadAmount": {
           "getCCoin": 0
         },
@@ -89,7 +90,7 @@
         "change": 0,
         "index": 0
       }
-    },
+    ],
     "utxos": [
       {
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",

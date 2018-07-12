@@ -30,7 +30,7 @@ export const loadLovefieldDB = () => {
 
   schemaBuilder.createTable(txsTableSchema.name)
     .addColumn(txsTableSchema.properties.id, lf.Type.STRING)
-    .addColumn(txsTableSchema.properties.date, lf.Type.STRING)
+    .addColumn(txsTableSchema.properties.date, lf.Type.DATE_TIME)
     .addColumn(txsTableSchema.properties.value, lf.Type.OBJECT)
     .addColumn(txsTableSchema.properties.isPending, lf.Type.BOOLEAN)
     .addPrimaryKey([txsTableSchema.properties.id])

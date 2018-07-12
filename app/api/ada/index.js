@@ -26,7 +26,8 @@ import {
   isValidAdaAddress,
   newAdaAddress,
   getAdaAddressesList,
-  getAdaAddressesByType
+  getAdaAddressesByType,
+  saveAdaAddress
 } from './adaAddress';
 import {
   restoreAdaWallet
@@ -306,6 +307,16 @@ export default class AdaApi {
       return _createAddressFromServerData(newAddress);
     } catch (error) {
       Logger.error('AdaApi::createAddress error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  // FIXME: This method is exposed to allow injecting data when testing
+  async saveAddress(address: AdaAddress, addressType: AddressType): Promise<void> {
+    try {
+      await saveAdaAddress(address, addressType);
+    } catch (error) {
+      Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

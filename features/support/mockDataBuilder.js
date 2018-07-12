@@ -15,19 +15,16 @@ export function getFakeAddresses(
   addressesStartingWith
 ) {
   const addresses = _generateListOfStrings(addressesStartingWith);
-  return addresses.slice(0, totalAddresses).reduce((newAddresses, address) => {
-    newAddresses[address] = {
-      cadAmount: {
-        getCCoin: 0
-      },
-      cadId: address,
-      cadIsUsed: false,
-      account: 0,
-      change: 0,
-      index: 0
-    };
-    return newAddresses;
-  }, {});
+  return addresses.slice(0, totalAddresses).map((address) => ({
+    cadAmount: {
+      getCCoin: 0
+    },
+    cadId: address,
+    cadIsUsed: false,
+    account: 0,
+    change: 0,
+    index: 0
+  }));
 }
 
 export function getLovefieldTxs(walletName) {
