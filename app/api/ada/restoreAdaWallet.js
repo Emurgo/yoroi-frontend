@@ -46,7 +46,7 @@ export async function restoreAdaWallet({
       _discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, ADDRESS_REQUEST_SIZE);
     if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
       // TODO: Store all at once
-      saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External', true);
+      saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
       saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal');
     } else {
       newAdaAddress(cryptoAccount, [], 'External');

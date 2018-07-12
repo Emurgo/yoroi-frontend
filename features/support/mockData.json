@@ -1,6 +1,6 @@
 {
   "default": {
-    "addresses": [
+    "adaAddresses": [
       {
         "cadAmount": {
           "getCCoin": 0
@@ -80,7 +80,7 @@
         "txsNumber": 45
       }
     },
-    "addresses": [
+    "adaAddresses": [
       {
         "cadAmount": {
           "getCCoin": 0

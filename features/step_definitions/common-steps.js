@@ -58,7 +58,7 @@ function refreshWallet(client) {
 }
 
 async function storeWallet(client, walletName) {
-  const { seed, wallet, cryptoAccount, addresses, walletInitialData } = getMockData();
+  const { seed, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
   if (walletName) {
     wallet.cwMeta.cwName = walletName;
   }
@@ -74,7 +74,7 @@ async function storeWallet(client, walletName) {
       walletInitialData[walletName].addressesStartingWith
     ));
   } else {
-    client.saveAddressesToDB(addresses);
+    client.saveAddressesToDB(adaAddresses);
   }
   await refreshWallet(client);
   await client.waitForElement('.TopBar_walletName');
