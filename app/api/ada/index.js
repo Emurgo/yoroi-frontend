@@ -67,6 +67,7 @@ import type {
   RestoreWalletRequest,
   RestoreWalletResponse,
 } from '../common';
+import { InvalidWitnessError } from './errors';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -276,6 +277,9 @@ export default class AdaApi {
       return response;
     } catch (error) {
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
       throw new GenericApiError();
     }
   }
