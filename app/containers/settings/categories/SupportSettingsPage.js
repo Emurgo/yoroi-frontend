@@ -12,23 +12,15 @@ export default class SupportSettingsPage extends Component<InjectedProps> {
   handleExternalLinkClick = (event: MouseEvent) => {
     event.preventDefault();
     const target = event.target;
-    if (target instanceof HTMLInputElement) {
-      window.open(event.target.href, '_blank');
+    if (target instanceof HTMLAnchorElement) {
+      window.open(target.href, '_blank');
     }
-  };
-
-  handleDownloadLogs = () => {
-    const destination = remote.dialog.showSaveDialog({
-      defaultPath: 'logs.zip',
-    });
-    if (destination) this.props.actions.profile.downloadLogs.trigger({ destination, fresh: true });
   };
 
   render() {
     return (
       <SupportSettings
         onExternalLinkClick={this.handleExternalLinkClick}
-        onDownloadLogs={this.handleDownloadLogs}
       />
     );
   }
