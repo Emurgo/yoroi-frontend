@@ -64,7 +64,8 @@
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
         "amount": "1000000"
       }
-    ]
+    ],
+    "usedAddresses": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"]
   },
   "Get balance": {
     "walletInitialData": {
