@@ -7,8 +7,7 @@ function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFromList, txTo
   txId, expectedTx, txConfirmations) {
   chai.expect(txType).to.equal(expectedTx.txType);
   chai.expect(txAmount.split(' ')[0]).to.equal(expectedTx.txAmount);
-  chai.expect(txTime).to.equal(expectedTx.txTimeTitle + ' ' +
-    moment(expectedTx.txTime).format('hh:mm:ss A'));
+  chai.expect(txTime).to.equal(moment(expectedTx.txTime).format('hh:mm:ss A'));
   chai.expect(txStatus).to.equal(expectedTx.txStatus);
   for (let i = 0; i < txFromList.length; i++) {
     chai.expect(txFromList[i]).to.equal(expectedTx.txFrom[i]);
@@ -30,10 +29,6 @@ function mapPendingTxFields(txExpectedStatus, pendingTxFields) {
   const [txConfirmations, , txId] = pendingTxFields;
   return [txId, txConfirmations];
 }
-
-Then(/^I go to Txs History tab$/, async function () {
-  await this.clickByXpath("//*[contains(text(), 'Transactions')]");
-});
 
 When(/^I see the transactions summary$/, async function () {
   await this.waitForElement('.WalletSummary_numberOfTransactions');
@@ -64,7 +59,7 @@ async function (txsNumber, txExpectedStatus, walletName) {
     await actualTxsList[i].click();
     const txData = await actualTxsList[i].getText();
     const txDataFields = txData.split('\n');
-    const [txType, txAmount, txTime, txStatus, , txFrom, , txTo, , ...pendingTxFields]
+    const [txType, txTime, txStatus, txAmount, , txFrom, , txTo, , ...pendingTxFields]
       = txDataFields;
     const [txId, txConfirmations] = mapPendingTxFields(txExpectedStatus, pendingTxFields);
     verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom],
