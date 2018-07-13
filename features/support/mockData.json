@@ -65,6 +65,32 @@
         "amount": "1000000"
       }
     ],
+    "walletInitialData": {
+      "wallet": {
+        "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "totalAddresses": 1
+      }
+    },
+    "txs": {
+      "wallet": [
+        {
+          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+          "tx": {
+            "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
+            "time": "2018-05-12T13:51:33.000Z",
+            "inputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
+            ],
+            "inputs_amount": [200],
+            "outputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"
+            ],
+            "outputs_amount": [100, 100],
+            "best_block_num": 101
+          }
+        }
+      ]
+    },
     "usedAddresses": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"]
   },
   "Get balance": {

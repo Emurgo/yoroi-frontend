@@ -1,12 +1,11 @@
-import lf from 'lovefield';
+import lf, { Type } from 'lovefield';
 
 const addressesTableSchema = {
   name: 'Addresses',
   properties: {
     id: 'id',
     type: 'type',
-    value: 'value',
-    isUsed: 'isUsed'
+    value: 'value'
   }
 };
 
@@ -20,6 +19,15 @@ const txsTableSchema = {
   }
 };
 
+const txAddressesTableSchema = {
+  name: 'TxAddresses',
+  properties: {
+    id: 'id',
+    address: 'address',
+    tx: 'tx'
+  }
+};
+
 let db;
 
 // Ensure we are only creating a single instance of the lovefield database
@@ -29,19 +37,32 @@ export const loadLovefieldDB = () => {
   const schemaBuilder = lf.schema.create('icarus-schema', 1);
 
   schemaBuilder.createTable(txsTableSchema.name)
-    .addColumn(txsTableSchema.properties.id, lf.Type.STRING)
-    .addColumn(txsTableSchema.properties.date, lf.Type.DATE_TIME)
-    .addColumn(txsTableSchema.properties.value, lf.Type.OBJECT)
-    .addColumn(txsTableSchema.properties.isPending, lf.Type.BOOLEAN)
+    .addColumn(txsTableSchema.properties.id, Type.STRING)
+    .addColumn(txsTableSchema.properties.date, Type.DATE_TIME)
+    .addColumn(txsTableSchema.properties.value, Type.OBJECT)
+    .addColumn(txsTableSchema.properties.isPending, Type.BOOLEAN)
     .addPrimaryKey([txsTableSchema.properties.id])
     .addIndex('idxDate', [txsTableSchema.properties.date], false, lf.Order.DESC);
 
   schemaBuilder.createTable(addressesTableSchema.name)
-    .addColumn(addressesTableSchema.properties.id, lf.Type.STRING)
-    .addColumn(addressesTableSchema.properties.type, lf.Type.STRING)
-    .addColumn(addressesTableSchema.properties.value, lf.Type.OBJECT)
-    .addColumn(addressesTableSchema.properties.isUsed, lf.Type.BOOLEAN)
+    .addColumn(addressesTableSchema.properties.id, Type.STRING)
+    .addColumn(addressesTableSchema.properties.type, Type.STRING)
+    .addColumn(addressesTableSchema.properties.value, Type.OBJECT)
     .addPrimaryKey([addressesTableSchema.properties.id]);
+
+  schemaBuilder.createTable(txAddressesTableSchema.name)
+    .addColumn(txAddressesTableSchema.properties.id, Type.STRING)
+    .addColumn(txAddressesTableSchema.properties.address, Type.STRING)
+    .addColumn(txAddressesTableSchema.properties.tx, Type.STRING)
+    .addPrimaryKey([txAddressesTableSchema.properties.id])
+    .addForeignKey('fkAddress', {
+      local: txAddressesTableSchema.properties.address,
+      ref: `${addressesTableSchema.name}.${addressesTableSchema.properties.id}`
+    })
+    .addForeignKey('fkTx', {
+      local: txAddressesTableSchema.properties.tx,
+      ref: `${txsTableSchema.name}.${txsTableSchema.properties.id}`
+    });
 
   return schemaBuilder.connect().then(newDb => {
     db = newDb;
@@ -59,18 +80,6 @@ export const deleteAddress = (address) => {
 
 export const getAddresses = () => db.select().from(_getAddressesTable()).exec();
 
-export const getUnusedExternalAddresses = () => {
-  const addressesTable = _getAddressesTable();
-  return db.select()
-    .from(addressesTable)
-    .where(lf.op.and(
-      addressesTable[addressesTableSchema.properties.isUsed].eq(false),
-      addressesTable[addressesTableSchema.properties.type].eq('External')
-    ))
-    .exec()
-    .then(rows => rows.map(row => row[addressesTableSchema.properties.value]));
-};
-
 export const getAddressesList = () => {
   const addressesTable = _getAddressesTable();
   return db.select()
@@ -81,21 +90,48 @@ export const getAddressesList = () => {
 
 export const getAddressesListByType = addressType => {
   const addressesTable = _getAddressesTable();
-  return db.select()
+  const txAddressesTable = _getTxAddressesTable();
+  return db.select(
+    addressesTable[addressesTableSchema.properties.value],
+    // We count the amount of txs the address is part of
+    // to avoid checking for null properties in the joined result
+    lf.fn.count(txAddressesTable[txAddressesTableSchema.properties.tx]).as('timesUsed')
+  )
     .from(addressesTable)
+    .leftOuterJoin(
+      txAddressesTable,
+      addressesTable[addressesTableSchema.properties.id]
+        .eq(txAddressesTable[txAddressesTableSchema.properties.address])
+    )
     .where(addressesTable[addressesTableSchema.properties.type].eq(addressType))
+    .groupBy(addressesTable[addressesTableSchema.properties.id])
     .exec()
-    .then(rows => rows.map(row => row[addressesTableSchema.properties.value]));
+    .then(rows => rows.map(row =>
+      Object.assign(
+        {},
+        row[addressesTableSchema.name][addressesTableSchema.properties.value],
+        { cadIsUsed: !!row.timesUsed }
+      )
+    ));
 };
 
 export const saveAddresses = (addresses, type) => {
   const rows = addresses.map(address => _addressToRow(address, type));
-  return _insertOrReplace(rows, _getAddressesTable());
+  return _insertOrReplaceQuery(rows, _getAddressesTable()).exec();
 };
 
-export const saveTxs = (txs) => {
-  const rows = txs.map(tx => _txToRow(tx));
-  _insertOrReplace(rows, _getTxsTable());
+export const saveTxs = async (txs) => {
+  const dbTransaction = db.createTransaction();
+  const [txRows, txAddressesRowsPromises] =
+    txs.reduce(([txRowsAccum, txAddressesRowsAccum], tx) => [
+      txRowsAccum.concat(_txToRow(tx)),
+      txAddressesRowsAccum.concat(_getTxAddressesRows(tx))
+    ], [[], []]);
+  const txQuery = _insertOrReplaceQuery(txRows, _getTxsTable());
+  const txAddressesRows = await Promise.all(txAddressesRowsPromises);
+  const txAddressRows = txAddressesRows.reduce((accum, rows) => accum.concat(rows), []);
+  const txAddressesQuery = _insertOrReplaceQuery(txAddressRows, _getTxAddressesTable());
+  return dbTransaction.exec([txQuery, txAddressesQuery]);
 };
 
 export const getMostRecentTx = function (txs) {
@@ -129,6 +165,26 @@ export const deletePendingTxs = async function () {
     .exec();
 };
 
+const _getTxAddressesRows = async (tx) => {
+  const txOutputs = tx.ctOutputs.map(([outputAddress]) => outputAddress);
+  const txAddresses = await _getAddressesIn(txOutputs);
+  const txAddressesTable = _getTxAddressesTable();
+  return txAddresses.map(address => txAddressesTable.createRow({
+    id: address.concat(tx.ctId),
+    address,
+    tx: tx.ctId
+  }));
+};
+
+const _getAddressesIn = (addresses) => {
+  const addressesTable = _getAddressesTable();
+  return db.select()
+    .from(addressesTable)
+    .where(addressesTable[addressesTableSchema.properties.id].in(addresses))
+    .exec()
+    .then(rows => rows.map(row => row[addressesTableSchema.properties.id]));
+};
+
 const _txToRow = (tx) =>
   _getTxsTable().createRow({
     id: tx.ctId,
@@ -145,11 +201,13 @@ const _addressToRow = (address, type) =>
     isUsed: address.cadIsUsed
   });
 
-const _insertOrReplace = (rows, table) =>
-  db.insertOrReplace().into(table).values(rows).exec();
+const _insertOrReplaceQuery = (rows, table) =>
+  db.insertOrReplace().into(table).values(rows);
 
 const _getTable = (name) => db.getSchema().table(name);
 
 const _getTxsTable = () => _getTable(txsTableSchema.name);
 
 const _getAddressesTable = () => _getTable(addressesTableSchema.name);
+
+const _getTxAddressesTable = () => _getTable(txAddressesTableSchema.name);

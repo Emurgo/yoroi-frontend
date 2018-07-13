@@ -19,8 +19,7 @@ import {
 import { toAdaWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
   getAdaAddressesList,
-  newAdaAddress,
-  updateUsedAddresses
+  newAdaAddress
 } from './adaAddress';
 import { newCryptoAccount } from './adaAccount';
 import type {
@@ -82,7 +81,6 @@ export const refreshAdaWallet = async (): Promise<?AdaWallet> => {
       }
     });
     _saveAdaWalletKeepingSeed(updatedWallet);
-    await updateUsedAddresses();
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
