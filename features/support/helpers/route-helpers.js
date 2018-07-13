@@ -7,6 +7,7 @@ export const waitUntilUrlEquals = function (expectedUrl) {
   const context = this;
   return context.driver.wait(async () => {
     const url = await getCurrentAppRoute.call(context);
+    console.log(url);
     return url === expectedUrl;
   });
 };

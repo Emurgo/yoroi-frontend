@@ -46,16 +46,6 @@ export default class SettingsMenu extends Component<Props> {
     const { intl } = this.context;
     const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
 
-    const walletSettingsMenu = hasActiveWallet ? (
-      <SettingsMenuItem
-        label={intl.formatMessage(messages.wallet)}
-        onClick={() => onItemClick(ROUTES.SETTINGS.WALLET)}
-        active={isActiveItem(ROUTES.SETTINGS.WALLET)}
-        className="wallet"
-      />
-    ) : null;
-
-
     return (
       <div>
         <div className={styles.component}>
@@ -66,7 +56,17 @@ export default class SettingsMenu extends Component<Props> {
             className="general"
           />
 
-          { walletSettingsMenu }          
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.wallet)}
+            onClick={() => {
+              if (hasActiveWallet) {
+                onItemClick(ROUTES.SETTINGS.WALLET);
+              }
+            }}
+            active={isActiveItem(ROUTES.SETTINGS.WALLET)}
+            className="wallet"
+            disabled={!hasActiveWallet}
+          />
 
           <SettingsMenuItem
             label={intl.formatMessage(messages.termsOfUse)}

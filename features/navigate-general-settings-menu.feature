@@ -35,4 +35,5 @@ Feature: General Settings
 
   Scenario: Users should not be able to navigate wallet settings if there isn't any created
     Given I am on the General Settings "general" screen
-    Then I should not see wallet settings menu
+    When I click on secondary menu "wallet" item
+    Then I should see General Settings "general" screen

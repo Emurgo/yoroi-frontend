@@ -1,4 +1,5 @@
 import { Given, When, Then } from 'cucumber';
+import { expect } from 'chai';
 import _ from 'lodash';
 import {
   navigateTo,
@@ -31,9 +32,3 @@ Then(/^I should see Japanese language as selected$/, async function () {
     return activeLanguage === 'ja-JP';
   });
 });
-
-Then('I should not see wallet settings menu', async function () {
-  const buttonSelector = `.SettingsMenuItem_component.wallet`;
-  await this.waitForElementNotPresent(buttonSelector);
-});
-
