@@ -12,8 +12,7 @@ exports.replaceWebpack = () => {
   replaceTasks.forEach(task => cp(task.from, task.to));
 };
 
-exports.copyAssets = (type) => {
-  const env = process.env.NODE_ENV;
+exports.copyAssets = (type, env) => {
   rm('-rf', type);
   mkdir(type);
   mkdir(`${type}/js`);
