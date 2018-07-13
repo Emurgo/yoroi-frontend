@@ -18,7 +18,7 @@ When(/^I click on secondary menu (.*) item$/, async function (buttonName) {
 });
 
 When(/^I open General Settings language selection dropdown$/, async function () {
-  await this.click('.GeneralSettings_component .SimpleInput_input');
+  await this.click('.SettingsLayout_settingsPane .SimpleInput_input');
 });
 
 Then(/^I should see General Settings "([^"]*)" screen$/, async function (screenName) {
@@ -31,3 +31,9 @@ Then(/^I should see Japanese language as selected$/, async function () {
     return activeLanguage === 'ja-JP';
   });
 });
+
+Then('I should not see wallet settings menu', async function () {
+  const buttonSelector = `.SettingsMenuItem_component.wallet`;
+  await this.waitForElementNotPresent(buttonSelector);
+});
+
