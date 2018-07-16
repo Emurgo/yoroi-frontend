@@ -4,22 +4,23 @@ import { observer, inject } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import validWords from 'bip39/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import MainLayout from '../MainLayout';
 import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
-import DaedalusTransferForm from '../../components/daedalusTransfer/DaedalusTransferForm';
+import DaedalusTransferInstructionsPage from '../../components/daedalusTransfer/DaedalusTransferInstructionsPage';
+import DaedalusTransferFormPage from '../../components/daedalusTransfer/DaedalusTransferFormPage';
 import DaedalusTransferWaitingPage from '../../components/daedalusTransfer/DaedalusTransferWaitingPage';
 import DaedalusTransferSummaryPage from '../../components/daedalusTransfer/DaedalusTransferSummaryPage';
 import DaedalusTransferErrorPage from '../../components/daedalusTransfer/DaedalusTransferErrorPage';
-import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
+import { ROUTES } from '../../routes-config';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
+const MainLayout = resolver('containers/MainLayout');
 
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.title',
-    defaultMessage: '!!!Transfer From Daedalus',
+    defaultMessage: '!!!Transfer funds from Daedalus',
     description: 'Transfer from Daedalus Title.'
   },
 });
@@ -33,6 +34,27 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
+  goToCreateWallet = () => {
+    this._getRouter().goToRoute.trigger({
+      route: ROUTES.WALLETS.ADD
+    });
+  }
+
+  goToReceiveScreen = () => {
+    const wallet = this._getWalletsStore().active;
+    this._getRouter().goToRoute.trigger({
+      route: ROUTES.WALLETS.PAGE,
+      params: {
+        id: wallet && wallet.id,
+        page: 'receive'
+      },
+    });
+  }
+
+  startTransferFunds = () => {
+    this._getDaedalusTransferActions().startTransferFunds.trigger();
+  }
+
   setupTransferFunds = (payload: { recoveryPhrase: string }) => {
     this._getDaedalusTransferActions().setupTransferFunds.trigger(payload);
   };
@@ -41,11 +63,15 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this._getDaedalusTransferActions().transferFunds.trigger({
       next: () => {
         this._getWalletsStore().refreshWalletsData();
-        this.props.actions.router.goToRoute.trigger({
+        this._getRouter().goToRoute.trigger({
           route: this._getWalletsStore().activeWalletRoute
         });
       }
     });
+  }
+
+  backToUninitialized = () => {
+    this._getDaedalusTransferActions().backToUninitialized.trigger();
   }
 
   cancelTransferFunds = () => {
@@ -53,16 +79,38 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   }
 
   render() {
-    const topBar = (<TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />);
+    const { stores, actions } = this.props;
+    const { sidebar } = stores;
+    const topBar = (
+      <TextOnlyTopBar
+        title={this.context.intl.formatMessage(messages.title)}
+        onCategoryClicked={category => {
+          actions.sidebar.activateSidebarCategory.trigger({ category });
+        }}
+        categories={sidebar.CATEGORIES}
+        activeSidebarCategory={sidebar.activeSidebarCategory}
+      />
+    );
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
-    if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
           <MainLayout topbar={topBar}>
-            <DaedalusTransferForm
+            <DaedalusTransferInstructionsPage
+              onFollowInstructionsPrerequisites={this.goToCreateWallet}
+              onAnswerYes={this.goToReceiveScreen}
+              onAnswerNo={this.startTransferFunds}
+              disableTransferFunds={daedalusTransfer.disableTransferFunds}
+            />
+          </MainLayout>
+        );
+      case 'gettingMnemonics':
+        return (
+          <MainLayout topbar={topBar}>
+            <DaedalusTransferFormPage
               onSubmit={this.setupTransferFunds}
+              onBack={this.backToUninitialized}
               mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic, 12)}
               suggestedMnemonics={validWords}
             />
@@ -101,6 +149,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
       default:
         return null;
     }
+  }
+
+  _getRouter() {
+    return this.props.actions.router;
   }
 
   _getWalletsStore() {

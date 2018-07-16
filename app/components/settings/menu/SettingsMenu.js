@@ -12,6 +12,16 @@ const messages = defineMessages({
     defaultMessage: '!!!General',
     description: 'Label for the "General" link in the settings menu.',
   },
+  wallet: {
+    id: 'settings.menu.wallet.link.label',
+    defaultMessage: '!!!Wallet',
+    description: 'Label for the "Wallet" link in the settings menu.',
+  },
+  support: {
+    id: 'settings.menu.support.link.label',
+    defaultMessage: '!!!Support',
+    description: 'Label for the "Support" link in the settings menu.',
+  },
   termsOfUse: {
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
@@ -22,6 +32,7 @@ const messages = defineMessages({
 type Props = {
   isActiveItem: Function,
   onItemClick: Function,
+  hasActiveWallet: boolean,
 };
 
 @observer
@@ -33,7 +44,8 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
+
     return (
       <div>
         <div className={styles.component}>
@@ -45,10 +57,29 @@ export default class SettingsMenu extends Component<Props> {
           />
 
           <SettingsMenuItem
+            label={intl.formatMessage(messages.wallet)}
+            onClick={() => {
+              if (hasActiveWallet) {
+                onItemClick(ROUTES.SETTINGS.WALLET);
+              }
+            }}
+            active={isActiveItem(ROUTES.SETTINGS.WALLET)}
+            className="wallet"
+            disabled={!hasActiveWallet}
+          />
+
+          <SettingsMenuItem
             label={intl.formatMessage(messages.termsOfUse)}
             onClick={() => onItemClick(ROUTES.SETTINGS.TERMS_OF_USE)}
             active={isActiveItem(ROUTES.SETTINGS.TERMS_OF_USE)}
             className="termsOfUse"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.support)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
+            active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
+            className="support"
           />
         </div>
       </div>

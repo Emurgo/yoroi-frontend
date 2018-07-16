@@ -16,7 +16,7 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
     cwAmount: {
       getCCoin: 0
     },
-    cwId: '1111111111111111',
+    cwId: '1',
     cwMeta: {
       cwAssurance,
       cwName,

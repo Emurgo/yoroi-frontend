@@ -137,16 +137,12 @@ export default class WalletReceive extends Component<Props, State> {
         <BorderedBox>
 
           <div className={styles.qrCodeAndInstructions}>
-            <div className={styles.qrCode}>
-              <QRCode
-                value={walletAddress}
-                bgColor={qrCodeBackgroundColor}
-                fgColor={qrCodeForegroundColor}
-                size={152}
-              />
-            </div>
 
             <div className={styles.instructions}>
+              <div className={styles.hashLabel}>
+                {intl.formatMessage(messages.walletAddressLabel)}
+              </div>
+
               <div className={walletAddressClasses}>
                 {walletAddress}
                 <CopyToClipboard
@@ -157,19 +153,25 @@ export default class WalletReceive extends Component<Props, State> {
                 </CopyToClipboard>
               </div>
 
-              <div className={styles.hashLabel}>
-                {intl.formatMessage(messages.walletAddressLabel)}
-              </div>
-
               <div className={styles.instructionsText}>
                 {intl.formatMessage(messages.walletReceiveInstructions)}
               </div>
 
               {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
 
-              {generateAddressForm }
+              {generateAddressForm}
 
             </div>
+
+            <div className={styles.qrCode}>
+              <QRCode
+                value={walletAddress}
+                bgColor={qrCodeBackgroundColor}
+                fgColor={qrCodeForegroundColor}
+                size={152}
+              />
+            </div>
+
           </div>
 
           <div className={styles.generatedAddresses}>

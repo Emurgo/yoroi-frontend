@@ -2,8 +2,8 @@
   align-items: center;
   background: var(--theme-topbar-background-color);
   display: flex;
-  height: 84px;
-  padding: 0 26px;
+  height: 64px;
+  padding: 0;
   position: relative;
   z-index: 100;
 
@@ -14,12 +14,12 @@
       color: var(--theme-topbar-wallet-info-color);
       font-family: var(--font-regular);
       letter-spacing: 0.5px;
-      line-height: 23px;
+      line-height: 20px;
       text-align: center;
       text-transform: uppercase;
 
       .walletName {
-        font-size: 19px;
+        font-size: 17px;
         font-weight: 600;
         color: var(--theme-topbar-wallet-name-color);
       }
@@ -54,7 +54,6 @@
 
   .topBarTitle {
     flex-grow: 1;
-    margin-right: 24px;
   }
 }
 
