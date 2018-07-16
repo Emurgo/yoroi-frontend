@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import WalletSettings from '../../components/wallet/WalletSettings';
-import type { InjectedProps } from '../../types/injectedPropsType';
-import { isValidWalletName } from '../../utils/validations';
+import WalletSettings from '../../../components/wallet/WalletSettings';
+import type { InjectedProps } from '../../../types/injectedPropsType';
+import { isValidWalletName } from '../../../utils/validations';
 
 type Props = InjectedProps
 
