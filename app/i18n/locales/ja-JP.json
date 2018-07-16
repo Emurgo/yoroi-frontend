@@ -18,6 +18,7 @@
   "api.errors.getTxHistoryForAddressesApiError": "!!!Error received from server while getting txs.",
   "api.errors.getUtxosForAddressesApiError": "!!!Error received from server while getting UTXOs.",
   "api.errors.getUtxosSumsForAddressesApiError": "!!!Error received from server while getting balance.",
+  "api.errors.invalidWitnessError": "!!!The signature is invalid.",
   "api.errors.pendingTransactionError": "!!!Error while updating pending transactions.",
   "api.errors.sendTransactionApiError": "!!!Error received from server while sending tx.",
   "api.errors.sendTransactionError": "!!!Error received from api method call while sending tx.",
