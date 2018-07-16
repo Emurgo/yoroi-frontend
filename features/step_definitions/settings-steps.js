@@ -1,7 +1,7 @@
 import { When, Given, Then } from 'cucumber';
 import { expect } from 'chai';
 
-const walletNameInputSelector = '.WalletSettings_component .walletName input';
+const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
 Given(/^I should see the "([^"]*)" wallet password dialog$/, function (dialogType) {
   const selector = '.' + dialogType + 'PasswordDialog';
@@ -9,7 +9,7 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, function (dialogTyp
 });
 
 When(/^I click on "name" input field$/, async function () {
-  await this.click('.WalletSettings_component .InlineEditingInput_component');
+  await this.click('.SettingsLayout_settingsPane .InlineEditingInput_component');
 });
 
 When(/^I enter new wallet name:$/, async function (table) {
@@ -19,7 +19,7 @@ When(/^I enter new wallet name:$/, async function (table) {
 });
 
 When(/^I click outside "name" input field$/, async function () {
-  await this.click('.WalletSettings_component');
+  await this.click('.SettingsLayout_settingsPane');
 });
 
 When(/^I click on the "([^"]*)" password label$/, function (label) {
@@ -45,7 +45,7 @@ Then(/^I should not see the change password dialog anymore$/, async function () 
 Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
   return this
     .driver
-    .wait(async() => {
+    .wait(async () => {
       const updatedName = await this.getText('.TopBar_walletName');
       return walletName.toUpperCase() === updatedName;
     });

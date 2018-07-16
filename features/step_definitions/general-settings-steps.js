@@ -1,4 +1,5 @@
 import { Given, When, Then } from 'cucumber';
+import { expect } from 'chai';
 import _ from 'lodash';
 import {
   navigateTo,
@@ -18,7 +19,7 @@ When(/^I click on secondary menu (.*) item$/, async function (buttonName) {
 });
 
 When(/^I open General Settings language selection dropdown$/, async function () {
-  await this.click('.GeneralSettings_component .SimpleInput_input');
+  await this.click('.SettingsLayout_settingsPane .SimpleInput_input');
 });
 
 Then(/^I should see General Settings "([^"]*)" screen$/, async function (screenName) {
