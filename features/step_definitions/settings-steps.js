@@ -3,9 +3,9 @@ import { expect } from 'chai';
 
 const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
-Given(/^I should see the "([^"]*)" wallet password dialog$/, function (dialogType) {
+Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dialogType) {
   const selector = '.' + dialogType + 'PasswordDialog';
-  return this.waitForElement(selector);
+  await this.waitForElement(selector);
 });
 
 When(/^I click on "name" input field$/, async function () {
@@ -22,9 +22,9 @@ When(/^I click outside "name" input field$/, async function () {
   await this.click('.SettingsLayout_settingsPane');
 });
 
-When(/^I click on the "([^"]*)" password label$/, function (label) {
+When(/^I click on the "([^"]*)" password label$/, async function (label) {
   const selector = '.' + label + 'Label button';
-  return this.click(selector);
+  await this.click(selector);
 });
 
 When(/^I change wallet password:$/, async function (table) {

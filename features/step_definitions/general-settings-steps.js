@@ -23,7 +23,7 @@ When(/^I open General Settings language selection dropdown$/, async function () 
 });
 
 Then(/^I should see General Settings "([^"]*)" screen$/, async function (screenName) {
-  return waitUntilUrlEquals.call(this, `/settings/${screenName}`);
+  await waitUntilUrlEquals.call(this, `/settings/${screenName}`);
 });
 
 Then(/^I should see Japanese language as selected$/, async function () {
