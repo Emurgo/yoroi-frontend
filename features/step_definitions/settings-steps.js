@@ -54,18 +54,15 @@ Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
   const errorSelector = '.ChangeWalletPasswordDialog_newPassword .SimpleFormField_error';
-  await checkError(this, errorSelector, error);
+  await checkErrorByTranslationId(this, errorSelector, error);
 });
 
 Then(/^I should see the following submit error messages:$/, async function (data) {
   const error = data.hashes()[0];
   const errorSelector = '.ChangeWalletPasswordDialog_error';
-  await checkError(this, errorSelector, error);
+  await checkErrorByTranslationId(this, errorSelector, error);
 });
 
-async function checkError(client, errorSelector, error) {
-  await client.waitForElement(errorSelector);
-  const errorsOnScreen = await client.getText(errorSelector);
-  const expectedError = await client.intl(error.message);
-  expect(errorsOnScreen).to.equal(expectedError);
+async function checkErrorByTranslationId(client, errorSelector, error) {
+  await client.waitUntilText(errorSelector, await client.intl(error.message));
 }
