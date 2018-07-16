@@ -15,6 +15,7 @@ Given(/^I am on the General Settings "([^"]*)" screen$/, async function (screen)
 When(/^I click on secondary menu (.*) item$/, async function (buttonName) {
   const buttonSelector = `.SettingsMenuItem_component.${_.camelCase(buttonName)}`;
   await this.driver.waitForElement(buttonSelector);
+  await this.waitEnable(buttonSelector);
   await this.click(buttonSelector);
 });
 

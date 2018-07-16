@@ -43,7 +43,7 @@ Then(/^I should not see the change password dialog anymore$/, async function () 
 });
 
 Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
-  return this
+  await this
     .driver
     .wait(async () => {
       const updatedName = await this.getText('.TopBar_walletName');
