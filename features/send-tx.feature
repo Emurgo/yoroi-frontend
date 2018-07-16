@@ -53,7 +53,7 @@ Feature: Send transaction
     Then I should see the summary screen
 
   @invalidWitnessTest
-  Scenario: Sending a Tx and receiving Invalid Witness error
+  Scenario: Sending a Tx and receiving from the server an invalid signature error
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -65,4 +65,4 @@ Feature: Send transaction
       | password  |
       | Secret123 |
     And I submit the wallet send form
-    Then I should see the error message "!!!The signature is invalid."
+    Then I should see an invalid signature error message
