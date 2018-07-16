@@ -276,6 +276,9 @@ export default class AdaApi {
       );
       return response;
     } catch (error) {
+      if (error.message.includes('Invalid passphrase given')) {
+        throw new IncorrectWalletPasswordError();
+      }
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();

@@ -68,7 +68,14 @@ export async function newAdaTransaction(
   password: string
 ): Promise<any> {
   const seed = getWalletSeed();
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  let cryptoWallet;
+  try {
+    cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  } catch (error) {
+    if (error.message.includes('Passphrase doesn\'t match')) {
+      throw new Error('Invalid passphrase given');
+    }
+  }
   const [{ cbor_encoded_tx }, changeAdaAddr] =
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
