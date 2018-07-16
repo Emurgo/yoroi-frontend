@@ -1,5 +1,4 @@
 import { Given, When, Then } from 'cucumber';
-import { expect } from 'chai';
 import _ from 'lodash';
 import {
   navigateTo,
@@ -17,6 +16,12 @@ When(/^I click on secondary menu (.*) item$/, async function (buttonName) {
   await this.driver.waitForElement(buttonSelector);
   await this.waitEnable(buttonSelector);
   await this.click(buttonSelector);
+});
+
+Then(/^I should see secondary menu (.*) item disabled$/, async function (buttonName) {
+  const buttonSelector =
+    `.SettingsMenuItem_component.SettingsMenuItem_disabled.${_.camelCase(buttonName)}`;
+  await this.driver.waitForElement(buttonSelector);
 });
 
 When(/^I open General Settings language selection dropdown$/, async function () {
