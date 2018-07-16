@@ -14,7 +14,7 @@ const messages = defineMessages({
   },
   wallet: {
     id: 'settings.menu.wallet.link.label',
-    defaultMessage: "!!!Wallet",
+    defaultMessage: '!!!Wallet',
     description: 'Label for the "Wallet" link in the settings menu.',
   },
   support: {

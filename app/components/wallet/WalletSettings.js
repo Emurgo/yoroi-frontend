@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import moment from 'moment';
 import LocalizableError from '../../i18n/LocalizableError';
-import BorderedBox from '../widgets/BorderedBox';
 import InlineEditingInput from '../widgets/forms/InlineEditingInput';
 import ReadOnlyInput from '../widgets/forms/ReadOnlyInput';
 import ChangeWalletPasswordDialog from './settings/ChangeWalletPasswordDialog';

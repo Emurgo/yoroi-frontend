@@ -53,7 +53,7 @@ export default class WalletAddPage extends Component<Props> {
         categories={sidebar.CATEGORIES}
         activeSidebarCategory={sidebar.activeSidebarCategory}
       />);
-    
+
     const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
