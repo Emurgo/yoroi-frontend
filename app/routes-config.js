@@ -17,10 +17,10 @@ export const ROUTES = {
     TRANSACTIONS: '/wallets/:id/transactions',
     SEND: '/wallets/:id/send',
     RECEIVE: '/wallets/:id/receive',
-    SETTINGS: '/wallets/:id/settings',
   },
   SETTINGS: {
     ROOT: '/settings',
+    WALLET: '/settings/wallet',
     GENERAL: '/settings/general',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',

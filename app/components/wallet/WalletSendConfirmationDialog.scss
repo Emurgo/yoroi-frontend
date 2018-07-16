@@ -3,7 +3,6 @@
 
 .dialog {
   font-family: var(--font-medium);
-  width: 580px;
 
   :global {
     .Dialog_title {
@@ -22,15 +21,17 @@
   }
 
   .addressToLabel {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.5px;
     line-height: 1.38;
+    margin-left: 10px;
     text-transform: uppercase;
   }
 
   .addressTo {
     font-family: var(--font-light);
+    font-size: 15px;
     line-height: 1.38;
     margin-top: 6px;
     opacity: 0.5;
@@ -52,15 +53,17 @@
     }
     .amountLabel,
     .feesLabel {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.5px;
       line-height: 1.38;
+      margin-left: 10px;
       text-transform: uppercase;
     }
     .amount,
     .fees {
       color: var(--theme-send-confirmation-dialog-send-values-color);
+      font-size: 15px;
       line-height: 1.38;
       margin-top: 6px;
       word-break: break-word;
@@ -71,10 +74,11 @@
   }
 
   .totalAmountLabel {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.5px;
     line-height: 1.38;
+    margin-left: 10px;
     text-transform: uppercase;
   }
 
@@ -92,7 +96,7 @@
   .error {
     @include error-message;
     text-align: center;
-    margin-top: 27px;
+    margin-top: 17px;
   }
 }
 

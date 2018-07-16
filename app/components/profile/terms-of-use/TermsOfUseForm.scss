@@ -13,16 +13,15 @@
 }
 
 .centeredBox {
-  background-color: var(--theme-bordered-box-background-color);
-  border: var(--theme-bordered-box-border);
-  border-radius: 4px;
-  padding: 30px 30px 20px;
+  margin: 0 auto;
+  width: 600px;
 }
 
 .submitButton,
 .submitButtonSpinning {
   display: block !important;
   margin: 0 auto;
+  width: 100% !important;
 }
 
 .submitButtonSpinning {

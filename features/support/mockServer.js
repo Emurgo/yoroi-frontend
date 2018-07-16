@@ -11,7 +11,7 @@ const port = 8080;
 const addressesLimit = 50;
 const txsLimit = 20;
 
-export function createServer() {
+export function createServer(settings) {
   const server = create();
 
   server.use(middlewares);
@@ -29,6 +29,10 @@ export function createServer() {
       throw new Error('DateFrom should be a valid datetime');
     }
     return true;
+  }
+
+  function defaultSignedTransaction(req, res) {
+    res.send();
   }
 
   server.post('/api/txs/utxoForAddresses', (req, res) => {
@@ -66,9 +70,8 @@ export function createServer() {
     res.send(filteredTxs.slice(0, txsLimit));
   });
 
-  server.post('/api/txs/signed', (req, res) => {
-    res.send();
-  });
+  server.post('/api/txs/signed', settings.signedTransaction ?
+    settings.signedTransaction : defaultSignedTransaction);
 
   server.post('/api/addresses/filterUsed', (req, res) => {
     const usedAddresses = getMockData().usedAddresses.filter((address) =>

@@ -1,5 +1,7 @@
 @mixin error-message {
   color: var(--theme-error-color);
   font-family: var(--font-regular);
+  font-size: 14px;
   line-height: 1.5em;
+  letter-spacing: 0.5px;
 }

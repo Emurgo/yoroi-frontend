@@ -17,6 +17,7 @@ import environment from '../environment';
 export default class WalletsStore extends Store {
 
   WALLET_REFRESH_INTERVAL = environment.walletRefreshInterval;
+  ON_VISIBLE_DEBOUNCE_WAIT = 1000;
   WAIT_FOR_SERVER_ERROR_TIME = 2000;
   MIN_NOTIFICATION_TIME = 500;
 
@@ -37,6 +38,7 @@ export default class WalletsStore extends Store {
 
   setup() {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
+    document.addEventListener('visibilitychange', _.debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
 
     this.registerReactions([
       this._updateActiveWalletOnRouteChanges,

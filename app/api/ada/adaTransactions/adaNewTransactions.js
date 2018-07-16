@@ -39,7 +39,8 @@ import {
   NotEnoughMoneyToSendError,
   TransactionError,
   SendTransactionError,
-  GetAllUTXOsForAddressesError
+  GetAllUTXOsForAddressesError,
+  InvalidWitnessError
 } from '../errors';
 
 const fakePassword = 'fake';
@@ -80,6 +81,9 @@ export async function newAdaTransaction(
     removeAdaAddress(changeAdaAddr);
     Logger.error('adaNewTransactions::newAdaTransaction error: ' +
       stringifyError(sendTxError));
+    if (sendTxError instanceof InvalidWitnessError) {
+      throw new InvalidWitnessError();
+    }
     throw new SendTransactionError();
   }
 }

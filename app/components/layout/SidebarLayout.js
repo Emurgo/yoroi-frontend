@@ -6,7 +6,7 @@ import styles from './SidebarLayout.scss';
 
 type Props = {
   children: any | Node,
-  sidebar: Node,
+  sidebar?: Node,
   topbar: Node,
   notification?: ?Node,
   contentDialogs?: ?Array<Node>,
@@ -27,9 +27,11 @@ export default class SidebarLayout extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <div className={styles.sidebar}>
-          {sidebar}
-        </div>
+        {sidebar ? (
+          <div className={styles.sidebar}>
+            {sidebar}
+          </div>
+        ) : null}
         <div className={styles.main}>
           <div className={styles.topbar}>
             {topbar}

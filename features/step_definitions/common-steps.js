@@ -5,12 +5,20 @@ import { setActiveLanguage } from '../support/helpers/i18n-helpers';
 
 let server;
 
+export function initializeServer(settings) {
+  server = createServer(settings);
+}
+
+export function closeServer() {
+  server.close();
+}
+
 BeforeAll(() => {
-  server = createServer();
+  initializeServer({});
 });
 
 AfterAll(() => {
-  server.close();
+  closeServer();
 });
 
 After(async function () {
