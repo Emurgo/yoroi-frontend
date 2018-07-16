@@ -76,7 +76,6 @@ export default class DaedalusTransferStore extends Store {
     }
   }
 
-  /* TODO: Handle WS connection errors */
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
     this._updateStatus('restoringAddresses');
