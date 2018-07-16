@@ -294,6 +294,20 @@
           "column": 37,
           "line": 105
         }
+      },
+      {
+        "defaultMessage": "!!!The signature is invalid.",
+        "description": "\"The signature is invalid.\" error message",
+        "end": {
+          "column": 3,
+          "line": 114
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.invalidWitnessError",
+        "start": {
+          "column": 23,
+          "line": 110
+        }
       }
     ],
     "path": "app/api/ada/errors.json"
@@ -1458,17 +1472,31 @@
         }
       },
       {
-        "defaultMessage": "!!!Support",
-        "description": "Label for the \"Support\" link in the settings menu.",
+        "defaultMessage": "!!!Wallet",
+        "description": "Label for the \"Wallet\" link in the settings menu.",
         "end": {
           "column": 3,
           "line": 19
         },
         "file": "app/components/settings/menu/SettingsMenu.js",
+        "id": "settings.menu.wallet.link.label",
+        "start": {
+          "column": 10,
+          "line": 15
+        }
+      },
+      {
+        "defaultMessage": "!!!Support",
+        "description": "Label for the \"Support\" link in the settings menu.",
+        "end": {
+          "column": 3,
+          "line": 24
+        },
+        "file": "app/components/settings/menu/SettingsMenu.js",
         "id": "settings.menu.support.link.label",
         "start": {
           "column": 11,
-          "line": 15
+          "line": 20
         }
       },
       {
@@ -1476,13 +1504,13 @@
         "description": "Label for the \"Terms of use\" link in the settings menu.",
         "end": {
           "column": 3,
-          "line": 24
+          "line": 29
         },
         "file": "app/components/settings/menu/SettingsMenu.js",
         "id": "settings.menu.termsOfUse.link.label",
         "start": {
           "column": 14,
-          "line": 20
+          "line": 25
         }
       }
     ],
@@ -3106,13 +3134,13 @@
         "description": "Label for the \"Name\" text input on the wallet settings page.",
         "end": {
           "column": 3,
-          "line": 20
+          "line": 19
         },
         "file": "app/components/wallet/WalletSettings.js",
         "id": "wallet.settings.name.label",
         "start": {
           "column": 8,
-          "line": 16
+          "line": 15
         }
       },
       {
@@ -3120,13 +3148,13 @@
         "description": "Label for the \"Password\" field.",
         "end": {
           "column": 3,
-          "line": 25
+          "line": 24
         },
         "file": "app/components/wallet/WalletSettings.js",
         "id": "wallet.settings.password",
         "start": {
           "column": 17,
-          "line": 21
+          "line": 20
         }
       },
       {
@@ -3134,13 +3162,13 @@
         "description": "Last updated X time ago message.",
         "end": {
           "column": 3,
-          "line": 30
+          "line": 29
         },
         "file": "app/components/wallet/WalletSettings.js",
         "id": "wallet.settings.passwordLastUpdated",
         "start": {
           "column": 23,
-          "line": 26
+          "line": 25
         }
       },
       {
@@ -3148,13 +3176,13 @@
         "description": "Label for the export button on wallet settings.",
         "end": {
           "column": 3,
-          "line": 35
+          "line": 34
         },
         "file": "app/components/wallet/WalletSettings.js",
         "id": "wallet.settings.exportWalletButtonLabel",
         "start": {
           "column": 21,
-          "line": 31
+          "line": 30
         }
       }
     ],
