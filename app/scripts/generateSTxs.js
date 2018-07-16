@@ -33,7 +33,7 @@ export async function generateSTxs(password: string,
 
   const adaAddresses = [];
   for (let i = 0; i < numberOfTxs; i++) {
-    const newAddress = _generateNewAddress(cryptoAccount);
+    const newAddress = await _generateNewAddress(cryptoAccount);
     adaAddresses.push(newAddress);
     log(`[generateSTxs] Generated the address ${newAddress.cadId}`);
   }
@@ -56,7 +56,7 @@ export async function generateSTxs(password: string,
   _saveAdaAddresses(cryptoAccount, adaAddresses);
 
   log('[generateSTxs] Starting generating stxs');
-  const newAddress = _generateNewAddress(cryptoAccount).cadId;
+  const newAddress = (await _generateNewAddress(cryptoAccount)).cadId;
   const seed = getWalletSeed();
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   for (let i = 0; i < numberOfTxs; i++) {
@@ -104,5 +104,5 @@ function _removeAdaAddresses(cryptoAccount, addresses) {
 
 // The same index from the AdaAddresses is used when saving them
 function _saveAdaAddresses(cryptoAccount, adaAddresses) {
-  adaAddresses.forEach(saveAdaAddress);
+  adaAddresses.forEach((adaAddress) => saveAdaAddress(adaAddress, 'External'));
 }

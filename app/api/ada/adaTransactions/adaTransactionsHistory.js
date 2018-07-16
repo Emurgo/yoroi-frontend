@@ -13,20 +13,21 @@ import {
   getPendingTxsForAddresses
 } from '../lib/icarus-backend-api';
 import {
-  insertOrReplaceToTxsTable,
-  getDBRow,
-  getTxWithDBSchema,
-  getMostRecentTxFromRows,
-  getAllTxsFromTxsTable,
-  updatePendingTxs,
-  getConfirmedTxsFromDB
+  saveTxs,
+  getMostRecentTx,
+  getTxs,
+  deletePendingTxs,
+  getConfirmedTxs
 } from '../lib/lovefieldDatabase';
+import {
+  toAdaTx
+} from '../lib/utils';
 import {
   getLastBlockNumber,
   saveLastBlockNumber
 } from '../getAdaLastBlockNumber';
 import {
-  getAdaAddresses
+  getAdaAddressesList
 } from '../adaAddress';
 import {
   UpdateAdaTxsHistoryError,
@@ -39,16 +40,17 @@ import type
   AdaTransactionInputOutput
 } from '../adaTypes';
 
-export const getAdaConfirmedTxs = getConfirmedTxsFromDB;
+export const getAdaConfirmedTxs = getConfirmedTxs;
 
 export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
-  const transactions = await getAllTxsFromTxsTable();
+  const transactions = await getTxs();
   return Promise.resolve([transactions, transactions.length]);
 };
 
 export async function refreshTxs() {
   try {
-    const addresses = await getAdaAddresses();
+    const adaAddresses = await getAdaAddressesList();
+    const addresses: Array<string> = adaAddresses.map(addr => addr.cadId);
     await _updateAdaPendingTxs(addresses);
     await _updateAdaTxsHistory(await getAdaConfirmedTxs(), addresses);
   } catch (error) {
@@ -63,8 +65,9 @@ async function _updateAdaPendingTxs(addresses: Array<string>) {
       addresses,
       getPendingTxsForAddresses
     );
-    const mappedPendingTxs = _mapToTxRow(txs, addresses);
-    return updatePendingTxs(mappedPendingTxs);
+    const mappedPendingTxs = _mapToAdaTxs(txs, addresses);
+    await deletePendingTxs();
+    await saveTxs(mappedPendingTxs);
   } catch (error) {
     Logger.error('adaTransactionsHistory::updateAdaPendingTxs error: ' + stringifyError(error));
     throw new PendingTransactionError();
@@ -77,13 +80,13 @@ async function _updateAdaTxsHistory(
 ) {
   try {
     const mostRecentTx = Object.assign({}, existingTransactions[0]);
-    const dateFrom = mostRecentTx && mostRecentTx.ctMeta ?
+    const dateFrom = mostRecentTx.ctMeta ?
       moment(mostRecentTx.ctMeta.ctmDate) :
       moment(new Date(0));
     const mappedTxs = await _getTxsForChunksOfAddresses(addresses, groupOfAddresses =>
       _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
     );
-    return insertOrReplaceToTxsTable(mappedTxs);
+    return saveTxs(mappedTxs);
   } catch (error) {
     Logger.error('adaTransactionsHistory::updateAdaTxsHistory error: ' + stringifyError(error));
     throw new UpdateAdaTxsHistoryError();
@@ -98,12 +101,12 @@ async function _getTxsForChunksOfAddresses(addresses, apiCall) {
 }
 
 async function _updateAdaTxsHistoryForGroupOfAddresses(
-  previousTxsRows,
+  previousTxs,
   groupOfAddresses,
   dateFrom,
   allAddresses
 ) {
-  const mostRecentTx = getMostRecentTxFromRows(previousTxsRows);
+  const mostRecentTx = getMostRecentTx(previousTxs);
   const updatedDateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : dateFrom;
   const txHash = mostRecentTx ? mostRecentTx.ctId : mostRecentTx;
   const history = await getTransactionsHistoryForAddresses(
@@ -119,32 +122,31 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
       saveLastBlockNumber(history[0].best_block_num);
     }
 
-    const transactionsRows = previousTxsRows.concat(
-      _mapToTxRow(history, allAddresses));
+    const transactions = previousTxs.concat(
+      _mapToAdaTxs(history, allAddresses));
     if (history.length === transactionsLimit) {
       return await _updateAdaTxsHistoryForGroupOfAddresses(
-        transactionsRows,
+        transactions,
         groupOfAddresses,
         dateFrom,
         allAddresses
       );
     }
-    return Promise.resolve(transactionsRows);
+    return transactions;
   }
-  return Promise.resolve(previousTxsRows);
+  return previousTxs;
 }
 
-function _mapToTxRow(
-  transactions,
+function _mapToAdaTxs(
+  txs,
   accountAddresses
 ) {
-  return transactions.map(tx => {
+  return txs.map(tx => {
     const inputs = _mapInputOutput(tx.inputs_address, tx.inputs_amount);
     const outputs = _mapInputOutput(tx.outputs_address, tx.outputs_amount);
     const { isOutgoing, amount } = _spenderData(inputs, outputs, accountAddresses);
     const time = tx.time || tx.created_time;
-    const newtx = getTxWithDBSchema(amount, tx, inputs, isOutgoing, outputs, time);
-    return getDBRow(newtx);
+    return toAdaTx(amount, tx, inputs, isOutgoing, outputs, time);
   });
 }
 

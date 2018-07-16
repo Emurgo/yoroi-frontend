@@ -57,6 +57,18 @@ export type AdaAccount = {
 
 export type AdaAccounts = Array<AdaAccount>;
 
+export type Transaction = {
+  hash: string,
+  inputs_address: Array<string>,
+  inputs_amount: Array<string>,
+  outputs_address: Array<string>,
+  outputs_amount: Array<string>,
+  block_num: string,
+  time: string,
+  succeeded: boolean,
+  best_block_num: string
+};
+
 export type AdaTransaction = {
   ctAmount: AdaAmount,
   ctBlockNumber: number,

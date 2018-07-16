@@ -60,13 +60,13 @@ Given(/^There is a wallet stored( named ([^"]*))?$/, async function (walletName)
 });
 
 function refreshWallet(client) {
-  return client.driver.executeAsyncScript((done) => { 
+  return client.driver.executeAsyncScript((done) => {
     window.icarus.stores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
   });
 }
 
 async function storeWallet(client, walletName) {
-  const { seed, wallet, cryptoAccount, addresses, walletInitialData } = getMockData();
+  const { seed, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
   if (walletName) {
     wallet.cwMeta.cwName = walletName;
   }
@@ -81,12 +81,12 @@ async function storeWallet(client, walletName) {
       walletInitialData[walletName] &&
       walletInitialData[walletName].totalAddresses
     ) {
-    client.saveToLocalStorage('ADDRESSES', getFakeAddresses(
+    client.saveAddressesToDB(getFakeAddresses(
       walletInitialData[walletName].totalAddresses,
       walletInitialData[walletName].addressesStartingWith
     ));
   } else {
-    client.saveToLocalStorage('ADDRESSES', addresses);
+    client.saveAddressesToDB(adaAddresses);
   }
   await refreshWallet(client);
   await client.waitForElement('.TopBar_walletName');
