@@ -21,7 +21,8 @@ import {
   saveAdaAddress,
   removeAdaAddress,
   createAdaAddress,
-  getAdaAddressesMap
+  getAdaAddressesMap,
+  getAdaAddressesList
 } from '../adaAddress';
 import {
   getCryptoWalletFromSeed,
@@ -75,7 +76,7 @@ export async function newAdaTransaction(
   const [{ cbor_encoded_tx }, changeAdaAddr] =
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-  saveAdaAddress(changeAdaAddr);
+  await saveAdaAddress(changeAdaAddr, 'Internal');
   try {
     const backendResponse = await sendTx(signedTx);
     return backendResponse;
@@ -106,32 +107,30 @@ export async function getAllUTXOsForAddresses(
   }
 }
 
-export function getAdaTransactionFromSenders(
+export async function getAdaTransactionFromSenders(
   senders: AdaAddresses,
   receiver: string,
   amount: string,
   cryptoWallet: CryptoWallet
 ) {
   const cryptoAccount = getSingleCryptoAccount();
-  const addressesMap = getAdaAddressesMap();
+  const addressesMap = await getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
-  const changeAdaAddr = createAdaAddress(cryptoAccount, addresses, 'Internal');
+  const changeAdaAddr = await createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
   const outputs = [{ address: receiver, value: amount }];
-  return getAllUTXOsForAddresses(_getAddresses(senders))
-    .then((senderUtxos) => {
-      const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-      const result = getOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
-      return [result, changeAdaAddr];
-    });
+  const senderUtxos = await getAllUTXOsForAddresses(_getAddresses(senders));
+  const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
+  const result = getOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
+  return [result, changeAdaAddr];
 }
 
-function _getAdaTransaction(
+async function _getAdaTransaction(
   receiver: string,
   amount: string,
   cryptoWallet: CryptoWallet,
 ) {
-  const senders = mapToList(getAdaAddressesMap());
+  const senders = await getAdaAddressesList();
   return getAdaTransactionFromSenders(senders, receiver, amount, cryptoWallet);
 }
 
