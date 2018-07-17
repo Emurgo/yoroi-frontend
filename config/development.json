@@ -6,6 +6,8 @@
     "name": "staging"
   },
   "app": {
-    "walletRefreshInterval": 20000
+    "walletRefreshInterval": 20000,
+    "logsBufferSize": 500,
+    "logsFileSuffix": "-icarus.log"
   }
 }
