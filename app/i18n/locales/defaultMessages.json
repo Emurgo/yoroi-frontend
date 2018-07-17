@@ -1451,6 +1451,48 @@
           "column": 25,
           "line": 43
         }
+      },
+      {
+        "defaultMessage": "!!!Logs",
+        "description": "Title \"Logs\" on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 52
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.logs.title",
+        "start": {
+          "column": 13,
+          "line": 48
+        }
+      },
+      {
+        "defaultMessage": "!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.",
+        "description": "Content for the \"Logs\" section on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 57
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.logs.content",
+        "start": {
+          "column": 15,
+          "line": 53
+        }
+      },
+      {
+        "defaultMessage": "!!!download them here",
+        "description": "\"download them here\" link in the Logs section on the support settings page",
+        "end": {
+          "column": 3,
+          "line": 62
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.logs.downloadLogsLink",
+        "start": {
+          "column": 20,
+          "line": 58
+        }
       }
     ],
     "path": "app/components/settings/categories/SupportSettings.json"
@@ -3787,13 +3829,13 @@
         "description": "\"Unable to transfer funds.\" error message",
         "end": {
           "column": 3,
-          "line": 191
+          "line": 190
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.transferFundsError",
         "start": {
           "column": 22,
-          "line": 187
+          "line": 186
         }
       },
       {
@@ -3801,13 +3843,13 @@
         "description": "\"There is no transfer transaction to send.\" error message",
         "end": {
           "column": 3,
-          "line": 196
+          "line": 195
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.noTransferTxError",
         "start": {
           "column": 21,
-          "line": 192
+          "line": 191
         }
       },
       {
@@ -3815,13 +3857,13 @@
         "description": "Any reason why the websocket transferring could failed",
         "end": {
           "column": 3,
-          "line": 201
+          "line": 200
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.webSocketRestoreError",
         "start": {
           "column": 25,
-          "line": 197
+          "line": 196
         }
       }
     ],
