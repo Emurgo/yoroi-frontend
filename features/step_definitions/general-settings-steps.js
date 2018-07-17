@@ -4,8 +4,7 @@ import {
   navigateTo,
   waitUntilUrlEquals,
 } from '../support/helpers/route-helpers';
-
-import { getActiveLanguage } from '../support/helpers/i18n-helpers';
+import i18n from '../support/helpers/i18n-helpers';
 
 Given(/^I am on the General Settings "([^"]*)" screen$/, async function (screen) {
   await navigateTo.call(this, `/settings/${screen}`);
@@ -19,9 +18,11 @@ When(/^I click on secondary menu (.*) item$/, async function (buttonName) {
 });
 
 Then(/^I should see secondary menu (.*) item disabled$/, async function (buttonName) {
+  const formattedButtonName = _.camelCase(buttonName);
   const buttonSelector =
-    `.SettingsMenuItem_component.SettingsMenuItem_disabled.${_.camelCase(buttonName)}`;
-  await this.driver.waitForElement(buttonSelector);
+    `.SettingsMenuItem_component.SettingsMenuItem_disabled.${formattedButtonName}`;
+  const label = await i18n.formatMessage(this.driver, { id: `settings.menu.${formattedButtonName}.link.label` });
+  await this.waitUntilText(buttonSelector, label);
 });
 
 When(/^I open General Settings language selection dropdown$/, async function () {
@@ -34,7 +35,7 @@ Then(/^I should see General Settings "([^"]*)" screen$/, async function (screenN
 
 Then(/^I should see Japanese language as selected$/, async function () {
   this.driver.wait(async () => {
-    const activeLanguage = await getActiveLanguage(this.driver);
+    const activeLanguage = await i18n.getActiveLanguage(this.driver);
     return activeLanguage === 'ja-JP';
   });
 });
