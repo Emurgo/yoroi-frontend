@@ -16,15 +16,19 @@ export default class TopBarContainer extends Component<Props> {
 
   render() {
     const { actions, stores } = this.props;
-    const { app } = stores;
+    const { app, sidebar } = stores;
 
     return (
       <TopBar
-        onToggleSidebar={actions.sidebar.toggleSubMenus.trigger}
         activeWallet={stores[environment.API].wallets.active}
         currentRoute={app.currentRoute}
         showSubMenus={false}
         formattedWalletAmount={formattedWalletAmount}
+        onCategoryClicked={category => {
+          actions.sidebar.activateSidebarCategory.trigger({ category });
+        }}
+        categories={sidebar.CATEGORIES}
+        activeSidebarCategory={sidebar.activeSidebarCategory}
       />
     );
   }

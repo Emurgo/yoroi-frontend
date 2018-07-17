@@ -9,22 +9,19 @@
 }
 
 .centeredBox {
-  background-color: var(--theme-bordered-box-background-color);
-  border: var(--theme-bordered-box-border);
-  border-radius: 4px;
-  padding: 30px 30px 20px;
   overflow: visible;
-  width: 620px;
+  width: 400px;
 }
 
 .languageSelect {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .submitButton,
 .submitButtonSpinning {
   display: block !important;
   margin: 0 auto;
+  width: 100% !important;
 }
 
 .submitButtonSpinning {

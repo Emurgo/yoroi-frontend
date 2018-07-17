@@ -16,17 +16,7 @@
   cursor: default;
 }
 
-.icon {
-  & > svg {
-    height: 48px;
-    path {
-      fill: var(--theme-icon-add-wallet-dialog-big-button-color);
-    }
-  }
-}
-
 .label {
-  margin-top: 20px;
   font-size: 19px;
   line-height: 1.37;
   color: var(--theme-dialog-big-button-label-color);

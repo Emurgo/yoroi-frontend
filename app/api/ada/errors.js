@@ -106,6 +106,11 @@ const messages = defineMessages({
     id: 'api.errors.getPendingTxsForAddressesApiError',
     defaultMessage: '!!!Error received from server while getting pending txs.',
     description: '"Error received from server while getting pending txs." error message'
+  },
+  invalidWitnessError: {
+    id: 'api.errors.invalidWitnessError',
+    defaultMessage: '!!!The signature is invalid.',
+    description: '"The signature is invalid." error message'
   }
 });
 
@@ -294,6 +299,15 @@ export class GetPendingTxsForAddressesApiError extends LocalizableError {
     super({
       id: messages.getPendingTxsForAddressesApiError.id,
       defaultMessage: messages.getPendingTxsForAddressesApiError.defaultMessage
+    });
+  }
+}
+
+export class InvalidWitnessError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.invalidWitnessError.id,
+      defaultMessage: messages.invalidWitnessError.defaultMessage
     });
   }
 }

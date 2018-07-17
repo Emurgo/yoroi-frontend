@@ -9,6 +9,7 @@ import WalletNoTransactions from '../../components/wallet/transactions/WalletNoT
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import resolver from '../../utils/imports';
+import { Logger } from '../../utils/logging';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 
@@ -20,6 +21,11 @@ export const messages = defineMessages({
     defaultMessage: '!!!No recent transactions',
     description:
       'Message shown when wallet has no transactions on wallet summary page.'
+  },
+  noTransactionsFound: {
+    id: 'wallet.summary.no.transaction',
+    defaultMessage: '!!!No transactions found',
+    description: 'Message shown when wallet transaction search returns zero results.'
   }
 });
 
@@ -33,37 +39,47 @@ export default class WalletSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const actions = this.props.actions;
     const { wallets, transactions } = this.props.stores.ada;
     const {
       hasAny,
       totalAvailable,
-      recent,
+      filtered,
+      searchOptions,
+      searchRequest,
       recentTransactionsRequest,
       unconfirmedAmount,
     } = transactions;
     const wallet = wallets.active;
+    let walletTransactions = null;
     // Guard against potential null values
     if (!wallet) {
-      throw new Error('Active wallet required for WalletSummaryPage.');
+      Logger.error('[WalletSummaryPage::render] Active wallet required');
+      return null;
     }
+    if (searchOptions) {
+      const { searchLimit, searchTerm } = searchOptions;
+      const wasSearched = searchTerm !== '';
+      const noTransactionsLabel = intl.formatMessage(messages.noTransactions);
+      const noTransactionsFoundLabel = intl.formatMessage(messages.noTransactionsFound);
 
-    let walletTransactions = null;
-    const noTransactionsLabel = intl.formatMessage(messages.noTransactions);
-
-    if (recentTransactionsRequest.isExecutingFirstTime || hasAny) {
-      walletTransactions = (
-        <WalletTransactionsList
-          key={`WalletTransactionsList_${wallet.id}`}
-          transactions={recent}
-          isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
-          hasMoreToLoad={false}
-          assuranceMode={wallet.assuranceMode}
-          walletId={wallet.id}
-          formattedWalletAmount={formattedWalletAmount}
-        />
-      );
-    } else if (!hasAny) {
-      walletTransactions = <WalletNoTransactions label={noTransactionsLabel} />;
+      if (searchRequest.isExecutingFirstTime || hasAny) {
+        walletTransactions = (
+          <WalletTransactionsList
+            transactions={filtered}
+            isLoadingTransactions={searchRequest.isExecutingFirstTime}
+            hasMoreToLoad={totalAvailable > searchLimit}
+            onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
+            assuranceMode={wallet.assuranceMode}
+            walletId={wallet.id}
+            formattedWalletAmount={formattedWalletAmount}
+          />
+        );
+      } else if (wasSearched && !hasAny) {
+        walletTransactions = <WalletNoTransactions label={noTransactionsFoundLabel} />;
+      } else if (!hasAny) {
+        walletTransactions = <WalletNoTransactions label={noTransactionsLabel} />;
+      }
     }
 
     return (

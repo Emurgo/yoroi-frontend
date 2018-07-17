@@ -31,10 +31,15 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   render() {
     const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const topbar = <TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />;
+    const { sidebar } = this.props.stores;
+    const topBar = (
+      <TextOnlyTopBar
+        title={this.context.intl.formatMessage(messages.title)}
+        activeSidebarCategory={sidebar.activeSidebarCategory}
+      />);
     return (
       <TopBarLayout
-        topbar={topbar}
+        topbar={topBar}
       >
         <LanguageSelectionForm
           onSubmit={this.onSubmit}

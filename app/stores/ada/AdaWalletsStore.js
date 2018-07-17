@@ -6,7 +6,6 @@ import Wallet from '../../domain/Wallet';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '.././lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
-import WalletAddDialog from '../../components/wallet/WalletAddDialog';
 import type { walletExportTypeChoices } from '../../types/walletExportTypes';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type { ImportWalletFromFileResponse } from '../../api/ada/index';
@@ -196,7 +195,7 @@ export default class AdaWalletsStore extends WalletStore {
     // A) show the 'Add wallet' dialog (in case we don't have any wallets) or
     // B) just close the active dialog and unblock the UI
     if (this.hasLoadedWallets && !this.hasAnyWallets) {
-      this.actions.dialogs.open.trigger({ dialog: WalletAddDialog });
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     } else {
       this.actions.dialogs.closeActiveDialog.trigger();
     }

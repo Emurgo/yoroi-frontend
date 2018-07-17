@@ -1,5 +1,6 @@
 // @flow
 import { observable, action, runInAction } from 'mobx';
+import { defineMessages } from 'react-intl';
 import {
   Logger,
   stringifyError
@@ -21,22 +22,30 @@ import {
   getAddressesWithFunds,
   generateTransferTx
 } from '../../api/ada/daedalusTransfer';
+import environment from '../../environment';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
+const WS_CODE_NORMAL_CLOSURE = 1000;
 
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatus = 'uninitialized';
+  @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable transferFundsRequest: Request<any> = new Request(this._transferFundsRequest);
   @observable ws: any = null;
 
   setup(): void {
+    this.registerReactions([
+      this._enableDisableTransferFunds
+    ]);
     const actions = this.actions.ada.daedalusTransfer;
+    actions.startTransferFunds.listen(this._startTransferFunds);
     actions.setupTransferFunds.listen(this._setupTransferFunds);
+    actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._transferFunds);
     actions.cancelTransferFunds.listen(this._reset);
   }
@@ -46,13 +55,33 @@ export default class DaedalusTransferStore extends Store {
     this._reset();
   }
 
-  /* TODO: Handle WS connection errors */
+  _startTransferFunds = (): void => {
+    this._updateStatus('gettingMnemonics');
+  }
+
+  /* @Attention:
+      You should check wallets state outside of the runInAction,
+      because this method run as a reaction.
+  */
+  _enableDisableTransferFunds = (): void => {
+    const { wallets } = this.stores && this.stores[environment.API];
+    if (wallets && wallets.hasActiveWallet) {
+      runInAction(() => {
+        this.disableTransferFunds = false;
+      });
+    } else {
+      runInAction(() => {
+        this.disableTransferFunds = true;
+      });
+    }
+  }
+
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
-    this.status = 'restoringAddresses';
+    this._updateStatus('restoringAddresses');
     this.ws = new WebSocket(websocketUrl);
     this.ws.addEventListener('open', () => {
-      console.log('[ws::connected]');
+      Logger.info('[ws::connected]');
       this.ws.send(JSON.stringify({
         msg: MSG_TYPE_RESTORE,
       }));
@@ -63,7 +92,7 @@ export default class DaedalusTransferStore extends Store {
     this.ws.addEventListener('message', async (event: any) => {
       try {
         const data = JSON.parse(event.data);
-        console.log(`[ws::message] on: ${data.msg}`);
+        Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
           this._updateStatus('checkingAddresses');
           const addressesWithFunds = getAddressesWithFunds({
@@ -88,6 +117,22 @@ export default class DaedalusTransferStore extends Store {
         });
       }
     });
+
+    this.ws.addEventListener('close', (event: any) => {
+      Logger.info(
+        `[ws::close] CODE: ${event.code} - REASON: ${event.reason} - was clean? ${event.wasClean}`
+      );
+      if (event.code !== WS_CODE_NORMAL_CLOSURE) {
+        runInAction(() => {
+          this.status = 'error';
+          this.error = new WebSocketRestoreError();
+        });
+      }
+    });
+  }
+
+  _backToUninitialized = (): void => {
+    this._updateStatus('uninitialized');
   }
 
   @action.bound
@@ -131,19 +176,36 @@ export default class DaedalusTransferStore extends Store {
     this.transferTx = null;
     this.transferFundsRequest.reset();
     if (this.ws) {
-      this.ws.close();
+      this.ws.close(WS_CODE_NORMAL_CLOSURE);
       this.ws = null;
     }
   }
 }
 
-// FIXME: Define a place for these type of errors
+const messages = defineMessages({
+  transferFundsError: {
+    id: 'daedalusTransfer.error.transferFundsError',
+    defaultMessage: '!!!Unable to transfer funds.',
+    description: '"Unable to transfer funds." error message',
+  },
+  noTransferTxError: {
+    id: 'daedalusTransfer.error.noTransferTxError',
+    defaultMessage: '!!!There is no transfer transaction to send.',
+    description: '"There is no transfer transaction to send." error message'
+  },
+  webSocketRestoreError: {
+    id: 'daedalusTransfer.error.webSocketRestoreError',
+    defaultMessage: '!!!Error while restoring blockchain addresses',
+    description: 'Any reason why the websocket transferring could failed'
+  }
+});
+
 export class TransferFundsError extends LocalizableError {
   constructor() {
     super({
-      id: 'daedalusTransfer.error.transferFundsError',
-      defaultMessage: '!!!Unable to transfer funds.',
-      description: '"Unable to transfer funds." error message',
+      id: messages.transferFundsError.id,
+      defaultMessage: messages.transferFundsError.defaultMessage,
+      description: messages.transferFundsError.description,
     });
   }
 }
@@ -151,9 +213,19 @@ export class TransferFundsError extends LocalizableError {
 export class NoTransferTxError extends LocalizableError {
   constructor() {
     super({
-      id: 'daedalusTransfer.error.noTransferTxError',
-      defaultMessage: '!!!There is no transfer transaction to send.',
-      description: '"There is no transfer transaction to send." error message'
+      id: messages.noTransferTxError.id,
+      defaultMessage: messages.noTransferTxError.defaultMessage,
+      description: messages.noTransferTxError.description,
+    });
+  }
+}
+
+export class WebSocketRestoreError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.webSocketRestoreError.id,
+      defaultMessage: messages.webSocketRestoreError.defaultMessage,
+      description: messages.webSocketRestoreError.description,
     });
   }
 }

@@ -24,7 +24,6 @@
 
 .togglerContent {
   flex: 1;
-  margin-left: 20px;
   padding-top: 1px;
 }
 
@@ -51,14 +50,35 @@
   letter-spacing: 1px;
 }
 
+.amountSent {
+  color: #eb6d7a;
+
+  .currencySymbol {
+    & > svg > g > g {
+      stroke: #eb6d7a;
+    }
+  }
+}
+
+.amountReceived {
+  color: #54ca87;
+
+  .currencySymbol {
+    & > svg > g > g {
+      stroke: #54ca87;
+    }
+  }
+}
+
 .pendingLabel, .failedLabel, .low, .medium, .high {
   color: var(--theme-transactions-priority-color);
   display: inline-block;
   font-family: var(--font-bold);
   font-size: 8px;
+  height: 17px;
   line-height: 16px;
-  margin-left: auto;
-  margin-top: 3px;
+  margin-left: 12px;
+  margin-top: 2px;
   padding: 0 9px;
   text-transform: uppercase;
 }
@@ -115,6 +135,7 @@
 .type {
   font-family: var(--font-light);
   font-size: 14px;
+  margin-left: 12px;
   margin-top: 3px;
 }
 
@@ -122,7 +143,7 @@
 
 .content {
   border-bottom: 1px solid var(--theme-separation-border-color);
-  margin-left: 64px;
+  margin-left: 20px;
   margin-right: 20px;
 }
 
@@ -138,8 +159,10 @@
   }
   h2 {
     font-family: var(--font-medium);
-    font-size: 16px;
+    font-size: 11px;
+    font-weight: 600;
     margin-bottom: 8px;
+    text-transform: uppercase;
   }
   span {
     font-family: var(--font-light);

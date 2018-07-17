@@ -101,6 +101,11 @@ function CustomWorld() {
     this.driver.executeScript((k, l) =>
         window.icarus.translations[l][k]
     , key, lang);
+
+  this.saveAddressesToDB = addresses =>
+    this.driver.executeScript(addrs => {
+      addrs.forEach(addr => window.icarus.api.ada.saveAddress(addr, 'External'));
+    }, addresses);
 }
 
 setWorldConstructor(CustomWorld);

@@ -12,7 +12,8 @@ import {
   GetTxHistoryForAddressesApiError,
   SendTransactionApiError,
   CheckAdressesInUseApiError,
-  GetPendingTxsForAddressesApiError
+  GetPendingTxsForAddressesApiError,
+  InvalidWitnessError
 } from '../errors';
 
 export const transactionsLimit = 20;
@@ -79,6 +80,9 @@ export const sendTx = (signedTx: string) =>
   ).then(response => response.data)
   .catch((error) => {
     Logger.error('icarus-backend-api::sendTx error: ' + stringifyError(error));
+    if (error.request.response.includes('Invalid witness')) {
+      throw new InvalidWitnessError();
+    }
     throw new SendTransactionApiError();
   });
 
