@@ -31,7 +31,7 @@ export const Logger = {
 };
 
 export const downloadLogs = () => {
-  const toDownload = logs.peekN(logs.size() - 1);
+  const toDownload = logs.peekN(logs.size());
   const blob = new Blob(toDownload, { type: 'text/plain;charset=utf-8' });
   FileSaver.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
 };
