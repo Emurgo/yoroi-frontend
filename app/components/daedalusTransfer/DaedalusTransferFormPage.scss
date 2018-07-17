@@ -6,7 +6,7 @@
 
 .button {
   display: block !important;
-  margin: 30px auto 0;
+  margin: 20px auto 0;
 }
 
 .body {
@@ -16,24 +16,26 @@
   line-height: 19px;
 
   .title {
-    font-size: 19px;
+    font-size: 11px;
     font-family: var(--font-medium);
-    line-height: 23px;
-    margin-bottom: 6px;
-    word-break: break-all;
+    font-weight: 600;
+    line-height: 1.38;
+    margin-bottom: 4px;
+    padding-left: 10px;
     text-transform: uppercase;
   }
 
   .text {
-    font-size: 16px;
-    line-height: 22px;
-    margin-bottom: 12px;
+    font-size: 15px;
+    line-height: 1.38;
+    margin-bottom: 2px;
     word-break: break-word;
   }
 
   .instructionsList {
-    list-style-type:disc;
-    margin: 2%;
+    list-style-type: disc;
+    list-style-position: inside;
+    margin-bottom: 20px;
   }
 
   .buttonsWrapper {
@@ -43,12 +45,9 @@
   }
 
   .submitWithPasswordButton {
-    max-width: 310px;
-    width: calc(50% - 10px);
     &.spinning {
       @include loading-spinner("../../assets/images/spinner-light.svg");
     }
   }
-
 }
 

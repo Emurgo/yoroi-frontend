@@ -4,7 +4,6 @@ import moment from 'moment';
 import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
 import styles from './Transaction.scss';
-import TransactionTypeIcon from './TransactionTypeIcon';
 import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import WalletTransaction, { transactionStates, transactionTypes } from '../../../domain/WalletTransaction';
 import { assuranceLevels } from '../../../config/transactionAssuranceConfig';
@@ -164,6 +163,11 @@ export default class Transaction extends Component<Props, State> {
       isExpanded ? styles.expanded : styles.closed
     ]);
 
+    const amountStyles = classNames([
+      styles.amount,
+      data.type === transactionTypes.EXPEND ? styles.amountSent : styles.amountReceived
+    ]);
+
     const status = intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
     // const symbol = environment.isAdaApi() ? adaSymbol : 'etcSymbol';
@@ -174,10 +178,6 @@ export default class Transaction extends Component<Props, State> {
 
         {/* ==== Clickable Header -> toggles details ==== */}
         <div className={styles.toggler} onClick={this.toggleDetails.bind(this)} role="presentation" aria-hidden>
-          <TransactionTypeIcon
-            iconType={isFailedTransaction ? transactionStates.FAILED : data.type}
-          />
-
           <div className={styles.togglerContent}>
             <div className={styles.header}>
               <div className={styles.title}>
@@ -186,21 +186,9 @@ export default class Transaction extends Component<Props, State> {
                   intl.formatMessage(messages.received, { currency })
                 }
               </div>
-              <div className={styles.amount}>
-                {
-                  // hide currency (we are showing symbol instead)
-                  formattedWalletAmount(data.amount, false)
-                }
-                <SvgInline svg={symbol} className={styles.currencySymbol} />
-              </div>
-            </div>
-
-            <div className={styles.details}>
               <div className={styles.type}>
-                {intl.formatMessage(messages.type, { currency })}
-                , {moment(data.date).format('hh:mm:ss A')}
+                {moment(data.date).format('hh:mm:ss A')}
               </div>
-
               {state === transactionStates.OK ? (
                 <div className={styles[assuranceLevel]}>{status}</div>
               ) : (
@@ -208,6 +196,13 @@ export default class Transaction extends Component<Props, State> {
                   {intl.formatMessage(stateTranslations[state])}
                 </div>
               )}
+              <div className={amountStyles}>
+                {
+                  // hide currency (we are showing symbol instead)
+                  formattedWalletAmount(data.amount, false)
+                }
+                <SvgInline svg={symbol} className={styles.currencySymbol} />
+              </div>
             </div>
           </div>
         </div>

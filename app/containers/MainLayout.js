@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import type { Node } from 'react';
-import Sidebar from '../components/sidebar/Sidebar';
 import TopBarContainer from './TopBarContainer';
 import SidebarLayout from '../components/layout/SidebarLayout';
 import type { StoresMap } from '../stores/index';
@@ -27,27 +26,10 @@ export default class MainLayout extends Component<MainLayoutProps> {
 
   render() {
     const { actions, stores, topbar } = this.props;
-    const { sidebar } = stores;
-
-    const sidebarComponent = (
-      <Sidebar
-        isShowingSubMenus={false}
-        categories={sidebar.CATEGORIES}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
-        onCategoryClicked={category => {
-          actions.sidebar.activateSidebarCategory.trigger({ category });
-        }}
-        isSynced
-        openDialogAction={actions.dialogs.open.trigger}
-        isDialogOpen={stores.uiDialogs.isOpen}
-      />
-    );
-
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
 
     return (
       <SidebarLayout
-        sidebar={sidebarComponent}
         topbar={topbarComponent}
         notification={<div />}
         contentDialogs={[]}

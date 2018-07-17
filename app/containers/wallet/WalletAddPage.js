@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
+import { ROUTES } from '../../routes-config';
 import WalletAdd from '../../components/wallet/WalletAdd';
-import WalletAddDialog from '../../components/wallet/WalletAddDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
@@ -36,17 +36,24 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   onClose = () => {
-    if (this.props.stores[environment.API].wallets.hasAnyWallets) {
-      this.props.actions.dialogs.closeActiveDialog.trigger();
-    } else {
-      this.props.actions.dialogs.open.trigger({
-        dialog: WalletAddDialog,
-      });
+    if (!this.props.stores[environment.API].wallets.hasAnyWallets) {
+      this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
+    this.props.actions.dialogs.closeActiveDialog.trigger();
   };
 
   render() {
-    const topBar = (<TextOnlyTopBar title={this.context.intl.formatMessage(messages.title)} />);
+    const { sidebar } = this.props.stores;
+    const topBar = (
+      <TextOnlyTopBar
+        title={this.context.intl.formatMessage(messages.title)}
+        onCategoryClicked={category => {
+          actions.sidebar.activateSidebarCategory.trigger({ category });
+        }}
+        categories={sidebar.CATEGORIES}
+        activeSidebarCategory={sidebar.activeSidebarCategory}
+      />);
+
     const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
@@ -64,7 +71,6 @@ export default class WalletAddPage extends Component<Props> {
         <WalletAdd
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
-          onImportFile={() => {}}
           isRestoreActive={isRestoreActive}
         />
       );

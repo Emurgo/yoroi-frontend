@@ -11,13 +11,13 @@ export const CATEGORIES = [
     icon: walletsIcon,
   },
   {
+    name: 'DAEDALUS_TRANSFER',
+    route: ROUTES.DAEDALUS_TRANFER.ROOT,
+    icon: daedalusTransferIcon,
+  },
+  {
     name: 'SETTINGS',
     route: ROUTES.SETTINGS.ROOT,
     icon: settingsIcon,
   },
-  {
-    name: 'DAEDALUS_TRANSFER',
-    route: ROUTES.DAEDALUS_TRANFER.ROOT,
-    icon: daedalusTransferIcon,
-  }
 ];
