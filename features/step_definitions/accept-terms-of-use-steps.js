@@ -8,20 +8,20 @@ Given(/^I have accepted "Terms of use"$/, async function () {
   await termsOfUse.acceptTerms(this.driver);
 });
 
-Given(/^I am on the "Terms of use" screen$/, function () {
-  return this.waitForElement(TERMS_OF_USE_FORM);
+Given(/^I am on the "Terms of use" screen$/, async function () {
+  await this.waitForElement(TERMS_OF_USE_FORM);
 });
 
-When(/^I click on "I agree with terms of use" checkbox$/, function () {
-  return this.click('.TermsOfUseForm_component .SimpleCheckbox_root');
+When(/^I click on "I agree with terms of use" checkbox$/, async function () {
+  await this.click('.TermsOfUseForm_component .SimpleCheckbox_root');
 });
 
-When(/^I submit the "Terms of use" form$/, function () {
-  return this.click('.TermsOfUseForm_submitButton');
+When(/^I submit the "Terms of use" form$/, async function () {
+  await this.click('.TermsOfUseForm_submitButton');
 });
 
-Then(/^I should not see the "Terms of use" screen anymore$/, function () {
-  return this.waitForElementNotPresent(TERMS_OF_USE_FORM);
+Then(/^I should not see the "Terms of use" screen anymore$/, async function () {
+  await this.waitForElementNotPresent(TERMS_OF_USE_FORM);
 });
 
 Then(/^I should have "Terms of use" accepted$/, async function () {

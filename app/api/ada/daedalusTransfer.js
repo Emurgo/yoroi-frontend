@@ -16,14 +16,10 @@ import {
   GenerateTransferTxError
 } from './errors';
 import {
-  mapToList
-} from './lib/utils';
-import {
   getCryptoDaedalusWalletFromMnemonics
 } from './lib/cardanoCrypto/cryptoWallet';
 import {
-  getAdaAddressesMap,
-  filterAdaAddressesByType
+  getAdaAddressesByType
 } from './adaAddress';
 import {
   getAllUTXOsForAddresses
@@ -63,7 +59,7 @@ export async function generateTransferTx(payload: {
     const recoveredBalance = await getBalance(senders);
     const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
     const inputs = _getInputs(senderUtxos, addressesWithFunds);
-    const output = _getReceiverAddress();
+    const output = await _getReceiverAddress();
     const tx = getOrFail(Wallet.move(wallet, inputs, output));
     return {
       recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
@@ -78,10 +74,9 @@ export async function generateTransferTx(payload: {
   }
 }
 
-function _getReceiverAddress(): string {
-  const addressesMap = getAdaAddressesMap();
-  const addresses = mapToList(addressesMap);
-  return filterAdaAddressesByType(addresses, 'External')[0].cadId;
+async function _getReceiverAddress(): Promise<string> {
+  const addresses = await getAdaAddressesByType('External');
+  return addresses[0].cadId;
 }
 
 function _getInputs(

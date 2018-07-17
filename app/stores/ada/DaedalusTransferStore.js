@@ -1,5 +1,6 @@
 // @flow
 import { observable, action, runInAction } from 'mobx';
+import { defineMessages } from 'react-intl';
 import {
   Logger,
   stringifyError
@@ -26,6 +27,7 @@ import environment from '../../environment';
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
+const WS_CODE_NORMAL_CLOSURE = 1000;
 
 export default class DaedalusTransferStore extends Store {
 
@@ -74,13 +76,12 @@ export default class DaedalusTransferStore extends Store {
     }
   }
 
-  /* TODO: Handle WS connection errors */
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
     this._updateStatus('restoringAddresses');
     this.ws = new WebSocket(websocketUrl);
     this.ws.addEventListener('open', () => {
-      console.log('[ws::connected]');
+      Logger.info('[ws::connected]');
       this.ws.send(JSON.stringify({
         msg: MSG_TYPE_RESTORE,
       }));
@@ -91,7 +92,7 @@ export default class DaedalusTransferStore extends Store {
     this.ws.addEventListener('message', async (event: any) => {
       try {
         const data = JSON.parse(event.data);
-        console.log(`[ws::message] on: ${data.msg}`);
+        Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
           this._updateStatus('checkingAddresses');
           const addressesWithFunds = getAddressesWithFunds({
@@ -113,6 +114,18 @@ export default class DaedalusTransferStore extends Store {
         runInAction(() => {
           this.status = 'error';
           this.error = localizedError(error);
+        });
+      }
+    });
+
+    this.ws.addEventListener('close', (event: any) => {
+      Logger.info(
+        `[ws::close] CODE: ${event.code} - REASON: ${event.reason} - was clean? ${event.wasClean}`
+      );
+      if (event.code !== WS_CODE_NORMAL_CLOSURE) {
+        runInAction(() => {
+          this.status = 'error';
+          this.error = new WebSocketRestoreError();
         });
       }
     });
@@ -163,19 +176,36 @@ export default class DaedalusTransferStore extends Store {
     this.transferTx = null;
     this.transferFundsRequest.reset();
     if (this.ws) {
-      this.ws.close();
+      this.ws.close(WS_CODE_NORMAL_CLOSURE);
       this.ws = null;
     }
   }
 }
 
-// FIXME: Define a place for these type of errors
+const messages = defineMessages({
+  transferFundsError: {
+    id: 'daedalusTransfer.error.transferFundsError',
+    defaultMessage: '!!!Unable to transfer funds.',
+    description: '"Unable to transfer funds." error message',
+  },
+  noTransferTxError: {
+    id: 'daedalusTransfer.error.noTransferTxError',
+    defaultMessage: '!!!There is no transfer transaction to send.',
+    description: '"There is no transfer transaction to send." error message'
+  },
+  webSocketRestoreError: {
+    id: 'daedalusTransfer.error.webSocketRestoreError',
+    defaultMessage: '!!!Error while restoring blockchain addresses',
+    description: 'Any reason why the websocket transferring could failed'
+  }
+});
+
 export class TransferFundsError extends LocalizableError {
   constructor() {
     super({
-      id: 'daedalusTransfer.error.transferFundsError',
-      defaultMessage: '!!!Unable to transfer funds.',
-      description: '"Unable to transfer funds." error message',
+      id: messages.transferFundsError.id,
+      defaultMessage: messages.transferFundsError.defaultMessage,
+      description: messages.transferFundsError.description,
     });
   }
 }
@@ -183,9 +213,19 @@ export class TransferFundsError extends LocalizableError {
 export class NoTransferTxError extends LocalizableError {
   constructor() {
     super({
-      id: 'daedalusTransfer.error.noTransferTxError',
-      defaultMessage: '!!!There is no transfer transaction to send.',
-      description: '"There is no transfer transaction to send." error message'
+      id: messages.noTransferTxError.id,
+      defaultMessage: messages.noTransferTxError.defaultMessage,
+      description: messages.noTransferTxError.description,
+    });
+  }
+}
+
+export class WebSocketRestoreError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.webSocketRestoreError.id,
+      defaultMessage: messages.webSocketRestoreError.defaultMessage,
+      description: messages.webSocketRestoreError.description,
     });
   }
 }

@@ -8,24 +8,24 @@ Given(/^I have selected English language$/, async function () {
   await languageSelection.ensureLanguageIsSelected(this.driver, { language: 'en-US' });
 });
 
-When(/^I am on the language selection screen$/, function () {
-  return this.waitForElement('.LanguageSelectionForm_component');
+When(/^I am on the language selection screen$/, async function () {
+  await this.waitForElement('.LanguageSelectionForm_component');
 });
 
-When(/^I open language selection dropdown$/, function () {
-  return this.click('.LanguageSelectionForm_component .SimpleInput_input');
+When(/^I open language selection dropdown$/, async function () {
+  await this.click('.LanguageSelectionForm_component .SimpleInput_input');
 });
 
-When(/^I select Japanese language$/, function () {
-  return this.clickByXpath('//li[contains(text(), "Japanese")]');
+When(/^I select Japanese language$/, async function () {
+  await this.clickByXpath('//li[contains(text(), "Japanese")]');
 });
 
-When(/^I submit the language selection form$/, function () {
-  return this.click('.LanguageSelectionForm_submitButton');
+When(/^I submit the language selection form$/, async function () {
+  await this.click('.LanguageSelectionForm_submitButton');
 });
 
-Then(/^I should not see the language selection screen anymore$/, function () {
-  return this.waitForElementNotPresent(LANGUAGE_SELECTION_FORM);
+Then(/^I should not see the language selection screen anymore$/, async function () {
+  await this.waitForElementNotPresent(LANGUAGE_SELECTION_FORM);
 });
 
 Then(/^I should have Japanese language set$/, async function () {

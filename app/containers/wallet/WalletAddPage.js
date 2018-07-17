@@ -47,8 +47,13 @@ export default class WalletAddPage extends Component<Props> {
     const topBar = (
       <TextOnlyTopBar
         title={this.context.intl.formatMessage(messages.title)}
+        onCategoryClicked={category => {
+          actions.sidebar.activateSidebarCategory.trigger({ category });
+        }}
+        categories={sidebar.CATEGORIES}
         activeSidebarCategory={sidebar.activeSidebarCategory}
       />);
+
     const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
