@@ -6,26 +6,6 @@ export default defineMessages({
     defaultMessage: '!!!This field is required.',
     description: 'Error message when required fields are left empty.'
   },
-  invalidMnemonic: {
-    id: 'global.errors.invalidMnemonic',
-    defaultMessage: '!!!Invalid phrase entered, please check.',
-    description: 'Error message shown when invalid bip39 mnemonic was entered.'
-  },
-  invalidEmail: {
-    id: 'global.errors.invalidEmail',
-    defaultMessage: '!!!Invalid email entered, please check.',
-    description: 'Error message shown when invalid email was entered.'
-  },
-  invalidAdaRedemptionCertificate: {
-    id: 'global.errors.AdaRedemptionCertificateParseError',
-    defaultMessage: '!!!The ADA redemption code could not be parsed from the given document.',
-    description: 'Error message shown when invalid Ada redemption certificate was uploaded.',
-  },
-  invalidAdaRedemptionEncryptedCertificate: {
-    id: 'global.errors.AdaRedemptionEncryptedCertificateParseError',
-    defaultMessage: '!!!The ADA redemption code could not be parsed, please check your passphrase.',
-    description: 'Error message shown when invalid Ada redemption encrypted certificate was uploaded.',
-  },
   invalidWalletName: {
     id: 'global.errors.invalidWalletName',
     defaultMessage: '!!!Wallet name requires at least 3 and at most 40 letters.',
@@ -101,40 +81,15 @@ export default defineMessages({
     defaultMessage: '!!!Croatian',
     description: 'Language name for "Croatian" language.'
   },
-  assuranceLevelNormal: {
-    id: 'global.assuranceLevel.normal',
-    defaultMessage: '!!!Normal',
-    description: 'Name for "Normal" transaction assurance security level.'
-  },
-  assuranceLevelStrict: {
-    id: 'global.assuranceLevel.strict',
-    defaultMessage: '!!!Strict',
-    description: 'Name for "Strict" transaction assurance security level.'
-  },
   unitAda: {
     id: 'global.unit.ada',
     defaultMessage: '!!!Ada',
     description: 'Name for "Ada" unit.'
   },
-  unitEtc: {
-    id: 'global.unit.etc',
-    defaultMessage: '!!!Etc',
-    description: 'Name for "Etc" unit.'
-  },
   recoveryPhraseDialogTitle: {
     id: 'wallet.backup.recovery.phrase.dialog.title',
     defaultMessage: '!!!Recovery phrase',
     description: 'Title for the "Recovery Phrase" dialog.'
-  },
-  spendingPasswordLabel: {
-    id: 'global.spendingPasswordLabel',
-    defaultMessage: '!!!Spending Password',
-    description: 'Label for the "Wallet password" input in the create wallet dialog.',
-  },
-  spendingPasswordPlaceholder: {
-    id: 'global.spendingPasswordPlaceholder',
-    defaultMessage: '!!!Password',
-    description: 'Placeholder for the "Password" inputs in the create wallet dialog.',
   },
 });
 
