@@ -23,7 +23,7 @@ export const messages = defineMessages({
       'Message shown when wallet has no transactions on wallet summary page.'
   },
   noTransactionsFound: {
-    id: 'wallet.transactions.no.transactions.found',
+    id: 'wallet.summary.no.transaction',
     defaultMessage: '!!!No transactions found',
     description: 'Message shown when wallet transaction search returns zero results.'
   }

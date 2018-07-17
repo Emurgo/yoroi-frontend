@@ -3375,13 +3375,27 @@
         "description": "Message shown when wallet has no transactions on wallet summary page.",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 24
         },
         "file": "app/containers/wallet/WalletSummaryPage.js",
         "id": "wallet.summary.no.transactions",
         "start": {
           "column": 18,
-          "line": 18
+          "line": 19
+        }
+      },
+      {
+        "defaultMessage": "!!!No transactions found",
+        "description": "Message shown when wallet transaction search returns zero results.",
+        "end": {
+          "column": 3,
+          "line": 29
+        },
+        "file": "app/containers/wallet/WalletSummaryPage.js",
+        "id": "wallet.summary.no.transaction",
+        "start": {
+          "column": 23,
+          "line": 25
         }
       }
     ],
@@ -3787,13 +3801,13 @@
         "description": "\"Unable to transfer funds.\" error message",
         "end": {
           "column": 3,
-          "line": 191
+          "line": 190
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.transferFundsError",
         "start": {
           "column": 22,
-          "line": 187
+          "line": 186
         }
       },
       {
@@ -3801,13 +3815,13 @@
         "description": "\"There is no transfer transaction to send.\" error message",
         "end": {
           "column": 3,
-          "line": 196
+          "line": 195
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.noTransferTxError",
         "start": {
           "column": 21,
-          "line": 192
+          "line": 191
         }
       },
       {
@@ -3815,13 +3829,13 @@
         "description": "Any reason why the websocket transferring could failed",
         "end": {
           "column": 3,
-          "line": 201
+          "line": 200
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.webSocketRestoreError",
         "start": {
           "column": 25,
-          "line": 197
+          "line": 196
         }
       }
     ],
