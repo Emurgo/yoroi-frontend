@@ -276,7 +276,7 @@ export default class AdaApi {
       );
       return response;
     } catch (error) {
-      if (error.message.includes('Invalid passphrase given')) {
+      if (error instanceof IncorrectWalletPasswordError) {
         throw new IncorrectWalletPasswordError();
       }
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
@@ -427,7 +427,7 @@ export default class AdaApi {
       Logger.error(
         'AdaApi::updateWalletPassword error: ' + stringifyError(error)
       );
-      if (error.message.includes('Invalid old passphrase given')) {
+      if (error instanceof IncorrectWalletPasswordError) {
         throw new IncorrectWalletPasswordError();
       }
       throw new GenericApiError();

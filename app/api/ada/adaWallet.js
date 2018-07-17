@@ -38,6 +38,8 @@ import {
   addressesLimit
 } from './lib/icarus-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
+import { IncorrectWalletPasswordError } from '../common';
+import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 
@@ -148,8 +150,8 @@ export const changeAdaWalletPassphrase = (
     saveAdaWallet(updatedWallet, updatedWalletSeed);
     return Promise.resolve(updatedWallet);
   } catch (err) {
-    if (err.message.includes('Passphrase doesn\'t match')) {
-      throw new Error('Invalid old passphrase given');
+    if (err instanceof WrongPassphraseError) {
+      throw new IncorrectWalletPasswordError();
     }
     throw err;
   }
