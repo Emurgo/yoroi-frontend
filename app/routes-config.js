@@ -14,7 +14,6 @@ export const ROUTES = {
     ADD: '/wallets/add',
     PAGE: '/wallets/:id/:page',
     SUMMARY: '/wallets/:id/summary',
-    TRANSACTIONS: '/wallets/:id/transactions',
     SEND: '/wallets/:id/send',
     RECEIVE: '/wallets/:id/receive',
   },

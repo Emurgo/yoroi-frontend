@@ -3417,13 +3417,27 @@
         "description": "Message shown when wallet has no transactions on wallet summary page.",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 24
         },
         "file": "app/containers/wallet/WalletSummaryPage.js",
         "id": "wallet.summary.no.transactions",
         "start": {
           "column": 18,
-          "line": 18
+          "line": 19
+        }
+      },
+      {
+        "defaultMessage": "!!!No transactions found",
+        "description": "Message shown when wallet transaction search returns zero results.",
+        "end": {
+          "column": 3,
+          "line": 29
+        },
+        "file": "app/containers/wallet/WalletSummaryPage.js",
+        "id": "wallet.summary.no.transaction",
+        "start": {
+          "column": 23,
+          "line": 25
         }
       }
     ],

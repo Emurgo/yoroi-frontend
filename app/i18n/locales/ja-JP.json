@@ -217,6 +217,7 @@
   "wallet.settings.name.label": "!!!Name",
   "wallet.settings.password": "!!!Password",
   "wallet.settings.passwordLastUpdated": "!!!Last updated",
+  "wallet.summary.no.transaction": "!!!No transactions found",
   "wallet.summary.no.transactions": "!!!No recent transactions",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "!!!Incoming pending confirmation",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "!!!Outgoing pending confirmation",
