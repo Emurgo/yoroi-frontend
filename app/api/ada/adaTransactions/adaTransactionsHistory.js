@@ -10,14 +10,12 @@ import {
   getTransactionsHistoryForAddresses,
   transactionsLimit,
   addressesLimit,
-  getPendingTxsForAddresses
 } from '../lib/icarus-backend-api';
 import {
   saveTxs,
   getMostRecentTx,
   getTxs,
-  deletePendingTxs,
-  getConfirmedTxs
+  getTxsOrderedByUpdate
 } from '../lib/lovefieldDatabase';
 import {
   toAdaTx
@@ -31,7 +29,6 @@ import {
 } from '../adaAddress';
 import {
   UpdateAdaTxsHistoryError,
-  PendingTransactionError
 } from '../errors';
 import type
  {
@@ -39,8 +36,6 @@ import type
   AdaTransactions,
   AdaTransactionInputOutput
 } from '../adaTypes';
-
-export const getAdaConfirmedTxs = getConfirmedTxs;
 
 export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
   const transactions = await getTxs();
@@ -51,26 +46,10 @@ export async function refreshTxs() {
   try {
     const adaAddresses = await getAdaAddressesList();
     const addresses: Array<string> = adaAddresses.map(addr => addr.cadId);
-    await _updateAdaPendingTxs(addresses);
-    await _updateAdaTxsHistory(await getAdaConfirmedTxs(), addresses);
+    await _updateAdaTxsHistory(await getTxsOrderedByUpdate(), addresses);
   } catch (error) {
     Logger.error('adaTransactionsHistory::refreshTxs error: ' + JSON.stringify(error));
     throw new UpdateAdaTxsHistoryError();
-  }
-}
-
-async function _updateAdaPendingTxs(addresses: Array<string>) {
-  try {
-    const txs = await _getTxsForChunksOfAddresses(
-      addresses,
-      getPendingTxsForAddresses
-    );
-    const mappedPendingTxs = _mapToAdaTxs(txs, addresses);
-    await deletePendingTxs();
-    await saveTxs(mappedPendingTxs);
-  } catch (error) {
-    Logger.error('adaTransactionsHistory::updateAdaPendingTxs error: ' + stringifyError(error));
-    throw new PendingTransactionError();
   }
 }
 
@@ -81,7 +60,7 @@ async function _updateAdaTxsHistory(
   try {
     const mostRecentTx = Object.assign({}, existingTransactions[0]);
     const dateFrom = mostRecentTx.ctMeta ?
-      moment(mostRecentTx.ctMeta.ctmDate) :
+      moment(mostRecentTx.ctMeta.ctmUpdate) :
       moment(new Date(0));
     const mappedTxs = await _getTxsForChunksOfAddresses(addresses, groupOfAddresses =>
       _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
@@ -107,12 +86,10 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
   allAddresses
 ) {
   const mostRecentTx = getMostRecentTx(previousTxs);
-  const updatedDateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : dateFrom;
-  const txHash = mostRecentTx ? mostRecentTx.ctId : mostRecentTx;
+  const updatedDateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmUpdate) : dateFrom;
   const history = await getTransactionsHistoryForAddresses(
     groupOfAddresses,
-    updatedDateFrom,
-    txHash
+    updatedDateFrom
   );
   if (history.length > 0) {
     // FIXME: Add an endpoint for querying the best_block_num
