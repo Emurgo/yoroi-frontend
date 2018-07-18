@@ -1,5 +1,5 @@
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import seleniumWebdriver, { By } from 'selenium-webdriver';
+import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import path from 'path';
 
@@ -79,6 +79,13 @@ function CustomWorld() {
   this.clearInput = async (locator) => {
     const input = await this.getElementBy(locator);
     await input.clear();
+  };
+
+  this.clearInputUpdatingForm = async (locator, textLength) => {
+    const input = await this.getElementBy(locator);
+    for (let i = 0; i < textLength; i++) {
+      await input.sendKeys(Key.BACK_SPACE);
+    }
   };
 
   this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
