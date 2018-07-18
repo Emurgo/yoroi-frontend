@@ -9,8 +9,8 @@ import { Blake2b, Wallet } from 'rust-cardano-crypto';
 import { encryptWithPassword, decryptWithPassword } from '../../../../utils/passwordCipher';
 import { getOrFail } from './cryptoUtils';
 
-import type { ConfigType }
-from '../../../../../config/config-types';
+import { WrongPassphraseError } from './cryptoErrors';
+import type { ConfigType } from '../../../../../config/config-types';
 
 export type WalletSeed = {
   encryptedSeed: string,
@@ -33,7 +33,7 @@ function calculatePasswordVerifier(password : string, salt: string) : string {
 function decryptSeed(walletSeed : WalletSeed, password : string) : Uint8Array {
   const passwordVerifier = calculatePasswordVerifier(password, walletSeed.passwordSalt);
   if (passwordVerifier !== walletSeed.passwordVerifier) {
-    throw new Error('Passphrase doesn\'t match');
+    throw new WrongPassphraseError();
   }
   return decryptWithPassword(password, walletSeed.encryptedSeed);
 }
