@@ -66,3 +66,17 @@ Feature: Send transaction
       | Secret123 |
     And I submit the wallet send form
     Then I should see an invalid signature error message
+
+  Scenario: Sending a Tx entering a wrong password
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
+    And The transaction fees are "0.167950"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password      |
+      | WrongPassword |
+    And I submit the wallet send form
+    Then I should see an incorrect wallet password error message
