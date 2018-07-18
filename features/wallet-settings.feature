@@ -51,7 +51,7 @@ Feature: Wallet Settings
     Then I should see new wallet name "first Edited"
 
   Scenario: User fails to change password due to incomplete fields
-    Given I am on the wallet "settings" screen
+    Given I am on the General Settings "wallet" screen
     And I click on the "change" password label
     And I should see the "change" wallet password dialog
     And I change wallet password:
