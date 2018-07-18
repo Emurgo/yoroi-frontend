@@ -3,14 +3,6 @@ import _ from 'lodash';
 import { Wallet } from 'rust-cardano-crypto';
 import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
-  createAdaWallet,
-  saveAdaWallet
-} from './adaWallet';
-import {
-  createCryptoAccount,
-  saveCryptoAccount
-} from './adaAccount';
-import {
   saveAsAdaAddresses,
   newAdaAddress
 } from './adaAddress';
@@ -28,6 +20,9 @@ import {
 import {
   DiscoverAddressesError
 } from './errors';
+import { saveCryptoAccount, saveAdaWallet } from '../localStorage/localStorageUtils';
+import { createAdaWallet } from './adaWallet';
+import { createCryptoAccount } from './adaAccount';
 
 // We will query the backend for 20 addresses window
 // FIXME: Improve this to decouple requests and BIP-44 unused window parsing

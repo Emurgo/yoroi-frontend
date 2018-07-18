@@ -1,11 +1,10 @@
 // @flow
 
-import { mapToList, saveInStorage } from '../api/ada/lib/utils';
-import { getWalletSeed } from '../api/ada/adaWallet';
+import { mapToList } from '../api/ada/lib/utils';
 import { getCryptoWalletFromSeed } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, ADDRESSES_KEY } from '../api/ada/adaAddress';
-import { getSingleCryptoAccount } from '../api/ada/adaAccount';
+import { newAdaAddress, getAdaAddressesMap, saveAdaAddress } from '../api/ada/adaAddress';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
+import { getSingleCryptoAccount, removeAdaAddresses, getWalletSeed } from '../api/localStorage/localStorageUtils';
 
 const CONFIRMATION_TIME = 40 * 1000; // 40 seconds
 const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be bigger than
@@ -99,7 +98,7 @@ function _removeAdaAddresses(cryptoAccount, addresses) {
   addresses.forEach((addr) => {
     delete addressesMap[addr.cadId];
   });
-  saveInStorage(ADDRESSES_KEY, addressesMap);
+  removeAdaAddresses(addressesMap);
 }
 
 // The same index from the AdaAddresses is used when saving them

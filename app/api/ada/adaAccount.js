@@ -2,13 +2,9 @@
 import { Wallet } from 'rust-cardano-crypto';
 import { getCryptoWalletFromSeed } from './lib/cardanoCrypto/cryptoWallet';
 import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
-import {
-  getFromStorage,
-  saveInStorage
-} from './lib/utils';
 import type { WalletSeed } from './lib/cardanoCrypto/cryptoWallet';
+import { saveCryptoAccount } from '../localStorage/localStorageUtils';
 
-const ACCOUNT_KEY = 'ACCOUNT'; // single wallet atm
 const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */
 
 export function newCryptoAccount(
@@ -29,14 +25,4 @@ export function createCryptoAccount(
   // This Ok object is the crypto account
   const { Ok } = getOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
   return Ok;
-}
-
-export function saveCryptoAccount(
-  ca: CryptoAccount
-): void {
-  saveInStorage(ACCOUNT_KEY, ca);
-}
-
-export function getSingleCryptoAccount(): CryptoAccount {
-  return getFromStorage(ACCOUNT_KEY);
 }

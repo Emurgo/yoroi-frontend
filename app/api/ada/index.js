@@ -17,11 +17,9 @@ import {
   getAdaAccountRecoveryPhrase,
   newAdaWallet,
   updateAdaWallet,
-  getAdaWallet,
   refreshAdaWallet,
   changeAdaWalletPassphrase
 } from './adaWallet';
-import { getSingleCryptoAccount } from './adaAccount';
 import {
   isValidAdaAddress,
   newAdaAddress,
@@ -40,7 +38,6 @@ import {
   getAdaTransactionFee,
   newAdaTransaction
 } from './adaTransactions/adaNewTransactions';
-import { getLastBlockNumber } from './getAdaLastBlockNumber';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -68,6 +65,7 @@ import type {
   RestoreWalletResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
+import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from '../localStorage/localStorageUtils';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
