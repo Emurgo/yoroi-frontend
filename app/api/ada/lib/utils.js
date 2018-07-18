@@ -2,7 +2,12 @@
 import bs58 from 'bs58';
 import BigNumber from 'bignumber.js';
 
-import type { AdaTransactionInputOutput, Transaction } from '../adaTypes';
+import type {
+  AdaTransactionInputOutput,
+  Transaction,
+  AdaTransaction,
+  AdaTransactionCondition
+} from '../adaTypes';
 
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();
@@ -33,23 +38,28 @@ export const toAdaTx = function (
   isOutgoing: boolean,
   outputs: AdaTransactionInputOutput,
   time: string
-) {
-  const isPending = !tx.block_num;
+) : AdaTransaction {
   return {
     ctAmount: {
       getCCoin: amount.toString()
     },
-    ctBlockNumber: tx.block_num || '',
+    ctBlockNumber: Number(tx.block_num || ''),
     ctId: tx.hash,
     ctInputs: inputs,
     ctIsOutgoing: isOutgoing,
     ctMeta: {
-      ctmDate: time,
+      ctmDate: new Date(time),
       ctmDescription: undefined,
-      ctmTitle: undefined
+      ctmTitle: undefined,
+      ctmUpdate: new Date(tx.last_update)
     },
-    ctmDate: new Date(time),
     ctOutputs: outputs,
-    ctCondition: isPending ? 'CPtxApplying' : 'CPtxInBlocks'
+    ctCondition: _getTxCondition(tx.tx_state)
   };
+};
+
+const _getTxCondition = (state: string): AdaTransactionCondition => {
+  if (state === 'Successful') return 'CPtxInBlocks';
+  if (state === 'Pending') return 'CPtxApplying';
+  return 'CPtxWontApply';
 };

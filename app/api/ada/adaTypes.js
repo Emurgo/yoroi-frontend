@@ -66,7 +66,9 @@ export type Transaction = {
   block_num: string,
   time: string,
   succeeded: boolean,
-  best_block_num: string
+  best_block_num: string,
+  last_update: string,
+  tx_state: string
 };
 
 export type AdaTransaction = {
@@ -79,6 +81,7 @@ export type AdaTransaction = {
     ctmDate: Date,
     ctmDescription: ?string,
     ctmTitle: ?string,
+    ctmUpdate: Date
   },
   ctOutputs: AdaTransactionInputOutput,
   ctCondition: AdaTransactionCondition,
