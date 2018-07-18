@@ -8,6 +8,10 @@ When(/^I enter the name "([^"]*)"$/, async function (walletName) {
   await this.input('#walletName--2', walletName);
 });
 
+When(/^I clear the name "([^"]*)"$/, async function (walletName) {
+  await this.clearInputUpdatingForm('#walletName--2', walletName.length);
+});
+
 Then(/^I should see the opened wallet$/, async function () {
   await this.waitForElement('.TopBar_walletName');
 });

@@ -68,6 +68,7 @@ import type {
   RestoreWalletResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
+import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -272,6 +273,9 @@ export default class AdaApi {
       );
       return response;
     } catch (error) {
+      if (error instanceof WrongPassphraseError) {
+        throw new IncorrectWalletPasswordError();
+      }
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
@@ -429,7 +433,7 @@ export default class AdaApi {
       Logger.error(
         'AdaApi::updateWalletPassword error: ' + stringifyError(error)
       );
-      if (error.message.includes('Invalid old passphrase given')) {
+      if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
       throw new GenericApiError();

@@ -142,18 +142,11 @@ export async function getBalance(
 export const changeAdaWalletPassphrase = (
   { oldPassword, newPassword }: ChangeAdaWalletPassphraseParams
 ): Promise<AdaWallet> => {
-  try {
-    const walletSeed = getWalletSeed();
-    const updatedWalletSeed = updateWalletSeedPassword(walletSeed, oldPassword, newPassword);
-    const updatedWallet = Object.assign({}, getAdaWallet(), { cwPassphraseLU: moment().format() });
-    saveAdaWallet(updatedWallet, updatedWalletSeed);
-    return Promise.resolve(updatedWallet);
-  } catch (err) {
-    if (err.message.includes('Passphrase doesn\'t match')) {
-      throw new Error('Invalid old passphrase given');
-    }
-    throw err;
-  }
+  const walletSeed = getWalletSeed();
+  const updatedWalletSeed = updateWalletSeedPassword(walletSeed, oldPassword, newPassword);
+  const updatedWallet = Object.assign({}, getAdaWallet(), { cwPassphraseLU: moment().format() });
+  saveAdaWallet(updatedWallet, updatedWalletSeed);
+  return Promise.resolve(updatedWallet);
 };
 
 function _saveAdaWalletKeepingSeed(adaWallet: AdaWallet): void {
