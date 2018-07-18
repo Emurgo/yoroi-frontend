@@ -5,6 +5,8 @@
     "name": "testing"
   },
   "app": {
-    "walletRefreshInterval": 2000
+    "walletRefreshInterval": 2000,
+    "logsBufferSize": 500,
+    "logsFileSuffix": "-icarus.log"
   }
 }

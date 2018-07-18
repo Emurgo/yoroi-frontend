@@ -7,6 +7,8 @@ export type ConfigType = {
 
 export type AppConfigType = {
   walletRefreshInterval: number,
+  logsBufferSize: number,
+  logsFileSuffix: string
 }
 
 export type NetworkConfigType = {

@@ -45,10 +45,26 @@ const messages = defineMessages({
     defaultMessage: '!!!https://zendesk.com/support/',
     description: 'URL for the "Support Request" link in the Support section on the support settings page',
   },
+  logsTitle: {
+    id: 'settings.support.logs.title',
+    defaultMessage: '!!!Logs',
+    description: 'Title "Logs" on the support settings page.',
+  },
+  logsContent: {
+    id: 'settings.support.logs.content',
+    defaultMessage: '!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.',
+    description: 'Content for the "Logs" section on the support settings page.',
+  },
+  downloadLogsLink: {
+    id: 'settings.support.logs.downloadLogsLink',
+    defaultMessage: '!!!download them here',
+    description: '"download them here" link in the Logs section on the support settings page',
+  },
 });
 
 type Props = {
-  onExternalLinkClick: Function
+  onExternalLinkClick: Function,
+  onDownloadLogs: Function,
 };
 
 @observer
@@ -59,7 +75,7 @@ export default class SupportSettings extends Component<Props> {
   };
 
   render() {
-    const { onExternalLinkClick } = this.props;
+    const { onExternalLinkClick, onDownloadLogs } = this.props;
     const { intl } = this.context;
 
     const faqLink = (
@@ -80,6 +96,12 @@ export default class SupportSettings extends Component<Props> {
       </a>
     );
 
+    const downloadLogsLink = (
+      <button onClick={onDownloadLogs}>
+        {intl.formatMessage(messages.downloadLogsLink)}
+      </button>
+    );
+
     return (
       <div className={styles.component}>
 
@@ -92,6 +114,10 @@ export default class SupportSettings extends Component<Props> {
         <p>
           <FormattedMessage {...messages.reportProblemContent} values={{ supportRequestLink }} />
         </p>
+
+        <h1>{intl.formatMessage(messages.logsTitle)}</h1>
+
+        <p><FormattedMessage {...messages.logsContent} values={{ downloadLogsLink }} /></p>
 
       </div>
     );
