@@ -38,8 +38,6 @@ import {
   addressesLimit
 } from './lib/icarus-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
-import { IncorrectWalletPasswordError } from '../common';
-import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
 const WALLET_KEY = 'WALLET'; // single wallet atm
 
@@ -144,18 +142,11 @@ export async function getBalance(
 export const changeAdaWalletPassphrase = (
   { oldPassword, newPassword }: ChangeAdaWalletPassphraseParams
 ): Promise<AdaWallet> => {
-  try {
-    const walletSeed = getWalletSeed();
-    const updatedWalletSeed = updateWalletSeedPassword(walletSeed, oldPassword, newPassword);
-    const updatedWallet = Object.assign({}, getAdaWallet(), { cwPassphraseLU: moment().format() });
-    saveAdaWallet(updatedWallet, updatedWalletSeed);
-    return Promise.resolve(updatedWallet);
-  } catch (err) {
-    if (err instanceof WrongPassphraseError) {
-      throw new IncorrectWalletPasswordError();
-    }
-    throw err;
-  }
+  const walletSeed = getWalletSeed();
+  const updatedWalletSeed = updateWalletSeedPassword(walletSeed, oldPassword, newPassword);
+  const updatedWallet = Object.assign({}, getAdaWallet(), { cwPassphraseLU: moment().format() });
+  saveAdaWallet(updatedWallet, updatedWalletSeed);
+  return Promise.resolve(updatedWallet);
 };
 
 function _saveAdaWalletKeepingSeed(adaWallet: AdaWallet): void {

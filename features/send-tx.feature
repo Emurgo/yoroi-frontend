@@ -76,7 +76,7 @@ Feature: Send transaction
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
-      | password  |
-      | Secret1234 |
+      | password      |
+      | WrongPassword |
     And I submit the wallet send form
     Then I should see an incorrect wallet password error message

@@ -29,7 +29,6 @@ import {
   generateWalletSeed,
   generateAdaMnemonic,
 } from '../lib/cardanoCrypto/cryptoWallet';
-import type { WalletSeed } from '../lib/cardanoCrypto/cryptoWallet';
 import { getOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {
   AdaAddresses,
@@ -43,8 +42,6 @@ import {
   GetAllUTXOsForAddressesError,
   InvalidWitnessError
 } from '../errors';
-import { IncorrectWalletPasswordError } from '../../common';
-import { WrongPassphraseError } from '../lib/cardanoCrypto/cryptoErrors';
 
 const fakePassword = 'fake';
 
@@ -72,7 +69,7 @@ export async function newAdaTransaction(
   password: string
 ): Promise<any> {
   const seed = getWalletSeed();
-  const cryptoWallet = _getCryptoWalletFromSeed(seed, password);
+  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   const [{ cbor_encoded_tx }, changeAdaAddr] =
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
@@ -156,18 +153,4 @@ function _mapUTXOsToInputs(utxos, adaAddressesMap) {
       index: adaAddressesMap[utxo.receiver].index
     }
   }));
-}
-
-function _getCryptoWalletFromSeed(
-  seed: WalletSeed,
-  password: string
-): CryptoWallet {
-  try {
-    return getCryptoWalletFromSeed(seed, password);
-  } catch (error) {
-    if (error instanceof WrongPassphraseError) {
-      throw new IncorrectWalletPasswordError();
-    }
-    throw error;
-  }
 }
