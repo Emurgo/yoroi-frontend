@@ -1,9 +1,9 @@
 export default {
   wallets: {
     ADDRESS_COPY_NOTIFICATION_DURATION: 10,
-  },
-  adaRedemption: {
-    ADA_REDEMPTION_KEY_LENGTH: 44,
-    ADA_REDEMPTION_PAPER_KEY_LENGTH: 66,
+    MAX_ALLOWED_UNUSED_ADDRESSES: 20,
+    // We will query the backend for 20 addresses window
+    // FIXME: Improve this to decouple requests and BIP-44 unused window parsing
+    ADDRESS_REQUEST_SIZE: 20,
   },
 };
