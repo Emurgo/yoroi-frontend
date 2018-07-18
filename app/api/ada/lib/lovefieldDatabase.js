@@ -140,20 +140,19 @@ export const getMostRecentTx = function (txs) {
   return txs[txs.length - 1];
 };
 
-export const getTxsOrderedByUpdate = function () {
-  const txsTable = _getTxsTable();
-  return db.select()
-    .from(txsTable)
-    .orderBy(txsTable[txsTableSchema.properties.lastUpdated], lf.Order.DESC)
-    .exec()
-    .then(rows => rows.map(row => row[txsTableSchema.properties.value]));
+export const getTxsOrderedByUpdateDesc = function () {
+  return _getTxsOrderedBy(txsTableSchema.properties.lastUpdated, lf.Order.DESC);
 };
 
-export const getTxs = async function () {
+export const getTxsOrderedByDateDesc = function () {
+  return _getTxsOrderedBy(txsTableSchema.properties.date, lf.Order.DESC);
+};
+
+const _getTxsOrderedBy = (orderField, lfOrder) => {
   const txsTable = _getTxsTable();
   return db.select()
     .from(txsTable)
-    .orderBy(txsTable[txsTableSchema.properties.date], lf.Order.DESC)
+    .orderBy(txsTable[orderField], lfOrder)
     .exec()
     .then(rows => rows.map(row => row[txsTableSchema.properties.value]));
 };

@@ -2,7 +2,12 @@
 import bs58 from 'bs58';
 import BigNumber from 'bignumber.js';
 
-import type { AdaTransactionInputOutput, Transaction, AdaTransaction } from '../adaTypes';
+import type {
+  AdaTransactionInputOutput,
+  Transaction,
+  AdaTransaction,
+  AdaTransactionCondition
+} from '../adaTypes';
 
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();
@@ -53,7 +58,7 @@ export const toAdaTx = function (
   };
 };
 
-const _getTxCondition = state => {
+const _getTxCondition = (state: string): AdaTransactionCondition => {
   if (state === 'Successful') return 'CPtxInBlocks';
   if (state === 'Pending') return 'CPtxApplying';
   return 'CPtxWontApply';

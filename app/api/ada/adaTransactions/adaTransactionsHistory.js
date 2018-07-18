@@ -14,8 +14,8 @@ import {
 import {
   saveTxs,
   getMostRecentTx,
-  getTxs,
-  getTxsOrderedByUpdate
+  getTxsOrderedByDateDesc,
+  getTxsOrderedByUpdateDesc
 } from '../lib/lovefieldDatabase';
 import {
   toAdaTx
@@ -38,7 +38,7 @@ import type
 } from '../adaTypes';
 
 export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
-  const transactions = await getTxs();
+  const transactions = await getTxsOrderedByDateDesc();
   return Promise.resolve([transactions, transactions.length]);
 };
 
@@ -46,13 +46,17 @@ export async function refreshTxs() {
   try {
     const adaAddresses = await getAdaAddressesList();
     const addresses: Array<string> = adaAddresses.map(addr => addr.cadId);
-    await _updateAdaTxsHistory(await getTxsOrderedByUpdate(), addresses);
+    await _updateAdaTxsHistory(await getTxsOrderedByUpdateDesc(), addresses);
   } catch (error) {
     Logger.error('adaTransactionsHistory::refreshTxs error: ' + JSON.stringify(error));
     throw new UpdateAdaTxsHistoryError();
   }
 }
 
+/**
+ * @requires existingTransactions should be ordered discendingly by ctmUpdate
+ * to query only for the recently updated txs
+ */
 async function _updateAdaTxsHistory(
   existingTransactions: Array<AdaTransaction>,
   addresses: Array<string>
