@@ -15,9 +15,9 @@ When(/^I click on the Hide used addresses button$/, async function () {
 });
 
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {
-  for (let curr = 1; curr <= times; curr++) {
+  for (let curr = 0; curr < times; curr++) {
     await this.click('.generateAddressButton'); 
-    this.waitForElement(`.generatedAddress-${curr + 1} .WalletReceive_addressId`)
+    await this.waitForElement(`.generatedAddress-${curr + 1} .WalletReceive_addressId`)
   }
 });
 
