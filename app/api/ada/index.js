@@ -45,7 +45,6 @@ import {
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
   UpdateWalletResponse,
-  UnusedAddressesError,
 } from '../common';
 import type {
   AdaAddress,
