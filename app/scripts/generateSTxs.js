@@ -1,9 +1,9 @@
 // @flow
 
-import { mapToList, saveInStorage } from '../api/ada/lib/utils';
+import { mapToList } from '../api/ada/lib/utils';
 import { getWalletSeed } from '../api/ada/adaWallet';
 import { getCryptoWalletFromSeed } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, ADDRESSES_KEY } from '../api/ada/adaAddress';
+import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
 import { getSingleCryptoAccount } from '../api/ada/adaAccount';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
 
@@ -94,12 +94,10 @@ function _generateNewAddress(cryptoAccount) {
   return newAdaAddress(cryptoAccount, addresses, 'External');
 }
 
-function _removeAdaAddresses(cryptoAccount, addresses) {
-  const addressesMap = getAdaAddressesMap();
-  addresses.forEach((addr) => {
-    delete addressesMap[addr.cadId];
-  });
-  saveInStorage(ADDRESSES_KEY, addressesMap);
+async function _removeAdaAddresses(cryptoAccount, addresses) {
+  for (const addr of addresses) {
+    await removeAdaAddress(addr);
+  }
 }
 
 // The same index from the AdaAddresses is used when saving them

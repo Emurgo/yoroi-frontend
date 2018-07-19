@@ -53,14 +53,13 @@ export const getUTXOsSumsForAddresses = (addresses: Array<string>) =>
   });
 
 export const getTransactionsHistoryForAddresses = (addresses: Array<string>,
-  dateFrom: Moment, txHash: string) =>
+  dateFrom: Moment) =>
   axios(`${backendUrl}/api/txs/history`,
     {
       method: 'post',
       data: {
         addresses,
-        dateFrom,
-        txHash
+        dateFrom
       }
     }
   ).then(response => response.data)

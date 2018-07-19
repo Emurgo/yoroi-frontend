@@ -15,7 +15,8 @@ const txsTableSchema = {
     id: 'id',
     date: 'date',
     value: 'value',
-    isPending: 'isPending'
+    state: 'state',
+    lastUpdated: 'lastUpdated'
   }
 };
 
@@ -38,9 +39,10 @@ export const loadLovefieldDB = () => {
 
   schemaBuilder.createTable(txsTableSchema.name)
     .addColumn(txsTableSchema.properties.id, Type.STRING)
+    .addColumn(txsTableSchema.properties.state, Type.STRING)
     .addColumn(txsTableSchema.properties.date, Type.DATE_TIME)
+    .addColumn(txsTableSchema.properties.lastUpdated, Type.DATE_TIME)
     .addColumn(txsTableSchema.properties.value, Type.OBJECT)
-    .addColumn(txsTableSchema.properties.isPending, Type.BOOLEAN)
     .addPrimaryKey([txsTableSchema.properties.id])
     .addIndex('idxDate', [txsTableSchema.properties.date], false, lf.Order.DESC);
 
@@ -138,31 +140,21 @@ export const getMostRecentTx = function (txs) {
   return txs[txs.length - 1];
 };
 
-export const getConfirmedTxs = function () {
+export const getTxsOrderedByUpdateDesc = function () {
+  return _getTxsOrderedBy(txsTableSchema.properties.lastUpdated, lf.Order.DESC);
+};
+
+export const getTxsOrderedByDateDesc = function () {
+  return _getTxsOrderedBy(txsTableSchema.properties.date, lf.Order.DESC);
+};
+
+const _getTxsOrderedBy = (orderField, lfOrder) => {
   const txsTable = _getTxsTable();
   return db.select()
     .from(txsTable)
-    .where(txsTable[txsTableSchema.properties.isPending].eq(false))
-    .orderBy(txsTable[txsTableSchema.properties.date], lf.Order.DESC)
+    .orderBy(txsTable[orderField], lfOrder)
     .exec()
     .then(rows => rows.map(row => row[txsTableSchema.properties.value]));
-};
-
-export const getTxs = async function () {
-  const txsTable = _getTxsTable();
-  return db.select()
-    .from(txsTable)
-    .orderBy(txsTable[txsTableSchema.properties.date], lf.Order.DESC)
-    .exec()
-    .then(rows => rows.map(row => row[txsTableSchema.properties.value]));
-};
-
-export const deletePendingTxs = async function () {
-  const txsTable = _getTxsTable();
-  return db.delete()
-    .from(txsTable)
-    .where(txsTable[txsTableSchema.properties.isPending].eq(true))
-    .exec();
 };
 
 const _getTxAddressesRows = async (tx) => {
@@ -188,9 +180,10 @@ const _getAddressesIn = (addresses) => {
 const _txToRow = (tx) =>
   _getTxsTable().createRow({
     id: tx.ctId,
-    date: tx.ctmDate,
+    date: tx.ctMeta.ctmDate,
     value: tx,
-    isPending: !tx.ctBlockNumber
+    state: tx.ctCondition,
+    lastUpdated: tx.ctMeta.ctmUpdate
   });
 
 const _addressToRow = (address, type) =>
