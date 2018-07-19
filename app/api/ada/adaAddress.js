@@ -1,5 +1,7 @@
 // @flow
 import { Wallet } from 'rust-cardano-crypto';
+import _ from 'lodash';
+import config from '../../config';
 import {
   toAdaAddress
 } from './lib/cardanoCrypto/cryptoToModel';
@@ -12,12 +14,17 @@ import {
   deleteAddress
 } from './lib/lovefieldDatabase';
 import {
+  UnusedAddressesError,
+} from '../common';
+import {
   getAddressInHex
 } from './lib/utils';
 import type {
   AdaAddresses,
   AdaAddress
 } from './adaTypes';
+
+const { MAX_ALLOWED_UNUSED_ADDRESSES } = config.wallets;
 
 export function isValidAdaAddress(address: string): Promise<boolean> {
   try {
@@ -47,6 +54,20 @@ export function getAdaAddressesList() {
 
 export function getAdaAddressesByType(addressType: AddressType): Promise<AdaAddresses> {
   return getAddressesListByType(addressType);
+}
+
+export async function newExternalAdaAddress(
+  cryptoAccount: CryptoAccount
+): Promise<AdaAddress> {
+  const addresses: AdaAddresses = await getAdaAddressesByType('External');
+  const lastUsedAddressIndex = _.findLastIndex(addresses, address => address.cadIsUsed) + 1;
+  // TODO Move this to a config file
+  const unusedSpan = addresses.length - lastUsedAddressIndex;
+  if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) {
+    throw new UnusedAddressesError();
+  }
+  const newAddress: AdaAddress = await newAdaAddress(cryptoAccount, addresses, 'External');
+  return newAddress;
 }
 
 /* Create and save the next address for the given account */

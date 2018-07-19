@@ -1,8 +1,6 @@
 // @flow
 import { action } from 'mobx';
-import _ from 'lodash';
 import BigNumber from 'bignumber.js';
-import config from '../../config';
 import {
   Logger,
   stringifyError,
@@ -26,8 +24,7 @@ import {
 import { getSingleCryptoAccount } from './adaAccount';
 import {
   isValidAdaAddress,
-  newAdaAddress,
-  getAdaAddressesList,
+  newExternalAdaAddress,
   getAdaAddressesByType,
   saveAdaAddress
 } from './adaAddress';
@@ -152,9 +149,6 @@ export type ChangeAdaWalletPassphraseParams = {
 export type UpdateWalletPasswordResponse = boolean;
 
 export type AdaWalletRecoveryPhraseResponse = Array<string>;
-
-
-const { MAX_ALLOWED_UNUSED_ADDRESSES } = config.wallets;
 
 export default class AdaApi {
   async getWallets(): Promise<GetWalletsResponse> {
@@ -315,18 +309,11 @@ export default class AdaApi {
     Logger.debug('AdaApi::createAddress called');
     try {
       const cryptoAccount = getSingleCryptoAccount();
-      const addresses: AdaAddresses = await getAdaAddressesByType("External");
-      const lastUsedAddressIndex  = _.findLastIndex(addresses, address => address.cadIsUsed) + 1;
-      // TODO Move this to a config file
-      const unusedSpan = addresses.length - lastUsedAddressIndex;
-      if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) { 
-        throw new UnusedAddressesError();
-      }
-      const newAddress: AdaAddress = await newAdaAddress(cryptoAccount, addresses, 'External');
+      const newAddress = await newExternalAdaAddress(cryptoAccount);
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
-      if (error.name === 'UnusedAddressesError') throw error;
+      if (error.id && error.id.includes('unusedAddressesError')) throw error;
       Logger.error('AdaApi::createAddress error: ' + stringifyError(error));
       throw new GenericApiError();
     }
