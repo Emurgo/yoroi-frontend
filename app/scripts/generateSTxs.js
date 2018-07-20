@@ -1,8 +1,8 @@
 // @flow
 
 import { mapToList } from '../api/ada/lib/utils';
-import { getWalletSeed } from '../api/ada/adaWallet';
-import { getCryptoWalletFromSeed } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { getWalletMasterKey } from '../api/ada/adaWallet';
+import { getCryptoWalletFromMasterKey } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
 import { getSingleCryptoAccount } from '../api/ada/adaAccount';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
@@ -57,8 +57,8 @@ export async function generateSTxs(password: string,
 
   log('[generateSTxs] Starting generating stxs');
   const newAddress = (await _generateNewAddress(cryptoAccount)).cadId;
-  const seed = getWalletSeed();
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  const masterKey = getWalletMasterKey();
+  const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
   for (let i = 0; i < numberOfTxs; i++) {
     const sender = adaAddresses[i];
     const createSTxResult = await getAdaTransactionFromSenders(
