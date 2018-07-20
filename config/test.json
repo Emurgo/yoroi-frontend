@@ -1,8 +1,8 @@
 {
   "network": {
     "protocolMagic": 633343913,
-    "backendUrl": "https://localhost:8080",
-    "websocketUrl": "wss://localhost:8080",
+    "backendUrl": "http://localhost:8080",
+    "websocketUrl": "ws://localhost:8080",
     "name": "testnet"
   },
   "app": {
