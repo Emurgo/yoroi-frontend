@@ -2,6 +2,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+import classnames from 'classnames';
+import Button from 'react-polymorph/lib/components/Button';
+import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import moment from 'moment';
 import styles from './WalletTransactionsList.scss';
 import Transaction from './Transaction';
@@ -20,6 +23,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Yesterday',
     description: 'Label for the "Yesterday" label on the wallet summary page.',
   },
+  showMoreTransactionsButtonLabel: {
+    id: 'wallet.summary.page.showMoreTransactionsButtonLabel',
+    defaultMessage: '!!!Show more transactions',
+    description: 'Label for the "Show more transactions" button on the wallet summary page.',
+  },
 });
 
 const dateFormat = 'YYYY-MM-DD';
@@ -31,6 +39,7 @@ type Props = {
   assuranceMode: AssuranceMode,
   walletId: string,
   formattedWalletAmount: Function,
+  onLoadMore: Function,
 };
 
 @observer
@@ -88,18 +97,25 @@ export default class WalletTransactionsList extends Component<Props> {
   }
 
   render() {
+    const { intl } = this.context;
     const {
       transactions,
       isLoadingTransactions,
       hasMoreToLoad,
       assuranceMode,
       walletId,
-      formattedWalletAmount
+      formattedWalletAmount,
+      onLoadMore
     } = this.props;
+
+    const buttonClasses = classnames([
+      'primary',
+      styles.showMoreTransactionsButton,
+    ]);
 
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
-    const loadingSpinner = isLoadingTransactions || hasMoreToLoad ? (
+    const loadingSpinner = isLoadingTransactions ? (
       <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />
     ) : null;
 
@@ -124,6 +140,14 @@ export default class WalletTransactionsList extends Component<Props> {
           </div>
         ))}
         {loadingSpinner}
+        {!loadingSpinner && hasMoreToLoad &&
+          <Button
+            className={buttonClasses}
+            label={intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
+            onClick={onLoadMore}
+            skin={<SimpleButtonSkin />}
+          />
+        }
       </div>
     );
   }

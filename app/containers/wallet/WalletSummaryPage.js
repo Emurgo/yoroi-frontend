@@ -62,12 +62,11 @@ export default class WalletSummaryPage extends Component<Props> {
       const wasSearched = searchTerm !== '';
       const noTransactionsLabel = intl.formatMessage(messages.noTransactions);
       const noTransactionsFoundLabel = intl.formatMessage(messages.noTransactionsFound);
-
       if (searchRequest.isExecutingFirstTime || hasAny) {
         walletTransactions = (
           <WalletTransactionsList
             transactions={filtered}
-            isLoadingTransactions={searchRequest.isExecutingFirstTime}
+            isLoadingTransactions={searchRequest.isExecuting}
             hasMoreToLoad={totalAvailable > searchLimit}
             onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
             assuranceMode={wallet.assuranceMode}

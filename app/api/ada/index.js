@@ -45,7 +45,8 @@ import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
-  UpdateWalletResponse
+  UpdateWalletResponse,
+  GetTransactionsRequest
 } from '../common';
 import type {
   AdaAddress,
@@ -188,38 +189,21 @@ export default class AdaApi {
     }
   }
 
-  async refreshTransactions(): Promise<GetTransactionsResponse> {
+  async refreshTransactions(request: GetTransactionsRequest): Promise<GetTransactionsResponse> {
+    Logger.debug('AdaApi::searchHistory called: ' + stringifyData(request));
+    const { skip = 0, limit } = request;
     try {
       await refreshTxs();
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
       Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
-      const transactions = history[0].map(data =>
+      const mappedTransactions = history[0].map(data =>
         _createTransactionFromServerData(data)
       );
+      const transactions = limit ?
+        mappedTransactions.slice(skip, skip + limit) : mappedTransactions;
       return Promise.resolve({
         transactions,
         total: history[1]
-      });
-    } catch (error) {
-      Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  async getTransactions(): Promise<GetTransactionsResponse> {
-    // FIXME: Sync with TransactionStore skip and limit indexes
-    // Logger.debug('AdaApi::searchHistory called: ' + stringifyData(request));
-    // const { walletId, skip, limit } = request;
-    try {
-      await refreshTxs();
-      const history: AdaTransactions = await getAdaTxsHistoryByWallet();
-      Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
-      const transactions = history[0].map(data =>
-        _createTransactionFromServerData(data)
-      );
-      return Promise.resolve({
-        transactions,
-        total: history[1],
       });
     } catch (error) {
       Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));

@@ -15,8 +15,8 @@ export type TransactionSearchOptionsStruct = {
 
 export default class TransactionsStore extends Store {
 
-  INITIAL_SEARCH_LIMIT = 1000;
-  SEARCH_LIMIT_INCREASE = 500;
+  INITIAL_SEARCH_LIMIT = 5;
+  SEARCH_LIMIT_INCREASE = 5;
   SEARCH_SKIP = 0;
   RECENT_TRANSACTIONS_LIMIT = 5;
 
@@ -29,9 +29,9 @@ export default class TransactionsStore extends Store {
   @observable _searchOptionsForWallets = {};
 
   setup() {
-    // const actions = this.actions[environment.API].transactions;
+    const actions = this.actions[environment.API].transactions;
     // actions.filterTransactions.listen(this._updateSearchTerm);
-    // actions.loadMoreTransactions.listen(this._increaseSearchLimit);
+    actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }
 
   @action _updateSearchTerm = ({ searchTerm }: { searchTerm: string }) => {
@@ -43,6 +43,7 @@ export default class TransactionsStore extends Store {
   @action _increaseSearchLimit = () => {
     if (this.searchOptions != null) {
       this.searchOptions.searchLimit += this.SEARCH_LIMIT_INCREASE;
+      this._refreshTransactionData();
     }
   };
 
@@ -82,7 +83,7 @@ export default class TransactionsStore extends Store {
     const wallet = this.stores[environment.API].wallets.active;
     if (!wallet || !this.searchOptions) return [];
     const { searchTerm } = this.searchOptions;
-    const request = this._getTransactionsAllRequest(wallet.id);
+    const request = this._getTransactionsRecentRequest(wallet.id);
     if (searchTerm && request.result && request.result.transactions) {
       return request.result.transactions.filter(
         transaction => transaction.title.search(new RegExp(searchTerm, 'i')) !== -1
@@ -129,9 +130,11 @@ export default class TransactionsStore extends Store {
   @action _refreshTransactionData = () => {
     const allWallets = this.stores[environment.API].wallets.all;
     for (const wallet of allWallets) {
+      const searchLimit = this.searchOptions ?
+        this.searchOptions.searchLimit : this.INITIAL_SEARCH_LIMIT;
       const requestParams = {
         walletId: wallet.id,
-        limit: this.RECENT_TRANSACTIONS_LIMIT,
+        limit: searchLimit,
         skip: 0,
         searchTerm: '',
       };
@@ -140,14 +143,14 @@ export default class TransactionsStore extends Store {
       recentRequest.execute(requestParams);
       const allRequest = this._getTransactionsAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
-      allRequest.execute(requestParams);
+      allRequest.execute({ walletId: wallet.id });
     }
   };
 
   _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.recentRequest) return foundRequest.recentRequest;
-    return new CachedRequest(this.api[environment.API].getTransactions);
+    return new CachedRequest(this.api[environment.API].refreshTransactions);
   };
 
   _getTransactionsAllRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
