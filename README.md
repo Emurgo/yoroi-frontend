@@ -85,7 +85,7 @@ $ npm run build -- --env "mainnet"
 ```bash
 # compress build folder to {manifest.name}.zip and crx
 $ npm run build -- --env "mainnet" 
-$ npm run compress -- --env "mainnet" --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx"
+$ npm run compress -- --env "mainnet" --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" --key ./production-key.pem
 ```
 
 #### Options
