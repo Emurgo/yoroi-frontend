@@ -1,9 +1,9 @@
 // @flow
 
-import { mapToList, saveInStorage } from '../api/ada/lib/utils';
+import { mapToList } from '../api/ada/lib/utils';
 import { getWalletSeed } from '../api/ada/adaWallet';
 import { getCryptoWalletFromSeed } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, ADDRESSES_KEY } from '../api/ada/adaAddress';
+import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
 import { getSingleCryptoAccount } from '../api/ada/adaAccount';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
 
@@ -33,7 +33,7 @@ export async function generateSTxs(password: string,
 
   const adaAddresses = [];
   for (let i = 0; i < numberOfTxs; i++) {
-    const newAddress = _generateNewAddress(cryptoAccount);
+    const newAddress = await _generateNewAddress(cryptoAccount);
     adaAddresses.push(newAddress);
     log(`[generateSTxs] Generated the address ${newAddress.cadId}`);
   }
@@ -56,7 +56,7 @@ export async function generateSTxs(password: string,
   _saveAdaAddresses(cryptoAccount, adaAddresses);
 
   log('[generateSTxs] Starting generating stxs');
-  const newAddress = _generateNewAddress(cryptoAccount).cadId;
+  const newAddress = (await _generateNewAddress(cryptoAccount)).cadId;
   const seed = getWalletSeed();
   const cryptoWallet = getCryptoWalletFromSeed(seed, password);
   for (let i = 0; i < numberOfTxs; i++) {
@@ -94,15 +94,13 @@ function _generateNewAddress(cryptoAccount) {
   return newAdaAddress(cryptoAccount, addresses, 'External');
 }
 
-function _removeAdaAddresses(cryptoAccount, addresses) {
-  const addressesMap = getAdaAddressesMap();
-  addresses.forEach((addr) => {
-    delete addressesMap[addr.cadId];
-  });
-  saveInStorage(ADDRESSES_KEY, addressesMap);
+async function _removeAdaAddresses(cryptoAccount, addresses) {
+  for (const addr of addresses) {
+    await removeAdaAddress(addr);
+  }
 }
 
 // The same index from the AdaAddresses is used when saving them
 function _saveAdaAddresses(cryptoAccount, adaAddresses) {
-  adaAddresses.forEach(saveAdaAddress);
+  adaAddresses.forEach((adaAddress) => saveAdaAddress(adaAddress, 'External'));
 }

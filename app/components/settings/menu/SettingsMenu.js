@@ -12,6 +12,11 @@ const messages = defineMessages({
     defaultMessage: '!!!General',
     description: 'Label for the "General" link in the settings menu.',
   },
+  wallet: {
+    id: 'settings.menu.wallet.link.label',
+    defaultMessage: '!!!Wallet',
+    description: 'Label for the "Wallet" link in the settings menu.',
+  },
   support: {
     id: 'settings.menu.support.link.label',
     defaultMessage: '!!!Support',
@@ -27,6 +32,7 @@ const messages = defineMessages({
 type Props = {
   isActiveItem: Function,
   onItemClick: Function,
+  hasActiveWallet: boolean,
 };
 
 @observer
@@ -38,7 +44,8 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
+
     return (
       <div>
         <div className={styles.component}>
@@ -47,6 +54,18 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}
             active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
             className="general"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.wallet)}
+            onClick={() => {
+              if (hasActiveWallet) {
+                onItemClick(ROUTES.SETTINGS.WALLET);
+              }
+            }}
+            active={isActiveItem(ROUTES.SETTINGS.WALLET)}
+            className="wallet"
+            disabled={!hasActiveWallet}
           />
 
           <SettingsMenuItem

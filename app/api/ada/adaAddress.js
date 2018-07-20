@@ -1,22 +1,30 @@
 // @flow
 import { Wallet } from 'rust-cardano-crypto';
+import _ from 'lodash';
+import config from '../../config';
 import {
-  toAdaAddress,
-  getAddressTypeIndex
+  toAdaAddress
 } from './lib/cardanoCrypto/cryptoToModel';
 import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
-  getAddressInHex,
-  saveInStorage,
-  getFromStorage,
-  mapToList,
+  saveAddresses,
+  getAddresses,
+  getAddressesList,
+  getAddressesListByType,
+  deleteAddress
+} from './lib/lovefieldDatabase';
+import {
+  UnusedAddressesError,
+} from '../common';
+import {
+  getAddressInHex
 } from './lib/utils';
 import type {
   AdaAddresses,
   AdaAddress
 } from './adaTypes';
 
-export const ADDRESSES_KEY = 'ADDRESSES'; // we store a single Map<Address, AdaAddress>
+const { MAX_ALLOWED_UNUSED_ADDRESSES } = config.wallets;
 
 export function isValidAdaAddress(address: string): Promise<boolean> {
   try {
@@ -31,56 +39,65 @@ export function isValidAdaAddress(address: string): Promise<boolean> {
 
 /* Just return all existing addresses because we are using a SINGLE account */
 export function getAdaAddressesMap() {
-  const addresses = getFromStorage(ADDRESSES_KEY);
-  if (!addresses) return {};
-  return addresses;
+  return getAddresses().then(addresses => {
+    const addressesMap = {};
+    addresses.forEach(address => {
+      addressesMap[address.id] = address.value;
+    });
+    return addressesMap;
+  });
 }
 
-export function getAdaAddresses(): Array<string> {
-  const persistentAddresses: AdaAddresses = mapToList(getAdaAddressesMap());
-  return persistentAddresses.map(addr => addr.cadId);
+export function getAdaAddressesList() {
+  return getAddressesList();
 }
 
-export function filterAdaAddressesByType(
-  addresses: AdaAddresses,
-  addressType: AddressType
-): AdaAddresses {
-  return addresses.filter((address: AdaAddress) =>
-      address.change === getAddressTypeIndex(addressType));
+export function getAdaAddressesByType(addressType: AddressType): Promise<AdaAddresses> {
+  return getAddressesListByType(addressType);
+}
+
+export async function newExternalAdaAddress(
+  cryptoAccount: CryptoAccount
+): Promise<AdaAddress> {
+  const addresses: AdaAddresses = await getAdaAddressesByType('External');
+  const lastUsedAddressIndex = _.findLastIndex(addresses, address => address.cadIsUsed) + 1;
+  // TODO Move this to a config file
+  const unusedSpan = addresses.length - lastUsedAddressIndex;
+  if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) {
+    throw new UnusedAddressesError();
+  }
+  const newAddress: AdaAddress = await newAdaAddress(cryptoAccount, addresses, 'External');
+  return newAddress;
 }
 
 /* Create and save the next address for the given account */
-export function newAdaAddress(
+export async function newAdaAddress(
   cryptoAccount: CryptoAccount,
   addresses: AdaAddresses,
   addressType: AddressType
-): AdaAddress {
-  const address: AdaAddress = createAdaAddress(cryptoAccount, addresses, addressType);
-  saveAdaAddress(address);
+): Promise<AdaAddress> {
+  const address: AdaAddress = await createAdaAddress(cryptoAccount, addresses, addressType);
+  await saveAdaAddress(address, addressType);
   return address;
 }
 
-export function createAdaAddress(
+export async function createAdaAddress(
   cryptoAccount: CryptoAccount,
   addresses: AdaAddresses,
   addressType: AddressType
-): AdaAddress {
-  const filteredAddresses = filterAdaAddressesByType(addresses, addressType);
+): Promise<AdaAddress> {
+  const filteredAddresses = await getAdaAddressesByType(addressType);
   const addressIndex = filteredAddresses.length;
   const [address] = getOrFail(Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]));
   return toAdaAddress(cryptoAccount.account, addressType, addressIndex, address);
 }
 
-export function saveAdaAddress(address: AdaAddress): void {
-  const addressesMap = getAdaAddressesMap();
-  addressesMap[address.cadId] = address;
-  saveInStorage(ADDRESSES_KEY, addressesMap);
+export function saveAdaAddress(address: AdaAddress, addressType: AddressType): Promise<void> {
+  return saveAddresses([address], addressType);
 }
 
 export function removeAdaAddress(address: AdaAddress): void {
-  const addressesMap = getAdaAddressesMap();
-  delete addressesMap[address.cadId];
-  saveInStorage(ADDRESSES_KEY, addressesMap);
+  deleteAddress(address.cadId);
 }
 
 export function saveAsAdaAddresses(
@@ -88,9 +105,8 @@ export function saveAsAdaAddresses(
   addresses: Array<string>,
   addressType: AddressType
 ): void {
-  addresses.forEach((hash, index) => {
-    const adaAddress: AdaAddress =
-      toAdaAddress(cryptoAccount.account, addressType, index, hash);
-    saveAdaAddress(adaAddress);
-  });
+  const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) =>
+    toAdaAddress(cryptoAccount.account, addressType, index, hash)
+  );
+  saveAddresses(mappedAddresses, addressType);
 }

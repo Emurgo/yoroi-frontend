@@ -1,5 +1,5 @@
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import seleniumWebdriver, { By } from 'selenium-webdriver';
+import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import path from 'path';
 
@@ -81,6 +81,13 @@ function CustomWorld() {
     await input.clear();
   };
 
+  this.clearInputUpdatingForm = async (locator, textLength) => {
+    const input = await this.getElementBy(locator);
+    for (let i = 0; i < textLength; i++) {
+      await input.sendKeys(Key.BACK_SPACE);
+    }
+  };
+
   this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
 
   this.getFromLocalStorage = async (key) => {
@@ -94,6 +101,11 @@ function CustomWorld() {
     this.driver.executeScript((k, l) =>
         window.icarus.translations[l][k]
     , key, lang);
+
+  this.saveAddressesToDB = addresses =>
+    this.driver.executeScript(addrs => {
+      addrs.forEach(addr => window.icarus.api.ada.saveAddress(addr, 'External'));
+    }, addresses);
 }
 
 setWorldConstructor(CustomWorld);

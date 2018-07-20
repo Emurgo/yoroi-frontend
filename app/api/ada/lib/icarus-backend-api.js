@@ -12,7 +12,8 @@ import {
   GetTxHistoryForAddressesApiError,
   SendTransactionApiError,
   CheckAdressesInUseApiError,
-  GetPendingTxsForAddressesApiError
+  GetPendingTxsForAddressesApiError,
+  InvalidWitnessError
 } from '../errors';
 
 export const transactionsLimit = 20;
@@ -52,14 +53,13 @@ export const getUTXOsSumsForAddresses = (addresses: Array<string>) =>
   });
 
 export const getTransactionsHistoryForAddresses = (addresses: Array<string>,
-  dateFrom: Moment, txHash: string) =>
+  dateFrom: Moment) =>
   axios(`${backendUrl}/api/txs/history`,
     {
       method: 'post',
       data: {
         addresses,
-        dateFrom,
-        txHash
+        dateFrom
       }
     }
   ).then(response => response.data)
@@ -79,6 +79,9 @@ export const sendTx = (signedTx: string) =>
   ).then(response => response.data)
   .catch((error) => {
     Logger.error('icarus-backend-api::sendTx error: ' + stringifyError(error));
+    if (error.request.response.includes('Invalid witness')) {
+      throw new InvalidWitnessError();
+    }
     throw new SendTransactionApiError();
   });
 

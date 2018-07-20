@@ -1,7 +1,7 @@
 {
   "default": {
-    "addresses": {
-      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod": {
+    "adaAddresses": [
+      {
         "cadAmount": {
           "getCCoin": 0
         },
@@ -11,7 +11,8 @@
         "change": 0,
         "index": 0
       }
-    },
+    ],
+    "usedAddresses": [],
     "seed": {
       "encryptedSeed": "d207774a43e617045acbff9ebca37c1748d656976398eb9b1117651e9198eae5",
       "passwordSalt": "cd4a9a3753ddccb56f4d6e062b23e503",
@@ -63,7 +64,34 @@
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
         "amount": "1000000"
       }
-    ]
+    ],
+    "walletInitialData": {
+      "wallet": {
+        "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "totalAddresses": 1
+      }
+    },
+    "txs": {
+      "wallet": [
+        {
+          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+          "tx": {
+            "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
+            "time": "2018-05-12T13:51:33.000Z",
+            "inputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
+            ],
+            "inputs_amount": [200],
+            "outputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"
+            ],
+            "outputs_amount": [100, 100],
+            "best_block_num": 101
+          }
+        }
+      ]
+    },
+    "usedAddresses": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"]
   },
   "Get balance": {
     "walletInitialData": {
@@ -78,8 +106,8 @@
         "txsNumber": 45
       }
     },
-    "addresses": {
-      "Be2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod": {
+    "adaAddresses": [
+      {
         "cadAmount": {
           "getCCoin": 0
         },
@@ -89,7 +117,7 @@
         "change": 0,
         "index": 0
       }
-    },
+    ],
     "utxos": [
       {
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
@@ -172,7 +200,9 @@
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
             ],
             "outputs_amount": [100, 100],
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-05-10T13:51:33.000Z",
+            "tx_state": "Pending"
           }
         },
         {
@@ -188,7 +218,9 @@
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
             "outputs_amount": [100],
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-05-10T13:51:33.000Z",
+            "tx_state": "Pending"
           }
         },
         {
@@ -205,7 +237,9 @@
             ],
             "outputs_amount": [160],
             "block_num": 90,
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-05-10T13:51:33.000Z",
+            "tx_state": "Successful"
           }
         }
       ],
@@ -228,7 +262,9 @@
               "9007199254720698"
             ],
             "block_num": 70,
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-05-10T13:51:33.000Z",
+            "tx_state": "Successful"
           }
         }
       ]

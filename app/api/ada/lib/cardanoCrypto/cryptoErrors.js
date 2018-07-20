@@ -7,4 +7,10 @@ class CardanoCryptoError extends ExtendableError {
   }
 }
 
+export class WrongPassphraseError extends CardanoCryptoError {
+  constructor(message: ?string = 'Passphrase doesn\'t match') {
+    super(message);
+  }
+}
+
 export default CardanoCryptoError;

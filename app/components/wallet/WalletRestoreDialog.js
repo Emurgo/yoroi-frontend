@@ -125,7 +125,9 @@ export default class WalletRestoreDialog extends Component<Props> {
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
-          if (repeatPasswordField.value.length > 0) repeatPasswordField.validate(form);
+          if (repeatPasswordField.value.length > 0) {
+            repeatPasswordField.validate({ showErrors: true });
+          }
           return [
             isValidWalletPassword(field.value),
             this.context.intl.formatMessage(globalMessages.invalidWalletPassword)

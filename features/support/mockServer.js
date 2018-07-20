@@ -11,7 +11,7 @@ const port = 8080;
 const addressesLimit = 50;
 const txsLimit = 20;
 
-export function createServer() {
+export function createServer(settings) {
   const server = create();
 
   server.use(middlewares);
@@ -29,6 +29,10 @@ export function createServer() {
       throw new Error('DateFrom should be a valid datetime');
     }
     return true;
+  }
+
+  function defaultSignedTransaction(req, res) {
+    res.send();
   }
 
   server.post('/api/txs/utxoForAddresses', (req, res) => {
@@ -54,36 +58,21 @@ export function createServer() {
     validateDatetimeReq(req.body);
     const txsMapList = getTxsMapList(req.body.addresses);
     // Filters all txs according to hash and date
-    const filteredTxs = txsMapList.filter(txMap => {
-      const extraFilter = req.body.txHash ?
-        txMap.tx.hash > req.body.txHash :
-        !req.body.txHash;
-      return req.body.addresses.includes(txMap.address) &&
-        moment(txMap.tx.time) >= moment(req.body.dateFrom) &&
-        extraFilter;
-    }).map(txMap => txMap.tx);
+    const filteredTxs = txsMapList.filter(txMap =>
+      req.body.addresses.includes(txMap.address) &&
+        moment(txMap.tx.last_update) >= moment(req.body.dateFrom)
+    ).map(txMap => txMap.tx);
     // Returns a chunk of txs
     res.send(filteredTxs.slice(0, txsLimit));
   });
 
-  server.post('/api/txs/signed', (req, res) => {
-    res.send();
-  });
+  server.post('/api/txs/signed', settings.signedTransaction ?
+    settings.signedTransaction : defaultSignedTransaction);
 
   server.post('/api/addresses/filterUsed', (req, res) => {
     const usedAddresses = getMockData().usedAddresses.filter((address) =>
       req.body.addresses.includes(address));
     res.send(usedAddresses);
-  });
-
-  server.post('/api/txs/pending', (req, res) => {
-    validateAddressesReq(req.body);
-    const txsMapList = getTxsMapList(req.body.addresses);
-    const txs = txsMapList.filter(txMap => (
-      req.body.addresses.includes(txMap.address) &&
-        !txMap.tx.block_num
-    )).map(txMap => txMap.tx);
-    res.send(txs);
   });
 
   return server.listen(port, () => {

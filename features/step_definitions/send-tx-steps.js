@@ -1,5 +1,21 @@
-import { Given, When, Then } from 'cucumber';
+import { Given, When, Then, Before, After } from 'cucumber';
 import { expect } from 'chai';
+import { closeServer, initializeServer } from './common-steps';
+import i18n from '../support/helpers/i18n-helpers';
+
+Before({ tags: '@invalidWitnessTest' }, () => {
+  closeServer();
+  initializeServer({ signedTransaction: (req, res) => {
+    res.status(400).jsonp({
+      message: 'Invalid witness'
+    });
+  } });
+});
+
+After({ tags: '@invalidWitnessTest' }, () => {
+  closeServer();
+  initializeServer({});
+});
 
 Given(/^I have a wallet with funds$/, async function () {
   const { adaWallet } = await this.getFromLocalStorage('WALLET');
@@ -53,4 +69,14 @@ Then(/^I should see a not enough ada error$/, async function () {
 
 Then(/^I should not be able to submit$/, async function () {
   await this.waitForElement('.primary.SimpleButton_disabled');
+});
+
+Then(/^I should see an invalid signature error message$/, async function () {
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.invalidWitnessError' });
+  await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
+});
+
+Then(/^I should see an incorrect wallet password error message$/, async function () {
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.IncorrectPasswordError' });
+  await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
 });
