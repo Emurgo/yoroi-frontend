@@ -200,7 +200,9 @@
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
             ],
             "outputs_amount": [100, 100],
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-05-10T13:51:33.000Z",
+            "tx_state": "Pending"
           }
         },
         {
@@ -216,7 +218,9 @@
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
             "outputs_amount": [100],
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-05-10T13:51:33.000Z",
+            "tx_state": "Pending"
           }
         },
         {
@@ -233,7 +237,9 @@
             ],
             "outputs_amount": [160],
             "block_num": 90,
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-05-10T13:51:33.000Z",
+            "tx_state": "Successful"
           }
         }
       ],
@@ -256,7 +262,9 @@
               "9007199254720698"
             ],
             "block_num": 70,
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-05-10T13:51:33.000Z",
+            "tx_state": "Successful"
           }
         }
       ]

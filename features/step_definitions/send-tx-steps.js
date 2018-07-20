@@ -75,3 +75,8 @@ Then(/^I should see an invalid signature error message$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.invalidWitnessError' });
   await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
 });
+
+Then(/^I should see an incorrect wallet password error message$/, async function () {
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.IncorrectPasswordError' });
+  await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
+});

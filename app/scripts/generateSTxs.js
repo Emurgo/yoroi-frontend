@@ -94,8 +94,10 @@ function _generateNewAddress(cryptoAccount) {
   return newAdaAddress(cryptoAccount, addresses, 'External');
 }
 
-function _removeAdaAddresses(cryptoAccount, adaAddresses) {
-  adaAddresses.forEach((adaAddress) => removeAdaAddress(adaAddress));
+async function _removeAdaAddresses(cryptoAccount, addresses) {
+  for (const addr of addresses) {
+    await removeAdaAddress(addr);
+  }
 }
 
 // The same index from the AdaAddresses is used when saving them

@@ -23,6 +23,11 @@ const messages = defineMessages({
     defaultMessage: '!!!There was a problem sending the support request.',
     description: '"There was a problem sending the support request." error message'
   },
+  unusedAddressesError: {
+    id: 'api.errors.unusedAddressesError',
+    defaultMessage: '!!!You cannot generate more than 20 consecutive unused addresses.',
+    description: '"User cannot generate more unused addresses" error message'
+  },
 });
 
 export class GenericApiError extends LocalizableError {
@@ -57,6 +62,15 @@ export class ReportRequestError extends LocalizableError {
     super({
       id: messages.reportRequestError.id,
       defaultMessage: messages.reportRequestError.defaultMessage,
+    });
+  }
+}
+
+export class UnusedAddressesError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.unusedAddressesError.id,
+      defaultMessage: messages.unusedAddressesError.defaultMessage,
     });
   }
 }

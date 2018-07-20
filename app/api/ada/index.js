@@ -24,8 +24,7 @@ import {
 import { getSingleCryptoAccount } from './adaAccount';
 import {
   isValidAdaAddress,
-  newAdaAddress,
-  getAdaAddressesList,
+  newExternalAdaAddress,
   getAdaAddressesByType,
   saveAdaAddress
 } from './adaAddress';
@@ -45,7 +44,7 @@ import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
-  UpdateWalletResponse
+  UpdateWalletResponse,
 } from '../common';
 import type {
   AdaAddress,
@@ -68,6 +67,7 @@ import type {
   RestoreWalletResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
+import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -272,6 +272,9 @@ export default class AdaApi {
       );
       return response;
     } catch (error) {
+      if (error instanceof WrongPassphraseError) {
+        throw new IncorrectWalletPasswordError();
+      }
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
@@ -305,11 +308,11 @@ export default class AdaApi {
     Logger.debug('AdaApi::createAddress called');
     try {
       const cryptoAccount = getSingleCryptoAccount();
-      const addresses: AdaAddresses = await getAdaAddressesList();
-      const newAddress: AdaAddress = await newAdaAddress(cryptoAccount, addresses, 'External');
+      const newAddress = await newExternalAdaAddress(cryptoAccount);
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
+      if (error.id && error.id.includes('unusedAddressesError')) throw error;
       Logger.error('AdaApi::createAddress error: ' + stringifyError(error));
       throw new GenericApiError();
     }
@@ -429,7 +432,7 @@ export default class AdaApi {
       Logger.error(
         'AdaApi::updateWalletPassword error: ' + stringifyError(error)
       );
-      if (error.message.includes('Invalid old passphrase given')) {
+      if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
       throw new GenericApiError();

@@ -15,3 +15,14 @@ Feature: Create wallet
     And I accept the creation terms
     And I copy and enter the displayed mnemonic phrase
     Then I should see the opened wallet
+
+  Scenario: Fail to create due to incomplete fields
+    When I click the create button
+    And I enter the name "Created Wallet"
+    And I enter the created wallet password:
+    | password  | repeatedPassword |
+    | Secret123 | Secret123        |
+    And I clear the name "Created Wallet"
+    And I clear the created wallet password Secret123
+    And I click the "Create personal wallet" button
+    Then I should stay in the create wallet dialog

@@ -76,7 +76,11 @@ async function storeWallet(client, walletName) {
 
   /* Obs: If "with $number addresses" is include in the sentence,
      we override the wallet with fake addresses" */
-  if (walletName && walletInitialData && walletInitialData[walletName] && walletInitialData[walletName].totalAddresses) {
+  if (walletName &&
+      walletInitialData &&
+      walletInitialData[walletName] &&
+      walletInitialData[walletName].totalAddresses
+    ) {
     client.saveAddressesToDB(getFakeAddresses(
       walletInitialData[walletName].totalAddresses,
       walletInitialData[walletName].addressesStartingWith
