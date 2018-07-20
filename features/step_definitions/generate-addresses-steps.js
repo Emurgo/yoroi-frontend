@@ -19,9 +19,9 @@ Then(/^I should see my latest address "([^"]*)" at the top$/, async function (ad
 
 Then(/^I should see the addresses list them$/, async function (table) {
   const rows = table.hashes();
-  const waitUntilAddressesAppeared = rows.map((row) =>
+  const waitUntilAddressesAppeared = rows.map((row, index) =>
     this.waitUntilText(
-      `.generatedAddress-${row.index} .WalletReceive_addressId`,
+      `.generatedAddress-${index + 1} .WalletReceive_addressId`,
       row.address
     )
   );

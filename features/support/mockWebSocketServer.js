@@ -1,13 +1,15 @@
 import WebSocket from 'ws';
 
 const MSG_TYPE_RESTORE = 'RESTORE';
-
 const fromMessage = JSON.parse;
 const toMessage = JSON.stringify;
 
 export async function createWebSocketServer(server) {
   const wss = new WebSocket.Server({ server });
+  return wss;
+}
 
+export function mockRestoredDaedalusAddresses(wss, addresses) {
   wss.on('connection', ws => {
     ws.on('message', (msg) => {
       const data = fromMessage(msg);
@@ -15,7 +17,7 @@ export async function createWebSocketServer(server) {
         case MSG_TYPE_RESTORE:
           ws.send(toMessage({
             msg: MSG_TYPE_RESTORE,
-            addresses: [],
+            addresses
           }));
           break;
         default:
@@ -23,6 +25,4 @@ export async function createWebSocketServer(server) {
       }
     });
   });
-
-  return wss;
 }
