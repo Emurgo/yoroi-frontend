@@ -23,6 +23,7 @@
   "api.errors.sendTransactionApiError": "!!!Error received from server while sending tx.",
   "api.errors.sendTransactionError": "!!!Error received from api method call while sending tx.",
   "api.errors.transactionError": "Error while creating transaction.",
+  "api.errors.unusedAddressesError": "!!!You cannot generate more than 20 consecutive unused addresses.",
   "api.errors.updateAdaTxsHistoryError": "Error while updating ada transactions history.",
   "api.errors.updateAdaWalletError": "Error while updating ada wallet.",
   "app.errors.unknowError": "Unknow error.",

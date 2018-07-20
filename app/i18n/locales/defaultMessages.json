@@ -369,6 +369,20 @@
           "column": 22,
           "line": 21
         }
+      },
+      {
+        "defaultMessage": "!!!You cannot generate more than 20 consecutive unused addresses.",
+        "description": "\"User cannot generate more unused addresses\" error message",
+        "end": {
+          "column": 3,
+          "line": 30
+        },
+        "file": "app/api/common.js",
+        "id": "api.errors.unusedAddressesError",
+        "start": {
+          "column": 24,
+          "line": 26
+        }
       }
     ],
     "path": "app/api/common.json"
