@@ -33,7 +33,6 @@ function _defaultSignedTransaction(req, res) {
 let MockServer = null;
 
 export function getMockServer(settings) {
-
   // If the MockServer doesn't exist or new settings are passed the Mocker Server is created.
   if (!MockServer || settings) {
     const server = create();

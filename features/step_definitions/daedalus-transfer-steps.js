@@ -1,12 +1,16 @@
-import { Before, Given, When, Then } from 'cucumber';
+import { Before, Given, When, Then, After } from 'cucumber';
 import BigNumber from 'bignumber.js';
 import {
   LOVELACES_PER_ADA,
   DECIMAL_PLACES_IN_ADA
 } from '../../app/config/numbersConfig';
-import { getMockServer } from '../support/mockServer';
 import {
-  createWebSocketServer,
+  getMockServer,
+  closeMockServer
+} from '../support/mockServer';
+import {
+  getMockWebSocketServer,
+  closeMockWebSocketServer,
   mockRestoredDaedalusAddresses
 } from '../support/mockWebSocketServer';
 import {
@@ -14,10 +18,16 @@ import {
 } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 
-let wss;
-
 Before({ tags: '@withWebSocketConnection' }, () => {
-  wss = createWebSocketServer(getMockServer({}));
+  closeMockServer();
+  getMockWebSocketServer(getMockServer({}));
+});
+
+After({ tags: '@withWebSocketConnection' }, () => {
+  closeMockServer();
+  getMockServer({});
+
+  closeMockWebSocketServer();
 });
 
 Given(/^My Daedalus wallet has funds/, () => {
@@ -25,12 +35,12 @@ Given(/^My Daedalus wallet has funds/, () => {
     'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb',
     'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm'
   ];
-  mockRestoredDaedalusAddresses(wss, daedalusAddresses);
+  mockRestoredDaedalusAddresses(daedalusAddresses);
 });
 
 Given(/^My Daedalus wallet hasn't funds/, () => {
   const daedalusAddresses = [];
-  mockRestoredDaedalusAddresses(wss, daedalusAddresses);
+  mockRestoredDaedalusAddresses(daedalusAddresses);
 });
 
 Given(/^I am on the Daedalus Transfer screen$/, async function () {
