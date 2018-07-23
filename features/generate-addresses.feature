@@ -21,7 +21,8 @@ Feature: Generate Addresses
     | Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod | 2     |
 
   Scenario: Don't allow more than 20 unused address generation
-    When I click on the Generate new address button 21 times
+    When I click on the Generate new address button 20 times
+    And  I click on the Generate new address button
     Then I should see an error about max unused addresses
 
   Scenario: Hide used addresses
