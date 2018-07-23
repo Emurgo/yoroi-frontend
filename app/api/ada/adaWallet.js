@@ -7,10 +7,6 @@ import {
   stringifyError
 } from '../../utils/logging';
 import {
-  saveInStorage,
-  getFromStorage
-} from './lib/utils';
-import {
   generateWalletMasterKey,
   generateAdaMnemonic,
   isValidAdaMnemonic,
@@ -31,13 +27,12 @@ import type {
   ChangeAdaWalletPassphraseParams,
   AdaWalletRecoveryPhraseResponse,
 } from './index';
-import type { WalletMasterKey } from './lib/cardanoCrypto/cryptoWallet';
 import {
   getUTXOsSumsForAddresses,
   addressesLimit
 } from './lib/icarus-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
-import { saveAdaWallet, getAdaWallet, getWalletSeed } from './adaLocalStorage';
+import { saveAdaWallet, getAdaWallet, getWalletMasterKey } from './adaLocalStorage';
 
 /* Create and save a wallet with your master key, and a SINGLE account with one address */
 export async function newAdaWallet({

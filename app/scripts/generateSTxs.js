@@ -1,11 +1,10 @@
 // @flow
 
 import { mapToList } from '../api/ada/lib/utils';
-import { getWalletMasterKey } from '../api/ada/adaWallet';
 import { getCryptoWalletFromMasterKey } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
-import { getSingleCryptoAccount, getWalletSeed } from '../api/ada/adaLocalStorage';
+import { getSingleCryptoAccount, getWalletMasterKey } from '../api/ada/adaLocalStorage';
 
 const CONFIRMATION_TIME = 40 * 1000; // 40 seconds
 const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be bigger than
