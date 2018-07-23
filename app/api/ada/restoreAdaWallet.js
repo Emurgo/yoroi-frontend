@@ -1,6 +1,7 @@
 // @flow
 import _ from 'lodash';
 import { Wallet } from 'rust-cardano-crypto';
+import config from '../../config';
 import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
   saveAsAdaAddresses,
@@ -24,9 +25,7 @@ import { saveCryptoAccount, saveAdaWallet } from './adaLocalStorage';
 import { createAdaWallet } from './adaWallet';
 import { createCryptoAccount } from './adaAccount';
 
-// We will query the backend for 20 addresses window
-// FIXME: Improve this to decouple requests and BIP-44 unused window parsing
-const ADDRESS_REQUEST_SIZE = 20;
+const { ADDRESS_REQUEST_SIZE } = config.wallets;
 
 export async function restoreAdaWallet({
   walletPassword,

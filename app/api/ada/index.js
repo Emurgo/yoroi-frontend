@@ -22,8 +22,7 @@ import {
 } from './adaWallet';
 import {
   isValidAdaAddress,
-  newAdaAddress,
-  getAdaAddressesList,
+  newExternalAdaAddress,
   getAdaAddressesByType,
   saveAdaAddress
 } from './adaAddress';
@@ -42,7 +41,7 @@ import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
-  UpdateWalletResponse
+  UpdateWalletResponse,
 } from '../common';
 import type {
   AdaAddress,
@@ -307,11 +306,11 @@ export default class AdaApi {
     Logger.debug('AdaApi::createAddress called');
     try {
       const cryptoAccount = getSingleCryptoAccount();
-      const addresses: AdaAddresses = await getAdaAddressesList();
-      const newAddress: AdaAddress = await newAdaAddress(cryptoAccount, addresses, 'External');
+      const newAddress = await newExternalAdaAddress(cryptoAccount);
       Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
       return _createAddressFromServerData(newAddress);
     } catch (error) {
+      if (error.id && error.id.includes('unusedAddressesError')) throw error;
       Logger.error('AdaApi::createAddress error: ' + stringifyError(error));
       throw new GenericApiError();
     }

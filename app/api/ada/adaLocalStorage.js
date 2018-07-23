@@ -5,8 +5,7 @@ import type { WalletSeed } from '../ada/lib/cardanoCrypto/cryptoWallet';
 const storageKeys = {
   ACCOUNT_KEY: 'ACCOUNT',
   WALLET_KEY: 'WALLET',
-  LAST_BLOCK_NUMBER_KEY: 'LAST_BLOCK_NUMBER',
-  ADDRESSES_KEY: 'ADDRESSES'
+  LAST_BLOCK_NUMBER_KEY: 'LAST_BLOCK_NUMBER'
 };
 
 export function saveCryptoAccount(
@@ -42,10 +41,6 @@ export function saveLastBlockNumber(blockNumber: number): void {
 
 export function getLastBlockNumber() {
   return _getFromStorage(storageKeys.LAST_BLOCK_NUMBER_KEY);
-}
-
-export function removeAdaAddresses(addressesMap: Array<{ id: string }>) {
-  _saveInStorage(storageKeys.ADDRESSES_KEY, addressesMap);
 }
 
 function _saveInStorage(key: string, toSave: any): void {

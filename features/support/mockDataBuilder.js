@@ -75,11 +75,14 @@ function _getTxs(txsNumber, addressesStartingWith, txHashesStartingWith, pending
         inputs_amount: [70],
         outputs_address: [addressesStartingWith + 'W'],
         outputs_amount: [200],
-        best_block_num: 101
+        best_block_num: 101,
+        last_update: new Date(index),
+        tx_state: 'Pending'
       });
-      const txMap = Object.assign({}, { address: addressesStartingWith + 'W', tx: newTx } );
+      const txMap = Object.assign({}, { address: addressesStartingWith + 'W', tx: newTx });
       if (index >= pendingNumber) {
         txMap.tx.block_num = 56;
+        txMap.tx.tx_state = 'Successful';
       }
       return txMap;
     });
