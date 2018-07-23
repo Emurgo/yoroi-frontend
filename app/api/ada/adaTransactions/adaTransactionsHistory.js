@@ -35,7 +35,7 @@ import type
   AdaTransactions,
   AdaTransactionInputOutput
 } from '../adaTypes';
-import { saveLastBlockNumber, getLastBlockNumber } from '../../localStorage/localStorageUtils';
+import { saveLastBlockNumber, getLastBlockNumber } from '../adaLocalStorage';
 
 export const getAdaConfirmedTxs = getConfirmedTxs;
 

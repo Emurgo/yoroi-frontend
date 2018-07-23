@@ -66,7 +66,7 @@ import type {
 } from '../common';
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
-import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from '../localStorage/localStorageUtils';
+import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {

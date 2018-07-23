@@ -38,7 +38,7 @@ import {
   GetAllUTXOsForAddressesError,
   InvalidWitnessError
 } from '../errors';
-import { getSingleCryptoAccount, getWalletSeed } from '../../localStorage/localStorageUtils';
+import { getSingleCryptoAccount, getWalletSeed } from '../adaLocalStorage';
 
 const fakePassword = 'fake';
 

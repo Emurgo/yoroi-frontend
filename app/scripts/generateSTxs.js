@@ -4,7 +4,7 @@ import { mapToList } from '../api/ada/lib/utils';
 import { getCryptoWalletFromSeed } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { newAdaAddress, getAdaAddressesMap, saveAdaAddress } from '../api/ada/adaAddress';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
-import { getSingleCryptoAccount, removeAdaAddresses, getWalletSeed } from '../api/localStorage/localStorageUtils';
+import { getSingleCryptoAccount, removeAdaAddresses, getWalletSeed } from '../api/ada/adaLocalStorage';
 
 const CONFIRMATION_TIME = 40 * 1000; // 40 seconds
 const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be bigger than

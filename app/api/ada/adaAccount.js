@@ -3,7 +3,7 @@ import { Wallet } from 'rust-cardano-crypto';
 import { getCryptoWalletFromSeed } from './lib/cardanoCrypto/cryptoWallet';
 import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import type { WalletSeed } from './lib/cardanoCrypto/cryptoWallet';
-import { saveCryptoAccount } from '../localStorage/localStorageUtils';
+import { saveCryptoAccount } from './adaLocalStorage';
 
 const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */
 

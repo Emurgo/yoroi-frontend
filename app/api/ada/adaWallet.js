@@ -32,7 +32,7 @@ import {
   addressesLimit
 } from './lib/icarus-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
-import { saveAdaWallet, getAdaWallet, getWalletSeed } from '../localStorage/localStorageUtils';
+import { saveAdaWallet, getAdaWallet, getWalletSeed } from './adaLocalStorage';
 
 /* Create and save a wallet with your seed, and a SINGLE account with one address */
 export async function newAdaWallet({

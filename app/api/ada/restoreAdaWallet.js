@@ -20,7 +20,7 @@ import {
 import {
   DiscoverAddressesError
 } from './errors';
-import { saveCryptoAccount, saveAdaWallet } from '../localStorage/localStorageUtils';
+import { saveCryptoAccount, saveAdaWallet } from './adaLocalStorage';
 import { createAdaWallet } from './adaWallet';
 import { createCryptoAccount } from './adaAccount';
 
