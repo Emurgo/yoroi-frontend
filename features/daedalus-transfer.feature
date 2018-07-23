@@ -16,7 +16,7 @@ Feature: Transfer Daedalus Wallet funds
     When I click on the go to the Receive screen button
     Then I should see the Receive screen
 
-  Scenario: I try to transfer funds from an Icarus wallet
+  Scenario: Transfer fail when I try to transfer funds from an Icarus wallet
     Given There is a wallet stored named Test
     And I am on the Daedalus Transfer screen
     When I click on the transfer funds from Daedalus button
@@ -26,7 +26,7 @@ Feature: Transfer Daedalus Wallet funds
     And I proceed with the recovery
     Then I should see an "Invalid recovery phrase" error message
   
-  Scenario: try to transfer funds from my Daedalus wallet but connection is lost
+  Scenario: Try to transfer funds from my Daedalus wallet but connection is lost
     Given There is a wallet stored named Test
     And I am on the Daedalus Transfer screen
     When I click on the transfer funds from Daedalus button
@@ -54,7 +54,7 @@ Feature: Transfer Daedalus Wallet funds
     Then I should see the summary screen
     
   @withWebSocketConnection
-  Scenario:  try to transfer funds from my Daedalus wallet but it doesn't have funds
+  Scenario: Try to transfer funds from my Daedalus wallet but it doesn't have funds
     Given There is a wallet stored named Test
     And My Daedalus wallet hasn't funds
     And I am on the Daedalus Transfer screen

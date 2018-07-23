@@ -20,14 +20,15 @@ import i18n from '../support/helpers/i18n-helpers';
 
 Before({ tags: '@withWebSocketConnection' }, () => {
   closeMockServer();
-  getMockWebSocketServer(getMockServer({}));
+  const newMockServer = getMockServer({});
+  getMockWebSocketServer(newMockServer);
 });
 
 After({ tags: '@withWebSocketConnection' }, () => {
   closeMockServer();
-  getMockServer({});
-
   closeMockWebSocketServer();
+
+  getMockServer({});
 });
 
 Given(/^My Daedalus wallet has funds/, () => {

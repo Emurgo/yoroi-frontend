@@ -5,11 +5,13 @@ import i18n from '../support/helpers/i18n-helpers';
 
 Before({ tags: '@invalidWitnessTest' }, () => {
   closeMockServer();
-  getMockServer({ signedTransaction: (req, res) => {
-    res.status(400).jsonp({
-      message: 'Invalid witness'
-    });
-  } });
+  getMockServer({
+    signedTransaction: (req, res) => {
+      res.status(400).jsonp({
+        message: 'Invalid witness'
+      });
+    }
+  });
 });
 
 After({ tags: '@invalidWitnessTest' }, () => {
