@@ -31,15 +31,13 @@ import type {
   ChangeAdaWalletPassphraseParams,
   AdaWalletRecoveryPhraseResponse,
 } from './index';
-
 import type { WalletMasterKey } from './lib/cardanoCrypto/cryptoWallet';
 import {
   getUTXOsSumsForAddresses,
   addressesLimit
 } from './lib/icarus-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
-
-const WALLET_KEY = 'WALLET'; // single wallet atm
+import { saveAdaWallet, getAdaWallet, getWalletSeed } from './adaLocalStorage';
 
 /* Create and save a wallet with your master key, and a SINGLE account with one address */
 export async function newAdaWallet({
@@ -96,23 +94,6 @@ export function createAdaWallet({
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const masterKey = generateWalletMasterKey(mnemonic, walletPassword);
   return [adaWallet, masterKey];
-}
-
-export function saveAdaWallet(
-  adaWallet: AdaWallet,
-  masterKey: WalletMasterKey
-): void {
-  saveInStorage(WALLET_KEY, { adaWallet, masterKey });
-}
-
-export function getAdaWallet(): ?AdaWallet {
-  const stored = getFromStorage(WALLET_KEY);
-  return stored ? stored.adaWallet : null;
-}
-
-export function getWalletMasterKey(): WalletMasterKey {
-  const stored = getFromStorage(WALLET_KEY);
-  return stored.masterKey;
 }
 
 export const isValidMnemonic = (phrase: string, numberOfWords: ?number) =>

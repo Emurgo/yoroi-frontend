@@ -9,16 +9,16 @@ Feature: Generate Addresses
   Scenario: Show my initial receive address
     Then I should see my latest address "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt" at the top
     And I should see the addresses list them
-    | address                                                     | index |
-    | Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt | 1     |
+    | address                                                     |
+    | Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt |
 
   Scenario: Generate a new receive address
     When I click on the Generate new address button
     Then I should see my latest address "Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB" at the top
     And I should see the addresses list them
-    | address                                                     | index |
-    | Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB | 1     |
-    | Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt | 2     |
+    | address                                                     |
+    | Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB |
+    | Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt |
 
   Scenario: Don't allow more than 20 unused address generation
     When I click on the Generate new address button 20 times
@@ -29,6 +29,6 @@ Feature: Generate Addresses
     When I click on the Generate new address button
     And I click on the Hide used addresses button
     Then I should see the addresses list them
-    | address                                                     | index |
-    | Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB | 1     |
+    | address                                                     |
+    | Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB |
     And I shouldn't see the address "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"

@@ -14,10 +14,6 @@ import {
   stringifyError
 } from '../../../utils/logging';
 import {
-  getWalletMasterKey
-} from '../adaWallet';
-import { getSingleCryptoAccount } from '../adaAccount';
-import {
   saveAdaAddress,
   removeAdaAddress,
   createAdaAddress,
@@ -42,6 +38,7 @@ import {
   GetAllUTXOsForAddressesError,
   InvalidWitnessError
 } from '../errors';
+import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 
 const fakePassword = 'fake';
 
