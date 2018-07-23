@@ -49,12 +49,16 @@ Then(/^I should see no transactions$/, async function () {
 
 Then(/^I should see ([^"]*) ([^"]*) transactions in ([^"]*)$/,
 async function (txsNumber, txExpectedStatus, walletName) {
-  const actualTxsList = await this.getElementsBy('.Transaction_component');
+  const txsAmount = parseInt(txsNumber, 10);
+  for (let i = 1; i < (txsAmount / 5); i++) {
+    const button = await this.waitEnable('.WalletTransactionsList_showMoreTransactionsButton');
+    await button.click();
+  }
   const expectedTxsList = getLovefieldTxs(walletName);
-  const firstIndex = txExpectedStatus === 'pending' ?
-    0 : (actualTxsList.length - parseInt(txsNumber.length, 10));
-  const lastIndex = txExpectedStatus === 'pending' ?
-    parseInt(txsNumber, 10) : actualTxsList.length;
+  await this.waitForContent(`//span[contains(text(), "${expectedTxsList[expectedTxsList.length - 1].txId}")]`);
+  const actualTxsList = await this.getElementsBy('.Transaction_component');
+  const firstIndex = txExpectedStatus === 'pending' ? 0 : (actualTxsList.length - txsAmount);
+  const lastIndex = txExpectedStatus === 'pending' ? txsAmount : actualTxsList.length;
   for (let i = firstIndex; i < lastIndex; i++) {
     await actualTxsList[i].click();
     const txData = await actualTxsList[i].getText();

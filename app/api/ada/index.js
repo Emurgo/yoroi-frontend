@@ -189,23 +189,22 @@ export default class AdaApi {
   }
 
   async refreshTransactions(request: GetTransactionsRequest): Promise<GetTransactionsResponse> {
-    Logger.debug('AdaApi::searchHistory called: ' + stringifyData(request));
+    Logger.debug('AdaApi::refreshTransactions called: ' + stringifyData(request));
     const { skip = 0, limit } = request;
     try {
       await refreshTxs();
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
-      Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
-      const mappedTransactions = history[0].map(data =>
+      Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(history));
+      const transactions = limit ? history[0].slice(skip, skip + limit) : history[0];
+      const mappedTransactions = transactions.map(data =>
         _createTransactionFromServerData(data)
       );
-      const transactions = limit ?
-        mappedTransactions.slice(skip, skip + limit) : mappedTransactions;
       return Promise.resolve({
-        transactions,
+        transactions: mappedTransactions,
         total: history[1]
       });
     } catch (error) {
-      Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));
+      Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

@@ -44,9 +44,8 @@ export default class WalletSummaryPage extends Component<Props> {
     const {
       hasAny,
       totalAvailable,
-      filtered,
+      recent,
       searchOptions,
-      searchRequest,
       recentTransactionsRequest,
       unconfirmedAmount,
     } = transactions;
@@ -58,15 +57,14 @@ export default class WalletSummaryPage extends Component<Props> {
       return null;
     }
     if (searchOptions) {
-      const { searchLimit, searchTerm } = searchOptions;
-      const wasSearched = searchTerm !== '';
+      const { searchLimit } = searchOptions;
       const noTransactionsLabel = intl.formatMessage(messages.noTransactions);
       const noTransactionsFoundLabel = intl.formatMessage(messages.noTransactionsFound);
-      if (searchRequest.isExecutingFirstTime || hasAny) {
+      if (recentTransactionsRequest.isExecutingFirstTime || hasAny) {
         walletTransactions = (
           <WalletTransactionsList
-            transactions={filtered}
-            isLoadingTransactions={searchRequest.isExecuting}
+            transactions={recent}
+            isLoadingTransactions={recentTransactionsRequest.isExecuting}
             hasMoreToLoad={totalAvailable > searchLimit}
             onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
             assuranceMode={wallet.assuranceMode}
@@ -74,7 +72,7 @@ export default class WalletSummaryPage extends Component<Props> {
             formattedWalletAmount={formattedWalletAmount}
           />
         );
-      } else if (wasSearched && !hasAny) {
+      } else if (!hasAny) {
         walletTransactions = <WalletNoTransactions label={noTransactionsFoundLabel} />;
       } else if (!hasAny) {
         walletTransactions = <WalletNoTransactions label={noTransactionsLabel} />;

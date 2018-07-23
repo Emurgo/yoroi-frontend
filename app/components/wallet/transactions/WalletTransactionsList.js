@@ -140,8 +140,9 @@ export default class WalletTransactionsList extends Component<Props> {
           </div>
         ))}
         {loadingSpinner}
-        {!loadingSpinner && hasMoreToLoad &&
+        {hasMoreToLoad &&
           <Button
+            disabled={isLoadingTransactions}
             className={buttonClasses}
             label={intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
             onClick={onLoadMore}
