@@ -8,6 +8,7 @@
   "app": {
     "walletRefreshInterval": 2000,
     "logsBufferSize": 500,
-    "logsFileSuffix": "-icarus.log"
+    "logsFileSuffix": "-icarus.log",
+    "addressRequestSize": 3
   }
 }
