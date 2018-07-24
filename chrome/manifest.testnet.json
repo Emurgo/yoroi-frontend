@@ -1,0 +1,24 @@
+{
+  "version": "0.0.0",
+  "name": "icarus-light-cardano-wallet-poc",
+  "manifest_version": 2,
+  "description": "[testnet] Icarus light Cardano wallet - PoC",
+  "browser_action": {
+    "default_title": "[testnet] Icarus light Cardano wallet - PoC"
+  },
+  "icons": {
+    "16": "img/icon-16.png",
+    "48": "img/icon-48.png",
+    "128": "img/icon-128.png"
+  },
+  "background": {
+    "page": "background.html"
+  },
+  "permissions": [
+    "contextMenus",
+    "management",
+    "tabs",
+    "storage"
+  ],
+  "content_security_policy": "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src https://lld5qq5jl5.execute-api.us-east-1.amazonaws.com wss://18.206.30.1; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+}
