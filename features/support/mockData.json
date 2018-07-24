@@ -346,5 +346,25 @@
         }
       ]
     }
+  },
+  "Daedalus transfer funds Screen": {
+    "daedalusAddressesWithFunds": [
+      "DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb",
+      "DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm"
+    ],
+    "utxos": [
+      {
+        "tx_hash": "918cea05a9c88c7f144c13eabb016fa86efddb0073312f2ae4acb5412668337a",
+        "tx_index": 0,
+        "receiver": "DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb",
+        "amount": "500000"
+      },
+      {
+        "tx_hash": "d2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04",
+        "tx_index": 1,
+        "receiver": "DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm",
+        "amount": "500000"
+      }
+    ]
   }
 }
