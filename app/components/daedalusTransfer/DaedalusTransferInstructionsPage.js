@@ -7,7 +7,7 @@ import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
-import styles from './DaedalusTRansferInstructionsPage.scss';
+import styles from './DaedalusTransferInstructionsPage.scss';
 
 const messages = defineMessages({
   instructionTitle: {
@@ -153,7 +153,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
 
               <div className={styles.tableWrapper}>
 
-                <div>
+                <div className={styles.columnWrapper}>
                   <div className={styles.answerLabel}>
                     {intl.formatMessage(messages.answerYes)}
                   </div>
@@ -169,7 +169,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
                   />
                 </div>
 
-                <div>
+                <div className={styles.columnWrapper}>
                   <div className={styles.answerLabel}>
                     {intl.formatMessage(messages.answerNo)}
                   </div>
