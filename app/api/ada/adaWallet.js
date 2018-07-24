@@ -7,10 +7,6 @@ import {
   stringifyError
 } from '../../utils/logging';
 import {
-  saveInStorage,
-  getFromStorage
-} from './lib/utils';
-import {
   generateWalletSeed,
   generateAdaMnemonic,
   isValidAdaMnemonic,
@@ -31,15 +27,12 @@ import type {
   ChangeAdaWalletPassphraseParams,
   AdaWalletRecoveryPhraseResponse,
 } from './index';
-
-import type { WalletSeed } from './lib/cardanoCrypto/cryptoWallet';
 import {
   getUTXOsSumsForAddresses,
   addressesLimit
 } from './lib/icarus-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
-
-const WALLET_KEY = 'WALLET'; // single wallet atm
+import { saveAdaWallet, getAdaWallet, getWalletSeed } from './adaLocalStorage';
 
 /* Create and save a wallet with your seed, and a SINGLE account with one address */
 export async function newAdaWallet({
@@ -96,23 +89,6 @@ export function createAdaWallet({
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const seed = generateWalletSeed(mnemonic, walletPassword);
   return [adaWallet, seed];
-}
-
-export function saveAdaWallet(
-  adaWallet: AdaWallet,
-  seed: WalletSeed
-): void {
-  saveInStorage(WALLET_KEY, { adaWallet, seed });
-}
-
-export function getAdaWallet(): ?AdaWallet {
-  const stored = getFromStorage(WALLET_KEY);
-  return stored ? stored.adaWallet : null;
-}
-
-export function getWalletSeed(): WalletSeed {
-  const stored = getFromStorage(WALLET_KEY);
-  return stored.seed;
 }
 
 export const isValidMnemonic = (phrase: string, numberOfWords: ?number) =>

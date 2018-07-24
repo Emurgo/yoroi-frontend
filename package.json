@@ -86,7 +86,8 @@
     "url-loader": "1.0.1",
     "webpack": "3.12.0",
     "webpack-hot-middleware": "2.22.2",
-    "webpack-httpolyglot-server": "0.3.0"
+    "webpack-httpolyglot-server": "0.3.0",
+    "ws": "5.2.2"
   },
   "dependencies": {
     "aes-js": "3.1.1",
