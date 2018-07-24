@@ -5,15 +5,15 @@ import pbkdf2 from 'pbkdf2';
 import aesjs from 'aes-js';
 import cryptoRandomString from 'crypto-random-string';
 
-import { Blake2b, Wallet } from 'rust-cardano-crypto';
+import { HdWallet, Wallet } from 'rust-cardano-crypto';
 import { encryptWithPassword, decryptWithPassword } from '../../../../utils/passwordCipher';
 import { getOrFail } from './cryptoUtils';
 
 import { WrongPassphraseError } from './cryptoErrors';
 import type { ConfigType } from '../../../../../config/config-types';
 
-export type WalletSeed = {
-  encryptedSeed: string,
+export type WalletMasterKey = {
+  encryptedMasterKey: string,
   passwordVerifier: string,
   passwordSalt: string,
 };
@@ -30,18 +30,18 @@ function calculatePasswordVerifier(password : string, salt: string) : string {
     .fromBytes(derivedKey);
 }
 
-function decryptSeed(walletSeed : WalletSeed, password : string) : Uint8Array {
-  const passwordVerifier = calculatePasswordVerifier(password, walletSeed.passwordSalt);
-  if (passwordVerifier !== walletSeed.passwordVerifier) {
+function decryptMasterKey(walletMasterKey : WalletMasterKey, password : string) : Uint8Array {
+  const passwordVerifier = calculatePasswordVerifier(password, walletMasterKey.passwordSalt);
+  if (passwordVerifier !== walletMasterKey.passwordVerifier) {
     throw new WrongPassphraseError();
   }
-  return decryptWithPassword(password, walletSeed.encryptedSeed);
+  return decryptWithPassword(password, walletMasterKey.encryptedMasterKey);
 }
 
-function encryptWalletSeed(seed : Uint8Array, password : string) {
+function encryptWalletMasterKey(masterKey : Uint8Array, password : string) {
   const passwordSalt = cryptoRandomString(32);
   return {
-    encryptedSeed: encryptWithPassword(password, seed),
+    encryptedMasterKey: encryptWithPassword(password, masterKey),
     passwordVerifier: calculatePasswordVerifier(password, passwordSalt),
     passwordSalt,
   };
@@ -55,26 +55,28 @@ export const isValidAdaMnemonic = (
 ) =>
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
 
-export function generateWalletSeed(secretWords : string, password : string) : WalletSeed {
-  const entropy = bip39.mnemonicToEntropy(secretWords);
-  const seed: Uint8Array = Blake2b.blake2b_256(entropy);
-  return encryptWalletSeed(seed, password);
+export function generateWalletMasterKey(secretWords : string, password : string) : WalletMasterKey {
+  const entropy = new Buffer(bip39.mnemonicToEntropy(secretWords), 'hex');
+  const masterKey: Uint8Array = HdWallet.fromEnhancedEntropy(entropy, '');
+  return encryptWalletMasterKey(masterKey, password);
 }
 
-export function updateWalletSeedPassword(
-  walletSeed : WalletSeed,
+export function updateWalletMasterKeyPassword(
+  walletMasterKey : WalletMasterKey,
   oldPassword : string,
   newPassword : string
-): WalletSeed {
-  const seed = decryptSeed(walletSeed, oldPassword);
-  return encryptWalletSeed(seed, newPassword);
+): WalletMasterKey {
+  const masterKey = decryptMasterKey(walletMasterKey, oldPassword);
+  return encryptWalletMasterKey(masterKey, newPassword);
 }
 
-export function getCryptoWalletFromSeed(walletSeed : WalletSeed, password : string) : CryptoWallet {
-  const seed = decryptSeed(walletSeed, password);
-  const seedAsArray = Object.values(seed);
+export function getCryptoWalletFromMasterKey(
+  walleMasterKey: WalletMasterKey,
+  password: string
+): CryptoWallet {
+  const masterKey = decryptMasterKey(walleMasterKey, password);
   const wallet = Wallet
-    .fromSeed(seedAsArray)
+    .fromMasterKey(masterKey)
     .result;
   wallet.config.protocol_magic = protocolMagic;
   return wallet;

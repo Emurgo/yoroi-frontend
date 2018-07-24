@@ -21,10 +21,6 @@ import {
   toAdaTx
 } from '../lib/utils';
 import {
-  getLastBlockNumber,
-  saveLastBlockNumber
-} from '../getAdaLastBlockNumber';
-import {
   getAdaAddressesList
 } from '../adaAddress';
 import {
@@ -36,6 +32,7 @@ import type
   AdaTransactions,
   AdaTransactionInputOutput
 } from '../adaTypes';
+import { saveLastBlockNumber, getLastBlockNumber } from '../adaLocalStorage';
 
 export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
   const transactions = await getTxsOrderedByDateDesc();
