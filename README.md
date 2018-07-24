@@ -30,7 +30,7 @@ In order to update it:
 
 ```bash
 #### Update js-cardano-wasm
-```cd js-cardano-wasm;
+cd js-cardano-wasm;
 git checkout master;
 git pull origin master;
 cd ..;
@@ -74,6 +74,8 @@ $ npm run start -- --env "development"
 This boilerplate uses `Webpack` and `react-transform`. You can hot reload by editing related files of Popup & Window & Inject page.
 
 ## Build
+
+*Note*: Before building, the `NODE_ENV` should be configured with `production` or `development`.
 
 ```bash
 # build files to './build'
