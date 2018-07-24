@@ -1,6 +1,6 @@
 // @flow
 import type { AdaWallet } from '../ada/adaTypes';
-import type { WalletSeed } from '../ada/lib/cardanoCrypto/cryptoWallet';
+import type { WalletMasterKey } from '../ada/lib/cardanoCrypto/cryptoWallet';
 
 const storageKeys = {
   ACCOUNT_KEY: 'ACCOUNT',
@@ -20,9 +20,9 @@ export function getSingleCryptoAccount(): CryptoAccount {
 
 export function saveAdaWallet(
   adaWallet: AdaWallet,
-  seed: WalletSeed
+  masterKey: WalletMasterKey
 ): void {
-  _saveInStorage(storageKeys.WALLET_KEY, { adaWallet, seed });
+  _saveInStorage(storageKeys.WALLET_KEY, { adaWallet, masterKey });
 }
 
 export function getAdaWallet(): ?AdaWallet {
@@ -30,9 +30,9 @@ export function getAdaWallet(): ?AdaWallet {
   return stored ? stored.adaWallet : null;
 }
 
-export function getWalletSeed(): WalletSeed {
+export function getWalletMasterKey(): WalletMasterKey {
   const stored = _getFromStorage(storageKeys.WALLET_KEY);
-  return stored.seed;
+  return stored.masterKey;
 }
 
 export function saveLastBlockNumber(blockNumber: number): void {

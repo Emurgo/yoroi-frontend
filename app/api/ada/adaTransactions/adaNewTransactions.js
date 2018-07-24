@@ -21,8 +21,8 @@ import {
   getAdaAddressesList
 } from '../adaAddress';
 import {
-  getCryptoWalletFromSeed,
-  generateWalletSeed,
+  getCryptoWalletFromMasterKey,
+  generateWalletMasterKey,
   generateAdaMnemonic,
 } from '../lib/cardanoCrypto/cryptoWallet';
 import { getOrFail } from '../lib/cardanoCrypto/cryptoUtils';
@@ -38,7 +38,7 @@ import {
   GetAllUTXOsForAddressesError,
   InvalidWitnessError
 } from '../errors';
-import { getSingleCryptoAccount, getWalletSeed } from '../adaLocalStorage';
+import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 
 const fakePassword = 'fake';
 
@@ -46,13 +46,18 @@ export function getAdaTransactionFee(
   receiver: string,
   amount: string
 ): Promise<AdaTransactionFee> {
-  const fakeWalletSeed = generateWalletSeed(generateAdaMnemonic().join(' '), fakePassword);
-  return _getAdaTransaction(receiver, amount, getCryptoWalletFromSeed(fakeWalletSeed, fakePassword))
+  const fakeWalletMasterKey = generateWalletMasterKey(generateAdaMnemonic().join(' '), fakePassword);
+  return _getAdaTransaction(
+    receiver,
+    amount,
+    getCryptoWalletFromMasterKey(fakeWalletMasterKey, fakePassword)
+  )
     .then(response => {
       const [{ fee }] = response;
       return { getCCoin: fee };
     })
     .catch(err => {
+      Logger.error('adaNetTransactions::getAdaTransactionFee error: ' + stringifyError(err));
       const notEnoughFunds = err.message === 'FeeCalculationError(NotEnoughInput)' ||
         err.message === 'FeeCalculationError(NoInputs)';
       if (notEnoughFunds) throw new NotEnoughMoneyToSendError();
@@ -65,8 +70,8 @@ export async function newAdaTransaction(
   amount: string,
   password: string
 ): Promise<any> {
-  const seed = getWalletSeed();
-  const cryptoWallet = getCryptoWalletFromSeed(seed, password);
+  const masterKey = getWalletMasterKey();
+  const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
   const [{ cbor_encoded_tx }, changeAdaAddr] =
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
