@@ -100,10 +100,12 @@ export default class TransactionsStore extends Store {
       const allRequest = this._getTransactionsAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
       allRequest.execute(requestParams);
-      allRequest.promise.then(async () => {
-        const lastUpdateDate = await this.api[environment.API].getAdaTxLastUpdatedDate(); 
-        return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
-      }).catch(() => {});
+      allRequest.promise
+        .then(async () => {
+          const lastUpdateDate = await this.api[environment.API].getAdaTxLastUpdatedDate();
+          return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
+        })
+        .catch(() => {}); // Do nothing. It's logged in the api call
     }
   };
 

@@ -152,6 +152,7 @@ export type UpdateWalletPasswordResponse = boolean;
 export type AdaWalletRecoveryPhraseResponse = Array<string>;
 
 export default class AdaApi {
+
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
     try {
