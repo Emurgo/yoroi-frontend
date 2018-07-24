@@ -1,20 +1,22 @@
 import { Given, When, Then, Before, After } from 'cucumber';
 import { expect } from 'chai';
-import { closeServer, initializeServer } from './common-steps';
+import { getMockServer, closeMockServer } from '../support/mockServer';
 import i18n from '../support/helpers/i18n-helpers';
 
 Before({ tags: '@invalidWitnessTest' }, () => {
-  closeServer();
-  initializeServer({ signedTransaction: (req, res) => {
-    res.status(400).jsonp({
-      message: 'Invalid witness'
-    });
-  } });
+  closeMockServer();
+  getMockServer({
+    signedTransaction: (req, res) => {
+      res.status(400).jsonp({
+        message: 'Invalid witness'
+      });
+    }
+  });
 });
 
 After({ tags: '@invalidWitnessTest' }, () => {
-  closeServer();
-  initializeServer({});
+  closeMockServer();
+  getMockServer({});
 });
 
 Given(/^I have a wallet with funds$/, async function () {

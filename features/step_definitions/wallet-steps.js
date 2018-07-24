@@ -12,8 +12,9 @@ When(/^I clear the name "([^"]*)"$/, async function (walletName) {
   await this.clearInputUpdatingForm('#walletName--2', walletName.length);
 });
 
-Then(/^I should see the opened wallet$/, async function () {
-  await this.waitForElement('.TopBar_walletName');
+Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (walletName) {
+  const walletNameFormatted = walletName.toUpperCase();
+  await this.waitUntilText('.TopBar_walletName', walletNameFormatted);
 });
 
 Given(/^I am on the wallet "([^"]*)" screen$/, async function (screen) {

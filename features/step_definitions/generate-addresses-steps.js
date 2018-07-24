@@ -15,7 +15,7 @@ When(/^I click on the Hide used addresses button$/, async function () {
 });
 
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {
-  for (let curr = 0; curr < times; curr++) {
+  for (let curr = 1; curr <= times; curr++) {
     await this.click('.generateAddressButton'); 
     await this.waitForElement(`.generatedAddress-${curr + 1} .WalletReceive_addressId`)
   }
@@ -27,9 +27,9 @@ Then(/^I should see my latest address "([^"]*)" at the top$/, async function (ad
 
 Then(/^I should see the addresses list them$/, async function (table) {
   const rows = table.hashes();
-  const waitUntilAddressesAppeared = rows.map((row) =>
+  const waitUntilAddressesAppeared = rows.map((row, index) =>
     this.waitUntilText(
-      `.generatedAddress-${row.index} .WalletReceive_addressId`,
+      `.generatedAddress-${index + 1} .WalletReceive_addressId`,
       row.address
     )
   );

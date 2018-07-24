@@ -16,7 +16,7 @@ Feature: Restore Wallet
     | password  | repeatedPassword |
     | Secret123 | Secret123        |
     And I click the "Restore Wallet" button
-    Then I should see the opened wallet
+    Then I should see the opened wallet with name "Restored Wallet"
 
   Scenario: Fail to restore a Daedalus wallet
     When I click the restore button

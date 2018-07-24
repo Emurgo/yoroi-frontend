@@ -1,24 +1,14 @@
 import { BeforeAll, Given, After, AfterAll } from 'cucumber';
-import { createServer } from '../support/mockServer';
+import { getMockServer, closeMockServer } from '../support/mockServer';
 import { buildMockData, getMockData, getFakeAddresses } from '../support/mockDataBuilder';
 import { setActiveLanguage } from '../support/helpers/i18n-helpers';
 
-let server;
-
-export function initializeServer(settings) {
-  server = createServer(settings);
-}
-
-export function closeServer() {
-  server.close();
-}
-
 BeforeAll(() => {
-  initializeServer({});
+  getMockServer({});
 });
 
 AfterAll(() => {
-  closeServer();
+  closeMockServer();
 });
 
 After(async function () {
