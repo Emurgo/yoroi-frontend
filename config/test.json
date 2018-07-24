@@ -9,6 +9,7 @@
     "walletRefreshInterval": 2000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-icarus.log",
-    "addressRequestSize": 3
+    "addressScanSize": 3,
+    "addressRequestSize": 5
   }
 }

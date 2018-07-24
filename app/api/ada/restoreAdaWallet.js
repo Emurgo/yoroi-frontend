@@ -25,10 +25,9 @@ import { createAdaWallet } from './adaWallet';
 import { createCryptoAccount } from './adaAccount';
 import type { ConfigType } from '../../../config/config-types';
 
-// We will query the backend for 20 addresses window
-// FIXME: Improve this to decouple requests and BIP-44 unused window parsing
 declare var CONFIG: ConfigType;
-const ADDRESS_REQUEST_SIZE = CONFIG.app.addressRequestSize;
+const addressScanSize = CONFIG.app.addressScanSize;
+const addressRequestSize = CONFIG.app.addressRequestSize;
 
 export async function restoreAdaWallet({
   walletPassword,
@@ -38,9 +37,9 @@ export async function restoreAdaWallet({
   const cryptoAccount = createCryptoAccount(seed, walletPassword);
   try {
     const externalAddressesToSave = await
-      _discoverAllAddressesFrom(cryptoAccount, 'External', 0, ADDRESS_REQUEST_SIZE);
+      _discoverAllAddressesFrom(cryptoAccount, 'External', 0, addressScanSize, addressRequestSize);
     const internalAddressesToSave = await
-      _discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, ADDRESS_REQUEST_SIZE);
+      _discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, addressScanSize, addressRequestSize);
     if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
       // TODO: Store all at once
       saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
@@ -58,17 +57,22 @@ export async function restoreAdaWallet({
   return Promise.resolve(adaWallet);
 }
 
+type AddressInfo = { address: string, isUsed: boolean, index: number };
+
 async function _discoverAllAddressesFrom(
   cryptoAccount: CryptoAccount,
   addressType: AddressType,
   initialIndex: number,
-  offset: number
+  scanSize: number,
+  requestSize: number,
 ) {
   let addressesDiscovered = [];
+  const fetchedAddressesInfo = [];
   let fromIndex = initialIndex;
   while (fromIndex >= 0) {
     const [newIndex, addressesRecovered] =
-      await _discoverAddressesFrom(cryptoAccount, addressType, fromIndex, offset);
+      await _discoverAddressesFrom(fetchedAddressesInfo, cryptoAccount, addressType,
+                                   fromIndex, scanSize, requestSize);
     fromIndex = newIndex;
     addressesDiscovered = addressesDiscovered.concat(addressesRecovered);
   }
@@ -76,36 +80,65 @@ async function _discoverAllAddressesFrom(
 }
 
 async function _discoverAddressesFrom(
+  fetchedAddressesInfo: Array<AddressInfo>,
   cryptoAccount: CryptoAccount,
   addressType: AddressType,
   fromIndex: number,
-  offset: number
+  scanSize: number,
+  requestSize: number,
 ) {
-  const addressesIndex = _.range(fromIndex, fromIndex + offset);
-  const addresses = getOrFail(Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex));
-  const addressIndexesMap = _generateAddressIndexesMap(addresses, addressesIndex);
-  const usedAddresses = await checkAddressesInUse(addresses);
-  const highestIndex = usedAddresses.reduce((currentHighestIndex, address) => {
-    const index = addressIndexesMap[address];
-    if (index > currentHighestIndex) {
-      return index;
+  const addressesInfo = await _getAddressToScan(fetchedAddressesInfo, cryptoAccount,
+                                                addressType, fromIndex, scanSize, requestSize);
+  const highestIndex = addressesInfo.reduce((currentHighestIndex, addressInfo) => {
+    if (addressInfo.index > currentHighestIndex && addressInfo.isUsed) {
+      return addressInfo.index;
     }
     return currentHighestIndex;
   }, -1);
   if (highestIndex >= 0) {
     const nextIndex = highestIndex + 1;
-    return Promise.resolve([nextIndex, addresses.slice(0, nextIndex - fromIndex)]);
+    return Promise.resolve([
+      nextIndex,
+      addressesInfo.slice(0, nextIndex - fromIndex).map((addressInfo) => addressInfo.address)
+    ]);
   }
   return Promise.resolve([highestIndex, []]);
 }
 
-function _generateAddressIndexesMap(
-  addresses: Array<string>,
+async function _getAddressToScan(
+  fetchedAddressesInfo: Array<AddressInfo>,
+  cryptoAccount: CryptoAccount,
+  addressType: AddressType,
+  fromIndex: number,
+  scanSize: number,
+  requestSize: number,
+): Promise<Array<AddressInfo>> {
+  if (fetchedAddressesInfo.length < fromIndex + scanSize) {
+    const addressesIndex = _.range(fetchedAddressesInfo.length,
+                                   fetchedAddressesInfo.length + requestSize);
+    const newAddresses = getOrFail(
+      Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex));
+    const usedAddresses = await checkAddressesInUse(newAddresses);
+    _addFetchedAddressesInfo(fetchedAddressesInfo, newAddresses, usedAddresses, addressesIndex);
+  }
+
+  return Promise.resolve(fetchedAddressesInfo.slice(fromIndex, fromIndex + scanSize));
+}
+
+function _addFetchedAddressesInfo(
+  fetchedAddressesInfo: Array<AddressInfo>,
+  newAddresses: Array<string>,
+  usedAddresses: Array<string>,
   addressesIndex: Array<number>
 ) {
-  const map = {};
-  addresses.forEach((address, position) => {
-    map[address] = addressesIndex[position];
+  const isUsedSet = new Set(usedAddresses);
+
+  newAddresses.forEach((address, position) => {
+    const addressInfo = {
+      address,
+      isUsed: isUsedSet.has(address),
+      index: addressesIndex[position]
+    };
+    fetchedAddressesInfo.push(addressInfo);
   });
-  return map;
 }

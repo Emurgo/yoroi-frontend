@@ -53,6 +53,8 @@ Feature: Restore Wallet
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
+    | Ae2tdPwUPEZKjEHDxtB6nqfu3roARBCz2xXKbXk7nBHaSfu9JVmqWbkCpVa |
+    | Ae2tdPwUPEZ75Ui7ybYEaQHJyjLbMWDe2RXBoiY8kegT5ES7dSs5ogsue82 |
     | Ae2tdPwUPEZ3Wm1NkX2L8aGTrcSABn4Zn5n1DFRKqA7Zt3B1j1UmCqFY1fd |
     | Ae2tdPwUPEZF1ZWG6Yot71VMxEyvX13zmeH1m78dp63Z3fxzogJfvCLXg9g |
     | Ae2tdPwUPEZ6f5E7UZ5Ke28CRZjv5VnAX1NBhedwVLdmuyamUt4E7oPBsJw |

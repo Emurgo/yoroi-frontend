@@ -3,7 +3,6 @@ import _ from 'lodash';
 import { Wallet } from 'rust-cardano-crypto';
 import {
   getUTXOsForAddresses,
-  addressesLimit,
   sendTx
 } from '../lib/icarus-backend-api';
 import {
@@ -39,6 +38,10 @@ import {
   InvalidWitnessError
 } from '../errors';
 import { getSingleCryptoAccount, getWalletSeed } from '../adaLocalStorage';
+import type { ConfigType } from '../../../../config/config-types';
+
+declare var CONFIG : ConfigType;
+const addressesLimit = CONFIG.app.addressRequestSize;
 
 const fakePassword = 'fake';
 

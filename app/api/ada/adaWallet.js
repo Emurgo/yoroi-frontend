@@ -28,11 +28,14 @@ import type {
   AdaWalletRecoveryPhraseResponse,
 } from './index';
 import {
-  getUTXOsSumsForAddresses,
-  addressesLimit
+  getUTXOsSumsForAddresses
 } from './lib/icarus-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
 import { saveAdaWallet, getAdaWallet, getWalletSeed } from './adaLocalStorage';
+import type { ConfigType } from '../../../config/config-types';
+
+declare var CONFIG : ConfigType;
+const addressesLimit = CONFIG.app.addressRequestSize;
 
 /* Create and save a wallet with your seed, and a SINGLE account with one address */
 export async function newAdaWallet({

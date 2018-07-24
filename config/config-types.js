@@ -9,6 +9,7 @@ export type AppConfigType = {
   walletRefreshInterval: number,
   logsBufferSize: number,
   logsFileSuffix: string,
+  addressScanSize: number,
   addressRequestSize: number
 }
 
