@@ -106,6 +106,18 @@ function CustomWorld() {
     this.driver.executeScript(addrs => {
       addrs.forEach(addr => window.icarus.api.ada.saveAddress(addr, 'External'));
     }, addresses);
+
+  this.saveTxsToDB = transactions =>
+    this.driver.executeScript(txs => {
+      const formattedTxs = txs.map(tx => {
+        const newTx = Object.assign({}, tx);
+        newTx.ctMeta = {};
+        newTx.ctMeta.ctmDate = new Date(tx.ctMeta.ctmDate);
+        newTx.ctMeta.ctmUpdate = new Date(tx.ctMeta.ctmDate);
+        return newTx;
+      });
+      window.icarus.api.ada.saveTxs(formattedTxs);
+    }, transactions);
 }
 
 setWorldConstructor(CustomWorld);

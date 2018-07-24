@@ -66,6 +66,7 @@ import type {
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
+import { saveTxs } from './lib/lovefieldDatabase';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -322,6 +323,16 @@ export default class AdaApi {
       await saveAdaAddress(address, addressType);
     } catch (error) {
       Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  // FIXME: This method is exposed to allow injecting data when testing
+  async saveTxs(txs: Array<AdaTransaction>): Promise<void> {
+    try {
+      await saveTxs(txs);
+    } catch (error) {
+      Logger.error('AdaApi::saveTxs error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

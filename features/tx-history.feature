@@ -12,7 +12,8 @@ Feature: Txs History
     And I should see no transactions
 
   Scenario: Simple Txs History
-    Given There is a wallet stored named simple-wallet
+    Given There are transactions already stored
+    And There is a wallet stored named simple-wallet
     When I see the transactions summary
     Then I should see that the number of transactions is 3
     And I should see 2 pending transactions in simple-wallet
@@ -30,4 +31,3 @@ Feature: Txs History
     Then I should see that the number of transactions is 1
     And I should see 1 confirmed transactions in tx-big-input-wallet
 
-  # TODO: Make tests for existing / non-existing txs in lovefield db 
