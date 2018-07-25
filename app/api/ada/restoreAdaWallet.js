@@ -37,9 +37,9 @@ export async function restoreAdaWallet({
   const cryptoAccount = createCryptoAccount(seed, walletPassword);
   try {
     const externalAddressesToSave = await
-      _discoverAllAddressesFrom(cryptoAccount, 'External', 0, addressScanSize, addressRequestSize);
+      _discoverAllAddressesFrom(cryptoAccount, 'External', -1, addressScanSize, addressRequestSize);
     const internalAddressesToSave = await
-      _discoverAllAddressesFrom(cryptoAccount, 'Internal', 0, addressScanSize, addressRequestSize);
+      _discoverAllAddressesFrom(cryptoAccount, 'Internal', -1, addressScanSize, addressRequestSize);
     if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
       // TODO: Store all at once
       saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
@@ -62,47 +62,47 @@ type AddressInfo = { address: string, isUsed: boolean, index: number };
 async function _discoverAllAddressesFrom(
   cryptoAccount: CryptoAccount,
   addressType: AddressType,
-  initialIndex: number,
+  initialHighestUsedIndex: number,
   scanSize: number,
   requestSize: number,
 ) {
-  let addressesDiscovered = [];
-  const fetchedAddressesInfo = [];
-  let fromIndex = initialIndex;
-  while (fromIndex >= 0) {
-    const [newIndex, addressesRecovered] =
-      await _discoverAddressesFrom(fetchedAddressesInfo, cryptoAccount, addressType,
-                                   fromIndex, scanSize, requestSize);
-    fromIndex = newIndex;
-    addressesDiscovered = addressesDiscovered.concat(addressesRecovered);
+  let fetchedAddressesInfo = [];
+  let highestUsedIndex = initialHighestUsedIndex;
+  let shouldScanNewBatch = true;
+  while (shouldScanNewBatch) {
+    // Scans new batch (of size addressScanSize) to update the highestUsedIndex
+    const [newHighestUsedIndex, newFetchedAddressesInfo] =
+      await _scanAddressesBatchFrom(fetchedAddressesInfo, cryptoAccount, addressType,
+                                    highestUsedIndex, scanSize, requestSize);
+
+    shouldScanNewBatch = highestUsedIndex !== newHighestUsedIndex;
+    highestUsedIndex = newHighestUsedIndex;
+    fetchedAddressesInfo = newFetchedAddressesInfo;
   }
-  return addressesDiscovered;
+  return fetchedAddressesInfo.slice(0, highestUsedIndex + 1)
+                             .map((addressInfo) => addressInfo.address);
 }
 
-async function _discoverAddressesFrom(
+async function _scanAddressesBatchFrom(
   fetchedAddressesInfo: Array<AddressInfo>,
   cryptoAccount: CryptoAccount,
   addressType: AddressType,
-  fromIndex: number,
+  highestUsedIndex: number,
   scanSize: number,
   requestSize: number,
 ) {
-  const addressesInfo = await _getAddressToScan(fetchedAddressesInfo, cryptoAccount,
-                                                addressType, fromIndex, scanSize, requestSize);
-  const highestIndex = addressesInfo.reduce((currentHighestIndex, addressInfo) => {
+  const [newFetchedAddressesInfo, addressesToScan] =
+      await _getAddressToScan(fetchedAddressesInfo, cryptoAccount,
+                              addressType, highestUsedIndex + 1, scanSize, requestSize);
+
+  const newHighestUsedIndex = addressesToScan.reduce((currentHighestIndex, addressInfo) => {
     if (addressInfo.index > currentHighestIndex && addressInfo.isUsed) {
       return addressInfo.index;
     }
     return currentHighestIndex;
-  }, -1);
-  if (highestIndex >= 0) {
-    const nextIndex = highestIndex + 1;
-    return Promise.resolve([
-      nextIndex,
-      addressesInfo.slice(0, nextIndex - fromIndex).map((addressInfo) => addressInfo.address)
-    ]);
-  }
-  return Promise.resolve([highestIndex, []]);
+  }, highestUsedIndex);
+
+  return Promise.resolve([newHighestUsedIndex, newFetchedAddressesInfo]);
 }
 
 async function _getAddressToScan(
@@ -112,17 +112,24 @@ async function _getAddressToScan(
   fromIndex: number,
   scanSize: number,
   requestSize: number,
-): Promise<Array<AddressInfo>> {
+): Promise<Array<Array<AddressInfo>>> {
+  let newFetchedAddressesInfo = fetchedAddressesInfo;
+
+  // Requests new batch (of size addressRequestSize) to add to the currently fetched ones
   if (fetchedAddressesInfo.length < fromIndex + scanSize) {
     const addressesIndex = _.range(fetchedAddressesInfo.length,
                                    fetchedAddressesInfo.length + requestSize);
     const newAddresses = getOrFail(
       Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex));
     const usedAddresses = await checkAddressesInUse(newAddresses);
-    _addFetchedAddressesInfo(fetchedAddressesInfo, newAddresses, usedAddresses, addressesIndex);
+    newFetchedAddressesInfo = _addFetchedAddressesInfo(fetchedAddressesInfo, newAddresses,
+                                                       usedAddresses, addressesIndex);
   }
 
-  return Promise.resolve(fetchedAddressesInfo.slice(fromIndex, fromIndex + scanSize));
+  return Promise.resolve([
+    newFetchedAddressesInfo,
+    newFetchedAddressesInfo.slice(fromIndex, fromIndex + scanSize)
+  ]);
 }
 
 function _addFetchedAddressesInfo(
@@ -133,12 +140,11 @@ function _addFetchedAddressesInfo(
 ) {
   const isUsedSet = new Set(usedAddresses);
 
-  newAddresses.forEach((address, position) => {
-    const addressInfo = {
-      address,
-      isUsed: isUsedSet.has(address),
-      index: addressesIndex[position]
-    };
-    fetchedAddressesInfo.push(addressInfo);
-  });
+  const newAddressesInfo = newAddresses.map((address, position) => ({
+    address,
+    isUsed: isUsedSet.has(address),
+    index: addressesIndex[position]
+  }));
+
+  return fetchedAddressesInfo.concat(newAddressesInfo);
 }
