@@ -31,7 +31,15 @@ function mapPendingTxFields(txExpectedStatus, pendingTxFields) {
 }
 
 Given(/^There are transactions already stored$/, async function () {
-  await this.saveTxsToDB(getMockData().lovefieldStoredTxs['simple-wallet']);
+  const transactions = getMockData().lovefieldStoredTxs['simple-wallet'];
+  const formattedTransactions = transactions.map(tx => {
+    const newTx = Object.assign({}, tx);
+    newTx.ctMeta = {};
+    newTx.ctMeta.ctmDate = new Date(tx.ctMeta.ctmDate);
+    newTx.ctMeta.ctmUpdate = new Date(tx.ctMeta.ctmDate);
+    return newTx;
+  });
+  await this.saveTxsToDB(formattedTransactions);
 });
 
 When(/^I see the transactions summary$/, async function () {

@@ -108,16 +108,9 @@ function CustomWorld() {
     }, addresses);
 
   this.saveTxsToDB = transactions => {
-    const formattedTransactions = transactions.map(tx => {
-      const newTx = Object.assign({}, tx);
-      newTx.ctMeta = {};
-      newTx.ctMeta.ctmDate = new Date(tx.ctMeta.ctmDate);
-      newTx.ctMeta.ctmUpdate = new Date(tx.ctMeta.ctmDate);
-      return newTx;
-    });
-    this.driver.executeScript(fromattedTxs => {
-      window.icarus.api.ada.saveTxs(fromattedTxs);
-    }, formattedTransactions);
+    this.driver.executeScript(txs => {
+      window.icarus.api.ada.saveTxs(txs);
+    }, transactions);
   };
 }
 

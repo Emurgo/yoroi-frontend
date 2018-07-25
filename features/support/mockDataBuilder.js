@@ -96,13 +96,12 @@ function _getLovefieldTxs(txsNumber, addressesStartingWith, txHashesStartingWith
     return builtMockData.txs;
   }
   const pendingNumber = pendingTxsNumber || 0;
-  const listOfHashes = _generateListOfStrings(txHashesStartingWith)
-    .slice(0, txsNumber + pendingNumber);
-  return listOfHashes
+  const listOfHashesReversed = _generateListOfStrings(txHashesStartingWith)
+    .slice(0, txsNumber + pendingNumber).reverse();
+  return listOfHashesReversed
     .map((txHash, index) => {
       const currentTime = new Date(getMockData().currentDateExample);
       const txTime = currentTime.setDate(currentTime.getDate() + index);
-      const txId = listOfHashes[listOfHashes.length - index - 1];
       return (
         {
           txType: 'ADA received',
@@ -113,7 +112,7 @@ function _getLovefieldTxs(txsNumber, addressesStartingWith, txHashesStartingWith
           txFrom: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
           txTo: [addressesStartingWith + 'W'],
           txConfirmations: 'High. 45 confirmations.',
-          txId
+          txId: txHash
         }
       );
     });
