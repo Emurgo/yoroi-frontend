@@ -56,12 +56,12 @@ function refreshWallet(client) {
 }
 
 async function storeWallet(client, walletName) {
-  const { seed, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
+  const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
   if (walletName) {
     wallet.cwMeta.cwName = walletName;
   }
 
-  await client.saveToLocalStorage('WALLET', { adaWallet: wallet, seed });
+  await client.saveToLocalStorage('WALLET', { adaWallet: wallet, masterKey });
   await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
 
   /* Obs: If "with $number addresses" is include in the sentence,
