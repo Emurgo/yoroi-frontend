@@ -66,6 +66,7 @@
 
 .pendingConfirmation {
   @extend %smallText;
+  font-size: 24px;
   & > .currencySymbolSmallest {
     display: inline-block;
     margin-left: 1px;
@@ -81,4 +82,5 @@
 
 .numberOfTransactions {
   @extend %smallText;
+  font-size: 24px;
 }

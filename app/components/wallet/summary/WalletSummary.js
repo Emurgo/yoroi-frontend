@@ -55,11 +55,6 @@ export default class WalletSummary extends Component<Props> {
     return (
       <div className={styles.component}>
         <BorderedBox>
-          <div className={styles.walletName}>{walletName}</div>
-          <div className={styles.walletAmount}>
-            {amount}
-            <SvgInline svg={adaSymbolBig} className={styles.currencySymbolBig} />
-          </div>
           {pendingAmount.incoming.greaterThan(0) &&
             <div className={styles.pendingConfirmation}>
               {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}

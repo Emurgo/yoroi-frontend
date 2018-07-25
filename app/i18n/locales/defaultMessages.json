@@ -1106,6 +1106,25 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Testnet",
+        "description": "Message alerting users the wallet is not running in mainnet.",
+        "end": {
+          "column": 3,
+          "line": 23
+        },
+        "file": "app/components/layout/SidebarLayout.js",
+        "id": "testnet.label.message",
+        "start": {
+          "column": 16,
+          "line": 19
+        }
+      }
+    ],
+    "path": "app/components/layout/SidebarLayout.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!Connecting to network",
         "description": "Message \"Connecting to network\" on the loading screen.",
         "end": {
@@ -1730,16 +1749,16 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Summary",
-        "description": "Label for the \"Summary\" nav button in the wallet navigation.",
+        "defaultMessage": "!!!Transactions",
+        "description": "Label for the \"Transactions\" nav button in the wallet navigation.",
         "end": {
           "column": 3,
           "line": 16
         },
         "file": "app/components/wallet/navigation/WalletNavigation.js",
-        "id": "wallet.navigation.summary",
+        "id": "wallet.navigation.transactions",
         "start": {
-          "column": 11,
+          "column": 16,
           "line": 12
         }
       },
