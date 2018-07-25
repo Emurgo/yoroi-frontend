@@ -7,8 +7,7 @@ import {
   stringifyError
 } from '../../../utils/logging';
 import {
-  getTransactionsHistoryForAddresses,
-  transactionsLimit
+  getTransactionsHistoryForAddresses
 } from '../lib/icarus-backend-api';
 import {
   saveTxs,
@@ -33,9 +32,11 @@ import type
 } from '../adaTypes';
 import { saveLastBlockNumber, getLastBlockNumber } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
+import config from '../../../config';
 
 declare var CONFIG : ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
+const transactionsLimit = config.wallets.TRANSACTION_REQUEST_SIZE;
 
 export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
   const transactions = await getTxsOrderedByDateDesc();

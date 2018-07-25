@@ -25,6 +25,8 @@ import { createAdaWallet } from './adaWallet';
 import { createCryptoAccount } from './adaAccount';
 import type { ConfigType } from '../../../config/config-types';
 
+type AddressInfo = { address: string, isUsed: boolean, index: number };
+
 declare var CONFIG: ConfigType;
 const addressScanSize = CONFIG.app.addressScanSize;
 const addressRequestSize = CONFIG.app.addressRequestSize;
@@ -54,10 +56,8 @@ export async function restoreAdaWallet({
   }
   saveCryptoAccount(cryptoAccount);
   saveAdaWallet(adaWallet, masterKey);
-  return Promise.resolve(adaWallet);
+  return adaWallet;
 }
-
-type AddressInfo = { address: string, isUsed: boolean, index: number };
 
 async function _discoverAllAddressesFrom(
   cryptoAccount: CryptoAccount,
@@ -102,7 +102,7 @@ async function _scanAddressesBatchFrom(
     return currentHighestIndex;
   }, highestUsedIndex);
 
-  return Promise.resolve([newHighestUsedIndex, newFetchedAddressesInfo]);
+  return [newHighestUsedIndex, newFetchedAddressesInfo];
 }
 
 async function _getAddressToScan(
@@ -126,10 +126,10 @@ async function _getAddressToScan(
                                                        usedAddresses, addressesIndex);
   }
 
-  return Promise.resolve([
+  return [
     newFetchedAddressesInfo,
     newFetchedAddressesInfo.slice(fromIndex, fromIndex + scanSize)
-  ]);
+  ];
 }
 
 function _addFetchedAddressesInfo(
