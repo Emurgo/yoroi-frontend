@@ -3,13 +3,12 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2
+
 jobs:
   build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:8-browsers
-      
     working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
 
     steps:
       - checkout
@@ -33,4 +32,37 @@ jobs:
       - run: npm run eslint
 
       # run tests!
-      - run: npm run test-e2e
+      # - run: npm run test-e2e
+      - run: npm run build -- --env "testnet"
+      - run: npm run compress -- --env "testnet" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/icarus-extension.crx"
+
+      # Persist the specified paths (~/repo) into the workspace for use in downstream job. 
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - ./repo/icarus-light-cardano-wallet-poc.zip
+
+  deploy-testnet:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+
+    steps:
+      - attach_workspace:
+          at: ~/build
+
+      - run: sudo npm install -g chrome-webstore-upload-cli
+      - run: cd ~/build/repo/ && webstore upload --source icarus-light-cardano-wallet-poc.zip --extension-id="${APP_ID}" --client-id="${CLIENT_ID}" --client-secret="${CLIENT_SECRET}" --refresh-token="${REFRESH_TOKEN}"
+      - run: webstore publish --extension-id --extension-id $APP_ID
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy-testnet:
+          requires:
+            - build
+          filters:
+            branches:
+              only: testnet
