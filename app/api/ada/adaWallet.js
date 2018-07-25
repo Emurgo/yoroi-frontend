@@ -7,10 +7,10 @@ import {
   stringifyError
 } from '../../utils/logging';
 import {
-  generateWalletSeed,
+  generateWalletMasterKey,
   generateAdaMnemonic,
   isValidAdaMnemonic,
-  updateWalletSeedPassword,
+  updateWalletMasterKeyPassword,
 } from './lib/cardanoCrypto/cryptoWallet';
 import { toAdaWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
@@ -32,17 +32,17 @@ import {
   addressesLimit
 } from './lib/icarus-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
-import { saveAdaWallet, getAdaWallet, getWalletSeed } from './adaLocalStorage';
+import { saveAdaWallet, getAdaWallet, getWalletMasterKey } from './adaLocalStorage';
 
-/* Create and save a wallet with your seed, and a SINGLE account with one address */
+/* Create and save a wallet with your master key, and a SINGLE account with one address */
 export async function newAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
-  const [adaWallet, seed] = createAdaWallet({ walletPassword, walletInitData });
-  const cryptoAccount = newCryptoAccount(seed, walletPassword);
+  const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
+  const cryptoAccount = newCryptoAccount(masterKey, walletPassword);
   newAdaAddress(cryptoAccount, [], 'External');
-  saveAdaWallet(adaWallet, seed);
+  saveAdaWallet(adaWallet, masterKey);
   return Promise.resolve(adaWallet);
 }
 
@@ -53,7 +53,7 @@ export const updateAdaWallet = async (
   if (!persistentWallet) return Promise.resolve();
   try {
     const updatedWallet = Object.assign({}, persistentWallet, { cwMeta: walletMeta });
-    _saveAdaWalletKeepingSeed(updatedWallet);
+    _saveAdaWalletKeepingMasterKey(updatedWallet);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
@@ -73,7 +73,7 @@ export const refreshAdaWallet = async (): Promise<?AdaWallet> => {
         getCCoin: await getBalance(addresses)
       }
     });
-    _saveAdaWalletKeepingSeed(updatedWallet);
+    _saveAdaWalletKeepingMasterKey(updatedWallet);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
@@ -87,8 +87,8 @@ export function createAdaWallet({
 }: AdaWalletParams) {
   const adaWallet = toAdaWallet(walletInitData);
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
-  const seed = generateWalletSeed(mnemonic, walletPassword);
-  return [adaWallet, seed];
+  const masterKey = generateWalletMasterKey(mnemonic, walletPassword);
+  return [adaWallet, masterKey];
 }
 
 export const isValidMnemonic = (phrase: string, numberOfWords: ?number) =>
@@ -118,14 +118,15 @@ export async function getBalance(
 export const changeAdaWalletPassphrase = (
   { oldPassword, newPassword }: ChangeAdaWalletPassphraseParams
 ): Promise<AdaWallet> => {
-  const walletSeed = getWalletSeed();
-  const updatedWalletSeed = updateWalletSeedPassword(walletSeed, oldPassword, newPassword);
+  const walletMasterKey = getWalletMasterKey();
+  const updatedWalletMasterKey =
+    updateWalletMasterKeyPassword(walletMasterKey, oldPassword, newPassword);
   const updatedWallet = Object.assign({}, getAdaWallet(), { cwPassphraseLU: moment().format() });
-  saveAdaWallet(updatedWallet, updatedWalletSeed);
+  saveAdaWallet(updatedWallet, updatedWalletMasterKey);
   return Promise.resolve(updatedWallet);
 };
 
-function _saveAdaWalletKeepingSeed(adaWallet: AdaWallet): void {
-  const seed = getWalletSeed();
-  saveAdaWallet(adaWallet, seed);
+function _saveAdaWalletKeepingMasterKey(adaWallet: AdaWallet): void {
+  const masterKey = getWalletMasterKey();
+  saveAdaWallet(adaWallet, masterKey);
 }

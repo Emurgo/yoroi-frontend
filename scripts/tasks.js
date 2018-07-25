@@ -12,13 +12,12 @@ exports.replaceWebpack = () => {
   replaceTasks.forEach(task => cp(task.from, task.to));
 };
 
-exports.copyAssets = (type) => {
-  const env = process.env.NODE_ENV;
+exports.copyAssets = (type, env) => {
   rm('-rf', type);
   mkdir(type);
   mkdir(`${type}/js`);
   cp(`chrome/manifest.${env}.json`, `${type}/manifest.json`);
   cp('-R', 'chrome/assets/*', type);
   cp('-R', 'dll/*', `${type}/js/`);
-  exec(`pug -O "{ env: '${env}' }" -o ${type} chrome/views/`);
+  exec(`./node_modules/.bin/pug -O "{ env: '${env}' }" -o ${type} chrome/views/`);
 };
