@@ -31,7 +31,7 @@ export const Routes = (
     <Route path={ROUTES.NO_WALLETS} component={NoWalletsPage} />
     <Route path={ROUTES.WALLETS.ADD} component={WalletAddPage} />
     <Route path={ROUTES.WALLETS.ROOT} component={Wallet}>
-      <Route path={ROUTES.WALLETS.SUMMARY} component={WalletSummaryPage} />
+      <Route path={ROUTES.WALLETS.TRANSACTIONS} component={WalletSummaryPage} />
       <Route path={ROUTES.WALLETS.SEND} component={WalletSendPage} />
       <Route path={ROUTES.WALLETS.RECEIVE} component={WalletReceivePage} />
     </Route>

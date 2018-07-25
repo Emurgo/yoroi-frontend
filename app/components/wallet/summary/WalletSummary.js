@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
-import adaSymbolBig from '../../../assets/images/ada-symbol-big-dark.inline.svg';
 import adaSymbolSmallest from '../../../assets/images/ada-symbol-smallest-dark.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
@@ -29,8 +28,6 @@ const messages = defineMessages({
 });
 
 type Props = {
-  walletName: string,
-  amount: string,
   numberOfTransactions: number,
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
@@ -45,8 +42,6 @@ export default class WalletSummary extends Component<Props> {
 
   render() {
     const {
-      walletName,
-      amount,
       pendingAmount,
       numberOfTransactions,
       isLoadingTransactions

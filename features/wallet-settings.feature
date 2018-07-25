@@ -47,7 +47,7 @@ Feature: Wallet Settings
     | name         |
     | first Edited |
     And I click outside "name" input field
-    When I am on the wallet "summary" screen
+    When I am on the wallet "transactions" screen
     Then I should see new wallet name "first Edited"
 
   Scenario: User fails to change password due to incomplete fields

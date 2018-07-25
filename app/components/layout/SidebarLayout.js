@@ -2,8 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
-import { defineMessages } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import styles from './SidebarLayout.scss';
 import environment from '../../environment';
 
@@ -39,7 +38,7 @@ export default class SidebarLayout extends Component<Props> {
       children, sidebar, topbar,
       notification, contentDialogs,
     } = this.props;
-    
+
     const { intl } = this.context;
 
     return (
