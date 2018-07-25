@@ -1,24 +1,14 @@
 import { BeforeAll, Given, After, AfterAll } from 'cucumber';
-import { createServer } from '../support/mockServer';
+import { getMockServer, closeMockServer } from '../support/mockServer';
 import { buildMockData, getMockData, getFakeAddresses } from '../support/mockDataBuilder';
 import { setActiveLanguage } from '../support/helpers/i18n-helpers';
 
-let server;
-
-export function initializeServer(settings) {
-  server = createServer(settings);
-}
-
-export function closeServer() {
-  server.close();
-}
-
 BeforeAll(() => {
-  initializeServer({});
+  getMockServer({});
 });
 
 AfterAll(() => {
-  closeServer();
+  closeMockServer();
 });
 
 After(async function () {
@@ -66,12 +56,12 @@ function refreshWallet(client) {
 }
 
 async function storeWallet(client, walletName) {
-  const { seed, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
+  const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
   if (walletName) {
     wallet.cwMeta.cwName = walletName;
   }
 
-  await client.saveToLocalStorage('WALLET', { adaWallet: wallet, seed });
+  await client.saveToLocalStorage('WALLET', { adaWallet: wallet, masterKey });
   await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
 
   /* Obs: If "with $number addresses" is include in the sentence,

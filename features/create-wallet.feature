@@ -14,7 +14,7 @@ Feature: Create wallet
     And I click the "Create personal wallet" button
     And I accept the creation terms
     And I copy and enter the displayed mnemonic phrase
-    Then I should see the opened wallet
+    Then I should see the opened wallet with name "Created Wallet"
 
   Scenario: Fail to create due to incomplete fields
     When I click the create button

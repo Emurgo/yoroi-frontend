@@ -2,7 +2,7 @@
   "network": {
     "protocolMagic": 633343913,
     "backendUrl": "http://localhost:8080",
-    "name": "testing"
+    "websocketUrl": "ws://localhost:8080"
   },
   "app": {
     "walletRefreshInterval": 2000,

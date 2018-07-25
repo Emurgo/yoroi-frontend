@@ -4,14 +4,6 @@ import { Wallet } from 'rust-cardano-crypto';
 import config from '../../config';
 import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
-  createAdaWallet,
-  saveAdaWallet
-} from './adaWallet';
-import {
-  createCryptoAccount,
-  saveCryptoAccount
-} from './adaAccount';
-import {
   saveAsAdaAddresses,
   newAdaAddress
 } from './adaAddress';
@@ -29,6 +21,9 @@ import {
 import {
   DiscoverAddressesError
 } from './errors';
+import { saveCryptoAccount, saveAdaWallet } from './adaLocalStorage';
+import { createAdaWallet } from './adaWallet';
+import { createCryptoAccount } from './adaAccount';
 
 const { ADDRESS_REQUEST_SIZE } = config.wallets;
 
@@ -36,8 +31,8 @@ export async function restoreAdaWallet({
   walletPassword,
   walletInitData
 }: AdaWalletParams): Promise<AdaWallet> {
-  const [adaWallet, seed] = createAdaWallet({ walletPassword, walletInitData });
-  const cryptoAccount = createCryptoAccount(seed, walletPassword);
+  const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
+  const cryptoAccount = createCryptoAccount(masterKey, walletPassword);
   try {
     const externalAddressesToSave = await
       _discoverAllAddressesFrom(cryptoAccount, 'External', 0, ADDRESS_REQUEST_SIZE);
@@ -56,7 +51,7 @@ export async function restoreAdaWallet({
     throw new DiscoverAddressesError();
   }
   saveCryptoAccount(cryptoAccount);
-  saveAdaWallet(adaWallet, seed);
+  saveAdaWallet(adaWallet, masterKey);
   return Promise.resolve(adaWallet);
 }
 

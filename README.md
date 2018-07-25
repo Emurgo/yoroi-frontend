@@ -30,7 +30,7 @@ In order to update it:
 
 ```bash
 #### Update js-cardano-wasm
-```cd js-cardano-wasm;
+cd js-cardano-wasm;
 git checkout master;
 git pull origin master;
 cd ..;
@@ -52,6 +52,8 @@ $ npm run build-dll
 # build files to './dev'
 # start webpack development server
 $ npm run dev
+# or
+$ npm run start -- --env "development"
 ```
 * If you're developing Inject page, please allow `https://localhost:3000` connections. (Because `injectpage` injected GitHub (https) pages, so webpack server procotol must be https.)
 * [Load unpacked extensions](https://developer.chrome.com/extensions/getstarted#unpacked) 
@@ -73,17 +75,35 @@ This boilerplate uses `Webpack` and `react-transform`. You can hot reload by edi
 
 ## Build
 
+*Note*: Before building, the `NODE_ENV` should be configured with `production` or `development`.
+
 ```bash
 # build files to './build'
-$ npm run build
+$ npm run build -- --env "mainnet" 
 ```
 
 ## Compress
 
+This tasks allow to generate compressed bundles (zip and crx) 
+
+### Zip
+
+Zip files can be uploaded to the Chrome Web Store
+
 ```bash
 # compress build folder to {manifest.name}.zip and crx
-$ npm run build
-$ npm run compress -- --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx"
+$ npm run build -- --env "mainnet" 
+$ npm run compress -- --env "mainnet" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" 
+```
+
+### CRX
+
+Crx are compressed and signed chrome extension bundles
+
+```bash
+# compress build folder to {manifest.name}.zip and crx
+$ npm run build -- --env "mainnet" 
+$ npm run compress -- --env "mainnet" --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" --key ./production-key.pem
 ```
 
 #### Options
