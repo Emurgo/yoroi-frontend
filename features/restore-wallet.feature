@@ -20,7 +20,7 @@ Feature: Restore Wallet
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
-    | Ae2tdPwUPEZL9umCSr3hxiV9ETByJQDne3u6tHKd4cec9hyvkYLoFkX6KBQ |
+    | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
 
   Scenario: Successfully restoring a simple wallet
     When I click the restore button
@@ -36,8 +36,8 @@ Feature: Restore Wallet
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
-    | Ae2tdPwUPEYyiwxP7APP28UotYKobqvRt5XjnAKRLPD5WXeKXAmsiz8gbyF |
-    | Ae2tdPwUPEYxj1a3XxQmUcN2gmv5CZdLcVzRCDLHewBthv4HtYbY4Uxoq9X |
+    | Ae2tdPwUPEZ7sn3AQhUFGHXiWuG5aU3XnMi2SNKeh94S9Pp17igo1RwzodB |
+    | Ae2tdPwUPEZ73Nh3ALXKwtt9Wmb8bQHa9owoXtkvGEWK3AX6kXNHBK1D261 |
 
   Scenario: Successfully restoring a complex wallet
     When I click the restore button
@@ -53,12 +53,12 @@ Feature: Restore Wallet
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
-    | Ae2tdPwUPEZKjEHDxtB6nqfu3roARBCz2xXKbXk7nBHaSfu9JVmqWbkCpVa |
-    | Ae2tdPwUPEZ75Ui7ybYEaQHJyjLbMWDe2RXBoiY8kegT5ES7dSs5ogsue82 |
-    | Ae2tdPwUPEZ3Wm1NkX2L8aGTrcSABn4Zn5n1DFRKqA7Zt3B1j1UmCqFY1fd |
-    | Ae2tdPwUPEZF1ZWG6Yot71VMxEyvX13zmeH1m78dp63Z3fxzogJfvCLXg9g |
-    | Ae2tdPwUPEZ6f5E7UZ5Ke28CRZjv5VnAX1NBhedwVLdmuyamUt4E7oPBsJw |
-    | Ae2tdPwUPEZMkq24yQkF1fVvvCq4dHLqagiubgivBcTzWHxZzWTN6wPFMsy |
+    | Ae2tdPwUPEYz5p78UtoKpzeQV8DMEHf8nM9TNJGu1xwF9ez26Zx26wupZ2v |
+    | Ae2tdPwUPEZ7RZHyqo5P7LMcFny5PLpJJax9Xma8QqdTV5PeYeGwivdwGNq |
+    | Ae2tdPwUPEZ5jDsa81F9tjv9QunxzBLsrV8XNjYdt5CdNtuAUKgroxTxZdP |
+    | Ae2tdPwUPEYy4sHipF5wCMmFhsz9asT5HdEarYcguJimUnVebcTKnfViLak |
+    | Ae2tdPwUPEZBdh5hX9QMWCeiihXf3onFAgx6KzKBtm7nj4wwyN8eoroTWqF |
+    | Ae2tdPwUPEYzErSRwThtfVfBbhM87NCXDwkGHRqSYJcRVP4GS8Lgx3AxAXd |
 
   Scenario: Fail to completely restore a wallet with wrongly generated addresses
     When I click the restore button
@@ -74,7 +74,7 @@ Feature: Restore Wallet
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
-    | Ae2tdPwUPEZ4GbKB9wjsEeCtsfct2Q8shuh4rEB8VDHatJ1KXWT2FcbSW6i |
+    | Ae2tdPwUPEZLzYQaqFk1U9VWBeY9AfQ2hKBWZjxtfwWVE46sy6u5ZZAeFu1 |
 
   Scenario: Fail to restore a Daedalus wallet
     When I click the restore button
