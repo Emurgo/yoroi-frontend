@@ -1,4 +1,5 @@
 import { Before, Given, When, Then, After } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import BigNumber from 'bignumber.js';
 import {
   LOVELACES_PER_ADA,
@@ -51,31 +52,31 @@ Given(/^I am on the Daedalus Transfer screen$/, async function () {
 When(/^I click on the create Icarus wallet button$/, async function () {
   const createWalletLabel = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.instructions.instructions.button.label' });
-  await this.clickByXpath(`//button[contains(text(), '${createWalletLabel}')]`);
+  await this.click(`//button[contains(text(), '${createWalletLabel}')]`, By.xpath);
 });
 
 When(/^I click on the go to the Receive screen button$/, async function () {
   const goToReceiveLabel = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.instructions.instructions.attention.answer.yes.button.label' });
-  await this.clickByXpath(`//button[contains(text(), '${goToReceiveLabel}')]`);
+  await this.click(`//button[contains(text(), '${goToReceiveLabel}')]`, By.xpath);
 });
 
 When(/^I click on the transfer funds from Daedalus button$/, async function () {
   const transferWalletLabel = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.instructions.attention.answer.no.button.label' });
-  await this.clickByXpath(`//button[contains(text(), '${transferWalletLabel}')]`);
+  await this.click(`//button[contains(text(), '${transferWalletLabel}')]`, By.xpath);
 });
 
 When(/^I proceed with the recovery$/, async function () {
   const next = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.form.next' });
-  await this.clickByXpath(`//button[contains(text(), '${next}')]`);
+  await this.click(`//button[contains(text(), '${next}')]`, By.xpath);
 });
 
 When(/^I confirm Daedalus transfer funds$/, async function () {
   const transferButtonLabel = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.summary.transferButton.label' });
-  await this.clickByXpath(`//button[contains(text(), '${transferButtonLabel}')]`); 
+  await this.click(`//button[contains(text(), '${transferButtonLabel}')]`, By.xpath); 
 });
 
 Then(/^I should see the Create wallet screen$/, async function () {

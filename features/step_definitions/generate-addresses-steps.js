@@ -11,7 +11,9 @@ When(/^I click on the Generate new address button$/, async function () {
 });
 
 When(/^I click on the Hide used addresses button$/, async function () {
-  this.clickByXpath('//button[contains(text(), "hide used")]');
+  const hideUsedText =
+    await i18n.formatMessage(this.driver, { id: 'wallet.receive.page.hideUsedLabel' });
+  await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
 });
 
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {

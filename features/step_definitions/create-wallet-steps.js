@@ -34,7 +34,7 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
   const recoveryPhrase = mnemonic.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.clickByXpath(`//button[contains(text(), '${word}')]`);
+    await this.click(`//button[contains(text(), '${word}')]`, By.xpath);
   }
   const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
   checkboxes.forEach((box) => box.click());

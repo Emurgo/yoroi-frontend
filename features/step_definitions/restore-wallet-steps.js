@@ -1,4 +1,5 @@
 import { When, Then } from 'cucumber';
+import { By } from 'selenium-webdriver';
 
 When(/^I click the restore button$/, async function () {
   await this.click('.restoreWalletButton');
@@ -10,7 +11,7 @@ When(/^I enter the recovery phrase:$/, async function (table) {
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
     await this.input('.SimpleAutocomplete_autocompleteWrapper input', word);
-    await this.clickByXpath(`//li[contains(text(), '${word}')]`);
+    await this.click(`//li[contains(text(), '${word}')]`, By.xpath);
   }
 });
 
