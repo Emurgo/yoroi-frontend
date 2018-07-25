@@ -114,7 +114,6 @@ export type GetSyncProgressResponse = {
 
 export type GetTransactionsRequest = {
   walletId: string,
-  searchTerm: string,
   skip: number,
   limit: number,
 };
