@@ -3,13 +3,18 @@ import React, { Component } from 'react';
 import { Provider, observer } from 'mobx-react';
 import { ThemeProvider } from 'react-css-themr';
 import { Router } from 'react-router';
-import { IntlProvider } from 'react-intl';
+import { addLocaleData, IntlProvider } from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import ko from 'react-intl/locale-data/ko';
 import { Routes } from './Routes';
 import { daedalusTheme } from './themes/daedalus';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
 import ThemeManager from './ThemeManager';
+
+// https://github.com/yahoo/react-intl/wiki#loading-locale-data
+addLocaleData([...en, ...ko]);
 
 @observer
 export default class App extends Component<{
