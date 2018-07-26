@@ -1,5 +1,4 @@
 import { When, Then } from 'cucumber';
-import chai from 'chai';
 
 When(/^I see the balance$/, async function () {
   await this.waitForElement('.TopBar_walletAmount');

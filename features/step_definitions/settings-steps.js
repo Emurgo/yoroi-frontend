@@ -1,5 +1,5 @@
 import { When, Given, Then } from 'cucumber';
-import { expect } from 'chai';
+import i18n from '../support/helpers/i18n-helpers';
 
 const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
@@ -67,6 +67,8 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 }
 
 Then(/^I should stay in the change password dialog$/, async function () {
-  await this.waitUntilText('.Dialog_title', 'CHANGE PASSWORD', 2000);
+  const changePasswordMessage = await i18n.formatMessage(this.driver,
+    { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
+  await this.waitUntilText('.Dialog_title', changePasswordMessage.toUpperCase(), 2000);
 });
 
