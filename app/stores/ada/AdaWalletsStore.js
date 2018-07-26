@@ -97,6 +97,7 @@ export default class AdaWalletsStore extends WalletStore {
         walletId,
         recentRequest: this.stores.ada.transactions._getTransactionsRecentRequest(walletId),
         allRequest: this.stores.ada.transactions._getTransactionsAllRequest(walletId),
+        getBalanceRequest: this.stores.ada.transactions._getBalanceRequest(walletId),
       }));
       this.stores.ada.transactions._refreshTransactionData();
     });
