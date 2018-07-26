@@ -21,8 +21,15 @@ After({ tags: '@invalidWitnessTest' }, () => {
 });
 
 Given(/^I have a wallet with funds$/, async function () {
-  const { adaWallet } = await this.getFromLocalStorage('WALLET');
-  expect(adaWallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
+  await this.driver.wait(async () => {
+    try {
+      const { adaWallet } = await this.getFromLocalStorage('WALLET');
+      expect(adaWallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  });
 });
 
 When(/^I go to the send transaction screen$/, async function () {

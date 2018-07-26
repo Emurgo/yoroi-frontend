@@ -1,6 +1,7 @@
 import { defineMessages } from 'react-intl';
 import LocalizableError from '../i18n/LocalizableError';
 import { WalletTransaction, Wallet } from '../domain/WalletTransaction';
+import { AdaAmount } from './ada/adaTypes';
 
 const messages = defineMessages({
   genericApiError: {
@@ -122,6 +123,8 @@ export type GetTransactionsResponse = {
   transactions: Array<WalletTransaction>,
   total: number,
 };
+
+export type GetBalanceResponse = AdaAmount;
 
 export type SendBugReportRequest = {
   email: string,

@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Store from './lib/Store';
 import CachedRequest from './lib/LocalizedCachedRequest';
 import WalletTransaction from '../domain/WalletTransaction';
-import type { GetTransactionsResponse } from '../api/common';
+import type { GetTransactionsResponse, GetBalanceResponse } from '../api/common';
 import environment from '../environment';
 
 export type TransactionSearchOptionsStruct = {
@@ -21,7 +21,8 @@ export default class TransactionsStore extends Store {
   @observable transactionsRequests: Array<{
     walletId: string,
     recentRequest: CachedRequest<GetTransactionsResponse>,
-    allRequest: CachedRequest<GetTransactionsResponse>
+    allRequest: CachedRequest<GetTransactionsResponse>,
+    getBalanceRequest: CachedRequest<GetBalanceResponse>
   }> = [];
 
   @observable _searchOptionsForWallets = {};
@@ -99,6 +100,12 @@ export default class TransactionsStore extends Store {
       const allRequest = this._getTransactionsAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
       allRequest.execute({ walletId: wallet.id });
+      allRequest.promise
+        .then(async () => {
+          const lastUpdateDate = await this.api[environment.API].getAdaTxLastUpdatedDate();
+          return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
+        })
+        .catch(() => {}); // Do nothing. It's logged in the api call
     }
   };
 
@@ -112,6 +119,12 @@ export default class TransactionsStore extends Store {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
     return new CachedRequest(this.api[environment.API].refreshTransactions);
+  };
+
+  _getBalanceRequest = (walletId: string): CachedRequest<GetBalanceResponse> => {
+    const foundRequest = _.find(this.transactionsRequests, { walletId });
+    if (foundRequest && foundRequest.getBalanceRequest) return foundRequest.getBalanceRequest;
+    return new CachedRequest(this.api[environment.API].getBalance);
   };
 
 }
