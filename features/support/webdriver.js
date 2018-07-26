@@ -23,10 +23,14 @@ function CustomWorld() {
   this.getValue = this.driver.getValue =
     async (locator) => this.getElementBy(locator).getAttribute('value');
 
+  this.waitForElementLocated = (locator, method = By.css) => {
+    const isLocated = seleniumWebdriver.until.elementLocated(method(locator));
+    return this.driver.wait(isLocated);
+  };
+  
   // Returns a promise that resolves to the element
   this.waitForElement = this.driver.waitForElement = async (locator, method = By.css) => {
-    const isLocated = seleniumWebdriver.until.elementLocated(method(locator));
-    await this.driver.wait(isLocated);
+    await this.waitForElementLocated(locator, method);
     const element = await this.getElementBy(locator, method);
     const condition = seleniumWebdriver.until.elementIsVisible(element);
     return this.driver.wait(condition);
