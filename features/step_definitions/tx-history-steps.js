@@ -1,4 +1,5 @@
 import { Then, When, Given } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import chai from 'chai';
 import moment from 'moment';
 import { getLovefieldTxs, getMockData } from '../support/mockDataBuilder';
@@ -70,7 +71,10 @@ async function (txsNumber, txExpectedStatus, walletName) {
     await button.click();
   }
   const expectedTxsList = getLovefieldTxs(walletName);
-  await this.waitForContent(`//span[contains(text(), "${expectedTxsList[expectedTxsList.length - 1].txId}")]`);
+  await this.waitForElement(
+    `//span[contains(text(), "${expectedTxsList[expectedTxsList.length - 1].txId}")]`,
+    By.xpath
+  );
   const actualTxsList = await this.getElementsBy('.Transaction_component');
   const firstIndex = txExpectedStatus === 'pending' ? 0 : (actualTxsList.length - txsAmount);
   const lastIndex = txExpectedStatus === 'pending' ? txsAmount : actualTxsList.length;
