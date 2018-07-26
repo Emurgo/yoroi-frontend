@@ -14,7 +14,8 @@ import {
   getMostRecentTx,
   getTxsOrderedByDateDesc,
   getTxsOrderedByUpdateDesc,
-  getTxLastUpdatedDate
+  getTxLastUpdatedDate,
+  getPendingTxs
 } from '../lib/lovefieldDatabase';
 import {
   toAdaTx
@@ -55,6 +56,10 @@ export async function refreshTxs() {
     Logger.error('adaTransactionsHistory::refreshTxs error: ' + JSON.stringify(error));
     throw new UpdateAdaTxsHistoryError();
   }
+}
+
+export function getPendingAdaTxs() {
+  return getPendingTxs();
 }
 
 /**
