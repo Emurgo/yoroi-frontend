@@ -99,7 +99,7 @@ export default class TransactionsStore extends Store {
       recentRequest.execute(requestParams);
       const allRequest = this._getTransactionsAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
-      allRequest.execute(requestParams);
+      allRequest.execute({ walletId: wallet.id });
       allRequest.promise
         .then(async () => {
           const lastUpdateDate = await this.api[environment.API].getAdaTxLastUpdatedDate();
