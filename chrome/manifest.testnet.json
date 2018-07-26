@@ -1,5 +1,5 @@
 {
-  "version": "0.0.3",
+  "version": "0.0.4",
   "name": "icarus-light-cardano-wallet-poc",
   "manifest_version": 2,
   "description": "[testnet] Icarus light Cardano wallet - PoC",
