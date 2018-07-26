@@ -1,5 +1,6 @@
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
+import i18n from '../support/helpers/i18n-helpers';
 
 When(/^I click the create button$/, async function () {
   await this.click('.createWalletButton');
@@ -42,5 +43,6 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 });
 
 Then(/^I should stay in the create wallet dialog$/, async function () {
-  await this.waitUntilText('.Dialog_title', 'CREATE A NEW WALLET', 2000);
+  const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.add.dialog.create.description' });
+  await this.waitUntilText('.Dialog_title', createMessage.toUpperCase(), 2000);
 });

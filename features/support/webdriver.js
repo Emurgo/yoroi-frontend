@@ -99,6 +99,12 @@ function CustomWorld() {
     this.driver.executeScript(addrs => {
       addrs.forEach(addr => window.icarus.api.ada.saveAddress(addr, 'External'));
     }, addresses);
+
+  this.saveTxsToDB = transactions => {
+    this.driver.executeScript(txs => {
+      window.icarus.api.ada.saveTxs(txs);
+    }, transactions);
+  };
 }
 
 setWorldConstructor(CustomWorld);

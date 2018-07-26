@@ -42,6 +42,7 @@ import {
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
   UpdateWalletResponse,
+  GetTransactionsRequest
 } from '../common';
 import type {
   AdaAddress,
@@ -66,6 +67,7 @@ import type {
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
+import { saveTxs } from './lib/lovefieldDatabase';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -185,41 +187,23 @@ export default class AdaApi {
     }
   }
 
-  async refreshTransactions(): Promise<GetTransactionsResponse> {
+  async refreshTransactions(request: GetTransactionsRequest): Promise<GetTransactionsResponse> {
+    Logger.debug('AdaApi::refreshTransactions called: ' + stringifyData(request));
+    const { skip = 0, limit } = request;
     try {
       await refreshTxs();
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
-      Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
-      const transactions = history[0].map(data =>
+      Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(history));
+      const transactions = limit ? history[0].slice(skip, skip + limit) : history[0];
+      const mappedTransactions = transactions.map(data =>
         _createTransactionFromServerData(data)
       );
       return Promise.resolve({
-        transactions,
+        transactions: mappedTransactions,
         total: history[1]
       });
     } catch (error) {
-      Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  async getTransactions(): Promise<GetTransactionsResponse> {
-    // FIXME: Sync with TransactionStore skip and limit indexes
-    // Logger.debug('AdaApi::searchHistory called: ' + stringifyData(request));
-    // const { walletId, skip, limit } = request;
-    try {
-      await refreshTxs();
-      const history: AdaTransactions = await getAdaTxsHistoryByWallet();
-      Logger.debug('AdaApi::searchHistory success: ' + stringifyData(history));
-      const transactions = history[0].map(data =>
-        _createTransactionFromServerData(data)
-      );
-      return Promise.resolve({
-        transactions,
-        total: history[1],
-      });
-    } catch (error) {
-      Logger.error('AdaApi::searchHistory error: ' + stringifyError(error));
+      Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -322,6 +306,16 @@ export default class AdaApi {
       await saveAdaAddress(address, addressType);
     } catch (error) {
       Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  // FIXME: This method is exposed to allow injecting data when testing
+  async saveTxs(txs: Array<AdaTransaction>): Promise<void> {
+    try {
+      await saveTxs(txs);
+    } catch (error) {
+      Logger.error('AdaApi::saveTxs error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
