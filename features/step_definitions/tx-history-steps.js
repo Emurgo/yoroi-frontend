@@ -2,6 +2,7 @@ import { Then, When, Given } from 'cucumber';
 import chai from 'chai';
 import moment from 'moment';
 import { getLovefieldTxs, getMockData } from '../support/mockDataBuilder';
+import i18n from '../support/helpers/i18n-helpers';
 
 function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFromList, txToList,
   txId, expectedTx, txConfirmations) {
@@ -48,9 +49,11 @@ When(/^I see the transactions summary$/, async function () {
 
 Then(/^I should see that the number of transactions is ([^"]*)$/,
 async function (expectedTxsNumber) {
+  const txsNumberMessage = await i18n.formatMessage(this.driver,
+    { id: 'wallet.summary.page.transactionsLabel' });
   await this.waitUntilText(
     '.WalletSummary_numberOfTransactions',
-    'Number of transactions: ' + expectedTxsNumber
+    txsNumberMessage + ': ' + expectedTxsNumber
   );
 });
 

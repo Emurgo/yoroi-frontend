@@ -1,7 +1,7 @@
 import { create, bodyParser, defaults } from 'json-server';
 import moment from 'moment';
-import { getMockData, getTxsMapList } from './mockDataBuilder';
 import BigNumber from 'bignumber.js';
+import { getMockData, getTxsMapList } from './mockDataBuilder';
 
 const middlewares = [...defaults(), bodyParser];
 
