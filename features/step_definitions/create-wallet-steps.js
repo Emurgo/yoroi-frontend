@@ -27,7 +27,11 @@ When(/^I accept the creation terms$/, async function () {
 
 When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
   // Get the displayed mnemonic
-  const mnemonicElement = await this.waitForElement('.WalletRecoveryPhraseMnemonic_component');
+  const mnemonicElement = await this.waitElementTextMatches(
+    /^.*$/,
+    '.WalletRecoveryPhraseMnemonic_component'
+  );
+
   const mnemonic = await mnemonicElement.getText();
   await this.click('.WalletRecoveryPhraseDisplayDialog .primary');
 

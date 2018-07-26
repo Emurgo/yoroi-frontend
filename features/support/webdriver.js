@@ -36,6 +36,14 @@ function CustomWorld() {
     return this.driver.wait(condition);
   };
 
+  this.waitElementTextMatches = async (regex, locator, method = By.css) => {
+    await this.waitForElement(locator, method);
+    const element = await this.getElementBy(locator, method);
+    const condition = seleniumWebdriver.until.elementTextMatches(element, regex);
+    await this.driver.wait(condition);
+    return element;
+  };
+
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent =
     async (locator, method = By.css) => {
       await this.driver.wait(async () => {
