@@ -60,7 +60,7 @@ Feature: Restore Wallet
     | Ae2tdPwUPEZBdh5hX9QMWCeiihXf3onFAgx6KzKBtm7nj4wwyN8eoroTWqF |
     | Ae2tdPwUPEYzErSRwThtfVfBbhM87NCXDwkGHRqSYJcRVP4GS8Lgx3AxAXd |
 
-  Scenario: Fail to completely restore a wallet with wrongly generated addresses
+  Scenario: Fail to completely restore a wallet with addresses generated not following gap from BIP44 protocol
     When I click the restore button
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
