@@ -5,7 +5,7 @@
         "cadAmount": {
           "getCCoin": 0
         },
-        "cadId": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "cadId": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
         "cadIsUsed": false,
         "account": 0,
         "change": 0,
@@ -13,10 +13,10 @@
       }
     ],
     "usedAddresses": [],
-    "seed": {
-      "encryptedSeed": "d207774a43e617045acbff9ebca37c1748d656976398eb9b1117651e9198eae5",
-      "passwordSalt": "cd4a9a3753ddccb56f4d6e062b23e503",
-      "passwordVerifier": "b4e43f5698bb7f6e7883d9386de3e3fbf714d79f6c0f5be24e656bacc7fc20ce"
+    "masterKey": {
+      "encryptedMasterKey": "99cce23420afd095af01b9659e9d9b4404ccb2ec5a2e41d93e0c6765b098e02c7bbecf7a3b5e421b1157ddbf42fff38f4f10fe5b739b01eb32f00bfb7286f64d8ad3d4b3c8c42e2ec8aa25bfe2e21710059a074d0492b162a947624c75360c6c",
+      "passwordSalt": "53644ec38b1c8e4208335b9f376e693d",
+      "passwordVerifier": "b7898ccee09a2be62633501e2ea1da9782c0da7c30257220fe9ae30a912ab512"
     },
     "password": "Secret123",
     "wallet": {
@@ -34,7 +34,7 @@
     },
     "cryptoAccount": {
       "account": 0,
-      "cached_account_key": "aa3f222043b56d4bd7616abe44687db98a3b4ca6efc5bb2c806ca3b593d0e4c4218fe0d2481703ed883d19d62540fad4cfc32f0a763102bcfa2d69029d2d3545",
+      "root_cached_key": "7601e4d9b02e2ffa15f35c62444e76279c597153bdb210690366d66b2c10b065aab68f024845aa380cfa8d53f0f373325fd888391a7137ad57a2034b14c357be",
       "derivation_scheme": "V2"
     }
   },
@@ -44,15 +44,22 @@
         "utxo_id": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f64290",
         "tx_hash": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f6429",
         "tx_index": 0,
-        "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "receiver": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
         "amount": "9007199254720698"
       }
     ]
   },
   "Restore wallet": {
     "usedAddresses": [
-      "Ae2tdPwUPEZ3vu63a1tJVMghcbu5CWSrybC2pzwzh6dvPx7uxngY36LQnVk",
-      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"
+      "Ae2tdPwUPEZ73Nh3ALXKwtt9Wmb8bQHa9owoXtkvGEWK3AX6kXNHBK1D261",
+      "Ae2tdPwUPEZ7sn3AQhUFGHXiWuG5aU3XnMi2SNKeh94S9Pp17igo1RwzodB",
+
+      "Ae2tdPwUPEYz5p78UtoKpzeQV8DMEHf8nM9TNJGu1xwF9ez26Zx26wupZ2v",
+      "Ae2tdPwUPEZ5jDsa81F9tjv9QunxzBLsrV8XNjYdt5CdNtuAUKgroxTxZdP",
+      "Ae2tdPwUPEYzErSRwThtfVfBbhM87NCXDwkGHRqSYJcRVP4GS8Lgx3AxAXd",
+
+      "Ae2tdPwUPEZLzYQaqFk1U9VWBeY9AfQ2hKBWZjxtfwWVE46sy6u5ZZAeFu1",
+      "Ae2tdPwUPEYwS8KygpV49Y5aN1PsZnT1sXKWqPJvnCfk2wwgb4tk7xP1ipB"
     ]
   },
   "Generate addresses": {
@@ -61,20 +68,20 @@
         "utxo_id": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f64290",
         "tx_hash": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f6429",
         "tx_index": 0,
-        "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "receiver": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
         "amount": "1000000"
       }
     ],
     "walletInitialData": {
       "wallet": {
-        "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "addressesStartingWith": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYW",
         "totalAddresses": 1
       }
     },
     "txs": {
       "wallet": [
         {
-          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+          "address": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
           "tx": {
             "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
             "time": "2018-05-12T13:51:33.000Z",
@@ -83,7 +90,7 @@
             ],
             "inputs_amount": [200],
             "outputs_address": [
-              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"
+              "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"
             ],
             "outputs_amount": [100, 100],
             "best_block_num": 101
@@ -91,7 +98,7 @@
         }
       ]
     },
-    "usedAddresses": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"]
+    "usedAddresses": ["Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"]
   },
   "Get balance": {
     "walletInitialData": {
@@ -142,6 +149,7 @@
     ]
   },
   "Transaction History": {
+    "currentDateExample": "2018-01-01T00:00:00.000Z",
     "walletInitialData": {
       "empty-wallet": {
         "addressesStartingWith": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo",
@@ -191,7 +199,7 @@
           "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
           "tx": {
             "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
-            "time": "2018-05-12T13:51:33.000Z",
+            "time": "2018-01-01T00:02:00.000Z",
             "inputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
@@ -201,7 +209,7 @@
             ],
             "outputs_amount": [100, 100],
             "best_block_num": 101,
-            "last_update": "2018-05-10T13:51:33.000Z",
+            "last_update": "2018-01-01T00:02:00.000Z",
             "tx_state": "Pending"
           }
         },
@@ -209,7 +217,7 @@
           "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
           "tx": {
             "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Y",
-            "time": "2018-05-11T13:51:33.000Z",
+            "time": "2018-01-01T00:01:00.000Z",
             "inputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"
             ],
@@ -219,7 +227,7 @@
             ],
             "outputs_amount": [100],
             "best_block_num": 101,
-            "last_update": "2018-05-10T13:51:33.000Z",
+            "last_update": "2018-01-01T00:01:00.000Z",
             "tx_state": "Pending"
           }
         },
@@ -227,7 +235,7 @@
           "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
           "tx": {
             "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
-            "time": "2018-05-10T13:51:33.000Z",
+            "time": "2018-01-01T00:00:00.000Z",
             "inputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
@@ -238,7 +246,7 @@
             "outputs_amount": [160],
             "block_num": 90,
             "best_block_num": 101,
-            "last_update": "2018-05-10T13:51:33.000Z",
+            "last_update": "2018-01-01T00:00:00.000Z",
             "tx_state": "Successful"
           }
         }
@@ -248,7 +256,7 @@
           "address": "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
           "tx": {
             "hash": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
-            "time": "2018-01-01T13:51:33.000Z",
+            "time": "2018-01-01T00:00:00.000Z",
             "inputs_address": [
               "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU"
             ],
@@ -263,20 +271,43 @@
             ],
             "block_num": 70,
             "best_block_num": 101,
-            "last_update": "2018-05-10T13:51:33.000Z",
+            "last_update": "2018-01-01T00:00:00.000Z",
             "tx_state": "Successful"
           }
         }
       ]
     },
-    "lovefieldTxs": {
+    "lovefieldStoredTxs": {
+      "simple-wallet": [{
+        "ctAmount": {"getCCoin": "200"},
+        "ctBlockNumber": 0,
+        "ctId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
+        "ctInputs": [[
+          "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
+          {"getCCoin": "200"}
+        ]],
+        "ctIsOutgoing": true,
+        "ctMeta": {
+          "ctmDate": "2018-01-01T00:02:00.000Z",
+          "ctmUpdate": "2018-01-01T00:02:00.000Z",
+          "ctmDescription": "undefined",
+          "ctmTitle": "undefined"
+        },
+        "ctOutputs": [[
+          "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv",
+          {"getCCoin": 100}
+        ]],
+        "ctCondition": "CPtxApplying"
+      }]
+    },
+    "lovefieldShownTxs": {
       "empty-wallet": [],
       "simple-wallet": [
         {
           "txType": "ADA sent",
           "txAmount": "-0.000200",
           "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
+          "txTime": "2018-01-01T00:02:00.000Z",
           "txStatus": "TRANSACTION PENDING",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
@@ -286,7 +317,7 @@
           "txType": "ADA received",
           "txAmount": "0.000100",
           "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
+          "txTime": "2018-01-01T00:01:00.000Z",
           "txStatus": "TRANSACTION PENDING",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
@@ -296,7 +327,7 @@
           "txType": "ADA sent",
           "txAmount": "-0.000160",
           "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
+          "txTime": "2018-01-01T00:00:00.000Z",
           "txStatus": "HIGH",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
@@ -309,7 +340,7 @@
           "txType": "ADA received",
           "txAmount": "9,007,199,254.720698",
           "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
+          "txTime": "2018-01-01T00:00:00.000Z",
           "txStatus": "HIGH",
           "txFrom": [
             "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU"

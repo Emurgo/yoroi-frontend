@@ -97,7 +97,20 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
       disableTransferFunds,
     } = this.props;
 
-    const buttonClasses = classnames([
+    const instructionsButtonClasses = classnames([
+      'instructionsButton',
+      'primary',
+      styles.button,
+    ]);
+
+    const answerYesButtonClasses = classnames([
+      'answerYesButton',
+      'primary',
+      styles.button,
+    ]);
+
+    const answerNoButtonClasses = classnames([
+      'answerNoButton',
       'primary',
       styles.button,
     ]);
@@ -120,7 +133,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
               </div>
 
               <Button
-                className={buttonClasses}
+                className={instructionsButtonClasses}
                 label={intl.formatMessage(messages.instructionsButton)}
                 onClick={onFollowInstructionsPrerequisites}
                 disabled={!disableTransferFunds}
@@ -161,7 +174,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
                     {intl.formatMessage(messages.answerYesText)}
                   </div>
                   <Button
-                    className={buttonClasses}
+                    className={answerYesButtonClasses}
                     label={intl.formatMessage(messages.answerYesButton)}
                     onClick={onAnswerYes}
                     disabled={disableTransferFunds}
@@ -177,7 +190,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
                     {intl.formatMessage(messages.answerNoText)}
                   </div>
                   <Button
-                    className={buttonClasses}
+                    className={answerNoButtonClasses}
                     label={intl.formatMessage(messages.answerNoButton)}
                     onClick={onAnswerNo}
                     disabled={disableTransferFunds}

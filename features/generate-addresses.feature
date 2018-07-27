@@ -7,18 +7,18 @@ Feature: Generate Addresses
     And I go to the receive screen
 
   Scenario: Show my initial receive address
-    Then I should see my latest address "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod" at the top
-    And I should see the addresses list them
+    Then I should see my latest address "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt" at the top
+    And I should see the addresses exactly list them
     | address                                                     |
-    | Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod |
+    | Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt |
 
   Scenario: Generate a new receive address
     When I click on the Generate new address button
-    Then I should see my latest address "Ae2tdPwUPEYyi3jN1dAR6CXbKY335oh8XxD6eLxqqaHMX8decXzuWDP91VX" at the top
-    And I should see the addresses list them
+    Then I should see my latest address "Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB" at the top
+    And I should see the addresses exactly list them
     | address                                                     |
-    | Ae2tdPwUPEYyi3jN1dAR6CXbKY335oh8XxD6eLxqqaHMX8decXzuWDP91VX |
-    | Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod |
+    | Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB |
+    | Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt |
 
   Scenario: Don't allow more than 20 unused address generation
     When I click on the Generate new address button 20 times
@@ -28,7 +28,7 @@ Feature: Generate Addresses
   Scenario: Hide used addresses
     When I click on the Generate new address button
     And I click on the Hide used addresses button
-    Then I should see the addresses list them
+    Then I should see the addresses exactly list them
     | address                                                     |
-    | Ae2tdPwUPEYyi3jN1dAR6CXbKY335oh8XxD6eLxqqaHMX8decXzuWDP91VX |
-    And I shouldn't see the address "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"
+    | Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB |
+    And I shouldn't see the address "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"

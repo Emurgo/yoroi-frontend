@@ -16,9 +16,6 @@ import {
   InvalidWitnessError
 } from '../errors';
 
-export const transactionsLimit = 20;
-export const addressesLimit = 50;
-
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
 

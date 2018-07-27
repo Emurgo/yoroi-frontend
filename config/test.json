@@ -2,12 +2,13 @@
   "network": {
     "protocolMagic": 633343913,
     "backendUrl": "http://localhost:8080",
-    "websocketUrl": "ws://localhost:8080",
-    "name": "testing"
+    "websocketUrl": "ws://localhost:8080"
   },
   "app": {
     "walletRefreshInterval": 2000,
     "logsBufferSize": 500,
-    "logsFileSuffix": "-icarus.log"
+    "logsFileSuffix": "-icarus.log",
+    "addressScanSize": 3,
+    "addressRequestSize": 5
   }
 }

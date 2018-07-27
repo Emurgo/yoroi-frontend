@@ -25,7 +25,11 @@ declare module 'rust-cardano-crypto' {
       ): CryptoAddress,
       addressGetPayload(
         address: CryptoAddress
-      ): CryptoAddressPayload
+      ): CryptoAddressPayload,
+      fromEnhancedEntropy(
+        entropy: Uint8Array,
+        password: string
+      ): any // TODO: Complete with specific type
     },
     RandomAddressChecker: {
       newChecker(
@@ -52,6 +56,11 @@ declare module 'rust-cardano-crypto' {
       }
     },
     Wallet: {
+      fromMasterKey(masterKey: Uint8Array): {
+        result: CryptoWallet,
+        failed: boolean,
+        msg: ?string
+      },
       fromSeed(seed: Array<mixed>): {
         result: CryptoWallet,
         failed: boolean,
@@ -91,8 +100,8 @@ declare module 'rust-cardano-crypto' {
       ): {
         result: {
           cbor_encoded_tx: Array<number>,
-          fee: number,
-          tx: CryptoTransaction
+          changed_used: boolean,
+          fee: number
         },
         failed: boolean,
         msg: ?string

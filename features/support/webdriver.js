@@ -3,6 +3,7 @@ import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import path from 'path';
 
+// FIXME: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld() {
   this.driver = new seleniumWebdriver.Builder()
     .withCapabilities({
@@ -16,14 +17,33 @@ function CustomWorld() {
     .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../icarus-light-cardano-wallet-poc-test.crx')))
     .build();
 
+  this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
+  this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
+  this.getText = (locator) => this.getElementBy(locator).getText();
+  this.getValue = this.driver.getValue =
+    async (locator) => this.getElementBy(locator).getAttribute('value');
+
+  this.waitForElementLocated = (locator, method = By.css) => {
+    const isLocated = seleniumWebdriver.until.elementLocated(method(locator));
+    return this.driver.wait(isLocated);
+  };
+  
   // Returns a promise that resolves to the element
-  // FIXME: We should move this to driver object, not `this`
-  this.waitForElement = this.driver.waitForElement = (locator, method = By.css) => {
-    const condition = seleniumWebdriver.until.elementLocated(method(locator));
+  this.waitForElement = this.driver.waitForElement = async (locator, method = By.css) => {
+    await this.waitForElementLocated(locator, method);
+    const element = await this.getElementBy(locator, method);
+    const condition = seleniumWebdriver.until.elementIsVisible(element);
     return this.driver.wait(condition);
   };
 
-  // FIXME: We should move this to driver object, not `this`
+  this.waitElementTextMatches = async (regex, locator, method = By.css) => {
+    await this.waitForElement(locator, method);
+    const element = await this.getElementBy(locator, method);
+    const condition = seleniumWebdriver.until.elementTextMatches(element, regex);
+    await this.driver.wait(condition);
+    return element;
+  };
+
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent =
     async (locator, method = By.css) => {
       await this.driver.wait(async () => {
@@ -32,18 +52,11 @@ function CustomWorld() {
       });
     };
 
-  this.waitForContent = (locator) => this.waitForElement(locator, By.xpath);
-
-  this.waitEnable = async (locator) => {
-    const element = this.getElementBy(locator);
+  this.waitEnable = async (locator, method = By.css) => {
+    const element = await this.getElementBy(locator, method);
     const condition = seleniumWebdriver.until.elementIsEnabled(element);
     return this.driver.wait(condition);
   };
-
-  this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
-  this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
-
-  this.getText = (locator) => this.getElementBy(locator).getText();
 
   this.waitUntilText = async (locator, text, timeout = 60000) => {
     await this.driver.wait(async () => {
@@ -56,19 +69,11 @@ function CustomWorld() {
     }, timeout);
   };
 
-  this.getValue = this.driver.getValue = async (locator) => this.getElementBy(locator).getAttribute('value');
-
-  const clickElement = async (locator, method) => {
+  this.click = async (locator, method = By.css) => {
+    await this.waitForElement(locator, method);
+    await this.waitEnable(locator, method);
     const clickable = await this.getElementBy(locator, method);
     await clickable.click();
-  };
-
-  this.click = async (locator) => {
-    await clickElement(locator);
-  };
-
-  this.clickByXpath = async (locator) => {
-    await clickElement(locator, By.xpath);
   };
 
   this.input = async (locator, value) => {
@@ -106,6 +111,12 @@ function CustomWorld() {
     this.driver.executeScript(addrs => {
       addrs.forEach(addr => window.icarus.api.ada.saveAddress(addr, 'External'));
     }, addresses);
+
+  this.saveTxsToDB = transactions => {
+    this.driver.executeScript(txs => {
+      window.icarus.api.ada.saveTxs(txs);
+    }, transactions);
+  };
 }
 
 setWorldConstructor(CustomWorld);

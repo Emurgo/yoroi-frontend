@@ -14,7 +14,8 @@ import {
   mockRestoredDaedalusAddresses
 } from '../support/mockWebSocketServer';
 import {
-  navigateTo
+  navigateTo,
+  waitUntilUrlEquals
 } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 
@@ -46,36 +47,27 @@ Given(/^My Daedalus wallet hasn't funds/, () => {
 
 Given(/^I am on the Daedalus Transfer screen$/, async function () {
   await navigateTo.call(this, '/daedalus-transfer');
+  await waitUntilUrlEquals.call(this, '/daedalus-transfer');
 });
 
 When(/^I click on the create Icarus wallet button$/, async function () {
-  const createWalletLabel = await i18n.formatMessage(this.driver,
-    { id: 'daedalusTransfer.instructions.instructions.button.label' });
-  await this.clickByXpath(`//button[contains(text(), '${createWalletLabel}')]`);
+  await this.click('.instructionsButton');
 });
 
 When(/^I click on the go to the Receive screen button$/, async function () {
-  const goToReceiveLabel = await i18n.formatMessage(this.driver,
-    { id: 'daedalusTransfer.instructions.instructions.attention.answer.yes.button.label' });
-  await this.clickByXpath(`//button[contains(text(), '${goToReceiveLabel}')]`);
+  await this.click('.answerYesButton');
 });
 
 When(/^I click on the transfer funds from Daedalus button$/, async function () {
-  const transferWalletLabel = await i18n.formatMessage(this.driver,
-    { id: 'daedalusTransfer.instructions.attention.answer.no.button.label' });
-  await this.clickByXpath(`//button[contains(text(), '${transferWalletLabel}')]`);
+  await this.click('.answerNoButton');
 });
 
 When(/^I proceed with the recovery$/, async function () {
-  const next = await i18n.formatMessage(this.driver,
-    { id: 'daedalusTransfer.form.next' });
-  await this.clickByXpath(`//button[contains(text(), '${next}')]`);
+  await this.click('.proceedTransferButtonClasses');
 });
 
 When(/^I confirm Daedalus transfer funds$/, async function () {
-  const transferButtonLabel = await i18n.formatMessage(this.driver,
-    { id: 'daedalusTransfer.summary.transferButton.label' });
-  await this.clickByXpath(`//button[contains(text(), '${transferButtonLabel}')]`); 
+  await this.click('.transferButton');
 });
 
 Then(/^I should see the Create wallet screen$/, async function () {
