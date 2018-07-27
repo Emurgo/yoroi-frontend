@@ -28,7 +28,7 @@ export function getFakeAddresses(
 }
 
 export function getLovefieldTxs(walletName) {
-  const { walletInitialData, lovefieldTxs } = getMockData();
+  const { walletInitialData, lovefieldShownTxs } = getMockData();
   const wallet = walletInitialData[walletName];
   return wallet && wallet.txHashesStartingWith && wallet.txsNumber ?
     _getLovefieldTxs(
@@ -37,7 +37,7 @@ export function getLovefieldTxs(walletName) {
       wallet.txHashesStartingWith,
       wallet.pendingTxsNumber
     ) :
-    lovefieldTxs[walletName];
+    lovefieldShownTxs[walletName];
 }
 
 export function getTxsMapList(addresses) {
@@ -68,15 +68,17 @@ function _getTxs(txsNumber, addressesStartingWith, txHashesStartingWith, pending
   return _generateListOfStrings(txHashesStartingWith)
     .slice(0, txsNumber + pendingNumber)
     .map((txHash, index) => {
+      const currentTime = new Date(getMockData().currentDateExample);
+      const txTime = currentTime.setDate(currentTime.getDate() + index);
       const newTx = Object.assign({}, {
         hash: txHash,
-        time: '2018-05-10T13:51:33.000Z',
+        time: new Date(txTime),
         inputs_address: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
         inputs_amount: [70],
         outputs_address: [addressesStartingWith + 'W'],
         outputs_amount: [200],
         best_block_num: 101,
-        last_update: new Date(index),
+        last_update: new Date(txTime),
         tx_state: 'Pending'
       });
       const txMap = Object.assign({}, { address: addressesStartingWith + 'W', tx: newTx });
@@ -94,21 +96,26 @@ function _getLovefieldTxs(txsNumber, addressesStartingWith, txHashesStartingWith
     return builtMockData.txs;
   }
   const pendingNumber = pendingTxsNumber || 0;
-  return _generateListOfStrings(txHashesStartingWith)
-    .slice(0, txsNumber + pendingNumber)
-    .map((txHash, index) => (
-      {
-        txType: 'ADA received',
-        txAmount: '0.000200',
-        txTimeTitle: 'ADA transaction,',
-        txTime: '2018-05-10T13:51:33.000Z',
-        txStatus: index < pendingNumber ? 'TRANSACTION PENDING' : 'HIGH',
-        txFrom: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
-        txTo: [addressesStartingWith + 'W'],
-        txConfirmations: 'High. 45 confirmations.',
-        txId: txHash
-      }
-    ));
+  const listOfHashesReversed = _generateListOfStrings(txHashesStartingWith)
+    .slice(0, txsNumber + pendingNumber).reverse();
+  return listOfHashesReversed
+    .map((txHash, index) => {
+      const currentTime = new Date(getMockData().currentDateExample);
+      const txTime = currentTime.setDate(currentTime.getDate() + index);
+      return (
+        {
+          txType: 'ADA received',
+          txAmount: '0.000200',
+          txTimeTitle: 'ADA transaction,',
+          txTime: new Date(txTime),
+          txStatus: index < pendingNumber ? 'TRANSACTION PENDING' : 'HIGH',
+          txFrom: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
+          txTo: [addressesStartingWith + 'W'],
+          txConfirmations: 'High. 45 confirmations.',
+          txId: txHash
+        }
+      );
+    });
 }
 
 function _getWallet(addressesStartingWith) {

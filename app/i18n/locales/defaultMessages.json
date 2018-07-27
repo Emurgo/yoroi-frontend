@@ -2249,13 +2249,13 @@
         "description": "Label for the \"Today\" label on the wallet summary page.",
         "end": {
           "column": 3,
-          "line": 17
+          "line": 20
         },
         "file": "app/components/wallet/transactions/WalletTransactionsList.js",
         "id": "wallet.summary.page.todayLabel",
         "start": {
           "column": 9,
-          "line": 13
+          "line": 16
         }
       },
       {
@@ -2263,13 +2263,27 @@
         "description": "Label for the \"Yesterday\" label on the wallet summary page.",
         "end": {
           "column": 3,
-          "line": 22
+          "line": 25
         },
         "file": "app/components/wallet/transactions/WalletTransactionsList.js",
         "id": "wallet.summary.page.yesterdayLabel",
         "start": {
           "column": 13,
-          "line": 18
+          "line": 21
+        }
+      },
+      {
+        "defaultMessage": "!!!Show more transactions",
+        "description": "Label for the \"Show more transactions\" button on the wallet summary page.",
+        "end": {
+          "column": 3,
+          "line": 30
+        },
+        "file": "app/components/wallet/transactions/WalletTransactionsList.js",
+        "id": "wallet.summary.page.showMoreTransactionsButtonLabel",
+        "start": {
+          "column": 35,
+          "line": 26
         }
       }
     ],

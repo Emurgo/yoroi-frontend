@@ -25,7 +25,7 @@ Then(/^I should see my latest address "([^"]*)" at the top$/, async function (ad
   await this.waitUntilText('.WalletReceive_hash', address);
 });
 
-Then(/^I should see the addresses list them$/, async function (table) {
+Then(/^I should see the addresses exactly list them$/, async function (table) {
   const rows = table.hashes();
   const waitUntilAddressesAppeared = rows.map((row, index) =>
     this.waitUntilText(
@@ -33,6 +33,9 @@ Then(/^I should see the addresses list them$/, async function (table) {
       row.address
     )
   );
+  const noMoreAddressAppeared = this.waitForElementNotPresent(
+    `.generatedAddress-${rows.length + 1} .WalletReceive_addressId`);
+  waitUntilAddressesAppeared.push(noMoreAddressAppeared);
   await Promise.all(waitUntilAddressesAppeared);
 });
 

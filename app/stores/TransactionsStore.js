@@ -4,45 +4,38 @@ import _ from 'lodash';
 import Store from './lib/Store';
 import CachedRequest from './lib/LocalizedCachedRequest';
 import WalletTransaction from '../domain/WalletTransaction';
-import type { GetTransactionsResponse } from '../api/common';
+import type { GetTransactionsResponse, GetBalanceResponse } from '../api/common';
 import environment from '../environment';
 
 export type TransactionSearchOptionsStruct = {
-  searchTerm: string,
   searchLimit: number,
   searchSkip: number,
 };
 
 export default class TransactionsStore extends Store {
 
-  INITIAL_SEARCH_LIMIT = 1000;
-  SEARCH_LIMIT_INCREASE = 500;
+  INITIAL_SEARCH_LIMIT = 5;
+  SEARCH_LIMIT_INCREASE = 5;
   SEARCH_SKIP = 0;
-  RECENT_TRANSACTIONS_LIMIT = 5;
 
   @observable transactionsRequests: Array<{
     walletId: string,
     recentRequest: CachedRequest<GetTransactionsResponse>,
-    allRequest: CachedRequest<GetTransactionsResponse>
+    allRequest: CachedRequest<GetTransactionsResponse>,
+    getBalanceRequest: CachedRequest<GetBalanceResponse>
   }> = [];
 
   @observable _searchOptionsForWallets = {};
 
   setup() {
-    // const actions = this.actions[environment.API].transactions;
-    // actions.filterTransactions.listen(this._updateSearchTerm);
-    // actions.loadMoreTransactions.listen(this._increaseSearchLimit);
+    const actions = this.actions[environment.API].transactions;
+    actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }
-
-  @action _updateSearchTerm = ({ searchTerm }: { searchTerm: string }) => {
-    if (this.searchOptions != null) {
-      this.searchOptions.searchTerm = searchTerm;
-    }
-  };
 
   @action _increaseSearchLimit = () => {
     if (this.searchOptions != null) {
       this.searchOptions.searchLimit += this.SEARCH_LIMIT_INCREASE;
+      this._refreshTransactionData();
     }
   };
 
@@ -53,13 +46,6 @@ export default class TransactionsStore extends Store {
     return this._getTransactionsRecentRequest(wallet.id);
   }
 
-  @computed get searchRequest(): CachedRequest<GetTransactionsResponse> {
-    const wallet = this.stores[environment.API].wallets.active;
-    // TODO: Do not return new request here
-    if (!wallet) return new CachedRequest(this.api[environment.API].getTransactions);
-    return this._getTransactionsAllRequest(wallet.id);
-  }
-
   @computed get searchOptions(): ?TransactionSearchOptionsStruct {
     const wallet = this.stores[environment.API].wallets.active;
     if (!wallet) return null;
@@ -68,7 +54,6 @@ export default class TransactionsStore extends Store {
       // Setup options for each requested wallet
       extendObservable(this._searchOptionsForWallets, {
         [wallet.id]: {
-          searchTerm: '',
           searchLimit: this.INITIAL_SEARCH_LIMIT,
           searchSkip: this.SEARCH_SKIP
         }
@@ -78,31 +63,11 @@ export default class TransactionsStore extends Store {
     return options;
   }
 
-  @computed get filtered(): Array<WalletTransaction> {
-    const wallet = this.stores[environment.API].wallets.active;
-    if (!wallet || !this.searchOptions) return [];
-    const { searchTerm } = this.searchOptions;
-    const request = this._getTransactionsAllRequest(wallet.id);
-    if (searchTerm && request.result && request.result.transactions) {
-      return request.result.transactions.filter(
-        transaction => transaction.title.search(new RegExp(searchTerm, 'i')) !== -1
-      );
-    }
-    return request.result ? request.result.transactions : [];
-  }
-
   @computed get recent(): Array<WalletTransaction> {
     const wallet = this.stores[environment.API].wallets.active;
     if (!wallet) return [];
     const result = this._getTransactionsRecentRequest(wallet.id).result;
-    return result ? result.transactions.slice(0, this.RECENT_TRANSACTIONS_LIMIT) : [];
-  }
-
-  @computed get hasAnyFiltered(): boolean {
-    const wallet = this.stores[environment.API].wallets.active;
-    if (!wallet) return false;
-    const result = this._getTransactionsAllRequest(wallet.id).result;
-    return result ? result.transactions.length > 0 : false;
+    return result ? result.transactions : [];
   }
 
   @computed get hasAny(): boolean {
@@ -119,41 +84,47 @@ export default class TransactionsStore extends Store {
     return result ? result.transactions.length : 0;
   }
 
-  @computed get totalFilteredAvailable(): number {
-    const wallet = this.stores[environment.API].wallets.active;
-    if (!wallet) return 0;
-    const result = this._getTransactionsAllRequest(wallet.id).result;
-    return result ? result.transactions.length : 0;
-  }
-
   @action _refreshTransactionData = () => {
     const allWallets = this.stores[environment.API].wallets.all;
     for (const wallet of allWallets) {
+      const searchLimit = this.searchOptions ?
+        this.searchOptions.searchLimit : this.INITIAL_SEARCH_LIMIT;
       const requestParams = {
         walletId: wallet.id,
-        limit: this.RECENT_TRANSACTIONS_LIMIT,
+        limit: searchLimit,
         skip: 0,
-        searchTerm: '',
       };
       const recentRequest = this._getTransactionsRecentRequest(wallet.id);
       recentRequest.invalidate({ immediately: false });
       recentRequest.execute(requestParams);
       const allRequest = this._getTransactionsAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
-      allRequest.execute(requestParams);
+      allRequest.execute({ walletId: wallet.id });
+      allRequest.promise
+        .then(async () => {
+          const lastUpdateDate = await this.api[environment.API].getAdaTxLastUpdatedDate();
+          return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
+        })
+        .catch(() => {}); // Do nothing. It's logged in the api call
     }
   };
 
   _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.recentRequest) return foundRequest.recentRequest;
-    return new CachedRequest(this.api[environment.API].getTransactions);
+    return new CachedRequest(this.api[environment.API].refreshTransactions);
   };
 
   _getTransactionsAllRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
     return new CachedRequest(this.api[environment.API].refreshTransactions);
+  };
+
+  _getBalanceRequest = (walletId: string): CachedRequest<GetBalanceResponse> => {
+    const foundRequest = _.find(this.transactionsRequests, { walletId });
+    if (foundRequest && foundRequest.getBalanceRequest) return foundRequest.getBalanceRequest;
+    return new CachedRequest(this.api[environment.API].getBalance);
   };
 
 }

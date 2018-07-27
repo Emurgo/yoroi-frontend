@@ -1,4 +1,5 @@
 import { When, Then } from 'cucumber';
+import i18n from '../support/helpers/i18n-helpers';
 
 When(/^I click the restore button$/, async function () {
   await this.click('.restoreWalletButton');
@@ -37,5 +38,6 @@ Then(/^I should see an "Invalid recovery phrase" error message$/, async function
 });
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {
-  await this.waitUntilText('.Dialog_title', 'RESTORE WALLET', 2000);
+  const restoreMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.title.label' });
+  await this.waitUntilText('.Dialog_title', restoreMessage.toUpperCase(), 2000);
 });
