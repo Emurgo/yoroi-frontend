@@ -1,4 +1,5 @@
 const bluebird = require('bluebird');
+const _ = require('lodash');
 
 global.Promise = bluebird;
 
@@ -29,7 +30,7 @@ chrome.tabs.onRemoved.addListener(tabId => {
   if (tabId === currentTab.id) currentTab = undefined;
 });
 
-chrome.browserAction.onClicked.addListener(() => {
+const onIconClicked = () => {
   if (currentTab) {
     chrome.tabs.update(currentTab.id, { active: true }, () => {
       chrome.windows.update(currentTab.windowId, { focused: true });
@@ -42,4 +43,6 @@ chrome.browserAction.onClicked.addListener(() => {
       };
     });
   }
-});
+};
+
+chrome.browserAction.onClicked.addListener(_.debounce(onIconClicked, 500));
