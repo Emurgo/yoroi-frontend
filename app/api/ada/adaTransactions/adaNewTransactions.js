@@ -61,8 +61,7 @@ export function getAdaTransactionFee(
     })
     .catch(err => {
       Logger.error('adaNetTransactions::getAdaTransactionFee error: ' + stringifyError(err));
-      const notEnoughFunds = err.message === 'FeeCalculationError(NotEnoughInput)' ||
-        err.message === 'FeeCalculationError(NoInputs)';
+      const notEnoughFunds = err.message === 'NotEnoughInput';
       if (notEnoughFunds) throw new NotEnoughMoneyToSendError();
       throw new TransactionError(err.message);
     });
@@ -75,10 +74,12 @@ export async function newAdaTransaction(
 ): Promise<any> {
   const masterKey = getWalletMasterKey();
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
-  const [{ cbor_encoded_tx }, changeAdaAddr] =
+  const [{ cbor_encoded_tx, changed_used }, changeAdaAddr] =
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-  await saveAdaAddress(changeAdaAddr, 'Internal');
+  if (changed_used) { // eslint-disable-line camelcase
+    await saveAdaAddress(changeAdaAddr, 'Internal');
+  }
   try {
     const backendResponse = await sendTx(signedTx);
     return backendResponse;

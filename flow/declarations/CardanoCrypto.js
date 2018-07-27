@@ -100,8 +100,8 @@ declare module 'rust-cardano-crypto' {
       ): {
         result: {
           cbor_encoded_tx: Array<number>,
-          fee: number,
-          tx: CryptoTransaction
+          changed_used: boolean,
+          fee: number
         },
         failed: boolean,
         msg: ?string

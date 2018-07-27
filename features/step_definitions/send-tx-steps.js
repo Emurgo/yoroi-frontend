@@ -1,4 +1,5 @@
 import { Given, When, Then, Before, After } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { getMockServer, closeMockServer } from '../support/mockServer';
 import i18n from '../support/helpers/i18n-helpers';
@@ -42,7 +43,7 @@ When(/^I fill the form:$/, async function (table) {
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  await this.waitForContent(`//span[contains(text(), '+ ${fee} of fees')]`);
+  await this.waitForElement(`//span[contains(text(), '+ ${fee} of fees')]`, By.xpath);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
@@ -59,9 +60,7 @@ When(/^I enter the wallet password:$/, async function (table) {
 });
 
 When(/^I submit the wallet send form$/, async function () {
-  const button = '.confirmButton';
-  await this.waitEnable(button);
-  await this.click(button);
+  await this.click('.confirmButton');
 });
 
 Then(/^I should see the summary screen$/, async function () {
@@ -73,7 +72,8 @@ Then(/^I should see an invalid address error$/, async function () {
 });
 
 Then(/^I should see a not enough ada error$/, async function () {
-  await this.waitForElement('.amount.SimpleInput_errored');
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.NotEnoughMoneyToSendError' });
+  await this.waitUntilText('.SimpleFormField_error', errorMessage);
 });
 
 Then(/^I should not be able to submit$/, async function () {
