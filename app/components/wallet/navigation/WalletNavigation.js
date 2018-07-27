@@ -9,10 +9,10 @@ import sendIcon from '../../../assets/images/wallet-nav/send-ic.inline.svg';
 import receiveIcon from '../../../assets/images/wallet-nav/receive-ic.inline.svg';
 
 const messages = defineMessages({
-  summary: {
-    id: 'wallet.navigation.summary',
-    defaultMessage: '!!!Summary',
-    description: 'Label for the "Summary" nav button in the wallet navigation.'
+  transactions: {
+    id: 'wallet.navigation.transactions',
+    defaultMessage: '!!!Transactions',
+    description: 'Label for the "Transactions" nav button in the wallet navigation.'
   },
   send: {
     id: 'wallet.navigation.send',
@@ -47,10 +47,10 @@ export default class WalletNavigation extends Component<Props> {
         <div className={styles.navItem}>
           <WalletNavButton
             className="summary"
-            label={intl.formatMessage(messages.summary)}
+            label={intl.formatMessage(messages.transactions)}
             icon={summaryIcon}
-            isActive={isActiveNavItem('summary')}
-            onClick={() => onNavItemClick('summary')}
+            isActive={isActiveNavItem('transactions')}
+            onClick={() => onNavItemClick('transactions')}
           />
         </div>
 
