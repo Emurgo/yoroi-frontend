@@ -1,7 +1,8 @@
-import { Then, When } from 'cucumber';
+import { Then, When, Given } from 'cucumber';
 import chai from 'chai';
 import moment from 'moment';
-import { getLovefieldTxs } from '../support/mockDataBuilder';
+import { getLovefieldTxs, getMockData } from '../support/mockDataBuilder';
+import i18n from '../support/helpers/i18n-helpers';
 
 function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFromList, txToList,
   txId, expectedTx, txConfirmations) {
@@ -30,15 +31,29 @@ function mapPendingTxFields(txExpectedStatus, pendingTxFields) {
   return [txId, txConfirmations];
 }
 
+Given(/^There are transactions already stored$/, async function () {
+  const transactions = getMockData().lovefieldStoredTxs['simple-wallet'];
+  const formattedTransactions = transactions.map(tx => {
+    const newTx = Object.assign({}, tx);
+    newTx.ctMeta = {};
+    newTx.ctMeta.ctmDate = new Date(tx.ctMeta.ctmDate);
+    newTx.ctMeta.ctmUpdate = new Date(tx.ctMeta.ctmDate);
+    return newTx;
+  });
+  await this.saveTxsToDB(formattedTransactions);
+});
+
 When(/^I see the transactions summary$/, async function () {
   await this.waitForElement('.WalletSummary_numberOfTransactions');
 });
 
 Then(/^I should see that the number of transactions is ([^"]*)$/,
 async function (expectedTxsNumber) {
+  const txsNumberMessage = await i18n.formatMessage(this.driver,
+    { id: 'wallet.summary.page.transactionsLabel' });
   await this.waitUntilText(
     '.WalletSummary_numberOfTransactions',
-    'Number of transactions: ' + expectedTxsNumber
+    txsNumberMessage + ': ' + expectedTxsNumber
   );
 });
 
@@ -60,7 +75,8 @@ async function (txsNumber, txExpectedStatus, walletName) {
   const firstIndex = txExpectedStatus === 'pending' ? 0 : (actualTxsList.length - txsAmount);
   const lastIndex = txExpectedStatus === 'pending' ? txsAmount : actualTxsList.length;
   for (let i = firstIndex; i < lastIndex; i++) {
-    await actualTxsList[i].click();
+    const clickeableElement = await actualTxsList[i];
+    await clickeableElement.click();
     const txData = await actualTxsList[i].getText();
     const txDataFields = txData.split('\n');
     const [txType, txTime, txStatus, txAmount, , txFrom, , txTo, , ...pendingTxFields]

@@ -31,6 +31,7 @@ import {
 } from './restoreAdaWallet';
 import {
   getAdaTxsHistoryByWallet,
+  getAdaTxLastUpdatedDate,
   refreshTxs,
 } from './adaTransactions/adaTransactionsHistory';
 import {
@@ -59,6 +60,7 @@ import type {
   CreateWalletRequest,
   CreateWalletResponse,
   GetTransactionsResponse,
+  GetBalanceResponse,
   GetWalletRecoveryPhraseResponse,
   GetWalletsResponse,
   RestoreWalletRequest,
@@ -67,6 +69,7 @@ import type {
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
+import { saveTxs } from './lib/lovefieldDatabase';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -149,13 +152,11 @@ export type UpdateWalletPasswordResponse = boolean;
 export type AdaWalletRecoveryPhraseResponse = Array<string>;
 
 export default class AdaApi {
+
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
     try {
       const wallet = await getAdaWallet();
-      if (wallet) {
-        await refreshAdaWallet();
-      }
       const wallets: AdaWallets = wallet ? [wallet] : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
@@ -183,6 +184,25 @@ export default class AdaApi {
     } catch (error) {
       Logger.error('AdaApi::getAddresses error: ' + stringifyError(error));
       throw new GenericApiError();
+    }
+  }
+
+  async getBalance(): Promise<GetBalanceResponse> {
+    try {
+      await refreshAdaWallet();
+      return Promise.resolve(true);
+    } catch (error) {
+      Logger.error('AdaApi::getBalance error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getAdaTxLastUpdatedDate() : Promise<Date> {
+    try {
+      return getAdaTxLastUpdatedDate(); 
+    } catch (error) {
+      Logger.error('AdaApi::getAdaTxLastUpdatedDate error: ' + stringifyError(error));
+      throw new GenericApiError();  
     }
   }
 
@@ -305,6 +325,16 @@ export default class AdaApi {
       await saveAdaAddress(address, addressType);
     } catch (error) {
       Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  // FIXME: This method is exposed to allow injecting data when testing
+  async saveTxs(txs: Array<AdaTransaction>): Promise<void> {
+    try {
+      await saveTxs(txs);
+    } catch (error) {
+      Logger.error('AdaApi::saveTxs error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

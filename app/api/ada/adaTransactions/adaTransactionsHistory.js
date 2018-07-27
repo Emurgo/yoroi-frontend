@@ -13,7 +13,8 @@ import {
   saveTxs,
   getMostRecentTx,
   getTxsOrderedByDateDesc,
-  getTxsOrderedByUpdateDesc
+  getTxsOrderedByUpdateDesc,
+  getTxLastUpdatedDate
 } from '../lib/lovefieldDatabase';
 import {
   toAdaTx
@@ -42,6 +43,8 @@ export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
   const transactions = await getTxsOrderedByDateDesc();
   return Promise.resolve([transactions, transactions.length]);
 };
+
+export const getAdaTxLastUpdatedDate = async (): Promise<Date> => getTxLastUpdatedDate();
 
 export async function refreshTxs() {
   try {

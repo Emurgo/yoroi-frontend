@@ -1,7 +1,7 @@
 import { create, bodyParser, defaults } from 'json-server';
 import moment from 'moment';
-import { getMockData, getTxsMapList } from './mockDataBuilder';
 import BigNumber from 'bignumber.js';
+import { getMockData, getTxsMapList } from './mockDataBuilder';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -64,7 +64,7 @@ export function getMockServer(settings) {
       // Filters all txs according to hash and date
       const filteredTxs = txsMapList.filter(txMap =>
         req.body.addresses.includes(txMap.address) &&
-          moment(txMap.tx.last_update) >= moment(req.body.dateFrom)
+          moment(txMap.tx.last_update) > moment(req.body.dateFrom)
       ).map(txMap => txMap.tx);
       // Returns a chunk of txs
       res.send(filteredTxs.slice(0, txsLimit));
