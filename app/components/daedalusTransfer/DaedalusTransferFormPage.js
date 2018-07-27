@@ -134,10 +134,12 @@ export default class DaedalusTransferFormPage extends Component<Props> {
     const { suggestedMnemonics, onBack } = this.props;
 
     const nextButtonClasses = classnames([
+      'proceedTransferButtonClasses',
       'primary',
       styles.button,
     ]);
     const backButtonClasses = classnames([
+      'backTransferButtonClasses',
       'flat',
       styles.button,
     ]);
