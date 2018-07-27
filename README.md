@@ -75,16 +75,25 @@ This boilerplate uses `Webpack` and `react-transform`. You can hot reload by edi
 
 ## Build
 
-*Note*: Before building, the `NODE_ENV` should be configured with `production` or `development`.
+Extension can be built for both the Cardano mainnet and testnet:
 
+- Mainnet
 ```bash
 # build files to './build'
 $ npm run build -- --env "mainnet" 
 ```
 
+- Testnet
+```bash
+# build files to './build'
+$ npm run build -- --env "testnet" 
+```
+
 ## Compress
 
-This tasks allow to generate compressed bundles (zip and crx) 
+This tasks allow to generate compressed bundles (zip and crx).
+
+**Note**: The same `--env` flag should be used as for the build.
 
 ### Zip
 
@@ -92,8 +101,8 @@ Zip files can be uploaded to the Chrome Web Store
 
 ```bash
 # compress build folder to {manifest.name}.zip and crx
-$ npm run build -- --env "mainnet" 
-$ npm run compress -- --env "mainnet" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" 
+$ npm run build -- --env "${chain}" 
+$ npm run compress -- --env "${chain}" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" 
 ```
 
 ### CRX
@@ -102,8 +111,8 @@ Crx are compressed and signed chrome extension bundles
 
 ```bash
 # compress build folder to {manifest.name}.zip and crx
-$ npm run build -- --env "mainnet" 
-$ npm run compress -- --env "mainnet" --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" --key ./production-key.pem
+$ npm run build -- --env "${chain}" 
+$ npm run compress -- --env "${chain}" --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" --key ./production-key.pem
 ```
 
 #### Options
