@@ -23,6 +23,9 @@ promisifyAll(chrome, ['tabs', 'windows', 'browserAction', 'contextMenus']);
 promisifyAll(chrome.storage, ['local']);
 
 
+function getBaseUrl(url) {
+  return url.split("#")[0];
+}
 
 let currentTab;
 
@@ -44,5 +47,20 @@ const onIconClicked = () => {
     });
   }
 };
+
+chrome.tabs.onUpdated.addListener((tabId, changes) => {
+  if (!currentTab) return; // If no tab loaded, return.
+  if (currentTab.id === tabId && changes.url) {
+    currentTab.baseUrl = getBaseUrl((changes.url));
+    return;
+  }
+  if (changes.url) {
+    const baseUrl = getBaseUrl((changes.url));
+    if (baseUrl === currentTab.baseUrl) {
+      onIconClicked();
+      chrome.tabs.remove(tabId);
+    }
+  }
+});
 
 chrome.browserAction.onClicked.addListener(_.debounce(onIconClicked, 500));
