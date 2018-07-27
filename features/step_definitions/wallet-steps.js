@@ -1,6 +1,7 @@
 import { Given, When, Then } from 'cucumber';
 import {
   navigateTo,
+  waitUntilUrlEquals
 } from '../support/helpers/route-helpers';
 import { getMockData } from '../support/mockDataBuilder';
 
@@ -19,6 +20,7 @@ Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (wal
 
 Given(/^I am on the wallet "([^"]*)" screen$/, async function (screen) {
   const { wallet } = getMockData();
-  await navigateTo.call(this, `/wallets/${wallet.cwId}/${screen}`);
-  await this.waitForElement('.TopBar_walletName');
+  const url = `/wallets/${wallet.cwId}/${screen}`;
+  await navigateTo.call(this, url);
+  await waitUntilUrlEquals.call(this, url);
 });

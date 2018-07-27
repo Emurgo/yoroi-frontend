@@ -20,10 +20,13 @@ Given(/^I am testing "([^"]*)"$/, feature => {
 });
 
 Given(/^I have completed the basic setup$/, async function () {
-  await this.waitForElement('.LanguageSelectionForm_submitButton');
-  // Default Profile Configs
+  // Default Profile Configs (language and terms of use)
+  await this.waitForElement('.LanguageSelectionForm_component');
+
   await setActiveLanguage(this.driver);
-  await this.driver.executeScript(() => { 
+
+  await this.waitForElement('.TermsOfUseForm_component');
+  await this.driver.executeScript(() => {
     window.icarus.actions.profile.acceptTermsOfUse.trigger();
   });
 });
@@ -40,13 +43,9 @@ Given(/^There is no wallet stored$/, async function () {
   await this.waitForElement('.WalletAdd');
 });
 
-Given(/^There is a default wallet stored$/, async function () {
-  buildMockData('default');
-  await storeWallet(this);
-});
-
-Given(/^There is a wallet stored( named ([^"]*))?$/, async function (walletName) {
+Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await storeWallet(this, walletName);
+  await this.waitUntilText('.TopBar_walletName', walletName.toUpperCase());
 });
 
 function refreshWallet(client) {
@@ -57,9 +56,7 @@ function refreshWallet(client) {
 
 async function storeWallet(client, walletName) {
   const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
-  if (walletName) {
-    wallet.cwMeta.cwName = walletName;
-  }
+  wallet.cwMeta.cwName = walletName;
 
   await client.saveToLocalStorage('WALLET', { adaWallet: wallet, masterKey });
   await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
@@ -79,5 +76,4 @@ async function storeWallet(client, walletName) {
     client.saveAddressesToDB(adaAddresses);
   }
   await refreshWallet(client);
-  await client.waitForElement('.TopBar_walletName');
 }
