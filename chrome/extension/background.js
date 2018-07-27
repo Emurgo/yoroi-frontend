@@ -33,11 +33,11 @@ chrome.tabs.onRemoved.addListener(tabId => {
   if (tabId === currentTab.id) currentTab = undefined;
 });
 
+const selectWindow = (windowId) => chrome.windows.update(windowId, { focused: true });
+
 const onIconClicked = () => {
   if (currentTab) {
-    chrome.tabs.update(currentTab.id, { active: true }, () => {
-      chrome.windows.update(currentTab.windowId, { focused: true });
-    });
+    chrome.tabs.update(currentTab.id, { active: true }, () => selectWindow(currentTab.windowId));
   } else {
     chrome.tabs.create({ url: 'main_window.html' }, ({ id, windowId }) => {
       currentTab = {
@@ -57,7 +57,7 @@ chrome.tabs.onUpdated.addListener((tabId, changes) => {
   if (changes.url) {
     const baseUrl = getBaseUrl((changes.url));
     if (baseUrl === currentTab.baseUrl) {
-      onIconClicked();
+      selectWindow();
       chrome.tabs.remove(tabId);
     }
   }
