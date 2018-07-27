@@ -394,13 +394,13 @@
         "description": "Label \"Unable to restore Daedalus wallet\" on the Daedalus transfer error page.",
         "end": {
           "column": 3,
-          "line": 17
+          "line": 16
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferErrorPage.js",
         "id": "daedalusTransfer.errorPage.title.label",
         "start": {
           "column": 9,
-          "line": 13
+          "line": 12
         }
       },
       {
@@ -408,13 +408,13 @@
         "description": "Label \"Back\" on the Daedalus transfer error page.",
         "end": {
           "column": 3,
-          "line": 22
+          "line": 21
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferErrorPage.js",
         "id": "daedalusTransfer.errorPage.backButton.label",
         "start": {
           "column": 19,
-          "line": 18
+          "line": 17
         }
       }
     ],
@@ -596,8 +596,8 @@
         }
       },
       {
-        "defaultMessage": "!!!Find you Daedalus mnemonics and prepare it",
-        "description": "Text for instructions step 1 on the Daedalus transfer form page.",
+        "defaultMessage": "!!!Enter the 12-word recovery phrase used to back up your Daedalus wallet to restore the balance and transfer all the funds from Daedalus to Icarus.",
+        "description": "Text for instructions step 0 on the Daedalus transfer form page.",
         "end": {
           "column": 3,
           "line": 26
@@ -610,8 +610,8 @@
         }
       },
       {
-        "defaultMessage": "!!!Enter mnemonics",
-        "description": "Text for instructions step 2 on the Daedalus transfer form page.",
+        "defaultMessage": "!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds from Daedalus to Icarus. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.",
+        "description": "Text for instructions step 1 on the Daedalus transfer form page.",
         "end": {
           "column": 3,
           "line": 31
@@ -624,59 +624,17 @@
         }
       },
       {
-        "defaultMessage": "!!!Click Next button",
-        "description": "Text for instructions step 3 on the Daedalus transfer form page.",
+        "defaultMessage": "!!!Recovery phrase",
+        "description": "Label for the recovery phrase input on the Daedalus transfer form page.",
         "end": {
           "column": 3,
           "line": 36
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
-        "id": "daedalusTransfer.form.instructions.step2.text",
-        "start": {
-          "column": 9,
-          "line": 32
-        }
-      },
-      {
-        "defaultMessage": "!!!Wait until wallet is synced",
-        "description": "Text for instructions step 4 on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 41
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
-        "id": "daedalusTransfer.form.instructions.step3.text",
-        "start": {
-          "column": 9,
-          "line": 37
-        }
-      },
-      {
-        "defaultMessage": "!!!Accept \"transfer funds\" transaction between Daedalus and Icarus wallets.",
-        "description": "Text for instructions step 5 on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 46
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
-        "id": "daedalusTransfer.form.instructions.step4.text",
-        "start": {
-          "column": 9,
-          "line": 42
-        }
-      },
-      {
-        "defaultMessage": "!!!Recovery phrase",
-        "description": "Label for the recovery phrase input on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 51
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
         "id": "daedalusTransfer.form.recovery.phrase.input.label",
         "start": {
           "column": 28,
-          "line": 47
+          "line": 32
         }
       },
       {
@@ -684,13 +642,13 @@
         "description": "Hint \"Enter recovery phrase\" for the recovery phrase input on the Daedalus transfer form page.",
         "end": {
           "column": 3,
-          "line": 56
+          "line": 41
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
         "id": "daedalusTransfer.form.recovery.phrase.input.hint",
         "start": {
           "column": 27,
-          "line": 52
+          "line": 37
         }
       },
       {
@@ -698,13 +656,13 @@
         "description": "\"No results\" message for the recovery phrase input search results.",
         "end": {
           "column": 3,
-          "line": 61
+          "line": 46
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
         "id": "daedalusTransfer.form.recovery.phrase.input.noResults",
         "start": {
           "column": 27,
-          "line": 57
+          "line": 42
         }
       },
       {
@@ -712,13 +670,13 @@
         "description": "Error message shown when invalid recovery phrase was entered.",
         "end": {
           "column": 3,
-          "line": 66
+          "line": 51
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
         "id": "daedalusTransfer.form.errors.invalidRecoveryPhrase",
         "start": {
           "column": 25,
-          "line": 62
+          "line": 47
         }
       },
       {
@@ -726,13 +684,13 @@
         "description": "Label for the back button on the Daedalus transfer form page.",
         "end": {
           "column": 3,
-          "line": 71
+          "line": 56
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
         "id": "daedalusTransfer.form.back",
         "start": {
           "column": 19,
-          "line": 67
+          "line": 52
         }
       },
       {
@@ -740,13 +698,13 @@
         "description": "Label for the next button on the Daedalus transfer form page.",
         "end": {
           "column": 3,
-          "line": 76
+          "line": 61
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferFormPage.js",
         "id": "daedalusTransfer.form.next",
         "start": {
           "column": 19,
-          "line": 72
+          "line": 57
         }
       }
     ],
@@ -1045,17 +1003,17 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Daedalus wallet is being restored...",
-        "description": "Label \"Daedalus wallet is being restored...\" on the Daedalus transfer waiting page.",
+        "defaultMessage": "!!!Daedalus wallet is being restored",
+        "description": "Label \"Daedalus wallet is being restored\" on the Daedalus transfer waiting page.",
         "end": {
           "column": 3,
-          "line": 14
+          "line": 13
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferWaitingPage.js",
         "id": "daedalusTransfer.waiting.title.label",
         "start": {
           "column": 9,
-          "line": 10
+          "line": 9
         }
       },
       {
@@ -1063,13 +1021,13 @@
         "description": "Progress info \"Fetching addresses\" on the Daedalus transfer waiting page.",
         "end": {
           "column": 3,
-          "line": 19
+          "line": 18
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferWaitingPage.js",
         "id": "daedalusTransfer.waiting.progressInfo.restoringAddresses",
         "start": {
           "column": 22,
-          "line": 15
+          "line": 14
         }
       },
       {
@@ -1077,13 +1035,13 @@
         "description": "Progress info \"Checking addresses funds\" on the Daedalus transfer waiting page.",
         "end": {
           "column": 3,
-          "line": 24
+          "line": 23
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferWaitingPage.js",
         "id": "daedalusTransfer.waiting.progressInfo.checkingAddresses",
         "start": {
           "column": 21,
-          "line": 20
+          "line": 19
         }
       },
       {
@@ -1091,17 +1049,36 @@
         "description": "Progress info \"Generating transfer transaction\" on the Daedalus transfer waiting page.",
         "end": {
           "column": 3,
-          "line": 29
+          "line": 28
         },
         "file": "app/components/daedalusTransfer/DaedalusTransferWaitingPage.js",
         "id": "daedalusTransfer.waiting.checkingAddresses.generatingTx",
         "start": {
           "column": 16,
-          "line": 25
+          "line": 24
         }
       }
     ],
     "path": "app/components/daedalusTransfer/DaedalusTransferWaitingPage.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Testnet",
+        "description": "Message alerting users the wallet is not running in mainnet.",
+        "end": {
+          "column": 3,
+          "line": 23
+        },
+        "file": "app/components/layout/SidebarLayout.js",
+        "id": "testnet.label.message",
+        "start": {
+          "column": 16,
+          "line": 19
+        }
+      }
+    ],
+    "path": "app/components/layout/SidebarLayout.json"
   },
   {
     "descriptors": [
@@ -1730,16 +1707,16 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Summary",
-        "description": "Label for the \"Summary\" nav button in the wallet navigation.",
+        "defaultMessage": "!!!Transactions",
+        "description": "Label for the \"Transactions\" nav button in the wallet navigation.",
         "end": {
           "column": 3,
           "line": 16
         },
         "file": "app/components/wallet/navigation/WalletNavigation.js",
-        "id": "wallet.navigation.summary",
+        "id": "wallet.navigation.transactions",
         "start": {
-          "column": 11,
+          "column": 16,
           "line": 12
         }
       },

@@ -51,7 +51,7 @@ export default class LoadingStore extends Store {
     if (app.currentRoute === ROUTES.ROOT) {
       if (wallets.first) {
         this.actions.router.goToRoute.trigger({
-          route: ROUTES.WALLETS.SUMMARY,
+          route: ROUTES.WALLETS.TRANSACTIONS,
           params: { id: wallets.first.id }
         });
       } else {

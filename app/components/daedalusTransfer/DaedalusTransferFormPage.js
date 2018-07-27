@@ -21,28 +21,13 @@ const messages = defineMessages({
   },
   step0: {
     id: 'daedalusTransfer.form.instructions.step0.text',
-    defaultMessage: '!!!Find you Daedalus mnemonics and prepare it',
-    description: 'Text for instructions step 1 on the Daedalus transfer form page.'
+    defaultMessage: '!!!Enter the 12-word recovery phrase used to back up your Daedalus wallet to restore the balance and transfer all the funds from Daedalus to Icarus.',
+    description: 'Text for instructions step 0 on the Daedalus transfer form page.'
   },
   step1: {
     id: 'daedalusTransfer.form.instructions.step1.text',
-    defaultMessage: '!!!Enter mnemonics',
-    description: 'Text for instructions step 2 on the Daedalus transfer form page.'
-  },
-  step2: {
-    id: 'daedalusTransfer.form.instructions.step2.text',
-    defaultMessage: '!!!Click Next button',
-    description: 'Text for instructions step 3 on the Daedalus transfer form page.'
-  },
-  step3: {
-    id: 'daedalusTransfer.form.instructions.step3.text',
-    defaultMessage: '!!!Wait until wallet is synced',
-    description: 'Text for instructions step 4 on the Daedalus transfer form page.'
-  },
-  step4: {
-    id: 'daedalusTransfer.form.instructions.step4.text',
-    defaultMessage: '!!!Accept "transfer funds" transaction between Daedalus and Icarus wallets.',
-    description: 'Text for instructions step 5 on the Daedalus transfer form page.'
+    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds from Daedalus to Icarus. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
+    description: 'Text for instructions step 1 on the Daedalus transfer form page.'
   },
   recoveryPhraseInputLabel: {
     id: 'daedalusTransfer.form.recovery.phrase.input.label',
@@ -134,10 +119,12 @@ export default class DaedalusTransferFormPage extends Component<Props> {
     const { suggestedMnemonics, onBack } = this.props;
 
     const nextButtonClasses = classnames([
+      'proceedTransferButtonClasses',
       'primary',
       styles.button,
     ]);
     const backButtonClasses = classnames([
+      'backTransferButtonClasses',
       'flat',
       styles.button,
     ]);
@@ -157,10 +144,10 @@ export default class DaedalusTransferFormPage extends Component<Props> {
 
               <ul className={styles.instructionsList}>
                 {
-                  Array(5).fill().map((_, idx) =>
-                    <li key={`step${idx}`} className={styles.text}>
+                  Array(2).fill().map((_, idx) =>
+                    <div key={`step${idx}`} className={styles.text}>
                       {intl.formatMessage({ id: messages[`step${idx}`].id })}
-                    </li>
+                    </div>
                   )
                 }
               </ul>

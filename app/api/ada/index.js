@@ -199,10 +199,10 @@ export default class AdaApi {
 
   async getAdaTxLastUpdatedDate() : Promise<Date> {
     try {
-      return getAdaTxLastUpdatedDate(); 
+      return getAdaTxLastUpdatedDate();
     } catch (error) {
       Logger.error('AdaApi::getAdaTxLastUpdatedDate error: ' + stringifyError(error));
-      throw new GenericApiError();  
+      throw new GenericApiError();
     }
   }
 

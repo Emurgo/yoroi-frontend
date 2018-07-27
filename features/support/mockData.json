@@ -51,8 +51,15 @@
   },
   "Restore wallet": {
     "usedAddresses": [
-      "Ae2tdPwUPEZ3vu63a1tJVMghcbu5CWSrybC2pzwzh6dvPx7uxngY36LQnVk",
-      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"
+      "Ae2tdPwUPEZ73Nh3ALXKwtt9Wmb8bQHa9owoXtkvGEWK3AX6kXNHBK1D261",
+      "Ae2tdPwUPEZ7sn3AQhUFGHXiWuG5aU3XnMi2SNKeh94S9Pp17igo1RwzodB",
+
+      "Ae2tdPwUPEYz5p78UtoKpzeQV8DMEHf8nM9TNJGu1xwF9ez26Zx26wupZ2v",
+      "Ae2tdPwUPEZ5jDsa81F9tjv9QunxzBLsrV8XNjYdt5CdNtuAUKgroxTxZdP",
+      "Ae2tdPwUPEYzErSRwThtfVfBbhM87NCXDwkGHRqSYJcRVP4GS8Lgx3AxAXd",
+
+      "Ae2tdPwUPEZLzYQaqFk1U9VWBeY9AfQ2hKBWZjxtfwWVE46sy6u5ZZAeFu1",
+      "Ae2tdPwUPEYwS8KygpV49Y5aN1PsZnT1sXKWqPJvnCfk2wwgb4tk7xP1ipB"
     ]
   },
   "Generate addresses": {
