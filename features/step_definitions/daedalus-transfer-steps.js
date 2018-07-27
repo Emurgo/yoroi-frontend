@@ -14,7 +14,8 @@ import {
   mockRestoredDaedalusAddresses
 } from '../support/mockWebSocketServer';
 import {
-  navigateTo
+  navigateTo,
+  waitUntilUrlEquals
 } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 
@@ -46,6 +47,7 @@ Given(/^My Daedalus wallet hasn't funds/, () => {
 
 Given(/^I am on the Daedalus Transfer screen$/, async function () {
   await navigateTo.call(this, '/daedalus-transfer');
+  await waitUntilUrlEquals.call(this, '/daedalus-transfer');
 });
 
 When(/^I click on the create Icarus wallet button$/, async function () {

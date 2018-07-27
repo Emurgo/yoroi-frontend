@@ -8,6 +8,7 @@ import i18n from '../support/helpers/i18n-helpers';
 
 Given(/^I am on the General Settings "([^"]*)" screen$/, async function (screen) {
   await navigateTo.call(this, `/settings/${screen}`);
+  await waitUntilUrlEquals.call(this, `/settings/${screen}`);
 });
 
 When(/^I click on secondary menu (.*) item$/, async function (buttonName) {
