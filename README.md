@@ -101,8 +101,8 @@ Zip files can be uploaded to the Chrome Web Store
 
 ```bash
 # compress build folder to {manifest.name}.zip and crx
-$ npm run build -- --env "${chain}" 
-$ npm run compress -- --env "${chain}" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" 
+$ npm run build -- --env "${network}"
+$ npm run compress -- --env "${network}" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx"
 ```
 
 ### CRX
@@ -111,8 +111,8 @@ Crx are compressed and signed chrome extension bundles
 
 ```bash
 # compress build folder to {manifest.name}.zip and crx
-$ npm run build -- --env "${chain}" 
-$ npm run compress -- --env "${chain}" --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" --key ./production-key.pem
+$ npm run build -- --env "${network}"
+$ npm run compress -- --env "${network}" --app-id "APP_ID" --codebase "https://www.sample.com/dw/icarus-extension.crx" --key ./production-key.pem
 ```
 
 #### Options
