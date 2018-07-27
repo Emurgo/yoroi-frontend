@@ -1,4 +1,5 @@
 import { Given, When, Then } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import languageSelection from '../support/helpers/language-selection-helpers';
 
@@ -9,15 +10,15 @@ Given(/^I have selected English language$/, async function () {
 });
 
 When(/^I am on the language selection screen$/, async function () {
-  await this.waitForElement('.LanguageSelectionForm_component');
+  await this.waitForElement(LANGUAGE_SELECTION_FORM);
 });
 
 When(/^I open language selection dropdown$/, async function () {
-  await this.click('.LanguageSelectionForm_component .SimpleInput_input');
+  await this.click(`${LANGUAGE_SELECTION_FORM} .SimpleInput_input`);
 });
 
 When(/^I select Japanese language$/, async function () {
-  await this.clickByXpath('//li[contains(text(), "Japanese")]');
+  await this.click('//li[contains(text(), "Japanese")]', By.xpath);
 });
 
 When(/^I submit the language selection form$/, async function () {
