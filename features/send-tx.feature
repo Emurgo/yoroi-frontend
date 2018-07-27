@@ -7,12 +7,12 @@ Feature: Send transaction
     And There is a wallet stored
     And I have a wallet with funds
 
-  Scenario: Sending a Tx to a valid address
+  Scenario Outline: Sending successful tx
     When I go to the send transaction screen
     And I fill the form:
-      | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.167950"
+      | address                                                     | amount  |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | <amount> |
+    And The transaction fees are "<fee>"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -20,6 +20,12 @@ Feature: Send transaction
       | Secret123 |
     And I submit the wallet send form
     Then I should see the summary screen
+
+    Examples:
+      | amount              | fee       |
+      | 0.001000            | 0.167950  | # Sent tx to a valid adress
+      | 9007199254..552484  | 0.168214  | # Sent all funds
+      | 9007199253..720698  | 0.168214  | # Sent a big amount
 
   Scenario: Sending a Tx to an invalid address
     When I go to the send transaction screen
@@ -36,21 +42,6 @@ Feature: Send transaction
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 9007199255 |
     Then I should see a not enough ada error
     And I should not be able to submit
-
-  Scenario: Sending a Tx to a valid address with big amount
-    When I go to the send transaction screen
-    And I fill the form:
-    # The .. in amount is used to ensure the rational numbers input
-      | address                                                     | amount             |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 9007199253..720698 |
-    And The transaction fees are "0.168214"
-    And I click on the next button in the wallet send form
-    And I see send money confirmation dialog
-    And I enter the wallet password:
-      | password  |
-      | Secret123 |
-    And I submit the wallet send form
-    Then I should see the summary screen
 
   @invalidWitnessTest
   Scenario: Sending a Tx and receiving from the server an invalid signature error
