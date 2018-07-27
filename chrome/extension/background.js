@@ -57,7 +57,7 @@ chrome.tabs.onUpdated.addListener((tabId, changes) => {
   if (changes.url) {
     const baseUrl = getBaseUrl((changes.url));
     if (baseUrl === currentTab.baseUrl) {
-      selectWindow();
+      selectWindow(currentTab.windowId);
       chrome.tabs.remove(tabId);
     }
   }
