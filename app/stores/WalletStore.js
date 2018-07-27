@@ -155,7 +155,7 @@ export default class WalletsStore extends Store {
 
   getWalletByName = (name: string): (?Wallet) => this.all.find(w => w.name === name);
 
-  getWalletRoute = (walletId: string, page: string = 'summary'): string => (
+  getWalletRoute = (walletId: string, page: string = 'transactions'): string => (
     buildRoute(ROUTES.WALLETS.PAGE, { id: walletId, page })
   );
 

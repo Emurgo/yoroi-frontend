@@ -1,7 +1,7 @@
 %smallText {
   height: 19px;
   font-family: var(--font-light);
-  font-size: 14px;
+  font-size: 20px;
   line-height: 1.36;
   letter-spacing: 0.5px;
   color: var(--theme-bordered-box-text-color);
@@ -70,8 +70,8 @@
     display: inline-block;
     margin-left: 1px;
     & > svg {
-      height: 10px;
-      width: 9px;
+      height: 15px;
+      width: 19px;
       & > g > g {
         stroke: var(--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color);
       }
