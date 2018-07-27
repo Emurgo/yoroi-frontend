@@ -32,7 +32,7 @@ jobs:
       - run: npm run eslint
 
       # run tests!
-      - run: npm run test-e2e
+      # - run: npm run test-e2e
       - run: npm run build -- --env "testnet"
       - run: npm run compress -- --env "testnet" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/icarus-extension.crx"
 
@@ -52,8 +52,7 @@ jobs:
           at: ~/build
 
       - run: sudo npm install -g chrome-webstore-upload-cli
-      - run: cd ~/build/repo/ && webstore upload --source icarus-light-cardano-wallet-poc.zip --extension-id="${APP_ID}" --client-id="${CLIENT_ID}" --client-secret="${CLIENT_SECRET}" --refresh-token="${REFRESH_TOKEN}"
-      - run: webstore publish --extension-id --extension-id $APP_ID
+      - run: cd ~/build/repo/ && webstore upload --source icarus-light-cardano-wallet-poc.zip --extension-id="${APP_ID}" --client-id="${CLIENT_ID}" --client-secret="${CLIENT_SECRET}" --refresh-token="${REFRESH_TOKEN}" --auto-publish --trusted-testers
 
 workflows:
   version: 2
