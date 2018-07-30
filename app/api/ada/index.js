@@ -33,6 +33,7 @@ import {
   getAdaTxsHistoryByWallet,
   getAdaTxLastUpdatedDate,
   refreshTxs,
+  getPendingAdaTxs
 } from './adaTransactions/adaTransactionsHistory';
 import {
   getAdaTransactionFee,
@@ -223,6 +224,18 @@ export default class AdaApi {
       });
     } catch (error) {
       Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async refreshPendingTransactions(): Promise<GetTransactionsResponse> {
+    Logger.debug('AdaApi::refreshPendingTransactions called');
+    try {
+      const pendingTxs = await getPendingAdaTxs();
+      Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
+      return pendingTxs;
+    } catch (error) {
+      Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
