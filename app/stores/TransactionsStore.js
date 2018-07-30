@@ -115,32 +115,21 @@ export default class TransactionsStore extends Store {
       allRequest.execute({ walletId: wallet.id });
       allRequest.promise
         .then(async () => {
+          const pendingRequest = this._getTransactionsPendingRequest(wallet.id);
+          pendingRequest.invalidate({ immediately: false });
+          pendingRequest.execute({ walletId: wallet.id });
+
           const lastUpdateDate = await this.api[environment.API].getAdaTxLastUpdatedDate();
           return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
         })
         .catch(() => {}); // Do nothing. It's logged in the api call
-      const pendingRequest = this._getTransactionsPendingRequest(wallet.id);
-      pendingRequest.invalidate({ immediately: false });
-      pendingRequest.execute({ walletId: wallet.id });
     }
   };
 
   _getTransactionsPendingRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.pendingRequest) return foundRequest.pendingRequest;
-    const newRequest = new CachedRequest(this.api[environment.API].refreshPendingTransactions);
-    if (!foundRequest) {
-      this.transactionsRequests.push({
-        walletId,
-        pendingRequest: newRequest,
-        allRequest: undefined,
-        recentRequest: undefined,
-        getBalanceRequest: undefined
-      });
-    } else {
-      foundRequest.pendingRequest = newRequest;
-    }
-    return newRequest;
+    return new CachedRequest(this.api[environment.API].refreshPendingTransactions);
   };
 
   _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {

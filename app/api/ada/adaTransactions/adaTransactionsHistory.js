@@ -58,7 +58,7 @@ export async function refreshTxs() {
   }
 }
 
-export function getPendingAdaTxs() {
+export function getPendingAdaTxs(): Promise<Array<AdaTransaction>> {
   return getPendingTxs();
 }
 
