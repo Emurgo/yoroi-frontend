@@ -27,7 +27,6 @@
       "cwId": "1",
       "cwMeta": {
         "cwAssurance": "CWANormal",
-        "cwName": "Test Wallet",
         "cwUnit": 0
       },
       "cwPassphraseLU": "2018-06-11T18:38:43.339Z"
@@ -373,5 +372,6 @@
         "amount": "500000"
       }
     ]
-  }
+  },
+  "General Settings": {}
 }

@@ -45,9 +45,10 @@ Given(/^My Daedalus wallet hasn't funds/, () => {
   mockRestoredDaedalusAddresses(daedalusAddresses);
 });
 
-Given(/^I am on the Daedalus Transfer screen$/, async function () {
+Given(/^I am on the Daedalus Transfer instructions screen$/, async function () {
   await navigateTo.call(this, '/daedalus-transfer');
   await waitUntilUrlEquals.call(this, '/daedalus-transfer');
+  await this.waitForElement('.daedalusTransferInstructionsPageComponent');
 });
 
 When(/^I click on the create Icarus wallet button$/, async function () {
