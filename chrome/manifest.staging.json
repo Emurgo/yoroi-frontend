@@ -1,5 +1,6 @@
 {
-  "version": "st-0.0.7#67.0_GC-w7",
+  "version": "0.0.7",
+  "version_name": "st-0.0.7#67.0_GC-w7",
   "name": "icarus-light-cardano-wallet-poc",
   "manifest_version": 2,
   "description": "[staging] Icarus light Cardano wallet - PoC",
