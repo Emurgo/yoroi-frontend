@@ -7,7 +7,6 @@ import WalletTransactionsList from '../../components/wallet/transactions/WalletT
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
-import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import resolver from '../../utils/imports';
 import { Logger } from '../../utils/logging';
 
@@ -82,8 +81,6 @@ export default class WalletSummaryPage extends Component<Props> {
     return (
       <VerticalFlexContainer>
         <WalletSummary
-          walletName={wallet.name}
-          amount={wallet.amount.toFormat(DECIMAL_PLACES_IN_ADA)}
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}

@@ -1,10 +1,11 @@
 {
-  "version": "0.0.6",
+  "version": "0.0.7",
+  "version_name": "st-0.0.7#67.0_GC-w7",
   "name": "icarus-light-cardano-wallet-poc",
   "manifest_version": 2,
-  "description": "[testnet] Icarus light Cardano wallet - PoC",
+  "description": "[staging] Icarus light Cardano wallet - PoC",
   "browser_action": {
-    "default_title": "[testnet] Icarus light Cardano wallet - PoC"
+    "default_title": "[staging] Icarus light Cardano wallet - PoC"
   },
   "icons": {
     "16": "img/icon-16.png",
