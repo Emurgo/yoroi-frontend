@@ -5,7 +5,7 @@ Feature: General Settings
     And I have completed the basic setup
 
   Scenario Outline: Navigating through General Settings secondary menu
-    Given There is a default wallet stored
+    Given There is a wallet stored named Test
     And I am on the General Settings "<FROM>" screen
     When I click on secondary menu "<TO>" item
     Then I should see General Settings "<TO>" screen
@@ -27,7 +27,7 @@ Feature: General Settings
 
 
   Scenario: Change language in General Settings
-    Given There is a default wallet stored
+    Given There is a wallet stored named Test
     And I am on the General Settings "general" screen
     And I open General Settings language selection dropdown
     And I select Japanese language

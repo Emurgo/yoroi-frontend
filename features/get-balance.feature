@@ -14,5 +14,5 @@ Feature: Get balance
     Then I should see the balance number "0.020295 ADA"
 
   Scenario: Get balance with a big amount
-    Given There is a wallet stored
+    Given There is a wallet stored named Test
     Then I should see the balance number "9,007,199,254.720698 ADA"

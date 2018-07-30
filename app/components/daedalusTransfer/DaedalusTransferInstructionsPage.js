@@ -116,7 +116,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
     ]);
 
     return (
-      <div>
+      <div className={'daedalusTransferInstructionsPageComponent'}>
 
         <div className={styles.component}>
           <BorderedBox>

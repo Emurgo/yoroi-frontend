@@ -3,7 +3,7 @@ Feature: Generate Addresses
     Given I have opened the chrome extension
     And I have completed the basic setup
     And I am testing "Generate addresses"
-    And There is a wallet stored
+    And There is a wallet stored named Test
     And I go to the receive screen
 
   Scenario: Show my initial receive address
