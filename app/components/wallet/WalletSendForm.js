@@ -9,6 +9,7 @@ import NumericInput from 'react-polymorph/lib/components/NumericInput';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
+import SvgInline from 'react-svg-inline';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import AmountInputSkin from './skins/AmountInputSkin';
 import BorderedBox from '../widgets/BorderedBox';
@@ -17,6 +18,7 @@ import globalMessages from '../../i18n/global-messages';
 import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
 import WalletSendConfirmationDialogContainer from '../../containers/wallet/dialogs/WalletSendConfirmationDialogContainer';
 import { formattedAmountToBigNumber, formattedAmountToNaturalUnits } from '../../utils/formatters';
+import dangerIcon from '../../assets/images/danger.inline.svg';
 
 export const messages = defineMessages({
   titleLabel: {
@@ -88,6 +90,11 @@ export const messages = defineMessages({
     id: 'wallet.send.form.calculatingFee',
     defaultMessage: '!!!Calculating fee...',
     description: 'Calculating fee...',
+  },
+  sendingIsDisabled: {
+    id: 'wallet.send.form.sendingIsDisabled',
+    defaultMessage: '!!!Cannot send a transaction while there is a pending one',
+    description: '"Cannot send a transaction while there is a pending one" error message',
   }
 });
 
@@ -102,6 +109,7 @@ type Props = {
   addressValidator: Function,
   openDialogAction: Function,
   isDialogOpen: Function,
+  hasAnyPending: boolean
 };
 
 type State = {
@@ -205,7 +213,7 @@ export default class WalletSendForm extends Component<Props, State> {
     const { intl } = this.context;
     const {
       currencyUnit, currencyMaxIntegerDigits, currencyMaxFractionalDigits,
-      openDialogAction, isDialogOpen
+      openDialogAction, isDialogOpen, hasAnyPending
     } = this.props;
     const { isTransactionFeeCalculated, transactionFee, transactionFeeError } = this.state;
     const amountField = form.$('amount');
@@ -219,8 +227,17 @@ export default class WalletSendForm extends Component<Props, State> {
       styles.nextButton,
     ]);
 
+    const hasPendingTxWarning = (
+      <div className={styles.contentWarning}>
+        <SvgInline svg={dangerIcon} className={styles.icon} />
+        <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
+      </div>
+    );
+
     return (
       <div className={styles.component}>
+
+        {hasAnyPending && hasPendingTxWarning}
 
         <BorderedBox>
 
@@ -255,8 +272,11 @@ export default class WalletSendForm extends Component<Props, State> {
             onMouseUp={() => openDialogAction({
               dialog: WalletSendConfirmationDialog,
             })}
-            // Form can't be submitted in case transaction fees are not calculated
-            disabled={!isTransactionFeeCalculated}
+            /*
+             * Form can't be submitted in case transaction fees are not calculated
+             * or there's a transaction waiting to be confirmed (pending)
+             */
+            disabled={!isTransactionFeeCalculated || hasAnyPending}
             skin={<SimpleButtonSkin />}
           />
 
