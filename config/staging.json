@@ -1,0 +1,13 @@
+{
+  "network": {
+    "protocolMagic": 633343913,
+    "backendUrl": "https://lld5qq5jl5.execute-api.us-east-1.amazonaws.com/latest",
+    "websocketUrl": "wss://18.206.30.1:443",
+    "name": "staging"
+  },
+  "app": {
+    "walletRefreshInterval": 20000,
+    "logsBufferSize": 500,
+    "logsFileSuffix": "-icarus.log"
+  }
+}
