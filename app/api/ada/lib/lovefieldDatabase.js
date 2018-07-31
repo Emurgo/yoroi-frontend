@@ -158,6 +158,15 @@ export const getTxLastUpdatedDate = async () => {
   return result.length === 1 ? result[0].lastUpdated : undefined;
 };
 
+export const getPendingTxs = function () {
+  const txsTable = _getTxsTable();
+  return db.select()
+    .from(txsTable)
+    .where(txsTable[txsTableSchema.properties.state].eq('CPtxApplying'))
+    .exec()
+    .then(rows => rows.map(row => row[addressesTableSchema.properties.value]));
+};
+
 const _getTxsOrderedBy = (orderField, lfOrder) => {
   const txsTable = _getTxsTable();
   return db.select()

@@ -32,9 +32,9 @@ jobs:
       - run: npm run eslint
 
       # run tests!
-      # - run: npm run test-e2e
-      - run: npm run build -- --env "testnet"
-      - run: npm run compress -- --env "testnet" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/icarus-extension.crx"
+      - run: npm run test-e2e
+      - run: npm run build -- --env "staging"
+      - run: npm run compress -- --env "staging" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/icarus-extension.crx"
 
       # Persist the specified paths (~/repo) into the workspace for use in downstream job. 
       - persist_to_workspace:
@@ -64,4 +64,4 @@ workflows:
             - build
           filters:
             branches:
-              only: testnet
+              only: staging

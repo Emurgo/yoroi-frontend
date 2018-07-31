@@ -200,6 +200,7 @@
   "wallet.send.form.next": "Next",
   "wallet.send.form.receiver.hint": "Wallet Address",
   "wallet.send.form.receiver.label": "Receiver",
+  "wallet.send.form.sendingIsDisabled": "!!!Cannot send a transaction while there is a pending one",
   "wallet.send.form.title.hint": "E.g. Money for Frank",
   "wallet.send.form.title.label": "Title",
   "wallet.send.form.transactionFeeError": "Not enough Ada for fees. Try sending a smaller amount.",

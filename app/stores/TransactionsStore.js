@@ -20,12 +20,15 @@ export default class TransactionsStore extends Store {
 
   @observable transactionsRequests: Array<{
     walletId: string,
+    pendingRequest: CachedRequest<GetTransactionsResponse>,
     recentRequest: CachedRequest<GetTransactionsResponse>,
     allRequest: CachedRequest<GetTransactionsResponse>,
     getBalanceRequest: CachedRequest<GetBalanceResponse>
   }> = [];
 
   @observable _searchOptionsForWallets = {};
+
+  _hasAnyPending: boolean = false;
 
   setup() {
     const actions = this.actions[environment.API].transactions;
@@ -77,6 +80,16 @@ export default class TransactionsStore extends Store {
     return result ? result.transactions.length > 0 : false;
   }
 
+  @computed get hasAnyPending(): boolean {
+    const wallet = this.stores[environment.API].wallets.active;
+    if (!wallet) return false;
+    const result = this._getTransactionsPendingRequest(wallet.id).result;
+    if (result) {
+      this._hasAnyPending = result.length > 0;
+    }
+    return this._hasAnyPending;
+  }
+
   @computed get totalAvailable(): number {
     const wallet = this.stores[environment.API].wallets.active;
     if (!wallet) return 0;
@@ -102,11 +115,21 @@ export default class TransactionsStore extends Store {
       allRequest.execute({ walletId: wallet.id });
       allRequest.promise
         .then(async () => {
+          const pendingRequest = this._getTransactionsPendingRequest(wallet.id);
+          pendingRequest.invalidate({ immediately: false });
+          pendingRequest.execute({ walletId: wallet.id });
+
           const lastUpdateDate = await this.api[environment.API].getAdaTxLastUpdatedDate();
           return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
         })
         .catch(() => {}); // Do nothing. It's logged in the api call
     }
+  };
+
+  _getTransactionsPendingRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
+    const foundRequest = _.find(this.transactionsRequests, { walletId });
+    if (foundRequest && foundRequest.pendingRequest) return foundRequest.pendingRequest;
+    return new CachedRequest(this.api[environment.API].refreshPendingTransactions);
   };
 
   _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {

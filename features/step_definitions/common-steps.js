@@ -43,7 +43,7 @@ Given(/^There is no wallet stored$/, async function () {
   await this.waitForElement('.WalletAdd');
 });
 
-Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
+Given(/^There is a wallet stored named (.*)$/, async function (walletName) {
   await storeWallet(this, walletName);
   await this.waitUntilText('.TopBar_walletName', walletName.toUpperCase());
 });
