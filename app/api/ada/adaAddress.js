@@ -32,8 +32,7 @@ export function isValidAdaAddress(address: string): Promise<boolean> {
     return Promise.resolve(result);
   } catch (error) {
     // This error means the address is not valid
-    if (error.message.includes('Expected(Array, UnsignedInteger)')) return Promise.resolve(false);
-    throw error;
+    return Promise.resolve(false);
   }
 }
 
