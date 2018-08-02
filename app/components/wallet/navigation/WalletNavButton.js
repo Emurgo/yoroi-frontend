@@ -30,7 +30,7 @@ export default class WalletNavButton extends Component<Props> {
     return (
       <button className={componentClasses} onClick={onClick}>
         <div className={styles.container}>
-          {/* <SvgInline svg={icon} className={iconClasses} /> */}
+          {/* <SvgInline svg={icon} className={iconClasses} cleanup={['title']} /> */}
           <span className={styles.label}>{this.props.label}</span>
         </div>
       </button>

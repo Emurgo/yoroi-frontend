@@ -147,7 +147,7 @@ export default class WalletReceive extends Component<Props, State> {
                 text={walletAddress}
                 onCopy={onCopyAddress.bind(this, walletAddress)}
               >
-                <SvgInline svg={iconCopy} className={styles.copyIconBig} />
+                <SvgInline svg={iconCopy} className={styles.copyIconBig} cleanup={['title']} />
               </CopyToClipboard>
             </div>
             <div className={styles.instructionsText}>
@@ -189,7 +189,7 @@ export default class WalletReceive extends Component<Props, State> {
                     onCopy={onCopyAddress.bind(this, address.id)}
                   >
                     <span className={styles.copyAddress}>
-                      <SvgInline svg={iconCopy} className={styles.copyIcon} />
+                      <SvgInline svg={iconCopy} className={styles.copyIcon} cleanup={['title']} />
                       <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
                     </span>
                   </CopyToClipboard>
