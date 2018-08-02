@@ -34,7 +34,6 @@ export default class AddressesStore extends Store {
       if (address != null) {
         this._refreshAddresses();
         runInAction('set last generated address and reset error', () => {
-          this.lastGeneratedAddress = address;
           this.error = null;
         });
       }
@@ -58,7 +57,6 @@ export default class AddressesStore extends Store {
   }
 
   @computed get active(): ?WalletAddress {
-    if (this.lastGeneratedAddress) return this.lastGeneratedAddress;
     const wallet = this.stores.ada.wallets.active;
     if (!wallet) return;
     const result = this._getAddressesAllRequest(wallet.id).result;
