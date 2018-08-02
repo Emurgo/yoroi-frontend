@@ -30,7 +30,7 @@ export default class TopBarCategory extends Component<Props> {
 
     return (
       <button className={componentStyles} onClick={onClick}>
-        <SvgInline svg={icon} className={iconStyles} />
+        <SvgInline svg={icon} className={iconStyles} cleanup={['title']} />
       </button>
     );
   }
