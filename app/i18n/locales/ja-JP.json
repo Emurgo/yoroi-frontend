@@ -19,6 +19,7 @@
   "api.errors.getUtxosForAddressesApiError": "UTxOの取得中にサーバーからエラーを受信しました。",
   "api.errors.getUtxosSumsForAddressesApiError": "残高の取得中にサーバーからエラーを受信しました。",
   "api.errors.invalidWitnessError": "署名が無効です。",
+  "api.errors.noInputsError": "!!!Wallet without funds",
   "api.errors.pendingTransactionError": "保留取引の更新中にエラーが発生しました。",
   "api.errors.sendTransactionApiError": "取引の送信中にサーバーからエラーを受信しました。",
   "api.errors.sendTransactionError": "取引の送信中にAPI方式呼び出しからエラーを受信しました。",
