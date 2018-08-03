@@ -19,6 +19,7 @@
   "api.errors.getUtxosForAddressesApiError": "UTxO를 가져오는 중 서버로부터 오류를 수신했습니다.",
   "api.errors.getUtxosSumsForAddressesApiError": "잔액을 가져오는 중 서버로부터 오류를 수신했습니다.",
   "api.errors.invalidWitnessError": "서명이 잘못되었습니다.",
+  "api.errors.noInputsError": "!!!Wallet without funds",
   "api.errors.pendingTransactionError": "보류 중인 거래를 업데이트하는 중 오류가 발생했습니다.",
   "api.errors.sendTransactionApiError": "거래를 전송하는 중 서버로부터 오류를 수신했습니다.",
   "api.errors.sendTransactionError": "거래를 전송하는 중 API 방식 호출로부터 오류를 수신했습니다.",

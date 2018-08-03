@@ -1,5 +1,6 @@
 // @flow
 import BigNumber from 'bignumber.js';
+import _ from 'lodash';
 import {
   RandomAddressChecker,
   Wallet
@@ -13,6 +14,7 @@ import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import { getBalance } from './adaWallet';
 import {
   GetAddressesWithFundsError,
+  NoInputsError,
   GenerateTransferTxError
 } from './errors';
 import {
@@ -56,6 +58,9 @@ export async function generateTransferTx(payload: {
     const { secretWords, addressesWithFunds } = payload;
     const senders = addressesWithFunds.map(a => a.address);
     const senderUtxos = await getAllUTXOsForAddresses(senders);
+    if (_.isEmpty(senderUtxos)) {
+      throw new NoInputsError();
+    }
     const recoveredBalance = await getBalance(senders);
     const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
     const inputs = _getInputs(senderUtxos, addressesWithFunds);
@@ -70,6 +75,9 @@ export async function generateTransferTx(payload: {
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
+    if (error instanceof NoInputsError) {
+      throw error;
+    }
     throw new GenerateTransferTxError();
   }
 }

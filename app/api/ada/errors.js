@@ -57,6 +57,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Error while getting addresses with funds.',
     description: '"Error while getting addresses with funds." error message'
   },
+  noInputsError: {
+    id: 'api.errors.noInputsError',
+    defaultMessage: '!!!Wallet without funds',
+    description: '"Wallet without funds" error message'
+  },
   generateTransferTxError: {
     id: 'api.errors.generateTransferTxError',
     defaultMessage: '!!!Error while generating transfer transacion.',
@@ -209,6 +214,15 @@ export class GetAddressesWithFundsError extends LocalizableError {
     super({
       id: messages.getAddressesWithFundsError.id,
       defaultMessage: messages.getAddressesWithFundsError.defaultMessage
+    });
+  }
+}
+
+export class NoInputsError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.noInputsError.id,
+      defaultMessage: messages.noInputsError.defaultMessage
     });
   }
 }
