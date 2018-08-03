@@ -89,6 +89,18 @@ Then(/^I should see an Error screen$/, async function () {
   await this.waitUntilText('.DaedalusTransferErrorPage_title', errorPageTitle);
 });
 
+Then(/^I should see 'Connection lost' error message$/, async function () {
+  const errorDescription = await i18n.formatMessage(this.driver,
+    { id: 'daedalusTransfer.error.webSocketRestoreError' });
+  await this.waitUntilText('.DaedalusTransferErrorPage_error', errorDescription);
+});
+
+Then(/^I should see 'Daedalus wallet without funds' error message$/, async function () {
+  const errorDescription = await i18n.formatMessage(this.driver,
+    { id: 'api.errors.noInputsError' });
+  await this.waitUntilText('.DaedalusTransferErrorPage_error', errorDescription);
+});
+
 Then(/^I should wait until funds are recovered:$/, async function (table) {
   const rows = table.hashes();
   await _checkDaedalusAddressesRecoveredAreCorrect(rows, this);

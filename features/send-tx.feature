@@ -71,3 +71,12 @@ Feature: Send transaction
       | WrongPassword |
     And I submit the wallet send form
     Then I should see an incorrect wallet password error message
+
+  Scenario: Sending a Tx changing a valid address for an invalid one
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
+    And I clear the receiver
+    And I fill the receiver as "Invalid address"
+    And I should not be able to submit

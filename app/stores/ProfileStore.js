@@ -13,6 +13,7 @@ export default class SettingsStore extends Store {
   LANGUAGE_OPTIONS = [
     { value: 'en-US', label: globalMessages.languageEnglish },
     { value: 'ja-JP', label: globalMessages.languageJapanese },
+    { value: 'ko-KR', label: globalMessages.languageKorean },
   ];
 
   @observable bigNumberDecimalFormat = {

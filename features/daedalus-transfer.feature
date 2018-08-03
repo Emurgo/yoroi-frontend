@@ -36,6 +36,7 @@ Feature: Transfer Daedalus Wallet funds
     | leaf immune metal phrase river cool domain snow year below result three |
     And I proceed with the recovery
     Then I should see an Error screen
+    And I should see 'Connection lost' error message
   
   @withWebSocketConnection
   Scenario: I transfer funds from my Daedalus wallet
@@ -65,3 +66,4 @@ Feature: Transfer Daedalus Wallet funds
     | leaf immune metal phrase river cool domain snow year below result three |
     And I proceed with the recovery
     Then I should see an Error screen
+    And I should see 'Daedalus wallet without funds' error message
