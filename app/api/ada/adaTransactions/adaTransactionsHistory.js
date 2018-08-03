@@ -7,15 +7,15 @@ import {
   stringifyError
 } from '../../../utils/logging';
 import {
-  getTransactionsHistoryForAddresses,
-  transactionsLimit,
-  addressesLimit,
+  getTransactionsHistoryForAddresses
 } from '../lib/icarus-backend-api';
 import {
   saveTxs,
   getMostRecentTx,
   getTxsOrderedByDateDesc,
-  getTxsOrderedByUpdateDesc
+  getTxsOrderedByUpdateDesc,
+  getTxLastUpdatedDate,
+  getPendingTxs
 } from '../lib/lovefieldDatabase';
 import {
   toAdaTx
@@ -33,11 +33,19 @@ import type
   AdaTransactionInputOutput
 } from '../adaTypes';
 import { saveLastBlockNumber, getLastBlockNumber } from '../adaLocalStorage';
+import type { ConfigType } from '../../../../config/config-types';
+import config from '../../../config';
+
+declare var CONFIG : ConfigType;
+const addressesLimit = CONFIG.app.addressRequestSize;
+const transactionsLimit = config.wallets.TRANSACTION_REQUEST_SIZE;
 
 export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
   const transactions = await getTxsOrderedByDateDesc();
   return Promise.resolve([transactions, transactions.length]);
 };
+
+export const getAdaTxLastUpdatedDate = async (): Promise<Date> => getTxLastUpdatedDate();
 
 export async function refreshTxs() {
   try {
@@ -48,6 +56,10 @@ export async function refreshTxs() {
     Logger.error('adaTransactionsHistory::refreshTxs error: ' + JSON.stringify(error));
     throw new UpdateAdaTxsHistoryError();
   }
+}
+
+export function getPendingAdaTxs(): Promise<Array<AdaTransaction>> {
+  return getPendingTxs();
 }
 
 /**

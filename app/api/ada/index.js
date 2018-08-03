@@ -31,7 +31,9 @@ import {
 } from './restoreAdaWallet';
 import {
   getAdaTxsHistoryByWallet,
+  getAdaTxLastUpdatedDate,
   refreshTxs,
+  getPendingAdaTxs
 } from './adaTransactions/adaTransactionsHistory';
 import {
   getAdaTransactionFee,
@@ -59,6 +61,7 @@ import type {
   CreateWalletRequest,
   CreateWalletResponse,
   GetTransactionsResponse,
+  GetBalanceResponse,
   GetWalletRecoveryPhraseResponse,
   GetWalletsResponse,
   RestoreWalletRequest,
@@ -150,13 +153,11 @@ export type UpdateWalletPasswordResponse = boolean;
 export type AdaWalletRecoveryPhraseResponse = Array<string>;
 
 export default class AdaApi {
+
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
     try {
       const wallet = await getAdaWallet();
-      if (wallet) {
-        await refreshAdaWallet();
-      }
       const wallets: AdaWallets = wallet ? [wallet] : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
@@ -187,6 +188,25 @@ export default class AdaApi {
     }
   }
 
+  async getBalance(): Promise<GetBalanceResponse> {
+    try {
+      await refreshAdaWallet();
+      return Promise.resolve(true);
+    } catch (error) {
+      Logger.error('AdaApi::getBalance error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getAdaTxLastUpdatedDate() : Promise<Date> {
+    try {
+      return getAdaTxLastUpdatedDate();
+    } catch (error) {
+      Logger.error('AdaApi::getAdaTxLastUpdatedDate error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
   async refreshTransactions(request: GetTransactionsRequest): Promise<GetTransactionsResponse> {
     Logger.debug('AdaApi::refreshTransactions called: ' + stringifyData(request));
     const { skip = 0, limit } = request;
@@ -204,6 +224,18 @@ export default class AdaApi {
       });
     } catch (error) {
       Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async refreshPendingTransactions(): Promise<GetTransactionsResponse> {
+    Logger.debug('AdaApi::refreshPendingTransactions called');
+    try {
+      const pendingTxs = await getPendingAdaTxs();
+      Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
+      return pendingTxs;
+    } catch (error) {
+      Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

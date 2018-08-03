@@ -148,6 +148,25 @@ export const getTxsOrderedByDateDesc = function () {
   return _getTxsOrderedBy(txsTableSchema.properties.date, lf.Order.DESC);
 };
 
+export const getTxLastUpdatedDate = async () => {
+  const table = _getTxsTable();
+  const result = await db.select(table[txsTableSchema.properties.lastUpdated])
+    .from(table)
+    .orderBy(table[txsTableSchema.properties.lastUpdated], lf.Order.DESC)
+    .limit(1)
+    .exec();
+  return result.length === 1 ? result[0].lastUpdated : undefined;
+};
+
+export const getPendingTxs = function () {
+  const txsTable = _getTxsTable();
+  return db.select()
+    .from(txsTable)
+    .where(txsTable[txsTableSchema.properties.state].eq('CPtxApplying'))
+    .exec()
+    .then(rows => rows.map(row => row[addressesTableSchema.properties.value]));
+};
+
 const _getTxsOrderedBy = (orderField, lfOrder) => {
   const txsTable = _getTxsTable();
   return db.select()

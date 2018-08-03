@@ -32,7 +32,7 @@ $topBarHeight: 64px;
 }
 
 .contentWrapper {
-  flex: 1;
+  height: 100%;
   overflow-x: hidden;
   overflow-y: overlay;
   position: relative;
@@ -40,4 +40,13 @@ $topBarHeight: 64px;
     height: 7px;
     display: block;
   }
+}
+
+.testnetWarning {
+  font-family: var(--font-bold);
+  text-align: center;
+  color: white;
+  background-color: #b54b4b;
+  padding: 4px;
+  text-transform: uppercase;
 }

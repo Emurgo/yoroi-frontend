@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import BorderedBox from '../widgets/BorderedBox';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './DaedalusTransferErrorPage.scss';
 
@@ -44,8 +43,8 @@ export default class DaedalusTransferErrorPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox>
 
+        <div>
           <div className={styles.body}>
 
             <div className={styles.title}>
@@ -64,8 +63,7 @@ export default class DaedalusTransferErrorPage extends Component<Props> {
             </div>
 
           </div>
-
-        </BorderedBox>
+        </div>
 
       </div>
     );

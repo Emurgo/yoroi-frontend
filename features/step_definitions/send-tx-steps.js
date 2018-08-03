@@ -1,4 +1,5 @@
 import { Given, When, Then, Before, After } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { getMockServer, closeMockServer } from '../support/mockServer';
 import i18n from '../support/helpers/i18n-helpers';
@@ -20,8 +21,15 @@ After({ tags: '@invalidWitnessTest' }, () => {
 });
 
 Given(/^I have a wallet with funds$/, async function () {
-  const { adaWallet } = await this.getFromLocalStorage('WALLET');
-  expect(adaWallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
+  await this.driver.wait(async () => {
+    try {
+      const { adaWallet } = await this.getFromLocalStorage('WALLET');
+      expect(adaWallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  });
 });
 
 When(/^I go to the send transaction screen$/, async function () {
@@ -34,8 +42,16 @@ When(/^I fill the form:$/, async function (table) {
   await this.input('#amount--3', fields.amount);
 });
 
+When(/^I clear the receiver$/, async function () {
+  await this.clearInput('#receiver--2');
+});
+
+When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
+  await this.input('#receiver--2', receiver);
+});
+
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  await this.waitForContent(`//span[contains(text(), '+ ${fee} of fees')]`);
+  await this.waitForElement(`//span[contains(text(), '+ ${fee} of fees')]`, By.xpath);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
@@ -52,9 +68,7 @@ When(/^I enter the wallet password:$/, async function (table) {
 });
 
 When(/^I submit the wallet send form$/, async function () {
-  const button = '.confirmButton';
-  await this.waitEnable(button);
-  await this.click(button);
+  await this.click('.confirmButton');
 });
 
 Then(/^I should see the summary screen$/, async function () {
@@ -66,7 +80,8 @@ Then(/^I should see an invalid address error$/, async function () {
 });
 
 Then(/^I should see a not enough ada error$/, async function () {
-  await this.waitForElement('.amount.SimpleInput_errored');
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.NotEnoughMoneyToSendError' });
+  await this.waitUntilText('.SimpleFormField_error', errorMessage);
 });
 
 Then(/^I should not be able to submit$/, async function () {

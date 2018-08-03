@@ -24,7 +24,7 @@ export default class WalletSendPage extends Component<Props> {
     const { wallets, transactions } = this.props.stores.ada;
     const { actions } = this.props;
     const { isValidAddress } = wallets;
-    const { calculateTransactionFee, validateAmount } = transactions;
+    const { calculateTransactionFee, validateAmount, hasAnyPending } = transactions;
     const activeWallet = wallets.active;
 
     // Guard against potential null values
@@ -42,6 +42,7 @@ export default class WalletSendPage extends Component<Props> {
         addressValidator={isValidAddress}
         isDialogOpen={uiDialogs.isOpen}
         openDialogAction={actions.dialogs.open.trigger}
+        hasAnyPending={hasAnyPending}
       />
     );
   }

@@ -6,19 +6,20 @@ Feature: Transfer Daedalus Wallet funds
     And I am testing "Daedalus transfer funds Screen"
 
   Scenario: I follow setup instructions
-    Given I am on the Daedalus Transfer screen
+    Given There is no wallet stored
+    And I am on the Daedalus Transfer instructions screen
     When I click on the create Icarus wallet button
     Then I should see the Create wallet screen
 
   Scenario: I have access to a working copy of my Daedalus wallet
     Given There is a wallet stored named Test
-    And I am on the Daedalus Transfer screen
+    And I am on the Daedalus Transfer instructions screen
     When I click on the go to the Receive screen button
     Then I should see the Receive screen
 
   Scenario: Transfer fail when I try to transfer funds from an Icarus wallet
     Given There is a wallet stored named Test
-    And I am on the Daedalus Transfer screen
+    And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
@@ -28,7 +29,7 @@ Feature: Transfer Daedalus Wallet funds
   
   Scenario: Try to transfer funds from my Daedalus wallet but connection is lost
     Given There is a wallet stored named Test
-    And I am on the Daedalus Transfer screen
+    And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
     And I enter the recovery phrase:
     | recoveryPhrase                                                          |
@@ -40,7 +41,7 @@ Feature: Transfer Daedalus Wallet funds
   Scenario: I transfer funds from my Daedalus wallet
     Given There is a wallet stored named Test
     And My Daedalus wallet has funds
-    And I am on the Daedalus Transfer screen
+    And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
     And I enter the recovery phrase:
     | recoveryPhrase                                                          |
@@ -57,7 +58,7 @@ Feature: Transfer Daedalus Wallet funds
   Scenario: Try to transfer funds from my Daedalus wallet but it doesn't have funds
     Given There is a wallet stored named Test
     And My Daedalus wallet hasn't funds
-    And I am on the Daedalus Transfer screen
+    And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
     And I enter the recovery phrase:
     | recoveryPhrase                                                          |

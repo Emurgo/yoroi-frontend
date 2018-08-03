@@ -1,13 +1,15 @@
 {
   "network": {
-    "protocolMagic": 633343913,
-    "backendUrl": "https://lld5qq5jl5.execute-api.us-east-1.amazonaws.com/latest",
-    "websocketUrl": "wss://18.206.30.1:443",
+    "protocolMagic": 1097911063,
+    "backendUrl": "https://DEFINE:443",
+    "websocketUrl": "wss://DEFINE:443",
     "name": "testnet"
   },
   "app": {
     "walletRefreshInterval": 20000,
     "logsBufferSize": 500,
-    "logsFileSuffix": "-icarus.log"
+    "logsFileSuffix": "-icarus.log",
+    "addressScanSize": 20,
+    "addressRequestSize": 50
   }
 }

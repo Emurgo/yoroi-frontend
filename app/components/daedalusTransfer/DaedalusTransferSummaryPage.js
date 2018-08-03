@@ -81,11 +81,13 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
     );
 
     const nextButtonClasses = classnames([
+      'transferButton',
       isSubmitting ? styles.isSubmitting : 'primary',
       styles.button,
     ]);
 
     const cancelButtonClasses = classnames([
+      'cancelTransferButton',
       'flat',
       styles.button,
     ]);
