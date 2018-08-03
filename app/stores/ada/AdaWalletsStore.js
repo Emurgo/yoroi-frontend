@@ -163,16 +163,12 @@ export default class AdaWalletsStore extends WalletStore {
 
   @action _setActiveWallet = ({ walletId }: { walletId: string }) => {
     if (this.hasAnyWallets) {
-      const activeWalletId = this.active ? this.active.id : null;
-      const activeWalletChange = activeWalletId !== walletId;
-      if (activeWalletChange) this.stores.ada.addresses.lastGeneratedAddress = null;
       this.active = this.all.find(wallet => wallet.id === walletId);
     }
   };
 
   @action _unsetActiveWallet = () => {
     this.active = null;
-    this.stores.ada.addresses.lastGeneratedAddress = null;
   };
 
   @action _onRouteChange = (options: { route: string, params: ?Object }) => {
