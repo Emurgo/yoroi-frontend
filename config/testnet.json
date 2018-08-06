@@ -2,7 +2,7 @@
   "network": {
     "protocolMagic": 1097911063,
     "backendUrl": "https://18.207.22.26:8080",
-    "websocketUrl": "wss://18.207.22.26:443",
+    "websocketUrl": "wss://18.207.22.26:8080",
     "name": "testnet"
   },
   "app": {
