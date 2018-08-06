@@ -23,6 +23,10 @@ import type {
   AdaAddresses,
   AdaAddress
 } from './adaTypes';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
 
 const { MAX_ALLOWED_UNUSED_ADDRESSES } = config.wallets;
 
@@ -30,10 +34,12 @@ export function isValidAdaAddress(address: string): Promise<boolean> {
   try {
     const result = getOrFail(Wallet.checkAddress(getAddressInHex(address)));
     return Promise.resolve(result);
-  } catch (error) {
+  } catch (validateAddressError) {
+    Logger.error('adaAddress::isValidAdaAddress error: ' +
+      stringifyError(validateAddressError));
+
     // This error means the address is not valid
-    if (error.message.includes('Expected(Array, UnsignedInteger)')) return Promise.resolve(false);
-    throw error;
+    return Promise.resolve(false);
   }
 }
 

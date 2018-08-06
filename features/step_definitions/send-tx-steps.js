@@ -42,6 +42,14 @@ When(/^I fill the form:$/, async function (table) {
   await this.input('#amount--3', fields.amount);
 });
 
+When(/^I clear the receiver$/, async function () {
+  await this.clearInput('#receiver--2');
+});
+
+When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
+  await this.input('#receiver--2', receiver);
+});
+
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
   await this.waitForElement(`//span[contains(text(), '+ ${fee} of fees')]`, By.xpath);
 });

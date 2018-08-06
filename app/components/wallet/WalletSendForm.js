@@ -229,7 +229,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
     const hasPendingTxWarning = (
       <div className={styles.contentWarning}>
-        <SvgInline svg={dangerIcon} className={styles.icon} />
+        <SvgInline svg={dangerIcon} className={styles.icon} cleanup={['title']} />
         <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
       </div>
     );

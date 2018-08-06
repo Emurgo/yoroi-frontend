@@ -10,7 +10,6 @@ import type { GetAddressesResponse, CreateAddressResponse } from '../../api/ada/
 
 export default class AddressesStore extends Store {
 
-  @observable lastGeneratedAddress: ?WalletAddress = null;
   @observable addressesRequests: Array<{
     walletId: string,
     allRequest: CachedRequest<GetAddressesResponse>
@@ -33,10 +32,7 @@ export default class AddressesStore extends Store {
       const address: ?CreateAddressResponse = await this.createAddressRequest.execute().promise;
       if (address != null) {
         this._refreshAddresses();
-        runInAction('set last generated address and reset error', () => {
-          this.lastGeneratedAddress = address;
-          this.error = null;
-        });
+        runInAction('reset error', () => { this.error = null; });
       }
     } catch (error) {
       runInAction('set error', () => { this.error = localizedError(error); });
@@ -58,7 +54,6 @@ export default class AddressesStore extends Store {
   }
 
   @computed get active(): ?WalletAddress {
-    if (this.lastGeneratedAddress) return this.lastGeneratedAddress;
     const wallet = this.stores.ada.wallets.active;
     if (!wallet) return;
     const result = this._getAddressesAllRequest(wallet.id).result;

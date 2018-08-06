@@ -201,7 +201,7 @@ export default class Transaction extends Component<Props, State> {
                   // hide currency (we are showing symbol instead)
                   formattedWalletAmount(data.amount, false)
                 }
-                <SvgInline svg={symbol} className={styles.currencySymbol} />
+                <SvgInline svg={symbol} className={styles.currencySymbol} cleanup={['title']} />
               </div>
             </div>
           </div>

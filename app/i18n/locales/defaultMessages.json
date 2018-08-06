@@ -156,17 +156,31 @@
         }
       },
       {
-        "defaultMessage": "!!!Error while generating transfer transacion.",
-        "description": "\"Error while generating transfer transacion.\" error message",
+        "defaultMessage": "!!!Wallet without funds",
+        "description": "\"Wallet without funds\" error message",
         "end": {
           "column": 3,
           "line": 64
         },
         "file": "app/api/ada/errors.js",
+        "id": "api.errors.noInputsError",
+        "start": {
+          "column": 17,
+          "line": 60
+        }
+      },
+      {
+        "defaultMessage": "!!!Error while generating transfer transacion.",
+        "description": "\"Error while generating transfer transacion.\" error message",
+        "end": {
+          "column": 3,
+          "line": 69
+        },
+        "file": "app/api/ada/errors.js",
         "id": "api.errors.generateTransferTxError",
         "start": {
           "column": 27,
-          "line": 60
+          "line": 65
         }
       },
       {
@@ -174,13 +188,13 @@
         "description": "\"Error received from api method call while sending tx.\" error message",
         "end": {
           "column": 3,
-          "line": 69
+          "line": 74
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.sendTransactionError",
         "start": {
           "column": 24,
-          "line": 65
+          "line": 70
         }
       },
       {
@@ -188,13 +202,13 @@
         "description": "\"Error received from api method call while getting utxos.\" error message",
         "end": {
           "column": 3,
-          "line": 74
+          "line": 79
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.getAllUTXOsForAddressesError",
         "start": {
           "column": 32,
-          "line": 70
+          "line": 75
         }
       },
       {
@@ -202,13 +216,13 @@
         "description": "\"Error received from api method call while discovering addresses.\" error message",
         "end": {
           "column": 3,
-          "line": 79
+          "line": 84
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.discoverAddressesError",
         "start": {
           "column": 26,
-          "line": 75
+          "line": 80
         }
       },
       {
@@ -216,13 +230,13 @@
         "description": "\"Error received from server while getting UTXOs.\" error message",
         "end": {
           "column": 3,
-          "line": 84
+          "line": 89
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.getUtxosForAddressesApiError",
         "start": {
           "column": 32,
-          "line": 80
+          "line": 85
         }
       },
       {
@@ -230,13 +244,13 @@
         "description": "\"Error received from server while getting balance.\" error message",
         "end": {
           "column": 3,
-          "line": 89
+          "line": 94
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.getUtxosSumsForAddressesApiError",
         "start": {
           "column": 36,
-          "line": 85
+          "line": 90
         }
       },
       {
@@ -244,13 +258,13 @@
         "description": "\"Error received from server while getting txs.\" error message",
         "end": {
           "column": 3,
-          "line": 94
+          "line": 99
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.getTxHistoryForAddressesApiError",
         "start": {
           "column": 36,
-          "line": 90
+          "line": 95
         }
       },
       {
@@ -258,13 +272,13 @@
         "description": "\"Error received from server while sending tx.\" error message",
         "end": {
           "column": 3,
-          "line": 99
+          "line": 104
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.sendTransactionApiError",
         "start": {
           "column": 27,
-          "line": 95
+          "line": 100
         }
       },
       {
@@ -272,13 +286,13 @@
         "description": "\"Error received from server while checking used addresses.\" error message",
         "end": {
           "column": 3,
-          "line": 104
+          "line": 109
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.checkAdressesInUseApiError",
         "start": {
           "column": 30,
-          "line": 100
+          "line": 105
         }
       },
       {
@@ -286,13 +300,13 @@
         "description": "\"Error received from server while getting pending txs.\" error message",
         "end": {
           "column": 3,
-          "line": 109
+          "line": 114
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.getPendingTxsForAddressesApiError",
         "start": {
           "column": 37,
-          "line": 105
+          "line": 110
         }
       },
       {
@@ -300,13 +314,13 @@
         "description": "\"The signature is invalid.\" error message",
         "end": {
           "column": 3,
-          "line": 114
+          "line": 119
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.invalidWitnessError",
         "start": {
           "column": 23,
-          "line": 110
+          "line": 115
         }
       }
     ],
@@ -1068,13 +1082,13 @@
         "description": "Message alerting users the wallet is not running in mainnet.",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 22
         },
         "file": "app/components/layout/SidebarLayout.js",
         "id": "testnet.label.message",
         "start": {
           "column": 16,
-          "line": 19
+          "line": 18
         }
       }
     ],
@@ -1908,13 +1922,13 @@
         "description": "\"Outgoing pending confirmation\" label on Wallet summary page",
         "end": {
           "column": 3,
-          "line": 18
+          "line": 17
         },
         "file": "app/components/wallet/summary/WalletSummary.js",
         "id": "wallet.summary.page.pendingOutgoingConfirmationLabel",
         "start": {
           "column": 36,
-          "line": 14
+          "line": 13
         }
       },
       {
@@ -1922,13 +1936,13 @@
         "description": "\"Incoming pending confirmation\" label on Wallet summary page",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 22
         },
         "file": "app/components/wallet/summary/WalletSummary.js",
         "id": "wallet.summary.page.pendingIncomingConfirmationLabel",
         "start": {
           "column": 36,
-          "line": 19
+          "line": 18
         }
       },
       {
@@ -1936,13 +1950,13 @@
         "description": "\"Number of transactions\" label on Wallet summary page",
         "end": {
           "column": 3,
-          "line": 28
+          "line": 27
         },
         "file": "app/components/wallet/summary/WalletSummary.js",
         "id": "wallet.summary.page.transactionsLabel",
         "start": {
           "column": 21,
-          "line": 24
+          "line": 23
         }
       }
     ],
@@ -2587,13 +2601,13 @@
         "description": "Label for wallet address on the wallet \"Receive page\"",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 24
         },
         "file": "app/components/wallet/WalletReceive.js",
         "id": "wallet.receive.page.walletAddressLabel",
         "start": {
           "column": 22,
-          "line": 19
+          "line": 20
         }
       },
       {
@@ -2601,13 +2615,13 @@
         "description": "Wallet receive payments instructions on the wallet \"Receive page\"",
         "end": {
           "column": 3,
-          "line": 28
+          "line": 29
         },
         "file": "app/components/wallet/WalletReceive.js",
         "id": "wallet.receive.page.walletReceiveInstructions",
         "start": {
           "column": 29,
-          "line": 24
+          "line": 25
         }
       },
       {
@@ -2615,13 +2629,13 @@
         "description": "Label for \"Generate new address\" button on the wallet \"Receive page\"",
         "end": {
           "column": 3,
-          "line": 33
+          "line": 34
         },
         "file": "app/components/wallet/WalletReceive.js",
         "id": "wallet.receive.page.generateNewAddressButtonLabel",
         "start": {
           "column": 33,
-          "line": 29
+          "line": 30
         }
       },
       {
@@ -2629,13 +2643,13 @@
         "description": "\"Generated addresses\" section title on the wallet \"Receive page\"",
         "end": {
           "column": 3,
-          "line": 38
+          "line": 39
         },
         "file": "app/components/wallet/WalletReceive.js",
         "id": "wallet.receive.page.generatedAddressesSectionTitle",
         "start": {
           "column": 34,
-          "line": 34
+          "line": 35
         }
       },
       {
@@ -2643,13 +2657,13 @@
         "description": "Label for \"hide used\" wallet addresses link on the wallet \"Receive page\"",
         "end": {
           "column": 3,
-          "line": 43
+          "line": 44
         },
         "file": "app/components/wallet/WalletReceive.js",
         "id": "wallet.receive.page.hideUsedLabel",
         "start": {
           "column": 17,
-          "line": 39
+          "line": 40
         }
       },
       {
@@ -2657,13 +2671,13 @@
         "description": "Label for \"show used\" wallet addresses link on the wallet \"Receive page\"",
         "end": {
           "column": 3,
-          "line": 48
+          "line": 49
         },
         "file": "app/components/wallet/WalletReceive.js",
         "id": "wallet.receive.page.showUsedLabel",
         "start": {
           "column": 17,
-          "line": 44
+          "line": 45
         }
       },
       {
@@ -2671,13 +2685,13 @@
         "description": "Label for \"Copy address\" link on the wallet \"Receive page\"",
         "end": {
           "column": 3,
-          "line": 53
+          "line": 54
         },
         "file": "app/components/wallet/WalletReceive.js",
         "id": "wallet.receive.page.copyAddressLabel",
         "start": {
           "column": 20,
-          "line": 49
+          "line": 50
         }
       }
     ],
@@ -3436,13 +3450,13 @@
         "description": "Message shown when wallet has no transactions on wallet summary page.",
         "end": {
           "column": 3,
-          "line": 24
+          "line": 23
         },
         "file": "app/containers/wallet/WalletSummaryPage.js",
         "id": "wallet.summary.no.transactions",
         "start": {
           "column": 18,
-          "line": 19
+          "line": 18
         }
       },
       {
@@ -3450,13 +3464,13 @@
         "description": "Message shown when wallet transaction search returns zero results.",
         "end": {
           "column": 3,
-          "line": 29
+          "line": 28
         },
         "file": "app/containers/wallet/WalletSummaryPage.js",
         "id": "wallet.summary.no.transaction",
         "start": {
           "column": 23,
-          "line": 25
+          "line": 24
         }
       }
     ],
