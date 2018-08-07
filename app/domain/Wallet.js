@@ -3,6 +3,7 @@ import { observable, computed } from 'mobx';
 import BigNumber from 'bignumber.js';
 import type { AssuranceMode, AssuranceModeOption } from '../types/transactionAssuranceTypes';
 import { assuranceModes, assuranceModeOptions } from '../config/transactionAssuranceConfig';
+import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 
 export default class Wallet {
 
@@ -23,8 +24,10 @@ export default class Wallet {
     Object.assign(this, data);
   }
 
-  @computed get hasFunds(): boolean {
-    return this.amount > 0;
+  @computed get balance(): BigNumber {
+    return this.amount.dividedBy(
+      LOVELACES_PER_ADA
+    );
   }
 
   @computed get assuranceMode(): AssuranceMode {

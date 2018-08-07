@@ -1,6 +1,7 @@
 // @flow
 import { observable, computed, action, extendObservable } from 'mobx';
 import _ from 'lodash';
+import BigNumber from 'bignumber.js';
 import Store from './lib/Store';
 import CachedRequest from './lib/LocalizedCachedRequest';
 import WalletTransaction from '../domain/WalletTransaction';
@@ -98,7 +99,9 @@ export default class TransactionsStore extends Store {
   }
 
   @action _refreshTransactionData = () => {
-    const allWallets = this.stores[environment.API].wallets.all;
+    const walletsStore = this.stores[environment.API].wallets;
+    const walletsActions = this.actions[environment.API].wallets;
+    const allWallets = walletsStore.all;
     for (const wallet of allWallets) {
       const searchLimit = this.searchOptions ?
         this.searchOptions.searchLimit : this.INITIAL_SEARCH_LIMIT;
@@ -118,9 +121,14 @@ export default class TransactionsStore extends Store {
           const pendingRequest = this._getTransactionsPendingRequest(wallet.id);
           pendingRequest.invalidate({ immediately: false });
           pendingRequest.execute({ walletId: wallet.id });
-
           const lastUpdateDate = await this.api[environment.API].getAdaTxLastUpdatedDate();
           return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
+        })
+        .then((updatedBalance: BigNumber) => {
+          if (walletsStore.active.id === wallet.id) {
+            walletsActions.updateBalance.trigger(updatedBalance);
+          }
+          return undefined;
         })
         .catch(() => {}); // Do nothing. It's logged in the api call
     }

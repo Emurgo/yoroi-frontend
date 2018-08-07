@@ -20,7 +20,7 @@ export default class TopBarContainer extends Component<Props> {
 
     return (
       <TopBar
-        activeWallet={stores[environment.API].wallets.active}
+        wallets={stores[environment.API].wallets}
         currentRoute={app.currentRoute}
         showSubMenus={false}
         formattedWalletAmount={formattedWalletAmount}

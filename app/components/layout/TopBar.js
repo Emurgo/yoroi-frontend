@@ -5,14 +5,14 @@ import { kebabCase } from 'lodash';
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import TopBarCategory from './TopBarCategory';
-import Wallet from '../../domain/Wallet';
 import styles from './TopBar.scss';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
+import WalletsStore from '../../stores/WalletStore';
 
 type Props = {
   children?: ?Node,
-  activeWallet?: ?Wallet,
+  wallets?: ?WalletsStore,
   currentRoute: string,
   showSubMenus?: ?boolean,
   formattedWalletAmount?: Function,
@@ -30,11 +30,11 @@ export default class TopBar extends Component<Props> {
 
   render() {
     const {
-      activeWallet, currentRoute, formattedWalletAmount,
+      wallets, currentRoute, formattedWalletAmount,
       categories, activeSidebarCategory, onCategoryClicked,
     } = this.props;
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-    const showWalletInfo = walletRoutesMatch && activeWallet != null;
+    const showWalletInfo = walletRoutesMatch && wallets.active != null;
     const topBarStyles = classNames([
       styles.topBar,
       showWalletInfo ? styles.withWallet : styles.withoutWallet,
@@ -42,9 +42,9 @@ export default class TopBar extends Component<Props> {
 
     const topBarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
-        <div className={styles.walletName}>{activeWallet.name}</div>
+        <div className={styles.walletName}>{wallets.active.name}</div>
         <div className={styles.walletAmount}>
-          { formattedWalletAmount(activeWallet.amount, true, true) + ' ADA' }
+          { formattedWalletAmount(wallets.active.balance, true, true) + ' ADA' }
         </div>
       </div>
     ) : null;

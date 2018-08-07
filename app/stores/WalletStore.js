@@ -161,6 +161,10 @@ export default class WalletsStore extends Store {
 
   // ACTIONS
 
+  @action.bound _updateBalance(balance: BigNumber): void {
+    this.active.amount = balance;
+  }
+
   @action refreshWalletsData = async () => {
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
