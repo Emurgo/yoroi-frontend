@@ -27,7 +27,7 @@ Given(/^I have completed the basic setup$/, async function () {
 
   await this.waitForElement('.TermsOfUseForm_component');
   await this.driver.executeScript(() => {
-    window.icarus.actions.profile.acceptTermsOfUse.trigger();
+    window.yoroi.actions.profile.acceptTermsOfUse.trigger();
   });
 });
 
@@ -50,7 +50,7 @@ Given(/^There is a wallet stored named (.*)$/, async function (walletName) {
 
 function refreshWallet(client) {
   return client.driver.executeAsyncScript((done) => {
-    window.icarus.stores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
+    window.yoroi.stores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
   });
 }
 

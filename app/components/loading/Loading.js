@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
-import icarusLogo from '../../assets/images/icarus-logo-loading.inline.svg';
+import yoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
 import type { ReactIntlMessage } from '../../types/i18nTypes';
 import environment from '../../environment';
@@ -46,8 +46,8 @@ export default class Loading extends Component<Props, State> {
       styles.component,
       hasLoadedCurrentTheme ? null : styles['is-loading-theme']
     ]);
-    const icarusLogoStyles = classNames([
-      styles.icarusLogo
+    const yoroiLogoStyles = classNames([
+      styles.yoroiLogo
     ]);
     const currencyLogoStyles = classNames([
       styles[`${environment.API}-logo`],
@@ -56,7 +56,7 @@ export default class Loading extends Component<Props, State> {
       styles[`${environment.API}-apiLogo`],
     ]);
 
-    const icarusLoadingLogo = icarusLogo;
+    const yoroiLoadingLogo = yoroiLogo;
     const currencyLoadingLogo = currencyIcon;
     const apiLoadingLogo = apiIcon;
 
@@ -64,7 +64,7 @@ export default class Loading extends Component<Props, State> {
       <div className={componentStyles}>
         <div className={styles.logos}>
           <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} cleanup={['title']} />
-          <SvgInline svg={icarusLoadingLogo} className={icarusLogoStyles} cleanup={['title']} />
+          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} cleanup={['title']} />
           <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} cleanup={['title']} />
         </div>
         {hasLoadedCurrentLocale && (

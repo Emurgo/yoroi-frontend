@@ -31,7 +31,7 @@ Then(/^I should not see the language selection screen anymore$/, async function 
 
 Then(/^I should have Japanese language set$/, async function () {
   const result = await this.driver.executeAsyncScript((done) => {
-    window.icarus.stores.profile.getProfileLocaleRequest.execute()
+    window.yoroi.stores.profile.getProfileLocaleRequest.execute()
       .then(done)
       .catch((error) => done(error));
   });

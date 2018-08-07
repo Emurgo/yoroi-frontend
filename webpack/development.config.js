@@ -12,7 +12,7 @@ const hotScript =
 const baseDevConfig = () => ({
   devtool: 'eval-cheap-module-source-map',
   entry: {
-    icaruspoc: [
+    yoroipoc: [
       customPath,
       hotScript,
       path.join(__dirname, '../chrome/extension/index')

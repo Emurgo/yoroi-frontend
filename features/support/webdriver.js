@@ -14,7 +14,7 @@ function CustomWorld() {
       }
     })
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../icarus-light-cardano-wallet-poc-test.crx')))
+    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-light-cardano-wallet-poc-test.crx')))
     .build();
 
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
@@ -104,17 +104,17 @@ function CustomWorld() {
 
   this.intl = (key, lang = 'en-US') =>
     this.driver.executeScript((k, l) =>
-        window.icarus.translations[l][k]
+        window.yoroi.translations[l][k]
     , key, lang);
 
   this.saveAddressesToDB = addresses =>
     this.driver.executeScript(addrs => {
-      addrs.forEach(addr => window.icarus.api.ada.saveAddress(addr, 'External'));
+      addrs.forEach(addr => window.yoroi.api.ada.saveAddress(addr, 'External'));
     }, addresses);
 
   this.saveTxsToDB = transactions => {
     this.driver.executeScript(txs => {
-      window.icarus.api.ada.saveTxs(txs);
+      window.yoroi.api.ada.saveTxs(txs);
     }, transactions);
   };
 }

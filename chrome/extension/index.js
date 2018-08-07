@@ -14,13 +14,13 @@ import '../../app/themes/index.global.scss';
 // run MobX in strict mode
 useStrict(true);
 
-const initializeIcarus = async () => {
+const initializeYoroi = async () => {
   const api = setupApi();
   const router = new RouterStore();
   const history = syncHistoryWithStore(hashHistory, router);
   const stores = createStores(api, actions, router);
 
-  window.icarus = {
+  window.yoroi = {
     api,
     actions,
     translations,
@@ -37,4 +37,4 @@ const initializeIcarus = async () => {
   );
 };
 
-window.addEventListener('load', initializeIcarus);
+window.addEventListener('load', initializeYoroi);

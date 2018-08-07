@@ -26,7 +26,7 @@ Then(/^I should not see the "Terms of use" screen anymore$/, async function () {
 
 Then(/^I should have "Terms of use" accepted$/, async function () {
   const result = await this.driver.executeAsyncScript((done) => {
-    window.icarus.stores.profile.getTermsOfUseAcceptanceRequest.execute()
+    window.yoroi.stores.profile.getTermsOfUseAcceptanceRequest.execute()
       .then(done)
       .catch((error) => done(error));
   });

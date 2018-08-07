@@ -26,7 +26,7 @@ export default class App extends Component<{
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
-    const currentTheme = 'icarus';
+    const currentTheme = 'yoroi';
     const theme = require(`./themes/daedalus/${currentTheme}.js`); // eslint-disable-line
 
     return (
