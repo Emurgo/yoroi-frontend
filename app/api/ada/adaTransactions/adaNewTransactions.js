@@ -4,7 +4,7 @@ import { Wallet } from 'rust-cardano-crypto';
 import {
   getUTXOsForAddresses,
   sendTx
-} from '../lib/icarus-backend-api';
+} from '../lib/yoroi-backend-api';
 import {
   mapToList
 } from '../lib/utils';

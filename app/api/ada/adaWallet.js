@@ -29,7 +29,7 @@ import type {
 } from './index';
 import {
   getUTXOsSumsForAddresses
-} from './lib/icarus-backend-api';
+} from './lib/yoroi-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
 import { saveAdaWallet, getAdaWallet, getWalletMasterKey } from './adaLocalStorage';
 import type { ConfigType } from '../../../config/config-types';
@@ -64,7 +64,7 @@ export const updateAdaWallet = async (
   }
 };
 
-export const refreshAdaWallet = async (): Promise<?AdaWallet> => {
+export const updateAdaWalletBalance = async (): Promise<?BigNumber> => {
   const persistentWallet = getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
   const adaAddresses = await getAdaAddressesList();
@@ -77,9 +77,9 @@ export const refreshAdaWallet = async (): Promise<?AdaWallet> => {
       }
     });
     _saveAdaWalletKeepingMasterKey(updatedWallet);
-    return updatedWallet;
+    return updatedWallet.cwAmount.getCCoin;
   } catch (error) {
-    Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
+    Logger.error('adaWallet::updateAdaWalletBalance error: ' + stringifyError(error));
     throw new UpdateAdaWalletError();
   }
 };

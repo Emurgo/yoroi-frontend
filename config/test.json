@@ -7,7 +7,7 @@
   "app": {
     "walletRefreshInterval": 2000,
     "logsBufferSize": 500,
-    "logsFileSuffix": "-icarus.log",
+    "logsFileSuffix": "-yoroi.log",
     "addressScanSize": 3,
     "addressRequestSize": 5
   }

@@ -51,7 +51,7 @@ Given(/^I am on the Daedalus Transfer instructions screen$/, async function () {
   await this.waitForElement('.daedalusTransferInstructionsPageComponent');
 });
 
-When(/^I click on the create Icarus wallet button$/, async function () {
+When(/^I click on the create Yoroi wallet button$/, async function () {
   await this.click('.instructionsButton');
 });
 

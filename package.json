@@ -1,13 +1,13 @@
 {
-  "name": "icarus-light-cardano-wallet-poc",
+  "name": "yoroi-light-cardano-wallet-poc",
   "version": "0.0.1",
-  "description": "Icarus light Cardano wallet - PoC",
+  "description": "Yoroi light Cardano wallet - PoC",
   "scripts": {
     "start": "node scripts/start",
     "dev": "node scripts/start --env 'development'",
     "build": "node scripts/build",
     "compress": "node scripts/compress",
-    "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'icarus-light-cardano-wallet-poc' --codebase 'https://www.iohk.io/dw/icarus-extension.crx' --key ./e2etest-key.pem",
+    "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi-light-cardano-wallet-poc' --codebase 'https://www.iohk.io/dw/yoroi-extension.crx' --key ./e2etest-key.pem",
     "compress-keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx dll/",
     "flow": "flow .",
