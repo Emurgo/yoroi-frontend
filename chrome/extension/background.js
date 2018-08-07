@@ -24,7 +24,7 @@ promisifyAll(chrome.storage, ['local']);
 
 
 function getBaseUrl(url) {
-  return url.split("#")[0];
+  return url.split('#')[0];
 }
 
 let currentTab;

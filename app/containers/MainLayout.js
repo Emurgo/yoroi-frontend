@@ -27,7 +27,6 @@ export default class MainLayout extends Component<MainLayoutProps> {
   render() {
     const { actions, stores, topbar } = this.props;
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
-
     return (
       <SidebarLayout
         topbar={topbarComponent}
