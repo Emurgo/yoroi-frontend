@@ -44,10 +44,12 @@ export async function restoreAdaWallet({
       _discoverAllAddressesFrom(cryptoAccount, 'Internal', -1, addressScanSize, addressRequestSize);
     if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
       // TODO: Store all at once
-      saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External');
-      saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal');
+      await Promise.all([
+        saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External'),
+        saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal')
+      ]);
     } else {
-      newAdaAddress(cryptoAccount, [], 'External');
+      await newAdaAddress(cryptoAccount, [], 'External');
     }
   } catch (discoverAddressesError) {
     Logger.error('restoreAdaWallet::restoreAdaWallet error: ' +
