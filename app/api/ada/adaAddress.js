@@ -106,13 +106,13 @@ export function removeAdaAddress(address: AdaAddress): void {
   deleteAddress(address.cadId);
 }
 
-export function saveAsAdaAddresses(
+export async function saveAsAdaAddresses(
   cryptoAccount: CryptoAccount,
   addresses: Array<string>,
   addressType: AddressType
-): void {
+): Promise<void> {
   const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) =>
     toAdaAddress(cryptoAccount.account, addressType, index, hash)
   );
-  saveAddresses(mappedAddresses, addressType);
+  return saveAddresses(mappedAddresses, addressType);
 }

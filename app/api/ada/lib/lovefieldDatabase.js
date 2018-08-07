@@ -117,7 +117,7 @@ export const getAddressesListByType = addressType => {
     ));
 };
 
-export const saveAddresses = (addresses, type) => {
+export const saveAddresses = async (addresses, type) => {
   const rows = addresses.map(address => _addressToRow(address, type));
   return _insertOrReplaceQuery(rows, _getAddressesTable()).exec();
 };
