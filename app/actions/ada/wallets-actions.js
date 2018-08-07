@@ -1,4 +1,5 @@
 // @flow
+import BigNumber from 'bignumber.js';
 import Action from '../lib/Action';
 
 export type WalletImportFromFileParams = {

@@ -33,8 +33,9 @@ export default class TopBar extends Component<Props> {
       wallets, currentRoute, formattedWalletAmount,
       categories, activeSidebarCategory, onCategoryClicked,
     } = this.props;
+    const activeWallet = wallets && wallets.active;
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-    const showWalletInfo = walletRoutesMatch && wallets.active != null;
+    const showWalletInfo = walletRoutesMatch && activeWallet;
     const topBarStyles = classNames([
       styles.topBar,
       showWalletInfo ? styles.withWallet : styles.withoutWallet,
@@ -42,9 +43,9 @@ export default class TopBar extends Component<Props> {
 
     const topBarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
-        <div className={styles.walletName}>{wallets.active.name}</div>
+        <div className={styles.walletName}>{activeWallet && activeWallet.name}</div>
         <div className={styles.walletAmount}>
-          { formattedWalletAmount(wallets.active.amount) + ' ADA' }
+          { activeWallet && formattedWalletAmount(activeWallet.amount) + ' ADA' }
         </div>
       </div>
     ) : null;

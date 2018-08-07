@@ -1,5 +1,6 @@
 // @flow
 import { observable, action, computed, runInAction } from 'mobx';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import Store from './lib/Store';
 import Wallet from '../domain/Wallet';
@@ -163,9 +164,11 @@ export default class WalletsStore extends Store {
   // ACTIONS
 
   @action.bound _updateBalance(balance: BigNumber): void {
-    this.active.amount = balance.dividedBy(
-      LOVELACES_PER_ADA
-    );
+    if (this.active) {
+      this.active.updateAmount(balance.dividedBy(
+        LOVELACES_PER_ADA
+      ));
+    }
   }
 
   @action refreshWalletsData = async () => {

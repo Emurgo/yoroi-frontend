@@ -23,6 +23,9 @@ export default class Wallet {
     Object.assign(this, data);
   }
 
+  updateAmount(amount: BigNumber): void {
+    this.amount = amount;
+  }
 
   @computed get assuranceMode(): AssuranceMode {
     switch (this.assurance) {
