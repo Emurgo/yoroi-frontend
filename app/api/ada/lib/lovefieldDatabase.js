@@ -35,7 +35,7 @@ let db;
 export const loadLovefieldDB = () => {
   if (db) return Promise.resolve(db);
 
-  const schemaBuilder = lf.schema.create('icarus-schema', 1);
+  const schemaBuilder = lf.schema.create('yoroi-schema', 1);
 
   schemaBuilder.createTable(txsTableSchema.name)
     .addColumn(txsTableSchema.properties.id, Type.STRING)

@@ -7,7 +7,7 @@ const customPath = path.join(__dirname, './customPublicPath');
 
 module.exports = {
   entry: {
-    icaruspoc: [
+    yoroipoc: [
       customPath,
       path.join(__dirname, '../chrome/extension/index')
     ],

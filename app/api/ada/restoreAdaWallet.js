@@ -8,7 +8,7 @@ import {
 } from './adaAddress';
 import {
   checkAddressesInUse,
-} from './lib/icarus-backend-api';
+} from './lib/yoroi-backend-api';
 import type {
   AdaWallet,
   AdaWalletParams

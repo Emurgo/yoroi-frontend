@@ -1,10 +1,10 @@
 {
   "version": "0.0.0",
-  "name": "icarus-light-cardano-wallet-poc",
+  "name": "yoroi-light-cardano-wallet-poc",
   "manifest_version": 2,
-  "description": "[test] Icarus light Cardano wallet - PoC",
+  "description": "[test] Yoroi light Cardano wallet - PoC",
   "browser_action": {
-    "default_title": "[test] Icarus light Cardano wallet - PoC"
+    "default_title": "[test] Yoroi light Cardano wallet - PoC"
   },
   "icons": {
     "16": "img/icon-16.png",
