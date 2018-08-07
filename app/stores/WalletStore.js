@@ -8,6 +8,7 @@ import { buildRoute, matchRoute } from '../utils/routing';
 import { ROUTES } from '../routes-config';
 import type { GetWalletRecoveryPhraseResponse } from '../api/common';
 import environment from '../environment';
+import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 
 /**
  * The base wallet store that contains the shared logic
@@ -162,7 +163,9 @@ export default class WalletsStore extends Store {
   // ACTIONS
 
   @action.bound _updateBalance(balance: BigNumber): void {
-    this.active.amount = balance;
+    this.active.amount = balance.dividedBy(
+      LOVELACES_PER_ADA
+    );
   }
 
   @action refreshWalletsData = async () => {

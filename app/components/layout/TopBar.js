@@ -44,7 +44,7 @@ export default class TopBar extends Component<Props> {
       <div className={styles.walletInfo}>
         <div className={styles.walletName}>{wallets.active.name}</div>
         <div className={styles.walletAmount}>
-          { formattedWalletAmount(wallets.active.balance, true, true) + ' ADA' }
+          { formattedWalletAmount(wallets.active.amount) + ' ADA' }
         </div>
       </div>
     ) : null;
