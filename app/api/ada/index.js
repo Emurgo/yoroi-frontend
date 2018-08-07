@@ -17,7 +17,7 @@ import {
   getAdaAccountRecoveryPhrase,
   newAdaWallet,
   updateAdaWallet,
-  refreshAdaWallet,
+  updateAdaWalletBalance,
   changeAdaWalletPassphrase
 } from './adaWallet';
 import {
@@ -190,8 +190,7 @@ export default class AdaApi {
 
   async getBalance(): Promise<GetBalanceResponse> {
     try {
-      await refreshAdaWallet();
-      return Promise.resolve(true);
+      return updateAdaWalletBalance();
     } catch (error) {
       Logger.error('AdaApi::getBalance error: ' + stringifyError(error));
       throw new GenericApiError();

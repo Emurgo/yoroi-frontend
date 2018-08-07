@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-// import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import TopBar from '../components/layout/TopBar';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
@@ -10,7 +10,7 @@ const { formattedWalletAmount } = resolver('utils/formatters');
 
 type Props = InjectedProps;
 
-// @inject('stores', 'actions') @observer
+@observer
 export default class TopBarContainer extends Component<Props> {
   static defaultProps = { actions: null, stores: null };
 

@@ -1,6 +1,5 @@
 // @flow
 import Action from '../lib/Action';
-import type { walletExportTypeChoices } from '../../types/walletExportTypes';
 
 export type WalletImportFromFileParams = {
   filePath: string,
@@ -17,5 +16,4 @@ export default class WalletsActions {
   importWalletFromFile: Action<WalletImportFromFileParams> = new Action();
   deleteWallet: Action<{ walletId: string }> = new Action();
   sendMoney: Action<{ receiver: string, amount: string, password: ?string }> = new Action();
-  chooseWalletExportType: Action<{ walletExportType: walletExportTypeChoices }> = new Action();
 }

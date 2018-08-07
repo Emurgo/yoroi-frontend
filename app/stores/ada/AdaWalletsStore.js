@@ -6,7 +6,6 @@ import Wallet from '../../domain/Wallet';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '.././lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
-import type { walletExportTypeChoices } from '../../types/walletExportTypes';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type { ImportWalletFromFileResponse } from '../../api/ada/index';
 import type {
@@ -18,18 +17,26 @@ import type {
 export default class AdaWalletsStore extends WalletStore {
 
   // REQUESTS
-  /* eslint-disable max-len */
-  @observable walletsRequest: Request<GetWalletsResponse> = new Request(this.api.ada.getWallets);
-  @observable importFromFileRequest: Request<ImportWalletFromFileResponse> = new Request(() => {});
-  @observable createWalletRequest: Request<CreateWalletResponse> = new Request(this.api.ada.createWallet);
-  @observable deleteWalletRequest: Request<DeleteWalletResponse> = new Request(() => {});
-  @observable sendMoneyRequest: Request<CreateTransactionResponse> = new Request(this.api.ada.createTransaction);
-  @observable getWalletRecoveryPhraseRequest: Request<GetWalletRecoveryPhraseResponse> = new Request(this.api.ada.getWalletRecoveryPhrase);
-  @observable restoreRequest: Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
-  /* eslint-enable max-len */
+  @observable walletsRequest:
+    Request<GetWalletsResponse> = new Request(this.api.ada.getWallets);
 
-  @observable walletExportType: walletExportTypeChoices = 'paperWallet';
-  @observable walletExportMnemonic = 'marine joke dry silk ticket thing sugar stereo aim';
+  @observable importFromFileRequest:
+    Request<ImportWalletFromFileResponse> = new Request(() => {});
+
+  @observable createWalletRequest:
+    Request<CreateWalletResponse> = new Request(this.api.ada.createWallet);
+
+  @observable deleteWalletRequest:
+    Request<DeleteWalletResponse> = new Request(() => {});
+
+  @observable sendMoneyRequest:
+    Request<CreateTransactionResponse> = new Request(this.api.ada.createTransaction);
+
+  @observable getWalletRecoveryPhraseRequest:
+    Request<GetWalletRecoveryPhraseResponse> = new Request(this.api.ada.getWalletRecoveryPhrase);
+
+  @observable restoreRequest:
+    Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
 
   setup() {
     super.setup();
@@ -40,7 +47,6 @@ export default class AdaWalletsStore extends WalletStore {
     wallets.sendMoney.listen(this._sendMoney);
     wallets.restoreWallet.listen(this._restoreWallet);
     wallets.importWalletFromFile.listen(this._importWalletFromFile);
-    wallets.chooseWalletExportType.listen(this._chooseWalletExportType);
     router.goToRoute.listen(this._onRouteChange);
     walletBackup.finishWalletBackup.listen(this._finishCreation);
   }
@@ -70,9 +76,6 @@ export default class AdaWalletsStore extends WalletStore {
     mnemonic: string,
     numberOfWords: ?number
   ) => this.api.ada.isValidMnemonic(mnemonic, numberOfWords);
-
-  // TODO - call endpoint to check if private key is valid
-  isValidPrivateKey = () => { return true; }; // eslint-disable-line
 
   @action refreshWalletsData = async () => {
     const result = await this.walletsRequest.execute().promise;
@@ -175,14 +178,6 @@ export default class AdaWalletsStore extends WalletStore {
     // Reset the send request anytime we visit the send page (e.g: to remove any previous errors)
     if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params))) {
       this.sendMoneyRequest.reset();
-    }
-  };
-
-  @action _chooseWalletExportType = (params: {
-    walletExportType: walletExportTypeChoices,
-  }) => {
-    if (this.walletExportType !== params.walletExportType) {
-      this.walletExportType = params.walletExportType;
     }
   };
 

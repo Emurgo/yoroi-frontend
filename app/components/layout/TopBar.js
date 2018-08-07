@@ -40,14 +40,11 @@ export default class TopBar extends Component<Props> {
       showWalletInfo ? styles.withWallet : styles.withoutWallet,
     ]);
 
-    const topBarTitle = walletRoutesMatch && activeWallet != null && formattedWalletAmount ? (
+    const topBarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
         <div className={styles.walletName}>{activeWallet.name}</div>
         <div className={styles.walletAmount}>
-          {
-            // show currency and use long format (e.g. in ETC show all decimal places)
-            formattedWalletAmount(activeWallet.amount, true, true)
-          } ADA
+          { formattedWalletAmount(activeWallet.amount, true, true) + ' ADA' }
         </div>
       </div>
     ) : null;
