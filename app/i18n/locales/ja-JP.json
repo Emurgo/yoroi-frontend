@@ -51,7 +51,7 @@
   "daedalusTransfer.instructions.attention.answer.yes.label": "はい",
   "daedalusTransfer.instructions.attention.answer.yes.text": "<receive screen>を使用して新しいアドレスを生成し、それを使用してダイダロスから送金する。",
   "daedalusTransfer.instructions.attention.question.label": "ダイダロスウォレットの作業コピーへのアクセス権限を持っていますか？",
-  "daedalusTransfer.instructions.attention.text": "ヨロイウォレットとダイダロスウォレットは、それぞれ異なる鍵導出スキームおよび異なるアドレス形式を使用しています。そのため、ダイダロスウォレットを引き続き使用することはできず、ヨロイウォレットを作成し、送金する必要があります。（今後は１アドレスで両方のウォレットが使用できる予定をしております。）現時点では、ダイダロスウォレットの資金を使用するためにはヨロイウォレットに送金する必要があります。ダイダロスウォレットとヨロイウォレットは、送金において互換性があります。ダイダロスのワーキングコピーがない場合、12単語から成るリカバリフレーズを使用してダイダロスからヨロイウォレットに残高を送金する事ができます。",
+  "daedalusTransfer.instructions.attention.text": "ヨロイウォレットとダイダロスウォレットは、それぞれ異なる鍵導出スキームおよび異なるアドレス形式を使用しています。そのため、ダイダロスウォレットを引き続き使用することはできず、ヨロイウォレットを作成し、送金する必要があります。（今後は１つのアドレスで両方のウォレットが使用できる予定です。）現時点では、ダイダロスウォレットの資金を使用するためにはヨロイウォレットに送金する必要があります。ダイダロスウォレットとヨロイウォレットは、送金において互換性があります。ダイダロスのワーキングコピーがない場合、12単語から成るリカバリフレーズを使用してダイダロスからヨロイウォレットに残高を送金する事ができます。",
   "daedalusTransfer.instructions.attention.title.label": "注意",
   "daedalusTransfer.instructions.instructions.attention.answer.yes.button.label": "受信画面に移動",
   "daedalusTransfer.instructions.instructions.button.label": "ヨロイウォレットを作成",
