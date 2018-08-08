@@ -59,7 +59,7 @@ const messages = defineMessages({
   },
   noInputsError: {
     id: 'api.errors.noInputsError',
-    defaultMessage: '!!!Wallet without funds',
+    defaultMessage: '!!!The wallet restored from your recovery phrase is empty. Please check your recovery phrase and attempt restoration again.',
     description: '"Wallet without funds" error message'
   },
   generateTransferTxError: {
