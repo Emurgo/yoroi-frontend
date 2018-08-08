@@ -9,7 +9,7 @@ import {
   Logger,
   stringifyError,
 } from '../../utils/logging';
-import { getOrFail } from '../ada/lib//cardanoCrypto/cryptoUtils';
+import { getResultOrFail } from '../ada/lib//cardanoCrypto/cryptoUtils';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import { getBalance } from './adaWallet';
 import {
@@ -40,9 +40,9 @@ export function getAddressesWithFunds(payload: {
   try {
     const { secretWords, addresses } = payload;
     const checker =
-      getOrFail(RandomAddressChecker.newCheckerFromMnemonics(secretWords));
+      getResultOrFail(RandomAddressChecker.newCheckerFromMnemonics(secretWords));
     const addressesWithFunds =
-      getOrFail(RandomAddressChecker.checkAddresses(checker, addresses));
+      getResultOrFail(RandomAddressChecker.checkAddresses(checker, addresses));
     return addressesWithFunds;
   } catch (error) {
     Logger.error(`daedalusTransfer::getAddressesWithFunds ${stringifyError(error)}`);
@@ -65,7 +65,7 @@ export async function generateTransferTx(payload: {
     const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
     const inputs = _getInputs(senderUtxos, addressesWithFunds);
     const output = await _getReceiverAddress();
-    const tx = getOrFail(Wallet.move(wallet, inputs, output));
+    const tx = getResultOrFail(Wallet.move(wallet, inputs, output));
     return {
       recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
       fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),

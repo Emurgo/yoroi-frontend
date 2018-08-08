@@ -13,11 +13,7 @@
       }
     ],
     "usedAddresses": [],
-    "masterKey": {
-      "encryptedMasterKey": "99cce23420afd095af01b9659e9d9b4404ccb2ec5a2e41d93e0c6765b098e02c7bbecf7a3b5e421b1157ddbf42fff38f4f10fe5b739b01eb32f00bfb7286f64d8ad3d4b3c8c42e2ec8aa25bfe2e21710059a074d0492b162a947624c75360c6c",
-      "passwordSalt": "53644ec38b1c8e4208335b9f376e693d",
-      "passwordVerifier": "b7898ccee09a2be62633501e2ea1da9782c0da7c30257220fe9ae30a912ab512"
-    },
+    "masterKey": "49354dacd927fd359e27e2227e122448a74fb1848ea8a52616abb0907a52c6a29f46fb1a4ed35419eb414727d27ae2dfbf89263725b9dc6faba53b3852e296b13a2e06d141fbd2b233418d0a581f912115bee42f7a11a34262774a9af880d54b1d723c064267af0f532719646d9bd6a6c16b0061ffe8fc25056df9f70a029677fc89e67f17e0b348369198982a3e6de5d123dd80b7802358fb6e095c",
     "password": "Secret123",
     "wallet": {
       "cwAccountsNumber": 1,

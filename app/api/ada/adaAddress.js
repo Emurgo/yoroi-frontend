@@ -5,7 +5,7 @@ import config from '../../config';
 import {
   toAdaAddress
 } from './lib/cardanoCrypto/cryptoToModel';
-import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
+import { getResultOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
   saveAddresses,
   getAddresses,
@@ -32,7 +32,7 @@ const { MAX_ALLOWED_UNUSED_ADDRESSES } = config.wallets;
 
 export function isValidAdaAddress(address: string): Promise<boolean> {
   try {
-    const result = getOrFail(Wallet.checkAddress(getAddressInHex(address)));
+    const result = getResultOrFail(Wallet.checkAddress(getAddressInHex(address)));
     return Promise.resolve(result);
   } catch (validateAddressError) {
     Logger.error('adaAddress::isValidAdaAddress error: ' +
@@ -94,7 +94,8 @@ export async function createAdaAddress(
 ): Promise<AdaAddress> {
   const filteredAddresses = await getAdaAddressesByType(addressType);
   const addressIndex = filteredAddresses.length;
-  const [address] = getOrFail(Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]));
+  const [address] = getResultOrFail(
+    Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]));
   return toAdaAddress(cryptoAccount.account, addressType, addressIndex, address);
 }
 
