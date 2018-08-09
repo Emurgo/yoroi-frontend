@@ -1,13 +1,13 @@
 {
-  "name": "yoroi-light-cardano-wallet-poc",
+  "name": "yoroi",
   "version": "0.0.1",
-  "description": "Yoroi light Cardano wallet - PoC",
+  "description": "Cardano ADA wallet",
   "scripts": {
     "start": "node scripts/start",
     "dev": "node scripts/start --env 'development'",
     "build": "node scripts/build",
     "compress": "node scripts/compress",
-    "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi-light-cardano-wallet-poc' --codebase 'https://www.iohk.io/dw/yoroi-extension.crx' --key ./e2etest-key.pem",
+    "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi' --codebase 'https://www.iohk.io/dw/yoroi-extension.crx' --key ./e2etest-key.pem",
     "compress-keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx dll/",
     "flow": "flow .",
@@ -90,7 +90,6 @@
     "ws": "5.2.2"
   },
   "dependencies": {
-    "aes-js": "3.1.1",
     "autoprefixer": "7.2.5",
     "axios": "0.18.0",
     "bignumber.js": "4.0.0",
@@ -111,7 +110,6 @@
     "mobx-react-form": "1.32.2",
     "mobx-react-router": "3.1.2",
     "moment": "2.21.0",
-    "pbkdf2": "3.0.16",
     "prop-types": "15.6.1",
     "qrcode.react": "0.8.0",
     "react": "15.4.2",

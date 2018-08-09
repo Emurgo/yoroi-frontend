@@ -1,11 +1,11 @@
 {
   "version": "0.0.10",
   "version_name": "tn-0.0.10#67.0_GC-w7",
-  "name": "yoroi-light-cardano-wallet-poc",
+  "name": "yoroi",
   "manifest_version": 2,
-  "description": "[testnet] Yoroi light Cardano wallet - PoC",
+  "description": "[testnet] Cardano ADA wallet",
   "browser_action": {
-    "default_title": "[testnet] Yoroi light Cardano wallet - PoC"
+    "default_title": "[testnet] Yoroi"
   },
   "icons": {
     "16": "img/icon-16.png",

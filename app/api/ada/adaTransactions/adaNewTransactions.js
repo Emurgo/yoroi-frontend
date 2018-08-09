@@ -24,7 +24,7 @@ import {
   generateWalletMasterKey,
   generateAdaMnemonic,
 } from '../lib/cardanoCrypto/cryptoWallet';
-import { getOrFail } from '../lib/cardanoCrypto/cryptoUtils';
+import { getResultOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {
   AdaAddresses,
   AdaTransactionFee,
@@ -124,7 +124,7 @@ export async function getAdaTransactionFromSenders(
   const outputs = [{ address: receiver, value: amount }];
   const senderUtxos = await getAllUTXOsForAddresses(_getAddresses(senders));
   const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-  const result = getOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
+  const result = getResultOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
   return [result, changeAdaAddr];
 }
 
