@@ -40,7 +40,7 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - ./repo/yoroi-light-cardano-wallet-poc.zip
+            - ./repo/yoroi.zip
 
   deploy-testnet:
     working_directory: ~/repo
@@ -52,7 +52,7 @@ jobs:
           at: ~/build
 
       - run: sudo npm install -g chrome-webstore-upload-cli
-      - run: cd ~/build/repo/ && webstore upload --source yoroi-light-cardano-wallet-poc.zip --extension-id="${APP_ID}" --client-id="${CLIENT_ID}" --client-secret="${CLIENT_SECRET}" --refresh-token="${REFRESH_TOKEN}" --auto-publish --trusted-testers
+      - run: cd ~/build/repo/ && webstore upload --source yoroi.zip --extension-id="${APP_ID}" --client-id="${CLIENT_ID}" --client-secret="${CLIENT_SECRET}" --refresh-token="${REFRESH_TOKEN}" --auto-publish --trusted-testers
 
 workflows:
   version: 2
