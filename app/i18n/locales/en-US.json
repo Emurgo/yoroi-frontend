@@ -131,7 +131,7 @@
   "systemTime.error.overlayText": "Attention, Yoroi is unable to sync with the blockchain because the time on your machine is different from the global time. You are 2 hours 12 minutes 54 seconds behind.<br>To synchronize the time and fix this issue, please visit the FAQ section of Yoroi website:",
   "systemTime.error.overlayTitle": "Unable to sync - incorrect time",
   "systemTime.error.problemSolutionLink": "yoroi-wallet.com/faq",
-  "testnet.label.message": "Warning: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at https://yoroi-wallet.com/faq/",
+  "testnet.label.message": "Warning: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}",
   "wallet.add.dialog.create.description": "Create a new wallet",
   "wallet.add.dialog.create.label": "Create",
   "wallet.add.dialog.import.description": "Import wallet from a file",

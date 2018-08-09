@@ -131,7 +131,7 @@
   "systemTime.error.overlayText": "注意：デバイスに設定されている時間がグローバル時間と異なるため、ダイダロスはブロックチェーンと同期することができません。お使いのデバイスの時間は、2時間12分54秒遅れています。<br>時間を同期させてこの問題を解決するには、ダイダロスのウェブサイトの「よくある質問」をご覧ください：",
   "systemTime.error.overlayTitle": "同期できません - 時間が正しくありません",
   "systemTime.error.problemSolutionLink": "yoroi-wallet.com/faq",
-  "testnet.label.message": "注意：テストネット上のADAには貨幣価値がありません。詳細は、FAQ(https://yoroi-wallet.com/faq/)をご参照ください。",
+  "testnet.label.message": "注意：テストネット上のADAには貨幣価値がありません。詳細は、FAQ({faqLink})をご参照ください。",
   "wallet.add.dialog.create.description": "新しいウォレットを作成する",
   "wallet.add.dialog.create.label": "作成",
   "wallet.add.dialog.import.description": "ファイルからウォレットをインポートする",
