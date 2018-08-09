@@ -3,6 +3,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import moment from 'moment';
 import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
+import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import WalletTransaction, { transactionStates, transactionTypes } from '../../../domain/WalletTransaction';
@@ -228,7 +229,7 @@ export default class Transaction extends Component<Props, State> {
                   environment.isEtcApi() ? 'fromAddress' : 'fromAddresses'
                 ])}
               </h2>
-              {data.addresses.from.map((address, addressIndex) => (
+              {uniq(data.addresses.from).map((address, addressIndex) => (
                 <span key={`${data.id}-from-${address}-${addressIndex}`} className={styles.address}>{address}</span>
               ))}
               <h2>
