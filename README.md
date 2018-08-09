@@ -1,4 +1,4 @@
-# Yoroi light Cardano wallet - PoC
+# Yoroi - Cardano ADA wallet
   
   We use as template for this repository: [React Chrome Extension Boilerplate](https://github.com/jhen0409/react-chrome-extension-boilerplate)
 

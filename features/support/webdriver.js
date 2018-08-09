@@ -14,7 +14,7 @@ function CustomWorld() {
       }
     })
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-light-cardano-wallet-poc-test.crx')))
+    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')))
     .build();
 
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
