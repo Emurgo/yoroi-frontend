@@ -156,7 +156,7 @@
         }
       },
       {
-        "defaultMessage": "!!!Wallet without funds",
+        "defaultMessage": "!!!The wallet restored from your recovery phrase is empty. Please check your recovery phrase and attempt restoration again.",
         "description": "\"Wallet without funds\" error message",
         "end": {
           "column": 3,
@@ -333,13 +333,13 @@
         "description": "Generic error message.",
         "end": {
           "column": 3,
-          "line": 11
+          "line": 10
         },
         "file": "app/api/common.js",
         "id": "api.errors.GenericApiError",
         "start": {
           "column": 19,
-          "line": 7
+          "line": 6
         }
       },
       {
@@ -347,13 +347,13 @@
         "description": "\"Incorrect wallet password.\" error message.",
         "end": {
           "column": 3,
-          "line": 16
+          "line": 15
         },
         "file": "app/api/common.js",
         "id": "api.errors.IncorrectPasswordError",
         "start": {
           "column": 32,
-          "line": 12
+          "line": 11
         }
       },
       {
@@ -361,13 +361,13 @@
         "description": "\"Wallet you are trying to restore already exists.\" error message.",
         "end": {
           "column": 3,
-          "line": 21
+          "line": 20
         },
         "file": "app/api/common.js",
         "id": "api.errors.WalletAlreadyRestoredError",
         "start": {
           "column": 30,
-          "line": 17
+          "line": 16
         }
       },
       {
@@ -375,13 +375,13 @@
         "description": "\"There was a problem sending the support request.\" error message",
         "end": {
           "column": 3,
-          "line": 26
+          "line": 25
         },
         "file": "app/api/common.js",
         "id": "api.errors.ReportRequestError",
         "start": {
           "column": 22,
-          "line": 22
+          "line": 21
         }
       },
       {
@@ -389,13 +389,13 @@
         "description": "\"User cannot generate more unused addresses\" error message",
         "end": {
           "column": 3,
-          "line": 31
+          "line": 30
         },
         "file": "app/api/common.js",
         "id": "api.errors.unusedAddressesError",
         "start": {
           "column": 24,
-          "line": 27
+          "line": 26
         }
       }
     ],
@@ -1089,6 +1089,20 @@
         "start": {
           "column": 16,
           "line": 18
+        }
+      },
+      {
+        "defaultMessage": "!!!https://daedaluswallet.io/faq/",
+        "description": "URL for the \"FAQ on Yoroi website\". link in the testnet banner",
+        "end": {
+          "column": 3,
+          "line": 27
+        },
+        "file": "app/components/layout/SidebarLayout.js",
+        "id": "settings.support.faq.faqLinkURL",
+        "start": {
+          "column": 14,
+          "line": 23
         }
       }
     ],

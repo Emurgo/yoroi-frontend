@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
+import { handleExternalLinkClick } from '../../utils/routing';
 import styles from './SidebarLayout.scss';
 import environment from '../../environment';
 
@@ -19,6 +20,11 @@ export const messages = defineMessages({
     id: 'testnet.label.message',
     defaultMessage: '!!!Testnet',
     description: 'Message alerting users the wallet is not running in mainnet.'
+  },
+  faqLinkUrl: {
+    id: 'settings.support.faq.faqLinkURL',
+    defaultMessage: '!!!https://daedaluswallet.io/faq/',
+    description: 'URL for the "FAQ on Yoroi website". link in the testnet banner',
   },
 });
 
@@ -41,6 +47,15 @@ export default class SidebarLayout extends Component<Props> {
 
     const { intl } = this.context;
 
+    const faqLink = (
+      <a
+        href={intl.formatMessage(messages.faqLinkUrl)}
+        onClick={event => handleExternalLinkClick(event)}
+      >
+        {intl.formatMessage(messages.faqLinkUrl)}
+      </a>
+    );
+
     return (
       <div className={styles.component}>
         {sidebar ? (
@@ -55,7 +70,7 @@ export default class SidebarLayout extends Component<Props> {
           {
             environment.isMainnet() ? null : (
               <div className={styles.testnetWarning}>
-                {intl.formatMessage(messages.testnetLabel)}
+                <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
               </div>
             )
           }
