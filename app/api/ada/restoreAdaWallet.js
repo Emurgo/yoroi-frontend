@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 import { Wallet } from 'rust-cardano-crypto';
-import { getOrFail } from './lib/cardanoCrypto/cryptoUtils';
+import { getResultOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
   saveAsAdaAddresses,
   newAdaAddress
@@ -121,7 +121,7 @@ async function _getAddressToScan(
   if (fetchedAddressesInfo.length < fromIndex + scanSize) {
     const addressesIndex = _.range(fetchedAddressesInfo.length,
                                    fetchedAddressesInfo.length + requestSize);
-    const newAddresses = getOrFail(
+    const newAddresses = getResultOrFail(
       Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex));
     const usedAddresses = await checkAddressesInUse(newAddresses);
     newFetchedAddressesInfo = _addFetchedAddressesInfo(fetchedAddressesInfo, newAddresses,

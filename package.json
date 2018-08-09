@@ -90,7 +90,6 @@
     "ws": "5.2.2"
   },
   "dependencies": {
-    "aes-js": "3.1.1",
     "autoprefixer": "7.2.5",
     "axios": "0.18.0",
     "bignumber.js": "4.0.0",
@@ -111,7 +110,6 @@
     "mobx-react-form": "1.32.2",
     "mobx-react-router": "3.1.2",
     "moment": "2.21.0",
-    "pbkdf2": "3.0.16",
     "prop-types": "15.6.1",
     "qrcode.react": "0.8.0",
     "react": "15.4.2",

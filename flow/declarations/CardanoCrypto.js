@@ -1,3 +1,5 @@
+import PasswordProtect from "../../js-cardano-wasm/js/PasswordProtect";
+
 declare module 'rust-cardano-crypto' {
   declare module.exports: {
     loadRustModule(): Promise<void>,
@@ -119,6 +121,18 @@ declare module 'rust-cardano-crypto' {
         failed: boolean,
         msg: ?string
       }
+    },
+    PasswordProtect: {
+      encryptWithPassword(
+        password: string,
+        salt: Uint8Array,
+        nonce: Uint8Array,
+        data: Uint8Array
+      ): ?Uint8Array | Boolean,
+      decryptWithPassword(
+        password: string,
+        data: Uint8Array
+      ): ?Uint8Array | Boolean
     }
   }
 }
