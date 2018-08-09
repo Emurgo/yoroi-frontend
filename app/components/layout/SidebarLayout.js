@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
+import { handleExternalLinkClick } from '../../utils/routing';
 import styles from './SidebarLayout.scss';
 import environment from '../../environment';
 
@@ -49,7 +50,7 @@ export default class SidebarLayout extends Component<Props> {
     const faqLink = (
       <a
         href={intl.formatMessage(messages.faqLinkUrl)}
-        onClick={event => onExternalLinkClick(event)}
+        onClick={event => handleExternalLinkClick(event)}
       >
         {intl.formatMessage(messages.faqLinkUrl)}
       </a>
