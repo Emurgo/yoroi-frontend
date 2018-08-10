@@ -11,9 +11,9 @@ export function encryptWithPassword(
 ): string {
   const salt = new Buffer(cryptoRandomString(2 * 32), 'hex');
   const nonce = new Buffer(cryptoRandomString(2 * 12), 'hex');
-
+  const formattedPassword: Uint8Array = new TextEncoder().encode(password);
   const encryptedBytes = getOrFail(
-    PasswordProtect.encryptWithPassword(password, salt, nonce, bytes));
+    PasswordProtect.encryptWithPassword(formattedPassword, salt, nonce, bytes));
   const encryptedHex = Buffer.from(encryptedBytes).toString('hex');
   return encryptedHex;
 }
@@ -23,8 +23,10 @@ export function decryptWithPassword(
   encryptedHex: string
 ): Uint8Array {
   const encryptedBytes = new Buffer(encryptedHex, 'hex');
+  const formattedPassword: Uint8Array = new TextEncoder().encode(password);
   // FIXME: null or false is returned on invalid password
-  const decryptedBytes: any = PasswordProtect.decryptWithPassword(password, encryptedBytes);
+  const decryptedBytes: ?Uint8Array | false =
+    PasswordProtect.decryptWithPassword(formattedPassword, encryptedBytes);
   if (!decryptedBytes) {
     throw new WrongPassphraseError();
   } else {

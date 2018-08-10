@@ -10,14 +10,14 @@ Feature: Send transaction
   Scenario Outline: Sending successful tx
     When I go to the send transaction screen
     And I fill the form:
-      | address                                                     | amount  |
+      | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | <amount> |
     And The transaction fees are "<fee>"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
-      | password  |
-      | Secret123 |
+      | password   |
+      | Secret_123 |
     And I submit the wallet send form
     Then I should see the summary screen
 
@@ -53,8 +53,8 @@ Feature: Send transaction
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
-      | password  |
-      | Secret123 |
+      | password   |
+      | Secret_123 |
     And I submit the wallet send form
     Then I should see an invalid signature error message
 

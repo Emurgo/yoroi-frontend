@@ -12,8 +12,8 @@ Feature: Wallet Settings
     And I click on the "change" password label
     And I should see the "change" wallet password dialog
     And I change wallet password:
-    | currentPassword   | password | repeatedPassword |
-    | Secret123 | secret   | secret           |
+    | currentPassword    | password | repeatedPassword |
+    | Secret_123         | secret   | secret           |
     And I submit the wallet password dialog
     Then I should see the following error messages:
     | message                             |
@@ -25,8 +25,8 @@ Feature: Wallet Settings
     And I click on the "change" password label
     And I should see the "change" wallet password dialog
     And I change wallet password:
-    | currentPassword   | password     | repeatedPassword |
-    | Secret123 | newSecret123 | newSecret123     |
+    | currentPassword    | password     | repeatedPassword |
+    | Secret_123         | newSecret123 | newSecret123     |
     And I submit the wallet password dialog
     Then I should not see the change password dialog anymore
   
@@ -38,6 +38,19 @@ Feature: Wallet Settings
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword |
     | InvalidPrevious123 | newSecret123 | newSecret123     |
+    And I submit the wallet password dialog
+    Then I should see the following submit error messages:
+    | message                           |
+    | api.errors.IncorrectPasswordError |
+
+  Scenario: User tries to change the password omitting special characters in their current password
+    When I navigate to the general settings screen
+    And I click on secondary menu "wallet" item
+    And I click on the "change" password label
+    And I should see the "change" wallet password dialog
+    And I change wallet password:
+    | currentPassword    | password     | repeatedPassword |
+    | Secret123          | newSecret123 | newSecret123     |
     And I submit the wallet password dialog
     Then I should see the following submit error messages:
     | message                           |
@@ -60,8 +73,8 @@ Feature: Wallet Settings
     And I click on the "change" password label
     And I should see the "change" wallet password dialog
     And I change wallet password:
-    | currentPassword   | password     | repeatedPassword |
-    | Secret123 | newSecret123 | newSecret123     |
-    And I clear the current wallet password Secret123
+    | currentPassword    | password     | repeatedPassword |
+    | Secret_123         | newSecret123 | newSecret123     |
+    And I clear the current wallet password Secret_123
     And I submit the wallet password dialog
     Then I should stay in the change password dialog

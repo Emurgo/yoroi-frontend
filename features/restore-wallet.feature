@@ -13,8 +13,8 @@ Feature: Restore Wallet
     | recoveryPhrase                                                                             |
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
     And I enter the restored wallet password:
-    | password  | repeatedPassword |
-    | Secret123 | Secret123        |
+    | password   | repeatedPassword |
+    | Secret_123 | Secret_123       |
     And I click the "Restore Wallet" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
@@ -29,8 +29,8 @@ Feature: Restore Wallet
     | recoveryPhrase                                                                                   |
     | shoe rose battle fine shoulder address kite coffee jaguar proof practice area party sphere train |
     And I enter the restored wallet password:
-    | password  | repeatedPassword |
-    | Secret123 | Secret123        |
+    | password   | repeatedPassword |
+    | Secret_123 | Secret_123       |
     And I click the "Restore Wallet" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
@@ -46,8 +46,8 @@ Feature: Restore Wallet
     | recoveryPhrase                                                                                        |
     | offer liberty horror emerge twice behind tag agree october dismiss vehicle obtain anchor endorse town |
     And I enter the restored wallet password:
-    | password  | repeatedPassword |
-    | Secret123 | Secret123        |
+    | password   | repeatedPassword |
+    | Secret_123 | Secret_123       |
     And I click the "Restore Wallet" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
@@ -67,8 +67,8 @@ Feature: Restore Wallet
     | recoveryPhrase                                                                                 |
     | grace saddle snake vocal amateur coin inside ginger leopard place liar patrol usual joy around |
     And I enter the restored wallet password:
-    | password  | repeatedPassword |
-    | Secret123 | Secret123        |
+    | password   | repeatedPassword |
+    | Secret_123 | Secret_123       |
     And I click the "Restore Wallet" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
@@ -83,8 +83,8 @@ Feature: Restore Wallet
     | recoveryPhrase                                                                 |
     | forum salon region tent laugh agree spirit share damage observe captain suffer |
     And I enter the restored wallet password:
-    | password  | repeatedPassword |
-    | Secret123 | Secret123        |
+    | password   | repeatedPassword |
+    | Secret_123 | Secret_123       |
     And I click the "Restore Wallet" button
     Then I should see an "Invalid recovery phrase" error message
 
@@ -95,10 +95,10 @@ Feature: Restore Wallet
     | recoveryPhrase                                                                                           |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
     And I enter the restored wallet password:
-    | password  | repeatedPassword |
-    | Secret123 | Secret123        |
+    | password   | repeatedPassword |
+    | Secret_123 | Secret_123       |
     And I clear the name "Restored Wallet"
     And I clear the recovery phrase
-    And I clear the restored wallet password Secret123
+    And I clear the restored wallet password Secret_123
     And I click the "Restore Wallet" button
     Then I should stay in the restore wallet dialog
