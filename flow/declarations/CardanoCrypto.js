@@ -124,15 +124,15 @@ declare module 'rust-cardano-crypto' {
     },
     PasswordProtect: {
       encryptWithPassword(
-        password: string,
+        password: Uint8Array,
         salt: Uint8Array,
         nonce: Uint8Array,
         data: Uint8Array
-      ): ?Uint8Array | Boolean,
+      ): ?Uint8Array | false,
       decryptWithPassword(
-        password: string,
+        password: Uint8Array,
         data: Uint8Array
-      ): ?Uint8Array | Boolean
+      ): ?Uint8Array | false
     }
   }
 }
