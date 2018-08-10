@@ -1,6 +1,6 @@
 {
-  "version": "0.0.11",
-  "version_name": "st-0.0.11#67.0_GC-w7",
+  "version": "0.0.12",
+  "version_name": "st-0.0.12#68.0_GC-w7",
   "name": "yoroi",
   "manifest_version": 2,
   "description": "[staging] Cardano ADA wallet",
