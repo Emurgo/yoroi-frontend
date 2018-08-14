@@ -2,45 +2,25 @@
   
   We use as template for this repository: [React Chrome Extension Boilerplate](https://github.com/jhen0409/react-chrome-extension-boilerplate)
 
-## Features
-
- - Hot reloading React (Using [Webpack](https://github.com/webpack/webpack) and [React Transform](https://github.com/gaearon/react-transform))
- - Write code with ES2015+ syntax (Using [Babel](https://github.com/babel/babel))
- - E2E tests of Window & Popup & Inject pages (Using [Chrome Driver](https://www.npmjs.com/package/chromedriver), [Selenium Webdriver](https://www.npmjs.com/package/selenium-webdriver))
-
 ## Installation
-
-### Prerequisites
-
-- node v8.9.4 (if you are using nvm, just execute: `$ nvm use`)
-- Install rust tools as mentioned in [js-cardano-wasm](https://github.com/input-output-hk/js-cardano-wasm#installation)
 
 ```bash
 # clone the repository with the submodule js-cardano-wasm
 $ git clone --recursive git@github.com:input-output-hk/icarus-poc.git
-# or
 $ git submodule update --init --recursive
-
-# Install dependencies
-$ npm run build-js-cardano-wasm 
-$ npm install
 ```
 
-In order to update it:
+### Prerequisites
+
+- node v8.9.4 (if you are using nvm, just execute: `$ nvm use`)
+
+- Install rust tools as mentioned in [js-cardano-wasm](https://github.com/input-output-hk/js-cardano-wasm#installation)
+
+### Install dependencies
 
 ```bash
-#### Update js-cardano-wasm
-cd js-cardano-wasm;
-git checkout master;
-git pull origin master;
-cd ..;
-
-# Commit the update
-git add .
-git commit -S -m "${youCommitMessage}"
-git push ...
-
-# Repeat process from `$npm run build-js-cardano-wasm`
+$ npm run build-js-cardano-wasm 
+$ npm install
 ```
 
 ## Development
@@ -69,9 +49,12 @@ $ npm run start -- --env "development"
   Navigate to the directory in which your extension files live (`./dev` folder), and select it.
 
 
-#### React hot reload
+### Dev Features
 
-This boilerplate uses `Webpack` and `react-transform`. You can hot reload by editing related files of Popup & Window & Inject page.
+ - Hot reloading React (Using [Webpack](https://github.com/webpack/webpack) and [React Transform](https://github.com/gaearon/react-transform))
+ - Write code with ES2015+ syntax (Using [Babel](https://github.com/babel/babel))
+ - E2E tests of Window & Popup & Inject pages (Using [Chrome Driver](https://www.npmjs.com/package/chromedriver), [Selenium Webdriver](https://www.npmjs.com/package/selenium-webdriver))
+
 
 ## Build
 
@@ -137,6 +120,29 @@ $ npm run flow
 $ npm run eslint
 # features
 $ npm run test-e2e
+```
+
+## Update Cardano crypto library
+
+In order to update it run the following commands:
+
+```bash
+# Update js-cardano-wasm
+cd js-cardano-wasm;
+git checkout master;
+git pull origin master;
+cd ..;
+
+# Commit the update
+git add .
+git commit -S -m "${youCommitMessage}"
+git push ...
+
+# Re-install the module
+$ npm run build-js-cardano-wasm 
+$ npm install
+
+# At this point you can go back to Development steps. 
 ```
 
 ## LICENSE
