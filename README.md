@@ -30,7 +30,7 @@ In order to update it:
 
 ```bash
 #### Update js-cardano-wasm
-```cd js-cardano-wasm;
+cd js-cardano-wasm;
 git checkout master;
 git pull origin master;
 cd ..;
