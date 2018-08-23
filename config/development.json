@@ -1,8 +1,8 @@
 {
   "network": {
     "protocolMagic": 633343913,
-    "backendUrl": "https://lld5qq5jl5.execute-api.us-east-1.amazonaws.com/latest",
-    "websocketUrl": "wss://18.206.30.1:443",
+    "backendUrl": "https://iohk-staging.yoroiwallet.com",
+    "websocketUrl": "wss://iohk-staging.yoroiwallet.com:443",
     "name": "testnet"
   },
   "app": {

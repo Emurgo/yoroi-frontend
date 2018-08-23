@@ -1,13 +1,14 @@
 {
-  "name": "yoroi",
-  "version": "0.0.1",
+  "name": "Yoroi",
+  "version": "0.1.0",
   "description": "Cardano ADA wallet",
   "scripts": {
     "start": "node scripts/start",
     "dev": "node scripts/start --env 'development'",
     "build": "node scripts/build",
     "compress": "node scripts/compress",
-    "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi' --codebase 'https://www.iohk.io/dw/yoroi-extension.crx' --key ./e2etest-key.pem",
+    "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi' --codebase 'https://www.yoroiwallet.com/dw/yoroi-extension.crx' --key ./e2etest-key.pem",
+    "build-compress-staging": "npm run build -- --env 'staging' && npm run compress -- --env 'staging' --app-id 'yoroi-stag' --zip-only --codebase 'https://www.yoroiwallet.com/dw/yoroi-extension.crx' --key ./staging-key.pem",
     "compress-keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx dll/",
     "flow": "flow .",
@@ -20,17 +21,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/input-output-hk/icarus-poc.git"
+    "url": "https://github.com/Emurgo/yoroi-frontend"
   },
   "keywords": [
+    "yoroi",
+    "icarus",
+    "light wallet",
+    "cardano",
+    "ADA",
     "chrome",
-    "extension",
-    "react",
-    "hot reload",
-    "webpack",
-    "boilerplate"
+    "extension"
   ],
-  "author": "IOHK",
+  "author": "IOHK & EMURGO",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "6.26.3",
@@ -129,5 +131,10 @@
     "rust-cardano-crypto": "file:js-cardano-wasm",
     "safe-buffer": "5.1.1",
     "validator": "6.3.0"
+  },
+  "engineStrict" : true,
+  "engine": {
+    "node": "~8.9.4",
+    "npm": "~5.6.0"
   }
 }
