@@ -75,10 +75,10 @@ Feature: Wallet UI Settings
     | message                           |
     | api.errors.IncorrectPasswordError |
   Examples:
-  | currentPassword | password         |repeatedPassword |
-  | SecretT12345    | ValidPassword123 |ValidPassword123 |
-  | secret123       | ValidPassword123 |ValidPassword123 |
-  | SECRET_123      | ValidPassword123 |ValidPassword123 |
+  | currentPassword | password         |repeatedPassword |errorMessage|
+  | SecreT_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
+  | seCReT_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
+  | SEcRET_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
 
   
   @it-8

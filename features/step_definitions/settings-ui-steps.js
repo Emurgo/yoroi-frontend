@@ -15,6 +15,7 @@ When(/^I click on "name" input field$/, async function () {
 When(/^I enter new wallet name:$/, async function (table) {
   const fields = table.hashes()[0];
   await this.clearInput(walletNameInputSelector);
+  await this.clearInput(walletNameInputSelector);
   await this.input(walletNameInputSelector, fields.name);
 });
 
