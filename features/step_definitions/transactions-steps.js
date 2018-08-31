@@ -38,16 +38,16 @@ When(/^I go to the send transaction screen$/, async function () {
 
 When(/^I fill the form:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input('#receiver--2', fields.address);
-  await this.input('#amount--3', fields.amount);
+  await this.input("input[name='receiver']", fields.address);
+  await this.input("input[name='amount']", fields.amount);
 });
 
 When(/^I clear the receiver$/, async function () {
-  await this.clearInput('#receiver--2');
+  await this.clearInput("input[name='receiver']");
 });
 
 When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
-  await this.input('#receiver--2', receiver);
+  await this.input("input[name='receiver']", receiver);
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
@@ -64,7 +64,7 @@ When(/^I see send money confirmation dialog$/, async function () {
 
 When(/^I enter the wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input('#walletPassword--4', fields.password);
+  await this.input("input[name='walletPassword']", fields.password);
 });
 
 When(/^I submit the wallet send form$/, async function () {

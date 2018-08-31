@@ -38,6 +38,10 @@ Given(/^I have opened the chrome extension$/, async function () {
   await this.driver.get('chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg/main_window.html');
 });
 
+Given(/^I refresh the page$/, async function () {
+  await this.driver.navigate().refresh();
+});
+
 Given(/^There is no wallet stored$/, async function () {
   await refreshWallet(this);
   await this.waitForElement('.WalletAdd');

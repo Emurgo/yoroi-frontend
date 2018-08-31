@@ -50,3 +50,7 @@ Then(/^I should stay in the create wallet dialog$/, async function () {
   const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.add.dialog.create.description' });
   await this.waitUntilText('.Dialog_title', createMessage.toUpperCase(), 2000);
 });
+
+Then(/^I should see "([^"]*)" error message on Wallet creation pop up$/, async function (errorMessage) {
+  await this.waitUntilText('.SimpleFormField_error', errorMessage);
+});
