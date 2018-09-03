@@ -19,6 +19,10 @@ When(/^I enter new wallet name:$/, async function (table) {
   await this.input(walletNameInputSelector, fields.name);
 });
 
+Then(/^I should see the "Terms of use" screen$/, async function () {
+  await this.waitForElement('#terms-of-service-agreement');
+});
+
 When(/^I click outside "name" input field$/, async function () {
   await this.click('.SettingsLayout_settingsPane');
 });
