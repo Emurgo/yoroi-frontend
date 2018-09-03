@@ -127,6 +127,13 @@ Feature: Wallet UI Settings
     When I refresh the page
     Then I should see Japanese language as selected
 
+  @it-3
+  Scenario: Yoroi Settings Screen / Terms of Use in Default English(IT-3)
+    When I am testing "Wallet Settings Screen"
+    And I navigate to the general settings screen
+    And I click on secondary menu "Terms of use" item
+    Then I should see the "Terms of use" screen
+
   @it-23
   Scenario: Wallet settings tab isn't active if wallet is not created (IT-23)
     Given I am testing "General Settings"
