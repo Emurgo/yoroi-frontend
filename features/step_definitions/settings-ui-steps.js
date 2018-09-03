@@ -1,7 +1,7 @@
 import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
 
-const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
+var walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
 Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dialogType) {
   const selector = '.' + dialogType + 'PasswordDialog';
@@ -10,11 +10,15 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dia
 
 When(/^I click on "name" input field$/, async function () {
   await this.click('.SettingsLayout_settingsPane .InlineEditingInput_component');
+  await sleep(500);
 });
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 When(/^I enter new wallet name:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.clearInput(walletNameInputSelector);
   await this.clearInput(walletNameInputSelector);
   await this.input(walletNameInputSelector, fields.name);
 });
