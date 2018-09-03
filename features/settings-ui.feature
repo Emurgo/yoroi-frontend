@@ -140,3 +140,11 @@ Feature: Wallet UI Settings
     When There is no wallet stored
     And I navigate to the general settings screen
     Then I should see secondary menu "wallet" item disabled
+
+  @it-4
+  Scenario: Yoroi Settings Screen / Support (IT-4)
+    When I am testing "Wallet Settings Screen"
+    And There is a wallet stored named Test
+    And I navigate to the general settings screen
+    And I click on secondary menu "support" item
+    Then I should see support screen

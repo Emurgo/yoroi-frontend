@@ -1,5 +1,6 @@
 import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
+import { By } from 'selenium-webdriver';
 
 var walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
@@ -80,4 +81,11 @@ Then(/^I should stay in the change password dialog$/, async function () {
     { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
   await this.waitUntilText('.Dialog_title', changePasswordMessage.toUpperCase(), 2000);
 });
+
+Then(/^I should see support screen$/, async function () {
+  await this.waitForElement("//h1[contains(text(), 'Frequently asked questions')]", By.xpath);
+  await this.waitForElement("//h1[contains(text(), 'Reporting a problem')]", By.xpath);
+  await this.waitForElement("//h1[contains(text(), 'Logs')]", By.xpath);
+});
+
 
