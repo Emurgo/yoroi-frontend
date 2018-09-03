@@ -48,6 +48,10 @@ When(/^I clear the current wallet password ([^"]*)$/, async function (password) 
   await this.clearInputUpdatingForm('.changePasswordDialog .currentPassword input', password.length);
 });
 
+When(/^I clear the current wallet repeat password ([^"]*)$/, async function (repeatPassword) {
+  await this.clearInputUpdatingForm('.changePasswordDialog .repeatedPassword input', repeatPassword.length);
+});
+
 When(/^I submit the wallet password dialog$/, async function () {
   await this.click('.confirmButton');
 });
@@ -63,6 +67,12 @@ Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
   const errorSelector = '.ChangeWalletPasswordDialog_newPassword .SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
+});
+
+Then(/^I should see "Doesn't match" error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 

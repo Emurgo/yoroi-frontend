@@ -116,6 +116,24 @@ Feature: Wallet UI Settings
     And I submit the wallet password dialog
     Then I should stay in the change password dialog
 
+  @it-40
+  Scenario: User can't change password without filling Password repeat field (IT-40)
+    When I am testing "Wallet Settings Screen"
+    And There is a wallet stored named Test
+    And I navigate to the general settings screen
+    And I click on secondary menu "wallet" item
+    And I click on the "change" password label
+    And I should see the "change" wallet password dialog
+    And I change wallet password:
+    | currentPassword    | password     | repeatedPassword |
+    | Secret_123         | newSecret123 | newSecret123     |
+    And I clear the current wallet repeat password newSecret123 
+    And I submit the wallet password dialog
+    Then I should stay in the change password dialog
+    And I should see "Doesn't match" error message:
+    | message                             |
+    | global.errors.invalidRepeatPassword |
+
   @it-2
   Scenario: Change language in General Settings (IT-2)
     Given I am testing "General Settings"
