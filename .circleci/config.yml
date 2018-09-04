@@ -37,10 +37,11 @@ jobs:
       - run: npm run compress -- --env "staging" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/yoroi-extension.crx"
 
       # Persist the specified paths (~/repo) into the workspace for use in downstream job. 
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - ./repo/yoroi.zip
+      # FIXME:
+      #- persist_to_workspace:
+      #    root: ~/
+      #    paths:
+      #      - ./repo/yoroi.zip
 
   deploy-testnet:
     working_directory: ~/repo
