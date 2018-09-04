@@ -42,10 +42,29 @@ Feature: Wallet creation
     And I enter the name "<invalidWalletName>"
     And I click the "Create personal wallet" button
     Then I should stay in the create wallet dialog
-    And I should see "Wallet name requires at least 3 and at most 40 letters." error message on Wallet creation pop up
-
-
+    And I should see "Wallet name requires at least 3 and at most 40 letters." error message:
+    | message                             |
+    | global.errors.invalidWalletName     |
     Examples:
     | invalidWalletName                        | 
     | ab                                       |
     | qwertyuiopasdfghjklzxcvbnmzxcvbnmlkjhgfds|
+
+  @it-7
+  Scenario Outline:  Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
+    When I click the create button
+    And I enter the name "Created Wallet"
+    And I enter the created wallet password:
+    | password        | repeatedPassword  |
+    | <wrongPassword> | <wrongPassword>   |
+    And I click the "Create personal wallet" button
+    Then I should see "Invalid Password" error message:
+    | message                             |
+    | global.errors.invalidWalletPassword |
+  Examples:
+  | wrongPassword | 
+  | secret_123  | 
+  | SECRET_123  | 
+  | secret_123  | 
+  | Secre1      | 
+  | SecretSecret| 
