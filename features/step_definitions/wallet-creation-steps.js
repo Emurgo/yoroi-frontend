@@ -2,6 +2,10 @@ import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 
+async function checkErrorByTranslationId(client, errorSelector, error) {
+  await client.waitUntilText(errorSelector, await client.intl(error.message));
+}
+
 When(/^I click the create button$/, async function () {
   await this.click('.createWalletButton');
 });
@@ -53,4 +57,10 @@ Then(/^I should stay in the create wallet dialog$/, async function () {
 
 Then(/^I should see "([^"]*)" error message on Wallet creation pop up$/, async function (errorMessage) {
   await this.waitUntilText('.SimpleFormField_error', errorMessage);
+});
+
+Then(/^I should see "Invalid Password" error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
 });
