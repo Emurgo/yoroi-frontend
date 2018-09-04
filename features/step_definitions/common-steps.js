@@ -42,6 +42,11 @@ Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
 });
 
+Given(/^I restart the browser$/, async function () {
+  await this.driver.manage().deleteAllCookies();
+  await this.driver.navigate().refresh();
+});
+
 Given(/^There is no wallet stored$/, async function () {
   await refreshWallet(this);
   await this.waitForElement('.WalletAdd');
