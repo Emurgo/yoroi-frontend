@@ -1,5 +1,5 @@
 import { Then, When, Given } from 'cucumber';
-import { By } from 'selenium-webdriver';
+import { By, until } from 'selenium-webdriver';
 import chai from 'chai';
 import moment from 'moment';
 import { getLovefieldTxs, getMockData } from '../support/mockDataBuilder';
@@ -58,6 +58,10 @@ async function (expectedTxsNumber) {
   );
 });
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 Then(/^I should see no transactions$/, async function () {
   const actualTxsList = await this.getElementsBy('.Transaction_component');
   chai.expect(actualTxsList.length).to.equal(0);
@@ -66,9 +70,18 @@ Then(/^I should see no transactions$/, async function () {
 Then(/^I should see ([^"]*) ([^"]*) transactions in ([^"]*)$/,
 async function (txsNumber, txExpectedStatus, walletName) {
   const txsAmount = parseInt(txsNumber, 10);
-  for (let i = 1; i < (txsAmount / 5); i++) {
-    await this.click('.WalletTransactionsList_showMoreTransactionsButton');
-  }
+
+  for (let i = 1; i < 25; i++) {
+    var webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
+
+    if(webElements.length==0){
+     await console.log("0 elements!");
+       break;
+    } else {
+       await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
+    }
+ 
+}
   const expectedTxsList = getLovefieldTxs(walletName);
   /* FIXME: Currently these code needs to wait for something before check that each field is correct
      It would be better to wait until each element exist with the correct information.
