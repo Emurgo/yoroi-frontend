@@ -6,7 +6,7 @@
 
 ```bash
 # clone the repository with the submodule js-cardano-wasm
-$ git clone --recursive git@github.com:input-output-hk/icarus-poc.git
+$ git clone --recursive https://github.com/Emurgo/yoroi-frontend.git
 $ git submodule update --init --recursive
 ```
 
@@ -15,6 +15,12 @@ $ git submodule update --init --recursive
 - node v8.9.4 (if you are using nvm, just execute: `$ nvm use`)
 
 - Install rust tools as mentioned in [js-cardano-wasm](https://github.com/input-output-hk/js-cardano-wasm#installation)
+
+# install rustup
+curl https://sh.rustup.rs -sSf | sh
+# use nightly version
+rustup install nightly-2018-06-05
+rustup target add wasm32-unknown-unknown --toolchain nightly-2018-06-05
 
 ### Install dependencies
 
@@ -118,8 +124,10 @@ See [autoupdate guide](https://developer.chrome.com/extensions/autoupdate) for m
 $ npm run flow
 # lint
 $ npm run eslint
-# features
+# features (command to run all existing tests)
 $ npm run test-e2e
+# How to run one .feature file
+$ npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && ./node_modules/.bin/cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/feature_name.feature
 ```
 
 ## Update Cardano crypto library
