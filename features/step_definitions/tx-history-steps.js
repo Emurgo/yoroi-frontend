@@ -74,7 +74,7 @@ async function (txsNumber, txExpectedStatus, walletName) {
   for (let i = 1; i < txsAmount; i++) {
     var webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
     if(webElements.length==0)
-       break;
+      break;
     await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
 }
   const expectedTxsList = getLovefieldTxs(walletName);
