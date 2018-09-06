@@ -20,11 +20,11 @@ Feature: Wallet UI Settings
     | message                             |
     | global.errors.invalidWalletPassword |
   Examples:
-  | currentPassword | password    | repeatedPassword |
-  | Secret_123      | secret      | secret           |  
-  | Secret_123      | secret123   | secret123        |  
-  | Secret_123      | secretSecReT| secretSecReT     | 
-  | Secret_123      | SECRET1234T | SECRET1234T      | 
+  | currentPassword | password    | repeatedPassword | |
+  | Secret_123      | secret_123  | secret_123       | without upper case letters|
+  | Secret_123      | SECRET_123  | SECRET_123       | without lower case letters|
+  | Secret_123      | SecretSecret| SecretSecret     | without numbers           |
+  | Secret_123      | Secre1      | Secre1           | too short                 |
 
 @it-94
   Scenario Outline: User is able to change spending password (IT-94)
