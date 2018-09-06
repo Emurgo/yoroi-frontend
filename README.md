@@ -16,11 +16,12 @@ $ git submodule update --init --recursive
 
 - Install rust tools as mentioned in [js-cardano-wasm](https://github.com/input-output-hk/js-cardano-wasm#installation)
 
-# install rustup
-curl https://sh.rustup.rs -sSf | sh
-# use nightly version
-rustup install nightly-2018-06-05
-rustup target add wasm32-unknown-unknown --toolchain nightly-2018-06-05
+### Install rustup
+```bash
+$ curl https://sh.rustup.rs -sSf | sh
+$ rustup install nightly-2018-06-05
+$ rustup target add wasm32-unknown-unknown --toolchain nightly-2018-06-05
+```
 
 ### Install dependencies
 
@@ -131,8 +132,6 @@ $ npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run
 # How to run one scenario (1 scenario = 1 test case). @it-5 - tag of test case from youtrack
 $ npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && ./node_modules/.bin/cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature --tags @it-5
 ```
-
-## Tests structure 
 
 
 
