@@ -73,9 +73,9 @@ Feature: Wallet creation
     | message                             |
     | global.errors.invalidWalletName     |
     Examples:
-    | invalidWalletName                        | 
-    | ab                                       |
-    | qwertyuiopasdfghjklzxcvbnmzxcvbnmlkjhgfds|
+    | invalidWalletName                        |               |
+    | ab                                       |2 letters name |
+    | qwertyuiopasdfghjklzxcvbnmzxcvbnmlkjhgfds|41 letters name| 
 
   @it-7
   Scenario Outline:  Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
@@ -89,9 +89,8 @@ Feature: Wallet creation
     | message                             |
     | global.errors.invalidWalletPassword |
   Examples:
-  | wrongPassword | 
-  | secret_123  | 
-  | SECRET_123  | 
-  | secret_123  | 
-  | Secre1      | 
-  | SecretSecret| 
+  | wrongPassword |                         |
+  | secret_123  | without upper case letters|
+  | SECRET_123  | without lower case letters|
+  | Secre1      | too short                 |
+  | SecretSecret| without numbers           |

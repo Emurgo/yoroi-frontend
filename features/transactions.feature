@@ -32,8 +32,8 @@ Feature: Send transaction
   Scenario: User can't send funds to the invalid address (IT-46)
     When I go to the send transaction screen
     And I fill the form:
-      | address                                                    | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMC | 0.001000 |
+      | address                                                    | amount   | |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMC | 0.001000 | Some characters in address has been changed and removed|
     Then I should see an invalid address error
     And I should not be able to submit
 

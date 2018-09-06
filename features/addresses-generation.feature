@@ -6,7 +6,8 @@ Feature: Generate Addresses
     And There is a wallet stored named Test
     And I go to the receive screen
 
-  Scenario: Show my initial receive address
+  @it-106
+  Scenario: Latest address should be displayed at the top (IT-106)
     Then I should see my latest address "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt" at the top
     And I should see the addresses exactly list them
     | address                                                     |
