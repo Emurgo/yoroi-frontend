@@ -73,7 +73,7 @@ Feature: Wallet UI Settings
     And I submit the wallet password dialog
     Then I should see the following submit error messages:
     | message                           |
-    | api.errors.IncorrectPasswordError |
+    | <errorMessage> |
   Examples:
   | currentPassword | password         |repeatedPassword |errorMessage|
   | SecreT_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
