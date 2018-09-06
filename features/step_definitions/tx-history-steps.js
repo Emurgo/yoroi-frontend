@@ -58,9 +58,6 @@ async function (expectedTxsNumber) {
   );
 });
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 Then(/^I should see no transactions$/, async function () {
   const actualTxsList = await this.getElementsBy('.Transaction_component');
@@ -70,9 +67,8 @@ Then(/^I should see no transactions$/, async function () {
 Then(/^I should see ([^"]*) ([^"]*) transactions in ([^"]*)$/,
 async function (txsNumber, txExpectedStatus, walletName) {
   const txsAmount = parseInt(txsNumber, 10);
-
   for (let i = 1; i < txsAmount; i++) {
-    var webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
+    const webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
     if(webElements.length==0)
       break;
     await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
