@@ -95,7 +95,7 @@
     },
     "usedAddresses": ["Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"]
   },
-  "Get balance": {
+  "Main UI": {
     "walletInitialData": {
       "simple-wallet": {
         "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
