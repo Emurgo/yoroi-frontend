@@ -20,7 +20,7 @@ Feature: Txs History
     And I should see 2 pending transactions in simple-wallet
     And I should see 1 confirmed transactions in simple-wallet
 
-  @it-103
+  @it-103 @it-56
   Scenario: Open the tx history of a complex wallet (IT-103)
     Given There is a wallet stored named complex-wallet
     When I see the transactions summary
