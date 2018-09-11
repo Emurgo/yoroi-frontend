@@ -40,3 +40,10 @@ Feature: Main UI
     Then I should see "You have successfully copied wallet address" pop up:
     | message                                            |
     | wallet.receive.page.addressCopyNotificationMessage |
+
+  @it-30
+  Scenario: User can't restore Daedalus wallet in Yoroi if Yoroi wallet is not created (IT-30)
+    Given I am testing "Main UI"
+    When There is no wallet stored
+    And I am on the Daedalus Transfer instructions screen
+    Then I see transactions buttons are disabled

@@ -1,7 +1,6 @@
 import { When, Given, Then } from 'cucumber';
-import { By, Key } from 'selenium-webdriver'; 
+import { By } from 'selenium-webdriver'; 
 import { expect } from 'chai';
-import i18n from '../support/helpers/i18n-helpers';
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -36,4 +35,15 @@ Then(/^I should see "You have successfully copied wallet address" pop up:$/, asy
   const error = data.hashes()[0];
   const errorMessage = await this.intl(error.message);
   await this.waitForElement(`//div[@class='VerticalFlexContainer_component']//span[contains(text(), '${errorMessage}')]`, By.xpath);
+});
+
+Then(/^I see transactions buttons are disabled$/, async function () {
+  const disabledButtons = await this.driver.findElements(By.xpath("//div[@class='DaedalusTransferInstructionsPage_columnWrapper']//button[contains(@class, 'disabled')]"));
+  expect(disabledButtons.length).to.be.equal(2);
+
+  const pageUrl = await this.driver.getCurrentUrl();
+  disabledButtons[0].click();
+  expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
+  disabledButtons[1].click();
+  expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
 });
