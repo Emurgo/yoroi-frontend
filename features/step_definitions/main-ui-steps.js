@@ -2,10 +2,6 @@ import { When, Given, Then } from 'cucumber';
 import { By } from 'selenium-webdriver'; 
 import { expect } from 'chai';
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function checkErrorByTranslationId(client, errorSelector, error) {
   await client.waitUntilText(errorSelector, await client.intl(error.message));
 }
