@@ -75,3 +75,13 @@ Feature: Transfer Daedalus Wallet funds
     And I proceed with the recovery
     Then I should see an Error screen
     And I should see 'Daedalus wallet without funds' error message
+
+  @it-29 @withWebSocketConnection
+  Scenario: Yoroi "TRANSFER FUNDS FROM DAEDALUS" screen validation (IT-29)
+    Given I am testing "Daedalus transfer funds Screen"
+    When There is a wallet stored named Test
+    And My Daedalus wallet hasn't funds
+    And I am on the Daedalus Transfer instructions screen
+    Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
+    |instructionMessage                              | attentionMessage| 
+    |daedalusTransfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
