@@ -7,7 +7,7 @@ Feature: Send transaction
     And There is a wallet stored named Test
     And I have a wallet with funds
     
-  @it-54
+  @it-54 @it-52
   Scenario Outline: User can send funds from one Yoroi wallet to another (IT-54)
     When I go to the send transaction screen
     And I fill the form:
