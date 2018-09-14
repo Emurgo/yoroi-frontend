@@ -56,7 +56,7 @@ Feature: Wallet creation
     Then I should stay in the create wallet dialog
 
   @it-16
-  Scenario Outline: Wallet can't be created if wallet name doesn't meet requirements (IT-16) test
+  Scenario Outline: Wallet can't be created if wallet name doesn't meet requirements (IT-16)
     When I click the create button
     And I enter the name "Created Wallet"
     And I enter the created wallet password:

@@ -95,11 +95,32 @@ Feature: Wallet UI Settings
     And I navigate to wallet transactions screen
     Then I should see new wallet name "<walletName>"
     Examples:
-    | walletName    |
-    | first Edited  | 
-    |ウォレットの追加  |
-    |지갑 추가      |
-    |НАСТРОЙКИ      | 
+    | walletName                               |                    |
+    | first Edited                             |2 words name        | 
+    |ウォレットの追加                             |Japanese            |
+    |지갑 추가                                 | Korean             |
+    |НАСТРОЙКИ                                 | Russian            |
+    | abc                                      |3-characters length |
+    | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwer |40 characters length|
+
+  @it-41
+  Scenario Outline: Wallet can't be renamed if new wallet name doesn't meet requirements (IT-41)
+    When I am testing "Wallet Settings Screen"
+    And There is a wallet stored named Test
+    And I navigate to the general settings screen
+    And I click on secondary menu "wallet" item
+    And I click on "name" input field
+    And I enter new wallet name:
+    | name         |
+    | <walletName> |
+    And I click outside "name" input field
+    Then I should see "Wallet name requires at least 3 and at most 40 letters." error message:
+    | message                             |
+    | global.errors.invalidWalletName     |
+    Examples:
+    | walletName                                | |
+    | ab                                        |2-characters length |
+    | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwerd |41 characters length |
 
   @it-14
   Scenario: User can't change the password without entering old password (IT-14)
