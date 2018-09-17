@@ -23,6 +23,15 @@ Feature: Restore Wallet
     | address                                                     |
     | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
 
+  @it-13
+  Scenario: Mnemonic words can be cleared by pressing "x" sign for each word on wallet restoration screen (IT-13)
+    When I click the restore button
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                             |
+    | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
+    Then I delete recovery phrase by pressing "x" signs
+  
   Scenario: Successfully restoring a simple wallet
     When I click the restore button
     And I enter the name "Restored Wallet"

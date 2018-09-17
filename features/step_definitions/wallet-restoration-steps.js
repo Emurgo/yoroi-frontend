@@ -1,6 +1,7 @@
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
+import { expect } from 'chai';
 
 When(/^I click the restore button$/, async function () {
   await this.click('.restoreWalletButton');
@@ -41,4 +42,13 @@ Then(/^I should see an "Invalid recovery phrase" error message$/, async function
 Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.title.label' });
   await this.waitUntilText('.Dialog_title', restoreMessage.toUpperCase(), 2000);
+});
+
+Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
+  const webElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
+  for (let i = 0; i < webElements.length; i++) {
+    await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);
+  }
+  let expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
+  expect(expectedElements.length).to.be.equal(0);
 });

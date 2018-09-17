@@ -127,13 +127,13 @@ $ npm run flow
 $ npm run eslint
 # features (command to run all existing tests)
 $ npm run test-e2e
-# How to run one .feature file
-$ npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && ./node_modules/.bin/cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/feature_name.feature
-# How to run one scenario (1 scenario = 1 test case). @it-5 - tag of test case from youtrack
-$ npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && ./node_modules/.bin/cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature --tags @it-5
+# How to run one .feature file (One feature file = one covered component from youtrack)
+$ npm run test-by-feature feature/wallet-creation.feature
+# How to run one test. Instead of '@it-10' you can use any tag from youtrack
+$ npm run test-by-tag @it-10
 ```
 
-
+ 
 
 ## Update Cardano crypto library
 
