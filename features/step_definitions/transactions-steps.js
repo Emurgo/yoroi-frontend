@@ -51,7 +51,7 @@ When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  await this.waitForElement(`//span[contains(text(), '+ ${fee} of fees')]`, By.xpath);
+  await this.waitForElement(`//label[contains(text(), 'Amount')]//following::span[contains(text(), '+ ${fee} of fees')]`, By.xpath);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {

@@ -1,4 +1,5 @@
 import { Before, Given, When, Then, After } from 'cucumber';
+import { By } from 'selenium-webdriver'; 
 import BigNumber from 'bignumber.js';
 import {
   LOVELACES_PER_ADA,
@@ -105,6 +106,17 @@ Then(/^I should wait until funds are recovered:$/, async function (table) {
   const rows = table.hashes();
   await _checkDaedalusAddressesRecoveredAreCorrect(rows, this);
   await _checkTotalAmountIsCorrect(rows, this);
+});
+
+Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/, async function (table) {
+  const messages = table.hashes()[0];
+  const instructionMessage = await this.intl(messages.instructionMessage);
+  const attentionMessage = await this.intl(messages.attentionMessage);
+    await this.waitForElement(`//div[@class='DaedalusTransferInstructionsPage_text' and contains(text(), '${instructionMessage}')]`, By.xpath);
+    await this.waitForElement(`//div[contains(text(), 'Attention')]//following::div[@class='DaedalusTransferInstructionsPage_text' and contains(text(), '${attentionMessage}')]`, By.xpath);
+    await this.waitForElement(`//button[contains(@class, 'disabled') and contains(text(), 'Create Yoroi wallet')]`, By.xpath); //Disabled "Create yoroi" button
+    await this.waitForElement(`//button[contains(@class, 'answerYesButton') and contains(text(), 'Go to the Receive screen')]`, By.xpath); 
+    await this.waitForElement(`//button[contains(@class, 'answerNoButton') and contains(text(), 'Transfer all funds from Daedalus wallet')]`, By.xpath); 
 });
 
 async function _checkDaedalusAddressesRecoveredAreCorrect(rows, world) {
