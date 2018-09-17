@@ -22,7 +22,7 @@ Then(/^I go to the transaction history screen$/, async function () {
 Then(/^I should see the transactions screen$/, async function () {
   await this.waitForElement("//div[@class='WalletSummary_numberOfTransactions']", By.xpath);
 });
-//
+
 Then(/^I click on "copy to clipboard" button$/, async function () {
   await this.click("//div[@class = 'WalletReceive_hash']//following-sibling::span", By.xpath);
 });
