@@ -6,7 +6,7 @@ Feature: Wallet creation
     And There is no wallet stored
 
   @it-5
-  Scenario:  Wallet creation (IT-5)
+  Scenario: Wallet creation (IT-5)
     When I click the create button
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
@@ -18,7 +18,7 @@ Feature: Wallet creation
     Then I should see the opened wallet with name "Created Wallet"
 
   @it-9
-  Scenario:   Wallet access after Chrome restart (IT-9)
+  Scenario: Wallet access after Chrome restart (IT-9)
     When I click the create button
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
@@ -54,6 +54,19 @@ Feature: Wallet creation
     And I clear the created wallet password Secret_123
     And I click the "Create personal wallet" button
     Then I should stay in the create wallet dialog
+    #
+
+  @it-27
+   Scenario: Users will be presented with a security warning prior to seed creation (IT-27)
+    When I click the create button
+    And I enter the name "Created Wallet"
+    And I enter the created wallet password:
+    | password   | repeatedPassword  |
+    | Secret_123 | Secret_123        |
+    And I click the "Create personal wallet" button
+    Then I see the security warning prior:
+    | message                             |
+    | wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching   |
 
   @it-16
   Scenario Outline: Wallet can't be created if wallet name doesn't meet requirements (IT-16)
@@ -78,7 +91,7 @@ Feature: Wallet creation
     | qwertyuiopasdfghjklzxcvbnmzxcvbnmlkjhgfds|41 letters name| 
 
   @it-7
-  Scenario Outline:  Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
+  Scenario Outline: Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
     When I click the create button
     And I enter the name "Created Wallet"
     And I enter the created wallet password:

@@ -57,13 +57,10 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 
 When(/^I enter random mnemonic phrase$/, async function () {
   await this.click('.WalletRecoveryPhraseDisplayDialog .primary');
-
   for (let i = 1; i < 16; i++) {
     await this.click(`//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${i}]`, By.xpath);
   }
-
   const words = await this.driver.findElement(By.xpath("//div[@class='WalletRecoveryPhraseMnemonic_component']"));
-  
   words.getText().then(function (text) {
     expect(text).to.not.equal("");
  });
@@ -95,5 +92,11 @@ Then(/^I should see "Wallet name requires at least 3 and at most 40 letters." er
 Then(/^I should see "Invalid Password" error message:$/, async function (data) {
   const error = data.hashes()[0];
   const errorSelector = '.SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
+});
+
+Then(/^I see the security warning prior:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.SimpleCheckbox_label';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
