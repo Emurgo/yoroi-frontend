@@ -19,6 +19,10 @@ Then(/^I go to the transaction history screen$/, async function () {
   await this.click(`//span[contains(text(), "Transactions")]`, By.xpath);
 });
 
+When(/^I go to the main screen$/, async function () {
+  await this.click(`//header//button[1]`, By.xpath); 
+});
+
 Then(/^I should see the transactions screen$/, async function () {
   await this.waitForElement("//div[@class='WalletSummary_numberOfTransactions']", By.xpath);
 });
