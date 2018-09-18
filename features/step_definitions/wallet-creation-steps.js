@@ -7,10 +7,6 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
   await client.waitUntilText(errorSelector, await client.intl(error.message));
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 When(/^I click the create button$/, async function () {
   await this.click('.createWalletButton');
 });
@@ -65,10 +61,6 @@ When(/^I enter random mnemonic phrase$/, async function () {
     expect(text).to.not.equal("");
  });
 });
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 Then(/^I click Clear button$/, async function () {
   await this.click(`//button[contains(text(), 'Clear')]`, By.xpath);
