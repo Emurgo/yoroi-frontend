@@ -69,6 +69,19 @@ function CustomWorld() {
     }, timeout);
   };
 
+  this.waitUntilContainsText = async (locator, text, timeout = 10000) => {
+    await this.driver.wait(async () => {
+      try {
+        const value = await this.getText(locator);
+        return value.indexOf(text) !== -1;
+      } catch (err) {
+        return false;
+      }
+    }, timeout);
+  };
+
+
+
   this.click = async (locator, method = By.css) => {
     await this.waitForElement(locator, method);
     await this.waitEnable(locator, method);

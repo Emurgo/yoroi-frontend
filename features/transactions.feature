@@ -28,6 +28,22 @@ Feature: Send transaction
       | 9007199254..552484  | 0.168214  | # Sent all funds|
       | 9007199253..720698  | 0.168214  | # Sent a big amount|
 
+  @it-48
+  Scenario Outline: CONFIRM TRANSACTION Pop up displays properly (IT-48)
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                        | amount   |
+      | <address>                      | <amount> |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see CONFIRM TRANSACTION Pop up:
+      | address   | amount    |fee      |
+      | <address> | <amount>  |<fee>    |
+
+    Examples:
+      | address                                                     | amount    |fee      |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.167950 | 
+
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
     When I go to the send transaction screen
