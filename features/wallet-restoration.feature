@@ -32,6 +32,7 @@ Feature: Restore Wallet
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
     Then I delete recovery phrase by pressing "x" signs
   
+  @it-86
   Scenario: Successfully restoring a simple wallet
     When I click the restore button
     And I enter the name "Restored Wallet"
@@ -49,7 +50,8 @@ Feature: Restore Wallet
     | Ae2tdPwUPEZ7sn3AQhUFGHXiWuG5aU3XnMi2SNKeh94S9Pp17igo1RwzodB |
     | Ae2tdPwUPEZ73Nh3ALXKwtt9Wmb8bQHa9owoXtkvGEWK3AX6kXNHBK1D261 |
 
-  Scenario: Successfully restoring a complex wallet
+  @it-86
+  Scenario: Ensure that wallet addresses are restored correctly (IT-86)
     When I click the restore button
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
