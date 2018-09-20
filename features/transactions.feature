@@ -40,7 +40,7 @@ Feature: Send transaction
       | address   | amount    |fee      |
       | <address> | <amount>  |<fee>    |
 
-    Examples:
+  Examples:
       | address                                                     | amount    |fee      |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.167950 | 
 
