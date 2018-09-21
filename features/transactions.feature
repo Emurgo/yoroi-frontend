@@ -28,6 +28,26 @@ Feature: Send transaction
       | 9007199254..552484  | 0.168214  | # Sent all funds|
       | 9007199253..720698  | 0.168214  | # Sent a big amount|
 
+  @it-90
+  Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.100000 |
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | <password> |
+    And I submit the wallet send form
+    Then I should see an incorrect wallet password error message
+
+    Examples:
+      | password              | 
+      | secret_123            | 
+      | SECRET_123            |
+      | sECRET_123            |
+
   @it-48
   Scenario Outline: CONFIRM TRANSACTION Pop up displays properly (IT-48)
     When I go to the send transaction screen
