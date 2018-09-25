@@ -82,6 +82,7 @@ When(/^I submit the wallet send form$/, async function () {
 
 Then(/^I should see the summary screen$/, async function () {
   await this.waitForElement('.WalletSummary_component');
+  await this.driver.sleep(5000);
 });
 
 Then(/^I should see an invalid address error$/, async function () {

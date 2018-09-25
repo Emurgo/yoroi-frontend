@@ -3,6 +3,10 @@ import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
 
+async function checkErrorByTranslationId(client, errorSelector, error) {
+  await client.waitUntilText(errorSelector, await client.intl(error.message));
+}
+
 When(/^I click the restore button$/, async function () {
   await this.click('.restoreWalletButton');
 });
@@ -44,6 +48,12 @@ When(/^I click the "Restore Wallet" button$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message$/, async function () {
   await this.waitForElement('.SimpleAutocomplete_errored');
+});
+
+Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.SimpleAutocomplete_errored .SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
 });
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {
