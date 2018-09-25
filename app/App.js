@@ -7,6 +7,7 @@ import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
 import ja from 'react-intl/locale-data/ja';
+import zh from 'react-intl/locale-data/zh';
 import { Routes } from './Routes';
 import { daedalusTheme } from './themes/daedalus';
 import translations from './i18n/translations';
@@ -15,7 +16,7 @@ import type { ActionsMap } from './actions/index';
 import ThemeManager from './ThemeManager';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja]);
+addLocaleData([...en, ...ko, ...ja, ...zh]);
 
 @observer
 export default class App extends Component<{
