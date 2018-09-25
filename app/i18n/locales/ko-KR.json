@@ -229,6 +229,5 @@
   "wallet.transaction.transactionId": "거래 ID",
   "wallet.transaction.type": "{currency} 거래",
   "wallet.transaction.type.card": "카드 결제",
-  "wallet.transaction.type.exchange": "환율",
-  "wallet.trezor.dialog.title.label": "!!!Waiting for Trezor"
+  "wallet.transaction.type.exchange": "환율"
 }

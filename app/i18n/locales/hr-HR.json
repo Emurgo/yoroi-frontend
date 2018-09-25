@@ -229,6 +229,5 @@
   "wallet.transaction.transactionId": "!!!Transaction ID",
   "wallet.transaction.type": "!!!{currency} transaction",
   "wallet.transaction.type.card": "!!!Card payment",
-  "wallet.transaction.type.exchange": "!!!Exchange",
-  "wallet.trezor.dialog.title.label": "!!!Waiting for Trezor"
+  "wallet.transaction.type.exchange": "!!!Exchange"
 }

@@ -2821,25 +2821,6 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Waiting for Trezor",
-        "description": "Label \"Waiting for Trezor\" on the wallet connect trezor dialog.",
-        "end": {
-          "column": 3,
-          "line": 18
-        },
-        "file": "app/components/wallet/WalletTrezorDialog.js",
-        "id": "wallet.trezor.dialog.title.label",
-        "start": {
-          "column": 9,
-          "line": 14
-        }
-      }
-    ],
-    "path": "app/components/wallet/WalletTrezorDialog.json"
-  },
-  {
-    "descriptors": [
-      {
         "defaultMessage": "!!!change",
         "description": "Label \"change\" on inline editing inputs in inactive state.",
         "end": {
@@ -3221,17 +3202,31 @@
         }
       },
       {
-        "defaultMessage": "!!!Chinese",
-        "description": "Language name for \"Chinese\" language.",
+        "defaultMessage": "!!!Chinese Simplified",
+        "description": "Language name for \"Simplified Chinese\" language.",
         "end": {
           "column": 3,
           "line": 68
         },
         "file": "app/i18n/global-messages.js",
-        "id": "global.language.chinese",
+        "id": "global.language.chinese.simplified",
         "start": {
-          "column": 19,
+          "column": 29,
           "line": 64
+        }
+      },
+      {
+        "defaultMessage": "!!!Chinese Traditional",
+        "description": "Language name for \"Traditional Chinese\" language.",
+        "end": {
+          "column": 3,
+          "line": 73
+        },
+        "file": "app/i18n/global-messages.js",
+        "id": "global.language.chinese.traditional",
+        "start": {
+          "column": 30,
+          "line": 69
         }
       },
       {
@@ -3239,13 +3234,13 @@
         "description": "Language name for \"Korean\" language.",
         "end": {
           "column": 3,
-          "line": 73
+          "line": 78
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.korean",
         "start": {
           "column": 18,
-          "line": 69
+          "line": 74
         }
       },
       {
@@ -3253,13 +3248,13 @@
         "description": "Language name for \"German\" language.",
         "end": {
           "column": 3,
-          "line": 78
+          "line": 83
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.german",
         "start": {
           "column": 18,
-          "line": 74
+          "line": 79
         }
       },
       {
@@ -3267,13 +3262,13 @@
         "description": "Language name for \"Croatian\" language.",
         "end": {
           "column": 3,
-          "line": 83
+          "line": 88
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.croatian",
         "start": {
           "column": 20,
-          "line": 79
+          "line": 84
         }
       },
       {
@@ -3281,13 +3276,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 3,
-          "line": 88
+          "line": 93
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.unit.ada",
         "start": {
           "column": 11,
-          "line": 84
+          "line": 89
         }
       },
       {
@@ -3295,13 +3290,13 @@
         "description": "Title for the \"Recovery Phrase\" dialog.",
         "end": {
           "column": 3,
-          "line": 93
+          "line": 98
         },
         "file": "app/i18n/global-messages.js",
         "id": "wallet.backup.recovery.phrase.dialog.title",
         "start": {
           "column": 29,
-          "line": 89
+          "line": 94
         }
       },
       {
@@ -3309,13 +3304,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 5,
-          "line": 102
+          "line": 107
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.ada",
         "start": {
           "column": 14,
-          "line": 98
+          "line": 103
         }
       },
       {
@@ -3323,13 +3318,13 @@
         "description": "Name for \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 107
+          "line": 112
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.cardano",
         "start": {
           "column": 13,
-          "line": 103
+          "line": 108
         }
       },
       {
@@ -3337,13 +3332,13 @@
         "description": "Version of \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 112
+          "line": 117
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.cardano",
         "start": {
           "column": 16,
-          "line": 108
+          "line": 113
         }
       },
       {
@@ -3351,13 +3346,13 @@
         "description": "Name for \"Etc\" unit.",
         "end": {
           "column": 5,
-          "line": 119
+          "line": 124
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.etc",
         "start": {
           "column": 14,
-          "line": 115
+          "line": 120
         }
       },
       {
@@ -3365,13 +3360,13 @@
         "description": "Name for \"Mantis\" client.",
         "end": {
           "column": 5,
-          "line": 124
+          "line": 129
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.mantis",
         "start": {
           "column": 13,
-          "line": 120
+          "line": 125
         }
       },
       {
@@ -3379,13 +3374,13 @@
         "description": "Version of \"Mantis\" client.",
         "end": {
           "column": 5,
-          "line": 129
+          "line": 134
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.mantis",
         "start": {
           "column": 16,
-          "line": 125
+          "line": 130
         }
       }
     ],
