@@ -7,5 +7,3 @@ export const checkIfElementsInArrayAreUnique = async function (arr) {
      } 
      return true;
  }
-
-  

@@ -44,7 +44,7 @@ When(/^I fill the form:$/, async function (table) {
 
 When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const fields = table.hashes()[0];
-  let total = parseFloat(fields.amount) + parseFloat(fields.fee);
+  const total = parseFloat(fields.amount) + parseFloat(fields.fee);
   await this.waitUntilText('.WalletSendConfirmationDialog_addressTo', fields.address);
   await this.waitUntilContainsText('.WalletSendConfirmationDialog_fees', fields.fee);
   await this.waitUntilContainsText('.WalletSendConfirmationDialog_amount', fields.amount);

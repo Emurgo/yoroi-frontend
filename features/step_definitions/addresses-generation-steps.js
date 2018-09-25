@@ -32,7 +32,7 @@ Then(/^I should see my latest address "([^"]*)" at the top$/, async function (ad
 });
 
 Then(/^I see every generated address is unique$/, async function () {
-  var addressesStringArray = [];
+  let addressesStringArray = [];
   const addresses = await this.driver.findElements(By.xpath("//div[@class='WalletReceive_addressId']"));
 
   for(let i=1; i<=addresses.length; i++){
@@ -40,7 +40,7 @@ Then(/^I see every generated address is unique$/, async function () {
       addressesStringArray.push(addr);
     });
   }
-  var unique = await checkIfElementsInArrayAreUnique.call(this, addressesStringArray);
+  let unique = await checkIfElementsInArrayAreUnique.call(this, addressesStringArray);
   expect(unique).to.be.true;
 });
 
