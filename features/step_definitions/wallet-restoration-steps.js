@@ -69,3 +69,9 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
   let expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
   expect(expectedElements.length).to.be.equal(0);
 });
+
+Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async function (table) {
+  const words = table.split(' ');
+  const lastWord = words[words.length-1];
+  await this.waitForElementNotPresent(`//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`, By.xpath);
+});

@@ -121,3 +121,15 @@ Feature: Restore Wallet
     | recoveryPhrase                                                                                           |                    |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow         | 14-words phrase    |
     | atom remind style monster lunch result upgrade fashion eight limit glance frequent eternal borrow accuse | invalid word order |
+
+    @it-71
+    Scenario Outline: Ensure user can not add more than 15 words to the Yoroi Wallet Recovery Phrase (IT-71)
+    And I click the restore button
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase   |
+    | <recoveryPhrase> |
+    Then I don't see last word of <recoveryPhrase> in recovery phrase field
+    Examples:
+    | recoveryPhrase                                                                                                  |                    |
+    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster galaxy | 16-words phrase    |
