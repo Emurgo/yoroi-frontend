@@ -43,7 +43,20 @@ Feature: Transfer Daedalus Wallet funds
     And I proceed with the recovery
     Then I should see an Error screen
     And I should see 'Connection lost' error message
-  
+
+  @it-35
+  Scenario: Ensure user can not add more than 12 words to the Daedalus recovery phrase (IT-35)
+    Given I am testing "Daedalus transfer funds Screen"
+    When There is a wallet stored named Test
+    And I am on the Daedalus Transfer instructions screen
+    When I click on the transfer funds from Daedalus button
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                          |
+    | leaf immune metal phrase river cool domain snow year below result three |
+    Then I enter one more word to the recovery phrase field:
+    | word   |
+    | gadget |
+
   @withWebSocketConnection @it-45
   Scenario: User can transfer Daedalus funds to Icarus using 12-word mnemonic phrase (IT-45)
     Given I am testing "Daedalus transfer funds Screen"

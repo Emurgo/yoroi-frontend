@@ -11,12 +11,7 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dia
 
 When(/^I click on "name" input field$/, async function () {
   await this.click('.SettingsLayout_settingsPane .InlineEditingInput_component');
-  await sleep(500);
 });
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 When(/^I enter new wallet name:$/, async function (table) {
   const fields = table.hashes()[0];

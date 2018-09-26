@@ -1,6 +1,10 @@
 import { Given, When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
+import { expect } from 'chai';
+import {
+  checkIfElementsInArrayAreUnique,
+} from '../support/helpers/helpers';
 
 Given(/^I go to the receive screen$/, async function () {
   await this.click('.receive');
@@ -12,7 +16,7 @@ When(/^I click on the Generate new address button$/, async function () {
 
 When(/^I click on the Hide used addresses button$/, async function () {
   const hideUsedText =
-    await i18n.formatMessage(this.driver, { id: 'wallet.receive.page.hideUsedLabel' });
+  await i18n.formatMessage(this.driver, { id: 'wallet.receive.page.hideUsedLabel' });
   await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
 });
 
@@ -25,6 +29,19 @@ When(/^I click on the Generate new address button ([0-9]+) times$/, async functi
 
 Then(/^I should see my latest address "([^"]*)" at the top$/, async function (address) {
   await this.waitUntilText('.WalletReceive_hash', address);
+});
+
+Then(/^I see every generated address is unique$/, async function () {
+  let addressesStringArray = [];
+  const addresses = await this.driver.findElements(By.xpath("//div[@class='WalletReceive_addressId']"));
+
+  for(let i=1; i<=addresses.length; i++){
+    let addr = await this.driver.findElement(By.css(`.generatedAddress-${i} .WalletReceive_addressId`)).getText().then(function(addr){
+      addressesStringArray.push(addr);
+    });
+  }
+  let unique = await checkIfElementsInArrayAreUnique.call(this, addressesStringArray);
+  expect(unique).to.be.true;
 });
 
 Then(/^I should see the addresses exactly list them$/, async function (table) {

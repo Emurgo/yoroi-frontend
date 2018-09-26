@@ -17,6 +17,13 @@ When(/^I enter the recovery phrase:$/, async function (table) {
   }
 });
 
+When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
+  const words = table.hashes()[0];
+  await this.input('.SimpleAutocomplete_autocompleteWrapper input', words.word);
+  const lastWord = await this.driver.findElements(By.xpath(`//span[contains(text(), '${words.word}')]`));
+  expect(lastWord.length).to.be.equal(0);
+});
+
 When(/^I clear the recovery phrase$/, async function () {
   await this.clearInputUpdatingForm('.SimpleAutocomplete_autocompleteWrapper input', 15);
 });

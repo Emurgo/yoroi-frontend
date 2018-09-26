@@ -28,6 +28,11 @@ Feature: Generate Addresses
     And  I click on the Generate new address button
     Then I should see an error about max unused addresses
 
+  @it-34
+  Scenario: Ensure every generated wallet address is unique (IT-34)
+  When I click on the Generate new address button 20 times
+  Then I see every generated address is unique
+
   @it-22
   Scenario: Ensure user can hide used Addresses under "Receive tab" (IT-22)
     When I click on the Generate new address button

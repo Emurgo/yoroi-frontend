@@ -30,6 +30,17 @@ Feature: Main UI
     When I go to the transaction history screen
     Then I should see the transactions screen
 
+  @it-21
+  Scenario: Yoroi Wallet "Home Button" Test (IT-21)
+    Given I am testing "Main UI"
+    When There is a wallet stored named complex-wallet
+    And I am on the Daedalus Transfer instructions screen
+    And I go to the main screen
+    Then I should see the transactions screen
+    When I navigate to the general settings screen
+    And I go to the main screen
+    Then I should see the transactions screen
+
   @it-25
   Scenario: Ensure user can copy Wallet address to Windows clipboard via "Copy address" buttons (IT-25)
     Given I am testing "Main UI"

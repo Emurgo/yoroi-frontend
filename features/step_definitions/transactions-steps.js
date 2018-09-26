@@ -42,6 +42,15 @@ When(/^I fill the form:$/, async function (table) {
   await this.input("input[name='amount']", fields.amount);
 });
 
+When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
+  const fields = table.hashes()[0];
+  const total = parseFloat(fields.amount) + parseFloat(fields.fee);
+  await this.waitUntilText('.WalletSendConfirmationDialog_addressTo', fields.address);
+  await this.waitUntilContainsText('.WalletSendConfirmationDialog_fees', fields.fee);
+  await this.waitUntilContainsText('.WalletSendConfirmationDialog_amount', fields.amount);
+  await this.waitUntilContainsText('.WalletSendConfirmationDialog_totalAmount', total);
+});
+
 When(/^I clear the receiver$/, async function () {
   await this.clearInput("input[name='receiver']");
 });
