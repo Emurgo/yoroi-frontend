@@ -109,7 +109,7 @@
   "settings.menu.termsOfUse.link.label": "使用条款",
   "settings.menu.wallet.link.label": "钱包",
   "settings.support.faq.content": "如果遇到问题，请访问 {faqLink} 查看已知问题指南。",
-  "settings.support.faq.faqLink": "Yoroi 钱包网站上的常见问题解答",
+  "settings.support.faq.faqLink": "Yoroi 网站上的常见问题解答",
   "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",
   "settings.support.faq.supportRequestLinkURL": "https://zendesk.com/support/",
   "settings.support.faq.title": "常见问题",

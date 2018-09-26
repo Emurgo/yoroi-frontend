@@ -109,7 +109,7 @@
   "settings.menu.termsOfUse.link.label": "使用條款",
   "settings.menu.wallet.link.label": "皮夾",
   "settings.support.faq.content": "若您遇到問題，請參閱 {faqLink}，瞭解已知問題處理指導。",
-  "settings.support.faq.faqLink": "Yoroi 皮夾網站常見問題集",
+  "settings.support.faq.faqLink": "Yoroi 網站常見問題集",
   "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",
   "settings.support.faq.supportRequestLinkURL": "https://zendesk.com/support/",
   "settings.support.faq.title": "常見問題集",
