@@ -229,5 +229,5 @@
   "wallet.transaction.transactionId": "交易 ID",
   "wallet.transaction.type": "{currency} 交易",
   "wallet.transaction.type.card": "卡支付",
-  "wallet.transaction.type.exchange": "兌換",
+  "wallet.transaction.type.exchange": "兌換"
 }
