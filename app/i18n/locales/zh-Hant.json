@@ -110,7 +110,7 @@
   "settings.menu.wallet.link.label": "皮夾",
   "settings.support.faq.content": "若您遇到問題，請參閱 {faqLink}，瞭解已知問題處理指導。",
   "settings.support.faq.faqLink": "MyWallet 網站常見問題集",
-  "settings.support.faq.faqLinkURL": "https://daedaluswallet.io/faq/",
+  "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",
   "settings.support.faq.supportRequestLinkURL": "https://zendesk.com/support/",
   "settings.support.faq.title": "常見問題集",
   "settings.support.logs.content": "若想檢查記錄，您可以 {downloadLogsLink}。記錄不包含機密資訊，將這些記錄附加至問題報告，幫助團隊調查您遇到的問題非常有用。使用錯誤報告功能時，可以自動附加記錄。",

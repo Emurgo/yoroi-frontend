@@ -110,7 +110,7 @@
   "settings.menu.wallet.link.label": "钱包",
   "settings.support.faq.content": "如果遇到问题，请访问 {faqLink} 查看已知问题指南。",
   "settings.support.faq.faqLink": "MyWallet 网站上的常见问题解答",
-  "settings.support.faq.faqLinkURL": "https://daedaluswallet.io/faq/",
+  "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",
   "settings.support.faq.supportRequestLinkURL": "https://zendesk.com/support/",
   "settings.support.faq.title": "常见问题",
   "settings.support.logs.content": "如果想要查看日志，您可以 {downloadLogsLink}。日志不包含敏感信息，将日志附到问题报告上有助于团队调查您遇到的问题。在使用问题报告功能时，会自动附带日志。",
