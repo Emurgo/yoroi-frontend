@@ -66,4 +66,3 @@ Then(/I should see an error about max unused addresses/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.unusedAddressesError' });
   await this.waitUntilText('.WalletReceive_error', errorMessage);
 });
-

@@ -92,5 +92,3 @@ Then(/^I should see support screen$/, async function () {
   await this.waitForElement("//h1[contains(text(), 'Reporting a problem')]", By.xpath);
   await this.waitForElement("//h1[contains(text(), 'Logs')]", By.xpath);
 });
-
-

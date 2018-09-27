@@ -34,7 +34,6 @@ Feature: Txs History
     Then I should see that the number of transactions is 45
     And I should see 45 transactions in complex-wallet
 
-    
   @it-104
   Scenario: Open the tx history of a wallet with a big input tx (IT-104)
     Given There is a wallet stored named tx-big-input-wallet

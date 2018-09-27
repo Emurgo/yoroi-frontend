@@ -58,7 +58,6 @@ async function (expectedTxsNumber) {
   );
 });
 
-
 Then(/^I should see no transactions$/, async function () {
   const actualTxsList = await this.getElementsBy('.Transaction_component');
   chai.expect(actualTxsList.length).to.equal(0);
