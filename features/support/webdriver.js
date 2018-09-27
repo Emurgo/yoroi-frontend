@@ -80,8 +80,6 @@ function CustomWorld() {
     }, timeout);
   };
 
-
-
   this.click = async (locator, method = By.css) => {
     await this.waitForElement(locator, method);
     await this.waitEnable(locator, method);

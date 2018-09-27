@@ -49,4 +49,3 @@ Feature: Txs History
     Then I should see that the number of transactions is 3
     And I should see 2 pending transactions in simple-wallet
     And I should see 1 confirmed transactions in simple-wallet
-
