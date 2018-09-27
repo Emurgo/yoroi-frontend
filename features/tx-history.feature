@@ -27,6 +27,14 @@ Feature: Txs History
     Then I should see that the number of transactions is 45
     And I should see 45 confirmed transactions in complex-wallet
 
+  @it-66
+  Scenario: Ensure that "Number of transactions" message is correspond to the actual number of transactions (IT-66)
+    Given There is a wallet stored named complex-wallet
+    When I see the transactions summary
+    Then I should see that the number of transactions is 45
+    And I should see 45 transactions in complex-wallet
+
+    
   @it-104
   Scenario: Open the tx history of a wallet with a big input tx (IT-104)
     Given There is a wallet stored named tx-big-input-wallet
