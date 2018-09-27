@@ -107,8 +107,22 @@ export default class SettingsStore extends Store {
   };
 
   _updateMomentJsLocaleAfterLocaleChange = () => {
-    moment.locale(this.currentLocale);
+    moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
   };
+
+  _convertLocaleKeyToMomentJSLocalKey = (localeKey: string ): string  => {
+    // REF -> https://github.com/moment/moment/tree/develop/locale
+    let momentJSLocalKey = localeKey;
+    switch(localeKey) {
+      case 'zh-Hans': 
+       momentJSLocalKey = 'zh-cn';
+       break;
+      case 'zh-Hant': 
+       momentJSLocalKey = 'zh-tw';
+       break;                     
+    }
+    return momentJSLocalKey;
+  }
 
   _acceptTermsOfUse = async () => {
     await this.setTermsOfUseAcceptanceRequest.execute();
