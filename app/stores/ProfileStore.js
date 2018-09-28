@@ -110,16 +110,19 @@ export default class SettingsStore extends Store {
     moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
   };
 
-  _convertLocaleKeyToMomentJSLocalKey = (localeKey: string ): string  => {
+  _convertLocaleKeyToMomentJSLocalKey = (localeKey: string): string => {
     // REF -> https://github.com/moment/moment/tree/develop/locale
     let momentJSLocalKey = localeKey;
-    switch(localeKey) {
-      case 'zh-Hans': 
-       momentJSLocalKey = 'zh-cn';
-       break;
-      case 'zh-Hant': 
-       momentJSLocalKey = 'zh-tw';
-       break;                     
+    switch (localeKey) {
+      case 'zh-Hans':
+        momentJSLocalKey = 'zh-cn';
+        break;
+      case 'zh-Hant':
+        momentJSLocalKey = 'zh-tw';
+        break;
+      default:
+        momentJSLocalKey = localeKey;
+        break;
     }
     return momentJSLocalKey;
   }
