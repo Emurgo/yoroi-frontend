@@ -6,8 +6,6 @@ import Wallet from '../../domain/Wallet';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '.././lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
-import WalletAddDialog from '../../components/wallet/WalletAddDialog';
-import type { walletExportTypeChoices } from '../../types/walletExportTypes';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type { ImportWalletFromFileResponse } from '../../api/ada/index';
 import type {
@@ -19,18 +17,26 @@ import type {
 export default class AdaWalletsStore extends WalletStore {
 
   // REQUESTS
-  /* eslint-disable max-len */
-  @observable walletsRequest: Request<GetWalletsResponse> = new Request(this.api.ada.getWallets);
-  @observable importFromFileRequest: Request<ImportWalletFromFileResponse> = new Request(() => {});
-  @observable createWalletRequest: Request<CreateWalletResponse> = new Request(this.api.ada.createWallet);
-  @observable deleteWalletRequest: Request<DeleteWalletResponse> = new Request(() => {});
-  @observable sendMoneyRequest: Request<CreateTransactionResponse> = new Request(this.api.ada.createTransaction);
-  @observable getWalletRecoveryPhraseRequest: Request<GetWalletRecoveryPhraseResponse> = new Request(this.api.ada.getWalletRecoveryPhrase);
-  @observable restoreRequest: Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
-  /* eslint-enable max-len */
+  @observable walletsRequest:
+    Request<GetWalletsResponse> = new Request(this.api.ada.getWallets);
 
-  @observable walletExportType: walletExportTypeChoices = 'paperWallet';
-  @observable walletExportMnemonic = 'marine joke dry silk ticket thing sugar stereo aim';
+  @observable importFromFileRequest:
+    Request<ImportWalletFromFileResponse> = new Request(() => {});
+
+  @observable createWalletRequest:
+    Request<CreateWalletResponse> = new Request(this.api.ada.createWallet);
+
+  @observable deleteWalletRequest:
+    Request<DeleteWalletResponse> = new Request(() => {});
+
+  @observable sendMoneyRequest:
+    Request<CreateTransactionResponse> = new Request(this.api.ada.createTransaction);
+
+  @observable getWalletRecoveryPhraseRequest:
+    Request<GetWalletRecoveryPhraseResponse> = new Request(this.api.ada.getWalletRecoveryPhrase);
+
+  @observable restoreRequest:
+    Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
 
   setup() {
     super.setup();
@@ -41,7 +47,7 @@ export default class AdaWalletsStore extends WalletStore {
     wallets.sendMoney.listen(this._sendMoney);
     wallets.restoreWallet.listen(this._restoreWallet);
     wallets.importWalletFromFile.listen(this._importWalletFromFile);
-    wallets.chooseWalletExportType.listen(this._chooseWalletExportType);
+    wallets.updateBalance.listen(this._updateBalance);
     router.goToRoute.listen(this._onRouteChange);
     walletBackup.finishWalletBackup.listen(this._finishCreation);
   }
@@ -67,14 +73,12 @@ export default class AdaWalletsStore extends WalletStore {
 
   isValidAddress = (address: string) => this.api.ada.isValidAddress(address);
 
-  isValidMnemonic = (mnemonic: string) => this.api.ada.isValidMnemonic(mnemonic);
-
-  // TODO - call endpoint to check if private key is valid
-  isValidPrivateKey = () => { return true; }; // eslint-disable-line
+  isValidMnemonic = (
+    mnemonic: string,
+    numberOfWords: ?number
+  ) => this.api.ada.isValidMnemonic(mnemonic, numberOfWords);
 
   @action refreshWalletsData = async () => {
-    // FIXME: We don't care about network status
-    // if (this.stores.networkStatus.isConnected) {
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {
@@ -97,6 +101,8 @@ export default class AdaWalletsStore extends WalletStore {
         walletId,
         recentRequest: this.stores.ada.transactions._getTransactionsRecentRequest(walletId),
         allRequest: this.stores.ada.transactions._getTransactionsAllRequest(walletId),
+        getBalanceRequest: this.stores.ada.transactions._getBalanceRequest(walletId),
+        pendingRequest: this.stores.ada.transactions._getTransactionsPendingRequest(walletId),
       }));
       this.stores.ada.transactions._refreshTransactionData();
     });
@@ -161,30 +167,18 @@ export default class AdaWalletsStore extends WalletStore {
 
   @action _setActiveWallet = ({ walletId }: { walletId: string }) => {
     if (this.hasAnyWallets) {
-      const activeWalletId = this.active ? this.active.id : null;
-      const activeWalletChange = activeWalletId !== walletId;
-      if (activeWalletChange) this.stores.ada.addresses.lastGeneratedAddress = null;
       this.active = this.all.find(wallet => wallet.id === walletId);
     }
   };
 
   @action _unsetActiveWallet = () => {
     this.active = null;
-    this.stores.ada.addresses.lastGeneratedAddress = null;
   };
 
   @action _onRouteChange = (options: { route: string, params: ?Object }) => {
     // Reset the send request anytime we visit the send page (e.g: to remove any previous errors)
     if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params))) {
       this.sendMoneyRequest.reset();
-    }
-  };
-
-  @action _chooseWalletExportType = (params: {
-    walletExportType: walletExportTypeChoices,
-  }) => {
-    if (this.walletExportType !== params.walletExportType) {
-      this.walletExportType = params.walletExportType;
     }
   };
 
@@ -195,7 +189,7 @@ export default class AdaWalletsStore extends WalletStore {
     // A) show the 'Add wallet' dialog (in case we don't have any wallets) or
     // B) just close the active dialog and unblock the UI
     if (this.hasLoadedWallets && !this.hasAnyWallets) {
-      this.actions.dialogs.open.trigger({ dialog: WalletAddDialog });
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     } else {
       this.actions.dialogs.closeActiveDialog.trigger();
     }

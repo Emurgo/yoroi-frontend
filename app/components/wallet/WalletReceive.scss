@@ -10,6 +10,12 @@
     height: 7px;
     display: block;
   }
+
+  :global {
+    .BorderedBox_component {
+      padding-bottom: 6px;
+    }
+  }
 }
 
 .copyIconBig,
@@ -41,31 +47,35 @@
 }
 
 .qrCodeAndInstructions {
+  border-bottom: 1px solid #dfe4e8;
   display: flex;
   flex-direction: row;
-  margin: 10px 0 24px;
+  margin: 0 0 18px;
+  padding-bottom: 26px;
   position: relative;
 
   .qrCode {
-    align-items: center;
+    align-items: flex-start;
     display: flex;
-    margin-right: 30px;
+    margin-left: 20px;
 
     canvas {
       border: 4px solid var(--theme-receive-qr-code-background-color);
       box-sizing: content-box;
-      margin-bottom: 1.5rem;
     }
   }
 
   .instructions {
     color: var(--theme-bordered-box-text-color);
+    display: flex;
+    flex-direction: column;
     font-family: var(--font-regular);
     font-size: 14px;
+    justify-content: space-between;
     line-height: 19px;
 
     .hash {
-      font-size: 19px;
+      font-size: 17px;
       font-family: var(--font-medium);
       line-height: 23px;
       margin-bottom: 6px;
@@ -77,12 +87,16 @@
     }
 
     .hashLabel {
+      font-size: 11px;
+      font-weight: 600;
       margin-bottom: 6px;
       opacity: 0.5;
+      text-transform: uppercase;
     }
 
     .instructionsText {
-      font-size: 16px;
+      font-size: 15px;
+      letter-spacing: 0.5px;
       line-height: 22px;
       margin-bottom: 12px;
       word-break: break-word;
@@ -105,18 +119,21 @@
 .generatedAddresses {
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 22px;
-  padding-bottom: 10px;
 
   h2 {
     font-family: var(--font-medium);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
 
     button {
       color: var(--theme-label-button-color);
       cursor: pointer;
+      float: right;
       font-family: var(--font-regular);
-      font-size: 16px;
+      font-size: 14px;
       line-height: 22px;
       margin-left: 12px;
       opacity: 0.55;
@@ -130,7 +147,7 @@
   .walletAddress {
     box-sizing: border-box;
     display: flex;
-    padding: 10.5px 0;
+    padding: 8.5px 0;
     word-break: break-all;
 
     & + .walletAddress {
@@ -146,6 +163,7 @@
       .copyAddress {
         cursor: pointer;
         display: inline-block;
+        letter-spacing: 0.5px;
         line-height: 20px;
         vertical-align: top;
         white-space: nowrap;
@@ -178,7 +196,6 @@
 
 .error {
   @include error-message;
-  font-size: 16px;
   margin-bottom: 1rem;
   text-align: center;
 }

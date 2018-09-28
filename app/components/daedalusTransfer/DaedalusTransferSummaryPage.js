@@ -81,11 +81,13 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
     );
 
     const nextButtonClasses = classnames([
+      'transferButton',
       isSubmitting ? styles.isSubmitting : 'primary',
       styles.button,
     ]);
 
     const cancelButtonClasses = classnames([
+      'cancelTransferButton',
       'flat',
       styles.button,
     ]);
@@ -104,9 +106,16 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
                 {intl.formatMessage(messages.addressFromSubLabel)}
               </div>
               {
-                transferTx.senders.map((sender, index) => (
-                  <div key={index} className={styles.address}>{sender}</div>
-                ))
+                transferTx.senders.map((sender, index) => {
+                  const addressesClasses = classnames([
+                    'daedalusAddressRecovered-' + (index + 1),
+                    styles.address
+                  ]);
+
+                  return (
+                    <div key={index} className={addressesClasses}>{sender}</div>
+                  );
+                })
               }
             </div>
 

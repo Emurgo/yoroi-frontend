@@ -1,11 +1,11 @@
 %smallText {
   height: 19px;
   font-family: var(--font-light);
-  font-size: 14px;
+  font-size: 20px;
   line-height: 1.36;
   letter-spacing: 0.5px;
   color: var(--theme-bordered-box-text-color);
-
+  margin-bottom: 5px;
   span {
     font-family: var(--font-medium);
     margin-right: 2px;
@@ -13,7 +13,17 @@
 }
 
 .component {
-  padding: 20px 20px 0;
+  text-align: center;
+  border-bottom: 1px solid #dfe4e8;
+  margin: 0 auto;
+  width: 80%;
+
+  :global {
+    .BorderedBox_component {
+      background: none;
+      border: none;
+    }
+  }
 }
 
 .walletName {
@@ -59,8 +69,8 @@
     display: inline-block;
     margin-left: 1px;
     & > svg {
-      height: 10px;
-      width: 9px;
+      height: 15px;
+      width: 19px;
       & > g > g {
         stroke: var(--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color);
       }

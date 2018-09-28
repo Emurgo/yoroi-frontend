@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js';
 // ========= Response Types =========
 export type AdaAssurance = 'CWANormal' | 'CWAStrict';
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
-export type AdaWalletRecoveryPhraseResponse = Array<string>;
 
 export type AdaSyncProgressResponse = {
   _spLocalCD: {
@@ -58,6 +57,20 @@ export type AdaAccount = {
 
 export type AdaAccounts = Array<AdaAccount>;
 
+export type Transaction = {
+  hash: string,
+  inputs_address: Array<string>,
+  inputs_amount: Array<string>,
+  outputs_address: Array<string>,
+  outputs_amount: Array<string>,
+  block_num: string,
+  time: string,
+  succeeded: boolean,
+  best_block_num: string,
+  last_update: string,
+  tx_state: string
+};
+
 export type AdaTransaction = {
   ctAmount: AdaAmount,
   ctBlockNumber: number,
@@ -68,6 +81,7 @@ export type AdaTransaction = {
     ctmDate: Date,
     ctmDescription: ?string,
     ctmTitle: ?string,
+    ctmUpdate: Date
   },
   ctOutputs: AdaTransactionInputOutput,
   ctCondition: AdaTransactionCondition,
@@ -102,6 +116,14 @@ export type AdaLocalTimeDifference = number;
 export type AdaWalletParams = {
   walletPassword: string,
   walletInitData: AdaWalletInitData
+};
+
+export type UpdateAdaWalletParams = {
+  walletMeta: {
+    cwName: string,
+    cwAssurance: AdaAssurance,
+    cwUnit: number,
+  }
 };
 
 export type UTXO = {

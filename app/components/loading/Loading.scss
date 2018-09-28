@@ -1,60 +1,10 @@
 @import "../../themes/mixins/animations";
+@import '../../themes/mixins/error-message';
 
 .component {
   height: 100%;
   transition: background-color 500ms;
   width: 100%;
-
-  .reportIssue {
-    position: fixed;
-    text-align: center;
-    width: 100%;
-
-    .reportIssueText {
-      font-family: var(--font-regular);
-      font-size: 18px;
-      line-height: 1.22;
-      margin-top: 24px;
-    }
-
-    .reportIssueButton {
-      background-color: var(--theme-report-issue-button-background-color);
-      margin: 20px 0;
-      width: 240px;
-
-      &:hover {
-        background-color: var(--theme-report-issue-button-background-color-hover) !important;
-      }
-      &:active {
-        background-color: var(--theme-report-issue-button-background-color-active) !important;
-      }
-
-    }
-  }
-
-  &.is-loading-theme {
-    background-color: transparent !important;
-  }
-  &.is-connecting {
-    background-color: var(--theme-connecting-background-color);
-
-    .reportIssue {
-      background-color: var(--theme-report-issue-connecting-background-color);
-    }
-    .reportIssueText {
-      color: var(--theme-report-issue-connecting-text-color);
-    }
-  }
-  &.is-syncing {
-    background-color: var(--theme-syncing-background-color);
-
-    .reportIssue {
-      background-color: var(--theme-report-issue-syncing-background-color);
-    }
-    .reportIssueText {
-      color: var(--theme-report-issue-syncing-text-color);
-    }
-  }
 }
 
 .logos {
@@ -65,16 +15,11 @@
   height: 100%;
 }
 
-.connecting,
-.syncing {
-  bottom: 60px;
-  position: absolute;
-  text-align: center;
-  width: 100%;
-}
-
-.syncing {
-  color: var(--theme-syncing-text-color);
+.loading {	
+  bottom: 10%;	
+  position: absolute;	
+  text-align: center;	
+  width: 100%;	
 }
 
 .ada-logo,
@@ -103,22 +48,15 @@ $adaLogoWidth: 43px;
   margin-top: 7px; // aligning the icon visually in the middle
 }
 
-.daedalusLogo {
+.yoroiLogo {
   & > svg {
     display: block;
-    width: 173px;
+    width: 100px;
     margin: 0 114px;
+    & > path {
+      fill: #daa49a;
+    }
   }
-}
-
-.connectingLogo {
-  & > svg path {
-    fill: var(--theme-icon-connecting-logo-color);
-  }
-}
-
-.syncingLogo svg path {
-  fill: var(--theme-icon-syncing-logo-color);
 }
 
 .headline {
@@ -126,14 +64,15 @@ $adaLogoWidth: 43px;
   font-size: 16px;
 }
 
-.connecting {
-  color: var(--theme-connecting-text-color);
-  .headline {
-    overflow: visible;
-    @include animated-ellipsis($width: 16px);
-  }
+.component, .headline, .logo, .error {
+  -webkit-backface-visibility: hidden;
 }
 
-.component, .headline, .logo {
-  -webkit-backface-visibility: hidden;
+.error {
+  @include error-message;
+  font-family: var(--font-light);
+  font-size: 16px;
+  line-height: 22px;
+  word-break: break-word;
+  text-align: center;
 }

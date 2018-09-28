@@ -106,3 +106,11 @@ export const getUrlParameterByName = (name, url) => {
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
+
+export const handleExternalLinkClick = (event: MouseEvent) => {
+  event.preventDefault();
+  const target = event.target;
+  if (target instanceof HTMLAnchorElement) {
+    window.open(target.href, '_blank');
+  }
+};

@@ -23,8 +23,8 @@ export default class Wallet {
     Object.assign(this, data);
   }
 
-  @computed get hasFunds(): boolean {
-    return this.amount > 0;
+  updateAmount(amount: BigNumber): void {
+    this.amount = amount;
   }
 
   @computed get assuranceMode(): AssuranceMode {

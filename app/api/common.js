@@ -23,6 +23,11 @@ const messages = defineMessages({
     defaultMessage: '!!!There was a problem sending the support request.',
     description: '"There was a problem sending the support request." error message'
   },
+  unusedAddressesError: {
+    id: 'api.errors.unusedAddressesError',
+    defaultMessage: '!!!You cannot generate more than 20 consecutive unused addresses.',
+    description: '"User cannot generate more unused addresses" error message'
+  },
 });
 
 export class GenericApiError extends LocalizableError {
@@ -61,6 +66,15 @@ export class ReportRequestError extends LocalizableError {
   }
 }
 
+export class UnusedAddressesError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.unusedAddressesError.id,
+      defaultMessage: messages.unusedAddressesError.defaultMessage,
+    });
+  }
+}
+
 export type CreateTransactionResponse = any;
 export type CreateWalletResponse = Wallet;
 export type DeleteWalletResponse = boolean;
@@ -77,11 +91,10 @@ export type CreateWalletRequest = {
   password: string,
 };
 
-// FIXME: When adding the ability to change password we should check whether ? is needed
 export type UpdateWalletPasswordRequest = {
   walletId: string,
-  oldPassword: ?string,
-  newPassword: ?string,
+  oldPassword: string,
+  newPassword: string,
 };
 
 export type DeleteWalletRequest = {
@@ -101,7 +114,6 @@ export type GetSyncProgressResponse = {
 
 export type GetTransactionsRequest = {
   walletId: string,
-  searchTerm: string,
   skip: number,
   limit: number,
 };
@@ -110,6 +122,8 @@ export type GetTransactionsResponse = {
   transactions: Array<WalletTransaction>,
   total: number,
 };
+
+export type GetBalanceResponse = BigNumber;
 
 export type SendBugReportRequest = {
   email: string,

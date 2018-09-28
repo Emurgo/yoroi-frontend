@@ -1,5 +1,6 @@
 // @flow
 import BigNumber from 'bignumber.js';
+import _ from 'lodash';
 import {
   RandomAddressChecker,
   Wallet
@@ -8,22 +9,19 @@ import {
   Logger,
   stringifyError,
 } from '../../utils/logging';
-import { getOrFail } from '../ada/lib//cardanoCrypto/cryptoUtils';
+import { getResultOrFail } from '../ada/lib//cardanoCrypto/cryptoUtils';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import { getBalance } from './adaWallet';
 import {
   GetAddressesWithFundsError,
+  NoInputsError,
   GenerateTransferTxError
 } from './errors';
-import {
-  mapToList
-} from './lib/utils';
 import {
   getCryptoDaedalusWalletFromMnemonics
 } from './lib/cardanoCrypto/cryptoWallet';
 import {
-  getAdaAddressesMap,
-  filterAdaAddressesByType
+  getAdaAddressesByType
 } from './adaAddress';
 import {
   getAllUTXOsForAddresses
@@ -42,9 +40,9 @@ export function getAddressesWithFunds(payload: {
   try {
     const { secretWords, addresses } = payload;
     const checker =
-      getOrFail(RandomAddressChecker.newCheckerFromMnemonics(secretWords));
+      getResultOrFail(RandomAddressChecker.newCheckerFromMnemonics(secretWords));
     const addressesWithFunds =
-      getOrFail(RandomAddressChecker.checkAddresses(checker, addresses));
+      getResultOrFail(RandomAddressChecker.checkAddresses(checker, addresses));
     return addressesWithFunds;
   } catch (error) {
     Logger.error(`daedalusTransfer::getAddressesWithFunds ${stringifyError(error)}`);
@@ -60,11 +58,14 @@ export async function generateTransferTx(payload: {
     const { secretWords, addressesWithFunds } = payload;
     const senders = addressesWithFunds.map(a => a.address);
     const senderUtxos = await getAllUTXOsForAddresses(senders);
+    if (_.isEmpty(senderUtxos)) {
+      throw new NoInputsError();
+    }
     const recoveredBalance = await getBalance(senders);
     const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
     const inputs = _getInputs(senderUtxos, addressesWithFunds);
-    const output = _getReceiverAddress();
-    const tx = getOrFail(Wallet.move(wallet, inputs, output));
+    const output = await _getReceiverAddress();
+    const tx = getResultOrFail(Wallet.move(wallet, inputs, output));
     return {
       recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
       fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),
@@ -74,14 +75,16 @@ export async function generateTransferTx(payload: {
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
+    if (error instanceof NoInputsError) {
+      throw error;
+    }
     throw new GenerateTransferTxError();
   }
 }
 
-function _getReceiverAddress(): string {
-  const addressesMap = getAdaAddressesMap();
-  const addresses = mapToList(addressesMap);
-  return filterAdaAddressesByType(addresses, 'External')[0].cadId;
+async function _getReceiverAddress(): Promise<string> {
+  const addresses = await getAdaAddressesByType('External');
+  return addresses[0].cadId;
 }
 
 function _getInputs(
@@ -92,14 +95,14 @@ function _getInputs(
   addressesWithFunds.forEach(a => {
     addressingByAddress[a.address] = a.addressing;
   });
-  return utxos.map(utxo => {
-    return {
+  return utxos.map(utxo => (
+    {
       ptr: {
         index: utxo.tx_index,
         id: utxo.tx_hash
       },
       value: utxo.amount,
       addressing: addressingByAddress[utxo.receiver]
-    };
-  });
+    }
+  ));
 }

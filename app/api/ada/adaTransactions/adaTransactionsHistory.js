@@ -7,27 +7,24 @@ import {
   stringifyError
 } from '../../../utils/logging';
 import {
-  getTransactionsHistoryForAddresses,
-  transactionsLimit,
-  addressesLimit,
-  getPendingTxsForAddresses
-} from '../lib/icarus-backend-api';
+  getTransactionsHistoryForAddresses
+} from '../lib/yoroi-backend-api';
 import {
-  insertOrReplaceToTxsTable,
-  getDBRow,
-  getTxWithDBSchema,
-  getMostRecentTxFromRows,
-  getAllTxsFromTxsTable,
-  updatePendingTxs,
-  getConfirmedTxsFromDB
+  saveTxs,
+  getMostRecentTx,
+  getTxsOrderedByDateDesc,
+  getTxsOrderedByUpdateDesc,
+  getTxLastUpdatedDate,
+  getPendingTxs
 } from '../lib/lovefieldDatabase';
 import {
-  getLastBlockNumber,
-  saveLastBlockNumber
-} from '../getAdaLastBlockNumber';
+  toAdaTx
+} from '../lib/utils';
+import {
+  getAdaAddressesList
+} from '../adaAddress';
 import {
   UpdateAdaTxsHistoryError,
-  PendingTransactionError
 } from '../errors';
 import type
  {
@@ -35,41 +32,53 @@ import type
   AdaTransactions,
   AdaTransactionInputOutput
 } from '../adaTypes';
+import { saveLastBlockNumber, getLastBlockNumber } from '../adaLocalStorage';
+import type { ConfigType } from '../../../../config/config-types';
+import config from '../../../config';
 
-export const getAdaConfirmedTxs = getConfirmedTxsFromDB;
+declare var CONFIG : ConfigType;
+const addressesLimit = CONFIG.app.addressRequestSize;
+const transactionsLimit = config.wallets.TRANSACTION_REQUEST_SIZE;
 
 export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
-  const transactions = await getAllTxsFromTxsTable();
+  const transactions = await getTxsOrderedByDateDesc();
   return Promise.resolve([transactions, transactions.length]);
 };
 
-export async function updateAdaPendingTxs(addresses: Array<string>) {
+export const getAdaTxLastUpdatedDate = async (): Promise<Date> => getTxLastUpdatedDate();
+
+export async function refreshTxs() {
   try {
-    const txs = await _getTxsForChunksOfAddresses(
-      addresses,
-      getPendingTxsForAddresses
-    );
-    const mappedPendingTxs = _mapToTxRow(txs, addresses);
-    return updatePendingTxs(mappedPendingTxs);
+    const adaAddresses = await getAdaAddressesList();
+    const addresses: Array<string> = adaAddresses.map(addr => addr.cadId);
+    await _updateAdaTxsHistory(await getTxsOrderedByUpdateDesc(), addresses);
   } catch (error) {
-    Logger.error('adaTransactionsHistory::updateAdaPendingTxs error: ' + stringifyError(error));
-    throw new PendingTransactionError();
+    Logger.error('adaTransactionsHistory::refreshTxs error: ' + JSON.stringify(error));
+    throw new UpdateAdaTxsHistoryError();
   }
 }
 
-export async function updateAdaTxsHistory(
+export function getPendingAdaTxs(): Promise<Array<AdaTransaction>> {
+  return getPendingTxs();
+}
+
+/**
+ * @requires existingTransactions should be ordered discendingly by ctmUpdate
+ * to query only for the recently updated txs
+ */
+async function _updateAdaTxsHistory(
   existingTransactions: Array<AdaTransaction>,
   addresses: Array<string>
 ) {
   try {
     const mostRecentTx = Object.assign({}, existingTransactions[0]);
-    const dateFrom = mostRecentTx && mostRecentTx.ctMeta ?
-      moment(mostRecentTx.ctMeta.ctmDate) :
+    const dateFrom = mostRecentTx.ctMeta ?
+      moment(mostRecentTx.ctMeta.ctmUpdate) :
       moment(new Date(0));
     const mappedTxs = await _getTxsForChunksOfAddresses(addresses, groupOfAddresses =>
       _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
     );
-    return insertOrReplaceToTxsTable(mappedTxs);
+    return saveTxs(mappedTxs);
   } catch (error) {
     Logger.error('adaTransactionsHistory::updateAdaTxsHistory error: ' + stringifyError(error));
     throw new UpdateAdaTxsHistoryError();
@@ -84,18 +93,16 @@ async function _getTxsForChunksOfAddresses(addresses, apiCall) {
 }
 
 async function _updateAdaTxsHistoryForGroupOfAddresses(
-  previousTxsRows,
+  previousTxs,
   groupOfAddresses,
   dateFrom,
   allAddresses
 ) {
-  const mostRecentTx = getMostRecentTxFromRows(previousTxsRows);
-  const updatedDateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmDate) : dateFrom;
-  const txHash = mostRecentTx ? mostRecentTx.ctId : mostRecentTx;
+  const mostRecentTx = getMostRecentTx(previousTxs);
+  const updatedDateFrom = mostRecentTx ? moment(mostRecentTx.ctMeta.ctmUpdate) : dateFrom;
   const history = await getTransactionsHistoryForAddresses(
     groupOfAddresses,
-    updatedDateFrom,
-    txHash
+    updatedDateFrom
   );
   if (history.length > 0) {
     // FIXME: Add an endpoint for querying the best_block_num
@@ -105,32 +112,31 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
       saveLastBlockNumber(history[0].best_block_num);
     }
 
-    const transactionsRows = previousTxsRows.concat(
-      _mapToTxRow(history, allAddresses));
+    const transactions = previousTxs.concat(
+      _mapToAdaTxs(history, allAddresses));
     if (history.length === transactionsLimit) {
       return await _updateAdaTxsHistoryForGroupOfAddresses(
-        transactionsRows,
+        transactions,
         groupOfAddresses,
         dateFrom,
         allAddresses
       );
     }
-    return Promise.resolve(transactionsRows);
+    return transactions;
   }
-  return Promise.resolve(previousTxsRows);
+  return previousTxs;
 }
 
-function _mapToTxRow(
-  transactions,
+function _mapToAdaTxs(
+  txs,
   accountAddresses
 ) {
-  return transactions.map(tx => {
+  return txs.map(tx => {
     const inputs = _mapInputOutput(tx.inputs_address, tx.inputs_amount);
     const outputs = _mapInputOutput(tx.outputs_address, tx.outputs_amount);
     const { isOutgoing, amount } = _spenderData(inputs, outputs, accountAddresses);
     const time = tx.time || tx.created_time;
-    const newtx = getTxWithDBSchema(amount, tx, inputs, isOutgoing, outputs, time);
-    return getDBRow(newtx);
+    return toAdaTx(amount, tx, inputs, isOutgoing, outputs, time);
   });
 }
 
@@ -161,13 +167,12 @@ function _spenderData(txInputs, txOutputs, addresses) {
     incoming.totalAmount
   );
 
-  const isLocal =
+  const isSelfTransaction =
     incoming.count === txInputs.length &&
     outgoing.count === txOutputs.length;
 
   let amount;
-  if (isLocal) amount = outgoing.totalAmount;
-  else if (isOutgoing) amount = outgoing.totalAmount.minus(incoming.totalAmount);
+  if (isOutgoing || isSelfTransaction) amount = outgoing.totalAmount.minus(incoming.totalAmount);
   else amount = incoming.totalAmount.minus(outgoing.totalAmount);
 
   return {

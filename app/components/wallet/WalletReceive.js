@@ -13,6 +13,7 @@ import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 
 const messages = defineMessages({
@@ -89,6 +90,8 @@ export default class WalletReceive extends Component<Props, State> {
     this.props.onGenerateAddress();
   }
 
+  loadingSpinner: ?LoadingSpinner;
+
   render() {
     const {
       walletAddress, walletAddresses,
@@ -131,85 +134,79 @@ export default class WalletReceive extends Component<Props, State> {
     const qrCodeForegroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
+    const walletReceiveContent = (
+      <BorderedBox>
+        <div className={styles.qrCodeAndInstructions}>
+          <div className={styles.instructions}>
+            <div className={styles.hashLabel}>
+              {intl.formatMessage(messages.walletAddressLabel)}
+            </div>
+            <div className={walletAddressClasses}>
+              {walletAddress}
+              <CopyToClipboard
+                text={walletAddress}
+                onCopy={onCopyAddress.bind(this, walletAddress)}
+              >
+                <SvgInline svg={iconCopy} className={styles.copyIconBig} cleanup={['title']} />
+              </CopyToClipboard>
+            </div>
+            <div className={styles.instructionsText}>
+              {intl.formatMessage(messages.walletReceiveInstructions)}
+            </div>
+            {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
+            {generateAddressForm}
+          </div>
+          <div className={styles.qrCode}>
+            <QRCode
+              value={walletAddress}
+              bgColor={qrCodeBackgroundColor}
+              fgColor={qrCodeForegroundColor}
+              size={152}
+            />
+          </div>
+        </div>
+        <div className={styles.generatedAddresses}>
+          <h2>
+            {intl.formatMessage(messages.generatedAddressesSectionTitle)}
+            <button onClick={this.toggleUsedAddresses}>
+              {intl.formatMessage(messages[showUsed ? 'hideUsedLabel' : 'showUsedLabel'])}
+            </button>
+          </h2>
+          {walletAddresses.map((address, index) => {
+            const isAddressVisible = !address.isUsed || showUsed;
+            if (!isAddressVisible) return null;
+            const addressClasses = classnames([
+              'generatedAddress-' + (index + 1),
+              styles.walletAddress,
+              address.isUsed ? styles.usedWalletAddress : null,
+            ]);
+            return (
+              <div key={index} className={addressClasses}>
+                <div className={styles.addressId}>{address.id}</div>
+                <div className={styles.addressActions}>
+                  <CopyToClipboard
+                    text={address.id}
+                    onCopy={onCopyAddress.bind(this, address.id)}
+                  >
+                    <span className={styles.copyAddress}>
+                      <SvgInline svg={iconCopy} className={styles.copyIcon} cleanup={['title']} />
+                      <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
+                    </span>
+                  </CopyToClipboard>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </BorderedBox>
+    );
+
+    const loadingSpinner =
+      <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />;
+
     return (
       <div className={styles.component}>
-
-        <BorderedBox>
-
-          <div className={styles.qrCodeAndInstructions}>
-            <div className={styles.qrCode}>
-              <QRCode
-                value={walletAddress}
-                bgColor={qrCodeBackgroundColor}
-                fgColor={qrCodeForegroundColor}
-                size={152}
-              />
-            </div>
-
-            <div className={styles.instructions}>
-              <div className={walletAddressClasses}>
-                {walletAddress}
-                <CopyToClipboard
-                  text={walletAddress}
-                  onCopy={onCopyAddress.bind(this, walletAddress)}
-                >
-                  <SvgInline svg={iconCopy} className={styles.copyIconBig} />
-                </CopyToClipboard>
-              </div>
-
-              <div className={styles.hashLabel}>
-                {intl.formatMessage(messages.walletAddressLabel)}
-              </div>
-
-              <div className={styles.instructionsText}>
-                {intl.formatMessage(messages.walletReceiveInstructions)}
-              </div>
-
-              {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
-
-              {generateAddressForm }
-
-            </div>
-          </div>
-
-          <div className={styles.generatedAddresses}>
-            <h2>
-              {intl.formatMessage(messages.generatedAddressesSectionTitle)}
-              <button onClick={this.toggleUsedAddresses}>
-                {intl.formatMessage(messages[showUsed ? 'hideUsedLabel' : 'showUsedLabel'])}
-              </button>
-            </h2>
-
-            {walletAddresses.map((address, index) => {
-              const isAddressVisible = !address.isUsed || showUsed;
-              if (!isAddressVisible) return null;
-
-              const addressClasses = classnames([
-                'generatedAddress-' + (index + 1),
-                styles.walletAddress,
-                address.isUsed ? styles.usedWalletAddress : null,
-              ]);
-              return (
-                <div key={index} className={addressClasses}>
-                  <div className={styles.addressId}>{address.id}</div>
-                  <div className={styles.addressActions}>
-                    <CopyToClipboard
-                      text={address.id}
-                      onCopy={onCopyAddress.bind(this, address.id)}
-                    >
-                      <span className={styles.copyAddress}>
-                        <SvgInline svg={iconCopy} className={styles.copyIcon} />
-                        <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
-                      </span>
-                    </CopyToClipboard>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-        </BorderedBox>
-
+        {walletAddress ? walletReceiveContent : loadingSpinner}
       </div>
     );
   }

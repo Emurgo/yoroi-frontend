@@ -1,16 +1,14 @@
 import { BeforeAll, Given, After, AfterAll } from 'cucumber';
-import { createServer } from '../support/mockServer';
+import { getMockServer, closeMockServer } from '../support/mockServer';
 import { buildMockData, getMockData, getFakeAddresses } from '../support/mockDataBuilder';
 import { setActiveLanguage } from '../support/helpers/i18n-helpers';
 
-let server;
-
 BeforeAll(() => {
-  server = createServer();
+  getMockServer({});
 });
 
 AfterAll(() => {
-  server.close();
+  closeMockServer();
 });
 
 After(async function () {
@@ -22,11 +20,14 @@ Given(/^I am testing "([^"]*)"$/, feature => {
 });
 
 Given(/^I have completed the basic setup$/, async function () {
-  await this.waitForElement('.LanguageSelectionForm_submitButton');
-  // Default Profile Configs
+  // Default Profile Configs (language and terms of use)
+  await this.waitForElement('.LanguageSelectionForm_component');
+
   await setActiveLanguage(this.driver);
-  await this.driver.executeScript(() => { 
-    window.icarus.actions.profile.acceptTermsOfUse.trigger();
+
+  await this.waitForElement('.TermsOfUseForm_component');
+  await this.driver.executeScript(() => {
+    window.yoroi.actions.profile.acceptTermsOfUse.trigger();
   });
 });
 
@@ -37,33 +38,51 @@ Given(/^I have opened the chrome extension$/, async function () {
   await this.driver.get('chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg/main_window.html');
 });
 
+Given(/^I refresh the page$/, async function () {
+  await this.driver.navigate().refresh();
+});
+
+Given(/^I restart the browser$/, async function () {
+  await this.driver.manage().deleteAllCookies();
+  await this.driver.navigate().refresh();
+});
+
 Given(/^There is no wallet stored$/, async function () {
-  await this.waitForElement('.WalletAddDialog');
+  await refreshWallet(this);
+  await this.waitForElement('.WalletAdd');
 });
 
-Given(/^There is a default wallet stored$/, async function () {
-  buildMockData('default');
-  await storeWallet(this);
+Given(/^There is a wallet stored named (.*)$/, async function (walletName) {
+  await storeWallet(this, walletName);
+  await this.waitUntilText('.TopBar_walletName', walletName.toUpperCase());
 });
 
-Given(/^There is a wallet stored( with ([^"]*) addresses)?( starting with ([^"]*))?$/, async function (addressAmount, addressPrefix) {
-  await storeWallet(this, addressAmount, addressPrefix);
-});
+function refreshWallet(client) {
+  return client.driver.executeAsyncScript((done) => {
+    window.yoroi.stores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
+  });
+}
 
-async function storeWallet(client, addressAmount, addressPrefix) {
-  const { seed, wallet, cryptoAccount, addresses } = getMockData();
-  client.saveToLocalStorage('SEED', seed);
-  client.saveToLocalStorage('WALLET', wallet);
-  client.saveToLocalStorage('ACCOUNT', cryptoAccount);
+async function storeWallet(client, walletName) {
+  const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
+  wallet.cwMeta.cwName = walletName;
+
+  await client.saveToLocalStorage('WALLET', { adaWallet: wallet, masterKey });
+  await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
+
   /* Obs: If "with $number addresses" is include in the sentence,
      we override the wallet with fake addresses" */
-  if (addressAmount) {
-    client.saveToLocalStorage('ADDRESSES', getFakeAddresses(addressAmount, addressPrefix));
+  if (walletName &&
+      walletInitialData &&
+      walletInitialData[walletName] &&
+      walletInitialData[walletName].totalAddresses
+    ) {
+    client.saveAddressesToDB(getFakeAddresses(
+      walletInitialData[walletName].totalAddresses,
+      walletInitialData[walletName].addressesStartingWith
+    ));
   } else {
-    client.saveToLocalStorage('ADDRESSES', addresses);
+    client.saveAddressesToDB(adaAddresses);
   }
-  client.driver.executeScript(() => {
-    window.icarus.stores.ada.wallets.refreshWalletsData();
-  });
-  await client.waitForElement('.TopBar_walletName');
+  await refreshWallet(client);
 }

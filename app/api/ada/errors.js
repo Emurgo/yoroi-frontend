@@ -27,26 +27,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Not enough money to make this transaction.',
     description: '"Not enough money to make this transaction." error message.'
   },
-  notAllowedToSendMoneyToSameAddressError: {
-    id: 'api.errors.NotAllowedToSendMoneyToSameAddressError',
-    defaultMessage: '!!!It\'s not allowed to send money to the same address you are sending from. Make sure you have enough addresses with money in this account or send to a different address.',
-    description: '"It\'s not allowed to send money to the same address you are sending from." error message.'
-  },
-  notAllowedToSendMoneyToRedeemAddressError: {
-    id: 'api.errors.NotAllowedToSendMoneyToRedeemAddressError',
-    defaultMessage: '!!!It is not allowed to send money to Ada redemption address.',
-    description: '"It is not allowed to send money to Ada redemption address." error message.'
-  },
-  allFundsAlreadyAtReceiverAddressError: {
-    id: 'api.errors.AllFundsAlreadyAtReceiverAddressError',
-    defaultMessage: '!!!All your funds are already at the address you are trying send money to.',
-    description: '"All your funds are already at the address you are trying send money to." error message.'
-  },
-  notEnoughFundsForTransactionFeesError: {
-    id: 'api.errors.NotEnoughFundsForTransactionFeesError',
-    defaultMessage: '!!!Not enough Ada for fees. Try sending a smaller amount.',
-    description: '"Not enough Ada for fees. Try sending a smaller amount." error message'
-  },
   updateAdaWalletError: {
     id: 'api.errors.updateAdaWalletError',
     defaultMessage: '!!!Error while updating ada wallet.',
@@ -77,15 +57,65 @@ const messages = defineMessages({
     defaultMessage: '!!!Error while getting addresses with funds.',
     description: '"Error while getting addresses with funds." error message'
   },
+  noInputsError: {
+    id: 'api.errors.noInputsError',
+    defaultMessage: '!!!The wallet restored from your recovery phrase is empty. Please check your recovery phrase and attempt restoration again.',
+    description: '"Wallet without funds" error message'
+  },
   generateTransferTxError: {
     id: 'api.errors.generateTransferTxError',
     defaultMessage: '!!!Error while generating transfer transacion.',
     description: '"Error while generating transfer transacion." error message'
   },
+  sendTransactionError: {
+    id: 'api.errors.sendTransactionError',
+    defaultMessage: '!!!Error received from api method call while sending tx.',
+    description: '"Error received from api method call while sending tx." error message'
+  },
+  getAllUTXOsForAddressesError: {
+    id: 'api.errors.getAllUTXOsForAddressesError',
+    defaultMessage: '!!!Error received from api method call while getting utxos.',
+    description: '"Error received from api method call while getting utxos." error message'
+  },
+  discoverAddressesError: {
+    id: 'api.errors.discoverAddressesError',
+    defaultMessage: '!!!Error received from api method call while discovering addresses.',
+    description: '"Error received from api method call while discovering addresses." error message'
+  },
+  getUtxosForAddressesApiError: {
+    id: 'api.errors.getUtxosForAddressesApiError',
+    defaultMessage: '!!!Error received from server while getting UTXOs.',
+    description: '"Error received from server while getting UTXOs." error message'
+  },
+  getUtxosSumsForAddressesApiError: {
+    id: 'api.errors.getUtxosSumsForAddressesApiError',
+    defaultMessage: '!!!Error received from server while getting balance.',
+    description: '"Error received from server while getting balance." error message'
+  },
+  getTxHistoryForAddressesApiError: {
+    id: 'api.errors.getTxHistoryForAddressesApiError',
+    defaultMessage: '!!!Error received from server while getting txs.',
+    description: '"Error received from server while getting txs." error message'
+  },
   sendTransactionApiError: {
     id: 'api.errors.sendTransactionApiError',
     defaultMessage: '!!!Error received from server while sending tx.',
     description: '"Error received from server while sending tx." error message'
+  },
+  checkAdressesInUseApiError: {
+    id: 'api.errors.checkAdressesInUseApiError',
+    defaultMessage: '!!!Error received from server while checking used addresses.',
+    description: '"Error received from server while checking used addresses." error message'
+  },
+  getPendingTxsForAddressesApiError: {
+    id: 'api.errors.getPendingTxsForAddressesApiError',
+    defaultMessage: '!!!Error received from server while getting pending txs.',
+    description: '"Error received from server while getting pending txs." error message'
+  },
+  invalidWitnessError: {
+    id: 'api.errors.invalidWitnessError',
+    defaultMessage: '!!!The signature is invalid.',
+    description: '"The signature is invalid." error message'
   }
 });
 
@@ -130,42 +160,6 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
     super({
       id: messages.notEnoughMoneyToSendError.id,
       defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage,
-    });
-  }
-}
-
-export class NotAllowedToSendMoneyToSameAddressError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.notAllowedToSendMoneyToSameAddressError.id,
-      defaultMessage: messages.notAllowedToSendMoneyToSameAddressError.defaultMessage,
-    });
-  }
-}
-
-export class NotAllowedToSendMoneyToRedeemAddressError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.notAllowedToSendMoneyToRedeemAddressError.id,
-      defaultMessage: messages.notAllowedToSendMoneyToRedeemAddressError.defaultMessage,
-    });
-  }
-}
-
-export class AllFundsAlreadyAtReceiverAddressError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.allFundsAlreadyAtReceiverAddressError.id,
-      defaultMessage: messages.allFundsAlreadyAtReceiverAddressError.defaultMessage,
-    });
-  }
-}
-
-export class NotEnoughFundsForTransactionFeesError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.notEnoughFundsForTransactionFeesError.id,
-      defaultMessage: messages.notEnoughFundsForTransactionFeesError.defaultMessage,
     });
   }
 }
@@ -224,6 +218,15 @@ export class GetAddressesWithFundsError extends LocalizableError {
   }
 }
 
+export class NoInputsError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.noInputsError.id,
+      defaultMessage: messages.noInputsError.defaultMessage
+    });
+  }
+}
+
 export class GenerateTransferTxError extends LocalizableError {
   constructor() {
     super({
@@ -233,11 +236,92 @@ export class GenerateTransferTxError extends LocalizableError {
   }
 }
 
+export class SendTransactionError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.sendTransactionError.id,
+      defaultMessage: messages.sendTransactionError.defaultMessage
+    });
+  }
+}
+
+export class GetAllUTXOsForAddressesError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getAllUTXOsForAddressesError.id,
+      defaultMessage: messages.getAllUTXOsForAddressesError.defaultMessage
+    });
+  }
+}
+
+export class DiscoverAddressesError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.discoverAddressesError.id,
+      defaultMessage: messages.discoverAddressesError.defaultMessage
+    });
+  }
+}
+
+export class GetUtxosForAddressesApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getUtxosForAddressesApiError.id,
+      defaultMessage: messages.getUtxosForAddressesApiError.defaultMessage
+    });
+  }
+}
+
+export class GetUtxosSumsForAddressesApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getUtxosSumsForAddressesApiError.id,
+      defaultMessage: messages.getUtxosSumsForAddressesApiError.defaultMessage
+    });
+  }
+}
+
+export class GetTxHistoryForAddressesApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getTxHistoryForAddressesApiError.id,
+      defaultMessage: messages.getTxHistoryForAddressesApiError.defaultMessage
+    });
+  }
+}
+
 export class SendTransactionApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.sendTransactionApiError.id,
       defaultMessage: messages.sendTransactionApiError.defaultMessage
+    });
+  }
+}
+
+export class CheckAdressesInUseApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.checkAdressesInUseApiError.id,
+      defaultMessage: messages.checkAdressesInUseApiError.defaultMessage
+    });
+  }
+}
+
+export class GetPendingTxsForAddressesApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getPendingTxsForAddressesApiError.id,
+      defaultMessage: messages.getPendingTxsForAddressesApiError.defaultMessage
+    });
+  }
+}
+
+export class InvalidWitnessError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.invalidWitnessError.id,
+      defaultMessage: messages.invalidWitnessError.defaultMessage
     });
   }
 }

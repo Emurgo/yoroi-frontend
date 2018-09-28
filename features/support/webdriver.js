@@ -1,8 +1,9 @@
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import seleniumWebdriver, { By } from 'selenium-webdriver';
+import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import path from 'path';
 
+// FIXME: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld() {
   this.driver = new seleniumWebdriver.Builder()
     .withCapabilities({
@@ -13,57 +14,96 @@ function CustomWorld() {
       }
     })
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../icarus-light-cardano-wallet-poc-test.crx')))
+    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')))
     .build();
 
+  this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
+  this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
+  this.getText = (locator) => this.getElementBy(locator).getText();
+  this.getValue = this.driver.getValue =
+    async (locator) => this.getElementBy(locator).getAttribute('value');
+
+  this.waitForElementLocated = (locator, method = By.css) => {
+    const isLocated = seleniumWebdriver.until.elementLocated(method(locator));
+    return this.driver.wait(isLocated);
+  };
+  
   // Returns a promise that resolves to the element
-  // FIXME: We should move this to driver object, not `this`
-  this.waitForElement = this.driver.waitForElement = (locator, method = By.css) => {
-    const condition = seleniumWebdriver.until.elementLocated(method(locator));
+  this.waitForElement = this.driver.waitForElement = async (locator, method = By.css) => {
+    await this.waitForElementLocated(locator, method);
+    const element = await this.getElementBy(locator, method);
+    const condition = seleniumWebdriver.until.elementIsVisible(element);
     return this.driver.wait(condition);
   };
 
-  // FIXME: We should move this to driver object, not `this`
-  this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (locator, method = By.css) => {
-    try {
-      await this.getElementBy(locator, method);
-      throw Error('Element shouldn\'t be present');
-    } catch (err) {
-      return Promise.resolve(true);
-    }
+  this.waitElementTextMatches = async (regex, locator, method = By.css) => {
+    await this.waitForElement(locator, method);
+    const element = await this.getElementBy(locator, method);
+    const condition = seleniumWebdriver.until.elementTextMatches(element, regex);
+    await this.driver.wait(condition);
+    return element;
   };
 
-  this.waitForContent = (locator) => this.waitForElement(locator, By.xpath);
+  this.waitForElementNotPresent = this.driver.waitForElementNotPresent =
+    async (locator, method = By.css) => {
+      await this.driver.wait(async () => {
+        const elements = await this.getElementsBy(locator, method);
+        return elements.length === 0;
+      });
+    };
 
-  this.waitEnable = async (locator) => {
-    const element = this.getElementBy(locator);
+  this.waitEnable = async (locator, method = By.css) => {
+    const element = await this.getElementBy(locator, method);
     const condition = seleniumWebdriver.until.elementIsEnabled(element);
     return this.driver.wait(condition);
   };
 
-  this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
-  this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
+  this.waitUntilText = async (locator, text, timeout = 60000) => {
+    await this.driver.wait(async () => {
+      try {
+        const value = await this.getText(locator);
+        return value === text;
+      } catch (err) {
+        return false;
+      }
+    }, timeout);
+  };
 
-  this.getText = (locator) => this.getElementBy(locator).getText();
+  this.waitUntilContainsText = async (locator, text, timeout = 10000) => {
+    await this.driver.wait(async () => {
+      try {
+        const value = await this.getText(locator);
+        return value.indexOf(text) !== -1;
+      } catch (err) {
+        return false;
+      }
+    }, timeout);
+  };
 
-  this.getValue = this.driver.getValue = async (locator) => this.getElementBy(locator).getAttribute('value');
 
-  const clickElement = async (locator, method) => {
+
+  this.click = async (locator, method = By.css) => {
+    await this.waitForElement(locator, method);
+    await this.waitEnable(locator, method);
     const clickable = await this.getElementBy(locator, method);
     await clickable.click();
-  };
-
-  this.click = async (locator) => {
-    await clickElement(locator);
-  };
-
-  this.clickByXpath = async (locator) => {
-    await clickElement(locator, By.xpath);
   };
 
   this.input = async (locator, value) => {
     const input = await this.getElementBy(locator);
     await input.sendKeys(value);
+  };
+
+  this.clearInput = async (locator) => {
+    const input = await this.getElementBy(locator);
+    await input.clear();
+  };
+
+  this.clearInputUpdatingForm = async (locator, textLength) => {
+    const input = await this.getElementBy(locator);
+    for (let i = 0; i < textLength; i++) {
+      await input.sendKeys(Key.BACK_SPACE);
+    }
   };
 
   this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
@@ -75,9 +115,24 @@ function CustomWorld() {
 
   this.saveToLocalStorage = (key, value) => this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 
+  this.intl = (key, lang = 'en-US') =>
+    this.driver.executeScript((k, l) =>
+        window.yoroi.translations[l][k]
+    , key, lang);
+
+  this.saveAddressesToDB = addresses =>
+    this.driver.executeScript(addrs => {
+      addrs.forEach(addr => window.yoroi.api.ada.saveAddress(addr, 'External'));
+    }, addresses);
+
+  this.saveTxsToDB = transactions => {
+    this.driver.executeScript(txs => {
+      window.yoroi.api.ada.saveTxs(txs);
+    }, transactions);
+  };
 }
 
 setWorldConstructor(CustomWorld);
 // I'm setting this timeout to 10 seconds as usually it takes about 5 seconds
 // to startup
-setDefaultTimeout(60 * 10000);
+setDefaultTimeout(60 * 1000);

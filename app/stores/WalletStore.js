@@ -1,14 +1,15 @@
 // @flow
-import { observable, action, computed, runInAction, untracked } from 'mobx';
+import { observable, action, computed, runInAction } from 'mobx';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import Store from './lib/Store';
 import Wallet from '../domain/Wallet';
 import Request from './lib/LocalizedRequest';
 import { buildRoute, matchRoute } from '../utils/routing';
 import { ROUTES } from '../routes-config';
-import WalletAddDialog from '../components/wallet/WalletAddDialog';
 import type { GetWalletRecoveryPhraseResponse } from '../api/common';
 import environment from '../environment';
+import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 
 /**
  * The base wallet store that contains the shared logic
@@ -17,7 +18,8 @@ import environment from '../environment';
 
 export default class WalletsStore extends Store {
 
-  WALLET_REFRESH_INTERVAL = 1000 * 20;
+  WALLET_REFRESH_INTERVAL = environment.walletRefreshInterval;
+  ON_VISIBLE_DEBOUNCE_WAIT = 1000;
   WAIT_FOR_SERVER_ERROR_TIME = 2000;
   MIN_NOTIFICATION_TIME = 500;
 
@@ -38,10 +40,11 @@ export default class WalletsStore extends Store {
 
   setup() {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
-    this._pollRefresh(); // I added this but it wasn't originally in Daedalus
+    document.addEventListener('visibilitychange', _.debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
+
     this.registerReactions([
       this._updateActiveWalletOnRouteChanges,
-      this._toggleAddWalletDialogOnWalletsLoaded,
+      this._showAddWalletPageWhenNoWallets,
     ]);
   }
 
@@ -70,9 +73,7 @@ export default class WalletsStore extends Store {
       this.actions.dialogs.closeActiveDialog.trigger();
       this.goToWalletRoute(wallet.id);
     } else {
-      this.actions.dialogs.open.trigger({
-        dialog: WalletAddDialog,
-      });
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
   };
 
@@ -147,18 +148,30 @@ export default class WalletsStore extends Store {
     return this.getWalletRoute(this.active.id);
   }
 
+  @computed get isWalletRoute(): boolean {
+    const { currentRoute } = this.stores.app;
+    return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute);
+  }
+
   getWalletById = (id: string): (?Wallet) => this.all.find(w => w.id === id);
 
   getWalletByName = (name: string): (?Wallet) => this.all.find(w => w.name === name);
 
-  getWalletRoute = (walletId: string, page: string = 'summary'): string => (
+  getWalletRoute = (walletId: string, page: string = 'transactions'): string => (
     buildRoute(ROUTES.WALLETS.PAGE, { id: walletId, page })
   );
 
   // ACTIONS
 
+  @action.bound _updateBalance(balance: BigNumber): void {
+    if (this.active) {
+      this.active.updateAmount(balance.dividedBy(
+        LOVELACES_PER_ADA
+      ));
+    }
+  }
+
   @action refreshWalletsData = async () => {
-    // if (!this.stores.networkStatus.isConnected) return;
     const result = await this.walletsRequest.execute().promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {
@@ -214,21 +227,23 @@ export default class WalletsStore extends Store {
     }
   };
 
-  _toggleAddWalletDialogOnWalletsLoaded = () => {
-    if (this.hasLoadedWallets && !this.hasAnyWallets) {
-      this.actions.dialogs.open.trigger({ dialog: WalletAddDialog });
-    } else if (untracked(() => this.stores.uiDialogs.isOpen(WalletAddDialog))) {
-      this.actions.dialogs.closeActiveDialog.trigger();
+  _showAddWalletPageWhenNoWallets = () => {
+    if (this.isWalletRoute && !this.hasAnyWallets) {
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
   };
 
+  /* @Attention:
+      This method has a really tricky logic because is in charge of some redirection rules
+      related to app urls and wallet status. Also, this behaviour is trigger by mobx reactions,
+      so it's hard to reason about all the scenarios could happend.
+  */
   _updateActiveWalletOnRouteChanges = () => {
     const currentRoute = this.stores.app.currentRoute;
     const hasAnyWalletLoaded = this.hasAnyLoaded;
     runInAction('WalletsStore::_updateActiveWalletOnRouteChanges', () => {
       // There are not wallets loaded (yet) -> unset active and return
       if (!hasAnyWalletLoaded) {
-        this.actions.router.goToRoute.trigger({ route: ROUTES.NO_WALLETS });
         return this._unsetActiveWallet();
       }
       const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
@@ -249,8 +264,7 @@ export default class WalletsStore extends Store {
           this._setActiveWallet({ walletId: this.all[0].id });
         }
         if (this.active) {
-          const walletId = this.active.id;
-          this.goToWalletRoute(walletId);
+          this.goToWalletRoute(this.active.id);
         }
       }
     });

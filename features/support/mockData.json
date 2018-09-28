@@ -1,37 +1,35 @@
 {
   "default": {
-    "addresses": {
-      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod": {
+    "adaAddresses": [
+      {
         "cadAmount": {
           "getCCoin": 0
         },
-        "cadId": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "cadId": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
         "cadIsUsed": false,
         "account": 0,
         "change": 0,
         "index": 0
       }
-    },
-    "seed": {
-      "encryptedSeed": "db05c50d0dbd3ed0de72879fa701211a597781faa593a2927fcdd3a7edb92ab2"
-    },
-    "password": "Secret123",
+    ],
+    "usedAddresses": [],
+    "masterKey": "1bfed8ddba1b405397664593d6b7b05bd630fa903fa554532b141a8a3f741118a2c15cd524f8f279e1c4b8b6cce1bb8203f1860e14d65a9047e709d6e6585d0c1e8df66c05c31db4b1673b1978fe5f08e5dedbacb8be25ce991a44766f38708a47e9b2285d0533a0f71b5528e45ea8a899b655274626cad429d83963cb68b40612dd45341d20f0e14146befe4df6c40c1fd1e4c8d51c566b040aaaaf",
+    "password": "Secret_123",
     "wallet": {
       "cwAccountsNumber": 1,
       "cwAmount": {
         "getCCoin": "0"
       },
-      "cwId": "1111111111111111",
+      "cwId": "1",
       "cwMeta": {
         "cwAssurance": "CWANormal",
-        "cwName": "Test Wallet",
         "cwUnit": 0
       },
       "cwPassphraseLU": "2018-06-11T18:38:43.339Z"
     },
     "cryptoAccount": {
       "account": 0,
-      "cached_account_key":"e0c9ce9d55b551ff11cab36fec1bbece53a836b6716a446d9d8619f5944c79215302a384b661114963e88678f663fe6be0af5ae27ce6c6e12f0ebcd3e8128b6a",
+      "root_cached_key": "7601e4d9b02e2ffa15f35c62444e76279c597153bdb210690366d66b2c10b065aab68f024845aa380cfa8d53f0f373325fd888391a7137ad57a2034b14c357be",
       "derivation_scheme": "V2"
     }
   },
@@ -41,15 +39,22 @@
         "utxo_id": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f64290",
         "tx_hash": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f6429",
         "tx_index": 0,
-        "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "receiver": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
         "amount": "9007199254720698"
       }
     ]
   },
   "Restore wallet": {
     "usedAddresses": [
-      "Ae2tdPwUPEZ3vu63a1tJVMghcbu5CWSrybC2pzwzh6dvPx7uxngY36LQnVk",
-      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod"
+      "Ae2tdPwUPEZ73Nh3ALXKwtt9Wmb8bQHa9owoXtkvGEWK3AX6kXNHBK1D261",
+      "Ae2tdPwUPEZ7sn3AQhUFGHXiWuG5aU3XnMi2SNKeh94S9Pp17igo1RwzodB",
+
+      "Ae2tdPwUPEYz5p78UtoKpzeQV8DMEHf8nM9TNJGu1xwF9ez26Zx26wupZ2v",
+      "Ae2tdPwUPEZ5jDsa81F9tjv9QunxzBLsrV8XNjYdt5CdNtuAUKgroxTxZdP",
+      "Ae2tdPwUPEYzErSRwThtfVfBbhM87NCXDwkGHRqSYJcRVP4GS8Lgx3AxAXd",
+
+      "Ae2tdPwUPEZLzYQaqFk1U9VWBeY9AfQ2hKBWZjxtfwWVE46sy6u5ZZAeFu1",
+      "Ae2tdPwUPEYwS8KygpV49Y5aN1PsZnT1sXKWqPJvnCfk2wwgb4tk7xP1ipB"
     ]
   },
   "Generate addresses": {
@@ -58,14 +63,53 @@
         "utxo_id": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f64290",
         "tx_hash": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f6429",
         "tx_index": 0,
-        "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+        "receiver": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
         "amount": "1000000"
       }
-    ]
+    ],
+    "walletInitialData": {
+      "wallet": {
+        "addressesStartingWith": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYW",
+        "totalAddresses": 1
+      }
+    },
+    "txs": {
+      "wallet": [
+        {
+          "address": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
+          "tx": {
+            "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
+            "time": "2018-05-12T13:51:33.000Z",
+            "inputs_address": [
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
+            ],
+            "inputs_amount": [200],
+            "outputs_address": [
+              "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"
+            ],
+            "outputs_amount": [100, 100],
+            "best_block_num": 101
+          }
+        }
+      ]
+    },
+    "usedAddresses": ["Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"]
   },
-  "Get balance": {
-    "addresses": {
-      "Be2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod": {
+  "Main UI": {
+    "walletInitialData": {
+      "simple-wallet": {
+        "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "totalAddresses": 1
+      },
+      "complex-wallet": {
+        "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "txHashesStartingWith": "p27Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
+        "totalAddresses": 55,
+        "txsNumber": 45
+      }
+    },
+    "adaAddresses": [
+      {
         "cadAmount": {
           "getCCoin": 0
         },
@@ -75,7 +119,7 @@
         "change": 0,
         "index": 0
       }
-    },
+    ],
     "utxos": [
       {
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
@@ -99,7 +143,28 @@
       }
     ]
   },
-  "Update transaction history": {
+  "Transaction History": {
+    "currentDateExample": "2018-01-01T00:00:00.000Z",
+    "walletInitialData": {
+      "empty-wallet": {
+        "addressesStartingWith": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo",
+        "totalAddresses": 1
+      },
+      "simple-wallet": {
+        "addressesStartingWith": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "totalAddresses": 1
+      },
+      "complex-wallet": {
+        "addressesStartingWith": "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
+        "txHashesStartingWith": "p27Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
+        "totalAddresses": 55,
+        "txsNumber": 45
+      },
+      "tx-big-input-wallet": {
+        "addressesStartingWith": "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo",
+        "totalAddresses": 1
+      }
+    },
     "usedAddresses": [
       "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
       "Ae2tdPwUPEZFS55qLkW2sApaWnWFdRyEh1MKwqBNnXMH89K9XaaVRH2Mxro"
@@ -123,48 +188,51 @@
       }
     ],
     "txs": {
-      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
+      "empty-wallet": [],
+      "simple-wallet": [
         {
-          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
+          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
           "tx": {
             "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
-            "time": "2018-05-12T13:51:33.000Z",
+            "time": "2018-01-01T00:02:00.000Z",
             "inputs_address": [
-              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
             "inputs_amount": [200],
             "outputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
             ],
             "outputs_amount": [100, 100],
-            "block_num": 92,
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-01-01T00:02:00.000Z",
+            "tx_state": "Pending"
           }
         },
         {
-          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
+          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
           "tx": {
             "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Y",
-            "time": "2018-05-11T13:51:33.000Z",
+            "time": "2018-01-01T00:01:00.000Z",
             "inputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"
             ],
             "inputs_amount": [100],
             "outputs_address": [
-              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
             "outputs_amount": [100],
-            "block_num": 89,
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-01-01T00:01:00.000Z",
+            "tx_state": "Pending"
           }
         },
         {
-          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
+          "address": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
           "tx": {
             "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
-            "time": "2018-05-10T13:51:33.000Z",
+            "time": "2018-01-01T00:00:00.000Z",
             "inputs_address": [
-              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"
+              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
             "inputs_amount": [160],
             "outputs_address": [
@@ -172,169 +240,134 @@
             ],
             "outputs_amount": [160],
             "block_num": 90,
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-01-01T00:00:00.000Z",
+            "tx_state": "Successful"
           }
         }
       ],
-      "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo": [
-        {
-          "address": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW",
-          "tx": {
-            "hash": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
-            "time": "2018-01-01T13:51:33.000Z",
-            "inputs_address": [
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoN",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoD"
-            ],
-            "inputs_amount": [400, 500, 700],
-            "outputs_address": [
-              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv",
-              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkzyxwA",
-              "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
-              "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoC"
-            ],
-            "outputs_amount": [20, 100, 290, 100],
-            "block_num": 70,
-            "best_block_num": 101
-          }
-        }
-      ],
-      "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo": [
+      "tx-big-input-wallet": [
         {
           "address": "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
           "tx": {
             "hash": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X",
-            "time": "2018-01-01T13:51:33.000Z",
+            "time": "2018-01-01T00:00:00.000Z",
             "inputs_address": [
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoV",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW"
+              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU"
             ],
             "inputs_amount": [
-              "9007199254720699",
-              "1",
-              "1"
+              "9007199254720699"
             ],
             "outputs_address": [
-              "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoX",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoY",
-              "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoZ"
+              "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA"
             ],
             "outputs_amount": [
-              "9007199254720698",
-              "1",
-              "1",
-              "1"
+              "9007199254720698"
             ],
             "block_num": 70,
-            "best_block_num": 101
+            "best_block_num": 101,
+            "last_update": "2018-01-01T00:00:00.000Z",
+            "tx_state": "Successful"
           }
         }
       ]
     },
-    "addressesMapper": [
-      {
-        "prefix": "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
-        "hashPrefix": "p27Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
-        "txsAmount": 30
-      },
-      {
-        "prefix": "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo",
-        "hashPrefix": "na7je9b63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693",
-        "txsAmount": 45
-      },
-      {
-        "prefix": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo"
-      },
-      {
-        "prefix": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo"
-      },
-      {
-        "prefix": "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo"
-      }
-    ],
-    "lovefieldTxs": {
-      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxo": [
+    "lovefieldStoredTxs": {
+      "simple-wallet": [{
+        "ctAmount": {"getCCoin": "200"},
+        "ctBlockNumber": 0,
+        "ctId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
+        "ctInputs": [[
+          "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
+          {"getCCoin": "200"}
+        ]],
+        "ctIsOutgoing": true,
+        "ctMeta": {
+          "ctmDate": "2018-01-01T00:02:00.000Z",
+          "ctmUpdate": "2018-01-01T00:02:00.000Z",
+          "ctmDescription": "undefined",
+          "ctmTitle": "undefined"
+        },
+        "ctOutputs": [[
+          "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv",
+          {"getCCoin": 100}
+        ]],
+        "ctCondition": "CPtxApplying"
+      }]
+    },
+    "lovefieldShownTxs": {
+      "empty-wallet": [],
+      "simple-wallet": [
         {
           "txType": "ADA sent",
           "txAmount": "-0.000200",
           "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
-          "txStatus": "HIGH",
-          "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
+          "txTime": "2018-01-01T00:02:00.000Z",
+          "txStatus": "TRANSACTION PENDING",
+          "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
-          "txConfirmations": "High. 9 confirmations.",
           "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z"
         },
         {
           "txType": "ADA received",
           "txAmount": "0.000100",
           "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
-          "txStatus": "HIGH",
+          "txTime": "2018-01-01T00:01:00.000Z",
+          "txStatus": "TRANSACTION PENDING",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"],
-          "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
-          "txConfirmations": "High. 12 confirmations.",
+          "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
           "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Y"
         },
         {
           "txType": "ADA sent",
           "txAmount": "-0.000160",
           "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
+          "txTime": "2018-01-01T00:00:00.000Z",
           "txStatus": "HIGH",
-          "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW"],
+          "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
           "txConfirmations": "High. 11 confirmations.",
           "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X"
         }
       ],
-      "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo": [
-        {
-          "txType": "ADA sent",
-          "txAmount": "-0.001600",
-          "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
-          "txStatus": "HIGH",
-          "txFrom": [
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoN",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoD"
-          ],
-          "txTo": [
-            "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv",
-            "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkzyxwA",
-            "B1sy6PwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA",
-            "C19iTPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoC"
-          ],
-          "txConfirmations": "High. 31 confirmations.",
-          "txId": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X"
-        }
-      ],
-      "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo": [
+      "tx-big-input-wallet": [
         {
           "txType": "ADA received",
           "txAmount": "9,007,199,254.720698",
           "txTimeTitle": "ADA transaction,",
-          "txTime": "2018-05-10T13:51:33.000Z",
+          "txTime": "2018-01-01T00:00:00.000Z",
           "txStatus": "HIGH",
           "txFrom": [
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoV",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoW"
+            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU"
           ],
           "txTo": [
-            "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoX",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoY",
-            "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoZ"
+            "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoA"
           ],
           "txConfirmations": "High. 31 confirmations.",
           "txId": "sdfewfb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693X"
         }
       ]
     }
-  }
+  },
+  "Daedalus transfer funds Screen": {
+    "daedalusAddressesWithFunds": [
+      "DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb",
+      "DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm"
+    ],
+    "utxos": [
+      {
+        "tx_hash": "918cea05a9c88c7f144c13eabb016fa86efddb0073312f2ae4acb5412668337a",
+        "tx_index": 0,
+        "receiver": "DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb",
+        "amount": "500000"
+      },
+      {
+        "tx_hash": "d2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04",
+        "tx_index": 1,
+        "receiver": "DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm",
+        "amount": "500000"
+      }
+    ]
+  },
+  "General Settings": {}
 }

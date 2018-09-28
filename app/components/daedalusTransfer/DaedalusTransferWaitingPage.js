@@ -2,29 +2,28 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import BorderedBox from '../widgets/BorderedBox';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './DaedalusTransferWaitingPage.scss';
 
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.waiting.title.label',
-    defaultMessage: 'Daedalus wallet is being restored...',
-    description: 'Label "Daedalus wallet is being restored..." on the Daedalus transfer waiting page.'
+    defaultMessage: '!!!Daedalus wallet is being restored',
+    description: 'Label "Daedalus wallet is being restored" on the Daedalus transfer waiting page.'
   },
   restoringAddresses: {
     id: 'daedalusTransfer.waiting.progressInfo.restoringAddresses',
-    defaultMessage: 'Fetching addresses',
+    defaultMessage: '!!!Fetching addresses',
     description: 'Progress info "Fetching addresses" on the Daedalus transfer waiting page.'
   },
   checkingAddresses: {
     id: 'daedalusTransfer.waiting.progressInfo.checkingAddresses',
-    defaultMessage: 'Checking addresses funds',
+    defaultMessage: '!!!Checking addresses funds',
     description: 'Progress info "Checking addresses funds" on the Daedalus transfer waiting page.'
   },
   generatingTx: {
     id: 'daedalusTransfer.waiting.checkingAddresses.generatingTx',
-    defaultMessage: 'Generating transfer transaction',
+    defaultMessage: '!!!Generating transfer transaction',
     description: 'Progress info "Generating transfer transaction" on the Daedalus transfer waiting page.'
   }
 });
@@ -46,8 +45,8 @@ export default class DaedalusTransferWaitingPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox>
 
+        <div>
           <div className={styles.body}>
 
             <div className={styles.title}>
@@ -59,10 +58,8 @@ export default class DaedalusTransferWaitingPage extends Component<Props> {
             <div className={styles.progressInfo}>
               {intl.formatMessage(messages[status])}
             </div>
-
           </div>
-
-        </BorderedBox>
+        </div>
 
       </div>
     );

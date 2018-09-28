@@ -1,6 +1,8 @@
 node_modules
 npm-debug.log
 .DS_Store
+staging-key.pem
+production-key.pem
 
 build/
 dev/

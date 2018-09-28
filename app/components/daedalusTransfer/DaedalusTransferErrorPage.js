@@ -5,19 +5,18 @@ import classnames from 'classnames';
 import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import BorderedBox from '../widgets/BorderedBox';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './DaedalusTransferErrorPage.scss';
 
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.errorPage.title.label',
-    defaultMessage: 'Unable to restored Daedalus wallet',
-    description: 'Label "Unable to restored Daedalus wallet" on the Daedalus transfer error page.'
+    defaultMessage: '!!!Unable to restore Daedalus wallet',
+    description: 'Label "Unable to restore Daedalus wallet" on the Daedalus transfer error page.'
   },
   backButtonLabel: {
     id: 'daedalusTransfer.errorPage.backButton.label',
-    defaultMessage: 'Back',
+    defaultMessage: '!!!Back',
     description: 'Label "Back" on the Daedalus transfer error page.'
   },
 });
@@ -44,8 +43,8 @@ export default class DaedalusTransferErrorPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox>
 
+        <div>
           <div className={styles.body}>
 
             <div className={styles.title}>
@@ -64,8 +63,7 @@ export default class DaedalusTransferErrorPage extends Component<Props> {
             </div>
 
           </div>
-
-        </BorderedBox>
+        </div>
 
       </div>
     );

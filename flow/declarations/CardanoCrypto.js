@@ -1,5 +1,8 @@
+import PasswordProtect from "../../js-cardano-wasm/js/PasswordProtect";
+
 declare module 'rust-cardano-crypto' {
   declare module.exports: {
+    loadRustModule(): Promise<void>,
     Blake2b: {
       blake2b_256(entropy: string): Uint8Array;
     },
@@ -24,7 +27,11 @@ declare module 'rust-cardano-crypto' {
       ): CryptoAddress,
       addressGetPayload(
         address: CryptoAddress
-      ): CryptoAddressPayload
+      ): CryptoAddressPayload,
+      fromEnhancedEntropy(
+        entropy: Uint8Array,
+        password: string
+      ): any // TODO: Complete with specific type
     },
     RandomAddressChecker: {
       newChecker(
@@ -51,6 +58,11 @@ declare module 'rust-cardano-crypto' {
       }
     },
     Wallet: {
+      fromMasterKey(masterKey: Uint8Array): {
+        result: CryptoWallet,
+        failed: boolean,
+        msg: ?string
+      },
       fromSeed(seed: Array<mixed>): {
         result: CryptoWallet,
         failed: boolean,
@@ -90,8 +102,8 @@ declare module 'rust-cardano-crypto' {
       ): {
         result: {
           cbor_encoded_tx: Array<number>,
-          fee: number,
-          tx: CryptoTransaction
+          changed_used: boolean,
+          fee: number
         },
         failed: boolean,
         msg: ?string
@@ -109,6 +121,18 @@ declare module 'rust-cardano-crypto' {
         failed: boolean,
         msg: ?string
       }
+    },
+    PasswordProtect: {
+      encryptWithPassword(
+        password: Uint8Array,
+        salt: Uint8Array,
+        nonce: Uint8Array,
+        data: Uint8Array
+      ): ?Uint8Array | false,
+      decryptWithPassword(
+        password: Uint8Array,
+        data: Uint8Array
+      ): ?Uint8Array | false
     }
   }
 }

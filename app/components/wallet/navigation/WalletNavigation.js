@@ -7,14 +7,12 @@ import WalletNavButton from './WalletNavButton';
 import summaryIcon from '../../../assets/images/wallet-nav/summary-ic.inline.svg';
 import sendIcon from '../../../assets/images/wallet-nav/send-ic.inline.svg';
 import receiveIcon from '../../../assets/images/wallet-nav/receive-ic.inline.svg';
-import transactionsIcon from '../../../assets/images/wallet-nav/transactions-ic.inline.svg';
-import settingsIcon from '../../../assets/images/wallet-nav/wallet-settings-2-ic.inline.svg';
 
 const messages = defineMessages({
-  summary: {
-    id: 'wallet.navigation.summary',
-    defaultMessage: '!!!Summary',
-    description: 'Label for the "Summary" nav button in the wallet navigation.'
+  transactions: {
+    id: 'wallet.navigation.transactions',
+    defaultMessage: '!!!Transactions',
+    description: 'Label for the "Transactions" nav button in the wallet navigation.'
   },
   send: {
     id: 'wallet.navigation.send',
@@ -26,16 +24,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Receive',
     description: 'Label for the "Receive" nav button in the wallet navigation.'
   },
-  transactions: {
-    id: 'wallet.navigation.transactions',
-    defaultMessage: '!!!Transactions',
-    description: 'Label for the "Transactions" nav button in the wallet navigation.'
-  },
-  settings: {
-    id: 'wallet.navigation.settings',
-    defaultMessage: '!!!Settings',
-    description: 'Label for the "Settings" nav button in the wallet navigation.'
-  }
 });
 
 type Props = {
@@ -59,10 +47,10 @@ export default class WalletNavigation extends Component<Props> {
         <div className={styles.navItem}>
           <WalletNavButton
             className="summary"
-            label={intl.formatMessage(messages.summary)}
+            label={intl.formatMessage(messages.transactions)}
             icon={summaryIcon}
-            isActive={isActiveNavItem('summary')}
-            onClick={() => onNavItemClick('summary')}
+            isActive={isActiveNavItem('transactions')}
+            onClick={() => onNavItemClick('transactions')}
           />
         </div>
 
@@ -83,24 +71,6 @@ export default class WalletNavigation extends Component<Props> {
             icon={receiveIcon}
             isActive={isActiveNavItem('receive')}
             onClick={() => onNavItemClick('receive')}
-          />
-        </div>
-
-        <div className={styles.navItem}>
-          <WalletNavButton
-            label={intl.formatMessage(messages.transactions)}
-            icon={transactionsIcon}
-            isActive={isActiveNavItem('transactions')}
-            onClick={() => onNavItemClick('transactions')}
-          />
-        </div>
-
-        <div className={styles.navItem}>
-          <WalletNavButton
-            label={intl.formatMessage(messages.settings)}
-            icon={settingsIcon}
-            isActive={isActiveNavItem('settings')}
-            onClick={() => onNavItemClick('settings')}
           />
         </div>
 

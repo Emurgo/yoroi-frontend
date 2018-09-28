@@ -13,6 +13,9 @@ export default class SettingsStore extends Store {
   LANGUAGE_OPTIONS = [
     { value: 'en-US', label: globalMessages.languageEnglish },
     { value: 'ja-JP', label: globalMessages.languageJapanese },
+    { value: 'ko-KR', label: globalMessages.languageKorean },
+    { value: 'zh-Hans', label: globalMessages.languageChineseSimplified },
+    { value: 'zh-Hant', label: globalMessages.languageChineseTraditional },
   ];
 
   @observable bigNumberDecimalFormat = {
@@ -104,8 +107,25 @@ export default class SettingsStore extends Store {
   };
 
   _updateMomentJsLocaleAfterLocaleChange = () => {
-    moment.locale(this.currentLocale);
+    moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
   };
+
+  _convertLocaleKeyToMomentJSLocalKey = (localeKey: string): string => {
+    // REF -> https://github.com/moment/moment/tree/develop/locale
+    let momentJSLocalKey = localeKey;
+    switch (localeKey) {
+      case 'zh-Hans':
+        momentJSLocalKey = 'zh-cn';
+        break;
+      case 'zh-Hant':
+        momentJSLocalKey = 'zh-tw';
+        break;
+      default:
+        momentJSLocalKey = localeKey;
+        break;
+    }
+    return momentJSLocalKey;
+  }
 
   _acceptTermsOfUse = async () => {
     await this.setTermsOfUseAcceptanceRequest.execute();
@@ -117,7 +137,8 @@ export default class SettingsStore extends Store {
   };
 
   _redirectToLanguageSelectionIfNoLocaleSet = () => {
-    if (this.hasLoadedCurrentLocale && !this.isCurrentLocaleSet) {
+    const { isLoading } = this.stores.loading;
+    if (!isLoading && this.hasLoadedCurrentLocale && !this.isCurrentLocaleSet) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
     }
   };

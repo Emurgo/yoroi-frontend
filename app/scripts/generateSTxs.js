@@ -1,9 +1,10 @@
 // @flow
 
-import { mapToList, saveInStorage } from '../api/ada/lib/utils';
-import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, ADDRESSES_KEY } from '../api/ada/adaAddress';
-import { getSingleCryptoAccount } from '../api/ada/adaAccount';
+import { mapToList } from '../api/ada/lib/utils';
+import { getCryptoWalletFromMasterKey } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
+import { getSingleCryptoAccount, getWalletMasterKey } from '../api/ada/adaLocalStorage';
 
 const CONFIRMATION_TIME = 40 * 1000; // 40 seconds
 const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be bigger than
@@ -31,7 +32,7 @@ export async function generateSTxs(password: string,
 
   const adaAddresses = [];
   for (let i = 0; i < numberOfTxs; i++) {
-    const newAddress = _generateNewAddress(cryptoAccount);
+    const newAddress = await _generateNewAddress(cryptoAccount);
     adaAddresses.push(newAddress);
     log(`[generateSTxs] Generated the address ${newAddress.cadId}`);
   }
@@ -54,16 +55,18 @@ export async function generateSTxs(password: string,
   _saveAdaAddresses(cryptoAccount, adaAddresses);
 
   log('[generateSTxs] Starting generating stxs');
-  const newAddress = _generateNewAddress(cryptoAccount).cadId;
+  const newAddress = (await _generateNewAddress(cryptoAccount)).cadId;
+  const masterKey = getWalletMasterKey();
+  const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
   for (let i = 0; i < numberOfTxs; i++) {
     const sender = adaAddresses[i];
     const createSTxResult = await getAdaTransactionFromSenders(
       [sender],
       newAddress,
       AMOUNT_TO_BE_SENT,
-      password
+      cryptoWallet
     );
-    const cborEncodedStx = createSTxResult[0].result.cbor_encoded_tx;
+    const cborEncodedStx = createSTxResult[0].cbor_encoded_tx;
     const bs64STx = Buffer.from(cborEncodedStx).toString('base64');
 
     if (!debugging) {
@@ -85,20 +88,18 @@ function _logIfDebugging(debugging) {
   return printMsg;
 }
 
-function _generateNewAddress(cryptoAccount) {
+async function _generateNewAddress(cryptoAccount) {
   const addresses = mapToList(getAdaAddressesMap());
   return newAdaAddress(cryptoAccount, addresses, 'External');
 }
 
-function _removeAdaAddresses(cryptoAccount, addresses) {
-  const addressesMap = getAdaAddressesMap();
-  addresses.forEach((addr) => {
-    delete addressesMap[addr.cadId];
-  });
-  saveInStorage(ADDRESSES_KEY, addressesMap);
+async function _removeAdaAddresses(cryptoAccount, addresses) {
+  for (const addr of addresses) {
+    await removeAdaAddress(addr);
+  }
 }
 
 // The same index from the AdaAddresses is used when saving them
 function _saveAdaAddresses(cryptoAccount, adaAddresses) {
-  adaAddresses.forEach(saveAdaAddress);
+  adaAddresses.forEach((adaAddress) => saveAdaAddress(adaAddress, 'External'));
 }
