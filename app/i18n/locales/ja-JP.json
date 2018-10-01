@@ -111,7 +111,7 @@
   "settings.support.faq.content": "ご不明な点がある場合は、こちら{faqLink}をご覧ください。",
   "settings.support.faq.faqLink": "ヨロイウォレットのウェブサイトに関する「よくある質問」",
   "settings.support.faq.faqLinkURL": "https://yoroi-wallet.io/faq/",
-  "settings.support.faq.supportRequestLinkURL": "https://zendesk.com/support/",
+  "settings.support.faq.supportRequestLinkURL": "https://yoroi-wallet.com/support/",
   "settings.support.faq.title": "よくある質問",
   "settings.support.logs.content": "ログはこちら：{downloadLogsLink}。お問い合わせ内容にログを添付してください。ログには個人情報は含まれません。バグ報告機能により自動で添付が可能です。",
   "settings.support.logs.downloadLogsLink": "こちらからダウンロードしてください",
