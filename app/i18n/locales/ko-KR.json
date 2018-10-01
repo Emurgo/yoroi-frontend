@@ -111,7 +111,7 @@
   "settings.support.faq.content": "문제가 있으면 {faqLink}을(를) 참조하여 알려진 문제에서 도움을 받으십시오.",
   "settings.support.faq.faqLink": "Yoroi 웹사이트에 대한 FAQ",
   "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",
-  "settings.support.faq.supportRequestLinkURL": "https://emurgo.zendesk.com/support/",
+  "settings.support.faq.supportRequestLinkURL": "https://yoroi-wallet.com/support/",
   "settings.support.faq.title": "자주 묻는 질문",
   "settings.support.logs.content": "로그를 확인하려면 {downloadLogsLink}을(를)할 수 있습니다. 로그에는 민감한 정보가 포함되어 있지 않으며, 문제 보고서에 첨부하면 팀에서 문제를 조사하는 데 도움을 받을 수 있습니다. 로그는 버그 보고 기능을 사용할 경우 자동으로 첨부됩니다.",
   "settings.support.logs.downloadLogsLink": "여기서 다운로드",
