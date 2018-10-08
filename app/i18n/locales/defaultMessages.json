@@ -437,165 +437,6 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "Instructions",
-        "description": "Label \"Instructions\" on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 21
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.instructions.title.label",
-        "start": {
-          "column": 9,
-          "line": 17
-        }
-      },
-      {
-        "defaultMessage": "Find you Daedalus mnemonics and prepare it",
-        "description": "Text for instructions step 1 on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 26
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.instructions.step0.text",
-        "start": {
-          "column": 9,
-          "line": 22
-        }
-      },
-      {
-        "defaultMessage": "Enter mnemonics",
-        "description": "Text for instructions step 2 on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 31
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.instructions.step1.text",
-        "start": {
-          "column": 9,
-          "line": 27
-        }
-      },
-      {
-        "defaultMessage": "Click Next button",
-        "description": "Text for instructions step 3 on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 36
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.instructions.step2.text",
-        "start": {
-          "column": 9,
-          "line": 32
-        }
-      },
-      {
-        "defaultMessage": "Wait until wallet is synced",
-        "description": "Text for instructions step 4 on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 41
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.instructions.step3.text",
-        "start": {
-          "column": 9,
-          "line": 37
-        }
-      },
-      {
-        "defaultMessage": "Accept \"transfer funds\" transaction between Daedalus and Icarus wallets.",
-        "description": "Text for instructions step 5 on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 46
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.instructions.step4.text",
-        "start": {
-          "column": 9,
-          "line": 42
-        }
-      },
-      {
-        "defaultMessage": "Recovery phrase",
-        "description": "Label for the recovery phrase input on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 51
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.recovery.phrase.input.label",
-        "start": {
-          "column": 28,
-          "line": 47
-        }
-      },
-      {
-        "defaultMessage": "Enter recovery phrase",
-        "description": "Hint \"Enter recovery phrase\" for the recovery phrase input on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 56
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.recovery.phrase.input.hint",
-        "start": {
-          "column": 27,
-          "line": 52
-        }
-      },
-      {
-        "defaultMessage": "No results",
-        "description": "\"No results\" message for the recovery phrase input search results.",
-        "end": {
-          "column": 3,
-          "line": 61
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.recovery.phrase.input.noResults",
-        "start": {
-          "column": 27,
-          "line": 57
-        }
-      },
-      {
-        "defaultMessage": "Invalid recovery phrase",
-        "description": "Error message shown when invalid recovery phrase was entered.",
-        "end": {
-          "column": 3,
-          "line": 66
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.errors.invalidRecoveryPhrase",
-        "start": {
-          "column": 25,
-          "line": 62
-        }
-      },
-      {
-        "defaultMessage": "Next",
-        "description": "Label for the next button on the Daedalus transfer form page.",
-        "end": {
-          "column": 3,
-          "line": 71
-        },
-        "file": "app/components/daedalusTransfer/DaedalusTransferForm.js",
-        "id": "daedalusTransfer.form.next",
-        "start": {
-          "column": 19,
-          "line": 67
-        }
-      }
-    ],
-    "path": "app/components/daedalusTransfer/DaedalusTransferForm.json"
-  },
-  {
-    "descriptors": [
-      {
         "defaultMessage": "!!!Instructions",
         "description": "Label \"Instructions\" on the Daedalus transfer form page.",
         "end": {
@@ -1078,17 +919,17 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Testnet",
+        "defaultMessage": "!!!Warning: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}",
         "description": "Message alerting users the wallet is not running in mainnet.",
         "end": {
           "column": 3,
-          "line": 22
+          "line": 23
         },
         "file": "app/components/layout/SidebarLayout.js",
         "id": "testnet.label.message",
         "start": {
           "column": 16,
-          "line": 18
+          "line": 19
         }
       },
       {
@@ -1096,167 +937,17 @@
         "description": "URL for the \"FAQ on Yoroi website\". link in the testnet banner",
         "end": {
           "column": 3,
-          "line": 27
+          "line": 28
         },
         "file": "app/components/layout/SidebarLayout.js",
         "id": "settings.support.faq.faqLinkURL",
         "start": {
           "column": 14,
-          "line": 23
+          "line": 24
         }
       }
     ],
     "path": "app/components/layout/SidebarLayout.json"
-  },
-  {
-    "descriptors": [
-      {
-        "defaultMessage": "!!!Connecting to network",
-        "description": "Message \"Connecting to network\" on the loading screen.",
-        "end": {
-          "column": 3,
-          "line": 25
-        },
-        "file": "app/components/loading/Loading.js",
-        "id": "loading.screen.connectingToNetworkMessage",
-        "start": {
-          "column": 14,
-          "line": 21
-        }
-      },
-      {
-        "defaultMessage": "!!!Connected - waiting for block syncing to start",
-        "description": "Message \"Connected - waiting for block syncing to start\" on the loading screen.",
-        "end": {
-          "column": 3,
-          "line": 30
-        },
-        "file": "app/components/loading/Loading.js",
-        "id": "loading.screen.waitingForSyncToStart",
-        "start": {
-          "column": 25,
-          "line": 26
-        }
-      },
-      {
-        "defaultMessage": "!!!Network connection lost - reconnecting",
-        "description": "Message \"Network connection lost - reconnecting\" on the loading screen.",
-        "end": {
-          "column": 3,
-          "line": 35
-        },
-        "file": "app/components/loading/Loading.js",
-        "id": "loading.screen.reconnectingToNetworkMessage",
-        "start": {
-          "column": 16,
-          "line": 31
-        }
-      },
-      {
-        "defaultMessage": "!!!Syncing blocks",
-        "description": "Message \"Syncing blocks\" on the loading screen.",
-        "end": {
-          "column": 3,
-          "line": 40
-        },
-        "file": "app/components/loading/Loading.js",
-        "id": "loading.screen.syncingBlocksMessage",
-        "start": {
-          "column": 11,
-          "line": 36
-        }
-      },
-      {
-        "defaultMessage": "!!!Having trouble connecting to network?",
-        "description": "Report connecting issue text on the loading screen.",
-        "end": {
-          "column": 3,
-          "line": 45
-        },
-        "file": "app/components/loading/Loading.js",
-        "id": "loading.screen.reportIssue.connecting.text",
-        "start": {
-          "column": 29,
-          "line": 41
-        }
-      },
-      {
-        "defaultMessage": "!!!Having trouble syncing?",
-        "description": "Report syncing issue text on the loading screen.",
-        "end": {
-          "column": 3,
-          "line": 50
-        },
-        "file": "app/components/loading/Loading.js",
-        "id": "loading.screen.reportIssue.syncing.text",
-        "start": {
-          "column": 26,
-          "line": 46
-        }
-      },
-      {
-        "defaultMessage": "!!!Report an issue",
-        "description": "Report an issue button label on the loading .",
-        "end": {
-          "column": 3,
-          "line": 55
-        },
-        "file": "app/components/loading/Loading.js",
-        "id": "loading.screen.reportIssue.buttonLabel",
-        "start": {
-          "column": 26,
-          "line": 51
-        }
-      }
-    ],
-    "path": "app/components/loading/Loading.json"
-  },
-  {
-    "descriptors": [
-      {
-        "defaultMessage": "!!!Unable to sync - incorrect time",
-        "description": "Title of Sync error overlay",
-        "end": {
-          "column": 3,
-          "line": 17
-        },
-        "file": "app/components/loading/SystemTimeErrorOverlay.js",
-        "id": "systemTime.error.overlayTitle",
-        "start": {
-          "column": 16,
-          "line": 13
-        }
-      },
-      {
-        "defaultMessage": "!!!Attention, Daedalus is unable to sync with the blockchain because the time on your machine is different from the global time. You are 2 hours 12 minutes 54 seconds behind.<br>To synchronize the time and fix this issue, please visit the FAQ section of Daedalus website:",
-        "description": "Text of Sync error overlay",
-        "end": {
-          "column": 3,
-          "line": 22
-        },
-        "file": "app/components/loading/SystemTimeErrorOverlay.js",
-        "id": "systemTime.error.overlayText",
-        "start": {
-          "column": 15,
-          "line": 18
-        }
-      },
-      {
-        "defaultMessage": "!!!daedaluswallet.io/faq",
-        "description": "Link to Daedalus website FAQ page",
-        "end": {
-          "column": 3,
-          "line": 27
-        },
-        "file": "app/components/loading/SystemTimeErrorOverlay.js",
-        "id": "systemTime.error.problemSolutionLink",
-        "start": {
-          "column": 23,
-          "line": 23
-        }
-      }
-    ],
-    "path": "app/components/loading/SystemTimeErrorOverlay.json"
   },
   {
     "descriptors": [
@@ -1983,13 +1674,13 @@
         "description": "Transaction type shown for credit card payments.",
         "end": {
           "column": 3,
-          "line": 19
+          "line": 20
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.type.card",
         "start": {
           "column": 8,
-          "line": 15
+          "line": 16
         }
       },
       {
@@ -1997,13 +1688,13 @@
         "description": "Transaction type shown for {currency} transactions.",
         "end": {
           "column": 3,
-          "line": 24
+          "line": 25
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.type",
         "start": {
           "column": 8,
-          "line": 20
+          "line": 21
         }
       },
       {
@@ -2011,13 +1702,13 @@
         "description": "Transaction type shown for money exchanges between currencies.",
         "end": {
           "column": 3,
-          "line": 29
+          "line": 30
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.type.exchange",
         "start": {
           "column": 12,
-          "line": 25
+          "line": 26
         }
       },
       {
@@ -2025,13 +1716,13 @@
         "description": "Transaction assurance level.",
         "end": {
           "column": 3,
-          "line": 34
+          "line": 35
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.assuranceLevel",
         "start": {
           "column": 18,
-          "line": 30
+          "line": 31
         }
       },
       {
@@ -2039,13 +1730,13 @@
         "description": "Transaction confirmations.",
         "end": {
           "column": 3,
-          "line": 39
+          "line": 40
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.confirmations",
         "start": {
           "column": 17,
-          "line": 35
+          "line": 36
         }
       },
       {
@@ -2053,13 +1744,13 @@
         "description": "Transaction ID.",
         "end": {
           "column": 3,
-          "line": 44
+          "line": 45
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.transactionId",
         "start": {
           "column": 17,
-          "line": 40
+          "line": 41
         }
       },
       {
@@ -2067,13 +1758,13 @@
         "description": "Conversion rate.",
         "end": {
           "column": 3,
-          "line": 49
+          "line": 50
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.conversion.rate",
         "start": {
           "column": 18,
-          "line": 45
+          "line": 46
         }
       },
       {
@@ -2081,13 +1772,13 @@
         "description": "Label \"{currency} sent\" for the transaction.",
         "end": {
           "column": 3,
-          "line": 54
+          "line": 55
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.sent",
         "start": {
           "column": 8,
-          "line": 50
+          "line": 51
         }
       },
       {
@@ -2095,13 +1786,13 @@
         "description": "Label \"{currency} received\" for the transaction.",
         "end": {
           "column": 3,
-          "line": 59
+          "line": 60
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.received",
         "start": {
           "column": 12,
-          "line": 55
+          "line": 56
         }
       },
       {
@@ -2109,13 +1800,13 @@
         "description": "From address",
         "end": {
           "column": 3,
-          "line": 64
+          "line": 65
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.address.from",
         "start": {
           "column": 15,
-          "line": 60
+          "line": 61
         }
       },
       {
@@ -2123,13 +1814,13 @@
         "description": "From addresses",
         "end": {
           "column": 3,
-          "line": 69
+          "line": 70
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.addresses.from",
         "start": {
           "column": 17,
-          "line": 65
+          "line": 66
         }
       },
       {
@@ -2137,13 +1828,13 @@
         "description": "To address",
         "end": {
           "column": 3,
-          "line": 74
+          "line": 75
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.address.to",
         "start": {
           "column": 13,
-          "line": 70
+          "line": 71
         }
       },
       {
@@ -2151,13 +1842,13 @@
         "description": "To addresses",
         "end": {
           "column": 3,
-          "line": 79
+          "line": 80
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.addresses.to",
         "start": {
           "column": 15,
-          "line": 75
+          "line": 76
         }
       },
       {
@@ -2165,13 +1856,13 @@
         "description": "Transaction amount.",
         "end": {
           "column": 3,
-          "line": 84
+          "line": 85
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.transactionAmount",
         "start": {
           "column": 21,
-          "line": 80
+          "line": 81
         }
       },
       {
@@ -2179,13 +1870,13 @@
         "description": "Transaction assurance level \"low\".",
         "end": {
           "column": 3,
-          "line": 92
+          "line": 93
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.assuranceLevel.low",
         "start": {
           "column": 25,
-          "line": 88
+          "line": 89
         }
       },
       {
@@ -2193,13 +1884,13 @@
         "description": "Transaction assurance level \"medium\".",
         "end": {
           "column": 3,
-          "line": 97
+          "line": 98
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.assuranceLevel.medium",
         "start": {
           "column": 28,
-          "line": 93
+          "line": 94
         }
       },
       {
@@ -2207,13 +1898,13 @@
         "description": "Transaction assurance level \"high\".",
         "end": {
           "column": 3,
-          "line": 102
+          "line": 103
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.assuranceLevel.high",
         "start": {
           "column": 26,
-          "line": 98
+          "line": 99
         }
       },
       {
@@ -2221,13 +1912,13 @@
         "description": "Transaction state \"pending\"",
         "end": {
           "column": 3,
-          "line": 110
+          "line": 111
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.state.pending",
         "start": {
           "column": 31,
-          "line": 106
+          "line": 107
         }
       },
       {
@@ -2235,13 +1926,13 @@
         "description": "Transaction state \"pending\"",
         "end": {
           "column": 3,
-          "line": 115
+          "line": 116
         },
         "file": "app/components/wallet/transactions/Transaction.js",
         "id": "wallet.transaction.state.failed",
         "start": {
           "column": 30,
-          "line": 111
+          "line": 112
         }
       }
     ],
@@ -2293,25 +1984,6 @@
       }
     ],
     "path": "app/components/wallet/transactions/WalletTransactionsList.json"
-  },
-  {
-    "descriptors": [
-      {
-        "defaultMessage": "!!!Search transaction",
-        "description": "Hint in the transactions search box.",
-        "end": {
-          "column": 3,
-          "line": 13
-        },
-        "file": "app/components/wallet/transactions/WalletTransactionsSearch.js",
-        "id": "wallet.transactions.search.hint",
-        "start": {
-          "column": 14,
-          "line": 9
-        }
-      }
-    ],
-    "path": "app/components/wallet/transactions/WalletTransactionsSearch.json"
   },
   {
     "descriptors": [
@@ -2373,137 +2045,6 @@
       }
     ],
     "path": "app/components/wallet/WalletAdd.json"
-  },
-  {
-    "descriptors": [
-      {
-        "defaultMessage": "!!!Add wallet",
-        "description": "Label for the \"Add wallet\" title on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 21
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.title.label",
-        "start": {
-          "column": 9,
-          "line": 17
-        }
-      },
-      {
-        "defaultMessage": "!!!Create",
-        "description": "Label for the \"Create\" button on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 26
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.create.label",
-        "start": {
-          "column": 15,
-          "line": 22
-        }
-      },
-      {
-        "defaultMessage": "!!!Create a new wallet",
-        "description": "Description for the \"Create\" button on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 31
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.create.description",
-        "start": {
-          "column": 21,
-          "line": 27
-        }
-      },
-      {
-        "defaultMessage": "!!!Join",
-        "description": "Label for the \"Join\" button on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 36
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.join.label",
-        "start": {
-          "column": 13,
-          "line": 32
-        }
-      },
-      {
-        "defaultMessage": "!!!Join a shared wallet with up to 5 people",
-        "description": "Description for the \"Join\" button on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 41
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.join.description",
-        "start": {
-          "column": 19,
-          "line": 37
-        }
-      },
-      {
-        "defaultMessage": "!!!Restore",
-        "description": "Label for the \"Restore\" button on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 46
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.restore.label",
-        "start": {
-          "column": 16,
-          "line": 42
-        }
-      },
-      {
-        "defaultMessage": "!!!Restore wallet from backup",
-        "description": "Description for the \"Restore\" button on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 51
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.restore.description",
-        "start": {
-          "column": 22,
-          "line": 47
-        }
-      },
-      {
-        "defaultMessage": "!!!Import",
-        "description": "Label for the \"Import\" button on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 56
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.import.label",
-        "start": {
-          "column": 15,
-          "line": 52
-        }
-      },
-      {
-        "defaultMessage": "!!!Import wallet from a file",
-        "description": "Description for the \"Import\" button on the wallet add dialog.",
-        "end": {
-          "column": 3,
-          "line": 61
-        },
-        "file": "app/components/wallet/WalletAddDialog.js",
-        "id": "wallet.add.dialog.import.description",
-        "start": {
-          "column": 21,
-          "line": 57
-        }
-      }
-    ],
-    "path": "app/components/wallet/WalletAddDialog.json"
   },
   {
     "descriptors": [
@@ -3493,39 +3034,6 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!No transactions",
-        "description": "Message shown when wallet has no transactions yet.",
-        "end": {
-          "column": 3,
-          "line": 19
-        },
-        "file": "app/containers/wallet/WalletTransactionsPage.js",
-        "id": "wallet.transactions.no.transactions",
-        "start": {
-          "column": 18,
-          "line": 15
-        }
-      },
-      {
-        "defaultMessage": "!!!No transactions found",
-        "description": "Message shown when wallet transaction search returns zero results.",
-        "end": {
-          "column": 3,
-          "line": 24
-        },
-        "file": "app/containers/wallet/WalletTransactionsPage.js",
-        "id": "wallet.transactions.no.transactions.found",
-        "start": {
-          "column": 23,
-          "line": 20
-        }
-      }
-    ],
-    "path": "app/containers/wallet/WalletTransactionsPage.json"
-  },
-  {
-    "descriptors": [
-      {
         "defaultMessage": "!!!This field is required.",
         "description": "Error message when required fields are left empty.",
         "end": {
@@ -3694,17 +3202,31 @@
         }
       },
       {
-        "defaultMessage": "!!!Chinese",
-        "description": "Language name for \"Chinese\" language.",
+        "defaultMessage": "!!!Chinese Simplified",
+        "description": "Language name for \"Simplified Chinese\" language.",
         "end": {
           "column": 3,
           "line": 68
         },
         "file": "app/i18n/global-messages.js",
-        "id": "global.language.chinese",
+        "id": "global.language.chinese.simplified",
         "start": {
-          "column": 19,
+          "column": 29,
           "line": 64
+        }
+      },
+      {
+        "defaultMessage": "!!!Chinese Traditional",
+        "description": "Language name for \"Traditional Chinese\" language.",
+        "end": {
+          "column": 3,
+          "line": 73
+        },
+        "file": "app/i18n/global-messages.js",
+        "id": "global.language.chinese.traditional",
+        "start": {
+          "column": 30,
+          "line": 69
         }
       },
       {
@@ -3712,13 +3234,13 @@
         "description": "Language name for \"Korean\" language.",
         "end": {
           "column": 3,
-          "line": 73
+          "line": 78
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.korean",
         "start": {
           "column": 18,
-          "line": 69
+          "line": 74
         }
       },
       {
@@ -3726,13 +3248,13 @@
         "description": "Language name for \"German\" language.",
         "end": {
           "column": 3,
-          "line": 78
+          "line": 83
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.german",
         "start": {
           "column": 18,
-          "line": 74
+          "line": 79
         }
       },
       {
@@ -3740,13 +3262,13 @@
         "description": "Language name for \"Croatian\" language.",
         "end": {
           "column": 3,
-          "line": 83
+          "line": 88
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.croatian",
         "start": {
           "column": 20,
-          "line": 79
+          "line": 84
         }
       },
       {
@@ -3754,13 +3276,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 3,
-          "line": 88
+          "line": 93
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.unit.ada",
         "start": {
           "column": 11,
-          "line": 84
+          "line": 89
         }
       },
       {
@@ -3768,13 +3290,13 @@
         "description": "Title for the \"Recovery Phrase\" dialog.",
         "end": {
           "column": 3,
-          "line": 93
+          "line": 98
         },
         "file": "app/i18n/global-messages.js",
         "id": "wallet.backup.recovery.phrase.dialog.title",
         "start": {
           "column": 29,
-          "line": 89
+          "line": 94
         }
       },
       {
@@ -3782,13 +3304,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 5,
-          "line": 102
+          "line": 107
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.ada",
         "start": {
           "column": 14,
-          "line": 98
+          "line": 103
         }
       },
       {
@@ -3796,13 +3318,13 @@
         "description": "Name for \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 107
+          "line": 112
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.cardano",
         "start": {
           "column": 13,
-          "line": 103
+          "line": 108
         }
       },
       {
@@ -3810,13 +3332,13 @@
         "description": "Version of \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 112
+          "line": 117
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.cardano",
         "start": {
           "column": 16,
-          "line": 108
+          "line": 113
         }
       },
       {
@@ -3824,13 +3346,13 @@
         "description": "Name for \"Etc\" unit.",
         "end": {
           "column": 5,
-          "line": 119
+          "line": 124
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.etc",
         "start": {
           "column": 14,
-          "line": 115
+          "line": 120
         }
       },
       {
@@ -3838,13 +3360,13 @@
         "description": "Name for \"Mantis\" client.",
         "end": {
           "column": 5,
-          "line": 124
+          "line": 129
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.mantis",
         "start": {
           "column": 13,
-          "line": 120
+          "line": 125
         }
       },
       {
@@ -3852,13 +3374,13 @@
         "description": "Version of \"Mantis\" client.",
         "end": {
           "column": 5,
-          "line": 129
+          "line": 134
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.mantis",
         "start": {
           "column": 16,
-          "line": 125
+          "line": 130
         }
       }
     ],

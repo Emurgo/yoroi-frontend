@@ -18,7 +18,7 @@ type Props = {
 export const messages = defineMessages({
   testnetLabel: {
     id: 'testnet.label.message',
-    defaultMessage: '!!!Testnet',
+    defaultMessage: '!!!Warning: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
     description: 'Message alerting users the wallet is not running in mainnet.'
   },
   faqLinkUrl: {
