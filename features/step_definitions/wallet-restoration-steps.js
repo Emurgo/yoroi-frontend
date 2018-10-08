@@ -64,14 +64,14 @@ Then(/^I should stay in the restore wallet dialog$/, async function () {
 Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
   const webElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
   for (let i = 0; i < webElements.length; i++) {
-    await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);
+    await this.click("(//span[@class='SimpleAutocomplete_selectedWordRemoveButton'])[1]", By.xpath);
   }
-  let expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
+  const expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
   expect(expectedElements.length).to.be.equal(0);
 });
 
 Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async function (table) {
   const words = table.split(' ');
-  const lastWord = words[words.length-1];
+  const lastWord = words[words.length - 1];
   await this.waitForElementNotPresent(`//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`, By.xpath);
 });
