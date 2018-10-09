@@ -68,7 +68,7 @@ async function (txsNumber) {
     }
     await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
   }
-  const displayedTransactions = await this.driver.findElements(By.xpath(`//div[contains(@class, 'Transaction_component')]`));
+  const displayedTransactions = await this.driver.findElements(By.xpath("//div[contains(@class, 'Transaction_component')]"));
   await this.driver.findElement(By.xpath(`//div[contains(@class, 'WalletSummary_numberOfTransactions')]//span`)).getText().then(function (numberOfTransactions) {
     chai.expect(parseInt(numberOfTransactions)).to.equal(displayedTransactions.length);
   });
