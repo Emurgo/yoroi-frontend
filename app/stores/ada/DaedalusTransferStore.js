@@ -106,6 +106,8 @@ export default class DaedalusTransferStore extends Store {
           });
           runInAction(() => {
             this.transferTx = transferTx;
+            // close to avoid WS timeout after we no longer need it
+            this.ws.close(WS_CODE_NORMAL_CLOSURE);
           });
           this._updateStatus('readyToTransfer');
         }
@@ -119,14 +121,20 @@ export default class DaedalusTransferStore extends Store {
     });
 
     this.ws.addEventListener('close', (event: any) => {
-      Logger.info(
-        `[ws::close] CODE: ${event.code} - REASON: ${event.reason} - was clean? ${event.wasClean}`
-      );
       if (event.code !== WS_CODE_NORMAL_CLOSURE) {
+        // if connection was not closed normally, we log this as an error. Otherwise it's an info
+        Logger.error(
+          `[ws::close] CODE: ${event.code} - REASON: ${event.reason} - was clean? ${event.wasClean}`
+        );
+
         runInAction(() => {
           this.status = 'error';
           this.error = new WebSocketRestoreError();
         });
+      } else {
+        Logger.info(
+          `[ws::close] CODE: ${event.code} - REASON: ${event.reason} - was clean? ${event.wasClean}`
+        );
       }
     });
   }
