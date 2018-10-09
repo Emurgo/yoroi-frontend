@@ -4,11 +4,6 @@ Feature: Main UI
     Given I have opened the chrome extension
     And I have completed the basic setup
 
-  Scenario: Get balance with 1 address
-    Given I am testing "Main UI"
-    And There is a wallet stored named simple-wallet
-    Then I should see the balance number "0.000000 ADA"
-
   Scenario: Get balance with 45 addresses
     Given I am testing "Main UI"
     And There is a wallet stored named complex-wallet
