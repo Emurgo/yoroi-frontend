@@ -3,6 +3,10 @@ import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
 
+async function checkErrorByTranslationId(client, errorSelector, error) {
+  await client.waitUntilText(errorSelector, await client.intl(error.message));
+}
+
 When(/^I click the restore button$/, async function () {
   await this.click('.restoreWalletButton');
 });
@@ -58,4 +62,10 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
   }
   let expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
   expect(expectedElements.length).to.be.equal(0);
+});
+
+Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.SimpleAutocomplete_errored .SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
 });
