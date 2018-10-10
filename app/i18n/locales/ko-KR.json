@@ -128,7 +128,7 @@
   "wallet.amountInput.feesLabel": "+ {amount}의 수수료",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "계속",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "다른 사람이 귀하의 자금에 액세스하지 않도록 하려면 아무도 화면을 보지 않도록 하십시오.",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "다음 화면에 일련의 무작위 문자 X개가 표시됩니다. 이것은\n    귀하의 지갑 백업 구절입니다. 아무 버전의 Yoroi에 입력하여\n    지갑의 자금과 보안 키를 백업하거나 복원할 수 있습니다.",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "다음 화면에 일련의 무작위 문자 15개가 표시됩니다. 이것은\n    귀하의 지갑 백업 구절입니다. 아무 버전의 Yoroi에 입력하여\n    지갑의 자금과 보안 키를 백업하거나 복원할 수 있습니다.",
   "wallet.backup.recovery.phrase.dialog.title": "복구 구절",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "복구 구절을 적어서 안전한 곳에 보관하십시오.\n    이 구절은 나중에 복구할 때 필요합니다. 구절은 대소문자를 구분합니다.",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "예, 기록해 두었습니다",
