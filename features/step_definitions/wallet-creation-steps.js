@@ -38,11 +38,12 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 
   const mnemonic = await mnemonicElement.getText();
   await this.click('.WalletRecoveryPhraseDisplayDialog .primary');
-
+  await console.log("Mnemonic: " + mnemonic);
   const recoveryPhrase = mnemonic.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.click(`//button[contains(text(), '${word}')]`, By.xpath);
+    //await this.waitForElement(`(//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[contains(@class, 'MnemonicWord_active') and @label = '${word}'])[1]`, By.xpath);
+    await this.click(`(//button[contains(@class, 'MnemonicWord_active') and @label = '${word}'])[1]`, By.xpath);
   }
   const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
   checkboxes.forEach((box) => box.click());

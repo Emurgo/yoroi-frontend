@@ -69,3 +69,9 @@ Then(/^I should see an "Invalid recovery phrase" error message:$/, async functio
   const errorSelector = '.SimpleAutocomplete_errored .SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
+
+Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async function (table) {
+  const words = table.split(' ');
+  const lastWord = words[words.length - 1];
+  await this.waitForElementNotPresent(`//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`, By.xpath);
+});
