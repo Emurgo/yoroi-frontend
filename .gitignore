@@ -10,7 +10,10 @@ dll/
 
 *.zip
 *.crx
+# pem files are used to sign the extension so we ignore the to avoid accidental leakage
 *.pem
+# we want some agreed-upon pem to run the e2etest though
+!e2etest-key.pem
 update.xml
 .vscode/
 
