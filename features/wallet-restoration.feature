@@ -101,3 +101,35 @@ Feature: Restore Wallet
     And I clear the restored wallet password Secret_123
     And I click the "Restore Wallet" button
     Then I should stay in the restore wallet dialog
+
+    @it-70
+    Scenario Outline: Wallet restoration Recovery Phrase test (IT-70)
+    And I click the restore button
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase   |
+    | <recoveryPhrase> |
+    And I enter the restored wallet password:
+    | password   | repeatedPassword |
+    | Secret_123 | Secret_123       |
+    And I click the "Restore Wallet" button
+    Then I should stay in the restore wallet dialog
+    And I should see an "Invalid recovery phrase" error message:
+    | message                                                 |
+    | wallet.restore.dialog.form.errors.invalidRecoveryPhrase |
+    Examples:
+    | recoveryPhrase                                                                                           |                    |
+    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow         | 14-words phrase    |
+    | atom remind style monster lunch result upgrade fashion eight limit glance frequent eternal borrow accuse | invalid word order |
+
+    @it-71
+    Scenario Outline: Ensure user can not add more than 15 words to the Yoroi Wallet Recovery Phrase (IT-71)
+    And I click the restore button
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase   |
+    | <recoveryPhrase> |
+    Then I don't see last word of <recoveryPhrase> in recovery phrase field
+    Examples:
+    | recoveryPhrase                                                                                                  |                    |
+    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster galaxy | 16-words phrase    |

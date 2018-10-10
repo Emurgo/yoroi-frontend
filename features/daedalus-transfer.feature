@@ -98,3 +98,19 @@ Feature: Transfer Daedalus Wallet funds
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
     |instructionMessage                              | attentionMessage| 
     |daedalusTransfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
+
+  @it-37 @withWebSocketConnection
+  Scenario: "Daedalus-transfer" page buttons test (IT-37)
+    Given I am testing "Daedalus transfer funds Screen"
+    When There is a wallet stored named Test
+    And My Daedalus wallet hasn't funds
+    And I am on the Daedalus Transfer instructions screen
+    And I click on the transfer funds from Daedalus button
+    And I click next button on the Daedalus transfer page
+    Then I should see "This field is required." error message:
+    | message                                            |
+    | global.errors.fieldIsRequired                      |
+    When I click back button on the Daedalus transfer page
+    Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
+    |instructionMessage                              | attentionMessage| 
+    |daedalusTransfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
