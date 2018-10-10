@@ -6,6 +6,7 @@ production-key.pem
 
 build/
 dev/
+dll/
 
 *.zip
 *.crx
