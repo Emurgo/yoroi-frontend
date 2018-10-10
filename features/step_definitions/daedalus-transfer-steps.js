@@ -33,6 +33,10 @@ After({ tags: '@withWebSocketConnection' }, () => {
   getMockServer({});
 });
 
+async function checkErrorByTranslationId (client, errorSelector, error) {
+  await client.waitUntilText(errorSelector, await client.intl(error.message));
+}
+
 Given(/^My Daedalus wallet has funds/, () => {
   const daedalusAddresses = [
     'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb',
@@ -66,6 +70,20 @@ When(/^I click on the transfer funds from Daedalus button$/, async function () {
 
 When(/^I proceed with the recovery$/, async function () {
   await this.click('.proceedTransferButtonClasses');
+});
+
+When(/^I click next button on the Daedalus transfer page$/, async function () {
+  await this.click("//button[contains(@label, 'Next')]", By.xpath);
+});
+
+When(/^I click back button on the Daedalus transfer page$/, async function () {
+  await this.click("//button[contains(@label, 'Back')]", By.xpath);
+});
+
+Then(/^I should see "This field is required." error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
 });
 
 When(/^I confirm Daedalus transfer funds$/, async function () {
@@ -112,11 +130,11 @@ Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/,
   const messages = table.hashes()[0];
   const instructionMessage = await this.intl(messages.instructionMessage);
   const attentionMessage = await this.intl(messages.attentionMessage);
-    await this.waitForElement(`//div[@class='DaedalusTransferInstructionsPage_text' and contains(text(), '${instructionMessage}')]`, By.xpath);
-    await this.waitForElement(`//div[contains(text(), 'Attention')]//following::div[@class='DaedalusTransferInstructionsPage_text' and contains(text(), '${attentionMessage}')]`, By.xpath);
-    await this.waitForElement(`//button[contains(@class, 'disabled') and contains(text(), 'Create Yoroi wallet')]`, By.xpath); //Disabled "Create yoroi" button
-    await this.waitForElement(`//button[contains(@class, 'answerYesButton') and contains(text(), 'Go to the Receive screen')]`, By.xpath); 
-    await this.waitForElement(`//button[contains(@class, 'answerNoButton') and contains(text(), 'Transfer all funds from Daedalus wallet')]`, By.xpath); 
+  await this.waitForElement(`//div[@class='DaedalusTransferInstructionsPage_text' and contains(text(), '${instructionMessage}')]`, By.xpath);
+  await this.waitForElement(`//div[contains(text(), 'Attention')]//following::div[@class='DaedalusTransferInstructionsPage_text' and contains(text(), '${attentionMessage}')]`, By.xpath);
+  await this.waitForElement(`//button[contains(@class, 'disabled') and contains(text(), 'Create Yoroi wallet')]`, By.xpath); //Disabled "Create yoroi" button
+  await this.waitForElement(`//button[contains(@class, 'answerYesButton') and contains(text(), 'Go to the Receive screen')]`, By.xpath); 
+  await this.waitForElement(`//button[contains(@class, 'answerNoButton') and contains(text(), 'Transfer all funds from Daedalus wallet')]`, By.xpath); 
 });
 
 async function _checkDaedalusAddressesRecoveredAreCorrect(rows, world) {
