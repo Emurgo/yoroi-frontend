@@ -57,7 +57,7 @@ Feature: Wallet UI Settings
 
         Examples:
       | amount              | fee       | |
-      | 0.001000            | 0.167950  | # Sent tx to a valid adress|
+      | 0.001000            | 0.168082  | # Sent tx to a valid adress|
   
   @it-91
   Scenario Outline: Password should be case-sensitive [Wallet password changing] (IT-91)

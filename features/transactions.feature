@@ -24,9 +24,9 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       | |
-      | 0.001000            | 0.167950  | # Sent tx to a valid adress|
-      | 9007199254..552484  | 0.168214  | # Sent all funds|
-      | 9007199253..720698  | 0.168214  | # Sent a big amount|
+      | 0.001000            | 0.168082  | # Sent tx to a valid adress|
+      | 9007199254..552484  | 0.168038  | # Sent all funds|
+      | 9007199253..720698  | 0.168170  | # Sent a big amount|
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
@@ -62,7 +62,7 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.167950 | 
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.168082 | 
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
@@ -88,7 +88,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.167950"
+    And The transaction fees are "0.168082"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
