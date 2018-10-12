@@ -103,7 +103,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.167950"
+    And The transaction fees are "0.168082"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
