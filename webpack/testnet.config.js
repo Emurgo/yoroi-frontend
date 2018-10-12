@@ -36,7 +36,8 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('testnet')
+        NODE_ENV: JSON.stringify('testnet'),
+        COMMIT: JSON.stringify(exec('git rev-parse HEAD', {silent:true}).trim())
       }
     })
   ],
