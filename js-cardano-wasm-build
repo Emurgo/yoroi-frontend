@@ -3,7 +3,6 @@
 RUST_TOOLCHAIN="$(cat rust-toolchain)"
 
 set +e
-#git submodule update --init --recursive
 pushd wallet-wasm
 rustup target add --toolchain ${RUST_TOOLCHAIN} wasm32-unknown-unknown && \
 cargo  +${RUST_TOOLCHAIN} build --target wasm32-unknown-unknown --release --verbose && \
