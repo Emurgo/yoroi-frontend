@@ -4,11 +4,11 @@ Feature: Send transaction
     Given I have opened the chrome extension
     And I have completed the basic setup
     And I am testing "Send transaction"
-    And There is a wallet stored named Test
-    And I have a wallet with funds
-    
+
   @it-54 @it-52
   Scenario Outline: User can send funds from one Yoroi wallet to another (IT-54)
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -24,12 +24,14 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       | |
-      | 0.001000            | 0.167950  | # Sent tx to a valid adress|
-      | 9007199254..552484  | 0.168214  | # Sent all funds|
-      | 9007199253..720698  | 0.168214  | # Sent a big amount|
+      | 0.001000            | 0.168082  | # Sent tx to a valid adress|
+      | 9007199254..552484  | 0.168038  | # Sent all funds|
+      | 9007199253..720698  | 0.168170  | # Sent a big amount|
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -50,6 +52,8 @@ Feature: Send transaction
 
   @it-48
   Scenario Outline: CONFIRM TRANSACTION Pop up displays properly (IT-48)
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                        | amount   |
@@ -62,10 +66,12 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.167950 | 
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.168082 | 
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                    | amount   | |
@@ -75,6 +81,8 @@ Feature: Send transaction
 
   @it-47
   Scenario: User can't send more funds than he has (IT-47)
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount     |
@@ -84,11 +92,13 @@ Feature: Send transaction
 
   @invalidWitnessTest
   Scenario: Sending a Tx and receiving from the server an invalid signature error
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.167950"
+    And The transaction fees are "0.168082"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -99,11 +109,13 @@ Feature: Send transaction
 
   @it-42
   Scenario: User can't send funds with incorrect Spending password (IT-42)
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.167950"
+    And The transaction fees are "0.168082"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -114,6 +126,8 @@ Feature: Send transaction
 
   @it-53
   Scenario: Sending a Tx changing a valid address for an invalid one (IT-53)
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -126,3 +140,12 @@ Feature: Send transaction
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdXXXX | 0.001000 |
     Then I should not be able to submit  
+
+  @it-89
+  Scenario: Try to make a transactions from the empty wallet (IT-89)
+    Given There is a wallet stored named empty-wallet
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.100000 |
+    Then I should see a not enough ada error
