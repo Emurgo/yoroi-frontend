@@ -6,7 +6,7 @@
 
 ```bash
 # clone the repository with the submodule js-cardano-wasm
-$ git clone --recursive https://github.com/Emurgo/yoroi-frontend.git
+$ git clone --recursive git@github.com:Emurgo/yoroi-frontend.git
 $ git submodule update --init --recursive
 ```
 
