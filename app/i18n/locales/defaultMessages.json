@@ -933,7 +933,7 @@
         }
       },
       {
-        "defaultMessage": "!!!https://daedaluswallet.io/faq/",
+        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
         "description": "URL for the \"FAQ on Yoroi website\". link in the testnet banner",
         "end": {
           "column": 3,
@@ -1093,7 +1093,7 @@
         }
       },
       {
-        "defaultMessage": "!!!https://daedaluswallet.io/faq/",
+        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
         "description": "URL for the \"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
         "end": {
           "column": 3,
@@ -3412,13 +3412,13 @@
         "description": "\"Unable to transfer funds.\" error message",
         "end": {
           "column": 3,
-          "line": 190
+          "line": 198
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.transferFundsError",
         "start": {
           "column": 22,
-          "line": 186
+          "line": 194
         }
       },
       {
@@ -3426,13 +3426,13 @@
         "description": "\"There is no transfer transaction to send.\" error message",
         "end": {
           "column": 3,
-          "line": 195
+          "line": 203
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.noTransferTxError",
         "start": {
           "column": 21,
-          "line": 191
+          "line": 199
         }
       },
       {
@@ -3440,13 +3440,13 @@
         "description": "Any reason why the websocket transferring could failed",
         "end": {
           "column": 3,
-          "line": 200
+          "line": 208
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.webSocketRestoreError",
         "start": {
           "column": 25,
-          "line": 196
+          "line": 204
         }
       }
     ],

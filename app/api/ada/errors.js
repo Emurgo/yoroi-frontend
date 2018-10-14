@@ -107,11 +107,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Error received from server while checking used addresses.',
     description: '"Error received from server while checking used addresses." error message'
   },
-  getPendingTxsForAddressesApiError: {
-    id: 'api.errors.getPendingTxsForAddressesApiError',
-    defaultMessage: '!!!Error received from server while getting pending txs.',
-    description: '"Error received from server while getting pending txs." error message'
-  },
   invalidWitnessError: {
     id: 'api.errors.invalidWitnessError',
     defaultMessage: '!!!The signature is invalid.',
@@ -304,15 +299,6 @@ export class CheckAdressesInUseApiError extends LocalizableError {
     super({
       id: messages.checkAdressesInUseApiError.id,
       defaultMessage: messages.checkAdressesInUseApiError.defaultMessage
-    });
-  }
-}
-
-export class GetPendingTxsForAddressesApiError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getPendingTxsForAddressesApiError.id,
-      defaultMessage: messages.getPendingTxsForAddressesApiError.defaultMessage
     });
   }
 }

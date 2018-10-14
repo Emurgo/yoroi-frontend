@@ -14,7 +14,6 @@
   "api.errors.getAddressesWithFundsError": "!!!Error while getting addresses with funds.",
   "api.errors.getAllUTXOsForAddressesError": "!!!Error received from api method call while getting UTxOs.",
   "api.errors.getBalanceError": "!!!Error while getting balance.",
-  "api.errors.getPendingTxsForAddressesApiError": "!!!Error received from server while getting pending transactions.",
   "api.errors.getTxHistoryForAddressesApiError": "!!!Error received from server while getting transactions.",
   "api.errors.getUtxosForAddressesApiError": "!!!Error received from server while getting UTxOs.",
   "api.errors.getUtxosSumsForAddressesApiError": "!!!Error received from server while getting balance.",

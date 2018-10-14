@@ -14,7 +14,6 @@
   "api.errors.getAddressesWithFundsError": "获取资金地址时发生错误。",
   "api.errors.getAllUTXOsForAddressesError": "获取 UTxOs 时从 api 方法调用收到错误。",
   "api.errors.getBalanceError": "获取余额时发生错误。",
-  "api.errors.getPendingTxsForAddressesApiError": "获取暂挂 txs 时从服务器收到错误。",
   "api.errors.getTxHistoryForAddressesApiError": "获取 txs 时从服务器收到错误。",
   "api.errors.getUtxosForAddressesApiError": "获取 UTxOs 时从服务器收到错误。",
   "api.errors.getUtxosSumsForAddressesApiError": "获取余额时从服务器收到错误。",

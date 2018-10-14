@@ -14,7 +14,6 @@
   "api.errors.getAddressesWithFundsError": "자금이 있는 주소를 수집하는 중 오류가 발생했습니다.",
   "api.errors.getAllUTXOsForAddressesError": "UTxO를 가져오는 중 API 방식 호출로부터 오류를 수신했습니다.",
   "api.errors.getBalanceError": "잔액을 가져오는 중 오류가 발생했습니다.",
-  "api.errors.getPendingTxsForAddressesApiError": "보류 중인 거래를 가져오는 중 서버로부터 오류를 수신했습니다.",
   "api.errors.getTxHistoryForAddressesApiError": "거래를 가져오는 중 서버로부터 오류를 수신했습니다.",
   "api.errors.getUtxosForAddressesApiError": "UTxO를 가져오는 중 서버로부터 오류를 수신했습니다.",
   "api.errors.getUtxosSumsForAddressesApiError": "잔액을 가져오는 중 서버로부터 오류를 수신했습니다.",
