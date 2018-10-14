@@ -6,6 +6,7 @@ import FileSaver from 'file-saver';
 import type { ConfigType } from '../../config/config-types';
 
 import environment from '../environment';
+
 export const version = require('../../chrome/manifest.' + environment.current + '.json').version;
 
 const logger = console;
@@ -35,20 +36,20 @@ export const Logger = {
 
 export const downloadLogs = () => {
   const header = generateLogHeader();
-  var errorLogs = logs.peekN(logs.size());
+  let errorLogs = logs.peekN(logs.size());
   if (errorLogs.length === 0) {
-    errorLogs = ["No errors logged."];
+    errorLogs = ['No errors logged.'];
   }
   errorLogs.unshift(header);
-  const blob = new Blob(errorLogs , { type: 'text/plain;charset=utf-8' });
+  const blob = new Blob(errorLogs, { type: 'text/plain;charset=utf-8' });
   FileSaver.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
 };
 
 // ========== STRINGIFY =========
 
-export const generateLogHeader = () => {
-  return `[INFO] Yoroi v.${version}\r\n[INFO] Commit: ${environment.commit}\r\n[INFO] Network: ${environment.NETWORK}\r\n`;
-}
+export const generateLogHeader = () => (
+  `[INFO] Yoroi v.${version}\r\n[INFO] Commit: ${environment.commit}\r\n[INFO] Network: ${environment.NETWORK}\r\n`
+);
 
 export const stringifyData = (data : any) => JSON.stringify(data, null, 2);
 

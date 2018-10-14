@@ -92,7 +92,7 @@ export default class DaedalusTransferStore extends Store {
     this.ws.addEventListener('message', async (event: any) => {
       try {
         // Note: we only expect a single message from our WS so we can close it right away.
-        // Not closing it right away will cause a WS timeout error as we don't keep the connection alive.
+        // Not closing it right away will cause a WS timeout as we don't keep the connection alive.
         this.ws.close(WS_CODE_NORMAL_CLOSURE);
 
         const data = JSON.parse(event.data);
