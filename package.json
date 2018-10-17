@@ -122,6 +122,7 @@
     "ringbufferjs": "1.1.0",
     "route-parser": "0.0.5",
     "rust-cardano-crypto": "file:js-cardano-wasm",
+    "trezor-connect": "6.0.1",
     "validator": "6.3.0"
   },
   "engineStrict": true,

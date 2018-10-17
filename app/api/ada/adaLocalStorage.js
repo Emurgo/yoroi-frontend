@@ -2,7 +2,7 @@
 
 // Wrapper API to Save&Load localstorage using JSON
 
-import type { AdaWallet } from './adaTypes';
+import type { AdaWallet, AdaWalletTypeInfo } from '../ada/adaTypes';
 
 // Use constant keys to store/load localstorage
 const storageKeys = {
@@ -29,7 +29,7 @@ export function getSingleCryptoAccount(): CryptoAccount {
  * @param masterKey decrypt to send funds  */
 export function saveAdaWallet(
   adaWallet: AdaWallet,
-  masterKey: string
+  masterKey?: string
 ): void {
   _saveInStorage(storageKeys.WALLET_KEY, { adaWallet, masterKey });
 }
@@ -42,6 +42,11 @@ export function getAdaWallet(): ?AdaWallet {
 export function getWalletMasterKey(): string {
   const stored = _getFromStorage(storageKeys.WALLET_KEY);
   return stored.masterKey;
+}
+
+export function getWalletTypeInfo(): AdaWalletTypeInfo {
+  const stored = _getFromStorage(storageKeys.WALLET_KEY);
+  return stored.walletTypeInfo;
 }
 
 /* Last block Nunmber storage */

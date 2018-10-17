@@ -4,12 +4,14 @@ import { inject, observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import WalletAdd from '../../components/wallet/WalletAdd';
+import WalletTrezorDialog from '../../components/wallet/WalletTrezorDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
 import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
 import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
+import WalletTrezorDialogContainer from './dialogs/WalletTrezorDialogContainer';
 import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
@@ -58,6 +60,7 @@ export default class WalletAddPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
     const { isRestoreActive } = wallets;
+    const { isConnectTrezorActive } = wallets;
     let content = null;
 
     if (uiDialogs.isOpen(WalletCreateDialog)) {
@@ -66,9 +69,13 @@ export default class WalletAddPage extends Component<Props> {
       content = <WalletRestoreDialogContainer onClose={this.onClose} />;
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       content = <WalletBackupDialogContainer onClose={this.onClose} />;
+    } else if (uiDialogs.isOpen(WalletTrezorDialog)) {
+      content = <WalletTrezorDialogContainer onClose={this.onClose} />;
     } else {
       content = (
         <WalletAdd
+          onTrezor={() => actions.dialogs.open.trigger({ dialog: WalletTrezorDialog })}
+          isConnectTrezorActive={isConnectTrezorActive}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           isRestoreActive={isRestoreActive}

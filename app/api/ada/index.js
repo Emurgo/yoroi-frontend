@@ -30,6 +30,9 @@ import {
   restoreAdaWallet
 } from './restoreAdaWallet';
 import {
+  connectTrezorAdaWallet
+} from './hardware-wallet/connectTrezorAdaWallet';
+import {
   getAdaTxsHistoryByWallet,
   getAdaTxLastUpdatedDate,
   refreshTxs,
@@ -44,6 +47,7 @@ import {
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError
 } from '../common';
+import LocalizableError from '../../i18n/LocalizableError';
 import type {
   AdaAddress,
   AdaAddresses,
@@ -54,6 +58,7 @@ import type {
   AdaWallet,
   AdaWallets,
   AdaAssurance,
+  AdaWalletTypeInfo
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -69,6 +74,8 @@ import type {
   RestoreWalletRequest,
   RestoreWalletResponse,
   UpdateWalletResponse,
+  ConnectTrezorRequest,
+  ConnectTrezorResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
@@ -152,6 +159,7 @@ export default class AdaApi {
       const wallets: AdaWallets = wallet
         ? [wallet]
         : [];
+
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
       return wallets.map(data => _createWalletFromServerData(data));
@@ -461,23 +469,71 @@ export default class AdaApi {
     }
   }
 
+  async connectTrezor(
+    request: ConnectTrezorRequest
+  ): Promise<ConnectTrezorResponse> {
+    try {
+      Logger.debug('AdaApi::connectTrezor called');
+      const { walletName, publicMasterKey, deviceFeatures } = request;
+      const assurance = 'CWANormal';
+      const unit = 0;
+
+      const walletInitData = {
+        cwInitMeta: {
+          cwName: walletName,
+          cwAssurance: assurance,
+          cwUnit: unit
+        },
+        cwHardwareInfo: {
+          vendor: deviceFeatures.vendor,
+          model: deviceFeatures.model,
+          deviceId: deviceFeatures.device_id,
+          label: deviceFeatures.label,
+          majorVersion: deviceFeatures.major_version,
+          minorVersion: deviceFeatures.minor_version,
+          patchVersion: deviceFeatures.patch_version,
+          language: deviceFeatures.language,
+          publicMasterKey,
+        },
+      };
+      const wallet: AdaWallet = await connectTrezorAdaWallet({ walletInitData });
+
+      Logger.debug('AdaApi::connectTrezor success');
+      return _createWalletFromServerData(wallet);
+    } catch (error) {
+      Logger.error('AdaApi::connectTrezor error: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
+    }
+  }
 }
+// ========== End of class AdaApi =========
 
 // ========== TRANSFORM SERVER DATA INTO FRONTEND MODELS =========
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
-  (data: AdaWallet) => (
-    new Wallet({
-      id: data.cwId,
-      amount: new BigNumber(data.cwAmount.getCCoin).dividedBy(
+  (adaWallet: AdaWallet) => {
+    const walletObj = {
+      id: adaWallet.cwId,
+      amount: new BigNumber(adaWallet.cwAmount.getCCoin).dividedBy(
         LOVELACES_PER_ADA
       ),
-      name: data.cwMeta.cwName,
-      assurance: data.cwMeta.cwAssurance,
-      passwordUpdateDate: data.cwPassphraseLU
-    })
-  )
+      name: adaWallet.cwMeta.cwName,
+      assurance: adaWallet.cwMeta.cwAssurance,
+      passwordUpdateDate: adaWallet.cwPassphraseLU,
+      type: adaWallet.cwType,
+      hardwareInfo: adaWallet.cwHardwareInfo,
+    };
+
+    return new Wallet(walletObj);
+  }
 );
 
 const _createAddressFromServerData = action(

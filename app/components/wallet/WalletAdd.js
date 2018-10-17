@@ -19,6 +19,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Create a new wallet',
     description: 'Description for the "Create" button on the wallet add dialog.',
   },
+  useTrezorDescription: {
+    id: 'wallet.add.dialog.trezor.description',
+    defaultMessage: '!!!Connect to Trezor',
+    description: 'Description for the "Trezor" button on the wallet add dialog.',
+  },
   restoreDescription: {
     id: 'wallet.add.dialog.restore.description',
     defaultMessage: '!!!Restore wallet from backup',
@@ -28,13 +33,20 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Restore notification message shown during async wallet restore on the wallet add screen.',
+  },
+  trezorConnectNotificationMessage: {
+    id: 'wallet.add.dialog.trezorConnectNotificationMessage',
+    defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
+    description: 'Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
   }
 });
 
 type Props = {
   onCreate: Function,
   onRestore: Function,
+  onTrezor: Function,
   isRestoreActive: boolean,
+  isConnectTrezorActive: boolean,
 };
 
 @observer
@@ -49,7 +61,9 @@ export default class WalletAdd extends Component<Props> {
     const {
       onCreate,
       onRestore,
-      isRestoreActive
+      onTrezor,
+      isRestoreActive,
+      isConnectTrezorActive
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
@@ -57,11 +71,19 @@ export default class WalletAdd extends Component<Props> {
     let activeNotification = null;
     if (isRestoreActive) {
       activeNotification = 'restoreNotificationMessage';
+    } else if (isConnectTrezorActive) {
+      activeNotification = 'trezorConnectNotificationMessage';
     }
 
     return (
       <div className={componentClasses}>
         <div className={styles.buttonsContainer}>
+          <Button
+            className="primary trezorWalletButton"
+            label={intl.formatMessage(messages.useTrezorDescription)}
+            onMouseUp={onTrezor}
+            skin={<SimpleButtonSkin />}
+          />
           <Button
             className="primary createWalletButton"
             label={intl.formatMessage(messages.createDescription)}
