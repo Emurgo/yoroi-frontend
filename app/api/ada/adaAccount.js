@@ -27,3 +27,29 @@ export function createCryptoAccount(
   const result: CryptoAccount = getResultOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
   return Object.assign({}, { account: accountIndex }, result);
 }
+
+export function createHardwareWalletAccount(
+  publicMasterKey: string,
+  accountIndex: number = ACCOUNT_INDEX
+): CryptoAccount {
+  const cryptoAccount = {
+    root_cached_key: publicMasterKey,
+    derivation_scheme: 'V2',
+    account: accountIndex
+  };
+
+  return cryptoAccount;
+}
+
+export function createHardwareWalletAccount(
+  publicMasterKey: string,
+  accountIndex: number = ACCOUNT_INDEX
+): CryptoAccount {
+  const cryptoAccount = {
+    root_cached_key: publicMasterKey,
+    derivation_scheme: 'V2',
+    account: accountIndex
+  };
+
+  return cryptoAccount;
+}

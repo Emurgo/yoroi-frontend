@@ -4,14 +4,16 @@ import moment from 'moment';
 import type {
   AdaWallet,
   AdaAddress,
-  AdaWalletInitData
+  AdaWalletInitData,
+  AdaHardwareWalletInitData
 } from '../../adaTypes';
-
+import { AdaWalletTypeOption } from '../../config/AdaTypesConfig';
 
 /** Convert uesr-inputted data during wallet creation to internal wallet representation */
+/** WEB_WALLET */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
-  return {
+  const adaWebWallet: AdaWallet = {
     cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
@@ -22,8 +24,48 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
       cwName,
       cwUnit
     },
-    cwPassphraseLU: moment().format()
+    cwType: AdaWalletTypeOption.WEB_WALLET,
+    cwPassphraseLU: moment().format(),
   };
+
+  return adaWebWallet;
+}
+
+/** Convert uesr-inputted data during wallet creation to internal wallet representation */
+/** HARDWARE_WALLET */
+export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData): AdaWallet {
+  const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
+  const adaHardwareWallet: AdaWallet = {
+    cwAccountsNumber: 1,
+    cwAmount: {
+      getCCoin: 0
+    },
+    cwId: '1',
+    cwMeta: {
+      cwAssurance,
+      cwName,
+      cwUnit
+    },    
+    cwType: AdaWalletTypeOption.WEB_WALLET,
+    cwPassphraseLU: moment().format(),
+  };
+
+  return adaWebWallet;
+}
+
+// FIXME: try to merge this with function toAdaWallet(), make a generic fuction
+export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData ): AdaWallet {
+  const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
+  const adaHardwareWallet: AdaWallet = {
+    cwAccountsNumber: 1,
+    cwAmount: {
+      getCCoin: 0
+    },
+    cwType: AdaWalletTypeOption.HARDWARE_WALLET,
+    cwHardwareInfo: walletInitData.cwHardwareInfo,
+  };
+
+  return adaHardwareWallet;
 }
 
 export function toAdaAddress(

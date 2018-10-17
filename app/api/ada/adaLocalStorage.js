@@ -29,7 +29,7 @@ export function getSingleCryptoAccount(): CryptoAccount {
  * @param masterKey decrypt to send funds  */
 export function saveAdaWallet(
   adaWallet: AdaWallet,
-  masterKey: string
+  masterKey?: string
 ): void {
   _saveInStorage(storageKeys.WALLET_KEY, { adaWallet, masterKey });
 }

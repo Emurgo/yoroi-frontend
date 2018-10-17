@@ -4,4 +4,7 @@ export default {
     MAX_ALLOWED_UNUSED_ADDRESSES: 20,
     TRANSACTION_REQUEST_SIZE: 20
   },
+  trezor: {
+    DEFAULT_CARDANO_PATH: 'm/44\'/1815\'/0\''
+  }
 };

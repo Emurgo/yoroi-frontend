@@ -1,0 +1,59 @@
+$common-color:#daa49a;
+
+.outer {
+  text-align: center;
+}
+
+.stepBlock {
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 5px;
+  padding-right: 5px; 
+}
+
+.stepTopBar {
+  height: 6px;
+  background-color: $common-color;
+  border-radius: 3px;
+  opacity: 0.3;
+}
+
+.stepTopBarDone {
+  opacity: 1.0;
+}
+
+.stepTopBarActive {
+  opacity: 1.0;
+}
+
+.stepBottomBlock {
+  margin-top: 2px;
+  padding-left: 24px;
+  padding-right: 40px;
+}
+
+.stepStateIconContainer {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+
+.stepTextContainer {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.stepText {
+  color: $common-color;
+  opacity: 0.3;
+  font-size: 13px;
+  font-family: var(--font-light);
+}
+
+.stepTextDone {
+  opacity: 1.0;
+}
+
+.stepTextActive {
+  opacity: 1.0;
+}
