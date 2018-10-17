@@ -4,9 +4,11 @@ import { inject, observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import WalletAdd from '../../components/wallet/WalletAdd';
+import WalletTrezorDialog from '../../components/wallet/WalletTrezorDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
+import WalletTrezorDialogContainer from '../wallet/dialogs/WalletTrezorDialogContainer';
 import WalletRestoreDialogContainer from '../wallet/dialogs/WalletRestoreDialogContainer';
 import WalletCreateDialogContainer from '../wallet/dialogs/WalletCreateDialogContainer';
 import WalletBackupDialogContainer from '../wallet/dialogs/WalletBackupDialogContainer';
@@ -66,12 +68,16 @@ export default class WalletAddPage extends Component<Props> {
       content = <WalletRestoreDialogContainer onClose={this.onClose} />;
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       content = <WalletBackupDialogContainer onClose={this.onClose} />;
+    } else if (uiDialogs.isOpen(WalletTrezorDialog)) {
+      content = <WalletTrezorDialogContainer onClose={this.onClose} />;
     } else {
       content = (
         <WalletAdd
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onTrezor={() => actions.dialogs.open.trigger({ dialog: WalletTrezorDialog })}
           isRestoreActive={isRestoreActive}
+          isTrezorActive={false} // FIX : THIS
         />
       );
     }

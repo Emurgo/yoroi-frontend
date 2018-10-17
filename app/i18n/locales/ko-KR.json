@@ -124,6 +124,7 @@
   "wallet.add.dialog.restore.description": "백업에서 지갑 복원",
   "wallet.add.dialog.restoreNotificationMessage": "현재 지갑을 복원하고 있습니다.  완료될 때까지 새 지갑을 복원하거나 가져올 수 없습니다.",
   "wallet.add.dialog.title.label": "지갑 추가",
+  "wallet.add.dialog.trezor.description": "!!!Connect to Trezor",
   "wallet.add.page.title": "지갑 추가",
   "wallet.amountInput.feesLabel": "+ {amount}의 수수료",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "계속",
@@ -229,5 +230,6 @@
   "wallet.transaction.transactionId": "거래 ID",
   "wallet.transaction.type": "{currency} 거래",
   "wallet.transaction.type.card": "카드 결제",
-  "wallet.transaction.type.exchange": "환율"
+  "wallet.transaction.type.exchange": "환율",
+  "wallet.trezor.dialog.title.label": "!!!Waiting for Trezor"
 }

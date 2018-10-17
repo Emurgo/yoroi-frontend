@@ -124,6 +124,7 @@
   "wallet.add.dialog.restore.description": "从备份恢复钱包",
   "wallet.add.dialog.restoreNotificationMessage": "目前正在修复钱包中。在完成之前，无法恢复或导入新钱包。",
   "wallet.add.dialog.title.label": "添加钱包",
+  "wallet.add.dialog.trezor.description": "!!!Connect to Trezor",
   "wallet.add.page.title": "添加钱包",
   "wallet.amountInput.feesLabel": "+ {amount} 手续费",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "继续",
@@ -229,5 +230,6 @@
   "wallet.transaction.transactionId": "交易 ID",
   "wallet.transaction.type": "{currency} 交易",
   "wallet.transaction.type.card": "卡支付",
-  "wallet.transaction.type.exchange": "交易所"
+  "wallet.transaction.type.exchange": "交易所",
+  "wallet.trezor.dialog.title.label": "!!!Waiting for Trezor"
 }

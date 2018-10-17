@@ -19,6 +19,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Create a new wallet',
     description: 'Description for the "Create" button on the wallet add dialog.',
   },
+  useTrezorDescription: {
+    id: 'wallet.add.dialog.trezor.description',
+    defaultMessage: '!!!Connect to Trezor',
+    description: 'Description for the "Trezor" button on the wallet add dialog.',
+  },
   restoreDescription: {
     id: 'wallet.add.dialog.restore.description',
     defaultMessage: '!!!Restore wallet from backup',
@@ -34,7 +39,9 @@ const messages = defineMessages({
 type Props = {
   onCreate: Function,
   onRestore: Function,
+  onTrezor: Function,
   isRestoreActive: boolean,
+  isTrezorActive: boolean,
 };
 
 @observer
@@ -49,7 +56,9 @@ export default class WalletAdd extends Component<Props> {
     const {
       onCreate,
       onRestore,
-      isRestoreActive
+      onTrezor,
+      isRestoreActive,
+      isTrezorActive
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
@@ -74,7 +83,21 @@ export default class WalletAdd extends Component<Props> {
             onMouseUp={onRestore}
             skin={<SimpleButtonSkin />}
           />
+          <Button
+            className="primary trezorWalletButton"
+            label={intl.formatMessage(messages.useTrezorDescription)}
+            onMouseUp={onTrezor}
+            skin={<SimpleButtonSkin />}
+          />
           {activeNotification ? (
+            <div className={styles.notification}>
+              <FormattedHTMLMessage
+                {...messages[activeNotification]}
+                values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
+              />
+            </div>
+          ) : null}
+          {isTrezorActive ? (
             <div className={styles.notification}>
               <FormattedHTMLMessage
                 {...messages[activeNotification]}

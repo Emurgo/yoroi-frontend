@@ -19,7 +19,15 @@
     "contextMenus",
     "management",
     "tabs",
-    "storage"
+    "storage",
+    "notifications",
+    "*://connect.trezor.io/5/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://connect.trezor.io/5/popup.html"],
+      "js": ["js/trezor-content-script.js"]
+    }
   ],
   "content_security_policy": "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src https://18.207.22.26:8080 wss://18.207.22.26:8080; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
 }

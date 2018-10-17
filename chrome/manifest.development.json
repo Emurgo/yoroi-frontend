@@ -18,8 +18,16 @@
     "contextMenus",
     "management",
     "tabs",
-    "storage"
+    "storage",
+    "notifications",
+    "*://connect.trezor.io/5/*"
   ],
-  "content_security_policy": "default-src 'self' http://localhost:3000 https://localhost:3000; script-src 'self' http://localhost:3000 https://localhost:3000 'unsafe-eval'; connect-src http://localhost:3000 https://localhost:3000 http://localhost:8080 https://localhost:8080 ws://localhost:8080 wss://localhost:8080 wss://iohk-staging.yoroiwallet.com:443 https://iohk-staging.yoroiwallet.com; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;",
+  "content_scripts": [
+    {
+      "matches": ["*://connect.trezor.io/5/popup.html"],
+      "js": ["js/trezor-content-script.js"]
+    }
+  ],
+  "content_security_policy": "default-src 'self' http://localhost:3000 https://localhost:3000 https://connect.trezor.io/5/*; frame-src 'self' https://connect.trezor.io; child-src 'self' https://connect.trezor.io/*; script-src 'self' http://localhost:3000 https://localhost:3000 https://connect.trezor.io/* 'unsafe-eval'; connect-src http://localhost:3000 https://localhost:3000 http://localhost:8080 https://localhost:8080 ws://localhost:8080 wss://localhost:8080 wss://iohk-staging.yoroiwallet.com:443 https://iohk-staging.yoroiwallet.com https://connect.trezor.io; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;",
   "key": "pojejnpjgcacmnpkdiklhlnlbkjechfh"
 }
