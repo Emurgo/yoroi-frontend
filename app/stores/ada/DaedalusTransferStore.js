@@ -91,6 +91,10 @@ export default class DaedalusTransferStore extends Store {
     */
     this.ws.addEventListener('message', async (event: any) => {
       try {
+        // Note: we only expect a single message from our WS so we can close it right away.
+        // Not closing it right away will cause a WS timeout as we don't keep the connection alive.
+        this.ws.close(WS_CODE_NORMAL_CLOSURE);
+
         const data = JSON.parse(event.data);
         Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
@@ -106,8 +110,6 @@ export default class DaedalusTransferStore extends Store {
           });
           runInAction(() => {
             this.transferTx = transferTx;
-            // close to avoid WS timeout after we no longer need it
-            this.ws.close(WS_CODE_NORMAL_CLOSURE);
           });
           this._updateStatus('readyToTransfer');
         }

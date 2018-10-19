@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ConfigWebpackPlugin = require('config-webpack');
+const shell = require('shelljs');
 
 const host = 'localhost';
 const port = 3000;
@@ -51,7 +52,8 @@ const baseDevConfig = () => ({
       __HOST__: `'${host}'`,
       __PORT__: port,
       'process.env': {
-        NODE_ENV: JSON.stringify('development')
+        NODE_ENV: JSON.stringify('development'),
+        COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim())
       }
     })
   ],

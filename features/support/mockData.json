@@ -34,6 +34,20 @@
     }
   },
   "Send transaction": {
+    "walletInitialData": {
+      "empty-wallet": {
+        "addressesStartingWith": "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo",
+        "totalAddresses": 1
+      },
+      "tx-big-input-wallet": {
+        "addressesStartingWith": "EFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxo",
+        "totalAddresses": 1
+      }
+    },
+    "usedAddresses": [
+      "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
+      "Ae2tdPwUPEZFS55qLkW2sApaWnWFdRyEh1MKwqBNnXMH89K9XaaVRH2Mxro"
+    ],
     "utxos": [
       {
         "utxo_id": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f64290",

@@ -4,6 +4,7 @@ import chai from 'chai';
 import moment from 'moment';
 import { getLovefieldTxs, getMockData } from '../support/mockDataBuilder';
 import i18n from '../support/helpers/i18n-helpers';
+import { awaitExpression } from 'babel-types';
 
 function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFromList, txToList,
   txId, expectedTx, txConfirmations) {
@@ -107,6 +108,7 @@ async function (txsNumber) {
       break;
     }
     await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
+    await this.driver.sleep(500);
   }
   const displayedTransactions = await this.driver.findElements(By.xpath(`//div[contains(@class, 'Transaction_component')]`));
   await this.driver.findElement(By.xpath(`//div[contains(@class, 'WalletSummary_numberOfTransactions')]//span`)).getText().then(function(numberOfTransactions){
