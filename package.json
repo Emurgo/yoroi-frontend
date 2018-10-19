@@ -10,6 +10,7 @@
     "compress": "node scripts/compress",
     "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "build-compress:production": "npm run build -- --env 'mainnet' && npm run compress -- --env 'mainnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
+    "build-compress-crx:production": "npm run build -- --env 'mainnet' && npm run compress -- --env 'mainnet' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
     "build-compress:staging": "npm run build -- --env 'staging' && npm run compress -- --env 'staging' --app-id 'yoroi-stag' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-staging-extension.crx' --key ./staging-key.pem",
     "build-compress-crx:staging": "npm run build -- --env 'staging' && npm run compress -- --env 'staging' --app-id 'yoroi-stag' --codebase 'https://yoroiwallet.com/dw/yoroi-staging-extension.crx' --key ./staging-key.pem",
     "compress-keygen": "crx keygen",
