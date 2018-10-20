@@ -7,6 +7,8 @@ import { handleExternalLinkClick } from '../../utils/routing';
 import styles from './SidebarLayout.scss';
 import environment from '../../environment';
 
+import { faqLinkUrlMessage } from '../settings/categories/SupportSettings.js';
+
 type Props = {
   children: any | Node,
   sidebar?: Node,
@@ -20,11 +22,6 @@ export const messages = defineMessages({
     id: 'testnet.label.message',
     defaultMessage: '!!!Warning: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
     description: 'Message alerting users the wallet is not running in mainnet.'
-  },
-  faqLinkUrl: {
-    id: 'settings.support.faq.faqLinkURL',
-    defaultMessage: '!!!https://yoroi-wallet.com/faq/',
-    description: 'URL for the "FAQ on Yoroi website". link in the testnet banner',
   },
 });
 
@@ -49,10 +46,10 @@ export default class SidebarLayout extends Component<Props> {
 
     const faqLink = (
       <a
-        href={intl.formatMessage(messages.faqLinkUrl)}
+        href={intl.formatMessage(faqLinkUrlMessage.faqLinkUrl)}
         onClick={event => handleExternalLinkClick(event)}
       >
-        {intl.formatMessage(messages.faqLinkUrl)}
+        {intl.formatMessage(faqLinkUrlMessage.faqLinkUrl)}
       </a>
     );
 

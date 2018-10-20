@@ -32,7 +32,8 @@ $ npm install
 
 ## Development
 
-* Run script
+1) *if you switched git branches and it may have affected translation files*, you need to [rebuild the translation cache on your machine](app/i18n/README.md)
+2) Run the following
 ```bash
 # build dll dependencies
 $ npm run build-dll
