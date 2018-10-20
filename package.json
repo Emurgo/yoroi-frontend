@@ -81,7 +81,7 @@
     "postcss-loader": "1.2.1",
     "pug-cli": "1.0.0-alpha6",
     "raw-loader": "0.5.1",
-    "react-intl-translations-manager": "4.0.1",
+    "react-intl-translations-manager": "5.0.3",
     "react-test-renderer": "16.4.1",
     "rimraf": "2.4.3",
     "sass-loader": "6.0.7",
