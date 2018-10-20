@@ -7,7 +7,7 @@ import { handleExternalLinkClick } from '../../utils/routing';
 import styles from './SidebarLayout.scss';
 import environment from '../../environment';
 
-import { faqLinkUrlMessage } from '../settings/categories/SupportSettings.js';
+import { faqLinkUrlMessage } from '../settings/categories/SupportSettings';
 
 type Props = {
   children: any | Node,
