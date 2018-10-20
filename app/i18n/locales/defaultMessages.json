@@ -300,13 +300,13 @@
         "description": "\"The signature is invalid.\" error message",
         "end": {
           "column": 3,
-          "line": 119
+          "line": 114
         },
         "file": "app/api/ada/errors.js",
         "id": "api.errors.invalidWitnessError",
         "start": {
           "column": 23,
-          "line": 115
+          "line": 110
         }
       }
     ],
@@ -909,27 +909,13 @@
         "description": "Message alerting users the wallet is not running in mainnet.",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 25
         },
         "file": "app/components/layout/SidebarLayout.js",
         "id": "testnet.label.message",
         "start": {
           "column": 16,
-          "line": 19
-        }
-      },
-      {
-        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
-        "description": "URL for the \"FAQ on Yoroi website\". link in the testnet banner",
-        "end": {
-          "column": 3,
-          "line": 28
-        },
-        "file": "app/components/layout/SidebarLayout.js",
-        "id": "settings.support.faq.faqLinkURL",
-        "start": {
-          "column": 14,
-          "line": 24
+          "line": 21
         }
       }
     ],
@@ -1037,17 +1023,31 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!Frequently asked questions",
-        "description": "Title \"Frequently asked questions\" on the support settings page.",
+        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
+        "description": "URL for the \"FAQ on Yoroi website\"",
         "end": {
           "column": 3,
           "line": 12
         },
         "file": "app/components/settings/categories/SupportSettings.js",
+        "id": "settings.support.faq.faqLinkURL",
+        "start": {
+          "column": 14,
+          "line": 8
+        }
+      },
+      {
+        "defaultMessage": "!!!Frequently asked questions",
+        "description": "Title \"Frequently asked questions\" on the support settings page.",
+        "end": {
+          "column": 3,
+          "line": 20
+        },
+        "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.faq.title",
         "start": {
           "column": 12,
-          "line": 8
+          "line": 16
         }
       },
       {
@@ -1055,41 +1055,27 @@
         "description": "Content for the \"Frequently asked questions\" section on the support settings page.",
         "end": {
           "column": 3,
-          "line": 17
+          "line": 25
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.faq.content",
         "start": {
           "column": 14,
-          "line": 13
+          "line": 21
         }
       },
       {
-        "defaultMessage": "!!!FAQ on Daedalus website",
-        "description": "\"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
+        "defaultMessage": "!!!FAQ on Yoroi website",
+        "description": "\"FAQ on Yoroi website\" link in the FAQ section on the support settings page",
         "end": {
           "column": 3,
-          "line": 22
+          "line": 30
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.faq.faqLink",
         "start": {
           "column": 11,
-          "line": 18
-        }
-      },
-      {
-        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
-        "description": "URL for the \"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
-        "end": {
-          "column": 3,
-          "line": 27
-        },
-        "file": "app/components/settings/categories/SupportSettings.js",
-        "id": "settings.support.faq.faqLinkURL",
-        "start": {
-          "column": 14,
-          "line": 23
+          "line": 26
         }
       },
       {
@@ -1097,13 +1083,13 @@
         "description": "Title \"Reporting a problem\" on the support settings page.",
         "end": {
           "column": 3,
-          "line": 32
+          "line": 35
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.reportProblem.title",
         "start": {
           "column": 22,
-          "line": 28
+          "line": 31
         }
       },
       {
@@ -1111,13 +1097,13 @@
         "description": "Content for the \"Reporting a problem\" section on the support settings page.",
         "end": {
           "column": 3,
-          "line": 37
+          "line": 40
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.reportProblem.content",
         "start": {
           "column": 24,
-          "line": 33
+          "line": 36
         }
       },
       {
@@ -1125,13 +1111,13 @@
         "description": "\"Support request\" link in the \"Report a problem\" section on the support settings page.",
         "end": {
           "column": 3,
-          "line": 42
+          "line": 45
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.reportProblem.link",
         "start": {
           "column": 22,
-          "line": 38
+          "line": 41
         }
       },
       {
@@ -1139,13 +1125,13 @@
         "description": "URL for the \"Support Request\" link in the Support section on the support settings page",
         "end": {
           "column": 3,
-          "line": 47
+          "line": 50
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.faq.supportRequestLinkURL",
         "start": {
           "column": 25,
-          "line": 43
+          "line": 46
         }
       },
       {
@@ -1153,13 +1139,13 @@
         "description": "Title \"Logs\" on the support settings page.",
         "end": {
           "column": 3,
-          "line": 52
+          "line": 55
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.logs.title",
         "start": {
           "column": 13,
-          "line": 48
+          "line": 51
         }
       },
       {
@@ -1167,13 +1153,13 @@
         "description": "Content for the \"Logs\" section on the support settings page.",
         "end": {
           "column": 3,
-          "line": 57
+          "line": 60
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.logs.content",
         "start": {
           "column": 15,
-          "line": 53
+          "line": 56
         }
       },
       {
@@ -1181,13 +1167,13 @@
         "description": "\"download them here\" link in the Logs section on the support settings page",
         "end": {
           "column": 3,
-          "line": 62
+          "line": 65
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.logs.downloadLogsLink",
         "start": {
           "column": 20,
-          "line": 58
+          "line": 61
         }
       }
     ],
@@ -3398,13 +3384,13 @@
         "description": "\"Unable to transfer funds.\" error message",
         "end": {
           "column": 3,
-          "line": 198
+          "line": 200
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.transferFundsError",
         "start": {
           "column": 22,
-          "line": 194
+          "line": 196
         }
       },
       {
@@ -3412,13 +3398,13 @@
         "description": "\"There is no transfer transaction to send.\" error message",
         "end": {
           "column": 3,
-          "line": 203
+          "line": 205
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.noTransferTxError",
         "start": {
           "column": 21,
-          "line": 199
+          "line": 201
         }
       },
       {
@@ -3426,13 +3412,13 @@
         "description": "Any reason why the websocket transferring could failed",
         "end": {
           "column": 3,
-          "line": 208
+          "line": 210
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.webSocketRestoreError",
         "start": {
           "column": 25,
-          "line": 204
+          "line": 206
         }
       }
     ],
