@@ -15,8 +15,6 @@
     "page": "background.html"
   },
   "permissions": [
-    "contextMenus",
-    "management",
     "tabs",
     "storage"
   ],
