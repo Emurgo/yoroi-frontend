@@ -31,7 +31,6 @@ When(/^I accept the creation terms$/, async function () {
 });
 
 When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
-  // Get the displayed mnemonic
   const mnemonicElement = await this.waitElementTextMatches(
     /^.*$/,
     '.WalletRecoveryPhraseMnemonic_component'
@@ -39,12 +38,10 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 
   const mnemonic = await mnemonicElement.getText();
   await this.click('.WalletRecoveryPhraseDisplayDialog .primary');
-
-  // Enter the saved mnemonic
   const recoveryPhrase = mnemonic.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.click(`//button[contains(text(), '${word}')]`, By.xpath);
+    await this.click(`(//button[contains(@class, 'MnemonicWord_active') and @label = '${word}'])[1]`, By.xpath);
   }
   const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
   checkboxes.forEach((box) => box.click());
@@ -59,11 +56,11 @@ When(/^I enter random mnemonic phrase$/, async function () {
   const words = await this.driver.findElement(By.xpath("//div[@class='WalletRecoveryPhraseMnemonic_component']"));
   words.getText().then(function (text) {
     expect(text).to.not.equal("");
- });
+  });
 });
 
 Then(/^I click Clear button$/, async function () {
-  await this.click(`//button[contains(text(), 'Clear')]`, By.xpath);
+  await this.click("//button[contains(text(), 'Clear')]", By.xpath);
 });
 
 Then(/^I see All selected words are cleared$/, async function () {

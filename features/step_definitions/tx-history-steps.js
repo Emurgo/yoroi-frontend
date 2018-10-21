@@ -1,9 +1,10 @@
 import { Then, When, Given } from 'cucumber';
-import { By, until } from 'selenium-webdriver';
+import { By } from 'selenium-webdriver';
 import chai from 'chai';
 import moment from 'moment';
 import { getLovefieldTxs, getMockData } from '../support/mockDataBuilder';
 import i18n from '../support/helpers/i18n-helpers';
+import { awaitExpression } from 'babel-types';
 
 function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFromList, txToList,
   txId, expectedTx, txConfirmations) {
@@ -69,10 +70,11 @@ async function (txsNumber, txExpectedStatus, walletName) {
   const txsAmount = parseInt(txsNumber, 10);
   for (let i = 1; i < txsAmount; i++) {
     const webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
-    if(webElements.length==0)
+    if (webElements.length === 0) {
       break;
+    }
     await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
-}
+  }
   const expectedTxsList = getLovefieldTxs(walletName);
   /* FIXME: Currently these code needs to wait for something before check that each field is correct
      It would be better to wait until each element exist with the correct information.
@@ -95,4 +97,21 @@ async function (txsNumber, txExpectedStatus, walletName) {
     verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom],
         [txTo], txId, expectedTxsList[i], txConfirmations);
   }
+});
+
+Then(/^I should see ([^"]*) transactions in complex-wallet on main screen$/,
+async function (txsNumber) {
+  const txsAmount = parseInt(txsNumber, 10);
+  for (let i = 1; i < txsAmount; i++) {
+    const webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
+    if (webElements.length === 0) {
+      break;
+    }
+    await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
+    await this.driver.sleep(500);
+  }
+  const displayedTransactions = await this.driver.findElements(By.xpath(`//div[contains(@class, 'Transaction_component')]`));
+  await this.driver.findElement(By.xpath(`//div[contains(@class, 'WalletSummary_numberOfTransactions')]//span`)).getText().then(function(numberOfTransactions){
+    chai.expect(parseInt(numberOfTransactions)).to.equal(displayedTransactions.length);
+  });
 });

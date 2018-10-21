@@ -54,7 +54,6 @@ Feature: Wallet creation
     And I clear the created wallet password Secret_123
     And I click the "Create personal wallet" button
     Then I should stay in the create wallet dialog
-    #
 
   @it-27
    Scenario: Users will be presented with a security warning prior to seed creation (IT-27)

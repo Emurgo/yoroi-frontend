@@ -23,7 +23,7 @@ export const messages = defineMessages({
   },
   faqLinkUrl: {
     id: 'settings.support.faq.faqLinkURL',
-    defaultMessage: '!!!https://daedaluswallet.io/faq/',
+    defaultMessage: '!!!https://yoroi-wallet.com/faq/',
     description: 'URL for the "FAQ on Yoroi website". link in the testnet banner',
   },
 });
