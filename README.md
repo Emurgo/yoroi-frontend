@@ -63,6 +63,14 @@ $ npm run start -- --env "development"
  - Write code with ES2015+ syntax (Using [Babel](https://github.com/babel/babel))
  - E2E tests of Window & Popup & Inject pages (Using [Chrome Driver](https://www.npmjs.com/package/chromedriver), [Selenium Webdriver](https://www.npmjs.com/package/selenium-webdriver))
 
+ ### Dev Setup
+
+ We recommend running Visual Studio Code on Ubuntu
+ 
+ Download the [Flow plugin](https://marketplace.visualstudio.com/items?itemName=flowtype.flow-for-vscode) for VS Code and change the following workspace settings:
+ 1) `javascript.validate.enable` to `false`
+ 1) `flow.useNPMPackagedFlow` to `true`
+
 
 ## Build
 
