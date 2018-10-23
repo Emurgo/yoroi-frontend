@@ -86,7 +86,7 @@ export default class WalletReceive extends Component<Props, State> {
     this.setState({ showUsed: !this.state.showUsed });
   };
 
-  submit() {
+  submit = () => {
     this.props.onGenerateAddress();
   }
 
@@ -122,7 +122,7 @@ export default class WalletReceive extends Component<Props, State> {
         <Button
           className={generateAddressButtonClasses}
           label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
-          onMouseUp={this.submit.bind(this)}
+          onMouseUp={this.submit}
           skin={<SimpleButtonSkin />}
         />
       </div>
