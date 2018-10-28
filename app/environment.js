@@ -19,7 +19,6 @@ const environment = Object.assign({
   isTest: () => environment.current === environment.TEST,
   isMainnet: () => environment.NETWORK === environment.MAINNET,
   isAdaApi: () => environment.API === 'ada',
-  isEtcApi: () => environment.API === 'etc',
   build: process.env.DAEDALUS_VERSION || 'dev',
   platform: os.platform(),
   walletRefreshInterval: CONFIG.app.walletRefreshInterval,
