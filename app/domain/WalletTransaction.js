@@ -4,16 +4,20 @@ import BigNumber from 'bignumber.js';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
 
-export type TransactionState = 'pending' | 'failed' | 'ok';
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
-export type TransactionType = 'card' | 'expend' | 'income' | 'exchange';
 
+export type TransactionState = 'pending' | 'failed' | 'ok';
 export const transactionStates: {
-  PENDING: TransactionState, FAILED: TransactionState, OK: TransactionState,
+  PENDING: TransactionState, 
+  FAILED: TransactionState, 
+  OK: TransactionState,
 } = {
-  PENDING: 'pending', FAILED: 'failed', OK: 'ok',
+  PENDING: 'pending', 
+  FAILED: 'failed', 
+  OK: 'ok',
 };
 
+export type TransactionType = 'card' | 'expend' | 'income' | 'exchange';
 export const transactionTypes: {
   CARD: TransactionType,
   EXPEND: TransactionType,
@@ -55,7 +59,8 @@ export default class WalletTransaction {
   getAssuranceLevelForMode(mode: AssuranceMode): AssuranceLevel {
     if (this.numberOfConfirmations < mode.low) {
       return assuranceLevels.LOW;
-    } else if (this.numberOfConfirmations < mode.medium) {
+    } 
+    if (this.numberOfConfirmations < mode.medium) {
       return assuranceLevels.MEDIUM;
     }
     return assuranceLevels.HIGH;
