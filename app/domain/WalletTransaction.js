@@ -7,6 +7,8 @@ import { assuranceLevels } from '../config/transactionAssuranceConfig';
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
 
 export type TransactionState = 'pending' | 'failed' | 'ok';
+export type TransactionType = 'card' | 'expend' | 'income' | 'exchange';
+
 export const transactionStates: {
   PENDING: TransactionState, 
   FAILED: TransactionState, 
@@ -17,7 +19,6 @@ export const transactionStates: {
   OK: 'ok',
 };
 
-export type TransactionType = 'card' | 'expend' | 'income' | 'exchange';
 export const transactionTypes: {
   CARD: TransactionType,
   EXPEND: TransactionType,
@@ -59,8 +60,7 @@ export default class WalletTransaction {
   getAssuranceLevelForMode(mode: AssuranceMode): AssuranceLevel {
     if (this.numberOfConfirmations < mode.low) {
       return assuranceLevels.LOW;
-    } 
-    if (this.numberOfConfirmations < mode.medium) {
+    } else if (this.numberOfConfirmations < mode.medium) {
       return assuranceLevels.MEDIUM;
     }
     return assuranceLevels.HIGH;
