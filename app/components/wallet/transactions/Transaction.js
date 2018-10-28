@@ -171,7 +171,6 @@ export default class Transaction extends Component<Props, State> {
 
     const status = intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
-    // const symbol = environment.isAdaApi() ? adaSymbol : 'etcSymbol';
     const symbol = adaSymbol;
 
     return (
@@ -211,6 +210,7 @@ export default class Transaction extends Component<Props, State> {
         {/* ==== Toggleable Transaction Details ==== */}
         <div className={contentStyles}>
           <div className={detailsStyles}>
+            { /* converting assets is not implemented but we may use it in the future for tokens */}
             {data.exchange && data.conversionRate && (
               <div className={styles.conversion}>
                 <div>
@@ -225,17 +225,13 @@ export default class Transaction extends Component<Props, State> {
             )}
             <div>
               <h2>
-                {intl.formatMessage(messages[
-                  environment.isEtcApi() ? 'fromAddress' : 'fromAddresses'
-                ])}
+                {intl.formatMessage(messages.fromAddresses)}
               </h2>
               {uniq(data.addresses.from).map((address, addressIndex) => (
                 <span key={`${data.id}-from-${address}-${addressIndex}`} className={styles.address}>{address}</span>
               ))}
               <h2>
-                {intl.formatMessage(messages[
-                  environment.isEtcApi() ? 'toAddress' : 'toAddresses'
-                ])}
+                {intl.formatMessage(messages.toAddresses)}
               </h2>
               {data.addresses.to.map((address, addressIndex) => (
                 <span key={`${data.id}-to-${address}-${addressIndex}`} className={styles.address}>{address}</span>
@@ -253,27 +249,9 @@ export default class Transaction extends Component<Props, State> {
                 </div>
               ) : null}
 
-              {environment.isEtcApi() ? (
-                <div className={styles.row}>
-                  <h2>{intl.formatMessage(messages.transactionAmount)}</h2>
-                  <span>
-                    {
-                      // show currency and use long format (e.g. in ETC show all decimal places)
-                      formattedWalletAmount(data.amount, true, true)
-                    }
-                  </span>
-                </div>
-              ) : null}
-
               <h2>{intl.formatMessage(messages.transactionId)}</h2>
               <span>{data.id}</span>
             </div>
-            {/*
-            <div>
-              <h2>Description</h2>
-              <span>{data.description !== '' ? data.description : 'No description yet'}</span>
-            </div>
-            */}
           </div>
         </div>
 

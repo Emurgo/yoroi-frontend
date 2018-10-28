@@ -971,20 +971,6 @@
         }
       },
       {
-        "defaultMessage": "!!!I understand that the terms of use are only available in English and agree to the terms of use",
-        "description": "Label for the \"I agree with terms of use\" checkbox when terms of use are not translated.",
-        "end": {
-          "column": 3,
-          "line": 25
-        },
-        "file": "app/components/profile/terms-of-use/TermsOfUseForm.js",
-        "id": "profile.termsOfUse.checkboxLabelWithDisclaimer",
-        "start": {
-          "column": 31,
-          "line": 21
-        }
-      },
-      {
         "defaultMessage": "!!!Continue",
         "description": "Label for the \"Terms of use\" form submit button.",
         "end": {
@@ -3311,48 +3297,6 @@
         "start": {
           "column": 16,
           "line": 113
-        }
-      },
-      {
-        "defaultMessage": "!!!Etc",
-        "description": "Name for \"Etc\" unit.",
-        "end": {
-          "column": 5,
-          "line": 124
-        },
-        "file": "app/i18n/global-messages.js",
-        "id": "environment.currency.etc",
-        "start": {
-          "column": 14,
-          "line": 120
-        }
-      },
-      {
-        "defaultMessage": "!!!Mantis",
-        "description": "Name for \"Mantis\" client.",
-        "end": {
-          "column": 5,
-          "line": 129
-        },
-        "file": "app/i18n/global-messages.js",
-        "id": "environment.apiName.mantis",
-        "start": {
-          "column": 13,
-          "line": 125
-        }
-      },
-      {
-        "defaultMessage": "!!!1.0 rc1",
-        "description": "Version of \"Mantis\" client.",
-        "end": {
-          "column": 5,
-          "line": 134
-        },
-        "file": "app/i18n/global-messages.js",
-        "id": "environment.apiVersion.mantis",
-        "start": {
-          "column": 16,
-          "line": 130
         }
       }
     ],
