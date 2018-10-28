@@ -1,5 +1,9 @@
 import { defineMessages } from 'react-intl';
 
+// Some messages need to be used in multiple components
+// In order to avoid componenets depending on each other just to resuse translation messages
+// We instead store the shared messages in this file 
+
 export default defineMessages({
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
@@ -96,6 +100,11 @@ export default defineMessages({
     defaultMessage: '!!!Recovery phrase',
     description: 'Title for the "Recovery Phrase" dialog.'
   },
+  faqLinkUrl: {
+    id: 'settings.support.faq.faqLinkURL',
+    defaultMessage: '!!!https://yoroi-wallet.com/faq/',
+    description: 'URL for the "FAQ on Yoroi website"',
+  }
 });
 
 export const environmentSpecificMessages = {
@@ -114,23 +123,6 @@ export const environmentSpecificMessages = {
       id: 'environment.apiVersion.cardano',
       defaultMessage: '!!!1.0.4',
       description: 'Version of "Cardano" client.'
-    },
-  }),
-  etc: defineMessages({
-    currency: {
-      id: 'environment.currency.etc',
-      defaultMessage: '!!!Etc',
-      description: 'Name for "Etc" unit.'
-    },
-    apiName: {
-      id: 'environment.apiName.mantis',
-      defaultMessage: '!!!Mantis',
-      description: 'Name for "Mantis" client.'
-    },
-    apiVersion: {
-      id: 'environment.apiVersion.mantis',
-      defaultMessage: '!!!1.0 rc1',
-      description: 'Version of "Mantis" client.'
     },
   }),
 };

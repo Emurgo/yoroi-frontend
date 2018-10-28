@@ -2,15 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
 import styles from './SupportSettings.scss';
-
-export const faqLinkUrlMessage = defineMessages({
-  faqLinkUrl: {
-    id: 'settings.support.faq.faqLinkURL',
-    defaultMessage: '!!!https://yoroi-wallet.com/faq/',
-    description: 'URL for the "FAQ on Yoroi website"',
-  }
-});
 
 const messages = defineMessages({
   faqTitle: {
@@ -83,7 +76,7 @@ export default class SupportSettings extends Component<Props> {
 
     const faqLink = (
       <a
-        href={intl.formatMessage(faqLinkUrlMessage.faqLinkUrl)}
+        href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
         {intl.formatMessage(messages.faqLink)}

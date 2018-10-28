@@ -3,11 +3,10 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
+import globalMessages from '../../i18n/global-messages';
 import { handleExternalLinkClick } from '../../utils/routing';
 import styles from './SidebarLayout.scss';
 import environment from '../../environment';
-
-import { faqLinkUrlMessage } from '../settings/categories/SupportSettings';
 
 type Props = {
   children: any | Node,
@@ -46,10 +45,10 @@ export default class SidebarLayout extends Component<Props> {
 
     const faqLink = (
       <a
-        href={intl.formatMessage(faqLinkUrlMessage.faqLinkUrl)}
+        href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => handleExternalLinkClick(event)}
       >
-        {intl.formatMessage(faqLinkUrlMessage.faqLinkUrl)}
+        {intl.formatMessage(globalMessages.faqLinkUrl)}
       </a>
     );
 

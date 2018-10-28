@@ -1,3 +1,5 @@
+# Rebuilding language cache
+
 After making changes that affect the languages files, please do the following **AFTER** backing up your work (these actions may edit your files in a way you would like to reverse).
 
 1) `npm run purge-translations` (delete translation cache)
