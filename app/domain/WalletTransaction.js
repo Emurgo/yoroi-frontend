@@ -5,7 +5,6 @@ import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranc
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
 
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
-
 export type TransactionState = 'pending' | 'failed' | 'ok';
 export type TransactionType = 'card' | 'expend' | 'income' | 'exchange';
 
