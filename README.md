@@ -19,7 +19,7 @@ $ git submodule update --init --recursive
 ### Install rustup
 ```bash
 $ curl https://sh.rustup.rs -sSf | sh
-$ rustup install nightly-2018-06-05
+$ rustup install nightly-2018-10-30
 $ rustup target add wasm32-unknown-unknown --toolchain nightly-2018-06-05
 ```
 
