@@ -30,6 +30,9 @@ import {
   restoreAdaWallet
 } from './restoreAdaWallet';
 import {
+  connectTrezorAdaWallet
+} from './hardware-backed-wallet/connectTrezorAdaWallet';
+import {
   getAdaTxsHistoryByWallet,
   getAdaTxLastUpdatedDate,
   refreshTxs,
@@ -56,6 +59,7 @@ import type {
   AdaWallets,
   AdaAssurance,
   AdaWalletInitData,
+  AdaWalletTypeInfo
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -66,10 +70,12 @@ import type {
   GetWalletsResponse,
   RestoreWalletRequest,
   RestoreWalletResponse,
+  ConnectTrezorRequest,
+  ConnectTrezorResponse
 } from '../common';
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
-import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
+import { getSingleCryptoAccount, getAdaWallet, getWalletTypeInfo, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
 
 // ADA specific Request / Response params
@@ -157,11 +163,12 @@ export default class AdaApi {
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
     try {
-      const wallet = await getAdaWallet();
-      const wallets: AdaWallets = wallet ? [wallet] : [];
+      const adaWallet = await getAdaWallet();
+      const adaWalletTypeInfo = await getWalletTypeInfo();
+      const wallets: AdaWallets = adaWallet ? [{ adaWallet, adaWalletTypeInfo }] : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets.map(data => _createWalletFromServerData(data));
+      return wallets.map(data => _createWalletFromServerData(data.adaWallet, data.adaWalletTypeInfo));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -462,22 +469,83 @@ export default class AdaApi {
     }
   }
 
+  async connectTrezor(
+    request: ConnectTrezorRequest
+  ): Promise<ConnectTrezorResponse> {
+    Logger.debug('AdaApi::connectTrezor called');
+    const { walletName, publicKey, deviceFeatures } = request;
+    const assurance = 'CWANormal';
+    const unit = 0;
+
+    const walletInitData = {
+      cwInitMeta: {
+        cwName: walletName,
+        cwAssurance: assurance,
+        cwUnit: unit
+      },
+      cwBackupPhrase: {
+        bpToList: '' // array of mnemonic words
+      }
+    };
+
+    const walletTypeInfo = {
+      type: 'CWTHarwareBacked',
+      vendorInfo : {
+        vendor : deviceFeatures.vendor,
+        model: deviceFeatures.model,
+        deviceId: deviceFeatures.device_id,
+        lable: deviceFeatures.label,
+        majorVersion: deviceFeatures.major_version,
+        minorVersion: deviceFeatures.minor_version,
+        patchVersion: deviceFeatures.patch_version,
+        language: deviceFeatures.language
+      }
+    };
+
+    try {
+      const wallet: AdaWallet = await connectTrezorAdaWallet({publicKey , walletInitData, walletTypeInfo});
+      Logger.debug('AdaApi::connectTrezor success');
+      return _createWalletFromServerData(wallet);
+    } catch (error) {
+      Logger.error('AdaApi::connectTrezor error: ' + stringifyError(error));
+      // TODO: backend will return something different here, if multiple wallets
+      // are restored from the key and if there are duplicate wallets we will get
+      // some kind of error and present the user with message that some wallets
+      // where not imported/restored if some where. if no wallets are imported
+      // we will error out completely with throw block below
+      if (error.message.includes('Wallet with that mnemonics already exists')) {
+        throw new WalletAlreadyRestoredError();
+      }
+      // We don't know what the problem was -> throw generic error
+      throw new GenericApiError();
+    }
+  }
+
 }
+// ========== End of class AdaApi =========
 
 // ========== TRANSFORM SERVER DATA INTO FRONTEND MODELS =========
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
-  (data: AdaWallet) =>
-    new Wallet({
-      id: data.cwId,
-      amount: new BigNumber(data.cwAmount.getCCoin).dividedBy(
+  (adaWallet: AdaWallet, adaWalletTypeInfo: ?AdaWalletTypeInfo) => {
+    const walletObj = {
+      id: adaWallet.cwId,
+      amount: new BigNumber(adaWallet.cwAmount.getCCoin).dividedBy(
         LOVELACES_PER_ADA
       ),
-      name: data.cwMeta.cwName,
-      assurance: data.cwMeta.cwAssurance,
-      passwordUpdateDate: data.cwPassphraseLU
-    })
+      name: adaWallet.cwMeta.cwName,
+      assurance: adaWallet.cwMeta.cwAssurance,
+      passwordUpdateDate: adaWallet.cwPassphraseLU
+    };
+
+    // FIXME : do proper conversion 
+    // if(adaWalletTypeInfo) {
+    //   walletObj.typeInfo = adaWalletTypeInfo;
+    // }
+
+    return new Wallet(walletObj);
+  }
 );
 
 const _createAddressFromServerData = action(

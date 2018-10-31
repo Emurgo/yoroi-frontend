@@ -31,6 +31,7 @@ export default class WalletsStore extends Store {
   @observable restoreRequest: Request<any>;
   @observable isImportActive: boolean = false;
   @observable isRestoreActive: boolean = false;
+  @observable isConnectTrezorActive: boolean = false;
 
   _newWalletDetails: { name: string, mnemonic: string, password: ?string } = {
     name: '',

@@ -9,8 +9,12 @@ import { ROUTES } from '../../routes-config';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type { ImportWalletFromFileResponse } from '../../api/ada/index';
 import type {
-  CreateTransactionResponse, CreateWalletResponse, DeleteWalletResponse,
-  GetWalletsResponse, RestoreWalletResponse,
+  CreateTransactionResponse,
+  CreateWalletResponse, 
+  DeleteWalletResponse,
+  GetWalletsResponse,
+  RestoreWalletResponse,
+  ConnectTrezorResponse,
   GetWalletRecoveryPhraseResponse,
 } from '../../api/common';
 
@@ -38,6 +42,9 @@ export default class AdaWalletsStore extends WalletStore {
   @observable restoreRequest:
     Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
 
+  @observable connectTrezorRequest:
+    Request<ConnectTrezorResponse> = new Request(this.api.ada.connectTrezor);    
+
   setup() {
     super.setup();
     const { router, walletBackup, ada } = this.actions;
@@ -46,6 +53,7 @@ export default class AdaWalletsStore extends WalletStore {
     wallets.deleteWallet.listen(this._delete);
     wallets.sendMoney.listen(this._sendMoney);
     wallets.restoreWallet.listen(this._restoreWallet);
+    wallets.connectTrezor.listen(this._connectTrezor);
     wallets.importWalletFromFile.listen(this._importWalletFromFile);
     wallets.updateBalance.listen(this._updateBalance);
     router.goToRoute.listen(this._onRouteChange);
@@ -134,6 +142,36 @@ export default class AdaWalletsStore extends WalletStore {
     if (!restoredWallet) throw new Error('Restored wallet was not received correctly');
     this.restoreRequest.reset();
     await this._patchWalletRequestWithNewWallet(restoredWallet);
+    this.refreshWalletsData();
+  };
+
+  @action _setIsConnectTrezorActive = (active: boolean) => {
+    this.isConnectTrezorActive = active;
+  };  
+
+  @action _connectTrezor = async (params: {
+    publicKey: string,
+    walletName: string,
+    deviceFeatures: any,
+  }) => {
+    this.connectTrezorRequest.reset();
+    this._setIsConnectTrezorActive(true);
+    // Hide connnet trezor dialog some time after restore has been started
+    // FIXME: give better name for _toggleAddWalletDialogOnActiveRestoreOrImport()    
+    // ...or keep it open in case it has errored out (so that error message can be shown)
+    setTimeout(() => {
+      if (!this.connectTrezorRequest.isExecuting) this._setIsConnectTrezorActive(false);
+      if (!this.connectTrezorRequest.isError) this._toggleAddWalletDialogOnActiveRestoreOrImport();
+    }, this.WAIT_FOR_SERVER_ERROR_TIME);
+
+    const connectedWallet = await this.connectTrezorRequest.execute(params).promise;
+    setTimeout(() => {
+      this._setIsConnectTrezorActive(false);
+      this.actions.dialogs.closeActiveDialog.trigger();
+    }, this.MIN_NOTIFICATION_TIME);
+    if (!connectedWallet) throw new Error('Connected Trezor wallet was not received correctly');
+    this.connectTrezorRequest.reset();
+    await this._patchWalletRequestWithNewWallet(connectedWallet);
     this.refreshWalletsData();
   };
 

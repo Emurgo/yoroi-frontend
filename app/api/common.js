@@ -82,6 +82,7 @@ export type GetLocalTimeDifferenceResponse = number;
 export type GetWalletsResponse = Array<Wallet>;
 export type GetWalletRecoveryPhraseResponse = Array<string>;
 export type RestoreWalletResponse = Wallet;
+export type ConnectTrezorResponse = Wallet;
 export type UpdateWalletResponse = Wallet;
 export type UpdateWalletPasswordResponse = boolean;
 
@@ -105,6 +106,12 @@ export type RestoreWalletRequest = {
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
+};
+
+export type ConnectTrezorRequest = {
+  publicKey: string,
+  walletName: string,
+  deviceFeatures: any // FIXME : use appropriate type not "any"
 };
 
 export type GetSyncProgressResponse = {

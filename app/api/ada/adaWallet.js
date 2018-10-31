@@ -20,6 +20,7 @@ import {
 import { newCryptoAccount } from './adaAccount';
 import type {
   AdaWallet,
+  AdaHardwareWalletParams,
   UpdateAdaWalletParams,
 } from './adaTypes';
 import type {
@@ -31,7 +32,7 @@ import {
   getUTXOsSumsForAddresses
 } from './lib/yoroi-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
-import { saveAdaWallet, getAdaWallet, getWalletMasterKey } from './adaLocalStorage';
+import { saveAdaWallet, getAdaWallet, getWalletMasterKey, getWalletTypeInfo } from './adaLocalStorage';
 import type { ConfigType } from '../../../config/config-types';
 
 declare var CONFIG : ConfigType;
@@ -56,7 +57,7 @@ export const updateAdaWallet = async (
   if (!persistentWallet) return Promise.resolve();
   try {
     const updatedWallet = Object.assign({}, persistentWallet, { cwMeta: walletMeta });
-    _saveAdaWalletKeepingMasterKey(updatedWallet);
+    _saveAdaWalletKeepingMasterKeyAndWalletTypeInfo(updatedWallet);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
@@ -76,7 +77,7 @@ export const updateAdaWalletBalance = async (): Promise<?BigNumber> => {
         getCCoin: await getBalance(addresses)
       }
     });
-    _saveAdaWalletKeepingMasterKey(updatedWallet);
+    _saveAdaWalletKeepingMasterKeyAndWalletTypeInfo(updatedWallet);
     return updatedWallet.cwAmount.getCCoin;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWalletBalance error: ' + stringifyError(error));
@@ -92,6 +93,15 @@ export function createAdaWallet({
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const masterKey = generateWalletMasterKey(mnemonic, walletPassword);
   return [adaWallet, masterKey];
+}
+
+export function createAdaHardwarBackedeWallet({
+  publicKey,
+  walletInitData,
+  walletTypeInfo
+}: AdaHardwareWalletParams) {
+  const adaWallet = toAdaWallet(walletInitData);
+  return [adaWallet, publicKey];
 }
 
 export const isValidMnemonic = (phrase: string, numberOfWords: ?number) =>
@@ -125,11 +135,13 @@ export const changeAdaWalletPassphrase = (
   const updatedWalletMasterKey =
     updateWalletMasterKeyPassword(walletMasterKey, oldPassword, newPassword);
   const updatedWallet = Object.assign({}, getAdaWallet(), { cwPassphraseLU: moment().format() });
-  saveAdaWallet(updatedWallet, updatedWalletMasterKey);
+  const walletTypeInfo = getWalletTypeInfo();
+  saveAdaWallet(updatedWallet, updatedWalletMasterKey, walletTypeInfo);
   return Promise.resolve(updatedWallet);
 };
 
-function _saveAdaWalletKeepingMasterKey(adaWallet: AdaWallet): void {
+function _saveAdaWalletKeepingMasterKeyAndWalletTypeInfo(adaWallet: AdaWallet): void {
   const masterKey = getWalletMasterKey();
-  saveAdaWallet(adaWallet, masterKey);
+  const walletTypeInfo = getWalletTypeInfo();
+  saveAdaWallet(adaWallet, masterKey, walletTypeInfo);
 }

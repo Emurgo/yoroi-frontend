@@ -124,7 +124,7 @@
   "wallet.add.dialog.restore.description": "Restore wallet from backup",
   "wallet.add.dialog.restoreNotificationMessage": "Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.",
   "wallet.add.dialog.title.label": "Add wallet",
-  "wallet.add.dialog.trezor.description": "!!!Connect to Trezor",
+  "wallet.add.dialog.trezor.description": "Connect to Trezor Hardware Wallet",
   "wallet.add.page.title": "Add Wallet",
   "wallet.amountInput.feesLabel": "+ {amount} of fees",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "Continue",
@@ -167,6 +167,8 @@
   "wallet.restore.dialog.wallet.name.input.hint": "Enter wallet name",
   "wallet.restore.dialog.wallet.name.input.label": "Wallet name",
   "wallet.restore.dialog.walletPasswordLabel": "Wallet password",
+  "wallet.trezor.dialog.title.label": "Connect to Trezor Hardware Wallet",
+  "wallet.trezor.dialog.trezor.connect.button.label": "Connect",  
   "wallet.send.confirmationDialog.addressToLabel": "To",
   "wallet.send.confirmationDialog.amountLabel": "Amount",
   "wallet.send.confirmationDialog.back": "Back",
@@ -230,6 +232,5 @@
   "wallet.transaction.transactionId": "Transaction ID",
   "wallet.transaction.type": "{currency} transaction",
   "wallet.transaction.type.card": "Card payment",
-  "wallet.transaction.type.exchange": "Exchange",
-  "wallet.trezor.dialog.title.label": "!!!Waiting for Trezor"
+  "wallet.transaction.type.exchange": "Exchange"
 }

@@ -4,6 +4,23 @@ import BigNumber from 'bignumber.js';
 // ========= Response Types =========
 export type AdaAssurance = 'CWANormal' | 'CWAStrict';
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
+export type AdaWalletType = 'CWTWeb' | 'CWTHardwareBacked';
+
+export type AdaHardwareWalletVendorInfo = {
+  vendor : string,
+  model: string,
+  deviceId: string,
+  lable: string,
+  majorVersion: string,
+  minorVersion: string,
+  patchVersion: string,
+  language: string
+}
+
+export type AdaWalletTypeInfo = {
+  type: AdaWalletType,
+  vendorInfo: ?AdaHardwareWalletVendorInfo
+}
 
 export type AdaSyncProgressResponse = {
   _spLocalCD: {
@@ -117,6 +134,12 @@ export type AdaWalletParams = {
   walletPassword: string,
   walletInitData: AdaWalletInitData
 };
+
+export type AdaHardwareWalletParams = {
+  publicKey: string,
+  walletInitData: AdaWalletInitData,
+  walletTypeInfo: AdaWalletTypeInfo
+}
 
 export type UpdateAdaWalletParams = {
   walletMeta: {

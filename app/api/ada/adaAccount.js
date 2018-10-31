@@ -24,3 +24,18 @@ export function createCryptoAccount(
   const result = getResultOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
   return Object.assign({ account: accountIndex }, result);
 }
+
+export function createCryptoHardwareBackedAccount(
+  masterKey: string,
+  walletPassword: string,
+  accountIndex: number = ACCOUNT_INDEX
+): CryptoAccount {
+  // FIXME : if possible call rust-cardano-crypto
+  const cryptoAccount = {
+    root_cached_key: masterKey,
+    derivation_scheme: 'V2',
+    account: accountIndex
+  };
+
+  return cryptoAccount;
+}
