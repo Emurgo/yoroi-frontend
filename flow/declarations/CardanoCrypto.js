@@ -139,7 +139,7 @@ declare module 'rust-cardano-crypto' {
 
 declare type CryptoWallet = {
   root_key: string,
-  cached_root_key: string,
+  root_cached_key: string, // cached_root_key -> root_cached_key
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: string
@@ -147,7 +147,7 @@ declare type CryptoWallet = {
 
 declare type CryptoDaedalusWallet = {
   root_key: string,
-  cached_root_key: string,
+  root_cached_key: string, // cached_root_key -> root_cached_key
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: DerivationScheme
@@ -155,7 +155,7 @@ declare type CryptoDaedalusWallet = {
 
 declare type CryptoAccount = {
   account: number,
-  cached_account_key: string,
+  root_cached_key: string, // cached_account_key -> root_cached_key
   derivation_scheme: string
 }
 
