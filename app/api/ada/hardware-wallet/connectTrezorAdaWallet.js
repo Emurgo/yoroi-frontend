@@ -32,7 +32,7 @@ const addressScanSize = CONFIG.app.addressScanSize;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
 export async function connectTrezorAdaWallet({
-  walletInitData 
+  walletInitData
 }: AdaHardwareWalletParams): Promise<AdaWallet> {
   const [adaWallet] = createAdaHardwareWallet({ walletInitData });
   const cryptoAccount = createHardwareWalletAccount(walletInitData.cwHardwareInfo.publicMasterKey);
@@ -59,7 +59,7 @@ export async function connectTrezorAdaWallet({
   return adaWallet;
 }
 
-// FIXME : its repeated in all wallet creation, try to make it reusable  
+// FIXME : its repeated in all wallet creation, try to make it reusable
 async function _discoverAllAddressesFrom(
   cryptoAccount: CryptoAccount,
   addressType: AddressType,

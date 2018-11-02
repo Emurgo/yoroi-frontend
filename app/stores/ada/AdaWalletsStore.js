@@ -10,7 +10,7 @@ import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actio
 import type { ImportWalletFromFileResponse } from '../../api/ada/index';
 import type {
   CreateTransactionResponse,
-  CreateWalletResponse, 
+  CreateWalletResponse,
   DeleteWalletResponse,
   GetWalletsResponse,
   RestoreWalletResponse,
@@ -43,7 +43,7 @@ export default class AdaWalletsStore extends WalletStore {
     Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
 
   @observable connectTrezorRequest:
-    Request<ConnectTrezorResponse> = new Request(this.api.ada.connectTrezor);    
+    Request<ConnectTrezorResponse> = new Request(this.api.ada.connectTrezor);
 
   setup() {
     super.setup();
@@ -147,7 +147,7 @@ export default class AdaWalletsStore extends WalletStore {
 
   @action _setIsConnectTrezorActive = (active: boolean) => {
     this.isConnectTrezorActive = active;
-  };  
+  };
 
   @action _connectTrezor = async (params: {
     publicMasterKey: string,
@@ -157,7 +157,7 @@ export default class AdaWalletsStore extends WalletStore {
     this.connectTrezorRequest.reset();
     this._setIsConnectTrezorActive(true);
     // Hide connnet trezor dialog some time after restore has been started
-    // FIXME: give better name for _toggleAddWalletDialogOnActiveRestoreOrImport()    
+    // FIXME: give better name for _toggleAddWalletDialogOnActiveRestoreOrImport()
     // ...or keep it open in case it has errored out (so that error message can be shown)
     setTimeout(() => {
       if (!this.connectTrezorRequest.isExecuting) this._setIsConnectTrezorActive(false);

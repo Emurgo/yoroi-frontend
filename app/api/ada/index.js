@@ -163,10 +163,10 @@ export default class AdaApi {
     Logger.debug('AdaApi::getWallets called');
     try {
       const adaWallet = await getAdaWallet();
-      const wallets: AdaWallets = adaWallet ? [ adaWallet ] : [];
+      const wallets: AdaWallets = adaWallet ? [adaWallet] : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets.map(data => _createWalletFromServerData(adaWallet));
+      return wallets.map(data => _createWalletFromServerData(data));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -482,7 +482,7 @@ export default class AdaApi {
         cwUnit: unit
       },
       cwHardwareInfo: {
-        vendor : deviceFeatures.vendor,
+        vendor: deviceFeatures.vendor,
         model: deviceFeatures.model,
         deviceId: deviceFeatures.device_id,
         label: deviceFeatures.label,
@@ -490,7 +490,7 @@ export default class AdaApi {
         minorVersion: deviceFeatures.minor_version,
         patchVersion: deviceFeatures.patch_version,
         language: deviceFeatures.language,
-        publicMasterKey: publicMasterKey,
+        publicMasterKey,
       },
     };
 

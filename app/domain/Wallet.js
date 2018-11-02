@@ -18,10 +18,10 @@ export default class Wallet {
   @observable passwordUpdateDate: ?Date;
 
   /**
-   * When creating Wallet object we can skip typeInfo, 
-   * in that case it will be by default CWTWeb type wallet 
-   * 
-   * @param {*} data 
+   * When creating Wallet object we can skip typeInfo,
+   * in that case it will be by default CWTWeb type wallet
+   *
+   * @param {*} data
    */
   constructor(data: {
     id: string,

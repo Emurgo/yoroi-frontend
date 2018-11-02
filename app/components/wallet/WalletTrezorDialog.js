@@ -1,27 +1,25 @@
 // @flow
-import React, { Component } from "react";
-import { join } from "lodash";
-import { observer } from "mobx-react";
-import classnames from "classnames";
-import { defineMessages, intlShape } from "react-intl";
-import TrezorConnect, { DEVICE, DEVICE_EVENT, UI, UI_EVENT, TRANSPORT, TRANSPORT_EVENT } from 'trezor-connect';
-import type { DeviceMessage } from 'trezor-connect';
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import classnames from 'classnames';
+import { defineMessages, intlShape } from 'react-intl';
+import TrezorConnect, { DEVICE, DEVICE_EVENT, UI_EVENT, TRANSPORT_EVENT } from 'trezor-connect';
 
-import DialogCloseButton from "../widgets/DialogCloseButton";
-import Dialog from "../widgets/Dialog";
-import globalMessages from "../../i18n/global-messages";
-import LocalizableError from "../../i18n/LocalizableError";
-import styles from "./WalletTrezorDialog.scss";
+import DialogCloseButton from '../widgets/DialogCloseButton';
+import Dialog from '../widgets/Dialog';
+import globalMessages from '../../i18n/global-messages';
+import LocalizableError from '../../i18n/LocalizableError';
+import styles from './WalletTrezorDialog.scss';
 
 const messages = defineMessages({
   title: {
-    id: "wallet.trezor.dialog.title.label",
-    defaultMessage: "!!!Connect to Trezor",
+    id: 'wallet.trezor.dialog.title.label',
+    defaultMessage: '!!!Connect to Trezor',
     description: 'Label "Connect to Trezor" on the Connect to Trezor dialog.'
   },
   connectButtonLabel: {
-    id: "wallet.trezor.dialog.trezor.connect.button.label",
-    defaultMessage: "!!!Connect",
+    id: 'wallet.trezor.dialog.trezor.connect.button.label',
+    defaultMessage: '!!!Connect',
     description: 'Label for the "Connect" button on the wallet restore dialog.'
   }
 });
@@ -40,8 +38,8 @@ type Props = {
 @observer
 export default class WalletTrezorDialog extends Component<Props> {
   /**
-   * 
-   * @param {*} props 
+   *
+   * @param {*} props
    */
   constructor(props: Props) {
     super(props);
@@ -58,10 +56,10 @@ export default class WalletTrezorDialog extends Component<Props> {
     // DEVICE_EVENT listener
     TrezorConnect.on(DEVICE_EVENT, (event) => {
       console.log(`Trezor ${DEVICE_EVENT} : ` + JSON.stringify(event, null, ' '));
-      if(event.type === DEVICE.CONNECT || event.type === DEVICE.CHANGED) {
+      if (event.type === DEVICE.CONNECT || event.type === DEVICE.CHANGED) {
         this.deviceEvent = event;
       }
-    });    
+    });
   }
 
   static contextTypes = {
@@ -77,12 +75,12 @@ export default class WalletTrezorDialog extends Component<Props> {
     let valid = false;
 
     // FIXME : fetch 'device-connect' | 'device-changed' from trezor-connect
-    if((this.deviceEvent.type === DEVICE.CONNECT || this.deviceEvent.type == DEVICE.CHANGED) && 
-    publicKeyInfo.success && 
+    if ((this.deviceEvent.type === DEVICE.CONNECT || this.deviceEvent.type === DEVICE.CHANGED) &&
+    publicKeyInfo.success &&
     publicKeyInfo.payload.publicKey) {
       valid = true;
     }
-  
+
     return valid;
   }
 
@@ -97,30 +95,29 @@ export default class WalletTrezorDialog extends Component<Props> {
 
       // FIXME : find better place to store constants
       // FIXME : Change it from any -> proper type
-      const publicKeyInfo: any = await TrezorConnect.cardanoGetPublicKey({path: `m/44'/1815'/0'`});
-      console.log(`Trezor cardanoGetPublicKey : ` + JSON.stringify(publicKeyInfo, null, ' '));
-      if(this.checkTrezorResultValidity(publicKeyInfo)) {
+      const publicKeyInfo: any = await TrezorConnect.cardanoGetPublicKey({ path: 'm/44\'/1815\'/0\'' });
+      console.log('Trezor cardanoGetPublicKey : ' + JSON.stringify(publicKeyInfo, null, ' '));
+      if (this.checkTrezorResultValidity(publicKeyInfo)) {
         // FIXME : get wallet name from form data
-        const walletName = "TREZOR WALLET";
+        const walletName = 'TREZOR WALLET';
         const walletData = {
           publicMasterKey: publicKeyInfo.payload.publicKey,
           walletName,
-          deviceFeatures : this.deviceEvent.payload.features,
-        }
+          deviceFeatures: this.deviceEvent.payload.features,
+        };
         this.props.onSubmit(walletData);
       }
-
     } catch (error) {
       // FIXME: proper error handling
-      console.log(`TrezorConnectError : ` + JSON.stringify(error, null, ''));
+      console.log('TrezorConnectError : ' + JSON.stringify(error, null, ''));
     }
   }
 
   render() {
     const { intl } = this.context;
-    const { suggestedMnemonics, isSubmitting, error, onCancel } = this.props;
+    const { isSubmitting, error, onCancel } = this.props;
 
-    const dialogClasses = classnames([styles.component, "WalletRestoreDialog"]);
+    const dialogClasses = classnames([styles.component, 'WalletRestoreDialog']);
 
     const actions = [
       {
