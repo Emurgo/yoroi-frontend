@@ -31,7 +31,7 @@ import {
 } from './restoreAdaWallet';
 import {
   connectTrezorAdaWallet
-} from './hardware-backed-wallet/connectTrezorAdaWallet';
+} from './hardware-wallet/connectTrezorAdaWallet';
 import {
   getAdaTxsHistoryByWallet,
   getAdaTxLastUpdatedDate,
@@ -59,7 +59,6 @@ import type {
   AdaWallets,
   AdaAssurance,
   AdaWalletInitData,
-  AdaWalletTypeInfo
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -71,11 +70,11 @@ import type {
   RestoreWalletRequest,
   RestoreWalletResponse,
   ConnectTrezorRequest,
-  ConnectTrezorResponse
+  ConnectTrezorResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
-import { getSingleCryptoAccount, getAdaWallet, getWalletTypeInfo, getLastBlockNumber } from './adaLocalStorage';
+import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
 
 // ADA specific Request / Response params
@@ -164,11 +163,10 @@ export default class AdaApi {
     Logger.debug('AdaApi::getWallets called');
     try {
       const adaWallet = await getAdaWallet();
-      const adaWalletTypeInfo = await getWalletTypeInfo();
-      const wallets: AdaWallets = adaWallet ? [{ adaWallet, adaWalletTypeInfo }] : [];
+      const wallets: AdaWallets = adaWallet ? [ adaWallet ] : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets.map(data => _createWalletFromServerData(data.adaWallet, data.adaWalletTypeInfo));
+      return wallets.map(data => _createWalletFromServerData(adaWallet));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -473,7 +471,7 @@ export default class AdaApi {
     request: ConnectTrezorRequest
   ): Promise<ConnectTrezorResponse> {
     Logger.debug('AdaApi::connectTrezor called');
-    const { walletName, publicKey, deviceFeatures } = request;
+    const { walletName, publicMasterKey, deviceFeatures } = request;
     const assurance = 'CWANormal';
     const unit = 0;
 
@@ -483,31 +481,26 @@ export default class AdaApi {
         cwAssurance: assurance,
         cwUnit: unit
       },
-      cwBackupPhrase: {
-        bpToList: '' // array of mnemonic words
-      }
-    };
-
-    const walletTypeInfo = {
-      type: 'CWTHarwareBacked',
-      vendorInfo : {
+      cwHardwareInfo: {
         vendor : deviceFeatures.vendor,
         model: deviceFeatures.model,
         deviceId: deviceFeatures.device_id,
-        lable: deviceFeatures.label,
+        label: deviceFeatures.label,
         majorVersion: deviceFeatures.major_version,
         minorVersion: deviceFeatures.minor_version,
         patchVersion: deviceFeatures.patch_version,
-        language: deviceFeatures.language
-      }
+        language: deviceFeatures.language,
+        publicMasterKey: publicMasterKey,
+      },
     };
 
     try {
-      const wallet: AdaWallet = await connectTrezorAdaWallet({publicKey , walletInitData, walletTypeInfo});
+      const wallet: AdaWallet = await connectTrezorAdaWallet({ walletInitData });
       Logger.debug('AdaApi::connectTrezor success');
       return _createWalletFromServerData(wallet);
     } catch (error) {
       Logger.error('AdaApi::connectTrezor error: ' + stringifyError(error));
+      // FIXME
       // TODO: backend will return something different here, if multiple wallets
       // are restored from the key and if there are duplicate wallets we will get
       // some kind of error and present the user with message that some wallets
@@ -528,7 +521,7 @@ export default class AdaApi {
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
-  (adaWallet: AdaWallet, adaWalletTypeInfo: ?AdaWalletTypeInfo) => {
+  (adaWallet: AdaWallet) => {
     const walletObj = {
       id: adaWallet.cwId,
       amount: new BigNumber(adaWallet.cwAmount.getCCoin).dividedBy(
@@ -536,13 +529,10 @@ const _createWalletFromServerData = action(
       ),
       name: adaWallet.cwMeta.cwName,
       assurance: adaWallet.cwMeta.cwAssurance,
-      passwordUpdateDate: adaWallet.cwPassphraseLU
+      passwordUpdateDate: adaWallet.cwPassphraseLU,
+      type: adaWallet.cwType,
+      hardwareInfo: adaWallet.cwHardwareInfo,
     };
-
-    // FIXME : do proper conversion 
-    // if(adaWalletTypeInfo) {
-    //   walletObj.typeInfo = adaWalletTypeInfo;
-    // }
 
     return new Wallet(walletObj);
   }

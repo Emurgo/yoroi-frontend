@@ -109,7 +109,7 @@ export type RestoreWalletRequest = {
 };
 
 export type ConnectTrezorRequest = {
-  publicKey: string,
+  publicMasterKey: string,
   walletName: string,
   deviceFeatures: any // FIXME : use appropriate type not "any"
 };

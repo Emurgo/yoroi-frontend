@@ -18,5 +18,5 @@ export default class WalletsActions {
   deleteWallet: Action<{ walletId: string }> = new Action();
   sendMoney: Action<{ receiver: string, amount: string, password: ?string }> = new Action();
   updateBalance: Action <{ amount: BigNumber }> = new Action();
-  connectTrezor: Action<{ publicKey: string, walletName: string, deviceFeatures: any}> = new Action();
+  connectTrezor: Action<{ publicMasterKey: string, walletName: string, deviceFeatures: any}> = new Action();
 }

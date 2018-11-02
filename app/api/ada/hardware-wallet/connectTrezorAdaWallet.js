@@ -21,9 +21,9 @@ import {
   DiscoverAddressesError
 } from '../errors';
 import { saveCryptoAccount, saveAdaWallet } from '../adaLocalStorage';
-import { createAdaHardwarBackedeWallet } from '../adaWallet';
-import { createCryptoHardwareBackedAccount } from '../adaAccount';
-import type { ConfigType } from '../../../config/config-types';
+import { createAdaHardwareWallet } from '../adaWallet';
+import { createHardwareWalletAccount } from '../adaAccount';
+import type { ConfigType } from '../../../../config/config-types';
 
 type AddressInfo = { address: string, isUsed: boolean, index: number };
 
@@ -32,12 +32,10 @@ const addressScanSize = CONFIG.app.addressScanSize;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
 export async function connectTrezorAdaWallet({
-  publicKey,
-  walletInitData,
-  walletTypeInfo  
+  walletInitData 
 }: AdaHardwareWalletParams): Promise<AdaWallet> {
-  const [adaWallet, masterKey] = createAdaHardwarBackedeWallet({ publicKey, walletInitData , walletTypeInfo});
-  const cryptoAccount = createCryptoHardwareBackedAccount(masterKey);
+  const [adaWallet] = createAdaHardwareWallet({ walletInitData });
+  const cryptoAccount = createHardwareWalletAccount(walletInitData.cwHardwareInfo.publicMasterKey);
   try {
     const externalAddressesToSave = await
       _discoverAllAddressesFrom(cryptoAccount, 'External', -1, addressScanSize, addressRequestSize);
@@ -53,15 +51,15 @@ export async function connectTrezorAdaWallet({
       await newAdaAddress(cryptoAccount, [], 'External');
     }
   } catch (discoverAddressesError) {
-    Logger.error('restoreAdaWallet::restoreAdaWallet error: ' +
-      stringifyError(discoverAddressesError));
+    Logger.error(`restoreAdaWallet::restoreAdaWallet error: ${stringifyError(discoverAddressesError)}`);
     throw new DiscoverAddressesError();
   }
   saveCryptoAccount(cryptoAccount);
-  saveAdaWallet(adaWallet, masterKey, walletTypeInfo);
+  saveAdaWallet(adaWallet);
   return adaWallet;
 }
 
+// FIXME : its repeated in all wallet creation, try to make it reusable  
 async function _discoverAllAddressesFrom(
   cryptoAccount: CryptoAccount,
   addressType: AddressType,
@@ -86,7 +84,6 @@ async function _discoverAllAddressesFrom(
                              .map((addressInfo) => addressInfo.address);
 }
 
-// FIXME : its repeated in all wallet creation, try to make it reusable  
 async function _scanAddressesBatchFrom(
   fetchedAddressesInfo: Array<AddressInfo>,
   cryptoAccount: CryptoAccount,

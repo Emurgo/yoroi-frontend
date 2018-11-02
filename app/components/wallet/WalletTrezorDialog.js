@@ -103,7 +103,7 @@ export default class WalletTrezorDialog extends Component<Props> {
         // FIXME : get wallet name from form data
         const walletName = "TREZOR WALLET";
         const walletData = {
-          publicKey: publicKeyInfo.payload.publicKey,
+          publicMasterKey: publicKeyInfo.payload.publicKey,
           walletName,
           deviceFeatures : this.deviceEvent.payload.features,
         }

@@ -1,5 +1,5 @@
 // @flow
-import type { AdaWallet, AdaWalletTypeInfo } from '../ada/adaTypes';
+import type { AdaWallet } from '../ada/adaTypes';
 
 const storageKeys = {
   ACCOUNT_KEY: 'ACCOUNT',
@@ -19,10 +19,9 @@ export function getSingleCryptoAccount(): CryptoAccount {
 
 export function saveAdaWallet(
   adaWallet: AdaWallet,
-  masterKey: string,
-  walletTypeInfo: AdaWalletTypeInfo = { 'type' : 'CWTWeb' }
+  masterKey?: string
 ): void {
-  _saveInStorage(storageKeys.WALLET_KEY, { adaWallet, masterKey, walletTypeInfo });
+  _saveInStorage(storageKeys.WALLET_KEY, { adaWallet, masterKey });
 }
 
 export function getAdaWallet(): ?AdaWallet {
@@ -33,11 +32,6 @@ export function getAdaWallet(): ?AdaWallet {
 export function getWalletMasterKey(): string {
   const stored = _getFromStorage(storageKeys.WALLET_KEY);
   return stored.masterKey;
-}
-
-export function getWalletTypeInfo(): AdaWalletTypeInfo {
-  const stored = _getFromStorage(storageKeys.WALLET_KEY);
-  return stored.walletTypeInfo;
 }
 
 export function saveLastBlockNumber(blockNumber: number): void {

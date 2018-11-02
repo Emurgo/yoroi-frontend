@@ -13,7 +13,7 @@ export default class WalletTrezorDialogContainer extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null, children: null, onClose: () => {} };
 
-  onSubmit = (values: { publicKey : string, walletName: string, deviceFeatures: any, }) => {
+  onSubmit = (values: { publicMasterKey : string, walletName: string, deviceFeatures: any, }) => {
     this.props.actions[environment.API].wallets.connectTrezor.trigger(values);
   };
 

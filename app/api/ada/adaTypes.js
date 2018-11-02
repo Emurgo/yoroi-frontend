@@ -4,23 +4,19 @@ import BigNumber from 'bignumber.js';
 // ========= Response Types =========
 export type AdaAssurance = 'CWANormal' | 'CWAStrict';
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
-export type AdaWalletType = 'CWTWeb' | 'CWTHardwareBacked';
+export type AdaWalletType = 'CWTWeb' | 'CWTHardware';
 
-export type AdaHardwareWalletVendorInfo = {
+export type AdaWalletHardwareInfo = {
   vendor : string,
   model: string,
   deviceId: string,
-  lable: string,
+  label: string,
   majorVersion: string,
   minorVersion: string,
   patchVersion: string,
-  language: string
-}
-
-export type AdaWalletTypeInfo = {
-  type: AdaWalletType,
-  vendorInfo: ?AdaHardwareWalletVendorInfo
-}
+  language: string,
+  publicMasterKey: string,
+};
 
 export type AdaSyncProgressResponse = {
   _spLocalCD: {
@@ -45,6 +41,15 @@ export type AdaWalletInitData = {
   cwBackupPhrase: {
     bpToList: string,
   }
+};
+
+export type AdaHardwareWalletInitData = {
+  cwInitMeta: {
+    cwName: string,
+    cwAssurance: AdaAssurance,
+    cwUnit: number,
+  },
+  cwHardwareInfo: AdaWalletHardwareInfo,
 };
 
 export type AdaAmount = {
@@ -124,7 +129,9 @@ export type AdaWallet = {
     cwName: string,
     cwUnit: number,
   },
-  cwPassphraseLU: Date,
+  cwPassphraseLU?: Date,
+  cwType: AdaWalletType,
+  cwHardwareInfo?: AdaWalletHardwareInfo,
 };
 
 export type AdaWallets = Array<AdaWallet>;
@@ -136,9 +143,7 @@ export type AdaWalletParams = {
 };
 
 export type AdaHardwareWalletParams = {
-  publicKey: string,
-  walletInitData: AdaWalletInitData,
-  walletTypeInfo: AdaWalletTypeInfo
+  walletInitData: AdaHardwareWalletInitData
 }
 
 export type UpdateAdaWalletParams = {

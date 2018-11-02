@@ -150,7 +150,7 @@ export default class AdaWalletsStore extends WalletStore {
   };  
 
   @action _connectTrezor = async (params: {
-    publicKey: string,
+    publicMasterKey: string,
     walletName: string,
     deviceFeatures: any,
   }) => {
