@@ -85,6 +85,7 @@
   "global.language.german": "Deutsche",
   "global.language.japanese": "日本語",
   "global.language.korean": "한국어",
+  "global.language.russian": "Pусский",
   "global.passwordInstructions": "Обратите внимание, что пароль должен быть длиной минимум 7 символов, содержать как минимум 1 заглавную букву, 1 букву нижнего регистра и 1 цифру.",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "отменить",
@@ -224,5 +225,5 @@
   "wallet.transaction.transactionId": "ID транзакции",
   "wallet.transaction.type": "{currency} транзакции",
   "wallet.transaction.type.card": "Оплата картой",
-  "wallet.transaction.type.exchange": "Обмен"
+  "wallet.transaction.type.exchange": "Обмен",
 }

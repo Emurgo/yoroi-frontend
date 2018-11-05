@@ -85,6 +85,7 @@
   "global.language.german": "ドイツ語",
   "global.language.japanese": "日本語",
   "global.language.korean": "한국어",
+  "global.language.russian": "Pусский",
   "global.passwordInstructions": "パスワードは7文字以上で、少なくとも大文字1文字、小文字1文字、数字1つを含む必要があります。",
   "global.unit.ada": "ADA",
   "inline.editing.input.cancel.label": "キャンセル",
@@ -224,5 +225,5 @@
   "wallet.transaction.transactionId": "取引ID",
   "wallet.transaction.type": "{currency} 取引",
   "wallet.transaction.type.card": "カード支払い",
-  "wallet.transaction.type.exchange": "交換"
+  "wallet.transaction.type.exchange": "交換",
 }

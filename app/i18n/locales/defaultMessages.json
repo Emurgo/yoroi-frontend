@@ -909,13 +909,13 @@
         "description": "Message alerting users the wallet is not running in mainnet.",
         "end": {
           "column": 3,
-          "line": 25
+          "line": 24
         },
         "file": "app/components/layout/SidebarLayout.js",
         "id": "testnet.label.message",
         "start": {
           "column": 16,
-          "line": 21
+          "line": 20
         }
       }
     ],
@@ -961,13 +961,13 @@
         "description": "Label for the \"I agree with terms of use\" checkbox.",
         "end": {
           "column": 3,
-          "line": 20
+          "line": 19
         },
         "file": "app/components/profile/terms-of-use/TermsOfUseForm.js",
         "id": "profile.termsOfUse.checkboxLabel",
         "start": {
           "column": 17,
-          "line": 16
+          "line": 15
         }
       },
       {
@@ -975,13 +975,13 @@
         "description": "Label for the \"Terms of use\" form submit button.",
         "end": {
           "column": 3,
-          "line": 30
+          "line": 24
         },
         "file": "app/components/profile/terms-of-use/TermsOfUseForm.js",
         "id": "profile.termsOfUse.submitLabel",
         "start": {
           "column": 15,
-          "line": 26
+          "line": 20
         }
       }
     ],
@@ -1009,31 +1009,36 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
-        "description": "URL for the \"FAQ on Yoroi website\"",
+        "defaultMessage": "!!!Restore wallet",
+        "description": "Label \"Restore wallet\" on the wallet restore dialog.",
         "end": {
           "column": 3,
-          "line": 12
+          "line": 16
         },
-        "file": "app/components/settings/categories/SupportSettings.js",
-        "id": "settings.support.faq.faqLinkURL",
+        "file": "app/components/settings/categories/LogOutDialog.js",
+        "id": "wallet.restore.dialog.title.label",
         "start": {
-          "column": 14,
-          "line": 8
+          "column": 9,
+          "line": 12
         }
-      },
+      }
+    ],
+    "path": "app/components/settings/categories/LogOutDialog.json"
+  },
+  {
+    "descriptors": [
       {
         "defaultMessage": "!!!Frequently asked questions",
         "description": "Title \"Frequently asked questions\" on the support settings page.",
         "end": {
           "column": 3,
-          "line": 20
+          "line": 13
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.faq.title",
         "start": {
           "column": 12,
-          "line": 16
+          "line": 9
         }
       },
       {
@@ -1041,13 +1046,13 @@
         "description": "Content for the \"Frequently asked questions\" section on the support settings page.",
         "end": {
           "column": 3,
-          "line": 25
+          "line": 18
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.faq.content",
         "start": {
           "column": 14,
-          "line": 21
+          "line": 14
         }
       },
       {
@@ -1055,13 +1060,13 @@
         "description": "\"FAQ on Yoroi website\" link in the FAQ section on the support settings page",
         "end": {
           "column": 3,
-          "line": 30
+          "line": 23
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.faq.faqLink",
         "start": {
           "column": 11,
-          "line": 26
+          "line": 19
         }
       },
       {
@@ -1069,13 +1074,13 @@
         "description": "Title \"Reporting a problem\" on the support settings page.",
         "end": {
           "column": 3,
-          "line": 35
+          "line": 28
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.reportProblem.title",
         "start": {
           "column": 22,
-          "line": 31
+          "line": 24
         }
       },
       {
@@ -1083,13 +1088,13 @@
         "description": "Content for the \"Reporting a problem\" section on the support settings page.",
         "end": {
           "column": 3,
-          "line": 40
+          "line": 33
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.reportProblem.content",
         "start": {
           "column": 24,
-          "line": 36
+          "line": 29
         }
       },
       {
@@ -1097,13 +1102,13 @@
         "description": "\"Support request\" link in the \"Report a problem\" section on the support settings page.",
         "end": {
           "column": 3,
-          "line": 45
+          "line": 38
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.reportProblem.link",
         "start": {
           "column": 22,
-          "line": 41
+          "line": 34
         }
       },
       {
@@ -1111,13 +1116,13 @@
         "description": "URL for the \"Support Request\" link in the Support section on the support settings page",
         "end": {
           "column": 3,
-          "line": 50
+          "line": 43
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.faq.supportRequestLinkURL",
         "start": {
           "column": 25,
-          "line": 46
+          "line": 39
         }
       },
       {
@@ -1125,13 +1130,13 @@
         "description": "Title \"Logs\" on the support settings page.",
         "end": {
           "column": 3,
-          "line": 55
+          "line": 48
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.logs.title",
         "start": {
           "column": 13,
-          "line": 51
+          "line": 44
         }
       },
       {
@@ -1139,13 +1144,13 @@
         "description": "Content for the \"Logs\" section on the support settings page.",
         "end": {
           "column": 3,
-          "line": 60
+          "line": 53
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.logs.content",
         "start": {
           "column": 15,
-          "line": 56
+          "line": 49
         }
       },
       {
@@ -1153,13 +1158,13 @@
         "description": "\"download them here\" link in the Logs section on the support settings page",
         "end": {
           "column": 3,
-          "line": 65
+          "line": 58
         },
         "file": "app/components/settings/categories/SupportSettings.js",
         "id": "settings.support.logs.downloadLogsLink",
         "start": {
           "column": 20,
-          "line": 61
+          "line": 54
         }
       }
     ],
@@ -2779,6 +2784,25 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Waiting for Trezor",
+        "description": "Label \"Waiting for Trezor\" on the wallet connect trezor dialog.",
+        "end": {
+          "column": 3,
+          "line": 18
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.title.label",
+        "start": {
+          "column": 9,
+          "line": 14
+        }
+      }
+    ],
+    "path": "app/components/wallet/WalletTrezorDialog.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!change",
         "description": "Label \"change\" on inline editing inputs in inactive state.",
         "end": {
@@ -2996,13 +3020,13 @@
         "description": "Error message when required fields are left empty.",
         "end": {
           "column": 3,
-          "line": 8
+          "line": 14
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.errors.fieldIsRequired",
         "start": {
           "column": 19,
-          "line": 4
+          "line": 10
         }
       },
       {
@@ -3010,13 +3034,13 @@
         "description": "Error message shown when invalid wallet name was entered in create wallet dialog.",
         "end": {
           "column": 3,
-          "line": 13
+          "line": 19
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.errors.invalidWalletName",
         "start": {
           "column": 21,
-          "line": 9
+          "line": 15
         }
       },
       {
@@ -3024,13 +3048,13 @@
         "description": "Error message shown when invalid wallet password was entered in create wallet dialog.",
         "end": {
           "column": 3,
-          "line": 18
+          "line": 24
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.errors.invalidWalletPassword",
         "start": {
           "column": 25,
-          "line": 14
+          "line": 20
         }
       },
       {
@@ -3038,13 +3062,13 @@
         "description": "Error message shown when wallet password and repeat passwords don't match in create wallet dialog.",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 29
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.errors.invalidRepeatPassword",
         "start": {
           "column": 25,
-          "line": 19
+          "line": 25
         }
       },
       {
@@ -3052,13 +3076,13 @@
         "description": "Password instructions note.",
         "end": {
           "column": 3,
-          "line": 28
+          "line": 34
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.passwordInstructions",
         "start": {
           "column": 24,
-          "line": 24
+          "line": 30
         }
       },
       {
@@ -3066,13 +3090,13 @@
         "description": "The word \"cancel\" reused at several places (like cancel buttons)",
         "end": {
           "column": 3,
-          "line": 33
+          "line": 39
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.cancel",
         "start": {
           "column": 10,
-          "line": 29
+          "line": 35
         }
       },
       {
@@ -3080,13 +3104,13 @@
         "description": "The word \"change\" reused at several places (like change buttons)",
         "end": {
           "column": 3,
-          "line": 38
+          "line": 44
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.change",
         "start": {
           "column": 10,
-          "line": 34
+          "line": 40
         }
       },
       {
@@ -3094,13 +3118,13 @@
         "description": "The word \"create\" reused at several places (like create buttons)",
         "end": {
           "column": 3,
-          "line": 43
+          "line": 49
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.create",
         "start": {
           "column": 10,
-          "line": 39
+          "line": 45
         }
       },
       {
@@ -3108,13 +3132,13 @@
         "description": "The word \"remove\" reused at several places (like remove buttons)",
         "end": {
           "column": 3,
-          "line": 48
+          "line": 54
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.remove",
         "start": {
           "column": 10,
-          "line": 44
+          "line": 50
         }
       },
       {
@@ -3122,13 +3146,13 @@
         "description": "The word \"save\" reused at several places (like save buttons)",
         "end": {
           "column": 3,
-          "line": 53
+          "line": 59
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.save",
         "start": {
           "column": 8,
-          "line": 49
+          "line": 55
         }
       },
       {
@@ -3136,13 +3160,13 @@
         "description": "Language name for \"English\" language.",
         "end": {
           "column": 3,
-          "line": 58
+          "line": 64
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.english",
         "start": {
           "column": 19,
-          "line": 54
+          "line": 60
         }
       },
       {
@@ -3150,13 +3174,27 @@
         "description": "Language name for \"Japanese\" language.",
         "end": {
           "column": 3,
-          "line": 63
+          "line": 69
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.japanese",
         "start": {
           "column": 20,
-          "line": 59
+          "line": 65
+        }
+      },
+      {
+        "defaultMessage": "!!!Russian",
+        "description": "Language name for \"Russian\" language.",
+        "end": {
+          "column": 3,
+          "line": 74
+        },
+        "file": "app/i18n/global-messages.js",
+        "id": "global.language.russian",
+        "start": {
+          "column": 19,
+          "line": 70
         }
       },
       {
@@ -3164,13 +3202,13 @@
         "description": "Language name for \"Simplified Chinese\" language.",
         "end": {
           "column": 3,
-          "line": 68
+          "line": 79
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.chinese.simplified",
         "start": {
           "column": 29,
-          "line": 64
+          "line": 75
         }
       },
       {
@@ -3178,13 +3216,13 @@
         "description": "Language name for \"Traditional Chinese\" language.",
         "end": {
           "column": 3,
-          "line": 73
+          "line": 84
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.chinese.traditional",
         "start": {
           "column": 30,
-          "line": 69
+          "line": 80
         }
       },
       {
@@ -3192,13 +3230,13 @@
         "description": "Language name for \"Korean\" language.",
         "end": {
           "column": 3,
-          "line": 78
+          "line": 89
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.korean",
         "start": {
           "column": 18,
-          "line": 74
+          "line": 85
         }
       },
       {
@@ -3206,13 +3244,13 @@
         "description": "Language name for \"German\" language.",
         "end": {
           "column": 3,
-          "line": 83
+          "line": 94
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.german",
         "start": {
           "column": 18,
-          "line": 79
+          "line": 90
         }
       },
       {
@@ -3220,13 +3258,13 @@
         "description": "Language name for \"Croatian\" language.",
         "end": {
           "column": 3,
-          "line": 88
+          "line": 99
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.croatian",
         "start": {
           "column": 20,
-          "line": 84
+          "line": 95
         }
       },
       {
@@ -3234,13 +3272,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 3,
-          "line": 93
+          "line": 104
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.unit.ada",
         "start": {
           "column": 11,
-          "line": 89
+          "line": 100
         }
       },
       {
@@ -3248,13 +3286,27 @@
         "description": "Title for the \"Recovery Phrase\" dialog.",
         "end": {
           "column": 3,
-          "line": 98
+          "line": 109
         },
         "file": "app/i18n/global-messages.js",
         "id": "wallet.backup.recovery.phrase.dialog.title",
         "start": {
           "column": 29,
-          "line": 94
+          "line": 105
+        }
+      },
+      {
+        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
+        "description": "URL for the \"FAQ on Yoroi website\"",
+        "end": {
+          "column": 3,
+          "line": 114
+        },
+        "file": "app/i18n/global-messages.js",
+        "id": "settings.support.faq.faqLinkURL",
+        "start": {
+          "column": 14,
+          "line": 110
         }
       },
       {
@@ -3262,13 +3314,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 5,
-          "line": 107
+          "line": 123
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.ada",
         "start": {
           "column": 14,
-          "line": 103
+          "line": 119
         }
       },
       {
@@ -3276,13 +3328,13 @@
         "description": "Name for \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 112
+          "line": 128
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.cardano",
         "start": {
           "column": 13,
-          "line": 108
+          "line": 124
         }
       },
       {
@@ -3290,13 +3342,13 @@
         "description": "Version of \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 117
+          "line": 133
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.cardano",
         "start": {
           "column": 16,
-          "line": 113
+          "line": 129
         }
       }
     ],

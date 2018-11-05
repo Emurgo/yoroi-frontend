@@ -67,6 +67,11 @@ export default defineMessages({
     defaultMessage: '!!!Japanese',
     description: 'Language name for "Japanese" language.'
   },
+  languageRussian: {
+    id: 'global.language.russian',
+    defaultMessage: '!!!Russian',
+    description: 'Language name for "Russian" language.'
+  },
   languageChineseSimplified: {
     id: 'global.language.chinese.simplified',
     defaultMessage: '!!!Chinese Simplified',

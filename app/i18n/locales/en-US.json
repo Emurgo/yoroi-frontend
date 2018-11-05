@@ -85,6 +85,7 @@
   "global.language.german": "German",
   "global.language.japanese": "日本語",
   "global.language.korean": "한국어",
+  "global.language.russian": "Pусский",
   "global.passwordInstructions": "Note that password needs to be at least 7 characters long, and have at least 1 uppercase, 1 lowercase letter and 1 number.",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "cancel",
@@ -224,5 +225,5 @@
   "wallet.transaction.transactionId": "Transaction ID",
   "wallet.transaction.type": "{currency} transaction",
   "wallet.transaction.type.card": "Card payment",
-  "wallet.transaction.type.exchange": "Exchange"
+  "wallet.transaction.type.exchange": "Exchange",
 }
