@@ -1,18 +1,18 @@
 // @flow
 import CardanoCryptoError from './cryptoErrors';
 
-export function getResultOrFail(
-  result: any
-): any {
-  if (result.failed) {
-    throw new CardanoCryptoError(result.msg);
+export function getResultOrFail<T>(
+  arg: { result: T, failed: boolean, msg: ?string }
+): T {
+  if (arg.failed) {
+    throw new CardanoCryptoError(arg.msg);
   }
-  return result.result;
+  return arg.result;
 }
 
-export function getOrFail(
-  result: ?any
-): any {
+export function getOrFail<T>(
+  result: ?T | false
+): T {
   if (!result) {
     throw new CardanoCryptoError('Result not defined');
   }

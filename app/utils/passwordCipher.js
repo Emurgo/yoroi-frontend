@@ -12,7 +12,8 @@ export function encryptWithPassword(
   const salt = new Buffer(cryptoRandomString(2 * 32), 'hex');
   const nonce = new Buffer(cryptoRandomString(2 * 12), 'hex');
   const formattedPassword: Uint8Array = new TextEncoder().encode(password);
-  const encryptedBytes = getOrFail(
+  // eslint-disable-next-line space-infix-ops
+  const encryptedBytes = getOrFail<Uint8Array>(
     PasswordProtect.encryptWithPassword(formattedPassword, salt, nonce, bytes));
   const encryptedHex = Buffer.from(encryptedBytes).toString('hex');
   return encryptedHex;

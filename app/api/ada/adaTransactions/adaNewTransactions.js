@@ -27,6 +27,7 @@ import {
 import { getResultOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {
   AdaAddresses,
+  AdaAddress,
   AdaTransactionFee,
   UTXO
 } from '../adaTypes';
@@ -115,7 +116,7 @@ export async function getAdaTransactionFromSenders(
   receiver: string,
   amount: string,
   cryptoWallet: CryptoWallet
-) {
+): Promise<[SpendResponse, AdaAddress]> {
   const cryptoAccount = getSingleCryptoAccount();
   const addressesMap = await getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
@@ -124,7 +125,8 @@ export async function getAdaTransactionFromSenders(
   const outputs = [{ address: receiver, value: amount }];
   const senderUtxos = await getAllUTXOsForAddresses(_getAddresses(senders));
   const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-  const result = getResultOrFail(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
+  // eslint-disable-next-line space-infix-ops
+  const result = getResultOrFail<SpendResponse>(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
   return [result, changeAdaAddr];
 }
 

@@ -21,6 +21,7 @@ export function createCryptoAccount(
   accountIndex: number = ACCOUNT_INDEX
 ): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, walletPassword);
-  const result = getResultOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
-  return Object.assign({ account: accountIndex }, result);
+  // eslint-disable-next-line space-infix-ops
+  const result = getResultOrFail<CryptoAccount>(Wallet.newAccount(cryptoWallet, accountIndex));
+  return Object.assign({}, { account: accountIndex }, result);
 }
