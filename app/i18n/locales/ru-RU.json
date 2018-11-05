@@ -225,5 +225,5 @@
   "wallet.transaction.transactionId": "ID транзакции",
   "wallet.transaction.type": "{currency} транзакции",
   "wallet.transaction.type.card": "Оплата картой",
-  "wallet.transaction.type.exchange": "Обмен",
+  "wallet.transaction.type.exchange": "Обмен"
 }

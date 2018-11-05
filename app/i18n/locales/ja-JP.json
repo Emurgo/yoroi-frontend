@@ -225,5 +225,5 @@
   "wallet.transaction.transactionId": "取引ID",
   "wallet.transaction.type": "{currency} 取引",
   "wallet.transaction.type.card": "カード支払い",
-  "wallet.transaction.type.exchange": "交換",
+  "wallet.transaction.type.exchange": "交換"
 }
