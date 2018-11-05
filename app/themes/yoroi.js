@@ -16,7 +16,8 @@ import SimpleBubble from './simple/SimpleBubble.scss';
 import SimpleOptions from './simple/SimpleOptions.scss';
 import SimpleSelect from './simple/SimpleSelect.scss';
 
-export const daedalusTheme = {
+// package all our overrides into one theme
+export const yoroiTheme = {
   [FORM_FIELD]: SimpleFormField,
   [INPUT]: SimpleInput,
   [CHECKBOX]: SimpleCheckbox,
