@@ -13,8 +13,9 @@ type Props = {
   className?: string,
 };
 
+export default
 @observer
-export default class WalletNavButton extends Component<Props> {
+class WalletNavButton extends Component<Props> {
 
   render() {
     const { isActive, /* icon, */ onClick, className } = this.props;

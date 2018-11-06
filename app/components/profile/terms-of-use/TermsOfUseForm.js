@@ -35,8 +35,9 @@ type State = {
   areTermsOfUseAccepted: boolean,
 };
 
+export default
 @observer
-export default class TermsOfUseForm extends Component<Props, State> {
+class TermsOfUseForm extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -47,7 +48,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
   };
 
   toggleAcceptance() {
-    this.setState({ areTermsOfUseAccepted: !this.state.areTermsOfUseAccepted });
+    this.setState(prevState => ({ areTermsOfUseAccepted: !prevState.areTermsOfUseAccepted }));
   }
 
   submit = () => {

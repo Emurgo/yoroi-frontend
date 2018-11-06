@@ -8,8 +8,9 @@ type Props = {
   localizedTermsOfUse: string,
 };
 
+export default
 @observer
-export default class TermsOfUseSettings extends Component<Props> {
+class TermsOfUseSettings extends Component<Props> {
   render() {
     const { localizedTermsOfUse } = this.props;
     return (

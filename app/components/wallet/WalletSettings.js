@@ -51,8 +51,9 @@ type Props = {
   lastUpdatedField: ?string,
 };
 
+export default
 @observer
-export default class WalletSettings extends Component<Props> {
+class WalletSettings extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

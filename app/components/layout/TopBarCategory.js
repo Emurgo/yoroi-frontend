@@ -13,8 +13,9 @@ type Props = {
   className: string,
 };
 
+export default
 @observer
-export default class TopBarCategory extends Component<Props> {
+class TopBarCategory extends Component<Props> {
   render() {
     const { icon, active, onClick, className } = this.props;
     const componentStyles = classNames([

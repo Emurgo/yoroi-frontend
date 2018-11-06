@@ -15,8 +15,9 @@ const messages = defineMessages({
   },
 });
 
+export default
 @inject('stores', 'actions') @observer
-export default class TermsOfUsePage extends Component<InjectedProps> {
+class TermsOfUsePage extends Component<InjectedProps> {
 
   static defaultProps = { actions: null, stores: null };
 

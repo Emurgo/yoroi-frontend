@@ -77,8 +77,9 @@ type State = {
   removePassword: boolean,
 };
 
+export default
 @observer
-export default class ChangeWalletPasswordDialog extends Component<Props, State> {
+class ChangeWalletPasswordDialog extends Component<Props, State> {
 
   static defaultProps = {
     currentPasswordValue: '',

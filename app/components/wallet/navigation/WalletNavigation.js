@@ -31,8 +31,9 @@ type Props = {
   onNavItemClick: Function,
 };
 
+export default
 @observer
-export default class WalletNavigation extends Component<Props> {
+class WalletNavigation extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

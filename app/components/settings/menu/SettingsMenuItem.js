@@ -12,8 +12,9 @@ type Props = {
   disabled?: boolean,
 };
 
+export default
 @observer
-export default class SettingsMenuItem extends Component<Props> {
+class SettingsMenuItem extends Component<Props> {
   render() {
     const { label, active, disabled, onClick, className } = this.props;
     let state = styles.enabled;

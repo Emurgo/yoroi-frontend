@@ -18,21 +18,21 @@ export default class LoadingStore extends Store {
   setup() {
     when(this._isRefresh, this._redirectToLoading);
     Promise.all([loadRustModule(), loadLovefieldDB()])
-    .then(async () => {
-      await this._checkingIfWalletsLoaded();
-      runInAction(() => {
-        this.error = null;
-        this._loading = false;
+      .then(async () => {
+        await this._checkingIfWalletsLoaded();
+        runInAction(() => {
+          this.error = null;
+          this._loading = false;
+        });
+        return undefined;
+      })
+      .catch((error) => {
+        console.error('LoadingStore::setup Unable to load libraries', error);
+        runInAction(() => {
+          this.error = localizedError(new UnableToLoadError());
+          this._loading = false;
+        });
       });
-      return undefined;
-    })
-    .catch((error) => {
-      console.error('LoadingStore::setup Unable to load libraries', error);
-      runInAction(() => {
-        this.error = localizedError(new UnableToLoadError());
-        this._loading = false;
-      });
-    });
   }
 
   @computed get isLoading(): boolean {
@@ -41,8 +41,9 @@ export default class LoadingStore extends Store {
 
   _isRefresh = () => this.isLoading;
 
-  _redirectToLoading = () =>
+  _redirectToLoading = () => {
     this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
+  }
 
   _checkingIfWalletsLoaded = async () => {
     const { app } = this.stores;

@@ -7,9 +7,9 @@ import WalletAdd from '../../components/wallet/WalletAdd';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-import WalletRestoreDialogContainer from '../wallet/dialogs/WalletRestoreDialogContainer';
-import WalletCreateDialogContainer from '../wallet/dialogs/WalletCreateDialogContainer';
-import WalletBackupDialogContainer from '../wallet/dialogs/WalletBackupDialogContainer';
+import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
+import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
+import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
 import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
@@ -26,8 +26,9 @@ const messages = defineMessages({
   },
 });
 
+export default
 @inject('actions', 'stores') @observer
-export default class WalletAddPage extends Component<Props> {
+class WalletAddPage extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null };
 

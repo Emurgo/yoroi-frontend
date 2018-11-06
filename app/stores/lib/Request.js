@@ -2,20 +2,32 @@
 import { observable, action, computed, isObservableArray } from 'mobx';
 import { isEqual } from 'lodash/fp';
 import ExtendableError from 'es6-error';
+import { defineMessages } from 'react-intl';
+import LocalizableError from '../../i18n/LocalizableError';
 
-class NotExecutedYetError extends ExtendableError {
-  message = 'You have to call Request::execute before you can access it as promise';
-}
+const messages = defineMessages({
+  apiMethodNotYetImplementedError: {
+    id: 'api.errors.ApiMethodNotYetImplementedError',
+    defaultMessage: '!!!This API method is not yet implemented.',
+    description: '"This API method is not yet implemented." error message.'
+  },
+  promiseNotCalledYetError: {
+    id: 'api.errors.PromiseNotCalledYetError',
+    defaultMessage: '!!!You have to call Request::execute before you can access it as promise.',
+    description: 'When call chain is not correct.'
+  }
+});
 
 export type ApiCallType = {
   args: Array<any>,
   result: any,
 };
 
-export default class Request<Result, Error> {
+// Note: Do not use this class directly. Only use LocalizedRequest.
+export default class Request<Result, Err> {
 
   @observable result: ?Result = null;
-  @observable error: ?Error = null;
+  @observable error: ?Err = null;
   @observable isExecuting: boolean = false;
   @observable isError: boolean = false;
   @observable wasExecuted: boolean = false;
@@ -30,7 +42,7 @@ export default class Request<Result, Error> {
     this._method = method;
   }
 
-  execute(...callArgs: Array<any>): Request<Result, Error> {
+  execute(...callArgs: Array<any>): Request<Result, Err> {
     // Do not continue if this request is already loading
     if (this._isWaitingForResponse) return this;
 
@@ -42,7 +54,9 @@ export default class Request<Result, Error> {
 
     // Issue api call & save it as promise that is handled to update the results of the operation
     this.promise = new Promise((resolve, reject) => {
-      if (!this._method) reject('Request method not defined');
+      if (!this._method) {
+        reject(new ApiMethodNotYetImplementedError());
+      }
       this._method(...callArgs)
         .then((result) => {
           setTimeout(action('Request::execute/then', () => {
@@ -110,7 +124,7 @@ export default class Request<Result, Error> {
    *
    * @returns {Promise}
    */
-  patch(modify: Function): Promise<Request<Result, Error>> {
+  patch(modify: Function): Promise<Request<Result, Err>> {
     return new Promise((resolve) => {
       setTimeout(action(() => {
         const override = modify(this.result);
@@ -121,7 +135,7 @@ export default class Request<Result, Error> {
     });
   }
 
-  @action reset(): Request<Result, Error> {
+  @action reset(): Request<Result, Err> {
     this.result = null;
     this.error = null;
     this.isError = false;
@@ -131,5 +145,22 @@ export default class Request<Result, Error> {
     this._currentApiCall = null;
     return this;
   }
+}
 
+export class ApiMethodNotYetImplementedError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.apiMethodNotYetImplementedError.id,
+      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage,
+    });
+  }
+}
+
+export class NotExecutedYetError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.apiMethodNotYetImplementedError.id,
+      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage,
+    });
+  }
 }

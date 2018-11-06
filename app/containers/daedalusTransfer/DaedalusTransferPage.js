@@ -25,8 +25,9 @@ const messages = defineMessages({
   },
 });
 
+export default
 @inject('stores', 'actions') @observer
-export default class DaedalusTransferPage extends Component<InjectedProps> {
+class DaedalusTransferPage extends Component<InjectedProps> {
 
   static defaultProps = { actions: null, stores: null };
 

@@ -40,8 +40,9 @@ type Props = {
   onCancelBackup: Function,
 };
 
+export default
 @observer
-export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
+class WalletBackupPrivacyWarningDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

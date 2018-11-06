@@ -37,8 +37,9 @@ type Props = {
   isRestoreActive: boolean,
 };
 
+export default
 @observer
-export default class WalletAdd extends Component<Props> {
+class WalletAdd extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

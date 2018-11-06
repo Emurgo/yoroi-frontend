@@ -7,8 +7,9 @@ type Props = {
   phrase: string,
 };
 
+export default
 @observer
-export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
+class WalletRecoveryPhraseMnemonic extends Component<Props> {
 
   render() {
     const { phrase } = this.props;

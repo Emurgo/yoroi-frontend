@@ -5,8 +5,9 @@ import ChangeWalletPasswordDialog from '../../../components/wallet/settings/Chan
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 
+export default
 @inject('actions', 'stores') @observer
-export default class ChangeWalletPasswordDialogContainer extends Component<InjectedProps> {
+class ChangeWalletPasswordDialogContainer extends Component<InjectedProps> {
 
   static defaultProps = { actions: null, stores: null };
 

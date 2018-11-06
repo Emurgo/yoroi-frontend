@@ -30,8 +30,9 @@ type Props = {
   onCancelBackup: Function,
 };
 
+export default
 @observer
-export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> {
+class WalletRecoveryPhraseDisplayDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

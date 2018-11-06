@@ -32,8 +32,9 @@ type Props = {
   error?: ?LocalizableError,
 };
 
+export default
 @observer
-export default class LanguageSelectionForm extends Component<Props> {
+class LanguageSelectionForm extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

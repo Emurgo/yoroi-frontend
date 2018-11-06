@@ -10,8 +10,9 @@ import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
 type Props = InjectedContainerProps;
 
+export default
 @inject('stores', 'actions') @observer
-export default class Wallet extends Component<Props> {
+class Wallet extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null };
 

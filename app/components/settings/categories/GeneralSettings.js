@@ -26,8 +26,9 @@ type Props = {
   error?: ?LocalizableError,
 };
 
+export default
 @observer
-export default class GeneralSettings extends Component<Props> {
+class GeneralSettings extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

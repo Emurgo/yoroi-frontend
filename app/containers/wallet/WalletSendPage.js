@@ -9,8 +9,9 @@ import { DECIMAL_PLACES_IN_ADA, MAX_INTEGER_PLACES_IN_ADA } from '../../config/n
 
 type Props = InjectedProps;
 
+export default
 @inject('stores', 'actions') @observer
-export default class WalletSendPage extends Component<Props> {
+class WalletSendPage extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null };
 

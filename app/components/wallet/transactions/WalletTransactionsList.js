@@ -42,8 +42,9 @@ type Props = {
   onLoadMore: Function,
 };
 
+export default
 @observer
-export default class WalletTransactionsList extends Component<Props> {
+class WalletTransactionsList extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

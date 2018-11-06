@@ -32,8 +32,9 @@ type Props = {
   status: string
 };
 
+export default
 @observer
-export default class DaedalusTransferWaitingPage extends Component<Props> {
+class DaedalusTransferWaitingPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired

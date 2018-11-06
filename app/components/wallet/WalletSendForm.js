@@ -118,8 +118,9 @@ type State = {
   transactionFeeError: ?string,
 };
 
+export default
 @observer
-export default class WalletSendForm extends Component<Props, State> {
+class WalletSendForm extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

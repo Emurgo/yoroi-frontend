@@ -70,8 +70,9 @@ type Props = {
   suggestedMnemonics: Array<string>,
 };
 
+export default
 @observer
-export default class DaedalusTransferFormPage extends Component<Props> {
+class DaedalusTransferFormPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -144,11 +145,11 @@ export default class DaedalusTransferFormPage extends Component<Props> {
 
               <ul className={styles.instructionsList}>
                 {
-                  Array(2).fill().map((_, idx) =>
+                  Array(2).fill().map((_, idx) => (
                     <div key={`step${idx}`} className={styles.text}>
                       {intl.formatMessage({ id: messages[`step${idx}`].id })}
                     </div>
-                  )
+                  ))
                 }
               </ul>
             </div>

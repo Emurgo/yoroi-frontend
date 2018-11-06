@@ -7,8 +7,9 @@ type Props = {
   label: string,
 };
 
+export default
 @observer
-export default class WalletNoTransactions extends Component<Props> {
+class WalletNoTransactions extends Component<Props> {
 
   render() {
     return (

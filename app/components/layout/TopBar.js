@@ -25,8 +25,9 @@ type Props = {
   onCategoryClicked?: Function,
 };
 
+export default
 @observer
-export default class TopBar extends Component<Props> {
+class TopBar extends Component<Props> {
 
   render() {
     const {

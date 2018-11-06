@@ -19,8 +19,9 @@ type Props = {
   currencyUnit: string,
 };
 
+export default
 @inject('actions', 'stores') @observer
-export default class WalletSendConfirmationDialogContainer extends Component<Props> {
+class WalletSendConfirmationDialogContainer extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null };
 

@@ -24,8 +24,9 @@ export const messages = defineMessages({
   },
 });
 
+export default
 @observer
-export default class SidebarLayout extends Component<Props> {
+class SidebarLayout extends Component<Props> {
 
   static defaultProps = {
     children: null

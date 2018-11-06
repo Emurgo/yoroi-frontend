@@ -10,8 +10,9 @@ const { formattedWalletAmount } = resolver('utils/formatters');
 
 type Props = InjectedProps;
 
+export default
 @observer
-export default class TopBarContainer extends Component<Props> {
+class TopBarContainer extends Component<Props> {
   static defaultProps = { actions: null, stores: null };
 
   render() {

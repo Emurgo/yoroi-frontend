@@ -1,4 +1,7 @@
 // @flow
+
+/* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
+
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -75,8 +78,9 @@ type Props = {
   currencyUnit: string,
 };
 
+export default
 @observer
-export default class WalletSendConfirmationDialog extends Component<Props> {
+class WalletSendConfirmationDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

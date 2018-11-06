@@ -44,8 +44,9 @@ type State = {
   isActive: boolean,
 };
 
+export default
 @observer
-export default class InlineEditingInput extends Component<Props, State> {
+class InlineEditingInput extends Component<Props, State> {
 
   state = {
     isActive: false,

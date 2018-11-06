@@ -18,8 +18,9 @@ import ThemeManager from './ThemeManager';
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh]);
 
+export default
 @observer
-export default class App extends Component<{
+class App extends Component<{
   stores: StoresMap,
   actions: ActionsMap,
   history: Object,

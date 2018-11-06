@@ -6,7 +6,8 @@ import WalletBackupDialog from '../components/wallet/WalletBackupDialog';
 
 export type walletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
-export default class WalletBackupStore extends Store {
+export default
+class WalletBackupStore extends Store {
 
   @observable inProgress = false;
   @observable currentStep: walletBackupSteps = null;

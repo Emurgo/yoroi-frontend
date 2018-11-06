@@ -71,8 +71,9 @@ type State = {
   showUsed: boolean,
 };
 
+export default
 @observer
-export default class WalletReceive extends Component<Props, State> {
+class WalletReceive extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -83,7 +84,7 @@ export default class WalletReceive extends Component<Props, State> {
   };
 
   toggleUsedAddresses = () => {
-    this.setState({ showUsed: !this.state.showUsed });
+    this.setState(prevState => ({ showUsed: !prevState.showUsed }));
   };
 
   submit = () => {

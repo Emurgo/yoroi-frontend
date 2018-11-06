@@ -14,8 +14,9 @@ export type MainLayoutProps = {
   topbar: ?any
 };
 
+export default
 @inject('stores', 'actions') @observer
-export default class MainLayout extends Component<MainLayoutProps> {
+class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     actions: null,
     stores: null,

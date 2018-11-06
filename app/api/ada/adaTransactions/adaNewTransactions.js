@@ -75,6 +75,7 @@ export async function newAdaTransaction(
 ): Promise<any> {
   const masterKey = getWalletMasterKey();
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
+  // eslint-disable-next-line camelcase
   const [{ cbor_encoded_tx, changed_used }, changeAdaAddr] =
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
@@ -100,10 +101,12 @@ export async function getAllUTXOsForAddresses(
 ): Promise<Array<UTXO>> {
   try {
     const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-    const promises = groupsOfAddresses.map(groupOfAddresses =>
-      getUTXOsForAddresses(groupOfAddresses));
-    return Promise.all(promises).then(groupsOfUTXOs =>
-      groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), []));
+    const promises = groupsOfAddresses
+      .map(groupOfAddresses => getUTXOsForAddresses(groupOfAddresses));
+    return Promise.all(promises)
+      .then(groupsOfUTXOs => (
+        groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), [])
+      ));
   } catch (getUtxosError) {
     Logger.error('adaNewTransactions::getAllUTXOsForAddresses error: ' +
       stringifyError(getUtxosError));
@@ -125,8 +128,9 @@ export async function getAdaTransactionFromSenders(
   const outputs = [{ address: receiver, value: amount }];
   const senderUtxos = await getAllUTXOsForAddresses(_getAddresses(senders));
   const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-  // eslint-disable-next-line space-infix-ops
-  const result = getResultOrFail<SpendResponse>(Wallet.spend(cryptoWallet, inputs, outputs, changeAddr));
+  const result = getResultOrFail<SpendResponse>(
+    Wallet.spend(cryptoWallet, inputs, outputs, changeAddr)
+  );
   return [result, changeAdaAddr];
 }
 

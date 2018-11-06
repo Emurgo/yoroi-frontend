@@ -108,13 +108,11 @@ export const getAddressesListByType = addressType => {
     .where(addressesTable[addressesTableSchema.properties.type].eq(addressType))
     .groupBy(addressesTable[addressesTableSchema.properties.id])
     .exec()
-    .then(rows => rows.map(row =>
-      Object.assign(
-        {},
-        row[addressesTableSchema.name][addressesTableSchema.properties.value],
-        { cadIsUsed: !!row.timesUsed }
-      )
-    ));
+    .then(rows => rows.map(row => Object.assign(
+      {},
+      row[addressesTableSchema.name][addressesTableSchema.properties.value],
+      { cadIsUsed: !!row.timesUsed }
+    )));
 };
 
 export const saveAddresses = async (addresses, type) => {
@@ -196,25 +194,32 @@ const _getAddressesIn = (addresses) => {
     .then(rows => rows.map(row => row[addressesTableSchema.properties.id]));
 };
 
-const _txToRow = (tx) =>
-  _getTxsTable().createRow({
-    id: tx.ctId,
-    date: tx.ctMeta.ctmDate,
-    value: tx,
-    state: tx.ctCondition,
-    lastUpdated: tx.ctMeta.ctmUpdate
-  });
+const _txToRow = (tx) => (
+  _getTxsTable().createRow(
+    {
+      id: tx.ctId,
+      date: tx.ctMeta.ctmDate,
+      value: tx,
+      state: tx.ctCondition,
+      lastUpdated: tx.ctMeta.ctmUpdate
+    }
+  )
+);
 
-const _addressToRow = (address, type) =>
-  _getAddressesTable().createRow({
-    id: address.cadId,
-    type,
-    value: address,
-    isUsed: address.cadIsUsed
-  });
+const _addressToRow = (address, type) => (
+  _getAddressesTable().createRow(
+    {
+      id: address.cadId,
+      type,
+      value: address,
+      isUsed: address.cadIsUsed
+    }
+  )
+);
 
-const _insertOrReplaceQuery = (rows, table) =>
-  db.insertOrReplace().into(table).values(rows);
+const _insertOrReplaceQuery = (rows, table) => (
+  db.insertOrReplace().into(table).values(rows)
+);
 
 const _getTable = (name) => db.getSchema().table(name);
 

@@ -28,8 +28,9 @@ export const messages = defineMessages({
   }
 });
 
+export default
 @inject('stores', 'actions') @observer
-export default class WalletSummaryPage extends Component<Props> {
+class WalletSummaryPage extends Component<Props> {
   static defaultProps = { actions: null, stores: null };
 
   static contextTypes = {
