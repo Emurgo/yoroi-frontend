@@ -41,9 +41,9 @@ export default class LoadingStore extends Store {
 
   _isRefresh = () => this.isLoading;
 
-  _redirectToLoading = () => {
-    this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
-  }
+  _redirectToLoading = () => (
+    this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT })
+  );
 
   _checkingIfWalletsLoaded = async () => {
     const { app } = this.stores;
