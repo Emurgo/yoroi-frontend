@@ -7,9 +7,8 @@ import environment from '../../../environment';
 
 type Props = InjectedDialogContainerProps;
 
-export default
 @inject('stores', 'actions') @observer
-class WalletBackupDialogContainer extends Component<Props> {
+export default class WalletBackupDialogContainer extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null, children: null, onClose: () => {} };
 

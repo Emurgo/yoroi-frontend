@@ -4,9 +4,8 @@ import { observer, inject } from 'mobx-react';
 import TermsOfUseSettings from '../../../components/settings/categories/TermsOfUseSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 
-export default
 @inject('stores') @observer
-class TermsOfUseSettingsPage extends Component<InjectedProps> {
+export default class TermsOfUseSettingsPage extends Component<InjectedProps> {
 
   static defaultProps = { actions: null, stores: null };
 

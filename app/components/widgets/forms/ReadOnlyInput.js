@@ -15,9 +15,8 @@ type Props = {
   onClick: Function,
 };
 
-export default
 @observer
-class ReadOnlyInput extends Component<Props> {
+export default class ReadOnlyInput extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

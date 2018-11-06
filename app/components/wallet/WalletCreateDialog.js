@@ -59,9 +59,8 @@ type State = {
   isSubmitting: boolean,
 };
 
-export default
 @observer
-class WalletCreateDialog extends Component<Props, State> {
+export default class WalletCreateDialog extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

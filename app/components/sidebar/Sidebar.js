@@ -20,9 +20,8 @@ type Props = {
   isDialogOpen: Function,
 };
 
-export default
 @observer
-class Sidebar extends Component<Props> {
+export default class Sidebar extends Component<Props> {
 
   static defaultProps = {
     isShowingSubMenus: false,

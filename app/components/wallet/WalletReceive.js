@@ -71,9 +71,8 @@ type State = {
   showUsed: boolean,
 };
 
-export default
 @observer
-class WalletReceive extends Component<Props, State> {
+export default class WalletReceive extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

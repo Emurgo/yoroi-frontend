@@ -8,9 +8,8 @@ type Props = {
   instructionsText: string | Element<any>,
 };
 
-export default
 @observer
-class WalletRecoveryInstructions extends Component<Props> {
+export default class WalletRecoveryInstructions extends Component<Props> {
 
   render() {
     const { instructionsText } = this.props;

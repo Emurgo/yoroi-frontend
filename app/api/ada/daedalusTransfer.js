@@ -39,10 +39,10 @@ export function getAddressesWithFunds(payload: {
 }): Array<CryptoDaedalusAddressRestored> {
   try {
     const { secretWords, addresses } = payload;
-    const checker = getResultOrFail<CryptoAddressChecker>(
+    const checker: CryptoAddressChecker = getResultOrFail(
       RandomAddressChecker.newCheckerFromMnemonics(secretWords)
     );
-    const addressesWithFunds = getResultOrFail<Array<CryptoDaedalusAddressRestored>>(
+    const addressesWithFunds: Array<CryptoDaedalusAddressRestored> = getResultOrFail(
       RandomAddressChecker.checkAddresses(checker, addresses)
     );
     return addressesWithFunds;
@@ -67,7 +67,7 @@ export async function generateTransferTx(payload: {
     const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
     const inputs = _getInputs(senderUtxos, addressesWithFunds);
     const output = await _getReceiverAddress();
-    const tx = getResultOrFail<MoveResponse>(Wallet.move(wallet, inputs, output));
+    const tx: MoveResponse = getResultOrFail(Wallet.move(wallet, inputs, output));
     return {
       recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
       fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),

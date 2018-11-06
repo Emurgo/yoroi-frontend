@@ -24,9 +24,8 @@ type State = {
   copiedAddress: string,
 };
 
-export default
 @inject('stores', 'actions') @observer
-class WalletReceivePage extends Component<Props, State> {
+export default class WalletReceivePage extends Component<Props, State> {
 
   static defaultProps = { actions: null, stores: null };
 

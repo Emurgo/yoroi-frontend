@@ -10,9 +10,8 @@ type Props = {
   notification?: ?Node,
 };
 
-export default
 @observer
-class TopBarLayout extends Component<Props> {
+export default class TopBarLayout extends Component<Props> {
 
   render() {
     const { children, topbar, notification } = this.props;

@@ -62,9 +62,8 @@ type Props = {
   error: LocalizableError
 };
 
-export default
 @observer
-class DaedalusTransferSummaryPage extends Component<Props> {
+export default class DaedalusTransferSummaryPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired

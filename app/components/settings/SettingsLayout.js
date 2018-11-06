@@ -9,9 +9,8 @@ type Props = {
   menu: Node,
 };
 
-export default
 @observer
-class SettingsLayout extends Component<Props> {
+export default class SettingsLayout extends Component<Props> {
   render() {
     const { menu, children } = this.props;
     return (

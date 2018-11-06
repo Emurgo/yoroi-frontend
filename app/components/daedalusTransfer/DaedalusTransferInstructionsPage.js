@@ -81,9 +81,8 @@ type Props = {
   disableTransferFunds: boolean,
 };
 
-export default
 @observer
-class DaedalusTransferInstructionsPage extends Component<Props> {
+export default class DaedalusTransferInstructionsPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired

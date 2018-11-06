@@ -1,7 +1,6 @@
 // @flow
 import { observable, action, computed, isObservableArray } from 'mobx';
 import { isEqual } from 'lodash/fp';
-import ExtendableError from 'es6-error';
 import { defineMessages } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 
@@ -23,7 +22,7 @@ export type ApiCallType = {
   result: any,
 };
 
-// Note: Do not use this class directly. Only use LocalizedRequest.
+// Note: Do not use this class directly. Only use LocalizedRequest or CachedLocalizedRequest
 export default class Request<Result, Err> {
 
   @observable result: ?Result = null;

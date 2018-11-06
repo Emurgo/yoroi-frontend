@@ -2,8 +2,7 @@
 
 import { PasswordProtect } from 'rust-cardano-crypto';
 import cryptoRandomString from 'crypto-random-string';
-import { getOrFail } from '../api/ada/lib/cardanoCrypto/cryptoUtils';
-import { WrongPassphraseError } from '../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { WrongPassphraseError, CardanoCryptoError } from '../api/ada/lib/cardanoCrypto/cryptoErrors';
 
 export function encryptWithPassword(
   password: string,
@@ -12,9 +11,10 @@ export function encryptWithPassword(
   const salt = Buffer.from(cryptoRandomString(2 * 32), 'hex');
   const nonce = Buffer.from(cryptoRandomString(2 * 12), 'hex');
   const formattedPassword: Uint8Array = new TextEncoder().encode(password);
-  const encryptedBytes = getOrFail<Uint8Array>(
-    PasswordProtect.encryptWithPassword(formattedPassword, salt, nonce, bytes)
-  );
+  const encryptedBytes = PasswordProtect.encryptWithPassword(formattedPassword, salt, nonce, bytes);
+  if (!encryptedBytes) {
+    throw new CardanoCryptoError('Result not defined');
+  }
   const encryptedHex = Buffer.from(encryptedBytes).toString('hex');
   return encryptedHex;
 }

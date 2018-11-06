@@ -63,9 +63,8 @@ type Props = {
   onDownloadLogs: Function,
 };
 
-export default
 @observer
-class SupportSettings extends Component<Props> {
+export default class SupportSettings extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

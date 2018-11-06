@@ -35,9 +35,8 @@ type State = {
   areTermsOfUseAccepted: boolean,
 };
 
-export default
 @observer
-class TermsOfUseForm extends Component<Props, State> {
+export default class TermsOfUseForm extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

@@ -5,9 +5,8 @@ import resolver from '../../utils/imports';
 
 const Layout = resolver('containers/MainLayout');
 
-export default
 @inject('stores', 'actions') @observer
-class NoWalletsPage extends Component<any> {
+export default class NoWalletsPage extends Component<any> {
 
   render() {
     return (

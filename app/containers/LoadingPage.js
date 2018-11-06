@@ -16,9 +16,8 @@ export const messages = defineMessages({
   },
 });
 
-export default
 @inject('stores', 'actions') @observer
-class LoadingPage extends Component<InjectedProps> {
+export default class LoadingPage extends Component<InjectedProps> {
 
   render() {
     const { stores } = this.props;

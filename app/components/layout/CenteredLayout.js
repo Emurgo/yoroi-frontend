@@ -8,9 +8,8 @@ type Props = {
   children: Node,
 };
 
-export default
 @observer
-class CenteredLayout extends Component<Props> {
+export default class CenteredLayout extends Component<Props> {
 
   static defaultProps = {
     children: null

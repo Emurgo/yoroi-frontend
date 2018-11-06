@@ -35,9 +35,8 @@ type Props = {
   hasActiveWallet: boolean,
 };
 
-export default
 @observer
-class SettingsMenu extends Component<Props> {
+export default class SettingsMenu extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

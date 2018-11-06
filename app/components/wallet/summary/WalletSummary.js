@@ -33,9 +33,8 @@ type Props = {
   isLoadingTransactions: boolean,
 };
 
-export default
 @observer
-class WalletSummary extends Component<Props> {
+export default class WalletSummary extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

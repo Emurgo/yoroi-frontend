@@ -128,7 +128,7 @@ export async function getAdaTransactionFromSenders(
   const outputs = [{ address: receiver, value: amount }];
   const senderUtxos = await getAllUTXOsForAddresses(_getAddresses(senders));
   const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
-  const result = getResultOrFail<SpendResponse>(
+  const result: SpendResponse = getResultOrFail(
     Wallet.spend(cryptoWallet, inputs, outputs, changeAddr)
   );
   return [result, changeAdaAddr];

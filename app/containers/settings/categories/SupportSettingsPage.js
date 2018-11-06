@@ -6,9 +6,8 @@ import SupportSettings from '../../../components/settings/categories/SupportSett
 import { downloadLogs } from '../../../utils/logging';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 
-export default
 @inject('stores', 'actions') @observer
-class SupportSettingsPage extends Component<InjectedProps> {
+export default class SupportSettingsPage extends Component<InjectedProps> {
 
   static defaultProps = { actions: null, stores: null };
 

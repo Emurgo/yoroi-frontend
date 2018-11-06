@@ -26,9 +26,8 @@ type Props = {
   onCancel: Function
 };
 
-export default
 @observer
-class DaedalusTransferErrorPage extends Component<Props> {
+export default class DaedalusTransferErrorPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired

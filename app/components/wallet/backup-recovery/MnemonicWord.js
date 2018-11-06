@@ -13,9 +13,8 @@ type Props = {
   onClick: Function,
 };
 
-export default
 @observer
-class MnemonicWord extends Component<Props> {
+export default class MnemonicWord extends Component<Props> {
 
   render() {
     const { word, index, isActive, onClick } = this.props;

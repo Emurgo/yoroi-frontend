@@ -7,9 +7,8 @@ import { isValidWalletName } from '../../../utils/validations';
 
 type Props = InjectedProps
 
-export default
 @inject('stores', 'actions') @observer
-class WalletSettingsPage extends Component<Props> {
+export default class WalletSettingsPage extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null };
 

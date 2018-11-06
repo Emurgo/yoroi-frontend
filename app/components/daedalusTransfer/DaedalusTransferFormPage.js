@@ -70,9 +70,8 @@ type Props = {
   suggestedMnemonics: Array<string>,
 };
 
-export default
 @observer
-class DaedalusTransferFormPage extends Component<Props> {
+export default class DaedalusTransferFormPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired

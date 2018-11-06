@@ -30,9 +30,8 @@ type Props = {
   onRestartBackup: Function,
 };
 
-export default
 @observer
-class WalletBackupDialog extends Component<Props> {
+export default class WalletBackupDialog extends Component<Props> {
 
   render() {
     const {
@@ -91,5 +90,9 @@ class WalletBackupDialog extends Component<Props> {
         />
       );
     }
+
+    // We should never get to this point
+    // TODO: use proper types to make sure this is not possible
+    return <br />;
   }
 }

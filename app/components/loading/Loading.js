@@ -23,9 +23,8 @@ type Props = {
   error: ?LocalizableError
 };
 
-export default
 @observer
-class Loading extends Component<Props, State> {
+export default class Loading extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

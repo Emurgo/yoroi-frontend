@@ -8,9 +8,8 @@ type Props = {
   children?: ?Node,
 };
 
-export default
 @observer
-class VerticalFlexContainer extends Component<Props> {
+export default class VerticalFlexContainer extends Component<Props> {
   render() {
     const { children } = this.props;
     return (

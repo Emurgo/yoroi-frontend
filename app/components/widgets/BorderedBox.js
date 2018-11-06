@@ -8,9 +8,8 @@ type Props = {
   children?: Node,
 };
 
-export default
 @observer
-class BorderedBox extends Component<Props> {
+export default class BorderedBox extends Component<Props> {
 
   render() {
     const { children } = this.props;

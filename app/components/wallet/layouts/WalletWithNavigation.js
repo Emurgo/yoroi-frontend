@@ -11,9 +11,8 @@ type Props = {
   onWalletNavItemClick: Function,
 };
 
-export default
 @observer
-class WalletWithNavigation extends Component<Props> {
+export default class WalletWithNavigation extends Component<Props> {
 
   render() {
     const { children, isActiveScreen, onWalletNavItemClick } = this.props;

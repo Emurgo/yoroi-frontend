@@ -52,7 +52,7 @@ export function getCryptoWalletFromMasterKey(
 export function getCryptoDaedalusWalletFromMnemonics(
   secretWords: string,
 ): CryptoDaedalusWallet {
-  const wallet = getResultOrFail<CryptoDaedalusWallet>(Wallet.fromDaedalusMnemonic(secretWords));
+  const wallet: CryptoDaedalusWallet = getResultOrFail(Wallet.fromDaedalusMnemonic(secretWords));
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }

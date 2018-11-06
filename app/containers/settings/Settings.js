@@ -18,9 +18,8 @@ const messages = defineMessages({
   },
 });
 
-export default
 @inject('stores', 'actions') @observer
-class Settings extends Component<InjectedContainerProps> {
+export default class Settings extends Component<InjectedContainerProps> {
 
   static defaultProps = { actions: null, stores: null };
 

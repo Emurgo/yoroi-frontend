@@ -8,9 +8,8 @@ type Props = {
   localizedTermsOfUse: string,
 };
 
-export default
 @observer
-class TermsOfUseText extends Component<Props> {
+export default class TermsOfUseText extends Component<Props> {
   render() {
     return (
       <div className={styles.terms}>

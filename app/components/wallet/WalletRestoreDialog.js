@@ -85,9 +85,8 @@ type Props = {
   suggestedMnemonics: Array<string>,
 };
 
-export default
 @observer
-class WalletRestoreDialog extends Component<Props> {
+export default class WalletRestoreDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired

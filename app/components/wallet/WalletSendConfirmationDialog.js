@@ -78,9 +78,8 @@ type Props = {
   currencyUnit: string,
 };
 
-export default
 @observer
-class WalletSendConfirmationDialog extends Component<Props> {
+export default class WalletSendConfirmationDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
