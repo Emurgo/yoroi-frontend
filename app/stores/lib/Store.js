@@ -4,6 +4,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { Api } from '../../api/index';
 
+// Base store class used by all stores in our application
 export default class Store {
 
   stores: StoresMap;

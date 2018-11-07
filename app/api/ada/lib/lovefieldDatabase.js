@@ -1,31 +1,37 @@
 import lf, { Type } from 'lovefield';
 
+// TODO: add type-checking to schemes
+// Note: Schemes are inspired (but !=) to schemes used by importer & postgresDB
+
+// Goal: Pair AdaAddress with its AddressType
 const addressesTableSchema = {
   name: 'Addresses',
   properties: {
-    id: 'id',
-    type: 'type',
-    value: 'value'
+    id: 'id', // AdaAddress.cadId (hash of address)
+    type: 'type', // AddressType
+    value: 'value' // AdaAddress
   }
 };
 
+// Goal: TODO
 const txsTableSchema = {
   name: 'Txs',
   properties: {
-    id: 'id',
-    date: 'date',
-    value: 'value',
-    state: 'state',
-    lastUpdated: 'lastUpdated'
+    id: 'id', // AdaTransaction.ctId (hash of transaction)
+    date: 'date', // AdaTransaction.ctMeta.ctmDate
+    value: 'value', // AdaTransaction
+    state: 'state', // AdaTransaction.ctCondition
+    lastUpdated: 'lastUpdated' // AdaTransaction.ctMeta.ctmUpdate
   }
 };
 
+// Goal: TODO
 const txAddressesTableSchema = {
   name: 'TxAddresses',
   properties: {
-    id: 'id',
-    address: 'address',
-    tx: 'tx'
+    id: 'id', // concat of address hash + tx hash
+    address: 'address', // AdaAddress.cadId
+    tx: 'tx' // AdaTransaction.ctId
   }
 };
 
@@ -72,16 +78,24 @@ export const loadLovefieldDB = () => {
   });
 };
 
+// Delete all data associated to AdaAddress matching address hash from Address table. 
 export const deleteAddress = (address) => {
-  const table = _getAddressesTable();
+  const addressesTable = _getAddressesTable();
   db.delete()
-    .from(table)
+    .from(addressesTable)
     .where(table[addressesTableSchema.properties.id].eq(address))
     .exec();
 };
 
-export const getAddresses = () => db.select().from(_getAddressesTable()).exec();
+// Get all data from Address table. 
+export const getAddresses = () => {
+  const addressesTable = _getAddressesTable();
+  db.select()
+    .from(addressesTable)
+    .exec();
+}
 
+// Get all AdaAddress from Address table.
 export const getAddressesList = () => {
   const addressesTable = _getAddressesTable();
   return db.select()
@@ -90,6 +104,7 @@ export const getAddressesList = () => {
     .then(rows => rows.map(row => row[addressesTableSchema.properties.value]));
 };
 
+// Get all AdaAddresses of a certain type and update their isUsed status
 export const getAddressesListByType = addressType => {
   const addressesTable = _getAddressesTable();
   const txAddressesTable = _getTxAddressesTable();
