@@ -79,9 +79,7 @@ declare module 'rust-cardano-crypto' {
         msg: ?string
       },
       newAccount(w: CryptoWallet, accountIndex: number): {
-        result: {
-          Ok: CryptoAccount
-        },
+        result: CryptoAccount,
         failed: boolean,
         msg: ?string
       },
@@ -100,11 +98,7 @@ declare module 'rust-cardano-crypto' {
         outputs: Array<TxOutput>,
         changeAddr: string
       ): {
-        result: {
-          cbor_encoded_tx: Array<number>,
-          changed_used: boolean,
-          fee: number
-        },
+        result: SpendResponse,
         failed: boolean,
         msg: ?string
       },
@@ -113,11 +107,7 @@ declare module 'rust-cardano-crypto' {
         inputs: Array<TxDaedalusInput>,
         output: string
       ): {
-        result: {
-          cbor_encoded_tx: Array<number>,
-          fee: number,
-          tx: CryptoTransaction
-        },
+        result: MoveResponse,
         failed: boolean,
         msg: ?string
       }
@@ -137,9 +127,22 @@ declare module 'rust-cardano-crypto' {
   }
 }
 
+
+declare type SpendResponse = {
+  cbor_encoded_tx: Array<number>,
+  changed_used: boolean,
+  fee: number
+}
+
+declare type MoveResponse = {
+  cbor_encoded_tx: Array<number>,
+  fee: number,
+  tx: CryptoTransaction
+}
+
 declare type CryptoWallet = {
   root_key: string,
-  cached_root_key: string,
+  root_cached_key: string,
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: string
@@ -147,7 +150,7 @@ declare type CryptoWallet = {
 
 declare type CryptoDaedalusWallet = {
   root_key: string,
-  cached_root_key: string,
+  root_cached_key: string,
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: DerivationScheme
@@ -155,7 +158,7 @@ declare type CryptoDaedalusWallet = {
 
 declare type CryptoAccount = {
   account: number,
-  cached_account_key: string,
+  root_cached_key: string,
   derivation_scheme: string
 }
 

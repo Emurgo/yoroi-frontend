@@ -1,4 +1,7 @@
 // @flow
+
+/* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
+
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';

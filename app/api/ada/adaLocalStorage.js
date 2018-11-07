@@ -1,5 +1,5 @@
 // @flow
-import type { AdaWallet } from '../ada/adaTypes';
+import type { AdaWallet } from './adaTypes';
 
 const storageKeys = {
   ACCOUNT_KEY: 'ACCOUNT',

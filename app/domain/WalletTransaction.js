@@ -9,12 +9,12 @@ export type TransactionState = 'pending' | 'failed' | 'ok';
 export type TransactionType = 'card' | 'expend' | 'income' | 'exchange';
 
 export const transactionStates: {
-  PENDING: TransactionState, 
-  FAILED: TransactionState, 
+  PENDING: TransactionState,
+  FAILED: TransactionState,
   OK: TransactionState,
 } = {
-  PENDING: 'pending', 
-  FAILED: 'failed', 
+  PENDING: 'pending',
+  FAILED: 'failed',
   OK: 'ok',
 };
 
@@ -59,7 +59,8 @@ export default class WalletTransaction {
   getAssuranceLevelForMode(mode: AssuranceMode): AssuranceLevel {
     if (this.numberOfConfirmations < mode.low) {
       return assuranceLevels.LOW;
-    } else if (this.numberOfConfirmations < mode.medium) {
+    }
+    if (this.numberOfConfirmations < mode.medium) {
       return assuranceLevels.MEDIUM;
     }
     return assuranceLevels.HIGH;

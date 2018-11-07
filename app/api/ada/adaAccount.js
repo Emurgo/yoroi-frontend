@@ -21,6 +21,6 @@ export function createCryptoAccount(
   accountIndex: number = ACCOUNT_INDEX
 ): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, walletPassword);
-  const result = getResultOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
-  return Object.assign({ account: accountIndex }, result);
+  const result: CryptoAccount = getResultOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
+  return Object.assign({}, { account: accountIndex }, result);
 }

@@ -3,6 +3,7 @@
   "api.errors.GenericApiError": "已發生錯誤，請稍候再試一次。",
   "api.errors.IncorrectPasswordError": "錢包密碼不正確。",
   "api.errors.NotEnoughMoneyToSendError": "達成交易所需的資金不足。",
+  "api.errors.PromiseNotCalledYetError": "!!!You have to call Request::execute before you can access it as promise.",
   "api.errors.RedeemAdaError": "您的 ADA 無法正確兌換。",
   "api.errors.ReportRequestError": "傳送支援要求時出現問題。",
   "api.errors.WalletAlreadyImportedError": "您嘗試匯入的錢包已存在。",
