@@ -78,22 +78,22 @@ export const loadLovefieldDB = () => {
   });
 };
 
-// Delete all data associated to AdaAddress matching address hash from Address table. 
+// Delete all data associated to AdaAddress matching address hash from Address table.
 export const deleteAddress = (address) => {
   const addressesTable = _getAddressesTable();
   db.delete()
     .from(addressesTable)
-    .where(table[addressesTableSchema.properties.id].eq(address))
+    .where(addressesTable[addressesTableSchema.properties.id].eq(address))
     .exec();
 };
 
-// Get all data from Address table. 
+// Get all data from Address table.
 export const getAddresses = () => {
   const addressesTable = _getAddressesTable();
   db.select()
     .from(addressesTable)
     .exec();
-}
+};
 
 // Get all AdaAddress from Address table.
 export const getAddressesList = () => {
