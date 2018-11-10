@@ -14,7 +14,10 @@ export type AppConfigType = {
 }
 
 export type NetworkConfigType = {
-  protocolMagic: 633343913 | 764824073,
+  protocolMagic: 
+      633343913  // staging protocol magic
+    | 764824073 // mainnet protocol magic
+    | 1097911063, // testnet protocol magic
   backendUrl: string,
   websocketUrl: string,
   name: string,

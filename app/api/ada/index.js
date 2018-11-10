@@ -50,6 +50,7 @@ import type {
   AdaAddress,
   AdaAddresses,
   AdaTransaction,
+  AdaTransactionCondition,
   AdaTransactionFee,
   AdaTransactions,
   AdaWallet,
@@ -201,11 +202,11 @@ export default class AdaApi {
     }
   }
 
-  async getAdaTxLastUpdatedDate() : Promise<Date> {
+  async getTxLastUpdatedDate() : Promise<Date> {
     try {
       return getAdaTxLastUpdatedDate();
     } catch (error) {
-      Logger.error('AdaApi::getAdaTxLastUpdatedDate error: ' + stringifyError(error));
+      Logger.error('AdaApi::getTxLastUpdatedDate error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -277,7 +278,7 @@ export default class AdaApi {
 
   async createTransaction(
     request: CreateTransactionRequest
-  ): Promise<any> {
+  ): Promise<Array<void>> {
     Logger.debug('AdaApi::createTransaction called');
     const { receiver, amount, password } = request;
     try {
@@ -500,7 +501,7 @@ const _createAddressFromServerData = action(
   )
 );
 
-const _conditionToTxState = (condition: string) => {
+const _conditionToTxState = (condition: AdaTransactionCondition) => {
   switch (condition) {
     case 'CPtxApplying':
       return 'pending';

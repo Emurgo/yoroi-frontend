@@ -1,4 +1,8 @@
 // @flow
+
+// Handles "Addresses" as defined in the bip44 specification
+// Also handles interfacing with the LovefieldDB for everything related purely to addresses. 
+
 import { Wallet } from 'rust-cardano-crypto';
 import _ from 'lodash';
 import config from '../../config';
@@ -43,8 +47,10 @@ export function isValidAdaAddress(address: string): Promise<boolean> {
   }
 }
 
-/* Just return all existing addresses because we are using a SINGLE account */
-export function getAdaAddressesMap() {
+/** Get a mapping of address hash to AdaAddress */
+export function getAdaAddressesMap(): Promise<[key: string]:AdaAddress> {
+  // Just return all existing addresses because we are using a SINGLE account
+  // TODO: make this work for multiple accounts in case we add multiple accounts eventually
   return getAddresses().then(addresses => {
     const addressesMap = {};
     addresses.forEach(address => {
@@ -54,10 +60,12 @@ export function getAdaAddressesMap() {
   });
 }
 
-export function getAdaAddressesList() {
+/** Wrapper function for LovefieldDB call to get all AdaAddresses */
+export function getAdaAddressesList(): Promise<Array<AdaAddress>> {
   return getAddressesList();
 }
 
+/** Wrapper function for LovefieldDB call to get all AdaAddresses by type */
 export function getAdaAddressesByType(addressType: AddressType): Promise<AdaAddresses> {
   return getAddressesListByType(addressType);
 }
@@ -65,8 +73,11 @@ export function getAdaAddressesByType(addressType: AddressType): Promise<AdaAddr
 export async function newExternalAdaAddress(
   cryptoAccount: CryptoAccount
 ): Promise<AdaAddress> {
+  // Note this function doesn't just get the addresses but also calculates their isUsed status
   const addresses: AdaAddresses = await getAdaAddressesByType('External');
+  // We use the isUsed status to now find the next unused address
   const lastUsedAddressIndex = _.findLastIndex(addresses, address => address.cadIsUsed) + 1;
+
   // TODO Move this to a config file
   const unusedSpan = addresses.length - lastUsedAddressIndex;
   if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) {
@@ -76,7 +87,7 @@ export async function newExternalAdaAddress(
   return newAddress;
 }
 
-/* Create and save the next address for the given account */
+/** Create and save the next address for the given account */
 export async function newAdaAddress(
   cryptoAccount: CryptoAccount,
   addresses: AdaAddresses,
@@ -87,6 +98,7 @@ export async function newAdaAddress(
   return address;
 }
 
+/** Create new wallet address based off bip44 and then convert it to an AdaAddress */
 export async function createAdaAddress(
   cryptoAccount: CryptoAccount,
   addresses: AdaAddresses,
@@ -100,19 +112,22 @@ export async function createAdaAddress(
   return toAdaAddress(cryptoAccount.account, addressType, addressIndex, address);
 }
 
-export function saveAdaAddress(address: AdaAddress, addressType: AddressType): Promise<void> {
+/** Wrapper function to save addresses to LovefieldDB */
+export function saveAdaAddress(address: AdaAddress, addressType: AddressType): Promise<Array<AddressesTableRow>> {
   return saveAddresses([address], addressType);
 }
 
-export function removeAdaAddress(address: AdaAddress): void {
-  deleteAddress(address.cadId);
+/** Wrapper function to remove an addresse from LovefieldDB */
+export function removeAdaAddress(address: AdaAddress): Promise<Array<void>> {
+  return deleteAddress(address.cadId);
 }
 
+/** Remove list of addresses from lovefieldDB */
 export async function saveAsAdaAddresses(
   cryptoAccount: CryptoAccount,
   addresses: Array<string>,
   addressType: AddressType
-): Promise<void> {
+): Promise<Array<AddressesTableRow>> {
   const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) => (
     toAdaAddress(cryptoAccount.account, addressType, index, hash)
   ));

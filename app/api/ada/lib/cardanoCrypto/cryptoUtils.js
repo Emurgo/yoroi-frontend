@@ -1,6 +1,7 @@
 // @flow
 import { CardanoCryptoError } from './cryptoErrors';
 
+// TODO: turn "any" into a templated type once we upgrade our packages enough to allow this
 export function getResultOrFail(
   result: any
 ): any {

@@ -76,7 +76,7 @@ export class UnusedAddressesError extends LocalizableError {
   }
 }
 
-export type CreateTransactionResponse = any;
+export type CreateTransactionResponse = Array<void>;
 export type CreateWalletResponse = Wallet;
 export type DeleteWalletResponse = boolean;
 export type GetLocalTimeDifferenceResponse = number;

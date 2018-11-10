@@ -8,7 +8,7 @@ import type {
 } from '../../adaTypes';
 
 
-/* @note: Ada wallet is the abstraction for Daedalus */
+/** @note: Ada wallet is the abstraction for Daedalus */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
@@ -46,5 +46,5 @@ export function toAdaAddress(
 
 export function getAddressTypeIndex(addressType: AddressType): number {
   if (addressType === 'External') return 0;
-  return 1; // addressType === 'Internal;
+  return 1; // addressType === 'Internal';
 }

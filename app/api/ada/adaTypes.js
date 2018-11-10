@@ -1,9 +1,18 @@
 // @flow
+
+// Types that come from either the importer (possibly replicated in backend-service)
 import BigNumber from 'bignumber.js';
 
 // ========= Response Types =========
+
+// Based on CWalletAssurance from the Importer
 export type AdaAssurance = 'CWANormal' | 'CWAStrict';
+
+// Based on CPtxCondition from the Importer
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
+
+// Based on TxState from the Importer
+export type AdaTxsState = 'Successful' | 'Failed' | 'Pending';
 
 export type AdaSyncProgressResponse = {
   _spLocalCD: {
@@ -60,15 +69,14 @@ export type AdaAccounts = Array<AdaAccount>;
 export type Transaction = {
   hash: string,
   inputs_address: Array<string>,
-  inputs_amount: Array<string>,
+  inputs_amount: Array<string>, // bingint[]
   outputs_address: Array<string>,
-  outputs_amount: Array<string>,
-  block_num: string,
-  time: string,
-  succeeded: boolean,
-  best_block_num: string,
-  last_update: string,
-  tx_state: string
+  outputs_amount: Array<string>, // bingint[]
+  block_num: ?string, // null if transaction failed
+  time: string, // timestamp with timezone
+  best_block_num: string, // bigint
+  last_update: string, // timestamp with timezone
+  tx_state: AdaTxsState
 };
 
 export type AdaTransaction = {
@@ -89,11 +97,12 @@ export type AdaTransaction = {
 
 export type AdaTransactions = [
   Array<AdaTransaction>,
-  number,
+  number, // length
 ];
 
 export type AdaTransactionInputOutput = [
-  [string, AdaAmount],
+  [string, // output address
+   AdaAmount],
 ];
 
 export type AdaTransactionFee = AdaAmount;

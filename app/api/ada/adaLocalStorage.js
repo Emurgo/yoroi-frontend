@@ -1,11 +1,17 @@
 // @flow
+
+// Wrapper API to Save&Load localstorage using JSON
+
 import type { AdaWallet } from './adaTypes';
 
+// Use constant keys to store/load localstorage
 const storageKeys = {
-  ACCOUNT_KEY: 'ACCOUNT',
+  ACCOUNT_KEY: 'ACCOUNT', // Note: only a single account
   WALLET_KEY: 'WALLET',
   LAST_BLOCK_NUMBER_KEY: 'LAST_BLOCK_NUMBER'
 };
+
+/* Account storage */
 
 export function saveCryptoAccount(
   ca: CryptoAccount
@@ -16,6 +22,8 @@ export function saveCryptoAccount(
 export function getSingleCryptoAccount(): CryptoAccount {
   return _getFromStorage(storageKeys.ACCOUNT_KEY);
 }
+
+/* Wallet storage */
 
 export function saveAdaWallet(
   adaWallet: AdaWallet,
@@ -34,6 +42,8 @@ export function getWalletMasterKey(): string {
   return stored.masterKey;
 }
 
+/* Last block Nnmber storage */
+
 export function saveLastBlockNumber(blockNumber: number): void {
   _saveInStorage(storageKeys.LAST_BLOCK_NUMBER_KEY, blockNumber);
 }
@@ -41,6 +51,8 @@ export function saveLastBlockNumber(blockNumber: number): void {
 export function getLastBlockNumber() {
   return _getFromStorage(storageKeys.LAST_BLOCK_NUMBER_KEY);
 }
+
+/* Util functions */
 
 function _saveInStorage(key: string, toSave: any): void {
   localStorage.setItem(key, JSON.stringify(toSave));

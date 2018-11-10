@@ -28,7 +28,7 @@ export const toAdaTx = function (
   isOutgoing: boolean,
   outputs: AdaTransactionInputOutput,
   time: string
-) : AdaTransaction {
+): AdaTransaction {
   return {
     ctAmount: {
       getCCoin: amount.toString()
@@ -48,6 +48,7 @@ export const toAdaTx = function (
   };
 };
 
+/** Convert TxState from icarus-importer to AdaTransactionCondition */
 const _getTxCondition = (state: string): AdaTransactionCondition => {
   if (state === 'Successful') return 'CPtxInBlocks';
   if (state === 'Pending') return 'CPtxApplying';

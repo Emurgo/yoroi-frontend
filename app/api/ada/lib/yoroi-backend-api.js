@@ -1,4 +1,8 @@
 // @flow
+
+// This file makes the actual HTTP requests to the yoroi-backend-service 
+// https://github.com/Emurgo/yoroi-backend-service/
+
 import axios from 'axios';
 import type Moment from 'moment';
 import type { ConfigType } from '../../../../config/config-types';
@@ -14,13 +18,17 @@ import {
   CheckAdressesInUseApiError,
   InvalidWitnessError
 } from '../errors';
+import type {
+  UTXO,
+  Transaction
+} from '../adaTypes';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
 
-// TODO: Refactor service call in order to re-use common parameters
-
-export const getUTXOsForAddresses = (addresses: Array<string>) => (
+export const getUTXOsForAddresses = (
+  addresses: Array<string>
+): Promise<Array<UTXO>> => (
   axios(
     `${backendUrl}/api/txs/utxoForAddresses`,
     {
@@ -36,7 +44,12 @@ export const getUTXOsForAddresses = (addresses: Array<string>) => (
     })
 );
 
-export const getUTXOsSumsForAddresses = (addresses: Array<string>) => (
+export type SumsForAddressesResult = {
+  sum: ?string
+};
+export const getUTXOsSumsForAddresses = (
+  addresses: Array<string>
+): Promise<SumsForAddressesResult> => (
   axios(
     `${backendUrl}/api/txs/utxoSumForAddresses`,
     {
@@ -52,7 +65,10 @@ export const getUTXOsSumsForAddresses = (addresses: Array<string>) => (
     })
 );
 
-export const getTransactionsHistoryForAddresses = (addresses: Array<string>, dateFrom: Moment) => (
+export const getTransactionsHistoryForAddresses = (
+  addresses: Array<string>,
+  dateFrom: Date
+): Promise<Array<Transaction>> => (
   axios(
     `${backendUrl}/api/txs/history`,
     {
@@ -69,7 +85,9 @@ export const getTransactionsHistoryForAddresses = (addresses: Array<string>, dat
     })
 );
 
-export const sendTx = (signedTx: string) => (
+export const sendTx = (
+  signedTx: string
+): Promise<Array<void>> => (
   axios(
     `${backendUrl}/api/txs/signed`,
     {
@@ -88,7 +106,9 @@ export const sendTx = (signedTx: string) => (
     })
 );
 
-export const checkAddressesInUse = (addresses: Array<string>) => (
+export const checkAddressesInUse = (
+  addresses: Array<string>
+): Promise<Array<string>> => (
   axios(
     `${backendUrl}/api/addresses/filterUsed`,
     {

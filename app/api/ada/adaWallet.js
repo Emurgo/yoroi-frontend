@@ -102,18 +102,22 @@ export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =
   generateAdaMnemonic()
 );
 
+/** Call backend-service to get the balances of addresses and then sum them */
 export async function getBalance(
   addresses: Array<string>
 ): Promise<BigNumber> {
   try {
+    // batch all addresses into chunks for API
     const groupsOfAddresses = _.chunk(addresses, addressesLimit);
     const promises =
       groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
-    const partialAmounts = await Promise.all(promises);
+    const partialAmounts: Array<SumsForAddressesResult> = await Promise.all(promises);
+
+    // sum all chunks together
     return partialAmounts.reduce(
       (acc, partialAmount) => (
         acc.plus(
-          partialAmount.sum
+          partialAmount.sum // null if no addresses in the batch has any balance in them
             ? new BigNumber(partialAmount.sum)
             : new BigNumber(0)
         )
@@ -132,7 +136,12 @@ export const changeAdaWalletPassphrase = (
   const walletMasterKey = getWalletMasterKey();
   const updatedWalletMasterKey =
     updateWalletMasterKeyPassword(walletMasterKey, oldPassword, newPassword);
-  const updatedWallet = Object.assign({}, getAdaWallet(), { cwPassphraseLU: moment().format() });
+  const wallet = getAdaWallet();
+  const updatedWallet = Object.assign(
+    {}, 
+    wallet ? wallet : {}, 
+    { cwPassphraseLU: moment().format() }
+  );
   saveAdaWallet(updatedWallet, updatedWalletMasterKey);
   return Promise.resolve(updatedWallet);
 };
