@@ -48,8 +48,10 @@ export function saveLastBlockNumber(blockNumber: number): void {
   _saveInStorage(storageKeys.LAST_BLOCK_NUMBER_KEY, blockNumber);
 }
 
-export function getLastBlockNumber() {
-  return _getFromStorage(storageKeys.LAST_BLOCK_NUMBER_KEY);
+export function getLastBlockNumber(): number {
+  const lastBlockNum = _getFromStorage(storageKeys.LAST_BLOCK_NUMBER_KEY);
+  // Note: have to cast to number because an old version of Yoroi saved as a string
+  return Number(lastBlockNum);
 }
 
 /* Util functions */

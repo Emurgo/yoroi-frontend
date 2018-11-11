@@ -51,7 +51,7 @@ export function getAdaTransactionFee(
   receiver: string,
   amount: string
 ): Promise<AdaTransactionFee> {
-  // To calculate what the transaction fee would be without requiring the user to enter their password
+  // To calculate the transaction fee without requiring the user to enter their password
   // We create a fake mnemonic with a fixed contant password
   const fakePassword = 'fake';
   const fakeWalletMasterKey = generateWalletMasterKey(generateAdaMnemonic().join(' '), fakePassword);

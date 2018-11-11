@@ -30,6 +30,9 @@ import type {
 import {
   getUTXOsSumsForAddresses
 } from './lib/yoroi-backend-api';
+import type {
+  SumForAddressesResult
+} from './lib/yoroi-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
 import { saveAdaWallet, getAdaWallet, getWalletMasterKey } from './adaLocalStorage';
 import type { ConfigType } from '../../../config/config-types';
@@ -111,11 +114,11 @@ export async function getBalance(
     const groupsOfAddresses = _.chunk(addresses, addressesLimit);
     const promises =
       groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
-    const partialAmounts: Array<SumsForAddressesResult> = await Promise.all(promises);
+    const partialAmounts: Array<SumForAddressesResult> = await Promise.all(promises);
 
     // sum all chunks together
     return partialAmounts.reduce(
-      (acc, partialAmount) => (
+      (acc: BigNumber, partialAmount) => (
         acc.plus(
           partialAmount.sum // null if no addresses in the batch has any balance in them
             ? new BigNumber(partialAmount.sum)
@@ -138,8 +141,8 @@ export const changeAdaWalletPassphrase = (
     updateWalletMasterKeyPassword(walletMasterKey, oldPassword, newPassword);
   const wallet = getAdaWallet();
   const updatedWallet = Object.assign(
-    {}, 
-    wallet ? wallet : {}, 
+    {},
+    wallet ? wallet : {},
     { cwPassphraseLU: moment().format() }
   );
   saveAdaWallet(updatedWallet, updatedWalletMasterKey);

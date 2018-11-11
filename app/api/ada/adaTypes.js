@@ -83,7 +83,7 @@ export type AdaTransaction = {
   ctAmount: AdaAmount,
   ctBlockNumber: number,
   ctId: string,
-  ctInputs: AdaTransactionInputOutput,
+  ctInputs: Array<AdaTransactionInputOutput>,
   ctIsOutgoing: boolean,
   ctMeta: {
     ctmDate: Date,
@@ -91,7 +91,7 @@ export type AdaTransaction = {
     ctmTitle: ?string,
     ctmUpdate: Date
   },
-  ctOutputs: AdaTransactionInputOutput,
+  ctOutputs: Array<AdaTransactionInputOutput>,
   ctCondition: AdaTransactionCondition,
 };
 
@@ -101,8 +101,8 @@ export type AdaTransactions = [
 ];
 
 export type AdaTransactionInputOutput = [
-  [string, // output address
-   AdaAmount],
+  string, // output address
+  AdaAmount,
 ];
 
 export type AdaTransactionFee = AdaAmount;

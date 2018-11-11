@@ -1,7 +1,7 @@
 // @flow
 
 // Handles "Addresses" as defined in the bip44 specification
-// Also handles interfacing with the LovefieldDB for everything related purely to addresses. 
+// Also handles interfacing with the LovefieldDB for everything related purely to addresses.
 
 import { Wallet } from 'rust-cardano-crypto';
 import _ from 'lodash';
@@ -16,6 +16,9 @@ import {
   getAddressesList,
   getAddressesListByType,
   deleteAddress
+} from './lib/lovefieldDatabase';
+import type {
+  AddressesTableRow
 } from './lib/lovefieldDatabase';
 import {
   UnusedAddressesError,
@@ -48,7 +51,7 @@ export function isValidAdaAddress(address: string): Promise<boolean> {
 }
 
 /** Get a mapping of address hash to AdaAddress */
-export function getAdaAddressesMap(): Promise<[key: string]:AdaAddress> {
+export function getAdaAddressesMap(): Promise<{[key: string]:AdaAddress}> {
   // Just return all existing addresses because we are using a SINGLE account
   // TODO: make this work for multiple accounts in case we add multiple accounts eventually
   return getAddresses().then(addresses => {
@@ -113,12 +116,17 @@ export async function createAdaAddress(
 }
 
 /** Wrapper function to save addresses to LovefieldDB */
-export function saveAdaAddress(address: AdaAddress, addressType: AddressType): Promise<Array<AddressesTableRow>> {
+export function saveAdaAddress(
+  address: AdaAddress,
+  addressType: AddressType
+): Promise<Array<AddressesTableRow>> {
   return saveAddresses([address], addressType);
 }
 
 /** Wrapper function to remove an addresse from LovefieldDB */
-export function removeAdaAddress(address: AdaAddress): Promise<Array<void>> {
+export function removeAdaAddress(
+  address: AdaAddress
+): Promise<Array<void>> {
   return deleteAddress(address.cadId);
 }
 

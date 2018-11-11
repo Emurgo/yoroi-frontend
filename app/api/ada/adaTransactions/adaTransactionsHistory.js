@@ -19,6 +19,10 @@ import {
   getTxsLastUpdatedDate,
   getPendingTxs
 } from '../lib/lovefieldDatabase';
+import type {
+  TxAddressesTableRow,
+  TxsTableRow
+} from '../lib/lovefieldDatabase';
 import {
   toAdaTx
 } from '../lib/utils';
@@ -38,6 +42,7 @@ import type
 import { saveLastBlockNumber, getLastBlockNumber } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import config from '../../../config';
+import type Moment from 'moment';
 
 declare var CONFIG : ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
@@ -53,7 +58,7 @@ export const getAdaTxsHistoryByWallet = async (): Promise<AdaTransactions> => {
 export const getAdaTxLastUpdatedDate = async (): Promise<Date> => getTxsLastUpdatedDate();
 
 /** Make backend-service calls to update any missing transactions in lovefieldDB */
-export async function refreshTxs(): Promise<Array<Array<TxsTableRow|TxAddressesTableRow>>> {
+export async function refreshTxs(): Promise<void> {
   try {
     const adaAddresses = await getAdaAddressesList();
     const addresses: Array<string> = adaAddresses.map(addr => addr.cadId);
@@ -76,7 +81,7 @@ export function getPendingAdaTxs(): Promise<Array<AdaTransaction>> {
 async function _updateAdaTxsHistory(
   existingTransactions: Array<AdaTransaction>,
   addresses: Array<string>
-): Promise<Array<Array<TxsTableRow|TxAddressesTableRow>>> {
+): Promise<[Array<TxsTableRow>, Array<TxAddressesTableRow>]> {
   try {
     // optimization: look for new transactions AFTER the timestamp of the last transaction received
     const dateFrom = existingTransactions.length > 0
@@ -99,8 +104,8 @@ async function _updateAdaTxsHistory(
 /** Split API call on list of addresses into batched requests */
 async function _getTxsForChunksOfAddresses(
   addresses: Array<string>,
-  apiCall: (Array<Array<string>>) => Promise<Array<AdaTransaction>>
-): Array<AdaTransaction> {
+  apiCall: (Array<string>) => Promise<Array<AdaTransaction>>
+): Promise<Array<AdaTransaction>> {
   const groupsOfAddresses = _.chunk(addresses, addressesLimit);
   const groupedTxsPromises = groupsOfAddresses.map(apiCall);
   const groupedTxs = await Promise.all(groupedTxsPromises);
@@ -108,7 +113,7 @@ async function _getTxsForChunksOfAddresses(
 }
 
 /** Recursively fetch transaction history for a set of addresses from backend API
-  * At the same time, update best block saved in local storage 
+  * At the same time, update best block saved in local storage
 */
 async function _updateAdaTxsHistoryForGroupOfAddresses(
   previousTxs: Array<AdaTransaction>,
@@ -123,13 +128,13 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
 
   // Move cutoff date forward to make progress on recursive calls
   const updatedDateFrom = previousTxs.length > 0
-    ? moment(previousTxs[previousTxs.length - 1].ctMeta.ctmUpdate) 
+    ? moment(previousTxs[previousTxs.length - 1].ctMeta.ctmUpdate)
     : dateFrom;
 
   // Get historic transactions from backend API
   const history = await getTransactionsHistoryForAddresses(
     groupOfAddresses,
-    updatedDateFrom.toDate();
+    updatedDateFrom.toDate()
   );
 
   // No more history left to fetch
@@ -137,12 +142,13 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
     return previousTxs;
   }
 
-  /* Update last block to best block in wallet history. 
+  /* Update last block to best block in wallet history.
    * Note: Done for one tx as the best_block_num is the same for all txs in request
   */
+  const bestBlockNum = Number(history[0].best_block_num);
   const lastKnownBlockNumber = getLastBlockNumber();
-  if (!lastKnownBlockNumber || history[0].best_block_num > lastKnownBlockNumber) {
-    saveLastBlockNumber(history[0].best_block_num);
+  if (!lastKnownBlockNumber || bestBlockNum > lastKnownBlockNumber) {
+    saveLastBlockNumber(bestBlockNum);
   }
 
   // map database format for historic transactions to actual AdaTransaction format
@@ -172,7 +178,7 @@ function _mapToAdaTxs(
     const inputs = _mapInputOutput(tx.inputs_address, tx.inputs_amount);
     const outputs = _mapInputOutput(tx.outputs_address, tx.outputs_amount);
     const { isOutgoing, amount } = _spenderData(inputs, outputs, accountAddresses);
-    const time = tx.time || tx.created_time;
+    const time = tx.time;
     return toAdaTx(amount, tx, inputs, isOutgoing, outputs, time);
   });
 }
@@ -181,14 +187,14 @@ function _mapToAdaTxs(
 function _mapInputOutput(
   addresses: Array<string>,
   amounts: Array<string>
-): AdaTransactionInputOutput {
+): Array<AdaTransactionInputOutput> {
   return addresses.map((address, index) => [address, { getCCoin: amounts[index] }]);
 }
 
 /** Calculate whether transaction is ingoing/outgoing and how was sent out */
 function _spenderData(
-  txInputs: AdaTransactionInputOutput,
-  txOutputs: AdaTransactionInputOutput,
+  txInputs: Array<AdaTransactionInputOutput>,
+  txOutputs: Array<AdaTransactionInputOutput>,
   addresses: Array<string>
 ): {
   isOutgoing: boolean,

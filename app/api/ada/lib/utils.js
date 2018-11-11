@@ -24,9 +24,9 @@ export function getAddressInHex(address: string): string {
 export const toAdaTx = function (
   amount: BigNumber,
   tx: Transaction,
-  inputs: AdaTransactionInputOutput,
+  inputs: Array<AdaTransactionInputOutput>,
   isOutgoing: boolean,
-  outputs: AdaTransactionInputOutput,
+  outputs: Array<AdaTransactionInputOutput>,
   time: string
 ): AdaTransaction {
   return {

@@ -172,15 +172,15 @@ export const saveAddresses = async (
 
 export const saveTxs = async (
   txs: Array<AdaTransaction>
-): Promise<Array<Array<TxsTableRow|TxAddressesTableRow>>> => {
+): Promise<[Array<TxsTableRow>, Array<TxAddressesTableRow>]> => {
   // For every TX we need to update both the TxsTable and TxAddressesTable
   const dbTransaction = db.createTransaction();
 
   // get row insertions for both tables
-  const txsTableInsertRows = tx.map(tx => _txToRow(tx));
-  const txAddressesTableInsertRows = tx.map(tx => _getTxAddressesRows(tx));
-  
-  // Note: for every tx there are multiple addresses so we have to flatten the map 
+  const txsTableInsertRows = txs.map(tx => _txToRow(tx));
+  const txAddressesTableInsertRows = txs.map(tx => _getTxAddressesRows(tx));
+
+  // Note: for every tx there are multiple addresses so we have to flatten the map
   const txAddressesRows = await Promise.all(txAddressesTableInsertRows);
   const txAddressRows = txAddressesRows.reduce((accum, rows) => accum.concat(rows), []);
 
@@ -207,8 +207,8 @@ export const getTxsLastUpdatedDate = async (): Date => {
     .orderBy(table[txsTableSchema.properties.lastUpdated], lf.Order.DESC)
     .limit(1)
     .exec();
-  return result.length === 1 
-    ? result[0].lastUpdated 
+  return result.length === 1
+    ? result[0].lastUpdated
     : new Date(0);
 };
 
@@ -225,7 +225,7 @@ export const getPendingTxs = function (): Promise<Array<AdaTransaction>> {
 
 /** Helper function to order TxsTable by abitrary field */
 const _getTxsOrderedBy = (
-  orderField, 
+  orderField,
   lfOrder
 ): Promise<Array<AdaTransaction>> => {
   const txsTable = _getTxsTable();

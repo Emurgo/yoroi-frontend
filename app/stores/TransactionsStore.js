@@ -122,7 +122,7 @@ export default class TransactionsStore extends Store {
           pendingRequest.invalidate({ immediately: false });
           pendingRequest.execute({ walletId: wallet.id });
           const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate();
-          // Note: we cache based off lastUpdateDate even though it's not actually used in the balanceRequest call
+          // Note: cache based on lastUpdateDate even though it's not used in balanceRequest
           return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
         })
         .then((updatedBalance: BigNumber) => {

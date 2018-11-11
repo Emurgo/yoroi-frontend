@@ -1,10 +1,9 @@
 // @flow
 
-// This file makes the actual HTTP requests to the yoroi-backend-service 
+// This file makes the actual HTTP requests to the yoroi-backend-service
 // https://github.com/Emurgo/yoroi-backend-service/
 
 import axios from 'axios';
-import type Moment from 'moment';
 import type { ConfigType } from '../../../../config/config-types';
 import {
   Logger,
@@ -44,12 +43,12 @@ export const getUTXOsForAddresses = (
     })
 );
 
-export type SumsForAddressesResult = {
+export type SumForAddressesResult = {
   sum: ?string
 };
 export const getUTXOsSumsForAddresses = (
   addresses: Array<string>
-): Promise<SumsForAddressesResult> => (
+): Promise<SumForAddressesResult> => (
   axios(
     `${backendUrl}/api/txs/utxoSumForAddresses`,
     {
