@@ -1,6 +1,17 @@
 // @flow
 
-// Types that come from either the importer (possibly replicated in backend-service)
+/*
+ * Types that come from either the importer (possibly replicated in backend-service)
+ * Note: These types from come from the v0 api for Cardano-SL
+ * The v0 API was deprecated and replaced by v1 which uses different fields and different types
+ * Therefore we differ from the v0 API in types to match the types used in the v1 API
+ * However the data structures themselves remain those of the v0 apI
+ *
+ * To see how the API changed, you can refer to a programmatic translation between the APIs
+ * That was deleted in a process called "The Great Cleanup"
+ * https://github.com/input-output-hk/cardano-sl/pull/3700
+*/
+
 import BigNumber from 'bignumber.js';
 
 // ========= Response Types =========
@@ -28,12 +39,9 @@ export type AdaSyncProgressResponse = {
   _spPeers: number,
 };
 
+/** Data passed from user when creating / restoring a wallet */
 export type AdaWalletInitData = {
-  cwInitMeta: {
-    cwName: string,
-    cwAssurance: AdaAssurance,
-    cwUnit: number,
-  },
+  cwInitMeta: AdaWalletMetaParams,
   cwBackupPhrase: {
     bpToList: string,
   }
@@ -111,11 +119,7 @@ export type AdaWallet = {
   cwAccountsNumber: number,
   cwAmount: AdaAmount,
   cwId: string,
-  cwMeta: {
-    cwAssurance: AdaAssurance,
-    cwName: string,
-    cwUnit: number,
-  },
+  cwMeta: AdaWalletMetaParams,
   cwPassphraseLU: Date,
 };
 
@@ -127,12 +131,11 @@ export type AdaWalletParams = {
   walletInitData: AdaWalletInitData
 };
 
-export type UpdateAdaWalletParams = {
-  walletMeta: {
-    cwName: string,
-    cwAssurance: AdaAssurance,
-    cwUnit: number,
-  }
+export type AdaWalletMetaParams = {
+  cwName: string,
+  cwAssurance: AdaAssurance,
+  // This was never used by supposed to represent 0 = (bitcoin, ada); 1 = (satoshi, lovelace)
+  cwUnit: number
 };
 
 export type UTXO = {

@@ -8,7 +8,7 @@ import type {
 } from '../../adaTypes';
 
 
-/** @note: Ada wallet is the abstraction for Daedalus */
+/** Convert uesr-inputted data during wallet creation to internal wallet representation */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {

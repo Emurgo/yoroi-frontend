@@ -1,3 +1,8 @@
+// @flow
+
+// Define types that are exposed to connect to the API layer
+
+import BigNumber from 'bignumber.js';
 import { defineMessages } from 'react-intl';
 import LocalizableError from '../i18n/LocalizableError';
 import WalletTransaction from '../domain/WalletTransaction';
@@ -123,6 +128,9 @@ export type GetTransactionsResponse = {
   transactions: Array<WalletTransaction>,
   total: number,
 };
+
+export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
+
 
 export type GetBalanceResponse = BigNumber;
 

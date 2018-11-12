@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import type { AssuranceMode, AssuranceModeOption } from '../types/transactionAssuranceTypes';
 import { assuranceModes, assuranceModeOptions } from '../config/transactionAssuranceConfig';
 
+/** External representation of the internal Wallet in the API layer  */
 export default class Wallet {
 
   id: string = '';

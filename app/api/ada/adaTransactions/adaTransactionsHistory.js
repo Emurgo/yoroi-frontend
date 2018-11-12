@@ -3,7 +3,6 @@
 // Handles interfacing with & updating the LovefieldDB for things related to historic transactions
 
 import _ from 'lodash';
-import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import {
   Logger,
@@ -42,7 +41,6 @@ import type
 import { saveLastBlockNumber, getLastBlockNumber } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import config from '../../../config';
-import type Moment from 'moment';
 
 declare var CONFIG : ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
@@ -85,8 +83,8 @@ async function _updateAdaTxsHistory(
   try {
     // optimization: look for new transactions AFTER the timestamp of the last transaction received
     const dateFrom = existingTransactions.length > 0
-      ? moment(existingTransactions[0].ctMeta.ctmUpdate)
-      : moment(new Date(0));
+      ? existingTransactions[0].ctMeta.ctmUpdate
+      : new Date(0);
 
     // send batched requests to get transaction history for addresses
     const mappedTxs = await _getTxsForChunksOfAddresses(addresses, groupOfAddresses => (
@@ -118,7 +116,7 @@ async function _getTxsForChunksOfAddresses(
 async function _updateAdaTxsHistoryForGroupOfAddresses(
   previousTxs: Array<AdaTransaction>,
   groupOfAddresses: Array<string>,
-  dateFrom: Moment,
+  dateFrom: Date,
   allAddresses: Array<string>
 ): Promise<Array<AdaTransaction>> {
   /* We want to get the transaction history of a list of addresses
@@ -128,13 +126,13 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
 
   // Move cutoff date forward to make progress on recursive calls
   const updatedDateFrom = previousTxs.length > 0
-    ? moment(previousTxs[previousTxs.length - 1].ctMeta.ctmUpdate)
+    ? previousTxs[previousTxs.length - 1].ctMeta.ctmUpdate
     : dateFrom;
 
   // Get historic transactions from backend API
   const history = await getTransactionsHistoryForAddresses(
     groupOfAddresses,
-    updatedDateFrom.toDate()
+    updatedDateFrom
   );
 
   // No more history left to fetch

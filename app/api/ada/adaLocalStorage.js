@@ -25,6 +25,8 @@ export function getSingleCryptoAccount(): CryptoAccount {
 
 /* Wallet storage */
 
+/** @param AdaWallet cache wallet information
+ * @param masterKey decrypt to send funds  */
 export function saveAdaWallet(
   adaWallet: AdaWallet,
   masterKey: string

@@ -1,4 +1,7 @@
 // @flow
+
+// Handle data created by wallets using the v1 address scheme
+
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import {
@@ -33,6 +36,7 @@ import type {
   TransferTx
 } from '../../types/daedalusTransferTypes';
 
+/** Go through all Daedalus addresses for wallet and see if they have non-empty balance */
 export function getAddressesWithFunds(payload: {
   secretWords: string,
   addresses: Array<string>
@@ -52,22 +56,31 @@ export function getAddressesWithFunds(payload: {
   }
 }
 
+/** Generate transaction including all addresses with no change */
 export async function generateTransferTx(payload: {
   secretWords: string,
   addressesWithFunds: Array<CryptoDaedalusAddressRestored>
 }): Promise<TransferTx> {
   try {
     const { secretWords, addressesWithFunds } = payload;
+
+    // fetch data to make transaction
     const senders = addressesWithFunds.map(a => a.address);
     const senderUtxos = await getAllUTXOsForAddresses(senders);
     if (_.isEmpty(senderUtxos)) {
       throw new NoInputsError();
     }
     const recoveredBalance = await getBalance(senders);
-    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
     const inputs = _getInputs(senderUtxos, addressesWithFunds);
+
+    // pick which address to send migration to
     const output = await _getReceiverAddress();
+
+    // get wallet and make transaction
+    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
     const tx: MoveResponse = getResultOrFail(Wallet.move(wallet, inputs, output));
+
+    // return summary of transaction
     return {
       recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
       fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),
@@ -84,11 +97,15 @@ export async function generateTransferTx(payload: {
   }
 }
 
+/** Follow heuristic to pick which address to send Daedalus migration to */
 async function _getReceiverAddress(): Promise<string> {
+  // Note: Current heuristic is to pick the first address in the wallet
+  // rationale & better heuristic described at https://github.com/Emurgo/yoroi-frontend/issues/96
   const addresses = await getAdaAddressesByType('External');
   return addresses[0].cadId;
 }
 
+/** Create V1 addressing scheme inputs from Daedalus restoration info */
 function _getInputs(
   utxos: Array<UTXO>,
   addressesWithFunds: Array<CryptoDaedalusAddressRestored>

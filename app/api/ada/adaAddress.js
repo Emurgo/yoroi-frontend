@@ -130,7 +130,7 @@ export function removeAdaAddress(
   return deleteAddress(address.cadId);
 }
 
-/** Remove list of addresses from lovefieldDB */
+/** Save list of addresses from lovefieldDB */
 export async function saveAsAdaAddresses(
   cryptoAccount: CryptoAccount,
   addresses: Array<string>,

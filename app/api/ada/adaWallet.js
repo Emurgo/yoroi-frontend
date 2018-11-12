@@ -1,4 +1,7 @@
 // @flow
+
+// Wrapper to generate/edit wallet information in localstorage
+
 import _ from 'lodash';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
@@ -20,11 +23,11 @@ import {
 import { newCryptoAccount } from './adaAccount';
 import type {
   AdaWallet,
-  UpdateAdaWalletParams,
+  AdaWalletParams,
+  AdaWalletMetaParams,
 } from './adaTypes';
 import type {
-  AdaWalletParams,
-  ChangeAdaWalletPassphraseParams,
+  ChangeAdaWalletSpendingPasswordParams,
   AdaWalletRecoveryPhraseResponse,
 } from './index';
 import {
@@ -41,10 +44,9 @@ declare var CONFIG : ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
 
 /* Create and save a wallet with your master key, and a SINGLE account with one address */
-export async function newAdaWallet({
-  walletPassword,
-  walletInitData
-}: AdaWalletParams): Promise<AdaWallet> {
+export async function newAdaWallet(
+  { walletPassword, walletInitData }: AdaWalletParams
+): Promise<AdaWallet> {
   const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
   const cryptoAccount = newCryptoAccount(masterKey, walletPassword);
   await newAdaAddress(cryptoAccount, [], 'External');
@@ -52,33 +54,46 @@ export async function newAdaWallet({
   return Promise.resolve(adaWallet);
 }
 
-export const updateAdaWallet = async (
-  { walletMeta }: UpdateAdaWalletParams
+/** Update wallet metadata cached in localstorage */
+export const updateAdaWalletMetaParams = async (
+  walletMeta : AdaWalletMetaParams
 ): Promise<?AdaWallet> => {
+  // Get existing wallet or return if non exists
   const persistentWallet = getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
+
   try {
+    // Swap out meta parameters
     const updatedWallet = Object.assign({}, persistentWallet, { cwMeta: walletMeta });
+
+    // Update the meta params cached in localstorage
     _saveAdaWalletKeepingMasterKey(updatedWallet);
     return updatedWallet;
   } catch (error) {
-    Logger.error('adaWallet::updateAdaWallet error: ' + stringifyError(error));
+    Logger.error('adaWallet::updateAdaWalletMetaParams error: ' + stringifyError(error));
     throw new UpdateAdaWalletError();
   }
 };
 
+/** Calculate balance and update wallet balance cached in localstorage */
 export const updateAdaWalletBalance = async (): Promise<?BigNumber> => {
+  // Get existing wallet or return if non exists
   const persistentWallet = getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
+
+  // get all wallet's addresses
   const adaAddresses = await getAdaAddressesList();
   const addresses = adaAddresses.map(address => address.cadId);
-  // Update wallet balance
+
   try {
+    // Calculate and set new user balance
     const updatedWallet = Object.assign({}, persistentWallet, {
       cwAmount: {
         getCCoin: await getBalance(addresses)
       }
     });
+
+    // Update the balance cached in localstorage
     _saveAdaWalletKeepingMasterKey(updatedWallet);
     return updatedWallet.cwAmount.getCCoin;
   } catch (error) {
@@ -87,20 +102,26 @@ export const updateAdaWalletBalance = async (): Promise<?BigNumber> => {
   }
 };
 
-export function createAdaWallet({
-  walletPassword,
-  walletInitData
-}: AdaWalletParams) {
+/** Wrapper function to generate wallet+cache based on user-inputted  */
+export function createAdaWallet(
+  { walletPassword, walletInitData }: AdaWalletParams
+): [AdaWallet, string] {
   const adaWallet = toAdaWallet(walletInitData);
+
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const masterKey = generateWalletMasterKey(mnemonic, walletPassword);
   return [adaWallet, masterKey];
 }
 
-export const isValidMnemonic = (phrase: string, numberOfWords: ?number) => (
+/** Wrapper function to check mnemonic validity according to bip39 */
+export const isValidMnemonic = (
+  phrase: string,
+  numberOfWords: ?number
+): boolean => (
   isValidAdaMnemonic(phrase, numberOfWords)
 );
 
+/** Wrapper function to create new mnemonic according to bip39 */
 export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse => (
   generateAdaMnemonic()
 );
@@ -133,23 +154,32 @@ export async function getBalance(
   }
 }
 
-export const changeAdaWalletPassphrase = (
-  { oldPassword, newPassword }: ChangeAdaWalletPassphraseParams
+/** Update spending password and password last update time */
+export const changeAdaWalletSpendingPassword = (
+  { oldPassword, newPassword }: ChangeAdaWalletSpendingPasswordParams
 ): Promise<AdaWallet> => {
+  // update spending password
   const walletMasterKey = getWalletMasterKey();
   const updatedWalletMasterKey =
     updateWalletMasterKeyPassword(walletMasterKey, oldPassword, newPassword);
+
+  // update password last update time
   const wallet = getAdaWallet();
   const updatedWallet = Object.assign(
     {},
     wallet ? wallet : {},
     { cwPassphraseLU: moment().format() }
   );
+
+  // save result in cache
   saveAdaWallet(updatedWallet, updatedWalletMasterKey);
   return Promise.resolve(updatedWallet);
 };
 
-function _saveAdaWalletKeepingMasterKey(adaWallet: AdaWallet): void {
+/** Swap the cached wallet information in localstorage but keep the wallet itself the same */
+function _saveAdaWalletKeepingMasterKey(
+  adaWallet: AdaWallet
+): void {
   const masterKey = getWalletMasterKey();
   saveAdaWallet(adaWallet, masterKey);
 }
