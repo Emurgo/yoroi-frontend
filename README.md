@@ -12,23 +12,67 @@ $ git submodule update --init --recursive
 
 ### Prerequisites
 
-- node v8.9.4 (if you are using nvm, just execute: `$ nvm use`)
+#### Install NodeJS
+- node [v8.9.4](https://nodejs.org/download/release/v8.9.4/) (if you are using nvm, just execute: `$ nvm use`)
 
-- Install rust tools as mentioned in [js-cardano-wasm](https://github.com/input-output-hk/js-cardano-wasm#installation)
-
-### Install rustup
+#### Install rust tools
 ```bash
 $ curl https://sh.rustup.rs -sSf | sh
+```
+Tested on the latest 1.30.1 version of rust and 1.14.0 of rustup.
+Don't forget to configure your current shell run for _rustup_:
+```bash
+$ source $HOME/.cargo/env
+```
+Toolchain install:
+```bash
 $ rustup install nightly-2018-06-05
 $ rustup target add wasm32-unknown-unknown --toolchain nightly-2018-06-05
 ```
-
-### Install dependencies
-
+If you having trouble with "nightly-2018-06-05" version, try to update to the latest one and provide target info:
 ```bash
-$ npm run build-js-cardano-wasm 
+$ rustup toolchain install nightly
+$ rustup update
+$ rustup target add wasm32-unknown-unknown --toolchain nightly
+```
+
+#### Install dependencies
+To automate donwloading and installation of _js-cardano-wasm_ dependency run _setup_cardano_crypto.sh_ to download latest _js-cardano-wasm_ repository into _js-cardano-wasm_ folder.
+```bash
+$ sh setup_cardano_crypto.sh
+```
+To install other Yoroi-frontend related dependencies use:
+```bash
 $ npm install
 ```
+
+#### Build dlls
+```bash
+$ npm run build-dll
+```
+
+## Build Yoroi Chrome extension
+
+Extension can be built for both the Cardano mainnet and testnet:
+
+- Mainnet
+```bash
+# build files to './build'
+$ npm run build -- --env "mainnet" 
+```
+
+- Testnet
+```bash
+# build files to './build'
+$ npm run build -- --env "testnet" 
+```
+
+## Run Yoroi Chrome extension
+Easy 3 STEPS:
+1. Open new webpage with _chrome://extensions_
+2. Turn on the developer mode
+3. Press "Load unpacked" button and open _build_ folder of your project. Then your app should be ready to use.
+
 
 ## Development
 
@@ -70,23 +114,6 @@ $ npm run start -- --env "development"
  Download the [Flow plugin](https://marketplace.visualstudio.com/items?itemName=flowtype.flow-for-vscode) for VS Code and change the following workspace settings:
  1) `javascript.validate.enable` to `false`
  1) `flow.useNPMPackagedFlow` to `true`
-
-
-## Build
-
-Extension can be built for both the Cardano mainnet and testnet:
-
-- Mainnet
-```bash
-# build files to './build'
-$ npm run build -- --env "mainnet" 
-```
-
-- Testnet
-```bash
-# build files to './build'
-$ npm run build -- --env "testnet" 
-```
 
 ## Compress
 
