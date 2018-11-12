@@ -1,7 +1,7 @@
 // @flow
 
 /*
- * Types that come from either the importer (possibly replicated in backend-service)
+ * Types that come primarily but not only from the importer
  * Note: These types from come from the v0 api for Cardano-SL
  * The v0 API was deprecated and replaced by v1 which uses different fields and different types
  * Therefore we differ from the v0 API in types to match the types used in the v1 API
@@ -24,20 +24,6 @@ export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWon
 
 // Based on TxState from the Importer
 export type AdaTxsState = 'Successful' | 'Failed' | 'Pending';
-
-export type AdaSyncProgressResponse = {
-  _spLocalCD: {
-    getChainDifficulty: {
-      getBlockCount: number,
-    }
-  },
-  _spNetworkCD: {
-    getChainDifficulty: {
-      getBlockCount: number,
-    }
-  },
-  _spPeers: number,
-};
 
 /** Data passed from user when creating / restoring a wallet */
 export type AdaWalletInitData = {
