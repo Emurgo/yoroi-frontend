@@ -44,7 +44,7 @@ export function getWalletMasterKey(): string {
   return stored.masterKey;
 }
 
-/* Last block Nnmber storage */
+/* Last block Nunmber storage */
 
 export function saveLastBlockNumber(blockNumber: number): void {
   _saveInStorage(storageKeys.LAST_BLOCK_NUMBER_KEY, blockNumber);

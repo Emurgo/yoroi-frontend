@@ -229,7 +229,7 @@ function _spenderData(
     incoming.count === txInputs.length &&
     outgoing.count === txOutputs.length;
 
-  let amount; // // represents how much sender sent out
+  let amount; // represents how much sender sent out
   if (isOutgoing || isSelfTransaction) amount = outgoing.totalAmount.minus(incoming.totalAmount);
   else amount = incoming.totalAmount.minus(outgoing.totalAmount);
 

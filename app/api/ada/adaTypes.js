@@ -60,19 +60,6 @@ export type AdaAccount = {
 
 export type AdaAccounts = Array<AdaAccount>;
 
-export type Transaction = {
-  hash: string,
-  inputs_address: Array<string>,
-  inputs_amount: Array<string>, // bingint[]
-  outputs_address: Array<string>,
-  outputs_amount: Array<string>, // bingint[]
-  block_num: ?string, // null if transaction failed
-  time: string, // timestamp with timezone
-  best_block_num: string, // bigint
-  last_update: string, // timestamp with timezone
-  tx_state: AdaTxsState
-};
-
 export type AdaTransaction = {
   ctAmount: AdaAmount,
   ctBlockNumber: number,
@@ -122,6 +109,21 @@ export type AdaWalletMetaParams = {
   cwAssurance: AdaAssurance,
   // This was never used by supposed to represent 0 = (bitcoin, ada); 1 = (satoshi, lovelace)
   cwUnit: number
+};
+
+/* Backend service Postgres data types */
+
+export type Transaction = {
+  hash: string,
+  inputs_address: Array<string>,
+  inputs_amount: Array<string>, // bingint[]
+  outputs_address: Array<string>,
+  outputs_amount: Array<string>, // bingint[]
+  block_num: ?string, // null if transaction failed
+  time: string, // timestamp with timezone
+  best_block_num: string, // bigint
+  last_update: string, // timestamp with timezone
+  tx_state: AdaTxsState
 };
 
 export type UTXO = {
