@@ -1,10 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import validWords from 'bip39/wordlists/english.json';
+import environment from '../../../environment';
 import WalletTrezorDialog from '../../../components/wallet/WalletTrezorDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
-import environment from '../../../environment';
 
 type Props = InjectedDialogContainerProps;
 
@@ -20,27 +19,20 @@ export default class WalletTrezorDialogContainer extends Component<Props> {
   onCancel = () => {
     this.props.onClose();
     // Restore request should be reset only in case restore is finished/errored
-    const { restoreRequest } = this._getWalletsStore();
-    if (!restoreRequest.isExecuting) restoreRequest.reset();
+    const { connectTrezorRequest } = this.props.stores[environment.API].wallets;
+    if (!connectTrezorRequest.isExecuting) connectTrezorRequest.reset();
   };
 
   render() {
-    const wallets = this._getWalletsStore();
-    const { restoreRequest } = wallets;
+    const { connectTrezorRequest } = this.props.stores[environment.API].wallets;
 
     return (
       <WalletTrezorDialog
-        mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
-        suggestedMnemonics={validWords}
-        isSubmitting={restoreRequest.isExecuting}
+        isSubmitting={connectTrezorRequest.isExecuting}
         onSubmit={this.onSubmit}
         onCancel={this.onCancel}
-        error={restoreRequest.error}
+        error={connectTrezorRequest.error}
       />
     );
-  }
-
-  _getWalletsStore() {
-    return this.props.stores[environment.API].wallets;
   }
 }

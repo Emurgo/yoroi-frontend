@@ -10,3 +10,26 @@
 .isSubmitting {
   @include loading-spinner("../../assets/images/spinner-light.svg");
 }
+
+.walletName {
+  margin-bottom: 20px;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  margin-top: 20px;
+
+  button {
+    width: 50%;
+
+    &:only-child {
+      margin: auto;
+      width: 100%;
+    }
+
+    & + button {
+      margin-left: 20px;
+    }
+  }
+}

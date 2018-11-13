@@ -133,7 +133,7 @@
     "route-parser": "0.0.5",
     "rust-cardano-crypto": "file:js-cardano-wasm",
     "safe-buffer": "5.1.1",
-    "trezor-connect": "^5.0.31",
+    "trezor-connect": "6.0.1",
     "validator": "6.3.0"
   },
   "engineStrict": true,
