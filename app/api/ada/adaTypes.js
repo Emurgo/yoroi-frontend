@@ -107,7 +107,7 @@ export type AdaWalletParams = {
 export type AdaWalletMetaParams = {
   cwName: string,
   cwAssurance: AdaAssurance,
-  // This was never used by supposed to represent 0 = (bitcoin, ada); 1 = (satoshi, lovelace)
+  // This was never used but is supposed to represent 0 = (bitcoin, ada); 1 = (satoshi, lovelace)
   cwUnit: number
 };
 
