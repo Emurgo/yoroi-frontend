@@ -76,6 +76,7 @@
   "global.errors.fieldIsRequired": "This field is required.",
   "global.errors.invalidRepeatPassword": "Doesn't match.",
   "global.errors.invalidWalletName": "Wallet name requires at least 3 and at most 40 letters.",
+  "global.errors.invalidHardwareWalletName": "Wallet name requires at least 1 and at most 40 letters.",  
   "global.errors.invalidWalletPassword": "Invalid password",
   "global.labels.cancel": "Cancel",
   "global.labels.change": "Change",

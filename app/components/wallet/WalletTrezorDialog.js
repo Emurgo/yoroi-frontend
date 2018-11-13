@@ -23,9 +23,10 @@ import SvgInline from 'react-svg-inline';
 import SvgTrezorInit  from '../../assets/images/trezor/ada-logo.inline.svg';
 import gifIcon from '../../assets/images/trezor/connecting.gif';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import { isValidWalletName } from '../../utils/validations';
+import { isValidHardwareWalletName } from '../../utils/validations';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import ProgressSteps from '../widgets/ProgressSteps';
 
 const messages = defineMessages({
   title: {
@@ -44,8 +45,8 @@ const messages = defineMessages({
     description: 'Label for the "Save" button on the Connect to Trezor Hardware Wallet dialog.'
   },
   walletNameInputLabel: {
-    id: 'wallet.restore.dialog.wallet.name.input.label',
-    defaultMessage: '!!!Wallet name',
+    id: 'wallet.trezor.dialog.wallet.name.input.label',
+    defaultMessage: '!!!Give a wallet name',
     description: 'Label for the wallet name input on the wallet restore dialog.'
   },
   walletNameInputHint: {
@@ -129,7 +130,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           value: '',
           validators: [({ field }) => (
             [
-              isValidWalletName(field.value),
+              isValidHardwareWalletName(field.value),
               this.context.intl.formatMessage(globalMessages.invalidWalletName)
             ]
           )],
@@ -220,8 +221,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           actions={actions}
           closeButton={<DialogCloseButton />}
         >
-        {progressComponentStep1}
-        <br/>
+        <ProgressSteps
+          stepsList={['INTRO', 'CONNECT', 'SAVE']}
+          progressIndex={0}
+        />
         {step1Component}
         <br/>
         {prerequisiteStart}
@@ -255,7 +258,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           actions={actions}
           closeButton={<DialogCloseButton />}
         >
-        {progressComponentStep2}
+        <ProgressSteps
+          stepsList={['INTRO', 'CONNECT', 'SAVE']}
+          progressIndex={1}
+        />
         <br/>
         {step2Component}
         <br/>
@@ -284,7 +290,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           actions={actions}
           closeButton={<DialogCloseButton />}
         >
-        {progressComponentStep2}
+        <ProgressSteps
+          stepsList={['INTRO', 'CONNECT', 'SAVE']}
+          progressIndex={1}
+        />
         <br/>
         {step2Component}
         {infoImageStart}
@@ -312,7 +321,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           actions={actions}
           closeButton={<DialogCloseButton />}
         >
-        {progressComponentStep2}
+        <ProgressSteps
+          stepsList={['INTRO', 'CONNECT', 'SAVE']}
+          progressIndex={1}
+        />
         <br/>
         {step2Component}
         <br/>
@@ -348,7 +360,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           actions={actions}
           closeButton={<DialogCloseButton />}
         >
-        {progressComponentStep3}
+        <ProgressSteps
+          stepsList={['INTRO', 'CONNECT', 'SAVE']}
+          progressIndex={2}
+        />
         <br/>
         {step3Component}
         <br/>
@@ -386,7 +401,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           actions={actions}
           closeButton={<DialogCloseButton />}
         >
-        {progressComponentStep3}
+        <ProgressSteps
+          stepsList={['INTRO', 'CONNECT', 'SAVE']}
+          progressIndex={2}
+        />
         <br/>
         {step3Component}
         <br/>
@@ -417,7 +435,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           actions={actions}
           closeButton={<DialogCloseButton />}
         >
-        {progressComponentStep3}
+        <ProgressSteps
+          stepsList={['INTRO', 'CONNECT', 'SAVE']}
+          progressIndex={2}
+        />
         <br/>
         {step3Component}
         <br/>

@@ -1,0 +1,61 @@
+$common-color:#daa49a;
+
+.outer {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.stepBox {
+  display: inline-block;
+  height: 1em;
+  margin: 5px;
+}
+
+.stepBottomBlock {
+  padding-top: 2px;
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+.stepTopBar {
+  height: 6px;
+  background-color: $common-color;
+  border-radius: 3px;
+  opacity: 0.3;
+}
+
+.stepTopBarDone {
+  opacity: 1.0;
+}
+
+.stepTopBarActive {
+  opacity: 1.0;
+}
+
+.stepDoneShape {
+  padding-left: 3px;
+  padding-right: 3px; 
+  object-fit: contain;
+  opacity: 0.0;
+}
+
+.stepDoneShapeDone {
+  opacity: 1.0;
+}
+
+.stepDoneShapeActive {
+  opacity: 0.0;  
+}
+
+.stepText {
+  color: $common-color;
+  opacity: 0.3;
+}
+
+.stepTextDone {
+  opacity: 1.0;
+}
+
+.stepTextActive {
+  opacity: 1.0;
+}
