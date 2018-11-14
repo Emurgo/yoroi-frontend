@@ -61,6 +61,6 @@ The user interaction would be:
 
 Ethereum EIPs have a mandatory PR but also require a `discussions-to` link where people can discuss the proposal as a whole. This `discussions-to` often ends up being a Github issue link meaning that many proposals have both a PR (to discuss individual line changes, etc) and an issue (to discuss the idea in general)
 
-# Final Proposal
+# Proposal
 
 I sugget we follow the PR process. Proposal-based repos (EIP, BIP, etc) have a mandatory PR for each feature suggestion because the advantages make up for the complexity. Since our proposals should more concrete than suggestions for a blockchain in general, I am not convinced we needed the added complexity of a `discussions-to` field.
