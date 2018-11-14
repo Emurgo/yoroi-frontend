@@ -101,7 +101,7 @@ export default class DaedalusTransferStore extends Store {
           this._updateStatus('checkingAddresses');
           const addressesWithFunds = getAddressesWithFunds({
             secretWords,
-            addresses: data.addresses
+            fullUtxo: data.addresses
           });
           this._updateStatus('generatingTx');
           const transferTx = await generateTransferTx({
