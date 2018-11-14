@@ -143,7 +143,7 @@ function _findNewHighestIndex(
 }
 
 /** If there are any addresses to scan,
- * batch `requestSize` calls to cryptographic primitives to restore addresse
+ * batch `requestSize` calls to cryptographic primitives to restore addresses
  * @returns all scanned addresses to date including the new ones
  */
 async function _scanNextBatch(

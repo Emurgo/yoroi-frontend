@@ -18,7 +18,7 @@ const protocolMagic = CONFIG.network.protocolMagic;
 export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
 
 /** Check validty of mnemonic (including checksum) */
-export const isValidAdaMnemonic = (
+export const isValidEnglishAdaMnemonic = (
   phrase: string,
   numberOfWords: ?number = 15
 ) => (

@@ -36,18 +36,20 @@ import type {
   TransferTx
 } from '../../types/daedalusTransferTypes';
 
-/** Go through all Daedalus addresses for wallet and see if they have non-empty balance */
+/** Go through the whole UTXO and see which belong to the walet and have non-empty balance
+ * @param fullUtxo the full utxo of the Cardano blockchain
+ */
 export function getAddressesWithFunds(payload: {
   secretWords: string,
-  addresses: Array<string>
+  fullUtxo: Array<string>
 }): Array<CryptoDaedalusAddressRestored> {
   try {
-    const { secretWords, addresses } = payload;
+    const { secretWords, fullUtxo } = payload;
     const checker: CryptoAddressChecker = getResultOrFail(
       RandomAddressChecker.newCheckerFromMnemonics(secretWords)
     );
     const addressesWithFunds: Array<CryptoDaedalusAddressRestored> = getResultOrFail(
-      RandomAddressChecker.checkAddresses(checker, addresses)
+      RandomAddressChecker.checkAddresses(checker, fullUtxo)
     );
     return addressesWithFunds;
   } catch (error) {

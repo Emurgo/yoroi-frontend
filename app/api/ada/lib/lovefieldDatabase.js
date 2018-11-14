@@ -98,8 +98,6 @@ export const loadLovefieldDB = () => {
     });
 
   return schemaBuilder.connect(
-    // Uncomment to allow debuggin with Lovefield DB Inspector plugin
-    // { enableInspector: true }
   ).then(newDb => {
     db = newDb;
     return db;
@@ -223,7 +221,7 @@ export const getPendingTxs = function (): Promise<Array<AdaTransaction>> {
     .then(rows => rows.map(row => row[txsTableSchema.properties.value]));
 };
 
-/** Helper function to order TxsTable by abitrary field */
+/** Helper function to order TxsTable by an arbitrary field */
 const _getTxsOrderedBy = (
   orderField,
   lfOrder

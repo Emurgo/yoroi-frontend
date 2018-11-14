@@ -34,7 +34,7 @@ export type StoresMap = {
   loading: LoadingStore,
 };
 
-// Constant that reprents the stores across the lifetime of the application
+// Constant that represents the stores across the lifetime of the application
 const stores = observable({
   profile: null,
   app: null,

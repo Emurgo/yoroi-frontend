@@ -12,7 +12,7 @@ import {
 import {
   generateWalletMasterKey,
   generateAdaMnemonic,
-  isValidAdaMnemonic,
+  isValidEnglishAdaMnemonic,
   updateWalletMasterKeyPassword,
 } from './lib/cardanoCrypto/cryptoWallet';
 import { toAdaWallet } from './lib/cardanoCrypto/cryptoToModel';
@@ -118,7 +118,7 @@ export const isValidMnemonic = (
   phrase: string,
   numberOfWords: ?number
 ): boolean => (
-  isValidAdaMnemonic(phrase, numberOfWords)
+  isValidEnglishAdaMnemonic(phrase, numberOfWords)
 );
 
 /** Wrapper function to create new mnemonic according to bip39 */
