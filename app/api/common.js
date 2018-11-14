@@ -1,6 +1,7 @@
 import { defineMessages } from 'react-intl';
 import LocalizableError from '../i18n/LocalizableError';
-import { WalletTransaction, Wallet } from '../domain/WalletTransaction';
+import WalletTransaction from '../domain/WalletTransaction';
+import Wallet from '../domain/Wallet';
 
 const messages = defineMessages({
   genericApiError: {

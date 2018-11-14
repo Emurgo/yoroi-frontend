@@ -27,7 +27,7 @@ import {
   UpdateAdaTxsHistoryError,
 } from '../errors';
 import type
- {
+{
   AdaTransaction,
   AdaTransactions,
   AdaTransactionInputOutput
@@ -72,12 +72,12 @@ async function _updateAdaTxsHistory(
 ) {
   try {
     const mostRecentTx = Object.assign({}, existingTransactions[0]);
-    const dateFrom = mostRecentTx.ctMeta ?
-      moment(mostRecentTx.ctMeta.ctmUpdate) :
-      moment(new Date(0));
-    const mappedTxs = await _getTxsForChunksOfAddresses(addresses, groupOfAddresses =>
+    const dateFrom = mostRecentTx.ctMeta
+      ? moment(mostRecentTx.ctMeta.ctmUpdate)
+      : moment(new Date(0));
+    const mappedTxs = await _getTxsForChunksOfAddresses(addresses, groupOfAddresses => (
       _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom, addresses)
-    );
+    ));
     return saveTxs(mappedTxs);
   } catch (error) {
     Logger.error('adaTransactionsHistory::updateAdaTxsHistory error: ' + stringifyError(error));
@@ -113,7 +113,8 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
     }
 
     const transactions = previousTxs.concat(
-      _mapToAdaTxs(history, allAddresses));
+      _mapToAdaTxs(history, allAddresses)
+    );
     if (history.length === transactionsLimit) {
       return await _updateAdaTxsHistoryForGroupOfAddresses(
         transactions,
@@ -145,7 +146,7 @@ function _mapInputOutput(addresses, amounts): AdaTransactionInputOutput {
 }
 
 function _spenderData(txInputs, txOutputs, addresses) {
-  const sum = toSum =>
+  const sum = toSum => (
     toSum.reduce(
       ({ totalAmount, count }, [address, { getCCoin }]) => {
         if (addresses.indexOf(address) < 0) return { totalAmount, count };
@@ -158,7 +159,8 @@ function _spenderData(txInputs, txOutputs, addresses) {
         totalAmount: new BigNumber(0),
         count: 0
       }
-    );
+    )
+  );
 
   const incoming = sum(txOutputs);
   const outgoing = sum(txInputs);

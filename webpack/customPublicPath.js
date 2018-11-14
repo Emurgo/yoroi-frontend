@@ -1,5 +1,6 @@
 /* global __webpack_public_path__ __HOST__ __PORT__ */
 /* eslint no-global-assign: 0 camelcase: 0 */
+/* eslint no-unused-vars: 0 */
 
 if (process.env.NODE_ENV !== 'development') {
   __webpack_public_path__ = chrome.extension.getURL('/js/');

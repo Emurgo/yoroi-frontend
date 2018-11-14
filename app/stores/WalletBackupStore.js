@@ -6,13 +6,17 @@ import WalletBackupDialog from '../components/wallet/WalletBackupDialog';
 
 export type walletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
-export default class WalletBackupStore extends Store {
+type RecoveryPhraseWordArray = Array<{ word: string }>;
+type RecoveryPhraseShuffledArray = Array<{ word: string, isActive: boolean }>;
+
+export default
+class WalletBackupStore extends Store {
 
   @observable inProgress = false;
   @observable currentStep: walletBackupSteps = null;
   @observable recoveryPhrase = [];
-  @observable recoveryPhraseWords = [];
-  @observable recoveryPhraseShuffled = [];
+  @observable recoveryPhraseWords: RecoveryPhraseWordArray = [];
+  @observable recoveryPhraseShuffled: RecoveryPhraseShuffledArray = [];
   @observable completed = false;
   @observable enteredPhrase = [];
   @observable isPrivacyNoticeAccepted = false;

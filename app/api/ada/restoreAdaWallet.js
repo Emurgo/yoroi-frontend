@@ -38,12 +38,13 @@ export async function restoreAdaWallet({
   const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
   const cryptoAccount = createCryptoAccount(masterKey, walletPassword);
   try {
-    const externalAddressesToSave = await
-      _discoverAllAddressesFrom(cryptoAccount, 'External', -1, addressScanSize, addressRequestSize);
-    const internalAddressesToSave = await
-      _discoverAllAddressesFrom(cryptoAccount, 'Internal', -1, addressScanSize, addressRequestSize);
+    const externalAddressesToSave =
+      await _discoverAllAddressesFrom(cryptoAccount, 'External', -1, addressScanSize, addressRequestSize);
+    const internalAddressesToSave =
+      await _discoverAllAddressesFrom(cryptoAccount, 'Internal', -1, addressScanSize, addressRequestSize);
     if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
       // TODO: Store all at once
+      // eslint-disable-next-line no-await-in-loop
       await Promise.all([
         saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External'),
         saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal')
@@ -74,15 +75,24 @@ async function _discoverAllAddressesFrom(
   while (shouldScanNewBatch) {
     // Scans new batch (of size addressScanSize) to update the highestUsedIndex
     const [newHighestUsedIndex, newFetchedAddressesInfo] =
-      await _scanAddressesBatchFrom(fetchedAddressesInfo, cryptoAccount, addressType,
-                                    highestUsedIndex, scanSize, requestSize);
+      // TODO: make more efficient
+      // eslint-disable-next-line no-await-in-loop
+      await _scanAddressesBatchFrom(
+        fetchedAddressesInfo,
+        cryptoAccount,
+        addressType,
+        highestUsedIndex,
+        scanSize,
+        requestSize
+      );
 
     shouldScanNewBatch = highestUsedIndex !== newHighestUsedIndex;
     highestUsedIndex = newHighestUsedIndex;
     fetchedAddressesInfo = newFetchedAddressesInfo;
   }
-  return fetchedAddressesInfo.slice(0, highestUsedIndex + 1)
-                             .map((addressInfo) => addressInfo.address);
+  return fetchedAddressesInfo
+    .slice(0, highestUsedIndex + 1)
+    .map((addressInfo) => addressInfo.address);
 }
 
 async function _scanAddressesBatchFrom(
@@ -94,8 +104,14 @@ async function _scanAddressesBatchFrom(
   requestSize: number,
 ) {
   const [newFetchedAddressesInfo, addressesToScan] =
-      await _getAddressToScan(fetchedAddressesInfo, cryptoAccount,
-                              addressType, highestUsedIndex + 1, scanSize, requestSize);
+      await _getAddressToScan(
+        fetchedAddressesInfo,
+        cryptoAccount,
+        addressType,
+        highestUsedIndex + 1,
+        scanSize,
+        requestSize
+      );
 
   const newHighestUsedIndex = addressesToScan.reduce((currentHighestIndex, addressInfo) => {
     if (addressInfo.index > currentHighestIndex && addressInfo.isUsed) {
@@ -119,13 +135,20 @@ async function _getAddressToScan(
 
   // Requests new batch (of size addressRequestSize) to add to the currently fetched ones
   if (fetchedAddressesInfo.length < fromIndex + scanSize) {
-    const addressesIndex = _.range(fetchedAddressesInfo.length,
-                                   fetchedAddressesInfo.length + requestSize);
+    const addressesIndex = _.range(
+      fetchedAddressesInfo.length,
+      fetchedAddressesInfo.length + requestSize
+    );
     const newAddresses = getResultOrFail(
-      Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex));
+      Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex)
+    );
     const usedAddresses = await checkAddressesInUse(newAddresses);
-    newFetchedAddressesInfo = _addFetchedAddressesInfo(fetchedAddressesInfo, newAddresses,
-                                                       usedAddresses, addressesIndex);
+    newFetchedAddressesInfo = _addFetchedAddressesInfo(
+      fetchedAddressesInfo,
+      newAddresses,
+      usedAddresses,
+      addressesIndex
+    );
   }
 
   return [

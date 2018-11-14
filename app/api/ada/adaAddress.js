@@ -32,7 +32,7 @@ const { MAX_ALLOWED_UNUSED_ADDRESSES } = config.wallets;
 
 export function isValidAdaAddress(address: string): Promise<boolean> {
   try {
-    const result = getResultOrFail(Wallet.checkAddress(getAddressInHex(address)));
+    const result: boolean = getResultOrFail(Wallet.checkAddress(getAddressInHex(address)));
     return Promise.resolve(result);
   } catch (validateAddressError) {
     Logger.error('adaAddress::isValidAdaAddress error: ' +
@@ -94,8 +94,9 @@ export async function createAdaAddress(
 ): Promise<AdaAddress> {
   const filteredAddresses = await getAdaAddressesByType(addressType);
   const addressIndex = filteredAddresses.length;
-  const [address] = getResultOrFail(
-    Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]));
+  const [address]: Array<string> = getResultOrFail(
+    Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex])
+  );
   return toAdaAddress(cryptoAccount.account, addressType, addressIndex, address);
 }
 
@@ -112,8 +113,8 @@ export async function saveAsAdaAddresses(
   addresses: Array<string>,
   addressType: AddressType
 ): Promise<void> {
-  const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) =>
+  const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) => (
     toAdaAddress(cryptoAccount.account, addressType, index, hash)
-  );
+  ));
   return saveAddresses(mappedAddresses, addressType);
 }

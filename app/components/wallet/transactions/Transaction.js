@@ -139,7 +139,7 @@ export default class Transaction extends Component<Props, State> {
   };
 
   toggleDetails() {
-    this.setState({ isExpanded: !this.state.isExpanded });
+    this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   }
 
   render() {

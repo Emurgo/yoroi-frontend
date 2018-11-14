@@ -1,5 +1,7 @@
 // @flow
 
+/* eslint no-await-in-loop: 0 */  // not a big deal since this is just a script for testing
+
 import { mapToList } from '../api/ada/lib/utils';
 import { getCryptoWalletFromMasterKey } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
@@ -7,8 +9,7 @@ import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaT
 import { getSingleCryptoAccount, getWalletMasterKey } from '../api/ada/adaLocalStorage';
 
 const CONFIRMATION_TIME = 40 * 1000; // 40 seconds
-const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be bigger than
-                                     //           the fee of the txs (In general ≃0.17)
+const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be >= the fee of the txs (In general ≃0.17)
 const AMOUNT_TO_BE_SENT = '1';       // 0.000001 ada. Amount transfered on the generated stxs.
 
 /**
@@ -22,9 +23,11 @@ const AMOUNT_TO_BE_SENT = '1';       // 0.000001 ada. Amount transfered on the g
  * @requires being called in a context where a wallet has been stored on local storage,
  *           with it having 'numberOfTxs * 0.36' ada.
  */
-export async function generateSTxs(password: string,
-                                   numberOfTxs: number,
-                                   debugging: boolean = false) {
+export async function generateSTxs(
+  password: string,
+  numberOfTxs: number,
+  debugging: boolean = false
+) {
   const log = _logIfDebugging(debugging);
   const cryptoAccount = getSingleCryptoAccount();
 

@@ -94,11 +94,13 @@ export function createAdaWallet({
   return [adaWallet, masterKey];
 }
 
-export const isValidMnemonic = (phrase: string, numberOfWords: ?number) =>
-  isValidAdaMnemonic(phrase, numberOfWords);
+export const isValidMnemonic = (phrase: string, numberOfWords: ?number) => (
+  isValidAdaMnemonic(phrase, numberOfWords)
+);
 
-export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse =>
-  generateAdaMnemonic();
+export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse => (
+  generateAdaMnemonic()
+);
 
 export async function getBalance(
   addresses: Array<string>
@@ -108,8 +110,14 @@ export async function getBalance(
     const promises =
       groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(groupOfAddresses));
     const partialAmounts = await Promise.all(promises);
-    return partialAmounts.reduce((acc, partialAmount) =>
-      acc.plus(partialAmount.sum ? new BigNumber(partialAmount.sum) : new BigNumber(0)),
+    return partialAmounts.reduce(
+      (acc, partialAmount) => (
+        acc.plus(
+          partialAmount.sum
+            ? new BigNumber(partialAmount.sum)
+            : new BigNumber(0)
+        )
+      ),
       new BigNumber(0)
     );
   } catch (error) {

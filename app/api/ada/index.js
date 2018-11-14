@@ -158,7 +158,9 @@ export default class AdaApi {
     Logger.debug('AdaApi::getWallets called');
     try {
       const wallet = await getAdaWallet();
-      const wallets: AdaWallets = wallet ? [wallet] : [];
+      const wallets: AdaWallets = wallet
+        ? [wallet]
+        : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
       return wallets.map(data => _createWalletFromServerData(data));
@@ -176,12 +178,14 @@ export default class AdaApi {
       const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
       Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
-      return new Promise(resolve =>
-        resolve({
-          accountId: '0', /* We are using a SINGLE account */
-          addresses
-        })
-      );
+      return new Promise(resolve => (
+        resolve(
+          {
+            accountId: '0', /* We are using a SINGLE account */
+            addresses
+          }
+        )
+      ));
     } catch (error) {
       Logger.error('AdaApi::getAddresses error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -213,10 +217,12 @@ export default class AdaApi {
       await refreshTxs();
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
       Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(history));
-      const transactions = limit ? history[0].slice(skip, skip + limit) : history[0];
-      const mappedTransactions = transactions.map(data =>
+      const transactions = limit
+        ? history[0].slice(skip, skip + limit)
+        : history[0];
+      const mappedTransactions = transactions.map(data => (
         _createTransactionFromServerData(data)
-      );
+      ));
       return Promise.resolve({
         transactions: mappedTransactions,
         total: history[1]
@@ -302,8 +308,8 @@ export default class AdaApi {
     Logger.debug('AdaApi::calculateTransactionFee called');
     const { receiver, amount } = request;
     try {
-      const response: AdaTransactionFee = await
-        getAdaTransactionFee(receiver, amount);
+      const response: AdaTransactionFee =
+        await getAdaTransactionFee(receiver, amount);
       Logger.debug(
         'AdaApi::calculateTransactionFee success: ' + stringifyData(response)
       );
@@ -468,7 +474,7 @@ export default class AdaApi {
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
-  (data: AdaWallet) =>
+  (data: AdaWallet) => (
     new Wallet({
       id: data.cwId,
       amount: new BigNumber(data.cwAmount.getCCoin).dividedBy(
@@ -478,11 +484,12 @@ const _createWalletFromServerData = action(
       assurance: data.cwMeta.cwAssurance,
       passwordUpdateDate: data.cwPassphraseLU
     })
+  )
 );
 
 const _createAddressFromServerData = action(
   'AdaApi::_createAddressFromServerData',
-  (data: AdaAddress) =>
+  (data: AdaAddress) => (
     new WalletAddress({
       id: data.cadId,
       amount: new BigNumber(data.cadAmount.getCCoin).dividedBy(
@@ -490,6 +497,7 @@ const _createAddressFromServerData = action(
       ),
       isUsed: data.cadIsUsed
     })
+  )
 );
 
 const _conditionToTxState = (condition: string) => {

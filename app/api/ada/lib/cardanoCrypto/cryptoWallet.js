@@ -17,11 +17,12 @@ export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
 export const isValidAdaMnemonic = (
   phrase: string,
   numberOfWords: ?number = 15
-) =>
-  phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
+) => (
+  phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase)
+);
 
 export function generateWalletMasterKey(secretWords : string, password : string): string {
-  const entropy = new Buffer(bip39.mnemonicToEntropy(secretWords), 'hex');
+  const entropy = Buffer.from(bip39.mnemonicToEntropy(secretWords), 'hex');
   const masterKey: Uint8Array = HdWallet.fromEnhancedEntropy(entropy, '');
   return encryptWithPassword(password, masterKey);
 }
@@ -47,11 +48,11 @@ export function getCryptoWalletFromMasterKey(
   return wallet;
 }
 
-/* FIXME: Should be pass a encrypted mnemonic and also the password to decrypt it*/
+// FIXME: Should be pass a encrypted mnemonic and also the password to decrypt it
 export function getCryptoDaedalusWalletFromMnemonics(
   secretWords: string,
 ): CryptoDaedalusWallet {
-  const wallet = getResultOrFail(Wallet.fromDaedalusMnemonic(secretWords));
+  const wallet: CryptoDaedalusWallet = getResultOrFail(Wallet.fromDaedalusMnemonic(secretWords));
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }
