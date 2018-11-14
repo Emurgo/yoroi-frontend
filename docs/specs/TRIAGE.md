@@ -46,7 +46,7 @@ The user interaction would be:
 - Limited to markdown support
 
 ##### Comparison table
-　
+
 | Issue-based  | PR-based |
 | ------------- | ------------- |
 | Easy to propose feature  | Requires Git knowledge  |
