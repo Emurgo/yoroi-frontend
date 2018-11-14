@@ -1,5 +1,6 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/error-message';
+@import '../../themes/mixins/place-form-field-error-below-input';
 
 .error {
   @include error-message;
@@ -32,4 +33,64 @@
       margin-left: 20px;
     }
   }
+}
+
+.topComponent {
+  width: 725px;
+  height: 5em;
+  // background-color: gold;
+  & > span {
+    font-family: var(--font-light);
+    line-height: 1.38;
+    font-size: 14px;
+    opacity: 0.5;
+  }
+}
+
+.middleComponent {
+  background-color: #f3f3f5;
+  object-fit: contain;
+  border-radius: 4px;  
+  width: 725px;
+  height: 300px;
+  margin-top: 1em;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;  
+  .prerequisiteBlock {
+    display: inline-block;
+    width: 520px;
+    height: 300px;
+    .prerequisiteHeaderText {
+      font-family: var(--font-semibold);
+      line-height: 1.38;
+      font-size: 18px;
+      opacity: 0.5;
+      margin-left: 10px;
+    }
+    li {
+      list-style-type: disc;
+      margin-left: 18px;
+      margin-top: 8px;
+      font-family: var(--font-regular);
+      line-height: 1.38;
+      font-size: 14px;
+      opacity: 0.8;    
+    }    
+  }
+  .trezorImageBlock {
+    vertical-align: baseline;
+    display: inline-block;
+  }
+}
+
+.bottomComponent {
+  width: 725px;
+  height: 1em;
+  margin-top: 1em;
+  // background-color: greenyellow;
+}
+
+.trezorWebsiteLink {
+  text-align: center;
 }

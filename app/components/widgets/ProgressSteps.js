@@ -56,7 +56,7 @@ export default class ProgressSteps extends Component<Props> {
       }
 
       steps.push(
-      <div className={stepBoxStyle}>
+      <div key={idx} className={stepBoxStyle}>
         <div className={stepTopBarStyle}></div>
         <div className={styles.stepBottomBlock}>
           <SvgInline svg={SVGDoneShape} className={stepDoneShapeStyle} cleanup={['title']} />

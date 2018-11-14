@@ -72,6 +72,12 @@ export default class WalletAdd extends Component<Props> {
       <div className={componentClasses}>
         <div className={styles.buttonsContainer}>
           <Button
+            className="primary trezorWalletButton"
+            label={intl.formatMessage(messages.useTrezorDescription)}
+            onMouseUp={onTrezor}
+            skin={<SimpleButtonSkin />}
+          />        
+          <Button
             className="primary createWalletButton"
             label={intl.formatMessage(messages.createDescription)}
             onMouseUp={onCreate}
@@ -81,12 +87,6 @@ export default class WalletAdd extends Component<Props> {
             className="primary restoreWalletButton"
             label={intl.formatMessage(messages.restoreDescription)}
             onMouseUp={onRestore}
-            skin={<SimpleButtonSkin />}
-          />
-          <Button
-            className="primary trezorWalletButton"
-            label={intl.formatMessage(messages.useTrezorDescription)}
-            onMouseUp={onTrezor}
             skin={<SimpleButtonSkin />}
           />
           {activeNotification ? (

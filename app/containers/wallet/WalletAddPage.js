@@ -73,11 +73,11 @@ export default class WalletAddPage extends Component<Props> {
     } else {
       content = (
         <WalletAdd
+          onTrezor={() => actions.dialogs.open.trigger({ dialog: WalletTrezorDialog })}
+          isTrezorActive={false} // FIX : THIS
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
-          onTrezor={() => actions.dialogs.open.trigger({ dialog: WalletTrezorDialog })}
           isRestoreActive={isRestoreActive}
-          isTrezorActive={false} // FIX : THIS
         />
       );
     }
