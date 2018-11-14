@@ -42,6 +42,7 @@ export async function generateSTxs(
   log('[generateSTxs] Generated addresses');
 
   // Delete addresses so that their funds are not used for any of the txs sent
+  // note: not awaiting on this
   _removeAdaAddresses(cryptoAccount, adaAddresses);
 
   for (let i = 0; i < numberOfTxs; i++) {
@@ -104,5 +105,6 @@ async function _removeAdaAddresses(cryptoAccount, addresses) {
 
 // The same index from the AdaAddresses is used when saving them
 function _saveAdaAddresses(cryptoAccount, adaAddresses) {
+  // Note: calling async function in loop
   adaAddresses.forEach((adaAddress) => saveAdaAddress(adaAddress, 'External'));
 }

@@ -35,7 +35,7 @@ export default class DaedalusTransferStore extends Store {
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<any> = new Request(this._transferFundsRequest);
+  @observable transferFundsRequest: Request<Array<void>> = new Request(this._transferFundsRequest);
   @observable ws: any = null;
 
   setup(): void {
@@ -101,7 +101,7 @@ export default class DaedalusTransferStore extends Store {
           this._updateStatus('checkingAddresses');
           const addressesWithFunds = getAddressesWithFunds({
             secretWords,
-            addresses: data.addresses
+            fullUtxo: data.addresses
           });
           this._updateStatus('generatingTx');
           const transferTx = await generateTransferTx({
@@ -152,7 +152,7 @@ export default class DaedalusTransferStore extends Store {
 
   _transferFundsRequest = async (payload: {
     cborEncodedTx: Array<number>
-  }): Promise<any> => {
+  }): Promise<Array<void>> => {
     const { cborEncodedTx } = payload;
     const signedTx = Buffer.from(cborEncodedTx).toString('base64');
     return sendTx(signedTx);

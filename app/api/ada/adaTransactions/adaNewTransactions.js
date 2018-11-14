@@ -1,4 +1,7 @@
 // @flow
+
+// Handles interfacing w/ lovefieldDB and rust-cardano to create transaction
+
 import _ from 'lodash';
 import { Wallet } from 'rust-cardano-crypto';
 import {
@@ -42,20 +45,22 @@ import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 
 declare var CONFIG : ConfigType;
-const addressesLimit = CONFIG.app.addressRequestSize;
 
-const fakePassword = 'fake';
-
+/** Calculate the transaction fee without actually sending the transaction */
 export function getAdaTransactionFee(
   receiver: string,
   amount: string
 ): Promise<AdaTransactionFee> {
+  // To calculate the transaction fee without requiring the user to enter their password
+  // We create a fake mnemonic with a fixed contant password
+  const fakePassword = 'fake';
   const fakeWalletMasterKey = generateWalletMasterKey(generateAdaMnemonic().join(' '), fakePassword);
   return _getAdaTransaction(
     receiver,
     amount,
     getCryptoWalletFromMasterKey(fakeWalletMasterKey, fakePassword)
   )
+    // we extract the fee since it's all we care about
     .then(response => {
       const [{ fee }] = response;
       return { getCCoin: fee };
@@ -68,11 +73,12 @@ export function getAdaTransactionFee(
     });
 }
 
+/** Send a transaction and save the new change address */
 export async function newAdaTransaction(
   receiver: string,
   amount: string,
   password: string
-): Promise<any> {
+): Promise<Array<void>> {
   const masterKey = getWalletMasterKey();
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
   // eslint-disable-next-line camelcase
@@ -80,12 +86,15 @@ export async function newAdaTransaction(
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
   if (changed_used) { // eslint-disable-line camelcase
+    // tentatively assume the transaction will success to we save the change address to the wallet
     await saveAdaAddress(changeAdaAddr, 'Internal');
   }
   try {
     const backendResponse = await sendTx(signedTx);
     return backendResponse;
   } catch (sendTxError) {
+    // On failure, we have to remove the change address we eagerly added
+    // Note: we don't await on this
     removeAdaAddress(changeAdaAddr);
     Logger.error('adaNewTransactions::newAdaTransaction error: ' +
       stringifyError(sendTxError));
@@ -96,13 +105,19 @@ export async function newAdaTransaction(
   }
 }
 
+/** Sum up the UTXO for a list of addresses by batching backend requests */
 export async function getAllUTXOsForAddresses(
   addresses: Array<string>
 ): Promise<Array<UTXO>> {
   try {
-    const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+    // split up all addresses into chunks of equal size
+    const groupsOfAddresses = _.chunk(addresses, CONFIG.app.addressRequestSize);
+
+    // convert chunks into list of Promises that call the backend-service
     const promises = groupsOfAddresses
       .map(groupOfAddresses => getUTXOsForAddresses(groupOfAddresses));
+
+    // Sum up all the utxo
     return Promise.all(promises)
       .then(groupsOfUTXOs => (
         groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), [])
@@ -114,42 +129,57 @@ export async function getAllUTXOsForAddresses(
   }
 }
 
+/** Perform the cryptography required to create a transaction */
 export async function getAdaTransactionFromSenders(
   senders: AdaAddresses,
   receiver: string,
   amount: string,
   cryptoWallet: CryptoWallet
 ): Promise<[SpendResponse, AdaAddress]> {
+  // Get all addresses in the single account to a list
   const cryptoAccount = getSingleCryptoAccount();
   const addressesMap = await getAdaAddressesMap();
   const addresses = mapToList(addressesMap);
+
+  // fetch new internal address from HD Wallet for change
   const changeAdaAddr = await createAdaAddress(cryptoAccount, addresses, 'Internal');
   const changeAddr = changeAdaAddr.cadId;
-  const outputs = [{ address: receiver, value: amount }];
-  const senderUtxos = await getAllUTXOsForAddresses(_getAddresses(senders));
+
+  // Get all user UTXOs
+  const senderUtxos = await getAllUTXOsForAddresses(_addressesToPublicHash(senders));
+
+  // Consider any UTXO as a possible input
   const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
+  const outputs = [{ address: receiver, value: amount }];
+
+  // Note: selection policy is decided on the js-cardano-wasm side
   const result: SpendResponse = getResultOrFail(
     Wallet.spend(cryptoWallet, inputs, outputs, changeAddr)
   );
   return [result, changeAdaAddr];
 }
 
+/** Perform the cryptography required to create a transaction */
 async function _getAdaTransaction(
   receiver: string,
   amount: string,
   cryptoWallet: CryptoWallet,
-) {
+): Promise<[SpendResponse, AdaAddress]> {
+  // Consider all user addresses valid for the source of a transaction
   const senders = await getAdaAddressesList();
   return getAdaTransactionFromSenders(senders, receiver, amount, cryptoWallet);
 }
 
-function _getAddresses(
+function _addressesToPublicHash(
   adaAddresses: AdaAddresses
 ): Array<string> {
   return adaAddresses.map(addr => addr.cadId);
 }
 
-function _mapUTXOsToInputs(utxos, adaAddressesMap) {
+function _mapUTXOsToInputs(
+  utxos: Array<UTXO>,
+  adaAddressesMap
+): Array<TxInput> {
   return utxos.map((utxo) => ({
     ptr: {
       index: utxo.tx_index,
