@@ -20,9 +20,15 @@ import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletTrezorDialog.scss';
 
 import SvgInline from 'react-svg-inline';
-import gifIcon from '../../assets/images/trezor/connecting.gif';
-import prerequisiteIconSVG from '../../assets/images/trezor/icon-prerequisite.inline.svg';
-import prerequisiteTrezorSVG from '../../assets/images/trezor/picture-about.inline.svg';
+import aboutPrerequisiteIconSVG from '../../assets/images/trezor/about-prerequisite-header-icon.inline.svg';
+import aboutPrerequisiteTrezorSVG from '../../assets/images/trezor/about-trezor.inline.svg';
+import connectLoadGIF from '../../assets/images/trezor/connect-load.gif';
+import connectStartGIF from '../../assets/images/trezor/connect-start.gif';
+import connectErrorSVG from '../../assets/images/trezor/connect-error.inline.svg';
+import saveLoadGIF from '../../assets/images/trezor/save-load.inline.svg';
+import saveStartSVG from '../../assets/images/trezor/save-start.inline.svg';
+import saveErrorSVG from '../../assets/images/trezor/save-error.inline.svg';
+
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import { isValidHardwareWalletName } from '../../utils/validations';
 import Input from 'react-polymorph/lib/components/Input';
@@ -66,24 +72,24 @@ const messages = defineMessages({
     defaultMessage: '!!!Save',
     description: 'Label for the "Save" button on the Connect to Trezor Hardware Wallet dialog.'
   },
-  aboutHeaderLine1: {
+  aboutIntroTextLine1: {
     id: 'wallet.trezor.dialog.trezor.step.about.introText.line.1',
-    defaultMessage: '!!!Trezor hardware wallet is a small USB device that allows you to access your wallet quickly, safely & easily.',
+    defaultMessage: '!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
-  aboutHeaderLine2: {
+  aboutIntroTextLine2: {
     id: 'wallet.trezor.dialog.trezor.step.about.introText.line.2',
     defaultMessage: '!!!It is more secure because your private key never leaves the hardware wallet.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
-  aboutHeaderLine3: {
+  aboutIntroTextLine3: {
     id: 'wallet.trezor.dialog.trezor.step.about.introText.line.3',
-    defaultMessage: '!!!It protects you from phishing, malware, and more.',
+    defaultMessage: '!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
-  },    
+  },
   aboutPrerequisiteHeader: {
     id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.header',
-    defaultMessage: '!!!Prerequisite',
+    defaultMessage: '!!!Prerequisites',
     description: 'Prerequisite header on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part1: {
@@ -98,7 +104,7 @@ const messages = defineMessages({
   },
   aboutPrerequisite1Part2LinkText: {
     id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.1.part2.link.text',
-    defaultMessage: '!!!Trezor Model T with Version 2.0.8',
+    defaultMessage: '!!!Trezor Model T with version 2.0.8',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part3: {
@@ -108,33 +114,28 @@ const messages = defineMessages({
   },      
   aboutPrerequisite2: {
     id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.2',
-    defaultMessage: '!!!Device Frimware should be greater than or equal to 2.0.8',
+    defaultMessage: '!!!Trezor device must be pre-initialized',
     description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
     id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.3',
-    defaultMessage: '!!!Device should be pre-initialized, if not then first goto https://trezor.io/start/',
+    defaultMessage: '!!!The computer needs to be connected to the Internet throughout the process',
     description: 'Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite4: {
     id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.4',
-    defaultMessage: '!!!make sure you are connected to internet throught the process',
+    defaultMessage: '!!!Only one Trezor device can be connected to the computer at any time',
     description: 'Fourth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite5: {
     id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.5',
-    defaultMessage: '!!!connect only one(not multiple) Trezor Model T device to computer\'s USB port',
+    defaultMessage: '!!!Trezor device screen must be unlocked',
     description: 'Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite6: {
     id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.6',
-    defaultMessage: '!!!Trezor Model T device screen must be in unlocked state',
+    defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
     description: 'Sixth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  aboutPrerequisite7: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.7',
-    defaultMessage: '!!!do not remove the device from USB port throught the connection process',
-    description: 'Seventh Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   helpLinkYoroiWithTrezor: {
     id: 'wallet.trezor.dialog.trezor.common.step.link.helpYoroiWithTrezor',
@@ -146,20 +147,60 @@ const messages = defineMessages({
     defaultMessage: '!!!Click here to know more about how to use Yoroi with Trezor.',
     description: 'Tutorial link text about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
   },  
-  connectHeader: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.header',
-    defaultMessage: '!!!After Connecting your Trezor device to USB port please press \"Connect\" button. A new tab will appear, please perform needed actions on new tab.',
-    description: 'Header text of connect step on the Connect to Trezor Hardware Wallet dialog.'
+  connectIntroTextLine1: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.introText.line.1',
+    defaultMessage: '!!!After connecting your Trezor device to the computer press the Connect button.',
+    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  connectIntroTextLine2: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.introText.line.2',
+    defaultMessage: '!!!A new tab will appear, please follow the instructions in the new tab.',
+    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  connectIntroTextLine3: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.introText.line.3',
+    defaultMessage: '!!!This process shares the Cardano public key with Yoroi.',
+    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  connectLiveMessageCheckingTrezorDevice: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.liveMessage.checkingTrezorDevice',
+    defaultMessage: '!!!Checking Trezor device, please follow the instructions on the new tab...',
+    description: 'Live message about checking Trezor device of connect start step on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  connectError1001: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.1001',
+    defaultMessage: '!!!ERROR#1001: Could not connect to the Internet, please retry.',
+    description: '\"ERROR#1001: Could not connect to the Internet, please retry\" on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  connectError1002: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.1002',
+    defaultMessage: '!!!ERROR#1002: Something unexpected happened, please retry.',
+    description: '\"ERROR#1002: Something unexpected happened, please retry.\" on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  connectError2001: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.2001',
+    defaultMessage: '!!!ERROR#2001: Necessary permissions were not granted by the user, please retry.',
+    description: '\"ERROR#2001: Necessary permissions were not granted by the user, please retry.\" on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  connectError2002: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.2002',
+    defaultMessage: '!!!ERROR#2002: Cancelled, please retry',
+    description: '\"ERROR#2002: Cancelled, please retry\" on the Connect to Trezor Hardware Wallet dialog.'
+  },      
+  saveWalletNameInputLabel: {
+    id: 'wallet.trezor.dialog.trezor.step.save.walletName.label',
+    defaultMessage: '!!!Wallet name',
+    description: 'Label for the wallet name input on the Connect to Trezor Hardware Wallet dialog.'
   },  
-  walletNameInputLabel: {
-    id: 'wallet.trezor.dialog.wallet.name.input.label',
-    defaultMessage: '!!!Give a wallet name',
-    description: 'Label for the wallet name input on the wallet restore dialog.'
-  },  
-  walletNameInputHint: {
+  saveWalletNameInputPlaceholder: {
     id: 'wallet.restore.dialog.wallet.name.input.hint',
     defaultMessage: '!!!Enter wallet name',
-    description: 'Hint "Enter wallet name" for the wallet name input on the wallet restore dialog.'
+    description: 'Placeholder "Enter wallet name" for the wallet name input on the wallet restore dialog.'
+  },
+  saveWalletNameInputBottomInfo: {
+    id: 'wallet.trezor.dialog.trezor.step.save.walletName.info',
+    defaultMessage: '!!!We have fetched Trezor device’s name for you; you can use as it is or assign a different name.',
+    description: 'Hint for the wallet name input on the wallet restore dialog.'
   },  
 });
 
@@ -198,7 +239,7 @@ type State = {
   currentProgressStep: 0 | 1 | 2,
   action_btn_name?: string,
   action_btn_processing? : boolean,
-  error_live_info_text? : string,
+  error_or_live_info_text? : string,
 }
 
 @observer
@@ -234,13 +275,13 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     this.form = new ReactToolboxMobxForm({
       fields: {
         walletName: {
-          label: intl.formatMessage(messages.walletNameInputLabel),
-          placeholder: intl.formatMessage(messages.walletNameInputHint),
+          label: intl.formatMessage(messages.saveWalletNameInputLabel),
+          placeholder: intl.formatMessage(messages.saveWalletNameInputPlaceholder),
           value: '',
           validators: [({ field }) => (
             [
               isValidHardwareWalletName(field.value),
-              intl.formatMessage(globalMessages.invalidWalletName)
+              intl.formatMessage(globalMessages.invalidHardwareWalletName)
             ]
           )],
         },
@@ -258,11 +299,6 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     // FIXME: better component division
     const { intl } = this.context;
     const { isSubmitting, error, onCancel } = this.props;
-
-    const dialogClasses = classnames([styles.component, 'WalletTrezorDialog']);
-
-    const infoImage = (<div><img src={gifIcon} height="297" width="725" alt={'TRY CONNECT ANIMATION'}/></div>);
-    const errorArea = (<div>{this.state.error_live_info_text}</div>);
 
     const progressStep = (<ProgressSteps
       stepsList={[
@@ -291,7 +327,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       }];
       dialog = (
         <Dialog
-          className={dialogClasses}
+          className={classnames([styles.component, 'WalletTrezorDialog'])}
           title={intl.formatMessage(messages.title)}
           closeOnOverlayClick={false}
           onClose={onCancel}
@@ -300,14 +336,14 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         >
         {progressStep}
         <div className={styles.topComponent}>
-          <span>{intl.formatMessage(messages.aboutHeaderLine1)}</span><br/>
-          <span>{intl.formatMessage(messages.aboutHeaderLine2)}</span><br/>
-          <span>{intl.formatMessage(messages.aboutHeaderLine3)}</span><br/>
+          <span>{intl.formatMessage(messages.aboutIntroTextLine1)}</span><br/>
+          <span>{intl.formatMessage(messages.aboutIntroTextLine2)}</span><br/>
+          <span>{intl.formatMessage(messages.aboutIntroTextLine3)}</span><br/>
         </div>
         <div className={styles.middleComponent}>
           <div className={styles.prerequisiteBlock}>
             <div>
-              <SvgInline svg={prerequisiteIconSVG} cleanup={['title']} />
+              <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />
               <span className={styles.prerequisiteHeaderText}>{intl.formatMessage(messages.aboutPrerequisiteHeader)}</span>
             </div>
             <ul>
@@ -318,18 +354,16 @@ export default class WalletTrezorDialog extends Component<Props, State> {
               <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
               <li key="6">{intl.formatMessage(messages.aboutPrerequisite6)}</li>
             </ul>
-            <br/>
-            <span>[ *Trezor One model support will come soon. ]</span>
           </div>
           <div className={styles.trezorImageBlock}>
-            <SvgInline svg={prerequisiteTrezorSVG} cleanup={['title']} />
-          </div>          
+            <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
+          </div>
         </div>
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
+        <div className={styles.bottomComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
-          {errorArea}
+        <div className={styles.bottomComponent}>
+          <div>{this.state.error_or_live_info_text}</div>
         </div>        
         </Dialog>
       );
@@ -343,7 +377,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       }];
       dialog = (
         <Dialog
-          className={dialogClasses}
+          className={classnames([styles.component, 'WalletTrezorDialog'])}
           title={intl.formatMessage(messages.title)}
           closeOnOverlayClick={false}
           onClose={onCancel}
@@ -352,15 +386,19 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           backButton={<DialogBackButton onBack={this.onBackToIntro} />}
         >
         {progressStep}
-        <div className={styles.topComponent}>{intl.formatMessage(messages.connectHeader)}</div>
-        <div className={styles.middleComponent}>
-          {infoImage}
+        <div className={styles.topComponent}>
+          <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
+          <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
+          <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
         </div>
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
+        <div className={classnames([styles.middleComponent, styles.middleComponentConnectLoad])}>
+          <img src={connectLoadGIF} width="725" height="297" alt={'TRY CONNECT ANIMATION'}/>
+        </div>
+        <div className={styles.bottomComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
-          {errorArea}
+        <div className={styles.bottomComponent}>
+          <div>{this.state.error_or_live_info_text}</div>
         </div>
         </Dialog>
       );
@@ -374,7 +412,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       }];
       dialog = (
         <Dialog
-          className={dialogClasses}
+          className={classnames([styles.component, 'WalletTrezorDialog'])}
           title={intl.formatMessage(messages.title)}
           closeOnOverlayClick={false}
           onClose={onCancel}
@@ -382,15 +420,19 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={styles.topComponent}>{intl.formatMessage(messages.connectHeader)}</div>
-        <div className={styles.middleComponent}>
-          {infoImage}        
+        <div className={styles.topComponent}>
+          <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
+          <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
+          <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
         </div>
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
+        <div className={classnames([styles.middleComponent, styles.middleComponentConnect])}>
+          <img src={connectStartGIF} width="725" height="297" alt={'TRY CONNECT ANIMATION'}/>
+        </div>
+        <div className={styles.bottomComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
-          {errorArea}
+        <div className={styles.bottomComponent}>
+          <div>{this.state.error_or_live_info_text}</div>
         </div>
         </Dialog>
       );
@@ -404,7 +446,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       }];
       dialog = (
         <Dialog
-          className={dialogClasses}
+          className={classnames([styles.component, 'WalletTrezorDialog'])}
           title={intl.formatMessage(messages.title)}
           closeOnOverlayClick={false}
           onClose={onCancel}
@@ -413,14 +455,19 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           backButton={<DialogBackButton onBack={this.onBackToIntro} />}
         >
         {progressStep}
-        <div className={styles.topComponent}>{intl.formatMessage(messages.connectHeader)}</div>
-        <div className={styles.middleComponent}>
+        <div className={styles.topComponent}>
+          <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
+          <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
+          <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
         </div>
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
+        <div className={classnames([styles.middleComponent, styles.middleComponentConnectError])}>
+          <SvgInline svg={connectErrorSVG} cleanup={['title']} />
+        </div>
+        <div className={styles.bottomComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
-          {errorArea}
+        <div className={classnames([styles.bottomComponent, styles.errorBlock])}>
+          <div>{this.state.error_or_live_info_text}</div>
         </div>
         </Dialog>
       );
@@ -435,7 +482,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
       dialog = (
         <Dialog
-          className={dialogClasses}
+          className={classnames([styles.component, 'WalletTrezorDialog'])}
           title={intl.formatMessage(messages.title)}
           closeOnOverlayClick={false}
           onClose={onCancel}
@@ -450,15 +497,16 @@ export default class WalletTrezorDialog extends Component<Props, State> {
             error={walletNameField.error}
             skin={<SimpleInputSkin />}
           />
-          <div>We have fetched Trezor device wallet name for you, you can use as it is or give a different name.</div>
+          <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
         </div>
         <div className={styles.middleComponent}>
+          <SvgInline svg={saveLoadGIF} cleanup={['title']} />
         </div>
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
+        <div className={styles.bottomComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
-          {errorArea}
+        <div className={styles.bottomComponent}>
+          <div>{this.state.error_or_live_info_text}</div>
         </div>
         </Dialog>
       );
@@ -472,7 +520,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       }];
       dialog = (
         <Dialog
-          className={dialogClasses}
+          className={classnames([styles.component, 'WalletTrezorDialog'])}
           title={intl.formatMessage(messages.title)}
           closeOnOverlayClick={false}
           onClose={onCancel}
@@ -486,15 +534,18 @@ export default class WalletTrezorDialog extends Component<Props, State> {
             {...walletNameField.bind()}
             error={walletNameField.error}
             skin={<SimpleInputSkin />}
+            disabled={true}
           />
+          <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
         </div>
         <div className={styles.middleComponent}>
+          <SvgInline svg={saveStartSVG} cleanup={['title']} />
         </div>
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
+        <div className={styles.bottomComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
-          {errorArea}
+        <div className={styles.bottomComponent}>
+          <div>{this.state.error_or_live_info_text}</div>
         </div>
         </Dialog>
       );
@@ -508,7 +559,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       }];
       dialog = (
         <Dialog
-          className={dialogClasses}
+          className={classnames([styles.component, 'WalletTrezorDialog'])}
           title={intl.formatMessage(messages.title)}
           closeOnOverlayClick={false}
           onClose={onCancel}
@@ -523,14 +574,16 @@ export default class WalletTrezorDialog extends Component<Props, State> {
             error={walletNameField.error}
             skin={<SimpleInputSkin />}
           />
+          <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>          
         </div>
         <div className={styles.middleComponent}>
+          <SvgInline svg={saveErrorSVG} cleanup={['title']} />
         </div>
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
+        <div className={styles.bottomComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={classnames([styles.bottomComponent, styles.trezorWebsiteLink])}>
-          {errorArea}
+        <div className={classnames([styles.bottomComponent, styles.errorBlock])}>
+          <div>{this.state.error_or_live_info_text}</div>
         </div>
         </Dialog>
       );    
@@ -548,43 +601,43 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       case ProgressStateOption.ABOUT:
         this.state.currentProgressStep = 0;
         this.state.action_btn_processing = false;
-        this.state.action_btn_name = 'Next';
-        this.state.error_live_info_text = '';
+        this.state.action_btn_name = intl.formatMessage(messages.nextButtonLabel);
+        this.state.error_or_live_info_text = '';
         break;      
       case ProgressStateOption.CONNECT_LOAD:
         this.state.currentProgressStep = 1;
         this.state.action_btn_processing = false;
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
-        this.state.error_live_info_text = '';
+        this.state.error_or_live_info_text = '';
         break;
       case ProgressStateOption.CONNECT_START:
         this.state.currentProgressStep = 1;
         this.state.action_btn_processing = true;
-        this.state.error_live_info_text = 'Checking Trezor device...'
+        this.state.error_or_live_info_text = intl.formatMessage(messages.connectLiveMessageCheckingTrezorDevice);
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
         break;
       case ProgressStateOption.CONNECT_ERROR:
         this.state.action_btn_processing = false;
-        this.state.error_live_info_text = this.trezorDeviceInfo.errorId;
+        this.state.error_or_live_info_text = intl.formatMessage(messages[this.trezorDeviceInfo.errorId]);
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
         break;        
       case ProgressStateOption.SAVE_LOAD:
         this.state.currentProgressStep = 2;
         this.state.action_btn_processing = false;
         this.form.$('walletName').value = this.trezorDeviceInfo.features.label;
-        this.state.error_live_info_text = '';
+        this.state.error_or_live_info_text = '';
         this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
         break;
        case ProgressStateOption.SAVE_START:
          this.state.currentProgressStep = 2;
         this.state.action_btn_processing = true;
-        this.state.error_live_info_text = '';
+        this.state.error_or_live_info_text = '';
         this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
         break;
       case ProgressStateOption.SAVE_ERROR:
         this.state.currentProgressStep = 2;
         this.state.action_btn_processing = false;
-        this.state.error_live_info_text = '';
+        this.state.error_or_live_info_text = '';
         this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
         break;                       
       default:
@@ -648,7 +701,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
   _onTrezorUIEvent = (event: UiMessage) => {
     console.log(`Trezor UI_EVENT : ${event.type} : ` + JSON.stringify(event, null, ' '));
-    // FIXME: trezord forces close
+    // FIXME: trezord forces close issue
     // if(event.type === CLOSE_UI_WINDOW && 
     //   this.progressState === ProgressStateOption.CONNECT_START &&
     //   this.publicKeyInfo.valid === false) {
@@ -664,15 +717,25 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     trezorDeviceInfo.errorId = '';
 
     if(!trezorCardanoGetPublicKeyResp.success) {
-      trezorDeviceInfo.errorId = trezorCardanoGetPublicKeyResp.payload.error;
+      switch(trezorCardanoGetPublicKeyResp.payload.error) {
+        case 'Permissions not granted':
+          trezorDeviceInfo.errorId = 'connectError2001';
+          break;
+        case 'Popup closed':
+          trezorDeviceInfo.errorId = 'connectError2002';
+          break;          
+        default:
+          trezorDeviceInfo.errorId = 'connectError1002';
+          break;
+      }
     }
     
     if(!trezorDeviceInfo.errorId && trezorCardanoGetPublicKeyResp.payload.publicKey.length <= 0) {
-      trezorDeviceInfo.errorId = 'UNKNOWN';
+      trezorDeviceInfo.errorId = 'connectError1002';
     }
     
     if(!trezorDeviceInfo.errorId && this.trezorEventDevice.payload.type != 'acquired') {
-      trezorDeviceInfo.errorId = 'Error: Cant get device feartures !!';
+      trezorDeviceInfo.errorId = 'connectError1002';
     }
     
     if(!trezorDeviceInfo.errorId) {

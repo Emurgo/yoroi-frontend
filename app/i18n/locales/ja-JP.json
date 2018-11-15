@@ -76,6 +76,7 @@
   "global.errors.fieldIsRequired": "この項目は必須です。",
   "global.errors.invalidRepeatPassword": "一致しません。",
   "global.errors.invalidWalletName": "3文字以上40文字以下のウォレット名を入力してください。",
+  "global.errors.invalidHardwareWalletName": "1文字以上40文字以下のウォレット名を入力してください。",
   "global.errors.invalidWalletPassword": "無効なパスワード",
   "global.labels.cancel": "キャンセル",
   "global.labels.change": "変更",

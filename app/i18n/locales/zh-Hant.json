@@ -76,6 +76,7 @@
   "global.errors.fieldIsRequired": "此欄位為必填欄。",
   "global.errors.invalidRepeatPassword": "不相符。",
   "global.errors.invalidWalletName": "錢包名稱要求具備至少 3 個且最多 40 個字母。",
+  "global.errors.invalidHardwareWalletName": "錢包名稱要求具備至少 1 個且最多 40 個字母。",  
   "global.errors.invalidWalletPassword": "無效密碼",
   "global.labels.cancel": "取消",
   "global.labels.change": "變更",

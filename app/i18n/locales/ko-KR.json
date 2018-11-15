@@ -76,6 +76,7 @@
   "global.errors.fieldIsRequired": "이 필드는 필수입니다.",
   "global.errors.invalidRepeatPassword": "일치하지 않습니다.",
   "global.errors.invalidWalletName": "지갑 이름은 3~40자 사이여야 합니다.",
+  "global.errors.invalidHardwareWalletName": "지갑 이름은 1~40자 사이여야 합니다.", 
   "global.errors.invalidWalletPassword": "잘못된 암호",
   "global.labels.cancel": "취소",
   "global.labels.change": "변경",
