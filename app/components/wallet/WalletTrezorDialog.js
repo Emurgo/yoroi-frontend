@@ -490,7 +490,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={styles.topComponent}>
+        <div className={classnames([styles.topComponent, styles.topComponentSave])}>
           <Input
             className={walletNameFieldClasses}
             {...walletNameField.bind()}
@@ -528,7 +528,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={styles.topComponent}>
+        <div className={classnames([styles.topComponent, styles.topComponentSave])}>
           <Input
             className={walletNameFieldClasses}
             {...walletNameField.bind()}
@@ -567,7 +567,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={styles.topComponent}>
+        <div className={classnames([styles.topComponent, styles.topComponentSave])}>
           <Input
             className={walletNameFieldClasses}
             {...walletNameField.bind()}

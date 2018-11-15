@@ -38,13 +38,17 @@
 .topComponent {
   width: 725px;
   height: 5em;
-  // background-color: gold;
+  padding-top: 1em;
   & > span {
     font-family: var(--font-light);
     line-height: 1.38;
     font-size: 14px;
     opacity: 0.5;
   }
+}
+
+.topComponentSave {
+  padding-top: 0;
 }
 
 .middleComponent {
@@ -57,7 +61,7 @@
   margin-top: 1em;
   padding-top: 10px;
   padding-bottom: 10px;
-  padding-left: 10px;  
+  padding-left: 10px;
   .prerequisiteBlock {
     display: inline-block;
     width: 520px;
