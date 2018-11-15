@@ -1,4 +1,7 @@
 // @flow
+
+// Wrapper for creating "accounts" as defined by bip44
+
 import { Wallet } from 'rust-cardano-crypto';
 import { getCryptoWalletFromMasterKey } from './lib/cardanoCrypto/cryptoWallet';
 import { getResultOrFail } from './lib/cardanoCrypto/cryptoUtils';

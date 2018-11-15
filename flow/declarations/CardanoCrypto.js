@@ -180,14 +180,23 @@ declare type CryptoAddressChecker = {
   payload_key: Array<number>
 }
 
+/**Daedalus uses a randomly generated 2-level addressing (V1 scheme) 
+ * Addressing(account | 0x80000000, index | 0x80000000)
+ * 
+ * You can find more at 
+ * https://github.com/input-output-hk/rust-cardano/blob/a82e65d1a63ae/cardano/src/wallet/rindex.rs
+*/
+declare type AddressingSchemeV1 = Array<number>;
+
 declare type CryptoDaedalusAddressRestored = {
   address: string,
-  addressing: Array<number>
+  addressing: AddressingSchemeV1
 }
 
 declare type TxInput = {
   ptr: TxInputPtr,
   value: TxOutput,
+  // bip 44 sequencial addressing which has 3 levels derivation
   addressing: {
     account: number,
     change: number,
@@ -198,7 +207,7 @@ declare type TxInput = {
 declare type TxDaedalusInput = {
   ptr: TxInputPtr,
   value: string,
-  addressing: Array<number>
+  addressing: AddressingSchemeV1
 }
 
 declare type TxOutput = {
@@ -223,4 +232,5 @@ declare type CryptoConfig = {
 
 declare type SelectionPolicy = 'FirstMatchFirst';
 
+/** V1 in intial version of Daedalus. V2 is used by Yoroi */
 declare type DerivationScheme = 'V1' | 'V2';

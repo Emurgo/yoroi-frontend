@@ -30,14 +30,18 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     this.stores.ada.wallets.refreshWalletsData();
   };
 
+  /** Updates meta-parameters for the internal wallet representation */
   @action _updateWalletField = async ({ field, value }: { field: string, value: string }) => {
     const activeWallet = this.stores.ada.wallets.active;
     if (!activeWallet) return;
     const { id: walletId, name, assurance } = activeWallet;
     const walletData = { walletId, name, assurance };
     walletData[field] = value;
+
+    // update the meta-parameters in the internal wallet representation
     const wallet = await this.updateWalletRequest.execute(walletData).promise;
     if (!wallet) return;
+
     await this.stores.ada.wallets.walletsRequest.patch(result => {
       const walletIndex = _.findIndex(result, { id: walletId });
       result[walletIndex] = wallet;
