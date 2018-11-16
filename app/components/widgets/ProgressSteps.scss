@@ -53,6 +53,8 @@ $common-color:#daa49a;
 .stepText {
   color: $common-color;
   opacity: 0.3;
+  font-size: 13px;
+  font-family: var(--font-light);
 }
 
 .stepTextDone {

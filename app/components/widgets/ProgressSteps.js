@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import styles from './ProgressSteps.scss';
 import classNames from 'classnames';
 import SvgInline from 'react-svg-inline';
-import SVGDoneShape from '../../assets/images/widget/done-shape.inline.svg';
+import iconTickSVG from '../../assets/images/widget/tick.inline.svg';
+import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
 
 type Props = {
   stepsList: Array<string>,
@@ -59,7 +60,7 @@ export default class ProgressSteps extends Component<Props> {
       <div key={idx} className={stepBoxStyle}>
         <div className={stepTopBarStyle}></div>
         <div className={styles.stepBottomBlock}>
-          <SvgInline svg={SVGDoneShape} className={stepDoneShapeStyle} cleanup={['title']} />
+          <SvgInline svg={iconTickSVG} className={stepDoneShapeStyle} cleanup={['title']} />
           <span className={stepTextStyle}>{stepText}</span>
         </div>
       </div>);      

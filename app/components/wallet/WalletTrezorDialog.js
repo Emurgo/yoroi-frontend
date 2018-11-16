@@ -28,6 +28,7 @@ import connectErrorSVG from '../../assets/images/trezor/connect-error.inline.svg
 import saveLoadGIF from '../../assets/images/trezor/save-load.inline.svg';
 import saveStartSVG from '../../assets/images/trezor/save-start.inline.svg';
 import saveErrorSVG from '../../assets/images/trezor/save-error.inline.svg';
+import saveSuccessSVG from '../../assets/images/trezor/save-success.inline.svg';
 
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import { isValidHardwareWalletName } from '../../utils/validations';
@@ -335,12 +336,12 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={styles.topComponent}>
+        <div className={styles.headerComponent}>
           <span>{intl.formatMessage(messages.aboutIntroTextLine1)}</span><br/>
           <span>{intl.formatMessage(messages.aboutIntroTextLine2)}</span><br/>
           <span>{intl.formatMessage(messages.aboutIntroTextLine3)}</span><br/>
         </div>
-        <div className={styles.middleComponent}>
+        <div className={classnames([styles.middleComponent, styles.middleComponentAbout])}>
           <div className={styles.prerequisiteBlock}>
             <div>
               <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />
@@ -359,11 +360,11 @@ export default class WalletTrezorDialog extends Component<Props, State> {
             <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
           </div>
         </div>
-        <div className={styles.bottomComponent}>
+        <div className={styles.yoroiLinkComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>
-        <div className={styles.bottomComponent}>
-          <div>{this.state.error_or_live_info_text}</div>
+        <div className={styles.liveInfoComponent}>
+          <span>{this.state.error_or_live_info_text}</span>
         </div>        
         </Dialog>
       );
@@ -386,19 +387,19 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           backButton={<DialogBackButton onBack={this.onBackToIntro} />}
         >
         {progressStep}
-        <div className={styles.topComponent}>
+        <div className={styles.headerComponent}>
           <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
           <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
           <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
         </div>
         <div className={classnames([styles.middleComponent, styles.middleComponentConnectLoad])}>
-          <img src={connectLoadGIF} width="725" height="297" alt={'TRY CONNECT ANIMATION'}/>
+          <img src={connectLoadGIF}/>
         </div>
-        <div className={styles.bottomComponent}>
+        <div className={styles.yoroiLinkComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={styles.bottomComponent}>
-          <div>{this.state.error_or_live_info_text}</div>
+        <div className={styles.liveInfoComponent}>
+          <span>{this.state.error_or_live_info_text}</span>
         </div>
         </Dialog>
       );
@@ -420,19 +421,19 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={styles.topComponent}>
+        <div className={styles.headerComponent}>
           <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
           <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
           <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
         </div>
-        <div className={classnames([styles.middleComponent, styles.middleComponentConnect])}>
-          <img src={connectStartGIF} width="725" height="297" alt={'TRY CONNECT ANIMATION'}/>
+        <div className={classnames([styles.middleComponent, styles.middleComponentConnectStart])}>
+          <img src={connectStartGIF}/>
         </div>
-        <div className={styles.bottomComponent}>
+        <div className={styles.yoroiLinkComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={styles.bottomComponent}>
-          <div>{this.state.error_or_live_info_text}</div>
+        <div className={styles.liveInfoComponent}>
+          <span>{this.state.error_or_live_info_text}</span>
         </div>
         </Dialog>
       );
@@ -455,7 +456,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           backButton={<DialogBackButton onBack={this.onBackToIntro} />}
         >
         {progressStep}
-        <div className={styles.topComponent}>
+        <div className={styles.headerComponent}>
           <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
           <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
           <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
@@ -463,11 +464,11 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         <div className={classnames([styles.middleComponent, styles.middleComponentConnectError])}>
           <SvgInline svg={connectErrorSVG} cleanup={['title']} />
         </div>
-        <div className={styles.bottomComponent}>
+        <div className={styles.yoroiLinkComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={classnames([styles.bottomComponent, styles.errorBlock])}>
-          <div>{this.state.error_or_live_info_text}</div>
+        <div className={classnames([styles.liveInfoComponent, styles.errorBlock])}>
+          <span>{this.state.error_or_live_info_text}</span>
         </div>
         </Dialog>
       );
@@ -490,7 +491,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={classnames([styles.topComponent, styles.topComponentSave])}>
+        <div className={classnames([styles.headerComponent, styles.headerComponentSave])}>
           <Input
             className={walletNameFieldClasses}
             {...walletNameField.bind()}
@@ -499,14 +500,14 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           />
           <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
         </div>
-        <div className={styles.middleComponent}>
+        <div className={classnames([styles.middleComponent, styles.middleComponentSaveLoad])}>
           <SvgInline svg={saveLoadGIF} cleanup={['title']} />
         </div>
-        <div className={styles.bottomComponent}>
+        <div className={styles.yoroiLinkComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={styles.bottomComponent}>
-          <div>{this.state.error_or_live_info_text}</div>
+        <div className={styles.liveInfoComponent}>
+          <span>{this.state.error_or_live_info_text}</span>
         </div>
         </Dialog>
       );
@@ -528,24 +529,23 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={classnames([styles.topComponent, styles.topComponentSave])}>
+        <div className={classnames([styles.headerComponent, styles.headerComponentSave])}>
           <Input
             className={walletNameFieldClasses}
             {...walletNameField.bind()}
             error={walletNameField.error}
             skin={<SimpleInputSkin />}
-            disabled={true}
           />
           <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
         </div>
-        <div className={styles.middleComponent}>
+        <div className={classnames([styles.middleComponent, styles.middleComponentSaveStart])}>
           <SvgInline svg={saveStartSVG} cleanup={['title']} />
         </div>
-        <div className={styles.bottomComponent}>
+        <div className={styles.yoroiLinkComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={styles.bottomComponent}>
-          <div>{this.state.error_or_live_info_text}</div>
+        <div className={styles.liveInfoComponent}>
+          <span>{this.state.error_or_live_info_text}</span>
         </div>
         </Dialog>
       );
@@ -567,7 +567,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
         >
         {progressStep}
-        <div className={classnames([styles.topComponent, styles.topComponentSave])}>
+        <div className={classnames([styles.headerComponent, styles.headerComponentSave])}>
           <Input
             className={walletNameFieldClasses}
             {...walletNameField.bind()}
@@ -579,14 +579,14 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         <div className={styles.middleComponent}>
           <SvgInline svg={saveErrorSVG} cleanup={['title']} />
         </div>
-        <div className={styles.bottomComponent}>
+        <div className={styles.yoroiLinkComponent}>
           <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
         </div>        
-        <div className={classnames([styles.bottomComponent, styles.errorBlock])}>
-          <div>{this.state.error_or_live_info_text}</div>
+        <div className={classnames([styles.liveInfoComponent, styles.errorBlock])}>
+          <span>{this.state.error_or_live_info_text}</span>
         </div>
         </Dialog>
-      );    
+      );
     } else {
       console.error(`UNHANDLED STATE, Please handle RENDERER for: ${this.progressState}`);
     }
@@ -766,7 +766,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           publicMasterKey: this.trezorDeviceInfo.trezorCardanoGetPublicKeyResult.payload.publicKey,
           walletName: walletName,
           deviceFeatures: this.trezorDeviceInfo.features
-        };        
+        };
         this.props.onSubmit(walletData);
       },
       onError: () => {
