@@ -32,8 +32,10 @@ export default class Sidebar extends Component<Props> {
       categories,
       activeSidebarCategory,
       onCategoryClicked,
-      /* openDialogAction,
-      isDialogOpen,*/
+      /*
+      openDialogAction,
+      isDialogOpen,
+      */
     } = this.props;
 
     const sidebarStyles = classNames([

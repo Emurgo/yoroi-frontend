@@ -1,4 +1,7 @@
 // @flow
+
+// File is based the same pattern used for the non-ada-specific stores in our app.
+
 import { observable, action } from 'mobx';
 import AdaWalletsStore from './AdaWalletsStore';
 import TransactionsStore from './AdaTransactionsStore';

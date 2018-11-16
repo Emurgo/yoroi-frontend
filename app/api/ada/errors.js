@@ -2,11 +2,6 @@ import { defineMessages } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 
 const messages = defineMessages({
-  apiMethodNotYetImplementedError: {
-    id: 'api.errors.ApiMethodNotYetImplementedError',
-    defaultMessage: '!!!This API method is not yet implemented.',
-    description: '"This API method is not yet implemented." error message.'
-  },
   walletAlreadyImportedError: {
     id: 'api.errors.WalletAlreadyImportedError',
     defaultMessage: '!!!Wallet you are trying to import already exists.',
@@ -113,15 +108,6 @@ const messages = defineMessages({
     description: '"The signature is invalid." error message'
   }
 });
-
-export class ApiMethodNotYetImplementedError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.apiMethodNotYetImplementedError.id,
-      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage,
-    });
-  }
-}
 
 export class WalletAlreadyImportedError extends LocalizableError {
   constructor() {

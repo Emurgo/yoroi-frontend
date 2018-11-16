@@ -16,9 +16,9 @@ import {
   isValidMnemonic,
   getAdaAccountRecoveryPhrase,
   newAdaWallet,
-  updateAdaWallet,
+  updateAdaWalletMetaParams,
   updateAdaWalletBalance,
-  changeAdaWalletPassphrase
+  changeAdaWalletSpendingPassword
 } from './adaWallet';
 import {
   isValidAdaAddress,
@@ -42,30 +42,31 @@ import {
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
-  WalletAlreadyRestoredError,
-  UpdateWalletResponse,
-  GetTransactionsRequest
+  WalletAlreadyRestoredError
 } from '../common';
 import type {
   AdaAddress,
   AdaAddresses,
   AdaTransaction,
+  AdaTransactionCondition,
   AdaTransactionFee,
   AdaTransactions,
   AdaWallet,
   AdaWallets,
   AdaAssurance,
-  AdaWalletInitData,
 } from './adaTypes';
 import type {
   CreateWalletRequest,
   CreateWalletResponse,
+  GetTransactionsRequest,
   GetTransactionsResponse,
   GetBalanceResponse,
   GetWalletRecoveryPhraseResponse,
   GetWalletsResponse,
+  RefreshPendingTransactionsResponse,
   RestoreWalletRequest,
   RestoreWalletResponse,
+  UpdateWalletResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
@@ -138,12 +139,7 @@ export type UpdateWalletPasswordRequest = {
   newPassword: string,
 };
 
-export type AdaWalletParams = {
-  walletPassword: string,
-  walletInitData: AdaWalletInitData
-};
-
-export type ChangeAdaWalletPassphraseParams = {
+export type ChangeAdaWalletSpendingPasswordParams = {
   oldPassword: string,
   newPassword: string,
 };
@@ -158,7 +154,9 @@ export default class AdaApi {
     Logger.debug('AdaApi::getWallets called');
     try {
       const wallet = await getAdaWallet();
-      const wallets: AdaWallets = wallet ? [wallet] : [];
+      const wallets: AdaWallets = wallet
+        ? [wallet]
+        : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
       return wallets.map(data => _createWalletFromServerData(data));
@@ -176,12 +174,14 @@ export default class AdaApi {
       const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
       Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
-      return new Promise(resolve =>
-        resolve({
-          accountId: '0', /* We are using a SINGLE account */
-          addresses
-        })
-      );
+      return new Promise(resolve => (
+        resolve(
+          {
+            accountId: '0', /* We are using a SINGLE account */
+            addresses
+          }
+        )
+      ));
     } catch (error) {
       Logger.error('AdaApi::getAddresses error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -197,11 +197,11 @@ export default class AdaApi {
     }
   }
 
-  async getAdaTxLastUpdatedDate() : Promise<Date> {
+  async getTxLastUpdatedDate() : Promise<Date> {
     try {
       return getAdaTxLastUpdatedDate();
     } catch (error) {
-      Logger.error('AdaApi::getAdaTxLastUpdatedDate error: ' + stringifyError(error));
+      Logger.error('AdaApi::getTxLastUpdatedDate error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -213,10 +213,12 @@ export default class AdaApi {
       await refreshTxs();
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
       Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(history));
-      const transactions = limit ? history[0].slice(skip, skip + limit) : history[0];
-      const mappedTransactions = transactions.map(data =>
+      const transactions = limit
+        ? history[0].slice(skip, skip + limit)
+        : history[0];
+      const mappedTransactions = transactions.map(data => (
         _createTransactionFromServerData(data)
-      );
+      ));
       return Promise.resolve({
         transactions: mappedTransactions,
         total: history[1]
@@ -227,12 +229,14 @@ export default class AdaApi {
     }
   }
 
-  async refreshPendingTransactions(): Promise<GetTransactionsResponse> {
+  async refreshPendingTransactions(): Promise<RefreshPendingTransactionsResponse> {
     Logger.debug('AdaApi::refreshPendingTransactions called');
     try {
       const pendingTxs = await getPendingAdaTxs();
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
-      return pendingTxs;
+      return pendingTxs.map(data => (
+        _createTransactionFromServerData(data)
+      ));
     } catch (error) {
       Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -271,7 +275,7 @@ export default class AdaApi {
 
   async createTransaction(
     request: CreateTransactionRequest
-  ): Promise<any> {
+  ): Promise<Array<void>> {
     Logger.debug('AdaApi::createTransaction called');
     const { receiver, amount, password } = request;
     try {
@@ -302,8 +306,8 @@ export default class AdaApi {
     Logger.debug('AdaApi::calculateTransactionFee called');
     const { receiver, amount } = request;
     try {
-      const response: AdaTransactionFee = await
-        getAdaTransactionFee(receiver, amount);
+      const response: AdaTransactionFee =
+        await getAdaTransactionFee(receiver, amount);
       Logger.debug(
         'AdaApi::calculateTransactionFee success: ' + stringifyData(response)
       );
@@ -429,7 +433,7 @@ export default class AdaApi {
       cwUnit: unit
     };
     try {
-      const wallet: ?AdaWallet = await updateAdaWallet({ walletMeta });
+      const wallet: ?AdaWallet = await updateAdaWalletMetaParams(walletMeta);
       if (!wallet) throw new Error('not persistent wallet');
       Logger.debug('AdaApi::updateWallet success: ' + stringifyData(wallet));
       return _createWalletFromServerData(wallet);
@@ -445,7 +449,7 @@ export default class AdaApi {
     Logger.debug('AdaApi::updateWalletPassword called');
     const { oldPassword, newPassword } = request;
     try {
-      await changeAdaWalletPassphrase({
+      await changeAdaWalletSpendingPassword({
         oldPassword,
         newPassword
       });
@@ -468,7 +472,7 @@ export default class AdaApi {
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
-  (data: AdaWallet) =>
+  (data: AdaWallet) => (
     new Wallet({
       id: data.cwId,
       amount: new BigNumber(data.cwAmount.getCCoin).dividedBy(
@@ -478,11 +482,12 @@ const _createWalletFromServerData = action(
       assurance: data.cwMeta.cwAssurance,
       passwordUpdateDate: data.cwPassphraseLU
     })
+  )
 );
 
 const _createAddressFromServerData = action(
   'AdaApi::_createAddressFromServerData',
-  (data: AdaAddress) =>
+  (data: AdaAddress) => (
     new WalletAddress({
       id: data.cadId,
       amount: new BigNumber(data.cadAmount.getCCoin).dividedBy(
@@ -490,9 +495,10 @@ const _createAddressFromServerData = action(
       ),
       isUsed: data.cadIsUsed
     })
+  )
 );
 
-const _conditionToTxState = (condition: string) => {
+const _conditionToTxState = (condition: AdaTransactionCondition) => {
   switch (condition) {
     case 'CPtxApplying':
       return 'pending';

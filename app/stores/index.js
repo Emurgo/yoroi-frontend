@@ -11,7 +11,8 @@ import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
 
-export const storeClasses = {
+// Map of var name to class. Allows dyanmic lookup of class so we can init all stores one loop.
+const storeClasses = {
   profile: ProfileStore,
   app: AppStore,
   sidebar: SidebarStore,
@@ -33,7 +34,7 @@ export type StoresMap = {
   loading: LoadingStore,
 };
 
-// Constant that does never change during lifetime
+// Constant that represents the stores across the lifetime of the application
 const stores = observable({
   profile: null,
   app: null,

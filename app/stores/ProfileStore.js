@@ -202,5 +202,6 @@ export default class SettingsStore extends Store {
       .catch(action((error) => {
         this.error = error;
       }));
-  });*/
+  });
+  */
 }

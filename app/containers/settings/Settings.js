@@ -47,7 +47,7 @@ export default class Settings extends Component<InjectedContainerProps> {
     );
     return (
       <Layout
-        topbar={
+        topbar={(
           <TextOnlyTopBar
             title={this.context.intl.formatMessage(messages.title)}
             onCategoryClicked={category => {
@@ -56,7 +56,7 @@ export default class Settings extends Component<InjectedContainerProps> {
             categories={sidebar.CATEGORIES}
             activeSidebarCategory={sidebar.activeSidebarCategory}
           />
-        }
+        )}
       >
         <SettingsLayout menu={menu}>
           {children}
