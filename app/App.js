@@ -8,6 +8,7 @@ import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
 import ja from 'react-intl/locale-data/ja';
 import zh from 'react-intl/locale-data/zh';
+import ru from 'react-intl/locale-data/ru';
 import { Routes } from './Routes';
 import { yoroiTheme } from './themes/yoroi';
 import translations from './i18n/translations';
@@ -16,7 +17,7 @@ import type { ActionsMap } from './actions/index';
 import ThemeManager from './ThemeManager';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru]);
 
 @observer
 export default class App extends Component<{
