@@ -1,4 +1,7 @@
 // @flow
+
+// Wrapper for creating "accounts" as defined by bip44
+
 import { Wallet } from 'rust-cardano-crypto';
 import { getCryptoWalletFromMasterKey } from './lib/cardanoCrypto/cryptoWallet';
 import { getResultOrFail } from './lib/cardanoCrypto/cryptoUtils';
@@ -21,6 +24,6 @@ export function createCryptoAccount(
   accountIndex: number = ACCOUNT_INDEX
 ): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, walletPassword);
-  const result = getResultOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
-  return Object.assign({ account: accountIndex }, result);
+  const result: CryptoAccount = getResultOrFail(Wallet.newAccount(cryptoWallet, accountIndex));
+  return Object.assign({}, { account: accountIndex }, result);
 }

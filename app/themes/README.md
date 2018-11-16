@@ -4,7 +4,7 @@ This folder serves three independent theme (css) related concepts
 
 ## 1) Overriding the default theme
 
-Yoroi uses [React-Polymorph](https://github.com/input-output-hk/react-polymorph/) to separtae the theming (style/css) of a component from its UI logic and its skin (markup).
+Yoroi uses [React-Polymorph](https://github.com/input-output-hk/react-polymorph/) to separate the theming (style/css) of a component from its UI logic and its skin (markup).
 
 React-Polymorph comes with a default theme for each component (called the `simple` theme) but we want to allow ourselves to easily extend/modify it as needed. To do this, we :
 

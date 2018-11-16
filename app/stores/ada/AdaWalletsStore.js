@@ -4,7 +4,7 @@ import { observable, action, runInAction } from 'mobx';
 import WalletStore from '../WalletStore';
 import Wallet from '../../domain/Wallet';
 import { matchRoute, buildRoute } from '../../utils/routing';
-import Request from '.././lib/LocalizedRequest';
+import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type { ImportWalletFromFileResponse } from '../../api/ada/index';

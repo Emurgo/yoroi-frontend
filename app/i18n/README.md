@@ -14,11 +14,11 @@ Now we can use `react-intl-translations-manager` to generate a report of our tra
 
 `babel-plugin-react-intl` forces us to pollute our code with all these `defineMessages` that require a default text also specified in the code. This causes duplication of the translations where it occurs in both our `json` and our source (you can see discussion about this [here](https://github.com/yahoo/babel-plugin-react-intl/issues/43)). We could fix this by wrapping `defineMessages` again with our own wrapper that removes this requirement.
 
-Since the `defineMessages` occur inside our code, it means you have to compile the project to detect which translations are used. This makes switching branches problematic since switching branches will invalidate your `translation/messages` cache and you have to rebuild to fix it (if you call `manage-translations` before doing this, you will get bad results). 
+Since the `defineMessages` occur inside our code, it means you have to compile the project to detect which translations are used. This makes switching branches problematic since switching branches will invalidate your `translation/messages` cache and you have to rebuild to fix it (if you call `manage-translations` before doing this, you will get bad results).
 
 One advantage is that this setup allows us to include the `translation-manager` results as part of our CI build (not done as of Oct 30th)
 
-# Rebuilding language cache
+## Rebuilding language cache
 
 After making changes that affect the languages files, please do the following **AFTER** backing up your work (these actions may edit your files in a way you would like to reverse).
 

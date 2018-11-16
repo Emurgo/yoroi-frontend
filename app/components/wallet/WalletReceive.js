@@ -83,7 +83,7 @@ export default class WalletReceive extends Component<Props, State> {
   };
 
   toggleUsedAddresses = () => {
-    this.setState({ showUsed: !this.state.showUsed });
+    this.setState(prevState => ({ showUsed: !prevState.showUsed }));
   };
 
   submit = () => {

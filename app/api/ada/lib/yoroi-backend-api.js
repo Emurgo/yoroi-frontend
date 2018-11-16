@@ -1,6 +1,9 @@
 // @flow
+
+// This file makes the actual HTTP requests to the yoroi-backend-service
+// https://github.com/Emurgo/yoroi-backend-service/
+
 import axios from 'axios';
-import type Moment from 'moment';
 import type { ConfigType } from '../../../../config/config-types';
 import {
   Logger,
@@ -14,14 +17,19 @@ import {
   CheckAdressesInUseApiError,
   InvalidWitnessError
 } from '../errors';
+import type {
+  UTXO,
+  Transaction
+} from '../adaTypes';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
 
-// TODO: Refactor service call in order to re-use common parameters
-
-export const getUTXOsForAddresses = (addresses: Array<string>) =>
-  axios(`${backendUrl}/api/txs/utxoForAddresses`,
+export const getUTXOsForAddresses = (
+  addresses: Array<string>
+): Promise<Array<UTXO>> => (
+  axios(
+    `${backendUrl}/api/txs/utxoForAddresses`,
     {
       method: 'post',
       data: {
@@ -32,10 +40,17 @@ export const getUTXOsForAddresses = (addresses: Array<string>) =>
     .catch((error) => {
       Logger.error('yoroi-backend-api::getUTXOsForAddresses error: ' + stringifyError(error));
       throw new GetUtxosForAddressesApiError();
-    });
+    })
+);
 
-export const getUTXOsSumsForAddresses = (addresses: Array<string>) =>
-  axios(`${backendUrl}/api/txs/utxoSumForAddresses`,
+export type SumForAddressesResult = {
+  sum: ?string
+};
+export const getUTXOsSumsForAddresses = (
+  addresses: Array<string>
+): Promise<SumForAddressesResult> => (
+  axios(
+    `${backendUrl}/api/txs/utxoSumForAddresses`,
     {
       method: 'post',
       data: {
@@ -46,11 +61,15 @@ export const getUTXOsSumsForAddresses = (addresses: Array<string>) =>
     .catch((error) => {
       Logger.error('yoroi-backend-api::getUTXOsSumsForAddresses error: ' + stringifyError(error));
       throw new GetUtxosSumsForAddressesApiError();
-    });
+    })
+);
 
-export const getTransactionsHistoryForAddresses = (addresses: Array<string>,
-  dateFrom: Moment) =>
-  axios(`${backendUrl}/api/txs/history`,
+export const getTransactionsHistoryForAddresses = (
+  addresses: Array<string>,
+  dateFrom: Date
+): Promise<Array<Transaction>> => (
+  axios(
+    `${backendUrl}/api/txs/history`,
     {
       method: 'post',
       data: {
@@ -62,10 +81,14 @@ export const getTransactionsHistoryForAddresses = (addresses: Array<string>,
     .catch((error) => {
       Logger.error('yoroi-backend-api::getTransactionsHistoryForAddresses error: ' + stringifyError(error));
       throw new GetTxHistoryForAddressesApiError();
-    });
+    })
+);
 
-export const sendTx = (signedTx: string) =>
-  axios(`${backendUrl}/api/txs/signed`,
+export const sendTx = (
+  signedTx: string
+): Promise<Array<void>> => (
+  axios(
+    `${backendUrl}/api/txs/signed`,
     {
       method: 'post',
       data: {
@@ -79,10 +102,14 @@ export const sendTx = (signedTx: string) =>
         throw new InvalidWitnessError();
       }
       throw new SendTransactionApiError();
-    });
+    })
+);
 
-export const checkAddressesInUse = (addresses: Array<string>) =>
-  axios(`${backendUrl}/api/addresses/filterUsed`,
+export const checkAddressesInUse = (
+  addresses: Array<string>
+): Promise<Array<string>> => (
+  axios(
+    `${backendUrl}/api/addresses/filterUsed`,
     {
       method: 'post',
       data: {
@@ -93,4 +120,5 @@ export const checkAddressesInUse = (addresses: Array<string>) =>
     .catch((error) => {
       Logger.error('yoroi-backend-api::checkAddressesInUse error: ' + stringifyError(error));
       throw new CheckAdressesInUseApiError();
-    });
+    })
+);

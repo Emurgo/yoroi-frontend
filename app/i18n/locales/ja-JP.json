@@ -3,6 +3,7 @@
   "api.errors.GenericApiError": "エラーが発生しました。後ほど再度お試しください。",
   "api.errors.IncorrectPasswordError": "ウォレットのパスワードが誤っています。",
   "api.errors.NotEnoughMoneyToSendError": "金額が不足しています。",
+  "api.errors.PromiseNotCalledYetError": "!!!You have to call Request::execute before you can access it as promise.",
   "api.errors.RedeemAdaError": "ADAの転送に失敗しました。",
   "api.errors.ReportRequestError": "サポート依頼の送信中にエラーが発生しました。",
   "api.errors.WalletAlreadyImportedError": "インポートしようとしたウォレットは既に存在しています。",
