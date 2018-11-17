@@ -20,6 +20,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletTrezorDialog.scss';
 
 import SvgInline from 'react-svg-inline';
+import externalLinkSVG from '../../assets/images/link-external.inline.svg';
 import aboutPrerequisiteIconSVG from '../../assets/images/trezor/about-prerequisite-header-icon.inline.svg';
 import aboutPrerequisiteTrezorSVG from '../../assets/images/trezor/about-trezor.inline.svg';
 import connectLoadGIF from '../../assets/images/trezor/connect-load.gif';
@@ -354,7 +355,14 @@ export default class WalletTrezorDialog extends Component<Props, State> {
               <span className={styles.prerequisiteHeaderText}>{intl.formatMessage(messages.aboutPrerequisiteHeader)}</span>
             </div>
             <ul>
-              <li key="1">{intl.formatMessage(messages.aboutPrerequisite1Part1)}<a target="_blank" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>{intl.formatMessage(messages.aboutPrerequisite1Part2LinkText)}</a>{intl.formatMessage(messages.aboutPrerequisite1Part3)}</li>
+              <li key="1">
+                {intl.formatMessage(messages.aboutPrerequisite1Part1)}
+                <a target="_blank" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
+                  {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText)}
+                  <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+                </a>
+                {intl.formatMessage(messages.aboutPrerequisite1Part3)}
+              </li>
               <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
               <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
               <li key="4">{intl.formatMessage(messages.aboutPrerequisite4)}</li>
@@ -367,7 +375,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           </div>
         </div>
         <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
+          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
+            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+          </a>
         </div>
         <div className={styles.liveInfoComponent}>
           <span>{this.state.error_or_live_info_text}</span>
@@ -402,8 +413,11 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           <img src={connectLoadGIF}/>
         </div>
         <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
-        </div>        
+          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
+            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+          </a>
+        </div>
         <div className={styles.liveInfoComponent}>
           <span>{this.state.error_or_live_info_text}</span>
         </div>
@@ -436,8 +450,11 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           <img src={connectStartGIF}/>
         </div>
         <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
-        </div>        
+          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
+            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+          </a>
+        </div>
         <div className={styles.liveInfoComponent}>
           <span>{this.state.error_or_live_info_text}</span>
         </div>
@@ -471,8 +488,11 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           <SvgInline svg={connectErrorSVG} cleanup={['title']} />
         </div>
         <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
-        </div>        
+          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
+            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+          </a>
+        </div>
         <div className={classnames([styles.liveInfoComponent, styles.errorBlock])}>
           <span>{this.state.error_or_live_info_text}</span>
         </div>
@@ -510,8 +530,11 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           <SvgInline svg={saveLoadGIF} cleanup={['title']} />
         </div>
         <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
-        </div>        
+          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
+            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+          </a>
+        </div>
         <div className={styles.liveInfoComponent}>
           <span>{this.state.error_or_live_info_text}</span>
         </div>
@@ -548,8 +571,11 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           <SvgInline svg={saveStartSVG} cleanup={['title']} />
         </div>
         <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
-        </div>        
+          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
+            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+          </a>
+        </div>
         <div className={styles.liveInfoComponent}>
           <span>{this.state.error_or_live_info_text}</span>
         </div>
@@ -586,8 +612,11 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           <SvgInline svg={saveErrorSVG} cleanup={['title']} />
         </div>
         <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>{intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}</a>
-        </div>        
+          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
+            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+          </a>
+        </div>
         <div className={classnames([styles.liveInfoComponent, styles.errorBlock])}>
           <span>{this.state.error_or_live_info_text}</span>
         </div>
