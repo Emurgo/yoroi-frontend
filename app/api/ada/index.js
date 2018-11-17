@@ -500,20 +500,12 @@ export default class AdaApi {
       return _createWalletFromServerData(wallet);
     } catch (error) {
       Logger.error('AdaApi::connectTrezor error: ' + stringifyError(error));
-      // FIXME
-      // TODO: backend will return something different here, if multiple wallets
-      // are restored from the key and if there are duplicate wallets we will get
-      // some kind of error and present the user with message that some wallets
-      // where not imported/restored if some where. if no wallets are imported
-      // we will error out completely with throw block below
-      if (error.message.includes('Wallet with that mnemonics already exists')) {
-        throw new WalletAlreadyRestoredError();
-      }
+      // FIXME : think for other possible error
+      
       // We don't know what the problem was -> throw generic error
       throw new GenericApiError();
     }
   }
-
 }
 // ========== End of class AdaApi =========
 

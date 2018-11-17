@@ -160,8 +160,13 @@ export default class AdaWalletsStore extends WalletStore {
     // FIXME: give better name for _toggleAddWalletDialogOnActiveRestoreOrImport()
     // ...or keep it open in case it has errored out (so that error message can be shown)
     setTimeout(() => {
-      if (!this.connectTrezorRequest.isExecuting) this._setIsConnectTrezorActive(false);
-      if (!this.connectTrezorRequest.isError) this._toggleAddWalletDialogOnActiveRestoreOrImport();
+      if (!this.connectTrezorRequest.isExecuting) {
+        this._setIsConnectTrezorActive(false);
+      }
+
+      if (!this.connectTrezorRequest.isError) {
+        this._toggleAddWalletDialogOnActiveRestoreOrImport();
+      }
     }, this.WAIT_FOR_SERVER_ERROR_TIME);
 
     const connectedWallet = await this.connectTrezorRequest.execute(params).promise;
@@ -169,7 +174,11 @@ export default class AdaWalletsStore extends WalletStore {
       this._setIsConnectTrezorActive(false);
       this.actions.dialogs.closeActiveDialog.trigger();
     }, this.MIN_NOTIFICATION_TIME);
-    if (!connectedWallet) throw new Error('Connected Trezor wallet was not received correctly');
+
+    if (!connectedWallet) {
+      throw new Error('Connected Trezor wallet was not executed correctly');
+    }
+
     this.connectTrezorRequest.reset();
     await this._patchWalletRequestWithNewWallet(connectedWallet);
     this.refreshWalletsData();
