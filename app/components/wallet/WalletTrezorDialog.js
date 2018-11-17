@@ -208,6 +208,15 @@ const messages = defineMessages({
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
+const ProgressStep = {
+  // ABOUT Page
+  ABOUT: 0,
+  // CONNECT Page
+  CONNECT: 1,
+  // SAVE Page
+  SAVE: 2,
+};
+
 type ProgressState = 'ABOUT' | 'CONNECT_LOAD' | 'CONNECT_START' | 'CONNECT_ERROR' | 'SAVE_LOAD' | 'SAVE_START' | 'SAVE_ERROR';
 const ProgressStateOption = {
   // ABOUT Page
@@ -237,7 +246,6 @@ type Props = {
 };
 
 type State = {
-  isSubmitting?: boolean, // FIXME : remove duplicate
   currentProgressStepInfo: {
     currentIndex: 0 | 1 | 2,
     error: boolean
@@ -281,7 +289,6 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
   componentWillMount() {
     const { intl } = this.context;
-    // FIXME : it is used only in 'SAVE_LOAD' | 'SAVE_START' | 'SAVE_ERROR, how about initializing at that moment  
     this.form = new ReactToolboxMobxForm({
       fields: {
         walletName: {
@@ -313,54 +320,54 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
     switch(this.progressState) {
       case ProgressStateOption.ABOUT:
-        this.state.currentProgressStepInfo.currentIndex = 0;
-        this.state.currentProgressStepInfo.error = false;
         this.state.action_btn_processing = false;
         this.state.action_btn_name = intl.formatMessage(messages.nextButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.ABOUT;
+        this.state.currentProgressStepInfo.error = false;
         this.state.error_or_live_info_text = '';
         break;      
       case ProgressStateOption.CONNECT_LOAD:
-        this.state.currentProgressStepInfo.currentIndex = 1;
-        this.state.currentProgressStepInfo.error = false;
         this.state.action_btn_processing = false;
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
+        this.state.currentProgressStepInfo.error = false;
         this.state.error_or_live_info_text = '';
         break;
       case ProgressStateOption.CONNECT_START:
-        this.state.currentProgressStepInfo.currentIndex = 1;
-        this.state.currentProgressStepInfo.error = false;        
         this.state.action_btn_processing = true;
-        this.state.error_or_live_info_text = intl.formatMessage(messages.connectLiveMessageCheckingTrezorDevice);
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
+        this.state.currentProgressStepInfo.error = false;        
+        this.state.error_or_live_info_text = intl.formatMessage(messages.connectLiveMessageCheckingTrezorDevice);
         break;
       case ProgressStateOption.CONNECT_ERROR:
-        this.state.currentProgressStepInfo.currentIndex = 1;
-        this.state.currentProgressStepInfo.error = true;
         this.state.action_btn_processing = false;
-        this.state.error_or_live_info_text = intl.formatMessage(messages[this.trezorDeviceInfo.errorId]);
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
+        this.state.currentProgressStepInfo.error = true;
+        this.state.error_or_live_info_text = intl.formatMessage(messages[this.trezorDeviceInfo.errorId]);
         break;        
       case ProgressStateOption.SAVE_LOAD:
-        this.state.currentProgressStepInfo.currentIndex = 2;
-        this.state.currentProgressStepInfo.error = false;
         this.state.action_btn_processing = false;
+        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
+        this.state.currentProgressStepInfo.error = false;
         this.form.$('walletName').value = this.trezorDeviceInfo.features.label;
         this.state.error_or_live_info_text = '';
-        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
         break;
        case ProgressStateOption.SAVE_START:
-         this.state.currentProgressStepInfo.currentIndex = 2;
-         this.state.currentProgressStepInfo.error = false;
         this.state.action_btn_processing = true;
-        this.state.error_or_live_info_text = '';
         this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
+        this.state.currentProgressStepInfo.error = false;
+        this.state.error_or_live_info_text = '';
         break;
       case ProgressStateOption.SAVE_ERROR:
-        this.state.currentProgressStepInfo.currentIndex = 2;
-        this.state.currentProgressStepInfo.error = true;
         this.state.action_btn_processing = false;
-        this.state.error_or_live_info_text = '';
         this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
+        this.state.currentProgressStepInfo.error = true;
+        this.state.error_or_live_info_text = '';
         break;                       
       default:
         console.error(`Error state, handle _updateState for : ${this.progressState}`);
@@ -374,6 +381,14 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     const { intl } = this.context;
     const { isSubmitting, error, onCancel } = this.props;
 
+    const actions = [{
+      className: this.state.action_btn_processing ? styles.isProcessing : null,
+      label: this.state.action_btn_name,
+      primary: true,
+      disabled: this.state.action_btn_processing,
+      onClick: ()=>{}
+    }];
+
     const progressStep = (<ProgressSteps
       stepsList={[
         intl.formatMessage(messages.stepAboutLabel),
@@ -383,197 +398,162 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       progressInfo={this.state.currentProgressStepInfo}
     />);
 
-    const walletNameFieldClasses = classnames([
-      'walletName',
-      styles.walletName,
-    ]);
-    const walletNameField = this.form.$('walletName');    
+    const helpLink = (
+    <div className={styles.yoroiLinkComponent}>
+      <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
+        {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+        <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+      </a>
+    </div>);
 
     let dialog = null;
 
     if(this.progressState === ProgressStateOption.ABOUT) {
-      const actions = [{
-        className: this.state.action_btn_processing ? styles.isProcessing : null,
-        label: this.state.action_btn_name,
-        primary: true,
-        disabled: this.state.action_btn_processing,
-        onClick: this.onNext
-      }];
-      dialog = (
-        <Dialog
-          className={classnames([styles.component, 'WalletTrezorDialog'])}
-          title={intl.formatMessage(messages.title)}
-          closeOnOverlayClick={false}
-          onClose={onCancel}
-          actions={actions}
-          closeButton={<DialogCloseButton />}
-        >
-        {progressStep}
-        <div className={styles.headerComponent}>
-          <span>{intl.formatMessage(messages.aboutIntroTextLine1)}</span><br/>
-          <span>{intl.formatMessage(messages.aboutIntroTextLine2)}</span><br/>
-          <span>{intl.formatMessage(messages.aboutIntroTextLine3)}</span><br/>
-        </div>
-        <div className={classnames([styles.middleComponent, styles.middleComponentAbout])}>
-          <div className={styles.prerequisiteBlock}>
-            <div>
-              <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />
-              <span className={styles.prerequisiteHeaderText}>{intl.formatMessage(messages.aboutPrerequisiteHeader)}</span>
-            </div>
-            <ul>
-              <li key="1">
-                {intl.formatMessage(messages.aboutPrerequisite1Part1)}
-                <a target="_blank" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
-                  {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText)}
-                  <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-                </a>
-                {intl.formatMessage(messages.aboutPrerequisite1Part3)}
-              </li>
-              <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
-              <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
-              <li key="4">{intl.formatMessage(messages.aboutPrerequisite4)}</li>
-              <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
-              <li key="6">{intl.formatMessage(messages.aboutPrerequisite6)}</li>
-            </ul>
-          </div>
-          <div className={styles.trezorImageBlock}>
-            <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
-          </div>
-        </div>
-        <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
-            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-          </a>
-        </div>
-        <div className={styles.liveInfoComponent}>
-          <span>{this.state.error_or_live_info_text}</span>
-        </div>        
-        </Dialog>
-      );
-    } else if(this.progressState === ProgressStateOption.CONNECT_LOAD) {
-      const actions = [{
-        className: this.state.action_btn_processing ? styles.isProcessing : null,
-        label: this.state.action_btn_name,
-        primary: true,
-        disabled: this.state.action_btn_processing,
-        onClick: this.onConnect
-      }];
-      dialog = (
-        <Dialog
-          className={classnames([styles.component, 'WalletTrezorDialog'])}
-          title={intl.formatMessage(messages.title)}
-          closeOnOverlayClick={false}
-          onClose={onCancel}
-          actions={actions}
-          closeButton={<DialogCloseButton />}
-          backButton={<DialogBackButton onBack={this.onBackToAbout} />}
-        >
-        {progressStep}
-        <div className={styles.headerComponent}>
-          <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
-          <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
-          <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
-        </div>
-        <div className={classnames([styles.middleComponent, styles.middleComponentConnectLoad])}>
-          <img src={connectLoadGIF}/>
-        </div>
-        <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
-            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-          </a>
-        </div>
-        <div className={styles.liveInfoComponent}>
-          <span>{this.state.error_or_live_info_text}</span>
-        </div>
-        </Dialog>
-      );
-    } else if(this.progressState === ProgressStateOption.CONNECT_START) {
-      const actions = [{
-        className: this.state.action_btn_processing ? styles.isProcessing : null,
-        label: this.state.action_btn_name,
-        primary: true,
-        disabled: this.state.action_btn_processing,
-        onClick: this.onConnect
-      }];
-      dialog = (
-        <Dialog
-          className={classnames([styles.component, 'WalletTrezorDialog'])}
-          title={intl.formatMessage(messages.title)}
-          closeOnOverlayClick={false}
-          onClose={onCancel}
-          actions={actions}
-          closeButton={<DialogCloseButton />}
-        >
-        {progressStep}
-        <div className={styles.headerComponent}>
-          <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
-          <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
-          <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
-        </div>
-        <div className={classnames([styles.middleComponent, styles.middleComponentConnectStart])}>
-          <img src={connectStartGIF}/>
-        </div>
-        <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
-            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-          </a>
-        </div>
-        <div className={styles.liveInfoComponent}>
-          <span>{this.state.error_or_live_info_text}</span>
-        </div>
-        </Dialog>
-      );
-    } else if(this.progressState === ProgressStateOption.CONNECT_ERROR) {
-      const actions = [{
-        className: this.state.action_btn_processing ? styles.isProcessing : null,
-        label: this.state.action_btn_name,
-        primary: true,
-        disabled: this.state.action_btn_processing,
-        onClick: this.onConnect
-      }];
-      dialog = (
-        <Dialog
-          className={classnames([styles.component, 'WalletTrezorDialog'])}
-          title={intl.formatMessage(messages.title)}
-          closeOnOverlayClick={false}
-          onClose={onCancel}
-          actions={actions}
-          closeButton={<DialogCloseButton />}
-          backButton={<DialogBackButton onBack={this.onBackToAbout} />}
-        >
-        {progressStep}
-        <div className={styles.headerComponent}>
-          <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
-          <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
-          <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
-        </div>
-        <div className={classnames([styles.middleComponent, styles.middleComponentConnectError])}>
-          <SvgInline svg={connectErrorSVG} cleanup={['title']} />
-        </div>
-        <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
-            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-          </a>
-        </div>
-        <div className={classnames([styles.liveInfoComponent, styles.errorBlock])}>
-          <span>{this.state.error_or_live_info_text}</span>
-        </div>
-        </Dialog>
-      );
-    } else if(this.progressState === ProgressStateOption.SAVE_LOAD) {
-      const actions = [{
-        className: this.state.action_btn_processing ? styles.isProcessing : null,
-        label: this.state.action_btn_name,
-        primary: true,
-        disabled: this.state.action_btn_processing,
-        onClick: this.onSave
-      }];
+      actions[0].onClick = this._onNext;
 
       dialog = (
+      <Dialog
+        className={classnames([styles.component, 'WalletTrezorDialog'])}
+        title={intl.formatMessage(messages.title)}
+        closeOnOverlayClick={false}
+        onClose={onCancel}
+        actions={actions}
+        closeButton={<DialogCloseButton />}
+      >
+      {progressStep}
+      <div className={styles.headerComponent}>
+        <span>{intl.formatMessage(messages.aboutIntroTextLine1)}</span><br/>
+        <span>{intl.formatMessage(messages.aboutIntroTextLine2)}</span><br/>
+        <span>{intl.formatMessage(messages.aboutIntroTextLine3)}</span><br/>
+      </div>
+      <div className={classnames([styles.middleComponent, styles.middleComponentAbout])}>
+        <div className={styles.prerequisiteBlock}>
+          <div>
+            <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />
+            <span className={styles.prerequisiteHeaderText}>{intl.formatMessage(messages.aboutPrerequisiteHeader)}</span>
+          </div>
+          <ul>
+            <li key="1">
+              {intl.formatMessage(messages.aboutPrerequisite1Part1)}
+              <a target="_blank" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
+                {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText)}
+                <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+              </a>
+              {intl.formatMessage(messages.aboutPrerequisite1Part3)}
+            </li>
+            <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
+            <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
+            <li key="4">{intl.formatMessage(messages.aboutPrerequisite4)}</li>
+            <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
+            <li key="6">{intl.formatMessage(messages.aboutPrerequisite6)}</li>
+          </ul>
+        </div>
+        <div className={styles.trezorImageBlock}>
+          <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
+        </div>
+      </div>
+      {helpLink}
+      <div className={styles.liveInfoComponent}>
+        <span>{this.state.error_or_live_info_text}</span>
+      </div>        
+      </Dialog>
+      );
+    } else if(this.progressState === ProgressStateOption.CONNECT_LOAD ||
+      this.progressState === ProgressStateOption.CONNECT_START ||
+      this.progressState === ProgressStateOption.CONNECT_ERROR) {
+
+      actions[0].onClick = this._onConnect;
+
+      let backButton = null;
+      let middleComponent = null;
+      let styleLiveInfo = null;
+      if(this.progressState === ProgressStateOption.CONNECT_LOAD) {
+        // LOAD
+        backButton = (<DialogBackButton onBack={this._onBackToAbout} />);
+        middleComponent = (
+        <div className={classnames([styles.middleComponent, styles.middleComponentConnectLoad])}>
+          <img src={connectLoadGIF}/>
+        </div>);
+        styleLiveInfo = styles.liveInfoComponent;
+      } else if(this.progressState === ProgressStateOption.CONNECT_START) {
+        // START
+        backButton = null;
+        middleComponent = (
+        <div className={classnames([styles.middleComponent, styles.middleComponentConnectStart])}>
+          <img src={connectStartGIF}/>
+        </div>);
+        styleLiveInfo = styles.liveInfoComponent;        
+      } else {
+        // ERROR
+        backButton = (<DialogBackButton onBack={this._onBackToAbout} />);
+        middleComponent = (
+        <div className={classnames([styles.middleComponent, styles.middleComponentConnectError])}>
+          <SvgInline svg={connectErrorSVG} cleanup={['title']} />
+        </div>);
+        styleLiveInfo = classnames([styles.liveInfoComponent, styles.errorBlock]);
+      }
+
+      dialog = (
+      <Dialog
+        className={classnames([styles.component, 'WalletTrezorDialog'])}
+        title={intl.formatMessage(messages.title)}
+        closeOnOverlayClick={false}
+        onClose={onCancel}
+        actions={actions}
+        closeButton={<DialogCloseButton />}
+        backButton={backButton}
+      >
+      {progressStep}
+      <div className={styles.headerComponent}>
+        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br/>
+        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br/>
+        <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br/>
+      </div>
+      {middleComponent}
+      {helpLink}
+      <div className={styleLiveInfo}>
+        <span>{this.state.error_or_live_info_text}</span>
+      </div>
+      </Dialog>
+      );
+    } else if(this.progressState === ProgressStateOption.SAVE_LOAD ||
+      this.progressState === ProgressStateOption.SAVE_START ||
+      this.progressState === ProgressStateOption.SAVE_ERROR) {
+
+        actions[0].onClick = this._onSave;
+
+        let middleComponent = null;
+        let styleLiveInfo = null;
+        if(this.progressState === ProgressStateOption.SAVE_LOAD) {
+          // LOAD
+          middleComponent = (
+          <div className={classnames([styles.middleComponent, styles.middleComponentSaveLoad])}>
+            <SvgInline svg={saveLoadGIF} cleanup={['title']} />
+          </div>);
+          styleLiveInfo = styles.liveInfoComponent;
+        } else if(this.progressState === ProgressStateOption.SAVE_START) {
+          // START
+          middleComponent = (
+          <div className={classnames([styles.middleComponent, styles.middleComponentSaveStart])}>
+            <SvgInline svg={saveStartSVG} cleanup={['title']} />
+          </div>);
+          styleLiveInfo = styles.liveInfoComponent;        
+        } else {
+          // ERROR
+          middleComponent = (
+          <div className={classnames([styles.liveInfoComponent, styles.errorBlock])}>
+            <span>{this.state.error_or_live_info_text}</span>
+          </div>);
+          styleLiveInfo = classnames([styles.liveInfoComponent, styles.errorBlock]);
+        }
+
+        const walletNameFieldClasses = classnames([
+          'walletName',
+          styles.walletName,
+        ]);
+        const walletNameField = this.form.$('walletName');                    
+
+        dialog = (
         <Dialog
           className={classnames([styles.component, 'WalletTrezorDialog'])}
           title={intl.formatMessage(messages.title)}
@@ -592,102 +572,13 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           />
           <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
         </div>
-        <div className={classnames([styles.middleComponent, styles.middleComponentSaveLoad])}>
-          <SvgInline svg={saveLoadGIF} cleanup={['title']} />
-        </div>
-        <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
-            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-          </a>
-        </div>
-        <div className={styles.liveInfoComponent}>
+        {middleComponent}
+        {helpLink}
+        <div className={styleLiveInfo}>
           <span>{this.state.error_or_live_info_text}</span>
         </div>
         </Dialog>
-      );
-    } else if(this.progressState === ProgressStateOption.SAVE_START) {
-      const actions = [{
-        className: this.state.action_btn_processing ? styles.isProcessing : null,
-        label: this.state.action_btn_name,
-        primary: true,
-        disabled: this.state.action_btn_processing,
-        onClick: this.onSave
-      }];
-      dialog = (
-        <Dialog
-          className={classnames([styles.component, 'WalletTrezorDialog'])}
-          title={intl.formatMessage(messages.title)}
-          closeOnOverlayClick={false}
-          onClose={onCancel}
-          actions={actions}
-          closeButton={<DialogCloseButton />}
-        >
-        {progressStep}
-        <div className={classnames([styles.headerComponent, styles.headerComponentSave])}>
-          <Input
-            className={walletNameFieldClasses}
-            {...walletNameField.bind()}
-            error={walletNameField.error}
-            skin={<SimpleInputSkin />}
-          />
-          <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
-        </div>
-        <div className={classnames([styles.middleComponent, styles.middleComponentSaveStart])}>
-          <SvgInline svg={saveStartSVG} cleanup={['title']} />
-        </div>
-        <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
-            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-          </a>
-        </div>
-        <div className={styles.liveInfoComponent}>
-          <span>{this.state.error_or_live_info_text}</span>
-        </div>
-        </Dialog>
-      );
-    } else if(this.progressState === ProgressStateOption.SAVE_ERROR) {
-      const actions = [{
-        className: this.state.action_btn_processing ? styles.isProcessing : null,
-        label: this.state.action_btn_name,
-        primary: true,
-        disabled: this.state.action_btn_processing,
-        onClick: this.onSave
-      }];
-      dialog = (
-        <Dialog
-          className={classnames([styles.component, 'WalletTrezorDialog'])}
-          title={intl.formatMessage(messages.title)}
-          closeOnOverlayClick={false}
-          onClose={onCancel}
-          actions={actions}
-          closeButton={<DialogCloseButton />}
-        >
-        {progressStep}
-        <div className={classnames([styles.headerComponent, styles.headerComponentSave])}>
-          <Input
-            className={walletNameFieldClasses}
-            {...walletNameField.bind()}
-            error={walletNameField.error}
-            skin={<SimpleInputSkin />}
-          />
-          <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>          
-        </div>
-        <div className={styles.middleComponent}>
-          <SvgInline svg={saveErrorSVG} cleanup={['title']} />
-        </div>
-        <div className={styles.yoroiLinkComponent}>
-          <a target="_blank" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-            {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
-            <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-          </a>
-        </div>
-        <div className={classnames([styles.liveInfoComponent, styles.errorBlock])}>
-          <span>{this.state.error_or_live_info_text}</span>
-        </div>
-        </Dialog>
-      );
+        );        
     } else {
       console.error(`Error state, handle render for : ${this.progressState}`);
     }
@@ -695,17 +586,17 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     return dialog;
   }
 
-  onBackToAbout = async () => {
+  _onBackToAbout = async () => {
     this.progressState = ProgressStateOption.ABOUT;
     await this._updateState();
   }
 
-  onNext = async () => {
+  _onNext = async () => {
     this.progressState = ProgressStateOption.CONNECT_LOAD;
     await this._updateState();
   }
 
-  onConnect = async () => {
+  _onConnect = async () => {
     // FIXME: check about TrezorBridge/WebUSB 
     let cardanoGetPublicKeyResp : CardanoGetPublicKey | any = null;
 
@@ -801,11 +692,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     return this.trezorDeviceInfo.valid;
   }    
 
-  onSave = async () => {
+  _onSave = async () => {
 
     this.form.submit({
       onSuccess: async (form) => {
-        this.setState({ isSubmitting: true });
         this.progressState = ProgressStateOption.SAVE_START;
         await this._updateState();
 
@@ -818,7 +708,6 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         this.props.onSubmit(walletData);
       },
       onError: () => {
-        this.setState({ isSubmitting: false });
       },
     });
   }
