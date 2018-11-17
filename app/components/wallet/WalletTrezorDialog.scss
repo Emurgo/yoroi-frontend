@@ -10,7 +10,7 @@ $opacityCommon: 0.7;
   text-align: center;
 }
 
-.isSubmitting {
+.isProcessing {
   @include loading-spinner("../../assets/images/spinner-light.svg");
 }
 
