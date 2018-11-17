@@ -7,49 +7,45 @@ import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
 
 type Props = {
   stepsList: Array<string>,
-  progressIndex: number
+  progressInfo: {
+    currentIndex : number,
+    error?: boolean
+  }
 };
 
 export default class ProgressSteps extends Component<Props> {
 
   createSetps = () => {
-    const { stepsList, progressIndex } = this.props;
+    const { stepsList, progressInfo } = this.props;
     // progressIndex can't be less than 0
-    const actProgressIndex = progressIndex < 0 ? 0 : progressIndex;
-
-    const stepBoxStyle = classNames([styles.stepBox]);
+    const currentProgressIndex = progressInfo.currentIndex < 0 ? 0 : progressInfo.currentIndex;
     
     const steps = [];
     for (let idx = 0; idx < stepsList.length; idx++) {
       const stepText = stepsList[idx];
-      let stepTopBarStyle = classNames([styles.stepTopBar]);
-      let stepDoneShapeStyle = classNames([styles.stepDoneShape]);
-      let stepTextStyle = classNames([styles.stepText]);
 
-      if(idx < actProgressIndex) {
-        // step done
+      let stepTopBarStyle = classNames([styles.stepTopBar]);
+      let stepTextStyle = classNames([styles.stepText]);
+      let showIcon = 'none';
+
+      if(idx < currentProgressIndex) {
+        // step already done
+        showIcon = 'done';
         stepTopBarStyle = classNames([
           styles.stepTopBar,
           styles.stepTopBarDone
-        ]);
-        stepDoneShapeStyle = classNames([
-          styles.stepDoneShape,
-          styles.stepDoneShapeDone
         ]);
         stepTextStyle = classNames([
           styles.stepText,
           styles.stepTextDone
         ]);
-      } else if (idx === actProgressIndex) {
+      } else if (idx === currentProgressIndex) {
         // step current
+        showIcon = progressInfo.error ? 'error' : 'none';
         stepTopBarStyle = classNames([
           styles.stepTopBar,
           styles.stepTopBarActive
         ]);
-        stepDoneShapeStyle = classNames([
-          styles.stepDoneShape,
-          styles.stepDoneShapeActive
-        ]);        
         stepTextStyle = classNames([
           styles.stepText,
           styles.stepTextActive
@@ -57,13 +53,18 @@ export default class ProgressSteps extends Component<Props> {
       }
 
       steps.push(
-      <div key={idx} className={stepBoxStyle}>
+      <div key={idx} className={styles.stepBlock}>
         <div className={stepTopBarStyle}></div>
         <div className={styles.stepBottomBlock}>
-          <SvgInline svg={iconTickSVG} className={stepDoneShapeStyle} cleanup={['title']} />
-          <span className={stepTextStyle}>{stepText}</span>
+          <div className={styles.stepStateIconContainer}>
+            {(showIcon === 'done') && <SvgInline svg={iconTickSVG} cleanup={['title']} />}
+            {(showIcon === 'error') && <SvgInline svg={iconCrossSVG} cleanup={['title']} />}
+          </div>
+          <div className={styles.stepTextContainer}>
+            <span className={stepTextStyle}>{stepText}</span>
+          </div>
         </div>
-      </div>);      
+      </div>);
     }
 
     return steps;
@@ -71,7 +72,6 @@ export default class ProgressSteps extends Component<Props> {
 
 
   render() {
-
     const outerStyle = classNames([styles.outer]);
     const comp = (<div className={outerStyle}>
       {this.createSetps()}

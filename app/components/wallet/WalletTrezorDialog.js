@@ -237,7 +237,10 @@ type Props = {
 
 type State = {
   isSubmitting?: boolean, // FIXME : remove duplicate
-  currentProgressStep: 0 | 1 | 2,
+  currentProgressStepInfo: {
+    currentIndex: 0 | 1 | 2,
+    error: boolean
+  },
   action_btn_name?: string,
   action_btn_processing? : boolean,
   error_or_live_info_text? : string,
@@ -267,7 +270,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
   _init() {
     this.progressState = ProgressStateOption.ABOUT;
     this.state = {
-      currentProgressStep: 0
+      currentProgressStepInfo: {
+        currentIndex: 0,
+        error: false
+      }
     };
   }
 
@@ -307,7 +313,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         intl.formatMessage(messages.stepConnectLabel),
         intl.formatMessage(messages.stepSaveLabel)        
       ]}
-      progressIndex={this.state.currentProgressStep}
+      progressInfo={this.state.currentProgressStepInfo}
     />);
 
     const walletNameFieldClasses = classnames([
@@ -599,43 +605,51 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
     switch(this.progressState) {
       case ProgressStateOption.ABOUT:
-        this.state.currentProgressStep = 0;
+        this.state.currentProgressStepInfo.currentIndex = 0;
+        this.state.currentProgressStepInfo.error = false;
         this.state.action_btn_processing = false;
         this.state.action_btn_name = intl.formatMessage(messages.nextButtonLabel);
         this.state.error_or_live_info_text = '';
         break;      
       case ProgressStateOption.CONNECT_LOAD:
-        this.state.currentProgressStep = 1;
+        this.state.currentProgressStepInfo.currentIndex = 1;
+        this.state.currentProgressStepInfo.error = false;
         this.state.action_btn_processing = false;
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
         this.state.error_or_live_info_text = '';
         break;
       case ProgressStateOption.CONNECT_START:
-        this.state.currentProgressStep = 1;
+        this.state.currentProgressStepInfo.currentIndex = 1;
+        this.state.currentProgressStepInfo.error = false;        
         this.state.action_btn_processing = true;
         this.state.error_or_live_info_text = intl.formatMessage(messages.connectLiveMessageCheckingTrezorDevice);
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
         break;
       case ProgressStateOption.CONNECT_ERROR:
+        this.state.currentProgressStepInfo.currentIndex = 1;
+        this.state.currentProgressStepInfo.error = true;
         this.state.action_btn_processing = false;
         this.state.error_or_live_info_text = intl.formatMessage(messages[this.trezorDeviceInfo.errorId]);
         this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
         break;        
       case ProgressStateOption.SAVE_LOAD:
-        this.state.currentProgressStep = 2;
+        this.state.currentProgressStepInfo.currentIndex = 2;
+        this.state.currentProgressStepInfo.error = false;
         this.state.action_btn_processing = false;
         this.form.$('walletName').value = this.trezorDeviceInfo.features.label;
         this.state.error_or_live_info_text = '';
         this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
         break;
        case ProgressStateOption.SAVE_START:
-         this.state.currentProgressStep = 2;
+         this.state.currentProgressStepInfo.currentIndex = 2;
+         this.state.currentProgressStepInfo.error = false;
         this.state.action_btn_processing = true;
         this.state.error_or_live_info_text = '';
         this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
         break;
       case ProgressStateOption.SAVE_ERROR:
-        this.state.currentProgressStep = 2;
+        this.state.currentProgressStepInfo.currentIndex = 2;
+        this.state.currentProgressStepInfo.error = true;
         this.state.action_btn_processing = false;
         this.state.error_or_live_info_text = '';
         this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
