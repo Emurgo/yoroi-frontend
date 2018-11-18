@@ -124,6 +124,7 @@
   "wallet.add.dialog.create.description": "创建新钱包",
   "wallet.add.dialog.restore.description": "从备份恢复钱包",
   "wallet.add.dialog.restoreNotificationMessage": "目前正在修复钱包中。在完成之前，无法恢复或导入新钱包。",
+  "wallet.add.dialog.trezorConnectNotificationMessage": "!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.",  
   "wallet.add.dialog.title.label": "添加钱包",
   "wallet.add.dialog.trezor.description": "!!!Connect to Trezor",
   "wallet.add.page.title": "添加钱包",

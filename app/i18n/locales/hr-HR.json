@@ -124,6 +124,7 @@
   "wallet.add.dialog.create.description": "!!!Create a new wallet",
   "wallet.add.dialog.restore.description": "!!!Restore wallet from backup",
   "wallet.add.dialog.restoreNotificationMessage": "!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.",
+  "wallet.add.dialog.trezorConnectNotificationMessage": "!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.",  
   "wallet.add.dialog.title.label": "!!!Add wallet",
   "wallet.add.dialog.trezor.description": "!!!Connect to Trezor",
   "wallet.add.page.title": "!!!Add Wallet",

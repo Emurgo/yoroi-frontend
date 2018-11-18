@@ -60,6 +60,7 @@ export default class WalletAddPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
     const { isRestoreActive } = wallets;
+    const { isConnectTrezorActive } = wallets;
     let content = null;
 
     if (uiDialogs.isOpen(WalletCreateDialog)) {
@@ -74,7 +75,7 @@ export default class WalletAddPage extends Component<Props> {
       content = (
         <WalletAdd
           onTrezor={() => actions.dialogs.open.trigger({ dialog: WalletTrezorDialog })}
-          isTrezorActive={false} // FIX : THIS
+          isConnectTrezorActive={isConnectTrezorActive}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           isRestoreActive={isRestoreActive}

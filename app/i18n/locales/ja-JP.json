@@ -124,6 +124,7 @@
   "wallet.add.dialog.create.description": "新しいウォレットを作成する",
   "wallet.add.dialog.restore.description": "ウォレットをバックアップから復元する",
   "wallet.add.dialog.restoreNotificationMessage": "ウォレットの復元が進行中です。完了するまで、新しいウォレットを復元またはインポートすることはできません。",
+  "wallet.add.dialog.trezorConnectNotificationMessage": "!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.",  
   "wallet.add.dialog.title.label": "ウォレットの追加",
   "wallet.add.dialog.trezor.description": "!!!Connect to Trezor",
   "wallet.add.page.title": "ウォレットの追加",

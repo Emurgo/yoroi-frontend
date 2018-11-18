@@ -33,7 +33,12 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Restore notification message shown during async wallet restore on the wallet add screen.',
-  }
+  },
+  trezorConnectNotificationMessage: {
+    id: 'wallet.add.dialog.trezorConnectNotificationMessage',
+    defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
+    description: 'Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
+  }  
 });
 
 type Props = {
@@ -41,7 +46,7 @@ type Props = {
   onRestore: Function,
   onTrezor: Function,
   isRestoreActive: boolean,
-  isTrezorActive: boolean,
+  isConnectTrezorActive: boolean,
 };
 
 @observer
@@ -58,7 +63,7 @@ export default class WalletAdd extends Component<Props> {
       onRestore,
       onTrezor,
       isRestoreActive,
-      isTrezorActive
+      isConnectTrezorActive
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
@@ -66,6 +71,8 @@ export default class WalletAdd extends Component<Props> {
     let activeNotification = null;
     if (isRestoreActive) {
       activeNotification = 'restoreNotificationMessage';
+    } else if(isConnectTrezorActive) {
+      activeNotification = 'trezorConnectNotificationMessage';
     }
 
     return (
@@ -90,14 +97,6 @@ export default class WalletAdd extends Component<Props> {
             skin={<SimpleButtonSkin />}
           />
           {activeNotification ? (
-            <div className={styles.notification}>
-              <FormattedHTMLMessage
-                {...messages[activeNotification]}
-                values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
-              />
-            </div>
-          ) : null}
-          {isTrezorActive ? (
             <div className={styles.notification}>
               <FormattedHTMLMessage
                 {...messages[activeNotification]}
