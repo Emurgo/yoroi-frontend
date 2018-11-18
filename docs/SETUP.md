@@ -41,7 +41,7 @@ $ git clone --recursive git@github.com:Emurgo/yoroi-frontend.git
 $ git submodule update --init --recursive
 ```
 
-To automate donwloading and installation of `js-cardano-wasm` dependency run `setup_cardano_crypto.sh` to download latest `js-cardano-wasm` repository into `js-cardano-wasm` folder.
+To automate downloading and installation of `js-cardano-wasm` dependency run `setup_cardano_crypto.sh` to download latest `js-cardano-wasm` repository into `js-cardano-wasm` folder.
 ```bash
 $ sh setup_cardano_crypto.sh
 ```
