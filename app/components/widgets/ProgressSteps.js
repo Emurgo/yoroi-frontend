@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import styles from './ProgressSteps.scss';
 import classNames from 'classnames';
 import SvgInline from 'react-svg-inline';
 import iconTickSVG from '../../assets/images/widget/tick.inline.svg';
 import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
+import styles from './ProgressSteps.scss';
 
 type Props = {
   stepsList: Array<string>,
@@ -19,7 +19,7 @@ export default class ProgressSteps extends Component<Props> {
     const { stepsList, progressInfo } = this.props;
     // progressIndex can't be less than 0
     const currentProgressIndex = progressInfo.currentIndex < 0 ? 0 : progressInfo.currentIndex;
-    
+
     const steps = [];
     for (let idx = 0; idx < stepsList.length; idx++) {
       const stepText = stepsList[idx];
@@ -28,7 +28,7 @@ export default class ProgressSteps extends Component<Props> {
       let stepTextStyle = classNames([styles.stepText]);
       let showIcon = 'none';
 
-      if(idx < currentProgressIndex) {
+      if (idx < currentProgressIndex) {
         // step already done
         showIcon = 'done';
         stepTopBarStyle = classNames([
@@ -53,18 +53,18 @@ export default class ProgressSteps extends Component<Props> {
       }
 
       steps.push(
-      <div key={idx} className={styles.stepBlock}>
-        <div className={stepTopBarStyle}></div>
-        <div className={styles.stepBottomBlock}>
-          <div className={styles.stepStateIconContainer}>
-            {(showIcon === 'done') && <SvgInline svg={iconTickSVG} cleanup={['title']} />}
-            {(showIcon === 'error') && <SvgInline svg={iconCrossSVG} cleanup={['title']} />}
+        <div key={idx} className={styles.stepBlock}>
+          <div className={stepTopBarStyle} />
+          <div className={styles.stepBottomBlock}>
+            <div className={styles.stepStateIconContainer}>
+              {(showIcon === 'done') && <SvgInline svg={iconTickSVG} cleanup={['title']} />}
+              {(showIcon === 'error') && <SvgInline svg={iconCrossSVG} cleanup={['title']} />}
+            </div>
+            <div className={styles.stepTextContainer}>
+              <span className={stepTextStyle}>{stepText}</span>
+            </div>
           </div>
-          <div className={styles.stepTextContainer}>
-            <span className={stepTextStyle}>{stepText}</span>
-          </div>
-        </div>
-      </div>);
+        </div>);
     }
 
     return steps;

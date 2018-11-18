@@ -38,7 +38,7 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.trezorConnectNotificationMessage',
     defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
-  }  
+  }
 });
 
 type Props = {
@@ -71,7 +71,7 @@ export default class WalletAdd extends Component<Props> {
     let activeNotification = null;
     if (isRestoreActive) {
       activeNotification = 'restoreNotificationMessage';
-    } else if(isConnectTrezorActive) {
+    } else if (isConnectTrezorActive) {
       activeNotification = 'trezorConnectNotificationMessage';
     }
 
@@ -83,7 +83,7 @@ export default class WalletAdd extends Component<Props> {
             label={intl.formatMessage(messages.useTrezorDescription)}
             onMouseUp={onTrezor}
             skin={<SimpleButtonSkin />}
-          />        
+          />
           <Button
             className="primary createWalletButton"
             label={intl.formatMessage(messages.createDescription)}

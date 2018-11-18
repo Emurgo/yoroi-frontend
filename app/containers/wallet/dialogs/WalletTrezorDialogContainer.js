@@ -21,7 +21,7 @@ export default class WalletTrezorDialogContainer extends Component<Props> {
     const { connectTrezorRequest } = this.props.stores[environment.API].wallets;
     // Connect Trezor request should be reset only in case connect is finished/errored
     if (!connectTrezorRequest.isExecuting) {
-      connectTrezorRequest.reset(); 
+      connectTrezorRequest.reset();
     }
   };
 

@@ -15,7 +15,7 @@ export default defineMessages({
     id: 'global.errors.invalidHardwareWalletName',
     defaultMessage: '!!!Wallet name requires at least 1 and at most 40 letters.',
     description: 'Error message shown when invalid wallet name was entered in create wallet dialog.'
-  },  
+  },
   invalidWalletPassword: {
     id: 'global.errors.invalidWalletPassword',
     defaultMessage: '!!!Invalid password',

@@ -501,7 +501,7 @@ export default class AdaApi {
     } catch (error) {
       Logger.error('AdaApi::connectTrezor error: ' + stringifyError(error));
       // FIXME : think for other possible error
-      
+
       // We don't know what the problem was -> throw generic error
       throw new GenericApiError();
     }
