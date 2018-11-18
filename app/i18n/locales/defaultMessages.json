@@ -933,7 +933,7 @@
         }
       },
       {
-        "defaultMessage": "!!!https://daedaluswallet.io/faq/",
+        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
         "description": "URL for the \"FAQ on Yoroi website\". link in the testnet banner",
         "end": {
           "column": 3,
@@ -1093,7 +1093,7 @@
         }
       },
       {
-        "defaultMessage": "!!!https://daedaluswallet.io/faq/",
+        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
         "description": "URL for the \"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
         "end": {
           "column": 3,
@@ -2016,17 +2016,31 @@
         }
       },
       {
-        "defaultMessage": "!!!Restore wallet from backup",
-        "description": "Description for the \"Restore\" button without paper wallet certificate on the wallet add dialog.",
+        "defaultMessage": "!!!Connect to Trezor",
+        "description": "Description for the \"Trezor\" button on the wallet add dialog.",
         "end": {
           "column": 3,
           "line": 26
         },
         "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.trezor.description",
+        "start": {
+          "column": 24,
+          "line": 22
+        }
+      },
+      {
+        "defaultMessage": "!!!Restore wallet from backup",
+        "description": "Description for the \"Restore\" button without paper wallet certificate on the wallet add dialog.",
+        "end": {
+          "column": 3,
+          "line": 31
+        },
+        "file": "app/components/wallet/WalletAdd.js",
         "id": "wallet.add.dialog.restore.description",
         "start": {
           "column": 22,
-          "line": 22
+          "line": 27
         }
       },
       {
@@ -2034,13 +2048,27 @@
         "description": "Restore notification message shown during async wallet restore on the wallet add screen.",
         "end": {
           "column": 3,
-          "line": 31
+          "line": 36
         },
         "file": "app/components/wallet/WalletAdd.js",
         "id": "wallet.add.dialog.restoreNotificationMessage",
         "start": {
           "column": 30,
-          "line": 27
+          "line": 32
+        }
+      },
+      {
+        "defaultMessage": "!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.",
+        "description": "Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.",
+        "end": {
+          "column": 3,
+          "line": 41
+        },
+        "file": "app/components/wallet/WalletAdd.js",
+        "id": "wallet.add.dialog.trezorConnectNotificationMessage",
+        "start": {
+          "column": 36,
+          "line": 37
         }
       }
     ],
@@ -2821,6 +2849,473 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Connect to Trezor Hardware Wallet",
+        "description": "Label \"Connect to Trezor Hardware Wallet\" on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 47
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.title.label",
+        "start": {
+          "column": 9,
+          "line": 43
+        }
+      },
+      {
+        "defaultMessage": "!!!ABOUT",
+        "description": "Progress Step Label \"About\" on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 52
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.label",
+        "start": {
+          "column": 17,
+          "line": 48
+        }
+      },
+      {
+        "defaultMessage": "!!!CONNECT",
+        "description": "Progress Step Label \"Connect\" on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 57
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.label",
+        "start": {
+          "column": 19,
+          "line": 53
+        }
+      },
+      {
+        "defaultMessage": "!!!SAVE",
+        "description": "Progress Step Label \"Save\" on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 62
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.save.label",
+        "start": {
+          "column": 16,
+          "line": 58
+        }
+      },
+      {
+        "defaultMessage": "!!!Next",
+        "description": "Label for the \"Next\" button on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 67
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.next.button.label",
+        "start": {
+          "column": 19,
+          "line": 63
+        }
+      },
+      {
+        "defaultMessage": "!!!Connect",
+        "description": "Label for the \"Connect\" button on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 72
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.connect.button.label",
+        "start": {
+          "column": 22,
+          "line": 68
+        }
+      },
+      {
+        "defaultMessage": "!!!Save",
+        "description": "Label for the \"Save\" button on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 77
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.save.button.label",
+        "start": {
+          "column": 19,
+          "line": 73
+        }
+      },
+      {
+        "defaultMessage": "!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.",
+        "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 82
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.introText.line.1",
+        "start": {
+          "column": 23,
+          "line": 78
+        }
+      },
+      {
+        "defaultMessage": "!!!It is more secure because your private key never leaves the hardware wallet.",
+        "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 87
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.introText.line.2",
+        "start": {
+          "column": 23,
+          "line": 83
+        }
+      },
+      {
+        "defaultMessage": "!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.",
+        "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 92
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.introText.line.3",
+        "start": {
+          "column": 23,
+          "line": 88
+        }
+      },
+      {
+        "defaultMessage": "!!!Prerequisites",
+        "description": "Prerequisite header on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 97
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.header",
+        "start": {
+          "column": 27,
+          "line": 93
+        }
+      },
+      {
+        "defaultMessage": "!!!Only Supports",
+        "description": "First Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 102
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.1.part1",
+        "start": {
+          "column": 27,
+          "line": 98
+        }
+      },
+      {
+        "defaultMessage": "!!!https://github.com/trezor/trezor-core/blob/master/ChangeLog",
+        "description": "First Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 107
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.1.part2.link",
+        "start": {
+          "column": 31,
+          "line": 103
+        }
+      },
+      {
+        "defaultMessage": "!!!Trezor Model T with version 2.0.8",
+        "description": "First Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 112
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.1.part2.link.text",
+        "start": {
+          "column": 35,
+          "line": 108
+        }
+      },
+      {
+        "defaultMessage": "!!!or later",
+        "description": "First Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 117
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.1.part3",
+        "start": {
+          "column": 27,
+          "line": 113
+        }
+      },
+      {
+        "defaultMessage": "!!!Trezor device must be pre-initialized",
+        "description": "Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 122
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.2",
+        "start": {
+          "column": 22,
+          "line": 118
+        }
+      },
+      {
+        "defaultMessage": "!!!The computer needs to be connected to the Internet throughout the process",
+        "description": "Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 127
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.3",
+        "start": {
+          "column": 22,
+          "line": 123
+        }
+      },
+      {
+        "defaultMessage": "!!!Only one Trezor device can be connected to the computer at any time",
+        "description": "Fourth Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 132
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.4",
+        "start": {
+          "column": 22,
+          "line": 128
+        }
+      },
+      {
+        "defaultMessage": "!!!Trezor device screen must be unlocked",
+        "description": "Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 137
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.5",
+        "start": {
+          "column": 22,
+          "line": 133
+        }
+      },
+      {
+        "defaultMessage": "!!!Trezor device must remain connected to the computer throughout the process",
+        "description": "Sixth Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 142
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.6",
+        "start": {
+          "column": 22,
+          "line": 138
+        }
+      },
+      {
+        "defaultMessage": "!!!https://yoroi-wallet.com/",
+        "description": "Tutorial link about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 147
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.common.step.link.helpYoroiWithTrezor",
+        "start": {
+          "column": 27,
+          "line": 143
+        }
+      },
+      {
+        "defaultMessage": "!!!Click here to know more about how to use Yoroi with Trezor.",
+        "description": "Tutorial link text about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 152
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.common.step.link.helpYoroiWithTrezor.text",
+        "start": {
+          "column": 31,
+          "line": 148
+        }
+      },
+      {
+        "defaultMessage": "!!!After connecting your Trezor device to the computer press the Connect button.",
+        "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 157
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.introText.line.1",
+        "start": {
+          "column": 25,
+          "line": 153
+        }
+      },
+      {
+        "defaultMessage": "!!!A new tab will appear, please follow the instructions in the new tab.",
+        "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 162
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.introText.line.2",
+        "start": {
+          "column": 25,
+          "line": 158
+        }
+      },
+      {
+        "defaultMessage": "!!!This process shares the Cardano public key with Yoroi.",
+        "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 167
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.introText.line.3",
+        "start": {
+          "column": 25,
+          "line": 163
+        }
+      },
+      {
+        "defaultMessage": "!!!Checking Trezor device, please follow the instructions on the new tab...",
+        "description": "Live message about checking Trezor device of connect start step on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 172
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.liveMessage.checkingTrezorDevice",
+        "start": {
+          "column": 42,
+          "line": 168
+        }
+      },
+      {
+        "defaultMessage": "!!!ERROR#TREZOR9999: Something unexpected happened, please retry.",
+        "description": "<ERROR#TREZOR9999: Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 177
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.error.9999",
+        "start": {
+          "column": 20,
+          "line": 173
+        }
+      },
+      {
+        "defaultMessage": "!!!ERROR#TREZOR1001: Falied to connect trezor.io. Please check your Internet connection and retry.",
+        "description": "<ERROR#TREZOR1001: Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 182
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.error.1001",
+        "start": {
+          "column": 20,
+          "line": 178
+        }
+      },
+      {
+        "defaultMessage": "!!!ERROR#TREZOR1002: Necessary permissions were not granted by the user. Please retry.",
+        "description": "<ERROR#TREZOR1002: Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 187
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.error.1002",
+        "start": {
+          "column": 20,
+          "line": 183
+        }
+      },
+      {
+        "defaultMessage": "!!!ERROR#TREZOR1003: Cancelled. Please retry.",
+        "description": "<ERROR#TREZOR1003: Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 192
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.connect.error.1003",
+        "start": {
+          "column": 20,
+          "line": 188
+        }
+      },
+      {
+        "defaultMessage": "!!!Wallet name",
+        "description": "Label for the wallet name input on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 197
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.save.walletName.label",
+        "start": {
+          "column": 28,
+          "line": 193
+        }
+      },
+      {
+        "defaultMessage": "!!!Enter wallet name",
+        "description": "Placeholder \"Enter wallet name\" for the wallet name input on the wallet restore dialog.",
+        "end": {
+          "column": 3,
+          "line": 202
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.save.walletName.hint",
+        "start": {
+          "column": 34,
+          "line": 198
+        }
+      },
+      {
+        "defaultMessage": "!!!We have fetched Trezor device’s name for you; you can use as it is or assign a different name.",
+        "description": "Hint for the wallet name input on the wallet restore dialog.",
+        "end": {
+          "column": 3,
+          "line": 207
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.save.walletName.info",
+        "start": {
+          "column": 33,
+          "line": 203
+        }
+      }
+    ],
+    "path": "app/components/wallet/WalletTrezorDialog.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!change",
         "description": "Label \"change\" on inline editing inputs in inactive state.",
         "end": {
@@ -2967,13 +3462,13 @@
         "description": "Add Wallet Title.",
         "end": {
           "column": 3,
-          "line": 26
+          "line": 28
         },
         "file": "app/containers/wallet/WalletAddPage.js",
         "id": "wallet.add.page.title",
         "start": {
           "column": 9,
-          "line": 22
+          "line": 24
         }
       }
     ],
@@ -3062,17 +3557,31 @@
         }
       },
       {
-        "defaultMessage": "!!!Invalid password",
-        "description": "Error message shown when invalid wallet password was entered in create wallet dialog.",
+        "defaultMessage": "!!!Wallet name requires at least 1 and at most 40 letters.",
+        "description": "Error message shown when invalid wallet name was entered in create wallet dialog.",
         "end": {
           "column": 3,
           "line": 18
         },
         "file": "app/i18n/global-messages.js",
+        "id": "global.errors.invalidHardwareWalletName",
+        "start": {
+          "column": 29,
+          "line": 14
+        }
+      },
+      {
+        "defaultMessage": "!!!Invalid password",
+        "description": "Error message shown when invalid wallet password was entered in create wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 23
+        },
+        "file": "app/i18n/global-messages.js",
         "id": "global.errors.invalidWalletPassword",
         "start": {
           "column": 25,
-          "line": 14
+          "line": 19
         }
       },
       {
@@ -3080,13 +3589,13 @@
         "description": "Error message shown when wallet password and repeat passwords don't match in create wallet dialog.",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 28
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.errors.invalidRepeatPassword",
         "start": {
           "column": 25,
-          "line": 19
+          "line": 24
         }
       },
       {
@@ -3094,13 +3603,13 @@
         "description": "Password instructions note.",
         "end": {
           "column": 3,
-          "line": 28
+          "line": 33
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.passwordInstructions",
         "start": {
           "column": 24,
-          "line": 24
+          "line": 29
         }
       },
       {
@@ -3108,13 +3617,13 @@
         "description": "The word \"cancel\" reused at several places (like cancel buttons)",
         "end": {
           "column": 3,
-          "line": 33
+          "line": 38
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.cancel",
         "start": {
           "column": 10,
-          "line": 29
+          "line": 34
         }
       },
       {
@@ -3122,13 +3631,13 @@
         "description": "The word \"change\" reused at several places (like change buttons)",
         "end": {
           "column": 3,
-          "line": 38
+          "line": 43
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.change",
         "start": {
           "column": 10,
-          "line": 34
+          "line": 39
         }
       },
       {
@@ -3136,13 +3645,13 @@
         "description": "The word \"create\" reused at several places (like create buttons)",
         "end": {
           "column": 3,
-          "line": 43
+          "line": 48
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.create",
         "start": {
           "column": 10,
-          "line": 39
+          "line": 44
         }
       },
       {
@@ -3150,13 +3659,13 @@
         "description": "The word \"remove\" reused at several places (like remove buttons)",
         "end": {
           "column": 3,
-          "line": 48
+          "line": 53
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.remove",
         "start": {
           "column": 10,
-          "line": 44
+          "line": 49
         }
       },
       {
@@ -3164,13 +3673,13 @@
         "description": "The word \"save\" reused at several places (like save buttons)",
         "end": {
           "column": 3,
-          "line": 53
+          "line": 58
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.save",
         "start": {
           "column": 8,
-          "line": 49
+          "line": 54
         }
       },
       {
@@ -3178,13 +3687,13 @@
         "description": "Language name for \"English\" language.",
         "end": {
           "column": 3,
-          "line": 58
+          "line": 63
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.english",
         "start": {
           "column": 19,
-          "line": 54
+          "line": 59
         }
       },
       {
@@ -3192,13 +3701,13 @@
         "description": "Language name for \"Japanese\" language.",
         "end": {
           "column": 3,
-          "line": 63
+          "line": 68
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.japanese",
         "start": {
           "column": 20,
-          "line": 59
+          "line": 64
         }
       },
       {
@@ -3206,13 +3715,13 @@
         "description": "Language name for \"Simplified Chinese\" language.",
         "end": {
           "column": 3,
-          "line": 68
+          "line": 73
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.chinese.simplified",
         "start": {
           "column": 29,
-          "line": 64
+          "line": 69
         }
       },
       {
@@ -3220,13 +3729,13 @@
         "description": "Language name for \"Traditional Chinese\" language.",
         "end": {
           "column": 3,
-          "line": 73
+          "line": 78
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.chinese.traditional",
         "start": {
           "column": 30,
-          "line": 69
+          "line": 74
         }
       },
       {
@@ -3234,13 +3743,13 @@
         "description": "Language name for \"Korean\" language.",
         "end": {
           "column": 3,
-          "line": 78
+          "line": 83
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.korean",
         "start": {
           "column": 18,
-          "line": 74
+          "line": 79
         }
       },
       {
@@ -3248,13 +3757,13 @@
         "description": "Language name for \"German\" language.",
         "end": {
           "column": 3,
-          "line": 83
+          "line": 88
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.german",
         "start": {
           "column": 18,
-          "line": 79
+          "line": 84
         }
       },
       {
@@ -3262,13 +3771,13 @@
         "description": "Language name for \"Croatian\" language.",
         "end": {
           "column": 3,
-          "line": 88
+          "line": 93
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.croatian",
         "start": {
           "column": 20,
-          "line": 84
+          "line": 89
         }
       },
       {
@@ -3276,13 +3785,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 3,
-          "line": 93
+          "line": 98
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.unit.ada",
         "start": {
           "column": 11,
-          "line": 89
+          "line": 94
         }
       },
       {
@@ -3290,13 +3799,13 @@
         "description": "Title for the \"Recovery Phrase\" dialog.",
         "end": {
           "column": 3,
-          "line": 98
+          "line": 103
         },
         "file": "app/i18n/global-messages.js",
         "id": "wallet.backup.recovery.phrase.dialog.title",
         "start": {
           "column": 29,
-          "line": 94
+          "line": 99
         }
       },
       {
@@ -3304,13 +3813,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 5,
-          "line": 107
+          "line": 112
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.ada",
         "start": {
           "column": 14,
-          "line": 103
+          "line": 108
         }
       },
       {
@@ -3318,13 +3827,13 @@
         "description": "Name for \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 112
+          "line": 117
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.cardano",
         "start": {
           "column": 13,
-          "line": 108
+          "line": 113
         }
       },
       {
@@ -3332,13 +3841,13 @@
         "description": "Version of \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 117
+          "line": 122
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.cardano",
         "start": {
           "column": 16,
-          "line": 113
+          "line": 118
         }
       },
       {
@@ -3346,13 +3855,13 @@
         "description": "Name for \"Etc\" unit.",
         "end": {
           "column": 5,
-          "line": 124
+          "line": 129
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.etc",
         "start": {
           "column": 14,
-          "line": 120
+          "line": 125
         }
       },
       {
@@ -3360,13 +3869,13 @@
         "description": "Name for \"Mantis\" client.",
         "end": {
           "column": 5,
-          "line": 129
+          "line": 134
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.mantis",
         "start": {
           "column": 13,
-          "line": 125
+          "line": 130
         }
       },
       {
@@ -3374,13 +3883,13 @@
         "description": "Version of \"Mantis\" client.",
         "end": {
           "column": 5,
-          "line": 134
+          "line": 139
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.mantis",
         "start": {
           "column": 16,
-          "line": 130
+          "line": 135
         }
       }
     ],
@@ -3412,13 +3921,13 @@
         "description": "\"Unable to transfer funds.\" error message",
         "end": {
           "column": 3,
-          "line": 190
+          "line": 200
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.transferFundsError",
         "start": {
           "column": 22,
-          "line": 186
+          "line": 196
         }
       },
       {
@@ -3426,13 +3935,13 @@
         "description": "\"There is no transfer transaction to send.\" error message",
         "end": {
           "column": 3,
-          "line": 195
+          "line": 205
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.noTransferTxError",
         "start": {
           "column": 21,
-          "line": 191
+          "line": 201
         }
       },
       {
@@ -3440,13 +3949,13 @@
         "description": "Any reason why the websocket transferring could failed",
         "end": {
           "column": 3,
-          "line": 200
+          "line": 210
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.webSocketRestoreError",
         "start": {
           "column": 25,
-          "line": 196
+          "line": 206
         }
       }
     ],
