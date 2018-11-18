@@ -1,6 +1,12 @@
 // @flow
 import BigNumber from 'bignumber.js';
 
+/*
+ * This file gives the flow equivalents of the the Haskell types given in the wallet API at
+ * https://github.com/input-output-hk/cardano-sl/blob/master/wallet/src/Pos/Wallet/Web/ClientTypes/Types.hs
+ * TODO: Update the link once IOHK migrates away from the Cardano-SL repo
+*/
+
 // ========= Response Types =========
 export type AdaAssurance = 'CWANormal' | 'CWAStrict';
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
