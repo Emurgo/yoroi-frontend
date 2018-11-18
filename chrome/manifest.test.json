@@ -19,14 +19,13 @@
     "management",
     "tabs",
     "storage",
-    "notifications",
-    "*://connect.trezor.io/5/*"
+    "*://connect.trezor.io/*"
   ],
   "content_scripts": [
     {
-      "matches": ["*://connect.trezor.io/5/popup.html"],
+      "matches": ["*://connect.trezor.io/*/popup.html"],
       "js": ["js/trezor-content-script.js"]
     }
   ],
-  "content_security_policy": "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src http://localhost:8080 https://localhost:8080 ws://localhost:8080 wss://localhost:8080; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "content_security_policy": "default-src 'self'; frame-src 'self' https://connect.trezor.io/; script-src 'self' 'unsafe-eval'; connect-src http://localhost:8080 https://localhost:8080 ws://localhost:8080 wss://localhost:8080; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
 }

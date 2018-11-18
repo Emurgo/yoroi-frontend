@@ -19,7 +19,6 @@
     "management",
     "tabs",
     "storage",
-    "notifications",
     "*://connect.trezor.io/*"
   ],
   "content_scripts": [
@@ -28,6 +27,6 @@
       "js": ["js/trezor-content-script.js"]
     }
   ],
-  "content_security_policy": "default-src 'self' http://localhost:3000 https://localhost:3000 https://connect.trezor.io/5/*; frame-src 'self' https://connect.trezor.io; child-src 'self' https://connect.trezor.io/*; script-src 'self' http://localhost:3000 https://localhost:3000 https://connect.trezor.io/* 'unsafe-eval'; connect-src http://localhost:3000 https://localhost:3000 http://localhost:8080 https://localhost:8080 ws://localhost:8080 wss://localhost:8080 wss://iohk-staging.yoroiwallet.com:443 https://iohk-staging.yoroiwallet.com https://connect.trezor.io http://127.0.0.1:21325/ http://127.0.0.1:21325/status/ http://www.google.com/; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data: http://localhost:3000 https://localhost:3000;",
+  "content_security_policy": "default-src 'self' http://localhost:3000 https://localhost:3000; frame-src 'self' https://connect.trezor.io/; script-src 'self' 'unsafe-eval' http://localhost:3000 https://localhost:3000; connect-src http://localhost:3000 https://localhost:3000 http://localhost:8080 https://localhost:8080 ws://localhost:8080 wss://localhost:8080 wss://iohk-staging.yoroiwallet.com:443 https://iohk-staging.yoroiwallet.com; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data: http://localhost:3000 https://localhost:3000;",
   "key": "pojejnpjgcacmnpkdiklhlnlbkjechfh"
 }
