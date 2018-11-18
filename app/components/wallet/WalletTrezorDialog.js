@@ -170,26 +170,26 @@ const messages = defineMessages({
     defaultMessage: '!!!Checking Trezor device, please follow the instructions on the new tab...',
     description: 'Live message about checking Trezor device of connect start step on the Connect to Trezor Hardware Wallet dialog.'
   },
+  connectError9999: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.9999',
+    defaultMessage: '!!!ERROR#TREZOR9999: Something unexpected happened, please retry.',
+    description: '<ERROR#TREZOR9999: Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.'
+  },
   connectError1001: {
     id: 'wallet.trezor.dialog.trezor.step.connect.error.1001',
-    defaultMessage: '!!!ERROR#1001: Could not connect to the Internet, please retry.',
-    description: '\"ERROR#1001: Could not connect to the Internet, please retry\" on the Connect to Trezor Hardware Wallet dialog.'
+    defaultMessage: '!!!ERROR#TREZOR1001: Falied to connect trezor.io. Please check your Internet connection and retry.',
+    description: '<ERROR#TREZOR1001: Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectError1002: {
     id: 'wallet.trezor.dialog.trezor.step.connect.error.1002',
-    defaultMessage: '!!!ERROR#1002: Something unexpected happened, please retry.',
-    description: '\"ERROR#1002: Something unexpected happened, please retry.\" on the Connect to Trezor Hardware Wallet dialog.'
+    defaultMessage: '!!!ERROR#TREZOR1002: Necessary permissions were not granted by the user. Please retry.',
+    description: '<ERROR#TREZOR1002: Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
-  connectError2001: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.error.2001',
-    defaultMessage: '!!!ERROR#2001: Necessary permissions were not granted by the user, please retry.',
-    description: '\"ERROR#2001: Necessary permissions were not granted by the user, please retry.\" on the Connect to Trezor Hardware Wallet dialog.'
+  connectError1003: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.1003',
+    defaultMessage: '!!!ERROR#TREZOR1003: Cancelled. Please retry.',
+    description: '<ERROR#TREZOR1003: Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
-  connectError2002: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.error.2002',
-    defaultMessage: '!!!ERROR#2002: Cancelled, please retry',
-    description: '\"ERROR#2002: Cancelled, please retry\" on the Connect to Trezor Hardware Wallet dialog.'
-  },      
   saveWalletNameInputLabel: {
     id: 'wallet.trezor.dialog.trezor.step.save.walletName.label',
     defaultMessage: '!!!Wallet name',
@@ -658,26 +658,29 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
     if(!cardanoGetPublicKeyResp.success) {
       switch(cardanoGetPublicKeyResp.payload.error) {
+        case 'Iframe timeout':
+          trezorDeviceInfo.errorId = 'connectError1001';
+          break;
         case 'Permissions not granted':
-          trezorDeviceInfo.errorId = 'connectError2001';
+          trezorDeviceInfo.errorId = 'connectError1002';
           break;
         case 'Popup closed':
-          trezorDeviceInfo.errorId = 'connectError2002';
-          break;          
+          trezorDeviceInfo.errorId = 'connectError1003';
+          break;
         default:
-          // connectError1002 = Something unexpected happened
-          trezorDeviceInfo.errorId = 'connectError1002';
+          // connectError9999 = Something unexpected happened
+          trezorDeviceInfo.errorId = 'connectError9999';
           break;
       }
     }
     
     if(!trezorDeviceInfo.errorId && cardanoGetPublicKeyResp.payload.publicKey.length <= 0) {
-      trezorDeviceInfo.errorId = 'connectError1002';
+      trezorDeviceInfo.errorId = 'connectError9999';
     }
 
     // FIXME: try to use constants defined in Trezor for 'acquired'
     if(!trezorDeviceInfo.errorId && this.trezorEventDevice.payload.type != 'acquired') {
-      trezorDeviceInfo.errorId = 'connectError1002';
+      trezorDeviceInfo.errorId = 'connectError9999';
     }
     
     if(!trezorDeviceInfo.errorId) {

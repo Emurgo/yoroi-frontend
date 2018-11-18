@@ -2,6 +2,10 @@
 
 $opacityCommon: 0.7;
 
+.component {
+  overflow: hidden;
+}
+
 .isProcessing {
   @include loading-spinner("../../assets/images/spinner-light.svg");
 }
