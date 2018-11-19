@@ -15,7 +15,7 @@ import Dialog from '../widgets/Dialog';
 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
-import styles from './WalletTrezorDialog.scss';
+import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 
 import externalLinkSVG from '../../assets/images/link-external.inline.svg';
 import aboutPrerequisiteIconSVG from '../../assets/images/trezor/about-prerequisite-header-icon.inline.svg';
@@ -34,6 +34,8 @@ import ProgressSteps from '../widgets/ProgressSteps';
 import DialogBackButton from '../widgets/DialogBackButton';
 
 import Config from '../../config';
+
+import styles from './WalletTrezorDialog.scss';
 
 const messages = defineMessages({
   title: {
@@ -186,6 +188,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Cancelled. Please retry.',
     description: '<Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
+  saveError1004: {
+    id: 'wallet.trezor.dialog.trezor.step.save.error.1004',
+    defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
+    description: '<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
+  },  
   saveWalletNameInputLabel: {
     id: 'wallet.trezor.dialog.trezor.step.save.walletName.label',
     defaultMessage: '!!!Wallet name',
@@ -374,7 +381,14 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     if (error) {
       this.progressState = ProgressStateOption.SAVE_ERROR;
       this.state.action_btn_processing = false;
-      this.state.error_or_live_info_text = intl.formatMessage(error);
+
+      if(error instanceof CheckAdressesInUseApiError) {
+        // redirecting CheckAdressesInUseApiError -> saveError1001
+        // because for user saveError1001 is more meaningful in this context
+        this.state.error_or_live_info_text = intl.formatMessage(messages.saveError1004);
+      } else {
+        this.state.error_or_live_info_text = intl.formatMessage(error);
+      }
     }
 
     const actions = [{

@@ -2853,13 +2853,13 @@
         "description": "Label \"Connect to Trezor Hardware Wallet\" on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 47
+          "line": 45
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.title.label",
         "start": {
           "column": 9,
-          "line": 43
+          "line": 41
         }
       },
       {
@@ -2867,13 +2867,13 @@
         "description": "Progress Step Label \"About\" on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 52
+          "line": 50
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.label",
         "start": {
-          "column": 17,
-          "line": 48
+          "column": 18,
+          "line": 46
         }
       },
       {
@@ -2881,13 +2881,13 @@
         "description": "Progress Step Label \"Connect\" on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 57
+          "line": 55
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.label",
         "start": {
-          "column": 19,
-          "line": 53
+          "column": 20,
+          "line": 51
         }
       },
       {
@@ -2895,13 +2895,13 @@
         "description": "Progress Step Label \"Save\" on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 62
+          "line": 60
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.save.label",
         "start": {
-          "column": 16,
-          "line": 58
+          "column": 17,
+          "line": 56
         }
       },
       {
@@ -2909,13 +2909,13 @@
         "description": "Label for the \"Next\" button on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 67
+          "line": 65
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.next.button.label",
         "start": {
           "column": 19,
-          "line": 63
+          "line": 61
         }
       },
       {
@@ -2923,13 +2923,13 @@
         "description": "Label for the \"Connect\" button on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 72
+          "line": 70
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.connect.button.label",
         "start": {
           "column": 22,
-          "line": 68
+          "line": 66
         }
       },
       {
@@ -2937,13 +2937,13 @@
         "description": "Label for the \"Save\" button on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 77
+          "line": 75
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.save.button.label",
         "start": {
           "column": 19,
-          "line": 73
+          "line": 71
         }
       },
       {
@@ -2951,13 +2951,13 @@
         "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 82
+          "line": 80
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.introText.line.1",
         "start": {
           "column": 23,
-          "line": 78
+          "line": 76
         }
       },
       {
@@ -2965,13 +2965,13 @@
         "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 87
+          "line": 85
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.introText.line.2",
         "start": {
           "column": 23,
-          "line": 83
+          "line": 81
         }
       },
       {
@@ -2979,13 +2979,13 @@
         "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 92
+          "line": 90
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.introText.line.3",
         "start": {
           "column": 23,
-          "line": 88
+          "line": 86
         }
       },
       {
@@ -2993,13 +2993,13 @@
         "description": "Prerequisite header on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 97
+          "line": 95
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.header",
         "start": {
           "column": 27,
-          "line": 93
+          "line": 91
         }
       },
       {
@@ -3007,13 +3007,13 @@
         "description": "First Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 102
+          "line": 100
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.1.part1",
         "start": {
           "column": 27,
-          "line": 98
+          "line": 96
         }
       },
       {
@@ -3021,13 +3021,13 @@
         "description": "First Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 107
+          "line": 105
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.1.part2.link",
         "start": {
           "column": 31,
-          "line": 103
+          "line": 101
         }
       },
       {
@@ -3035,13 +3035,13 @@
         "description": "First Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 112
+          "line": 110
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.1.part2.link.text",
         "start": {
           "column": 35,
-          "line": 108
+          "line": 106
         }
       },
       {
@@ -3049,13 +3049,13 @@
         "description": "First Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 117
+          "line": 115
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.1.part3",
         "start": {
           "column": 27,
-          "line": 113
+          "line": 111
         }
       },
       {
@@ -3063,13 +3063,13 @@
         "description": "Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 122
+          "line": 120
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.2",
         "start": {
           "column": 22,
-          "line": 118
+          "line": 116
         }
       },
       {
@@ -3077,13 +3077,13 @@
         "description": "Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 127
+          "line": 125
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.3",
         "start": {
           "column": 22,
-          "line": 123
+          "line": 121
         }
       },
       {
@@ -3091,13 +3091,13 @@
         "description": "Fourth Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 132
+          "line": 130
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.4",
         "start": {
           "column": 22,
-          "line": 128
+          "line": 126
         }
       },
       {
@@ -3105,13 +3105,13 @@
         "description": "Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 137
+          "line": 135
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.5",
         "start": {
           "column": 22,
-          "line": 133
+          "line": 131
         }
       },
       {
@@ -3119,13 +3119,13 @@
         "description": "Sixth Prerequisite on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 142
+          "line": 140
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.about.prerequisite.6",
         "start": {
           "column": 22,
-          "line": 138
+          "line": 136
         }
       },
       {
@@ -3133,13 +3133,13 @@
         "description": "Tutorial link about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 147
+          "line": 145
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.common.step.link.helpYoroiWithTrezor",
         "start": {
           "column": 27,
-          "line": 143
+          "line": 141
         }
       },
       {
@@ -3147,13 +3147,13 @@
         "description": "Tutorial link text about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 152
+          "line": 150
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.common.step.link.helpYoroiWithTrezor.text",
         "start": {
           "column": 31,
-          "line": 148
+          "line": 146
         }
       },
       {
@@ -3161,13 +3161,13 @@
         "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 157
+          "line": 155
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.introText.line.1",
         "start": {
           "column": 25,
-          "line": 153
+          "line": 151
         }
       },
       {
@@ -3175,13 +3175,13 @@
         "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 162
+          "line": 160
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.introText.line.2",
         "start": {
           "column": 25,
-          "line": 158
+          "line": 156
         }
       },
       {
@@ -3189,13 +3189,13 @@
         "description": "Header text of about step on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 167
+          "line": 165
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.introText.line.3",
         "start": {
           "column": 25,
-          "line": 163
+          "line": 161
         }
       },
       {
@@ -3203,13 +3203,13 @@
         "description": "Live message about checking Trezor device of connect start step on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 172
+          "line": 170
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.liveMessage.checkingTrezorDevice",
         "start": {
-          "column": 42,
-          "line": 168
+          "column": 28,
+          "line": 166
         }
       },
       {
@@ -3217,13 +3217,13 @@
         "description": "<Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 177
+          "line": 175
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.error.9999",
         "start": {
           "column": 20,
-          "line": 173
+          "line": 171
         }
       },
       {
@@ -3231,13 +3231,13 @@
         "description": "<Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 182
+          "line": 180
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.error.1001",
         "start": {
           "column": 20,
-          "line": 178
+          "line": 176
         }
       },
       {
@@ -3245,13 +3245,13 @@
         "description": "<Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 187
+          "line": 185
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.error.1002",
         "start": {
           "column": 20,
-          "line": 183
+          "line": 181
         }
       },
       {
@@ -3259,13 +3259,27 @@
         "description": "<Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 192
+          "line": 190
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.connect.error.1003",
         "start": {
           "column": 20,
-          "line": 188
+          "line": 186
+        }
+      },
+      {
+        "defaultMessage": "!!!Falied to save. Please check your Internet connection and retry.",
+        "description": "<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "end": {
+          "column": 3,
+          "line": 195
+        },
+        "file": "app/components/wallet/WalletTrezorDialog.js",
+        "id": "wallet.trezor.dialog.trezor.step.save.error.1004",
+        "start": {
+          "column": 17,
+          "line": 191
         }
       },
       {
@@ -3273,13 +3287,13 @@
         "description": "Label for the wallet name input on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
-          "line": 197
+          "line": 200
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.save.walletName.label",
         "start": {
           "column": 28,
-          "line": 193
+          "line": 196
         }
       },
       {
@@ -3287,13 +3301,13 @@
         "description": "Placeholder \"Enter wallet name\" for the wallet name input on the wallet restore dialog.",
         "end": {
           "column": 3,
-          "line": 202
+          "line": 205
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
-        "id": "wallet.trezor.dialog.trezor.step.save.walletName.hint",
+        "id": "wallet.restore.dialog.wallet.name.input.hint",
         "start": {
           "column": 34,
-          "line": 198
+          "line": 201
         }
       },
       {
@@ -3301,13 +3315,13 @@
         "description": "Hint for the wallet name input on the wallet restore dialog.",
         "end": {
           "column": 3,
-          "line": 207
+          "line": 210
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
         "id": "wallet.trezor.dialog.trezor.step.save.walletName.info",
         "start": {
           "column": 33,
-          "line": 203
+          "line": 206
         }
       }
     ],

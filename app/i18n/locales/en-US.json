@@ -262,6 +262,7 @@
   "wallet.trezor.dialog.trezor.step.connect.introText.line.3": "This process shares the Cardano public key with Yoroi.",
   "wallet.trezor.dialog.trezor.step.connect.label": "CONNECT",
   "wallet.trezor.dialog.trezor.step.connect.liveMessage.checkingTrezorDevice": "Checking the Trezor device. Please follow the instructions in the new tab...",
+  "wallet.trezor.dialog.trezor.step.save.error.1004": "Falied to save. Please check your Internet connection and retry.",
   "wallet.trezor.dialog.trezor.step.save.label": "SAVE",
   "wallet.trezor.dialog.trezor.step.save.walletName.hint": "!!!Enter wallet name",
   "wallet.trezor.dialog.trezor.step.save.walletName.info": "We have fetched the Trezor device’s name for you. You can use as it is, or assign a different name.",
