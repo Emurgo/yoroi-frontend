@@ -49,6 +49,7 @@ import {
   UpdateWalletResponse,
   GetTransactionsRequest
 } from '../common';
+import LocalizableError from '../../i18n/LocalizableError';
 import type {
   AdaAddress,
   AdaAddresses,
@@ -470,40 +471,44 @@ export default class AdaApi {
   async connectTrezor(
     request: ConnectTrezorRequest
   ): Promise<ConnectTrezorResponse> {
-    Logger.debug('AdaApi::connectTrezor called');
-    const { walletName, publicMasterKey, deviceFeatures } = request;
-    const assurance = 'CWANormal';
-    const unit = 0;
-
-    const walletInitData = {
-      cwInitMeta: {
-        cwName: walletName,
-        cwAssurance: assurance,
-        cwUnit: unit
-      },
-      cwHardwareInfo: {
-        vendor: deviceFeatures.vendor,
-        model: deviceFeatures.model,
-        deviceId: deviceFeatures.device_id,
-        label: deviceFeatures.label,
-        majorVersion: deviceFeatures.major_version,
-        minorVersion: deviceFeatures.minor_version,
-        patchVersion: deviceFeatures.patch_version,
-        language: deviceFeatures.language,
-        publicMasterKey,
-      },
-    };
-
     try {
+      Logger.debug('AdaApi::connectTrezor called');
+      const { walletName, publicMasterKey, deviceFeatures } = request;
+      const assurance = 'CWANormal';
+      const unit = 0;
+
+      const walletInitData = {
+        cwInitMeta: {
+          cwName: walletName,
+          cwAssurance: assurance,
+          cwUnit: unit
+        },
+        cwHardwareInfo: {
+          vendor: deviceFeatures.vendor,
+          model: deviceFeatures.model,
+          deviceId: deviceFeatures.device_id,
+          label: deviceFeatures.label,
+          majorVersion: deviceFeatures.major_version,
+          minorVersion: deviceFeatures.minor_version,
+          patchVersion: deviceFeatures.patch_version,
+          language: deviceFeatures.language,
+          publicMasterKey,
+        },
+      };
       const wallet: AdaWallet = await connectTrezorAdaWallet({ walletInitData });
+
       Logger.debug('AdaApi::connectTrezor success');
       return _createWalletFromServerData(wallet);
     } catch (error) {
       Logger.error('AdaApi::connectTrezor error: ' + stringifyError(error));
-      // FIXME : think for other possible error if any
 
-      // We don't know what the problem was -> throw generic error
-      throw new GenericApiError();
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
     }
   }
 }

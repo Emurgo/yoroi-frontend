@@ -17,9 +17,6 @@ import {
   Logger,
   stringifyError
 } from '../../../utils/logging';
-import {
-  DiscoverAddressesError
-} from '../errors';
 import { saveCryptoAccount, saveAdaWallet } from '../adaLocalStorage';
 import { createAdaHardwareWallet } from '../adaWallet';
 import { createHardwareWalletAccount } from '../adaAccount';
@@ -34,32 +31,54 @@ const addressRequestSize = CONFIG.app.addressRequestSize;
 export async function connectTrezorAdaWallet({
   walletInitData
 }: AdaHardwareWalletParams): Promise<AdaWallet> {
-  const [adaWallet] = createAdaHardwareWallet({ walletInitData });
-  const cryptoAccount = createHardwareWalletAccount(walletInitData.cwHardwareInfo.publicMasterKey);
   try {
-    const externalAddressesToSave = await
-      _discoverAllAddressesFrom(cryptoAccount, 'External', -1, addressScanSize, addressRequestSize);
-    const internalAddressesToSave = await
-      _discoverAllAddressesFrom(cryptoAccount, 'Internal', -1, addressScanSize, addressRequestSize);
+    Logger.debug('connectTrezorAdaWallet::connectTrezorAdaWallet called');
+
+    // create ada wallet object for hardware wallet
+    const [adaWallet] = createAdaHardwareWallet({ walletInitData });
+    // create crypto account object for hardware wallet
+    // eslint-disable-next-line max-len
+    const cryptoAccount = createHardwareWalletAccount(walletInitData.cwHardwareInfo.publicMasterKey);
+
+    // fetch all External addresses
+    const externalAddressesToSave =
+      await _discoverAllAddressesFrom(cryptoAccount, 'External', -1, addressScanSize, addressRequestSize);
+
+    // fetch all Internal addresses
+    const internalAddressesToSave =
+      await _discoverAllAddressesFrom(cryptoAccount, 'Internal', -1, addressScanSize, addressRequestSize);
+
+    // store wallet related addresses to lovefieldDatabase
     if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
-      // TODO: Store all at once
       await Promise.all([
         saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External'),
         saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal')
       ]);
     } else {
+      // no related addresses found, give it a new address and save it to lovefieldDatabase
       await newAdaAddress(cryptoAccount, [], 'External');
     }
-  } catch (discoverAddressesError) {
-    Logger.error(`restoreAdaWallet::restoreAdaWallet error: ${stringifyError(discoverAddressesError)}`);
-    throw new DiscoverAddressesError();
+
+    // save crypto account to the local storage
+    saveCryptoAccount(cryptoAccount);
+
+    // save ada wallet to the local storage
+    saveAdaWallet(adaWallet);
+
+    // It's a success, we are done
+    // 1. creating wallet and crypto account
+    // 2. storing wallet and crypto account to the local storage
+    // 3. storing wallet related addresses to lovefieldDatabase
+    Logger.debug('connectTrezorAdaWallet::connectTrezorAdaWallet success');
+    return adaWallet;
+  } catch (error) {
+    Logger.error(`connectTrezorAdaWallet::connectTrezorAdaWallet error: ${stringifyError(error)}`);
+    throw error;
   }
-  saveCryptoAccount(cryptoAccount);
-  saveAdaWallet(adaWallet);
-  return adaWallet;
 }
 
-// FIXME : its repeated in all wallet creation, try to make it reusable
+// FIXME : repeated in all wallet creation, try to make it reusable
+
 async function _discoverAllAddressesFrom(
   cryptoAccount: CryptoAccount,
   addressType: AddressType,
@@ -149,4 +168,5 @@ function _addFetchedAddressesInfo(
 
   return fetchedAddressesInfo.concat(newAddressesInfo);
 }
-// FIXME : its repeated in all wallet creation, try to make it reusable
+
+// FIXME : repeated in all wallet creation, try to make it reusable

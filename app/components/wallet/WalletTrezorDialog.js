@@ -369,7 +369,13 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel } = this.props;
+    const { error, onCancel } = this.props;
+
+    if (error) {
+      this.progressState = ProgressStateOption.SAVE_ERROR;
+      this.state.action_btn_processing = false;
+      this.state.error_or_live_info_text = intl.formatMessage(error);
+    }
 
     const actions = [{
       className: this.state.action_btn_processing ? styles.isProcessing : null,
@@ -705,7 +711,6 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           walletName,
           deviceFeatures: this.trezorDeviceInfo.features
         };
-        // FIXME: handle error case
         this.props.onSubmit(walletData);
       },
       onError: () => {
