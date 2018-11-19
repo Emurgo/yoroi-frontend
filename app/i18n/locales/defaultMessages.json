@@ -3213,8 +3213,8 @@
         }
       },
       {
-        "defaultMessage": "!!!ERROR#TREZOR9999: Something unexpected happened, please retry.",
-        "description": "<ERROR#TREZOR9999: Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "defaultMessage": "!!!Something unexpected happened, please retry.",
+        "description": "<Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
           "line": 177
@@ -3227,8 +3227,8 @@
         }
       },
       {
-        "defaultMessage": "!!!ERROR#TREZOR1001: Falied to connect trezor.io. Please check your Internet connection and retry.",
-        "description": "<ERROR#TREZOR1001: Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "defaultMessage": "!!!Falied to connect trezor.io. Please check your Internet connection and retry.",
+        "description": "<Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
           "line": 182
@@ -3241,8 +3241,8 @@
         }
       },
       {
-        "defaultMessage": "!!!ERROR#TREZOR1002: Necessary permissions were not granted by the user. Please retry.",
-        "description": "<ERROR#TREZOR1002: Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "defaultMessage": "!!!Necessary permissions were not granted by the user. Please retry.",
+        "description": "<Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
           "line": 187
@@ -3255,8 +3255,8 @@
         }
       },
       {
-        "defaultMessage": "!!!ERROR#TREZOR1003: Cancelled. Please retry.",
-        "description": "<ERROR#TREZOR1003: Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.",
+        "defaultMessage": "!!!Cancelled. Please retry.",
+        "description": "<Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.",
         "end": {
           "column": 3,
           "line": 192

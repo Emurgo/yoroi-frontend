@@ -168,23 +168,23 @@ const messages = defineMessages({
   },
   connectError9999: {
     id: 'wallet.trezor.dialog.trezor.step.connect.error.9999',
-    defaultMessage: '!!!ERROR#TREZOR9999: Something unexpected happened, please retry.',
-    description: '<ERROR#TREZOR9999: Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.'
+    defaultMessage: '!!!Something unexpected happened, please retry.',
+    description: '<Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectError1001: {
     id: 'wallet.trezor.dialog.trezor.step.connect.error.1001',
-    defaultMessage: '!!!ERROR#TREZOR1001: Falied to connect trezor.io. Please check your Internet connection and retry.',
-    description: '<ERROR#TREZOR1001: Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
+    defaultMessage: '!!!Falied to connect trezor.io. Please check your Internet connection and retry.',
+    description: '<Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectError1002: {
     id: 'wallet.trezor.dialog.trezor.step.connect.error.1002',
-    defaultMessage: '!!!ERROR#TREZOR1002: Necessary permissions were not granted by the user. Please retry.',
-    description: '<ERROR#TREZOR1002: Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
+    defaultMessage: '!!!Necessary permissions were not granted by the user. Please retry.',
+    description: '<Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectError1003: {
     id: 'wallet.trezor.dialog.trezor.step.connect.error.1003',
-    defaultMessage: '!!!ERROR#TREZOR1003: Cancelled. Please retry.',
-    description: '<ERROR#TREZOR1003: Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
+    defaultMessage: '!!!Cancelled. Please retry.',
+    description: '<Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
   saveWalletNameInputLabel: {
     id: 'wallet.trezor.dialog.trezor.step.save.walletName.label',
