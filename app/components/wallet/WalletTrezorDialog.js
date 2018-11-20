@@ -347,7 +347,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
         this.state.currentProgressStepInfo.error = true;
         // eslint-disable-next-line max-len
-        this.state.error_or_live_info_text = intl.formatMessage(messages[this.trezorDeviceInfo.error]);
+        this.state.error_or_live_info_text = intl.formatMessage(this.trezorDeviceInfo.error);
         break;
       case ProgressStateOption.SAVE_LOAD:
         this.state.action_btn_processing = false;
