@@ -4,6 +4,14 @@
 
 [SETUP.md](docs/SETUP.md)
 
+### Install rustup
+```bash
+$ curl https://sh.rustup.rs -sSf | sh
+$ rustup install nightly-2018-10-30
+$ rustup target add wasm32-unknown-unknown --toolchain nightly-2018-06-05
+```
+
+### Install dependencies
 *if you switched git branches, it may affect translation files*. Consider [rebuilding the translation cache](app/i18n/README.md)
 
 ## Build Yoroi Chrome extension
