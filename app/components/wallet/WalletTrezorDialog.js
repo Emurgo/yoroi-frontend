@@ -192,7 +192,7 @@ const messages = defineMessages({
     id: 'wallet.trezor.dialog.trezor.step.save.error.101',
     defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
     description: '<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },  
+  },
   saveWalletNameInputLabel: {
     id: 'wallet.trezor.dialog.trezor.step.save.walletName.label',
     defaultMessage: '!!!Wallet name',
@@ -386,7 +386,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
       this.state.currentProgressStepInfo.error = true;
 
-      if(error instanceof CheckAdressesInUseApiError) {
+      if (error instanceof CheckAdressesInUseApiError) {
         // redirecting CheckAdressesInUseApiError -> saveError101
         // because for user saveError101 is more meaningful in this context
         this.state.error_or_live_info_text = intl.formatMessage(messages.saveError101);
@@ -684,7 +684,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         case 'Cancelled':
         case 'Popup closed':
           trezorDeviceInfo.error = messages.connectError103;
-          break;          
+          break;
         default:
           // connectError999 = Something unexpected happened
           trezorDeviceInfo.error = messages.connectError999;
