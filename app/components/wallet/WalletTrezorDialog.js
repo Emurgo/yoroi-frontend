@@ -168,28 +168,28 @@ const messages = defineMessages({
     defaultMessage: '!!!Checking Trezor device, please follow the instructions on the new tab...',
     description: 'Live message about checking Trezor device of connect start step on the Connect to Trezor Hardware Wallet dialog.'
   },
-  connectError9999: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.error.9999',
+  connectError999: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.999',
     defaultMessage: '!!!Something unexpected happened, please retry.',
     description: '<Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
-  connectError1001: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.error.1001',
+  connectError101: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.101',
     defaultMessage: '!!!Falied to connect trezor.io. Please check your Internet connection and retry.',
     description: '<Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
-  connectError1002: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.error.1002',
+  connectError102: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.102',
     defaultMessage: '!!!Necessary permissions were not granted by the user. Please retry.',
     description: '<Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
-  connectError1003: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.error.1003',
+  connectError103: {
+    id: 'wallet.trezor.dialog.trezor.step.connect.error.103',
     defaultMessage: '!!!Cancelled. Please retry.',
     description: '<Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
-  saveError1004: {
-    id: 'wallet.trezor.dialog.trezor.step.save.error.1004',
+  saveError101: {
+    id: 'wallet.trezor.dialog.trezor.step.save.error.101',
     defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
     description: '<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },  
@@ -237,7 +237,11 @@ const ProgressStateOption = {
 
 type TrezorDeviceInfo = {
   valid: boolean;
-  errorId: string,
+  error: ?{
+    id: string,
+    defaultMessage: string,
+    description: string
+  },
   cardanoGetPublicKeyResult: CardanoGetPublicKey, // Trezor device CardanoGetPublicKey object
   features: Features
 };
@@ -343,7 +347,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
         this.state.currentProgressStepInfo.error = true;
         // eslint-disable-next-line max-len
-        this.state.error_or_live_info_text = intl.formatMessage(messages[this.trezorDeviceInfo.errorId]);
+        this.state.error_or_live_info_text = intl.formatMessage(messages[this.trezorDeviceInfo.error]);
         break;
       case ProgressStateOption.SAVE_LOAD:
         this.state.action_btn_processing = false;
@@ -361,11 +365,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         this.state.error_or_live_info_text = '';
         break;
       case ProgressStateOption.SAVE_ERROR:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
-        this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
-        this.state.currentProgressStepInfo.error = true;
-        this.state.error_or_live_info_text = '';
+        // managed in render()
         break;
       default:
         console.error(`[TREZOR] Error state, handle _updateState for: ${this.progressState}`);
@@ -382,10 +382,14 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       this.progressState = ProgressStateOption.SAVE_ERROR;
       this.state.action_btn_processing = false;
 
+      this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+      this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
+      this.state.currentProgressStepInfo.error = true;
+
       if(error instanceof CheckAdressesInUseApiError) {
-        // redirecting CheckAdressesInUseApiError -> saveError1001
-        // because for user saveError1001 is more meaningful in this context
-        this.state.error_or_live_info_text = intl.formatMessage(messages.saveError1004);
+        // redirecting CheckAdressesInUseApiError -> saveError101
+        // because for user saveError101 is more meaningful in this context
+        this.state.error_or_live_info_text = intl.formatMessage(messages.saveError101);
       } else {
         this.state.error_or_live_info_text = intl.formatMessage(error);
       }
@@ -667,39 +671,39 @@ export default class WalletTrezorDialog extends Component<Props, State> {
   _validateTrezorResponse = (cardanoGetPublicKeyResp: CardanoGetPublicKey) => {
     const trezorDeviceInfo = {};
     trezorDeviceInfo.valid = false;
-    trezorDeviceInfo.errorId = '';
+    trezorDeviceInfo.error = null;
 
     if (!cardanoGetPublicKeyResp.success) {
       switch (cardanoGetPublicKeyResp.payload.error) {
         case 'Iframe timeout':
-          trezorDeviceInfo.errorId = 'connectError1001';
+          trezorDeviceInfo.error = messages.connectError101;
           break;
         case 'Permissions not granted':
-          trezorDeviceInfo.errorId = 'connectError1002';
+          trezorDeviceInfo.error = messages.connectError102;
           break;
+        case 'Cancelled':
         case 'Popup closed':
-          trezorDeviceInfo.errorId = 'connectError1003';
-          break;
+          trezorDeviceInfo.error = messages.connectError103;
+          break;          
         default:
-          // connectError9999 = Something unexpected happened
-          trezorDeviceInfo.errorId = 'connectError9999';
+          // connectError999 = Something unexpected happened
+          trezorDeviceInfo.error = messages.connectError999;
           break;
       }
     }
 
-    if (!trezorDeviceInfo.errorId && cardanoGetPublicKeyResp.payload.publicKey.length <= 0) {
-      trezorDeviceInfo.errorId = 'connectError9999';
+    if (!trezorDeviceInfo.error && cardanoGetPublicKeyResp.payload.publicKey.length <= 0) {
+      trezorDeviceInfo.error = messages.connectError999;
     }
 
-    // FIXME: try to use constants defined in Trezor for 'acquired'
-    if (!trezorDeviceInfo.errorId && this.trezorEventDevice.payload.type !== 'acquired') {
-      trezorDeviceInfo.errorId = 'connectError9999';
+    if (!trezorDeviceInfo.error && this.trezorEventDevice.payload.type !== 'acquired') {
+      trezorDeviceInfo.error = messages.connectError999;
     }
 
-    if (!trezorDeviceInfo.errorId) {
+    if (!trezorDeviceInfo.error) {
       // FIXME: try to use constants defined in Trezor for 'acquired'
       if (this.trezorEventDevice.payload.type === 'acquired') {
-        // if is unwanted, but used because flow needs that
+        // if() is unwanted, but used because flow needs that
         trezorDeviceInfo.features = Object.assign({}, this.trezorEventDevice.payload.features);
       }
       trezorDeviceInfo.valid = true;

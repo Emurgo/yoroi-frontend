@@ -3220,7 +3220,7 @@
           "line": 175
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
-        "id": "wallet.trezor.dialog.trezor.step.connect.error.9999",
+        "id": "wallet.trezor.dialog.trezor.step.connect.error.999",
         "start": {
           "column": 20,
           "line": 171
@@ -3234,7 +3234,7 @@
           "line": 180
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
-        "id": "wallet.trezor.dialog.trezor.step.connect.error.1001",
+        "id": "wallet.trezor.dialog.trezor.step.connect.error.101",
         "start": {
           "column": 20,
           "line": 176
@@ -3248,7 +3248,7 @@
           "line": 185
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
-        "id": "wallet.trezor.dialog.trezor.step.connect.error.1002",
+        "id": "wallet.trezor.dialog.trezor.step.connect.error.102",
         "start": {
           "column": 20,
           "line": 181
@@ -3262,7 +3262,7 @@
           "line": 190
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
-        "id": "wallet.trezor.dialog.trezor.step.connect.error.1003",
+        "id": "wallet.trezor.dialog.trezor.step.connect.error.103",
         "start": {
           "column": 20,
           "line": 186
@@ -3276,7 +3276,7 @@
           "line": 195
         },
         "file": "app/components/wallet/WalletTrezorDialog.js",
-        "id": "wallet.trezor.dialog.trezor.step.save.error.1004",
+        "id": "wallet.trezor.dialog.trezor.step.save.error.101",
         "start": {
           "column": 17,
           "line": 191
