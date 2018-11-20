@@ -59,13 +59,14 @@ export default class DaedalusTransferStore extends Store {
     this._updateStatus('gettingMnemonics');
   }
 
-  /* @Attention:
+  /** @Attention:
       You should check wallets state outside of the runInAction,
       because this method run as a reaction.
   */
   _enableDisableTransferFunds = (): void => {
-    const { wallets } = this.stores && this.stores[environment.API];
-    if (wallets && wallets.hasActiveWallet) {
+    const { wallets } = this.stores.substores[environment.API];
+    // User must first make a Yoroi wallet before being able to migrate a Daedalus wallet
+    if (wallets.hasActiveWallet) {
       runInAction(() => {
         this.disableTransferFunds = false;
       });
@@ -76,6 +77,9 @@ export default class DaedalusTransferStore extends Store {
     }
   }
 
+  /** Call the backend service to fetch all the UTXO then find which belong to the Daedalus wallet.
+   * Finally, generate the tx to migrate the wallet to Yoroi
+   */
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
     this._updateStatus('restoringAddresses');
@@ -145,11 +149,13 @@ export default class DaedalusTransferStore extends Store {
     this._updateStatus('uninitialized');
   }
 
+  /** Updates the status that we show to the user as migration progresses */
   @action.bound
   _updateStatus(s: TransferStatus): void {
     this.status = s;
   }
 
+  /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (payload: {
     cborEncodedTx: Array<number>
   }): Promise<Array<void>> => {
@@ -158,6 +164,7 @@ export default class DaedalusTransferStore extends Store {
     return sendTx(signedTx);
   }
 
+  /** Broadcast the migration transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
     next: Function
   }): Promise<void> => {
@@ -169,6 +176,7 @@ export default class DaedalusTransferStore extends Store {
       await this.transferFundsRequest.execute({
         cborEncodedTx: this.transferTx.cborEncodedTx
       });
+      // TBD: why do we need a continuation instead of just pustting the code here directly?
       next();
       this._reset();
     } catch (error) {

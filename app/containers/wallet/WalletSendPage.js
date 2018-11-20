@@ -21,7 +21,7 @@ export default class WalletSendPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { uiDialogs } = this.props.stores;
-    const { wallets, transactions } = this.props.stores.ada;
+    const { wallets, transactions } = this.props.stores.substores.ada;
     const { actions } = this.props;
     const { isValidAddress } = wallets;
     const { calculateTransactionFee, validateAmount, hasAnyPending } = transactions;

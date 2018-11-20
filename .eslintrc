@@ -94,7 +94,6 @@
     "API": true,
     "NETWORK": true,
     "MOBX_DEV_TOOLS": true,
-    "DAEDALUS_VERSION": true,
     "CONFIG": true,
     "yoroi": true
   }

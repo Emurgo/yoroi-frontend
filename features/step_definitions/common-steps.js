@@ -59,7 +59,7 @@ Given(/^There is a wallet stored named (.*)$/, async function (walletName) {
 
 function refreshWallet(client) {
   return client.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
+    window.yoroi.stores.substores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
   });
 }
 

@@ -36,7 +36,7 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   onClose = () => {
-    if (!this.props.stores[environment.API].wallets.hasAnyWallets) {
+    if (!this.props.stores.substores[environment.API].wallets.hasAnyWallets) {
       this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
     this.props.actions.dialogs.closeActiveDialog.trigger();
@@ -83,7 +83,7 @@ export default class WalletAddPage extends Component<Props> {
   }
 
   _getWalletsStore() {
-    return this.props.stores[environment.API].wallets;
+    return this.props.stores.substores[environment.API].wallets;
   }
 
 }

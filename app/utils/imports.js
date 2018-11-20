@@ -3,7 +3,7 @@ import environment from '../environment';
 
 // resolver loads files relative to '/app/' directory
 const resolver = (path: string) => {
-  const envPathSubdir = environment.API || '';
+  const envPathSubdir = environment.API;
   const envPathSegments = path.split('/');
   envPathSegments.splice(-1, 0, envPathSubdir);
   const envPath = envPathSegments.join('/');

@@ -10,15 +10,18 @@ import LoadingStore from './LoadingStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
+import { RouterStore } from 'mobx-react-router';
+import type { ActionsMap } from '../actions/index';
+import type { Api } from '../api/index';
 
-// Map of var name to class. Allows dyanmic lookup of class so we can init all stores one loop.
+/** Map of var name to class. Allows dyanmic lookup of class so we can init all stores one loop */
 const storeClasses = {
   profile: ProfileStore,
   app: AppStore,
   sidebar: SidebarStore,
+  walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
-  walletBackup: WalletBackupStore,
   loading: LoadingStore,
 };
 
@@ -27,38 +30,46 @@ export type StoresMap = {
   app: AppStore,
   sidebar: SidebarStore,
   walletBackup: WalletBackupStore,
-  router: Object,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
-  ada: AdaStoresMap,
   loading: LoadingStore,
+
+  substores: { ada: AdaStoresMap },
+  router: RouterStore,
 };
 
-// Constant that represents the stores across the lifetime of the application
+/** Constant that represents the stores across the lifetime of the application */
 const stores = observable({
   profile: null,
   app: null,
   sidebar: null,
   walletBackup: null,
-  router: null,
   uiDialogs: null,
   uiNotifications: null,
-  ada: null,
   loading: null,
+
+  substores: {},
+  router: null,
 });
 
-// Set up and return the stores for this app -> also used to reset all stores to defaults
-export default action((api, actions, router): StoresMap => {
-  // Assign mobx-react-router only once
-  if (stores.router == null) stores.router = router;
-  // All other stores have our lifecycle
-  const storeNames = Object.keys(storeClasses);
-  storeNames.forEach(name => { if (stores[name]) stores[name].teardown(); });
-  storeNames.forEach(name => { stores[name] = new storeClasses[name](stores, api, actions); });
-  storeNames.forEach(name => { if (stores[name]) stores[name].initialize(); });
+/** Set up and return the stores for this app -> also used to reset all stores to defaults */
+export default action(
+  (
+    api: Api,
+    actions: ActionsMap,
+    router: RouterStore
+  ): StoresMap => {
+    // Assign mobx-react-router only once
+    if (stores.router == null) stores.router = router;
+    // All other stores have our lifecycle
+    const storeNames = Object.keys(storeClasses);
+    storeNames.forEach(name => { if (stores[name]) stores[name].teardown(); });
+    storeNames.forEach(name => { stores[name] = new storeClasses[name](stores, api, actions); });
+    storeNames.forEach(name => { if (stores[name]) stores[name].initialize(); });
 
-  // Add currency specific stores
-  if (environment.API === 'ada') stores.ada = setupAdaStores(stores, api, actions);
+    // Add currency specific stores
+    if (environment.API === 'ada') stores.substores.ada = setupAdaStores(stores, api, actions);
 
-  return stores;
-});
+    return stores;
+  }
+);

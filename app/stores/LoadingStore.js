@@ -9,7 +9,7 @@ import LocalizableError, {
   localizedError
 } from '../i18n/LocalizableError';
 
-
+/** Load dependencies before launching the app */
 export default class LoadingStore extends Store {
 
   @observable error: ?LocalizableError = null;
@@ -19,7 +19,7 @@ export default class LoadingStore extends Store {
     when(this._isRefresh, this._redirectToLoading);
     Promise.all([loadRustModule(), loadLovefieldDB()])
       .then(async () => {
-        await this._checkingIfWalletsLoaded();
+        await this._openPageAfterLoad();
         runInAction(() => {
           this.error = null;
           this._loading = false;
@@ -39,15 +39,16 @@ export default class LoadingStore extends Store {
     return !!this._loading;
   }
 
-  _isRefresh = () => this.isLoading;
+  _isRefresh = (): boolean => this.isLoading;
 
-  _redirectToLoading = () => (
+  _redirectToLoading = (): void => (
     this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT })
   );
 
-  _checkingIfWalletsLoaded = async () => {
+  /** Select which page to open after app is done loading */
+  _openPageAfterLoad = async (): Promise<void> => {
     const { app } = this.stores;
-    const { wallets } = this.stores[environment.API];
+    const { wallets } = this.stores.substores[environment.API];
     await wallets.refreshWalletsData();
     if (app.currentRoute === ROUTES.ROOT) {
       if (wallets.first) {
