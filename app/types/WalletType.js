@@ -6,9 +6,9 @@ export type WalletHardwareInfo = {
   model: string,
   deviceId: string,
   label: string,
-  majorVersion: string,
-  minorVersion: string,
-  patchVersion: string,
+  majorVersion: number,
+  minorVersion: number,
+  patchVersion: number,
   language: string,
   publicMasterKey: string,
 };

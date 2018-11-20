@@ -1,4 +1,6 @@
 import { defineMessages } from 'react-intl';
+import type { Features } from 'trezor-connect';
+
 import LocalizableError from '../i18n/LocalizableError';
 import { WalletTransaction, Wallet } from '../domain/WalletTransaction';
 
@@ -111,7 +113,7 @@ export type RestoreWalletRequest = {
 export type ConnectTrezorRequest = {
   publicMasterKey: string,
   walletName: string,
-  deviceFeatures: any // FIXME : use appropriate type not "any"
+  deviceFeatures: Features
 };
 
 export type GetSyncProgressResponse = {
