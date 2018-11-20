@@ -1,14 +1,15 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
-import type { DeviceMessage } from 'trezor-connect';
+import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
-import type { CardanoGetPublicKey, UiMessage, Features } from '../../../node_modules/trezor-connect/lib/types';
+
+import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
+import type { DeviceMessage, Features, UiMessage } from 'trezor-connect';
+import type { CardanoGetPublicKey } from '../../../node_modules/trezor-connect/lib/types';
 
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';

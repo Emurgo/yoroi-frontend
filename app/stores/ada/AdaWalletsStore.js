@@ -1,6 +1,8 @@
 // @flow
 // import { BigNumber } from 'bignumber.js';
 import { observable, action, runInAction } from 'mobx';
+import type { Features } from 'trezor-connect';
+
 import WalletStore from '../WalletStore';
 import Wallet from '../../domain/Wallet';
 import { matchRoute, buildRoute } from '../../utils/routing';
@@ -152,7 +154,7 @@ export default class AdaWalletsStore extends WalletStore {
   @action _connectTrezor = async (params: {
     publicMasterKey: string,
     walletName: string,
-    deviceFeatures: any,
+    deviceFeatures: Features,
   }) => {
     this.connectTrezorRequest.reset();
     this._setIsConnectTrezorActive(true);
