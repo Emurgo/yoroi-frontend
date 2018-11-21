@@ -59,7 +59,7 @@ type Props = {
   onSubmit: Function,
   isSubmitting: boolean,
   onCancel: Function,
-  error: LocalizableError
+  error: ?LocalizableError
 };
 
 @observer

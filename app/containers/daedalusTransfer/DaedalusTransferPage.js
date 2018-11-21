@@ -131,7 +131,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           </MainLayout>
         );
       case 'readyToTransfer':
-        if (daedalusTransfer.transferTx == null || daedalusTransfer.error == null) {
+        if (daedalusTransfer.transferTx == null) {
           return null;
         }
         return (
