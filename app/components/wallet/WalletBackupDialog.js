@@ -16,7 +16,7 @@ type Props = {
   isValid: boolean,
   isSubmitting: boolean,
   recoveryPhrase: string,
-  recoveryPhraseShuffled: Array<{ word: string, isActive: boolean }>,
+  recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
   enteredPhrase: Array<{ word: string }>,
   onCancelBackup: Function,
   onAcceptPrivacyNotice: Function,
@@ -44,7 +44,7 @@ export default class WalletBackupDialog extends Component<Props> {
       isTermRecoveryAccepted, isValid, isSubmitting,
       onAcceptTermDevice, onAcceptTermRecovery,
       onAddWord, onClear, onFinishBackup,
-      onRestartBackup, recoveryPhraseShuffled,
+      onRestartBackup, recoveryPhraseSorted,
     } = this.props;
 
     if (currentStep === 'privacyWarning') {
@@ -86,7 +86,7 @@ export default class WalletBackupDialog extends Component<Props> {
           onClear={onClear}
           onFinishBackup={onFinishBackup}
           onRestartBackup={onRestartBackup}
-          recoveryPhraseShuffled={recoveryPhraseShuffled}
+          recoveryPhraseSorted={recoveryPhraseSorted}
         />
       );
     }
