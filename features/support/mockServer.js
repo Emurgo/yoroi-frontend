@@ -1,7 +1,9 @@
+// @flow
+
 import { create, bodyParser, defaults } from 'json-server';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
-import { getMockData, getTxsMapList } from './mockDataBuilder';
+import { getFeatureData, getTxsMapList } from './mockDataBuilder';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -32,22 +34,23 @@ function _defaultSignedTransaction(req, res) {
 
 let MockServer = null;
 
-export function getMockServer(settings) {
+export function getMockServer(settings: { signedTransaction?: Function }) {
   if (!MockServer) {
     const server = create();
 
     server.use(middlewares);
 
     server.post('/api/txs/utxoForAddresses', (req, res) => {
-      const { utxos } = getMockData();
-      const filteredUtxos =
-        utxos.filter(utxo => req.body.addresses.includes(utxo.receiver));
+      const { utxos } = getFeatureData();
+      const filteredUtxos = utxos
+        ? utxos.filter(utxo => req.body.addresses.includes(utxo.receiver))
+        : [];
       res.send(filteredUtxos);
     });
 
     server.post('/api/txs/utxoSumForAddresses', (req, res) => {
       _validateAddressesReq(req.body);
-      const utxos = getMockData().utxos;
+      const utxos = getFeatureData().utxos;
       const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
         if (req.body.addresses.includes(utxo.receiver)) {
           return new BigNumber(utxo.amount).plus(sum);
@@ -62,10 +65,10 @@ export function getMockServer(settings) {
       _validateDatetimeReq(req.body);
       const txsMapList = getTxsMapList(req.body.addresses);
       // Filters all txs according to hash and date
-      const filteredTxs = txsMapList.filter(txMap =>
+      const filteredTxs = txsMapList.filter(txMap => (
         req.body.addresses.includes(txMap.address) &&
           moment(txMap.tx.last_update) > moment(req.body.dateFrom)
-      ).map(txMap => txMap.tx);
+      )).map(txMap => txMap.tx);
       // Returns a chunk of txs
       res.send(filteredTxs.slice(0, txsLimit));
     });
@@ -74,9 +77,13 @@ export function getMockServer(settings) {
       settings.signedTransaction : _defaultSignedTransaction);
 
     server.post('/api/addresses/filterUsed', (req, res) => {
-      const usedAddresses = getMockData().usedAddresses.filter((address) =>
-        req.body.addresses.includes(address));
-      res.send(usedAddresses);
+      const usedAddresses = getFeatureData().UsedAddresses;
+      const filteredAddresses = usedAddresses
+        ? usedAddresses.filter((address) => (
+          req.body.addresses.includes(address)
+        ))
+        : [];
+      res.send(filteredAddresses);
     });
 
     MockServer = server.listen(port, () => {

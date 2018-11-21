@@ -16,7 +16,7 @@
     "compress-keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx dll/",
     "flow": "flow .",
-    "eslint": "eslint app chrome scripts webpack/*.js",
+    "eslint": "eslint app features chrome scripts webpack/*.js",
     "test-e2e": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature",
     "test-by-tag": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature --tags ",
     "test-by-feature": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register ",

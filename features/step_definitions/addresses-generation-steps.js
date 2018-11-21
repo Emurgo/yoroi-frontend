@@ -1,3 +1,5 @@
+// @flow
+
 import { Given, When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
@@ -32,28 +34,29 @@ Then(/^I should see my latest address "([^"]*)" at the top$/, async function (ad
 });
 
 Then(/^I see every generated address is unique$/, async function () {
-  let addressesStringArray = [];
+  const addressesStringArray = [];
   const addresses = await this.driver.findElements(By.xpath("//div[@class='WalletReceive_addressId']"));
 
-  for(let i=1; i<=addresses.length; i++){
-    let addr = await this.driver.findElement(By.css(`.generatedAddress-${i} .WalletReceive_addressId`)).getText().then(function(addr){
-      addressesStringArray.push(addr);
-    });
+  for (let i = 1; i <= addresses.length; i++) {
+    await this.driver.findElement(By.css(`.generatedAddress-${i} .WalletReceive_addressId`)).getText().then(addr => (
+      addressesStringArray.push(addr)
+    ));
   }
-  let unique = await checkIfElementsInArrayAreUnique.call(this, addressesStringArray);
+  const unique = await checkIfElementsInArrayAreUnique.call(this, addressesStringArray);
   expect(unique).to.be.true;
 });
 
 Then(/^I should see the addresses exactly list them$/, async function (table) {
   const rows = table.hashes();
-  const waitUntilAddressesAppeared = rows.map((row, index) =>
+  const waitUntilAddressesAppeared = rows.map((row, index) => (
     this.waitUntilText(
       `.generatedAddress-${index + 1} .WalletReceive_addressId`,
       row.address
     )
-  );
+  ));
   const noMoreAddressAppeared = this.waitForElementNotPresent(
-    `.generatedAddress-${rows.length + 1} .WalletReceive_addressId`);
+    `.generatedAddress-${rows.length + 1} .WalletReceive_addressId`
+  );
   waitUntilAddressesAppeared.push(noMoreAddressAppeared);
   await Promise.all(waitUntilAddressesAppeared);
 });
@@ -66,4 +69,3 @@ Then(/I should see an error about max unused addresses/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.unusedAddressesError' });
   await this.waitUntilText('.WalletReceive_error', errorMessage);
 });
-

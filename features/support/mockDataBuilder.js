@@ -1,19 +1,29 @@
+// @flow
+
 import mockData from './mockData.json';
 
-let builtMockData;
+import type { AdaAddress } from '../../app/api/ada/adaTypes';
+import type {
+  InitialData,
+  LovefieldShownWalletTx,
+  FeatureData,
+  MockWalletTx
+} from './mockDataTypes';
 
-export function getMockData() {
+let builtMockData: FeatureData;
+
+export function getFeatureData(): FeatureData {
   return builtMockData;
 }
 
-export function buildMockData(feature) {
+export function buildFeatureData(feature: string): void {
   builtMockData = Object.assign({}, mockData.default, mockData[feature]);
 }
 
 export function getFakeAddresses(
-  totalAddresses,
-  addressesStartingWith
-) {
+  totalAddresses: number,
+  addressesStartingWith: string
+): Array<AdaAddress> {
   const addresses = _generateListOfStrings(addressesStartingWith);
   return addresses.slice(0, totalAddresses).map((address) => ({
     cadAmount: {
@@ -27,27 +37,39 @@ export function getFakeAddresses(
   }));
 }
 
-export function getLovefieldTxs(walletName) {
-  const { walletInitialData, lovefieldShownTxs } = getMockData();
+export function getLovefieldTxs(
+  walletName: string
+): Array<LovefieldShownWalletTx> {
+  const { walletInitialData, lovefieldShownTxs } = getFeatureData();
+  if (walletInitialData === undefined || lovefieldShownTxs === undefined) {
+    return [];
+  }
   const wallet = walletInitialData[walletName];
-  return wallet && wallet.txHashesStartingWith && wallet.txsNumber ?
-    _getLovefieldTxs(
+  return wallet && wallet.txHashesStartingWith && wallet.txsNumber
+    ? _getLovefieldTxs(
       wallet.txsNumber,
       wallet.addressesStartingWith,
       wallet.txHashesStartingWith,
-      wallet.pendingTxsNumber
-    ) :
-    lovefieldShownTxs[walletName];
+      0 // unused
+    )
+    : lovefieldShownTxs[walletName];
 }
 
-export function getTxsMapList(addresses) {
+export function getTxsMapList(
+  addresses: Array<string>
+): Array<MockWalletTx> {
   const firstAddress = addresses[0];
   const addressesStartingWith = firstAddress.slice(0, firstAddress.length - 1);
   const wallet = _getWallet(addressesStartingWith);
+  if (!wallet) {
+    return [];
+  }
   return _getTxsMapList(wallet);
 }
 
-function _generateListOfStrings(prefix) {
+function _generateListOfStrings(
+  prefix: string
+): Array<string> {
   const strings = [];
   // Generates strings ending with A-Z
   for (let i = 65; i < 90; i++) {
@@ -60,47 +82,57 @@ function _generateListOfStrings(prefix) {
   return strings;
 }
 
-function _getTxs(txsNumber, addressesStartingWith, txHashesStartingWith, pendingTxsNumber) {
-  if (!txsNumber) {
-    return builtMockData.txs;
-  }
-  const pendingNumber = pendingTxsNumber || 0;
+function _getTxs(
+  txsNumber: number,
+  addressesStartingWith: string,
+  txHashesStartingWith: string,
+  pendingTxsNumber: number
+): Array<MockWalletTx> {
   return _generateListOfStrings(txHashesStartingWith)
-    .slice(0, txsNumber + pendingNumber)
+    .slice(0, txsNumber + pendingTxsNumber)
     .map((txHash, index) => {
-      const currentTime = new Date(getMockData().currentDateExample);
+      const featureData = getFeatureData();
+      const currentTime = featureData.currentDateExample === undefined
+        ? new Date(0)
+        : new Date(featureData.currentDateExample);
       const txTime = currentTime.setDate(currentTime.getDate() + index);
       const newTx = Object.assign({}, {
         hash: txHash,
-        time: new Date(txTime),
+        time: new Date(txTime).toString(),
         inputs_address: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
-        inputs_amount: [70],
+        inputs_amount: ['70'],
         outputs_address: [addressesStartingWith + 'W'],
-        outputs_amount: [200],
-        best_block_num: 101,
-        last_update: new Date(txTime),
+        outputs_amount: ['200'],
+        best_block_num: '101',
+        last_update: new Date(txTime).toString(),
         tx_state: 'Pending'
       });
       const txMap = Object.assign({}, { address: addressesStartingWith + 'W', tx: newTx });
-      if (index >= pendingNumber) {
-        txMap.tx.block_num = 56;
+      if (index >= pendingTxsNumber) {
+        txMap.tx.block_num = '56';
         txMap.tx.tx_state = 'Successful';
       }
       return txMap;
     });
 }
 
-function _getLovefieldTxs(txsNumber, addressesStartingWith, txHashesStartingWith,
-  pendingTxsNumber) {
-  if (!txsNumber) {
-    return builtMockData.txs;
-  }
-  const pendingNumber = pendingTxsNumber || 0;
-  const listOfHashesReversed = _generateListOfStrings(txHashesStartingWith)
-    .slice(0, txsNumber + pendingNumber).reverse();
+function _getLovefieldTxs(
+  txsNumber: number,
+  addressesStartingWith: string,
+  txHashesStartingWith?: string,
+  pendingTxsNumber: number
+): Array<LovefieldShownWalletTx> {
+  const listOfHashes = txHashesStartingWith === undefined
+    ? []
+    : _generateListOfStrings(txHashesStartingWith);
+  const listOfHashesReversed = listOfHashes.slice(0, txsNumber + pendingTxsNumber).reverse();
   return listOfHashesReversed
     .map((txHash, index) => {
-      const currentTime = new Date(getMockData().currentDateExample);
+      const featureData = getFeatureData();
+
+      const currentTime = featureData.currentDateExample === undefined
+        ? new Date(0)
+        : new Date(featureData.currentDateExample);
       const txTime = currentTime.setDate(currentTime.getDate() + index);
       return (
         {
@@ -108,38 +140,61 @@ function _getLovefieldTxs(txsNumber, addressesStartingWith, txHashesStartingWith
           txAmount: '0.000200',
           txTimeTitle: 'ADA transaction,',
           txTime: new Date(txTime),
-          txStatus: index < pendingNumber ? 'TRANSACTION PENDING' : 'HIGH',
+          txStatus: index < pendingTxsNumber ? 'TRANSACTION PENDING' : 'HIGH',
           txFrom: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
           txTo: [addressesStartingWith + 'W'],
           txConfirmations: 'High. 45 confirmations.',
           txId: txHash
-        }
+        }: LovefieldShownWalletTx
       );
     });
 }
 
-function _getWallet(addressesStartingWith) {
-  if (!getMockData().walletInitialData) {
-    return {};
+function _getWallet(
+  addressesStartingWith: string
+): ?InitialData {
+  const initialData = getFeatureData().walletInitialData;
+  if (!initialData) {
+    return undefined;
   }
-  return Object.values(getMockData().walletInitialData).find(walletData =>
-    walletData.addressesStartingWith === addressesStartingWith);
+  return Object
+    .keys(initialData)
+    .map(key => initialData[key])
+    .find(walletData => (
+      walletData.addressesStartingWith === addressesStartingWith
+    ));
 }
 
-function _getTxsMapList(wallet) {
-  if (wallet && wallet.txHashesStartingWith && wallet.txsNumber) {
+function _getTxsMapList(
+  wallet: InitialData
+): Array<MockWalletTx> {
+  if (wallet.txHashesStartingWith && wallet.txsNumber) {
     return _getTxs(
       wallet.txsNumber,
       wallet.addressesStartingWith,
       wallet.txHashesStartingWith,
-      wallet.pendingTxsNumber
+      0 // unused
     );
   }
-  if (!getMockData().txs) {
+  const featureData = getFeatureData();
+  if (!featureData) {
     return [];
   }
-  const { walletInitialData } = getMockData();
-  const selectedWalletName = Object.keys(walletInitialData).find(walletName =>
-    walletInitialData[walletName].addressesStartingWith === wallet.addressesStartingWith);
-  return getMockData().txs[selectedWalletName];
+  const mockTxs = featureData.txs;
+  if (!mockTxs) {
+    return [];
+  }
+  const initialData = featureData.walletInitialData;
+  if (!initialData) {
+    return [];
+  }
+  const selectedWalletName = Object
+    .keys(initialData)
+    .find(walletName => (
+      initialData[walletName].addressesStartingWith === wallet.addressesStartingWith
+    ));
+  if (!selectedWalletName) {
+    return [];
+  }
+  return mockTxs[selectedWalletName];
 }

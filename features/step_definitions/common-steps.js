@@ -1,7 +1,9 @@
+// @flow
+
 import { BeforeAll, Given, After, AfterAll } from 'cucumber';
 import { getMockServer, closeMockServer } from '../support/mockServer';
-import { buildMockData, getMockData, getFakeAddresses } from '../support/mockDataBuilder';
-import { setActiveLanguage } from '../support/helpers/i18n-helpers';
+import { buildFeatureData, getFeatureData, getFakeAddresses } from '../support/mockDataBuilder';
+import i18nHelper from '../support/helpers/i18n-helpers';
 
 BeforeAll(() => {
   getMockServer({});
@@ -16,14 +18,14 @@ After(async function () {
 });
 
 Given(/^I am testing "([^"]*)"$/, feature => {
-  buildMockData(feature);
+  buildFeatureData(feature);
 });
 
 Given(/^I have completed the basic setup$/, async function () {
   // Default Profile Configs (language and terms of use)
   await this.waitForElement('.LanguageSelectionForm_component');
 
-  await setActiveLanguage(this.driver);
+  await i18nHelper.setActiveLanguage(this.driver);
 
   await this.waitForElement('.TermsOfUseForm_component');
   await this.driver.executeScript(() => {
@@ -59,12 +61,17 @@ Given(/^There is a wallet stored named (.*)$/, async function (walletName) {
 
 function refreshWallet(client) {
   return client.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.substores.ada.wallets.refreshWalletsData().then(done).catch(err => done(err));
+    window.yoroi.stores.substores.ada.wallets.refreshWalletsData()
+      .then(done)
+      .catch(err => done(err));
   });
 }
 
 async function storeWallet(client, walletName) {
-  const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = getMockData();
+  const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = getFeatureData();
+  if (wallet === undefined) {
+    return;
+  }
   wallet.cwMeta.cwName = walletName;
 
   await client.saveToLocalStorage('WALLET', { adaWallet: wallet, masterKey });
@@ -76,7 +83,7 @@ async function storeWallet(client, walletName) {
       walletInitialData &&
       walletInitialData[walletName] &&
       walletInitialData[walletName].totalAddresses
-    ) {
+  ) {
     client.saveAddressesToDB(getFakeAddresses(
       walletInitialData[walletName].totalAddresses,
       walletInitialData[walletName].addressesStartingWith
