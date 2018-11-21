@@ -44,7 +44,7 @@ const messages = defineMessages({
 });
 
 type Props = {
-  recoveryPhraseShuffled: Array<{ word: string, isActive: boolean }>,
+  recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
   enteredPhrase: Array<{ word: string }>,
   isValid: boolean,
   isTermDeviceAccepted: boolean,
@@ -70,7 +70,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
-      recoveryPhraseShuffled,
+      recoveryPhraseSorted,
       enteredPhrase,
       isValid,
       isTermDeviceAccepted,
@@ -130,7 +130,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
 
         {!isValid && (
           <div className={styles.words}>
-            {recoveryPhraseShuffled.map(({ word, isActive }, index) => (
+            {recoveryPhraseSorted.map(({ word, isActive }, index) => (
               <MnemonicWord
                 key={index}
                 word={word}

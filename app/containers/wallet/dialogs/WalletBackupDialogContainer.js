@@ -24,7 +24,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       enteredPhrase,
       isRecoveryPhraseValid,
       countdownRemaining,
-      recoveryPhraseShuffled,
+      recoveryPhraseSorted,
       isTermDeviceAccepted,
       isTermRecoveryAccepted,
       isPrivacyNoticeAccepted,
@@ -71,7 +71,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
           finishWalletBackup.trigger();
         }}
         onRestartBackup={restartWalletBackup.trigger}
-        recoveryPhraseShuffled={recoveryPhraseShuffled}
+        recoveryPhraseSorted={recoveryPhraseSorted}
       />
     );
   }

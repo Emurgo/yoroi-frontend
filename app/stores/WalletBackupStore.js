@@ -7,7 +7,7 @@ import WalletBackupDialog from '../components/wallet/WalletBackupDialog';
 export type walletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
 type RecoveryPhraseWordArray = Array<{ word: string }>;
-type RecoveryPhraseShuffledArray = Array<{ word: string, isActive: boolean }>;
+type recoveryPhraseSortedArray = Array<{ word: string, isActive: boolean }>;
 
 export default
 class WalletBackupStore extends Store {
@@ -16,7 +16,8 @@ class WalletBackupStore extends Store {
   @observable currentStep: walletBackupSteps = null;
   @observable recoveryPhrase = [];
   @observable recoveryPhraseWords: RecoveryPhraseWordArray = [];
-  @observable recoveryPhraseShuffled: RecoveryPhraseShuffledArray = [];
+  /** Sorted recovery phrase the user clicks on to make sure they remember their mnemonic */
+  @observable recoveryPhraseSorted: recoveryPhraseSortedArray = [];
   @observable completed = false;
   @observable enteredPhrase = [];
   @observable isPrivacyNoticeAccepted = false;
@@ -47,8 +48,8 @@ class WalletBackupStore extends Store {
     this.inProgress = true;
     this.currentStep = 'privacyWarning';
     this.recoveryPhraseWords = this.recoveryPhrase.map(word => ({ word }));
-    this.recoveryPhraseShuffled = this.recoveryPhrase
-      .sort(() => 0.5 - Math.random())
+    this.recoveryPhraseSorted = this.recoveryPhrase
+      .sort() // sort mnemonics by alphabetical order to make it easier for humans to click
       .map(w => ({ word: w, isActive: true }));
     this.completed = false;
     this.enteredPhrase = [];
@@ -85,13 +86,13 @@ class WalletBackupStore extends Store {
   @action _addWordToWalletBackupVerification = (params: { word: string, index: number }) => {
     const { word, index } = params;
     this.enteredPhrase.push({ word });
-    const pickedWord = this.recoveryPhraseShuffled[index];
+    const pickedWord = this.recoveryPhraseSorted[index];
     if (pickedWord && pickedWord.word === word) pickedWord.isActive = false;
   };
 
   @action _clearEnteredRecoveryPhrase = () => {
     this.enteredPhrase = [];
-    this.recoveryPhraseShuffled = this.recoveryPhraseShuffled.map(
+    this.recoveryPhraseSorted = this.recoveryPhraseSorted.map(
       ({ word }) => ({ word, isActive: true })
     );
   };
