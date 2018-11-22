@@ -1,12 +1,12 @@
 // @flow
 import { observable, action } from 'mobx';
-import AppStore from './AppStore';
-import ProfileStore from './ProfileStore';
-import WalletBackupStore from './WalletBackupStore';
-import SidebarStore from './SidebarStore';
-import UiDialogsStore from './UiDialogsStore';
-import UiNotificationsStore from './UiNotificationsStore';
-import LoadingStore from './LoadingStore';
+import AppStore from './toplevel/AppStore';
+import ProfileStore from './toplevel/ProfileStore';
+import WalletBackupStore from './toplevel/WalletBackupStore';
+import SidebarStore from './toplevel/SidebarStore';
+import UiDialogsStore from './toplevel/UiDialogsStore';
+import UiNotificationsStore from './toplevel/UiNotificationsStore';
+import LoadingStore from './toplevel/LoadingStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';

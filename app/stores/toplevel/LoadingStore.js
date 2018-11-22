@@ -1,13 +1,13 @@
 // @flow
 import { observable, computed, when, runInAction } from 'mobx';
 import { loadRustModule } from 'rust-cardano-crypto';
-import { loadLovefieldDB } from '../api/ada/lib/lovefieldDatabase';
-import Store from './lib/Store';
-import environment from '../environment';
-import { ROUTES } from '../routes-config';
+import { loadLovefieldDB } from '../../api/ada/lib/lovefieldDatabase';
+import Store from '../base/Store';
+import environment from '../../environment';
+import { ROUTES } from '../../routes-config';
 import LocalizableError, {
   localizedError
-} from '../i18n/LocalizableError';
+} from '../../i18n/LocalizableError';
 
 /** Load dependencies before launching the app */
 export default class LoadingStore extends Store {

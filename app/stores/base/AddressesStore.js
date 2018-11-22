@@ -1,7 +1,7 @@
 // @flow
 import { observable, computed, action, runInAction } from 'mobx';
 import _ from 'lodash';
-import Store from '../lib/Store';
+import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
 import WalletAddress from '../../domain/WalletAddress';

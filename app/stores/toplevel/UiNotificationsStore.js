@@ -1,7 +1,7 @@
 // @flow
 import { observable, action } from 'mobx';
-import Store from './lib/Store';
-import type { Notification } from '../types/notificationType';
+import Store from '../base/Store';
+import type { Notification } from '../../types/notificationType';
 
 /** Manage a list on ongoing notifications and closes them when they expire */
 export default class UiNotificationsStore extends Store {

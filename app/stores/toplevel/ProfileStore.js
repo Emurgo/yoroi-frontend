@@ -2,11 +2,11 @@
 import { observable, computed } from 'mobx';
 import BigNumber from 'bignumber.js';
 import moment from 'moment/moment';
-import Store from './lib/Store';
-import Request from './lib/LocalizedRequest';
-import environment from '../environment';
-import { ROUTES } from '../routes-config';
-import globalMessages from '../i18n/global-messages';
+import Store from '../base/Store';
+import Request from '../lib/LocalizedRequest';
+import environment from '../../environment';
+import { ROUTES } from '../../routes-config';
+import globalMessages from '../../i18n/global-messages';
 
 export default class SettingsStore extends Store {
 
@@ -74,7 +74,7 @@ export default class SettingsStore extends Store {
   }
 
   @computed get termsOfUse(): string {
-    return require(`../i18n/locales/terms-of-use/${environment.API}/${this.currentLocale}.md`);
+    return require(`../../i18n/locales/terms-of-use/${environment.API}/${this.currentLocale}.md`);
   }
 
   @computed get hasLoadedTermsOfUseAcceptance(): boolean {

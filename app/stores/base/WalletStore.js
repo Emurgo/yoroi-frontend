@@ -2,7 +2,7 @@
 import { observable, action, computed, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import Store from '../lib/Store';
+import Store from './Store';
 import Wallet from '../../domain/Wallet';
 import Request from '../lib/LocalizedRequest';
 import { buildRoute, matchRoute } from '../../utils/routing';

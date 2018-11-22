@@ -1,6 +1,6 @@
 // @flow
 import { observable, action } from 'mobx';
-import Store from './lib/Store';
+import Store from '../base/Store';
 
 /** Manages the open dialog window in Yoroi.
  * Note: There can only be one open dialog at a time
