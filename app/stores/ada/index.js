@@ -33,13 +33,14 @@ const adaStores = observable({
   daedalusTransfer: null
 });
 
-/** Set up and return the stores and reset all stores to defaults */
+/** See `stores` index for description of this weird behavior
+ * Note: stores created here are NOT initialized
+ */
 export default action((stores, api, actions): AdaStoresMap => {
   const storeNames = Object.keys(adaStoreClasses);
   storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });
   storeNames.forEach(name => {
-    adaStores[name] = new adaStoreClasses[name](stores, api, actions);
+    adaStores[name] = ((new adaStoreClasses[name](stores, api, actions)): any);
   });
-  storeNames.forEach(name => { if (adaStores[name]) adaStores[name].initialize(); });
-  return adaStores;
+  return (adaStores: any);
 });
