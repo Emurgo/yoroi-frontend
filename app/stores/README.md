@@ -6,7 +6,7 @@ Additionally, stores listen to `actions` to trigger state updates. Only `@comput
 
 ## Toplevel Stores
 
-These stores are uesd for currency-independent portions of the application
+These stores are uesd for currency-independent portions of the application.
 
 ## Base store
 
