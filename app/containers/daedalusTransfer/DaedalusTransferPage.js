@@ -59,13 +59,19 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this._getDaedalusTransferActions().setupTransferFunds.trigger(payload);
   };
 
+  /** Broadcast the migration transaction if one exists and return to wallet page */
   tranferFunds = () => {
+    // broadcasst migration transaction then call continuation
     this._getDaedalusTransferActions().transferFunds.trigger({
       next: () => {
-        this._getWalletsStore().refreshWalletsData();
-        this._getRouter().goToRoute.trigger({
-          route: this._getWalletsStore().activeWalletRoute
-        });
+        const walletsStore = this._getWalletsStore();
+        walletsStore.refreshWalletsData();
+        if (walletsStore.activeWalletRoute != null) {
+          const newRoute = walletsStore.activeWalletRoute;
+          this._getRouter().goToRoute.trigger({
+            route: newRoute
+          });
+        }
       }
     });
   }
@@ -125,6 +131,9 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           </MainLayout>
         );
       case 'readyToTransfer':
+        if (daedalusTransfer.transferTx == null) {
+          return null;
+        }
         return (
           <MainLayout topbar={topBar}>
             <DaedalusTransferSummaryPage
@@ -156,14 +165,14 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   }
 
   _getWalletsStore() {
-    return this.props.stores[environment.API].wallets;
+    return this.props.stores.substores[environment.API].wallets;
   }
 
   _getDaedalusTransferStore() {
-    return this.props.stores[environment.API].daedalusTransfer;
+    return this.props.stores.substores.ada.daedalusTransfer;
   }
 
   _getDaedalusTransferActions() {
-    return this.props.actions[environment.API].daedalusTransfer;
+    return this.props.actions.ada.daedalusTransfer;
   }
 }

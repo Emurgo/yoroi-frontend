@@ -2,10 +2,15 @@
 import { observable, action } from 'mobx';
 import Store from './lib/Store';
 
+/** Manages the open dialog window in Yoroi.
+ * Note: There can only be one open dialog at a time
+ */
 export default class UiDialogsStore extends Store {
 
   @observable activeDialog: ?Function = null;
   @observable secondsSinceActiveDialogIsOpen: number = 0;
+
+  /** Arbitrary data that may be used to render the dialog */
   @observable dataForActiveDialog: Object = {};
 
   _secondsTimerInterval: ?IntervalID = null;

@@ -10,7 +10,7 @@ import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 
 // TODO: this is a design mistake. Components should not depend on a store
-import WalletsStore from '../../stores/WalletStore';
+import WalletsStore from '../../stores/base/WalletStore';
 
 type Props = {
   children?: ?Node,

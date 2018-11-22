@@ -41,6 +41,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   }
 
   _getWalletsStore() {
-    return this.props.stores[environment.API].wallets;
+    return this.props.stores.substores[environment.API].wallets;
   }
 }

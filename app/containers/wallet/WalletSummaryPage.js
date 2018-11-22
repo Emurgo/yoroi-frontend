@@ -39,7 +39,7 @@ export default class WalletSummaryPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const actions = this.props.actions;
-    const { wallets, transactions } = this.props.stores.ada;
+    const { wallets, transactions } = this.props.stores.substores.ada;
     const {
       hasAny,
       totalAvailable,
@@ -56,7 +56,7 @@ export default class WalletSummaryPage extends Component<Props> {
       return null;
     }
     if (searchOptions) {
-      const { searchLimit } = searchOptions;
+      const { limit } = searchOptions;
       const noTransactionsLabel = intl.formatMessage(messages.noTransactions);
       const noTransactionsFoundLabel = intl.formatMessage(messages.noTransactionsFound);
       if (recentTransactionsRequest.isExecutingFirstTime || hasAny) {
@@ -64,7 +64,7 @@ export default class WalletSummaryPage extends Component<Props> {
           <WalletTransactionsList
             transactions={recent}
             isLoadingTransactions={recentTransactionsRequest.isExecuting}
-            hasMoreToLoad={totalAvailable > searchLimit}
+            hasMoreToLoad={totalAvailable > limit}
             onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}

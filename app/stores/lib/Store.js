@@ -19,6 +19,7 @@ export default class Store {
     this.actions = actions;
   }
 
+  /** Register a set of autoruns with the same lifetime as the store */
   registerReactions(reactions: Array<Function>) {
     reactions.forEach(reaction => this._reactions.push(new Reaction(reaction)));
   }

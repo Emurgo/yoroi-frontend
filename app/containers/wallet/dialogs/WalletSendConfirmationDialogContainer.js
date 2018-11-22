@@ -33,7 +33,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       actions, amount, receiver, totalAmount,
       transactionFee, amountToNaturalUnits, currencyUnit
     } = this.props;
-    const { wallets } = this.props.stores[environment.API];
+    const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
     const activeWallet = wallets.active;
 

@@ -14,11 +14,11 @@ export default class WalletSettingsPage extends Component<Props> {
 
   render() {
     const { uiDialogs } = this.props.stores;
-    const { wallets, walletSettings } = this.props.stores.ada;
+    const { wallets, walletSettings } = this.props.stores.substores.ada;
     const { actions } = this.props;
     const activeWallet = wallets.active;
     const {
-      updateWalletRequest,
+      updateWalletMetaRequest,
       lastUpdatedWalletField,
       walletFieldBeingEdited,
     } = walletSettings;
@@ -34,13 +34,13 @@ export default class WalletSettingsPage extends Component<Props> {
 
     return (
       <WalletSettings
-        error={updateWalletRequest.error}
+        error={updateWalletMetaRequest.error}
         openDialogAction={actions.dialogs.open.trigger}
         walletPasswordUpdateDate={activeWallet.passwordUpdateDate}
         isDialogOpen={uiDialogs.isOpen}
         walletName={activeWallet.name}
-        isSubmitting={updateWalletRequest.isExecuting}
-        isInvalid={updateWalletRequest.wasExecuted && updateWalletRequest.result === false}
+        isSubmitting={updateWalletMetaRequest.isExecuting}
+        isInvalid={updateWalletMetaRequest.wasExecuted && updateWalletMetaRequest.result === false}
         lastUpdatedField={lastUpdatedWalletField}
         onFieldValueChange={(field, value) => updateWalletField.trigger({ field, value })}
         onStartEditing={field => startEditingWalletField.trigger({ field })}

@@ -14,7 +14,7 @@ import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import {
   isValidMnemonic,
-  getAdaAccountRecoveryPhrase,
+  generateAdaAccountRecoveryPhrase,
   newAdaWallet,
   updateAdaWalletMetaParams,
   updateAdaWalletBalance,
@@ -60,8 +60,10 @@ import type {
   CreateWalletResponse,
   GetTransactionsRequest,
   GetTransactionsResponse,
+  GetAddressesRequest,
+  GetAddressesResponse,
   GetBalanceResponse,
-  GetWalletRecoveryPhraseResponse,
+  GenerateWalletRecoveryPhraseResponse,
   GetWalletsResponse,
   RefreshPendingTransactionsResponse,
   RestoreWalletRequest,
@@ -74,13 +76,6 @@ import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaL
 import { saveTxs } from './lib/lovefieldDatabase';
 
 // ADA specific Request / Response params
-export type GetAddressesResponse = {
-  accountId: ?string,
-  addresses: Array<WalletAddress>
-};
-export type GetAddressesRequest = {
-  walletId: string
-};
 export type CreateAddressResponse = WalletAddress;
 export type CreateTransactionRequest = {
   receiver: string,
@@ -166,13 +161,13 @@ export default class AdaApi {
     }
   }
 
-  async getAddresses(
+  async getExternalAddresses(
     request: GetAddressesRequest
   ): Promise<GetAddressesResponse> {
-    Logger.debug('AdaApi::getAddresses called: ' + stringifyData(request));
+    Logger.debug('AdaApi::getExternalAddresses called: ' + stringifyData(request));
     try {
       const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
-      Logger.debug('AdaApi::getAddresses success: ' + stringifyData(adaAddresses));
+      Logger.debug('AdaApi::getExternalAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses.map((address => _createAddressFromServerData(address)));
       return new Promise(resolve => (
         resolve(
@@ -183,7 +178,7 @@ export default class AdaApi {
         )
       ));
     } catch (error) {
-      Logger.error('AdaApi::getAddresses error: ' + stringifyError(error));
+      Logger.error('AdaApi::getExternalAddresses error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -363,17 +358,17 @@ export default class AdaApi {
     return isValidMnemonic(mnemonic, numberOfWords);
   }
 
-  getWalletRecoveryPhrase(): Promise<GetWalletRecoveryPhraseResponse> {
-    Logger.debug('AdaApi::getWalletRecoveryPhrase called');
+  generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {
+    Logger.debug('AdaApi::generateWalletRecoveryPhrase called');
     try {
       const response: Promise<AdaWalletRecoveryPhraseResponse> = new Promise(
-        resolve => resolve(getAdaAccountRecoveryPhrase())
+        resolve => resolve(generateAdaAccountRecoveryPhrase())
       );
-      Logger.debug('AdaApi::getWalletRecoveryPhrase success');
+      Logger.debug('AdaApi::generateWalletRecoveryPhrase success');
       return response;
     } catch (error) {
       Logger.error(
-        'AdaApi::getWalletRecoveryPhrase error: ' + stringifyError(error)
+        'AdaApi::generateWalletRecoveryPhrase error: ' + stringifyError(error)
       );
       throw new GenericApiError();
     }
@@ -420,12 +415,12 @@ export default class AdaApi {
     }
   }
 
-  async updateWallet(
+  async updateWalletMeta(
     request: UpdateWalletRequest
   ): Promise<UpdateWalletResponse> {
-    Logger.debug('AdaApi::updateWallet called: ' + stringifyData(request));
+    Logger.debug('AdaApi::updateWalletMeta called: ' + stringifyData(request));
     const { name, assurance } = request;
-    const unit = 0;
+    const unit = 0; // unused field that is always 0
 
     const walletMeta = {
       cwName: name,
@@ -435,10 +430,10 @@ export default class AdaApi {
     try {
       const wallet: ?AdaWallet = await updateAdaWalletMetaParams(walletMeta);
       if (!wallet) throw new Error('not persistent wallet');
-      Logger.debug('AdaApi::updateWallet success: ' + stringifyData(wallet));
+      Logger.debug('AdaApi::updateWalletMeta success: ' + stringifyData(wallet));
       return _createWalletFromServerData(wallet);
     } catch (error) {
-      Logger.error('AdaApi::updateWallet error: ' + stringifyError(error));
+      Logger.error('AdaApi::updateWalletMeta error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

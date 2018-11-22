@@ -6,6 +6,7 @@ import environment from '../environment';
 
 const sidebarConfig = resolver('config/sidebarConfig');
 
+/** Note: Sidebar is actually a TopBar in Yoroi */
 export default class SidebarStore extends Store {
 
   CATEGORIES = sidebarConfig.CATEGORIES;
@@ -21,7 +22,9 @@ export default class SidebarStore extends Store {
     ]);
   }
 
-  @action _onActivateSidebarCategory = (params: { category: string, }) => {
+  @action _onActivateSidebarCategory = (
+    params: { category: string, }
+  ): void => {
     const { category } = params;
     if (category !== this.activeSidebarCategory) {
       this.activeSidebarCategory = category;
@@ -29,15 +32,19 @@ export default class SidebarStore extends Store {
     }
   };
 
-  @action _onWalletSelected = ({ walletId }: { walletId: string }) => {
-    this.stores[environment.API].wallets.goToWalletRoute(walletId);
+  @action _onWalletSelected = (
+    { walletId }: { walletId: string }
+  ): void => {
+    this.stores.substores[environment.API].wallets.goToWalletRoute(walletId);
   };
 
-  @action _setActivateSidebarCategory = (category: string) => {
+  @action _setActivateSidebarCategory = (
+    category: string
+  ): void => {
     this.activeSidebarCategory = category;
   };
 
-  _syncSidebarRouteWithRouter = () => {
+  _syncSidebarRouteWithRouter = (): void => {
     const route = this.stores.app.currentRoute;
     this.CATEGORIES.forEach((category) => {
       // If the current route starts with the root of the category

@@ -16,7 +16,9 @@ export default class AppStore extends Store {
     return this.stores.router.location.pathname;
   }
 
-  _updateRouteLocation = (options: { route: string, params: ?Object }) => {
+  _updateRouteLocation = (
+    options: { route: string, params: ?Object }
+  ): void => {
     const routePath = buildRoute(options.route, options.params);
     const currentRoute = this.stores.router.location.pathname;
     if (currentRoute !== routePath) this.stores.router.push(routePath);

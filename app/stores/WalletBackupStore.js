@@ -9,6 +9,7 @@ export type walletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 're
 type RecoveryPhraseWordArray = Array<{ word: string }>;
 type recoveryPhraseSortedArray = Array<{ word: string, isActive: boolean }>;
 
+/** Pipeline for users to create their wallet and backing up their mnemonic somewhere safe */
 export default
 class WalletBackupStore extends Store {
 

@@ -6,7 +6,7 @@ import { observable, action } from 'mobx';
 import AdaWalletsStore from './AdaWalletsStore';
 import TransactionsStore from './AdaTransactionsStore';
 import AdaWalletSettingsStore from './AdaWalletSettingsStore';
-import AddressesStore from './AddressesStore';
+import AddressesStore from './AdaAddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
 
 export const adaStoreClasses = {
@@ -33,7 +33,7 @@ const adaStores = observable({
   daedalusTransfer: null
 });
 
-// Set up and return the stores and reset all stores to defaults
+/** Set up and return the stores and reset all stores to defaults */
 export default action((stores, api, actions): AdaStoresMap => {
   const storeNames = Object.keys(adaStoreClasses);
   storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });

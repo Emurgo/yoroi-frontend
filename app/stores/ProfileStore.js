@@ -33,22 +33,17 @@ export default class SettingsStore extends Store {
   @observable setProfileLocaleRequest: Request<string> = new Request(this.api.localStorage.setUserLocale);
   @observable getTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.getTermsOfUseAcceptance);
   @observable setTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.setTermsOfUseAcceptance);
-  @observable getSendLogsChoiceRequest: Request<boolean> = new Request(this.api.localStorage.getSendLogsChoice);
-  @observable setSendLogsChoiceRequest: Request = new Request(this.api.localStorage.setSendLogsChoice);
   /* eslint-enable max-len */
 
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
-    // this.actions.profile.resetBugReportDialog.listen(this._resetBugReportDialog);
-    // this.actions.profile.sendBugReport.listen(this._sendBugReport);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
       this._reloadAboutWindowOnLocaleChange,
       this._redirectToLanguageSelectionIfNoLocaleSet,
       this._redirectToTermsOfUseScreenIfTermsNotAccepted,
-      this._redirectToSendLogsChoiceScreenIfSendLogsChoiceNotSet,
       this._redirectToMainUiAfterTermsAreAccepted,
     ]);
     this._getTermsOfUseAcceptance();
@@ -93,17 +88,9 @@ export default class SettingsStore extends Store {
     return this.getTermsOfUseAcceptanceRequest.result === true;
   }
 
-  @computed get isSendLogsChoiceSet(): boolean {
-    return this.getSendLogsChoiceRequest.result !== null;
-  }
-
-  @computed get hasLoadedSendLogsChoice(): boolean {
-    return this.getSendLogsChoiceRequest.wasExecuted;
-  }
-
   _updateLocale = async ({ locale }: { locale: string }) => {
     await this.setProfileLocaleRequest.execute(locale);
-    await this.getProfileLocaleRequest.execute();
+    await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
 
   _updateMomentJsLocaleAfterLocaleChange = () => {
@@ -150,13 +137,6 @@ export default class SettingsStore extends Store {
     }
   };
 
-  _redirectToSendLogsChoiceScreenIfSendLogsChoiceNotSet = () => {
-    if (this.isCurrentLocaleSet && this.areTermsOfUseAccepted &&
-      this.hasLoadedSendLogsChoice && !this.isSendLogsChoiceSet) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.SEND_LOGS });
-    }
-  };
-
   _redirectToRoot = () => {
     this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
   };
@@ -173,35 +153,4 @@ export default class SettingsStore extends Store {
       this._redirectToRoot();
     }
   };
-
-  /*
-  FIXME: We will include bug report but not now
-  _resetBugReportDialog = () => {
-    // if logs are compressed then perform delete on dialog close
-    if (size(this.compressedLog) > 0) {
-      this._deleteCompressedFiles(this.compressedLog);
-    }
-    this._reset();
-    this.actions.dialogs.closeActiveDialog.trigger();
-  }
-
-  _sendBugReport = action(({ email, subject, problem, compressedLog } : {
-    email: string,
-    subject: ?string,
-    problem: ?string,
-    compressedLog: ?string,
-  }) => {
-    this.sendBugReport.execute({
-      email, subject, problem, compressedLog,
-    })
-      .then(action(() => {
-        this._deleteCompressedFiles();
-        this._reset();
-        this.actions.dialogs.closeActiveDialog.trigger();
-      }))
-      .catch(action((error) => {
-        this.error = error;
-      }));
-  });
-  */
 }

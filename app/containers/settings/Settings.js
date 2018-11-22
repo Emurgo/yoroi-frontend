@@ -42,7 +42,7 @@ export default class Settings extends Component<InjectedContainerProps> {
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
         isActiveItem={this.isActivePage}
-        hasActiveWallet={stores.ada.wallets.hasActiveWallet}
+        hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
       />
     );
     return (

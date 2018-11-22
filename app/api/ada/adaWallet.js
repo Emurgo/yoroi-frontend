@@ -122,7 +122,7 @@ export const isValidMnemonic = (
 );
 
 /** Wrapper function to create new mnemonic according to bip39 */
-export const getAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse => (
+export const generateAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse => (
   generateAdaMnemonic()
 );
 
