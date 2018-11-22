@@ -5,7 +5,7 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
-import Store from '../lib/Store';
+import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
 import {

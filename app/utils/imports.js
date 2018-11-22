@@ -1,7 +1,12 @@
 // @flow
 import environment from '../environment';
 
-// resolver loads files relative to '/app/' directory
+/** Loads a file relative to the app directory.
+ * If a currency-specific version of the file exists, we take that one.
+ * Otherwise, we resolve the path as-is from the app folders
+ *
+ * @example (if currency-specific) resolver('containers/Foo') -> app/containers/ada/Foo
+ * @example (if currency agnostic) resolver('containers/Foo') -> app/containers/Foo */
 const resolver = (path: string) => {
   const envPathSubdir = environment.API;
   const envPathSegments = path.split('/');
@@ -13,7 +18,10 @@ const resolver = (path: string) => {
   } catch (e) {
     file = require(`../${path}.js`); // eslint-disable-line
   }
-  return file.default || file;
+  return (
+    file.default // handle both ES6 modules also
+    || file
+  );
 };
 
 export default resolver;

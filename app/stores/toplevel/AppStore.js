@@ -1,12 +1,9 @@
 // @flow
-import { observable, computed } from 'mobx';
-import Store from './lib/Store';
-import LocalizableError from '../i18n/LocalizableError';
-import { buildRoute } from '../utils/routing';
+import { computed } from 'mobx';
+import Store from '../base/Store';
+import { buildRoute } from '../../utils/routing';
 
 export default class AppStore extends Store {
-
-  @observable error: ?LocalizableError = null;
 
   setup() {
     this.actions.router.goToRoute.listen(this._updateRouteLocation);

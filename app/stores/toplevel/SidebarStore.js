@@ -1,8 +1,8 @@
 // @flow
 import { observable, action } from 'mobx';
-import Store from './lib/Store';
-import resolver from '../utils/imports';
-import environment from '../environment';
+import Store from '../base/Store';
+import resolver from '../../utils/imports';
+import environment from '../../environment';
 
 const sidebarConfig = resolver('config/sidebarConfig');
 

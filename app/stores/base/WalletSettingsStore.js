@@ -1,6 +1,6 @@
 // @flow
 import { observable, action } from 'mobx';
-import Store from '../lib/Store';
+import Store from './Store';
 
 export default class WalletSettingsStore extends Store {
 
