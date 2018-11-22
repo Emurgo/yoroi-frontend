@@ -2,7 +2,9 @@
 .*/node_modules/fbjs/.*
 .*/node_modules/electron-packager/.*
 .*/node_modules/npm/.*
+.*/node_modules/mobx/.*
 .*/node_modules/oboe/.*
+.*/node_modules/mobx/lib/mobx.js.flow
 .*/dist/.*
 .*/release/.*
 .*/.git/.*
@@ -14,7 +16,6 @@
 
 [libs]
 flow/declarations/
-node_modules/mobx/lib/mobx.js.flow
 
 [options]
 esproposal.class_static_fields=enable
