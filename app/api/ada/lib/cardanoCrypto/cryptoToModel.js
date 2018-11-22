@@ -33,7 +33,7 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
 
 /** Convert uesr-inputted data during wallet creation to internal wallet representation */
 /** HARDWARE_WALLET */
-export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData ): AdaWallet {
+export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   const adaHardwareWallet: AdaWallet = {
     cwAccountsNumber: 1,

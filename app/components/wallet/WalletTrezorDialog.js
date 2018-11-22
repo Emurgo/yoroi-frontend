@@ -487,7 +487,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         backButton = (<DialogBackButton onBack={this._onBackToAbout} />);
         middleComponent = (
           <div className={classnames([styles.middleComponent, styles.middleComponentConnectLoad])}>
-            <img src={connectLoadGIF} role="presentation" />
+            <img src={connectLoadGIF} alt="" />
           </div>);
         styleLiveInfo = styles.liveInfoComponent;
       } else if (this.progressState === ProgressStateOption.CONNECT_START) {
@@ -495,7 +495,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         backButton = null;
         middleComponent = (
           <div className={classnames([styles.middleComponent, styles.middleComponentConnectStart])}>
-            <img src={connectStartGIF} role="presentation" />
+            <img src={connectStartGIF} alt="" />
           </div>);
         styleLiveInfo = styles.liveInfoComponent;
       } else {

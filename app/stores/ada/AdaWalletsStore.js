@@ -178,7 +178,7 @@ export default class AdaWalletsStore extends WalletStore {
     await this._patchWalletRequestWithNewWallet(connectedWallet);
     this.refreshWalletsData();
   };
-  
+
   // =================== WALLET IMPORTING ==================== //
 
   @action _setIsImportActive = (active: boolean) => {

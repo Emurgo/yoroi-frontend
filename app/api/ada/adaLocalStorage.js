@@ -2,7 +2,7 @@
 
 // Wrapper API to Save&Load localstorage using JSON
 
-import type { AdaWallet, AdaWalletTypeInfo } from '../ada/adaTypes';
+import type { AdaWallet } from './adaTypes';
 
 // Use constant keys to store/load localstorage
 const storageKeys = {
@@ -42,11 +42,6 @@ export function getAdaWallet(): ?AdaWallet {
 export function getWalletMasterKey(): string {
   const stored = _getFromStorage(storageKeys.WALLET_KEY);
   return stored.masterKey;
-}
-
-export function getWalletTypeInfo(): AdaWalletTypeInfo {
-  const stored = _getFromStorage(storageKeys.WALLET_KEY);
-  return stored.walletTypeInfo;
 }
 
 /* Last block Nunmber storage */

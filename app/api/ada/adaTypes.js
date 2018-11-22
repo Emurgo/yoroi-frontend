@@ -122,8 +122,8 @@ export type AdaWallet = {
   cwAmount: AdaAmount,
   cwId: string,
   cwMeta: AdaWalletMetaParams,
-  cwPassphraseLU?: Date,
   cwType: AdaWalletType,
+  cwPassphraseLU?: Date,
   cwHardwareInfo?: AdaWalletHardwareInfo,
 };
 

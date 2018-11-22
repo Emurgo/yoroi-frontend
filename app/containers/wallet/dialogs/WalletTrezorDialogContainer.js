@@ -24,7 +24,7 @@ export default class WalletTrezorDialogContainer extends Component<Props> {
 
   onCancel = () => {
     this.props.onClose();
-    const { connectTrezorRequest } = this.props.stores[environment.API].wallets;
+    const { connectTrezorRequest } = this.props.stores.substores[environment.API].wallets;
     // Connect Trezor request should be reset only in case connect is finished/errored
     if (!connectTrezorRequest.isExecuting) {
       connectTrezorRequest.reset();
@@ -32,7 +32,7 @@ export default class WalletTrezorDialogContainer extends Component<Props> {
   };
 
   render() {
-    const { connectTrezorRequest } = this.props.stores[environment.API].wallets;
+    const { connectTrezorRequest } = this.props.stores.substores[environment.API].wallets;
 
     return (
       <WalletTrezorDialog

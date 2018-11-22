@@ -64,7 +64,8 @@ export default class ProgressSteps extends Component<Props> {
               <span className={stepTextStyle}>{stepText}</span>
             </div>
           </div>
-        </div>);
+        </div>
+      );
     }
 
     return steps;
@@ -73,9 +74,11 @@ export default class ProgressSteps extends Component<Props> {
 
   render() {
     const outerStyle = classNames([styles.outer]);
-    const comp = (<div className={outerStyle}>
-      {this.createSetps()}
-    </div>);
+    const comp = (
+      <div className={outerStyle}>
+        {this.createSetps()}
+      </div>
+    );
 
     return comp;
   }

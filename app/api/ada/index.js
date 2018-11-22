@@ -57,8 +57,7 @@ import type {
   AdaTransactions,
   AdaWallet,
   AdaWallets,
-  AdaAssurance,
-  AdaWalletTypeInfo
+  AdaAssurance
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -159,7 +158,6 @@ export default class AdaApi {
       const wallets: AdaWallets = wallet
         ? [wallet]
         : [];
-
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
       return wallets.map(data => _createWalletFromServerData(data));
