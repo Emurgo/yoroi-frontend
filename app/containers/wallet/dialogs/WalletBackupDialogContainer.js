@@ -1,16 +1,14 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 
 type Props = InjectedDialogContainerProps;
 
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletBackupDialogContainer extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null, children: null, onClose: () => {} };
 
   onCancelBackup = () => {
     this.props.onClose();

@@ -9,7 +9,7 @@ import styles from './SidebarLayout.scss';
 import environment from '../../environment';
 
 type Props = {
-  children: any | Node,
+  children?: Node,
   sidebar?: Node,
   topbar: Node,
   notification?: ?Node,
@@ -26,9 +26,11 @@ export const messages = defineMessages({
 
 @observer
 export default class SidebarLayout extends Component<Props> {
-
   static defaultProps = {
-    children: null
+    children: undefined,
+    sidebar: undefined,
+    notification: undefined,
+    contentDialogs: undefined
   };
 
   static contextTypes = {

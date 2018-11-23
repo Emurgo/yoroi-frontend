@@ -1,21 +1,20 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import WalletSettings from '../../../components/wallet/WalletSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
+import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 
 type Props = InjectedProps
 
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletSettingsPage extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null };
 
   render() {
     const { uiDialogs } = this.props.stores;
     const { wallets, walletSettings } = this.props.stores.substores.ada;
-    const { actions } = this.props;
+    const { actions, stores } = this.props;
     const activeWallet = wallets.active;
     const {
       updateWalletMetaRequest,
@@ -32,12 +31,16 @@ export default class WalletSettingsPage extends Component<Props> {
     // Guard against potential null values
     if (!activeWallet) throw new Error('Active wallet required for WalletSettingsPage.');
 
+    const changeDialog = (
+      <ChangeWalletPasswordDialogContainer actions={actions} stores={stores} />
+    );
     return (
       <WalletSettings
         error={updateWalletMetaRequest.error}
         openDialogAction={actions.dialogs.open.trigger}
         walletPasswordUpdateDate={activeWallet.passwordUpdateDate}
         isDialogOpen={uiDialogs.isOpen}
+        dialog={changeDialog}
         walletName={activeWallet.name}
         isSubmitting={updateWalletMetaRequest.isExecuting}
         isInvalid={updateWalletMetaRequest.wasExecuted && updateWalletMetaRequest.result === false}

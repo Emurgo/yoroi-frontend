@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import type { InjectedContainerProps } from '../../types/injectedPropsType';
+import type { InjectedProps } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
@@ -12,7 +12,7 @@ import { Logger } from '../../utils/logging';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 
-type Props = InjectedContainerProps
+type Props = InjectedProps
 
 export const messages = defineMessages({
   noTransactions: {
@@ -28,10 +28,8 @@ export const messages = defineMessages({
   }
 });
 
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletSummaryPage extends Component<Props> {
-  static defaultProps = { actions: null, stores: null };
-
   static contextTypes = {
     intl: intlShape.isRequired
   };

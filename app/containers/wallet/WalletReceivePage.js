@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { defineMessages, FormattedHTMLMessage } from 'react-intl';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { ellipsis } from '../../utils/strings';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
@@ -24,11 +24,8 @@ type State = {
   copiedAddress: string,
 };
 
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletReceivePage extends Component<Props, State> {
-
-  static defaultProps = { actions: null, stores: null };
-
   state = {
     copiedAddress: '',
   };

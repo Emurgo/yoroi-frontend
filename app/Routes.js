@@ -3,6 +3,9 @@ import React from 'react';
 import { Route, IndexRedirect } from 'react-router';
 import { ROUTES } from './routes-config';
 import resolver from './utils/imports';
+import type { StoresMap } from './stores/index';
+import type { ActionsMap } from './actions/index';
+import type { Node } from 'react';
 
 // PAGES
 import NoWalletsPage from './containers/wallet/NoWalletsPage';
@@ -23,25 +26,75 @@ const WalletSendPage = resolver('containers/wallet/WalletSendPage');
 const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
 const DaedalusTransferPage = resolver('containers/daedalusTransfer/DaedalusTransferPage');
 
+/* eslint-disable max-len */
 export const Routes = (
+  stores: StoresMap,
+  actions: ActionsMap
+): Node => (
   <div>
-    <Route path={ROUTES.ROOT} component={LoadingPage} />
-    <Route path={ROUTES.PROFILE.LANGUAGE_SELECTION} component={LanguageSelectionPage} />
-    <Route path={ROUTES.PROFILE.TERMS_OF_USE} component={TermsOfUsePage} />
-    <Route path={ROUTES.NO_WALLETS} component={NoWalletsPage} />
-    <Route path={ROUTES.WALLETS.ADD} component={WalletAddPage} />
-    <Route path={ROUTES.WALLETS.ROOT} component={Wallet}>
-      <Route path={ROUTES.WALLETS.TRANSACTIONS} component={WalletSummaryPage} />
-      <Route path={ROUTES.WALLETS.SEND} component={WalletSendPage} />
-      <Route path={ROUTES.WALLETS.RECEIVE} component={WalletReceivePage} />
+    <Route
+      path={ROUTES.ROOT}
+      component={(props) => <LoadingPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      path={ROUTES.PROFILE.LANGUAGE_SELECTION}
+      component={(props) => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      path={ROUTES.PROFILE.TERMS_OF_USE}
+      component={(props) => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      path={ROUTES.NO_WALLETS}
+      component={(props) => <NoWalletsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      path={ROUTES.WALLETS.ADD}
+      component={(props) => <WalletAddPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      path={ROUTES.WALLETS.ROOT}
+      component={(props) => <Wallet {...props} stores={stores} actions={actions} />}
+    >
+      <Route
+        path={ROUTES.WALLETS.TRANSACTIONS}
+        component={(props) => <WalletSummaryPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path={ROUTES.WALLETS.SEND}
+        component={(props) => <WalletSendPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path={ROUTES.WALLETS.RECEIVE}
+        component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+      />
     </Route>
-    <Route path="/settings" component={Settings}>
+    <Route
+      path="/settings"
+      component={(props) => <Settings {...props} stores={stores} actions={actions} />}
+    >
       <IndexRedirect to="general" />
-      <Route path="general" component={GeneralSettingsPage} />
-      <Route path="terms-of-use" component={TermsOfUseSettingsPage} />
-      <Route path={ROUTES.SETTINGS.WALLET} component={WalletSettingsPage} />
-      <Route path="support" component={SupportSettingsPage} />
+      <Route
+        path="general"
+        component={(props) => <GeneralSettingsPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path="terms-of-use"
+        component={(props) => <TermsOfUseSettingsPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path={ROUTES.SETTINGS.WALLET}
+        component={(props) => <WalletSettingsPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path="support"
+        component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
+      />
     </Route>
-    <Route path={ROUTES.DAEDALUS_TRANFER.ROOT} component={DaedalusTransferPage} />
+    <Route
+      path={ROUTES.DAEDALUS_TRANFER.ROOT}
+      component={(props) => <DaedalusTransferPage {...props} stores={stores} actions={actions} />}
+    />
   </div>
 );
+/* eslint-enable max-len */

@@ -93,7 +93,7 @@ export default class SupportSettings extends Component<Props> {
     );
 
     const downloadLogsLink = (
-      <button onClick={onDownloadLogs}>
+      <button type="button" onClick={onDownloadLogs}>
         {intl.formatMessage(messages.downloadLogsLink)}
       </button>
     );

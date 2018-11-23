@@ -79,13 +79,6 @@ type State = {
 
 @observer
 export default class ChangeWalletPasswordDialog extends Component<Props, State> {
-
-  static defaultProps = {
-    currentPasswordValue: '',
-    newPasswordValue: '',
-    repeatedPasswordValue: '',
-  };
-
   static contextTypes = {
     intl: intlShape.isRequired,
   };

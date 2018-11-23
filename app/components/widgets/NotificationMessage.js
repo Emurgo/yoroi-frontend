@@ -11,6 +11,9 @@ type Props = {
 };
 
 export default class NotificationMessage extends Component<Props> {
+  static defaultProps = {
+    children: null
+  };
 
   render() {
     const { icon, show, children } = this.props;

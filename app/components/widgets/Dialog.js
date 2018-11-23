@@ -20,6 +20,16 @@ type Props = {
 };
 
 export default class Dialog extends Component<Props> {
+  static defaultProps = {
+    title: undefined,
+    children: undefined,
+    actions: undefined,
+    closeButton: undefined,
+    backButton: undefined,
+    className: undefined,
+    onClose: undefined,
+    closeOnOverlayClick: undefined,
+  };
 
   render() {
     const {

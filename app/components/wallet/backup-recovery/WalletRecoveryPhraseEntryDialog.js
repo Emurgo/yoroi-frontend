@@ -132,7 +132,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
           <div className={styles.words}>
             {recoveryPhraseSorted.map(({ word, isActive }, index) => (
               <MnemonicWord
-                key={index}
+                key={index} // eslint-disable-line react/no-array-index-key
                 word={word}
                 index={index}
                 isActive={isActive}

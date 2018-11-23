@@ -121,8 +121,8 @@ export default class WalletTransactionsList extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        {transactionsGroups.map((group, groupIndex) => (
-          <div className={styles.group} key={walletId + '-' + groupIndex}>
+        {transactionsGroups.map(group => (
+          <div className={styles.group} key={walletId + '-' + group.transactions.map(tx => tx.id).join('-')}>
             <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
             <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (

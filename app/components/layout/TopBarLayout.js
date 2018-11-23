@@ -12,6 +12,10 @@ type Props = {
 
 @observer
 export default class TopBarLayout extends Component<Props> {
+  static defaultProps = {
+    children: undefined,
+    notification: undefined
+  };
 
   render() {
     const { children, topbar, notification } = this.props;

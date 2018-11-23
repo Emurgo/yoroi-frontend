@@ -227,13 +227,14 @@ export default class Transaction extends Component<Props, State> {
               <h2>
                 {intl.formatMessage(messages.fromAddresses)}
               </h2>
-              {uniq(data.addresses.from).map((address, addressIndex) => (
-                <span key={`${data.id}-from-${address}-${addressIndex}`} className={styles.address}>{address}</span>
+              {uniq(data.addresses.from).map(address => (
+                <span key={`${data.id}-from-${address}`} className={styles.address}>{address}</span>
               ))}
               <h2>
                 {intl.formatMessage(messages.toAddresses)}
               </h2>
               {data.addresses.to.map((address, addressIndex) => (
+                // eslint-disable-next-line react/no-array-index-key
                 <span key={`${data.id}-to-${address}-${addressIndex}`} className={styles.address}>{address}</span>
               ))}
 

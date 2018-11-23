@@ -145,6 +145,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
               <ul className={styles.instructionsList}>
                 {
                   Array(2).fill().map((_, idx) => (
+                    // eslint-disable-next-line react/no-array-index-key
                     <div key={`step${idx}`} className={styles.text}>
                       {intl.formatMessage({ id: messages[`step${idx}`].id })}
                     </div>

@@ -15,6 +15,9 @@ type Props = {
 
 @observer
 export default class WalletNavButton extends Component<Props> {
+  static defaultProps = {
+    className: undefined
+  };
 
   render() {
     const { isActive, /* icon, */ onClick, className } = this.props;
@@ -28,7 +31,7 @@ export default class WalletNavButton extends Component<Props> {
     //   isActive ? styles.activeIcon : styles.normalIcon
     // ]);
     return (
-      <button className={componentClasses} onClick={onClick}>
+      <button type="button" className={componentClasses} onClick={onClick}>
         <div className={styles.container}>
           {/* <SvgInline svg={icon} className={iconClasses} cleanup={['title']} /> */}
           <span className={styles.label}>{this.props.label}</span>

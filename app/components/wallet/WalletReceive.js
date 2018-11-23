@@ -73,6 +73,9 @@ type State = {
 
 @observer
 export default class WalletReceive extends Component<Props, State> {
+  static defaultProps = {
+    error: undefined
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -168,7 +171,7 @@ export default class WalletReceive extends Component<Props, State> {
         <div className={styles.generatedAddresses}>
           <h2>
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
-            <button onClick={this.toggleUsedAddresses}>
+            <button type="button" onClick={this.toggleUsedAddresses}>
               {intl.formatMessage(messages[showUsed ? 'hideUsedLabel' : 'showUsedLabel'])}
             </button>
           </h2>
@@ -181,7 +184,7 @@ export default class WalletReceive extends Component<Props, State> {
               address.isUsed ? styles.usedWalletAddress : null,
             ]);
             return (
-              <div key={index} className={addressClasses}>
+              <div key={`gen-${address.id}`} className={addressClasses}>
                 <div className={styles.addressId}>{address.id}</div>
                 <div className={styles.addressActions}>
                   <CopyToClipboard

@@ -1,27 +1,19 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import TopBarContainer from './TopBarContainer';
 import SidebarLayout from '../components/layout/SidebarLayout';
-import type { StoresMap } from '../stores/index';
-import type { ActionsMap } from '../actions/index';
+import type { InjectedContainerProps } from '../types/injectedPropsType';
 
-export type MainLayoutProps = {
-  stores: any | StoresMap,
-  actions: any | ActionsMap,
-  children: Node,
-  topbar: ?any
+export type MainLayoutProps = InjectedContainerProps & {
+  topbar: ?Node
 };
 
-@inject('stores', 'actions') @observer
+@observer
 export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
-    actions: null,
-    stores: null,
-    children: null,
-    topbar: null,
-    onClose: () => {}
+    topbar: null
   };
 
   render() {

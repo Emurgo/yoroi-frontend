@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import MainLayout from '../MainLayout';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
@@ -10,10 +10,8 @@ import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
 type Props = InjectedContainerProps;
 
-@inject('stores', 'actions') @observer
+@observer
 export default class Wallet extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null };
 
   isActiveScreen = (page: string) => {
     const { app } = this.props.stores;
@@ -34,9 +32,12 @@ export default class Wallet extends Component<Props> {
 
   render() {
     const { wallets } = this.props.stores.substores.ada;
-    if (!wallets.active) return <MainLayout><LoadingSpinner /></MainLayout>;
+    const { actions, stores } = this.props;
+    if (!wallets.active) {
+      return <MainLayout actions={actions} stores={stores}><LoadingSpinner /></MainLayout>;
+    }
     return (
-      <MainLayout>
+      <MainLayout actions={actions} stores={stores}>
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
