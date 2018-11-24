@@ -77,7 +77,7 @@ export function getMockServer(settings: { signedTransaction?: Function }) {
       settings.signedTransaction : _defaultSignedTransaction);
 
     server.post('/api/addresses/filterUsed', (req, res) => {
-      const usedAddresses = getFeatureData().UsedAddresses;
+      const usedAddresses = getFeatureData().usedAddresses;
       const filteredAddresses = usedAddresses
         ? usedAddresses.filter((address) => (
           req.body.addresses.includes(address)

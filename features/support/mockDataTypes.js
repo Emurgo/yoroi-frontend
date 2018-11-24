@@ -52,7 +52,7 @@ export type LovefieldShownTxSet = {
 
 export type FeatureData = {
     walletInitialData?: WalletInitialData,
-    UsedAddresses?: Array<string>,
+    usedAddresses?: Array<string>,
     utxos?: Array<MockUTXO>,
     adaAddresses?: Array<AdaAddress>,
     masterKey?: string,
