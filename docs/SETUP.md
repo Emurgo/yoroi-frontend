@@ -2,7 +2,6 @@
 
 Tested on Ubuntu 18.04
 
-
 # Prerequisites
 
 ### NodeJS
@@ -56,13 +55,3 @@ Rebuild dll
 ```bash
 $ npm run build-dll
 ```
-
-# IDE
-
-We suggestion Visual Studio Code
-
-To make it work, you must: 
-
-- Download the [Flow plugin](https://marketplace.visualstudio.com/items?itemName=flowtype.flow-for-vscode) for VS Code and change the following workspace settings:
-1) `javascript.validate.enable` to `false`
-1) `flow.useNPMPackagedFlow` to `true`
