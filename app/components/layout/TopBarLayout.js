@@ -10,6 +10,7 @@ type Props = {
   notification?: ?Node,
 };
 
+/** Adds a top bar above the wrapped node */
 @observer
 export default class TopBarLayout extends Component<Props> {
   static defaultProps = {

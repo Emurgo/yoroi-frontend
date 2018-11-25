@@ -67,6 +67,7 @@ type Props = {
   onSubmit: Function,
   onBack: Function,
   mnemonicValidator: Function,
+  /** Array of all valid mnemonic words to use for auto-complete suggestions */
   suggestedMnemonics: Array<string>,
 };
 
@@ -100,6 +101,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
     },
   });
 
+  /** validation hook for mobx-react-form */
   submit = () => {
     this.form.submit({
       onSuccess: (form) => {
@@ -137,6 +139,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
 
           <div className={styles.body}>
 
+            { /* Instructions for how to migrate */ }
             <div>
               <div className={styles.title}>
                 {intl.formatMessage(messages.title)}
@@ -164,6 +167,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
               skin={<SimpleAutocompleteSkin />}
             />
 
+            { /* submit mnemonic */ }
             <div className={styles.buttonsWrapper}>
               <Button
                 className={nextButtonClasses}
@@ -172,6 +176,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
                 skin={<SimpleButtonSkin />}
               />
 
+              { /* cancel (go back) */ }
               <Button
                 className={backButtonClasses}
                 label={intl.formatMessage(messages.backButtonLabel)}

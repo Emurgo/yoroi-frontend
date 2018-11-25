@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
+import StaticTopbarTitle from '../../components/layout/StaticTopbarTitle';
+import TopBar from '../../components/layout/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -30,9 +31,10 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
     const { sidebar } = this.props.stores;
+    const topBartitle = <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />;
     const topBar = (
-      <TextOnlyTopBar
-        title={this.context.intl.formatMessage(messages.title)}
+      <TopBar
+        title={topBartitle}
         activeSidebarCategory={sidebar.activeSidebarCategory}
       />);
     return (

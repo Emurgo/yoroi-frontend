@@ -4,7 +4,8 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import validWords from 'bip39/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
+import StaticTopbarTitle from '../../components/layout/StaticTopbarTitle';
+import TopBar from '../../components/layout/TopBar';
 import DaedalusTransferInstructionsPage from '../../components/daedalusTransfer/DaedalusTransferInstructionsPage';
 import DaedalusTransferFormPage from '../../components/daedalusTransfer/DaedalusTransferFormPage';
 import DaedalusTransferWaitingPage from '../../components/daedalusTransfer/DaedalusTransferWaitingPage';
@@ -85,9 +86,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   render() {
     const { stores, actions } = this.props;
     const { sidebar } = stores;
+    const topbarTitle = <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     const topBar = (
-      <TextOnlyTopBar
-        title={this.context.intl.formatMessage(messages.title)}
+      <TopBar
+        title={topbarTitle}
         onCategoryClicked={category => {
           actions.sidebar.activateSidebarCategory.trigger({ category });
         }}
@@ -130,7 +132,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case 'readyToTransfer':
         if (daedalusTransfer.transferTx == null) {
-          return null;
+          return null; // TODO: throw error? Shoudln't happen
         }
         return (
           <MainLayout topbar={topBar}>
@@ -154,7 +156,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           </MainLayout>
         );
       default:
-        return null;
+        return null; // TODO: throw error? Shouldn't happen
     }
   }
 

@@ -62,6 +62,7 @@ type Props = {
   error: ?LocalizableError
 };
 
+/** Show user what the Daedalus migration would do to get final confirmation */
 @observer
 export default class DaedalusTransferSummaryPage extends Component<Props> {
 

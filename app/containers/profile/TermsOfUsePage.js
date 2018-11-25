@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
+import StaticTopbarTitle from '../../components/layout/StaticTopbarTitle';
+import TopBar from '../../components/layout/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -30,9 +31,10 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
     const { sidebar } = this.props.stores;
+    const topbarTitle = <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />;
     const topbar = (
-      <TextOnlyTopBar
-        title={this.context.intl.formatMessage(messages.title)}
+      <TopBar
+        title={topbarTitle}
         activeSidebarCategory={sidebar.activeSidebarCategory}
       />);
     return (

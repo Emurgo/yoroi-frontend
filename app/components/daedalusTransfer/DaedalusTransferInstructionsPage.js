@@ -118,6 +118,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
     return (
       <div className="daedalusTransferInstructionsPageComponent">
 
+        { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
         <div className={styles.component}>
           <BorderedBox>
 
@@ -146,6 +147,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
 
         </div>
 
+        { /* Ask user how they want to migrate their Daedalus wallet */ }
         <div className={styles.component}>
           <BorderedBox>
 

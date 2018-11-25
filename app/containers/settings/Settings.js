@@ -3,7 +3,8 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SettingsLayout from '../../components/settings/SettingsLayout';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
-import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
+import StaticTopbarTitle from '../../components/layout/StaticTopbarTitle';
+import TopBar from '../../components/layout/TopBar';
 import resolver from '../../utils/imports';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
@@ -43,11 +44,12 @@ export default class Settings extends Component<InjectedContainerProps> {
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
       />
     );
+    const topbarTitle = <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />;
     return (
       <Layout
         topbar={(
-          <TextOnlyTopBar
-            title={this.context.intl.formatMessage(messages.title)}
+          <TopBar
+            title={topbarTitle}
             onCategoryClicked={category => {
               actions.sidebar.activateSidebarCategory.trigger({ category });
             }}

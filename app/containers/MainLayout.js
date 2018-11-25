@@ -23,7 +23,6 @@ export default class MainLayout extends Component<MainLayoutProps> {
       <SidebarLayout
         topbar={topbarComponent}
         notification={<div />}
-        contentDialogs={[]}
       >
         {this.props.children}
       </SidebarLayout>

@@ -13,7 +13,6 @@ type Props = {
   sidebar?: Node,
   topbar: Node,
   notification?: ?Node,
-  contentDialogs?: ?Array<Node>,
 };
 
 export const messages = defineMessages({
@@ -24,13 +23,13 @@ export const messages = defineMessages({
   },
 });
 
+/** Wraps content in both a topbar and sidebar */
 @observer
 export default class SidebarLayout extends Component<Props> {
   static defaultProps = {
     children: undefined,
     sidebar: undefined,
     notification: undefined,
-    contentDialogs: undefined
   };
 
   static contextTypes = {
@@ -40,7 +39,7 @@ export default class SidebarLayout extends Component<Props> {
   render() {
     const {
       children, sidebar, topbar,
-      notification, contentDialogs,
+      notification,
     } = this.props;
 
     const { intl } = this.context;
@@ -56,6 +55,7 @@ export default class SidebarLayout extends Component<Props> {
 
     return (
       <div className={styles.component}>
+        { /* sidebar unused in Yoroi (comes from Daedalus) */ }
         {sidebar ? (
           <div className={styles.sidebar}>
             {sidebar}
@@ -77,7 +77,6 @@ export default class SidebarLayout extends Component<Props> {
             <div className={styles.content}>
               {children}
             </div>
-            {contentDialogs}
           </div>
         </div>
       </div>
