@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import StaticTopbarTitle from '../../components/layout/StaticTopbarTitle';
-import TopBar from '../../components/layout/TopBar';
+import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
+import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm';
 import type { InjectedProps } from '../../types/injectedPropsType';

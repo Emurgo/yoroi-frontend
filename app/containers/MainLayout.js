@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import TopBarContainer from './TopBarContainer';
-import SidebarLayout from '../components/layout/SidebarLayout';
+import TopBarLayout from '../components/layout/TopBarLayout';
+import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBanner';
 import type { InjectedContainerProps } from '../types/injectedPropsType';
 
 export type MainLayoutProps = InjectedContainerProps & {
@@ -20,12 +21,13 @@ export default class MainLayout extends Component<MainLayoutProps> {
     const { actions, stores, topbar } = this.props;
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
     return (
-      <SidebarLayout
+      <TopBarLayout
+        banner={<TestnetWarningBanner />}
         topbar={topbarComponent}
         notification={<div />}
       >
         {this.props.children}
-      </SidebarLayout>
+      </TopBarLayout>
     );
   }
 }

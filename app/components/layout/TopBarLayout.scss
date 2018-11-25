@@ -11,8 +11,10 @@ $topBarHeight: 64px;
 }
 
 .topbar {
-  flex-shrink: 0;
   height: $topBarHeight;
+  flex-shrink: 0;
+  // Show elements that overflow the topbar above the content area
+  z-index: 1;
 }
 
 .content {

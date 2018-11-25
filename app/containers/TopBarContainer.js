@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import TopBar from '../components/layout/TopBar';
-import WalletTopbarTitle from '../components/wallet/WalletTopbarTitle';
+import TopBar from '../components/topbar/TopBar';
+import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
 import resolver from '../utils/imports';
