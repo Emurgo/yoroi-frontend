@@ -258,9 +258,9 @@ type State = {
     currentIndex: 0 | 1 | 2,
     error: boolean
   },
-  action_btn_name?: string,
-  action_btn_processing? : boolean,
-  error_or_live_info_text? : string,
+  actionButtonName?: string,
+  isActionProcessing? : boolean,
+  errorOrLiveInfoText? : string,
 }
 
 @observer
@@ -319,26 +319,26 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
     if (error) {
       this.progressState = ProgressStateOption.SAVE_ERROR;
-      this.state.action_btn_processing = false;
+      this.state.isActionProcessing = false;
 
-      this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+      this.state.actionButtonName = intl.formatMessage(messages.saveButtonLabel);
       this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
       this.state.currentProgressStepInfo.error = true;
 
       if (error instanceof CheckAdressesInUseApiError) {
         // redirecting CheckAdressesInUseApiError -> saveError101
         // because for user saveError101 is more meaningful in this context
-        this.state.error_or_live_info_text = intl.formatMessage(messages.saveError101);
+        this.state.errorOrLiveInfoText = intl.formatMessage(messages.saveError101);
       } else {
-        this.state.error_or_live_info_text = intl.formatMessage(error);
+        this.state.errorOrLiveInfoText = intl.formatMessage(error);
       }
     }
 
     const actions = [{
-      className: this.state.action_btn_processing ? styles.isProcessing : null,
-      label: this.state.action_btn_name,
+      className: this.state.isActionProcessing ? styles.isProcessing : null,
+      label: this.state.actionButtonName,
       primary: true,
-      disabled: this.state.action_btn_processing,
+      disabled: this.state.isActionProcessing,
       onClick: () => {}
     }];
 
@@ -409,7 +409,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           </div>
           {helpLink}
           <div className={styles.liveInfoComponent}>
-            <span>{this.state.error_or_live_info_text}</span>
+            <span>{this.state.errorOrLiveInfoText}</span>
           </div>
         </Dialog>);
     } else if (this.progressState === ProgressStateOption.CONNECT_LOAD ||
@@ -465,7 +465,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           {middleComponent}
           {helpLink}
           <div className={styleLiveInfo}>
-            <span>{this.state.error_or_live_info_text}</span>
+            <span>{this.state.errorOrLiveInfoText}</span>
           </div>
         </Dialog>);
     } else if (this.progressState === ProgressStateOption.SAVE_LOAD ||
@@ -523,7 +523,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           {middleComponent}
           {helpLink}
           <div className={styleLiveInfo}>
-            <span>{this.state.error_or_live_info_text}</span>
+            <span>{this.state.errorOrLiveInfoText}</span>
           </div>
         </Dialog>);
     } else {
@@ -548,48 +548,48 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
     switch (this.progressState) {
       case ProgressStateOption.ABOUT:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.nextButtonLabel);
+        this.state.isActionProcessing = false;
+        this.state.actionButtonName = intl.formatMessage(messages.nextButtonLabel);
         this.state.currentProgressStepInfo.currentIndex = ProgressStep.ABOUT;
         this.state.currentProgressStepInfo.error = false;
-        this.state.error_or_live_info_text = '';
+        this.state.errorOrLiveInfoText = '';
         break;
       case ProgressStateOption.CONNECT_LOAD:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.isActionProcessing = false;
+        this.state.actionButtonName = intl.formatMessage(messages.connectButtonLabel);
         this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
         this.state.currentProgressStepInfo.error = false;
-        this.state.error_or_live_info_text = '';
+        this.state.errorOrLiveInfoText = '';
         break;
       case ProgressStateOption.CONNECT_START:
-        this.state.action_btn_processing = true;
-        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.isActionProcessing = true;
+        this.state.actionButtonName = intl.formatMessage(messages.connectButtonLabel);
         this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
         this.state.currentProgressStepInfo.error = false;
-        this.state.error_or_live_info_text = intl.formatMessage(messages.connectMsgCheckingTrezor);
+        this.state.errorOrLiveInfoText = intl.formatMessage(messages.connectMsgCheckingTrezor);
         break;
       case ProgressStateOption.CONNECT_ERROR:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.isActionProcessing = false;
+        this.state.actionButtonName = intl.formatMessage(messages.connectButtonLabel);
         this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
         this.state.currentProgressStepInfo.error = true;
         // eslint-disable-next-line max-len
-        this.state.error_or_live_info_text = intl.formatMessage(this.trezorDeviceInfo.error);
+        this.state.errorOrLiveInfoText = intl.formatMessage(this.trezorDeviceInfo.error);
         break;
       case ProgressStateOption.SAVE_LOAD:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+        this.state.isActionProcessing = false;
+        this.state.actionButtonName = intl.formatMessage(messages.saveButtonLabel);
         this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
         this.state.currentProgressStepInfo.error = false;
         this.form.$('walletName').value = this.trezorDeviceInfo.features.label;
-        this.state.error_or_live_info_text = '';
+        this.state.errorOrLiveInfoText = '';
         break;
       case ProgressStateOption.SAVE_START:
-        this.state.action_btn_processing = true;
-        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+        this.state.isActionProcessing = true;
+        this.state.actionButtonName = intl.formatMessage(messages.saveButtonLabel);
         this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
         this.state.currentProgressStepInfo.error = false;
-        this.state.error_or_live_info_text = '';
+        this.state.errorOrLiveInfoText = '';
         break;
       case ProgressStateOption.SAVE_ERROR:
         // managed in render()
