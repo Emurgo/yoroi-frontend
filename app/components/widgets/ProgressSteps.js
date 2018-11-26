@@ -71,16 +71,12 @@ export default class ProgressSteps extends Component<Props> {
     return steps;
   }
 
-
   render() {
-    const outerStyle = classNames([styles.outer]);
-    const comp = (
-      <div className={outerStyle}>
+    return (
+      <div className={classNames([styles.outer])}>
         {this.createSetps()}
       </div>
     );
-
-    return comp;
   }
 
 }
