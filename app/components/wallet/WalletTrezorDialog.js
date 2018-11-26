@@ -599,7 +599,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
         break;
     }
     this.setState({});
-  }  
+  }
 
   _onBackToAbout = async () => {
     this.progressState = ProgressStateOption.ABOUT;
@@ -626,9 +626,20 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       console.error('[TREZOR] TrezorConnectError cardanoGetPublicKey : ' + JSON.stringify(error, null, ''));
     } finally {
       this._removeTrezorConnectEventListeners();
-      this._validateTrezorResponse(cardanoGetPublicKeyResp);
 
-      if (this._isTrezorResponseValid()) {
+      const trezorEventDevice = { ...this.trezorEventDevice };
+      const trezorValidity = this._validateTrezor(cardanoGetPublicKeyResp, trezorEventDevice);
+
+      const trezorDeviceInfo = {};
+      trezorDeviceInfo.valid = trezorValidity.valid;
+      trezorDeviceInfo.error = trezorValidity.error;
+      trezorDeviceInfo.cardanoGetPublicKeyResult = cardanoGetPublicKeyResp;
+      if (trezorEventDevice.payload.type === 'acquired') {
+        trezorDeviceInfo.features = trezorEventDevice.payload.features;
+      }
+      this.trezorDeviceInfo = trezorDeviceInfo;
+
+      if (trezorDeviceInfo.valid) {
         this.progressState = ProgressStateOption.SAVE_LOAD;
       } else {
         this.progressState = ProgressStateOption.CONNECT_ERROR;
@@ -674,8 +685,14 @@ export default class WalletTrezorDialog extends Component<Props, State> {
   /**
    * Validates the compatibility of data which we have received from Trezor
    */
-  _validateTrezorResponse = (cardanoGetPublicKeyResp: CardanoGetPublicKey) => {
-    const trezorDeviceInfo = {
+  _validateTrezor = (
+    cardanoGetPublicKeyResp: CardanoGetPublicKey,
+    trezorEventDevice: DeviceMessage
+  ):{
+      valid: boolean,
+      error: ?LocalizableError
+    } => {
+    const trezorValidity = {
       valid: false,
       error: null,
     };
@@ -683,44 +700,35 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     if (!cardanoGetPublicKeyResp.success) {
       switch (cardanoGetPublicKeyResp.payload.error) {
         case 'Iframe timeout':
-          trezorDeviceInfo.error = messages.connectError101;
+          trezorValidity.error = messages.connectError101;
           break;
         case 'Permissions not granted':
-          trezorDeviceInfo.error = messages.connectError102;
+          trezorValidity.error = messages.connectError102;
           break;
         case 'Cancelled':
         case 'Popup closed':
-          trezorDeviceInfo.error = messages.connectError103;
+          trezorValidity.error = messages.connectError103;
           break;
         default:
           // connectError999 = Something unexpected happened
-          trezorDeviceInfo.error = messages.connectError999;
+          trezorValidity.error = messages.connectError999;
           break;
       }
     }
 
-    if (!trezorDeviceInfo.error && cardanoGetPublicKeyResp.payload.publicKey.length <= 0) {
-      trezorDeviceInfo.error = messages.connectError999;
+    if (!trezorValidity.error && cardanoGetPublicKeyResp.payload.publicKey.length <= 0) {
+      trezorValidity.error = messages.connectError999;
     }
 
-    if (!trezorDeviceInfo.error && this.trezorEventDevice.payload.type !== Config.trezor.EVENT_DEVICE_ACQUIRED) {
-      trezorDeviceInfo.error = messages.connectError999;
+    if (!trezorValidity.error && trezorEventDevice.payload.type !== 'acquired') {
+      trezorValidity.error = messages.connectError999;
     }
 
-    if (!trezorDeviceInfo.error) {
-      if (this.trezorEventDevice.payload.type === Config.trezor.EVENT_DEVICE_ACQUIRED) {
-        // if() is unwanted, but used because flow needs that
-        trezorDeviceInfo.features = {...this.trezorEventDevice.payload.features};
-      }
-      trezorDeviceInfo.valid = true;
-      trezorDeviceInfo.cardanoGetPublicKeyResult = cardanoGetPublicKeyResp;
+    if (!trezorValidity.error) {
+      trezorValidity.valid = true;
     }
 
-    this.trezorDeviceInfo = trezorDeviceInfo;    
-  }
-
-  _isTrezorResponseValid() {
-    return this.trezorDeviceInfo.valid;
+    return trezorValidity;
   }
 
   _onSave = async () => {
