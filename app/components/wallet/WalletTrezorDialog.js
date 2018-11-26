@@ -27,7 +27,6 @@ import connectErrorSVG from '../../assets/images/trezor/connect-error.inline.svg
 import saveLoadGIF from '../../assets/images/trezor/save-load.inline.svg';
 import saveStartSVG from '../../assets/images/trezor/save-start.inline.svg';
 import saveErrorSVG from '../../assets/images/trezor/save-error.inline.svg';
-// import saveSuccessSVG from '../../assets/images/trezor/save-success.inline.svg';
 
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import { isValidHardwareWalletName } from '../../utils/validations';
