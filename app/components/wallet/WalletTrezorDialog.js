@@ -533,6 +533,13 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     return dialog;
   }
 
+  componentWillUnmount() {
+    this._removeTrezorConnectEventListeners();
+    if (TrezorConnect) {
+      TrezorConnect.dispose();
+    }
+  }
+
   /**
    * prepares and updates the UI state
    */
@@ -734,12 +741,5 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       onError: () => {
       },
     });
-  }
-
-  componentWillUnmount() {
-    this._removeTrezorConnectEventListeners();
-    if (TrezorConnect) {
-      TrezorConnect.dispose();
-    }
   }
 }
