@@ -31,9 +31,9 @@ declare var CONFIG: ConfigType;
 const addressScanSize = CONFIG.app.addressScanSize;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
-/** Creates a new/empty ada wallet
+/** Creates and stores(into local storage) a new/empty AdaWallet and CryptoAccount
  * Fetches all related addresses
- * Caches the fetched address results locally
+ * Caches the fetched address results locally (into lovefieldDatabase)
  * @returns a new AdaWallet
  */
 export async function connectTrezorAdaWallet({
@@ -73,10 +73,6 @@ export async function connectTrezorAdaWallet({
     // save ada wallet to the local storage
     saveAdaWallet(adaWallet);
 
-    // It's a success, we are done
-    // 1. creating wallet and crypto account
-    // 2. storing wallet and crypto account to the local storage
-    // 3. storing wallet related addresses to lovefieldDatabase
     Logger.debug('connectTrezorAdaWallet::connectTrezorAdaWallet success');
     return adaWallet;
   } catch (error) {
