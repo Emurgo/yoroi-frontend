@@ -704,7 +704,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       // FIXME: try to use constants defined in Trezor for 'acquired'
       if (this.trezorEventDevice.payload.type === 'acquired') {
         // if() is unwanted, but used because flow needs that
-        trezorDeviceInfo.features = Object.assign({}, this.trezorEventDevice.payload.features);
+        trezorDeviceInfo.features = {...this.trezorEventDevice.payload.features};
       }
       trezorDeviceInfo.valid = true;
       trezorDeviceInfo.cardanoGetPublicKeyResult = cardanoGetPublicKeyResp;
