@@ -1,6 +1,6 @@
 # API
 
-Acts as the bridge between between our application and the following external componetns:
+Acts as the bridge between our application and the following external components:
 1) `js-cardano-wasm`
 2) Chrome `localstorage`
 3) Local `lovefield` database

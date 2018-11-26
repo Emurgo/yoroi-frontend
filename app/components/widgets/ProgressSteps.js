@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import SvgInline from 'react-svg-inline';
+
 import iconTickSVG from '../../assets/images/widget/tick.inline.svg';
 import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
 import styles from './ProgressSteps.scss';
@@ -8,28 +10,28 @@ import styles from './ProgressSteps.scss';
 type Props = {
   stepsList: Array<string>,
   progressInfo: {
-    currentIndex : number,
-    error?: boolean
+    currentStep : number, // example, 0 = pointing to stepsList[0]
+    stepState: number, // has three states, 0 = LOAD | 1 = PROCESS | 9 = ERROR
   }
 };
-
+@observer
 export default class ProgressSteps extends Component<Props> {
 
-  createSetps = () => {
-    const { stepsList, progressInfo } = this.props;
-    // progressIndex can't be less than 0
-    const currentProgressIndex = progressInfo.currentIndex < 0 ? 0 : progressInfo.currentIndex;
+  createSetps = (stepsList, progressInfo) => {
+    // currentStep should not be less than 0
+    const currentStep = progressInfo.currentStep < 0 ? 0 : progressInfo.currentStep;
+
     const steps = [];
     for (let idx = 0; idx < stepsList.length; idx++) {
       const stepText = stepsList[idx];
 
       let stepTopBarStyle = classNames([styles.stepTopBar]);
       let stepTextStyle = classNames([styles.stepText]);
-      let showIcon = 'none';
+      let displayIcon = 'none';
 
-      if (idx < currentProgressIndex) {
+      if (idx < currentStep) {
         // step already done
-        showIcon = 'done';
+        displayIcon = 'done';
         stepTopBarStyle = classNames([
           styles.stepTopBar,
           styles.stepTopBarDone
@@ -38,9 +40,11 @@ export default class ProgressSteps extends Component<Props> {
           styles.stepText,
           styles.stepTextDone
         ]);
-      } else if (idx === currentProgressIndex) {
+      } else if (idx === currentStep) {
         // step current
-        showIcon = progressInfo.error ? 'error' : 'none';
+        // for current step, 0 = LOAD | 1 = PROCESS | 9 = ERROR
+        // 0 = LOAD and 1 = PROCESS has same icon but for 9 = ERROR there is a error icon
+        displayIcon = (progressInfo.stepState === 9) ? 'error' : 'none';
         stepTopBarStyle = classNames([
           styles.stepTopBar,
           styles.stepTopBarActive
@@ -56,8 +60,8 @@ export default class ProgressSteps extends Component<Props> {
           <div className={stepTopBarStyle} />
           <div className={styles.stepBottomBlock}>
             <div className={styles.stepStateIconContainer}>
-              {(showIcon === 'done') && <SvgInline svg={iconTickSVG} cleanup={['title']} />}
-              {(showIcon === 'error') && <SvgInline svg={iconCrossSVG} cleanup={['title']} />}
+              {(displayIcon === 'done') && <SvgInline svg={iconTickSVG} cleanup={['title']} />}
+              {(displayIcon === 'error') && <SvgInline svg={iconCrossSVG} cleanup={['title']} />}
             </div>
             <div className={styles.stepTextContainer}>
               <span className={stepTextStyle}>{stepText}</span>
@@ -70,16 +74,13 @@ export default class ProgressSteps extends Component<Props> {
     return steps;
   }
 
-
   render() {
-    const outerStyle = classNames([styles.outer]);
-    const comp = (
-      <div className={outerStyle}>
-        {this.createSetps()}
+    const { stepsList, progressInfo } = this.props;
+    return (
+      <div className={classNames([styles.outer])}>
+        {this.createSetps(stepsList, progressInfo)}
       </div>
     );
-
-    return comp;
   }
 
 }

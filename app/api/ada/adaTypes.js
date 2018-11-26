@@ -27,19 +27,6 @@ export type AdaAssurance = 'CWANormal' | 'CWAStrict';
 
 // Based on CPtxCondition from the Importer
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
-export type AdaWalletType = 'CWTWeb' | 'CWTHardware';
-
-export type AdaWalletHardwareInfo = {
-  vendor : string,
-  model: string,
-  deviceId: string,
-  label: string,
-  majorVersion: number,
-  minorVersion: number,
-  patchVersion: number,
-  language: string,
-  publicMasterKey: string,
-};
 
 export type AdaWalletType = 'CWTWeb' | 'CWTHardware';
 
@@ -67,20 +54,7 @@ export type AdaWalletInitData = {
 };
 
 export type AdaHardwareWalletInitData = {
-  cwInitMeta: {
-    cwName: string,
-    cwAssurance: AdaAssurance,
-    cwUnit: number,
-  },
-  cwHardwareInfo: AdaWalletHardwareInfo,
-};
-
-export type AdaHardwareWalletInitData = {
-  cwInitMeta: {
-    cwName: string,
-    cwAssurance: AdaAssurance,
-    cwUnit: number,
-  },
+  cwInitMeta: AdaWalletMetaParams,
   cwHardwareInfo: AdaWalletHardwareInfo,
 };
 
@@ -164,6 +138,10 @@ export type AdaWalletMetaParams = {
   cwUnit: number
 };
 
+export type AdaHardwareWalletParams = {
+  walletInitData: AdaHardwareWalletInitData
+}
+
 /* Backend service Postgres data types */
 
 export type Transaction = {
@@ -178,9 +156,6 @@ export type Transaction = {
   last_update: string, // timestamp with timezone
   tx_state: AdaTxsState
 };
-export type AdaHardwareWalletParams = {
-  walletInitData: AdaHardwareWalletInitData
-}
 
 export type UTXO = {
   utxo_id: string,

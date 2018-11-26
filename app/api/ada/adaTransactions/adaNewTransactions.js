@@ -86,7 +86,8 @@ export async function newAdaTransaction(
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
   if (changed_used) { // eslint-disable-line camelcase
-    // tentatively assume the transaction will success to we save the change address to the wallet
+    // tentatively assume that the transaction will succeed,
+    // so we save the change address to the wallet
     await saveAdaAddress(changeAdaAddr, 'Internal');
   }
   try {

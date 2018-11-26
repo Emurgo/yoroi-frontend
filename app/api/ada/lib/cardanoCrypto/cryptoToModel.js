@@ -13,7 +13,7 @@ import { AdaWalletTypeOption } from '../../config/AdaTypesConfig';
 /** WEB_WALLET */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
-  const adaWebWallet: AdaWallet = {
+  return {
     cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
@@ -27,15 +27,13 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
     cwType: AdaWalletTypeOption.WEB_WALLET,
     cwPassphraseLU: moment().format(),
   };
-
-  return adaWebWallet;
 }
 
 /** Convert uesr-inputted data during wallet creation to internal wallet representation */
 /** HARDWARE_WALLET */
 export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
-  const adaHardwareWallet: AdaWallet = {
+  return {
     cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
@@ -45,27 +43,10 @@ export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData):
       cwAssurance,
       cwName,
       cwUnit
-    },    
-    cwType: AdaWalletTypeOption.WEB_WALLET,
-    cwPassphraseLU: moment().format(),
-  };
-
-  return adaWebWallet;
-}
-
-// FIXME: try to merge this with function toAdaWallet(), make a generic fuction
-export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData ): AdaWallet {
-  const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
-  const adaHardwareWallet: AdaWallet = {
-    cwAccountsNumber: 1,
-    cwAmount: {
-      getCCoin: 0
     },
     cwType: AdaWalletTypeOption.HARDWARE_WALLET,
-    cwHardwareInfo: walletInitData.cwHardwareInfo,
+    cwPassphraseLU: moment().format(),
   };
-
-  return adaHardwareWallet;
 }
 
 export function toAdaAddress(

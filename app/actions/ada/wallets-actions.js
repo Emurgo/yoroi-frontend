@@ -1,7 +1,5 @@
 // @flow
 import BigNumber from 'bignumber.js';
-import type { Features } from 'trezor-connect';
-
 import Action from '../lib/Action';
 
 export type WalletImportFromFileParams = {
@@ -20,6 +18,4 @@ export default class WalletsActions {
   deleteWallet: Action<{ walletId: string }> = new Action();
   sendMoney: Action<{ receiver: string, amount: string, password: ?string }> = new Action();
   updateBalance: Action <{ amount: BigNumber }> = new Action();
-  // eslint-disable-next-line max-len
-  connectTrezor: Action<{ publicMasterKey: string, walletName: string, deviceFeatures: Features}> = new Action();
 }

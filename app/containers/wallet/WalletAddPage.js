@@ -4,15 +4,13 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import WalletAdd from '../../components/wallet/WalletAdd';
-import WalletTrezorDialog from '../../components/wallet/WalletTrezorDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-import WalletTrezorDialog from '../../components/wallet/WalletTrezorDialog';
-import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
+import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
+import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
 import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
-import WalletTrezorDialogContainer from './dialogs/WalletTrezorDialogContainer';
 import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
@@ -58,7 +56,10 @@ export default class WalletAddPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
     const { isRestoreActive } = wallets;
-    const { isConnectTrezorActive } = wallets;
+    const { isTrezorConnectActive } = this._getTrezorConnectStore();
+    const openTrezorConnect = () => {
+      actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
+    };
     let content = null;
 
     if (uiDialogs.isOpen(WalletCreateDialog)) {
@@ -73,15 +74,20 @@ export default class WalletAddPage extends Component<Props> {
       content = (
         <WalletBackupDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
       );
-    } else if (uiDialogs.isOpen(WalletTrezorDialog)) {
+    } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
+      // TODO: TREZOR to discuss
       content = (
-        <WalletTrezorDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+        <WalletTrezorConnectDialogContainer
+          actions={actions}
+          stores={stores}
+          onClose={this.onClose}
+        />
       );
     } else {
       content = (
         <WalletAdd
-          onTrezor={() => actions.dialogs.open.trigger({ dialog: WalletTrezorDialog })}
-          isConnectTrezorActive={isConnectTrezorActive}
+          onTrezor={openTrezorConnect} // TODO: TREZOR to discuss ??
+          isTrezorConnectActive={isTrezorConnectActive}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           isRestoreActive={isRestoreActive}
@@ -97,6 +103,10 @@ export default class WalletAddPage extends Component<Props> {
 
   _getWalletsStore() {
     return this.props.stores.substores[environment.API].wallets;
+  }
+
+  _getTrezorConnectStore() {
+    return this.props.stores.substores[environment.API].trezorConnect;
   }
 
 }

@@ -57,7 +57,7 @@ import type {
   AdaTransactions,
   AdaWallet,
   AdaWallets,
-  AdaAssurance
+  AdaAssurance,
 } from './adaTypes';
 import type {
   CreateWalletRequest,

@@ -8,13 +8,15 @@ import TransactionsStore from './AdaTransactionsStore';
 import AdaWalletSettingsStore from './AdaWalletSettingsStore';
 import AddressesStore from './AdaAddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
+import TrezorConnectStore from './TrezorConnectStore';
 
 export const adaStoreClasses = {
   wallets: AdaWalletsStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore
+  daedalusTransfer: DaedalusTransferStore,
+  trezorConnect: TrezorConnectStore,
 };
 
 export type AdaStoresMap = {
@@ -22,7 +24,8 @@ export type AdaStoresMap = {
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore
+  daedalusTransfer: DaedalusTransferStore,
+  trezorConnect: TrezorConnectStore,
 };
 
 const adaStores = observable({
@@ -30,7 +33,8 @@ const adaStores = observable({
   transactions: null,
   walletSettings: null,
   addresses: null,
-  daedalusTransfer: null
+  daedalusTransfer: null,
+  trezorConnect: null,
 });
 
 /** See `stores` index for description of this weird behavior

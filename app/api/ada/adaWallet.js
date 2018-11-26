@@ -122,6 +122,8 @@ export const isValidMnemonic = (
   isValidEnglishAdaMnemonic(phrase, numberOfWords)
 );
 
+/** Wrapper function to create new Trezor ADA hardware wallet object
+  * usage SINGLE public master key */
 export function createAdaHardwareWallet({
   walletInitData
 }: AdaHardwareWalletParams) {
