@@ -276,7 +276,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
   // wallet name will be fetched from the user using form
   trezorDeviceInfo: TrezorDeviceInfo;
   // form for wallet name
-  form : typeof ReactToolboxMobxForm;
+  form: typeof ReactToolboxMobxForm;
   // Trezor device DeviceMessage event object
   trezorEventDevice: DeviceMessage;
 
