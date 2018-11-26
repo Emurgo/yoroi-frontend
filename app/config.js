@@ -5,7 +5,6 @@ export default {
     TRANSACTION_REQUEST_SIZE: 20
   },
   trezor: {
-    DEFAULT_CARDANO_PATH: 'm/44\'/1815\'/0\'',
-    EVENT_DEVICE_ACQUIRED: 'acquired'
+    DEFAULT_CARDANO_PATH: 'm/44\'/1815\'/0\''
   }
 };
