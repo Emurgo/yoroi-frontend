@@ -243,7 +243,7 @@ type TrezorDeviceInfo = {
     description: string
   },
   cardanoGetPublicKeyResult: CardanoGetPublicKey, // Trezor device CardanoGetPublicKey object
-  features: Features
+  features: Features // Trezor device CardanoGetPublicKey object
 };
 
 type Props = {
@@ -703,13 +703,12 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       trezorDeviceInfo.error = messages.connectError999;
     }
 
-    if (!trezorDeviceInfo.error && this.trezorEventDevice.payload.type !== 'acquired') {
+    if (!trezorDeviceInfo.error && this.trezorEventDevice.payload.type !== Config.trezor.EVENT_DEVICE_ACQUIRED) {
       trezorDeviceInfo.error = messages.connectError999;
     }
 
     if (!trezorDeviceInfo.error) {
-      // FIXME: try to use constants defined in Trezor for 'acquired'
-      if (this.trezorEventDevice.payload.type === 'acquired') {
+      if (this.trezorEventDevice.payload.type === Config.trezor.EVENT_DEVICE_ACQUIRED) {
         // if() is unwanted, but used because flow needs that
         trezorDeviceInfo.features = {...this.trezorEventDevice.payload.features};
       }
@@ -717,7 +716,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       trezorDeviceInfo.cardanoGetPublicKeyResult = cardanoGetPublicKeyResp;
     }
 
-    this.trezorDeviceInfo = trezorDeviceInfo;
+    this.trezorDeviceInfo = trezorDeviceInfo;    
   }
 
   _isTrezorResponseValid() {
