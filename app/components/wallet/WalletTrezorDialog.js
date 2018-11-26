@@ -313,67 +313,6 @@ export default class WalletTrezorDialog extends Component<Props, State> {
     this._updateState();
   }
 
-  /**
-   * prepares and updates the UI state
-   */
-  _updateState = async () => {
-    const { intl } = this.context;
-
-    switch (this.progressState) {
-      case ProgressStateOption.ABOUT:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.nextButtonLabel);
-        this.state.currentProgressStepInfo.currentIndex = ProgressStep.ABOUT;
-        this.state.currentProgressStepInfo.error = false;
-        this.state.error_or_live_info_text = '';
-        break;
-      case ProgressStateOption.CONNECT_LOAD:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
-        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
-        this.state.currentProgressStepInfo.error = false;
-        this.state.error_or_live_info_text = '';
-        break;
-      case ProgressStateOption.CONNECT_START:
-        this.state.action_btn_processing = true;
-        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
-        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
-        this.state.currentProgressStepInfo.error = false;
-        this.state.error_or_live_info_text = intl.formatMessage(messages.connectMsgCheckingTrezor);
-        break;
-      case ProgressStateOption.CONNECT_ERROR:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
-        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
-        this.state.currentProgressStepInfo.error = true;
-        // eslint-disable-next-line max-len
-        this.state.error_or_live_info_text = intl.formatMessage(this.trezorDeviceInfo.error);
-        break;
-      case ProgressStateOption.SAVE_LOAD:
-        this.state.action_btn_processing = false;
-        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
-        this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
-        this.state.currentProgressStepInfo.error = false;
-        this.form.$('walletName').value = this.trezorDeviceInfo.features.label;
-        this.state.error_or_live_info_text = '';
-        break;
-      case ProgressStateOption.SAVE_START:
-        this.state.action_btn_processing = true;
-        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
-        this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
-        this.state.currentProgressStepInfo.error = false;
-        this.state.error_or_live_info_text = '';
-        break;
-      case ProgressStateOption.SAVE_ERROR:
-        // managed in render()
-        break;
-      default:
-        console.error(`[TREZOR] Error state, handle _updateState for: ${this.progressState}`);
-        break;
-    }
-    this.setState({});
-  }
-
   render() {
     const { intl } = this.context;
     const { error, onCancel } = this.props;
@@ -593,6 +532,67 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
     return dialog;
   }
+
+  /**
+   * prepares and updates the UI state
+   */
+  _updateState = async () => {
+    const { intl } = this.context;
+
+    switch (this.progressState) {
+      case ProgressStateOption.ABOUT:
+        this.state.action_btn_processing = false;
+        this.state.action_btn_name = intl.formatMessage(messages.nextButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.ABOUT;
+        this.state.currentProgressStepInfo.error = false;
+        this.state.error_or_live_info_text = '';
+        break;
+      case ProgressStateOption.CONNECT_LOAD:
+        this.state.action_btn_processing = false;
+        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
+        this.state.currentProgressStepInfo.error = false;
+        this.state.error_or_live_info_text = '';
+        break;
+      case ProgressStateOption.CONNECT_START:
+        this.state.action_btn_processing = true;
+        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
+        this.state.currentProgressStepInfo.error = false;
+        this.state.error_or_live_info_text = intl.formatMessage(messages.connectMsgCheckingTrezor);
+        break;
+      case ProgressStateOption.CONNECT_ERROR:
+        this.state.action_btn_processing = false;
+        this.state.action_btn_name = intl.formatMessage(messages.connectButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.CONNECT;
+        this.state.currentProgressStepInfo.error = true;
+        // eslint-disable-next-line max-len
+        this.state.error_or_live_info_text = intl.formatMessage(this.trezorDeviceInfo.error);
+        break;
+      case ProgressStateOption.SAVE_LOAD:
+        this.state.action_btn_processing = false;
+        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
+        this.state.currentProgressStepInfo.error = false;
+        this.form.$('walletName').value = this.trezorDeviceInfo.features.label;
+        this.state.error_or_live_info_text = '';
+        break;
+      case ProgressStateOption.SAVE_START:
+        this.state.action_btn_processing = true;
+        this.state.action_btn_name = intl.formatMessage(messages.saveButtonLabel);
+        this.state.currentProgressStepInfo.currentIndex = ProgressStep.SAVE;
+        this.state.currentProgressStepInfo.error = false;
+        this.state.error_or_live_info_text = '';
+        break;
+      case ProgressStateOption.SAVE_ERROR:
+        // managed in render()
+        break;
+      default:
+        console.error(`[TREZOR] Error state, handle _updateState for: ${this.progressState}`);
+        break;
+    }
+    this.setState({});
+  }  
 
   _onBackToAbout = async () => {
     this.progressState = ProgressStateOption.ABOUT;
