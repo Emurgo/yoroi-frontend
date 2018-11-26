@@ -654,8 +654,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
   _onTrezorUIEvent = (event: UiMessage) => {
     console.log(`[TREZOR] UI_EVENT: ${event.type}`);
-    // FIXME: check about TrezorBridge/WebUSB inconsistency
-    // FIXME: trezord forces close issue
+    // FIXME: https://github.com/Emurgo/yoroi-frontend/issues/126
     // if(event.type === CLOSE_UI_WINDOW &&
     //   this.progressState === ProgressStateOption.CONNECT_START &&
     //   this.publicKeyInfo.valid === false) {
