@@ -61,7 +61,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   /** Broadcast the migration transaction if one exists and return to wallet page */
   tranferFunds = () => {
-    // broadcasst migration transaction then call continuation
+    // broadcast migration transaction then call continuation
     this._getDaedalusTransferActions().transferFunds.trigger({
       next: () => {
         const walletsStore = this._getWalletsStore();
