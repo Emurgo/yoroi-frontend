@@ -669,9 +669,10 @@ export default class WalletTrezorDialog extends Component<Props, State> {
    * Validates the compatibility of data which we have received from Trezor
    */
   _validateTrezorResponse = (cardanoGetPublicKeyResp: CardanoGetPublicKey) => {
-    const trezorDeviceInfo = {};
-    trezorDeviceInfo.valid = false;
-    trezorDeviceInfo.error = null;
+    const trezorDeviceInfo = {
+      valid: false,
+      error: null,
+    };
 
     if (!cardanoGetPublicKeyResp.success) {
       switch (cardanoGetPublicKeyResp.payload.error) {
