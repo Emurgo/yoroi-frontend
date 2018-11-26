@@ -237,13 +237,11 @@ const ProgressStateOption = {
 
 type TrezorDeviceInfo = {
   valid: boolean;
-  error: ?{
-    id: string,
-    defaultMessage: string,
-    description: string
-  },
-  cardanoGetPublicKeyResult: CardanoGetPublicKey, // Trezor device CardanoGetPublicKey object
-  features: Features // Trezor device CardanoGetPublicKey object
+  error: ?LocalizableError,
+  // Trezor device CardanoGetPublicKey object
+  cardanoGetPublicKeyResult: CardanoGetPublicKey,
+  // Trezor device Features object
+  features: Features
 };
 
 type Props = {
