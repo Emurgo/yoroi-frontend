@@ -725,8 +725,8 @@ export default class WalletTrezorDialog extends Component<Props, State> {
 
         const { walletName } = form.values();
         const walletData = {
-          publicMasterKey: this.trezorDeviceInfo.cardanoGetPublicKeyResult.payload.publicKey,
           walletName,
+          publicMasterKey: this.trezorDeviceInfo.cardanoGetPublicKeyResult.payload.publicKey,
           deviceFeatures: this.trezorDeviceInfo.features
         };
         this.props.onSubmit(walletData);
