@@ -41,16 +41,18 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { sidebar } = this.props.stores;
-    const topbarTitle = <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />;
+    const { topbar } = this.props.stores;
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
     const topBar = (
       <TopBar
         title={topbarTitle}
         onCategoryClicked={category => {
-          actions.sidebar.activateSidebarCategory.trigger({ category });
+          actions.topbar.activateTopbarCategory.trigger({ category });
         }}
-        categories={sidebar.CATEGORIES}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
+        categories={topbar.CATEGORIES}
+        activeTopbarCategory={topbar.activeTopbarCategory}
       />);
 
     const wallets = this._getWalletsStore();

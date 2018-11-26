@@ -85,16 +85,18 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   render() {
     const { stores, actions } = this.props;
-    const { sidebar } = stores;
-    const topbarTitle = <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    const { topbar } = stores;
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
     const topBar = (
       <TopBar
         title={topbarTitle}
         onCategoryClicked={category => {
-          actions.sidebar.activateSidebarCategory.trigger({ category });
+          actions.topbar.activateTopbarCategory.trigger({ category });
         }}
-        categories={sidebar.CATEGORIES}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
+        categories={topbar.CATEGORIES}
+        activeTopbarCategory={topbar.activeTopbarCategory}
       />
     );
     const wallets = this._getWalletsStore();
@@ -118,7 +120,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               onSubmit={this.setupTransferFunds}
               onBack={this.backToUninitialized}
               mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic, 12)}
-              suggestedMnemonics={validWords}
+              validWords={validWords}
             />
           </MainLayout>
         );

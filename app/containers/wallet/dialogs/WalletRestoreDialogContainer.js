@@ -29,7 +29,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     return (
       <WalletRestoreDialog
         mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
-        suggestedMnemonics={validWords}
+        validWords={validWords}
         isSubmitting={restoreRequest.isExecuting}
         onSubmit={this.onSubmit}
         onCancel={this.onCancel}

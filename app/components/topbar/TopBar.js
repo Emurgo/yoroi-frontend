@@ -6,13 +6,13 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import TopBarCategory from './TopBarCategory';
 import styles from './TopBar.scss';
-import type { Category } from '../../config/sidebarConfig';
+import type { Category } from '../../config/topbarConfig';
 
 type Props = {
   children?: ?Node,
   title: ?Node,
   categories?: Array<Category>,
-  activeSidebarCategory: string,
+  activeTopbarCategory: string,
   onCategoryClicked?: Function,
 };
 
@@ -27,7 +27,7 @@ export default class TopBar extends Component<Props> {
   render() {
     const {
       title,
-      categories, activeSidebarCategory, onCategoryClicked,
+      categories, activeTopbarCategory, onCategoryClicked,
     } = this.props;
 
     const topBarStyles = classNames([
@@ -45,7 +45,7 @@ export default class TopBar extends Component<Props> {
               key={category.name}
               className={categoryClassName}
               icon={category.icon}
-              active={activeSidebarCategory === category.route}
+              active={activeTopbarCategory === category.route}
               onClick={() => {
                 if (onCategoryClicked) {
                   onCategoryClicked(category.route);

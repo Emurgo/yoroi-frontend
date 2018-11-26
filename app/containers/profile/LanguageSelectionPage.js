@@ -30,12 +30,14 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   render() {
     const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const { sidebar } = this.props.stores;
-    const topBartitle = <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />;
+    const { topbar } = this.props.stores;
+    const topBartitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
     const topBar = (
       <TopBar
         title={topBartitle}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
+        activeTopbarCategory={topbar.activeTopbarCategory}
       />);
     return (
       <TopBarLayout

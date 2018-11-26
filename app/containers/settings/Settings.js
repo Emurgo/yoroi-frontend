@@ -36,7 +36,7 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { sidebar } = stores;
+    const { topbar } = stores;
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
@@ -44,17 +44,19 @@ export default class Settings extends Component<InjectedContainerProps> {
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
       />
     );
-    const topbarTitle = <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />;
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
     return (
       <Layout
         topbar={(
           <TopBar
             title={topbarTitle}
             onCategoryClicked={category => {
-              actions.sidebar.activateSidebarCategory.trigger({ category });
+              actions.topbar.activateTopbarCategory.trigger({ category });
             }}
-            categories={sidebar.CATEGORIES}
-            activeSidebarCategory={sidebar.activeSidebarCategory}
+            categories={topbar.CATEGORIES}
+            activeTopbarCategory={topbar.activeTopbarCategory}
           />
         )}
       >

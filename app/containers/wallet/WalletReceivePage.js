@@ -96,7 +96,6 @@ export default class WalletReceivePage extends Component<Props, State> {
               duration: notification.duration,
             });
           }}
-          isSidebarExpanded={false}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
         />

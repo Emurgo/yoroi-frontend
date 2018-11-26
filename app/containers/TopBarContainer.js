@@ -16,7 +16,7 @@ export default class TopBarContainer extends Component<Props> {
 
   render() {
     const { actions, stores } = this.props;
-    const { app, sidebar } = stores;
+    const { app, topbar } = stores;
 
     const title = (<WalletTopbarTitle
       wallet={stores.substores[environment.API].wallets.active}
@@ -27,10 +27,10 @@ export default class TopBarContainer extends Component<Props> {
       <TopBar
         title={title}
         onCategoryClicked={category => {
-          actions.sidebar.activateSidebarCategory.trigger({ category });
+          actions.topbar.activateTopbarCategory.trigger({ category });
         }}
-        categories={sidebar.CATEGORIES}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
+        categories={topbar.CATEGORIES}
+        activeTopbarCategory={topbar.activeTopbarCategory}
       />
     );
   }

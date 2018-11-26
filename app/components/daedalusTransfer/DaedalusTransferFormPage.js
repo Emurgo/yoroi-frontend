@@ -67,8 +67,7 @@ type Props = {
   onSubmit: Function,
   onBack: Function,
   mnemonicValidator: Function,
-  /** Array of all valid mnemonic words to use for auto-complete suggestions */
-  suggestedMnemonics: Array<string>,
+  validWords: Array<string>,
 };
 
 @observer
@@ -101,7 +100,6 @@ export default class DaedalusTransferFormPage extends Component<Props> {
     },
   });
 
-  /** validation hook for mobx-react-form */
   submit = () => {
     this.form.submit({
       onSuccess: (form) => {
@@ -118,7 +116,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { suggestedMnemonics, onBack } = this.props;
+    const { validWords, onBack } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -158,7 +156,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
             </div>
 
             <Autocomplete
-              options={suggestedMnemonics}
+              options={validWords}
               maxSelections={12}
               {...recoveryPhraseField.bind()}
               error={recoveryPhraseField.error}
@@ -167,7 +165,6 @@ export default class DaedalusTransferFormPage extends Component<Props> {
               skin={<SimpleAutocompleteSkin />}
             />
 
-            { /* submit mnemonic */ }
             <div className={styles.buttonsWrapper}>
               <Button
                 className={nextButtonClasses}
@@ -176,7 +173,6 @@ export default class DaedalusTransferFormPage extends Component<Props> {
                 skin={<SimpleButtonSkin />}
               />
 
-              { /* cancel (go back) */ }
               <Button
                 className={backButtonClasses}
                 label={intl.formatMessage(messages.backButtonLabel)}

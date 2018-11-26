@@ -4,30 +4,29 @@ import Store from '../base/Store';
 import resolver from '../../utils/imports';
 import environment from '../../environment';
 
-const sidebarConfig = resolver('config/sidebarConfig');
+const topbarConfig = resolver('config/topbarConfig');
 
-/** Note: Sidebar is actually a TopBar in Yoroi */
-export default class SidebarStore extends Store {
+export default class TopbarStore extends Store {
 
-  CATEGORIES = sidebarConfig.CATEGORIES;
+  CATEGORIES = topbarConfig.CATEGORIES;
 
-  @observable activeSidebarCategory: string = this.CATEGORIES[0].route;
+  @observable activeTopbarCategory: string = this.CATEGORIES[0].route;
 
   setup() {
-    const actions = this.actions.sidebar;
-    actions.activateSidebarCategory.listen(this._onActivateSidebarCategory);
+    const actions = this.actions.topbar;
+    actions.activateTopbarCategory.listen(this._onactivateTopbarCategory);
     actions.walletSelected.listen(this._onWalletSelected);
     this.registerReactions([
-      this._syncSidebarRouteWithRouter,
+      this._syncTopbarRouteWithRouter,
     ]);
   }
 
-  @action _onActivateSidebarCategory = (
+  @action _onactivateTopbarCategory = (
     params: { category: string, }
   ): void => {
     const { category } = params;
-    if (category !== this.activeSidebarCategory) {
-      this.activeSidebarCategory = category;
+    if (category !== this.activeTopbarCategory) {
+      this.activeTopbarCategory = category;
       this.actions.router.goToRoute.trigger({ route: category });
     }
   };
@@ -38,17 +37,17 @@ export default class SidebarStore extends Store {
     this.stores.substores[environment.API].wallets.goToWalletRoute(walletId);
   };
 
-  @action _setActivateSidebarCategory = (
+  @action _setactivateTopbarCategory = (
     category: string
   ): void => {
-    this.activeSidebarCategory = category;
+    this.activeTopbarCategory = category;
   };
 
-  _syncSidebarRouteWithRouter = (): void => {
+  _syncTopbarRouteWithRouter = (): void => {
     const route = this.stores.app.currentRoute;
     this.CATEGORIES.forEach((category) => {
       // If the current route starts with the root of the category
-      if (route.indexOf(category.route) === 0) this._setActivateSidebarCategory(category.route);
+      if (route.indexOf(category.route) === 0) this._setactivateTopbarCategory(category.route);
     });
   };
 }

@@ -3,74 +3,25 @@
 .component {
   @include button;
   align-items: center;
-  color: var(--theme-sidebar-category-text-color);
+  color: var(--theme-topbar-category-text-color);
   display: flex;
   height: 64px;
   justify-content: center;
   width: 64px;
 
   &:hover {
-    background-color: var(--theme-sidebar-category-background-color-hover);
-  }
-
-  &.supportRequest {
-    &:hover,
-    &.active {
-      svg {
-        & > g {
-          opacity: 1;
-
-          :nth-child(1) {
-            opacity: 0.5;
-          }
-
-          :nth-child(2) {
-            fill: rgb(255, 79, 25);
-            opacity: 1;
-          }
-
-          & > g {
-            opacity: 0.5;
-            stroke: none;
-            & > path {
-              opacity: 1 !important;
-            }
-          }
-
-          :nth-child(5) {
-            fill: rgb(255, 79, 25);
-          }
-
-          :nth-child(6) {
-            fill: rgb(220, 43, 0);
-          }
-
-          :nth-child(7) {
-            fill: rgb(255, 219, 45);
-          }
-
-          :nth-child(8) {
-            fill: rgb(250, 251, 252);
-            opacity: 0.5;
-          }
-
-          :nth-child(9) {
-            fill: rgb(245, 179, 0);
-          }
-        }
-      }
-    }
+    background-color: var(--theme-topbar-category-background-color-hover);
   }
 }
 
 .active {
   path {
-    stroke: #daa49a;
-    fill: #daa49a;
+    stroke: var(--theme-button-primary-background-color);
+    fill: var(--theme-button-primary-background-color);
   }
 
   .icon:not(.walletsIcon) path {
-    fill: #daa49a;
+    fill: var(--theme-button-primary-background-color);
   }
 
   &:hover {
@@ -85,11 +36,11 @@
     height: 24px;
 
     & > g > path {
-      fill: var(--theme-icon-sidebar-color);
+      fill: var(--theme-icon-topbar-color);
     }
     // ada.svg icon needs stroke attribute
     & > g > g {
-      stroke: var(--theme-icon-sidebar-color);
+      stroke: var(--theme-icon-topbar-color);
     }
   }
 }
@@ -110,21 +61,6 @@
     &.settings {
       right: 0;
     }
-  }
-}
-
-.supportRequest {
-  bottom: 0;
-  position: absolute;
-  width: auto;
-}
-
-.supportRequestIcon {
-  flex-shrink: 0;
-  margin: 0 30px;
-  & > svg {
-    width: 24px;
-    height: 24px;
   }
 }
 
