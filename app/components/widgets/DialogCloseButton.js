@@ -9,11 +9,14 @@ type Props = {
 };
 
 export default class DialogCloseButton extends Component<Props> {
+  static defaultProps = {
+    icon: null
+  };
 
   render() {
     const { onClose, icon } = this.props;
     return (
-      <button onClick={onClose} className={styles.component}>
+      <button type="button" onClick={onClose} className={styles.component}>
         <SvgInline svg={icon || closeCross} cleanup={['title']} />
       </button>
     );

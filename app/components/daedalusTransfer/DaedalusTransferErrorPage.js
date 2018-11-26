@@ -28,6 +28,9 @@ type Props = {
 
 @observer
 export default class DaedalusTransferErrorPage extends Component<Props> {
+  static defaultProps = {
+    error: undefined
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired

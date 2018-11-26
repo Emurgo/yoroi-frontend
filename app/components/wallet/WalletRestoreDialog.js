@@ -87,6 +87,9 @@ type Props = {
 
 @observer
 export default class WalletRestoreDialog extends Component<Props> {
+  static defaultProps = {
+    error: undefined
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SettingsLayout from '../../components/settings/SettingsLayout';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
@@ -18,10 +18,8 @@ const messages = defineMessages({
   },
 });
 
-@inject('stores', 'actions') @observer
+@observer
 export default class Settings extends Component<InjectedContainerProps> {
-
-  static defaultProps = { actions: null, stores: null };
 
   static contextTypes = {
     intl: intlShape.isRequired,

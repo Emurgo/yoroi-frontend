@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
@@ -15,10 +15,8 @@ const messages = defineMessages({
   },
 });
 
-@inject('stores', 'actions') @observer
+@observer
 export default class LanguageSelectionPage extends Component<InjectedProps> {
-
-  static defaultProps = { actions: null, stores: null };
 
   static contextTypes = {
     intl: intlShape.isRequired,

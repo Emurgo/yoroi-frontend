@@ -1,19 +1,17 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import WalletSendForm from '../../components/wallet/WalletSendForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
 import { DECIMAL_PLACES_IN_ADA, MAX_INTEGER_PLACES_IN_ADA } from '../../config/numbersConfig';
+import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
+import type { DialogProps } from './dialogs/WalletSendConfirmationDialogContainer';
 
 type Props = InjectedProps;
-
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletSendPage extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null };
-
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -22,7 +20,7 @@ export default class WalletSendPage extends Component<Props> {
     const { intl } = this.context;
     const { uiDialogs } = this.props.stores;
     const { wallets, transactions } = this.props.stores.substores.ada;
-    const { actions } = this.props;
+    const { actions, stores } = this.props;
     const { isValidAddress } = wallets;
     const { calculateTransactionFee, validateAmount, hasAnyPending } = transactions;
     const activeWallet = wallets.active;
@@ -30,6 +28,19 @@ export default class WalletSendPage extends Component<Props> {
     // Guard against potential null values
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
+    // Callback that creates a container to avoid the component knowing about actions/stores
+    const dialogCallback = function (props: DialogProps) {
+      return (<WalletSendConfirmationDialogContainer
+        actions={actions}
+        stores={stores}
+        amount={props.amount}
+        receiver={props.receiver}
+        totalAmount={props.totalAmount}
+        transactionFee={props.transactionFee}
+        amountToNaturalUnits={props.amountToNaturalUnits}
+        currencyUnit={props.currencyUnit}
+      />);
+    };
     return (
       <WalletSendForm
         currencyUnit={intl.formatMessage(globalMessages.unitAda)}
@@ -42,6 +53,7 @@ export default class WalletSendPage extends Component<Props> {
         addressValidator={isValidAddress}
         isDialogOpen={uiDialogs.isOpen}
         openDialogAction={actions.dialogs.open.trigger}
+        dialogRenderCallback={dialogCallback}
         hasAnyPending={hasAnyPending}
       />
     );

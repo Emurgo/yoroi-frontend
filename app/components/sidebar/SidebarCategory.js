@@ -29,7 +29,7 @@ export default class SidebarCategory extends Component<Props> {
     ]));
 
     return (
-      <button className={componentStyles} onClick={onClick}>
+      <button type="button" className={componentStyles} onClick={onClick}>
         <SvgInline svg={icon} className={iconStyles} cleanup={['title']} />
       </button>
     );

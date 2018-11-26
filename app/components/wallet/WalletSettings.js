@@ -7,9 +7,9 @@ import LocalizableError from '../../i18n/LocalizableError';
 import InlineEditingInput from '../widgets/forms/InlineEditingInput';
 import ReadOnlyInput from '../widgets/forms/ReadOnlyInput';
 import ChangeWalletPasswordDialog from './settings/ChangeWalletPasswordDialog';
-import ChangeWalletPasswordDialogContainer from '../../containers/wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletSettings.scss';
+import type { Node } from 'react';
 
 export const messages = defineMessages({
   name: {
@@ -40,6 +40,7 @@ type Props = {
   error?: ?LocalizableError,
   openDialogAction: Function,
   isDialogOpen: Function,
+  dialog: Node,
   onFieldValueChange: Function,
   onStartEditing: Function,
   onStopEditing: Function,
@@ -53,7 +54,9 @@ type Props = {
 
 @observer
 export default class WalletSettings extends Component<Props> {
-
+  static defaultProps = {
+    error: undefined
+  };
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -73,7 +76,7 @@ export default class WalletSettings extends Component<Props> {
       onStopEditing, onCancelEditing,
       nameValidator, activeField,
       isSubmitting, isInvalid,
-      lastUpdatedField,
+      lastUpdatedField, dialog
     } = this.props;
     const passwordMessage = (
       intl.formatMessage(messages.passwordLastUpdated, {
@@ -109,7 +112,7 @@ export default class WalletSettings extends Component<Props> {
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
         {isDialogOpen(ChangeWalletPasswordDialog) ? (
-          <ChangeWalletPasswordDialogContainer />
+          <div>{dialog}</div>
         ) : null}
 
       </div>

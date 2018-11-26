@@ -4,19 +4,20 @@ import classNames from 'classnames';
 import { kebabCase } from 'lodash';
 import TopBarCategory from './TopBarCategory';
 import styles from './TextOnlyTopbar.scss';
+import type { Category } from '../../config/sidebarConfig';
 
 type Props = {
   title: string,
-  categories?: Array<{
-    name: string,
-    route: string,
-    icon: string,
-  }>,
+  categories?: Array<Category>,
   activeSidebarCategory: string,
   onCategoryClicked?: Function,
 };
 
 export default class TextOnlyTopBar extends Component<Props> {
+  static defaultProps = {
+    categories: undefined,
+    onCategoryClicked: undefined
+  };
 
   render() {
     const { title, categories, activeSidebarCategory, onCategoryClicked } = this.props;
@@ -31,11 +32,11 @@ export default class TextOnlyTopBar extends Component<Props> {
             <div className={styles.topbarTitleText}>{title}</div>
           </div>
         </div>
-        {categories && categories.map((category, index) => {
+        {categories && categories.map(category => {
           const categoryClassName = kebabCase(category.name);
           return (
             <TopBarCategory
-              key={index}
+              key={category.name}
               className={categoryClassName}
               icon={category.icon}
               active={activeSidebarCategory === category.route}

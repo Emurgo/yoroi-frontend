@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import validWords from 'bip39/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -25,10 +25,8 @@ const messages = defineMessages({
   },
 });
 
-@inject('stores', 'actions') @observer
+@observer
 export default class DaedalusTransferPage extends Component<InjectedProps> {
-
-  static defaultProps = { actions: null, stores: null };
 
   static contextTypes = {
     intl: intlShape.isRequired,

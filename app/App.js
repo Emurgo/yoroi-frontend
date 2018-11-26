@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Provider, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-css-themr';
 import { Router } from 'react-router';
 import { addLocaleData, IntlProvider } from 'react-intl';
@@ -40,16 +40,14 @@ export default class App extends Component<{
     return (
       <div>
         <ThemeManager variables={theme} />
-        <Provider stores={stores} actions={actions}>
-          {/* Automatically pass a theme prop to all componenets in this subtree. */}
-          <ThemeProvider theme={yoroiTheme}>
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              <div style={{ height: '100%' }}>
-                <Router history={history} routes={Routes} />
-              </div>
-            </IntlProvider>
-          </ThemeProvider>
-        </Provider>
+        {/* Automatically pass a theme prop to all componenets in this subtree. */}
+        <ThemeProvider theme={yoroiTheme}>
+          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+            <div style={{ height: '100%' }}>
+              <Router history={history} routes={Routes(stores, actions)} />
+            </div>
+          </IntlProvider>
+        </ThemeProvider>
       </div>
     );
   }

@@ -16,7 +16,6 @@ import BorderedBox from '../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages from '../../i18n/global-messages';
 import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
-import WalletSendConfirmationDialogContainer from '../../containers/wallet/dialogs/WalletSendConfirmationDialogContainer';
 import { formattedAmountToBigNumber, formattedAmountToNaturalUnits } from '../../utils/formatters';
 import dangerIcon from '../../assets/images/danger.inline.svg';
 
@@ -102,13 +101,14 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   currencyUnit: string,
-  currencyMaxIntegerDigits?: number,
+  currencyMaxIntegerDigits: number,
   currencyMaxFractionalDigits: number,
   validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
   calculateTransactionFee: (receiver: string, amount: string) => Promise<BigNumber>,
   addressValidator: Function,
   openDialogAction: Function,
   isDialogOpen: Function,
+  dialogRenderCallback: Function,
   hasAnyPending: boolean
 };
 
@@ -213,7 +213,7 @@ export default class WalletSendForm extends Component<Props, State> {
     const { intl } = this.context;
     const {
       currencyUnit, currencyMaxIntegerDigits, currencyMaxFractionalDigits,
-      openDialogAction, isDialogOpen, hasAnyPending
+      openDialogAction, isDialogOpen, hasAnyPending, dialogRenderCallback
     } = this.props;
     const { isTransactionFeeCalculated, transactionFee, transactionFeeError } = this.state;
     const amountField = form.$('amount');
@@ -234,6 +234,14 @@ export default class WalletSendForm extends Component<Props, State> {
       </div>
     );
 
+    const dialogProps = {
+      amount: amountFieldProps.value,
+      receiver: receiverFieldProps.value,
+      totalAmount: totalAmount.toFormat(currencyMaxFractionalDigits),
+      transactionFee: transactionFee.toFormat(currencyMaxFractionalDigits),
+      amountToNaturalUnits: formattedAmountToNaturalUnits,
+      currencyUnit
+    };
     return (
       <div className={styles.component}>
 
@@ -283,14 +291,9 @@ export default class WalletSendForm extends Component<Props, State> {
         </BorderedBox>
 
         {isDialogOpen(WalletSendConfirmationDialog) ? (
-          <WalletSendConfirmationDialogContainer
-            amount={amountFieldProps.value}
-            receiver={receiverFieldProps.value}
-            totalAmount={totalAmount.toFormat(currencyMaxFractionalDigits)}
-            transactionFee={transactionFee.toFormat(currencyMaxFractionalDigits)}
-            amountToNaturalUnits={formattedAmountToNaturalUnits}
-            currencyUnit={currencyUnit}
-          />
+          <div>
+            {dialogRenderCallback(dialogProps)}
+          </div>
         ) : null}
 
       </div>

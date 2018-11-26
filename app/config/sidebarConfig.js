@@ -4,7 +4,12 @@ import walletsIcon from '../assets/images/yoroi-logo-shape-white.inline.svg';
 import settingsIcon from '../assets/images/sidebar/settings-ic.inline.svg';
 import daedalusTransferIcon from '../assets/images/sidebar/daedalus-transfer.inline.svg';
 
-export const CATEGORIES = [
+export type Category = {
+  name: string,
+  route: string,
+  icon: string
+}
+export const CATEGORIES = ([
   {
     name: 'WALLETS',
     route: ROUTES.WALLETS.ROOT,
@@ -20,4 +25,4 @@ export const CATEGORIES = [
     route: ROUTES.SETTINGS.ROOT,
     icon: settingsIcon,
   },
-];
+]: Array<Category>);

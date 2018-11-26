@@ -113,6 +113,7 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
                   ]);
 
                   return (
+                    // eslint-disable-next-line react/no-array-index-key
                     <div key={index} className={addressesClasses}>{sender}</div>
                   );
                 })

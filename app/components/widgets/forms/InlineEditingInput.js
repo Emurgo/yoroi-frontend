@@ -46,6 +46,9 @@ type State = {
 
 @observer
 export default class InlineEditingInput extends Component<Props, State> {
+  static defaultProps = {
+    className: undefined
+  };
 
   state = {
     isActive: false,
@@ -171,6 +174,7 @@ export default class InlineEditingInput extends Component<Props, State> {
 
         {isActive && (
           <button
+            type="button"
             className={styles.button}
             onMouseDown={this.onCancel}
           >

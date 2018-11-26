@@ -37,6 +37,9 @@ type State = {
 
 @observer
 export default class TermsOfUseForm extends Component<Props, State> {
+  static defaultProps = {
+    error: undefined
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,

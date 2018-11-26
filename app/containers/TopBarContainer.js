@@ -12,7 +12,6 @@ type Props = InjectedProps;
 
 @observer
 export default class TopBarContainer extends Component<Props> {
-  static defaultProps = { actions: null, stores: null };
 
   render() {
     const { actions, stores } = this.props;
@@ -20,7 +19,7 @@ export default class TopBarContainer extends Component<Props> {
 
     return (
       <TopBar
-        wallets={stores.substores[environment.API].wallets}
+        wallet={stores.substores[environment.API].wallets.active}
         currentRoute={app.currentRoute}
         showSubMenus={false}
         formattedWalletAmount={formattedWalletAmount}

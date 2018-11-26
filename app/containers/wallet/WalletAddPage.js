@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import WalletAdd from '../../components/wallet/WalletAdd';
@@ -26,11 +26,8 @@ const messages = defineMessages({
   },
 });
 
-@inject('actions', 'stores') @observer
+@observer
 export default class WalletAddPage extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null };
-
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -61,11 +58,17 @@ export default class WalletAddPage extends Component<Props> {
     let content = null;
 
     if (uiDialogs.isOpen(WalletCreateDialog)) {
-      content = <WalletCreateDialogContainer onClose={this.onClose} />;
+      content = (
+        <WalletCreateDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+      );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      content = <WalletRestoreDialogContainer onClose={this.onClose} />;
+      content = (
+        <WalletRestoreDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+      );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
-      content = <WalletBackupDialogContainer onClose={this.onClose} />;
+      content = (
+        <WalletBackupDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+      );
     } else {
       content = (
         <WalletAdd
