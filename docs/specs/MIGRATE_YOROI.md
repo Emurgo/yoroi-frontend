@@ -27,7 +27,7 @@ This is a very poor user experience -- especially if a user is trying to migrate
 
 # Proposal
 
-## Easiest imlpementation
+## Easiest implementation (Selected)
 
 We introduce a `Migrate Yoroi wallet` feature similar to the `Migrate Daedalus` wallet feature by simply copy pasting code. 
 
