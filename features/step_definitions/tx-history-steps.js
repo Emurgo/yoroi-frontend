@@ -42,10 +42,14 @@ Given(/^There are transactions already stored$/, async function () {
 
   const transactions = storedTxs['simple-wallet'];
   const formattedTransactions = transactions.map(tx => {
-    const newTx = Object.assign({}, tx);
-    newTx.ctMeta = {};
-    newTx.ctMeta.ctmDate = new Date(tx.ctMeta.ctmDate);
-    newTx.ctMeta.ctmUpdate = new Date(tx.ctMeta.ctmDate);
+    const newTx = Object.assign(
+      {},
+      tx,
+      { ctMeta: {
+        ctmDate: new Date(tx.ctMeta.ctmDate),
+        ctmUpdate: new Date(tx.ctMeta.ctmUpdate)
+      } }
+    );
     return newTx;
   });
   await this.saveTxsToDB(formattedTransactions);

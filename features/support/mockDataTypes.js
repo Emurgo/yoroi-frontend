@@ -1,6 +1,6 @@
 // @flow
 
-import type { AdaAddress, AdaTransaction, AdaWallet, Transaction } from '../../app/api/ada/adaTypes';
+import type { AdaAddress, AdaTransaction, AdaWallet, Transaction, UTXO } from '../../app/api/ada/adaTypes';
 
 export type InitialData = {
     addressesStartingWith: string,
@@ -11,14 +11,6 @@ export type InitialData = {
 
 export type WalletInitialData = {
     [key: string]: InitialData
-};
-
-export type MockUTXO = {
-    utxo_id?: string,
-    tx_hash?: string,
-    tx_index?: number,
-    receiver: string,
-    amount: number
 };
 
 export type MockWalletTx = {
@@ -53,7 +45,7 @@ export type LovefieldShownTxSet = {
 export type FeatureData = {
     walletInitialData?: WalletInitialData,
     usedAddresses?: Array<string>,
-    utxos?: Array<MockUTXO>,
+    utxos?: Array<UTXO>,
     adaAddresses?: Array<AdaAddress>,
     masterKey?: string,
     password?: string,

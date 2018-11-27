@@ -161,7 +161,7 @@ export default class DaedalusTransferStore extends Store {
   }): Promise<Array<void>> => {
     const { cborEncodedTx } = payload;
     const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-    return sendTx(signedTx);
+    return sendTx({ signedTx });
   }
 
   /** Broadcast the migration transaction if one exists and proceed to continuation */

@@ -4,6 +4,13 @@ import { create, bodyParser, defaults } from 'json-server';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { getFeatureData, getTxsMapList } from './mockDataBuilder';
+import type {
+  txsUtxoForAddressesInput, txsUtxoForAddressesOutput,
+  txsUtxoSumForAddressessInput, txsUtxoSumForAddressesOutput,
+  txsHistoryInput, txsHistoryOutput,
+  txsSignedInput, txsSignedOutput,
+  addressesFilterUsedInput, addressesFilterUsedOutput
+} from '../../app/api/ada/lib/yoroi-backend-api';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -13,7 +20,10 @@ const port = 8080;
 const addressesLimit = 50;
 const txsLimit = 20;
 
-function _validateAddressesReq({ addresses } = {}) {
+function _validateAddressesReq(
+  { addresses }: { addresses: Array<string> } = {}
+): boolean {
+  console.log(addresses);
   if (!addresses || addresses.length > addressesLimit || addresses.length === 0) {
     throw new Error('Addresses request length should be (0, ' + addressesLimit + ']');
   }
@@ -21,26 +31,50 @@ function _validateAddressesReq({ addresses } = {}) {
   return true;
 }
 
-function _validateDatetimeReq({ dateFrom } = {}) {
+function _validateDatetimeReq(
+  { dateFrom }: { dateFrom: Date } = {}
+): boolean {
   if (!dateFrom || !moment(dateFrom).isValid()) {
     throw new Error('DateFrom should be a valid datetime');
   }
   return true;
 }
 
-function _defaultSignedTransaction(req, res) {
-  res.send();
+function _defaultSignedTransaction(
+  req: {
+    body: txsSignedInput
+  },
+  res: { send(arg: txsSignedOutput): Response }
+): void {
+  res.send([]);
 }
 
 let MockServer = null;
 
-export function getMockServer(settings: { signedTransaction?: Function }) {
+export function getMockServer(
+  settings: {
+    signedTransaction?: (
+      req: {
+        body: txsSignedInput
+      },
+      res: {
+        send(arg: txsSignedOutput): any,
+        status: Function
+      }
+    ) => void
+  }
+) {
   if (!MockServer) {
     const server = create();
 
     server.use(middlewares);
 
-    server.post('/api/txs/utxoForAddresses', (req, res) => {
+    server.post('/api/txs/utxoForAddresses', (
+      req: {
+        body: txsUtxoForAddressesInput
+      },
+      res: { send(arg: txsUtxoForAddressesOutput): any }
+    ): void => {
       const { utxos } = getFeatureData();
       const filteredUtxos = utxos
         ? utxos.filter(utxo => req.body.addresses.includes(utxo.receiver))
@@ -48,7 +82,12 @@ export function getMockServer(settings: { signedTransaction?: Function }) {
       res.send(filteredUtxos);
     });
 
-    server.post('/api/txs/utxoSumForAddresses', (req, res) => {
+    server.post('/api/txs/utxoSumForAddresses', (
+      req: {
+        body: txsUtxoSumForAddressessInput
+      },
+      res: { send(arg: txsUtxoSumForAddressesOutput): any }
+    ): void => {
       _validateAddressesReq(req.body);
       const utxos = getFeatureData().utxos;
       const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
@@ -60,7 +99,13 @@ export function getMockServer(settings: { signedTransaction?: Function }) {
       res.send({ sum: sumUtxos.toString() });
     });
 
-    server.post('/api/txs/history', (req, res) => {
+    server.post('/api/txs/history', (
+      req: {
+        body: txsHistoryInput
+      },
+      res: { send(arg: txsHistoryOutput): any }
+    ): void => {
+      console.log(req.body);
       _validateAddressesReq(req.body);
       _validateDatetimeReq(req.body);
       const txsMapList = getTxsMapList(req.body.addresses);
@@ -76,7 +121,12 @@ export function getMockServer(settings: { signedTransaction?: Function }) {
     server.post('/api/txs/signed', settings.signedTransaction ?
       settings.signedTransaction : _defaultSignedTransaction);
 
-    server.post('/api/addresses/filterUsed', (req, res) => {
+    server.post('/api/addresses/filterUsed', (
+      req: {
+        body: addressesFilterUsedInput
+      },
+      res: { send(arg: addressesFilterUsedOutput): any }
+    ): void => {
       const usedAddresses = getFeatureData().usedAddresses;
       const filteredAddresses = usedAddresses
         ? usedAddresses.filter((address) => (

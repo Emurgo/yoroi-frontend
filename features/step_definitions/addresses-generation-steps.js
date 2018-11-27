@@ -34,16 +34,23 @@ Then(/^I should see my latest address "([^"]*)" at the top$/, async function (ad
 });
 
 Then(/^I see every generated address is unique$/, async function () {
-  const addressesStringArray = [];
   const addresses = await this.driver.findElements(By.xpath("//div[@class='WalletReceive_addressId']"));
 
-  for (let i = 1; i <= addresses.length; i++) {
-    await this.driver.findElement(By.css(`.generatedAddress-${i} .WalletReceive_addressId`)).getText().then(addr => (
-      addressesStringArray.push(addr)
+  const addressesStringArray = Array
+    .from({ length: addresses.length }, (x, i) => i + 1)
+    .map(async i => (
+      await this.driver
+        .findElement(By.css(`.generatedAddress-${i} .WalletReceive_addressId`))
+        .getText()
     ));
-  }
-  const unique = await checkIfElementsInArrayAreUnique.call(this, addressesStringArray);
-  expect(unique).to.be.true;
+
+  await Promise
+    .all(addressesStringArray)
+    .then(async completed => {
+      const unique = await checkIfElementsInArrayAreUnique.call(this, completed);
+      expect(unique).to.be.true;
+      return undefined;
+    });
 });
 
 Then(/^I should see the addresses exactly list them$/, async function (table) {

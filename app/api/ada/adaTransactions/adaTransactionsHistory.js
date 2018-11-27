@@ -130,10 +130,10 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
     : dateFrom;
 
   // Get historic transactions from backend API
-  const history = await getTransactionsHistoryForAddresses(
-    groupOfAddresses,
-    updatedDateFrom
-  );
+  const history = await getTransactionsHistoryForAddresses({
+    addresses: groupOfAddresses,
+    dateFrom: updatedDateFrom
+  });
 
   // No more history left to fetch
   if (history.length === 0) {

@@ -180,7 +180,7 @@ async function _scanNextBatch(
   );
 
   // batch to backend API
-  const usedAddresses = await checkAddressesInUse(newAddresses);
+  const usedAddresses = await checkAddressesInUse({ addresses: newAddresses });
 
   // Update metadata for new addresses
   newFetchedAddressesInfo = _addFetchedAddressesInfo(

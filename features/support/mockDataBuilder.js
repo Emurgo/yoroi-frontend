@@ -27,7 +27,7 @@ export function getFakeAddresses(
   const addresses = _generateListOfStrings(addressesStartingWith);
   return addresses.slice(0, totalAddresses).map((address) => ({
     cadAmount: {
-      getCCoin: 0
+      getCCoin: '0'
     },
     cadId: address,
     cadIsUsed: false,
@@ -98,13 +98,13 @@ function _getTxs(
       const txTime = currentTime.setDate(currentTime.getDate() + index);
       const newTx = Object.assign({}, {
         hash: txHash,
-        time: new Date(txTime).toString(),
+        time: JSON.stringify(new Date(txTime)),
         inputs_address: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
         inputs_amount: ['70'],
         outputs_address: [addressesStartingWith + 'W'],
         outputs_amount: ['200'],
         best_block_num: '101',
-        last_update: new Date(txTime).toString(),
+        last_update: JSON.stringify(new Date(txTime)),
         tx_state: 'Pending'
       });
       const txMap = Object.assign({}, { address: addressesStartingWith + 'W', tx: newTx });
