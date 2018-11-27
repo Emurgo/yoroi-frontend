@@ -17,7 +17,7 @@ export default class ProgressSteps extends Component<Props> {
 
   createSetps = () => {
     const { stepsList, progressInfo } = this.props;
-    // progressIndex can't be less than 0
+    // progressIndex should not be less than 0
     const currentProgressIndex = progressInfo.currentIndex < 0 ? 0 : progressInfo.currentIndex;
 
     const steps = [];
