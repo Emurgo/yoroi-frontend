@@ -23,7 +23,6 @@ const txsLimit = 20;
 function _validateAddressesReq(
   { addresses }: { addresses: Array<string> } = {}
 ): boolean {
-  console.log(addresses);
   if (!addresses || addresses.length > addressesLimit || addresses.length === 0) {
     throw new Error('Addresses request length should be (0, ' + addressesLimit + ']');
   }
@@ -105,7 +104,6 @@ export function getMockServer(
       },
       res: { send(arg: txsHistoryOutput): any }
     ): void => {
-      console.log(req.body);
       _validateAddressesReq(req.body);
       _validateDatetimeReq(req.body);
       const txsMapList = getTxsMapList(req.body.addresses);
