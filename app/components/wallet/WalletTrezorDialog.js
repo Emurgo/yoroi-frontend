@@ -259,7 +259,6 @@ type State = {
   actionButtonName?: string,
   isActionProcessing? : boolean,
   errorOrLiveInfoText? : string,
-  defaultWalletName: ?string
 }
 
 @observer
@@ -286,8 +285,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       currentProgressStepInfo: {
         currentIndex: ProgressStep.ABOUT,
         error: false
-      },
-      defaultWalletName: null
+      }
     };
 
     this.form = new ReactToolboxMobxForm({
@@ -476,7 +474,6 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       let styleLiveInfo = null;
       if (this.progressState === ProgressStateOption.SAVE_LOAD) {
         // LOAD
-        this.form.$('walletName').value = this.state.defaultWalletName;
         middleComponent = (
           <div className={classnames([styles.middleComponent, styles.middleComponentSaveLoad])}>
             <SvgInline svg={saveLoadGIF} cleanup={['title']} />
@@ -592,7 +589,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           currentIndex: ProgressStep.SAVE,
           error: false
         };
-        newState.defaultWalletName = this.trezorDeviceInfo.features.label;
+        this.form.$('walletName').value = this.trezorDeviceInfo.features.label;
         newState.errorOrLiveInfoText = '';
         break;
       case ProgressStateOption.SAVE_START:
