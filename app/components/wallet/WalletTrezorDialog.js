@@ -592,7 +592,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
           currentIndex: ProgressStep.SAVE,
           error: false
         };
-        newState.defaultWalletName = this.trezorDeviceInfo.features.label
+        newState.defaultWalletName = this.trezorDeviceInfo.features.label;
         newState.errorOrLiveInfoText = '';
         break;
       case ProgressStateOption.SAVE_START:
@@ -644,7 +644,7 @@ export default class WalletTrezorDialog extends Component<Props, State> {
       const trezorValidity = this._validateTrezor(cardanoGetPublicKeyResp, trezorEventDevice);
 
       const trezorDeviceInfo = Object.assign({}, trezorValidity);
-      
+
       if (trezorDeviceInfo.valid) {
         trezorDeviceInfo.cardanoGetPublicKeyResult = cardanoGetPublicKeyResp;
         if (trezorEventDevice.payload.type === 'acquired') {
