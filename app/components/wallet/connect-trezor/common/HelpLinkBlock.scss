@@ -1,0 +1,18 @@
+$opacityCommon: 0.7;
+
+.component {
+  overflow: hidden;
+}
+
+.yoroiLinkComponent {
+  margin-top: 16px;
+  width: 725px;
+  height: 18px;
+  text-align: center;
+  font-family: var(--font-regular);
+  font-size: 14px;
+  a {
+    opacity: $opacityCommon;
+    color: var(--font-black);
+  }  
+}

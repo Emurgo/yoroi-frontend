@@ -1,0 +1,21 @@
+$opacityCommon: 0.7;
+
+.component {
+  overflow: hidden;
+}
+
+.liveInfoComponent {
+  margin-top: 10px;
+  width: 725px;
+  height: 18px;
+  text-align: center;
+  font-family: var(--font-regular);
+  font-size: 14px;
+  span {
+    opacity: $opacityCommon;
+  }
+}
+
+.errorBlock {
+  color: var(--theme-input-error-color);
+}

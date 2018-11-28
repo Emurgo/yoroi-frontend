@@ -7,7 +7,6 @@ import WalletAdd from '../../components/wallet/WalletAdd';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-import WalletTrezorDialog from '../../components/wallet/WalletTrezorDialog';
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
 import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
 import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
@@ -69,12 +68,13 @@ export default class WalletAddPage extends Component<Props> {
       content = <WalletRestoreDialogContainer onClose={this.onClose} />;
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       content = <WalletBackupDialogContainer onClose={this.onClose} />;
-    } else if (uiDialogs.isOpen(WalletTrezorDialog)) {
+    } else if (uiDialogs.isOpen(WalletTrezorDialogContainer)) {
+      // TODO : to discuss
       content = <WalletTrezorDialogContainer onClose={this.onClose} />;
     } else {
       content = (
         <WalletAdd
-          onTrezor={() => actions.dialogs.open.trigger({ dialog: WalletTrezorDialog })}
+          onTrezor={() => actions.dialogs.open.trigger({ dialog: WalletTrezorDialogContainer })} // TODO : to discuss
           isConnectTrezorActive={isConnectTrezorActive}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}

@@ -1,4 +1,4 @@
-@import '../../themes/mixins/loading-spinner';
+@import '../../../themes/mixins/loading-spinner';
 
 $opacityCommon: 0.7;
 
@@ -7,7 +7,7 @@ $opacityCommon: 0.7;
 }
 
 .isProcessing {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
+  @include loading-spinner("../../../assets/images/spinner-light.svg");
 }
 
 .walletName {
