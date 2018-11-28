@@ -5,7 +5,7 @@ import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import path from 'path';
 
-// FIXME: We should add methods to `this.driver` object, instead of use `this` directly
+// TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld() {
   this.driver = new seleniumWebdriver.Builder()
     .withCapabilities({

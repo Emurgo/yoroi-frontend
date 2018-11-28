@@ -330,7 +330,7 @@ export default class AdaApi {
     }
   }
 
-  // FIXME: This method is exposed to allow injecting data when testing
+  /** TODO: This method is exposed to allow injecting data when testing */
   async saveAddress(address: AdaAddress, addressType: AddressType): Promise<void> {
     try {
       await saveAdaAddress(address, addressType);
@@ -340,7 +340,7 @@ export default class AdaApi {
     }
   }
 
-  // FIXME: This method is exposed to allow injecting data when testing
+  /** TODO: This method is exposed to allow injecting data when testing */
   async saveTxs(txs: Array<AdaTransaction>): Promise<void> {
     try {
       await saveTxs(txs);

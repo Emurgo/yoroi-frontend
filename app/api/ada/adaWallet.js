@@ -143,7 +143,7 @@ export async function getBalance(
     return partialAmounts.reduce(
       (acc: BigNumber, partialAmount) => (
         acc.plus(
-          partialAmount.sum // null if no addresses in the batch has any balance in them
+          partialAmount.sum // undefined if no addresses in the batch has any balance in them
             ? new BigNumber(partialAmount.sum)
             : new BigNumber(0)
         )

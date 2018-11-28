@@ -51,7 +51,7 @@ export async function generateSTxs(
     log(`[generateSTxs] Giving funds to ${newWalletAddr}`);
 
     // Wait fot the tx to be confirmed so that its inputs are not used by the next txs
-    // FIXME: Improve querying the explorer or using the tx history
+    // TODO: Improve querying the explorer or using the tx history
     await new Promise(resolve => setTimeout(resolve, CONFIRMATION_TIME));
     log('[generateSTxs] Tx that provided funds was confirmed');
   }
