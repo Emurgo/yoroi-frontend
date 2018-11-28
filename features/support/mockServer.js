@@ -5,12 +5,13 @@ import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { getFeatureData, getTxsMapList } from './mockDataBuilder';
 import type {
-  txsUtxoForAddressesInput, txsUtxoForAddressesOutput,
-  txsUtxoSumForAddressessInput, txsUtxoSumForAddressesOutput,
-  txsHistoryInput, txsHistoryOutput,
-  txsSignedInput, txsSignedOutput,
-  addressesFilterUsedInput, addressesFilterUsedOutput
+  UtxoForAddressesRequest, UtxoForAddressesResponse,
+  UtxoSumForAddressessRequest, UtxoSumForAddressesResponse,
+  HistoryRequest, HistoryResponse,
+  SignedRequest, SignedResponse,
+  FilterUsedRequest, FilterUsedResponse
 } from '../../app/api/ada/lib/yoroi-backend-api';
+import chai from 'chai';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -41,9 +42,9 @@ function _validateDatetimeReq(
 
 function _defaultSignedTransaction(
   req: {
-    body: txsSignedInput
+    body: SignedRequest
   },
-  res: { send(arg: txsSignedOutput): Response }
+  res: { send(arg: SignedResponse): any }
 ): void {
   res.send([]);
 }
@@ -54,10 +55,10 @@ export function getMockServer(
   settings: {
     signedTransaction?: (
       req: {
-        body: txsSignedInput
+        body: SignedRequest
       },
       res: {
-        send(arg: txsSignedOutput): any,
+        send(arg: SignedResponse): any,
         status: Function
       }
     ) => void
@@ -70,9 +71,9 @@ export function getMockServer(
 
     server.post('/api/txs/utxoForAddresses', (
       req: {
-        body: txsUtxoForAddressesInput
+        body: UtxoForAddressesRequest
       },
-      res: { send(arg: txsUtxoForAddressesOutput): any }
+      res: { send(arg: UtxoForAddressesResponse): any }
     ): void => {
       const { utxos } = getFeatureData();
       const filteredUtxos = utxos
@@ -83,11 +84,11 @@ export function getMockServer(
 
     server.post('/api/txs/utxoSumForAddresses', (
       req: {
-        body: txsUtxoSumForAddressessInput
+        body: UtxoSumForAddressessRequest
       },
-      res: { send(arg: txsUtxoSumForAddressesOutput): any }
+      res: { send(arg: UtxoSumForAddressesResponse): any }
     ): void => {
-      _validateAddressesReq(req.body);
+      chai.assert.isTrue(_validateAddressesReq(req.body));
       const utxos = getFeatureData().utxos;
       const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
         if (req.body.addresses.includes(utxo.receiver)) {
@@ -100,17 +101,17 @@ export function getMockServer(
 
     server.post('/api/txs/history', (
       req: {
-        body: txsHistoryInput
+        body: HistoryRequest
       },
-      res: { send(arg: txsHistoryOutput): any }
+      res: { send(arg: HistoryResponse): any }
     ): void => {
-      _validateAddressesReq(req.body);
-      _validateDatetimeReq(req.body);
+      chai.assert.isTrue(_validateAddressesReq(req.body));
+      chai.assert.isTrue(_validateDatetimeReq(req.body));
       const txsMapList = getTxsMapList(req.body.addresses);
       // Filters all txs according to hash and date
       const filteredTxs = txsMapList.filter(txMap => {
         const includesAddress = req.body.addresses.includes(txMap.address);
-        const timeOkay = moment(txMap.tx.last_update) > moment(req.body.dateFrom);
+        const timeOkay = moment(txMap.tx.last_update) >= moment(req.body.dateFrom);
         return includesAddress && timeOkay;
       }).map(txMap => txMap.tx);
       // Returns a chunk of txs
@@ -122,9 +123,9 @@ export function getMockServer(
 
     server.post('/api/addresses/filterUsed', (
       req: {
-        body: addressesFilterUsedInput
+        body: FilterUsedRequest
       },
-      res: { send(arg: addressesFilterUsedOutput): any }
+      res: { send(arg: FilterUsedResponse): any }
     ): void => {
       const usedAddresses = getFeatureData().usedAddresses;
       const filteredAddresses = usedAddresses

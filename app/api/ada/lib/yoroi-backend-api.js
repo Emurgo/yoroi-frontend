@@ -25,14 +25,14 @@ import type {
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
 
-export type txsUtxoForAddressesInput = {
+export type UtxoForAddressesRequest = {
   addresses: Array<string>
 };
-export type txsUtxoForAddressesOutput = Array<UTXO>;
+export type UtxoForAddressesResponse = Array<UTXO>;
 
 export const getUTXOsForAddresses = (
-  body: txsUtxoForAddressesInput
-): Promise<txsUtxoForAddressesOutput> => (
+  body: UtxoForAddressesRequest
+): Promise<UtxoForAddressesResponse> => (
   axios(
     `${backendUrl}/api/txs/utxoForAddresses`,
     {
@@ -48,13 +48,13 @@ export const getUTXOsForAddresses = (
     })
 );
 
-export type txsUtxoSumForAddressessInput = { addresses: Array<string> };
-export type txsUtxoSumForAddressesOutput = {
+export type UtxoSumForAddressessRequest = { addresses: Array<string> };
+export type UtxoSumForAddressesResponse = {
   sum: ?string
 };
 export const getUTXOsSumsForAddresses = (
-  body: txsUtxoSumForAddressessInput
-): Promise<txsUtxoSumForAddressesOutput> => (
+  body: UtxoSumForAddressessRequest
+): Promise<UtxoSumForAddressesResponse> => (
   axios(
     `${backendUrl}/api/txs/utxoSumForAddresses`,
     {
@@ -70,15 +70,15 @@ export const getUTXOsSumsForAddresses = (
     })
 );
 
-export type txsHistoryInput = {
+export type HistoryRequest = {
   addresses: Array<string>,
   dateFrom: Date
 };
-export type txsHistoryOutput = Array<Transaction>;
+export type HistoryResponse = Array<Transaction>;
 
 export const getTransactionsHistoryForAddresses = (
-  body: txsHistoryInput
-): Promise<txsHistoryOutput> => (
+  body: HistoryRequest
+): Promise<HistoryResponse> => (
   axios(
     `${backendUrl}/api/txs/history`,
     {
@@ -95,14 +95,14 @@ export const getTransactionsHistoryForAddresses = (
     })
 );
 
-export type txsSignedInput = {
+export type SignedRequest = {
   signedTx: string
 };
-export type txsSignedOutput = Array<void>;
+export type SignedResponse = Array<void>;
 
 export const sendTx = (
-  body: txsSignedInput
-): Promise<txsSignedOutput> => (
+  body: SignedRequest
+): Promise<SignedResponse> => (
   axios(
     `${backendUrl}/api/txs/signed`,
     {
@@ -121,14 +121,14 @@ export const sendTx = (
     })
 );
 
-export type addressesFilterUsedInput = {
+export type FilterUsedRequest = {
   addresses: Array<string>
 };
-export type addressesFilterUsedOutput = Array<string>;
+export type FilterUsedResponse = Array<string>;
 
 export const checkAddressesInUse = (
-  body: addressesFilterUsedInput
-): Promise<addressesFilterUsedOutput> => (
+  body: FilterUsedRequest
+): Promise<FilterUsedResponse> => (
   axios(
     `${backendUrl}/api/addresses/filterUsed`,
     {

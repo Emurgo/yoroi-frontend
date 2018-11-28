@@ -47,7 +47,7 @@ Then(/^I see every generated address is unique$/, async function () {
   await Promise
     .all(addressesStringArray)
     .then(async completed => {
-      const unique = await checkIfElementsInArrayAreUnique.call(this, completed);
+      const unique = checkIfElementsInArrayAreUnique.call(this, completed);
       expect(unique).to.be.true;
       return undefined;
     });

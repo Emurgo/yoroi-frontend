@@ -1,7 +1,7 @@
 // @flow
 
-export const checkIfElementsInArrayAreUnique = async function (
+export const checkIfElementsInArrayAreUnique = function (
   arr: Array<string>
-): Promise<boolean> {
+): boolean {
   return (new Set(arr)).size === arr.length;
 };

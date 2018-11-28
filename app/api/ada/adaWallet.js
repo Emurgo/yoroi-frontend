@@ -34,7 +34,7 @@ import {
   getUTXOsSumsForAddresses
 } from './lib/yoroi-backend-api';
 import type {
-  txsUtxoSumForAddressesOutput
+  UtxoSumForAddressesResponse
 } from './lib/yoroi-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
 import { saveAdaWallet, getAdaWallet, getWalletMasterKey } from './adaLocalStorage';
@@ -137,7 +137,7 @@ export async function getBalance(
       groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(
         { addresses: groupOfAddresses }
       ));
-    const partialAmounts: Array<txsUtxoSumForAddressesOutput> = await Promise.all(promises);
+    const partialAmounts: Array<UtxoSumForAddressesResponse> = await Promise.all(promises);
 
     // sum all chunks together
     return partialAmounts.reduce(
