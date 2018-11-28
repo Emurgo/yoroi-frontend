@@ -98,13 +98,13 @@ function _getTxs(
       const txTime = currentTime.setDate(currentTime.getDate() + index);
       const newTx = Object.assign({}, {
         hash: txHash,
-        time: JSON.stringify(new Date(txTime)),
+        time: new Date(txTime).toISOString(),
         inputs_address: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
         inputs_amount: ['70'],
         outputs_address: [addressesStartingWith + 'W'],
         outputs_amount: ['200'],
         best_block_num: '101',
-        last_update: JSON.stringify(new Date(txTime)),
+        last_update: new Date(txTime).toISOString(),
         tx_state: 'Pending'
       });
       const txMap = Object.assign({}, { address: addressesStartingWith + 'W', tx: newTx });
@@ -139,7 +139,7 @@ function _getLovefieldTxs(
           txType: 'ADA received',
           txAmount: '0.000200',
           txTimeTitle: 'ADA transaction,',
-          txTime: new Date(txTime),
+          txTime: new Date(txTime).toISOString(),
           txStatus: index < pendingTxsNumber ? 'TRANSACTION PENDING' : 'HIGH',
           txFrom: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
           txTo: [addressesStartingWith + 'W'],

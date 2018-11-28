@@ -108,10 +108,11 @@ export function getMockServer(
       _validateDatetimeReq(req.body);
       const txsMapList = getTxsMapList(req.body.addresses);
       // Filters all txs according to hash and date
-      const filteredTxs = txsMapList.filter(txMap => (
-        req.body.addresses.includes(txMap.address) &&
-          moment(txMap.tx.last_update) > moment(req.body.dateFrom)
-      )).map(txMap => txMap.tx);
+      const filteredTxs = txsMapList.filter(txMap => {
+        const includesAddress = req.body.addresses.includes(txMap.address);
+        const timeOkay = moment(txMap.tx.last_update) > moment(req.body.dateFrom);
+        return includesAddress && timeOkay;
+      }).map(txMap => txMap.tx);
       // Returns a chunk of txs
       res.send(filteredTxs.slice(0, txsLimit));
     });
