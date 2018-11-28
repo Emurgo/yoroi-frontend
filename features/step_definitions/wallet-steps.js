@@ -1,3 +1,5 @@
+// @flow
+
 import { When, Then } from 'cucumber';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {

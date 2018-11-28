@@ -3,7 +3,7 @@
     "adaAddresses": [
       {
         "cadAmount": {
-          "getCCoin": 0
+          "getCCoin": "0"
         },
         "cadId": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt",
         "cadIsUsed": false,
@@ -97,12 +97,14 @@
             "inputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
-            "inputs_amount": [200],
+            "inputs_amount": ["200"],
             "outputs_address": [
               "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"
             ],
-            "outputs_amount": [100, 100],
-            "best_block_num": 101
+            "outputs_amount": ["100", "100"],
+            "best_block_num": "101",
+            "last_update": "2018-01-01T00:00:00.000Z",
+            "tx_state": "Successful"
           }
         }
       ]
@@ -125,7 +127,7 @@
     "adaAddresses": [
       {
         "cadAmount": {
-          "getCCoin": 0
+          "getCCoin": "0"
         },
         "cadId": "Be2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
         "cadIsUsed": false,
@@ -136,24 +138,39 @@
     ],
     "utxos": [
       {
+        "utxo_id": "Fa1ce0",
+        "tx_hash": "Fa1ce00",
+        "tx_index": "0",
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "amount": 200
+        "amount": "200"
       },
       {
+        "utxo_id": "Fa1ce1",
+        "tx_hash": "Fa1ce10",
+        "tx_index": "0",
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "amount": -5
+        "amount": "-5"
       },
       {
+        "utxo_id": "Fa1ce2",
+        "tx_hash": "Fa1ce20",
+        "tx_index": "0",
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "amount": 100
+        "amount": "100"
       },
       {
+        "utxo_id": "Fa1ce3",
+        "tx_hash": "Fa1ce30",
+        "tx_index": "0",
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxos",
-        "amount": 20000
+        "amount": "20000"
       },
       {
+        "utxo_id": "Fa1ce4",
+        "tx_hash": "Fa1ce40",
+        "tx_index": "0",
         "receiver": "Be2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxod",
-        "amount": 9007199254720698
+        "amount": "9007199254720698"
       }
     ]
   },
@@ -185,20 +202,32 @@
     ],
     "utxos": [
       {
+        "utxo_id": "Fa1ce5",
+        "tx_hash": "Fa1ce50",
+        "tx_index": "0",
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "amount": 200
+        "amount": "200"
       },
       {
+        "utxo_id": "Fa1ce6",
+        "tx_hash": "Fa1ce60",
+        "tx_index": "0",
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "amount": -5
+        "amount": "-5"
       },
       {
+        "utxo_id": "Fa1ce7",
+        "tx_hash": "Fa1ce70",
+        "tx_index": "0",
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoW",
-        "amount": 100
+        "amount": "100"
       },
       {
+        "utxo_id": "Fa1ce8",
+        "tx_hash": "Fa1ce80",
+        "tx_index": "0",
         "receiver": "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxos",
-        "amount": 20000
+        "amount": "20000"
       }
     ],
     "txs": {
@@ -212,12 +241,12 @@
             "inputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
-            "inputs_amount": [200],
+            "inputs_amount": ["200"],
             "outputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
             ],
-            "outputs_amount": [100, 100],
-            "best_block_num": 101,
+            "outputs_amount": ["100", "100"],
+            "best_block_num": "101",
             "last_update": "2018-01-01T00:02:00.000Z",
             "tx_state": "Pending"
           }
@@ -230,12 +259,12 @@
             "inputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"
             ],
-            "inputs_amount": [100],
+            "inputs_amount": ["100"],
             "outputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
-            "outputs_amount": [100],
-            "best_block_num": 101,
+            "outputs_amount": ["100"],
+            "best_block_num": "101",
             "last_update": "2018-01-01T00:01:00.000Z",
             "tx_state": "Pending"
           }
@@ -248,13 +277,13 @@
             "inputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
-            "inputs_amount": [160],
+            "inputs_amount": ["160"],
             "outputs_address": [
               "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"
             ],
-            "outputs_amount": [160],
-            "block_num": 90,
-            "best_block_num": 101,
+            "outputs_amount": ["160"],
+            "block_num": "90",
+            "best_block_num": "101",
             "last_update": "2018-01-01T00:00:00.000Z",
             "tx_state": "Successful"
           }
@@ -279,7 +308,7 @@
               "9007199254720698"
             ],
             "block_num": 70,
-            "best_block_num": 101,
+            "best_block_num": "101",
             "last_update": "2018-01-01T00:00:00.000Z",
             "tx_state": "Successful"
           }
@@ -304,7 +333,7 @@
         },
         "ctOutputs": [[
           "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv",
-          {"getCCoin": 100}
+          {"getCCoin": "100"}
         ]],
         "ctCondition": "CPtxApplying"
       }]

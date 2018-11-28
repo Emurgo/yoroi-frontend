@@ -1,10 +1,8 @@
-import { When, Given, Then } from 'cucumber';
-import { By } from 'selenium-webdriver'; 
-import { expect } from 'chai';
+// @flow
 
-async function checkErrorByTranslationId(client, errorSelector, error) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message));
-}
+import { When, Then } from 'cucumber';
+import { By } from 'selenium-webdriver';
+import { expect } from 'chai';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
   await this.waitUntilText('.TopBar_walletAmount', number);
@@ -20,7 +18,7 @@ Then(/^I go to the transaction history screen$/, async function () {
 });
 
 When(/^I go to the main screen$/, async function () {
-  await this.click(`//header//button[1]`, By.xpath); 
+  await this.click(`//header//button[1]`, By.xpath);
 });
 
 Then(/^I should see the transactions screen$/, async function () {

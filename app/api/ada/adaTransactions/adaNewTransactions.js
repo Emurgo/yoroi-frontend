@@ -90,7 +90,7 @@ export async function newAdaTransaction(
     await saveAdaAddress(changeAdaAddr, 'Internal');
   }
   try {
-    const backendResponse = await sendTx(signedTx);
+    const backendResponse = await sendTx({ signedTx });
     return backendResponse;
   } catch (sendTxError) {
     // On failure, we have to remove the change address we eagerly added
@@ -115,7 +115,9 @@ export async function getAllUTXOsForAddresses(
 
     // convert chunks into list of Promises that call the backend-service
     const promises = groupsOfAddresses
-      .map(groupOfAddresses => getUTXOsForAddresses(groupOfAddresses));
+      .map(groupOfAddresses => getUTXOsForAddresses(
+        { addresses: groupOfAddresses }
+      ));
 
     // Sum up all the utxo
     return Promise.all(promises)

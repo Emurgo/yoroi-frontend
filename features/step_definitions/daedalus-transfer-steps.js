@@ -1,5 +1,7 @@
+// @flow
+
 import { Before, Given, When, Then, After } from 'cucumber';
-import { By } from 'selenium-webdriver'; 
+import { By } from 'selenium-webdriver';
 import BigNumber from 'bignumber.js';
 import {
   LOVELACES_PER_ADA,
@@ -33,7 +35,7 @@ After({ tags: '@withWebSocketConnection' }, () => {
   getMockServer({});
 });
 
-async function checkErrorByTranslationId (client, errorSelector, error) {
+async function checkErrorByTranslationId(client, errorSelector, error) {
   await client.waitUntilText(errorSelector, await client.intl(error.message));
 }
 
@@ -132,18 +134,18 @@ Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/,
   const attentionMessage = await this.intl(messages.attentionMessage);
   await this.waitForElement(`//div[@class='DaedalusTransferInstructionsPage_text' and contains(text(), '${instructionMessage}')]`, By.xpath);
   await this.waitForElement(`//div[contains(text(), 'Attention')]//following::div[@class='DaedalusTransferInstructionsPage_text' and contains(text(), '${attentionMessage}')]`, By.xpath);
-  await this.waitForElement(`//button[contains(@class, 'disabled') and contains(text(), 'Create Yoroi wallet')]`, By.xpath); //Disabled "Create yoroi" button
-  await this.waitForElement(`//button[contains(@class, 'answerYesButton') and contains(text(), 'Go to the Receive screen')]`, By.xpath); 
-  await this.waitForElement(`//button[contains(@class, 'answerNoButton') and contains(text(), 'Transfer all funds from Daedalus wallet')]`, By.xpath); 
+  await this.waitForElement(`//button[contains(@class, 'disabled') and contains(text(), 'Create Yoroi wallet')]`, By.xpath); // Disabled "Create yoroi" button
+  await this.waitForElement(`//button[contains(@class, 'answerYesButton') and contains(text(), 'Go to the Receive screen')]`, By.xpath);
+  await this.waitForElement(`//button[contains(@class, 'answerNoButton') and contains(text(), 'Transfer all funds from Daedalus wallet')]`, By.xpath);
 });
 
 async function _checkDaedalusAddressesRecoveredAreCorrect(rows, world) {
-  const waitUntilDaedalusAddressesRecoveredAppeared = rows.map((row, index) => {
-    return world.waitUntilText(
+  const waitUntilDaedalusAddressesRecoveredAppeared = rows.map((row, index) => (
+    world.waitUntilText(
       `.daedalusAddressRecovered-${index + 1}`,
       row.daedalusAddress
-    );
-  });
+    )
+  ));
   await Promise.all(waitUntilDaedalusAddressesRecoveredAppeared);
 }
 
