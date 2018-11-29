@@ -13,11 +13,11 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
-import ErrorBlock from './common/ErrorBlock';
+import TrezorErrorBlock from './common/TrezorErrorBlock';
 
 import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
-import aboutPrerequisiteIconSVG from '../../../assets/images/trezor/about-prerequisite-header-icon.inline.svg';
-import aboutPrerequisiteTrezorSVG from '../../../assets/images/trezor/about-trezor.inline.svg';
+import aboutPrerequisiteIconSVG from '../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
+import aboutPrerequisiteTrezorSVG from '../../../assets/images/trezor/connect/about-trezor.inline.svg';
 
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
 
@@ -96,8 +96,6 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
 type Props = {
   progressInfo: ProgressInfo,
   error: ?LocalizableError,
@@ -174,7 +172,7 @@ export default class AboutDialog extends Component<Props> {
         {introBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} />
-        <ErrorBlock progressInfo={progressInfo} error={error} />
+        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 }

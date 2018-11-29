@@ -105,6 +105,7 @@ export default {
   '--theme-receive-qr-code-foreground-color': '#121327',
 
   '--theme-send-confirmation-dialog-send-values-color': '#ea4c5b',
+  '--theme-trezor-send-confirmation-info-block-background-color': '#f3f3f5',
 
   '--theme-settings-body-background-color': '#ffffff',
   '--theme-settings-pane-background-color': '#f3f3f5',

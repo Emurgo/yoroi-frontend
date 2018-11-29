@@ -127,9 +127,10 @@ declare module 'rust-cardano-crypto' {
   }
 }
 
+declare type RustRawTxBody = Array<number>
 
 declare type SpendResponse = {
-  cbor_encoded_tx: Array<number>,
+  cbor_encoded_tx: RustRawTxBody,
   changed_used: boolean,
   fee: number
 }
@@ -142,7 +143,7 @@ declare type MoveResponse = {
 
 declare type CryptoWallet = {
   root_key: string,
-  root_cached_key: string,
+  root_cached_key: string, // Encrypted MasterPrivateKey
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: string
@@ -158,19 +159,28 @@ declare type CryptoDaedalusWallet = {
 
 declare type CryptoAccount = {
   account: number,
-  root_cached_key: string,
+  root_cached_key: string, // MasterPublicKey
   derivation_scheme: string
 }
 
 declare type CryptoTransaction = {
   tx: {
-    tx: {
-      inputs: Array<TxInputPtr>,
-      outputs: Array<TxOutput>
-    },
+    tx: UnsignedTransaction,
     witnesses: Array<TxWitness>
   }
 }
+
+declare type UnsignedTransaction = {
+  inputs: Array<TxInputPtr>,
+  outputs: Array<TxOutput>
+}
+
+declare type UnsignedTransactionExt = {
+  inputs: Array<TxInput>,
+  outputs: Array<TxOutput>
+}
+
+
 
 declare type CryptoAddress = any // TODO: Complete with specific type
 declare type CryptoAddressPayload = any // TODO: Complete with specific type
