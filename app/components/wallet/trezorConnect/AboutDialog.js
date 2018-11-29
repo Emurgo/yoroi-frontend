@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 
+import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 
 import Dialog from '../../widgets/Dialog';
@@ -18,10 +19,8 @@ import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
 import aboutPrerequisiteIconSVG from '../../../assets/images/trezor/about-prerequisite-header-icon.inline.svg';
 import aboutPrerequisiteTrezorSVG from '../../../assets/images/trezor/about-trezor.inline.svg';
 
-import globalMessages from '../../../i18n/global-messages';
-
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore'
-// TODO: remove unwated style
+
 import styles from './AboutDialog.scss';
 
 const messages = defineMessages({
@@ -123,7 +122,7 @@ export default class AboutDialog extends Component<Props> {
 
     // introBlock
     const introBlock = (
-      <div className={styles.headerComponent}>
+      <div className={styles.headerBlock}>
         <span>{intl.formatMessage(messages.aboutIntroTextLine1)}</span><br />
         <span>{intl.formatMessage(messages.aboutIntroTextLine2)}</span><br />
         <span>{intl.formatMessage(messages.aboutIntroTextLine3)}</span><br />
@@ -131,7 +130,7 @@ export default class AboutDialog extends Component<Props> {
 
     // middleBlock
     const middleBlock = (
-      <div className={classnames([styles.middleComponent, styles.middleComponentAbout])}>
+      <div className={classnames([styles.middleBlock, styles.middleAboutBlock])}>
         <div className={styles.prerequisiteBlock}>
           <div>
             <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />

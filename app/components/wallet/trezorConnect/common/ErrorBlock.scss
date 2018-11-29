@@ -1,10 +1,5 @@
-$opacityCommon: 0.7;
-
-.component {
-  overflow: hidden;
-}
-
-.liveInfoComponent {
+.errorBlock {
+  color: var(--theme-input-error-color);
   margin-top: 10px;
   width: 725px;
   height: 18px;
@@ -12,10 +7,6 @@ $opacityCommon: 0.7;
   font-family: var(--font-regular);
   font-size: 14px;
   span {
-    opacity: $opacityCommon;
+    opacity: 0.7;
   }
-}
-
-.errorBlock {
-  color: var(--theme-input-error-color);
 }

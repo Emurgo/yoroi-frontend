@@ -17,8 +17,7 @@ type Props = {
 @observer
 export default class ProgressSteps extends Component<Props> {
 
-  createSetps = () => {
-    const { stepsList, progressInfo } = this.props;
+  createSetps = (stepsList, progressInfo) => {
     // currentStep should not be less than 0
     const currentStep = progressInfo.currentStep < 0 ? 0 : progressInfo.currentStep;
 
@@ -76,9 +75,10 @@ export default class ProgressSteps extends Component<Props> {
   }
 
   render() {
+    const { stepsList, progressInfo } = this.props;
     return (
       <div className={classNames([styles.outer])}>
-        {this.createSetps()}
+        {this.createSetps(stepsList, progressInfo)}
       </div>
     );
   }

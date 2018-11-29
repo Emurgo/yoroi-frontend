@@ -5,10 +5,7 @@ import { intlShape } from 'react-intl';
 import classnames from 'classnames';
 
 import LocalizableError from '../../../../i18n/LocalizableError';
-
 import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore'
-
-// TODO: remove unwated style
 import styles from './ErrorBlock.scss';
 
 type Props = {
@@ -25,10 +22,13 @@ export default class ErrorBlock extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const errorText = (this.props.error) ? intl.formatMessage(this.props.error) : '';
+    let errorText = '';
+    try {
+      errorText = (this.props.error) ? intl.formatMessage(this.props.error) : '';
+    }catch(error){}
 
     return (
-      <div className={classnames([styles.liveInfoComponent, styles.errorBlock])}>
+      <div className={styles.errorBlock}>
         <span>{errorText}</span>
       </div>);
   }

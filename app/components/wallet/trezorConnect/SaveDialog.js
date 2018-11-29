@@ -8,12 +8,11 @@ import SvgInline from 'react-svg-inline';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import Dialog from '../../widgets/Dialog';
-
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
+
+import Dialog from '../../widgets/Dialog';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
@@ -26,8 +25,6 @@ import saveErrorSVG from '../../../assets/images/trezor/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { isValidHardwareWalletName } from '../../../utils/validations';
-import ProgressSteps from '../../widgets/ProgressSteps';
-import DialogBackButton from '../../widgets/DialogBackButton';
 
 import type { ProgressInfo, StepState } from '../../../stores/ada/TrezorConnectStore'
 import { StepStateOption } from '../../../stores/ada/TrezorConnectStore'
@@ -124,7 +121,7 @@ export default class SaveDialog extends Component<Props> {
     const walletNameField = this.form.$('walletName');
 
     const walletNameBlock = (
-      <div className={classnames([styles.headerComponent, styles.headerComponentSave])}>
+      <div className={classnames([styles.headerBlock, styles.headerSaveBlock])}>
         <Input
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
@@ -140,20 +137,20 @@ export default class SaveDialog extends Component<Props> {
     switch(this.props.progressInfo.stepState) {
       case StepStateOption.LOAD:
         middleBlock = (
-          <div className={classnames([styles.middleComponent, styles.middleComponentSaveLoad])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
             <SvgInline svg={saveLoadGIF} cleanup={['title']} />
           </div>);
         break;
       case StepStateOption.PROCESS:
         // START
         middleBlock = (
-          <div className={classnames([styles.middleComponent, styles.middleComponentSaveStart])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
             <SvgInline svg={saveStartSVG} cleanup={['title']} />
           </div>);        
         break;
       case StepStateOption.ERROR:
         middleBlock = (
-          <div className={classnames([styles.middleComponent, styles.middleComponentSaveError])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
             <SvgInline svg={saveErrorSVG} cleanup={['title']} />
           </div>);        
         break;
@@ -163,7 +160,7 @@ export default class SaveDialog extends Component<Props> {
     }
 
     const dailogActions = [{
-      className: this.props.isActionProcessing ? styles.isProcessing : null,
+      className: this.props.isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(messages.saveButtonLabel),
       primary: true,
       disabled: this.props.isActionProcessing,

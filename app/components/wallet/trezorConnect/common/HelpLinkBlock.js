@@ -5,13 +5,9 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 
-import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
-
 import globalMessages from '../../../../i18n/global-messages';
-
+import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
 import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore'
-
-// TODO: remove unwated style
 import styles from './HelpLinkBlock.scss';
 
 const messages = defineMessages({
@@ -42,7 +38,7 @@ export default class HelpLinkBlock extends Component<Props> {
     const { intl } = this.context;
 
     return (
-      <div className={styles.yoroiLinkComponent}>
+      <div className={styles.linkBlock}>
         <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
           {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
           <SvgInline svg={externalLinkSVG} cleanup={['title']} />
