@@ -55,11 +55,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Save',
     description: 'Label for the "Save" button on the Connect to Trezor Hardware Wallet dialog.'
   },
-  saveError101: {
-    id: 'wallet.trezor.dialog.trezor.step.save.error.101',
-    defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
-    description: '<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
