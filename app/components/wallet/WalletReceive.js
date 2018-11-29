@@ -116,14 +116,12 @@ export default class WalletReceive extends Component<Props, State> {
     ]);
 
     const generateAddressForm = (
-      <div>
-        <Button
-          className={generateAddressButtonClasses}
-          label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
-          onMouseUp={this.submit}
-          skin={<SimpleButtonSkin />}
-        />
-      </div>
+      <Button
+        className={generateAddressButtonClasses}
+        label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
+        onMouseUp={this.submit}
+        skin={<SimpleButtonSkin />}
+      />
     );
 
     // Get QRCode color value from active theme's CSS variable

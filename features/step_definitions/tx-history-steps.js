@@ -99,11 +99,14 @@ Then(
     const actualTxsList = await this.getElementsBy('.Transaction_component');
     const firstIndex = txExpectedStatus === 'pending' ? 0 : (actualTxsList.length - txsAmount);
     const lastIndex = txExpectedStatus === 'pending' ? txsAmount : actualTxsList.length;
+    console.log('test ', txsNumber, txExpectedStatus, walletName);
+    console.log('====');
     for (let i = firstIndex; i < lastIndex; i++) {
       const clickeableElement = actualTxsList[i];
       await clickeableElement.click();
       const txData = await actualTxsList[i].getText();
       const txDataFields = txData.split('\n');
+      console.log('txDataFields ', txDataFields);
       const [txType, txTime, txStatus, txAmount, , txFrom, , txTo, , ...pendingTxFields]
         = txDataFields;
       const [txId, txConfirmations] = mapPendingTxFields(txExpectedStatus, pendingTxFields);
