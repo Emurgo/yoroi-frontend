@@ -6,6 +6,7 @@ import WalletSendForm from '../../components/wallet/WalletSendForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
 import { DECIMAL_PLACES_IN_ADA, MAX_INTEGER_PLACES_IN_ADA } from '../../config/numbersConfig';
+import { action } from 'mobx';
 
 type Props = InjectedProps;
 
@@ -43,8 +44,13 @@ export default class WalletSendPage extends Component<Props> {
         isDialogOpen={uiDialogs.isOpen}
         openDialogAction={actions.dialogs.open.trigger}
         hasAnyPending={hasAnyPending}
+        isHardwareWallet={activeWallet.isHardwareWallet}
+        onSignWithHardware={(receiver, amount) => {
+          console.log("receiver: ", receiver);
+          console.log("amount: ", amount);
+          actions.ada.trezor.sendWithTrezor.trigger({ receiver, amount });
+        }}
       />
     );
   }
-
 }

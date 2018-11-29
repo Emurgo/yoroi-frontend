@@ -109,7 +109,9 @@ type Props = {
   addressValidator: Function,
   openDialogAction: Function,
   isDialogOpen: Function,
-  hasAnyPending: boolean
+  hasAnyPending: boolean,
+  isHardwareWallet: boolean,
+  onSignWithHardware: (receiver: string, amount: string) => void
 };
 
 type State = {
@@ -201,12 +203,12 @@ export default class WalletSendForm extends Component<Props, State> {
       },
     },
   }, {
-    options: {
-      validateOnBlur: false,
-      validateOnChange: true,
-      validationDebounceWait: 250,
-    },
-  });
+      options: {
+        validateOnBlur: false,
+        validateOnChange: true,
+        validationDebounceWait: 250,
+      },
+    });
 
   render() {
     const { form } = this;
@@ -269,9 +271,10 @@ export default class WalletSendForm extends Component<Props, State> {
           <Button
             className={buttonClasses}
             label={intl.formatMessage(messages.nextButtonLabel)}
-            onMouseUp={() => openDialogAction({
-              dialog: WalletSendConfirmationDialog,
-            })}
+            onMouseUp={() => {
+              const amount = formattedAmountToNaturalUnits(amountFieldProps.value);
+              this.props.onSignWithHardware(receiverFieldProps.value, formattedAmountToBigNumber(amount));
+            }}
             /*
              * Form can't be submitted in case transaction fees are not calculated
              * or there's a transaction waiting to be confirmed (pending)
@@ -279,6 +282,21 @@ export default class WalletSendForm extends Component<Props, State> {
             disabled={!isTransactionFeeCalculated || hasAnyPending}
             skin={<SimpleButtonSkin />}
           />
+
+
+          {/* <Button
+            className={buttonClasses}
+            label={intl.formatMessage(messages.nextButtonLabel)}
+            onMouseUp={() => openDialogAction({
+              dialog: WalletSendConfirmationDialog,
+            })} */}
+          {/*
+             * Form can't be submitted in case transaction fees are not calculated
+             * or there's a transaction waiting to be confirmed (pending)
+            */}
+          {/* disabled = {!isTransactionFeeCalculated || hasAnyPending}
+            skin={<SimpleButtonSkin />}
+          /> */}
 
         </BorderedBox>
 

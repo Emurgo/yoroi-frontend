@@ -9,6 +9,7 @@ import AdaWalletSettingsStore from './AdaWalletSettingsStore';
 import AddressesStore from './AdaAddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
+import TrezorStore from './TrezorStore';
 
 export const adaStoreClasses = {
   wallets: AdaWalletsStore,
@@ -17,6 +18,7 @@ export const adaStoreClasses = {
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore,
   trezorConnect: TrezorConnectStore,
+  trezor: TrezorStore
 };
 
 export type AdaStoresMap = {
@@ -26,6 +28,7 @@ export type AdaStoresMap = {
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore,
   trezorConnect: TrezorConnectStore,
+  trezor: TrezorStore,
 };
 
 const adaStores = observable({
@@ -35,6 +38,7 @@ const adaStores = observable({
   addresses: null,
   daedalusTransfer: null,
   trezorConnect: null,
+  trezor: null,
 });
 
 /** Set up and return the stores and reset all stores to defaults */
