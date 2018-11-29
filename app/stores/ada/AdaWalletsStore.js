@@ -1,7 +1,6 @@
 // @flow
 // import { BigNumber } from 'bignumber.js';
 import { observable, action } from 'mobx';
-import type { Features } from 'trezor-connect';
 import WalletStore from '../base/WalletStore';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '../lib/LocalizedRequest';

@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import PropTypes from 'prop-types'; 
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
@@ -18,7 +17,6 @@ import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import ErrorBlock from './common/ErrorBlock';
 
-import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
 import saveLoadGIF from '../../../assets/images/trezor/save-load.inline.svg';
 import saveStartSVG from '../../../assets/images/trezor/save-start.inline.svg';
 import saveErrorSVG from '../../../assets/images/trezor/save-error.inline.svg';
@@ -26,8 +24,8 @@ import saveErrorSVG from '../../../assets/images/trezor/save-error.inline.svg';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { isValidHardwareWalletName } from '../../../utils/validations';
 
-import type { ProgressInfo, StepState } from '../../../stores/ada/TrezorConnectStore'
-import { StepStateOption } from '../../../stores/ada/TrezorConnectStore'
+import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
+import { StepStateOption } from '../../../stores/ada/TrezorConnectStore';
 
 import styles from './SaveDialog.scss';
 
@@ -56,12 +54,12 @@ const messages = defineMessages({
     id: 'wallet.trezor.dialog.trezor.save.button.label',
     defaultMessage: '!!!Save',
     description: 'Label for the "Save" button on the Connect to Trezor Hardware Wallet dialog.'
-  },  
+  },
   saveError101: {
     id: 'wallet.trezor.dialog.trezor.step.save.error.101',
     defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
     description: '<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },  
+  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
@@ -112,7 +110,7 @@ export default class SaveDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    
+
     // walletNameBlock
     const walletNameFieldClasses = classnames([
       'walletName',
@@ -130,11 +128,11 @@ export default class SaveDialog extends Component<Props> {
         />
         <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);
-    
+
     // middleBlock selection depending upon state
     let middleBlock = null;
-    
-    switch(this.props.progressInfo.stepState) {
+
+    switch (this.props.progressInfo.stepState) {
       case StepStateOption.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
@@ -146,13 +144,13 @@ export default class SaveDialog extends Component<Props> {
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
             <SvgInline svg={saveStartSVG} cleanup={['title']} />
-          </div>);        
+          </div>);
         break;
       case StepStateOption.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
             <SvgInline svg={saveErrorSVG} cleanup={['title']} />
-          </div>);        
+          </div>);
         break;
       default:
         console.error('Error : something unexpected happened');
@@ -192,5 +190,5 @@ export default class SaveDialog extends Component<Props> {
       },
       onError: () => {},
     });
-  }  
+  }
 }

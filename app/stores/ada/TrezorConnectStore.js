@@ -2,19 +2,17 @@
 
 // Handles Connect to Trezor Hardware Wallet dialog
 
-import { observable, action, runInAction, computed } from 'mobx';
-import { defineMessages, intlShape } from 'react-intl';
+import { observable, action } from 'mobx';
+import { defineMessages } from 'react-intl';
 
 import Config from '../../config';
+import environment from '../../environment';
 
 import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
 import type { DeviceMessage, Features, UiMessage } from 'trezor-connect';
 import type { CardanoGetPublicKey } from '../../../node_modules/trezor-connect/lib/types';
 
 import Store from '../base/Store';
-import environment from '../../environment';
-
-import { ROUTES } from '../../routes-config';
 import Request from '../lib/LocalizedRequest';
 
 import globalMessages from '../../i18n/global-messages';
@@ -53,7 +51,7 @@ const messages = defineMessages({
     id: 'wallet.trezor.dialog.trezor.step.save.error.101',
     defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
     description: '<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },  
+  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
@@ -96,7 +94,7 @@ export default class TrezorConnectStore extends Store {
 
   get isActionProcessing() {
     return this.progressInfo.stepState === StepStateOption.PROCESS;
-  };
+  }
 
   // device info which will be used to create wallet (except wallet name)
   // also it holds Trezor device label which is used as default wallet name
@@ -106,11 +104,11 @@ export default class TrezorConnectStore extends Store {
   // Trezor device label
   get defaultWalletName() {
     let defaultWalletName = '';
-    if(this.trezorDeviceInfo && this.trezorDeviceInfo.features) {
+    if (this.trezorDeviceInfo && this.trezorDeviceInfo.features) {
       defaultWalletName = this.trezorDeviceInfo.features.label;
     }
     return defaultWalletName;
-  };
+  }
 
   // holds Trezor device DeviceMessage event object
   // device features will be fetched from this object and will be added to TrezorDeviceInfo object
@@ -121,7 +119,7 @@ export default class TrezorConnectStore extends Store {
   @observable trezorConnectRequest:
   Request<ConnectTrezorResponse> = new Request(this.api.ada.connectTrezor);
   /**
-   * While trezor wallet creation is taking place, we need to block users from starting a 
+   * While trezor wallet creation is taking place, we need to block users from starting a
    * trezor wallet creation on a seperate wallet and explain to them why the action is blocked
    */
   @observable isTrezorConnectActive: boolean = false;
@@ -129,20 +127,20 @@ export default class TrezorConnectStore extends Store {
 
   setup() {
     this._reset();
-    const action = this.actions.ada.trezorConnect;
-    action.cancel.listen(this._cancel);
-    action.submitAbout.listen(this._submitAbout);
-    action.goBacktToAbout.listen(this._goBacktToAbout);    
-    action.submitConnect.listen(this._submitConnect);
-    action.submitSave.listen(this._submitSave);
-  };
+    const a = this.actions.ada.trezorConnect;
+    a.cancel.listen(this._cancel);
+    a.submitAbout.listen(this._submitAbout);
+    a.goBacktToAbout.listen(this._goBacktToAbout);
+    a.submitConnect.listen(this._submitConnect);
+    a.submitSave.listen(this._submitSave);
+  }
 
   teardown() {
     if (!this.trezorConnectRequest.isExecuting) {
       // Trezor Connect request should be reset only in case connect is finished/errored
       this.trezorConnectRequest.reset();
     }
-    
+
     this._removeTrezorConnectEventListeners();
     if (TrezorConnect) {
       TrezorConnect.dispose();
@@ -150,11 +148,11 @@ export default class TrezorConnectStore extends Store {
 
     this._reset();
     super.teardown();
-  };
+  }
 
   @action _reset = () => {
     this.progressInfo = {
-      currentStep : ProgressStepOption.ABOUT,
+      currentStep: ProgressStepOption.ABOUT,
       stepState: StepStateOption.LOAD,
     };
     this.error = undefined;
@@ -209,7 +207,7 @@ export default class TrezorConnectStore extends Store {
     } catch (error) {
       Logger.error(`TrezorConnectStore::_checkAndStoreTrezorDeviceInfo ${stringifyError(error)}`);
     } finally {
-      // TODO: handle when user forcefully close Connect to Trezor Hardware Wallet 
+      // TODO: handle when user forcefully close Connect to Trezor Hardware Wallet
       // while connection in in progress
       this._removeTrezorConnectEventListeners();
 
@@ -230,7 +228,7 @@ export default class TrezorConnectStore extends Store {
         // TrezorConnect API is no longer needed
         if (TrezorConnect) {
           TrezorConnect.dispose();
-        }        
+        }
       } else {
         // It's an invalid trezor device, go to Connect Error state
         this.error = trezorValidity.error;
@@ -334,8 +332,8 @@ export default class TrezorConnectStore extends Store {
     this.progressInfo.currentStep = ProgressStepOption.SAVE;
     this.progressInfo.stepState = StepStateOption.PROCESS;
 
-    if(this.trezorDeviceInfo && 
-      this.trezorDeviceInfo.cardanoGetPublicKeyResult && 
+    if (this.trezorDeviceInfo &&
+      this.trezorDeviceInfo.cardanoGetPublicKeyResult &&
       this.trezorDeviceInfo.features) {
       const walletData = {
         walletName,
@@ -363,7 +361,7 @@ export default class TrezorConnectStore extends Store {
       this.trezorConnectRequest.reset();
 
       const trezorWallet = await this.trezorConnectRequest.execute(params).promise;
-      if(trezorWallet) {
+      if (trezorWallet) {
         // close the active dialog
         Logger.info('TrezorConnectStore::_saveTrezor success, closing dialog');
         this.actions.dialogs.closeActiveDialog.trigger();
@@ -381,7 +379,7 @@ export default class TrezorConnectStore extends Store {
         wallets.refreshWalletsData();
 
         // TODO: not sure if it actully distructing this Store ??
-        this.teardown()
+        this.teardown();
       } else {
         // this Error will be converted to messages.error999
         throw new Error();

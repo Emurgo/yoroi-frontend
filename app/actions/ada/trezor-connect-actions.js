@@ -7,7 +7,7 @@ export default class TrezorConnectActions {
   // TODO proper type
   submitAbout: Action<any> = new Action();
   // TODO proper type
-  goBacktToAbout: Action<any> = new Action();  
+  goBacktToAbout: Action<any> = new Action();
   // TODO proper type
   submitConnect: Action<any> = new Action();
   // TODO proper type

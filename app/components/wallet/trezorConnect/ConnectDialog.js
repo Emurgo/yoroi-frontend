@@ -1,31 +1,27 @@
 // @flow
 import React, { Component } from 'react';
-import PropTypes from 'prop-types'; 
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 
 import Dialog from '../../widgets/Dialog';
-import DialogBackButton from '../../widgets/DialogBackButton'
+import DialogBackButton from '../../widgets/DialogBackButton';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import ErrorBlock from './common/ErrorBlock';
 
-import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
 import connectLoadGIF from '../../../assets/images/trezor/connect-load.gif';
 import connectStartGIF from '../../../assets/images/trezor/connect-start.gif';
 import connectErrorSVG from '../../../assets/images/trezor/connect-error.inline.svg';
 
-import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore'
-import { StepStateOption } from '../../../stores/ada/TrezorConnectStore'
+import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
+import { StepStateOption } from '../../../stores/ada/TrezorConnectStore';
 
 import styles from './ConnectDialog.scss';
 
@@ -81,36 +77,36 @@ export default class ConnectDialog extends Component<Props> {
     // introBlock
     const introBlock = (
       <div className={styles.headerBlock}>
-          <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
-          <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br />
-          <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br />
+        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
+        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br />
+        <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br />
       </div>);
 
     // middleBlock + backButton selection depending upon state
     let middleBlock = null;
     let backButton = null;
 
-    switch(this.props.progressInfo.stepState) {
+    switch (this.props.progressInfo.stepState) {
       case StepStateOption.LOAD:
         backButton = (<DialogBackButton onBack={this.props.goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
             <img src={connectLoadGIF} alt="" />
-          </div>);      
+          </div>);
         break;
       case StepStateOption.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
             <img src={connectStartGIF} alt="" />
-          </div>);        
+          </div>);
         break;
       case StepStateOption.ERROR:
         backButton = (<DialogBackButton onBack={this.props.goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
             <SvgInline svg={connectErrorSVG} cleanup={['title']} />
-          </div>);        
+          </div>);
         break;
       default:
         console.error('Error : something unexpected happened');

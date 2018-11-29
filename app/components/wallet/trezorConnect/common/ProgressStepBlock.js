@@ -5,7 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 
 import globalMessages from '../../../../i18n/global-messages';
 import ProgressSteps from '../../../widgets/ProgressSteps';
-import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore'
+import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
 
 const messages = defineMessages({
   stepAboutLabel: {

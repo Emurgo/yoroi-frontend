@@ -20,7 +20,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
   cancel = () => {
     this.props.onClose();
     this._getAction().cancel.trigger();
-  };  
+  };
 
   render() {
     const store = this._getStore();
@@ -28,7 +28,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
 
     let component = null;
 
-    switch(store.progressInfo.currentStep) {
+    switch (store.progressInfo.currentStep) {
       case ProgressStepOption.ABOUT:
         component = (
           <AboutDialog
@@ -42,23 +42,23 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
       case ProgressStepOption.CONNECT:
         component = (
           <ConnectDialog
-              progressInfo={store.progressInfo}
-              isActionProcessing={store.isActionProcessing}
-              error={store.error}
-              goBack={action.goBacktToAbout.trigger}
-              submit={action.submitConnect.trigger}
-              cancel={this.cancel}
+            progressInfo={store.progressInfo}
+            isActionProcessing={store.isActionProcessing}
+            error={store.error}
+            goBack={action.goBacktToAbout.trigger}
+            submit={action.submitConnect.trigger}
+            cancel={this.cancel}
           />);
         break;
       case ProgressStepOption.SAVE:
         component = (
           <SaveDialog
-              progressInfo={store.progressInfo}
-              isActionProcessing={store.isActionProcessing}
-              error={store.error}
-              defaultWalletName={store.defaultWalletName}
-              submit={action.submitSave.trigger}
-              cancel={this.cancel}
+            progressInfo={store.progressInfo}
+            isActionProcessing={store.isActionProcessing}
+            error={store.error}
+            defaultWalletName={store.defaultWalletName}
+            submit={action.submitSave.trigger}
+            cancel={this.cancel}
           />);
         break;
       default:

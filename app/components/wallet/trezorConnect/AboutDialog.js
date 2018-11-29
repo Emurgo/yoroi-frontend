@@ -19,7 +19,7 @@ import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
 import aboutPrerequisiteIconSVG from '../../../assets/images/trezor/about-prerequisite-header-icon.inline.svg';
 import aboutPrerequisiteTrezorSVG from '../../../assets/images/trezor/about-trezor.inline.svg';
 
-import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore'
+import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
 
 import styles from './AboutDialog.scss';
 
@@ -98,7 +98,7 @@ const messages = defineMessages({
     id: 'wallet.trezor.dialog.trezor.next.button.label',
     defaultMessage: '!!!Next',
     description: 'Label for the "Next" button on the Connect to Trezor Hardware Wallet dialog.'
-  },  
+  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;

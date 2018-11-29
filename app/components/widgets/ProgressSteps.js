@@ -44,7 +44,7 @@ export default class ProgressSteps extends Component<Props> {
         // step current
         // for current step, 0 = LOAD | 1 = PROCESS | 9 = ERROR
         // 0 = LOAD and 1 = PROCESS has same icon but for 9 = ERROR there is a error icon
-        displayIcon = (progressInfo.stepState === 9)? 'error' : 'none';
+        displayIcon = (progressInfo.stepState === 9) ? 'error' : 'none';
         stepTopBarStyle = classNames([
           styles.stepTopBar,
           styles.stepTopBarActive

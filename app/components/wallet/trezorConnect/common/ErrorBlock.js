@@ -2,10 +2,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import classnames from 'classnames';
 
 import LocalizableError from '../../../../i18n/LocalizableError';
-import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore'
+import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
 import styles from './ErrorBlock.scss';
 
 type Props = {
@@ -25,7 +24,7 @@ export default class ErrorBlock extends Component<Props> {
     let errorText = '';
     try {
       errorText = (this.props.error) ? intl.formatMessage(this.props.error) : '';
-    }catch(error){}
+    } finally {} // eslint-disable-line no-empty
 
     return (
       <div className={styles.errorBlock}>
