@@ -43,6 +43,13 @@ import {
   newAdaTransaction
 } from './adaTransactions/adaNewTransactions';
 import {
+  newTrezorPayload,
+  newTrezorTransaction,
+} from './hardwareWallets/trezorNewTransactions';
+import type {
+  TrezorPayloadAndChangeAddress
+} from './hardwareWallets/trezorNewTransactions';
+import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError
@@ -87,6 +94,14 @@ export type CreateTransactionRequest = {
   receiver: string,
   amount: string,
   password: string
+};
+export type SendHardwareTransactionRequest = {
+  signedTxHex: string,
+  changeAdaAddr: AdaAddress
+}
+export type CreateTrezorPayloadRequest = {
+  receiver: string,
+  amount: string
 };
 export type UpdateWalletRequest = {
   walletId: string,
@@ -180,7 +195,7 @@ export default class AdaApi {
     }
   }
 
-  async getTxLastUpdatedDate() : Promise<Date> {
+  async getTxLastUpdatedDate(): Promise<Date> {
     try {
       return getAdaTxLastUpdatedDate();
     } catch (error) {
@@ -276,6 +291,61 @@ export default class AdaApi {
         throw new IncorrectWalletPasswordError();
       }
       Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
+      throw new GenericApiError();
+    }
+  }
+
+  async createTrezorPayload(
+    request: CreateTrezorPayloadRequest
+  ): Promise<[TrezorPayloadAndChangeAddress]> {
+    Logger.debug('AdaApi::createTrezorPayload called');
+    const { receiver, amount } = request;
+
+    try {
+      const fee: AdaTransactionFee =
+        await getAdaTransactionFee(receiver, amount);
+
+      const response = await newTrezorPayload(
+        receiver,
+        amount,
+        fee.getCCoin,
+      );
+      Logger.debug(
+        'AaApi::createTrezorPayload success: ' + stringifyData(response)
+      );
+      return response;
+    } catch (error) {
+      // FIXME: Update errors
+      if (error instanceof WrongPassphraseError) {
+        throw new IncorrectWalletPasswordError();
+      }
+      Logger.error('AdaApi::createTrezorPayload error: ' + stringifyError(error));
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
+      throw new GenericApiError();
+    }
+  }
+
+  async sendHardwareTransaction(
+    request: SendHardwareTransactionRequest
+  ): Promise<Array<void>> {
+    Logger.debug('AdaApi::sendHardwareTransaction called');
+    const { signedTxHex, changeAdaAddr } = request;
+    try {
+      const response = await newTrezorTransaction(
+        signedTxHex,
+        changeAdaAddr,
+      );
+      Logger.debug(
+        'AdaApi::sendHardwareTransaction success: ' + stringifyData(response)
+      );
+      return response;
+    } catch (error) {
+      Logger.error('AdaApi::sendHardwareTransaction error: ' + stringifyError(error));
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
       }

@@ -72,6 +72,16 @@ const messages = defineMessages({
     defaultMessage: '!!!Error received from api method call while getting utxos.',
     description: '"Error received from api method call while getting utxos." error message'
   },
+  getTxsBodiesForUTXOsError: {
+    id: 'api.errors.getTxsBodiesForUTXOsError',
+    defaultMessage: '!!!Error received from api method call while getting TxBodies.',
+    description: '"Error received from api method call while getting TxBodies." error message'
+  },
+  getTxsBodiesForUTXOsApiError: {
+    id: 'api.errors.getTxsBodiesForUTXOsApiError',
+    defaultMessage: '!!!Error received from server while getting TxBodies.',
+    description: '"Error received from server while getting TxBodies." error message'
+  },
   discoverAddressesError: {
     id: 'api.errors.discoverAddressesError',
     defaultMessage: '!!!Error received from api method call while discovering addresses.',
@@ -249,6 +259,24 @@ export class GetUtxosForAddressesApiError extends LocalizableError {
     super({
       id: messages.getUtxosForAddressesApiError.id,
       defaultMessage: messages.getUtxosForAddressesApiError.defaultMessage
+    });
+  }
+}
+
+export class GetTxsBodiesForUTXOsError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getTxsBodiesForUTXOsError.id,
+      defaultMessage: messages.getTxsBodiesForUTXOsError.defaultMessage
+    });
+  }
+}
+
+export class GetTxsBodiesForUTXOsApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getTxsBodiesForUTXOsApiError.id,
+      defaultMessage: messages.getTxsBodiesForUTXOsApiError.defaultMessage
     });
   }
 }

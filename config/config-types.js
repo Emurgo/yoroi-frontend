@@ -12,7 +12,8 @@ export type AppConfigType = {
   /** Defined by bip44
    * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit */
   addressScanSize: number,
-  addressRequestSize: number
+  addressRequestSize: number,
+  txsBodiesRequestSize: number
 }
 
 export type NetworkConfigType = {
@@ -23,6 +24,9 @@ export type NetworkConfigType = {
   backendUrl: string,
   websocketUrl: string,
   name: Network,
+  trezorNetwork:
+  1 // testnet
+  | 2, // Mainnet
 };
 
 export type Network = 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';

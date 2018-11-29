@@ -10,6 +10,7 @@ import {
   stringifyError
 } from '../../../utils/logging';
 import {
+  GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
@@ -52,6 +53,25 @@ export type UtxoSumForAddressessRequest = { addresses: Array<string> };
 export type UtxoSumForAddressesResponse = {
   sum: ?string
 };
+
+export const getTxsBodiesForUTXOs = (
+  txsHashes: Array<string>
+): Promise<Array<UTXO>> => (
+  axios(
+    `${backendUrl}/api/txs/txBodies`,
+    {
+      method: 'post',
+      data: {
+        txsHashes
+      }
+    }
+  ).then(response => Object.values(response.data))
+    .catch((error) => {
+      Logger.error('yoroi-backend-api::getTxsBodiesForUTXOs error: ' + stringifyError(error));
+      throw new GetTxsBodiesForUTXOsApiError();
+    })
+);
+
 export const getUTXOsSumsForAddresses = (
   body: UtxoSumForAddressessRequest
 ): Promise<UtxoSumForAddressesResponse> => (

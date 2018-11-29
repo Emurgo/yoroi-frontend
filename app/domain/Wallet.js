@@ -11,8 +11,8 @@ export default class Wallet {
 
   id: string = '';
   address: string = 'current address';
-  type : WalletType = WalletTypeOption.WEB_WALLET;
-  hardwareInfo : ?WalletHardwareInfo;
+  type: WalletType = WalletTypeOption.WEB_WALLET;
+  hardwareInfo: ?WalletHardwareInfo;
   @observable name: string = '';
   @observable amount: BigNumber;
   @observable assurance: AssuranceModeOption;
@@ -38,6 +38,10 @@ export default class Wallet {
 
   updateAmount(amount: BigNumber): void {
     this.amount = amount;
+  }
+
+  @computed get isHardwareWallet(): boolean {
+    return this.type === WalletTypeOption.HARDWARE_WALLET;
   }
 
   @computed get assuranceMode(): AssuranceMode {

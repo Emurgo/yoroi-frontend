@@ -55,8 +55,11 @@ export default class WalletSendPage extends Component<Props> {
         openDialogAction={actions.dialogs.open.trigger}
         dialogRenderCallback={dialogCallback}
         hasAnyPending={hasAnyPending}
+        isHardwareWallet={activeWallet.isHardwareWallet}
+        onSignWithHardware={(receiver, amount) => {
+          actions.ada.trezor.sendWithTrezor.trigger({ receiver, amount });
+        }}
       />
     );
   }
-
 }
