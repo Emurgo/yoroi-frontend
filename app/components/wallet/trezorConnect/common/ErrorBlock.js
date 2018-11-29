@@ -8,8 +8,8 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 // TODO: remove unwated style
 import styles from './ErrorBlock.scss';
 
-import type { ProgressState } from '../../../../stores/ada/AdaConnetTrezorStore';
-import { ProgressStateOption } from '../../../../stores/ada/AdaConnetTrezorStore';
+import type { ProgressState } from '../../../../stores/ada/TrezorConnetStore';
+import { ProgressStateOption } from '../../../../stores/ada/TrezorConnetStore';
 
 type Props = {
   error: ?LocalizableError,

@@ -3,7 +3,7 @@ import Action from '../lib/Action';
 
 // ======= CONNECT TREZOR ACTIONS =======
 
-export default class ConnectTrezorAction {
+export default class TrezorConnectActions {
   // TODO proper type
   submitAbout: Action<any> = new Action();
   // TODO proper type

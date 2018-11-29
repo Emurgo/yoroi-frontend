@@ -5,15 +5,15 @@ import { observer, inject } from 'mobx-react';
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 
-import AboutDialog from '../../../components/wallet/connect-trezor/AboutDialog';
-import ConnectDialog from '../../../components/wallet/connect-trezor/ConnectDialog';
-import SaveDialog from '../../../components/wallet/connect-trezor/SaveDialog';
+import AboutDialog from '../../../components/wallet/trezorConnect/AboutDialog';
+import ConnectDialog from '../../../components/wallet/trezorConnect/ConnectDialog';
+import SaveDialog from '../../../components/wallet/trezorConnect/SaveDialog';
 
-import { ProgressStepOption } from '../../../stores/ada/AdaConnetTrezorStore';
+import { ProgressStepOption } from '../../../stores/ada/TrezorConnetStore';
 
 type Props = InjectedDialogContainerProps;
 @inject('stores', 'actions') @observer
-export default class WalletTrezorDialogContainer extends Component<Props> {
+export default class WalletTrezorConnectDialogContainer extends Component<Props> {
 
   static defaultProps = { actions: null, stores: null, children: null, onClose: () => {} };
 
@@ -78,11 +78,11 @@ export default class WalletTrezorDialogContainer extends Component<Props> {
 
   /** Returns the store which is responsible for this Container */
   _getStore() {
-    return this.props.stores.substores[environment.API].connectTrezor;
+    return this.props.stores.substores[environment.API].trezorConnect;
   }
 
   /** Returns the action which is responsible for this Container */
   _getAction() {
-    return this.props.actions[environment.API].connectTrezor;
+    return this.props.actions[environment.API].trezorConnect;
   }
 }

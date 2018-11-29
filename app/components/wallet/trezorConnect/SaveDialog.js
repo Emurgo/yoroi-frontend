@@ -29,8 +29,8 @@ import { isValidHardwareWalletName } from '../../../utils/validations';
 import ProgressSteps from '../../widgets/ProgressSteps';
 import DialogBackButton from '../../widgets/DialogBackButton';
 
-import type { ProgressInfo, ProgressState } from '../../../stores/ada/AdaConnetTrezorStore'
-import { ProgressStateOption } from '../../../stores/ada/AdaConnetTrezorStore'
+import type { ProgressInfo, ProgressState } from '../../../stores/ada/TrezorConnetStore'
+import { ProgressStateOption } from '../../../stores/ada/TrezorConnetStore'
 
 import styles from './SaveDialog.scss';
 

@@ -27,8 +27,8 @@ import connectErrorSVG from '../../../assets/images/trezor/connect-error.inline.
 
 import Config from '../../../config';
 
-import type { ProgressInfo } from '../../../stores/ada/AdaConnetTrezorStore'
-import { ProgressStateOption } from '../../../stores/ada/AdaConnetTrezorStore'
+import type { ProgressInfo } from '../../../stores/ada/TrezorConnetStore'
+import { ProgressStateOption } from '../../../stores/ada/TrezorConnetStore'
 
 import styles from './ConnectDialog.scss';
 

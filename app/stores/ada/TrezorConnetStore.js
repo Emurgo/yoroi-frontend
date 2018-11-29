@@ -70,7 +70,9 @@ type TrezorDeviceInfo = {
   features: ?Features
 };
 
-export default class AdaConnectTrezorStore extends Store {
+/** */
+export default class TrezorConnetStore extends Store {
+
   // TODO comment
   @observable progressInfo: ProgressInfo;
   // TODO comment
@@ -96,7 +98,7 @@ export default class AdaConnectTrezorStore extends Store {
 
   setup() {
     this._reset();
-    const action = this.actions.ada.connectTrezor;
+    const action = this.actions.ada.trezorConnect;
     action.cancel.listen(this._cancel);
     action.submitAbout.listen(this._submitAbout);
     action.goBacktToAbout.listen(this._goBacktToAbout);    
