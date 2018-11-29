@@ -11,7 +11,7 @@ type Props = {
   stepsList: Array<string>,
   progressInfo: {
     currentStep : number, // example, 0 = pointing to stepsList[0]
-    currentState: number, // has three states, 0 = LOAD | 1 = PROCESS | 9 = ERROR
+    stepState: number, // has three states, 0 = LOAD | 1 = PROCESS | 9 = ERROR
   }
 };
 @observer
@@ -45,7 +45,7 @@ export default class ProgressSteps extends Component<Props> {
         // step current
         // for current step, 0 = LOAD | 1 = PROCESS | 9 = ERROR
         // 0 = LOAD and 1 = PROCESS has same icon but for 9 = ERROR there is a error icon
-        displayIcon = (progressInfo.currentState === 9)? 'error' : 'none';
+        displayIcon = (progressInfo.stepState === 9)? 'error' : 'none';
         stepTopBarStyle = classNames([
           styles.stepTopBar,
           styles.stepTopBarActive

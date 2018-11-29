@@ -141,8 +141,8 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={this.props.progressInfo} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock />
-        <ErrorBlock error={this.props.error} />
+        <HelpLinkBlock progressInfo={this.props.progressInfo} />
+        <ErrorBlock progressInfo={this.props.progressInfo} error={this.props.error} />
       </Dialog>);
   }
 }

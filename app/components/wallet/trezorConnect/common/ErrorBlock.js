@@ -5,10 +5,14 @@ import { intlShape } from 'react-intl';
 import classnames from 'classnames';
 
 import LocalizableError from '../../../../i18n/LocalizableError';
+
+import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore'
+
 // TODO: remove unwated style
 import styles from './ErrorBlock.scss';
 
 type Props = {
+  progressInfo: ProgressInfo,
   error: ?LocalizableError,
 };
 

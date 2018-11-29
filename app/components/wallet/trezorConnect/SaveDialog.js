@@ -182,8 +182,8 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={this.props.progressInfo} />
         {walletNameBlock}
         {middleBlock}
-        <HelpLinkBlock />
-        <ErrorBlock error={this.props.error} />
+        <HelpLinkBlock progressInfo={this.props.progressInfo} />
+        <ErrorBlock progressInfo={this.props.progressInfo} error={this.props.error} />
       </Dialog>);
   }
 

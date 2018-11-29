@@ -9,6 +9,8 @@ import externalLinkSVG from '../../../../assets/images/link-external.inline.svg'
 
 import globalMessages from '../../../../i18n/global-messages';
 
+import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore'
+
 // TODO: remove unwated style
 import styles from './HelpLinkBlock.scss';
 
@@ -25,7 +27,9 @@ const messages = defineMessages({
   },
 });
 
-type Props = {};
+type Props = {
+  progressInfo: ProgressInfo,
+};
 
 @observer
 export default class HelpLinkBlock extends Component<Props> {
