@@ -1,7 +1,6 @@
 // @flow
 
-// Handles Connect to Trezor Hardware Wallet dialog and 
-// uses 
+// Handles Connect to Trezor Hardware Wallet dialog
 
 import { observable, action, runInAction, computed } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
@@ -22,9 +21,12 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 
-import type {
-  ConnectTrezorResponse,
-} from '../../api/common';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
+
+import type { ConnectTrezorResponse } from '../../api/common';
 
 const messages = defineMessages({
   error999: {
@@ -98,6 +100,7 @@ export default class TrezorConnectStore extends Store {
 
   // device info which will be used to create wallet (except wallet name)
   // also it holds Trezor device label which is used as default wallet name
+  // final wallet name will be fetched from the user
   trezorDeviceInfo: ?TrezorDeviceInfo;
 
   // Trezor device label
@@ -110,6 +113,7 @@ export default class TrezorConnectStore extends Store {
   };
 
   // holds Trezor device DeviceMessage event object
+  // device features will be fetched from this object and will be added to TrezorDeviceInfo object
   trezorEventDevice: ?DeviceMessage;
   //============ VIEW RELATED ============
 
@@ -132,7 +136,7 @@ export default class TrezorConnectStore extends Store {
     this._removeTrezorConnectEventListeners();
     if (TrezorConnect) {
       TrezorConnect.dispose();
-    }    
+    }
     this._reset();
     super.teardown();
   };
@@ -193,7 +197,7 @@ export default class TrezorConnectStore extends Store {
         path: Config.trezor.DEFAULT_CARDANO_PATH
       });
     } catch (error) {
-      console.error('[TREZOR] TrezorConnectError cardanoGetPublicKey : ' + JSON.stringify(error, null, ''));
+      Logger.error(`TrezorConnectStore::_checkAndStoreTrezorDeviceInfo ${stringifyError(error)}`);
     } finally {
       // TODO: handle when user forcefully close Connect to Trezor Hardware Wallet 
       // while connection in in progress
@@ -211,12 +215,19 @@ export default class TrezorConnectStore extends Store {
           this.trezorDeviceInfo.features = trezorEventDevice.payload.features;
         }
         this._goToSaveLoad();
+        Logger.info('TrezorConnectStore::_checkAndStoreTrezorDeviceInfo Trezor device OK');
+
+        // TrezorConnect API is no longer needed
+        if (TrezorConnect) {
+          TrezorConnect.dispose();
+        }        
       } else {
         // It's an invalid trezor device, go to Connect Error state
         this.error = trezorValidity.error;
         this.trezorDeviceInfo.cardanoGetPublicKeyResult = undefined;
         this.trezorDeviceInfo.features = undefined;
         this._goToConnectError();
+        Logger.error(`TrezorConnectStore::_checkAndStoreTrezorDeviceInfo ${stringifyError(this.error)}`);
       }
     }
   };
@@ -226,7 +237,7 @@ export default class TrezorConnectStore extends Store {
       TrezorConnect.on(DEVICE_EVENT, this._onTrezorDeviceEvent);
       TrezorConnect.on(UI_EVENT, this._onTrezorUIEvent);
     } else {
-      console.error(`[TREZOR]::_addTrezorConnectEventListeners::TrezorConnect not installed`);
+      Logger.error('TrezorConnectStore::_addTrezorConnectEventListeners:: TrezorConnect not installed');
     }
   };
 
@@ -238,12 +249,12 @@ export default class TrezorConnectStore extends Store {
   };
 
   _onTrezorDeviceEvent = (event: DeviceMessage) => {
-    console.log(`[TREZOR] DEVICE_EVENT: ${event.type}`);
+    Logger.info(`TrezorConnectStore:: DEVICE_EVENT: ${event.type}`);
     this.trezorEventDevice = event;
   };
 
   _onTrezorUIEvent = (event: UiMessage) => {
-    console.log(`[TREZOR] UI_EVENT: ${event.type}`);
+    Logger.info(`TrezorConnectStore:: UI_EVENT: ${event.type}`);
     // TODO : https://github.com/Emurgo/yoroi-frontend/issues/126
     // if(event.type === CLOSE_UI_WINDOW &&
     //   this.progressState === ProgressStateOption.CONNECT_START &&
@@ -337,20 +348,32 @@ export default class TrezorConnectStore extends Store {
     deviceFeatures: Features,
   }) => {
     try {
+      Logger.info('TrezorConnectStore::_saveTrezor:: stated');
       this.trezorConnectRequest.reset();
+
       const trezorWallet = await this.trezorConnectRequest.execute(params).promise;
       if(trezorWallet) {
         // close the active dialog
+        Logger.info('TrezorConnectStore::_saveTrezor success, closing dialog');
         this.actions.dialogs.closeActiveDialog.trigger();
-        // 
+
         const { wallets } = this.stores.substores[environment.API];
+        // we need to patch new wallet to make it as active wallet
         await wallets._patchWalletRequestWithNewWallet(trezorWallet);
+
         // go to the wallet transactions page
+        Logger.info('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
         wallets.goToWalletRoute(trezorWallet.id);
+
         // fetch its data
+        Logger.info('TrezorConnectStore::_saveTrezor loading wallet data');
         wallets.refreshWalletsData();
-        // TODO: not sure if it actully distructing this Store??
+
+        // TODO: not sure if it actully distructing this Store ??
         this.teardown()
+      } else {
+        // this Error will be converted to messages.error999
+        throw new Error();
       }
     } catch (error) {
       if (error instanceof CheckAdressesInUseApiError) {
@@ -362,6 +385,7 @@ export default class TrezorConnectStore extends Store {
         this.error = messages.error999;
       }
       this._goToSaveError();
+      Logger.error(`TrezorConnectStore::_saveTrezor:: ${stringifyError(this.error)}`);
     } finally {
       this.trezorConnectRequest.reset();
     }
