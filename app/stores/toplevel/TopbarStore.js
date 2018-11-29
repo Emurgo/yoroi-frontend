@@ -14,14 +14,14 @@ export default class TopbarStore extends Store {
 
   setup() {
     const actions = this.actions.topbar;
-    actions.activateTopbarCategory.listen(this._onactivateTopbarCategory);
+    actions.activateTopbarCategory.listen(this._onActivateTopbarCategory);
     actions.walletSelected.listen(this._onWalletSelected);
     this.registerReactions([
       this._syncTopbarRouteWithRouter,
     ]);
   }
 
-  @action _onactivateTopbarCategory = (
+  @action _onActivateTopbarCategory = (
     params: { category: string, }
   ): void => {
     const { category } = params;
@@ -37,7 +37,7 @@ export default class TopbarStore extends Store {
     this.stores.substores[environment.API].wallets.goToWalletRoute(walletId);
   };
 
-  @action _setactivateTopbarCategory = (
+  @action _setActivateTopbarCategory = (
     category: string
   ): void => {
     this.activeTopbarCategory = category;
@@ -47,7 +47,7 @@ export default class TopbarStore extends Store {
     const route = this.stores.app.currentRoute;
     this.CATEGORIES.forEach((category) => {
       // If the current route starts with the root of the category
-      if (route.indexOf(category.route) === 0) this._setactivateTopbarCategory(category.route);
+      if (route.indexOf(category.route) === 0) this._setActivateTopbarCategory(category.route);
     });
   };
 }
