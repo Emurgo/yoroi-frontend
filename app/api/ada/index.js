@@ -31,7 +31,7 @@ import {
 } from './restoreAdaWallet';
 import {
   createTrezorWallet
-} from './hardware-wallet/createTrezorWallet';
+} from './hardwareWallet/createTrezorWallet';
 import {
   getAdaTxsHistoryByWallet,
   getAdaTxLastUpdatedDate,
@@ -42,6 +42,11 @@ import {
   getAdaTransactionFee,
   newAdaTransaction
 } from './adaTransactions/adaNewTransactions';
+import type { TrezorSignTxPayload } from '../../domain/TrezorSignTx';
+import {
+  createTrezorSignTxPayload,
+  newTrezorTransaction,
+} from './hardwareWallet/trezorNewTransactions';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -58,6 +63,7 @@ import type {
   AdaWallet,
   AdaWallets,
   AdaAssurance,
+  AdaFeeEstimateResponse,
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -75,6 +81,7 @@ import type {
   UpdateWalletResponse,
   CreateTrezorWalletRequest,
   CreateTrezorWalletResponse,
+  SendTrezorSignedTxResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
@@ -87,6 +94,18 @@ export type CreateTransactionRequest = {
   receiver: string,
   amount: string,
   password: string
+};
+export type SendTrezorSignedTxRequest = {
+  signedTxHex: string,
+  changeAdaAddr: AdaAddress
+};
+export type CreateTrezorSignTxDataRequest = {
+  receiver: string,
+  amount: string
+};
+export type CreateTrezorSignTxDataResponse = {
+  trezorSignTxPayload: TrezorSignTxPayload,
+  changeAddress: AdaAddress
 };
 export type UpdateWalletRequest = {
   walletId: string,
@@ -283,18 +302,64 @@ export default class AdaApi {
     }
   }
 
+  async createTrezorSignTxData(
+    request: CreateTrezorSignTxDataRequest
+  ): Promise<CreateTrezorSignTxDataResponse> {
+    try {
+      Logger.debug('AdaApi::createTrezorSignTxData called');
+      const { receiver, amount } = request;
+
+      const { changeAdaAddress, txExt } : AdaFeeEstimateResponse =
+          await getAdaTransactionFee(receiver, amount);
+      const trezorSignTxPayload: TrezorSignTxPayload = await createTrezorSignTxPayload(txExt);
+
+      Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
+      return {
+        trezorSignTxPayload,
+        changeAddress: changeAdaAddress
+      };
+    } catch (error) {
+      Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
+
+      // We don't know what the problem was so throw a generic error
+      throw new GenericApiError();
+    }
+  }
+
+  async sendTrezorSignedTx(
+    request: SendTrezorSignedTxRequest
+  ): Promise<SendTrezorSignedTxResponse> {
+    Logger.debug('AdaApi::sendTrezorSignedTx called');
+    const { signedTxHex, changeAdaAddr } = request;
+    try {
+      const response = await newTrezorTransaction(signedTxHex, changeAdaAddr);
+      Logger.debug('AdaApi::sendTrezorSignedTx success: ' + stringifyData(response));
+
+      return response;
+    } catch (error) {
+      Logger.error('AdaApi::sendTrezorSignedTx error: ' + stringifyError(error));
+
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
+
+      // We don't know what the problem was so throw a generic error
+      throw new GenericApiError();
+    }
+  }
+
   async calculateTransactionFee(
     request: TransactionFeeRequest
   ): Promise<TransactionFeeResponse> {
     Logger.debug('AdaApi::calculateTransactionFee called');
     const { receiver, amount } = request;
     try {
-      const response: AdaTransactionFee =
+      const { fee } : AdaFeeEstimateResponse =
         await getAdaTransactionFee(receiver, amount);
       Logger.debug(
-        'AdaApi::calculateTransactionFee success: ' + stringifyData(response)
+        'AdaApi::calculateTransactionFee success: ' + stringifyData(fee)
       );
-      return _createTransactionFeeFromServerData(response);
+      return _createTransactionFeeFromServerData(fee);
     } catch (error) {
       Logger.error(
         'AdaApi::calculateTransactionFee error: ' + stringifyError(error)

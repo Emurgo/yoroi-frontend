@@ -8,43 +8,18 @@ import classnames from 'classnames';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import Dialog from '../widgets/Dialog';
-import DialogCloseButton from '../widgets/DialogCloseButton';
-import globalMessages from '../../i18n/global-messages';
-import LocalizableError from '../../i18n/LocalizableError';
+import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import Dialog from '../../widgets/Dialog';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import globalMessages from '../../../i18n/global-messages';
+import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 
 export const messages = defineMessages({
-  dialogTitle: {
-    id: 'wallet.send.confirmationDialog.title',
-    defaultMessage: '!!!Confirm transaction',
-    description: 'Title for the "Confirm transaction" dialog.'
-  },
   walletPasswordLabel: {
     id: 'wallet.send.confirmationDialog.walletPasswordLabel',
     defaultMessage: '!!!Spending password',
     description: 'Label for the "Spending password" input in the wallet send confirmation dialog.',
-  },
-  addressToLabel: {
-    id: 'wallet.send.confirmationDialog.addressToLabel',
-    defaultMessage: '!!!To',
-    description: 'Label for the "To" in the wallet send confirmation dialog.',
-  },
-  amountLabel: {
-    id: 'wallet.send.confirmationDialog.amountLabel',
-    defaultMessage: '!!!Amount',
-    description: 'Label for the "Amount" in the wallet send confirmation dialog.',
-  },
-  feesLabel: {
-    id: 'wallet.send.confirmationDialog.feesLabel',
-    defaultMessage: '!!!Fees',
-    description: 'Label for the "Fees" in the wallet send confirmation dialog.',
-  },
-  totalLabel: {
-    id: 'wallet.send.confirmationDialog.totalLabel',
-    defaultMessage: '!!!Total',
-    description: 'Label for the "Total" in the wallet send confirmation dialog.',
   },
   walletPasswordFieldPlaceholder: {
     id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
@@ -55,11 +30,6 @@ export const messages = defineMessages({
     id: 'wallet.send.confirmationDialog.submit',
     defaultMessage: '!!!Send',
     description: 'Label for the send button in the wallet send confirmation dialog.'
-  },
-  backButtonLabel: {
-    id: 'wallet.send.confirmationDialog.back',
-    defaultMessage: '!!!Back',
-    description: 'Label for the back button in the wallet send confirmation dialog.'
   },
 });
 
@@ -145,7 +115,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
 
     const actions = [
       {
-        label: intl.formatMessage(messages.backButtonLabel),
+        label: intl.formatMessage(globalMessages.walletSendConfirmationBackButtonLabel),
         onClick: !isSubmitting && onCancel,
       },
       {
@@ -159,7 +129,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.dialogTitle)}
+        title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         actions={actions}
         closeOnOverlayClick
         onClose={!isSubmitting ? onCancel : null}
@@ -169,21 +139,25 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         <div className={styles.walletPasswordFields}>
           <div className={styles.addressToLabelWrapper}>
             <div className={styles.addressToLabel}>
-              {intl.formatMessage(messages.addressToLabel)}
+              {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
             </div>
             <div className={styles.addressTo}>{receiver}</div>
           </div>
 
           <div className={styles.amountFeesWrapper}>
             <div className={styles.amountWrapper}>
-              <div className={styles.amountLabel}>{intl.formatMessage(messages.amountLabel)}</div>
+              <div className={styles.amountLabel}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
+              </div>
               <div className={styles.amount}>{amount}
                 <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
               </div>
             </div>
 
             <div className={styles.feesWrapper}>
-              <div className={styles.feesLabel}>{intl.formatMessage(messages.feesLabel)}</div>
+              <div className={styles.feesLabel}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
+              </div>
               <div className={styles.fees}>+{transactionFee}
                 <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
               </div>
@@ -191,7 +165,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           </div>
 
           <div className={styles.totalAmountWrapper}>
-            <div className={styles.totalAmountLabel}>{intl.formatMessage(messages.totalLabel)}</div>
+            <div className={styles.totalAmountLabel}>
+              {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+            </div>
             <div className={styles.totalAmount}>{totalAmount}
               <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
             </div>

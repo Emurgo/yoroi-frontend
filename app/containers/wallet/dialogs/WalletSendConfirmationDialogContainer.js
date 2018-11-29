@@ -5,7 +5,7 @@ import environment from '../../../environment';
 import resolver from '../../../utils/imports';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 
-const WalletSendConfirmationDialog = resolver('components/wallet/WalletSendConfirmationDialog');
+const WalletSendConfirmationDialog = resolver('components/wallet/send/WalletSendConfirmationDialog');
 
 export type DialogProps = {
   amount: string,

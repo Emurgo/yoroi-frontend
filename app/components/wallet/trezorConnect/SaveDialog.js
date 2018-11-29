@@ -15,11 +15,11 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
-import ErrorBlock from './common/ErrorBlock';
+import TrezorErrorBlock from './common/TrezorErrorBlock';
 
-import saveLoadGIF from '../../../assets/images/trezor/save-load.inline.svg';
-import saveStartSVG from '../../../assets/images/trezor/save-start.inline.svg';
-import saveErrorSVG from '../../../assets/images/trezor/save-error.inline.svg';
+import saveLoadGIF from '../../../assets/images/trezor/connect/save-load.inline.svg';
+import saveStartSVG from '../../../assets/images/trezor/connect/save-start.inline.svg';
+import saveErrorSVG from '../../../assets/images/trezor/connect/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { isValidHardwareWalletName } from '../../../utils/validations';
@@ -53,8 +53,6 @@ const messages = defineMessages({
     description: 'Label for the "Save" button on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   progressInfo: ProgressInfo,
@@ -168,7 +166,7 @@ export default class SaveDialog extends Component<Props> {
         {walletNameBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} />
-        <ErrorBlock progressInfo={progressInfo} error={error} />
+        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 
