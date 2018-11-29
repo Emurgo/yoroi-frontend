@@ -87,7 +87,7 @@ type TrezorDeviceInfo = {
 
 export default class TrezorConnectStore extends Store {
 
-  //============ VIEW RELATED ============
+  // =================== VIEW RELATED =================== //
   // the only observable which manages state change
   @observable progressInfo: ProgressInfo;
 
@@ -115,12 +115,17 @@ export default class TrezorConnectStore extends Store {
   // holds Trezor device DeviceMessage event object
   // device features will be fetched from this object and will be added to TrezorDeviceInfo object
   trezorEventDevice: ?DeviceMessage;
-  //============ VIEW RELATED ============
+  // =================== VIEW RELATED =================== //
 
-  //============ API RELATED =============
+  // =================== API RELATED =================== //
   @observable trezorConnectRequest:
   Request<ConnectTrezorResponse> = new Request(this.api.ada.connectTrezor);
-  //============ API RELATED =============
+  /**
+   * While trezor wallet creation is taking place, we need to block users from starting a 
+   * trezor wallet creation on a seperate wallet and explain to them why the action is blocked
+   */
+  @observable isTrezorConnectActive: boolean = false;
+  // =================== API RELATED =================== //
 
   setup() {
     this._reset();
@@ -133,10 +138,16 @@ export default class TrezorConnectStore extends Store {
   };
 
   teardown() {
+    if (!this.trezorConnectRequest.isExecuting) {
+      // Trezor Connect request should be reset only in case connect is finished/errored
+      this.trezorConnectRequest.reset();
+    }
+    
     this._removeTrezorConnectEventListeners();
     if (TrezorConnect) {
       TrezorConnect.dispose();
     }
+
     this._reset();
     super.teardown();
   };
@@ -155,17 +166,16 @@ export default class TrezorConnectStore extends Store {
     this.teardown();
   };
 
-  //=============== ABOUT ===============
-
+  // =================== ABOUT =================== //
   /** ABOUT dialog submit(Next button) */
   @action _submitAbout = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStepOption.CONNECT;
     this.progressInfo.stepState = StepStateOption.LOAD;
   };
+  // =================== ABOUT =================== //
 
-  //=============== CONNECT ===============
-  
+  // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
   @action _goBacktToAbout = () => {
     this.error = undefined;
@@ -309,9 +319,9 @@ export default class TrezorConnectStore extends Store {
 
     return trezorValidity;
   };
+  // =================== CONNECT =================== //
 
-  //=============== SAVE ===============
-
+  // =================== SAVE =================== //
   @action _goToSaveLoad = () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStepOption.SAVE;
@@ -349,6 +359,7 @@ export default class TrezorConnectStore extends Store {
   }) => {
     try {
       Logger.info('TrezorConnectStore::_saveTrezor:: stated');
+      this._setIsTrezorConnectActive(true);
       this.trezorConnectRequest.reset();
 
       const trezorWallet = await this.trezorConnectRequest.execute(params).promise;
@@ -358,10 +369,10 @@ export default class TrezorConnectStore extends Store {
         this.actions.dialogs.closeActiveDialog.trigger();
 
         const { wallets } = this.stores.substores[environment.API];
-        // we need to patch new wallet to make it as active wallet
+        // TODO: we need to patch new wallet to make it as active wallet ??
         await wallets._patchWalletRequestWithNewWallet(trezorWallet);
 
-        // go to the wallet transactions page
+        // goto the wallet transactions page
         Logger.info('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
         wallets.goToWalletRoute(trezorWallet.id);
 
@@ -388,6 +399,14 @@ export default class TrezorConnectStore extends Store {
       Logger.error(`TrezorConnectStore::_saveTrezor:: ${stringifyError(this.error)}`);
     } finally {
       this.trezorConnectRequest.reset();
+      this._setIsTrezorConnectActive(false);
     }
   };
+  // =================== SAVE =================== //
+
+  // =================== API =================== //
+  @action _setIsTrezorConnectActive = (active: boolean) => {
+    this.isTrezorConnectActive = active;
+  };
+  // =================== API =================== //
 }

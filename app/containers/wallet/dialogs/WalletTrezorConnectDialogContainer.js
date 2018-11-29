@@ -19,15 +19,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
 
   cancel = () => {
     this.props.onClose();
-
-    const action = this._getAction();
-    action.cancel.trigger();
-
-    const { connectTrezorRequest } = this.props.stores.substores[environment.API].wallets;
-    // Connect Trezor request should be reset only in case connect is finished/errored
-    if (!connectTrezorRequest.isExecuting) {
-      connectTrezorRequest.reset();
-    }
+    this._getAction().cancel.trigger();
   };  
 
   render() {

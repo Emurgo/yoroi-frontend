@@ -42,11 +42,11 @@ const messages = defineMessages({
 });
 
 type Props = {
+  onTrezor: Function,
+  isTrezorConnectActive: boolean,
   onCreate: Function,
   onRestore: Function,
-  onTrezor: Function,
   isRestoreActive: boolean,
-  isConnectTrezorActive: boolean,
 };
 
 @observer
@@ -59,20 +59,20 @@ export default class WalletAdd extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
+      onTrezor,
+      isTrezorConnectActive,
       onCreate,
       onRestore,
-      onTrezor,
       isRestoreActive,
-      isConnectTrezorActive
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
 
     let activeNotification = null;
-    if (isRestoreActive) {
-      activeNotification = 'restoreNotificationMessage';
-    } else if (isConnectTrezorActive) {
+    if (isTrezorConnectActive) {
       activeNotification = 'trezorConnectNotificationMessage';
+    } else if (isRestoreActive) {
+      activeNotification = 'restoreNotificationMessage';
     }
 
     return (

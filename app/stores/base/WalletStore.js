@@ -37,7 +37,6 @@ export default class WalletsStore extends Store {
   /** While restoration is taking place, we need to block users from starting a restoration
    *  on a seperate wallet and explain to them why the action is blocked */
   @observable isRestoreActive: boolean = false;
-  @observable isConnectTrezorActive: boolean = false;
 
   _newWalletDetails: { name: string, mnemonic: string, password: ?string } = {
     name: '',
