@@ -29,8 +29,8 @@ import { isValidHardwareWalletName } from '../../../utils/validations';
 import ProgressSteps from '../../widgets/ProgressSteps';
 import DialogBackButton from '../../widgets/DialogBackButton';
 
-import type { ProgressInfo, ProgressState } from '../../../stores/ada/TrezorConnetStore'
-import { ProgressStateOption } from '../../../stores/ada/TrezorConnetStore'
+import type { ProgressInfo, StepState } from '../../../stores/ada/TrezorConnectStore'
+import { StepStateOption } from '../../../stores/ada/TrezorConnectStore'
 
 import styles from './SaveDialog.scss';
 
@@ -137,28 +137,28 @@ export default class SaveDialog extends Component<Props> {
     // middleBlock selection depending upon state
     let middleBlock = null;
     
-    switch(this.props.progressInfo.currentState) {
-      case ProgressStateOption.LOAD:
+    switch(this.props.progressInfo.stepState) {
+      case StepStateOption.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleComponent, styles.middleComponentSaveLoad])}>
             <SvgInline svg={saveLoadGIF} cleanup={['title']} />
           </div>);
         break;
-      case ProgressStateOption.PROCESS:
+      case StepStateOption.PROCESS:
         // START
         middleBlock = (
           <div className={classnames([styles.middleComponent, styles.middleComponentSaveStart])}>
             <SvgInline svg={saveStartSVG} cleanup={['title']} />
           </div>);        
         break;
-      case ProgressStateOption.ERROR:
+      case StepStateOption.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleComponent, styles.middleComponentSaveError])}>
             <SvgInline svg={saveErrorSVG} cleanup={['title']} />
           </div>);        
         break;
       default:
-        console.log('Error : something unexpected happened');
+        console.error('Error : something unexpected happened');
         break;
     }
 

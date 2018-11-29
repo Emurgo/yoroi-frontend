@@ -27,8 +27,8 @@ import connectErrorSVG from '../../../assets/images/trezor/connect-error.inline.
 
 import Config from '../../../config';
 
-import type { ProgressInfo } from '../../../stores/ada/TrezorConnetStore'
-import { ProgressStateOption } from '../../../stores/ada/TrezorConnetStore'
+import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore'
+import { StepStateOption } from '../../../stores/ada/TrezorConnectStore'
 
 import styles from './ConnectDialog.scss';
 
@@ -93,22 +93,22 @@ export default class ConnectDialog extends Component<Props> {
     let middleBlock = null;
     let backButton = null;
 
-    switch(this.props.progressInfo.currentState) {
-      case ProgressStateOption.LOAD:
+    switch(this.props.progressInfo.stepState) {
+      case StepStateOption.LOAD:
         backButton = (<DialogBackButton onBack={this.props.goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleComponent, styles.middleComponentConnectLoad])}>
             <img src={connectLoadGIF} alt="" />
           </div>);      
         break;
-      case ProgressStateOption.PROCESS:
+      case StepStateOption.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleComponent, styles.middleComponentConnectStart])}>
             <img src={connectStartGIF} alt="" />
           </div>);        
         break;
-      case ProgressStateOption.ERROR:
+      case StepStateOption.ERROR:
         backButton = (<DialogBackButton onBack={this.props.goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleComponent, styles.middleComponentConnectError])}>
@@ -116,7 +116,7 @@ export default class ConnectDialog extends Component<Props> {
           </div>);        
         break;
       default:
-        console.log('Error : something unexpected happened');
+        console.error('Error : something unexpected happened');
         break;
     }
 

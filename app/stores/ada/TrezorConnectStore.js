@@ -49,8 +49,8 @@ export const ProgressStepOption = {
   SAVE: 2,
 };
 
-export type ProgressState = 0 | 1 | 9;
-export const ProgressStateOption = {
+export type StepState = 0 | 1 | 9;
+export const StepStateOption = {
   LOAD: 0,
   PROCESS: 1,
   ERROR: 9,
@@ -58,7 +58,7 @@ export const ProgressStateOption = {
 
 export type ProgressInfo = {
   currentStep: ProgressStep,
-  currentState: ProgressState,
+  stepState: StepState,
 }
 
 type TrezorDeviceInfo = {
@@ -71,7 +71,7 @@ type TrezorDeviceInfo = {
 };
 
 /** */
-export default class TrezorConnetStore extends Store {
+export default class TrezorConnectStore extends Store {
 
   // TODO comment
   @observable progressInfo: ProgressInfo;
@@ -79,7 +79,7 @@ export default class TrezorConnetStore extends Store {
   @observable error: ?LocalizableError;
 
   @computed get isActionProcessing() {
-    return this.progressInfo.currentState === ProgressStateOption.PROCESS;
+    return this.progressInfo.stepState === StepStateOption.PROCESS;
   }
 
   @computed get defaultWalletName() {
@@ -116,7 +116,7 @@ export default class TrezorConnetStore extends Store {
   @action _reset = () => {
     this.progressInfo = {
       currentStep : ProgressStepOption.ABOUT,
-      currentState: ProgressStateOption.LOAD,
+      stepState: StepStateOption.LOAD,
     };
     this.trezorEventDevice = undefined;
   }
@@ -128,19 +128,19 @@ export default class TrezorConnetStore extends Store {
   @action _submitAbout = async () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStepOption.CONNECT;
-    this.progressInfo.currentState = ProgressStateOption.LOAD;
+    this.progressInfo.stepState = StepStateOption.LOAD;
   };
 
   @action _goBacktToAbout = async () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStepOption.ABOUT;
-    this.progressInfo.currentState = ProgressStateOption.LOAD;
+    this.progressInfo.stepState = StepStateOption.LOAD;
   };  
 
   @action _submitConnect = async () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStepOption.CONNECT;
-    this.progressInfo.currentState = ProgressStateOption.PROCESS;
+    this.progressInfo.stepState = StepStateOption.PROCESS;
     this._checkAndStoreTrezorDeviceInfo();
   };
 
@@ -149,19 +149,19 @@ export default class TrezorConnetStore extends Store {
       this.error = this.trezorDeviceInfo.error;
     }
     this.progressInfo.currentStep = ProgressStepOption.CONNECT;
-    this.progressInfo.currentState = ProgressStateOption.ERROR;
+    this.progressInfo.stepState = StepStateOption.ERROR;
   }
 
   @action _goToSaveLoad = async () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStepOption.SAVE;
-    this.progressInfo.currentState = ProgressStateOption.LOAD;
+    this.progressInfo.stepState = StepStateOption.LOAD;
   }
 
   @action _submitSave = async (walletName: string) => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStepOption.SAVE;
-    this.progressInfo.currentState = ProgressStateOption.PROCESS;
+    this.progressInfo.stepState = StepStateOption.PROCESS;
 
     if(this.trezorDeviceInfo && 
       this.trezorDeviceInfo.cardanoGetPublicKeyResult && 
@@ -180,7 +180,7 @@ export default class TrezorConnetStore extends Store {
       this.error = this.trezorDeviceInfo.error;
     }
     this.progressInfo.currentStep = ProgressStepOption.SAVE;
-    this.progressInfo.currentState = ProgressStateOption.ERROR;
+    this.progressInfo.stepState = StepStateOption.ERROR;
   }
 
   _checkAndStoreTrezorDeviceInfo = async () => {

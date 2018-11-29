@@ -1,7 +1,7 @@
 // @flow
 import Action from '../lib/Action';
 
-// ======= CONNECT TREZOR ACTIONS =======
+// ======= TREZOR CONNECT ACTIONS =======
 
 export default class TrezorConnectActions {
   // TODO proper type

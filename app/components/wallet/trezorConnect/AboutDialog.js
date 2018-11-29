@@ -20,7 +20,7 @@ import aboutPrerequisiteTrezorSVG from '../../../assets/images/trezor/about-trez
 
 import globalMessages from '../../../i18n/global-messages';
 
-import type { ProgressInfo } from '../../../stores/ada/TrezorConnetStore'
+import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore'
 // TODO: remove unwated style
 import styles from './AboutDialog.scss';
 

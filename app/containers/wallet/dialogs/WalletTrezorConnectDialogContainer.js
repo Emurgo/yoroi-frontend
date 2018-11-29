@@ -9,7 +9,7 @@ import AboutDialog from '../../../components/wallet/trezorConnect/AboutDialog';
 import ConnectDialog from '../../../components/wallet/trezorConnect/ConnectDialog';
 import SaveDialog from '../../../components/wallet/trezorConnect/SaveDialog';
 
-import { ProgressStepOption } from '../../../stores/ada/TrezorConnetStore';
+import { ProgressStepOption } from '../../../stores/ada/TrezorConnectStore';
 
 type Props = InjectedDialogContainerProps;
 @inject('stores', 'actions') @observer
@@ -41,6 +41,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
         component = (
           <AboutDialog
             progressInfo={store.progressInfo}
+            isActionProcessing={store.isActionProcessing}
             error={store.error}
             submit={action.submitAbout.trigger}
             cancel={this.cancel}
@@ -50,8 +51,8 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
         component = (
           <ConnectDialog
               progressInfo={store.progressInfo}
-              error={store.error}
               isActionProcessing={store.isActionProcessing}
+              error={store.error}
               goBack={action.goBacktToAbout.trigger}
               submit={action.submitConnect.trigger}
               cancel={this.cancel}
@@ -61,15 +62,15 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
         component = (
           <SaveDialog
               progressInfo={store.progressInfo}
-              error={store.error}
               isActionProcessing={store.isActionProcessing}
+              error={store.error}
               defaultWalletName={store.defaultWalletName}
               submit={action.submitSave.trigger}
               cancel={this.cancel}
           />);
         break;
       default:
-        console.log('Error : something unexpected happened');
+        console.error('Error : something unexpected happened');
         break;
     }
 
