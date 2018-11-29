@@ -14,11 +14,11 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
-import ErrorBlock from './common/ErrorBlock';
+import TrezorErrorBlock from './common/TrezorErrorBlock';
 
-import connectLoadGIF from '../../../assets/images/trezor/connect-load.gif';
-import connectStartGIF from '../../../assets/images/trezor/connect-start.gif';
-import connectErrorSVG from '../../../assets/images/trezor/connect-error.inline.svg';
+import connectLoadGIF from '../../../assets/images/trezor/connect/connect-load.gif';
+import connectStartGIF from '../../../assets/images/trezor/connect/connect-start.gif';
+import connectErrorSVG from '../../../assets/images/trezor/connect/connect-error.inline.svg';
 
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
 import { StepState } from '../../../stores/ada/TrezorConnectStore';
@@ -49,8 +49,6 @@ const messages = defineMessages({
     description: 'Label for the "Connect" button on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   progressInfo: ProgressInfo,
@@ -131,7 +129,7 @@ export default class ConnectDialog extends Component<Props> {
         {introBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} />
-        <ErrorBlock progressInfo={progressInfo} error={error} />
+        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 }

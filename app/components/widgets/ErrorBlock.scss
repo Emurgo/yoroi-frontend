@@ -1,0 +1,12 @@
+@import '../../themes/mixins/error-message.scss';
+
+.errorBlock {
+  @include error-message;
+  margin-top: 10px;
+  // width: 725px;
+  height: 18px;
+  text-align: center;
+  span {
+    opacity: 0.7;
+  }
+}

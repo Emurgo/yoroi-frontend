@@ -132,6 +132,40 @@ export async function getAllUTXOsForAddresses(
   }
 }
 
+/** Gets the inputs necessary to create a transaction */
+export async function getAdaTransactionInputs(
+  senders: AdaAddresses,
+): Promise<Array<TxInput>> {
+  const [inputs] = await getAdaTransactionInputsAndUtxos(senders);
+  return inputs;
+}
+
+/** Gets the inputs and utxs necessary to create a transaction */
+export async function getAdaTransactionInputsAndUtxos(
+  senders: AdaAddresses,
+): Promise<[Array<TxInput>, Array<UTXO>]> {
+  const addressesMap = await getAdaAddressesMap();
+
+  // Get all user UTXOs
+  const senderUtxos = await getAllUTXOsForAddresses(addressesToPublicHash(senders));
+
+  // Consider any UTXO as a possible input
+  const inputs = mapUTXOsToInputs(senderUtxos, addressesMap);
+
+  // This is a tuple (not an array)
+  return [inputs, senderUtxos];
+}
+
+/** fetch new internal address from HD Wallet for change */
+export async function getAdaTransactionChangeAddr(): Promise<AdaAddress> {
+  // Get all addresses in the single account to a list
+  const cryptoAccount = getSingleCryptoAccount();
+  const addressesMap = await getAdaAddressesMap();
+  const addresses = mapToList(addressesMap);
+
+  return await createAdaAddress(cryptoAccount, addresses, 'Internal');
+}
+
 /** Perform the cryptography required to create a transaction */
 export async function getAdaTransactionFromSenders(
   senders: AdaAddresses,
@@ -139,25 +173,16 @@ export async function getAdaTransactionFromSenders(
   amount: string,
   cryptoWallet: CryptoWallet
 ): Promise<[SpendResponse, AdaAddress]> {
-  // Get all addresses in the single account to a list
-  const cryptoAccount = getSingleCryptoAccount();
-  const addressesMap = await getAdaAddressesMap();
-  const addresses = mapToList(addressesMap);
-
   // fetch new internal address from HD Wallet for change
-  const changeAdaAddr = await createAdaAddress(cryptoAccount, addresses, 'Internal');
-  const changeAddr = changeAdaAddr.cadId;
-
-  // Get all user UTXOs
-  const senderUtxos = await getAllUTXOsForAddresses(_addressesToPublicHash(senders));
+  const changeAdaAddr = await getAdaTransactionChangeAddr();
 
   // Consider any UTXO as a possible input
-  const inputs = _mapUTXOsToInputs(senderUtxos, addressesMap);
+  const inputs = await getAdaTransactionInputs(senders);
   const outputs = [{ address: receiver, value: amount }];
 
   // Note: selection policy is decided on the js-cardano-wasm side
   const result: SpendResponse = getResultOrFail(
-    Wallet.spend(cryptoWallet, inputs, outputs, changeAddr)
+    Wallet.spend(cryptoWallet, inputs, outputs, changeAdaAddr.cadId)
   );
   return [result, changeAdaAddr];
 }
@@ -173,15 +198,15 @@ async function _getAdaTransaction(
   return getAdaTransactionFromSenders(senders, receiver, amount, cryptoWallet);
 }
 
-function _addressesToPublicHash(
+export function addressesToPublicHash(
   adaAddresses: AdaAddresses
 ): Array<string> {
   return adaAddresses.map(addr => addr.cadId);
 }
 
-function _mapUTXOsToInputs(
+export function mapUTXOsToInputs(
   utxos: Array<UTXO>,
-  adaAddressesMap
+  adaAddressesMap: any // TODO: [TREZOR] fix the type
 ): Array<TxInput> {
   return utxos.map((utxo) => ({
     ptr: {

@@ -10,14 +10,18 @@ import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import SvgInline from 'react-svg-inline';
-import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import AmountInputSkin from './skins/AmountInputSkin';
-import BorderedBox from '../widgets/BorderedBox';
+import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import AmountInputSkin from '../skins/AmountInputSkin';
+import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
-import globalMessages from '../../i18n/global-messages';
+import globalMessages from '../../../i18n/global-messages';
 import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
-import { formattedAmountToBigNumber, formattedAmountToNaturalUnits } from '../../utils/formatters';
-import dangerIcon from '../../assets/images/danger.inline.svg';
+import TrezorSendConfirmationDialog from './trezor/TrezorSendConfirmationDialog';
+import {
+  formattedAmountToBigNumber,
+  formattedAmountToNaturalUnits
+} from '../../../utils/formatters';
+import dangerIcon from '../../../assets/images/danger.inline.svg';
 
 export const messages = defineMessages({
   titleLabel: {
@@ -103,13 +107,15 @@ type Props = {
   currencyUnit: string,
   currencyMaxIntegerDigits: number,
   currencyMaxFractionalDigits: number,
+  hasAnyPending: boolean,
+  isTrezorTWallet: boolean,
   validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
   calculateTransactionFee: (receiver: string, amount: string) => Promise<BigNumber>,
   addressValidator: Function,
   openDialogAction: Function,
   isDialogOpen: Function,
-  dialogRenderCallback: Function,
-  hasAnyPending: boolean
+  webWalletConfirmationDialogRenderCallback: Function,
+  trezorTWalletConfirmationDialogRenderCallback: Function,
 };
 
 type State = {
@@ -211,21 +217,22 @@ export default class WalletSendForm extends Component<Props, State> {
   render() {
     const { form } = this;
     const { intl } = this.context;
+
     const {
-      currencyUnit, currencyMaxIntegerDigits, currencyMaxFractionalDigits,
-      openDialogAction, isDialogOpen, hasAnyPending, dialogRenderCallback
+      currencyUnit,
+      currencyMaxIntegerDigits,
+      currencyMaxFractionalDigits,
+      hasAnyPending,
     } = this.props;
-    const { isTransactionFeeCalculated, transactionFee, transactionFeeError } = this.state;
+    const {
+      transactionFee,
+      transactionFeeError
+    } = this.state;
+
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
-    const receiverFieldProps = receiverField.bind();
     const amountFieldProps = amountField.bind();
     const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
-
-    const buttonClasses = classnames([
-      'primary',
-      styles.nextButton,
-    ]);
 
     const hasPendingTxWarning = (
       <div className={styles.contentWarning}>
@@ -234,14 +241,6 @@ export default class WalletSendForm extends Component<Props, State> {
       </div>
     );
 
-    const dialogProps = {
-      amount: amountFieldProps.value,
-      receiver: receiverFieldProps.value,
-      totalAmount: totalAmount.toFormat(currencyMaxFractionalDigits),
-      transactionFee: transactionFee.toFormat(currencyMaxFractionalDigits),
-      amountToNaturalUnits: formattedAmountToNaturalUnits,
-      currencyUnit
-    };
     return (
       <div className={styles.component}>
 
@@ -274,30 +273,110 @@ export default class WalletSendForm extends Component<Props, State> {
             />
           </div>
 
-          <Button
-            className={buttonClasses}
-            label={intl.formatMessage(messages.nextButtonLabel)}
-            onMouseUp={() => openDialogAction({
-              dialog: WalletSendConfirmationDialog,
-            })}
-            /*
-             * Form can't be submitted in case transaction fees are not calculated
-             * or there's a transaction waiting to be confirmed (pending)
-             */
-            disabled={!isTransactionFeeCalculated || hasAnyPending}
-            skin={<SimpleButtonSkin />}
-          />
+          {this._makeInvokeConfirmationButton()}
 
         </BorderedBox>
 
-        {isDialogOpen(WalletSendConfirmationDialog) ? (
-          <div>
-            {dialogRenderCallback(dialogProps)}
-          </div>
-        ) : null}
+        {this._makeConfirmationDialogComponent()}
 
       </div>
     );
+  }
+
+  /** Makes custom button component depends on type of active wallet
+    * basically controlles which confirmation dialog to open
+    * CASE 1: Web Wallet
+    * CASE 2: Trezor Model T Wallet */
+  _makeInvokeConfirmationButton(): any { // TODO: fix the return type
+    const { intl } = this.context;
+
+    const buttonClasses = classnames([
+      'primary',
+      styles.nextButton,
+    ]);
+
+    /** Next Action can't be performed in case transaction fees are not calculated
+      * or there's a transaction waiting to be confirmed (pending) */
+    const {
+      openDialogAction,
+      hasAnyPending,
+    } = this.props;
+    const { isTransactionFeeCalculated } = this.state;
+
+    // TODO: too bad opening dialog directly even its container dialog exists
+    let onMouseUp;
+    if (this.props.isTrezorTWallet) {
+      onMouseUp = () => openDialogAction({
+        dialog: TrezorSendConfirmationDialog,
+      });
+    } else {
+      onMouseUp = () => openDialogAction({
+        dialog: WalletSendConfirmationDialog,
+      });
+    }
+
+    return (
+      <Button
+        className={buttonClasses}
+        label={intl.formatMessage(messages.nextButtonLabel)}
+        onMouseUp={onMouseUp}
+        disabled={!isTransactionFeeCalculated || hasAnyPending}
+        skin={<SimpleButtonSkin />}
+      />);
+  }
+
+  /** Makes component for respetive send confirmation dialog
+    * returns null when dialog is not needed
+    * CASE 1: Web Wallet
+    * CASE 2: Trezor Model T Wallet */
+  _makeConfirmationDialogComponent(): any { // TODO: fix the return type
+    let component = null;
+
+    const {
+      isDialogOpen,
+      webWalletConfirmationDialogRenderCallback,
+      trezorTWalletConfirmationDialogRenderCallback
+    } = this.props;
+
+    // this function is called from render hence it should return ASAP, hence using renderCB
+    let renderCB = null;
+    if (isDialogOpen(WalletSendConfirmationDialog)) {
+      renderCB = webWalletConfirmationDialogRenderCallback;
+    } else if (isDialogOpen(TrezorSendConfirmationDialog)) {
+      renderCB = trezorTWalletConfirmationDialogRenderCallback;
+    }
+
+    if (renderCB) {
+      const { form } = this;
+
+      const {
+        currencyUnit,
+        currencyMaxFractionalDigits,
+      } = this.props;
+      const { transactionFee } = this.state;
+
+      const amountField = form.$('amount');
+      const receiverField = form.$('receiver');
+      const receiverFieldProps = receiverField.bind();
+      const amountFieldProps = amountField.bind();
+      const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
+
+      const dialogProps = {
+        amount: amountFieldProps.value,
+        receiver: receiverFieldProps.value,
+        totalAmount: totalAmount.toFormat(currencyMaxFractionalDigits),
+        transactionFee: transactionFee.toFormat(currencyMaxFractionalDigits),
+        amountToNaturalUnits: formattedAmountToNaturalUnits,
+        currencyUnit
+      };
+
+      component = (
+        <div>
+          {renderCB(dialogProps)}
+        </div>);
+    }
+
+    return component;
   }
 
   _resetTransactionFee() {

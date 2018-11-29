@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import globalMessages from '../../../../i18n/global-messages';
 import ProgressSteps from '../../../widgets/ProgressSteps';
 import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
 
@@ -24,8 +23,6 @@ const messages = defineMessages({
     description: 'Progress Step Label "Save" on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   progressInfo: ProgressInfo,

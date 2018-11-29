@@ -142,7 +142,7 @@ declare type MoveResponse = {
 
 declare type CryptoWallet = {
   root_key: string,
-  root_cached_key: string,
+  root_cached_key: string, // Encrypted MasterPrivateKey
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: string
@@ -158,7 +158,7 @@ declare type CryptoDaedalusWallet = {
 
 declare type CryptoAccount = {
   account: number,
-  root_cached_key: string,
+  root_cached_key: string, // MasterPublicKey
   derivation_scheme: string
 }
 
