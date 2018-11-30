@@ -37,6 +37,14 @@ export default class App extends Component<{
     const currentTheme = 'yoroi';
     const theme = require(`./themes/prebuilt/${currentTheme}.js`); // eslint-disable-line
 
+    let mobxDevTools;
+    try {
+      const mobxDevToolsPackage = require('mobx-react-devtools').default;
+      mobxDevTools = React.createElement(mobxDevToolsPackage);
+    } catch (err) {
+      mobxDevTools = undefined;
+    }
+
     return (
       <div>
         <ThemeManager variables={theme} />
@@ -48,6 +56,7 @@ export default class App extends Component<{
             </div>
           </IntlProvider>
         </ThemeProvider>
+        {mobxDevTools}
       </div>
     );
   }
