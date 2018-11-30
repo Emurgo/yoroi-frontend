@@ -24,15 +24,19 @@ export default class TopBarLayout extends Component<Props> {
     const { banner, children, topbar, notification } = this.props;
     return (
       <div className={styles.component}>
-        <div className={styles.topbar}>
-          {topbar}
-        </div>
+        <div className={styles.main}>
+          <div className={styles.topbar}>
+            {topbar}
+          </div>
 
-        {banner}
+          {banner}
 
-        {notification}
-        <div className={styles.content}>
-          {children}
+          {notification}
+          <div className={styles.contentWrapper}>
+            <div className={styles.content}>
+              {children}
+            </div>
+          </div>
         </div>
       </div>
     );
