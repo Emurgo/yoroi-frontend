@@ -1,4 +1,4 @@
-//  ==== Theme: Yoroi === //
+//  ==== Theme: Yoroi Modern === //
 
 export default {
   '--preferred-font': '"Times New Roman", serif',
@@ -135,7 +135,7 @@ export default {
 
   '--theme-topbar-category-background-color-hover': '#373f52',
   '--theme-topbar-category-text-color': '#fafbfc',
-  '--theme-topbar-background-color': '#373f52',
+  '--theme-topbar-background-color': '#10aca4',
   '--theme-topbar-wallet-name-color': '#fafbfc',
   '--theme-topbar-wallet-info-color': '#fafbfc',
   '--theme-topbar-layout-body-background-color': '#ffffff',
@@ -199,8 +199,4 @@ export default {
   '--theme-wallet-password-switch-label-color': '#121327',
 
   '--theme-banner-warning-background-color': '#b54b4b',
-  '--theme-trezor-connect-dialog-middle-block-common-background-color': '#f3f3f5',
-  '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
-
-  '--theme-widgets-progress-step-common-color': '#daa49a',
 };

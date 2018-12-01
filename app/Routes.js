@@ -16,6 +16,7 @@ import GeneralSettingsPage from './containers/settings/categories/GeneralSetting
 import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
+import DisplaySettingsPage from './containers/settings/categories/DisplaySettingsPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
@@ -89,6 +90,10 @@ export const Routes = (
       <Route
         path="support"
         component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path="display"
+        component={(props) => <DisplaySettingsPage {...props} stores={stores} actions={actions} />}
       />
     </Route>
     <Route

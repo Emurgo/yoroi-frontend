@@ -9,7 +9,7 @@ Yoroi uses [React-Polymorph](https://github.com/input-output-hk/react-polymorph/
 React-Polymorph comes with a default theme for each component (called the `simple` theme) but we want to allow ourselves to easily extend/modify it as needed. To do this, we :
 
 A) Have a folder called `simple` which imports the default themes (css) and provides us the ability to override what we need.
-B) Rebundle this modified `simple` theme into a new theme called `yoroiTheme`. 
+B) Rebundle this modified `simple` theme into a new theme called `yoroiPolymorphTheme`.
 C) Use the `ThemeProvider` to automatically override the default theme on all React-Polymorph componenets at the top-level of our `App`.
 
 ## 2) Store prebuild themes

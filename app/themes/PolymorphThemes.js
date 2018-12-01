@@ -17,7 +17,7 @@ import SimpleOptions from './simple/SimpleOptions.scss';
 import SimpleSelect from './simple/SimpleSelect.scss';
 
 // package all our overrides into one theme
-export const yoroiTheme = {
+export const yoroiPolymorphTheme = {
   [FORM_FIELD]: SimpleFormField,
   [INPUT]: SimpleInput,
   [CHECKBOX]: SimpleCheckbox,

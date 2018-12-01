@@ -14,6 +14,8 @@ const storageKeys = {
 
 export default class LocalStorageApi {
 
+  // ========== Locale ========== //
+
   getUserLocale = (): Promise<string> => new Promise((resolve, reject) => {
     try {
       const locale = localStorage.getItem(storageKeys.USER_LOCALE);
@@ -39,6 +41,8 @@ export default class LocalStorageApi {
       resolve();
     } catch (error) {} // eslint-disable-line
   });
+
+  // ========== Terms of Use ========== //
 
   getTermsOfUseAcceptance = (): Promise<boolean> => new Promise((resolve, reject) => {
     try {
@@ -66,9 +70,38 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== User Theme ========== //
+
+  getUserTheme = (): Promise<string> => new Promise((resolve, reject) => {
+    try {
+      const theme = localStorage.getItem(storageKeys.THEME);
+      if (!theme) return resolve('');
+      resolve(theme);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setUserTheme = (theme: string): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.THEME, theme);
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetUserTheme = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.THEME);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
   async reset() {
     await this.unsetUserLocale(); // TODO: remove after saving locale to API is restored
     await this.unsetTermsOfUseAcceptance();
+    await this.unsetUserTheme();
   }
 
 }
