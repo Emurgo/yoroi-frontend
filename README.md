@@ -1,5 +1,9 @@
 # Yoroi - Cardano ADA wallet
 
+## Contributing
+
+Check out our [documents](docs/specs/meta) on the governance of this project.
+
 ## First-time setup (or branch change)
 
 [SETUP.md](docs/SETUP.md)
