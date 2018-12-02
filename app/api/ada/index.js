@@ -30,8 +30,8 @@ import {
   restoreAdaWallet
 } from './restoreAdaWallet';
 import {
-  connectTrezorAdaWallet
-} from './hardware-wallet/connectTrezorAdaWallet';
+  createTrezorWallet
+} from './hardware-wallet/createTrezorWallet';
 import {
   getAdaTxsHistoryByWallet,
   getAdaTxLastUpdatedDate,
@@ -73,8 +73,8 @@ import type {
   RestoreWalletRequest,
   RestoreWalletResponse,
   UpdateWalletResponse,
-  ConnectTrezorRequest,
-  ConnectTrezorResponse,
+  CreateTrezorWalletRequest,
+  CreateTrezorWalletResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
@@ -467,9 +467,9 @@ export default class AdaApi {
     }
   }
 
-  async connectTrezor(
-    request: ConnectTrezorRequest
-  ): Promise<ConnectTrezorResponse> {
+  async createTrezorWallet(
+    request: CreateTrezorWalletRequest
+  ): Promise<CreateTrezorWalletResponse> {
     try {
       Logger.debug('AdaApi::connectTrezor called');
       const { walletName, publicMasterKey, deviceFeatures } = request;
@@ -494,7 +494,7 @@ export default class AdaApi {
           publicMasterKey,
         },
       };
-      const wallet: AdaWallet = await connectTrezorAdaWallet({ walletInitData });
+      const wallet: AdaWallet = await createTrezorWallet({ walletInitData });
 
       Logger.debug('AdaApi::connectTrezor success');
       return _createWalletFromServerData(wallet);

@@ -34,8 +34,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Restore notification message shown during async wallet restore on the wallet add screen.',
   },
-  trezorConnectNotificationMessage: {
-    id: 'wallet.add.dialog.trezorConnectNotificationMessage',
+  createTrezorWalletNotificationMessage: {
+    id: 'wallet.add.dialog.createTrezorWalletNotificationMessage',
     defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
   }
@@ -43,7 +43,7 @@ const messages = defineMessages({
 
 type Props = {
   onTrezor: Function,
-  isTrezorConnectActive: boolean,
+  isCreateTrezorWalletActive: boolean,
   onCreate: Function,
   onRestore: Function,
   isRestoreActive: boolean,
@@ -60,7 +60,7 @@ export default class WalletAdd extends Component<Props> {
     const { intl } = this.context;
     const {
       onTrezor,
-      isTrezorConnectActive,
+      isCreateTrezorWalletActive,
       onCreate,
       onRestore,
       isRestoreActive,
@@ -69,8 +69,8 @@ export default class WalletAdd extends Component<Props> {
     const componentClasses = classnames([styles.component, 'WalletAdd']);
 
     let activeNotification = null;
-    if (isTrezorConnectActive) {
-      activeNotification = 'trezorConnectNotificationMessage';
+    if (isCreateTrezorWalletActive) {
+      activeNotification = 'createTrezorWalletNotificationMessage';
     } else if (isRestoreActive) {
       activeNotification = 'restoreNotificationMessage';
     }

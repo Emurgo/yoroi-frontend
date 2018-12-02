@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Element } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import SvgInline from 'react-svg-inline';
@@ -17,11 +17,12 @@ type Props = {
 @observer
 export default class ProgressSteps extends Component<Props> {
 
-  createSetps = (stepsList, progressInfo) => {
+  createSetps = (stepsList, progressInfo): Array<Element> => {
+    const steps = [];
+
     // currentStep should not be less than 0
     const currentStep = progressInfo.currentStep < 0 ? 0 : progressInfo.currentStep;
 
-    const steps = [];
     for (let idx = 0; idx < stepsList.length; idx++) {
       const stepText = stepsList[idx];
 
@@ -41,7 +42,6 @@ export default class ProgressSteps extends Component<Props> {
           styles.stepTextDone
         ]);
       } else if (idx === currentStep) {
-        // step current
         // for current step, 0 = LOAD | 1 = PROCESS | 9 = ERROR
         // 0 = LOAD and 1 = PROCESS has same icon but for 9 = ERROR there is a error icon
         displayIcon = (progressInfo.stepState === 9) ? 'error' : 'none';

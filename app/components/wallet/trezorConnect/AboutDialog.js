@@ -24,78 +24,73 @@ import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
 import styles from './AboutDialog.scss';
 
 const messages = defineMessages({
-  title: {
-    id: 'wallet.trezor.dialog.title.label',
-    defaultMessage: '!!!Connect to Trezor Hardware Wallet',
-    description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
-  },
   aboutIntroTextLine1: {
-    id: 'wallet.trezor.dialog.trezor.step.about.introText.line.1',
+    id: 'wallet.trezor.dialog.step.about.introText.line.1',
     defaultMessage: '!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutIntroTextLine2: {
-    id: 'wallet.trezor.dialog.trezor.step.about.introText.line.2',
+    id: 'wallet.trezor.dialog.step.about.introText.line.2',
     defaultMessage: '!!!It is more secure because your private key never leaves the hardware wallet.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutIntroTextLine3: {
-    id: 'wallet.trezor.dialog.trezor.step.about.introText.line.3',
+    id: 'wallet.trezor.dialog.step.about.introText.line.3',
     defaultMessage: '!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisiteHeader: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.header',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.header',
     defaultMessage: '!!!Prerequisites',
     description: 'Prerequisite header on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part1: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.1.part1',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.1.part1',
     defaultMessage: '!!!Only Supports',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2Link: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.1.part2.link',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.1.part2.link',
     defaultMessage: '!!!https://github.com/trezor/trezor-core/blob/master/ChangeLog',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2LinkText: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.1.part2.link.text',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.1.part2.link.text',
     defaultMessage: '!!!Trezor Model T with version 2.0.8',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part3: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.1.part3',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.1.part3',
     defaultMessage: '!!!or later',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite2: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.2',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.2',
     defaultMessage: '!!!Trezor device must be pre-initialized',
     description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.3',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.3',
     defaultMessage: '!!!The computer needs to be connected to the Internet throughout the process',
     description: 'Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite4: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.4',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.4',
     defaultMessage: '!!!Only one Trezor device can be connected to the computer at any time',
     description: 'Fourth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite5: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.5',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.5',
     defaultMessage: '!!!Trezor device screen must be unlocked',
     description: 'Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite6: {
-    id: 'wallet.trezor.dialog.trezor.step.about.prerequisite.6',
+    id: 'wallet.trezor.dialog.step.about.prerequisite.6',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
     description: 'Sixth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   nextButtonLabel: {
-    id: 'wallet.trezor.dialog.trezor.next.button.label',
+    id: 'wallet.trezor.dialog.next.button.label',
     defaultMessage: '!!!Next',
     description: 'Label for the "Next" button on the Connect to Trezor Hardware Wallet dialog.'
   },
@@ -119,8 +114,8 @@ export default class AboutDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const { progressInfo, error, submit, cancel } = this.props;
 
-    // introBlock
     const introBlock = (
       <div className={styles.headerBlock}>
         <span>{intl.formatMessage(messages.aboutIntroTextLine1)}</span><br />
@@ -128,7 +123,6 @@ export default class AboutDialog extends Component<Props> {
         <span>{intl.formatMessage(messages.aboutIntroTextLine3)}</span><br />
       </div>);
 
-    // middleBlock
     const middleBlock = (
       <div className={classnames([styles.middleBlock, styles.middleAboutBlock])}>
         <div className={styles.prerequisiteBlock}>
@@ -164,23 +158,23 @@ export default class AboutDialog extends Component<Props> {
       label: intl.formatMessage(messages.nextButtonLabel),
       primary: true,
       disabled: false,
-      onClick: this.props.submit,
+      onClick: submit,
     }];
 
     return (
       <Dialog
         className={classnames([styles.component, 'AboutDialog'])}
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
         actions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        onClose={this.props.cancel}
+        onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={this.props.progressInfo} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={this.props.progressInfo} />
-        <ErrorBlock progressInfo={this.props.progressInfo} error={this.props.error} />
+        <HelpLinkBlock progressInfo={progressInfo} />
+        <ErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 }

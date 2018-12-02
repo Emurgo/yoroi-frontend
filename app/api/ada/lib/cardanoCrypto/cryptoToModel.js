@@ -9,8 +9,7 @@ import type {
 } from '../../adaTypes';
 import { AdaWalletTypeOption } from '../../config/AdaTypesConfig';
 
-/** Convert uesr-inputted data during wallet creation to internal wallet representation */
-/** WEB_WALLET */
+/** Convert uesr-inputted data during wallet creation to internal web wallet representation */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
@@ -29,8 +28,7 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   };
 }
 
-/** Convert uesr-inputted data during wallet creation to internal wallet representation */
-/** HARDWARE_WALLET */
+/** Convert uesr-inputted data during wallet creation to internal hardware wallet representation */
 export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
@@ -46,6 +44,7 @@ export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData):
     },
     cwType: AdaWalletTypeOption.HARDWARE_WALLET,
     cwPassphraseLU: moment().format(),
+    cwHardwareInfo: walletInitData.cwHardwareInfo,
   };
 }
 

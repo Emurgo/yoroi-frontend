@@ -116,7 +116,12 @@ export default defineMessages({
     id: 'settings.support.faq.faqLinkURL',
     defaultMessage: '!!!https://yoroi-wallet.com/faq/',
     description: 'URL for the "FAQ on Yoroi website"',
-  }
+  },
+  trezorConnectAllDialogTitle: {
+    id: 'wallet.trezor.dialog.title.label',
+    defaultMessage: '!!!Connect to Trezor Hardware Wallet',
+    description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
+  },
 });
 
 export const environmentSpecificMessages = {

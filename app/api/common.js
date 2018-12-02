@@ -123,12 +123,12 @@ export type RestoreWalletRequest = {
 };
 export type RestoreWalletResponse = Wallet;
 
-export type ConnectTrezorRequest = {
+export type CreateTrezorWalletRequest = {
   publicMasterKey: string,
   walletName: string,
   deviceFeatures: Features
 };
-export type ConnectTrezorResponse = Wallet;
+export type CreateTrezorWalletResponse = Wallet;
 
 export type UpdateWalletPasswordRequest = {
   walletId: string,

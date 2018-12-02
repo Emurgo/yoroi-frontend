@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
@@ -9,60 +9,61 @@ import AboutDialog from '../../../components/wallet/trezorConnect/AboutDialog';
 import ConnectDialog from '../../../components/wallet/trezorConnect/ConnectDialog';
 import SaveDialog from '../../../components/wallet/trezorConnect/SaveDialog';
 
-import { ProgressStepOption } from '../../../stores/ada/TrezorConnectStore';
+import { Logger } from '../../../utils/logging';
+
+import TrezorConnectStore, { ProgressStep } from '../../../stores/ada/TrezorConnectStore';
+import TrezorConnectActions from '../../../actions/ada/trezor-connect-actions';
 
 type Props = InjectedDialogContainerProps;
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletTrezorConnectDialogContainer extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null, children: null, onClose: () => {} };
 
   cancel = () => {
     this.props.onClose();
-    this._getAction().cancel.trigger();
+    this._getTrezorConnectActions().cancel.trigger();
   };
 
   render() {
-    const store = this._getStore();
-    const action = this._getAction();
+    const trezorConnectStore = this._getTrezorConnectStore();
+    const trezorConnectActions = this._getTrezorConnectActions();
 
     let component = null;
 
-    switch (store.progressInfo.currentStep) {
-      case ProgressStepOption.ABOUT:
+    switch (trezorConnectStore.progressInfo.currentStep) {
+      case ProgressStep.ABOUT:
         component = (
           <AboutDialog
-            progressInfo={store.progressInfo}
-            isActionProcessing={store.isActionProcessing}
-            error={store.error}
-            submit={action.submitAbout.trigger}
+            progressInfo={trezorConnectStore.progressInfo}
+            isActionProcessing={trezorConnectStore.isActionProcessing}
+            error={trezorConnectStore.error}
+            submit={trezorConnectActions.submitAbout.trigger}
             cancel={this.cancel}
           />);
         break;
-      case ProgressStepOption.CONNECT:
+      case ProgressStep.CONNECT:
         component = (
           <ConnectDialog
-            progressInfo={store.progressInfo}
-            isActionProcessing={store.isActionProcessing}
-            error={store.error}
-            goBack={action.goBacktToAbout.trigger}
-            submit={action.submitConnect.trigger}
+            progressInfo={trezorConnectStore.progressInfo}
+            isActionProcessing={trezorConnectStore.isActionProcessing}
+            error={trezorConnectStore.error}
+            goBack={trezorConnectActions.goBacktToAbout.trigger}
+            submit={trezorConnectActions.submitConnect.trigger}
             cancel={this.cancel}
           />);
         break;
-      case ProgressStepOption.SAVE:
+      case ProgressStep.SAVE:
         component = (
           <SaveDialog
-            progressInfo={store.progressInfo}
-            isActionProcessing={store.isActionProcessing}
-            error={store.error}
-            defaultWalletName={store.defaultWalletName}
-            submit={action.submitSave.trigger}
+            progressInfo={trezorConnectStore.progressInfo}
+            isActionProcessing={trezorConnectStore.isActionProcessing}
+            error={trezorConnectStore.error}
+            defaultWalletName={trezorConnectStore.defaultWalletName}
+            submit={trezorConnectActions.submitSave.trigger}
             cancel={this.cancel}
           />);
         break;
       default:
-        console.error('Error : something unexpected happened');
+        Logger.error('WalletTrezorConnectDialogContainer::render: something unexpected happened');
         break;
     }
 
@@ -70,12 +71,12 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
   }
 
   /** Returns the store which is responsible for this Container */
-  _getStore() {
+  _getTrezorConnectStore(): TrezorConnectStore {
     return this.props.stores.substores[environment.API].trezorConnect;
   }
 
   /** Returns the action which is responsible for this Container */
-  _getAction() {
+  _getTrezorConnectActions(): TrezorConnectActions {
     return this.props.actions[environment.API].trezorConnect;
   }
 }

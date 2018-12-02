@@ -9,17 +9,17 @@ import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
 
 const messages = defineMessages({
   stepAboutLabel: {
-    id: 'wallet.trezor.dialog.trezor.step.about.label',
+    id: 'wallet.trezor.dialog.step.about.label',
     defaultMessage: '!!!ABOUT',
     description: 'Progress Step Label "About" on the Connect to Trezor Hardware Wallet dialog.'
   },
   stepConnectLabel: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.label',
+    id: 'wallet.trezor.dialog.step.connect.label',
     defaultMessage: '!!!CONNECT',
     description: 'Progress Step Label "Connect" on the Connect to Trezor Hardware Wallet dialog.'
   },
   stepSaveLabel: {
-    id: 'wallet.trezor.dialog.trezor.step.save.label',
+    id: 'wallet.trezor.dialog.step.save.label',
     defaultMessage: '!!!SAVE',
     description: 'Progress Step Label "Save" on the Connect to Trezor Hardware Wallet dialog.'
   },
@@ -40,6 +40,7 @@ export default class ProgressStepBlock extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const { progressInfo } = this.props;
 
     return (
       <ProgressSteps
@@ -48,7 +49,7 @@ export default class ProgressStepBlock extends Component<Props> {
           intl.formatMessage(messages.stepConnectLabel),
           intl.formatMessage(messages.stepSaveLabel)
         ]}
-        progressInfo={this.props.progressInfo}
+        progressInfo={progressInfo}
       />);
   }
 }

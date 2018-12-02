@@ -11,12 +11,12 @@ import styles from './HelpLinkBlock.scss';
 
 const messages = defineMessages({
   helpLinkYoroiWithTrezor: {
-    id: 'wallet.trezor.dialog.trezor.common.step.link.helpYoroiWithTrezor',
+    id: 'wallet.trezor.dialog.common.step.link.helpYoroiWithTrezor',
     defaultMessage: '!!!https://yoroi-wallet.com/',
     description: 'Tutorial link about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
   },
   helpLinkYoroiWithTrezorText: {
-    id: 'wallet.trezor.dialog.trezor.common.step.link.helpYoroiWithTrezor.text',
+    id: 'wallet.trezor.dialog.common.step.link.helpYoroiWithTrezor.text',
     defaultMessage: '!!!Click here to know more about how to use Yoroi with Trezor.',
     description: 'Tutorial link text about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
   },

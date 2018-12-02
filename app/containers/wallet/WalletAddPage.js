@@ -15,6 +15,8 @@ import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
 import type { InjectedProps } from '../../types/injectedPropsType';
+import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
+import TrezorConnectStore from '../../stores/ada/TrezorConnectStore';
 
 type Props = InjectedProps;
 const MainLayout = resolver('containers/MainLayout');
@@ -56,8 +58,8 @@ export default class WalletAddPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
     const { isRestoreActive } = wallets;
-    const { isTrezorConnectActive } = this._getTrezorConnectStore();
-    const openTrezorConnect = () => {
+    const { isCreateTrezorWalletActive } = this._getTrezorConnectStore();
+    const openTrezorConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
     };
     let content = null;
@@ -75,7 +77,6 @@ export default class WalletAddPage extends Component<Props> {
         <WalletBackupDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
-      // TODO: TREZOR to discuss
       content = (
         <WalletTrezorConnectDialogContainer
           actions={actions}
@@ -86,8 +87,8 @@ export default class WalletAddPage extends Component<Props> {
     } else {
       content = (
         <WalletAdd
-          onTrezor={openTrezorConnect} // TODO: TREZOR to discuss ??
-          isTrezorConnectActive={isTrezorConnectActive}
+          onTrezor={openTrezorConnectDialog}
+          isCreateTrezorWalletActive={isCreateTrezorWalletActive}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           isRestoreActive={isRestoreActive}
@@ -101,11 +102,11 @@ export default class WalletAddPage extends Component<Props> {
     );
   }
 
-  _getWalletsStore() {
+  _getWalletsStore(): AdaWalletsStore {
     return this.props.stores.substores[environment.API].wallets;
   }
 
-  _getTrezorConnectStore() {
+  _getTrezorConnectStore(): TrezorConnectStore {
     return this.props.stores.substores[environment.API].trezorConnect;
   }
 

@@ -25,33 +25,30 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { isValidHardwareWalletName } from '../../../utils/validations';
 
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
-import { StepStateOption } from '../../../stores/ada/TrezorConnectStore';
+import { StepState } from '../../../stores/ada/TrezorConnectStore';
+
+import { Logger } from '../../../utils/logging';
 
 import styles from './SaveDialog.scss';
 
 const messages = defineMessages({
-  title: {
-    id: 'wallet.trezor.dialog.title.label',
-    defaultMessage: '!!!Connect to Trezor Hardware Wallet',
-    description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
-  },
   saveWalletNameInputLabel: {
-    id: 'wallet.trezor.dialog.trezor.step.save.walletName.label',
+    id: 'wallet.trezor.dialog.step.save.walletName.label',
     defaultMessage: '!!!Wallet name',
     description: 'Label for the wallet name input on the Connect to Trezor Hardware Wallet dialog.'
   },
   saveWalletNameInputPlaceholder: {
-    id: 'wallet.restore.dialog.wallet.name.input.hint',
+    id: 'wallet.trezor.dialog.step.save.walletName.hint',
     defaultMessage: '!!!Enter wallet name',
     description: 'Placeholder "Enter wallet name" for the wallet name input on the wallet restore dialog.'
   },
   saveWalletNameInputBottomInfo: {
-    id: 'wallet.trezor.dialog.trezor.step.save.walletName.info',
+    id: 'wallet.trezor.dialog.step.save.walletName.info',
     defaultMessage: '!!!We have fetched Trezor device’s name for you; you can use as it is or assign a different name.',
     description: 'Hint for the wallet name input on the wallet restore dialog.'
   },
   saveButtonLabel: {
-    id: 'wallet.trezor.dialog.trezor.save.button.label',
+    id: 'wallet.trezor.dialog.save.button.label',
     defaultMessage: '!!!Save',
     description: 'Label for the "Save" button on the Connect to Trezor Hardware Wallet dialog.'
   },
@@ -75,18 +72,18 @@ export default class SaveDialog extends Component<Props> {
     intl: intlShape.isRequired
   };
 
-  // form for wallet name
   form: typeof ReactToolboxMobxForm;
 
   componentWillMount() {
     const { intl } = this.context;
+    const { defaultWalletName } = this.props;
 
     this.form = new ReactToolboxMobxForm({
       fields: {
         walletName: {
           label: intl.formatMessage(messages.saveWalletNameInputLabel),
           placeholder: intl.formatMessage(messages.saveWalletNameInputPlaceholder),
-          value: this.props.defaultWalletName,
+          value: defaultWalletName,
           validators: [({ field }) => (
             [
               isValidHardwareWalletName(field.value),
@@ -105,8 +102,8 @@ export default class SaveDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const { progressInfo, isActionProcessing, error, cancel } = this.props;
 
-    // walletNameBlock
     const walletNameFieldClasses = classnames([
       'walletName',
       styles.walletName,
@@ -124,56 +121,54 @@ export default class SaveDialog extends Component<Props> {
         <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);
 
-    // middleBlock selection depending upon state
     let middleBlock = null;
 
-    switch (this.props.progressInfo.stepState) {
-      case StepStateOption.LOAD:
+    switch (progressInfo.stepState) {
+      case StepState.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
             <SvgInline svg={saveLoadGIF} cleanup={['title']} />
           </div>);
         break;
-      case StepStateOption.PROCESS:
-        // START
+      case StepState.PROCESS:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
             <SvgInline svg={saveStartSVG} cleanup={['title']} />
           </div>);
         break;
-      case StepStateOption.ERROR:
+      case StepState.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
             <SvgInline svg={saveErrorSVG} cleanup={['title']} />
           </div>);
         break;
       default:
-        console.error('Error : something unexpected happened');
+        Logger.error('trezorConnect::ConnectDialog::render: something unexpected happened');
         break;
     }
 
     const dailogActions = [{
-      className: this.props.isActionProcessing ? styles.processing : null,
+      className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(messages.saveButtonLabel),
       primary: true,
-      disabled: this.props.isActionProcessing,
+      disabled: isActionProcessing,
       onClick: this.save
     }];
 
     return (
       <Dialog
         className={classnames([styles.component, 'SaveDialog'])}
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
         actions={dailogActions}
         closeOnOverlayClick={false}
-        onClose={this.props.cancel}
+        onClose={cancel}
         closeButton={<DialogCloseButton />}
       >
-        <ProgressStepBlock progressInfo={this.props.progressInfo} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {walletNameBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={this.props.progressInfo} />
-        <ErrorBlock progressInfo={this.props.progressInfo} error={this.props.error} />
+        <HelpLinkBlock progressInfo={progressInfo} />
+        <ErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 
@@ -182,8 +177,7 @@ export default class SaveDialog extends Component<Props> {
       onSuccess: async (form) => {
         const { walletName } = form.values();
         this.props.submit(walletName);
-      },
-      onError: () => {},
+      }
     });
   }
 }

@@ -5,6 +5,9 @@ import { intlShape } from 'react-intl';
 
 import LocalizableError from '../../../../i18n/LocalizableError';
 import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
+
+import { Logger, stringifyError } from '../../../../utils/logging';
+
 import styles from './ErrorBlock.scss';
 
 type Props = {
@@ -21,10 +24,14 @@ export default class ErrorBlock extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const { error } = this.props;
+
     let errorText = '';
     try {
-      errorText = (this.props.error) ? intl.formatMessage(this.props.error) : '';
-    } finally {} // eslint-disable-line no-empty
+      errorText = (error) ? intl.formatMessage(error) : '';
+    } catch (e) {
+      Logger.error(`trezorConnect::common::ErrorBlock:render ${stringifyError(e)}`);
+    }
 
     return (
       <div className={styles.errorBlock}>

@@ -21,33 +21,30 @@ import connectStartGIF from '../../../assets/images/trezor/connect-start.gif';
 import connectErrorSVG from '../../../assets/images/trezor/connect-error.inline.svg';
 
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
-import { StepStateOption } from '../../../stores/ada/TrezorConnectStore';
+import { StepState } from '../../../stores/ada/TrezorConnectStore';
+
+import { Logger } from '../../../utils/logging';
 
 import styles from './ConnectDialog.scss';
 
 const messages = defineMessages({
-  title: {
-    id: 'wallet.trezor.dialog.title.label',
-    defaultMessage: '!!!Connect to Trezor Hardware Wallet',
-    description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
-  },
   connectIntroTextLine1: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.introText.line.1',
+    id: 'wallet.trezor.dialog.step.connect.introText.line.1',
     defaultMessage: '!!!After connecting your Trezor device to the computer press the Connect button.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectIntroTextLine2: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.introText.line.2',
+    id: 'wallet.trezor.dialog.step.connect.introText.line.2',
     defaultMessage: '!!!A new tab will appear, please follow the instructions in the new tab.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectIntroTextLine3: {
-    id: 'wallet.trezor.dialog.trezor.step.connect.introText.line.3',
+    id: 'wallet.trezor.dialog.step.connect.introText.line.3',
     defaultMessage: '!!!This process shares the Cardano public key with Yoroi.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectButtonLabel: {
-    id: 'wallet.trezor.dialog.trezor.connect.button.label',
+    id: 'wallet.trezor.dialog.connect.button.label',
     defaultMessage: '!!!Connect',
     description: 'Label for the "Connect" button on the Connect to Trezor Hardware Wallet dialog.'
   },
@@ -73,8 +70,8 @@ export default class ConnectDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const { progressInfo, isActionProcessing, error, goBack, submit, cancel } = this.props;
 
-    // introBlock
     const introBlock = (
       <div className={styles.headerBlock}>
         <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
@@ -82,60 +79,59 @@ export default class ConnectDialog extends Component<Props> {
         <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br />
       </div>);
 
-    // middleBlock + backButton selection depending upon state
     let middleBlock = null;
     let backButton = null;
 
-    switch (this.props.progressInfo.stepState) {
-      case StepStateOption.LOAD:
-        backButton = (<DialogBackButton onBack={this.props.goBack} />);
+    switch (progressInfo.stepState) {
+      case StepState.LOAD:
+        backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
             <img src={connectLoadGIF} alt="" />
           </div>);
         break;
-      case StepStateOption.PROCESS:
+      case StepState.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
             <img src={connectStartGIF} alt="" />
           </div>);
         break;
-      case StepStateOption.ERROR:
-        backButton = (<DialogBackButton onBack={this.props.goBack} />);
+      case StepState.ERROR:
+        backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
             <SvgInline svg={connectErrorSVG} cleanup={['title']} />
           </div>);
         break;
       default:
-        console.error('Error : something unexpected happened');
+        Logger.error('trezorConnect::ConnectDialog::render: something unexpected happened');
         break;
     }
 
     const dailogActions = [{
-      className: this.props.isActionProcessing ? styles.processing : null,
+      className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(messages.connectButtonLabel),
       primary: true,
-      disabled: this.props.isActionProcessing,
-      onClick: this.props.submit
+      disabled: isActionProcessing,
+      onClick: submit
     }];
 
     return (
       <Dialog
         className={classnames([styles.component, 'AboutDialog'])}
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
         actions={dailogActions}
         closeOnOverlayClick={false}
-        onClose={this.props.cancel}
+        onClose={cancel}
         backButton={backButton}
         closeButton={<DialogCloseButton />}
       >
-        <ProgressStepBlock progressInfo={this.props.progressInfo} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={this.props.progressInfo} />
-        <ErrorBlock progressInfo={this.props.progressInfo} error={this.props.error} />
+        <HelpLinkBlock progressInfo={progressInfo} />
+        <ErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 }

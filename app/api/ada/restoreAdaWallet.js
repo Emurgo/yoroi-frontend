@@ -4,7 +4,7 @@
 
 import {
   discoverAllAddressesFrom
-} from './lib/utils';
+} from './lib/adaAddressProcessing';
 import {
   saveAsAdaAddresses,
   newAdaAddress
@@ -17,9 +17,6 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
-import {
-  DiscoverAddressesError
-} from './errors';
 import { saveCryptoAccount, saveAdaWallet } from './adaLocalStorage';
 import { createAdaWallet } from './adaWallet';
 import { createCryptoAccount } from './adaAccount';
@@ -35,34 +32,39 @@ const addressRequestSize = CONFIG.app.addressRequestSize;
 export async function restoreAdaWallet(
   { walletPassword, walletInitData }: AdaWalletParams
 ): Promise<AdaWallet> {
-  // recover master key
-  const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
-  const cryptoAccount = createCryptoAccount(masterKey, walletPassword);
-
   try {
-    // fetch all addresses
-    const externalAddressesToSave =
-      await discoverAllAddressesFrom(cryptoAccount, 'External', -1, addressScanSize, addressRequestSize);
-    const internalAddressesToSave =
-      await discoverAllAddressesFrom(cryptoAccount, 'Internal', -1, addressScanSize, addressRequestSize);
-
-    // Save all addresses in local DB
-    if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
-      await Promise.all([
-        saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External'),
-        saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal')
-      ]);
-    } else {
-      await newAdaAddress(cryptoAccount, [], 'External');
-    }
-  } catch (discoverAddressesError) {
+    // recover master key
+    const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
+    const cryptoAccount = createCryptoAccount(masterKey, walletPassword);
+    await restoreTransactionsAndSave(cryptoAccount, adaWallet, masterKey);
+    return adaWallet;
+  } catch (error) {
     Logger.error('restoreAdaWallet::restoreAdaWallet error: ' +
-      stringifyError(discoverAddressesError));
-    throw new DiscoverAddressesError();
+      stringifyError(error));
+    throw error;
+  }
+}
+
+/** Restore transactions and Save wallet + masterKey + cryptoAccount to localstorage */
+export async function restoreTransactionsAndSave(cryptoAccount: CryptoAccount,
+  adaWallet: AdaWallet,
+  masterKey?: string): Promise<void> {
+  // fetch all addresses
+  const externalAddressesToSave =
+    await discoverAllAddressesFrom(cryptoAccount, 'External', -1, addressScanSize, addressRequestSize);
+  const internalAddressesToSave =
+    await discoverAllAddressesFrom(cryptoAccount, 'Internal', -1, addressScanSize, addressRequestSize);
+  // Save all addresses in local DB
+  if (externalAddressesToSave.length !== 0 || internalAddressesToSave.length !== 0) {
+    await Promise.all([
+      saveAsAdaAddresses(cryptoAccount, externalAddressesToSave, 'External'),
+      saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal')
+    ]);
+  } else {
+    await newAdaAddress(cryptoAccount, [], 'External');
   }
 
   // save wallet info in localstorage
   saveCryptoAccount(cryptoAccount);
   saveAdaWallet(adaWallet, masterKey);
-  return adaWallet;
 }
