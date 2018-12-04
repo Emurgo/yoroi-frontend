@@ -23,7 +23,7 @@
     "build-dll": "rimraf ./dll && webpack --config=webpack/dll.config.js",
     "build-js-cardano-wasm": "./setup_cardano_crypto.sh",
     "manage-translations": "node ./translations/translation-runner.js",
-    "purge-translations": "rm -rf ./translations/messages"
+    "purge-translations": "rimraf ./translations/messages"
   },
   "repository": {
     "type": "git",

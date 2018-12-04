@@ -7,9 +7,8 @@ Check out our [documents](docs/specs/meta) on the governance of this project.
 ## First-time setup (or branch change)
 
 [SETUP.md](docs/SETUP.md)
-[TOOLS.md](docs/TOOLS.md)
 
-*if you switched git branches, it may affect translation files*. Consider [rebuilding the translation cache](app/i18n/README.md)
+[TOOLS.md](docs/TOOLS.md)
 
 ## Build Yoroi Chrome extension
 
