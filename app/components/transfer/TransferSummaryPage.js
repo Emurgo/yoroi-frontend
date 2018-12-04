@@ -6,48 +6,43 @@ import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
-import styles from './DaedalusTransferSummaryPage.scss';
-import type { TransferTx } from '../../types/daedalusTransferTypes';
+import styles from './TransferSummaryPage.scss';
+import type { TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 
 const messages = defineMessages({
   addressFromLabel: {
-    id: 'daedalusTransfer.summary.addressFrom.label',
+    id: 'transfer.summary.addressFrom.label',
     defaultMessage: '!!!From',
     description: 'Label showing addresses where the tx will be from',
   },
-  addressFromSubLabel: {
-    id: 'daedalusTransfer.summary.addressFrom.subLabel',
-    defaultMessage: '!!!Daedalus wallet Addresses',
-    description: 'SubLabel showing addresses where the tx will be from',
-  },
   addressToLabel: {
-    id: 'daedalusTransfer.summary.addressTo.label',
+    id: 'transfer.summary.addressTo.label',
     defaultMessage: '!!!To',
     description: 'Label showing addresses where the tx will be sent',
   },
   recoveredBalanceLabel: {
-    id: 'daedalusTransfer.summary.recoveredBalance.label',
+    id: 'transfer.summary.recoveredBalance.label',
     defaultMessage: '!!!Recovered balance',
     description: 'Label showing total recovered balance',
   },
   transactionFeeLabel: {
-    id: 'daedalusTransfer.summary.transactionFee.label',
+    id: 'transfer.summary.transactionFee.label',
     defaultMessage: '!!!Transaction fees',
     description: 'Label showing transaction fees when transferring',
   },
   finalBalanceLabel: {
-    id: 'daedalusTransfer.summary.finalBalance.label',
+    id: 'transfer.summary.finalBalance.label',
     defaultMessage: '!!!Final balance',
     description: 'Label showing final balance',
   },
   cancelTransferButtonLabel: {
-    id: 'daedalusTransfer.summary.cancelTransferButton.label',
+    id: 'transfer.summary.cancelTransferButton.label',
     defaultMessage: '!!!Cancel',
     description: 'Cancel button text',
   },
   transferButtonLabel: {
-    id: 'daedalusTransfer.summary.transferButton.label',
+    id: 'transfer.summary.transferButton.label',
     defaultMessage: '!!!Transfer Funds',
     description: 'Do tansfer button text',
   }
@@ -59,12 +54,13 @@ type Props = {
   onSubmit: Function,
   isSubmitting: boolean,
   onCancel: Function,
-  error: ?LocalizableError
+  error: ?LocalizableError,
+  addressFromSubLabel: string
 };
 
-/** Show user what the Daedalus migration would do to get final confirmation */
+/** Show user what the transfer would do to get final confirmation */
 @observer
-export default class DaedalusTransferSummaryPage extends Component<Props> {
+export default class TransferSummaryPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -72,7 +68,7 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error } = this.props;
+    const { transferTx, isSubmitting, error, addressFromSubLabel } = this.props;
 
     const receiver = transferTx.receiver;
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
@@ -104,12 +100,12 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
                 {intl.formatMessage(messages.addressFromLabel)}
               </div>
               <div className={styles.addressSubLabel}>
-                {intl.formatMessage(messages.addressFromSubLabel)}
+                {addressFromSubLabel}
               </div>
               {
                 transferTx.senders.map((sender, index) => {
                   const addressesClasses = classnames([
-                    'daedalusAddressRecovered-' + (index + 1),
+                    'addressRecovered-' + (index + 1),
                     styles.address
                   ]);
 

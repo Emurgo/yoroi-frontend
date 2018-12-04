@@ -6,11 +6,11 @@ import validWords from 'bip39/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
-import DaedalusTransferInstructionsPage from '../../components/daedalusTransfer/DaedalusTransferInstructionsPage';
-import DaedalusTransferFormPage from '../../components/daedalusTransfer/DaedalusTransferFormPage';
-import DaedalusTransferWaitingPage from '../../components/daedalusTransfer/DaedalusTransferWaitingPage';
-import DaedalusTransferSummaryPage from '../../components/daedalusTransfer/DaedalusTransferSummaryPage';
-import DaedalusTransferErrorPage from '../../components/daedalusTransfer/DaedalusTransferErrorPage';
+import DaedalusTransferInstructionsPage from './DaedalusTransferInstructionsPage';
+import DaedalusTransferFormPage from './DaedalusTransferFormPage';
+import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
+import DaedalusTransferSummaryPage from './DaedalusTransferSummaryPage';
+import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
 import { ROUTES } from '../../routes-config';
@@ -58,9 +58,9 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this._getDaedalusTransferActions().setupTransferFunds.trigger(payload);
   };
 
-  /** Broadcast the migration transaction if one exists and return to wallet page */
+  /** Broadcast the transfer transaction if one exists and return to wallet page */
   tranferFunds = () => {
-    // broadcast migration transaction then call continuation
+    // broadcast transfer transaction then call continuation
     this._getDaedalusTransferActions().transferFunds.trigger({
       next: () => {
         const walletsStore = this._getWalletsStore();
@@ -108,7 +108,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferInstructionsPage
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               onAnswerYes={this.goToReceiveScreen}
-              onAnswerNo={this.startTransferFunds}
+              onConfirm={this.startTransferFunds}
               disableTransferFunds={daedalusTransfer.disableTransferFunds}
             />
           </MainLayout>

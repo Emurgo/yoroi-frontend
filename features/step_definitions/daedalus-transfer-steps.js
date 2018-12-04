@@ -55,7 +55,7 @@ Given(/^My Daedalus wallet hasn't funds/, () => {
 Given(/^I am on the Daedalus Transfer instructions screen$/, async function () {
   await navigateTo.call(this, '/daedalus-transfer');
   await waitUntilUrlEquals.call(this, '/daedalus-transfer');
-  await this.waitForElement('.daedalusTransferInstructionsPageComponent');
+  await this.waitForElement('.transferInstructionsPageComponent');
 });
 
 When(/^I click on the create Yoroi wallet button$/, async function () {
@@ -142,7 +142,7 @@ Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/,
 async function _checkDaedalusAddressesRecoveredAreCorrect(rows, world) {
   const waitUntilDaedalusAddressesRecoveredAppeared = rows.map((row, index) => (
     world.waitUntilText(
-      `.daedalusAddressRecovered-${index + 1}`,
+      `.addressRecovered-${index + 1}`,
       row.daedalusAddress
     )
   ));

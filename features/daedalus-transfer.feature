@@ -90,7 +90,7 @@ Feature: Transfer Daedalus Wallet funds
     And I am on the Daedalus Transfer instructions screen
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
     |instructionMessage                              | attentionMessage| 
-    |daedalusTransfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
+    |transfer.instructions.instructions.text | transfer.instructions.attention.text|
 
   @it-37 @withWebSocketConnection
   Scenario: "Daedalus-transfer" page buttons test (IT-37)
@@ -106,4 +106,4 @@ Feature: Transfer Daedalus Wallet funds
     When I click back button on the Daedalus transfer page
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
     |instructionMessage                              | attentionMessage| 
-    |daedalusTransfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
+    |transfer.instructions.instructions.text | transfer.instructions.attention.text|

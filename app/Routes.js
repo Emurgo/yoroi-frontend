@@ -24,7 +24,7 @@ const Wallet = resolver('containers/wallet/Wallet');
 const WalletSummaryPage = resolver('containers/wallet/WalletSummaryPage');
 const WalletSendPage = resolver('containers/wallet/WalletSendPage');
 const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
-const DaedalusTransferPage = resolver('containers/daedalusTransfer/DaedalusTransferPage');
+const DaedalusTransferPage = resolver('containers/transfer/DaedalusTransferPage');
 
 /* eslint-disable max-len */
 export const Routes = (

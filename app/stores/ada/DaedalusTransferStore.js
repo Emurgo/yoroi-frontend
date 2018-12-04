@@ -17,7 +17,7 @@ import LocalizableError, {
 import type {
   TransferStatus,
   TransferTx
-} from '../../types/daedalusTransferTypes';
+} from '../../types/TransferTypes';
 import {
   getAddressesWithFunds,
   generateTransferTx
@@ -65,7 +65,7 @@ export default class DaedalusTransferStore extends Store {
   */
   _enableDisableTransferFunds = (): void => {
     const { wallets } = this.stores.substores[environment.API];
-    // User must first make a Yoroi wallet before being able to migrate a Daedalus wallet
+    // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
     if (wallets.hasActiveWallet) {
       runInAction(() => {
         this.disableTransferFunds = false;
@@ -78,7 +78,7 @@ export default class DaedalusTransferStore extends Store {
   }
 
   /** Call the backend service to fetch all the UTXO then find which belong to the Daedalus wallet.
-   * Finally, generate the tx to migrate the wallet to Yoroi
+   * Finally, generate the tx to transfer the wallet to Yoroi
    */
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
@@ -149,7 +149,7 @@ export default class DaedalusTransferStore extends Store {
     this._updateStatus('uninitialized');
   }
 
-  /** Updates the status that we show to the user as migration progresses */
+  /** Updates the status that we show to the user as transfer progresses */
   @action.bound
   _updateStatus(s: TransferStatus): void {
     this.status = s;
@@ -164,7 +164,7 @@ export default class DaedalusTransferStore extends Store {
     return sendTx({ signedTx });
   }
 
-  /** Broadcast the migration transaction if one exists and proceed to continuation */
+  /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
     next: Function
   }): Promise<void> => {
