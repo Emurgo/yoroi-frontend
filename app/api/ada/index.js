@@ -45,10 +45,10 @@ import {
 import {
   newTrezorPayload,
   newTrezorTransaction,
-} from './hardwareWallets/trezorNewTransactions';
+} from './hardware-wallet/trezorNewTransactions';
 import type {
   TrezorPayloadAndChangeAddress
-} from './hardwareWallets/trezorNewTransactions';
+} from './hardware-wallet/trezorNewTransactions';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -195,7 +195,7 @@ export default class AdaApi {
     }
   }
 
-  async getTxLastUpdatedDate(): Promise<Date> {
+  async getTxLastUpdatedDate() : Promise<Date> {
     try {
       return getAdaTxLastUpdatedDate();
     } catch (error) {

@@ -3,8 +3,8 @@
 import lf, { Type } from 'lovefield';
 import type {
   AdaTransaction,
-    AdaTransactionCondition,
-    AddressType
+  AdaTransactionCondition,
+  AddressType
 } from '../adaTypes';
 
 // Note: Schemes are inspired (but !=) to schemes used by importer & postgresDB
@@ -193,7 +193,7 @@ export const getTxsOrderedByLastUpdateDesc = function (): Promise<Array<AdaTrans
   return _getTxsOrderedBy(txsTableSchema.properties.lastUpdated, lf.Order.DESC);
 };
 
-export const getTxsOrderedByDateDesc = function (): Promise<Array<AdaTransaction>> {
+export const getTxsOrderedByDateDesc = function () : Promise<Array<AdaTransaction>> {
   return _getTxsOrderedBy(txsTableSchema.properties.date, lf.Order.DESC);
 };
 

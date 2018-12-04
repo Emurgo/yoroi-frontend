@@ -203,12 +203,12 @@ export default class WalletSendForm extends Component<Props, State> {
       },
     },
   }, {
-      options: {
-        validateOnBlur: false,
-        validateOnChange: true,
-        validationDebounceWait: 250,
-      },
-    });
+    options: {
+      validateOnBlur: false,
+      validateOnChange: true,
+      validationDebounceWait: 250,
+    },
+  });
 
   render() {
     const { form } = this;

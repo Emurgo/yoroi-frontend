@@ -30,9 +30,9 @@ import {
 import { getResultOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {
   AdaAddresses,
-    AdaAddress,
-    AdaTransactionFee,
-    UTXO
+  AdaAddress,
+  AdaTransactionFee,
+  UTXO
 } from '../adaTypes';
 import {
   NotEnoughMoneyToSendError,
@@ -44,7 +44,7 @@ import {
 import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 
-declare var CONFIG: ConfigType;
+declare var CONFIG : ConfigType;
 
 /** Calculate the transaction fee without actually sending the transaction */
 export function getAdaTransactionFee(
