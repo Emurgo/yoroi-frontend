@@ -11,7 +11,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Icarus and Daedalus wallets use different key derivation scheme and they each have a separate format for addresses. For this reason, Daedalus wallets cannot be restored and continued to be used in Icarus and vice versa. This will change in the future. For now, to use funds from your Daedalus wallet, you need to transfer them to your Icarus wallet. Daedalus and Icarus wallets are fully compatible for transferring of funds. If you don’t have a working copy of Daedalus, you can use your 12-word recovery phrase used to restore and transfer the balance from Daedalus into Icarus.',
     description: 'Attention text on the Daedalus transfer instructions page.'
   },
-  answerNoButton: {
+  confirmationText: {
     id: 'daedalusTransfer.instructions.attention.confirmation',
     defaultMessage: '!!!Transfer all funds from Daedalus wallet',
     description: 'Label "Transfer all funds from Daedalus wallet" on the Daedalus transfer instructions page.'
@@ -47,7 +47,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
         onConfirm={onConfirm}
         disableTransferFunds={disableTransferFunds}
         attentionText={intl.formatMessage(messages.attentionText)}
-        confirmationText={intl.formatMessage(messages.answerNoButton)}
+        confirmationText={intl.formatMessage(messages.confirmationText)}
       />
     );
   }

@@ -65,8 +65,8 @@ export default class TransferInstructionsPage extends Component<Props> {
       styles.button,
     ]);
 
-    const answerNoButtonClasses = classnames([
-      'answerNoButton',
+    const confirmButtonClasses = classnames([
+      'confirmButton',
       'primary',
       styles.button,
     ]);
@@ -119,7 +119,7 @@ export default class TransferInstructionsPage extends Component<Props> {
               </div>
 
               <Button
-                className={answerNoButtonClasses}
+                className={confirmButtonClasses}
                 label={confirmationText}
                 onClick={onConfirm}
                 disabled={disableTransferFunds}

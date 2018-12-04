@@ -36,11 +36,8 @@ Then(/^I should see "You have successfully copied wallet address" pop up:$/, asy
 });
 
 Then(/^I see transactions buttons are disabled$/, async function () {
-  const disabledButtons = await this.driver.findElements(By.xpath("//div[@class='DaedalusTransferInstructionsPage_columnWrapper']//button[contains(@class, 'disabled')]"));
-  expect(disabledButtons.length).to.be.equal(2);
+  const disabledButtons = await this.driver.findElement(By.xpath("//button[contains(@class, 'confirmButton') and contains(@class, 'disabled')]"));
   const pageUrl = await this.driver.getCurrentUrl();
-  disabledButtons[0].click();
-  expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
-  disabledButtons[1].click();
+  disabledButtons.click();
   expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
 });
