@@ -80,16 +80,6 @@ export default class WalletTransactionsList extends Component<Props> {
     );
   }
 
-  isSpinnerVisible() {
-    const spinner = this.loadingSpinner;
-    if (spinner == null || spinner.root == null) return false;
-    const spinnerRect = spinner.root.getBoundingClientRect();
-    const clientHeight = document.documentElement ? document.documentElement.clientHeight : 0;
-    const windowHeight = window.innerHeight;
-    const viewHeight = Math.max(clientHeight, windowHeight);
-    return !(spinnerRect.bottom < 0 || spinnerRect.top - viewHeight >= 0);
-  }
-
   localizedDate(date: string) {
     const { intl } = this.context;
     const today = moment().format(dateFormat);
@@ -141,7 +131,7 @@ export default class WalletTransactionsList extends Component<Props> {
             <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
             <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
-                <div key={walletId + '-' + transaction.id}>
+                <div key={`${walletId}-${transaction.id}-${transaction.type}`}>
                   <Transaction
                     data={transaction}
                     isLastInList={transactionIndex === group.transactions.length - 1}

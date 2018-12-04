@@ -67,7 +67,7 @@ type Props = {
   onSubmit: Function,
   onBack: Function,
   mnemonicValidator: Function,
-  suggestedMnemonics: Array<string>,
+  validWords: Array<string>,
 };
 
 @observer
@@ -116,7 +116,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { suggestedMnemonics, onBack } = this.props;
+    const { validWords, onBack } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -137,6 +137,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
 
           <div className={styles.body}>
 
+            { /* Instructions for how to migrate */ }
             <div>
               <div className={styles.title}>
                 {intl.formatMessage(messages.title)}
@@ -155,7 +156,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
             </div>
 
             <Autocomplete
-              options={suggestedMnemonics}
+              options={validWords}
               maxSelections={12}
               {...recoveryPhraseField.bind()}
               error={recoveryPhraseField.error}

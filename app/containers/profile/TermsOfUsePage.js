@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
+import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
+import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -29,15 +30,18 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
   render() {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
-    const { sidebar } = this.props.stores;
-    const topbar = (
-      <TextOnlyTopBar
-        title={this.context.intl.formatMessage(messages.title)}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
+    const { topbar } = this.props.stores;
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
+    const topbarElement = (
+      <TopBar
+        title={topbarTitle}
+        activeTopbarCategory={topbar.activeTopbarCategory}
       />);
     return (
       <TopBarLayout
-        topbar={topbar}
+        topbar={topbarElement}
       >
         <TermsOfUseForm
           localizedTermsOfUse={termsOfUse}

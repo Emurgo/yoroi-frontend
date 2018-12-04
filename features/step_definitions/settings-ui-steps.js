@@ -58,7 +58,7 @@ Then(/^I should not see the change password dialog anymore$/, async function () 
 });
 
 Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText('.TopBar_walletName', walletName.toUpperCase());
+  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
 });
 
 Then(/^I should see the following error messages:$/, async function (data) {

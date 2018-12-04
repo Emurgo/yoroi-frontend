@@ -1,37 +1,43 @@
 // @flow
 import React, { Component } from 'react';
-import classNames from 'classnames';
+import type { Node } from 'react';
 import { kebabCase } from 'lodash';
+import classNames from 'classnames';
+import { observer } from 'mobx-react';
 import TopBarCategory from './TopBarCategory';
-import styles from './TextOnlyTopbar.scss';
-import type { Category } from '../../config/sidebarConfig';
+import styles from './TopBar.scss';
+import type { Category } from '../../config/topbarConfig';
 
 type Props = {
-  title: string,
+  children?: ?Node,
+  title: ?Node,
   categories?: Array<Category>,
-  activeSidebarCategory: string,
+  activeTopbarCategory: string,
   onCategoryClicked?: Function,
 };
 
-export default class TextOnlyTopBar extends Component<Props> {
+@observer
+export default class TopBar extends Component<Props> {
   static defaultProps = {
+    children: undefined,
     categories: undefined,
     onCategoryClicked: undefined
   };
 
   render() {
-    const { title, categories, activeSidebarCategory, onCategoryClicked } = this.props;
+    const {
+      title,
+      categories, activeTopbarCategory, onCategoryClicked,
+    } = this.props;
+
     const topBarStyles = classNames([
       styles.topBar
     ]);
 
     return (
       <header className={topBarStyles}>
-        <div className={styles.topBarTitle}>
-          <div className={styles.topbarTitleContainer}>
-            <div className={styles.topbarTitleText}>{title}</div>
-          </div>
-        </div>
+        <div className={styles.topBarTitle}>{title}</div>
+        {this.props.children}
         {categories && categories.map(category => {
           const categoryClassName = kebabCase(category.name);
           return (
@@ -39,7 +45,7 @@ export default class TextOnlyTopBar extends Component<Props> {
               key={category.name}
               className={categoryClassName}
               icon={category.icon}
-              active={activeSidebarCategory === category.route}
+              active={activeTopbarCategory === category.route}
               onClick={() => {
                 if (onCategoryClicked) {
                   onCategoryClicked(category.route);

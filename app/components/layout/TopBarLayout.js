@@ -8,25 +8,35 @@ type Props = {
   topbar: Node,
   children?: ?Node,
   notification?: ?Node,
+  banner?: Node
 };
 
+/** Adds a top bar above the wrapped node */
 @observer
 export default class TopBarLayout extends Component<Props> {
   static defaultProps = {
     children: undefined,
-    notification: undefined
+    notification: undefined,
+    banner: undefined
   };
 
   render() {
-    const { children, topbar, notification } = this.props;
+    const { banner, children, topbar, notification } = this.props;
     return (
       <div className={styles.component}>
-        <div className={styles.topbar}>
-          {topbar}
-        </div>
-        {notification}
-        <div className={styles.content}>
-          {children}
+        <div className={styles.main}>
+          <div className={styles.topbar}>
+            {topbar}
+          </div>
+
+          {banner}
+
+          {notification}
+          <div className={styles.contentWrapper}>
+            <div className={styles.content}>
+              {children}
+            </div>
+          </div>
         </div>
       </div>
     );

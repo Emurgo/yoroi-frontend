@@ -3,7 +3,7 @@ import { observable, action } from 'mobx';
 import AppStore from './toplevel/AppStore';
 import ProfileStore from './toplevel/ProfileStore';
 import WalletBackupStore from './toplevel/WalletBackupStore';
-import SidebarStore from './toplevel/SidebarStore';
+import TopbarStore from './toplevel/TopbarStore';
 import UiDialogsStore from './toplevel/UiDialogsStore';
 import UiNotificationsStore from './toplevel/UiNotificationsStore';
 import LoadingStore from './toplevel/LoadingStore';
@@ -18,7 +18,7 @@ import type { Api } from '../api/index';
 const storeClasses = {
   profile: ProfileStore,
   app: AppStore,
-  sidebar: SidebarStore,
+  topbar: TopbarStore,
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
@@ -28,7 +28,7 @@ const storeClasses = {
 export type StoresMap = {
   profile: ProfileStore,
   app: AppStore,
-  sidebar: SidebarStore,
+  topbar: TopbarStore,
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
@@ -42,7 +42,7 @@ export type StoresMap = {
 const stores = observable({
   profile: null,
   app: null,
-  sidebar: null,
+  topbar: null,
   walletBackup: null,
   uiDialogs: null,
   uiNotifications: null,

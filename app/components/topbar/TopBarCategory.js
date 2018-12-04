@@ -20,12 +20,12 @@ export default class TopBarCategory extends Component<Props> {
     const componentStyles = classNames([
       styles.component,
       active ? styles.active : null,
-      className === 'supportRequest' ? styles.supportRequest : className
+      className
     ]);
 
     const iconStyles = classNames(uniq([
       className === 'wallets' ? styles.walletsIcon : styles.icon,
-      className === 'supportRequest' ? styles.supportRequestIcon : styles.icon
+      styles.icon
     ]));
 
     return (

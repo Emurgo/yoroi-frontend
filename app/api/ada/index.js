@@ -93,19 +93,6 @@ export type UpdateWalletRequest = {
   name: string,
   assurance: AdaAssurance
 };
-export type RedeemAdaRequest = {
-  redemptionCode: string,
-  accountId: string,
-  walletPassword: ?string
-};
-export type RedeemAdaResponse = Wallet;
-export type RedeemPaperVendedAdaRequest = {
-  shieldedRedemptionKey: string,
-  mnemonics: string,
-  accountId: string,
-  walletPassword: ?string
-};
-export type RedeemPaperVendedAdaResponse = RedeemPaperVendedAdaRequest;
 export type ImportWalletFromKeyRequest = {
   filePath: string,
   walletPassword: ?string
@@ -117,11 +104,6 @@ export type ImportWalletFromFileRequest = {
   walletName: ?string
 };
 export type ImportWalletFromFileResponse = Wallet;
-export type NextUpdateResponse = ?{
-  version: ?string
-};
-export type PostponeUpdateResponse = Promise<void>;
-export type ApplyUpdateResponse = Promise<void>;
 export type TransactionFeeRequest = {
   sender: string,
   receiver: string,

@@ -2,7 +2,6 @@
 export const ROUTES = {
   ROOT: '/',
   STAKING: '/staking',
-  ADA_REDEMPTION: '/ada-redemption',
   NO_WALLETS: '/no-wallets',
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',

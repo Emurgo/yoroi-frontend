@@ -1,0 +1,13 @@
+.topBar {
+  align-items: center;
+  background: var(--theme-topbar-background-color);
+  display: flex;
+  height: 64px;
+  padding: 0;
+  position: relative;
+  z-index: 100;
+}
+
+.topBarTitle {
+  flex-grow: 1;
+}

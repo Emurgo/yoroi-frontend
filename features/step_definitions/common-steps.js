@@ -56,7 +56,7 @@ Given(/^There is no wallet stored$/, async function () {
 
 Given(/^There is a wallet stored named (.*)$/, async function (walletName) {
   await storeWallet(this, walletName);
-  await this.waitUntilText('.TopBar_walletName', walletName.toUpperCase());
+  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
 });
 
 function refreshWallet(client) {

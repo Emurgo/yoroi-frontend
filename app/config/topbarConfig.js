@@ -1,8 +1,8 @@
 // @flow
 import { ROUTES } from '../routes-config';
 import walletsIcon from '../assets/images/yoroi-logo-shape-white.inline.svg';
-import settingsIcon from '../assets/images/sidebar/settings-ic.inline.svg';
-import daedalusTransferIcon from '../assets/images/sidebar/daedalus-transfer.inline.svg';
+import settingsIcon from '../assets/images/top-bar/settings-ic.inline.svg';
+import daedalusTransferIcon from '../assets/images/top-bar/daedalus-transfer.inline.svg';
 
 export type Category = {
   name: string,

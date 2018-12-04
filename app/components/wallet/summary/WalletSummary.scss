@@ -14,7 +14,7 @@
 
 .component {
   text-align: center;
-  border-bottom: 1px solid #dfe4e8;
+  border-bottom: 1px solid var(--theme-separation-border-color);
   margin: 0 auto;
   width: 80%;
 

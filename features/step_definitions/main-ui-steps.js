@@ -5,7 +5,7 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
-  await this.waitUntilText('.TopBar_walletAmount', number);
+  await this.waitUntilText('.WalletTopbarTitle_walletAmount', number);
 });
 
 Then(/^I should see send transaction screen$/, async function () {

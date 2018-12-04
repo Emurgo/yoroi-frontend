@@ -131,13 +131,13 @@ export default class WalletSendForm extends Component<Props, State> {
     transactionFeeError: null,
   };
 
-  // We need to track form submitting state in order to avoid calling
-  // calculate/reset transaction fee functions which causes them to flicker
+  /** We need to track form submitting state in order to avoid calling
+    * calculate/reset transaction fee functions which causes them to flicker */
   _isSubmitting = false;
 
-  // We need to track the mounted state in order to avoid calling
-  // setState promise handling code after the component was already unmounted:
-  // Read more: https://facebook.github.io/react/blog/2015/12/16/ismounted-antipattern.html
+  /** We need to track the mounted state in order to avoid calling
+    * setState promise handling code after the component was already unmounted:
+    * TODO: https://facebook.github.io/react/blog/2015/12/16/ismounted-antipattern.html */
   _isMounted = false;
 
   componentDidMount() {

@@ -11,7 +11,8 @@ import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDia
 import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
 import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
-import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
+import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
+import TopBar from '../../components/topbar/TopBar';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -43,15 +44,18 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { sidebar } = this.props.stores;
+    const { topbar } = this.props.stores;
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
     const topBar = (
-      <TextOnlyTopBar
-        title={this.context.intl.formatMessage(messages.title)}
+      <TopBar
+        title={topbarTitle}
         onCategoryClicked={category => {
-          actions.sidebar.activateSidebarCategory.trigger({ category });
+          actions.topbar.activateTopbarCategory.trigger({ category });
         }}
-        categories={sidebar.CATEGORIES}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
+        categories={topbar.CATEGORIES}
+        activeTopbarCategory={topbar.activeTopbarCategory}
       />);
 
     const wallets = this._getWalletsStore();

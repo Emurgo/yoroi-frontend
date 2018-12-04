@@ -87,6 +87,7 @@ Then(
         break;
       }
       await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
+      
     }
     const expectedTxsList = getLovefieldTxs(walletName);
     /* TODO: these code needs to wait for something before check that each field is correct
@@ -96,6 +97,7 @@ Then(
       `//span[contains(text(), "${expectedTxsList[expectedTxsList.length - 1].txId}")]`,
       By.xpath
     );
+
     const actualTxsList = await this.getElementsBy('.Transaction_component');
     const firstIndex = txExpectedStatus === 'pending' ? 0 : (actualTxsList.length - txsAmount);
     const lastIndex = txExpectedStatus === 'pending' ? txsAmount : actualTxsList.length;

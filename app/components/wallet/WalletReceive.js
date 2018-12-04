@@ -62,7 +62,6 @@ type Props = {
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
   onCopyAddress: Function,
-  isSidebarExpanded: boolean,
   isSubmitting: boolean,
   error?: ?LocalizableError,
 };
@@ -98,7 +97,7 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress, isSidebarExpanded,
+      onCopyAddress,
       isSubmitting, error, isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
@@ -109,10 +108,6 @@ export default class WalletReceive extends Component<Props, State> {
       isWalletAddressUsed ? styles.usedHash : null,
     ]);
 
-    const generateAddressWrapperClasses = classnames([
-      isSidebarExpanded ? styles.fullWidthOnSmallScreen : null,
-    ]);
-
     const generateAddressButtonClasses = classnames([
       'primary',
       'generateAddressButton',
@@ -121,14 +116,12 @@ export default class WalletReceive extends Component<Props, State> {
     ]);
 
     const generateAddressForm = (
-      <div className={generateAddressWrapperClasses}>
-        <Button
-          className={generateAddressButtonClasses}
-          label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
-          onMouseUp={this.submit}
-          skin={<SimpleButtonSkin />}
-        />
-      </div>
+      <Button
+        className={generateAddressButtonClasses}
+        label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
+        onMouseUp={this.submit}
+        skin={<SimpleButtonSkin />}
+      />
     );
 
     // Get QRCode color value from active theme's CSS variable
@@ -168,6 +161,7 @@ export default class WalletReceive extends Component<Props, State> {
             />
           </div>
         </div>
+
         <div className={styles.generatedAddresses}>
           <h2>
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}

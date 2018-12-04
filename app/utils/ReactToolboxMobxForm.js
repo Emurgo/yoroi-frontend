@@ -1,5 +1,7 @@
 import MobxReactForm from 'mobx-react-form';
 
+/** Custom Rewriter
+ * Based off https://foxhound87.github.io/mobx-react-form/docs/bindings/custom.html */
 export default class ReactToolboxMobxForm extends MobxReactForm {
 
   bindings() {
