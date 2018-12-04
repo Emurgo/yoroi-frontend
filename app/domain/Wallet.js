@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import type { AssuranceMode, AssuranceModeOption } from '../types/transactionAssuranceTypes';
 import { assuranceModes, assuranceModeOptions } from '../config/transactionAssuranceConfig';
 import type { WalletType, WalletHardwareInfo } from '../types/WalletType';
-import { WalletTypeOption } from '../config/WalletTypeConfig';
+import { WalletTypeOption, TrezorT } from '../config/WalletTypeConfig';
 
 /** External representation of the internal Wallet in the API layer  */
 export default class Wallet {
@@ -40,8 +40,23 @@ export default class Wallet {
     this.amount = amount;
   }
 
+  @computed get isWebWallet(): boolean {
+    return this.type === WalletTypeOption.WEB_WALLET;
+  }
+
   @computed get isHardwareWallet(): boolean {
     return this.type === WalletTypeOption.HARDWARE_WALLET;
+  }
+
+  @computed get isTrezorTWallet(): boolean {
+    let result = false;
+    if(this.isHardwareWallet
+    && this.hardwareInfo
+    && this.hardwareInfo.vendor === TrezorT.vendor
+    && this.hardwareInfo.model === TrezorT.model) {
+      result = true;
+    }
+    return result;
   }
 
   @computed get assuranceMode(): AssuranceMode {
