@@ -73,6 +73,7 @@
     "json-server": "0.13.0",
     "markdown-loader": "2.0.0",
     "minimist": "1.2.0",
+    "mobx-react-devtools": "^6.0.3",
     "mocha": "5.2.0",
     "node-sass": "4.9.3",
     "postcss-loader": "1.2.1",
@@ -122,6 +123,7 @@
     "ringbufferjs": "1.1.0",
     "route-parser": "0.0.5",
     "rust-cardano-crypto": "file:js-cardano-wasm",
+    "trezor-connect": "6.0.2",
     "validator": "6.3.0"
   },
   "engineStrict": true,

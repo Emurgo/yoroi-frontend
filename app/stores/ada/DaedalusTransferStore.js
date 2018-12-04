@@ -90,7 +90,7 @@ export default class DaedalusTransferStore extends Store {
         msg: MSG_TYPE_RESTORE,
       }));
     });
-    /*  FIXME: Remove 'any' from event
+    /*  TODO: Remove 'any' from event
         There is an open issue with this https://github.com/facebook/flow/issues/3116
     */
     this.ws.addEventListener('message', async (event: any) => {

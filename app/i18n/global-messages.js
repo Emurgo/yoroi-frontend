@@ -17,6 +17,11 @@ export default defineMessages({
     defaultMessage: '!!!Wallet name requires at least 3 and at most 40 letters.',
     description: 'Error message shown when invalid wallet name was entered in create wallet dialog.'
   },
+  invalidHardwareWalletName: {
+    id: 'global.errors.invalidHardwareWalletName',
+    defaultMessage: '!!!Wallet name requires at least 1 and at most 40 letters.',
+    description: 'Error message shown when invalid wallet name was entered in create wallet dialog.'
+  },
   invalidWalletPassword: {
     id: 'global.errors.invalidWalletPassword',
     defaultMessage: '!!!Invalid password',
@@ -111,7 +116,12 @@ export default defineMessages({
     id: 'settings.support.faq.faqLinkURL',
     defaultMessage: '!!!https://yoroi-wallet.com/faq/',
     description: 'URL for the "FAQ on Yoroi website"',
-  }
+  },
+  trezorConnectAllDialogTitle: {
+    id: 'wallet.trezor.dialog.title.label',
+    defaultMessage: '!!!Connect to Trezor Hardware Wallet',
+    description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
+  },
 });
 
 export const environmentSpecificMessages = {

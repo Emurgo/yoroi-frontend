@@ -90,7 +90,7 @@ Then(
       
     }
     const expectedTxsList = getLovefieldTxs(walletName);
-    /* FIXME: these code needs to wait for something before check that each field is correct
+    /* TODO: these code needs to wait for something before check that each field is correct
       It would be better to wait until each element exist with the correct information.
     */
     await this.waitForElementLocated(

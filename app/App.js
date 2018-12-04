@@ -15,6 +15,7 @@ import translations from './i18n/translations';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
 import ThemeManager from './ThemeManager';
+import environment from './environment';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru]);
@@ -25,6 +26,17 @@ export default class App extends Component<{
   actions: ActionsMap,
   history: Object,
 }> {
+
+  mobxDevToolsInstanceIfDevEnv(): ?React$Element<any> {
+    if (!environment.isDev()) return undefined;
+    try {
+      const mobxDevToolsPackage = require('mobx-react-devtools').default;
+      return React.createElement(mobxDevToolsPackage);
+    } catch (err) {
+      return undefined;
+    }
+  }
+
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -37,6 +49,8 @@ export default class App extends Component<{
     const currentTheme = 'yoroi';
     const theme = require(`./themes/prebuilt/${currentTheme}.js`); // eslint-disable-line
 
+    const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
+
     return (
       <div>
         <ThemeManager variables={theme} />
@@ -48,6 +62,7 @@ export default class App extends Component<{
             </div>
           </IntlProvider>
         </ThemeProvider>
+        {mobxDevTools}
       </div>
     );
   }

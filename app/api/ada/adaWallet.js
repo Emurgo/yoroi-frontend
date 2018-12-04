@@ -15,7 +15,7 @@ import {
   isValidEnglishAdaMnemonic,
   updateWalletMasterKeyPassword,
 } from './lib/cardanoCrypto/cryptoWallet';
-import { toAdaWallet } from './lib/cardanoCrypto/cryptoToModel';
+import { toAdaWallet, toAdaHardwareWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
   getAdaAddressesList,
   newAdaAddress
@@ -25,6 +25,7 @@ import type {
   AdaWallet,
   AdaWalletParams,
   AdaWalletMetaParams,
+  AdaHardwareWalletParams,
 } from './adaTypes';
 import type {
   ChangeAdaWalletSpendingPasswordParams,
@@ -121,6 +122,14 @@ export const isValidMnemonic = (
   isValidEnglishAdaMnemonic(phrase, numberOfWords)
 );
 
+/** Wrapper function to create new Trezor ADA hardware wallet object */
+export function createAdaHardwareWallet({
+  walletInitData
+}: AdaHardwareWalletParams) {
+  const adaWallet = toAdaHardwareWallet(walletInitData);
+  return [adaWallet];
+}
+
 /** Wrapper function to create new mnemonic according to bip39 */
 export const generateAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse => (
   generateAdaMnemonic()
@@ -143,7 +152,7 @@ export async function getBalance(
     return partialAmounts.reduce(
       (acc: BigNumber, partialAmount) => (
         acc.plus(
-          partialAmount.sum // null if no addresses in the batch has any balance in them
+          partialAmount.sum // undefined if no addresses in the batch has any balance in them
             ? new BigNumber(partialAmount.sum)
             : new BigNumber(0)
         )
