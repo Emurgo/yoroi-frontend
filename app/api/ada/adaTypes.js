@@ -14,6 +14,12 @@
 
 import BigNumber from 'bignumber.js';
 
+/*
+ * This file gives the flow equivalents of the the Haskell types given in the wallet API at
+ * https://github.com/input-output-hk/cardano-sl/blob/master/wallet/src/Pos/Wallet/Web/ClientTypes/Types.hs
+ * TODO: https://github.com/Emurgo/yoroi-frontend/issues/116
+*/
+
 // ========= Response Types =========
 
 // Based on CWalletAssurance from the Importer
@@ -21,6 +27,20 @@ export type AdaAssurance = 'CWANormal' | 'CWAStrict';
 
 // Based on CPtxCondition from the Importer
 export type AdaTransactionCondition = 'CPtxApplying' | 'CPtxInBlocks' | 'CPtxWontApply' | 'CPtxNotTracked';
+
+export type AdaWalletType = 'CWTWeb' | 'CWTHardware';
+
+export type AdaWalletHardwareInfo = {
+  vendor : string,
+  model: string,
+  deviceId: string,
+  label: string,
+  majorVersion: number,
+  minorVersion: number,
+  patchVersion: number,
+  language: string,
+  publicMasterKey: string,
+};
 
 // Based on TxState from the Importer
 export type AdaTxsState = 'Successful' | 'Failed' | 'Pending';
@@ -31,6 +51,11 @@ export type AdaWalletInitData = {
   cwBackupPhrase: {
     bpToList: string,
   }
+};
+
+export type AdaHardwareWalletInitData = {
+  cwInitMeta: AdaWalletMetaParams,
+  cwHardwareInfo: AdaWalletHardwareInfo,
 };
 
 export type AdaAmount = {
@@ -93,7 +118,9 @@ export type AdaWallet = {
   cwAmount: AdaAmount,
   cwId: string,
   cwMeta: AdaWalletMetaParams,
-  cwPassphraseLU: Date,
+  cwType: AdaWalletType,
+  cwPassphraseLU?: Date,
+  cwHardwareInfo?: AdaWalletHardwareInfo,
 };
 
 export type AdaWallets = Array<AdaWallet>;
@@ -110,6 +137,10 @@ export type AdaWalletMetaParams = {
   // This was never used but is supposed to represent 0 = (bitcoin, ada); 1 = (satoshi, lovelace)
   cwUnit: number
 };
+
+export type AdaHardwareWalletParams = {
+  walletInitData: AdaHardwareWalletInitData
+}
 
 /* Backend service Postgres data types */
 

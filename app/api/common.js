@@ -4,6 +4,8 @@
 
 import BigNumber from 'bignumber.js';
 import { defineMessages } from 'react-intl';
+import type { Features } from 'trezor-connect';
+
 import LocalizableError from '../i18n/LocalizableError';
 import WalletTransaction from '../domain/WalletTransaction';
 import WalletAddress from '../domain/WalletAddress';
@@ -120,6 +122,13 @@ export type RestoreWalletRequest = {
   walletPassword: string,
 };
 export type RestoreWalletResponse = Wallet;
+
+export type CreateTrezorWalletRequest = {
+  publicMasterKey: string,
+  walletName: string,
+  deviceFeatures: Features
+};
+export type CreateTrezorWalletResponse = Wallet;
 
 export type UpdateWalletPasswordRequest = {
   walletId: string,

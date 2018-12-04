@@ -1,7 +1,6 @@
 // @flow
 import bs58 from 'bs58';
 import BigNumber from 'bignumber.js';
-
 import type {
   AdaTransactionInputOutput,
   Transaction,
