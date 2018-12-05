@@ -1,0 +1,22 @@
+.enabling {
+  display: flex;
+  align-items: flex-start;
+}
+.title {
+  color: var(--theme-support-settings-text-color);
+  font-family: var(--font-semibold);
+  font-size: 16px;
+  line-height: 1.38;
+  margin-bottom: 10px;
+  padding-left: 10px;
+}
+.row {
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+.checkbox {
+  margin-left: 15px;
+}
+.input {
+  margin-top: 25px;;
+}

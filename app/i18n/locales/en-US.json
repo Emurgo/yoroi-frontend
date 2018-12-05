@@ -106,6 +106,7 @@
   "settings.menu.support.link.label": "Support",
   "settings.menu.termsOfUse.link.label": "Terms of use",
   "settings.menu.wallet.link.label": "Wallet",
+  "settings.menu.lock.link.label": "Lock screen",
   "settings.support.faq.content": "If you are experiencing issues, please see the {faqLink} for guidance on known issues.",
   "settings.support.faq.faqLink": "FAQ on Yoroi website",
   "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",

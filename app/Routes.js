@@ -17,6 +17,7 @@ import SupportSettingsPage from './containers/settings/categories/SupportSetting
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
+import LockScreenSettingsPage from './containers/settings/categories/LockScreenSettingsPage';
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 const LoadingPage = resolver('containers/LoadingPage');
@@ -85,6 +86,10 @@ export const Routes = (
       <Route
         path={ROUTES.SETTINGS.WALLET}
         component={(props) => <WalletSettingsPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path={ROUTES.SETTINGS.LOCK}
+        component={(props) => <LockScreenSettingsPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         path="support"

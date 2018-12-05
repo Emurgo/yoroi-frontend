@@ -23,6 +23,7 @@ export const ROUTES = {
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
     DISPLAY: '/settings/display',
+    LOCK: '/settings/lock-screen',
   },
   DAEDALUS_TRANFER: {
     ROOT: '/daedalus-transfer',

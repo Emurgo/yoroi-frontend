@@ -17,6 +17,10 @@ export default class MainLayout extends Component<MainLayoutProps> {
     topbar: null
   };
 
+  componentDidMount() {
+    console.log('main!');
+  }
+
   render() {
     const { actions, stores, topbar } = this.props;
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);

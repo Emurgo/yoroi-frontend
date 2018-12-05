@@ -17,6 +17,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Wallet',
     description: 'Label for the "Wallet" link in the settings menu.',
   },
+  lock: {
+    id: 'settings.menu.lock.link.label',
+    defaultMessage: '!!! Lock screen',
+    description: 'Label for the "Lock screen" link in the settings menu.',
+  },
   support: {
     id: 'settings.menu.support.link.label',
     defaultMessage: '!!!Support',
@@ -66,6 +71,13 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.WALLET)}
             className="wallet"
             disabled={!hasActiveWallet}
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.lock)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.LOCK)}
+            active={isActiveItem(ROUTES.SETTINGS.LOCK)}
+            className="lock"
           />
 
           <SettingsMenuItem
