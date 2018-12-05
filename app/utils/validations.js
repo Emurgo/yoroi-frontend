@@ -8,6 +8,7 @@ import type { NetworkRow, TokenRow } from '../api/ada/lib/storage/database/primi
 import { isCardanoHaskell, isErgo, getCardanoHaskellBaseConfig, getErgoBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { getTokenName } from '../stores/stateless/tokenHelpers';
 import { truncateToken } from './formatters';
+import bcryptjs from 'bcryptjs';
 
 export const isValidWalletName: string => boolean = (walletName) => {
   const nameLength = walletName.length;
@@ -144,3 +145,8 @@ export function getMinimumValue(
   }
   return new BigNumber(0);
 }
+
+export const isPinCodeValid: (string, string) => boolean = (
+  value,
+  pin
+) => bcryptjs.compareSync(value, pin);

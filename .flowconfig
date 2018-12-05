@@ -1,6 +1,7 @@
 [ignore]
 .*/node_modules/fbjs/.*
 .*/node_modules/npm/.*
+.*/node_modules/bcryptjs/src/bower.json
 .*/release/.*
 .*/.git/.*
 .*/.vscode/.*

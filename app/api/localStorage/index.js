@@ -30,6 +30,10 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
+  LOCK: networkForLocalStorage + '-LOCK-SCREEN',
+  PIN: networkForLocalStorage + '-PIN',
+  PIN_WAS_SAVED: networkForLocalStorage + '-PIN-WAS-SAVED',
+  APP_IS_LOCKED: networkForLocalStorage + '-APP_IS_LOCKED',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
 };
@@ -276,6 +280,59 @@ export default class LocalStorageApi {
     }
   }
 
+  // ========== Lock screen  ========== //
+
+  getLockScreenEnabled: void => Promise<boolean> = async () => {
+    const enabled = await getLocalItem(storageKeys.LOCK);
+    if (enabled == null) return false;
+    return JSON.parse(enabled);
+  }
+
+  setLockScreenEnabled: void => Promise<void> = async () => {
+    await setLocalItem(storageKeys.LOCK, 'true');
+  }
+
+  unsetLockScreenEnabled: void => Promise<void> = async () => {
+    await removeLocalItem(storageKeys.LOCK);
+  }
+
+  getPinCode: void => Promise<?string> = async () => {
+    return await getLocalItem(storageKeys.PIN);
+  }
+
+  getPinCodeUpdateTime: void => Promise<?Date> = async () => {
+    const time = await getLocalItem(storageKeys.PIN_WAS_SAVED);
+    if (time == null) return;
+    return new Date(JSON.parse(time));
+  }
+
+  setPinCode: (string, Date) => Promise<void> = async (
+    code,
+    updated
+  ) => {
+    await setLocalItem(storageKeys.PIN, code);
+    await setLocalItem(storageKeys.PIN_WAS_SAVED, String(updated.getTime()));
+  }
+
+  unsetPinCode: void => Promise<void> = async () => {
+    await removeLocalItem(storageKeys.PIN);
+  };
+
+  checkAppLocked: void => Promise<boolean> = async () => {
+    const locked = await getLocalItem(storageKeys.APP_IS_LOCKED);
+    if (locked == null) return false;
+    return JSON.parse(locked);
+  }
+
+  toggleAppLocked: void => Promise<void> = async () => {
+    const locked = await getLocalItem(storageKeys.APP_IS_LOCKED) ?? 'false';
+      await setLocalItem(storageKeys.APP_IS_LOCKED, !(JSON.parse(locked)));
+  }
+
+  unsetAppLocked: void => Promise<void> = async () => {
+    await removeLocalItem(storageKeys.APP_IS_LOCKED);
+  }
+
   async reset(): Promise<void> {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
@@ -287,6 +344,9 @@ export default class LocalStorageApi {
     await this.unsetCoinPricePubKeyData();
     await this.unsetExternalStorage();
     await this.unsetToggleSidebar();
+    await this.unsetLockScreenEnabled();
+    await this.unsetPinCode();
+    await this.unsetAppLocked();
   }
 
   getItem: string => Promise<?string> = (key) => getLocalItem(key);

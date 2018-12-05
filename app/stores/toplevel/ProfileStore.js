@@ -2,6 +2,7 @@
 import { action, observable, computed, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import moment from 'moment/moment';
+import bcryptjs from 'bcryptjs';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
@@ -220,6 +221,31 @@ export default class ProfileStore extends Store<StoresMap, ActionsMap> {
     (ComplexityLevelType) => Promise<void>
   > = new Request<(ComplexityLevelType) => Promise<void>>(this.api.localStorage.setComplexityLevel);
 
+  @observable getPinCodeUpdateTimeRequest: Request<void => Promise<?Date>> = new Request<
+    void => Promise<?Date>
+  >(this.api.localStorage.getPinCodeUpdateTime);
+  @observable getPinCodeRequest: Request<void => Promise<?string>> = new Request<
+    void => Promise<?string>
+  >(this.api.localStorage.getPinCode);
+  @observable setPinCodeRequest: Request<(string, Date) => Promise<void>> = new Request<
+    (string, Date) => Promise<void>
+  >(this.api.localStorage.setPinCode);
+  @observable getLockScreenEnabledRequest: Request<void => Promise<boolean>> = new Request<
+    void => Promise<boolean>
+  >(this.api.localStorage.getLockScreenEnabled);
+  @observable setLockScreenEnabledRequest: Request<void => Promise<void>> = new Request<
+    void => Promise<void>
+  >(this.api.localStorage.setLockScreenEnabled);
+  @observable unsetLockScreenEnabledRequest: Request<void => Promise<void>> = new Request<
+    void => Promise<void>
+  >(this.api.localStorage.unsetLockScreenEnabled);
+  @observable checkAppLockedRequest: Request<void => Promise<boolean>> = new Request<
+    void => Promise<boolean>
+  >(this.api.localStorage.checkAppLocked);
+  @observable toggleAppLockedRequest: Request<void => Promise<void>> = new Request<
+    void => Promise<void>
+  >(this.api.localStorage.toggleAppLocked);
+
   @observable unsetComplexityLevelRequest: Request<(void) => Promise<void>> = new Request<
     (void) => Promise<void>
   >(this.api.localStorage.unsetComplexityLevel);
@@ -272,6 +298,10 @@ export default class ProfileStore extends Store<StoresMap, ActionsMap> {
     this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
     this.actions.profile.acceptNightly.listen(this._acceptNightly);
     this.actions.profile.setSelectedNetwork.listen(this._setSelectedNetwork);
+    this.actions.profile.toggleLockScreen.listen(this._toggleLockScreen);
+    this.actions.profile.setPinCode.listen(this._setPinCode);
+    this.actions.profile.checkAppLocked.listen(this._isAppLocked);
+    this.actions.profile.toggleAppLocked.listen(this._toggleAppLocked);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -281,6 +311,10 @@ export default class ProfileStore extends Store<StoresMap, ActionsMap> {
     this._getSelectComplexityLevel(); // eagerly cache
     this._getUriSchemeAcceptance(); // eagerly cache
     this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
+    this._isAppLocked();
+    this._getLockScreenEnabled();
+    this._getPinCode();
+    this._getPinCodeUpdateTime();
   }
 
   teardown(): void {
@@ -296,6 +330,67 @@ export default class ProfileStore extends Store<StoresMap, ActionsMap> {
 
   static getDefaultLocale(): string {
     return 'en-US';
+  }
+
+  // ========== Lock screen ========== //
+
+  @computed get lockScreenEnabled(): boolean {
+    const { result } = this.getLockScreenEnabledRequest.execute();
+    return result ?? false;
+  }
+
+  @computed get pinCode(): ?string {
+    const { result } = this.getPinCodeRequest.execute();
+    return result;
+  }
+
+  @computed get pinCodeUpdateTime(): ?Date {
+    const { result } = this.getPinCodeUpdateTimeRequest.execute();
+    return result;
+  }
+
+  @computed get isAppLocked(): boolean {
+    const { result } = this.checkAppLockedRequest.execute();
+    return result ?? false;
+  }
+
+  _toggleAppLocked: void => Promise<void> = async () => {
+    await this.toggleAppLockedRequest.execute();
+    await this.checkAppLockedRequest.execute();
+  }
+
+  _toggleLockScreen: boolean => Promise<void> = async (value) => {
+    if (value) this.setLockScreenEnabledRequest.execute();
+    else this.unsetLockScreenEnabledRequest.execute();
+    await this.getLockScreenEnabledRequest.execute();
+  }
+
+  _getPinCodeUpdateTime: void => void = () => {
+    this.getPinCodeUpdateTimeRequest.execute();
+  }
+
+  _getLockScreenEnabled: void => void = () => {
+    this.getLockScreenEnabledRequest.execute();
+  }
+
+  _getPinCode: void => void = () => {
+    this.getPinCodeRequest.execute();
+  }
+
+  _isAppLocked: void => void = () => {
+    this.checkAppLockedRequest.execute();
+  }
+
+  _setPinCode: string => Promise<void> = async (code) => {
+    const hashed = await new Promise((resolve, reject) => {
+      bcryptjs.hash(code, 10, (err, hash) => {
+        if (err) reject(err);
+        resolve(hash);
+      });
+    });
+    await this.setPinCodeRequest.execute(hashed, new Date());
+    await this.getPinCodeRequest.execute();
+    await this.getPinCodeUpdateTimeRequest.execute();
   }
 
   // ========== Locale ========== //
