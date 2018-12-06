@@ -12,4 +12,4 @@ export const WalletTypeOption : {
 export const TrezorT = {
   vendor: 'trezor.io',
   model: 'T'
-}
+};

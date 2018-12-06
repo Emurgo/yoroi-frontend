@@ -9,7 +9,6 @@ import {
 import {
   saveAdaAddress,
   removeAdaAddress,
-  createAdaAddress,
   getAdaAddressesList
 } from '../adaAddress';
 import type {
@@ -25,10 +24,7 @@ import {
   getAdaTransactionChangeAddr,
 } from '../adaTransactions/adaNewTransactions';
 import {
-  NotEnoughMoneyToSendError,
-  TransactionError,
   SendTransactionError,
-  GetAllUTXOsForAddressesError,
   InvalidWitnessError,
   GetTxsBodiesForUTXOsError
 } from '../errors';

@@ -3,7 +3,7 @@
 import TrezorConnect from 'trezor-connect';
 import { action } from 'mobx';
 import WalletStore from '../base/WalletStore';
-import { 
+import {
   Logger,
   stringifyError,
 } from '../../utils/logging';
@@ -22,7 +22,8 @@ export default class TrezorStore extends WalletStore {
     amount: string,
   }): Promise<void> => {
     const { receiver, amount } = params;
-    const { trezorPayload, changeAddress } = await this.api.ada.createTrezorPayload({ amount, receiver });
+    const { trezorPayload, changeAddress } =
+    await this.api.ada.createTrezorPayload({ amount, receiver });
 
     TrezorConnect
       .cardanoSignTransaction({ ...trezorPayload })
