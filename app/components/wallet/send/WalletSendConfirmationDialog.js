@@ -8,11 +8,11 @@ import classnames from 'classnames';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import Dialog from '../widgets/Dialog';
-import DialogCloseButton from '../widgets/DialogCloseButton';
-import globalMessages from '../../i18n/global-messages';
-import LocalizableError from '../../i18n/LocalizableError';
+import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import Dialog from '../../widgets/Dialog';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import globalMessages from '../../../i18n/global-messages';
+import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 
 export const messages = defineMessages({

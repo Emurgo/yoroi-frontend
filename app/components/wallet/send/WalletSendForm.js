@@ -10,14 +10,14 @@ import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import SvgInline from 'react-svg-inline';
-import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import AmountInputSkin from './skins/AmountInputSkin';
-import BorderedBox from '../widgets/BorderedBox';
+import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import AmountInputSkin from '../skins/AmountInputSkin';
+import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
-import globalMessages from '../../i18n/global-messages';
+import globalMessages from '../../../i18n/global-messages';
 import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
-import { formattedAmountToBigNumber, formattedAmountToNaturalUnits } from '../../utils/formatters';
-import dangerIcon from '../../assets/images/danger.inline.svg';
+import { formattedAmountToBigNumber, formattedAmountToNaturalUnits } from '../../../utils/formatters';
+import dangerIcon from '../../../assets/images/danger.inline.svg';
 
 export const messages = defineMessages({
   titleLabel: {

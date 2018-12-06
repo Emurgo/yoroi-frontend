@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import WalletSendForm from '../../components/wallet/WalletSendForm';
+import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
 import { DECIMAL_PLACES_IN_ADA, MAX_INTEGER_PLACES_IN_ADA } from '../../config/numbersConfig';
