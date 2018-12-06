@@ -14,7 +14,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
-import ErrorBlock from './common/ErrorBlock';
+import TrezorErrorBlock from './common/TrezorErrorBlock';
 
 import connectLoadGIF from '../../../assets/images/trezor/connect/connect-load.gif';
 import connectStartGIF from '../../../assets/images/trezor/connect/connect-start.gif';
@@ -131,7 +131,7 @@ export default class ConnectDialog extends Component<Props> {
         {introBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} />
-        <ErrorBlock progressInfo={progressInfo} error={error} />
+        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 }

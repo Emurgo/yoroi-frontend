@@ -15,7 +15,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
-import ErrorBlock from './common/ErrorBlock';
+import TrezorErrorBlock from './common/TrezorErrorBlock';
 
 import saveLoadGIF from '../../../assets/images/trezor/connect/save-load.inline.svg';
 import saveStartSVG from '../../../assets/images/trezor/connect/save-start.inline.svg';
@@ -168,7 +168,7 @@ export default class SaveDialog extends Component<Props> {
         {walletNameBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} />
-        <ErrorBlock progressInfo={progressInfo} error={error} />
+        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 

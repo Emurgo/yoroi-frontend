@@ -49,14 +49,10 @@ export default class Wallet {
   }
 
   @computed get isTrezorTWallet(): boolean {
-    let result = false;
-    if (this.isHardwareWallet
-    && this.hardwareInfo
-    && this.hardwareInfo.vendor === TrezorT.vendor
-    && this.hardwareInfo.model === TrezorT.model) {
-      result = true;
-    }
-    return result;
+    return (this.isHardwareWallet
+      && !!this.hardwareInfo
+      && this.hardwareInfo.vendor === TrezorT.vendor
+      && this.hardwareInfo.model === TrezorT.model);
   }
 
   @computed get assuranceMode(): AssuranceMode {

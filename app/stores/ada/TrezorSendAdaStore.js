@@ -1,23 +1,22 @@
 // @flow
-
-import TrezorConnect from 'trezor-connect';
 import { action } from 'mobx';
-import WalletStore from '../base/WalletStore';
+import TrezorConnect from 'trezor-connect';
+import Store from '../base/Store';
 import {
   Logger,
   stringifyError,
 } from '../../utils/logging';
 
 /** Note: Handles Trezor Signing */
-export default class TrezorStore extends WalletStore {
+export default class TrezorSendAdaStore extends Store {
 
   setup() {
-    const actions = this.actions.ada.trezor;
-    actions.sendWithTrezor.listen(this._sendWithTrezor);
+    const actions = this.actions.ada.trezorSendAda;
+    actions.sendUsingTrezor.listen(this._sendUsingTrezor);
   }
 
   /** Generates a payload with Trezor format and tries Trezor signing */
-  @action _sendWithTrezor = async (params: {
+  @action _sendUsingTrezor = async (params: {
     receiver: string,
     amount: string,
   }): Promise<void> => {
