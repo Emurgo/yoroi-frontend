@@ -110,7 +110,7 @@ type Props = {
   isDialogOpen: Function,
   dialogRenderCallback: Function,
   hasAnyPending: boolean,
-  isHardwareWallet: boolean,
+  isTrezorTWallet: boolean,
   onSignWithHardware: (receiver: string, amount: string) => void
 };
 
@@ -213,21 +213,25 @@ export default class WalletSendForm extends Component<Props, State> {
   render() {
     const { form } = this;
     const { intl } = this.context;
+
     const {
-      currencyUnit, currencyMaxIntegerDigits, currencyMaxFractionalDigits,
-      openDialogAction, isDialogOpen, hasAnyPending, dialogRenderCallback
+      currencyUnit,
+      currencyMaxIntegerDigits,
+      currencyMaxFractionalDigits,
+      isDialogOpen,
+      hasAnyPending,
+      dialogRenderCallback
     } = this.props;
-    const { isTransactionFeeCalculated, transactionFee, transactionFeeError } = this.state;
+    const {
+      transactionFee,
+      transactionFeeError
+    } = this.state;
+
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
     const receiverFieldProps = receiverField.bind();
     const amountFieldProps = amountField.bind();
     const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
-
-    const buttonClasses = classnames([
-      'primary',
-      styles.nextButton,
-    ]);
 
     const hasPendingTxWarning = (
       <div className={styles.contentWarning}>
@@ -276,35 +280,7 @@ export default class WalletSendForm extends Component<Props, State> {
             />
           </div>
 
-          <Button
-            className={buttonClasses}
-            label={intl.formatMessage(messages.nextButtonLabel)}
-            onMouseUp={() => {
-              const amount = formattedAmountToNaturalUnits(amountFieldProps.value);
-              this.props.onSignWithHardware(receiverFieldProps.value, formattedAmountToBigNumber(amount));
-            }}
-            /*
-             * Form can't be submitted in case transaction fees are not calculated
-             * or there's a transaction waiting to be confirmed (pending)
-             */
-            disabled={!isTransactionFeeCalculated || hasAnyPending}
-            skin={<SimpleButtonSkin />}
-          />
-
-
-          {/* <Button
-            className={buttonClasses}
-            label={intl.formatMessage(messages.nextButtonLabel)}
-            onMouseUp={() => openDialogAction({
-              dialog: WalletSendConfirmationDialog,
-            })} */}
-          {/*
-             * Form can't be submitted in case transaction fees are not calculated
-             * or there's a transaction waiting to be confirmed (pending)
-            */}
-          {/* disabled = {!isTransactionFeeCalculated || hasAnyPending}
-            skin={<SimpleButtonSkin />}
-          /> */}
+          {this._makeInvokeConfirmationButton()}
 
         </BorderedBox>
 
@@ -316,6 +292,54 @@ export default class WalletSendForm extends Component<Props, State> {
 
       </div>
     );
+  }
+
+  /** Makes custom button component depends on type of active wallet
+    * basically controlles next operation to execute
+    * CASE 1: Web Wallet
+    * CASE 2: Trezor Model T Wallet */
+  _makeInvokeConfirmationButton() {
+    const { form } = this;
+    const { intl } = this.context;
+
+    const buttonClasses = classnames([
+      'primary',
+      styles.nextButton,
+    ]);
+
+    /** Next Action can't be performed in case transaction fees are not calculated
+      * or there's a transaction waiting to be confirmed (pending) */
+    const {
+      openDialogAction,
+      hasAnyPending,
+    } = this.props;
+    const { isTransactionFeeCalculated } = this.state;
+
+    let onMouseUp;
+    if (this.props.isTrezorTWallet) {
+      // Trezor Model T Wallet
+      onMouseUp = () => {
+        const { receiver, amount } = form.values();
+        const amountInNaturalUnits = formattedAmountToNaturalUnits(amount);
+        const amountInBigNumber = formattedAmountToBigNumber(amountInNaturalUnits);
+        this.props.onSignWithHardware(receiver, amountInBigNumber);
+      };
+    } else {
+      // Default: Web Wallet
+      onMouseUp = () => openDialogAction({
+        dialog: WalletSendConfirmationDialog,
+      });
+    }
+
+    // TODO: fix the return type
+    return (
+      <Button
+        className={buttonClasses}
+        label={intl.formatMessage(messages.nextButtonLabel)}
+        onMouseUp={onMouseUp}
+        disabled={!isTransactionFeeCalculated || hasAnyPending}
+        skin={<SimpleButtonSkin />}
+      />);
   }
 
   _resetTransactionFee() {

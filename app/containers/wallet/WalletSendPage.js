@@ -20,7 +20,7 @@ export default class WalletSendPage extends Component<Props> {
     const { intl } = this.context;
     const { uiDialogs } = this.props.stores;
     const { wallets, transactions } = this.props.stores.substores.ada;
-    const { actions, stores } = this.props;
+    const { actions } = this.props;
     const { isValidAddress } = wallets;
     const { calculateTransactionFee, validateAmount, hasAnyPending } = transactions;
     const activeWallet = wallets.active;
@@ -28,19 +28,6 @@ export default class WalletSendPage extends Component<Props> {
     // Guard against potential null values
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
-    // Callback that creates a container to avoid the component knowing about actions/stores
-    const dialogCallback = function (props: DialogProps) {
-      return (<WalletSendConfirmationDialogContainer
-        actions={actions}
-        stores={stores}
-        amount={props.amount}
-        receiver={props.receiver}
-        totalAmount={props.totalAmount}
-        transactionFee={props.transactionFee}
-        amountToNaturalUnits={props.amountToNaturalUnits}
-        currencyUnit={props.currencyUnit}
-      />);
-    };
     return (
       <WalletSendForm
         currencyUnit={intl.formatMessage(globalMessages.unitAda)}
@@ -53,13 +40,35 @@ export default class WalletSendPage extends Component<Props> {
         addressValidator={isValidAddress}
         isDialogOpen={uiDialogs.isOpen}
         openDialogAction={actions.dialogs.open.trigger}
-        dialogRenderCallback={dialogCallback}
+        dialogRenderCallback={this.onWebWalletDoConfirmation}
         hasAnyPending={hasAnyPending}
-        isHardwareWallet={activeWallet.isHardwareWallet}
+        isTrezorTWallet={activeWallet.isTrezorTWallet}
         onSignWithHardware={(receiver, amount) => {
           actions.ada.trezor.sendWithTrezor.trigger({ receiver, amount });
         }}
       />
     );
   }
+
+  /** Web Wallet Send Confirmation
+    * Callback that creates a container to avoid the component knowing about actions/stores */
+  onWebWalletDoConfirmation = (dialogProps: DialogProps) => {
+    const { actions, stores } = this.props;
+    return (<WalletSendConfirmationDialogContainer
+      actions={actions}
+      stores={stores}
+      amount={dialogProps.amount}
+      receiver={dialogProps.receiver}
+      totalAmount={dialogProps.totalAmount}
+      transactionFee={dialogProps.transactionFee}
+      amountToNaturalUnits={dialogProps.amountToNaturalUnits}
+      currencyUnit={dialogProps.currencyUnit}
+    />);
+  };
+
+  /** Trezor Model T Wallet Confirmation
+    * Callback that creates a container to avoid the component knowing about actions/stores */
+  onTrezorTWalletDoConfirmation = () => {
+    return ('TODO: Trezor Sign Tx Confirmation Dialog');
+  };
 }
