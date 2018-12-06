@@ -8,37 +8,44 @@ import CheckboxSkin from 'react-polymorph/lib/skins/simple/raw/CheckboxSkin';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import SetLockCodeDialog from './SetLockCodeDialog';
 
 import { defineMessages, intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import LocalizableError from '../../../i18n/LocalizableError';
+import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './LockScreenSettings.scss';
-import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import type { ReactIntlMessage } from '../../../../types/i18nTypes';
 
 const messages = defineMessages({
-  languageSelectLabel: {
-    id: 'settings.general.languageSelect.label',
-    defaultMessage: '!!!Language',
-    description: 'Label for the language select.'
+  checkboxLabel: {
+    id: 'settings.lock.enable.label',
+    defaultMessage: '!!!Enable lock screen',
+    description: 'Label for the lock enabling checkbox.'
+  },
+  submitLabel: {
+    id: 'settings.lock.submit',
+    defaultMessage: '!!!Submit',
+    description: 'Label for submit pin code button',
+  },
+  change: {
+    id: 'settings.lock.change',
+    defaultMessage: '!!!Change PIN code',
+    description: 'Title for changing PIN code form',
   },
 });
 
 type Props = {
-  languages: Array<{ value: string, label: ReactIntlMessage }>,
-  currentLocale: string,
-  onSelectLanguage: Function,
+  toggleLockScreen: Function,
+  close: Function,
+  submit: Function,
+  isEnabled: boolean,
   isSubmitting: boolean,
+  pin: string,
   error?: ?LocalizableError,
 };
 
-type State = {
-  checked: boolean,
-}
-
 @observer
-export default class LockScreenSettings extends Component<Props, State> {
+export default class LockScreenSettings extends Component<Props> {
   static defaultProps = {
     error: undefined
   };
@@ -47,21 +54,10 @@ export default class LockScreenSettings extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
 
-  state = {
-    checked: false,
-  };
-
-  handleCheck = () => {
-    this.setState({ checked: !this.state.checked });
-  }
-
   handleSubmit = () => {
     console.log('submitted!');
   }
 
-  selectLanguage = (values: { locale: string }) => {
-    this.props.onSelectLanguage({ locale: values });
-  };
 
   form = new ReactToolboxMobxForm({
     fields: {
@@ -98,7 +94,15 @@ export default class LockScreenSettings extends Component<Props, State> {
   });
 
   render() {
-    const { languages, isSubmitting, error } = this.props;
+    const {
+      toggleLockScreen,
+      close,
+      submit,
+      isSubmitting,
+      isEnabled,
+      error,
+      pin,
+    } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const currentCode = form.$('currentCode');
@@ -107,29 +111,21 @@ export default class LockScreenSettings extends Component<Props, State> {
 
     const componentClassNames = classNames([styles.component, 'general']);
 
-    const actions = [
-      {
-        label: 'test',
-        primary: true,
-        onClick: this.handleSubmit,
-      },
-    ];
-
     return (
       <div className={componentClassNames}>
         <div className={`${styles.enabling} ${styles.row}`}>
-          <span className={styles.title}>Enable lock screen</span>
+          <span className={styles.title}>{intl.formatMessage(messages.checkboxLabel)}</span>
           <Checkbox
             className={styles.checkbox}
             skin={<CheckboxSkin />}
-            checked={this.state.checked}
-            onChange={this.handleCheck}
+            checked={isEnabled}
+            onChange={toggleLockScreen}
           />
         </div>
 
-        {this.state.checked && (
+        {pin && isEnabled && (
           <div className={styles.row}>
-            <div className={styles.title}>Change PIN code</div>
+            <div className={styles.title}>{intl.formatMessage(messages.change)}</div>
             <Input
               className={styles.input}
               {...currentCode.bind()}
@@ -151,25 +147,7 @@ export default class LockScreenSettings extends Component<Props, State> {
           </div>
         )}
 
-        <Dialog
-          title="Set your pin code"
-          closeOnOverlayClick={false}
-          actions={actions}
-          closeButton={<DialogCloseButton />}
-        >
-          <Input
-            className={styles.input}
-            {...newCode.bind()}
-            error={newCode.error}
-            skin={<SimpleInputSkin />}
-          />
-          <Input
-            className={styles.input}
-            {...repeatNewCode.bind()}
-            error={repeatNewCode.error}
-            skin={<SimpleInputSkin />}
-          />
-        </Dialog>;
+        {!pin && isEnabled && <SetLockCodeDialog close={close} submit={submit} />}
 
         {error && <p className={styles.error}>{error}</p>}
 

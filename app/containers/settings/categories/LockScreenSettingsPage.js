@@ -1,26 +1,40 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import LockScreenSettings from '../../../components/settings/categories/LockScreenSettings';
+import LockScreenSettings from '../../../components/settings/categories/LockScreenSettings/LockScreenSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
 
-  onSelectLanguage = (values: { locale: string }) => {
-    this.props.actions.profile.updateLocale.trigger(values);
+  handleLockScreenToggle = (val: boolean = false) => {
+    this.props.actions.profile.toggleLockScreen.trigger(val);
   };
 
+  handleClose = () => {
+    this.props.actions.profile.toggleLockScreen.trigger();
+  }
+
+  handleSubmit = (code: string) => {
+    this.props.actions.profile.setPinCode.trigger(code);
+  }
+
   render() {
-    const { setProfileLocaleRequest, LANGUAGE_OPTIONS, currentLocale } = this.props.stores.profile;
-    const isSubmitting = setProfileLocaleRequest.isExecuting;
+    const {
+      setLockScreenEnabledRequest,
+      lockScreenEnabled,
+      pinCode,
+    } = this.props.stores.profile;
+    const isSubmitting = setLockScreenEnabledRequest.isExecuting;
     return (
       <LockScreenSettings
-        onSelectLanguage={this.onSelectLanguage}
+        toggleLockScreen={this.handleLockScreenToggle}
+        close={this.handleClose}
+        isEnabled={lockScreenEnabled}
         isSubmitting={isSubmitting}
-        languages={LANGUAGE_OPTIONS}
-        currentLocale={currentLocale}
-        error={setProfileLocaleRequest.error}
+        error={setLockScreenEnabledRequest.error}
+        pin={pinCode}
+        submit={this.handleSubmit}
       />
     );
   }

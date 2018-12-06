@@ -4,7 +4,9 @@ const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
-  THEME: networkForLocalStorage + '-THEME'
+  THEME: networkForLocalStorage + '-THEME',
+  LOCK: networkForLocalStorage + '-LOCK-SCREEN',
+  PIN: networkForLocalStorage + '-PIN',
 };
 
 /**
@@ -66,9 +68,63 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  getLockScreenEnabled = (): Promise<boolean> => new Promise((resolve, reject) => {
+    try {
+      const enabled = localStorage.getItem(storageKeys.LOCK);
+      if (!enabled) return resolve(false);
+      resolve(JSON.parse(enabled));
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setLockScreenEnabled = (): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.LOCK, true);
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetLockScreenEnabled = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.LOCK);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
+  getPinCode = (): Promise<boolean> => new Promise((resolve, reject) => {
+    try {
+      const pin = localStorage.getItem(storageKeys.PIN);
+      if (!pin) return resolve('');
+      resolve(pin);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setPinCode = (code: string): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.PIN, code);
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetPinCode = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.PIN);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
   async reset() {
     await this.unsetUserLocale(); // TODO: remove after saving locale to API is restored
     await this.unsetTermsOfUseAcceptance();
+    await this.unsetLockScreenEnabled();
+    await this.unsetPinCode();
   }
 
 }

@@ -33,11 +33,18 @@ export default class SettingsStore extends Store {
   @observable setProfileLocaleRequest: Request<string> = new Request(this.api.localStorage.setUserLocale);
   @observable getTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.getTermsOfUseAcceptance);
   @observable setTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.setTermsOfUseAcceptance);
+  @observable getPinCodeRequest: Request<string> = new Request(this.api.localStorage.getPinCode);
+  @observable setPinCodeRequest: Request<string> = new Request(this.api.localStorage.setPinCode);
+  @observable getLockScreenEnabledRequest: Request<string> = new Request(this.api.localStorage.getLockScreenEnabled);
+  @observable setLockScreenEnabledRequest: Request<string> = new Request(this.api.localStorage.setLockScreenEnabled);
+  @observable unsetLockScreenEnabledRequest: Request<string> = new Request(this.api.localStorage.unsetLockScreenEnabled);
   /* eslint-enable max-len */
 
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
+    this.actions.profile.toggleLockScreen.listen(this._toggleLockScreen);
+    this.actions.profile.setPinCode.listen(this._setPinCode);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -47,6 +54,8 @@ export default class SettingsStore extends Store {
       this._redirectToMainUiAfterTermsAreAccepted,
     ]);
     this._getTermsOfUseAcceptance();
+    this._getLockScreenEnabled();
+    this._getPinCode();
   }
 
   teardown() {
@@ -61,6 +70,16 @@ export default class SettingsStore extends Store {
     const { result } = this.getProfileLocaleRequest.execute();
     if (this.isCurrentLocaleSet) return result;
     return 'en-US'; // default
+  }
+
+  @computed get lockScreenEnabled(): boolean {
+    const { result } = this.getLockScreenEnabledRequest.execute();
+    return result;
+  }
+
+  @computed get pinCode(): string {
+    const { result } = this.getPinCodeRequest.execute();
+    return result;
   }
 
   @computed get hasLoadedCurrentLocale(): boolean {
@@ -92,6 +111,25 @@ export default class SettingsStore extends Store {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
+
+  _toggleLockScreen = async (checked: boolean) => {
+    if (checked) await this.setLockScreenEnabledRequest.execute();
+    else await this.unsetLockScreenEnabledRequest.execute();
+    await this.getLockScreenEnabledRequest.execute();
+  }
+
+  _getLockScreenEnabled = () => {
+    this.getLockScreenEnabledRequest.execute();
+  }
+
+  _getPinCode = () => {
+    this.getPinCodeRequest.execute();
+  }
+
+  _setPinCode = async (code: string) => {
+    await this.setPinCodeRequest.execute(code);
+    await this.getPinCodeRequest.execute();
+  }
 
   _updateMomentJsLocaleAfterLocaleChange = () => {
     moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
