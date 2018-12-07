@@ -25,8 +25,6 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
 type Props = {
   progressInfo: ProgressInfo,
 };

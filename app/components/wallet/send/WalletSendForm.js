@@ -16,8 +16,11 @@ import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
-import WalletTrezorSendConfirmationDialog from './trezor/WalletTrezorSendConfirmationDialog';
-import { formattedAmountToBigNumber, formattedAmountToNaturalUnits } from '../../../utils/formatters';
+import TrezorSendAdaConfirmationDialog from './trezor/TrezorSendAdaConfirmationDialog';
+import {
+  formattedAmountToBigNumber,
+  formattedAmountToNaturalUnits
+} from '../../../utils/formatters';
 import dangerIcon from '../../../assets/images/danger.inline.svg';
 
 export const messages = defineMessages({
@@ -304,7 +307,7 @@ export default class WalletSendForm extends Component<Props, State> {
     let onMouseUp;
     if (this.props.isTrezorTWallet) {
       onMouseUp = () => openDialogAction({
-        dialog: WalletTrezorSendConfirmationDialog,
+        dialog: TrezorSendAdaConfirmationDialog,
       });
     } else {
       onMouseUp = () => openDialogAction({
@@ -336,14 +339,14 @@ export default class WalletSendForm extends Component<Props, State> {
     } = this.props;
 
     // this function is called from render hence it should return ASAP, hence using renderCallback
-    let renderCallback = null;
+    let renderCB = null;
     if (isDialogOpen(WalletSendConfirmationDialog)) {
-      renderCallback = webWalletConfirmationDialogRenderCallback;
-    } else if (isDialogOpen(WalletTrezorSendConfirmationDialog)) {
-      renderCallback = trezorTWalletConfirmationDialogRenderCallback;
+      renderCB = webWalletConfirmationDialogRenderCallback;
+    } else if (isDialogOpen(TrezorSendAdaConfirmationDialog)) {
+      renderCB = trezorTWalletConfirmationDialogRenderCallback;
     }
 
-    if (renderCallback) {
+    if (renderCB) {
       const { form } = this;
 
       const {
@@ -369,7 +372,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
       component = (
         <div>
-          {renderCallback(dialogProps)}
+          {renderCB(dialogProps)}
         </div>);
     }
 

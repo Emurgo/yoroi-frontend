@@ -42,12 +42,10 @@ import {
   getAdaTransactionFee,
   newAdaTransaction
 } from './adaTransactions/adaNewTransactions';
+import type { TrezorSignTxPayload } from '../../domain/TrezorSignTx';
 import {
-  newTrezorPayload,
+  createTrezorSignTxData,
   newTrezorTransaction,
-} from './hardware-wallet/trezorNewTransactions';
-import type {
-  TrezorPayloadAndChangeAddress
 } from './hardware-wallet/trezorNewTransactions';
 import {
   GenericApiError,
@@ -99,10 +97,14 @@ export type SendHardwareTransactionRequest = {
   signedTxHex: string,
   changeAdaAddr: AdaAddress
 }
-export type CreateTrezorPayloadRequest = {
+export type CreateTrezorSignTxDataRequest = {
   receiver: string,
   amount: string
 };
+export type CreateTrezorSignTxDataResponse = {
+  trezorSignTxPayload: TrezorSignTxPayload,
+  changedAddress: AdaAddress
+}
 export type UpdateWalletRequest = {
   walletId: string,
   name: string,
@@ -298,31 +300,24 @@ export default class AdaApi {
     }
   }
 
-  async createTrezorPayload(
-    request: CreateTrezorPayloadRequest
-  ): Promise<[TrezorPayloadAndChangeAddress]> {
-    Logger.debug('AdaApi::createTrezorPayload called');
-    const { receiver, amount } = request;
-
+  async createTrezorSignTxData(
+    request: CreateTrezorSignTxDataRequest
+  ): Promise<CreateTrezorSignTxDataResponse> {
     try {
-      const fee: AdaTransactionFee =
-        await getAdaTransactionFee(receiver, amount);
+      Logger.debug('AdaApi::createTrezorSignTxData called');
+      const { receiver, amount } = request;
 
-      const response = await newTrezorPayload(
-        receiver,
-        amount,
-        fee.getCCoin,
-      );
-      Logger.debug(
-        'AaApi::createTrezorPayload success: ' + stringifyData(response)
-      );
+      const fee: AdaTransactionFee = await getAdaTransactionFee(receiver, amount);
+      const response = await createTrezorSignTxData(receiver, amount, fee.getCCoin);
+
+      Logger.debug('AaApi::createTrezorSignTxData success: ' + stringifyData(response));
       return response;
     } catch (error) {
-      // FIXME: Update errors
+      Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
+      // TODO: Update errors
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
-      Logger.error('AdaApi::createTrezorPayload error: ' + stringifyError(error));
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
       }

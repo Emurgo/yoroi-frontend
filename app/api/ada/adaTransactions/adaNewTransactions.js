@@ -206,7 +206,7 @@ export function addressesToPublicHash(
 
 export function mapUTXOsToInputs(
   utxos: Array<UTXO>,
-  adaAddressesMap: any // FIXME: type
+  adaAddressesMap: any // TODO: [TREZOR] fix the type
 ): Array<TxInput> {
   return utxos.map((utxo) => ({
     ptr: {

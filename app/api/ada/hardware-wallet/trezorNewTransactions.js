@@ -1,7 +1,7 @@
 // @flow
-
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
+
 import {
   Logger,
   stringifyError
@@ -28,52 +28,33 @@ import {
   InvalidWitnessError,
   GetTxsBodiesForUTXOsError
 } from '../errors';
+import type { CreateTrezorSignTxDataResponse } from '../index.js';
+import type {
+  TrezorInput,
+  TrezorOutput
+} from '../../../domain/TrezorSignTx';
 
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
 
 declare var CONFIG: ConfigType;
 
-type TrezorInput = {
-  path: string,
-  prev_hash: string,
-  prev_index: number, // I’m not sure what it is. cuOutIndex
-  type: number // refers to script type
-}
-
-type TrezorOutput = {
-  address: string,
-  amount: string,
-}
-
-export type TrezorPayload = {
-  inputs: Array<TrezorInput>,
-  outputs: Array<TrezorOutput>,
-  transactions: Array<any>,
-  network: number
-}
-
-export type TrezorPayloadAndChangeAddress = {
-  trezorPayload: TrezorPayload,
-  changeAddress: AdaAddress
-}
-
-/** Generate a payload for Trezor */
 // TODO: add trezor payload format. Maybe as a README in the same folder?
-export async function newTrezorPayload(
+/** Generate a payload for Trezor */
+export async function createTrezorSignTxData(
   receiver: string,
   amount: BigNumber,
   fee: number,
-): Promise<TrezorPayloadAndChangeAddress> {
+): Promise<CreateTrezorSignTxDataResponse> {
   // Inputs
   const senders = await getAdaAddressesList();
   const [inputs, utxos] = await getAdaTransactionInputsAndUtxos(senders);
   const trezorInputs = _transformToTrezorInputs(inputs, utxos);
 
   // Outputs
-  const changeAddr = await getAdaTransactionChangeAddr();
-  const changeAmount = _calculateChange(utxos, fee, amount);
-  const trezorOutputs = _generateTrezorOutputs(receiver, amount, changeAddr, changeAmount);
+  const changedAddress = await getAdaTransactionChangeAddr();
+  const changedAmount = _calculateChange(utxos, fee, amount);
+  const trezorOutputs = _generateTrezorOutputs(receiver, amount, changedAddress, changedAmount);
 
   // Transactions
   const txsBodies = await txsBodiesForUTXOs(utxos);
@@ -82,13 +63,13 @@ export async function newTrezorPayload(
   const network = CONFIG.network.trezorNetwork;
 
   return {
-    trezorPayload: {
+    trezorSignTxPayload: {
       network,
       transactions: txsBodies,
       inputs: trezorInputs,
       outputs: trezorOutputs,
     },
-    changeAddress: changeAddr,
+    changedAddress: changedAddress,
   };
 }
 

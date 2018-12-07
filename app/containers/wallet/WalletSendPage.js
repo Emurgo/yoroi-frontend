@@ -14,7 +14,7 @@ import {
 
 import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
-import WalletTrezorSendConfirmationDialogContainer from './dialogs/WalletTrezorSendConfirmationDialogContainer';
+import TrezorSendAdaConfirmationDialog from '../../components/wallet/send/trezor/TrezorSendAdaConfirmationDialog';
 import type { DialogProps } from './dialogs/WalletSendConfirmationDialogContainer';
 import TrezorSendAdaActions from '../../actions/ada/trezor-send-ada-actions';
 
@@ -26,16 +26,16 @@ export default class WalletSendPage extends Component<Props> {
   };
 
   render() {
+    const { wallets, transactions } = this.props.stores.substores.ada;
+    const activeWallet = wallets.active;
+    // Guard against potential null values
+    if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
+
     const { intl } = this.context;
     const { uiDialogs } = this.props.stores;
-    const { wallets, transactions } = this.props.stores.substores.ada;
     const { actions } = this.props;
     const { isValidAddress } = wallets;
     const { calculateTransactionFee, validateAmount, hasAnyPending } = transactions;
-    const activeWallet = wallets.active;
-
-    // Guard against potential null values
-    if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
     return (
       <WalletSendForm
@@ -57,7 +57,7 @@ export default class WalletSendPage extends Component<Props> {
     );
   }
 
-  /** Web Wallet Send Confirmation
+  /** Web Wallet Send Confirmation dialog
     * Callback that creates a container to avoid the component knowing about actions/stores */
   webWalletDoConfirmation = (dialogProps: DialogProps) => {
     const { actions, stores } = this.props;
@@ -73,22 +73,24 @@ export default class WalletSendPage extends Component<Props> {
     />);
   };
 
-  /** Trezor Model T Wallet Confirmation
-    * Callback that creates a container to avoid the component knowing about actions/stores */
+  /** Trezor Model T Wallet Confirmation dialog
+    * Callback that creates a component to avoid the component knowing about actions/stores
+    * separate container is not needed, this container acts as container for Confirmation dialog */
   trezorTWalletDoConfirmation = (dialogProps: DialogProps) => { // TODO: fix return type
-    const { actions, stores } = this.props;
-    const trezorSendAdaActions = this.props.actions[environment.API].trezorSendAda;
-    return (<WalletTrezorSendConfirmationDialogContainer
-      actions={actions}
-      stores={stores}
-      onSendUsingTrezor={trezorSendAdaActions.sendUsingTrezor.trigger}
-      onClose={trezorSendAdaActions.cancel.trigger}
-      amount={dialogProps.amount}
-      receiver={dialogProps.receiver}
-      totalAmount={dialogProps.totalAmount}
-      transactionFee={dialogProps.transactionFee}
-      amountToNaturalUnits={dialogProps.amountToNaturalUnits}
-      currencyUnit={dialogProps.currencyUnit}
-    />);
+    const trezorSendAdaAction = this.props.actions[environment.API].trezorSendAda;
+    const trezorSendAdaStore = this.props.stores.substores[environment.API].trezorSendAda
+    return (
+      <TrezorSendAdaConfirmationDialog
+        amount={dialogProps.amount}
+        receiver={dialogProps.receiver}
+        totalAmount={dialogProps.totalAmount}
+        transactionFee={dialogProps.transactionFee}
+        amountToNaturalUnits={dialogProps.amountToNaturalUnits}
+        currencyUnit={dialogProps.currencyUnit}
+        isSubmitting={trezorSendAdaStore.isActionProcessing}
+        error={trezorSendAdaStore.error}
+        onSubmit={trezorSendAdaAction.sendUsingTrezor.trigger}
+        onCancel={trezorSendAdaAction.cancel.trigger}
+      />);
   };
 }

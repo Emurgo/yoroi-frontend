@@ -11,9 +11,9 @@ import ErrorBlock from '../../../widgets/ErrorBlock';
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
-import styles from './WalletTrezorSendConfirmationDialog.scss';
+import styles from './TrezorSendAdaConfirmationDialog.scss';
 
-// TODO: make globalMessages for common with WalletSendConfirmationDialog
+// TODO: [TREZOR] make globalMessages for common with WalletSendConfirmationDialog
 export const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.send.confirmationDialog.title',
@@ -62,23 +62,21 @@ export const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
 type Props = {
-  isSubmitting: boolean,
-  error: ?LocalizableError,
   amount: string,
   receiver: string,
   totalAmount: string,
   transactionFee: string,
   currencyUnit: string,
-  amountToNaturalUnits: (amountWithFractions: string) => string,
+  amountToNaturalUnits: Function,
+  isSubmitting: boolean,
+  error: ?LocalizableError,
   onSubmit: Function,
   onCancel: Function,
 };
 
 @observer
-export default class WalletTrezorSendConfirmationDialog extends Component<Props> {
+export default class TrezorSendAdaConfirmationDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -87,7 +85,6 @@ export default class WalletTrezorSendConfirmationDialog extends Component<Props>
   render() {
     const { intl } = this.context;
     const {
-      onCancel,
       amount,
       receiver,
       totalAmount,
@@ -95,6 +92,7 @@ export default class WalletTrezorSendConfirmationDialog extends Component<Props>
       currencyUnit,
       isSubmitting,
       error,
+      onCancel,
     } = this.props;
 
     // TODO: do i18n
