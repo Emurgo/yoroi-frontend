@@ -93,17 +93,17 @@ export default class TrezorSendAdaStore extends Store {
 
       const {
         trezorSignTxPayload,
-        changedAddress
+        changeAddress
       } = await this.createTrezorSignTxDataRequest.execute(params).promise;
   
-      trezorResp = await TrezorConnect.cardanoSignTransaction({...trezorSignTxPayload});
-      if(trezorResp && trezorResp.success) {
+      trezorResp = await TrezorConnect.cardanoSignTransaction({ ...trezorSignTxPayload });
+      if (trezorResp && trezorResp.success) {
         // TODO: [TREZOR] fix type if possible
         const payload: any = trezorResp.payload;
         // TODO: [TREZOR] use LocalizedRequest for any API call
         await this.api.ada.sendHardwareTransaction({
           signedTxHex: payload.body,
-          changeAdaAddr: changedAddress
+          changeAdaAddr: changeAddress
         });
     
         wallets.refreshWalletsData();

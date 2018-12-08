@@ -52,9 +52,9 @@ export async function createTrezorSignTxData(
   const trezorInputs = _transformToTrezorInputs(inputs, utxos);
 
   // Outputs
-  const changedAddress = await getAdaTransactionChangeAddr();
-  const changedAmount = _calculateChange(utxos, fee, amount);
-  const trezorOutputs = _generateTrezorOutputs(receiver, amount, changedAddress, changedAmount);
+  const changeAddress = await getAdaTransactionChangeAddr();
+  const changeAmount = _calculateChange(utxos, fee, amount);
+  const trezorOutputs = _generateTrezorOutputs(receiver, amount, changeAddress, changeAmount);
 
   // Transactions
   const txsBodies = await txsBodiesForUTXOs(utxos);
@@ -69,7 +69,7 @@ export async function createTrezorSignTxData(
       inputs: trezorInputs,
       outputs: trezorOutputs,
     },
-    changedAddress: changedAddress,
+    changeAddress
   };
 }
 

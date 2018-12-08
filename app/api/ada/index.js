@@ -103,7 +103,7 @@ export type CreateTrezorSignTxDataRequest = {
 };
 export type CreateTrezorSignTxDataResponse = {
   trezorSignTxPayload: TrezorSignTxPayload,
-  changedAddress: AdaAddress
+  changeAddress: AdaAddress
 }
 export type UpdateWalletRequest = {
   walletId: string,
