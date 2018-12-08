@@ -154,11 +154,17 @@ function _generateTrezorOutputs(
   changeAdaAddr: AdaAddress,
   changeAmount: BigNumber,
 ): Array<TrezorOutput> {
+  const output = {
+    address: outputAddress,
+    amount: outputAmount.toString()
+  };
+
+  // If changeAmount is zero (input = ouput + fee), then we don’t need a change address.
+  if (changeAmount === BigNumber(0)) return [output];
+
   return [
+    output,
     {
-      address: outputAddress,
-      amount: outputAmount.toString()
-    }, {
       // TODO: Smaller tx (fee wise) with `path: "m/44'/1815'/0'/X/X"`
       address: changeAdaAddr.cadId,
       amount: changeAmount.toString()
