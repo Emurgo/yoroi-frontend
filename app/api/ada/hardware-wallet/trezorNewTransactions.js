@@ -160,7 +160,7 @@ function _generateTrezorOutputs(
   };
 
   // If changeAmount is zero (input = ouput + fee), then we don’t need a change address.
-  if (changeAmount === BigNumber(0)) return [output];
+  if (changeAmount === new BigNumber(0)) return [output];
 
   return [
     output,
