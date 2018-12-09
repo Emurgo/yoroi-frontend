@@ -31,55 +31,50 @@ import {
 import type { CreateTrezorSignTxDataResponse } from '../index.js';
 import type {
   TrezorInput,
-  TrezorOutput
+  TrezorOutput, TrezorSignTxPayload
 } from '../../../domain/TrezorSignTx';
 
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
+import type {TxInput, UnsignedTransactionExt} from "../../../../flow/declarations/CardanoCrypto";
 
 declare var CONFIG: ConfigType;
 
 // TODO: add trezor payload format. Maybe as a README in the same folder?
 /** Generate a payload for Trezor */
 export async function createTrezorSignTxData(
-  receiver: string,
-  amount: BigNumber,
-  fee: number,
-): Promise<CreateTrezorSignTxDataResponse> {
+  txExt: UnsignedTransactionExt
+): Promise<TrezorSignTxPayload> {
+
   // Inputs
-  const senders = await getAdaAddressesList();
-  const [inputs, utxos] = await getAdaTransactionInputsAndUtxos(senders);
-  const trezorInputs = _transformToTrezorInputs(inputs, utxos);
+  const trezorInputs = _transformToTrezorInputs(txExt.inputs);
 
   // Outputs
-  const changeAddress = await getAdaTransactionChangeAddr();
-  const changeAmount = _calculateChange(utxos, fee, amount);
-  const trezorOutputs = _generateTrezorOutputs(receiver, amount, changeAddress, changeAmount);
+  const trezorOutputs = _generateTrezorOutputs(txExt.outputs);
 
   // Transactions
-  const txsBodies = await txsBodiesForUTXOs(utxos);
+  const txsBodies = await txsBodiesForInputs(txExt.inputs);
 
   // Network
   const network = CONFIG.network.trezorNetwork;
 
   return {
-    trezorSignTxPayload: {
-      network,
-      transactions: txsBodies,
-      inputs: trezorInputs,
-      outputs: trezorOutputs,
-    },
-    changeAddress
+    network,
+    transactions: txsBodies,
+    inputs: trezorInputs,
+    outputs: trezorOutputs,
   };
 }
 
 /** List of Body hashes for a list of utxos by batching backend requests */
-export async function txsBodiesForUTXOs(
-  utxos: Array<UTXO>
+export async function txsBodiesForInputs(
+  inputs: Array<TxInput>
 ): Promise<Array<string>> {
-  if (utxos == null) return [];
+  if (!inputs) return [];
   try {
-    const txsHashes = utxos.map((utxo) => utxo.tx_hash);
+
+    // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
+    const txsHashes = [...new Set(inputs.map(x => x.ptr.id))];
 
     // split up all addresses into chunks of equal size
     const groupsOfTxsHashes = _.chunk(txsHashes, CONFIG.app.txsBodiesRequestSize);
@@ -137,39 +132,20 @@ function _derivePath(change: number, index: number): string {
   return `${Config.trezor.DEFAULT_CARDANO_PATH}/${change}/${index}`;
 }
 
-function _transformToTrezorInputs(inputs: Array<TxInput>, utxos: Array<UTXO>): Array<TrezorInput> {
-  return _
-    .zip(inputs, utxos)
-    .map(([input, utxo]) => ({
+function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
+  return inputs.map((input: TxInput) => ({
       path: _derivePath(input.addressing.change, input.addressing.index),
-      prev_hash: utxo.tx_hash,
-      prev_index: utxo.tx_index,
+      prev_hash: input.ptr.id,
+      prev_index: input.ptr.index,
       type: 0
     }));
 }
 
-function _generateTrezorOutputs(
-  outputAddress: string,
-  outputAmount: BigNumber,
-  changeAdaAddr: AdaAddress,
-  changeAmount: BigNumber,
-): Array<TrezorOutput> {
-  const output = {
-    address: outputAddress,
-    amount: outputAmount.toString()
-  };
-
-  // If changeAmount is zero (input = ouput + fee), then we don’t need a change address.
-  if (changeAmount === new BigNumber(0)) return [output];
-
-  return [
-    output,
-    {
-      // TODO: Smaller tx (fee wise) with `path: "m/44'/1815'/0'/X/X"`
-      address: changeAdaAddr.cadId,
-      amount: changeAmount.toString()
-    }
-  ];
+function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
+  return outputs.map(x => ({
+    address: x.address,
+    amount: x.value
+  }))
 }
 
 function _calculateChange(utxos: Array<UTXO>, fee: number, outputAmount: BigNumber): BigNumber {

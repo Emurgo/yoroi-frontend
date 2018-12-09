@@ -56,7 +56,7 @@ export type UtxoSumForAddressesResponse = {
 
 export const getTxsBodiesForUTXOs = (
   txsHashes: Array<string>
-): Promise<Array<UTXO>> => (
+): Promise<Array<string>> => (
   axios(
     `${backendUrl}/api/txs/txBodies`,
     {

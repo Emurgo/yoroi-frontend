@@ -34,6 +34,13 @@ import type {
   AdaFeeEstimateResponse,
   UTXO
 } from '../adaTypes';
+import type {
+  TxInput,
+  TxInputPtr,
+  UnsignedTransactionExt,
+  CryptoTransaction,
+  SpendResponse,
+} from '../../../../flow/declarations/CardanoCrypto'
 import {
   NotEnoughMoneyToSendError,
   TransactionError,
@@ -42,7 +49,7 @@ import {
   InvalidWitnessError
 } from '../errors';
 import {
-  decodeInputsFromTx
+  decodeRustTx
 } from '../lib/utils';
 import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
@@ -63,10 +70,10 @@ export function getAdaTransactionFee(
     amount,
     getCryptoWalletFromMasterKey(fakeWalletMasterKey, fakePassword)
   )
-    // we extract the fee since it's all we care about
+    // we extract the fee and inputs since it's all we care about
     .then(response => {
-      const [{ fee }] = response;
-      return { fee: { getCCoin: fee } };
+      const [{ fee }, changeAddress, tx] = response;
+      return { fee: { getCCoin: fee }, changeAdaAddress: changeAddress, txExt: tx };
     })
     .catch(err => {
       Logger.error('adaNetTransactions::getAdaTransactionFee error: ' + stringifyError(err));
@@ -175,7 +182,7 @@ export async function getAdaTransactionFromSenders(
   receiver: string,
   amount: string,
   cryptoWallet: CryptoWallet
-): Promise<[SpendResponse, AdaAddress, Array<TxInput>]> {
+): Promise<[SpendResponse, AdaAddress, UnsignedTransactionExt]> {
   // fetch new internal address from HD Wallet for change
   const changeAdaAddr = await getAdaTransactionChangeAddr();
 
@@ -187,14 +194,19 @@ export async function getAdaTransactionFromSenders(
   const result: SpendResponse = getResultOrFail(
     Wallet.spend(cryptoWallet, inputs, outputs, changeAdaAddr.cadId)
   );
-  return [result, changeAdaAddr, extractUsedInputsFromEncodedTx(result, inputs)];
+  return [result, changeAdaAddr, decodeRustTxWithInputs(result, inputs)];
 }
 
-function extractUsedInputsFromEncodedTx(resp: SpendResponse, availableInputs: Array<TxInput>): Array<TxInput> {
-  const pointers : Array<TxInputPtr> = decodeInputsFromTx(resp);
+function decodeRustTxWithInputs(resp: SpendResponse, availableInputs: Array<TxInput>): UnsignedTransactionExt {
+  const tx: CryptoTransaction = decodeRustTx(resp);
+  const pointers : Array<TxInputPtr> = tx.tx.tx.inputs;
   const pointerToStr = (p : TxInputPtr) => `${p.id}.${p.index}`;
-  const set = new Set(pointers.map(pointerToStr));
-  return availableInputs.filter((inp: TxInput) => set.has(pointerToStr(inp.ptr)))
+  const set : Set<string> = new Set(pointers.map(pointerToStr));
+  const selectedInputs = availableInputs.filter((inp: TxInput) => set.has(pointerToStr(inp.ptr)));
+  return {
+    inputs: selectedInputs,
+    outputs: tx.tx.tx.outputs
+  };
 }
 
 /** Perform the cryptography required to create a transaction */
@@ -202,7 +214,7 @@ async function _getAdaTransaction(
   receiver: string,
   amount: string,
   cryptoWallet: CryptoWallet,
-): Promise<[SpendResponse, AdaAddress]> {
+): Promise<[SpendResponse, AdaAddress, UnsignedTransactionExt]> {
   // Consider all user addresses valid for the source of a transaction
   const senders = await getAdaAddressesList();
   return getAdaTransactionFromSenders(senders, receiver, amount, cryptoWallet);

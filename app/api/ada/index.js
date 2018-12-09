@@ -308,11 +308,14 @@ export default class AdaApi {
       Logger.debug('AdaApi::createTrezorSignTxData called');
       const { receiver, amount } = request;
 
-      const { fee } : AdaFeeEstimateResponse = await getAdaTransactionFee(receiver, amount);
-      const response = await createTrezorSignTxData(receiver, amount, fee.getCCoin);
+      const { fee, changeAdaAddress, txExt } : AdaFeeEstimateResponse = await getAdaTransactionFee(receiver, amount);
+      const response: TrezorSignTxPayload = await createTrezorSignTxData(txExt);
 
       Logger.debug('AaApi::createTrezorSignTxData success: ' + stringifyData(response));
-      return response;
+      return {
+        trezorSignTxPayload: response,
+        changeAddress: changeAdaAddress
+      };
     } catch (error) {
       Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
       // TODO: Update errors

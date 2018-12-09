@@ -13,6 +13,7 @@
 */
 
 import BigNumber from 'bignumber.js';
+import type {UnsignedTransactionExt} from "../../../flow/declarations/CardanoCrypto";
 
 /*
  * This file gives the flow equivalents of the the Haskell types given in the wallet API at
@@ -114,7 +115,9 @@ export type AdaTransactionInputOutput = [
 export type AdaTransactionFee = AdaAmount;
 
 export type AdaFeeEstimateResponse = {
-  fee: AdaTransactionFee
+  fee: AdaTransactionFee,
+  changeAdaAddress: AdaAddress,
+  txExt: UnsignedTransactionExt
 }
 
 export type AdaWallet = {
