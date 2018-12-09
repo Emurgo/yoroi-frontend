@@ -63,6 +63,7 @@ import type {
   AdaWallet,
   AdaWallets,
   AdaAssurance,
+  AdaFeeEstimateResponse,
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -307,7 +308,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::createTrezorSignTxData called');
       const { receiver, amount } = request;
 
-      const fee: AdaTransactionFee = await getAdaTransactionFee(receiver, amount);
+      const { fee } : AdaFeeEstimateResponse = await getAdaTransactionFee(receiver, amount);
       const response = await createTrezorSignTxData(receiver, amount, fee.getCCoin);
 
       Logger.debug('AaApi::createTrezorSignTxData success: ' + stringifyData(response));
@@ -354,12 +355,12 @@ export default class AdaApi {
     Logger.debug('AdaApi::calculateTransactionFee called');
     const { receiver, amount } = request;
     try {
-      const response: AdaTransactionFee =
+      const { fee } : AdaFeeEstimateResponse =
         await getAdaTransactionFee(receiver, amount);
       Logger.debug(
-        'AdaApi::calculateTransactionFee success: ' + stringifyData(response)
+        'AdaApi::calculateTransactionFee success: ' + stringifyData(fee)
       );
-      return _createTransactionFeeFromServerData(response);
+      return _createTransactionFeeFromServerData(fee);
     } catch (error) {
       Logger.error(
         'AdaApi::calculateTransactionFee error: ' + stringifyError(error)

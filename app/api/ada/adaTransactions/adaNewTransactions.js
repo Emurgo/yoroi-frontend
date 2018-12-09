@@ -31,7 +31,7 @@ import { getResultOrFail } from '../lib/cardanoCrypto/cryptoUtils';
 import type {
   AdaAddresses,
   AdaAddress,
-  AdaTransactionFee,
+  AdaFeeEstimateResponse,
   UTXO
 } from '../adaTypes';
 import {
@@ -41,6 +41,9 @@ import {
   GetAllUTXOsForAddressesError,
   InvalidWitnessError
 } from '../errors';
+import {
+  decodeInputsFromTx
+} from '../lib/utils';
 import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 
@@ -50,7 +53,7 @@ declare var CONFIG : ConfigType;
 export function getAdaTransactionFee(
   receiver: string,
   amount: string
-): Promise<AdaTransactionFee> {
+): Promise<AdaFeeEstimateResponse> {
   // To calculate the transaction fee without requiring the user to enter their password
   // We create a fake mnemonic with a fixed contant password
   const fakePassword = 'fake';
@@ -63,7 +66,7 @@ export function getAdaTransactionFee(
     // we extract the fee since it's all we care about
     .then(response => {
       const [{ fee }] = response;
-      return { getCCoin: fee };
+      return { fee: { getCCoin: fee } };
     })
     .catch(err => {
       Logger.error('adaNetTransactions::getAdaTransactionFee error: ' + stringifyError(err));
@@ -172,7 +175,7 @@ export async function getAdaTransactionFromSenders(
   receiver: string,
   amount: string,
   cryptoWallet: CryptoWallet
-): Promise<[SpendResponse, AdaAddress]> {
+): Promise<[SpendResponse, AdaAddress, Array<TxInput>]> {
   // fetch new internal address from HD Wallet for change
   const changeAdaAddr = await getAdaTransactionChangeAddr();
 
@@ -184,7 +187,14 @@ export async function getAdaTransactionFromSenders(
   const result: SpendResponse = getResultOrFail(
     Wallet.spend(cryptoWallet, inputs, outputs, changeAdaAddr.cadId)
   );
-  return [result, changeAdaAddr];
+  return [result, changeAdaAddr, extractUsedInputsFromEncodedTx(result, inputs)];
+}
+
+function extractUsedInputsFromEncodedTx(resp: SpendResponse, availableInputs: Array<TxInput>): Array<TxInput> {
+  const pointers : Array<TxInputPtr> = decodeInputsFromTx(resp);
+  const pointerToStr = (p : TxInputPtr) => `${p.id}.${p.index}`;
+  const set = new Set(pointers.map(pointerToStr));
+  return availableInputs.filter((inp: TxInput) => set.has(pointerToStr(inp.ptr)))
 }
 
 /** Perform the cryptography required to create a transaction */

@@ -1,5 +1,6 @@
 // @flow
 import bs58 from 'bs58';
+import cbor from 'cbor';
 import BigNumber from 'bignumber.js';
 import type {
   AdaTransactionInputOutput,
@@ -53,3 +54,17 @@ const _getTxCondition = (state: string): AdaTransactionCondition => {
   if (state === 'Pending') return 'CPtxApplying';
   return 'CPtxWontApply';
 };
+
+export function decodeInputsFromTx(resp: SpendResponse): Array<TxInputPtr> {
+  if (!resp || !resp.cbor_encoded_tx) {
+    throw new Error('Cannot decode inputs from undefined transaction!')
+  }
+  const [[[inputs]]] = cbor.decodeAllSync(Buffer.from(resp.cbor_encoded_tx));
+  return inputs.map(x => {
+    [[buf, idx]] = cbor.decodeAllSync(x);
+    return {
+      id: buf.toString('hex'),
+      index: idx
+    }
+  })
+}
