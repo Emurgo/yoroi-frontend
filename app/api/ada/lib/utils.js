@@ -11,7 +11,6 @@ import type {
 import type {
   TxInputPtr,
   CryptoTransaction,
-  SpendResponse,
   TxOutput,
   TxWitness,
   RustRawTxBody
@@ -69,14 +68,14 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   }
   const [[[inputs, outputs], witnesses]] = cbor.decodeAllSync(Buffer.from(rustTxBody));
   const decInputs: Array<TxInputPtr> = inputs.map(x => {
-    [[buf, idx]] = cbor.decodeAllSync(x);
+    const [[buf, idx]] = cbor.decodeAllSync(x);
     return {
       id: buf.toString('hex'),
       index: idx
     };
   });
   const decOutputs: Array<TxOutput> = outputs.map(x => {
-    [addr, value] = x;
+    const [addr, value] = x;
     return {
       address: bs58.encode(cbor.encode(addr)),
       value: value
