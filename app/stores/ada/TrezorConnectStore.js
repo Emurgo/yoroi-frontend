@@ -92,7 +92,7 @@ export default class TrezorConnectStore extends Store {
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  createTrezorWalletRequest: LocalizedRequest<CreateTrezorWalletResponse> = 
+  createTrezorWalletRequest: LocalizedRequest<CreateTrezorWalletResponse> =
     new LocalizedRequest(this.api.ada.createTrezorWallet);
 
   /** While trezor wallet creation is taking place, we need to block users from starting a
@@ -312,7 +312,7 @@ export default class TrezorConnectStore extends Store {
     this.progressInfo.stepState = StepState.PROCESS;
 
     if (this.trezorDeviceInfo
-      && this.trezorDeviceInfo.publicKey 
+      && this.trezorDeviceInfo.publicKey
       && this.trezorDeviceInfo.features) {
       const walletData = {
         walletName,
@@ -356,7 +356,7 @@ export default class TrezorConnectStore extends Store {
         // fetch its data
         Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
         wallets.refreshWalletsData();
-        
+
         // TODO: [TREZOR] not sure if it actully distructing this Store ??
         this.teardown();
         Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');

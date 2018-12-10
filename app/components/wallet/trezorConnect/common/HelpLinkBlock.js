@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 
-import globalMessages from '../../../../i18n/global-messages';
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
 import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
 import styles from './HelpLinkBlock.scss';

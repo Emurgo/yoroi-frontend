@@ -7,7 +7,7 @@ import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
 
-import { 
+import {
   DECIMAL_PLACES_IN_ADA,
   MAX_INTEGER_PLACES_IN_ADA
 } from '../../config/numbersConfig';
@@ -77,7 +77,7 @@ export default class WalletSendPage extends Component<Props> {
     * separate container is not needed, this container acts as container for Confirmation dialog */
   trezorTWalletDoConfirmation = (dialogProps: DialogProps) => { // TODO: fix return type
     const trezorSendAction = this.props.actions[environment.API].trezorSend;
-    const trezorSendStore = this.props.stores.substores[environment.API].trezorSend
+    const trezorSendStore = this.props.stores.substores[environment.API].trezorSend;
     return (
       <TrezorSendConfirmationDialog
         amount={dialogProps.amount}

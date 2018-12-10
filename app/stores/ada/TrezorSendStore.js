@@ -24,7 +24,7 @@ const messages = defineMessages({
     id: 'wallet.send.trezor.error.101',
     defaultMessage: '!!!Signing cancelled on Trezor device. Please retry.',
     description: '<Signing cancelled on Trezor device. Please retry.> on the Trezor send ADA confirmation dialog.'
-  },  
+  },
 });
 
 /** Note: Handles Trezor Signing */
@@ -45,7 +45,7 @@ export default class TrezorSendStore extends Store {
     trezorSendAction.cancel.listen(this._cancel);
   }
 
-  _reset () {
+  _reset() {
     this._setActionProcessing(false);
     this._setError(null);
   }
@@ -76,7 +76,7 @@ export default class TrezorSendStore extends Store {
         trezorSignTxPayload,
         changeAddress
       } = await this.createTrezorSignTxDataRequest.execute(params).promise;
-  
+
       trezorResp = await TrezorConnect.cardanoSignTransaction({ ...trezorSignTxPayload });
       if (trezorResp && trezorResp.success) {
         // TODO: [TREZOR] fix type if possible
@@ -86,12 +86,12 @@ export default class TrezorSendStore extends Store {
           signedTxHex: payload.body,
           changeAdaAddr: changeAddress
         });
-    
+
         wallets.refreshWalletsData();
         this.actions.dialogs.closeActiveDialog.trigger();
-    
+
         // go to transaction screen
-        wallets.goToWalletRoute(activeWallet.id);        
+        wallets.goToWalletRoute(activeWallet.id);
 
         Logger.info('SUCCESS: ADA sent using Trezor SignTx');
       } else {
@@ -113,10 +113,10 @@ export default class TrezorSendStore extends Store {
     if (error instanceof LocalizableError) {
       // It means some API Error has been thrown
       localizableError = error;
-    } else if(trezorResp && trezorResp.payload && trezorResp.payload.error) {
+    } else if (trezorResp && trezorResp.payload && trezorResp.payload.error) {
       // Trezor device related error happend, convert then to LocalizableError
       // TODO: [TREZOR] check for device not supported if needed
-      switch(trezorResp.payload.error) {
+      switch (trezorResp.payload.error) {
         case 'Iframe timeout':
           localizableError = new LocalizableError(globalMessages.trezorError101);
           break;
@@ -129,6 +129,10 @@ export default class TrezorSendStore extends Store {
           break;
         case 'Signing cancelled':
           localizableError = new LocalizableError(messages.signTxError101);
+          break;
+        default:
+          // trezorError999 = Something unexpected happened
+          localizableError = new LocalizableError(globalMessages.trezorError999);
           break;
       }
     }
@@ -145,7 +149,7 @@ export default class TrezorSendStore extends Store {
   _cancel = (): void => {
     this.actions.dialogs.closeActiveDialog.trigger();
     this._reset();
-  }  
+  }
 
   @action _setActionProcessing = (processing: boolean): void => {
     this.isActionProcessing = processing;

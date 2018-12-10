@@ -171,7 +171,7 @@ export default defineMessages({
     id: 'wallet.trezor.error.103',
     defaultMessage: '!!!Cancelled. Please retry.',
     description: '<Cancelled. Please retry.>'
-  },  
+  },
 });
 
 export const environmentSpecificMessages = {

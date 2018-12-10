@@ -28,7 +28,7 @@ import {
   InvalidWitnessError,
   GetTxsBodiesForUTXOsError
 } from '../errors';
-import type { CreateTrezorSignTxDataResponse } from '../index.js';
+import type { CreateTrezorSignTxDataResponse } from '../index';
 import type {
   TrezorInput,
   TrezorOutput
