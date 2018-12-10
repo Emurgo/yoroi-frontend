@@ -28,7 +28,8 @@ import {
   InvalidWitnessError,
   GetTxsBodiesForUTXOsError
 } from '../errors';
-import type { CreateTrezorSignTxDataResponse } from '../index.js';
+import type { CreateTrezorSignTxDataResponse } from '../index';
+import type { SendTrezorSignedTxResponse } from '../../common';
 import type {
   TrezorInput,
   TrezorOutput,
@@ -100,11 +101,9 @@ export async function txsBodiesForInputs(
 export async function newTrezorTransaction(
   signedTxHex: string,
   changeAdaAddr: AdaAddress,
-): Promise<Array<void>> {
+): Promise<SendTrezorSignedTxResponse> {
+  Logger.debug('trezorNewTransactions::newAdaTransaction error: called');
   const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
-
-  // TODO: delete this. Only for debugging
-  console.log('newTrezorTransaction::SignedTx: ', signedTx);
 
   // We assume a change address is used. Currently, there is no way to perfectly match the tx.
   // tentatively assume that the transaction will succeed,
@@ -114,13 +113,14 @@ export async function newTrezorTransaction(
   try {
     const body = { signedTx };
     const backendResponse = await sendTx(body);
+    Logger.debug('trezorNewTransactions::newAdaTransaction error: success');
+
     return backendResponse;
   } catch (sendTxError) {
+    Logger.error('trezorNewTransactions::newAdaTransaction error: ' + stringifyError(sendTxError));
     // On failure, we have to remove the change address we eagerly added
     // Note: we don't await on this
     removeAdaAddress(changeAdaAddr);
-    Logger.error('trezorNewTransactions::newAdaTransaction error: ' +
-      stringifyError(sendTxError));
     if (sendTxError instanceof InvalidWitnessError) {
       throw new InvalidWitnessError();
     }

@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import globalMessages from '../../../../i18n/global-messages';
 import ProgressSteps from '../../../widgets/ProgressSteps';
 import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
 

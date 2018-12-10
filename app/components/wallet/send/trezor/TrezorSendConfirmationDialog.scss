@@ -12,11 +12,10 @@
 
   .submitButtonSpinning {
     @include loading-spinner("../../../../assets/images/spinner-light.svg");
-  };
+  }
 
   .infoBlock {
-     // TODO: create new color variable
-    background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
+    background-color: var(--theme-trezor-send-confirmation-info-block-background-color);
     font-family: var(--font-regular);
     padding: 5px;
     margin-bottom: 20px;

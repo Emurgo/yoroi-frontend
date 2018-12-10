@@ -26,26 +26,6 @@ import {
 import type { CreateTrezorWalletResponse } from '../../api/common';
 
 const messages = defineMessages({
-  error999: {
-    id: 'wallet.trezor.dialog.step.connect.error.999',
-    defaultMessage: '!!!Something unexpected happened, please retry.',
-    description: '<Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  connectError101: {
-    id: 'wallet.trezor.dialog.step.connect.error.101',
-    defaultMessage: '!!!Falied to connect trezor.io. Please check your Internet connection and retry.',
-    description: '<Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  connectError102: {
-    id: 'wallet.trezor.dialog.step.connect.error.102',
-    defaultMessage: '!!!Necessary permissions were not granted by the user. Please retry.',
-    description: '<Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  connectError103: {
-    id: 'wallet.trezor.dialog.step.connect.error.103',
-    defaultMessage: '!!!Cancelled. Please retry.',
-    description: '<Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
   saveError101: {
     id: 'wallet.trezor.dialog.step.save.error.101',
     defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
@@ -112,7 +92,7 @@ export default class TrezorConnectStore extends Store {
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  createTrezorWalletRequest: LocalizedRequest<CreateTrezorWalletResponse> = 
+  createTrezorWalletRequest: LocalizedRequest<CreateTrezorWalletResponse> =
     new LocalizedRequest(this.api.ada.createTrezorWallet);
 
   /** While trezor wallet creation is taking place, we need to block users from starting a
@@ -276,29 +256,28 @@ export default class TrezorConnectStore extends Store {
     trezorValidity.valid = false;
 
     if (!trezorResp.success) {
-      // TODO: [TREZOR] check for device not supported if needed
       switch (trezorResp.payload.error) {
         case 'Iframe timeout':
-          trezorValidity.error = messages.connectError101;
+          trezorValidity.error = new LocalizableError(globalMessages.trezorError101);
           break;
         case 'Permissions not granted':
-          trezorValidity.error = messages.connectError102;
+          trezorValidity.error = new LocalizableError(globalMessages.trezorError102);
           break;
         case 'Cancelled':
         case 'Popup closed':
-          trezorValidity.error = messages.connectError103;
+          trezorValidity.error = new LocalizableError(globalMessages.trezorError103);
           break;
         default:
-          // error999 = Something unexpected happened
-          trezorValidity.error = messages.error999;
+          // trezorError999 = Something unexpected happened
+          trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
           break;
       }
     }
 
     if (!trezorValidity.error
       && trezorResp.payload.publicKey.length <= 0) {
-      // error999 = Something unexpected happened
-      trezorValidity.error = messages.error999;
+      // trezorError999 = Something unexpected happened
+      trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
     }
 
     if (!trezorValidity.error
@@ -306,8 +285,8 @@ export default class TrezorConnectStore extends Store {
       || trezorEventDevice.payload == null
       || trezorEventDevice.payload.type !== 'acquired'
       || trezorEventDevice.payload.features == null)) {
-      // error999 = Something unexpected happened
-      trezorValidity.error = messages.error999;
+      // trezorError999 = Something unexpected happened
+      trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
     }
 
     if (!trezorValidity.error) {
@@ -332,7 +311,7 @@ export default class TrezorConnectStore extends Store {
     this.progressInfo.stepState = StepState.PROCESS;
 
     if (this.trezorDeviceInfo
-      && this.trezorDeviceInfo.publicKey 
+      && this.trezorDeviceInfo.publicKey
       && this.trezorDeviceInfo.features) {
       const walletData = {
         walletName,
@@ -366,7 +345,6 @@ export default class TrezorConnectStore extends Store {
         this.actions.dialogs.closeActiveDialog.trigger();
 
         const { wallets } = this.stores.substores[environment.API];
-        // TODO: [TREZOR] we need to patch new wallet to make it as active wallet ??
         await wallets._patchWalletRequestWithNewWallet(trezorWallet);
 
         // goto the wallet transactions page
@@ -376,7 +354,7 @@ export default class TrezorConnectStore extends Store {
         // fetch its data
         Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
         wallets.refreshWalletsData();
-        
+
         // TODO: [TREZOR] not sure if it actully distructing this Store ??
         this.teardown();
         Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');
