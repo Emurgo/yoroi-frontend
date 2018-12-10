@@ -9,7 +9,8 @@ import {
   sendTx
 } from '../lib/yoroi-backend-api';
 import {
-  mapToList
+  mapToList,
+  decodeRustTx
 } from '../lib/utils';
 import {
   Logger,
@@ -41,9 +42,6 @@ import {
   GetAllUTXOsForAddressesError,
   InvalidWitnessError
 } from '../errors';
-import {
-  decodeRustTx
-} from '../lib/utils';
 import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 
@@ -190,7 +188,10 @@ export async function getAdaTransactionFromSenders(
   return [result, changeAdaAddr, decodeRustTxWithInputs(result, inputs)];
 }
 
-function decodeRustTxWithInputs(resp: SpendResponse, availableInputs: Array<TxInput>): UnsignedTransactionExt {
+function decodeRustTxWithInputs(
+  resp: SpendResponse,
+  availableInputs: Array<TxInput>
+): UnsignedTransactionExt {
   const tx: CryptoTransaction = decodeRustTx(resp.cbor_encoded_tx);
   const pointers : Array<TxInputPtr> = tx.tx.tx.inputs;
   const pointerToStr = (p : TxInputPtr) => `${p.id}.${p.index}`;

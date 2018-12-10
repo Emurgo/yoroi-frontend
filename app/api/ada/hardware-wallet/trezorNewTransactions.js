@@ -1,5 +1,4 @@
 // @flow
-import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 
 import {
@@ -9,26 +8,19 @@ import {
 import {
   saveAdaAddress,
   removeAdaAddress,
-  getAdaAddressesList
 } from '../adaAddress';
 import type {
   AdaAddress,
-  UTXO
 } from '../adaTypes';
 import {
   sendTx,
   getTxsBodiesForUTXOs
 } from '../lib/yoroi-backend-api';
 import {
-  getAdaTransactionInputsAndUtxos,
-  getAdaTransactionChangeAddr,
-} from '../adaTransactions/adaNewTransactions';
-import {
   SendTransactionError,
   InvalidWitnessError,
   GetTxsBodiesForUTXOsError
 } from '../errors';
-import type { CreateTrezorSignTxDataResponse } from '../index';
 import type { SendTrezorSignedTxResponse } from '../../common';
 import type {
   TrezorInput,
@@ -134,25 +126,16 @@ function _derivePath(change: number, index: number): string {
 
 function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
   return inputs.map((input: TxInput) => ({
-      path: _derivePath(input.addressing.change, input.addressing.index),
-      prev_hash: input.ptr.id,
-      prev_index: input.ptr.index,
-      type: 0
-    }));
+    path: _derivePath(input.addressing.change, input.addressing.index),
+    prev_hash: input.ptr.id,
+    prev_index: input.ptr.index,
+    type: 0
+  }));
 }
 
 function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
   return outputs.map(x => ({
     address: x.address,
     amount: x.value
-  }))
-}
-
-function _calculateChange(utxos: Array<UTXO>, fee: number, outputAmount: BigNumber): BigNumber {
-  const totalInput: BigNumber = utxos.reduce((acc, current) => (
-    new BigNumber(current.amount).plus(acc)
-  ), new BigNumber(0));
-
-  const change = totalInput.minus(outputAmount).minus(new BigNumber(fee));
-  return change;
+  }));
 }

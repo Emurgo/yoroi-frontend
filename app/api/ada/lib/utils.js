@@ -57,7 +57,7 @@ const _getTxCondition = (state: string): AdaTransactionCondition => {
 
 export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   if (!rustTxBody) {
-    throw new Error('Cannot decode inputs from undefined transaction!')
+    throw new Error('Cannot decode inputs from undefined transaction!');
   }
   const [[[inputs, outputs], witnesses]] = cbor.decodeAllSync(Buffer.from(rustTxBody));
   const decInputs: Array<TxInputPtr> = inputs.map(x => {
@@ -68,10 +68,10 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
     };
   });
   const decOutputs: Array<TxOutput> = outputs.map(x => {
-    const [addr, value] = x;
+    const [addr, val] = x;
     return {
       address: bs58.encode(cbor.encode(addr)),
-      value: value
+      value: val
     };
   });
   const decWitnesses: Array<TxWitness> = witnesses.map(w => {
@@ -80,6 +80,7 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
         PkWitness: cbor.decodeAllSync(w[1].value)[0].map(x => x.toString('hex'))
       };
     }
+    throw Error('Unexpected witness type: ' + w);
   });
   return {
     tx: {
@@ -89,5 +90,5 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
       },
       witnesses: decWitnesses
     }
-  }
+  };
 }
