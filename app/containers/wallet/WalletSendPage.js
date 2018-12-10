@@ -16,7 +16,6 @@ import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
 import TrezorSendAdaConfirmationDialog from '../../components/wallet/send/trezor/TrezorSendAdaConfirmationDialog';
 import type { DialogProps } from './dialogs/WalletSendConfirmationDialogContainer';
-import TrezorSendAdaActions from '../../actions/ada/trezor-send-ada-actions';
 
 type Props = InjectedProps;
 @observer
@@ -77,8 +76,8 @@ export default class WalletSendPage extends Component<Props> {
     * Callback that creates a component to avoid the component knowing about actions/stores
     * separate container is not needed, this container acts as container for Confirmation dialog */
   trezorTWalletDoConfirmation = (dialogProps: DialogProps) => { // TODO: fix return type
-    const trezorSendAdaAction = this.props.actions[environment.API].trezorSendAda;
-    const trezorSendAdaStore = this.props.stores.substores[environment.API].trezorSendAda
+    const trezorSendAction = this.props.actions[environment.API].trezorSend;
+    const trezorSendStore = this.props.stores.substores[environment.API].trezorSend
     return (
       <TrezorSendAdaConfirmationDialog
         amount={dialogProps.amount}
@@ -87,10 +86,10 @@ export default class WalletSendPage extends Component<Props> {
         transactionFee={dialogProps.transactionFee}
         amountToNaturalUnits={dialogProps.amountToNaturalUnits}
         currencyUnit={dialogProps.currencyUnit}
-        isSubmitting={trezorSendAdaStore.isActionProcessing}
-        error={trezorSendAdaStore.error}
-        onSubmit={trezorSendAdaAction.sendUsingTrezor.trigger}
-        onCancel={trezorSendAdaAction.cancel.trigger}
+        isSubmitting={trezorSendStore.isActionProcessing}
+        error={trezorSendStore.error}
+        onSubmit={trezorSendAction.sendUsingTrezor.trigger}
+        onCancel={trezorSendAction.cancel.trigger}
       />);
   };
 }

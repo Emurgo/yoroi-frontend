@@ -66,10 +66,12 @@ export default class TrezorSendAdaStore extends Store {
   // =================== API RELATED =================== //
 
   setup() {
-    const trezorSendAdaAction = this.actions.ada.trezorSendAda;
-    trezorSendAdaAction.sendUsingTrezor.listen(this._sendUsingTrezor);
-    trezorSendAdaAction.cancel.listen(this._cancel);
+    const trezorSendAction = this.actions.ada.trezorSend;
+    trezorSendAction.sendUsingTrezor.listen(this._sendUsingTrezor);
+    trezorSendAction.cancel.listen(this._cancel);
   }
+
+  // TODO: [TREZOR] clear error state on initialization
 
   /** Generates a payload with Trezor format and tries Trezor signing */
   _sendUsingTrezor = async (params: CreateTrezorSignTxDataRequest): Promise<void> => {

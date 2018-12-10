@@ -8,7 +8,7 @@ export type SendUsingTrezorParams = {
 
 // ======= Sending ADA using Trezor ACTIONS =======
 
-export default class TrezorSendAdaActions {
+export default class TrezorSendActions {
   cancel: Action<void> = new Action();
   sendUsingTrezor: Action<SendUsingTrezorParams> = new Action();
 }
