@@ -38,7 +38,6 @@ import type {
 
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
-import type {TxInput, UnsignedTransactionExt} from "../../../../flow/declarations/CardanoCrypto";
 
 declare var CONFIG: ConfigType;
 

@@ -13,7 +13,6 @@
 */
 
 import BigNumber from 'bignumber.js';
-import type {UnsignedTransactionExt} from "../../../flow/declarations/CardanoCrypto";
 
 /*
  * This file gives the flow equivalents of the the Haskell types given in the wallet API at

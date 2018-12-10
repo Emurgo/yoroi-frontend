@@ -127,9 +127,9 @@ declare module 'rust-cardano-crypto' {
   }
 }
 
-export type RustRawTxBody = Array<number>
+declare type RustRawTxBody = Array<number>
 
-export type SpendResponse = {
+declare type SpendResponse = {
   cbor_encoded_tx: RustRawTxBody,
   changed_used: boolean,
   fee: number
@@ -163,19 +163,19 @@ declare type CryptoAccount = {
   derivation_scheme: string
 }
 
-export type CryptoTransaction = {
+declare type CryptoTransaction = {
   tx: {
     tx: UnsignedTransaction,
     witnesses: Array<TxWitness>
   }
 }
 
-export type UnsignedTransaction = {
+declare type UnsignedTransaction = {
   inputs: Array<TxInputPtr>,
   outputs: Array<TxOutput>
 }
 
-export type UnsignedTransactionExt = {
+declare type UnsignedTransactionExt = {
   inputs: Array<TxInput>,
   outputs: Array<TxOutput>
 }
@@ -203,7 +203,7 @@ declare type CryptoDaedalusAddressRestored = {
   addressing: AddressingSchemeV1
 }
 
-export type TxInput = {
+declare type TxInput = {
   ptr: TxInputPtr,
   value: TxOutput,
   // bip 44 sequencial addressing which has 3 levels derivation
@@ -220,19 +220,19 @@ declare type TxDaedalusInput = {
   addressing: AddressingSchemeV1
 }
 
-export type TxOutput = {
+declare type TxOutput = {
   address: string,
   value: string
 }
 
 declare type AddressType = "External" | "Internal";
 
-export type TxInputPtr = {
+declare type TxInputPtr = {
   id: string,
   index: number
 }
 
-export type TxWitness = {
+declare type TxWitness = {
   PkWitness: Array<string>
 }
 

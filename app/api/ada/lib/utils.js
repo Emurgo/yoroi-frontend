@@ -8,13 +8,6 @@ import type {
   AdaTransaction,
   AdaTransactionCondition
 } from '../adaTypes';
-import type {
-  TxInputPtr,
-  CryptoTransaction,
-  TxOutput,
-  TxWitness,
-  RustRawTxBody
-} from '../../../../flow/declarations/CardanoCrypto'
 
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();

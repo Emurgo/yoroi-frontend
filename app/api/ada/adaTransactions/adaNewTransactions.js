@@ -34,13 +34,6 @@ import type {
   AdaFeeEstimateResponse,
   UTXO
 } from '../adaTypes';
-import type {
-  TxInput,
-  TxInputPtr,
-  UnsignedTransactionExt,
-  CryptoTransaction,
-  SpendResponse,
-} from '../../../../flow/declarations/CardanoCrypto'
 import {
   NotEnoughMoneyToSendError,
   TransactionError,
