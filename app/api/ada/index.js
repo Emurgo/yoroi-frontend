@@ -80,6 +80,7 @@ import type {
   UpdateWalletResponse,
   CreateTrezorWalletRequest,
   CreateTrezorWalletResponse,
+  SendTrezorSignedTxResponse,
 } from '../common';
 import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
@@ -93,10 +94,10 @@ export type CreateTransactionRequest = {
   amount: string,
   password: string
 };
-export type SendHardwareTransactionRequest = {
+export type SendTrezorSignedTxRequest = {
   signedTxHex: string,
   changeAdaAddr: AdaAddress
-}
+};
 export type CreateTrezorSignTxDataRequest = {
   receiver: string,
   amount: string
@@ -104,7 +105,7 @@ export type CreateTrezorSignTxDataRequest = {
 export type CreateTrezorSignTxDataResponse = {
   trezorSignTxPayload: TrezorSignTxPayload,
   changeAddress: AdaAddress
-}
+};
 export type UpdateWalletRequest = {
   walletId: string,
   name: string,
@@ -310,41 +311,41 @@ export default class AdaApi {
       const fee: AdaTransactionFee = await getAdaTransactionFee(receiver, amount);
       const response = await createTrezorSignTxData(receiver, amount, fee.getCCoin);
 
-      Logger.debug('AaApi::createTrezorSignTxData success: ' + stringifyData(response));
+      Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(response));
       return response;
     } catch (error) {
       Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
-      // TODO: Update errors
-      if (error instanceof WrongPassphraseError) {
-        throw new IncorrectWalletPasswordError();
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
       }
-      if (error instanceof InvalidWitnessError) {
-        throw new InvalidWitnessError();
-      }
-      throw new GenericApiError();
     }
   }
 
-  async sendHardwareTransaction(
-    request: SendHardwareTransactionRequest
-  ): Promise<Array<void>> {
-    Logger.debug('AdaApi::sendHardwareTransaction called');
+  async sendTrezorSignedTx(
+    request: SendTrezorSignedTxRequest
+  ): Promise<SendTrezorSignedTxResponse> {
+    Logger.debug('AdaApi::sendTrezorSignedTx called');
     const { signedTxHex, changeAdaAddr } = request;
     try {
-      const response = await newTrezorTransaction(
-        signedTxHex,
-        changeAdaAddr,
-      );
-      Logger.debug(
-        'AdaApi::sendHardwareTransaction success: ' + stringifyData(response)
-      );
+      const response = await newTrezorTransaction(signedTxHex, changeAdaAddr);
+      Logger.debug('AdaApi::sendTrezorSignedTx success: ' + stringifyData(response));
+
       return response;
     } catch (error) {
-      Logger.error('AdaApi::sendHardwareTransaction error: ' + stringifyError(error));
-      if (error instanceof InvalidWitnessError) {
-        throw new InvalidWitnessError();
+      Logger.error('AdaApi::sendTrezorSignedTx error: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
       }
-      throw new GenericApiError();
     }
   }
 
