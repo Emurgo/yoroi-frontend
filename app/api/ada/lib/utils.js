@@ -61,7 +61,7 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   }
   const [[[inputs, outputs], witnesses]] = cbor.decodeAllSync(Buffer.from(rustTxBody));
   const decInputs: Array<TxInputPtr> = inputs.map(x => {
-    const [[buf, idx]] = cbor.decodeAllSync(x);
+    const [[buf, idx]] = cbor.decodeAllSync(x[1].value);
     return {
       id: buf.toString('hex'),
       index: idx
