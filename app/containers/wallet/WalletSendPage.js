@@ -14,7 +14,7 @@ import {
 
 import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
-import TrezorSendAdaConfirmationDialog from '../../components/wallet/send/trezor/TrezorSendAdaConfirmationDialog';
+import TrezorSendConfirmationDialog from '../../components/wallet/send/trezor/TrezorSendConfirmationDialog';
 import type { DialogProps } from './dialogs/WalletSendConfirmationDialogContainer';
 
 type Props = InjectedProps;
@@ -79,7 +79,7 @@ export default class WalletSendPage extends Component<Props> {
     const trezorSendAction = this.props.actions[environment.API].trezorSend;
     const trezorSendStore = this.props.stores.substores[environment.API].trezorSend
     return (
-      <TrezorSendAdaConfirmationDialog
+      <TrezorSendConfirmationDialog
         amount={dialogProps.amount}
         receiver={dialogProps.receiver}
         totalAmount={dialogProps.totalAmount}

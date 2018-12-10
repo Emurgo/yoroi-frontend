@@ -45,7 +45,10 @@ export default class TrezorSendStore extends Store {
     trezorSendAction.cancel.listen(this._cancel);
   }
 
-  // TODO: [TREZOR] clear error state on initialization
+  _reset () {
+    this._setActionProcessing(false);
+    this._setError(null);
+  }
 
   /** Generates a payload with Trezor format and tries Trezor signing */
   _sendUsingTrezor = async (params: CreateTrezorSignTxDataRequest): Promise<void> => {
@@ -58,10 +61,12 @@ export default class TrezorSendStore extends Store {
       const { wallets, addresses } = this.stores.substores[environment.API];
       const activeWallet = wallets.active;
       if (!activeWallet) {
+        // this Error will be converted to LocalizableError()
         throw new Error('Active wallet required before sending.');
       }
       const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
       if (!accountId) {
+        // this Error will be converted to LocalizableError()
         throw new Error('Active account required before sending.');
       }
 
@@ -137,15 +142,16 @@ export default class TrezorSendStore extends Store {
     return localizableError;
   }
 
+  _cancel = (): void => {
+    this.actions.dialogs.closeActiveDialog.trigger();
+    this._reset();
+  }  
+
   @action _setActionProcessing = (processing: boolean): void => {
     this.isActionProcessing = processing;
   }
 
   @action _setError = (error: ?LocalizableError): void => {
     this.error = error;
-  }
-
-  @action _cancel = async (): Promise<void> => {
-    this.actions.dialogs.closeActiveDialog.trigger();
   }
 }

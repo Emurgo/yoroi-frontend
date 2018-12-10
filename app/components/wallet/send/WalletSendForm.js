@@ -16,7 +16,7 @@ import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
-import TrezorSendAdaConfirmationDialog from './trezor/TrezorSendAdaConfirmationDialog';
+import TrezorSendConfirmationDialog from './trezor/TrezorSendConfirmationDialog';
 import {
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits
@@ -307,7 +307,7 @@ export default class WalletSendForm extends Component<Props, State> {
     let onMouseUp;
     if (this.props.isTrezorTWallet) {
       onMouseUp = () => openDialogAction({
-        dialog: TrezorSendAdaConfirmationDialog,
+        dialog: TrezorSendConfirmationDialog,
       });
     } else {
       onMouseUp = () => openDialogAction({
@@ -338,11 +338,11 @@ export default class WalletSendForm extends Component<Props, State> {
       trezorTWalletConfirmationDialogRenderCallback
     } = this.props;
 
-    // this function is called from render hence it should return ASAP, hence using renderCallback
+    // this function is called from render hence it should return ASAP, hence using renderCB
     let renderCB = null;
     if (isDialogOpen(WalletSendConfirmationDialog)) {
       renderCB = webWalletConfirmationDialogRenderCallback;
-    } else if (isDialogOpen(TrezorSendAdaConfirmationDialog)) {
+    } else if (isDialogOpen(TrezorSendConfirmationDialog)) {
       renderCB = trezorTWalletConfirmationDialogRenderCallback;
     }
 

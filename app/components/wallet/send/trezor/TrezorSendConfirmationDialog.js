@@ -11,7 +11,7 @@ import ErrorBlock from '../../../widgets/ErrorBlock';
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
-import styles from './TrezorSendAdaConfirmationDialog.scss';
+import styles from './TrezorSendConfirmationDialog.scss';
 
 // TODO: [TREZOR] make globalMessages for common with WalletSendConfirmationDialog
 export const messages = defineMessages({
@@ -19,11 +19,6 @@ export const messages = defineMessages({
     id: 'wallet.send.confirmationDialog.title',
     defaultMessage: '!!!Confirm transaction',
     description: 'Title for the "Confirm transaction" dialog.'
-  },
-  walletPasswordLabel: {
-    id: 'wallet.send.confirmationDialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
-    description: 'Label for the "Spending password" input in the wallet send confirmation dialog.',
   },
   addressToLabel: {
     id: 'wallet.send.confirmationDialog.addressToLabel',
@@ -44,11 +39,6 @@ export const messages = defineMessages({
     id: 'wallet.send.confirmationDialog.totalLabel',
     defaultMessage: '!!!Total',
     description: 'Label for the "Total" in the wallet send confirmation dialog.',
-  },
-  walletPasswordFieldPlaceholder: {
-    id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type your spending password',
-    description: 'Placeholder for the "Spending password" inputs in the wallet send confirmation dialog.',
   },
   sendUsingTrezorButtonLabel: {
     id: 'wallet.send.trezor.confirmationDialog.submit',
@@ -76,7 +66,7 @@ type Props = {
 };
 
 @observer
-export default class TrezorSendAdaConfirmationDialog extends Component<Props> {
+export default class TrezorSendConfirmationDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
