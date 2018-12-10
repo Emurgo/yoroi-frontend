@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+import classnames from 'classnames';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 
@@ -42,7 +43,12 @@ const messages = defineMessages({
     id: 'settings.lock.match-repeat.error',
     defaultMessage: '!!!The PIN codes don\'t match',
     description: 'Error message for repeating pin code',
-  }
+  },
+  note: {
+    id: 'settings.lock.note',
+    defaultMessage: '!!!Note that pin code can be used only for a lock screen',
+    description: 'A note for user about the pin code',
+  },
 });
 
 @observer
@@ -119,6 +125,12 @@ export default class SetLockCodeDialog extends Component {
     ];
     const newCode = this.form.$('newCode');
     const repeatNewCode = this.form.$('repeatNewCode');
+
+    const fieldsClasses = classnames([
+      styles.lockPasswordFields,
+      styles.show,
+    ]);
+
     return (
       <Dialog
         title={intl.formatMessage(messages.title)}
@@ -127,18 +139,25 @@ export default class SetLockCodeDialog extends Component {
         closeButton={<DialogCloseButton />}
         onClose={close}
       >
-        <Input
-          className={styles.input}
-          {...newCode.bind()}
-          error={newCode.error}
-          skin={<SimpleInputSkin />}
-        />
-        <Input
-          className={styles.input}
-          {...repeatNewCode.bind()}
-          error={repeatNewCode.error}
-          skin={<SimpleInputSkin />}
-        />
+        <div className={styles.lockPassword}>
+          <div className={fieldsClasses}>
+            <Input
+              className={styles.input}
+              {...newCode.bind()}
+              error={newCode.error}
+              skin={<SimpleInputSkin />}
+            />
+            <Input
+              className={styles.input}
+              {...repeatNewCode.bind()}
+              error={repeatNewCode.error}
+              skin={<SimpleInputSkin />}
+            />
+            <p className={styles.note}>
+              {intl.formatMessage(messages.note)}
+            </p>
+          </div>
+        </div>
       </Dialog>
     );
   }

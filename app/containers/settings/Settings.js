@@ -36,7 +36,12 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { topbar } = stores;
+    const { topbar, profile } = stores;
+    const {
+      lockScreenEnabled,
+      pinCode,
+    } = profile;
+    console.log('actions', stores.profile.isAppLocked);
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
@@ -52,13 +57,17 @@ export default class Settings extends Component<InjectedContainerProps> {
         topbar={(
           <TopBar
             title={topbarTitle}
+            lockIconIsVisible={lockScreenEnabled && Boolean(pinCode)}
             onCategoryClicked={category => {
               actions.topbar.activateTopbarCategory.trigger({ category });
             }}
             categories={topbar.CATEGORIES}
             activeTopbarCategory={topbar.activeTopbarCategory}
+            lockApp={actions.profile.toggleAppLocked.trigger}
           />
         )}
+        actions={actions}
+        stores={stores}
       >
         <SettingsLayout menu={menu}>
           {children}

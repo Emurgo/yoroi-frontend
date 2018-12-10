@@ -2,6 +2,7 @@
 import { observable, computed } from 'mobx';
 import BigNumber from 'bignumber.js';
 import moment from 'moment/moment';
+import bcryptjs from 'bcryptjs';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
@@ -38,6 +39,8 @@ export default class SettingsStore extends Store {
   @observable getLockScreenEnabledRequest: Request<string> = new Request(this.api.localStorage.getLockScreenEnabled);
   @observable setLockScreenEnabledRequest: Request<string> = new Request(this.api.localStorage.setLockScreenEnabled);
   @observable unsetLockScreenEnabledRequest: Request<string> = new Request(this.api.localStorage.unsetLockScreenEnabled);
+  @observable checkAppLockedRequest: Request<string> = new Request(this.api.localStorage.checkAppLocked);
+  @observable toggleAppLockedRequest: Request<string> = new Request(this.api.localStorage.toggleAppLocked);
   /* eslint-enable max-len */
 
   setup() {
@@ -45,6 +48,8 @@ export default class SettingsStore extends Store {
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.toggleLockScreen.listen(this._toggleLockScreen);
     this.actions.profile.setPinCode.listen(this._setPinCode);
+    this.actions.profile.checkAppLocked.listen(this._isAppLocked);
+    this.actions.profile.toggleAppLocked.listen(this._toggleAppLocked);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -54,6 +59,7 @@ export default class SettingsStore extends Store {
       this._redirectToMainUiAfterTermsAreAccepted,
     ]);
     this._getTermsOfUseAcceptance();
+    this._isAppLocked();
     this._getLockScreenEnabled();
     this._getPinCode();
   }
@@ -107,14 +113,23 @@ export default class SettingsStore extends Store {
     return this.getTermsOfUseAcceptanceRequest.result === true;
   }
 
+  @computed get isAppLocked(): boolean {
+    const { result } = this.checkAppLockedRequest.execute();
+    return result;
+  }
+
+  _toggleAppLocked = async () => {
+    await this.toggleAppLockedRequest.execute();
+    await this.checkAppLockedRequest.execute();
+  }
+
   _updateLocale = async ({ locale }: { locale: string }) => {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
 
-  _toggleLockScreen = async (checked: boolean) => {
-    if (checked) await this.setLockScreenEnabledRequest.execute();
-    else await this.unsetLockScreenEnabledRequest.execute();
+  _toggleLockScreen = async () => {
+    this.unsetLockScreenEnabledRequest.execute();
     await this.getLockScreenEnabledRequest.execute();
   }
 
@@ -126,8 +141,19 @@ export default class SettingsStore extends Store {
     this.getPinCodeRequest.execute();
   }
 
+  _isAppLocked = () => {
+    this.checkAppLockedRequest.execute();
+  }
+
   _setPinCode = async (code: string) => {
-    await this.setPinCodeRequest.execute(code);
+    const hashed = await new Promise((resolve, reject) => {
+      bcryptjs.hash(code, 10, (err, hash) => {
+        if (err) reject(err);
+        resolve(hash);
+      });
+    });
+    const date = Date.now();
+    await this.setPinCodeRequest.execute(hashed, date);
     await this.getPinCodeRequest.execute();
   }
 

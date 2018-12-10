@@ -55,10 +55,13 @@
     }
 
     &.daedalus-transfer {
-      right: 64px;
+      right: 128px;
     }
 
     &.settings {
+      right: 64px;
+    }
+    &.lock {
       right: 0;
     }
   }

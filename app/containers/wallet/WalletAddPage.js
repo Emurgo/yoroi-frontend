@@ -44,18 +44,24 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { topbar } = this.props.stores;
+    const { topbar, profile } = this.props.stores;
+    const {
+      lockScreenEnabled,
+      pinCode,
+    } = profile;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
     const topBar = (
       <TopBar
         title={topbarTitle}
+        lockIconIsVisible={lockScreenEnabled && Boolean(pinCode)}
         onCategoryClicked={category => {
           actions.topbar.activateTopbarCategory.trigger({ category });
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        lockApp={this.props.actions.profile.toggleAppLocked.trigger}
       />);
 
     const wallets = this._getWalletsStore();
@@ -100,7 +106,7 @@ export default class WalletAddPage extends Component<Props> {
       );
     }
     return (
-      <MainLayout topbar={topBar}>
+      <MainLayout topbar={topBar} stores={stores} actions={actions}>
         {content}
       </MainLayout>
     );

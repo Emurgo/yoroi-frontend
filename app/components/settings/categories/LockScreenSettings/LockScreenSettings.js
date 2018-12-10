@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 
 import Checkbox from 'react-polymorph/lib/components/Checkbox';
-import CheckboxSkin from 'react-polymorph/lib/skins/simple/raw/CheckboxSkin';
+import SwitchSkin from 'react-polymorph/lib/skins/simple/raw/SwitchSkin';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 
@@ -110,17 +110,18 @@ export default class LockScreenSettings extends Component<Props> {
     const repeatNewCode = form.$('repeatNewCode');
 
     const componentClassNames = classNames([styles.component, 'general']);
+    console.log('PIN', pin);
 
     return (
       <div className={componentClassNames}>
         <div className={`${styles.enabling} ${styles.row}`}>
-          <span className={styles.title}>{intl.formatMessage(messages.checkboxLabel)}</span>
           <Checkbox
             className={styles.checkbox}
-            skin={<CheckboxSkin />}
+            skin={<SwitchSkin />}
             checked={isEnabled}
             onChange={toggleLockScreen}
           />
+          <span className={styles.title}>{intl.formatMessage(messages.checkboxLabel)}</span>
         </div>
 
         {pin && isEnabled && (

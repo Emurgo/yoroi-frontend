@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import TopBarContainer from './TopBarContainer';
 import TopBarLayout from '../components/layout/TopBarLayout';
+import LockScreen from '../components/LockScreen';
 import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBanner';
 import type { InjectedContainerProps } from '../types/injectedPropsType';
 
@@ -17,13 +18,17 @@ export default class MainLayout extends Component<MainLayoutProps> {
     topbar: null
   };
 
-  componentDidMount() {
-    console.log('main!');
-  }
-
   render() {
     const { actions, stores, topbar } = this.props;
+    const { profile = {}} = stores;
+    const {
+      lockScreenEnabled,
+      pinCode,
+      isAppLocked,
+    } = profile;
+    const locked = Boolean(pinCode) && lockScreenEnabled && isAppLocked;
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
+    if (locked) return <LockScreen pin={pinCode} unlock={actions.profile.toggleAppLocked} />;
     return (
       <TopBarLayout
         banner={<TestnetWarningBanner />}

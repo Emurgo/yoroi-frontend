@@ -10,7 +10,7 @@ export default class NoWalletsPage extends Component<any> {
 
   render() {
     return (
-      <Layout>
+      <Layout actions={this.props.actions} stores={this.props.stores}>
         <div />
       </Layout>
     );

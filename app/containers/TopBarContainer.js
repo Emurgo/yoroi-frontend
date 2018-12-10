@@ -16,7 +16,11 @@ export default class TopBarContainer extends Component<Props> {
 
   render() {
     const { actions, stores } = this.props;
-    const { app, topbar } = stores;
+    const { app, topbar, profile } = stores;
+    const {
+      lockScreenEnabled,
+      pinCode,
+    } = profile;
 
     const title = (<WalletTopbarTitle
       wallet={stores.substores[environment.API].wallets.active}
@@ -26,11 +30,13 @@ export default class TopBarContainer extends Component<Props> {
     return (
       <TopBar
         title={title}
+        lockIconIsVisible={lockScreenEnabled && Boolean(pinCode)}
         onCategoryClicked={category => {
           actions.topbar.activateTopbarCategory.trigger({ category });
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        lockApp={actions.profile.toggleAppLocked.trigger}
       />
     );
   }

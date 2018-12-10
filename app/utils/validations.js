@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import isInt from 'validator/lib/isInt';
+import bcryptjs from 'bcryptjs';
 
 export const isValidHardwareWalletName = (walletName) => {
   const nameLength = walletName.length;
@@ -34,4 +35,8 @@ export const isValidAmountInLovelaces = (value: string) => {
   const maxValue = new BigNumber(45000000000000000);
   const isValid = numericValue.gte(minValue) && numericValue.lte(maxValue);
   return isValid;
+};
+
+export const isPinCodeValid = (value, pin) => {
+  return bcryptjs.compareSync(value, pin);
 };

@@ -1,3 +1,37 @@
+@import '../../../../themes/mixins/place-form-field-error-below-input';
 .input {
   margin-top: 25px;;
+}
+
+.lockPassword {
+  .lockPasswordFields {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 400ms ease;
+
+    &.show {
+      max-height: 250px;
+      opacity: 1;
+      overflow: visible;
+    }
+
+    & > div {
+      margin-top: 30px;
+      width: 350px;
+    }
+
+    @include place-form-field-error-below-input;
+
+    .note {
+      color: var(--theme-instructions-text-color);
+      font-family: var(--font-light);
+      line-height: 1.38;
+      margin-top: 16px;
+      opacity: 0.5;
+    }
+  }
 }

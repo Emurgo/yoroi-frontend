@@ -14,6 +14,8 @@ type Props = {
   categories?: Array<Category>,
   activeTopbarCategory: string,
   onCategoryClicked?: Function,
+  lockIconIsVisible: boolean,
+  lockApp: Function,
 };
 
 @observer
@@ -27,6 +29,8 @@ export default class TopBar extends Component<Props> {
   render() {
     const {
       title,
+      lockIconIsVisible,
+      lockApp,
       categories, activeTopbarCategory, onCategoryClicked,
     } = this.props;
 
@@ -54,6 +58,7 @@ export default class TopBar extends Component<Props> {
             />
           );
         })}
+        {lockIconIsVisible && <div style={{ background: '#000' }} className="TopBarCategory_component lock" onClick={lockApp} />}
       </header>
     );
   }

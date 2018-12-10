@@ -85,18 +85,24 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   render() {
     const { stores, actions } = this.props;
-    const { topbar } = stores;
+    const { topbar, profile } = stores;
+    const {
+      lockScreenEnabled,
+      pinCode,
+    } = profile;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
     const topBar = (
       <TopBar
         title={topbarTitle}
+        lockIconIsVisible={lockScreenEnabled && Boolean(pinCode)}
         onCategoryClicked={category => {
           actions.topbar.activateTopbarCategory.trigger({ category });
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        lockApp={this.props.actions.profile.toggleAppLocked.trigger}
       />
     );
     const wallets = this._getWalletsStore();
@@ -104,7 +110,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} stores={stores} actions={actions}>
             <DaedalusTransferInstructionsPage
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               onAnswerYes={this.goToReceiveScreen}
@@ -115,7 +121,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case 'gettingMnemonics':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} stores={stores} actions={actions}>
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFunds}
               onBack={this.backToUninitialized}
@@ -128,7 +134,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
       case 'checkingAddresses':
       case 'generatingTx':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} stores={stores} actions={actions}>
             <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
           </MainLayout>
         );
@@ -137,7 +143,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           return null; // TODO: throw error? Shoudln't happen
         }
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} stores={stores} actions={actions}>
             <DaedalusTransferSummaryPage
               formattedWalletAmount={formattedWalletAmount}
               transferTx={daedalusTransfer.transferTx}
@@ -150,7 +156,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case 'error':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} stores={stores} actions={actions}>
             <DaedalusTransferErrorPage
               error={daedalusTransfer.error}
               onCancel={this.cancelTransferFunds}

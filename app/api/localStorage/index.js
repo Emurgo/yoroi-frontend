@@ -7,6 +7,8 @@ const storageKeys = {
   THEME: networkForLocalStorage + '-THEME',
   LOCK: networkForLocalStorage + '-LOCK-SCREEN',
   PIN: networkForLocalStorage + '-PIN',
+  PIN_WAS_SAVED: networkForLocalStorage + '-PIN-WAS-SAVED',
+  APP_IS_LOCKED: networkForLocalStorage + '-APP_IS_LOCKED',
 };
 
 /**
@@ -104,9 +106,10 @@ export default class LocalStorageApi {
     }
   });
 
-  setPinCode = (code: string): Promise<void> => new Promise((resolve, reject) => {
+  setPinCode = (code: string, updated: number): Promise<void> => new Promise((resolve, reject) => {
     try {
       localStorage.setItem(storageKeys.PIN, code);
+      localStorage.setItem(storageKeys.PIN_WAS_SAVED, String(updated));
       resolve();
     } catch (error) {
       return reject(error);
@@ -120,11 +123,39 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  checkAppLocked = (): Promise<boolean> => new Promise((resolve, reject) => {
+    try {
+      const locked = localStorage.getItem(storageKeys.APP_IS_LOCKED);
+      if (!locked) return resolve(false);
+      resolve(JSON.parse(locked));
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  toggleAppLocked = (): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      const locked = localStorage.getItem(storageKeys.APP_IS_LOCKED);
+      localStorage.setItem(storageKeys.APP_IS_LOCKED, !(JSON.parse(locked)));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetAppLocked = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.APP_IS_LOCKED);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
   async reset() {
     await this.unsetUserLocale(); // TODO: remove after saving locale to API is restored
     await this.unsetTermsOfUseAcceptance();
     await this.unsetLockScreenEnabled();
     await this.unsetPinCode();
+    await this.unsetAppLocked();
   }
 
 }

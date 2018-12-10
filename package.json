@@ -53,6 +53,7 @@
     "babel-preset-react-optimize": "1.0.1",
     "babel-preset-stage-0": "6.3.13",
     "babel-runtime": "6.3.19",
+    "bcryptjs": "^2.4.3",
     "chai": "3.2.0",
     "chromedriver": "2.40.0",
     "config": "1.30.0",
