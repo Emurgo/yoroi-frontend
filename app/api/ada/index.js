@@ -309,6 +309,48 @@ export default class AdaApi {
       Logger.debug('AdaApi::createTrezorSignTxData called');
       const { receiver, amount } = request;
 
+      const fee: AdaTransactionFee = await getAdaTransactionFee(receiver, amount);
+      const response = await createTrezorSignTxData(receiver, amount, fee.getCCoin);
+
+      Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(response));
+      return response;
+    } catch (error) {
+      Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
+
+      // We don't know what the problem was so throw a generic error
+      throw new GenericApiError();
+    }
+  }
+
+  async sendTrezorSignedTx(
+    request: SendTrezorSignedTxRequest
+  ): Promise<SendTrezorSignedTxResponse> {
+    Logger.debug('AdaApi::sendTrezorSignedTx called');
+    const { signedTxHex, changeAdaAddr } = request;
+    try {
+      const response = await newTrezorTransaction(signedTxHex, changeAdaAddr);
+      Logger.debug('AdaApi::sendTrezorSignedTx success: ' + stringifyData(response));
+
+      return response;
+    } catch (error) {
+      Logger.error('AdaApi::sendTrezorSignedTx error: ' + stringifyError(error));
+
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
+
+      // We don't know what the problem was so throw a generic error
+      throw new GenericApiError();
+    }
+  }
+
+  async createTrezorSignTxData(
+    request: CreateTrezorSignTxDataRequest
+  ): Promise<CreateTrezorSignTxDataResponse> {
+    try {
+      Logger.debug('AdaApi::createTrezorSignTxData called');
+      const { receiver, amount } = request;
+
       const { fee, changeAdaAddress, txExt } : AdaFeeEstimateResponse = await getAdaTransactionFee(receiver, amount);
       const response: TrezorSignTxPayload = await createTrezorSignTxData(txExt);
 

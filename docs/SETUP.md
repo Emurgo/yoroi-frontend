@@ -55,3 +55,11 @@ Rebuild dll
 ```bash
 $ npm run build-dll
 ```
+
+### Git hooks
+
+To regiter the githooks locally you must run this command
+
+```bash
+$ git config core.hooksPath .githooks
+```

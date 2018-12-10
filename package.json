@@ -20,10 +20,13 @@
     "test-e2e": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature",
     "test-by-tag": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature --tags ",
     "test-by-feature": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register ",
+    "localci-setup": "sudo /bin/bash ./features/localCI/setup.sh",
+    "localci-newbuild": "sudo /bin/bash ./features/localCI/new_build.sh",
+    "localci-test": "sudo /bin/bash ./features/localCI/wrap_command.sh",
     "build-dll": "rimraf ./dll && webpack --config=webpack/dll.config.js",
     "build-js-cardano-wasm": "./setup_cardano_crypto.sh",
     "manage-translations": "node ./translations/translation-runner.js",
-    "purge-translations": "rm -rf ./translations/messages"
+    "purge-translations": "rimraf ./translations/messages"
   },
   "repository": {
     "type": "git",
