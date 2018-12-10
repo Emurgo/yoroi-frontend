@@ -31,7 +31,8 @@ import {
 import type { CreateTrezorSignTxDataResponse } from '../index.js';
 import type {
   TrezorInput,
-  TrezorOutput, TrezorSignTxPayload
+  TrezorOutput,
+  TrezorSignTxPayload
 } from '../../../domain/TrezorSignTx';
 
 import type { ConfigType } from '../../../../config/config-types';
