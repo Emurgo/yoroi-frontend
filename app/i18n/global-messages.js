@@ -122,6 +122,26 @@ export default defineMessages({
     defaultMessage: '!!!Connect to Trezor Hardware Wallet',
     description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
   },
+  trezorError999: {
+    id: 'wallet.trezor.error.999',
+    defaultMessage: '!!!Something unexpected happened, please retry.',
+    description: '<Something unexpected happened, please retry.>'
+  },
+  trezorError101: {
+    id: 'wallet.trezor.error.101',
+    defaultMessage: '!!!Falied to connect trezor.io. Please check your Internet connection and retry.',
+    description: '<Falied to connect trezor.io. Please check your Internet connection and retry.>'
+  },
+  trezorError102: {
+    id: 'wallet.trezor.error.102',
+    defaultMessage: '!!!Necessary permissions were not granted by the user. Please retry.',
+    description: '<Necessary permissions were not granted by the user. Please retry.>'
+  },
+  trezorError103: {
+    id: 'wallet.trezor.error.103',
+    defaultMessage: '!!!Cancelled. Please retry.',
+    description: '<Cancelled. Please retry.>'
+  },  
 });
 
 export const environmentSpecificMessages = {

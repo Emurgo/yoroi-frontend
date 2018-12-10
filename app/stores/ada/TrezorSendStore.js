@@ -6,8 +6,8 @@ import TrezorConnect from 'trezor-connect';
 import Store from '../base/Store';
 import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import LocalizableError from '../../i18n/LocalizableError';
 
+import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 
 import type {
@@ -19,34 +19,8 @@ import {
   stringifyError,
 } from '../../utils/logging';
 
-// TODO: [TREZOR] do i18n
 const messages = defineMessages({
-  error999: {
-    id: 'wallet.trezor.dialog.step.connect.error.999',
-    defaultMessage: '!!!Something unexpected happened, please retry.',
-    description: '<Something unexpected happened, please retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  connectError101: {
-    id: 'wallet.trezor.dialog.step.connect.error.101',
-    defaultMessage: '!!!Falied to connect trezor.io. Please check your Internet connection and retry.',
-    description: '<Falied to connect trezor.io. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  connectError102: {
-    id: 'wallet.trezor.dialog.step.connect.error.102',
-    defaultMessage: '!!!Necessary permissions were not granted by the user. Please retry.',
-    description: '<Necessary permissions were not granted by the user. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  connectError103: {
-    id: 'wallet.trezor.dialog.step.connect.error.103',
-    defaultMessage: '!!!Cancelled. Please retry.',
-    description: '<Cancelled. Please retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  saveError101: {
-    id: 'wallet.trezor.dialog.step.save.error.101',
-    defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
-    description: '<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  error101: {
+  signTxError101: {
     id: 'wallet.send.trezor.error.101',
     defaultMessage: '!!!Signing cancelled on Trezor device. Please retry.',
     description: '<Signing cancelled on Trezor device. Please retry.> on the Trezor send ADA confirmation dialog.'
@@ -54,7 +28,7 @@ const messages = defineMessages({
 });
 
 /** Note: Handles Trezor Signing */
-export default class TrezorSendAdaStore extends Store {
+export default class TrezorSendStore extends Store {
   // =================== VIEW RELATED =================== //
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError;
@@ -121,7 +95,7 @@ export default class TrezorSendAdaStore extends Store {
       }
     } catch (error) {
       this._setError(this._convertToLocalizableError(error, trezorResp));
-      Logger.error('TrezorSendAdaStore::_sendUsingTrezor::error: ' + stringifyError(error));
+      Logger.error('TrezorSendStore::_sendUsingTrezor::error: ' + stringifyError(error));
     } finally {
       this.createTrezorSignTxDataRequest.reset();
       this._setActionProcessing(false);
@@ -139,25 +113,25 @@ export default class TrezorSendAdaStore extends Store {
       // TODO: [TREZOR] check for device not supported if needed
       switch(trezorResp.payload.error) {
         case 'Iframe timeout':
-          localizableError = new LocalizableError(messages.connectError101);
+          localizableError = new LocalizableError(globalMessages.trezorError101);
           break;
         case 'Permissions not granted':
-          localizableError = new LocalizableError(messages.connectError102);
+          localizableError = new LocalizableError(globalMessages.trezorError102);
           break;
         case 'Cancelled':
         case 'Popup closed':
-          localizableError = new LocalizableError(messages.connectError103);
+          localizableError = new LocalizableError(globalMessages.trezorError103);
           break;
         case 'Signing cancelled':
-          localizableError = new LocalizableError(messages.error101);
+          localizableError = new LocalizableError(messages.signTxError101);
           break;
       }
     }
 
     if (!localizableError) {
       /** we are not able to figure out why Error is thrown
-        * make it, error999 = Something unexpected happened */
-      localizableError = new LocalizableError(messages.error999);
+        * make it, trezorError999 = Something unexpected happened */
+      localizableError = new LocalizableError(globalMessages.trezorError999);
     }
 
     return localizableError;
