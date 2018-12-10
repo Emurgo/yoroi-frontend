@@ -21,3 +21,7 @@ update.xml
 translations/messages
 translations/reports
 Yoroi
+
+# IntelliJ IDEA config
+.idea
+**/*.iml
