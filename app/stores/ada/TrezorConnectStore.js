@@ -256,7 +256,6 @@ export default class TrezorConnectStore extends Store {
     trezorValidity.valid = false;
 
     if (!trezorResp.success) {
-      // TODO: [TREZOR] check for device not supported if needed
       switch (trezorResp.payload.error) {
         case 'Iframe timeout':
           trezorValidity.error = new LocalizableError(globalMessages.trezorError101);
@@ -346,7 +345,6 @@ export default class TrezorConnectStore extends Store {
         this.actions.dialogs.closeActiveDialog.trigger();
 
         const { wallets } = this.stores.substores[environment.API];
-        // TODO: [TREZOR] we need to patch new wallet to make it as active wallet ??
         await wallets._patchWalletRequestWithNewWallet(trezorWallet);
 
         // goto the wallet transactions page
