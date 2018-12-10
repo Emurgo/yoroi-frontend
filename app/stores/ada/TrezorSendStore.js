@@ -85,11 +85,16 @@ export default class TrezorSendStore extends Store {
       this.createTrezorSignTxDataRequest.reset();
 
       const trezorSignTxDataResp =
-      await this.createTrezorSignTxDataRequest.execute(params).promise;
+        await this.createTrezorSignTxDataRequest.execute(params).promise;
 
       trezorResp = await TrezorConnect.cardanoSignTransaction({
         ...trezorSignTxDataResp.trezorSignTxPayload
       });
+
+      if (!trezorResp.success && trezorResp.payload && trezorResp.payload.error) {
+        throw new Error(`TrezorConnect::cardanoSignTransaction::error: ${trezorResp.payload.error}`);
+      }
+
       await this._sendTrezorSignedTx(trezorSignTxDataResp, trezorResp);
 
     } catch (error) {
@@ -100,7 +105,7 @@ export default class TrezorSendStore extends Store {
       this.sendTrezorSignedTxRequest.reset();
       this._setActionProcessing(false);
     }
-  }
+  };
 
   _sendTrezorSignedTx = async (trezorSignTxDataResp: CreateTrezorSignTxDataResponse,
     trezorResp: any): Promise<void> => {
