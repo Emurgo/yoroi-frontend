@@ -13,7 +13,8 @@ import type {
   CryptoTransaction,
   SpendResponse,
   TxOutput,
-  TxWitness
+  TxWitness,
+  RustRawTxBody
 } from '../../../../flow/declarations/CardanoCrypto'
 
 export const localeDateToUnixTimestamp =
@@ -62,11 +63,11 @@ const _getTxCondition = (state: string): AdaTransactionCondition => {
   return 'CPtxWontApply';
 };
 
-export function decodeRustTx(resp: SpendResponse): CryptoTransaction {
-  if (!resp || !resp.cbor_encoded_tx) {
+export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
+  if (!rustTxBody) {
     throw new Error('Cannot decode inputs from undefined transaction!')
   }
-  const [[[inputs, outputs], witnesses]] = cbor.decodeAllSync(Buffer.from(resp.cbor_encoded_tx));
+  const [[[inputs, outputs], witnesses]] = cbor.decodeAllSync(Buffer.from(rustTxBody));
   const decInputs: Array<TxInputPtr> = inputs.map(x => {
     [[buf, idx]] = cbor.decodeAllSync(x);
     return {

@@ -198,7 +198,7 @@ export async function getAdaTransactionFromSenders(
 }
 
 function decodeRustTxWithInputs(resp: SpendResponse, availableInputs: Array<TxInput>): UnsignedTransactionExt {
-  const tx: CryptoTransaction = decodeRustTx(resp);
+  const tx: CryptoTransaction = decodeRustTx(resp.cbor_encoded_tx);
   const pointers : Array<TxInputPtr> = tx.tx.tx.inputs;
   const pointerToStr = (p : TxInputPtr) => `${p.id}.${p.index}`;
   const set : Set<string> = new Set(pointers.map(pointerToStr));
