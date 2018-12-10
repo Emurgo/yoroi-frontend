@@ -13,42 +13,21 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 
 import styles from './TrezorSendConfirmationDialog.scss';
 
-// TODO: [TREZOR] make globalMessages for common with WalletSendConfirmationDialog
 export const messages = defineMessages({
-  dialogTitle: {
-    id: 'wallet.send.confirmationDialog.title',
-    defaultMessage: '!!!Confirm transaction',
-    description: 'Title for the "Confirm transaction" dialog.'
+  infoLine1: {
+    id: 'wallet.send.trezor.confirmationDialog.info.line.1',
+    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
+    description: 'Informative message line 1 in the wallet trezor send confirmation dialog.'
   },
-  addressToLabel: {
-    id: 'wallet.send.confirmationDialog.addressToLabel',
-    defaultMessage: '!!!To',
-    description: 'Label for the "To" in the wallet send confirmation dialog.',
-  },
-  amountLabel: {
-    id: 'wallet.send.confirmationDialog.amountLabel',
-    defaultMessage: '!!!Amount',
-    description: 'Label for the "Amount" in the wallet send confirmation dialog.',
-  },
-  feesLabel: {
-    id: 'wallet.send.confirmationDialog.feesLabel',
-    defaultMessage: '!!!Fees',
-    description: 'Label for the "Fees" in the wallet send confirmation dialog.',
-  },
-  totalLabel: {
-    id: 'wallet.send.confirmationDialog.totalLabel',
-    defaultMessage: '!!!Total',
-    description: 'Label for the "Total" in the wallet send confirmation dialog.',
+  infoLine2: {
+    id: 'wallet.send.trezor.confirmationDialog.info.line.2',
+    defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
+    description: 'Informative message line 2 in the wallet trezor send confirmation dialog.'
   },
   sendUsingTrezorButtonLabel: {
     id: 'wallet.send.trezor.confirmationDialog.submit',
     defaultMessage: '!!!Send using Trezor',
     description: 'Label for the send button in the wallet send confirmation dialog.'
-  },
-  backButtonLabel: {
-    id: 'wallet.send.confirmationDialog.back',
-    defaultMessage: '!!!Back',
-    description: 'Label for the back button in the wallet send confirmation dialog.'
   },
 });
 
@@ -89,15 +68,15 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
     const infoBlock = (
       <div className={styles.infoBlock}>
         <ul>
-          <li key="1"><span>After connecting your Trezor device to your computer, press the Send using Trezor button.</span><br /></li>
-          <li key="2"><span>A new tab will appear. Please follow the instructions in the new tab.</span><br /></li>
+          <li key="1"><span>{intl.formatMessage(messages.infoLine1)}</span><br /></li>
+          <li key="2"><span>{intl.formatMessage(messages.infoLine2)}</span><br /></li>
         </ul>
       </div>);
 
     const addressBlock = (
       <div className={styles.addressToLabelWrapper}>
         <div className={styles.addressToLabel}>
-          {intl.formatMessage(messages.addressToLabel)}
+          {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
         </div>
         <div className={styles.addressTo}>{receiver}</div>
       </div>);
@@ -105,14 +84,18 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
     const amountBlock = (
       <div className={styles.amountFeesWrapper}>
         <div className={styles.amountWrapper}>
-          <div className={styles.amountLabel}>{intl.formatMessage(messages.amountLabel)}</div>
+          <div className={styles.amountLabel}>
+            {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
+          </div>
           <div className={styles.amount}>{amount}
             <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
           </div>
         </div>
 
         <div className={styles.feesWrapper}>
-          <div className={styles.feesLabel}>{intl.formatMessage(messages.feesLabel)}</div>
+          <div className={styles.feesLabel}>
+            {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
+          </div>
           <div className={styles.fees}>+{transactionFee}
             <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
           </div>
@@ -121,7 +104,9 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
 
     const totalAmountBlock = (
       <div className={styles.totalAmountWrapper}>
-        <div className={styles.totalAmountLabel}>{intl.formatMessage(messages.totalLabel)}</div>
+        <div className={styles.totalAmountLabel}>
+          {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+        </div>
         <div className={styles.totalAmount}>{totalAmount}
           <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
         </div>
@@ -133,7 +118,7 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
     ]);
     const actions = [
       {
-        label: intl.formatMessage(messages.backButtonLabel),
+        label: intl.formatMessage(globalMessages.walletSendConfirmationBackButtonLabel),
         onClick: !isSubmitting && onCancel,
       },
       {
@@ -147,7 +132,7 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.dialogTitle)}
+        title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         actions={actions}
         closeOnOverlayClick
         onClose={!isSubmitting ? onCancel : null}

@@ -117,6 +117,36 @@ export default defineMessages({
     defaultMessage: '!!!https://yoroi-wallet.com/faq/',
     description: 'URL for the "FAQ on Yoroi website"',
   },
+  walletSendConfirmationDialogTitle: {
+    id: 'wallet.send.confirmationDialog.title',
+    defaultMessage: '!!!Confirm transaction',
+    description: 'Title for the "Confirm transaction" dialog.'
+  },
+  walletSendConfirmationAddressToLabel: {
+    id: 'wallet.send.confirmationDialog.addressToLabel',
+    defaultMessage: '!!!To',
+    description: 'Label for the "To" in the wallet send confirmation dialog.',
+  },
+  walletSendConfirmationAmountLabel: {
+    id: 'wallet.send.confirmationDialog.amountLabel',
+    defaultMessage: '!!!Amount',
+    description: 'Label for the "Amount" in the wallet send confirmation dialog.',
+  },
+  walletSendConfirmationFeesLabel: {
+    id: 'wallet.send.confirmationDialog.feesLabel',
+    defaultMessage: '!!!Fees',
+    description: 'Label for the "Fees" in the wallet send confirmation dialog.',
+  },
+  walletSendConfirmationTotalLabel: {
+    id: 'wallet.send.confirmationDialog.totalLabel',
+    defaultMessage: '!!!Total',
+    description: 'Label for the "Total" in the wallet send confirmation dialog.',
+  },
+  walletSendConfirmationBackButtonLabel: {
+    id: 'wallet.send.confirmationDialog.back',
+    defaultMessage: '!!!Back',
+    description: 'Label for the back button in the wallet send confirmation dialog.'
+  },
   trezorConnectAllDialogTitle: {
     id: 'wallet.trezor.dialog.title.label',
     defaultMessage: '!!!Connect to Trezor Hardware Wallet',
