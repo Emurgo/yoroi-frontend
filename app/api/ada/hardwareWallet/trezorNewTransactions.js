@@ -136,7 +136,7 @@ function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
 
 function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
   return outputs.map(x => ({
-    address: x.address,
+    address: x.fullAddress ? _derivePath(x.fullAddress.change, x.fullAddress.index) : x.address,
     amount: x.value.toString()
   }));
 }
