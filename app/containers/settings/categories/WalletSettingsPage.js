@@ -51,6 +51,7 @@ export default class WalletSettingsPage extends Component<Props> {
         onCancelEditing={cancelEditingWalletField.trigger}
         activeField={walletFieldBeingEdited}
         nameValidator={name => isValidWalletName(name)}
+        showPasswordBlock={activeWallet.isWebWallet}
       />
     );
   }
