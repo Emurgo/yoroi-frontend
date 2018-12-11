@@ -2,50 +2,72 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
-
-import Checkbox from 'react-polymorph/lib/components/Checkbox';
-import SwitchSkin from 'react-polymorph/lib/skins/simple/raw/SwitchSkin';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import SvgInline from 'react-svg-inline';
+import moment from 'moment';
 
 import SetLockCodeDialog from './SetLockCodeDialog';
 
 import { defineMessages, intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './LockScreenSettings.scss';
 import type { ReactIntlMessage } from '../../../../types/i18nTypes';
 
+import iconDisabled from '../../../../assets/images/lockscreen-disabled.inline.svg';
+import iconEnabled from '../../../../assets/images/lockscreen-enabled.inline.svg';
+
 const messages = defineMessages({
-  checkboxLabel: {
+  checkboxEnableLabel: {
     id: 'settings.lock.enable.label',
     defaultMessage: '!!!Enable lock screen',
     description: 'Label for the lock enabling checkbox.'
+  },
+  checkboxDisableLabel: {
+    id: 'settings.lock.disable.label',
+    defaultMessage: '!!!Disable lock screen',
+    description: 'Label for the lock disabling checkbox.'
   },
   submitLabel: {
     id: 'settings.lock.submit',
     defaultMessage: '!!!Submit',
     description: 'Label for submit pin code button',
   },
-  change: {
+  bottomTitle: {
+    id: 'lock-screen.pin.label',
+    defaultMessage: '!!!PIN code',
+    description: 'Title for bottom section',
+  },
+  updated: {
+    id: 'wallet.settings.passwordLastUpdated',
+    defaultMessage: '!!!Last updated',
+    description: 'Last updated X time ago message.',
+  },
+  dialogSetTitle: {
+    id: 'settings.lock.set',
+    defaultMessage: '!!!Set pin code',
+    description: 'Title for setting pin code dialog',
+  },
+  dialogChangeTitle: {
     id: 'settings.lock.change',
-    defaultMessage: '!!!Change PIN code',
-    description: 'Title for changing PIN code form',
+    defaultMessage: '!!!Change pin code',
+    description: 'Title for changing pin code dialog',
   },
 });
 
 type Props = {
   toggleLockScreen: Function,
-  close: Function,
   submit: Function,
   isEnabled: boolean,
-  isSubmitting: boolean,
   pin: string,
+  updated: string,
   error?: ?LocalizableError,
 };
 
+type State = {
+  changingCodeIsOpen: boolean,
+}
+
 @observer
-export default class LockScreenSettings extends Component<Props> {
+export default class LockScreenSettings extends Component<Props, State> {
   static defaultProps = {
     error: undefined
   };
@@ -54,116 +76,73 @@ export default class LockScreenSettings extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  handleSubmit = () => {
-    console.log('submitted!');
+  state = {
+    changingCodeIsOpen: false,
   }
 
+  toggleChangeDialog = () => {
+    const { changingCodeIsOpen } = this.state;
+    this.setState({ changingCodeIsOpen: !changingCodeIsOpen });
+  }
 
-  form = new ReactToolboxMobxForm({
-    fields: {
-      currentCode: {
-        label: 'Current PIN code',
-        placeholder: '',
-        value: '',
-        validators: [({ field }) => (
-          []
-        )],
-      },
-      newCode: {
-        label: 'New PIN code',
-        placeholder: '',
-        value: '',
-        validators: [({ field }) => (
-          []
-        )],
-      },
-      repeatNewCode: {
-        label: 'Repeat new PIN code',
-        placeholder: '',
-        value: '',
-        validators: [({ field }) => (
-          []
-        )],
-      }
-    },
-  }, {
-    options: {
-      validateOnChange: true,
-      validationDebounceWait: 250,
-    },
-  });
+  handleChangeSubmit = (data: string) => {
+    this.props.submit(data);
+    this.toggleChangeDialog();
+  }
 
   render() {
     const {
       toggleLockScreen,
-      close,
       submit,
-      isSubmitting,
       isEnabled,
       error,
       pin,
+      updated,
     } = this.props;
+    const { changingCodeIsOpen } = this.state;
     const { intl } = this.context;
-    const { form } = this;
-    const currentCode = form.$('currentCode');
-    const newCode = form.$('newCode');
-    const repeatNewCode = form.$('repeatNewCode');
 
-    const componentClassNames = classNames([styles.component, 'general']);
-    console.log('PIN', pin);
+    const componentClassNames = classNames([styles.container, 'general']);
+
+    const lastUpdated = updated ? (
+      intl.formatMessage(messages.updated, {
+        lastUpdated: moment(Number(updated)).fromNow(),
+      })
+    ) : '';
+
+    const dialogTitle = changingCodeIsOpen ? messages.dialogChangeTitle : messages.dialogSetTitle;
+    const checkboxLabel = isEnabled ? messages.checkboxDisableLabel : messages.checkboxEnableLabel;
 
     return (
       <div className={componentClassNames}>
         <div className={`${styles.enabling} ${styles.row}`}>
-          <Checkbox
-            className={styles.checkbox}
-            skin={<SwitchSkin />}
-            checked={isEnabled}
-            onChange={toggleLockScreen}
-          />
-          <span className={styles.title}>{intl.formatMessage(messages.checkboxLabel)}</span>
+          <button type="button" className={styles.checkbox} onClick={toggleLockScreen}>
+            <SvgInline svg={isEnabled ? iconEnabled : iconDisabled} cleanup={['title']} />
+          </button>
+          <span className={styles.title}>{intl.formatMessage(checkboxLabel)}</span>
+        </div>
+        <div className={styles.bottom}>
+          {(!pin || !isEnabled) && <div className={styles.overlay} />}
+          <div className={styles.title}>{intl.formatMessage(messages.bottomTitle)}</div>
+          <div className={styles.timeBox}>
+            {lastUpdated}
+            <button type="button" className={styles.change} onClick={this.toggleChangeDialog}>Change</button>
+          </div>
         </div>
 
-        {pin && isEnabled && (
-          <div className={styles.row}>
-            <div className={styles.title}>{intl.formatMessage(messages.change)}</div>
-            <Input
-              className={styles.input}
-              {...currentCode.bind()}
-              error={currentCode.error}
-              skin={<SimpleInputSkin />}
-            />
-            <Input
-              className={styles.input}
-              {...newCode.bind()}
-              error={newCode.error}
-              skin={<SimpleInputSkin />}
-            />
-            <Input
-              className={styles.input}
-              {...repeatNewCode.bind()}
-              error={repeatNewCode.error}
-              skin={<SimpleInputSkin />}
-            />
-          </div>
+        {(changingCodeIsOpen || (!pin && isEnabled)) && (
+          <SetLockCodeDialog
+            close={changingCodeIsOpen ? this.toggleChangeDialog : toggleLockScreen}
+            title={intl.formatMessage(dialogTitle)}
+            requestCurrent={changingCodeIsOpen}
+            pin={pin}
+            submit={changingCodeIsOpen ? this.handleChangeSubmit : submit}
+          />
         )}
-
-        {!pin && isEnabled && <SetLockCodeDialog close={close} submit={submit} />}
 
         {error && <p className={styles.error}>{error}</p>}
 
       </div>
     );
   }
-
 }
-
-/*
-<Select
-          className={languageSelectClassNames}
-          options={languageOptions}
-          {...languageId.bind()}
-          onChange={this.selectLanguage}
-          skin={<SelectSkin />}
-        />
-        */

@@ -41,7 +41,6 @@ export default class Settings extends Component<InjectedContainerProps> {
       lockScreenEnabled,
       pinCode,
     } = profile;
-    console.log('actions', stores.profile.isAppLocked);
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}

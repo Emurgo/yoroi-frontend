@@ -55,14 +55,27 @@
     }
 
     &.daedalus-transfer {
-      right: 128px;
+      right: 64px;
+      &.replaced {
+        right: 128px;
+      }
     }
 
     &.settings {
-      right: 64px;
+      right: 0;
+      &.replaced {
+        right: 64px;
+      }
     }
     &.lock {
       right: 0;
+      & span {
+        flex-shrink: 0;
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
     }
   }
 }

@@ -34,6 +34,7 @@ export default class SettingsStore extends Store {
   @observable setProfileLocaleRequest: Request<string> = new Request(this.api.localStorage.setUserLocale);
   @observable getTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.getTermsOfUseAcceptance);
   @observable setTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.setTermsOfUseAcceptance);
+  @observable getPinCodeUpdateTimeRequest: Request<string> = new Request(this.api.localStorage.getPinCodeUpdateTime);
   @observable getPinCodeRequest: Request<string> = new Request(this.api.localStorage.getPinCode);
   @observable setPinCodeRequest: Request<string> = new Request(this.api.localStorage.setPinCode);
   @observable getLockScreenEnabledRequest: Request<string> = new Request(this.api.localStorage.getLockScreenEnabled);
@@ -62,6 +63,7 @@ export default class SettingsStore extends Store {
     this._isAppLocked();
     this._getLockScreenEnabled();
     this._getPinCode();
+    this._getPinCodeUpdateTime();
   }
 
   teardown() {
@@ -85,6 +87,11 @@ export default class SettingsStore extends Store {
 
   @computed get pinCode(): string {
     const { result } = this.getPinCodeRequest.execute();
+    return result;
+  }
+
+  @computed get pinCodeUpdateTime(): string {
+    const { result } = this.getPinCodeUpdateTimeRequest.execute();
     return result;
   }
 
@@ -128,9 +135,14 @@ export default class SettingsStore extends Store {
     await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
 
-  _toggleLockScreen = async () => {
-    this.unsetLockScreenEnabledRequest.execute();
+  _toggleLockScreen = async (value: boolean) => {
+    if (value) this.setLockScreenEnabledRequest.execute();
+    else this.unsetLockScreenEnabledRequest.execute();
     await this.getLockScreenEnabledRequest.execute();
+  }
+
+  _getPinCodeUpdateTime = () => {
+    this.getPinCodeUpdateTimeRequest.execute();
   }
 
   _getLockScreenEnabled = () => {
@@ -155,6 +167,7 @@ export default class SettingsStore extends Store {
     const date = Date.now();
     await this.setPinCodeRequest.execute(hashed, date);
     await this.getPinCodeRequest.execute();
+    await this.getPinCodeUpdateTimeRequest.execute();
   }
 
   _updateMomentJsLocaleAfterLocaleChange = () => {

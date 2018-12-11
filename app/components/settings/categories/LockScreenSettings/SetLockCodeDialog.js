@@ -4,6 +4,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import { isPinCodeValid } from '../../../../utils/validations';
 
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
@@ -14,10 +15,10 @@ import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import styles from './SetLockCodeDialog.scss';
 
 const messages = defineMessages({
-  title: {
-    id: 'settings.lock.set',
-    defaultMessage: '!!!Set pin code',
-    description: 'Title for set pin code dialog',
+  currentCodeLabel: {
+    id: 'settings.lock.current.label',
+    defaultMessage: '!!!Current PIN code',
+    description: 'Label for current pin code input',
   },
   newCodeLabel: {
     id: 'settings.lock.new.label',
@@ -44,6 +45,11 @@ const messages = defineMessages({
     defaultMessage: '!!!The PIN codes don\'t match',
     description: 'Error message for repeating pin code',
   },
+  currentError: {
+    id: 'lock-screen.pin.error',
+    defaultMessage: '!!!Incorrect PIN code',
+    description: 'Error message for incorrect pin code',
+  },
   note: {
     id: 'settings.lock.note',
     defaultMessage: '!!!Note that pin code can be used only for a lock screen',
@@ -59,6 +65,23 @@ export default class SetLockCodeDialog extends Component {
 
   form = new ReactToolboxMobxForm({
     fields: {
+      ...this.props.requestCurrent && {
+        currentCode: {
+          label: this.context.intl.formatMessage(messages.currentCodeLabel),
+          type: 'password',
+          placeholder: '',
+          value: '',
+          validators: [({ field }) => {
+            if (field.value.length >= 6) {
+              return [
+                isPinCodeValid(field.value, this.props.pin),
+                this.context.intl.formatMessage(messages.currentError),
+              ];
+            }
+            return [false];
+          }],
+        },
+      },
       newCode: {
         label: this.context.intl.formatMessage(messages.newCodeLabel),
         type: 'password',
@@ -112,8 +135,14 @@ export default class SetLockCodeDialog extends Component {
     });
   }
 
+  handleKeyPress = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      this.handleSubmit();
+    }
+  }
+
   render() {
-    const { close } = this.props;
+    const { close, title, requestCurrent } = this.props;
     const { intl } = this.context;
 
     const actions = [
@@ -133,24 +162,35 @@ export default class SetLockCodeDialog extends Component {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.title)}
+        title={title}
         closeOnOverlayClick={false}
         actions={actions}
         closeButton={<DialogCloseButton />}
         onClose={close}
       >
+        {requestCurrent && (
+          <Input
+            className={styles.input}
+            {...this.form.$('currentCode').bind()}
+            error={this.form.$('currentCode').error}
+            onKeyPress={this.handleKeyPress}
+            skin={<SimpleInputSkin />}
+          />
+        )}
         <div className={styles.lockPassword}>
           <div className={fieldsClasses}>
             <Input
               className={styles.input}
               {...newCode.bind()}
               error={newCode.error}
+              onKeyPress={this.handleKeyPress}
               skin={<SimpleInputSkin />}
             />
             <Input
               className={styles.input}
               {...repeatNewCode.bind()}
               error={repeatNewCode.error}
+              onKeyPress={this.handleKeyPress}
               skin={<SimpleInputSkin />}
             />
             <p className={styles.note}>

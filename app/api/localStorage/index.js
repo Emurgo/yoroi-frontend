@@ -106,6 +106,16 @@ export default class LocalStorageApi {
     }
   });
 
+  getPinCodeUpdateTime = (): Promise<any> => new Promise((resolve, reject) => {
+    try {
+      const time = localStorage.getItem(storageKeys.PIN_WAS_SAVED);
+      if (!time) return resolve();
+      resolve(time);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
   setPinCode = (code: string, updated: number): Promise<void> => new Promise((resolve, reject) => {
     try {
       localStorage.setItem(storageKeys.PIN, code);

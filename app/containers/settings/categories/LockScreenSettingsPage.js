@@ -7,13 +7,10 @@ import type { InjectedProps } from '../../../types/injectedPropsType';
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
 
-  handleLockScreenToggle = (val: boolean = false) => {
-    this.props.actions.profile.toggleLockScreen.trigger(val);
+  handleLockScreenToggle = () =>  {
+    const { lockScreenEnabled } = this.props.stores.profile;
+    this.props.actions.profile.toggleLockScreen.trigger(!lockScreenEnabled);
   };
-
-  handleClose = () => {
-    this.props.actions.profile.toggleLockScreen.trigger();
-  }
 
   handleSubmit = (code: string) => {
     this.props.actions.profile.setPinCode.trigger(code);
@@ -24,16 +21,15 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       setLockScreenEnabledRequest,
       lockScreenEnabled,
       pinCode,
+      pinCodeUpdateTime,
     } = this.props.stores.profile;
-    const isSubmitting = setLockScreenEnabledRequest.isExecuting;
     return (
       <LockScreenSettings
         toggleLockScreen={this.handleLockScreenToggle}
-        close={this.handleClose}
         isEnabled={lockScreenEnabled}
-        isSubmitting={isSubmitting}
         error={setLockScreenEnabledRequest.error}
         pin={pinCode}
+        updated={pinCodeUpdateTime}
         submit={this.handleSubmit}
       />
     );

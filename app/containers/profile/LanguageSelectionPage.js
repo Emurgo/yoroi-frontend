@@ -28,7 +28,12 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   };
 
   render() {
-    const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
+    const {
+      setProfileLocaleRequest,
+      LANGUAGE_OPTIONS,
+      lockScreenEnabled,
+      pinCode,
+    } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
     const { topbar } = this.props.stores;
     const topBartitle = (
@@ -38,6 +43,8 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        lockIconIsVisible={lockScreenEnabled && Boolean(pinCode)}
+        lockApp={this.props.actions.profile.toggleAppLocked.trigger}
       />);
     return (
       <TopBarLayout

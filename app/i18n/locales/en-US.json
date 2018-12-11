@@ -108,6 +108,7 @@
   "settings.menu.wallet.link.label": "Wallet",
   "settings.menu.lock.link.label": "Screen lock",
   "settings.lock.enable.label": "Enable the lock screen",
+  "settings.lock.disable.label": "Disable the lock screen",
   "settings.lock.current.label": "Current PIN code",
   "settings.lock.new.label": "Screen lock PIN code",
   "settings.lock.repeat.label": "Repeat PIN code",

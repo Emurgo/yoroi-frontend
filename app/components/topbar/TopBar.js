@@ -4,9 +4,12 @@ import type { Node } from 'react';
 import { kebabCase } from 'lodash';
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
+import SvgInline from 'react-svg-inline';
 import TopBarCategory from './TopBarCategory';
 import styles from './TopBar.scss';
 import type { Category } from '../../config/topbarConfig';
+
+import lockIcon from '../../assets/images/lock.inline.svg';
 
 type Props = {
   children?: ?Node,
@@ -44,10 +47,11 @@ export default class TopBar extends Component<Props> {
         {this.props.children}
         {categories && categories.map(category => {
           const categoryClassName = kebabCase(category.name);
+          const additionalClass = lockIconIsVisible && categoryClassName !== 'wallets' ? ' replaced' : '';
           return (
             <TopBarCategory
               key={category.name}
-              className={categoryClassName}
+              className={categoryClassName + additionalClass}
               icon={category.icon}
               active={activeTopbarCategory === category.route}
               onClick={() => {
@@ -58,7 +62,11 @@ export default class TopBar extends Component<Props> {
             />
           );
         })}
-        {lockIconIsVisible && <div style={{ background: '#000' }} className="TopBarCategory_component lock" onClick={lockApp} />}
+        {lockIconIsVisible && (
+          <button type="button" className="TopBarCategory_component lock" onClick={lockApp}>
+            <SvgInline svg={lockIcon} cleanup={['title']} />
+          </button>
+        )}
       </header>
     );
   }

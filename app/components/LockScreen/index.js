@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
@@ -8,6 +9,8 @@ import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import Dialog from '../widgets/Dialog';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import { isPinCodeValid } from '../../utils/validations';
+
+import lockIcon from '../../assets/images/locked.inline.svg';
 
 import styles from './LockScreen.scss';
 
@@ -43,15 +46,22 @@ export default class LockScreen extends Component {
   openDialog = () => {
     this.setState({ dialogIsOpen: true });
   }
+
   handleSubmit = () => {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: () => {
         this.props.unlock.trigger();
       },
       onError: () => {
         console.log('error');
       },
     });
+  }
+
+  handleKeyPress = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      this.handleSubmit();
+    }
   }
 
   form = new ReactToolboxMobxForm({
@@ -90,7 +100,9 @@ export default class LockScreen extends Component {
     const code = this.form.$('code');
     return (
       <div className={styles.container}>
-        <div className={styles.placeholder} onClick={this.openDialog} />
+        <button type="button" className={styles.unlock} onClick={this.openDialog}>
+          <SvgInline svg={lockIcon} cleanup={['title']} />
+        </button>
         {dialogIsOpen && (
           <Dialog
             title={this.props.intl.formatMessage(messages.title)}
@@ -100,6 +112,7 @@ export default class LockScreen extends Component {
             <Input
               skin={<SimpleInputSkin />}
               {...code.bind()}
+              onKeyPress={this.handleKeyPress}
               error={code.error}
             />
           </Dialog>

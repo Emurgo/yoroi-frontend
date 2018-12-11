@@ -28,7 +28,12 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
   };
 
   render() {
-    const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
+    const {
+      setTermsOfUseAcceptanceRequest,
+      termsOfUse,
+      lockScreenEnabled,
+      pinCode,
+    } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
     const { topbar } = this.props.stores;
     const topbarTitle = (
@@ -38,6 +43,8 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
       <TopBar
         title={topbarTitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        lockIconIsVisible={lockScreenEnabled && Boolean(pinCode)}
+        lockApp={this.props.actions.profile.toggleAppLocked.trigger}
       />);
     return (
       <TopBarLayout
