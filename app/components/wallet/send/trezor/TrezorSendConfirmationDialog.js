@@ -64,7 +64,6 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
       onCancel,
     } = this.props;
 
-    // TODO: do i18n
     const infoBlock = (
       <div className={styles.infoBlock}>
         <ul>
