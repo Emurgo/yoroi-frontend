@@ -7,7 +7,8 @@ export type TrezorInput = {
 }
 
 export type TrezorOutput = {
-  address: string,
+  address?: string,
+  path?: string,
   amount: string,
 }
 

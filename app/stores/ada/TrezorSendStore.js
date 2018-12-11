@@ -91,11 +91,16 @@ export default class TrezorSendStore extends Store {
         ...trezorSignTxDataResp.trezorSignTxPayload
       });
 
+      if (trezorResp && trezorResp.payload && trezorResp.payload.error) {
+        // this Error will be converted to LocalizableError()
+        throw new Error(trezorResp.payload.error);
+      }
+
       await this._sendTrezorSignedTx(trezorSignTxDataResp, trezorResp);
 
     } catch (error) {
-      this._setError(this._convertToLocalizableError(error, trezorResp));
-      Logger.error('TrezorSendStore::_sendUsingTrezor::error: ' + stringifyError(error));
+      Logger.error('TrezorSendStore::_sendUsingTrezor error: ' + stringifyError(error));
+      this._setError(this._convertToLocalizableError(error));
     } finally {
       this.createTrezorSignTxDataRequest.reset();
       this.sendTrezorSignedTxRequest.reset();
@@ -105,46 +110,37 @@ export default class TrezorSendStore extends Store {
 
   _sendTrezorSignedTx = async (trezorSignTxDataResp: CreateTrezorSignTxDataResponse,
     trezorResp: any): Promise<void> => {
-    if (trezorResp && trezorResp.success) {
-      // TODO: [TREZOR] fix type if possible
-      const payload: any = trezorResp.payload;
-
-      this.sendTrezorSignedTxRequest.reset();
-      const reqParams: SendTrezorSignedTxRequest = {
-        signedTxHex: payload.body,
-        changeAdaAddr: trezorSignTxDataResp.changeAddress
-      };
-      // TODO: [TREZOR] add error check
-      await this.sendTrezorSignedTxRequest.execute(reqParams).promise;
-
-      this.actions.dialogs.closeActiveDialog.trigger();
-
-      const { wallets } = this.stores.substores[environment.API];
-      wallets.refreshWalletsData();
-
-      const activeWallet = wallets.active;
-      if (activeWallet) {
-        // go to transaction screen
-        wallets.goToWalletRoute(activeWallet.id);
-      }
-      Logger.info('SUCCESS: ADA sent using Trezor SignTx');
-    } else {
-      // this Error will be converted to LocalizableError()
-      throw new Error();
+    // TODO: [TREZOR] fix type if possible
+    const payload: any = trezorResp.payload;
+    this.sendTrezorSignedTxRequest.reset();
+    const reqParams: SendTrezorSignedTxRequest = {
+      signedTxHex: payload.body,
+      changeAdaAddr: trezorSignTxDataResp.changeAddress
+    };
+    // TODO: [TREZOR] add error check
+    await this.sendTrezorSignedTxRequest.execute(reqParams).promise;
+    this.actions.dialogs.closeActiveDialog.trigger();
+    const { wallets } = this.stores.substores[environment.API];
+    wallets.refreshWalletsData();
+    const activeWallet = wallets.active;
+    if (activeWallet) {
+      // go to transaction screen
+      wallets.goToWalletRoute(activeWallet.id);
     }
+    Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }
 
-  /** Converts error(from API) or trezorResp(from Trezor API) to LocalizableError */
-  _convertToLocalizableError = (error: any, trezorResp: any): LocalizableError => {
+  /** Converts error(from API or Trezor API) to LocalizableError */
+  _convertToLocalizableError = (error: any): LocalizableError => {
     let localizableError: ?LocalizableError = null;
 
     if (error instanceof LocalizableError) {
       // It means some API Error has been thrown
       localizableError = error;
-    } else if (trezorResp && trezorResp.payload && trezorResp.payload.error) {
+    } else if (error && error.message) {
       // Trezor device related error happend, convert then to LocalizableError
       // TODO: [TREZOR] check for device not supported if needed
-      switch (trezorResp.payload.error) {
+      switch (error.message) {
         case 'Iframe timeout':
           localizableError = new LocalizableError(globalMessages.trezorError101);
           break;
@@ -159,7 +155,8 @@ export default class TrezorSendStore extends Store {
           localizableError = new LocalizableError(messages.signTxError101);
           break;
         default:
-          // trezorError999 = Something unexpected happened
+          /** we are not able to figure out why Error is thrown
+            * make it, trezorError999 = Something unexpected happened */
           localizableError = new LocalizableError(globalMessages.trezorError999);
           break;
       }

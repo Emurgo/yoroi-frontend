@@ -3,7 +3,8 @@ import _ from 'lodash';
 
 import {
   Logger,
-  stringifyError
+  stringifyError,
+  stringifyData
 } from '../../../utils/logging';
 import {
   saveAdaAddress,
@@ -136,7 +137,18 @@ function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
 
 function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
   return outputs.map(x => ({
-    address: x.address,
-    amount: x.value.toString()
+    amount: x.value.toString(),
+    ..._outputAddressOrPath(x)
   }));
+}
+
+function _outputAddressOrPath(out: TxOutput) {
+  if (out.isChange) {
+    const fullAddress : ?AdaAddress = out.fullAddress;
+    if (fullAddress) {
+      return { path: _derivePath(fullAddress.change, fullAddress.index) };
+    }
+    Logger.debug(`[WEIRD]: Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
+  }
+  return { address: out.address };
 }
