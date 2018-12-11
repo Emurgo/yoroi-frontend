@@ -20,7 +20,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
 
   render() {
     const { actions, stores, topbar } = this.props;
-    const { profile = {}} = stores;
+    const { profile = {} } = stores;
     const {
       lockScreenEnabled,
       pinCode,

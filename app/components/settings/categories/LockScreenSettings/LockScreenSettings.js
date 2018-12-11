@@ -10,7 +10,6 @@ import SetLockCodeDialog from './SetLockCodeDialog';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './LockScreenSettings.scss';
-import type { ReactIntlMessage } from '../../../../types/i18nTypes';
 
 import iconDisabled from '../../../../assets/images/lockscreen-disabled.inline.svg';
 import iconEnabled from '../../../../assets/images/lockscreen-enabled.inline.svg';

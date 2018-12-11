@@ -37,6 +37,4 @@ export const isValidAmountInLovelaces = (value: string) => {
   return isValid;
 };
 
-export const isPinCodeValid = (value, pin) => {
-  return bcryptjs.compareSync(value, pin);
-};
+export const isPinCodeValid = (value, pin) => bcryptjs.compareSync(value, pin);

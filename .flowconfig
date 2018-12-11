@@ -3,6 +3,7 @@
 .*/node_modules/electron-packager/.*
 .*/node_modules/npm/.*
 .*/node_modules/oboe/.*
+.*/node_modules/bcryptjs/src/bower.json
 .*/dist/.*
 .*/release/.*
 .*/.git/.*
