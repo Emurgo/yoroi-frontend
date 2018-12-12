@@ -61,7 +61,7 @@ export async function restoreTransactionsAndSave(cryptoAccount: CryptoAccount,
       saveAsAdaAddresses(cryptoAccount, internalAddressesToSave, 'Internal')
     ]);
   } else {
-    await newAdaAddress(cryptoAccount, [], 'External');
+    await newAdaAddress(cryptoAccount, 'External');
   }
 
   // save wallet info in localstorage

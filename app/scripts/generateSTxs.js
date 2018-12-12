@@ -93,8 +93,7 @@ function _logIfDebugging(debugging) {
 }
 
 async function _generateNewAddress(cryptoAccount) {
-  const addresses = mapToList(getAdaAddressesMap());
-  return newAdaAddress(cryptoAccount, addresses, 'External');
+  return newAdaAddress(cryptoAccount, 'External');
 }
 
 async function _removeAdaAddresses(cryptoAccount, addresses) {
