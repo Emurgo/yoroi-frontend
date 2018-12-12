@@ -50,17 +50,19 @@ export function isValidAdaAddress(address: string): Promise<boolean> {
   }
 }
 
+export type AdaAddressMap = {[key: string]:AdaAddress}
+
 /** Get a mapping of address hash to AdaAddress */
-export function getAdaAddressesMap(): Promise<{[key: string]:AdaAddress}> {
+export function getAdaAddressesMap(): Promise<AdaAddressMap> {
   // Just return all existing addresses because we are using a SINGLE account
   // TODO: make this work for multiple accounts in case we add multiple accounts eventually
-  return getAddresses().then(addresses => {
-    const addressesMap = {};
-    addresses.forEach(address => {
-      addressesMap[address.id] = address.value;
-    });
-    return addressesMap;
-  });
+  return getAddresses().then(
+    addresses => addressesToAddressMap(addresses.map(r => r.value))
+  );
+}
+
+export function addressesToAddressMap(addresses: Array<AdaAddress>): AdaAddressMap {
+  return _.keyBy(addresses, a => a.cadId);
 }
 
 /** Wrapper function for LovefieldDB call to get all AdaAddresses */
@@ -86,17 +88,15 @@ export async function newExternalAdaAddress(
   if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) {
     throw new UnusedAddressesError();
   }
-  const newAddress: AdaAddress = await newAdaAddress(cryptoAccount, addresses, 'External');
-  return newAddress;
+  return await newAdaAddress(cryptoAccount, 'External');
 }
 
 /** Create and save the next address for the given account */
 export async function newAdaAddress(
   cryptoAccount: CryptoAccount,
-  addresses: AdaAddresses,
   addressType: AddressType
 ): Promise<AdaAddress> {
-  const address: AdaAddress = await createAdaAddress(cryptoAccount, addresses, addressType);
+  const address: AdaAddress = await createAdaAddress(cryptoAccount, addressType);
   await saveAdaAddress(address, addressType);
   return address;
 }
@@ -104,7 +104,6 @@ export async function newAdaAddress(
 /** Create new wallet address based off bip44 and then convert it to an AdaAddress */
 export async function createAdaAddress(
   cryptoAccount: CryptoAccount,
-  addresses: AdaAddresses,
   addressType: AddressType
 ): Promise<AdaAddress> {
   const filteredAddresses = await getAdaAddressesByType(addressType);
