@@ -203,6 +203,7 @@ function decodeRustTxWithInputs(
     outputs: tx.tx.tx.outputs.map(x => {
       if (x.address === changeAddress.cadId) {
         x.fullAddress = changeAddress;
+        x.isChange = true;
       }
       return x;
     })

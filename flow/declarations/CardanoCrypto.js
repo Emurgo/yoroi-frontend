@@ -223,6 +223,7 @@ declare type TxDaedalusInput = {
 declare type TxOutput = {
   address: string,
   value: string,
+  isChange?: boolean,
   fullAddress?: AdaAddress
 }
 
