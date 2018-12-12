@@ -1,4 +1,4 @@
-import PasswordProtect from "../../js-cardano-wasm/js/PasswordProtect";
+import type { AdaAddress } from '../../app/api/ada/adaTypes';
 
 declare module 'rust-cardano-crypto' {
   declare module.exports: {
@@ -222,7 +222,9 @@ declare type TxDaedalusInput = {
 
 declare type TxOutput = {
   address: string,
-  value: string
+  value: string,
+  isChange?: boolean,
+  fullAddress?: AdaAddress
 }
 
 declare type AddressType = "External" | "Internal";

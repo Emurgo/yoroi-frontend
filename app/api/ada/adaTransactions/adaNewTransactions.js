@@ -172,7 +172,7 @@ export async function getAdaTransactionFromSenders(
   cryptoWallet: CryptoWallet
 ): Promise<[SpendResponse, AdaAddress, UnsignedTransactionExt]> {
   // fetch new internal address from HD Wallet for change
-  const changeAdaAddr = await getAdaTransactionChangeAddr();
+  const changeAdaAddr : AdaAddress = await getAdaTransactionChangeAddr();
 
   // Consider any UTXO as a possible input
   const inputs = await getAdaTransactionInputs(senders);
@@ -182,12 +182,13 @@ export async function getAdaTransactionFromSenders(
   const result: SpendResponse = getResultOrFail(
     Wallet.spend(cryptoWallet, inputs, outputs, changeAdaAddr.cadId)
   );
-  return [result, changeAdaAddr, decodeRustTxWithInputs(result, inputs)];
+  return [result, changeAdaAddr, decodeRustTxWithInputs(result, inputs, changeAdaAddr)];
 }
 
 function decodeRustTxWithInputs(
   resp: SpendResponse,
-  availableInputs: Array<TxInput>
+  availableInputs: Array<TxInput>,
+  changeAddress: AdaAddress
 ): UnsignedTransactionExt {
   const tx: CryptoTransaction = decodeRustTx(resp.cbor_encoded_tx);
   const pointers : Array<TxInputPtr> = tx.tx.tx.inputs;
@@ -196,7 +197,13 @@ function decodeRustTxWithInputs(
   const selectedInputs = availableInputs.filter((inp: TxInput) => set.has(pointerToStr(inp.ptr)));
   return {
     inputs: selectedInputs,
-    outputs: tx.tx.tx.outputs
+    outputs: tx.tx.tx.outputs.map(x => {
+      if (x.address === changeAddress.cadId) {
+        x.isChange = true;
+        x.fullAddress = changeAddress;
+      }
+      return x;
+    })
   };
 }
 
