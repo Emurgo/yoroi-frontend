@@ -11,7 +11,7 @@ Currently there are some things in the project which make working with it a bit 
 
 - update dependencies: react-router 4 instead of 3, React 16 instead of 15
 
-Basically the routing in react-router 4 is more handy and allows to work with it with less effort. As for React 16, there are some useful things - for example, <Fragment /> component, it can be used to avoid wrapping multiple JSX elements in the unnecessary <div />. Also there are new lifecycle methods in React 16, and the React team works on the optimisation, so this can be useful.
+Basically the routing in react-router 4 is more handy and allows to work with it with less effort. As for React 16, there are some useful things - for example, `<Fragment />` component, it can be used to avoid wrapping multiple JSX elements in the unnecessary `<div />`. Also there are new lifecycle methods in React 16, and the React team works on the optimisation, so this can be useful.
 
 - update routing
 
