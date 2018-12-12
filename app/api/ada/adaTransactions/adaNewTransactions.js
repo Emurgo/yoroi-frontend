@@ -43,6 +43,7 @@ import {
 } from '../errors';
 import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
+import type { AdaAddressMap } from '../adaAddress';
 
 declare var CONFIG : ConfigType;
 
@@ -145,7 +146,7 @@ export async function getAdaTransactionInputsAndUtxos(
 ): Promise<[Array<TxInput>, Array<UTXO>]> {
 
   // Convert senders to a map
-  const addressesMap = addressesToAddressMap(senders);
+  const addressesMap : AdaAddressMap = addressesToAddressMap(senders);
 
   // Get all user UTXOs
   const senderUtxos = await getAllUTXOsForAddresses(addressesToPublicHash(senders));
@@ -226,7 +227,7 @@ export function addressesToPublicHash(
 
 export function mapUTXOsToInputs(
   utxos: Array<UTXO>,
-  adaAddressesMap: any // TODO: [TREZOR] fix the type
+  adaAddressesMap: AdaAddressMap
 ): Array<TxInput> {
   return utxos.map((utxo) => ({
     ptr: {
