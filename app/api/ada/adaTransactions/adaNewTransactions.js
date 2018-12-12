@@ -9,7 +9,6 @@ import {
   sendTx
 } from '../lib/yoroi-backend-api';
 import {
-  mapToList,
   decodeRustTx
 } from '../lib/utils';
 import {
@@ -20,7 +19,7 @@ import {
   saveAdaAddress,
   removeAdaAddress,
   createAdaAddress,
-  getAdaAddressesMap,
+  addressesToAddressMap,
   getAdaAddressesList
 } from '../adaAddress';
 import {
@@ -92,8 +91,7 @@ export async function newAdaTransaction(
     await saveAdaAddress(changeAdaAddr, 'Internal');
   }
   try {
-    const backendResponse = await sendTx({ signedTx });
-    return backendResponse;
+    return await sendTx({ signedTx });
   } catch (sendTxError) {
     // On failure, we have to remove the change address we eagerly added
     // Note: we don't await on this
@@ -145,7 +143,9 @@ export async function getAdaTransactionInputs(
 export async function getAdaTransactionInputsAndUtxos(
   senders: AdaAddresses,
 ): Promise<[Array<TxInput>, Array<UTXO>]> {
-  const addressesMap = await getAdaAddressesMap();
+
+  // Convert senders to a map
+  const addressesMap = addressesToAddressMap(senders);
 
   // Get all user UTXOs
   const senderUtxos = await getAllUTXOsForAddresses(addressesToPublicHash(senders));
@@ -161,10 +161,7 @@ export async function getAdaTransactionInputsAndUtxos(
 export async function getAdaTransactionChangeAddr(): Promise<AdaAddress> {
   // Get all addresses in the single account to a list
   const cryptoAccount = getSingleCryptoAccount();
-  const addressesMap = await getAdaAddressesMap();
-  const addresses = mapToList(addressesMap);
-
-  return await createAdaAddress(cryptoAccount, addresses, 'Internal');
+  return await createAdaAddress(cryptoAccount, 'Internal');
 }
 
 /** Perform the cryptography required to create a transaction */
@@ -175,7 +172,7 @@ export async function getAdaTransactionFromSenders(
   cryptoWallet: CryptoWallet
 ): Promise<[SpendResponse, AdaAddress, UnsignedTransactionExt]> {
   // fetch new internal address from HD Wallet for change
-  const changeAdaAddr = await getAdaTransactionChangeAddr();
+  const changeAdaAddr : AdaAddress = await getAdaTransactionChangeAddr();
 
   // Consider any UTXO as a possible input
   const inputs = await getAdaTransactionInputs(senders);
@@ -185,12 +182,13 @@ export async function getAdaTransactionFromSenders(
   const result: SpendResponse = getResultOrFail(
     Wallet.spend(cryptoWallet, inputs, outputs, changeAdaAddr.cadId)
   );
-  return [result, changeAdaAddr, decodeRustTxWithInputs(result, inputs)];
+  return [result, changeAdaAddr, decodeRustTxWithInputs(result, inputs, changeAdaAddr)];
 }
 
 function decodeRustTxWithInputs(
   resp: SpendResponse,
-  availableInputs: Array<TxInput>
+  availableInputs: Array<TxInput>,
+  changeAddress: AdaAddress
 ): UnsignedTransactionExt {
   const tx: CryptoTransaction = decodeRustTx(resp.cbor_encoded_tx);
   const pointers : Array<TxInputPtr> = tx.tx.tx.inputs;
@@ -199,7 +197,13 @@ function decodeRustTxWithInputs(
   const selectedInputs = availableInputs.filter((inp: TxInput) => set.has(pointerToStr(inp.ptr)));
   return {
     inputs: selectedInputs,
-    outputs: tx.tx.tx.outputs
+    outputs: tx.tx.tx.outputs.map(x => {
+      if (x.address === changeAddress.cadId) {
+        x.isChange = true;
+        x.fullAddress = changeAddress;
+      }
+      return x;
+    })
   };
 }
 
