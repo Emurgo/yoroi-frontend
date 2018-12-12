@@ -78,25 +78,24 @@ export function getAdaAddressesByType(addressType: AddressType): Promise<AdaAddr
 export async function newExternalAdaAddress(
   cryptoAccount: CryptoAccount
 ): Promise<AdaAddress> {
-  // Note this function doesn't just get the addresses but also calculates their isUsed status
-  const addresses: AdaAddresses = await getAdaAddressesByType('External');
-  // We use the isUsed status to now find the next unused address
-  const lastUsedAddressIndex = _.findLastIndex(addresses, address => address.cadIsUsed) + 1;
-
-  // TODO Move this to a config file
-  const unusedSpan = addresses.length - lastUsedAddressIndex;
-  if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) {
-    throw new UnusedAddressesError();
-  }
-  return await newAdaAddress(cryptoAccount, 'External');
+  return await newAdaAddress(cryptoAccount, 'External', addresses => {
+    // We use the isUsed status to now find the next unused address
+    const lastUsedAddressIndex = _.findLastIndex(addresses, address => address.cadIsUsed) + 1;
+    // TODO Move this to a config file
+    const unusedSpan = addresses.length - lastUsedAddressIndex;
+    if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) {
+      throw new UnusedAddressesError();
+    }
+  });
 }
 
 /** Create and save the next address for the given account */
 export async function newAdaAddress(
   cryptoAccount: CryptoAccount,
-  addressType: AddressType
+  addressType: AddressType,
+  addrValidation?: (AdaAddresses => void)
 ): Promise<AdaAddress> {
-  const address: AdaAddress = await createAdaAddress(cryptoAccount, addressType);
+  const address: AdaAddress = await createAdaAddress(cryptoAccount, addressType, addrValidation);
   await saveAdaAddress(address, addressType);
   return address;
 }
@@ -104,9 +103,14 @@ export async function newAdaAddress(
 /** Create new wallet address based off bip44 and then convert it to an AdaAddress */
 export async function createAdaAddress(
   cryptoAccount: CryptoAccount,
-  addressType: AddressType
+  addressType: AddressType,
+  addrValidation?: (AdaAddresses => void)
 ): Promise<AdaAddress> {
+  // Note this function doesn't just get the addresses but also calculates their isUsed status
   const filteredAddresses = await getAdaAddressesByType(addressType);
+  if (addrValidation) {
+    addrValidation(filteredAddresses);
+  }
   const addressIndex = filteredAddresses.length;
   const [address]: Array<string> = getResultOrFail(
     Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex])
