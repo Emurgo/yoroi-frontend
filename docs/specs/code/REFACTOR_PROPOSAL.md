@@ -24,3 +24,7 @@ We don't have a possibility to access store or actions from any component withou
 - fix the structure
 
 For now, the MainLayout component is used in most containers - they return the content wrapped in the MainLayout, and it happens in most cases. We could just wrap the routing in the MainLayout so we will achieve the same result but without breaking DRY principle. Again, for now it's a lot of really unnecessary code, with all it's cons. There can be some more issues with the structure, but this one is probably the main one.
+
+- additional: switch from Mobx to Redux
+
+Need to check if Redux has something to work with Intl, and if it does, we can use it - probably with Redux-sagas, which have a very neat syntax, very easy to test and which simplify a lot working with async actions and other side effects.
