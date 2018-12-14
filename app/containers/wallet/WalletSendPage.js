@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 
@@ -58,7 +59,7 @@ export default class WalletSendPage extends Component<Props> {
 
   /** Web Wallet Send Confirmation dialog
     * Callback that creates a container to avoid the component knowing about actions/stores */
-  webWalletDoConfirmation = (dialogProps: DialogProps) => {
+  webWalletDoConfirmation = (dialogProps: DialogProps): Node => {
     const { actions, stores } = this.props;
     return (<WalletSendConfirmationDialogContainer
       actions={actions}
@@ -75,7 +76,7 @@ export default class WalletSendPage extends Component<Props> {
   /** Trezor Model T Wallet Confirmation dialog
     * Callback that creates a component to avoid the component knowing about actions/stores
     * separate container is not needed, this container acts as container for Confirmation dialog */
-  trezorTWalletDoConfirmation = (dialogProps: DialogProps) => { // TODO: fix return type
+  trezorTWalletDoConfirmation = (dialogProps: DialogProps): Node => {
     const trezorSendAction = this.props.actions[environment.API].trezorSend;
     const trezorSendStore = this.props.stores.substores[environment.API].trezorSend;
     return (

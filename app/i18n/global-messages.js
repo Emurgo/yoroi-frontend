@@ -159,8 +159,8 @@ export default defineMessages({
   },
   trezorError101: {
     id: 'wallet.trezor.error.101',
-    defaultMessage: '!!!Falied to connect trezor.io. Please check your Internet connection and retry.',
-    description: '<Falied to connect trezor.io. Please check your Internet connection and retry.>'
+    defaultMessage: '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
+    description: '<Failed to connect trezor.io. Please check your Internet connection and retry.>'
   },
   trezorError102: {
     id: 'wallet.trezor.error.102',

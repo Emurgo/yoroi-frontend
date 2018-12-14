@@ -45,7 +45,7 @@ import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import type { AdaAddressMap } from '../adaAddress';
 
-declare var CONFIG : ConfigType;
+declare var CONFIG: ConfigType;
 
 /** Calculate the transaction fee without actually sending the transaction */
 export function getAdaTransactionFee(
@@ -146,7 +146,7 @@ export async function getAdaTransactionInputsAndUtxos(
 ): Promise<[Array<TxInput>, Array<UTXO>]> {
 
   // Convert senders to a map
-  const addressesMap : AdaAddressMap = addressesToAddressMap(senders);
+  const addressesMap: AdaAddressMap = addressesToAddressMap(senders);
 
   // Get all user UTXOs
   const senderUtxos = await getAllUTXOsForAddresses(addressesToPublicHash(senders));
@@ -173,7 +173,7 @@ export async function getAdaTransactionFromSenders(
   cryptoWallet: CryptoWallet
 ): Promise<[SpendResponse, AdaAddress, UnsignedTransactionExt]> {
   // fetch new internal address from HD Wallet for change
-  const changeAdaAddr : AdaAddress = await getAdaTransactionChangeAddr();
+  const changeAdaAddr: AdaAddress = await getAdaTransactionChangeAddr();
 
   // Consider any UTXO as a possible input
   const inputs = await getAdaTransactionInputs(senders);
@@ -192,9 +192,9 @@ function decodeRustTxWithInputs(
   changeAddress: AdaAddress
 ): UnsignedTransactionExt {
   const tx: CryptoTransaction = decodeRustTx(resp.cbor_encoded_tx);
-  const pointers : Array<TxInputPtr> = tx.tx.tx.inputs;
-  const pointerToStr = (p : TxInputPtr) => `${p.id}.${p.index}`;
-  const set : Set<string> = new Set(pointers.map(pointerToStr));
+  const pointers: Array<TxInputPtr> = tx.tx.tx.inputs;
+  const pointerToStr = (p: TxInputPtr) => `${p.id}.${p.index}`;
+  const set: Set<string> = new Set(pointers.map(pointerToStr));
   const selectedInputs = availableInputs.filter((inp: TxInput) => set.has(pointerToStr(inp.ptr)));
   return {
     inputs: selectedInputs,

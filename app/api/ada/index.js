@@ -199,7 +199,7 @@ export default class AdaApi {
     }
   }
 
-  async getTxLastUpdatedDate() : Promise<Date> {
+  async getTxLastUpdatedDate(): Promise<Date> {
     try {
       return getAdaTxLastUpdatedDate();
     } catch (error) {
@@ -309,7 +309,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::createTrezorSignTxData called');
       const { receiver, amount } = request;
 
-      const { changeAdaAddress, txExt } : AdaFeeEstimateResponse =
+      const { changeAdaAddress, txExt }: AdaFeeEstimateResponse =
           await getAdaTransactionFee(receiver, amount);
       const trezorSignTxPayload: TrezorSignTxPayload = await createTrezorSignTxPayload(txExt);
 
@@ -354,7 +354,7 @@ export default class AdaApi {
     Logger.debug('AdaApi::calculateTransactionFee called');
     const { receiver, amount } = request;
     try {
-      const { fee } : AdaFeeEstimateResponse =
+      const { fee }: AdaFeeEstimateResponse =
         await getAdaTransactionFee(receiver, amount);
       Logger.debug(
         'AdaApi::calculateTransactionFee success: ' + stringifyData(fee)

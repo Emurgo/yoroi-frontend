@@ -84,7 +84,7 @@ export async function txsBodiesForInputs(
         groupsOfTxBodies.reduce((acc, groupOfTxBodies) => acc.concat(groupOfTxBodies), [])
       ));
   } catch (getTxBodiesError) {
-    Logger.error('trezorNewTransactions::getTxsBodiesForUTXOs error: ' +
+    Logger.error('trezorNewTransactions::txsBodiesForInputs error: ' +
       stringifyError(getTxBodiesError));
     throw new GetTxsBodiesForUTXOsError();
   }
@@ -95,7 +95,7 @@ export async function newTrezorTransaction(
   signedTxHex: string,
   changeAdaAddr: AdaAddress,
 ): Promise<SendTrezorSignedTxResponse> {
-  Logger.debug('trezorNewTransactions::newAdaTransaction error: called');
+  Logger.debug('trezorNewTransactions::newTrezorTransaction error: called');
   const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
 
   // We assume a change address is used. Currently, there is no way to perfectly match the tx.
@@ -106,11 +106,11 @@ export async function newTrezorTransaction(
   try {
     const body = { signedTx };
     const backendResponse = await sendTx(body);
-    Logger.debug('trezorNewTransactions::newAdaTransaction error: success');
+    Logger.debug('trezorNewTransactions::newTrezorTransaction error: success');
 
     return backendResponse;
   } catch (sendTxError) {
-    Logger.error('trezorNewTransactions::newAdaTransaction error: ' + stringifyError(sendTxError));
+    Logger.error('trezorNewTransactions::newTrezorTransaction error: ' + stringifyError(sendTxError));
     // On failure, we have to remove the change address we eagerly added
     // Note: we don't await on this
     removeAdaAddress(changeAdaAddr);
@@ -144,11 +144,12 @@ function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
 
 function _outputAddressOrPath(out: TxOutput) {
   if (out.isChange) {
-    const fullAddress : ?AdaAddress = out.fullAddress;
+    const fullAddress: ?AdaAddress = out.fullAddress;
     if (fullAddress) {
       return { path: _derivePath(fullAddress.change, fullAddress.index) };
     }
-    Logger.debug(`[WEIRD]: Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
+    Logger.debug('trezorNewTransactions::_outputAddressOrPath: ' +
+      `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
   }
   return { address: out.address };
 }

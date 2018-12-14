@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import Button from 'react-polymorph/lib/components/Button';
@@ -287,7 +288,7 @@ export default class WalletSendForm extends Component<Props, State> {
     * basically controlles which confirmation dialog to open
     * CASE 1: Web Wallet
     * CASE 2: Trezor Model T Wallet */
-  _makeInvokeConfirmationButton(): any { // TODO: fix the return type
+  _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
 
     const buttonClasses = classnames([
@@ -295,41 +296,41 @@ export default class WalletSendForm extends Component<Props, State> {
       styles.nextButton,
     ]);
 
-    /** Next Action can't be performed in case transaction fees are not calculated
-      * or there's a transaction waiting to be confirmed (pending) */
     const {
       openDialogAction,
       hasAnyPending,
     } = this.props;
     const { isTransactionFeeCalculated } = this.state;
 
-    // TODO: too bad opening dialog directly even its container dialog exists
-    let onMouseUp;
-    if (this.props.isTrezorTWallet) {
-      onMouseUp = () => openDialogAction({
-        dialog: TrezorSendConfirmationDialog,
-      });
-    } else {
-      onMouseUp = () => openDialogAction({
-        dialog: WalletSendConfirmationDialog,
-      });
-    }
+    /** TODO: [REFACTOR]
+      * too bad, opening dialog directly without its container dialog
+      * WalletSendForm.js is a component and we already have Send Confirmation dialog's containers
+      * WalletSendForm.js tries to open a container but invoking it component
+      * this whole logic should be in WalletSendForm's container */
+    const targetDialog =  this.props.isTrezorTWallet ?
+      TrezorSendConfirmationDialog :
+      WalletSendConfirmationDialog;
+    const onMouseUp = () => openDialogAction({
+      dialog: targetDialog
+    });
 
     return (
       <Button
         className={buttonClasses}
         label={intl.formatMessage(messages.nextButtonLabel)}
         onMouseUp={onMouseUp}
+        /** Next Action can't be performed in case transaction fees are not calculated
+          * or there's a transaction waiting to be confirmed (pending) */
         disabled={!isTransactionFeeCalculated || hasAnyPending}
         skin={<SimpleButtonSkin />}
       />);
   }
 
-  /** Makes component for respetive send confirmation dialog
+  /** Makes component for respective send confirmation dialog
     * returns null when dialog is not needed
     * CASE 1: Web Wallet
     * CASE 2: Trezor Model T Wallet */
-  _makeConfirmationDialogComponent(): any { // TODO: fix the return type
+  _makeConfirmationDialogComponent(): Node {
     let component = null;
 
     const {

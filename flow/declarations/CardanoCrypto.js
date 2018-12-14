@@ -180,8 +180,6 @@ declare type UnsignedTransactionExt = {
   outputs: Array<TxOutput>
 }
 
-
-
 declare type CryptoAddress = any // TODO: Complete with specific type
 declare type CryptoAddressPayload = any // TODO: Complete with specific type
 

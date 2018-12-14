@@ -28,8 +28,8 @@ import type { CreateTrezorWalletResponse } from '../../api/common';
 const messages = defineMessages({
   saveError101: {
     id: 'wallet.trezor.dialog.step.save.error.101',
-    defaultMessage: '!!!Falied to save. Please check your Internet connection and retry.',
-    description: '<Falied to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
+    defaultMessage: '!!!Failed to save. Please check your Internet connection and retry.',
+    description: '<Failed to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
 
@@ -108,6 +108,13 @@ export default class TrezorConnectStore extends Store {
     trezorConnectAction.goBacktToAbout.listen(this._goBacktToAbout);
     trezorConnectAction.submitConnect.listen(this._submitConnect);
     trezorConnectAction.submitSave.listen(this._submitSave);
+
+    /** Preinitialization of TrezorConnect API will result in faster first response */
+    try {
+      TrezorConnect.init({});
+    } catch (error) {
+      Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
+    }
   }
 
   teardown(): void {
@@ -269,6 +276,7 @@ export default class TrezorConnectStore extends Store {
           break;
         default:
           // trezorError999 = Something unexpected happened
+          Logger.error(`TrezorConnectStore::_validateTrezor::error: ${trezorResp.payload.error}`);
           trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
           break;
       }
@@ -277,6 +285,7 @@ export default class TrezorConnectStore extends Store {
     if (!trezorValidity.error
       && trezorResp.payload.publicKey.length <= 0) {
       // trezorError999 = Something unexpected happened
+      Logger.error(`TrezorConnectStore::_validateTrezor::error: invalid public key`);
       trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
     }
 
@@ -286,6 +295,7 @@ export default class TrezorConnectStore extends Store {
       || trezorEventDevice.payload.type !== 'acquired'
       || trezorEventDevice.payload.features == null)) {
       // trezorError999 = Something unexpected happened
+      Logger.error(`TrezorConnectStore::_validateTrezor::error: invalid device event`);
       trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
     }
 

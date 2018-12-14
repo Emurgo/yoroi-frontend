@@ -98,6 +98,7 @@ const messages = defineMessages({
 
 type Props = {
   progressInfo: ProgressInfo,
+  isActionProcessing: boolean,
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
@@ -112,7 +113,13 @@ export default class AboutDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { progressInfo, error, submit, cancel } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      submit,
+      cancel
+    } = this.props;
 
     const introBlock = (
       <div className={styles.headerBlock}>
@@ -152,7 +159,7 @@ export default class AboutDialog extends Component<Props> {
       </div>);
 
     const dailogActions = [{
-      className: null,
+      className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(messages.nextButtonLabel),
       primary: true,
       disabled: false,

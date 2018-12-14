@@ -58,8 +58,6 @@ export default class TrezorSendStore extends Store {
 
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
   _sendUsingTrezor = async (params: CreateTrezorSignTxDataRequest): Promise<void> => {
-    // TODO: [TREZOR] fix type if possible
-    let trezorResp: any;
     try {
 
       if (this.isActionProcessing) {
@@ -87,7 +85,8 @@ export default class TrezorSendStore extends Store {
       const trezorSignTxDataResp =
         await this.createTrezorSignTxDataRequest.execute(params).promise;
 
-      trezorResp = await TrezorConnect.cardanoSignTransaction({
+      // TODO: [TREZOR] fix type if possible
+      const trezorResp = await TrezorConnect.cardanoSignTransaction({
         ...trezorSignTxDataResp.trezorSignTxPayload
       });
 
@@ -157,6 +156,7 @@ export default class TrezorSendStore extends Store {
         default:
           /** we are not able to figure out why Error is thrown
             * make it, trezorError999 = Something unexpected happened */
+          Logger.error(`TrezorSendStore::_convertToLocalizableError::error: ${error.message}`);
           localizableError = new LocalizableError(globalMessages.trezorError999);
           break;
       }
