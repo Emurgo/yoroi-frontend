@@ -50,7 +50,7 @@ export async function newAdaWallet(
 ): Promise<AdaWallet> {
   const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
   const cryptoAccount = newCryptoAccount(masterKey, walletPassword);
-  await newAdaAddress(cryptoAccount, [], 'External');
+  await newAdaAddress(cryptoAccount, 'External');
   saveAdaWallet(adaWallet, masterKey);
   return Promise.resolve(adaWallet);
 }

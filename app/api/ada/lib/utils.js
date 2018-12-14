@@ -1,5 +1,6 @@
 // @flow
 import bs58 from 'bs58';
+import cbor from 'cbor';
 import BigNumber from 'bignumber.js';
 import type {
   AdaTransactionInputOutput,
@@ -53,3 +54,41 @@ const _getTxCondition = (state: string): AdaTransactionCondition => {
   if (state === 'Pending') return 'CPtxApplying';
   return 'CPtxWontApply';
 };
+
+export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
+  if (!rustTxBody) {
+    throw new Error('Cannot decode inputs from undefined transaction!');
+  }
+  const [[[inputs, outputs], witnesses]] = cbor.decodeAllSync(Buffer.from(rustTxBody));
+  const decInputs: Array<TxInputPtr> = inputs.map(x => {
+    const [[buf, idx]] = cbor.decodeAllSync(x[1].value);
+    return {
+      id: buf.toString('hex'),
+      index: idx
+    };
+  });
+  const decOutputs: Array<TxOutput> = outputs.map(x => {
+    const [addr, val] = x;
+    return {
+      address: bs58.encode(cbor.encode(addr)),
+      value: val
+    };
+  });
+  const decWitnesses: Array<TxWitness> = witnesses.map(w => {
+    if (w[0] === 0) {
+      return {
+        PkWitness: cbor.decodeAllSync(w[1].value)[0].map(x => x.toString('hex'))
+      };
+    }
+    throw Error('Unexpected witness type: ' + w);
+  });
+  return {
+    tx: {
+      tx: {
+        inputs: decInputs,
+        outputs: decOutputs
+      },
+      witnesses: decWitnesses
+    }
+  };
+}

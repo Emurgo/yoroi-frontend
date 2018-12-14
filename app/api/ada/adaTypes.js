@@ -113,6 +113,12 @@ export type AdaTransactionInputOutput = [
 
 export type AdaTransactionFee = AdaAmount;
 
+export type AdaFeeEstimateResponse = {
+  fee: AdaTransactionFee,
+  changeAdaAddress: AdaAddress,
+  txExt: UnsignedTransactionExt
+}
+
 export type AdaWallet = {
   cwAccountsNumber: number,
   cwAmount: AdaAmount,

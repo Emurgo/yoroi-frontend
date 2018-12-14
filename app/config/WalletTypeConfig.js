@@ -8,3 +8,8 @@ export const WalletTypeOption : {
   WEB_WALLET: 'CWTWeb',
   HARDWARE_WALLET: 'CWTHardware'
 };
+
+export const TrezorT = {
+  vendor: 'trezor.io',
+  model: 'T'
+};

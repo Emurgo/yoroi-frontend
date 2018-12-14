@@ -87,7 +87,7 @@ Then(
         break;
       }
       await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
-      
+
     }
     const expectedTxsList = getLovefieldTxs(walletName);
     /* TODO: these code needs to wait for something before check that each field is correct

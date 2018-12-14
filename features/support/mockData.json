@@ -25,7 +25,8 @@
         "cwAssurance": "CWANormal",
         "cwUnit": 0
       },
-      "cwPassphraseLU": "2018-06-11T18:38:43.339Z"
+      "cwPassphraseLU": "2018-06-11T18:38:43.339Z",
+      "cwType": "CWTWeb"
     },
     "cryptoAccount": {
       "account": 0,

@@ -141,6 +141,8 @@ export type UpdateWalletResponse = Wallet;
 
 export type CreateTransactionResponse = Array<void>;
 
+export type SendTrezorSignedTxResponse = Array<void>;
+
 export type GetWalletsResponse = Array<Wallet>;
 
 export type GenerateWalletRecoveryPhraseResponse = Array<string>;

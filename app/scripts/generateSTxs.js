@@ -2,9 +2,8 @@
 
 /* eslint no-await-in-loop: 0 */  // not a big deal since this is just a script for testing
 
-import { mapToList } from '../api/ada/lib/utils';
 import { getCryptoWalletFromMasterKey } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
+import { newAdaAddress, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
 import { getSingleCryptoAccount, getWalletMasterKey } from '../api/ada/adaLocalStorage';
 
@@ -93,8 +92,7 @@ function _logIfDebugging(debugging) {
 }
 
 async function _generateNewAddress(cryptoAccount) {
-  const addresses = mapToList(getAdaAddressesMap());
-  return newAdaAddress(cryptoAccount, addresses, 'External');
+  return newAdaAddress(cryptoAccount, 'External');
 }
 
 async function _removeAdaAddresses(cryptoAccount, addresses) {

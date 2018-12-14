@@ -3,15 +3,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 
-import LocalizableError from '../../../../i18n/LocalizableError';
-import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
-
-import { Logger, stringifyError } from '../../../../utils/logging';
+import LocalizableError from '../../i18n/LocalizableError';
+import { Logger, stringifyError } from '../../utils/logging';
 
 import styles from './ErrorBlock.scss';
 
 type Props = {
-  progressInfo: ProgressInfo,
   error: ?LocalizableError,
 };
 
@@ -30,7 +27,7 @@ export default class ErrorBlock extends Component<Props> {
     try {
       errorText = (error) ? intl.formatMessage(error) : '';
     } catch (e) {
-      Logger.error(`trezorConnect::common::ErrorBlock:render ${stringifyError(e)}`);
+      Logger.error(`ErrorBlock:render ${stringifyError(e)}`);
     }
 
     return (

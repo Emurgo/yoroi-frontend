@@ -50,6 +50,7 @@ type Props = {
   isSubmitting: boolean,
   isInvalid: boolean,
   lastUpdatedField: ?string,
+  showPasswordBlock: boolean,
 };
 
 @observer
@@ -76,7 +77,8 @@ export default class WalletSettings extends Component<Props> {
       onStopEditing, onCancelEditing,
       nameValidator, activeField,
       isSubmitting, isInvalid,
-      lastUpdatedField, dialog
+      lastUpdatedField, dialog,
+      showPasswordBlock
     } = this.props;
     const passwordMessage = (
       intl.formatMessage(messages.passwordLastUpdated, {
@@ -100,14 +102,15 @@ export default class WalletSettings extends Component<Props> {
           successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
         />
 
-        <ReadOnlyInput
-          label={intl.formatMessage(messages.passwordLabel)}
-          value={passwordMessage}
-          isSet
-          onClick={() => openDialogAction({
-            dialog: ChangeWalletPasswordDialog,
-          })}
-        />
+        {showPasswordBlock &&
+          <ReadOnlyInput
+            label={intl.formatMessage(messages.passwordLabel)}
+            value={passwordMessage}
+            isSet
+            onClick={() => openDialogAction({
+              dialog: ChangeWalletPasswordDialog,
+            })}
+          />}
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
