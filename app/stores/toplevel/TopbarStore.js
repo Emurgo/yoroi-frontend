@@ -3,6 +3,7 @@ import { observable, action } from 'mobx';
 import Store from '../base/Store';
 import resolver from '../../utils/imports';
 import environment from '../../environment';
+import { TREZOR_T_CATEGORIE_WALLETS } from '../../config/topbarConfig';
 
 const topbarConfig = resolver('config/topbarConfig');
 
@@ -19,6 +20,19 @@ export default class TopbarStore extends Store {
     this.registerReactions([
       this._syncTopbarRouteWithRouter,
     ]);
+  }
+
+  /** Dynamic Initialization of Topbar Categories */
+  @action initCategories() {
+    this.CATEGORIES = topbarConfig.CATEGORIES;
+
+    // If active wallet is TrezorTWallet then show it's Yoroi with Trezor Icon
+    const { wallets } = this.stores.substores[environment.API];
+    if (wallets && wallets.first && wallets.first.isTrezorTWallet) {
+      this.CATEGORIES[0] = TREZOR_T_CATEGORIE_WALLETS;
+    }
+
+    this.activeTopbarCategory = this.CATEGORIES[0].route;
   }
 
   @action _onActivateTopbarCategory = (

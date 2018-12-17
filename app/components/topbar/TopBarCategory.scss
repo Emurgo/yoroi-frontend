@@ -15,13 +15,32 @@
 }
 
 .active {
-  path {
+  .icon:not(.walletsTrezorTIcon) path {
     stroke: var(--theme-button-primary-background-color);
     fill: var(--theme-button-primary-background-color);
   }
 
-  .icon:not(.walletsIcon) path {
+  .icon:not(.walletsIcon):not(.walletsTrezorTIcon) path {
     fill: var(--theme-button-primary-background-color);
+  }
+
+  .walletsTrezorTIcon {
+    & > svg {
+      // yoroi-logo
+      & > g > g:nth-child(1) {
+        stroke: none;
+        fill: var(--theme-button-primary-background-color);
+      }
+      // plus-logo
+      & > g > g:nth-child(2) {
+        stroke: none;
+        fill: var(--theme-button-primary-background-color);
+      }
+      // trezor-t-logo
+      & > g > g:nth-child(3) {
+        stroke: var(--theme-button-primary-background-color);
+      }
+    }
   }
 
   &:hover {
@@ -45,6 +64,36 @@
   }
 }
 
+.walletsIcon {
+  flex-shrink: 0;
+  & > svg {
+    width: 36px;
+    height: 42.5px;
+  }
+}
+
+.walletsTrezorTIcon {
+  flex-shrink: 0;
+  & > svg {
+    width: 108px;
+    height: 42.5px;
+    // yoroi-logo
+    & > g > g:nth-child(1) {
+      stroke: none;
+      fill: var(--theme-icon-topbar-color);
+    }
+    // plus-logo
+    & > g > g:nth-child(2) {
+      stroke: none;
+      fill: var(--theme-icon-topbar-color);
+    }
+    // trezor-t-logo
+    & > g > g:nth-child(3) {
+      stroke: var(--theme-icon-topbar-color);
+    }
+  }
+}
+
 :global {
   .TopBarCategory_component {
     position: absolute;
@@ -54,6 +103,12 @@
       left: 0;
     }
 
+    &.wallets-trezor-t {
+      left: 0;
+      height: 64px;
+      width: 108px;
+    }    
+
     &.daedalus-transfer {
       right: 64px;
     }
@@ -61,14 +116,6 @@
     &.settings {
       right: 0;
     }
-  }
-}
-
-.walletsIcon {
-  flex-shrink: 0;
-  & > svg {
-    width: 36px;
-    height: 42.5px;
   }
 }
 
