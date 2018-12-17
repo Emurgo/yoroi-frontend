@@ -41,15 +41,23 @@ export function decodeAddress(address: string): DecodedAddress {
   if (!isValidAddress(address)) {
     throw new Error(`Invalid Cardano address`);
   }
-  const bytes = bs58.decode(address);
-  const [addressData, checksum] = cbor.decode(bytes);
-  const [root, attr, type] = cbor.decode(addressData.value);
-  return { root: root.toString('hex'), attr, type, checksum };
+  try {
+    const bytes = bs58.decode(address);
+    const [addressData, checksum] = cbor.decode(bytes);
+    const [root, attr, type] = cbor.decode(addressData.value);
+    return { root: root.toString('hex'), attr, type, checksum };
+  } catch (e) {
+    throw new Error('Failed to decode an address! Cause: ' + stringifyError(e));
+  }
 }
 
 export function createAddressRoot(pubKey: Buffer, type: number, attr: any): Buffer {
-  const newRootData = cbor.encode([type, [type, pubKey], attr]);
-  return blake2b(_sha3_256(newRootData), 28);
+  try {
+    const newRootData = cbor.encode([type, [type, pubKey], attr]);
+    return blake2b(_sha3_256(newRootData), 28);
+  } catch (e) {
+    throw new Error('Failed to create address root! Cause: ' + stringifyError(e));
+  }
 }
 
 export const toAdaTx = function (
