@@ -38,7 +38,6 @@ import type {
 } from '../../types/daedalusTransferTypes';
 import {
   derivePrivate,
-  packAddress,
   unpackAddress,
   walletSecretFromMnemonic,
   xpubToHdPassphrase
