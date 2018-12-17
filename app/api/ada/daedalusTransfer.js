@@ -174,8 +174,6 @@ function _validateAddressAndSignature(
     return { address, reason: 'Failed to unpack address', error: stringifyError(e) };
   }
   const { derivationPath } = unpackedAddress;
-  // !!!! TODO: remove test fail: !!!!!
-  derivationPath[1] += 1;
   if (!_.isEqual(derivationPath, rustDerivationPath)) {
     return { address, reason: 'Derivation path did not match', derivationPath, rustDerivationPath };
   }

@@ -117,13 +117,13 @@ export const getTransactionsHistoryForAddresses = (
 );
 
 export type SignedRequest = {
-  signedTx: string
+  signedTx: string,
+  txValidation?: TxValidation
 };
 export type SignedResponse = Array<void>;
 
 export const sendTx = (
-  body: SignedRequest,
-  txValidation?: TxValidation
+  body: SignedRequest
 ): Promise<SignedResponse> => (
   axios(
     `${backendUrl}/api/txs/signed`,
@@ -131,7 +131,7 @@ export const sendTx = (
       method: 'post',
       data: {
         signedTx: body.signedTx,
-        validation: txValidation
+        validation: body.txValidation
       }
     }
   ).then(response => response.data)
