@@ -16,7 +16,8 @@ import LocalizableError, {
 } from '../../i18n/LocalizableError';
 import type {
   TransferStatus,
-  TransferTx, TxValidation
+  TransferTx,
+  TxValidation
 } from '../../types/daedalusTransferTypes';
 import {
   getAddressesWithFunds,
