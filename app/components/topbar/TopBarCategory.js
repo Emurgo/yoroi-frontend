@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import { uniq } from 'lodash';
 import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
@@ -23,10 +22,11 @@ export default class TopBarCategory extends Component<Props> {
       className
     ]);
 
-    const iconStyles = classNames(uniq([
-      className === 'wallets' ? styles.walletsIcon : styles.icon,
+    const iconStyles = classNames([
+      className === 'wallets' ? styles.walletsIcon : null,
+      className === 'with-trezor-t' ? styles.withTrezorTIcon : null,
       styles.icon
-    ]));
+    ]);
 
     return (
       <button type="button" className={componentStyles} onClick={onClick}>

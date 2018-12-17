@@ -15,14 +15,28 @@
 }
 
 .active {
-  path {
+  .icon:not(.withTrezorTIcon) path {
     stroke: var(--theme-button-primary-background-color);
     fill: var(--theme-button-primary-background-color);
   }
 
-  .icon:not(.walletsIcon) path {
+  .icon:not(.walletsIcon):not(.withTrezorTIcon) path {
     fill: var(--theme-button-primary-background-color);
   }
+
+  .withTrezorTIcon {
+    & > svg {
+      // plus-logo
+      & > g > g:nth-child(1) {
+        stroke: none;
+        fill: var(--theme-button-primary-background-color);
+      }
+      // trezor-t-logo
+      & > g > g:nth-child(2) {
+        stroke: var(--theme-button-primary-background-color);
+      }
+    }
+  }  
 
   &:hover {
     cursor: default;
@@ -45,6 +59,31 @@
   }
 }
 
+.walletsIcon {
+  flex-shrink: 0;
+  & > svg {
+    width: 36px;
+    height: 42.5px;
+  }
+}
+
+.withTrezorTIcon {
+  flex-shrink: 0;
+  & > svg {
+    width: 64px;
+    height: 42.5px;
+    // plus-logo
+    & > g > g:nth-child(1) {
+      stroke: none;
+      fill: var(--theme-icon-topbar-color);
+    }
+    // trezor-t-logo
+    & > g > g:nth-child(2) {
+      stroke: var(--theme-icon-topbar-color);
+    }    
+  }
+}
+
 :global {
   .TopBarCategory_component {
     position: absolute;
@@ -54,6 +93,10 @@
       left: 0;
     }
 
+    &.with-trezor-t {
+      left: 64px;
+    }    
+
     &.daedalus-transfer {
       right: 64px;
     }
@@ -61,14 +104,6 @@
     &.settings {
       right: 0;
     }
-  }
-}
-
-.walletsIcon {
-  flex-shrink: 0;
-  & > svg {
-    width: 36px;
-    height: 42.5px;
   }
 }
 
