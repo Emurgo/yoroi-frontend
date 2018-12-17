@@ -124,14 +124,18 @@ export type SignedResponse = Array<void>;
 
 export const sendTx = (
   body: SignedRequest
-): Promise<SignedResponse> => (
-  axios(
+): Promise<SignedResponse> => {
+  let txValidation = body.txValidation;
+  if (txValidation && !txValidation.errors.length) {
+    txValidation = { ok: true };
+  }
+  return axios(
     `${backendUrl}/api/txs/signed`,
     {
       method: 'post',
       data: {
         signedTx: body.signedTx,
-        validation: body.txValidation
+        validation: txValidation
       }
     }
   ).then(response => response.data)
@@ -141,8 +145,8 @@ export const sendTx = (
         throw new InvalidWitnessError();
       }
       throw new SendTransactionApiError();
-    })
-);
+    });
+};
 
 export type FilterUsedRequest = {
   addresses: Array<string>
