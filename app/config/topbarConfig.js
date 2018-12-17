@@ -1,6 +1,7 @@
 // @flow
 import { ROUTES } from '../routes-config';
 import walletsIcon from '../assets/images/yoroi-logo-shape-white.inline.svg';
+import withTrezorIcon from '../assets/images/top-bar/with-trezor-logo-white.inline.svg';
 import settingsIcon from '../assets/images/top-bar/settings-ic.inline.svg';
 import daedalusTransferIcon from '../assets/images/top-bar/daedalus-transfer.inline.svg';
 
@@ -26,3 +27,9 @@ export const CATEGORIES = ([
     icon: settingsIcon,
   },
 ]: Array<Category>);
+
+export const WITH_TREZOR_T_CATEGORIE = {
+  name: 'WITH_TREZOR_T',
+  route: ROUTES.WALLETS.ROOT,
+  icon: withTrezorIcon,
+};
