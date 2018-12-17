@@ -1,6 +1,5 @@
 // @flow
 import bs58 from 'bs58';
-import cbor from 'cbor';
 import borc from 'borc';
 import BigNumber from 'bignumber.js';
 import type {
@@ -40,8 +39,8 @@ export function decodeAddress(address: string): DecodedAddress {
     throw new Error(`Invalid Cardano address`);
   }
   const bytes = bs58.decode(address);
-  const [[addressData, checksum]] = cbor.decodeAllSync(bytes);
-  const [[root, attr, type]] = cbor.decodeAllSync(addressData.value);
+  const [[addressData, checksum]] = borc.decode(bytes);
+  const [[root, attr, type]] = borc.decode(addressData.value);
   return { root: root.toString('hex'), attr, type, checksum };
 }
 
@@ -88,9 +87,9 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   if (!rustTxBody) {
     throw new Error('Cannot decode inputs from undefined transaction!');
   }
-  const [[[inputs, outputs], witnesses]] = cbor.decodeAllSync(Buffer.from(rustTxBody));
+  const [[[inputs, outputs], witnesses]] = borc.decode(Buffer.from(rustTxBody));
   const decInputs: Array<TxInputPtr> = inputs.map(x => {
-    const [[buf, idx]] = cbor.decodeAllSync(x[1].value);
+    const [[buf, idx]] = borc.decode(x[1].value);
     return {
       id: buf.toString('hex'),
       index: idx
@@ -99,14 +98,14 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   const decOutputs: Array<TxOutput> = outputs.map(x => {
     const [addr, val] = x;
     return {
-      address: bs58.encode(cbor.encode(addr)),
+      address: bs58.encode(borc.encode(addr)),
       value: val
     };
   });
   const decWitnesses: Array<TxWitness> = witnesses.map(w => {
     if (w[0] === 0) {
       return {
-        PkWitness: cbor.decodeAllSync(w[1].value)[0].map(x => x.toString('hex'))
+        PkWitness: borc.decode(w[1].value)[0].map(x => x.toString('hex'))
       };
     }
     throw Error('Unexpected witness type: ' + w);
