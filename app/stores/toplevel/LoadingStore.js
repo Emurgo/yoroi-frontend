@@ -3,6 +3,7 @@ import { observable, computed, when, runInAction } from 'mobx';
 import { loadRustModule } from 'rust-cardano-crypto';
 import { loadLovefieldDB } from '../../api/ada/lib/lovefieldDatabase';
 import Store from '../base/Store';
+import Wallet from '../../domain/Wallet';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import LocalizableError, {
@@ -52,9 +53,14 @@ export default class LoadingStore extends Store {
     await wallets.refreshWalletsData();
     if (app.currentRoute === ROUTES.ROOT) {
       if (wallets.first) {
+        const firstWallet: Wallet = wallets.first;
+
+        // Dynamic Initialization of Topbar Categories
+        this.stores.topbar.initCategories();
+
         this.actions.router.goToRoute.trigger({
           route: ROUTES.WALLETS.TRANSACTIONS,
-          params: { id: wallets.first.id }
+          params: { id: firstWallet.id }
         });
       } else {
         this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
