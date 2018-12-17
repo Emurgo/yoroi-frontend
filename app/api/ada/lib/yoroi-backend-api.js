@@ -22,6 +22,7 @@ import type {
   UTXO,
   Transaction
 } from '../adaTypes';
+import type { TxValidation } from '../../../types/daedalusTransferTypes';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
@@ -121,14 +122,16 @@ export type SignedRequest = {
 export type SignedResponse = Array<void>;
 
 export const sendTx = (
-  body: SignedRequest
+  body: SignedRequest,
+  txValidation?: TxValidation
 ): Promise<SignedResponse> => (
   axios(
     `${backendUrl}/api/txs/signed`,
     {
       method: 'post',
       data: {
-        signedTx: body.signedTx
+        signedTx: body.signedTx,
+        validation: txValidation
       }
     }
   ).then(response => response.data)

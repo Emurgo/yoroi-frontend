@@ -1,6 +1,7 @@
 // @flow
 import bs58 from 'bs58';
 import cbor from 'cbor';
+import borc from 'borc';
 import BigNumber from 'bignumber.js';
 import type {
   AdaTransactionInputOutput,
@@ -8,6 +9,12 @@ import type {
   AdaTransaction,
   AdaTransactionCondition
 } from '../adaTypes';
+import {
+  blake2b,
+  // eslint-disable-next-line camelcase
+  _sha3_256,
+  isValidAddress
+} from 'cardano-crypto.js';
 
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();
@@ -19,6 +26,28 @@ export function mapToList(map: any): Array<any> {
 export function getAddressInHex(address: string): string {
   const bytes = bs58.decode(address);
   return bytes.toString('hex');
+}
+
+export type DecodedAddress = {
+  root: string,
+  attr: any,
+  type: number,
+  checksum: number
+}
+
+export function decodeAddress(address: string): DecodedAddress {
+  if (!isValidAddress(address)) {
+    throw new Error(`Invalid Cardano address`);
+  }
+  const bytes = bs58.decode(address);
+  const [[addressData, checksum]] = cbor.decodeAllSync(bytes);
+  const [[root, attr, type]] = cbor.decodeAllSync(addressData.value);
+  return { root: root.toString('hex'), attr, type, checksum };
+}
+
+export function createAddressRoot(pubKey: Buffer, type: number, attr: any): Buffer {
+  const newRootData = borc.encode([type, [type, pubKey], attr]);
+  return blake2b(_sha3_256(newRootData), 28);
 }
 
 export const toAdaTx = function (
