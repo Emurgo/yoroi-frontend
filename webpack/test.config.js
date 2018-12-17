@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ConfigWebpackPlugin = require('config-webpack');
+const MinifyPlugin = require('babel-minify-webpack-plugin');
 const shell = require('shelljs');
 
 const customPath = path.join(__dirname, './customPublicPath');
@@ -29,12 +30,7 @@ module.exports = {
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
-    new webpack.optimize.UglifyJsPlugin({
-      comments: false,
-      compressor: {
-        warnings: false
-      }
-    }),
+    new MinifyPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('test'),
@@ -42,6 +38,9 @@ module.exports = {
       }
     })
   ],
+  node: {
+    fs: 'empty'
+  },
   resolve: {
     extensions: ['*', '.js']
   },

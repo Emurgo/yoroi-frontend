@@ -57,6 +57,9 @@ const baseDevConfig = () => ({
       }
     })
   ],
+  node: {
+    fs: 'empty'
+  },
   resolve: {
     extensions: ['*', '.js']
   },
