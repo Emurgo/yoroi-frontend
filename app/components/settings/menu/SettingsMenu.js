@@ -74,6 +74,13 @@ export default class SettingsMenu extends Component<Props> {
           />
 
           <SettingsMenuItem
+            label={intl.formatMessage(messages.lock)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.LOCK)}
+            active={isActiveItem(ROUTES.SETTINGS.LOCK)}
+            className="lock"
+          />
+
+          <SettingsMenuItem
             label={intl.formatMessage(messages.termsOfUse)}
             onClick={() => onItemClick(ROUTES.SETTINGS.TERMS_OF_USE)}
             active={isActiveItem(ROUTES.SETTINGS.TERMS_OF_USE)}
@@ -85,13 +92,6 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
-          />
-
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.lock)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.LOCK)}
-            active={isActiveItem(ROUTES.SETTINGS.LOCK)}
-            className="lock"
           />
         </div>
       </div>

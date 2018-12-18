@@ -1,9 +1,8 @@
 @mixin place-form-field-error-below-input {
   :global {
     .SimpleFormField_root {
+      margin-bottom: 21px;
       &.SimpleInput_errored {
-        margin-bottom: 21px;
-
         .SimpleFormField_error {
           left: 0;
           margin: 4px 10px 0 0;
