@@ -10,7 +10,7 @@ export type TransferStatus =
   | 'readyToTransfer'
   | 'error'
 
-/** Contains all information necessary to send and display the Daedalus migration transaction */
+/** Contains all information necessary to send and display the Daedalus transfer transaction */
 export type TransferTx = {
   recoveredBalance: BigNumber,
   fee: BigNumber,

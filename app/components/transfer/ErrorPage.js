@@ -1,0 +1,63 @@
+// @flow
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import classnames from 'classnames';
+import { intlShape } from 'react-intl';
+import Button from 'react-polymorph/lib/components/Button';
+import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import LocalizableError from '../../i18n/LocalizableError';
+import styles from './ErrorPage.scss';
+
+type Props = {
+  error?: ?LocalizableError,
+  onCancel: Function,
+  title: string,
+  backButtonLabel: string
+};
+
+@observer
+export default class ErrorPage extends Component<Props> {
+  static defaultProps = {
+    error: undefined
+  };
+
+  static contextTypes = {
+    intl: intlShape.isRequired
+  };
+
+  render() {
+    const { intl } = this.context;
+    const { error, onCancel, title, backButtonLabel } = this.props;
+    const backButtonClasses = classnames([
+      'flat',
+      styles.button,
+    ]);
+
+    return (
+      <div className={styles.component}>
+
+        <div>
+          <div className={styles.body}>
+
+            <div className={styles.title}>
+              {title}
+            </div>
+
+            {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+
+            <div className={styles.buttonsWrapper}>
+              <Button
+                className={backButtonClasses}
+                label={backButtonLabel}
+                onClick={onCancel}
+                skin={<SimpleButtonSkin />}
+              />
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+}

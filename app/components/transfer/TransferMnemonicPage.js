@@ -11,53 +11,48 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
-import styles from './DaedalusTransferFormPage.scss';
+import styles from './TransferMnemonicPage.scss';
 
 const messages = defineMessages({
   title: {
-    id: 'daedalusTransfer.form.instructions.title.label',
+    id: 'transfer.form.instructions.title.label',
     defaultMessage: '!!!Instructions',
-    description: 'Label "Instructions" on the Daedalus transfer form page.'
-  },
-  step0: {
-    id: 'daedalusTransfer.form.instructions.step0.text',
-    defaultMessage: '!!!Enter the 12-word recovery phrase used to back up your Daedalus wallet to restore the balance and transfer all the funds from Daedalus to Icarus.',
-    description: 'Text for instructions step 0 on the Daedalus transfer form page.'
+    description: 'Label "Instructions" on the transfer mnemonic page.'
   },
   step1: {
-    id: 'daedalusTransfer.form.instructions.step1.text',
-    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds from Daedalus to Icarus. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
-    description: 'Text for instructions step 1 on the Daedalus transfer form page.'
+    id: 'transfer.form.instructions.step1.text',
+    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
+    description: 'Text for instructions step 1 on the transfer mnemonic page.'
   },
   recoveryPhraseInputLabel: {
-    id: 'daedalusTransfer.form.recovery.phrase.input.label',
+    id: 'transfer.form.recovery.phrase.input.label',
     defaultMessage: '!!!Recovery phrase',
-    description: 'Label for the recovery phrase input on the Daedalus transfer form page.'
+    description: 'Label for the recovery phrase input on the transfer mnemonic page.'
   },
   recoveryPhraseInputHint: {
-    id: 'daedalusTransfer.form.recovery.phrase.input.hint',
+    id: 'transfer.form.recovery.phrase.input.hint',
     defaultMessage: '!!!Enter recovery phrase',
-    description: 'Hint "Enter recovery phrase" for the recovery phrase input on the Daedalus transfer form page.'
+    description: 'Hint "Enter recovery phrase" for the recovery phrase input on the transfer mnemonic page.'
   },
   recoveryPhraseNoResults: {
-    id: 'daedalusTransfer.form.recovery.phrase.input.noResults',
+    id: 'transfer.form.recovery.phrase.input.noResults',
     defaultMessage: '!!!No results',
     description: '"No results" message for the recovery phrase input search results.'
   },
   invalidRecoveryPhrase: {
-    id: 'daedalusTransfer.form.errors.invalidRecoveryPhrase',
+    id: 'transfer.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
     description: 'Error message shown when invalid recovery phrase was entered.'
   },
   backButtonLabel: {
-    id: 'daedalusTransfer.form.back',
+    id: 'transfer.form.back',
     defaultMessage: '!!!Back',
-    description: 'Label for the back button on the Daedalus transfer form page.'
+    description: 'Label for the back button on the transfer mnemonic page.'
   },
   nextButtonLabel: {
-    id: 'daedalusTransfer.form.next',
+    id: 'transfer.form.next',
     defaultMessage: '!!!Next',
-    description: 'Label for the next button on the Daedalus transfer form page.'
+    description: 'Label for the next button on the transfer mnemonic page.'
   },
 });
 
@@ -68,10 +63,12 @@ type Props = {
   onBack: Function,
   mnemonicValidator: Function,
   validWords: Array<string>,
+  step0: string,
+  mnemonicLength: number
 };
 
 @observer
-export default class DaedalusTransferFormPage extends Component<Props> {
+export default class TransferMnemonicPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -116,7 +113,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, onBack } = this.props;
+    const { validWords, onBack, step0, mnemonicLength } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -137,7 +134,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
 
           <div className={styles.body}>
 
-            { /* Instructions for how to migrate */ }
+            { /* Instructions for how to transfer */ }
             <div>
               <div className={styles.title}>
                 {intl.formatMessage(messages.title)}
@@ -145,19 +142,17 @@ export default class DaedalusTransferFormPage extends Component<Props> {
 
               <ul className={styles.instructionsList}>
                 {
-                  Array(2).fill().map((_, idx) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <div key={`step${idx}`} className={styles.text}>
-                      {intl.formatMessage({ id: messages[`step${idx}`].id })}
-                    </div>
-                  ))
+                  <div className={styles.text}>
+                    {step0}
+                    {intl.formatMessage(messages.step1)}
+                  </div>
                 }
               </ul>
             </div>
 
             <Autocomplete
               options={validWords}
-              maxSelections={12}
+              maxSelections={mnemonicLength}
               {...recoveryPhraseField.bind()}
               error={recoveryPhraseField.error}
               maxVisibleOptions={5}
