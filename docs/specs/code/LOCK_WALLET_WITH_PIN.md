@@ -39,3 +39,21 @@ minimum 6 characters (max depending on the design). PIN will be stored as a hash
 - The entered pin code will be processed by bcryptjs and if it's correct the app will be unlocked.
 - note: since all the settings are stored locally, the user will be able to open Application tab in browser and remove all related items from the localStorage, thus the app will be unlocked after a page refresh.
 - User is able to change his PIN code from settings page, but he have to remember his current PIN code for changing.
+
+# Improvement proposal
+
+### Flow 1: keep lock screen optional
+
+If we want to keep lock screen optional as it is, we could just encrypt saved data as it was proposed. We also might display some kind of notification to user when there are no wallet data in localStorage, something like "Enable lock screen to improve the security". I think we need user to understand clearly that if he\she don't avoid the lock screen, his\her data won't be protected with encryption.
+
+### Flow 2: make lock screen enabled by default for all users
+
+In this case, we will have 3 states of the app
+- state 1: there are no wallet data and no hashed pincode in the localStorage
+This is like a state after you just have installed the app. State 1 asks user to set a pin code to proceed. 
+- state 2: there is a hashed pincode in the localStorage
+At this stage user is asked to confirm his pincode every time when the user opens the app. Now user can work with wallets. When user tries to add or restore the wallet, wallet data should be encrypted and then saved. 
+- state 3: there is wallet data in localStorage, but no hashed pin code
+In this case walled data should be cleared and the app goes to state 1.
+
+Flow 2 has better security because if someone clears the lock screen-related fields in the localStorage, he\she won't be able to work with wallets.
