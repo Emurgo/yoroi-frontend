@@ -86,7 +86,7 @@ export async function generateTransferTx(payload: {
       throw new NoInputsError();
     }
     const recoveredBalance = await getBalance(senders);
-    const inputWrappers : Array<DaedalusInputWrapper> = _getInputs(senderUtxos, addressesWithFunds);
+    const inputWrappers: Array<DaedalusInputWrapper> = _getInputs(senderUtxos, addressesWithFunds);
     const inputs = inputWrappers.map(w => w.input);
 
     // pick which address to send transfer to
