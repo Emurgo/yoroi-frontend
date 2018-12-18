@@ -22,7 +22,7 @@ import type {
   UTXO,
   Transaction
 } from '../adaTypes';
-import type { TxValidation } from '../../../types/daedalusTransferTypes';
+import type { TxValidation } from '../../../types/TransferTypes';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
