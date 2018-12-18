@@ -34,7 +34,7 @@ import type {
 } from './adaTypes';
 import type {
   TransferTx
-} from '../../types/daedalusTransferTypes';
+} from '../../types/TransferTypes';
 
 /** Go through the whole UTXO and see which belong to the walet and have non-empty balance
  * @param fullUtxo the full utxo of the Cardano blockchain
@@ -75,7 +75,7 @@ export async function generateTransferTx(payload: {
     const recoveredBalance = await getBalance(senders);
     const inputs = _getInputs(senderUtxos, addressesWithFunds);
 
-    // pick which address to send migration to
+    // pick which address to send transfer to
     const output = await _getReceiverAddress();
 
     // get wallet and make transaction
@@ -99,7 +99,7 @@ export async function generateTransferTx(payload: {
   }
 }
 
-/** Follow heuristic to pick which address to send Daedalus migration to */
+/** Follow heuristic to pick which address to send Daedalus transfer to */
 async function _getReceiverAddress(): Promise<string> {
   // Note: Current heuristic is to pick the first address in the wallet
   // rationale & better heuristic described at https://github.com/Emurgo/yoroi-frontend/issues/96

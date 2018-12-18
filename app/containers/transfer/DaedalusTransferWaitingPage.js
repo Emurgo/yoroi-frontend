@@ -2,8 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import LoadingSpinner from '../widgets/LoadingSpinner';
-import styles from './DaedalusTransferWaitingPage.scss';
+import AnnotatedLoader from '../../components/transfer/AnnotatedLoader';
 
 const messages = defineMessages({
   title: {
@@ -44,24 +43,10 @@ export default class DaedalusTransferWaitingPage extends Component<Props> {
     const { status } = this.props;
 
     return (
-      <div className={styles.component}>
-
-        <div>
-          <div className={styles.body}>
-
-            <div className={styles.title}>
-              {intl.formatMessage(messages.title)}
-            </div>
-
-            <LoadingSpinner />
-
-            <div className={styles.progressInfo}>
-              {intl.formatMessage(messages[status])}
-            </div>
-          </div>
-        </div>
-
-      </div>
+      <AnnotatedLoader
+        title={intl.formatMessage(messages.title)}
+        details={intl.formatMessage(messages[status])}
+      />
     );
   }
 }
