@@ -1,7 +1,11 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import type { Notification } from '../../types/notificationType';
+import NotificationMessage from '../../components/widgets/NotificationMessage';
+import globalMessages from '../../i18n/global-messages';
+import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
@@ -76,15 +80,40 @@ export default class WalletSummaryPage extends Component<Props> {
       }
     }
 
+    const notification = this._getThisPageActiveNotification();
+
     return (
       <VerticalFlexContainer>
+
+        <NotificationMessage
+          icon={successIcon}
+          show={!!notification.id}
+        >
+          {notification.id && <FormattedHTMLMessage {...notification.message} />}
+        </NotificationMessage>
+
         <WalletSummary
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
         />
+
         {walletTransactions}
+
       </VerticalFlexContainer>
     );
+  }
+
+  _getThisPageActiveNotification = (): Notification | any => {
+    let notification = {};
+
+    const { firstActiveNotification } = this.props.stores.uiNotifications;
+    if (firstActiveNotification
+      && (firstActiveNotification.id ===
+        globalMessages.trezorTWalletIntegratedNotificationMessage.id)) {
+      notification = firstActiveNotification;
+    }
+
+    return notification;
   }
 }

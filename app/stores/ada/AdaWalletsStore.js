@@ -1,6 +1,10 @@
 // @flow
 // import { BigNumber } from 'bignumber.js';
 import { observable, action } from 'mobx';
+
+import config from '../../config';
+import globalMessages from '../../i18n/global-messages';
+import type { Notification } from '../../types/notificationType';
 import WalletStore from '../base/WalletStore';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '../lib/LocalizedRequest';
@@ -159,6 +163,16 @@ export default class AdaWalletsStore extends WalletStore {
     await this._patchWalletRequestWithNewWallet(importedWallet);
     this.refreshWalletsData();
   };
+
+  // =================== NOTIFICATION ==================== //
+  showTrezorTWalletIntegratedNotification(): void {
+    const notification: Notification = {
+      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
+      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
+      duration: config.wallets.TREZOR_T_WALLET_INTEGRATED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
 
   // =================== PRIVATE API ==================== //
 

@@ -368,6 +368,9 @@ export default class TrezorConnectStore extends Store {
         // Load the Yoroi with Trezor Icon
         this.stores.topbar.initCategories();
 
+        // show success notification
+        wallets.showTrezorTWalletIntegratedNotification();
+
         // TODO: [TREZOR] not sure if it actully distructing this Store ??
         this.teardown();
         Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');

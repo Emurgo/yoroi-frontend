@@ -1,5 +1,5 @@
 // @flow
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import Store from '../base/Store';
 import type { Notification } from '../../types/notificationType';
 
@@ -7,6 +7,10 @@ import type { Notification } from '../../types/notificationType';
 export default class UiNotificationsStore extends Store {
 
   @observable activeNotifications: Array<Notification> = [];
+
+  @computed get firstActiveNotification(): ?Notification {
+    return this.activeNotifications.length > 0 ? this.activeNotifications[0] : null;
+  }
 
   setup() {
     this.actions.notifications.open.listen(this._onOpen);
@@ -19,9 +23,10 @@ export default class UiNotificationsStore extends Store {
     this.activeNotifications.find(notification => notification.id === id)
   );
 
-  @action _onOpen = ({ id, duration } : { id: string, duration?: number }) => {
-    const notification = {
+  @action _onOpen = ({ id, message, duration }: Notification) => {
+    const notification: Notification = {
       id,
+      message,
       duration: duration || null,
       secondsTimerInterval: duration ? setInterval(this._updateSeconds, 1000, id) : null,
     };
