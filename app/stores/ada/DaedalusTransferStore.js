@@ -16,7 +16,8 @@ import LocalizableError, {
 } from '../../i18n/LocalizableError';
 import type {
   TransferStatus,
-  TransferTx
+  TransferTx,
+  TxValidation
 } from '../../types/TransferTypes';
 import {
   getAddressesWithFunds,
@@ -157,11 +158,12 @@ export default class DaedalusTransferStore extends Store {
 
   /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (payload: {
-    cborEncodedTx: Array<number>
+    cborEncodedTx: Array<number>,
+    txValidation: TxValidation
   }): Promise<Array<void>> => {
-    const { cborEncodedTx } = payload;
+    const { cborEncodedTx, txValidation } = payload;
     const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-    return sendTx({ signedTx });
+    return sendTx({ signedTx, txValidation });
   }
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
@@ -174,7 +176,8 @@ export default class DaedalusTransferStore extends Store {
         throw new NoTransferTxError();
       }
       await this.transferFundsRequest.execute({
-        cborEncodedTx: this.transferTx.cborEncodedTx
+        cborEncodedTx: this.transferTx.cborEncodedTx,
+        txValidation: this.transferTx.txValidation
       });
       // TBD: why do we need a continuation instead of just pustting the code here directly?
       next();

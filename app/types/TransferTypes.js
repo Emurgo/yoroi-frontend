@@ -16,5 +16,9 @@ export type TransferTx = {
   fee: BigNumber,
   cborEncodedTx: Array<number>,
   senders: Array<string>,
-  receiver: string
+  receiver: string,
+  txValidation: TxValidation
 }
+
+/** Validation is either an array of error objects, or a success message */
+export type TxValidation = { errors: Array<any> }
