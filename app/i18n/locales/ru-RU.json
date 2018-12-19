@@ -210,7 +210,7 @@
   "wallet.summary.page.showMoreTransactionsButtonLabel": "Показать больше транзакций",
   "wallet.summary.page.todayLabel": "Сегодня",
   "wallet.summary.page.transactionsLabel": "Количество транзакций",
-  "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with Trezor Model T device",
+  "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with your Trezor Model T device",
   "wallet.summary.page.yesterdayLabel": "Вчера",
   "wallet.transaction.address.from": "С адреса",
   "wallet.transaction.address.to": "На адрес",

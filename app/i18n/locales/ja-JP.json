@@ -210,7 +210,7 @@
   "wallet.summary.page.showMoreTransactionsButtonLabel": "さらに表示",
   "wallet.summary.page.todayLabel": "今日",
   "wallet.summary.page.transactionsLabel": "取引件数",
-  "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with Trezor Model T device",
+  "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with your Trezor Model T device",
   "wallet.summary.page.yesterdayLabel": "昨日",
   "wallet.transaction.address.from": "送信アドレス",
   "wallet.transaction.address.to": "受信アドレス",

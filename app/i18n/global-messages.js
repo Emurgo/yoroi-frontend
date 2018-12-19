@@ -174,7 +174,7 @@ export default defineMessages({
   },
   trezorTWalletIntegratedNotificationMessage: {
     id: 'wallet.summary.page.trezorTWalletIntegratedNotificationMessage',
-    defaultMessage: '!!!You have successfully integrated with Trezor Model T device',
+    defaultMessage: '!!!You have successfully integrated with your Trezor Model T device',
     description: 'Notification Message for successful integration with Trezor Model T device.',
   },
 });

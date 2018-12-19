@@ -8,8 +8,10 @@ export default class UiNotificationsStore extends Store {
 
   @observable activeNotifications: Array<Notification> = [];
 
-  @computed get firstActiveNotification(): ?Notification {
-    return this.activeNotifications.length > 0 ? this.activeNotifications[0] : null;
+  @computed get mostRecentActiveNotification(): ?Notification {
+    return this.activeNotifications.length > 0 ?
+      this.activeNotifications[this.activeNotifications.length - 1] :
+      null;
   }
 
   setup() {

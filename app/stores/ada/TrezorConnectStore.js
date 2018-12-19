@@ -5,13 +5,14 @@
 import { observable, action } from 'mobx';
 import { defineMessages } from 'react-intl';
 
-import Config from '../../config';
-import environment from '../../environment';
-
 import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
 import type { DeviceMessage, Features, UiMessage } from 'trezor-connect';
 
+import Config from '../../config';
+import environment from '../../environment';
+
 import Store from '../base/Store';
+import Wallet from '../../domain/Wallet';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import globalMessages from '../../i18n/global-messages';
@@ -348,32 +349,9 @@ export default class TrezorConnectStore extends Store {
       this._setIsCreateTrezorWalletActive(true);
       this.createTrezorWalletRequest.reset();
 
-      const trezorWallet = await this.createTrezorWalletRequest.execute(params).promise;
+      const trezorWallet: Wallet = await this.createTrezorWalletRequest.execute(params).promise;
       if (trezorWallet) {
-        // close the active dialog
-        Logger.debug('TrezorConnectStore::_saveTrezor success, closing dialog');
-        this.actions.dialogs.closeActiveDialog.trigger();
-
-        const { wallets } = this.stores.substores[environment.API];
-        await wallets._patchWalletRequestWithNewWallet(trezorWallet);
-
-        // goto the wallet transactions page
-        Logger.debug('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
-        wallets.goToWalletRoute(trezorWallet.id);
-
-        // fetch its data
-        Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
-        wallets.refreshWalletsData();
-
-        // Load the Yoroi with Trezor Icon
-        this.stores.topbar.initCategories();
-
-        // show success notification
-        wallets.showTrezorTWalletIntegratedNotification();
-
-        // TODO: [TREZOR] not sure if it actully distructing this Store ??
-        this.teardown();
-        Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');
+        await this._onSaveSucess(trezorWallet);
       } else {
         // this Error will be converted to LocalizableError()
         throw new Error();
@@ -395,6 +373,33 @@ export default class TrezorConnectStore extends Store {
       this.createTrezorWalletRequest.reset();
       this._setIsCreateTrezorWalletActive(false);
     }
+  };
+
+  _onSaveSucess = async (trezorWallet: Wallet) => {
+    // close the active dialog
+    Logger.debug('TrezorConnectStore::_saveTrezor success, closing dialog');
+    this.actions.dialogs.closeActiveDialog.trigger();
+
+    const { wallets } = this.stores.substores[environment.API];
+    await wallets._patchWalletRequestWithNewWallet(trezorWallet);
+
+    // goto the wallet transactions page
+    Logger.debug('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
+    wallets.goToWalletRoute(trezorWallet.id);
+
+    // fetch its data
+    Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
+    wallets.refreshWalletsData();
+
+    // Load the Yoroi with Trezor Icon
+    this.stores.topbar.initCategories();
+
+    // show success notification
+    wallets.showTrezorTWalletIntegratedNotification();
+
+    // TODO: [TREZOR] not sure if it actully distructing this Store ??
+    this.teardown();
+    Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');
   };
   // =================== SAVE =================== //
 

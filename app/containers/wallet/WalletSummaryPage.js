@@ -87,9 +87,9 @@ export default class WalletSummaryPage extends Component<Props> {
 
         <NotificationMessage
           icon={successIcon}
-          show={!!notification.id}
+          show={!!notification}
         >
-          {notification.id && <FormattedHTMLMessage {...notification.message} />}
+          {!!notification && <FormattedHTMLMessage {...notification.message} />}
         </NotificationMessage>
 
         <WalletSummary
@@ -104,14 +104,14 @@ export default class WalletSummaryPage extends Component<Props> {
     );
   }
 
-  _getThisPageActiveNotification = (): Notification | any => {
-    let notification = {};
+  _getThisPageActiveNotification = (): ?Notification => {
+    let notification = null;
 
-    const { firstActiveNotification } = this.props.stores.uiNotifications;
-    if (firstActiveNotification
-      && (firstActiveNotification.id ===
+    const { mostRecentActiveNotification } = this.props.stores.uiNotifications;
+    if (mostRecentActiveNotification
+      && (mostRecentActiveNotification.id ===
         globalMessages.trezorTWalletIntegratedNotificationMessage.id)) {
-      notification = firstActiveNotification;
+      notification = mostRecentActiveNotification;
     }
 
     return notification;

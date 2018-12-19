@@ -210,7 +210,7 @@
   "wallet.summary.page.showMoreTransactionsButtonLabel": "顯示更多交易（已編輯）",
   "wallet.summary.page.todayLabel": "今天",
   "wallet.summary.page.transactionsLabel": "交易數目",
-  "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with Trezor Model T device",
+  "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with your Trezor Model T device",
   "wallet.summary.page.yesterdayLabel": "昨天",
   "wallet.transaction.address.from": "寄件人地址",
   "wallet.transaction.address.to": "收件人地址",
