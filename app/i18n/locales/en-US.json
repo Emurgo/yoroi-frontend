@@ -141,7 +141,7 @@
   "wallet.navigation.receive": "Receive",
   "wallet.navigation.send": "Send",
   "wallet.navigation.transactions": "Transactions",
-  "wallet.receive.page.addressCopyNotificationMessage": "You have successfully copied wallet address",
+  "wallet.receive.page.addressCopyNotificationMessage": "You have successfully copied your wallet address",
   "wallet.receive.page.copyAddressLabel": "Copy address",
   "wallet.receive.page.generateNewAddressButtonLabel": "Generate new address",
   "wallet.receive.page.generatedAddressesSectionTitle": "Generated addresses",

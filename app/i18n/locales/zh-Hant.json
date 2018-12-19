@@ -141,7 +141,7 @@
   "wallet.navigation.receive": "接收",
   "wallet.navigation.send": "傳送",
   "wallet.navigation.transactions": "交易",
-  "wallet.receive.page.addressCopyNotificationMessage": "您已成功複製錢包地址",
+  "wallet.receive.page.addressCopyNotificationMessage": "您已成功複製您的錢包地址",
   "wallet.receive.page.copyAddressLabel": "複製地址",
   "wallet.receive.page.generateNewAddressButtonLabel": "產生新地址",
   "wallet.receive.page.generatedAddressesSectionTitle": "已產生地址",
