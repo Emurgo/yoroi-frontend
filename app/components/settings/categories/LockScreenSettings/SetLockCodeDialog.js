@@ -78,7 +78,7 @@ export default class SetLockCodeDialog extends Component {
                 this.context.intl.formatMessage(messages.currentError),
               ];
             }
-            return [false];
+            return [false, this.context.intl.formatMessage(messages.currentError)];
           }],
         },
       },
@@ -104,7 +104,7 @@ export default class SetLockCodeDialog extends Component {
         value: '',
         validators: [({ field, form }) => {
           const code = form.$('newCode').value;
-          if (!code.length) return [false];
+          if (!code.length && !field.value) return [true];
           if (code !== field.value) {
             return [
               false,

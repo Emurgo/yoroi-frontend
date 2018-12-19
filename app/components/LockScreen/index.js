@@ -78,7 +78,7 @@ export default class LockScreen extends Component {
               this.props.intl.formatMessage(messages.errorLabel),
             ];
           }
-          return [false];
+          return [false, this.props.intl.formatMessage(messages.errorLabel)];
         }],
       },
     },
