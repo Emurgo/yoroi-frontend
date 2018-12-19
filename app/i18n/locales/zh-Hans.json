@@ -211,6 +211,8 @@
   "wallet.summary.page.todayLabel": "今天",
   "wallet.summary.page.transactionsLabel": "交易数",
   "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with your Trezor Model T device",
+  "wallet.summary.page.walletCreatedNotificationMessage": "!!!You have successfully created a new Wallet",
+  "wallet.summary.page.walletRestoredNotificationMessage": "!!!You have successfully restored your Wallet",
   "wallet.summary.page.yesterdayLabel": "昨天",
   "wallet.transaction.address.from": "源地址",
   "wallet.transaction.address.to": "目标地址",

@@ -109,8 +109,14 @@ export default class WalletSummaryPage extends Component<Props> {
 
     const { mostRecentActiveNotification } = this.props.stores.uiNotifications;
     if (mostRecentActiveNotification
-      && (mostRecentActiveNotification.id ===
-        globalMessages.trezorTWalletIntegratedNotificationMessage.id)) {
+      && (
+        (mostRecentActiveNotification.id ===
+          globalMessages.walletCreatedNotificationMessage.id)
+        || (mostRecentActiveNotification.id ===
+          globalMessages.walletRestoredNotificationMessage.id)
+        || (mostRecentActiveNotification.id ===
+          globalMessages.trezorTWalletIntegratedNotificationMessage.id)
+      )) {
       notification = mostRecentActiveNotification;
     }
 

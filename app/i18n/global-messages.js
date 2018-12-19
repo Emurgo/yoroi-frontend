@@ -172,6 +172,16 @@ export default defineMessages({
     defaultMessage: '!!!Cancelled. Please retry.',
     description: '<Cancelled. Please retry.>'
   },
+  walletCreatedNotificationMessage: {
+    id: 'wallet.summary.page.walletCreatedNotificationMessage',
+    defaultMessage: '!!!You have successfully created a new Wallet',
+    description: 'Notification Message for successful wallet creation.',
+  },
+  walletRestoredNotificationMessage: {
+    id: 'wallet.summary.page.walletRestoredNotificationMessage',
+    defaultMessage: '!!!You have successfully restored your Wallet',
+    description: 'Notification Message for successful wallet restoration.',
+  },
   trezorTWalletIntegratedNotificationMessage: {
     id: 'wallet.summary.page.trezorTWalletIntegratedNotificationMessage',
     defaultMessage: '!!!You have successfully integrated with your Trezor Model T device',

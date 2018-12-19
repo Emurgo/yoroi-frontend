@@ -211,6 +211,8 @@
   "wallet.summary.page.todayLabel": "Сегодня",
   "wallet.summary.page.transactionsLabel": "Количество транзакций",
   "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with your Trezor Model T device",
+  "wallet.summary.page.walletCreatedNotificationMessage": "!!!You have successfully created a new Wallet",
+  "wallet.summary.page.walletRestoredNotificationMessage": "!!!You have successfully restored your Wallet",
   "wallet.summary.page.yesterdayLabel": "Вчера",
   "wallet.transaction.address.from": "С адреса",
   "wallet.transaction.address.to": "На адрес",

@@ -211,6 +211,8 @@
   "wallet.summary.page.todayLabel": "오늘",
   "wallet.summary.page.transactionsLabel": "거래 수",
   "wallet.summary.page.trezorTWalletIntegratedNotificationMessage": "!!!You have successfully integrated with your Trezor Model T device",
+  "wallet.summary.page.walletCreatedNotificationMessage": "!!!You have successfully created a new Wallet",
+  "wallet.summary.page.walletRestoredNotificationMessage": "!!!You have successfully restored your Wallet",
   "wallet.summary.page.yesterdayLabel": "어제",
   "wallet.transaction.address.from": "보낸 주소",
   "wallet.transaction.address.to": "받는 주소",
