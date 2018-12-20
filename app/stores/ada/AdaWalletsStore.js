@@ -131,7 +131,6 @@ export default class AdaWalletsStore extends WalletStore {
     this.restoreRequest.reset();
     await this._patchWalletRequestWithNewWallet(restoredWallet);
     this.refreshWalletsData();
-
     // show success notification
     this.showWalletRestoredNotification();
   };
@@ -168,11 +167,20 @@ export default class AdaWalletsStore extends WalletStore {
   };
 
   // =================== NOTIFICATION ==================== //
+  showTrezorTWalletIntegratedNotification = (): void => {
+    const notification: Notification = {
+      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
+      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
+      duration: config.wallets.TREZOR_WALLET_INTEGRATED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
+
   showWalletCreatedNotification = (): void => {
     const notification: Notification = {
       id: globalMessages.walletCreatedNotificationMessage.id,
       message: globalMessages.walletCreatedNotificationMessage,
-      duration: config.wallets.WALLET_CREATION_SUCCESS_NOTIFICATION_DURATION,
+      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
     };
     this.actions.notifications.open.trigger(notification);
   }
@@ -181,16 +189,7 @@ export default class AdaWalletsStore extends WalletStore {
     const notification: Notification = {
       id: globalMessages.walletRestoredNotificationMessage.id,
       message: globalMessages.walletRestoredNotificationMessage,
-      duration: config.wallets.WALLET_CREATION_SUCCESS_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showTrezorTWalletIntegratedNotification = (): void => {
-    const notification: Notification = {
-      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
-      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATION_SUCCESS_NOTIFICATION_DURATION,
+      duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
     };
     this.actions.notifications.open.trigger(notification);
   }

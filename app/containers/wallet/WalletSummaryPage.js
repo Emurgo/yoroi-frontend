@@ -32,6 +32,12 @@ export const messages = defineMessages({
   }
 });
 
+const targetNotificationIds = [
+  globalMessages.walletCreatedNotificationMessage.id,
+  globalMessages.walletRestoredNotificationMessage.id,
+  globalMessages.trezorTWalletIntegratedNotificationMessage.id,
+];
+
 @observer
 export default class WalletSummaryPage extends Component<Props> {
   static contextTypes = {
@@ -108,15 +114,10 @@ export default class WalletSummaryPage extends Component<Props> {
     let notification = null;
 
     const { mostRecentActiveNotification } = this.props.stores.uiNotifications;
-    if (mostRecentActiveNotification
-      && (
-        (mostRecentActiveNotification.id ===
-          globalMessages.walletCreatedNotificationMessage.id)
-        || (mostRecentActiveNotification.id ===
-          globalMessages.walletRestoredNotificationMessage.id)
-        || (mostRecentActiveNotification.id ===
-          globalMessages.trezorTWalletIntegratedNotificationMessage.id)
-      )) {
+    const activeNotificationId = mostRecentActiveNotification ?
+      mostRecentActiveNotification.id :
+      '';
+    if (targetNotificationIds.includes(activeNotificationId)) {
       notification = mostRecentActiveNotification;
     }
 

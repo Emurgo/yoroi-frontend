@@ -13,7 +13,7 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 
 import styles from './TrezorSendConfirmationDialog.scss';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   infoLine1: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
