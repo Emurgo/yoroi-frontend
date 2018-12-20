@@ -121,6 +121,31 @@ button {
   src: url("../assets/fonts/Montserrat-Medium.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: 'Rubik-Light';
+  src: url("../assets/fonts/Rubik-Light.ttf") format("opentype");
+}
+
+@font-face {
+  font-family: 'Rubik-Regular';
+  src: url("../assets/fonts/Rubik-Regular.ttf") format("opentype");
+}
+
+@font-face {
+  font-family: 'Rubik-Medium';
+  src: url("../assets/fonts/Rubik-Medium.ttf") format("opentype");
+}
+
+@font-face {
+  font-family: 'Rubik-Bold';
+  src: url("../assets/fonts/Rubik-Bold.ttf") format("opentype");
+}
+
+@font-face {
+  font-family: 'Rubik-Black';
+  src: url("../assets/fonts/Rubik-Black.ttf") format("opentype");
+}
+
 // ============ BASE ===========
 
 html, body, #root, #root > [data-reactroot] {

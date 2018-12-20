@@ -14,14 +14,14 @@
 
 .centeredBox {
   margin: 0 auto;
-  width: 600px;
+  width: 660px;
 }
 
 .submitButton,
 .submitButtonSpinning {
   display: block !important;
-  margin: 0 auto;
-  width: 100% !important;
+  margin: 0;
+  width: 210px !important;
 }
 
 .submitButtonSpinning {
@@ -35,8 +35,11 @@
 }
 
 .checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 30px;
-  padding-top: 10px;
+  padding-top: 60px;
 
   :global .SimpleCheckbox_label {
     font-family: var(--font-regular);

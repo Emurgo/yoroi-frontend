@@ -81,18 +81,17 @@ export default class TermsOfUseForm extends Component<Props, State> {
               checked={areTermsOfUseAccepted}
               skin={<SimpleCheckboxSkin />}
             />
+
+            <Button
+              className={buttonClasses}
+              label={intl.formatMessage(messages.submitLabel)}
+              onMouseUp={this.submit}
+              disabled={!areTermsOfUseAccepted}
+              skin={<SimpleButtonSkin />}
+            />
           </div>
 
           {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
-
-          <Button
-            className={buttonClasses}
-            label={intl.formatMessage(messages.submitLabel)}
-            onMouseUp={this.submit}
-            disabled={!areTermsOfUseAccepted}
-            skin={<SimpleButtonSkin />}
-          />
-
         </div>
       </div>
     );
