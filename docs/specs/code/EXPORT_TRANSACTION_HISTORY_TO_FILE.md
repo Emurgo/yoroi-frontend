@@ -8,13 +8,13 @@ Users should be able to chose the time period to export transaction for, like da
 
 ## UI
 
-I would suggest adding a new "menu button" (like triple dots, or something) at the bottom of the transactions list, and when user clicks it - it opens a menu with a single item (for now) - "Export to file". But later we might be adding new stuff to the menu. Something like this (general idea):
+I suggest adding a new "Export to File" icon at the top-right of the transactions list. Something like this (general idea):
 
-![image](https://user-images.githubusercontent.com/5585355/50314196-fad3e980-04be-11e9-8488-13e8803524c5.png)
+![image](https://user-images.githubusercontent.com/5585355/50343034-8e94cc80-0536-11e9-9058-1af18be67f8a.png)
 
 When user clicks "Export to file" - new dialog window opens up:
 
-![image](https://user-images.githubusercontent.com/5585355/50316193-af253e00-04c6-11e9-968d-e726548a7e5f.png)
+![image](https://user-images.githubusercontent.com/5585355/50346357-31534800-0543-11e9-949a-873bcae9b854.png)
 
 Dialog contains:
 1. Two date selectors: "from day", "to day"
@@ -28,7 +28,7 @@ Comments:
 
 When export process starts - dialog probably gotta be locked with a spinner:
 
-![image](https://user-images.githubusercontent.com/5585355/50315379-95cec280-04c3-11e9-989b-94b7f712ba0b.png)
+![image](https://user-images.githubusercontent.com/5585355/50346408-5647bb00-0543-11e9-9a63-684c0a5c8f17.png)
 
 If no transaction are found in the selected period - dialog is displayed again but with an error message like: "Selected period contains no transactions".
 
