@@ -1,6 +1,10 @@
 // @flow
 // import { BigNumber } from 'bignumber.js';
 import { observable, action } from 'mobx';
+
+import config from '../../config';
+import globalMessages from '../../i18n/global-messages';
+import type { Notification } from '../../types/notificationType';
 import WalletStore from '../base/WalletStore';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '../lib/LocalizedRequest';
@@ -127,6 +131,8 @@ export default class AdaWalletsStore extends WalletStore {
     this.restoreRequest.reset();
     await this._patchWalletRequestWithNewWallet(restoredWallet);
     this.refreshWalletsData();
+    // show success notification
+    this.showWalletRestoredNotification();
   };
 
   // =================== WALLET IMPORTING ==================== //
@@ -159,6 +165,34 @@ export default class AdaWalletsStore extends WalletStore {
     await this._patchWalletRequestWithNewWallet(importedWallet);
     this.refreshWalletsData();
   };
+
+  // =================== NOTIFICATION ==================== //
+  showTrezorTWalletIntegratedNotification = (): void => {
+    const notification: Notification = {
+      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
+      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
+      duration: config.wallets.TREZOR_WALLET_INTEGRATED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
+
+  showWalletCreatedNotification = (): void => {
+    const notification: Notification = {
+      id: globalMessages.walletCreatedNotificationMessage.id,
+      message: globalMessages.walletCreatedNotificationMessage,
+      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
+
+  showWalletRestoredNotification = (): void => {
+    const notification: Notification = {
+      id: globalMessages.walletRestoredNotificationMessage.id,
+      message: globalMessages.walletRestoredNotificationMessage,
+      duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
 
   // =================== PRIVATE API ==================== //
 

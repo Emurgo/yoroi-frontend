@@ -84,6 +84,13 @@ export default class WalletReceivePage extends Component<Props, State> {
     return (
       <VerticalFlexContainer>
 
+        <NotificationMessage
+          icon={successIcon}
+          show={uiNotifications.isOpen(notification.id)}
+        >
+          {notification.message}
+        </NotificationMessage>
+
         <WalletReceive
           walletAddress={walletAddress}
           isWalletAddressUsed={isWalletAddressUsed}
@@ -94,18 +101,12 @@ export default class WalletReceivePage extends Component<Props, State> {
             actions.notifications.open.trigger({
               id: notification.id,
               duration: notification.duration,
+              message: messages.message
             });
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
         />
-
-        <NotificationMessage
-          icon={successIcon}
-          show={uiNotifications.isOpen(notification.id)}
-        >
-          {notification.message}
-        </NotificationMessage>
 
       </VerticalFlexContainer>
     );

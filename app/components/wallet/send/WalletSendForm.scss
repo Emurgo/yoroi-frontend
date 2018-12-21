@@ -2,7 +2,10 @@
 @import '../../../themes/mixins/error-message';
 
 .component {
-  padding: 20px;
+  padding-top: 40px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  padding-left: 20px;
 }
 
 .amountInput,
