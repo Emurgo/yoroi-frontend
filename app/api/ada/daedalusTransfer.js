@@ -97,7 +97,7 @@ export async function generateTransferTx(payload: {
     const tx: MoveResponse = getResultOrFail(Wallet.move(wallet, inputs, output));
 
     // Validate address/witness crypto
-    const inputValidation = await _validateAddressesAndSignatures(secretWords, wallet, inputWrappers, tx);
+    const inputValidation = await _validateTxSignatures(secretWords, wallet, inputWrappers, tx);
     if (inputValidation.errors.length) {
       Logger.info('Input validation errors:');
       inputValidation.errors.forEach(e => Logger.info(JSON.stringify(e)));
@@ -125,7 +125,7 @@ export async function generateTransferTx(payload: {
  * Unpack and decode provided transaction and validate all addresses and witnesses
  * @return array of error descriptors, or string 'OK' is everything is ok
  */
-async function _validateAddressesAndSignatures(
+async function _validateTxSignatures(
   secretWords: string,
   wallet: CryptoDaedalusWallet,
   inputWrappers: Array<DaedalusInputWrapper>,
@@ -137,12 +137,6 @@ async function _validateAddressesAndSignatures(
   try {
     const derivationScheme = 1;
     const secret = await walletSecretFromMnemonic(secretWords, derivationScheme);
-    if (secret.toString('hex').substr(0, 128) !== wallet.root_cached_key.substr(0, 128)) {
-      return {
-        errors: [{ reason: 'Wallet private key does not match!' }]
-      };
-    }
-    Logger.info('Private key validation successful');
     const pass = await xpubToHdPassphrase(secret.slice(64, 128));
     const errors = inputWrappers.map((inputWrapper, idx) => {
       const address = inputWrapper.address;
@@ -154,6 +148,11 @@ async function _validateAddressesAndSignatures(
         return { address, reason: 'Failed to perform validation!', error: stringifyError(e) };
       }
     }).filter(x => x);
+    if (secret.toString('hex').substr(0, 128) === wallet.root_cached_key.substr(0, 128)) {
+      Logger.info('Private key validation successful');
+    } else {
+      errors.push({ reason: 'Wallet private key does not match!' });
+    }
     return { errors };
   } catch (e) {
     return {
