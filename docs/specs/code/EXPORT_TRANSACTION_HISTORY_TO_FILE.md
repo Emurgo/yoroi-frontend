@@ -14,12 +14,14 @@ I suggest adding a new "Export to File" icon at the top-right of the transaction
 
 When user clicks "Export to file" - new dialog window opens up:
 
-![image](https://user-images.githubusercontent.com/5585355/50386371-fb09fa00-06f5-11e9-970e-17c27da109c9.png)
+![image](https://user-images.githubusercontent.com/5585355/50401206-c6ea1400-079d-11e9-9980-2fb1c9cbc493.png)
+
 
 Dialog contains:
 1. Comment about the fact that the whole existing history will be exported
 2. Dropdown-selector: "File format"
 3. Button "Export"
+4. Icon "Help" (Question mark)
 
 Comments:
 1. If we only gonna support XSLT for now - the dropdown selector for format might be either locked/disabled on the only default option, or replaced with just a label.
@@ -74,16 +76,24 @@ Now users should be able to chose the time period to export transaction for, lik
 
 Export dialog now contains additional elements to select a date-period:
 
-![image](https://user-images.githubusercontent.com/5585355/50346357-31534800-0543-11e9-949a-873bcae9b854.png)
+![image](https://user-images.githubusercontent.com/5585355/50401307-9eaee500-079e-11e9-8972-a8162a3a5982.png)
 
 Dialog contains:
-1. Two date selectors: "from day", "to day"
-2. Dropdown-selector "Select period"
-3. Dropdown-selector: "File format"
-4. Button "Export"
+1. Comment about the fact that the whole existing history will be exported
+2. Dropdown-selector: "File format"
+3. Dropdown-selector "Period"
+4. Two date selectors: "from day", "to day"
+5. Button "Export"
+6. Icon "Help" (Question mark)
 
-Comments:
-1. It might be an option for date-selectors to be locked/disabled by default, and only display the period selected in the dropdown, unless user selects option "Custom" - at which point selectors become enabled. But when user selects any other option - selectors become disabled again.
+"Period" selector contains multiple **dynamic** values (meaning that selecting the same value
+in different calendar days will select different specific period), like: "this month", "last month",
+"this quarter", "last quarter", "this year", "last year", etc. While any of these **dynamic** values
+are selected - "From" and "To" fields change their value accordingly, but they remain **disabled**
+for manual input.
+
+Additionally "Period" selector contains special value **"Custom"**. When use selects this option -
+"From" and "To" selectors become enabled for manual input. 
 
 ## Technical
 
