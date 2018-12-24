@@ -150,7 +150,7 @@ declare type CryptoWallet = {
 }
 
 declare type CryptoDaedalusWallet = {
-  root_cached_key: string,
+  root_cached_key: string, // equal to `root_key` in CryptoWallet
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: DerivationScheme
