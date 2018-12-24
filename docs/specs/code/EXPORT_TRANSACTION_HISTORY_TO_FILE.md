@@ -1,4 +1,4 @@
-# Iteration 1
+# Iteration 1 (basics)
 
 ## Abstract
 
@@ -70,7 +70,7 @@ Yoroi-Transaction-History_YYYY-MM-DD.{xlsx, csv}
 
 With **current date** inserted.
 
-# Iteration 2
+# Iteration 2 (export period)
 
 ## Abstract
 
