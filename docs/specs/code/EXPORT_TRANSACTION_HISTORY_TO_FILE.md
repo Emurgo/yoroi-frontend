@@ -26,6 +26,10 @@ Dialog contains:
 Comments:
 1. If we only gonna support XSLT for now - the dropdown selector for format might be either locked/disabled on the only default option, or replaced with just a label.
 
+When user clicks the "Help" (question mark) icon - help dialog/tab is opened:
+
+![image](https://user-images.githubusercontent.com/5585355/50401545-788a4480-07a0-11e9-931c-cd9c1a0e7a9c.png)
+
 When export process starts - dialog probably gotta be locked with a spinner:
 
 ![image](https://user-images.githubusercontent.com/5585355/50346408-5647bb00-0543-11e9-9a63-684c0a5c8f17.png)
