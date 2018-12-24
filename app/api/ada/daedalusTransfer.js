@@ -93,11 +93,11 @@ export async function generateTransferTx(payload: {
     const output = await _getReceiverAddress();
 
     // get wallet and make transaction
-    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
+    const wallet: CryptoDaedalusWallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
     const tx: MoveResponse = getResultOrFail(Wallet.move(wallet, inputs, output));
 
     // Validate address/witness crypto
-    const inputValidation = await _validateAddressesAndSignatures(secretWords, inputWrappers, tx);
+    const inputValidation = await _validateAddressesAndSignatures(secretWords, wallet, inputWrappers, tx);
     if (inputValidation.errors.length) {
       Logger.info('Input validation errors:');
       inputValidation.errors.forEach(e => Logger.info(JSON.stringify(e)));
@@ -127,6 +127,7 @@ export async function generateTransferTx(payload: {
  */
 async function _validateAddressesAndSignatures(
   secretWords: string,
+  wallet: CryptoDaedalusWallet,
   inputWrappers: Array<DaedalusInputWrapper>,
   tx: MoveResponse
 ): Promise<TxValidation> {
@@ -136,6 +137,12 @@ async function _validateAddressesAndSignatures(
   try {
     const derivationScheme = 1;
     const secret = await walletSecretFromMnemonic(secretWords, derivationScheme);
+    if (secret.toString('hex').substr(0, 128) !== wallet.root_cached_key.substr(0, 128)) {
+      return {
+        errors: [{ reason: 'Wallet private key does not match!' }]
+      };
+    }
+    Logger.info('Private key validation successful');
     const pass = await xpubToHdPassphrase(secret.slice(64, 128));
     const errors = inputWrappers.map((inputWrapper, idx) => {
       const address = inputWrapper.address;
