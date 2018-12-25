@@ -22,7 +22,7 @@ import saveStartSVG from '../../../assets/images/trezor/connect/save-start.inlin
 import saveErrorSVG from '../../../assets/images/trezor/connect/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { isValidHardwareWalletName } from '../../../utils/validations';
+import { isValidWalletName } from '../../../utils/validations';
 
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
 import { StepState } from '../../../stores/ada/TrezorConnectStore';
@@ -84,8 +84,8 @@ export default class SaveDialog extends Component<Props> {
           value: defaultWalletName,
           validators: [({ field }) => (
             [
-              isValidHardwareWalletName(field.value),
-              intl.formatMessage(globalMessages.invalidHardwareWalletName)
+              isValidWalletName(field.value),
+              intl.formatMessage(globalMessages.invalidWalletName)
             ]
           )],
         },

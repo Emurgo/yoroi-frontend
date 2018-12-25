@@ -74,7 +74,7 @@ Then(/^I should stay in the create wallet dialog$/, async function () {
   await this.waitUntilText('.Dialog_title', createMessage.toUpperCase(), 2000);
 });
 
-Then(/^I should see "Wallet name requires at least 3 and at most 40 letters." error message:$/, async function (data) {
+Then(/^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/, async function (data) {
   const error = data.hashes()[0];
   const errorSelector = '.SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);
