@@ -49,7 +49,7 @@
   "environment.currency.ada": "ADA",
   "global.errors.fieldIsRequired": "Это поле обязательно к заполнению.",
   "global.errors.invalidRepeatPassword": "Не совпадает.",
-  "global.errors.invalidWalletName": " Длина имени кошелька должна быть не менее 1 и не более 40 букв.",
+  "global.errors.invalidWalletName": "Длина имени кошелька должна быть не менее 1 и не более 40 букв.",
   "global.errors.invalidWalletPassword": "Неверный пароль",
   "global.labels.cancel": "Отменить",
   "global.labels.change": "Изменить",
