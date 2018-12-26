@@ -100,7 +100,7 @@ Feature: Wallet UI Settings
     |ウォレットの追加                             |Japanese            |
     |지갑 추가                                 | Korean             |
     |НАСТРОЙКИ                                 | Russian            |
-    | abc                                      |3-characters length |
+    | a                                        |1-characters length |
     | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwer |40 characters length|
 
   @it-41
@@ -114,12 +114,11 @@ Feature: Wallet UI Settings
     | name         |
     | <walletName> |
     And I click outside "name" input field
-    Then I should see "Wallet name requires at least 3 and at most 40 letters." error message:
+    Then I should see "Wallet name requires at least 1 and at most 40 letters." error message:
     | message                             |
     | global.errors.invalidWalletName     |
     Examples:
     | walletName                                | |
-    | ab                                        |2-characters length |
     | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwerd |41 characters length |
 
   @it-14
