@@ -10,6 +10,11 @@ $topBarHeight: 64px;
   width: 100%;
 }
 
+.languageSelectionBackground {
+  background-image: url(../../assets/images/select-language.svg);
+  background-size: cover;
+}
+
 .topbar {
   height: $topBarHeight;
   flex-shrink: 0;

@@ -91,7 +91,7 @@ export default class WalletAdd extends Component<Props> {
             skin={<SimpleButtonSkin />}
           />
           <Button
-            className="primary restoreWalletButton"
+            className="flat restoreWalletButton"
             label={intl.formatMessage(messages.restoreDescription)}
             onMouseUp={onRestore}
             skin={<SimpleButtonSkin />}

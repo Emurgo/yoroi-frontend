@@ -7,36 +7,40 @@
   display: flex;
   height: 64px;
   justify-content: center;
-  width: 64px;
+  width: 87px;
 
-  &:hover {
-    background-color: var(--theme-topbar-category-background-color-hover);
-  }
+  // &:hover {
+  //   background-color: var(--theme-topbar-category-background-color-hover);
+  // }
 }
 
 .active {
+  background: #2f57d7;
+
   .icon:not(.withTrezorTIcon) path {
-    stroke: var(--theme-button-primary-background-color);
-    fill: var(--theme-button-primary-background-color);
+    // stroke: var(--theme-button-primary-background-color);
+    // fill: var(--theme-button-primary-background-color);
+    stroke: white;
+    fill: white;
   }
 
-  .icon:not(.walletsIcon):not(.withTrezorTIcon) path {
-    fill: var(--theme-button-primary-background-color);
-  }
+  // .icon:not(.walletsIcon):not(.withTrezorTIcon) path {
+  //   fill: var(--theme-button-primary-background-color);
+  // }
 
-  .withTrezorTIcon {
-    & > svg {
-      // plus-logo
-      & > g > g:nth-child(1) {
-        stroke: none;
-        fill: var(--theme-button-primary-background-color);
-      }
-      // trezor-t-logo
-      & > g > g:nth-child(2) {
-        stroke: var(--theme-button-primary-background-color);
-      }
-    }
-  }  
+  // .withTrezorTIcon {
+  //   & > svg {
+  //     // plus-logo
+  //     & > g > g:nth-child(1) {
+  //       stroke: none;
+  //       fill: var(--theme-button-primary-background-color);
+  //     }
+  //     // trezor-t-logo
+  //     & > g > g:nth-child(2) {
+  //       stroke: var(--theme-button-primary-background-color);
+  //     }
+  //   }
+  // }  
 
   &:hover {
     cursor: default;
@@ -98,7 +102,7 @@
     }    
 
     &.daedalus-transfer {
-      right: 64px;
+      right: 87px;
     }
 
     &.settings {

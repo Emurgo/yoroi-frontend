@@ -13,8 +13,22 @@
   width: 400px;
 }
 
+.languageSelectOld {
+  margin-bottom: 20px;
+}
+
 .languageSelect {
   margin-bottom: 20px;
+
+  label {
+    width: 100%;
+    left: 0;
+    top: -72px;
+    text-align: center;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-family: var(--font-medium);
+  }
 }
 
 .submitButton,

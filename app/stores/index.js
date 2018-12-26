@@ -1,5 +1,6 @@
 // @flow
 import { observable, action } from 'mobx';
+import ThemeStore from './toplevel/ThemeStore';
 import AppStore from './toplevel/AppStore';
 import ProfileStore from './toplevel/ProfileStore';
 import WalletBackupStore from './toplevel/WalletBackupStore';
@@ -17,6 +18,7 @@ import type { Api } from '../api/index';
 /** Map of var name to class. Allows dyanmic lookup of class so we can init all stores one loop */
 const storeClasses = {
   profile: ProfileStore,
+  theme: ThemeStore,
   app: AppStore,
   topbar: TopbarStore,
   walletBackup: WalletBackupStore,
@@ -27,6 +29,7 @@ const storeClasses = {
 
 export type StoresMap = {
   profile: ProfileStore,
+  theme: ThemeStore,
   app: AppStore,
   topbar: TopbarStore,
   walletBackup: WalletBackupStore,
@@ -41,6 +44,7 @@ export type StoresMap = {
 /** Constant that represents the stores across the lifetime of the application */
 const stores = observable({
   profile: null,
+  theme: null,
   app: null,
   topbar: null,
   walletBackup: null,

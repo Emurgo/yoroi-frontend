@@ -24,19 +24,33 @@ export default {
   '--theme-button-primary-text-color-disabled': '#ffffff',
   '--theme-button-primary-text-color': '#ffffff',
 
+  '--theme-button-flat-background-color': 'rgba(218, 164, 154, 0.1)',
+  '--theme-button-flat-background-color-hover': 'rgba(242, 183, 172, 0.1)',
+  '--theme-button-flat-background-color-active': 'rgba(191, 144, 136, 0.1)',
+  '--theme-button-flat-background-color-disabled': 'rgba(240, 243, 245, 0.3)',
+  '--theme-button-flat-text-color-disabled': '#121327',
+  '--theme-button-flat-text-color': '#121327',
+
+  '--theme-button-outlined-background-color': 'rgba(218, 164, 154, 0.1)',
+  '--theme-button-outlined-background-color-hover': 'rgba(242, 183, 172, 0.1)',
+  '--theme-button-outlined-background-color-active': 'rgba(191, 144, 136, 0.1)',
+  '--theme-button-outlined-background-color-disabled': 'rgba(240, 243, 245, 0.3)',
+  '--theme-button-outlined-text-color-disabled': '#121327',
+  '--theme-button-outlined-text-color': '#121327',
+
   '--theme-checkbox-label-color': '#353535',
   '--theme-checkbox-border-color': '#353535',
   '--theme-checkbox-background-color-checked': '#17d1aa',
 
   '--theme-select-arrow-color': '#353535',
-  '--theme-select-arrow-color-open': '#353535',
+  '--theme-select-arrow-color-open': '#15d1aa',
   '--theme-select-background-color': '#ffffff',
   '--theme-select-option-highlight-color': '#edeeef',
   '--theme-select-option-text-color': '#353535',
   '--theme-select-options-border-color': '#ffffff',
   '--theme-select-options-shadow': 'none',
 
-  '--theme-input-border-color': '#e2e2e2',
+  '--theme-input-border-color': '#9b9b9b',
   '--theme-input-label-color': '#353535',
   '--theme-input-text-color': '#353535',
   '--theme-input-right-floating-text-color': 'rgba(94, 96, 102, 0.5)',
@@ -48,7 +62,8 @@ export default {
   '--theme-input-remove-color-lightest': '#fac8ce',
   '--theme-input-background-color': '#f3f3f5',
   '--theme-input-disabled-background-color': '#cfcfcf',
-  '--theme-input-focus-border-color': '#4a4a4a',
+  '--theme-input-focus-border-color': '#15d1aa',
+  '--theme-input-hover-border-color': '#353535',
 
 //   '--theme-topbar-category-background-color-hover': '#4760ff',
   '--theme-topbar-category-text-color': '#ffffff',
@@ -61,4 +76,6 @@ export default {
   '--theme-error-text-color': '#ff1351',
 
   '--theme-terms-of-use-text-color': '#9b9b9b',
+
+  '--theme-banner-warning-background-color': '#f5a623',
 };

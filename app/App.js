@@ -11,7 +11,6 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import { Routes } from './Routes';
 import { yoroiTheme } from './themes/yoroi';
-import { yoroiRenewedTheme } from './themes/yoroiRenewed';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
@@ -38,6 +37,10 @@ export default class App extends Component<{
     }
   }
 
+  handleChange = (e: { target: { checked: boolean } }) => {
+    this.props.actions.theme.changeTheme.trigger({ theme: e.target.checked });
+  }
+
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -48,7 +51,9 @@ export default class App extends Component<{
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
     // const currentTheme = 'yoroi';
-    const currentTheme = 'yoroi-renewed';
+    // const currentTheme = 'yoroi-renewed';
+    const currentTheme = stores.theme.old ? 'yoroi' : 'yoroi-renewed';
+    // const currentTheme = stores.theme.old;
     const theme = require(`./themes/prebuilt/${currentTheme}.js`); // eslint-disable-line
 
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
@@ -57,10 +62,11 @@ export default class App extends Component<{
       <div>
         <ThemeManager variables={theme} />
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
-        {/* <ThemeProvider theme={yoroiTheme}> */}
-        <ThemeProvider theme={yoroiRenewedTheme}>
+        <ThemeProvider key={currentTheme} theme={yoroiTheme(currentTheme)}>
+        {/* <ThemeProvider theme={yoroiRenewedTheme}> */}
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             <div style={{ height: '100%' }}>
+              {/* <input type="checkbox" onChange={this.handleChange} checked={stores.theme.old} /> - old design */}
               <Router history={history} routes={Routes(stores, actions)} />
             </div>
           </IntlProvider>

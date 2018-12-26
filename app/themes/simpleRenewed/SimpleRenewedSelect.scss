@@ -11,8 +11,14 @@
 
   input {
     background: none;
-    font-family: var(--font-medium);
     text-transform: uppercase;
   }
 }
 
+.isOpen {
+  input {
+    border-width: 2px;
+    padding-left: 14px;
+    color: var(--theme-input-focus-border-color);
+  }
+}

@@ -29,6 +29,7 @@ type Props = {
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
+  oldTheme: boolean
 };
 
 type State = {
@@ -38,7 +39,8 @@ type State = {
 @observer
 export default class TermsOfUseForm extends Component<Props, State> {
   static defaultProps = {
-    error: undefined
+    error: undefined,
+    oldTheme: false
   };
 
   static contextTypes = {
@@ -59,22 +61,23 @@ export default class TermsOfUseForm extends Component<Props, State> {
 
   render() {
     const { intl } = this.context;
-    const { isSubmitting, error, localizedTermsOfUse } = this.props;
+    const { isSubmitting, error, localizedTermsOfUse, oldTheme } = this.props;
     const { areTermsOfUseAccepted } = this.state;
+    const submitButtonClass = oldTheme ? styles.submitButtonOld : styles.submitButton;
+    const submitButtonSpinningClass = oldTheme ? styles.submitButtonSpinningOld : styles.submitButtonSpinning;
     const buttonClasses = classnames([
       'primary',
-      isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
+      isSubmitting ? submitButtonSpinningClass : submitButtonClass,
     ]);
 
     const checkboxLabel = 'checkboxLabel';
-
     return (
       <div className={styles.component}>
-        <div className={styles.centeredBox}>
+        <div className={oldTheme ? styles.centeredBoxOld : styles.centeredBox}>
 
-          <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} />
+          <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} oldTheme={oldTheme} />
 
-          <div className={styles.checkbox}>
+          <div className={oldTheme ? styles.checkboxOld : styles.checkbox}>
             <Checkbox
               label={intl.formatMessage(messages[checkboxLabel])}
               onChange={this.toggleAcceptance.bind(this)}
