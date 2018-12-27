@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
@@ -94,7 +94,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 label={intl.formatMessage(messages.instructionsButton)}
                 onClick={onFollowInstructionsPrerequisites}
                 disabled={!disableTransferFunds}
-                skin={<SimpleButtonSkin />}
+                skin={ButtonSkin}
               />
 
             </div>
@@ -123,7 +123,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 label={confirmationText}
                 onClick={onConfirm}
                 disabled={disableTransferFunds}
-                skin={<SimpleButtonSkin />}
+                skin={ButtonSkin}
               />
 
             </div>

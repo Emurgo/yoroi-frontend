@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -206,7 +206,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
-            skin={<SimpleInputSkin />}
+            skin={InputSkin}
           />
         </div>
 
@@ -218,7 +218,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             onChange={(value) => this.handleDataChange('newPasswordValue', value)}
             {...newPasswordField.bind()}
             error={newPasswordField.error}
-            skin={<SimpleInputSkin />}
+            skin={InputSkin}
           />
 
           <Input
@@ -228,7 +228,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
             {...repeatedPasswordField.bind()}
             error={repeatedPasswordField.error}
-            skin={<SimpleInputSkin />}
+            skin={InputSkin}
           />
 
           <p className={styles.passwordInstructions}>

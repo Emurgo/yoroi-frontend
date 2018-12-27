@@ -1,8 +1,3 @@
-import {
-  SELECT, INPUT, FORM_FIELD, CHECKBOX, SWITCH, MODAL,
-  BUTTON, TEXT_AREA, AUTOCOMPLETE, OPTIONS, BUBBLE
-} from 'react-polymorph/lib/skins/simple/identifiers';
-
 // react-polymorph components
 import SimpleFormField from './simple/SimpleFormField.scss';
 import SimpleInput from './simple/SimpleInput.scss';
@@ -15,6 +10,22 @@ import SimpleAutocomplete from './simple/SimpleAutocomplete.scss';
 import SimpleBubble from './simple/SimpleBubble.scss';
 import SimpleOptions from './simple/SimpleOptions.scss';
 import SimpleSelect from './simple/SimpleSelect.scss';
+
+import { IDENTIFIERS } from 'react-polymorph/lib/themes/API';
+
+const {
+  AUTOCOMPLETE,
+  BUBBLE,
+  BUTTON,
+  CHECKBOX,
+  FORM_FIELD,
+  INPUT,
+  MODAL,
+  OPTIONS,
+  SELECT,
+  SWITCH,
+  TEXT_AREA,
+} = IDENTIFIERS;
 
 // package all our overrides into one theme
 export const yoroiTheme = {

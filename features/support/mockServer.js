@@ -75,7 +75,10 @@ export function getMockServer(
       },
       res: { send(arg: UtxoForAddressesResponse): any }
     ): void => {
-      const { utxos } = getFeatureData();
+      const featureData = getFeatureData();
+      const utxos = featureData
+        ? featureData.utxos
+        : undefined;
       const filteredUtxos = utxos
         ? utxos.filter(utxo => req.body.addresses.includes(utxo.receiver))
         : [];
@@ -89,7 +92,10 @@ export function getMockServer(
       res: { send(arg: UtxoSumForAddressesResponse): any }
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
-      const utxos = getFeatureData().utxos;
+      const featureData = getFeatureData();
+      const utxos = featureData
+        ? featureData.utxos
+        : undefined;
       const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
         if (req.body.addresses.includes(utxo.receiver)) {
           return new BigNumber(utxo.amount).plus(sum);
@@ -127,7 +133,10 @@ export function getMockServer(
       },
       res: { send(arg: FilterUsedResponse): any }
     ): void => {
-      const usedAddresses = getFeatureData().usedAddresses;
+      const featureData = getFeatureData();
+      const usedAddresses = featureData
+        ? featureData.usedAddresses
+        : undefined;
       const filteredAddresses = usedAddresses
         ? usedAddresses.filter((address) => (
           req.body.addresses.includes(address)

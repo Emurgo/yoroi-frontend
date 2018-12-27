@@ -68,7 +68,7 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.SimpleAutocomplete_errored .SimpleFormField_error';
+  const errorSelector = '.SimpleAutocomplete_autocompleteWrapper .SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
