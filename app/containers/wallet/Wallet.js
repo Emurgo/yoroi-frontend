@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import MainLayout from '../MainLayout';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
+import HelpLinkFooter from '../../components/footer/HelpLinkFooter';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -36,8 +37,20 @@ export default class Wallet extends Component<Props> {
     if (!wallets.active) {
       return <MainLayout actions={actions} stores={stores}><LoadingSpinner /></MainLayout>;
     }
+
+    const footer = wallets.active.isWebWallet ?
+      (<HelpLinkFooter
+        showBuyTrezorHardwareWallet
+        showWhatIsHardwareWallet
+      />) :
+      undefined;
+
     return (
-      <MainLayout actions={actions} stores={stores}>
+      <MainLayout
+        actions={actions}
+        stores={stores}
+        footer={footer}
+      >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}

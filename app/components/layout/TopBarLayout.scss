@@ -1,4 +1,5 @@
 $topBarHeight: 64px;
+$footerHeight: 52px;
 
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
@@ -21,15 +22,25 @@ $topBarHeight: 64px;
   height: 100%;
 }
 
+.contentWithFooter {
+  height: calc(100% - #{$footerHeight});
+}
+
 .contentWrapper {
   height: 100%;
   overflow-x: hidden;
-  overflow-y: overlay;
+  overflow-y: hidden;
   position: relative;
   &::-webkit-scrollbar-button {
     height: 7px;
     display: block;
   }
+}
+
+.footer {
+  z-index: 1;
+  margin-top: (-$footerHeight);
+  height: $footerHeight;
 }
 
 .main {
