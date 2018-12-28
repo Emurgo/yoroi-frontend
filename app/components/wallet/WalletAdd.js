@@ -5,8 +5,13 @@ import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 import styles from './WalletAdd.scss';
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
+import buyIcon from '../../assets/images/add-wallet/buy-trezor.inline.svg';
+import connectIcon from '../../assets/images/add-wallet/how-to-connect-trezor.inline.svg';
+import createIcon from '../../assets/images/add-wallet/how-to-create-wallet.inline.svg';
+import restoreIcon from '../../assets/images/add-wallet/how-to-restore-wallet.inline.svg';
 
 const messages = defineMessages({
   title: {
@@ -47,10 +52,16 @@ type Props = {
   onCreate: Function,
   onRestore: Function,
   isRestoreActive: boolean,
+  oldTheme: boolean,
+  title: string
 };
 
 @observer
 export default class WalletAdd extends Component<Props> {
+  static defaultProps = {
+    oldTheme: false,
+    title: undefined
+  }
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -64,9 +75,22 @@ export default class WalletAdd extends Component<Props> {
       onCreate,
       onRestore,
       isRestoreActive,
+      oldTheme,
+      title
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
+    const createWalletButtonClasses = classnames([
+      oldTheme ? 'primary' : 'outlined',
+      'createWalletButton'
+    ]);
+    const restoreWalletButtonClasses = classnames([
+      oldTheme ? 'primary' : 'outlined',
+      'restoreWalletButton'
+    ]);
+    const buttonsContainerClasses = classnames([
+      oldTheme ? styles.buttonsContainerOld : styles.buttonsContainer
+    ])
 
     let activeNotification = null;
     if (isCreateTrezorWalletActive) {
@@ -77,7 +101,11 @@ export default class WalletAdd extends Component<Props> {
 
     return (
       <div className={componentClasses}>
-        <div className={styles.buttonsContainer}>
+        <div className={buttonsContainerClasses}>          
+          {!oldTheme && (
+            <div className={styles.title}>{title}</div>
+          )}
+
           <Button
             className="primary trezorWalletButton"
             label={intl.formatMessage(messages.useTrezorDescription)}
@@ -85,13 +113,13 @@ export default class WalletAdd extends Component<Props> {
             skin={<SimpleButtonSkin />}
           />
           <Button
-            className="primary createWalletButton"
+            className={createWalletButtonClasses}
             label={intl.formatMessage(messages.createDescription)}
             onMouseUp={onCreate}
             skin={<SimpleButtonSkin />}
           />
           <Button
-            className="flat restoreWalletButton"
+            className={restoreWalletButtonClasses}
             label={intl.formatMessage(messages.restoreDescription)}
             onMouseUp={onRestore}
             skin={<SimpleButtonSkin />}
@@ -104,7 +132,36 @@ export default class WalletAdd extends Component<Props> {
               />
             </div>
           ) : null}
+
         </div>
+        
+        {!oldTheme && (
+          <div className={styles.footer}>
+            <a href='/' className={styles.link}>
+              <SvgInline svg={buyIcon} className={''} cleanup={['title']} />
+              <span>Buy Trezor</span>
+            </a>
+
+            <a href='/' className={styles.link}>
+              <SvgInline svg={connectIcon} className={''} cleanup={['title']} />
+              <span>How to connect Trezor</span>
+            </a>
+
+            <a href='/' className={styles.link}>
+              <SvgInline svg={createIcon} />
+              <span>How to create wallet</span>
+            </a>
+
+            <a href='/' className={styles.link}>
+              <SvgInline svg={restoreIcon} className={''} cleanup={['title']} />
+              <span>How to restore wallet</span>
+            </a>
+          </div>
+        )}
+
+        {!oldTheme && <div className={styles.background} />}
+
+        {!oldTheme && <div className={styles.walletImage} />}
       </div>
     );
   }

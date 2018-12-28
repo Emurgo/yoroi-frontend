@@ -42,6 +42,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     return (
       <TopBarLayout
         topbar={topBar}
+        oldTheme={theme.old}
         isTopBarVisible={theme.old}
         languageSelectionBackground
       >

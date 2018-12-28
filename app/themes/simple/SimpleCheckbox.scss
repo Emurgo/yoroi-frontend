@@ -6,16 +6,25 @@
 .root {
   .checked {
     background-color: var(--theme-checkbox-background-color-checked);
+    border: 0px solid var(--theme-checkbox-background-color-checked);
+
+    &:after {
+      top: 6px;
+      left: 11px;
+    }
   }
 }
 
 .check {
-  border: 1px solid var(--theme-checkbox-border-color);
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--theme-checkbox-border-color);
 }
 
 .label {
   color: var(--theme-checkbox-label-color);
   font-size: 15px;
+  line-height: 28px;
 
   strong {
     font-family: var(--font-medium);

@@ -44,7 +44,7 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { topbar } = this.props.stores;
+    const { topbar, theme } = this.props.stores;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -56,6 +56,8 @@ export default class WalletAddPage extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        oldTheme={theme.old}
+        areCategoriesVisible={theme.old}
       />);
 
     const wallets = this._getWalletsStore();
@@ -96,11 +98,37 @@ export default class WalletAddPage extends Component<Props> {
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           isRestoreActive={isRestoreActive}
+          oldTheme={theme.old}
+          title={this.context.intl.formatMessage(messages.title)}
         />
       );
     }
+    const topBarCondition = (
+      theme.old ||
+      uiDialogs.isOpen(WalletCreateDialog) ||
+      uiDialogs.isOpen(WalletRestoreDialog) ||
+      uiDialogs.isOpen(WalletBackupDialog) ||
+      uiDialogs.isOpen(WalletTrezorConnectDialogContainer)
+    ) ? topBar : false;
+
+    const bannerCondition = (
+      theme.old ||
+      uiDialogs.isOpen(WalletCreateDialog) ||
+      uiDialogs.isOpen(WalletRestoreDialog) ||
+      uiDialogs.isOpen(WalletBackupDialog) ||
+      uiDialogs.isOpen(WalletTrezorConnectDialogContainer)
+    );
+
+
     return (
-      <MainLayout topbar={topBar}>
+      <MainLayout
+        topbar={topBar}
+        oldTheme={theme.old}
+        actions={actions}
+        stores={stores}
+        isTopBarVisible={topBarCondition}
+        isBannerVisible={bannerCondition}
+      >
         {content}
       </MainLayout>
     );

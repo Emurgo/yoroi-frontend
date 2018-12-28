@@ -51,9 +51,7 @@ export default class App extends Component<{
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
     // const currentTheme = 'yoroi';
-    // const currentTheme = 'yoroi-renewed';
-    const currentTheme = stores.theme.old ? 'yoroi' : 'yoroi-renewed';
-    // const currentTheme = stores.theme.old;
+    const currentTheme = stores.theme.old ? 'yoroi-old' : 'yoroi';
     const theme = require(`./themes/prebuilt/${currentTheme}.js`); // eslint-disable-line
 
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
@@ -66,7 +64,7 @@ export default class App extends Component<{
         {/* <ThemeProvider theme={yoroiRenewedTheme}> */}
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             <div style={{ height: '100%' }}>
-              {/* <input type="checkbox" onChange={this.handleChange} checked={stores.theme.old} /> - old design */}
+              <input type="checkbox" onChange={this.handleChange} checked={stores.theme.old} /><span> - old design </span>
               <Router history={history} routes={Routes(stores, actions)} />
             </div>
           </IntlProvider>

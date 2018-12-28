@@ -1,8 +1,18 @@
-.topBar {
+.topBarOld {
   align-items: center;
   background: var(--theme-topbar-background-color);
   display: flex;
   height: 64px;
+  padding: 0;
+  position: relative;
+  z-index: 100;
+}
+
+.topBar {
+  align-items: center;
+  background: var(--theme-topbar-background-color);
+  display: flex;
+  height: 58px;
   padding: 0;
   position: relative;
   z-index: 100;

@@ -5,20 +5,12 @@
 
 .selectInput {
   &::after {
-    bottom: 23px;
-    left: calc(100% - 27px);
+    bottom: 16px;
+    left: calc(100% - 22px);
   }
 
   input {
     background: none;
-    text-transform: uppercase;
   }
 }
 
-.isOpen {
-  input {
-    border-width: 2px;
-    padding-left: 14px;
-    color: var(--theme-input-focus-border-color);
-  }
-}

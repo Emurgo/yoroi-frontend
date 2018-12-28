@@ -1,4 +1,5 @@
-$topBarHeight: 64px;
+$topBarOldHeight: 64px;
+$topBarHeight: 58px;
 
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
@@ -15,6 +16,13 @@ $topBarHeight: 64px;
   background-size: cover;
 }
 
+.topbarOld {
+  height: $topBarOldHeight;
+  flex-shrink: 0;
+  // Show elements that overflow the topbar above the content area
+  z-index: 1;
+}
+
 .topbar {
   height: $topBarHeight;
   flex-shrink: 0;
@@ -23,8 +31,20 @@ $topBarHeight: 64px;
 }
 
 .content {
-  height: calc(100% - #{$topBarHeight});
+  height: 100%;
 }
+
+// .contentOld {
+//   height: calc(100% - #{$topBarOldHeight});
+// }
+
+// .noTopBar {
+//   height: 100%;
+// }
+
+// .content {
+//   height: calc(100% - #{$topBarHeight});
+// }
 
 .contentWrapper {
   height: 100%;

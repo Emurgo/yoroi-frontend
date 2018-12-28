@@ -11,7 +11,9 @@ type Props = {
   notification?: ?Node,
   banner?: Node,
   isTopBarVisible: boolean,
-  languageSelectionBackground?: boolean
+  isBannerVisible: boolean,
+  languageSelectionBackground?: boolean,
+  oldTheme?: boolean
 };
 
 /** Adds a top bar above the wrapped node */
@@ -21,26 +23,39 @@ export default class TopBarLayout extends Component<Props> {
     children: undefined,
     notification: undefined,
     banner: undefined,
-    isTopBarVisible: true
+    isTopBarVisible: true,
+    isBannerVisible: true
   };
 
   render() {
-    const { banner, children, topbar, notification, isTopBarVisible, languageSelectionBackground } = this.props;
+    const {
+      banner,
+      children,
+      topbar,
+      notification,
+      isTopBarVisible,
+      isBannerVisible,
+      languageSelectionBackground,
+      oldTheme
+    } = this.props;
     const componentClasses = classnames([
       styles.component,
-      languageSelectionBackground ? styles.languageSelectionBackground : '',
+      languageSelectionBackground && !oldTheme ? styles.languageSelectionBackground : '',
+    ]);
+    const topbarClasses = classnames([
+      oldTheme ? styles.topbarOld : styles.topbar,
     ]);
 
     return (
       <div className={componentClasses}>
         <div className={styles.main}>
           {isTopBarVisible ? (
-            <div className={styles.topbar}>
+            <div className={topbarClasses}>
               {topbar}
             </div>
           ) : null}
 
-          {banner}
+          {isBannerVisible && banner}
 
           {notification}
           <div className={styles.contentWrapper}>

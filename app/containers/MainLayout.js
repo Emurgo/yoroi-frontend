@@ -8,7 +8,10 @@ import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBan
 import type { InjectedContainerProps } from '../types/injectedPropsType';
 
 export type MainLayoutProps = InjectedContainerProps & {
-  topbar: ?Node
+  topbar: ?Node,
+  oldTheme?: boolean,
+  isTopBarVisible?: boolean,
+  isBannerVisible?: boolean
 };
 
 @observer
@@ -18,13 +21,16 @@ export default class MainLayout extends Component<MainLayoutProps> {
   };
 
   render() {
-    const { actions, stores, topbar } = this.props;
+    const { actions, stores, topbar, oldTheme, isTopBarVisible, isBannerVisible } = this.props;
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
     return (
       <TopBarLayout
         banner={<TestnetWarningBanner />}
         topbar={topbarComponent}
         notification={<div />}
+        oldTheme={oldTheme}
+        isTopBarVisible={isTopBarVisible}
+        isBannerVisible={isBannerVisible}
       >
         {this.props.children}
       </TopBarLayout>

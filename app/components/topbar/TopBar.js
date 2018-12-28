@@ -14,6 +14,8 @@ type Props = {
   categories?: Array<Category>,
   activeTopbarCategory: string,
   onCategoryClicked?: Function,
+  oldTheme?: boolean,
+  areCategoriesVisible?: boolean
 };
 
 @observer
@@ -21,24 +23,30 @@ export default class TopBar extends Component<Props> {
   static defaultProps = {
     children: undefined,
     categories: undefined,
-    onCategoryClicked: undefined
+    onCategoryClicked: undefined,
+    oldTheme: false,
+    areCategoriesVisible: true
   };
 
   render() {
     const {
       title,
-      categories, activeTopbarCategory, onCategoryClicked,
+      categories,
+      activeTopbarCategory,
+      onCategoryClicked,
+      oldTheme,
+      areCategoriesVisible
     } = this.props;
 
     const topBarStyles = classNames([
-      styles.topBar
+      oldTheme ? styles.topBarOld : styles.topBar
     ]);
 
     return (
       <header className={topBarStyles}>
         <div className={styles.topBarTitle}>{title}</div>
         {this.props.children}
-        {categories && categories.map(category => {
+        {categories && areCategoriesVisible && categories.map(category => {
           const categoryClassName = kebabCase(category.name);
           return (
             <TopBarCategory

@@ -10,6 +10,21 @@
 }
 
 .input {
-  font-size: 15px;
-  padding: 10px;
+  height: 56px;
+  font-size: 16px;
+  box-sizing: border-box;
+  line-height: 56px;
+  padding: 0 15px;
+  border-radius: 8px;
+  border-width: 1px;
+
+  &:hover {
+    border-color: var(--theme-input-hover-border-color);
+  }
+
+  &:focus, &:active {
+    padding-left: 14px;
+    border-width: 2px;
+    border-color: var(--theme-input-focus-border-color);
+  }
 }
