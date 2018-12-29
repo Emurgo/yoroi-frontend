@@ -18,20 +18,20 @@ When(/^I enter the recovery phrase:$/, async function (table) {
   const recoveryPhrase = fields.recoveryPhrase.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.input('.SimpleAutocomplete_autocompleteWrapper input', word);
+    await this.input('.AutocompleteOverrides_autocompleteWrapper input', word);
     await this.click(`//li[contains(text(), '${word}')]`, By.xpath);
   }
 });
 
 When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
   const words = table.hashes()[0];
-  await this.input('.SimpleAutocomplete_autocompleteWrapper input', words.word);
+  await this.input('.AutocompleteOverrides_autocompleteWrapper input', words.word);
   const lastWord = await this.driver.findElements(By.xpath(`//span[contains(text(), '${words.word}')]`));
   expect(lastWord.length).to.be.equal(0);
 });
 
 When(/^I clear the recovery phrase$/, async function () {
-  await this.clearInputUpdatingForm('.SimpleAutocomplete_autocompleteWrapper input', 15);
+  await this.clearInputUpdatingForm('.AutocompleteOverrides_autocompleteWrapper input', 15);
 });
 
 When(/^I enter the restored wallet password:$/, async function (table) {
@@ -68,7 +68,7 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.SimpleAutocomplete_autocompleteWrapper .SimpleFormField_error';
+  const errorSelector = '.AutocompleteOverrides_autocompleteWrapper .SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 

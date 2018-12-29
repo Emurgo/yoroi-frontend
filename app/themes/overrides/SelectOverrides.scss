@@ -1,0 +1,12 @@
+// Css module overrides go here …
+
+.selectInput {
+  &::after {
+    bottom: 16px;
+    left: calc(100% - 22px);
+  }
+
+  input {
+    background: none;
+  }
+}

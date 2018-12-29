@@ -11,6 +11,7 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import { Routes } from './Routes';
 import { yoroiTheme } from './themes/yoroi';
+import { themeOverrides } from './themes/overrides/index.js';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
@@ -56,7 +57,7 @@ class App extends Component<{
       <div style={{ height: '100%' }}>
         <ThemeManager variables={themeVars} />
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
-        <ThemeProvider theme={yoroiTheme}>
+        <ThemeProvider theme={yoroiTheme} themeOverrides={themeOverrides}>
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             <Router history={history}>
               {Routes(stores, actions)}
