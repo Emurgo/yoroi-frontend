@@ -117,7 +117,7 @@ export default class HelpLinkFooter extends Component<Props> {
         {/* How to create a wallet */}
         {this.props.showHowToCreateWallet &&
           <a
-            href="https://youtu.be/9jg8lsreIQ8"
+            href="https://youtu.be/9jg8lsreIQ8?t=56"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.block}
@@ -133,7 +133,7 @@ export default class HelpLinkFooter extends Component<Props> {
         {/* How to restore a wallet */}
         {this.props.showHowToRestoreWallet &&
           <a
-            href="https://youtu.be/PKKWgTNKSks"
+            href="https://youtu.be/PKKWgTNKSks?t=14"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.block}
