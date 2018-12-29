@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import validWords from 'bip39/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
@@ -8,10 +8,8 @@ import environment from '../../../environment';
 
 type Props = InjectedDialogContainerProps;
 
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletRestoreDialogContainer extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null, children: null, onClose: () => {} };
 
   onSubmit = (values: { recoveryPhrase: string, walletName: string, walletPassword: string }) => {
     this.props.actions[environment.API].wallets.restoreWallet.trigger(values);
@@ -31,7 +29,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     return (
       <WalletRestoreDialog
         mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
-        suggestedMnemonics={validWords}
+        validWords={validWords}
         isSubmitting={restoreRequest.isExecuting}
         onSubmit={this.onSubmit}
         onCancel={this.onCancel}
@@ -41,6 +39,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   }
 
   _getWalletsStore() {
-    return this.props.stores[environment.API].wallets;
+    return this.props.stores.substores[environment.API].wallets;
   }
 }

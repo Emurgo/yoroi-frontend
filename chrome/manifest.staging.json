@@ -1,6 +1,6 @@
 {
-  "version": "1.0.4-rc.2",
-  "version_name": "st-1.0.4-rc.2", 
+  "version": "1.1.0",
+  "version_name": "st-1.1.0", 
   "name": "Yoroi Staging",
   "manifest_version": 2,
   "description": "[staging] Cardano ADA wallet",
@@ -16,10 +16,15 @@
     "page": "background.html"
   },
   "permissions": [
-    "contextMenus",
-    "management",
     "tabs",
-    "storage"
+    "storage",
+    "*://connect.trezor.io/*"
   ],
-  "content_security_policy": "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src wss://iohk-staging.yoroiwallet.com:443 https://iohk-staging.yoroiwallet.com; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "content_scripts": [
+    {
+      "matches": ["*://connect.trezor.io/*/popup.html"],
+      "js": ["js/trezor-content-script.js"]
+    }
+  ],
+  "content_security_policy": "default-src 'self'; frame-src https://connect.trezor.io/; script-src 'self' 'unsafe-eval'; connect-src wss://iohk-staging.yoroiwallet.com:443 https://iohk-staging.yoroiwallet.com; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
 }

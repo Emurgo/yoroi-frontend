@@ -20,3 +20,8 @@ update.xml
 # Generated translation files
 translations/messages
 translations/reports
+Yoroi
+
+# IntelliJ IDEA config
+.idea
+**/*.iml

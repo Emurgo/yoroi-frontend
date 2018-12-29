@@ -1,0 +1,15 @@
+.topbarTitleContainer {
+  color: var(--theme-topbar-wallet-info-color);
+  font-family: var(--font-regular);
+  letter-spacing: 0.5px;
+  line-height: 23px;
+  text-align: center;
+  text-transform: uppercase;
+
+  .topbarTitleText {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--theme-topbar-wallet-name-color);
+  }
+
+}

@@ -15,6 +15,9 @@ module.exports = {
   entry: {
     vendor: dependencies
   },
+  node: {
+    fs: 'empty'
+  },
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, '../dll'),

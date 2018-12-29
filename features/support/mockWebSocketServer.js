@@ -1,3 +1,5 @@
+// @flow
+
 import WebSocket from 'ws';
 
 const MSG_TYPE_RESTORE = 'RESTORE';
@@ -6,7 +8,7 @@ const toMessage = JSON.stringify;
 
 let wss = null;
 
-export function getMockWebSocketServer(server) {
+export function getMockWebSocketServer(server: any) {
   if (!wss) {
     wss = new WebSocket.Server({ server });
   }
@@ -17,7 +19,10 @@ export function closeMockWebSocketServer() {
   wss = null;
 }
 
-export function mockRestoredDaedalusAddresses(addresses) {
+export function mockRestoredDaedalusAddresses(addresses: Array<string>) {
+  if (!wss) {
+    return;
+  }
   wss.on('connection', ws => {
     ws.on('message', (msg) => {
       const data = fromMessage(msg);

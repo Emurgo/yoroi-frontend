@@ -1,13 +1,11 @@
-import { When, Given, Then } from 'cucumber';
-import { By } from 'selenium-webdriver'; 
+// @flow
+
+import { When, Then } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 
-async function checkErrorByTranslationId(client, errorSelector, error) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message));
-}
-
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
-  await this.waitUntilText('.TopBar_walletAmount', number);
+  await this.waitUntilText('.WalletTopbarTitle_walletAmount', number);
 });
 
 Then(/^I should see send transaction screen$/, async function () {
@@ -20,7 +18,7 @@ Then(/^I go to the transaction history screen$/, async function () {
 });
 
 When(/^I go to the main screen$/, async function () {
-  await this.click(`//header//button[1]`, By.xpath); 
+  await this.click(`//header//button[1]`, By.xpath);
 });
 
 Then(/^I should see the transactions screen$/, async function () {
@@ -38,11 +36,8 @@ Then(/^I should see "You have successfully copied wallet address" pop up:$/, asy
 });
 
 Then(/^I see transactions buttons are disabled$/, async function () {
-  const disabledButtons = await this.driver.findElements(By.xpath("//div[@class='DaedalusTransferInstructionsPage_columnWrapper']//button[contains(@class, 'disabled')]"));
-  expect(disabledButtons.length).to.be.equal(2);
+  const disabledButtons = await this.driver.findElement(By.xpath("//button[contains(@class, 'confirmButton') and contains(@class, 'disabled')]"));
   const pageUrl = await this.driver.getCurrentUrl();
-  disabledButtons[0].click();
-  expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
-  disabledButtons[1].click();
+  disabledButtons.click();
   expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
 });

@@ -1,63 +1,98 @@
 // @flow
 import { observable, action } from 'mobx';
-import AppStore from './AppStore';
-import ProfileStore from './ProfileStore';
-import WalletBackupStore from './WalletBackupStore';
-import SidebarStore from './SidebarStore';
-import UiDialogsStore from './UiDialogsStore';
-import UiNotificationsStore from './UiNotificationsStore';
-import LoadingStore from './LoadingStore';
+import AppStore from './toplevel/AppStore';
+import ProfileStore from './toplevel/ProfileStore';
+import WalletBackupStore from './toplevel/WalletBackupStore';
+import TopbarStore from './toplevel/TopbarStore';
+import UiDialogsStore from './toplevel/UiDialogsStore';
+import UiNotificationsStore from './toplevel/UiNotificationsStore';
+import LoadingStore from './toplevel/LoadingStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
+import { RouterStore } from 'mobx-react-router';
+import type { ActionsMap } from '../actions/index';
+import type { Api } from '../api/index';
 
-export const storeClasses = {
+/** Map of var name to class. Allows dyanmic lookup of class so we can init all stores one loop */
+const storeClasses = {
   profile: ProfileStore,
   app: AppStore,
-  sidebar: SidebarStore,
+  topbar: TopbarStore,
+  walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
-  walletBackup: WalletBackupStore,
   loading: LoadingStore,
 };
 
 export type StoresMap = {
   profile: ProfileStore,
   app: AppStore,
-  sidebar: SidebarStore,
+  topbar: TopbarStore,
   walletBackup: WalletBackupStore,
-  router: Object,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
-  ada: AdaStoresMap,
   loading: LoadingStore,
+
+  substores: { ada: AdaStoresMap },
+  router: RouterStore,
 };
 
-// Constant that does never change during lifetime
+/** Constant that represents the stores across the lifetime of the application */
 const stores = observable({
   profile: null,
   app: null,
-  sidebar: null,
+  topbar: null,
   walletBackup: null,
-  router: null,
   uiDialogs: null,
   uiNotifications: null,
-  ada: null,
   loading: null,
+
+  substores: {},
+  router: null,
 });
 
-// Set up and return the stores for this app -> also used to reset all stores to defaults
-export default action((api, actions, router): StoresMap => {
-  // Assign mobx-react-router only once
-  if (stores.router == null) stores.router = router;
-  // All other stores have our lifecycle
-  const storeNames = Object.keys(storeClasses);
-  storeNames.forEach(name => { if (stores[name]) stores[name].teardown(); });
-  storeNames.forEach(name => { stores[name] = new storeClasses[name](stores, api, actions); });
-  storeNames.forEach(name => { if (stores[name]) stores[name].initialize(); });
+/** Set up and return the stores for this app -> also used to reset all stores to defaults */
+export default action(
+  (
+    api: Api,
+    actions: ActionsMap,
+    router: RouterStore
+  ): StoresMap => {
+    /** Note: `stores` sets all values to null to start
+     * However this is incompatible with the `StoresMap` types
+     * We don't make `StoresMap` fields optional as it would bloat the code with nullchecks
+     * We need to keep `stores` null to
+     * - keep the global reference alive
+     * - allow resetting the stores
+     * - allow passing the incomplete `stores` type down to toplevel stores
+     *
+     * Therefore, we instead typecast to `any` so Flow doesn't complain about this hack */
 
-  // Add currency specific stores
-  if (environment.API === 'ada') stores.ada = setupAdaStores(stores, api, actions);
+    // Assign mobx-react-router only once
+    if (stores.router == null) stores.router = router;
+    // All other stores have our lifecycle
+    const storeNames = Object.keys(storeClasses);
+    storeNames.forEach(name => { if (stores[name]) stores[name].teardown(); });
+    storeNames.forEach(name => {
+      // Careful: we pass incomplete `store` down to child components
+      // Any toplevel store that accesses `store` in its constructor may crash
+      stores[name] = ((new storeClasses[name]((stores: any), api, actions)): any);
+    });
+    storeNames.forEach(name => { if (stores[name]) stores[name].initialize(); });
 
-  return stores;
-});
+    /** Add currency specific stores
+     * Note: we have to split up th setup and the initialization
+     * Because to make sure all substores are non-null we have to create the object
+     * But we only want to actually initialize it if it is the currency in use */
+    stores.substores.ada = setupAdaStores(stores, api, actions);
+    if (environment.API === 'ada') {
+      Object
+        .keys(stores.substores.ada)
+        .map(key => stores.substores.ada[key])
+        .forEach(store => store.initialize());
+    }
+
+    return (stores: any);
+  }
+);

@@ -10,6 +10,7 @@
 .*/.circleci/.*
 
 [include]
+../node_modules/eslint-plugin-jsx-a11y
 
 [libs]
 flow/declarations/
