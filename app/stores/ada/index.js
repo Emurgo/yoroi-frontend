@@ -1,17 +1,24 @@
 // @flow
+
+// File is based the same pattern used for the non-ada-specific stores in our app.
+
 import { observable, action } from 'mobx';
 import AdaWalletsStore from './AdaWalletsStore';
 import TransactionsStore from './AdaTransactionsStore';
 import AdaWalletSettingsStore from './AdaWalletSettingsStore';
-import AddressesStore from './AddressesStore';
+import AddressesStore from './AdaAddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
+import TrezorConnectStore from './TrezorConnectStore';
+import TrezorSendStore from './TrezorSendStore';
 
 export const adaStoreClasses = {
   wallets: AdaWalletsStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore
+  daedalusTransfer: DaedalusTransferStore,
+  trezorConnect: TrezorConnectStore,
+  trezorSend: TrezorSendStore
 };
 
 export type AdaStoresMap = {
@@ -19,7 +26,9 @@ export type AdaStoresMap = {
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore
+  daedalusTransfer: DaedalusTransferStore,
+  trezorConnect: TrezorConnectStore,
+  trezorSend: TrezorSendStore,
 };
 
 const adaStores = observable({
@@ -27,16 +36,19 @@ const adaStores = observable({
   transactions: null,
   walletSettings: null,
   addresses: null,
-  daedalusTransfer: null
+  daedalusTransfer: null,
+  trezorConnect: null,
+  trezorSend: null,
 });
 
-// Set up and return the stores and reset all stores to defaults
+/** See `stores` index for description of this weird behavior
+ * Note: stores created here are NOT initialized
+ */
 export default action((stores, api, actions): AdaStoresMap => {
   const storeNames = Object.keys(adaStoreClasses);
   storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });
   storeNames.forEach(name => {
-    adaStores[name] = new adaStoreClasses[name](stores, api, actions);
+    adaStores[name] = ((new adaStoreClasses[name](stores, api, actions)): any);
   });
-  storeNames.forEach(name => { if (adaStores[name]) adaStores[name].initialize(); });
-  return adaStores;
+  return (adaStores: any);
 });

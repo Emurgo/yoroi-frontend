@@ -4,19 +4,14 @@ import type { StoresMap } from '../stores/index';
 import type { ActionsMap } from '../actions/index';
 
 export type InjectedProps = {
-  stores: any | StoresMap,
-  actions: any | ActionsMap,
+  stores: StoresMap,
+  actions: ActionsMap,
 };
 
-export type InjectedContainerProps = {
-  stores: any | StoresMap,
-  actions: any | ActionsMap,
-  children: Node,
+export type InjectedContainerProps = InjectedProps & {
+  children?: Node,
 };
 
-export type InjectedDialogContainerProps = {
-  stores: any | StoresMap,
-  actions: any | ActionsMap,
-  children: Node,
+export type InjectedDialogContainerProps = InjectedContainerProps & {
   onClose: Function,
 };

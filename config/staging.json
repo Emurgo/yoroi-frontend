@@ -1,15 +1,17 @@
 {
   "network": {
     "protocolMagic": 633343913,
-    "backendUrl": "https://lld5qq5jl5.execute-api.us-east-1.amazonaws.com/latest",
-    "websocketUrl": "wss://18.206.30.1:443",
-    "name": "staging"
+    "backendUrl": "https://iohk-staging.yoroiwallet.com",
+    "websocketUrl": "wss://iohk-staging.yoroiwallet.com:443",
+    "name": "staging",
+    "trezorNetwork": 1
   },
   "app": {
     "walletRefreshInterval": 20000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi.log",
     "addressScanSize": 20,
-    "addressRequestSize": 50
+    "addressRequestSize": 50,
+    "txsBodiesRequestSize": 150
   }
 }

@@ -5,8 +5,8 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
-import Store from '../lib/Store';
-import Request from '.././lib/LocalizedRequest';
+import Store from '../base/Store';
+import Request from '../lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
 import {
   sendTx
@@ -17,7 +17,7 @@ import LocalizableError, {
 import type {
   TransferStatus,
   TransferTx
-} from '../../types/daedalusTransferTypes';
+} from '../../types/TransferTypes';
 import {
   getAddressesWithFunds,
   generateTransferTx
@@ -35,7 +35,7 @@ export default class DaedalusTransferStore extends Store {
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<any> = new Request(this._transferFundsRequest);
+  @observable transferFundsRequest: Request<Array<void>> = new Request(this._transferFundsRequest);
   @observable ws: any = null;
 
   setup(): void {
@@ -59,13 +59,14 @@ export default class DaedalusTransferStore extends Store {
     this._updateStatus('gettingMnemonics');
   }
 
-  /* @Attention:
+  /** @Attention:
       You should check wallets state outside of the runInAction,
       because this method run as a reaction.
   */
   _enableDisableTransferFunds = (): void => {
-    const { wallets } = this.stores && this.stores[environment.API];
-    if (wallets && wallets.hasActiveWallet) {
+    const { wallets } = this.stores.substores[environment.API];
+    // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
+    if (wallets.hasActiveWallet) {
       runInAction(() => {
         this.disableTransferFunds = false;
       });
@@ -76,6 +77,9 @@ export default class DaedalusTransferStore extends Store {
     }
   }
 
+  /** Call the backend service to fetch all the UTXO then find which belong to the Daedalus wallet.
+   * Finally, generate the tx to transfer the wallet to Yoroi
+   */
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     const { recoveryPhrase: secretWords } = payload;
     this._updateStatus('restoringAddresses');
@@ -86,18 +90,22 @@ export default class DaedalusTransferStore extends Store {
         msg: MSG_TYPE_RESTORE,
       }));
     });
-    /*  FIXME: Remove 'any' from event
+    /*  TODO: Remove 'any' from event
         There is an open issue with this https://github.com/facebook/flow/issues/3116
     */
     this.ws.addEventListener('message', async (event: any) => {
       try {
+        // Note: we only expect a single message from our WS so we can close it right away.
+        // Not closing it right away will cause a WS timeout as we don't keep the connection alive.
+        this.ws.close(WS_CODE_NORMAL_CLOSURE);
+
         const data = JSON.parse(event.data);
         Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
           this._updateStatus('checkingAddresses');
           const addressesWithFunds = getAddressesWithFunds({
             secretWords,
-            addresses: data.addresses
+            fullUtxo: data.addresses
           });
           this._updateStatus('generatingTx');
           const transferTx = await generateTransferTx({
@@ -119,14 +127,20 @@ export default class DaedalusTransferStore extends Store {
     });
 
     this.ws.addEventListener('close', (event: any) => {
-      Logger.info(
-        `[ws::close] CODE: ${event.code} - REASON: ${event.reason} - was clean? ${event.wasClean}`
-      );
       if (event.code !== WS_CODE_NORMAL_CLOSURE) {
+        // if connection was not closed normally, we log this as an error. Otherwise it's an info
+        Logger.error(
+          `[ws::close] CODE: ${event.code} - REASON: ${event.reason} - was clean? ${event.wasClean}`
+        );
+
         runInAction(() => {
           this.status = 'error';
           this.error = new WebSocketRestoreError();
         });
+      } else {
+        Logger.info(
+          `[ws::close] CODE: ${event.code} - REASON: ${event.reason} - was clean? ${event.wasClean}`
+        );
       }
     });
   }
@@ -135,19 +149,22 @@ export default class DaedalusTransferStore extends Store {
     this._updateStatus('uninitialized');
   }
 
+  /** Updates the status that we show to the user as transfer progresses */
   @action.bound
   _updateStatus(s: TransferStatus): void {
     this.status = s;
   }
 
+  /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (payload: {
     cborEncodedTx: Array<number>
-  }): Promise<any> => {
+  }): Promise<Array<void>> => {
     const { cborEncodedTx } = payload;
     const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-    return sendTx(signedTx);
+    return sendTx({ signedTx });
   }
 
+  /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
     next: Function
   }): Promise<void> => {
@@ -159,6 +176,7 @@ export default class DaedalusTransferStore extends Store {
       await this.transferFundsRequest.execute({
         cborEncodedTx: this.transferTx.cborEncodedTx
       });
+      // TBD: why do we need a continuation instead of just pustting the code here directly?
       next();
       this._reset();
     } catch (error) {

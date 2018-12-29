@@ -13,6 +13,9 @@ type Props = {
 
 @observer
 export default class WalletWithNavigation extends Component<Props> {
+  static defaultProps = {
+    children: undefined
+  };
 
   render() {
     const { children, isActiveScreen, onWalletNavItemClick } = this.props;

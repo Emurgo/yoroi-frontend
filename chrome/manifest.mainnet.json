@@ -1,8 +1,8 @@
 {
-  "version": "0.0.0",
-  "name": "yoroi",
+  "version": "1.0.4",
+  "name": "Yoroi",
   "manifest_version": 2,
-  "description": "Cardano ADA wallet",
+  "description": "A simple, secure and fast Cardano ADA wallet.",
   "browser_action": {
     "default_title": "Yoroi"
   },
@@ -15,10 +15,15 @@
     "page": "background.html"
   },
   "permissions": [
-    "contextMenus",
-    "management",
     "tabs",
-    "storage"
+    "storage",
+    "*://connect.trezor.io/*"
   ],
-  "content_security_policy": "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src https://DEFINE:443 wss://DEFINE:443; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "content_scripts": [
+    {
+      "matches": ["*://connect.trezor.io/*/popup.html"],
+      "js": ["js/trezor-content-script.js"]
+    }
+  ],
+  "content_security_policy": "default-src 'self'; frame-src https://connect.trezor.io/; script-src 'self' 'unsafe-eval'; connect-src https://iohk-mainnet.yoroiwallet.com wss://iohk-mainnet.yoroiwallet.com:443; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
 }

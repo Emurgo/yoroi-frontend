@@ -21,6 +21,7 @@ export default class BigButtonForDialogs extends Component<Props> {
     ]);
     return (
       <button
+        type="button"
         className={componentClasses}
         onClick={onClick}
         disabled={isDisabled}

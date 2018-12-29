@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ConfigWebpackPlugin = require('config-webpack');
+const shell = require('shelljs');
 
 const host = 'localhost';
 const port = 3000;
@@ -10,7 +11,7 @@ const hotScript =
   'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
 const baseDevConfig = () => ({
-  devtool: 'eval-cheap-module-source-map',
+  devtool: 'eval-source-map',
   entry: {
     yoroi: [
       customPath,
@@ -51,10 +52,14 @@ const baseDevConfig = () => ({
       __HOST__: `'${host}'`,
       __PORT__: port,
       'process.env': {
-        NODE_ENV: JSON.stringify('development')
+        NODE_ENV: JSON.stringify('development'),
+        COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim())
       }
     })
   ],
+  node: {
+    fs: 'empty'
+  },
   resolve: {
     extensions: ['*', '.js']
   },
@@ -108,7 +113,7 @@ const baseDevConfig = () => ({
         loader: 'raw-loader',
       },
       {
-        test: /\.(eot|otf|ttf|woff|woff2)$/,
+        test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
         loader: 'file-loader'
       },
       {

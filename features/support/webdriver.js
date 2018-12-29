@@ -1,9 +1,11 @@
+// @flow
+
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
 import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import path from 'path';
 
-// FIXME: We should add methods to `this.driver` object, instead of use `this` directly
+// TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld() {
   this.driver = new seleniumWebdriver.Builder()
     .withCapabilities({
@@ -27,7 +29,7 @@ function CustomWorld() {
     const isLocated = seleniumWebdriver.until.elementLocated(method(locator));
     return this.driver.wait(isLocated);
   };
-  
+
   // Returns a promise that resolves to the element
   this.waitForElement = this.driver.waitForElement = async (locator, method = By.css) => {
     await this.waitForElementLocated(locator, method);
@@ -69,6 +71,17 @@ function CustomWorld() {
     }, timeout);
   };
 
+  this.waitUntilContainsText = async (locator, text, timeout = 10000) => {
+    await this.driver.wait(async () => {
+      try {
+        const value = await this.getText(locator);
+        return value.indexOf(text) !== -1;
+      } catch (err) {
+        return false;
+      }
+    }, timeout);
+  };
+
   this.click = async (locator, method = By.css) => {
     await this.waitForElement(locator, method);
     await this.waitEnable(locator, method);
@@ -89,6 +102,7 @@ function CustomWorld() {
   this.clearInputUpdatingForm = async (locator, textLength) => {
     const input = await this.getElementBy(locator);
     for (let i = 0; i < textLength; i++) {
+      // eslint-disable-next-line no-await-in-loop
       await input.sendKeys(Key.BACK_SPACE);
     }
   };
@@ -102,15 +116,19 @@ function CustomWorld() {
 
   this.saveToLocalStorage = (key, value) => this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 
-  this.intl = (key, lang = 'en-US') =>
-    this.driver.executeScript((k, l) =>
-        window.yoroi.translations[l][k]
-    , key, lang);
+  this.intl = (key, lang = 'en-US') => (
+    this.driver.executeScript(
+      (k, l) => window.yoroi.translations[l][k],
+      key,
+      lang
+    )
+  );
 
-  this.saveAddressesToDB = addresses =>
+  this.saveAddressesToDB = addresses => (
     this.driver.executeScript(addrs => {
       addrs.forEach(addr => window.yoroi.api.ada.saveAddress(addr, 'External'));
-    }, addresses);
+    }, addresses)
+  );
 
   this.saveTxsToDB = transactions => {
     this.driver.executeScript(txs => {

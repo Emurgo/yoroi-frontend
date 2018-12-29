@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ConfigWebpackPlugin = require('config-webpack');
+const shell = require('shelljs');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
@@ -36,7 +37,8 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('test')
+        NODE_ENV: JSON.stringify('test'),
+        COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim())
       }
     })
   ],
@@ -93,7 +95,7 @@ module.exports = {
         loader: 'raw-loader',
       },
       {
-        test: /\.(eot|otf|ttf|woff|woff2)$/,
+        test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
         loader: 'file-loader'
       },
       {
