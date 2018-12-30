@@ -1,7 +1,7 @@
 Feature: Send transaction
 
   Background:
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I have completed the basic setup
     And I am testing "Send transaction"
 

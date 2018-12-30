@@ -33,6 +33,9 @@ jobs:
 
       # run tests!
       - run: npm run test-e2e
+      # todo: run firefox tests in parallel
+      - run: npm run test-e2e-firefox
+      
       - run: npm run build -- --env "staging"
       - run: npm run compress -- --env "staging" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/yoroi-extension.crx"
 

@@ -1,7 +1,7 @@
 Feature: Main UI
 
   Background:
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I have completed the basic setup
 
   Scenario: Get balance with 45 addresses

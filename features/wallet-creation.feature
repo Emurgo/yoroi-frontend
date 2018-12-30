@@ -1,7 +1,7 @@
 Feature: Wallet creation
 
   Background:
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I have completed the basic setup
     And There is no wallet stored
 
@@ -18,7 +18,7 @@ Feature: Wallet creation
     Then I should see the opened wallet with name "Created Wallet"
 
   @it-9
-  Scenario: Wallet access after Chrome restart (IT-9)
+  Scenario: Wallet access after browser restart (IT-9)
     When I click the create button
     And I enter the name "Created Wallet"
     And I enter the created wallet password:

@@ -27,6 +27,9 @@
     }
   }
 
+  // need this as Firefox disabled bubbling of click events on disabled inputs
+  input[disabled] {pointer-events:none}
+
   .button {
     bottom: 10px;
     color: var(--theme-label-button-color);
