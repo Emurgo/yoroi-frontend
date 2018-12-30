@@ -27,6 +27,17 @@ async function compress(isCrxBuild) {
   await crx.load(path.join(__dirname, '../build'));
   const archiveBuffer = await crx.loadContents();
   fs.writeFileSync(`${name}.zip`, archiveBuffer);
+
+  // xpi files are used for Firefox and are simply a renaming of zip
+  /** Reusing the same manifest for Chrome and Firefox is not supported by Selenium
+   * Notably, Chrome rejects Firefox extension IDs in the manifest but Selenium requires them
+   * We fix this by forking the repository and implementing the capability ourselves
+   * We can switch back to the selenium-webdriver package once the following is on npm
+   * https://github.com/SeleniumHQ/selenium/pull/6787
+   */
+  fs.copyFile(`${name}.zip`, `${name}-${argv.env}.xpi`, (err) => {
+    if (err) throw err;
+  });
   if (isCrxBuild) {
     const crxBuffer = await crx.pack(archiveBuffer);
     const updateXML = crx.generateUpdateXML();
