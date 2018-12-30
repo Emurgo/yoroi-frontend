@@ -21,11 +21,13 @@ When(/^I enter new wallet name:$/, async function (table) {
    * For example, onFocus, etc. can transfer between clear() (or other things) and sendKeys(key)
    * This makes our InlineEditingInput become disabled causing the clear and sendKeys to fail
    * https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/214
-   * We instead repeatedly send BACK_SPACE until we've deleted the name
+   * We instead repeatedly delete characters until we've deleted the whole name
   */
   const currentName = 'Test';  // can't programmtically get the wallet name due to the issue above
   for (let i = 0; i < currentName.length; i++) {
-    await this.input(walletNameInputSelector, Key.BACK_SPACE);
+    // Chrome and Firefox select the text field starting at the left / right respectively
+    await this.input(walletNameInputSelector, Key.BACK_SPACE); // Firefox
+    await this.input(walletNameInputSelector, Key.DELETE); // Chrome
   }
   await this.input(walletNameInputSelector, fields.name);
 });
