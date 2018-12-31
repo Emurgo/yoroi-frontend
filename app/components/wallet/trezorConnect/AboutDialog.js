@@ -18,6 +18,7 @@ import TrezorErrorBlock from './common/TrezorErrorBlock';
 import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
 import aboutPrerequisiteIconSVG from '../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
 import aboutPrerequisiteTrezorSVG from '../../../assets/images/trezor/connect/about-trezor.inline.svg';
+import aboutTrezorSvg from '../../../assets/images/wallet-connect/about-trezor.inline.svg';
 
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
 
@@ -102,10 +103,14 @@ type Props = {
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
+  oldTheme: boolean
 };
 
 @observer
 export default class AboutDialog extends Component<Props> {
+  static defaultProps = {
+    oldTheme: false
+  }
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -118,18 +123,25 @@ export default class AboutDialog extends Component<Props> {
       isActionProcessing,
       error,
       submit,
-      cancel
+      cancel,
+      oldTheme
     } = this.props;
+    const headerBlockClasses = oldTheme ? styles.headerBlockOld : classnames([styles.headerBlock, 'small']);
+    const middleBlockClasses = oldTheme 
+      ? classnames([styles.middleBlockOld, styles.middleAboutBlockOld])
+      : classnames([styles.middleBlock, styles.middleAboutBlock]);
 
     const introBlock = (
-      <div className={styles.headerBlock}>
+      <div className={headerBlockClasses}>
         <span>{intl.formatMessage(messages.aboutIntroTextLine1)}</span><br />
         <span>{intl.formatMessage(messages.aboutIntroTextLine2)}</span><br />
         <span>{intl.formatMessage(messages.aboutIntroTextLine3)}</span><br />
       </div>);
 
     const middleBlock = (
-      <div className={classnames([styles.middleBlock, styles.middleAboutBlock])}>
+      <div className={middleBlockClasses}>
+        {!oldTheme && <SvgInline svg={aboutTrezorSvg} cleanup={['title']} />}
+        
         <div className={styles.prerequisiteBlock}>
           <div>
             <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />
@@ -153,9 +165,12 @@ export default class AboutDialog extends Component<Props> {
             <li key="6">{intl.formatMessage(messages.aboutPrerequisite6)}</li>
           </ul>
         </div>
-        <div className={styles.trezorImageBlock}>
-          <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
-        </div>
+
+        {oldTheme && (
+          <div className={styles.trezorImageBlock}>
+            <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
+          </div>
+        )}
       </div>);
 
     const dailogActions = [{
@@ -174,12 +189,15 @@ export default class AboutDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
+        oldTheme={oldTheme}
       >
-        <ProgressStepBlock progressInfo={progressInfo} />
+        <ProgressStepBlock progressInfo={progressInfo} oldTheme={oldTheme} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
-        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
+        <HelpLinkBlock progressInfo={progressInfo} oldTheme={oldTheme} />
+        {oldTheme ? <TrezorErrorBlock progressInfo={progressInfo} error={error} /> : (
+          error && <TrezorErrorBlock progressInfo={progressInfo} error={error} />
+        )}
       </Dialog>);
   }
 }

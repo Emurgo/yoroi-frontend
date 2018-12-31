@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import SvgInline from 'react-svg-inline';
 
 import iconTickSVG from '../../assets/images/widget/tick.inline.svg';
+import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
 import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
 import styles from './ProgressSteps.scss';
 
@@ -12,12 +13,14 @@ type Props = {
   progressInfo: {
     currentStep : number, // example, 0 = pointing to stepsList[0]
     stepState: number, // has three states, 0 = LOAD | 1 = PROCESS | 9 = ERROR
-  }
+  },
+  oldTheme: boolean
 };
 @observer
 export default class ProgressSteps extends Component<Props> {
 
   createSetps = (stepsList, progressInfo): Array<Element> => {
+    const { oldTheme } = this.props;
     const steps = [];
 
     // currentStep should not be less than 0
@@ -26,19 +29,22 @@ export default class ProgressSteps extends Component<Props> {
     for (let idx = 0; idx < stepsList.length; idx++) {
       const stepText = stepsList[idx];
 
-      let stepTopBarStyle = classNames([styles.stepTopBar]);
-      let stepTextStyle = classNames([styles.stepText]);
+      const textClass = oldTheme ? styles.stepTextOld : styles.stepText;
+      const topBarClass = oldTheme ? styles.stepTopBarOld : styles.stepTopBar;
+
+      let stepTopBarStyle = classNames([topBarClass]);
+      let stepTextStyle = classNames([textClass]);
       let displayIcon = 'none';
 
       if (idx < currentStep) {
         // step already done
         displayIcon = 'done';
         stepTopBarStyle = classNames([
-          styles.stepTopBar,
+          topBarClass,
           styles.stepTopBarDone
         ]);
         stepTextStyle = classNames([
-          styles.stepText,
+          textClass,
           styles.stepTextDone
         ]);
       } else if (idx === currentStep) {
@@ -46,21 +52,23 @@ export default class ProgressSteps extends Component<Props> {
         // 0 = LOAD and 1 = PROCESS has same icon but for 9 = ERROR there is a error icon
         displayIcon = (progressInfo.stepState === 9) ? 'error' : 'none';
         stepTopBarStyle = classNames([
-          styles.stepTopBar,
+          topBarClass,
           styles.stepTopBarActive
         ]);
         stepTextStyle = classNames([
-          styles.stepText,
+          textClass,
           styles.stepTextActive
         ]);
       }
+      console.log('oldTheme in steps', oldTheme);
+      
 
       steps.push(
         <div key={idx} className={styles.stepBlock}>
           <div className={stepTopBarStyle} />
           <div className={styles.stepBottomBlock}>
             <div className={styles.stepStateIconContainer}>
-              {(displayIcon === 'done') && <SvgInline svg={iconTickSVG} cleanup={['title']} />}
+              {(displayIcon === 'done') && <SvgInline svg={oldTheme ? iconTickSVG : iconTickGreenSVG} cleanup={['title']} />}
               {(displayIcon === 'error') && <SvgInline svg={iconCrossSVG} cleanup={['title']} />}
             </div>
             <div className={styles.stepTextContainer}>

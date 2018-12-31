@@ -8,11 +8,13 @@
 }
 
 .modal {
-  border-radius: 5px;
+  border-radius: 8px;
+  padding: 25px 30px 30px;
   display: flex;
   flex-direction: column;
-  max-height: 90%;
-  max-width: 785px;
+  max-height: 97%;
+  min-width: 465px;
+  max-width: 465px;
 
   :global {
     .WalletExportDialogChoices_component {

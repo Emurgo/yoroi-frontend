@@ -1,6 +1,6 @@
 @import './common/DialogCommonStyle.scss';
 
-.middleAboutBlock {
+.middleAboutBlockOld {
   .prerequisiteBlock {
     display: inline-block;
     width: 520px;
@@ -20,6 +20,38 @@
       line-height: 1.38;
       font-size: 14px;
       opacity: $opacityCommon;
+      a {
+        color: var(--font-black);
+      }
+    }
+  }
+  .trezorImageBlock {
+    vertical-align: baseline;
+    display: inline-block;
+  }
+}
+
+.middleAboutBlock {
+  .prerequisiteBlock {
+    display: inline-block;
+    padding-top: 15px;
+    .prerequisiteHeaderText {
+      font-family: var(--font-medium);
+      font-size: 18px;
+      margin-left: 7px;
+    }
+    li {
+      list-style-type: disc;
+      margin-left: 18px;
+      font-family: var(--font-regular);
+      line-height: 1.57;
+      font-size: 14px;
+      letter-spacing: 0;
+
+      &:first-child {
+        margin-top: 8px;
+      }
+
       a {
         color: var(--font-black);
       }

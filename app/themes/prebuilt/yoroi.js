@@ -53,6 +53,15 @@ export default {
   '--theme-select-options-border-color': '#ffffff',
   '--theme-select-options-shadow': 'none',
 
+  // '--theme-dialog-choice-tabs-text-color': '#121327',
+  // '--theme-dialog-choice-tabs-text-color-active': '#121327',
+  // '--theme-dialog-choice-tabs-bottom-border-color-active': '#121327',
+  // '--theme-dialog-big-button-background-color': '#f3f3f5',
+  // '--theme-dialog-big-button-border-color': '#f3f3f5',
+  // '--theme-dialog-big-button-label-color': '#121327',
+  // '--theme-dialog-big-button-description-color': '#121327',
+  '--theme-dialog-title-color': '#2b2c32',
+
   '--theme-input-border-color': '#9b9b9b',
   '--theme-input-label-color': '#353535',
   '--theme-input-text-color': '#353535',
@@ -67,6 +76,12 @@ export default {
   '--theme-input-disabled-background-color': '#cfcfcf',
   '--theme-input-focus-border-color': '#15d1aa',
   '--theme-input-hover-border-color': '#353535',
+
+  '--theme-main-body-background-color': '#ffffff',
+  '--theme-main-body-messages-color': '#121327',
+
+  '--theme-modal-overlay-background-color': 'rgba(0, 0, 0, 0.4)',
+  '--theme-modal-background-color': '#ffffff',
 
 //   '--theme-topbar-category-background-color-hover': '#4760ff',
   '--theme-topbar-category-text-color': '#ffffff',
@@ -85,4 +100,8 @@ export default {
   '--theme-terms-of-use-text-color': '#9b9b9b',
 
   '--theme-banner-warning-background-color': '#f5a623',
+  '--theme-trezor-connect-dialog-middle-block-common-background-color': '#ffffff',
+  '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#ffffff',
+
+  '--theme-widgets-progress-step-common-color': '#15d1aa',
 };

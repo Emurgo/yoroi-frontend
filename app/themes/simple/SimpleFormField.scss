@@ -3,13 +3,18 @@
 @import "~react-polymorph/lib/themes/simple/SimpleFormField";
 // Css module overrides go here …
 
+.root {
+  margin: 10px 0 20px;
+}
+
 .error {
-  color: var(--theme-input-error-color);
-  font-size: 12px;
+  position: absolute;
+  bottom: -18px;
+  left: 15px;
+  margin: 0;
   line-height: 1.33;
-  // margin: 0 10px 6px;
-  margin-bottom: 6px;
-  // opacity: 0.75;
+  font-size: 12px;
+  color: var(--theme-input-error-color);
 }
 
 .label {
@@ -21,7 +26,6 @@
   font-family: var(--font-regular);
   font-size: 12px;
   font-weight: 500;
-  // margin-bottom: 6px;
   padding: 0 6px;
   z-index: 1;
 }

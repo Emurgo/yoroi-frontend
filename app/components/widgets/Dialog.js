@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node } from 'react';
 import Modal from 'react-polymorph/lib/components/Modal';
@@ -17,8 +18,10 @@ type Props = {
   className?: string,
   onClose?: Function,
   closeOnOverlayClick?: boolean,
+  oldTheme: boolean
 };
 
+@observer
 export default class Dialog extends Component<Props> {
   static defaultProps = {
     title: undefined,
@@ -29,6 +32,7 @@ export default class Dialog extends Component<Props> {
     className: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
+    oldTheme: false
   };
 
   render() {
@@ -41,7 +45,10 @@ export default class Dialog extends Component<Props> {
       className,
       closeButton,
       backButton,
+      oldTheme
     } = this.props;
+    const titleClasses = oldTheme ? styles.titleOld : styles.title;
+    
 
     return (
       <Modal
@@ -53,7 +60,7 @@ export default class Dialog extends Component<Props> {
 
         <div className={classnames([styles.dialogWrapper, className])}>
           {title && (
-            <div className={styles.title}>
+            <div className={titleClasses}>
               <h1>{title}</h1>
             </div>)
           }

@@ -10,12 +10,16 @@ import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
 type Props = {
   progressInfo: ProgressInfo,
   error: ?LocalizableError,
+  oldTheme: boolean
 };
 
 @observer
 export default class TrezorErrorBlock extends Component<Props> {
+  static defaultProps = {
+    oldTheme: false
+  }
 
   render() {
-    return (<ErrorBlock error={this.props.error} />);
+    return (<ErrorBlock error={this.props.error} oldTheme={this.props.oldTheme} />);
   }
 }

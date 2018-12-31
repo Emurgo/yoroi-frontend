@@ -19,6 +19,8 @@ import TrezorErrorBlock from './common/TrezorErrorBlock';
 import connectLoadGIF from '../../../assets/images/trezor/connect/connect-load.gif';
 import connectStartGIF from '../../../assets/images/trezor/connect/connect-start.gif';
 import connectErrorSVG from '../../../assets/images/trezor/connect/connect-error.inline.svg';
+import connectLoadImage from '../../../assets/images/wallet-connect/connect-load.inline.svg';
+import connectErrorImage from '../../../assets/images/wallet-connect/connect-error.inline.svg';
 
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
 import { StepState } from '../../../stores/ada/TrezorConnectStore';
@@ -57,10 +59,14 @@ type Props = {
   goBack: Function,
   submit: Function,
   cancel: Function,
+  oldTheme: boolean
 };
 
 @observer
 export default class ConnectDialog extends Component<Props> {
+  static defaultProps = {
+    oldTheme: false
+  }
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -68,10 +74,14 @@ export default class ConnectDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, goBack, submit, cancel } = this.props;
+    const { progressInfo, isActionProcessing, error, goBack, submit, cancel, oldTheme } = this.props;
+    const headerBlockClasses = oldTheme ? styles.headerBlockOld : styles.headerBlock;
+    const middleBlockClasses = oldTheme 
+      ? classnames([styles.middleBlockOld, styles.middleConnectLoadBlock])
+      : classnames([styles.middleBlock, styles.middleConnectLoadBlock]);
 
     const introBlock = (
-      <div className={styles.headerBlock}>
+      <div className={headerBlockClasses}>
         <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
         <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br />
         <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br />
@@ -85,21 +95,21 @@ export default class ConnectDialog extends Component<Props> {
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
-            <img src={connectLoadGIF} alt="" />
+            {oldTheme ? <img src={connectLoadGIF} alt="" /> : <SvgInline svg={connectLoadImage} cleanup={['title']} />}
           </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
-            <img src={connectStartGIF} alt="" />
+            {oldTheme ? <img src={connectStartGIF} alt="" /> : <SvgInline svg={connectLoadImage} cleanup={['title']} />}
           </div>);
         break;
       case StepState.ERROR:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            <SvgInline svg={connectErrorSVG} cleanup={['title']} />
+            <SvgInline svg={oldTheme ? connectErrorSVG : connectErrorImage} cleanup={['title']} />
           </div>);
         break;
       default:
@@ -124,12 +134,17 @@ export default class ConnectDialog extends Component<Props> {
         onClose={cancel}
         backButton={backButton}
         closeButton={<DialogCloseButton />}
+        oldTheme={oldTheme}
       >
-        <ProgressStepBlock progressInfo={progressInfo} />
+        <ProgressStepBlock progressInfo={progressInfo} oldTheme={oldTheme} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
-        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
+        
+        {!oldTheme && <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />}
+        
+        <HelpLinkBlock progressInfo={progressInfo} oldTheme={oldTheme} />
+        
+        {oldTheme && <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />}
       </Dialog>);
   }
 }

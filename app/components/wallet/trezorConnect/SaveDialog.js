@@ -20,6 +20,8 @@ import TrezorErrorBlock from './common/TrezorErrorBlock';
 import saveLoadGIF from '../../../assets/images/trezor/connect/save-load.inline.svg';
 import saveStartSVG from '../../../assets/images/trezor/connect/save-start.inline.svg';
 import saveErrorSVG from '../../../assets/images/trezor/connect/save-error.inline.svg';
+import saveLoadImage from '../../../assets/images/wallet-connect/save-load.inline.svg';
+import saveErrorImage from '../../../assets/images/wallet-connect/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { isValidHardwareWalletName } from '../../../utils/validations';
@@ -61,10 +63,14 @@ type Props = {
   defaultWalletName: string,
   submit: Function,
   cancel: Function,
+  oldTheme: boolean
 };
 
 @observer
 export default class SaveDialog extends Component<Props> {
+  static defaultProps = {
+    oldTheme: false
+  }
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -100,22 +106,24 @@ export default class SaveDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, cancel } = this.props;
+    const { progressInfo, isActionProcessing, error, cancel, oldTheme } = this.props;
 
     const walletNameFieldClasses = classnames([
       'walletName',
       styles.walletName,
     ]);
     const walletNameField = this.form.$('walletName');
+    const headerBlockClasses = oldTheme ? classnames([styles.headerBlockOld, styles.headerSaveBlockOld]) : styles.headerBlock; 
 
     const walletNameBlock = (
-      <div className={classnames([styles.headerBlock, styles.headerSaveBlock])}>
+      <div className={headerBlockClasses}>
         <Input
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
-          error={walletNameField.error}
           skin={<SimpleInputSkin />}
+          error={walletNameField.error}
         />
+        {/* {oldTheme && <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>} */}
         <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);
 
@@ -125,19 +133,19 @@ export default class SaveDialog extends Component<Props> {
       case StepState.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
-            <SvgInline svg={saveLoadGIF} cleanup={['title']} />
+            <SvgInline svg={oldTheme ? saveLoadGIF : saveLoadImage} cleanup={['title']} />
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
-            <SvgInline svg={saveStartSVG} cleanup={['title']} />
+            <SvgInline svg={oldTheme ? saveStartSVG : saveLoadImage} cleanup={['title']} />
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
-            <SvgInline svg={saveErrorSVG} cleanup={['title']} />
+            <SvgInline svg={oldTheme ? saveErrorSVG : saveErrorImage} cleanup={['title']} />
           </div>);
         break;
       default:
@@ -161,12 +169,17 @@ export default class SaveDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={cancel}
         closeButton={<DialogCloseButton />}
+        oldTheme={oldTheme}
       >
-        <ProgressStepBlock progressInfo={progressInfo} />
+        <ProgressStepBlock progressInfo={progressInfo} oldTheme={oldTheme} />
         {walletNameBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
-        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
+        
+        {!oldTheme && <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />}
+        
+        <HelpLinkBlock progressInfo={progressInfo} oldTheme={oldTheme} />
+        
+        {oldTheme && <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />}
       </Dialog>);
   }
 
