@@ -139,3 +139,7 @@ export type FileEvent = {
     files: Array<Blob>
   }
 }
+
+export type PDF = {
+  getPage: Function
+}

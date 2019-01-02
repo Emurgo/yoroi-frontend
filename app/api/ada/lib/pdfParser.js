@@ -1,6 +1,6 @@
 // @flow
 import pdfjsLib from 'pdfjs-dist';
-import type { FileEvent } from '../adaTypes';
+import type { FileEvent, PDF } from '../adaTypes';
 
 export const getSelectedFile = (event: FileEvent): Blob => event.target.files[0];
 
@@ -35,7 +35,7 @@ export const parsePDFFile = (file: Uint8Array): Promise<string> => (
   })
 );
 
-const _readPage = (pdf, pageNumber) => (
+const _readPage = (pdf: PDF, pageNumber: number): Promise<string> => (
   // TODO: Handle errors
   new Promise((resolve, reject) => {
     pdf.getPage(pageNumber)
