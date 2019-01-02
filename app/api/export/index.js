@@ -42,16 +42,15 @@ export default class ExportApi {
     fileName: string
   }) {
     const { rows, format, fileType, fileName } = request;
-    const data = this.convertExportRowsToCsv(rows, format);
-    const fileResponse = this.convertCsvDataToFile(data, fileType);
+    const data = ExportApi.convertExportRowsToCsv(rows, format);
+    const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
     this.sendFileToUser(fileResponse.data, `${fileName}.${fileResponse.fileType}`);
   }
 
-  // noinspection JSMethodCanBeStatic
   /**
    * Convert specified abstract rows to a specific data-format.
    */
-  convertExportRowsToCsv(
+  static convertExportRowsToCsv(
     rows: Array<TransactionExportRow>,
     format?: TransactionExportDataFormat
   ): CsvData {
@@ -61,11 +60,10 @@ export default class ExportApi {
     }
   }
 
-  // noinspection JSMethodCanBeStatic
   /**
    * Convert specified abstract CsvData to a byte-blob of a specific file-type.
    */
-  convertCsvDataToFile(
+  static convertCsvDataToFile(
     data: CsvData,
     fileType?: TransactionExportFileType
   ): ExportFileResponse {
