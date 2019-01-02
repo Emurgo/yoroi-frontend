@@ -1,13 +1,17 @@
+// @flow
 import pdfjsLib from 'pdfjs-dist';
+import type { FileEvent } from '../adaTypes';
 
-export const getSelectedFile = event => event.target.files[0];
+export const getSelectedFile = (event: FileEvent): Blob => event.target.files[0];
 
-export const readFile = file =>
+export const readFile = (file: Blob): Promise<Uint8Array> =>
   new Promise((resolve, reject) => {
     try {
       const reader = new FileReader();
       reader.onload = function () {
-        const fileBuffer = new Uint8Array(reader.result);
+        const { result } = reader;
+        const buffer = typeof result === 'string' ? JSON.parse(result) : result;
+        const fileBuffer = new Uint8Array(buffer);
         resolve(fileBuffer);
       };
       reader.readAsArrayBuffer(file);
@@ -18,7 +22,7 @@ export const readFile = file =>
 ;
 
 // It was based in the following example: https://ourcodeworld.com/articles/read/405/how-to-convert-pdf-to-text-extract-text-from-pdf-with-javascript
-export const parsePDFFile = file => (
+export const parsePDFFile = (file: Uint8Array): Promise<string> => (
   // TODO: Handle errors
   new Promise((resolve, reject) => {
     pdfjsLib.getDocument(file).then(async pdf => {
@@ -26,7 +30,7 @@ export const parsePDFFile = file => (
       for (let i = 0; i < pdf._pdfInfo.numPages; i++) {
         pagesText += await _readPage(pdf, i + 1);
       }
-      resolve(pagesText);
+      return resolve(pagesText);
     }).catch(error => reject(error));
   })
 );
@@ -44,7 +48,7 @@ const _readPage = (pdf, pageNumber) => (
           const item = textItems[i];
           finalString += item.str + ' ';
         }
-        resolve(finalString);
+        return resolve(finalString);
       })
       .catch(error => reject(error));
   })
