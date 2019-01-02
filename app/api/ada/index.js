@@ -586,8 +586,8 @@ export default class AdaApi {
         return {
           date: tx.ctMeta.ctmDate,
           type: tx.ctIsOutgoing ? 'out' : 'in',
-          amount: _formatNumber(value / 1000000),
-          fee: _formatNumber(fee / 1000000),
+          amount: _formatNumber(value / LOVELACES_PER_ADA),
+          fee: _formatNumber(fee / LOVELACES_PER_ADA),
         };
       });
   }
