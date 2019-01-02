@@ -1,5 +1,6 @@
 // @flow
 import { action } from 'mobx';
+import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import {
   Logger,
@@ -87,6 +88,7 @@ import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
+import type { TransactionExportRow } from '../export';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -557,8 +559,38 @@ export default class AdaApi {
       }
     }
   }
+
+  async getTransactionRowsToExport(): Promise<Array<TransactionExportRow>> {
+    try {
+      await refreshTxs();
+      const history: AdaTransactions = await getAdaTxsHistoryByWallet();
+      const [transactions] = history;
+      return transactions
+        .filter(tx => tx.ctCondition === 'CPtxInBlocks')
+        .map(tx => {
+          const fullValue = parseInt(tx.ctAmount.getCCoin, 10);
+          const sumInputs = _.sum(tx.ctInputs.map(x => parseInt(x[1].getCCoin, 10)));
+          const sumOutputs = _.sum(tx.ctOutputs.map(x => parseInt(x[1].getCCoin, 10)));
+          const fee = tx.ctIsOutgoing ? sumInputs - sumOutputs : 0;
+          const value = tx.ctIsOutgoing ? fullValue - fee : fullValue;
+          return {
+            date: tx.ctMeta.ctmDate,
+            type: tx.ctIsOutgoing ? 'out' : 'in',
+            amount: _formatNumber(value / 1000000),
+            fee: _formatNumber(fee / 1000000),
+          };
+        });
+    } catch (e) {
+      Logger.error('AdaApi::exportTransactionsToFile: ' + stringifyError(e));
+      throw e;
+    }
+  }
 }
 // ========== End of class AdaApi =========
+
+function _formatNumber(x: number): string {
+  return x % 1 === 0 ? x.toFixed(1) : JSON.stringify(x);
+}
 
 // ========== TRANSFORM SERVER DATA INTO FRONTEND MODELS =========
 
