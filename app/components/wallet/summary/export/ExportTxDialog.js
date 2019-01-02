@@ -41,8 +41,8 @@ export default class ExportTxDialog extends Component<Props> {
       cancel
     } = this.props;
 
-    const introBlock = (<div></div>);
-    const middleBlock = (<div></div>);
+    const introBlock = (<div />);
+    const middleBlock = (<div />);
 
     const dailogActions = [{
       className: isActionProcessing ? styles.processing : null,
@@ -55,7 +55,7 @@ export default class ExportTxDialog extends Component<Props> {
     return (
       <Dialog
         className={classnames([styles.component, 'ExportTxDialog'])}
-        title={'TEST'}
+        title="TEST"
         actions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
