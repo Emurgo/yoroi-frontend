@@ -37,6 +37,8 @@ jobs:
 
       # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
       # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr
+      # Firefox-esr is easier to install of Debian so we pick it
+      # https://www.mozilla.org/en-US/firefox/organizations/
       - run: sudo rm -f /opt/firefox/firefox
       - run: sudo rm -f /usr/local/bin/firefox
       - run: sudo apt install firefox-esr
