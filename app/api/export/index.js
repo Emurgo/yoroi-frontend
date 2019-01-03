@@ -22,8 +22,10 @@ export type ExportFileResponse = {
 }
 
 /**
- * This api layer provides access to the electron local storage
- * for user settings that are not synced with any coin backend.
+ * This api provides functions to export abstract lists of transactions
+ * as files in different formats and different types.
+ *
+ * Also provides functionality to send abstract byte-blobs as files for user to download.
  */
 
 export default class ExportApi {
