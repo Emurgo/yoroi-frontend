@@ -27,4 +27,16 @@
     border-width: 2px;
     border-color: var(--theme-input-focus-border-color);
   }
+
+  &.errored {
+    border: 1px solid var(--theme-input-error-color);
+  }
+
+  &.icon {
+    padding-right: 46px;
+  }
+
+  &.doubleIcon {
+    padding-right: 79px;
+  }
 }

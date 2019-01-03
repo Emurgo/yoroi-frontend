@@ -24,7 +24,7 @@ export default class TopBar extends Component<Props> {
     children: undefined,
     categories: undefined,
     onCategoryClicked: undefined,
-    oldTheme: false,
+    oldTheme: undefined,
     areCategoriesVisible: true
   };
 

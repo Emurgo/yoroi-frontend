@@ -6,6 +6,7 @@ import SvgInline from 'react-svg-inline';
 import iconTickSVG from '../../assets/images/widget/tick.inline.svg';
 import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
 import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
+import iconCrossGreenSVG from '../../assets/images/widget/cross-green.inline.svg';
 import styles from './ProgressSteps.scss';
 
 type Props = {
@@ -60,7 +61,6 @@ export default class ProgressSteps extends Component<Props> {
           styles.stepTextActive
         ]);
       }
-      console.log('oldTheme in steps', oldTheme);
       
 
       steps.push(
@@ -69,7 +69,7 @@ export default class ProgressSteps extends Component<Props> {
           <div className={styles.stepBottomBlock}>
             <div className={styles.stepStateIconContainer}>
               {(displayIcon === 'done') && <SvgInline svg={oldTheme ? iconTickSVG : iconTickGreenSVG} cleanup={['title']} />}
-              {(displayIcon === 'error') && <SvgInline svg={iconCrossSVG} cleanup={['title']} />}
+              {(displayIcon === 'error') && <SvgInline svg={oldTheme ? iconCrossSVG : iconCrossGreenSVG} cleanup={['title']} />}
             </div>
             <div className={styles.stepTextContainer}>
               <span className={stepTextStyle}>{stepText}</span>

@@ -37,7 +37,7 @@ type Props = {
 export default class LanguageSelectionForm extends Component<Props> {
   static defaultProps = {
     error: undefined,
-    oldTheme: false
+    oldTheme: undefined
   };
 
   static contextTypes = {

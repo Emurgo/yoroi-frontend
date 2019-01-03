@@ -5,12 +5,15 @@ import classnames from 'classnames';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
-import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../utils/validations';
+import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword, walletPasswordConditions } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
+import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
+import InputOwnSkin from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -53,6 +56,7 @@ const messages = defineMessages({
 type Props = {
   onSubmit: Function,
   onCancel: Function,
+  oldTheme: boolean
 };
 
 type State = {
@@ -61,6 +65,9 @@ type State = {
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {
+  static defaultProps = {
+    oldTheme: false
+  }
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -152,8 +159,10 @@ export default class WalletCreateDialog extends Component<Props, State> {
 
   render() {
     const { form } = this;
+    const { walletName, walletPassword, repeatPassword } = form.values();
+    const { condition1, condition2, condition3, condition4 } = walletPasswordConditions(walletPassword);
     const { intl } = this.context;
-    const { onCancel } = this.props;
+    const { onCancel, oldTheme } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([
       styles.component,
@@ -164,18 +173,26 @@ export default class WalletCreateDialog extends Component<Props, State> {
       styles.show,
     ]);
 
+    const disabledCondition = !(
+      isValidWalletName(walletName)
+      && isValidWalletPassword(walletPassword)
+      && isValidRepeatPassword(walletPassword, repeatPassword)
+    );
+    
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
         label: this.context.intl.formatMessage(messages.createPersonalWallet),
         primary: true,
         onClick: this.submit,
+        disabled: !oldTheme && disabledCondition
       },
     ];
 
     const walletNameField = form.$('walletName');
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
+    
 
     return (
       <Dialog
@@ -186,33 +203,61 @@ export default class WalletCreateDialog extends Component<Props, State> {
         onClose={!isSubmitting ? onCancel : null}
         closeButton={<DialogCloseButton />}
       >
-
         <Input
           className="walletName"
+          done={isValidWalletName(walletName)}
           onKeyPress={this.checkForEnterKey.bind(this)}
           ref={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={<SimpleInputSkin />}
+          skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
         />
 
         <div className={styles.walletPassword}>
           <div className={walletPasswordFieldsClasses}>
             <Input
               className="walletPassword"
+              done={isValidWalletPassword(walletPassword)}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
             />
             <Input
               className="repeatedPassword"
+              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
             />
-            <p className={styles.passwordInstructions}>
-              {intl.formatMessage(globalMessages.passwordInstructions)}
-            </p>
+            {oldTheme ? (
+              <p className={styles.passwordInstructions}>
+                {intl.formatMessage(globalMessages.passwordInstructions)}
+              </p>
+            ) : (
+              <div className={styles.passwordInstructions}>
+                <p>The password needs to contain at least:</p>
+
+                <ul>
+                  <li className={classnames({ [styles.successCondition]: condition1 })}>
+                    {condition1 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
+                    7 characters
+                  </li>
+                  <li className={classnames({ [styles.successCondition]: condition2 })}>
+                    {condition2 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
+                    one uppercase character
+                  </li>
+                  <li className={classnames({ [styles.successCondition]: condition3 })}>
+                    {condition3 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
+                    one number
+                  </li>
+                  <li className={classnames({ [styles.successCondition]: condition4 })}>
+                    {condition4 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
+                    one lowercase character
+                  </li>
+                </ul>
+              </div>
+            )}
+
           </div>
         </div>
 

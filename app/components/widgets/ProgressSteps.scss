@@ -43,9 +43,14 @@ $common-color:var(--theme-widgets-progress-step-common-color);
   width: 117px;
   margin-top: 2px;
 
+  span {
+    margin-top: 1px;
+    display: inline-block;
+  }
+
   svg {
-    height: 9px;
-    width: 9px;
+    height: 10px;
+    width: 10px;
   }
 }
 

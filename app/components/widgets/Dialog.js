@@ -32,7 +32,7 @@ export default class Dialog extends Component<Props> {
     className: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
-    oldTheme: false
+    oldTheme: undefined
   };
 
   render() {

@@ -72,15 +72,15 @@ export default class WalletAddPage extends Component<Props> {
 
     if (uiDialogs.isOpen(WalletCreateDialog)) {
       content = (
-        <WalletCreateDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+        <WalletCreateDialogContainer actions={actions} stores={stores} onClose={this.onClose} oldTheme={theme.old} />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
       content = (
-        <WalletRestoreDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+        <WalletRestoreDialogContainer actions={actions} stores={stores} onClose={this.onClose} oldTheme={theme.old} />
       );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       content = (
-        <WalletBackupDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+        <WalletBackupDialogContainer actions={actions} stores={stores} onClose={this.onClose} oldTheme={theme.old} />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
       content = (
@@ -88,6 +88,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
+          oldTheme={theme.old}
         />
       );
     } else {

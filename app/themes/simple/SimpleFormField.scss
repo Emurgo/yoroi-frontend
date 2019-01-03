@@ -5,6 +5,7 @@
 
 .root {
   margin: 10px 0 20px;
+  // position: relative;
 }
 
 .error {
@@ -14,7 +15,17 @@
   margin: 0;
   line-height: 1.33;
   font-size: 12px;
-  color: var(--theme-input-error-color);
+  color: var(--theme-input-error-color);  
+}
+
+.errored {
+  input:hover {
+    border: 1px solid var(--theme-input-error-color);
+  }
+
+  input:focus, input:active {
+    border: 2px solid var(--theme-input-error-color);
+  }
 }
 
 .label {
@@ -28,4 +39,17 @@
   font-weight: 500;
   padding: 0 6px;
   z-index: 1;
+}
+
+.inputWrapper > div {
+  height: 100%;
+  right: 13px;
+  top: 0;
+  display: flex;
+  align-items: center;
+  position: absolute;
+
+  > span, > button {
+    margin-left: 9px;
+  }
 }

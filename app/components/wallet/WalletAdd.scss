@@ -127,3 +127,27 @@
     width: 18px;
   }
 }
+
+.footerIcon {
+  width: 18px;
+  height: 18px;
+  background-image: url('../../assets/images/footer/how-to-create-wallet.inline.svg');
+  background-size: contain;
+}
+
+.buyIcon {
+  background-image: url(../../assets/images/footer/buy-trezor.inline.svg);
+}
+
+.connectIcon {
+  background-image: url(../../assets/images/footer/how-to-connect-trezor.inline.svg);
+}
+
+.createIcon {
+  background-image: url(../../assets/images/footer/how-to-create-wallet.inline.svg);
+}
+
+.restoreIcon {
+  background-image: url(../../assets/images/footer/how-to-restore-wallet.inline.svg);
+
+}

@@ -21,6 +21,13 @@ export const isValidWalletPassword = (walletPassword) => {
   return passwordRegex.test(walletPassword);
 };
 
+export const walletPasswordConditions = (walletPassword) => ({
+  condition1: walletPassword.length >= 7,
+  condition2: walletPassword.match(/[A-Z]/),
+  condition3: walletPassword.match(/\d/),
+  condition4: walletPassword.match(/[a-z]/)
+});
+
 // eslint-disable-next-line max-len
 export const isValidRepeatPassword = (walletPassword, repeatPassword) => walletPassword === repeatPassword;
 

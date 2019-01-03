@@ -78,7 +78,7 @@ export default {
   '--theme-input-hover-border-color': '#353535',
 
   '--theme-main-body-background-color': '#ffffff',
-  '--theme-main-body-messages-color': '#121327',
+  '--theme-main-body-messages-color': '#353535',
 
   '--theme-modal-overlay-background-color': 'rgba(0, 0, 0, 0.4)',
   '--theme-modal-background-color': '#ffffff',
@@ -96,6 +96,9 @@ export default {
 
   '--theme-error-color': '#ff1351',
   '--theme-error-text-color': '#ff1351',
+
+  '--theme-instructions-text-color': '#adaeb6',
+  '--theme-password-condition-text-color': '#17d1aa',
 
   '--theme-terms-of-use-text-color': '#9b9b9b',
 

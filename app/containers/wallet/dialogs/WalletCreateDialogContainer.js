@@ -17,6 +17,7 @@ export default class WalletCreateDialogContainer extends Component<Props> {
   render() {
     return (
       <WalletCreateDialog
+        oldTheme={this.props.oldTheme}
         onSubmit={this.onSubmit}
         onCancel={this.props.onClose}
       />

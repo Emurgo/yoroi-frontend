@@ -5,13 +5,8 @@ import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import styles from './WalletAdd.scss';
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
-import buyIcon from '../../assets/images/add-wallet/buy-trezor.inline.svg';
-import connectIcon from '../../assets/images/add-wallet/how-to-connect-trezor.inline.svg';
-import createIcon from '../../assets/images/add-wallet/how-to-create-wallet.inline.svg';
-import restoreIcon from '../../assets/images/add-wallet/how-to-restore-wallet.inline.svg';
 
 const messages = defineMessages({
   title: {
@@ -59,7 +54,7 @@ type Props = {
 @observer
 export default class WalletAdd extends Component<Props> {
   static defaultProps = {
-    oldTheme: false,
+    oldTheme: undefined,
     title: undefined
   }
 
@@ -138,22 +133,22 @@ export default class WalletAdd extends Component<Props> {
         {!oldTheme && (
           <div className={styles.footer}>
             <a href='/' className={styles.link}>
-              <SvgInline svg={buyIcon} className={''} cleanup={['title']} />
+              <div className={classnames([styles.footerIcon, styles.buyIcon])} />
               <span>Buy Trezor</span>
             </a>
 
             <a href='/' className={styles.link}>
-              <SvgInline svg={connectIcon} className={''} cleanup={['title']} />
+              <div className={classnames([styles.footerIcon, styles.connectIcon])} />
               <span>How to connect Trezor</span>
             </a>
 
             <a href='/' className={styles.link}>
-              <SvgInline svg={createIcon} />
+              <div className={classnames([styles.footerIcon, styles.createIcon])} />
               <span>How to create wallet</span>
             </a>
 
             <a href='/' className={styles.link}>
-              <SvgInline svg={restoreIcon} className={''} cleanup={['title']} />
+              <div className={classnames([styles.footerIcon, styles.restoreIcon])} />
               <span>How to restore wallet</span>
             </a>
           </div>

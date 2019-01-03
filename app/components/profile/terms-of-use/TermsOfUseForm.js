@@ -40,7 +40,7 @@ type State = {
 export default class TermsOfUseForm extends Component<Props, State> {
   static defaultProps = {
     error: undefined,
-    oldTheme: false
+    oldTheme: undefined
   };
 
   static contextTypes = {
