@@ -7,36 +7,25 @@ const pdfParser = require('../../../app/api/ada/lib/pdfParser');
 describe('PDF get secret key tests', () => {
   it('should get the secret key from a parsed PDF', () => {
     const { parsePDF } = mockData;
+    const secretKey = pdfParser.getSecretKey(parsePDF.PDFContent);
 
-    try {
-      const secretKey = pdfParser.getSecretKey(parsePDF.PDFContent);
-
-      assert.equal(secretKey, parsePDF.secretKey, 'Secret key does not equal content');
-    } catch (error) {
-      assert.fail(error.message);
-    }
+    assert.equal(secretKey, parsePDF.secretKey, 'Secret key does not equal content');
   });
 
   it('should fail if PDF is missing', () => {
-    try {
-      pdfParser.getSecretKey();
-
-      assert(false, 'getSecretKey did not throw an exception');
-    } catch (error) {
-      assert(true);
-    }
+    assert.throws(
+      () => { pdfParser.getSecretKey(); },
+      Error
+    );
   });
 
   it('should fail if parsed PDF has no redemption key', () => {
     const { parsePDF } = mockData;
 
-    try {
-      pdfParser.getSecretKey(parsePDF.noKeyPDFContent);
-
-      assert(false, 'getSecretKey did not throw an exception');
-    } catch (error) {
-      assert.equal(error.defaultMessage, '!!!Invalid certificate.');
-    }
+    assert.throws(
+      () => { pdfParser.getSecretKey(parsePDF.noKeyPDFContent); },
+      'api.errors.invalidCertificateError: {}'
+    );
   });
 });
 
