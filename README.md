@@ -45,8 +45,7 @@ _Note_: `dev` should hot reload on code change
 
 Debug builds are not maintained for Firefox as firefox rejects manifest files with non-https `localhost` in them.
 You can bypass this by manually adding the extension into your Firefox folder but this is kind of tedious.
-I suggest instead installing the `mainnet` build as it does not use `localhost`. (through `about:debugging` or `about:addons`)
-
+I suggest instead installing the `mainnet` build as it does not use `localhost`. (through `about:debugging` or `about:addons`). See [SETUP.md](docs/SETUP.md) for how to makes the unittests pass.
 
 ## Build release candidate
 
