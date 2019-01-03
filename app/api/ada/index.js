@@ -87,6 +87,7 @@ import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
+import type { SignedResponse } from './lib/yoroi-backend-api';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -277,7 +278,7 @@ export default class AdaApi {
 
   async createTransaction(
     request: CreateTransactionRequest
-  ): Promise<Array<void>> {
+  ): Promise<SignedResponse> {
     Logger.debug('AdaApi::createTransaction called');
     const { receiver, amount, password } = request;
     try {

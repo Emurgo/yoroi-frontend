@@ -22,6 +22,7 @@ import type {
   UTXO,
   Transaction
 } from '../adaTypes';
+import { rustRawTxToId } from './utils';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
@@ -118,7 +119,9 @@ export const getTransactionsHistoryForAddresses = (
 export type SignedRequest = {
   signedTx: string
 };
-export type SignedResponse = Array<void>;
+export type SignedResponse = {
+  txId: string
+};
 
 export const sendTx = (
   body: SignedRequest
@@ -131,7 +134,9 @@ export const sendTx = (
         signedTx: body.signedTx
       }
     }
-  ).then(response => response.data)
+  ).then(() => ({
+    txId: rustRawTxToId(Buffer.from(body.signedTx, 'base64'))
+  }))
     .catch((error) => {
       Logger.error('yoroi-backend-api::sendTx error: ' + stringifyError(error));
       if (error.request.response.includes('Invalid witness')) {
