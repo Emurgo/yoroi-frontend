@@ -34,6 +34,13 @@ jobs:
       # run tests!
       - run: npm run test-e2e
       # todo: run firefox tests in parallel
+
+      # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
+      # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr
+      - run: sudo rm -f /opt/firefox/firefox
+      - run: sudo rm -f /usr/local/bin/firefox
+      - run: sudo apt install firefox-esr
+      - run: sudo ln -s /usr/bin/firefox-esr /usr/local/bin/firefox
       - run: npm run test-e2e-firefox
       
       - run: npm run build -- --env "staging"
