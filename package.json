@@ -55,6 +55,7 @@
     "babel-preset-stage-0": "6.3.13",
     "babel-runtime": "6.3.19",
     "chai": "3.2.0",
+    "chai-as-promised": "7.1.1",
     "chromedriver": "2.40.0",
     "config": "1.30.0",
     "config-webpack": "1.0.4",
@@ -97,7 +98,7 @@
     "ws": "5.2.2"
   },
   "dependencies": {
-    "aes-js": "3.1.2",
+    "aes-js": "3.1.0",
     "autoprefixer": "7.2.5",
     "axios": "0.18.0",
     "bignumber.js": "4.0.0",
