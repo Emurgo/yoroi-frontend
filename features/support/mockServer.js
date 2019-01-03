@@ -46,7 +46,7 @@ function _defaultSignedTransaction(
   },
   res: { send(arg: SignedResponse): any }
 ): void {
-  res.send([]);
+  res.send({ txId: 'id' });
 }
 
 let MockServer = null;
