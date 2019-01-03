@@ -23,6 +23,7 @@ import {
   generateTransferTx
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
+import type { SignedResponse } from '../../api/ada/lib/yoroi-backend-api';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -35,7 +36,7 @@ export default class DaedalusTransferStore extends Store {
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<Array<void>> = new Request(this._transferFundsRequest);
+  @observable transferFundsRequest: Request<SignedResponse> = new Request(this._transferFundsRequest);
   @observable ws: any = null;
 
   setup(): void {
@@ -158,7 +159,7 @@ export default class DaedalusTransferStore extends Store {
   /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (payload: {
     cborEncodedTx: Array<number>
-  }): Promise<Array<void>> => {
+  }): Promise<SignedResponse> => {
     const { cborEncodedTx } = payload;
     const signedTx = Buffer.from(cborEncodedTx).toString('base64');
     return sendTx({ signedTx });
