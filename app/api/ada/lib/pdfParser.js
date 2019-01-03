@@ -3,7 +3,7 @@ import pdfjsLib from 'pdfjs-dist';
 import type { FileEvent, PDF } from '../adaTypes';
 import { InvalidCertificateError } from '../errors';
 
-const getSecretKey = (parsedPDF: string): string => {
+export const getSecretKey = (parsedPDF: string): string => {
   const splitArray = parsedPDF.split('——————');
   const redemptionKeyLabel = splitArray[3].trim();
 
