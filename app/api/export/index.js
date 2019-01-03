@@ -72,9 +72,7 @@ export default class ExportApi {
     fileType = fileType || 'csv';
     switch (fileType) {
       case 'csv': return {
-        data: new Blob([_writeCsvDataIntoCsvFile(data)], {
-          type: 'text/csv;charset=utf-8'
-        }),
+        data: _convertCsvDataIntoCsvBlob(data),
         fileType
       };
       default: throw new Error('Unexpected file type: ' + fileType);
@@ -130,8 +128,11 @@ function _formatExportRowTypeForCoinTracking(type: string): string {
   }
 }
 
-function _writeCsvDataIntoCsvFile(data: CsvData): string {
-  return [data.headers, ...data.rows]
+function _convertCsvDataIntoCsvBlob(data: CsvData): Blob {
+  const body = [data.headers, ...data.rows]
     .map(x => x.map(s => `"${s.replace(/"/g, '""')}"`).join(','))
     .join('\n');
+  return new Blob([body], {
+    type: 'text/csv;charset=utf-8'
+  });
 }
