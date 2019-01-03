@@ -1,6 +1,18 @@
 // @flow
 import pdfjsLib from 'pdfjs-dist';
 import type { FileEvent, PDF } from '../adaTypes';
+import { InvalidCertificateError } from '../errors';
+
+const getSecretKey = (parsedPDF: string): string => {
+  const splitArray = parsedPDF.split('——————');
+  const redemptionKeyLabel = splitArray[3].trim();
+
+  if (redemptionKeyLabel !== 'REDEMPTION KEY') {
+    throw new InvalidCertificateError();
+  }
+
+  return splitArray[2].trim();
+};
 
 export const getSelectedFile = (event: FileEvent): Blob => event.target.files[0];
 
