@@ -10,6 +10,7 @@ import LocalizableError from '../i18n/LocalizableError';
 import WalletTransaction from '../domain/WalletTransaction';
 import WalletAddress from '../domain/WalletAddress';
 import Wallet from '../domain/Wallet';
+import type { SignedResponse } from './ada/lib/yoroi-backend-api';
 
 const messages = defineMessages({
   genericApiError: {
@@ -139,9 +140,9 @@ export type UpdateWalletPasswordResponse = boolean;
 
 export type UpdateWalletResponse = Wallet;
 
-export type CreateTransactionResponse = Array<void>;
+export type CreateTransactionResponse = SignedResponse;
 
-export type SendTrezorSignedTxResponse = Array<void>;
+export type SendTrezorSignedTxResponse = SignedResponse;
 
 export type GetWalletsResponse = Array<Wallet>;
 
