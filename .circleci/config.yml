@@ -32,6 +32,7 @@ jobs:
       - run: npm run eslint
 
       # run tests!
+      - run: npm run jest
       - run: npm run test-e2e
       - run: npm run build -- --env "staging"
       - run: npm run compress -- --env "staging" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/yoroi-extension.crx"

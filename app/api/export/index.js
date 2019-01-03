@@ -89,21 +89,23 @@ export default class ExportApi {
 
 }
 
+export const COIN_TRACKING_HEADERS = [
+  'Type (Trade, IN or OUT)',
+  'Buy Amount',
+  'Buy Cur.',
+  'Sell Amount',
+  'Sell Cur.',
+  'Fee Amount (optional)',
+  'Fee Cur. (optional)',
+  'Exchange (optional)',
+  'Trade Group (optional)',
+  'Comment (optional)',
+  'Date'
+];
+
 function _formatExportRowsIntoCoinTrackingFormat(rows: Array<TransactionExportRow>): CsvData {
   return {
-    headers: [
-      'Type (Trade, IN or OUT)',
-      'Buy Amount',
-      'Buy Cur.',
-      'Sell Amount',
-      'Sell Cur.',
-      'Fee Amount (optional)',
-      'Fee Cur. (optional)',
-      'Exchange (optional)',
-      'Trade Group (optional)',
-      'Comment (optional)',
-      'Date'
-    ],
+    headers: COIN_TRACKING_HEADERS,
     rows: rows.map(r => [
       _formatExportRowTypeForCoinTracking(r.type),
       r.type === 'in' ? r.amount : '',
