@@ -37,16 +37,16 @@ export default class ExportApi {
    *
    * No result will be returned. File is sent to user as side-effect.
    */
-  exportTransactions(request : {
+  async exportTransactions(request : {
     rows: Array<TransactionExportRow>,
     format?: TransactionExportDataFormat,
     fileType?: TransactionExportFileType,
     fileName: string
-  }) {
+  }): Promise<void> {
     const { rows, format, fileType, fileName } = request;
     const data = ExportApi.convertExportRowsToCsv(rows, format);
     const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
-    this.sendFileToUser(fileResponse.data, `${fileName}.${fileResponse.fileType}`);
+    return await this.sendFileToUser(fileResponse.data, `${fileName}.${fileResponse.fileType}`);
   }
 
   /**
@@ -83,8 +83,8 @@ export default class ExportApi {
   /**
    * Make browser to download the specified blob of bytes as a file with the specified name
    */
-  sendFileToUser(data: Blob, fileName: string) {
-    sendFileToUser(data, fileName);
+  async sendFileToUser(data: Blob, fileName: string): Promise<void> {
+    return await sendFileToUser(data, fileName);
   }
 
 }
