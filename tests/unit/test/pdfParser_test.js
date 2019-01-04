@@ -8,6 +8,31 @@ const pdfParser = require('../../../app/api/ada/lib/pdfParser');
 chai.use(chaiAsPromised);
 const should = chai.should(); // eslint-disable-line
 
+describe('PDF get secret key tests', () => {
+  it('should get the secret key from a parsed PDF', () => {
+    const { parsePDF } = mockData;
+    const secretKey = pdfParser.getSecretKey(parsePDF.PDFContent);
+
+    assert.equal(secretKey, parsePDF.secretKey, 'Secret key does not equal content');
+  });
+
+  it('should fail if PDF is missing', () => {
+    assert.throws(
+      () => { pdfParser.getSecretKey(); },
+      Error
+    );
+  });
+
+  it('should fail if parsed PDF has no redemption key', () => {
+    const { parsePDF } = mockData;
+
+    assert.throws(
+      () => { pdfParser.getSecretKey(parsePDF.noKeyPDFContent); },
+      'api.errors.invalidCertificateError: {}'
+    );
+  });
+});
+
 describe('PDF parse test', () => {
   it('should parse PDF content', async () => {
     const fileBuffer = getMockedFileBuffer('regular.pdf');
