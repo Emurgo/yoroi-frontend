@@ -27,7 +27,7 @@ describe('PDF parse test', () => {
 });
 
 describe('PDF decrypt test', () => {
-  it('should decrypt and read encrypted regular PDF content', () => {
+  it('should decrypt regular PDF', () => {
     const fileBuffer = getMockedFileBuffer('regular.pdf.enc');
     const decryptedFileBuffer = getMockedFileBuffer('regular-decrypted.txt');
     const decryptedFile = pdfParser.decryptFile(mockData.decryptPDF.passphrase,
@@ -35,18 +35,20 @@ describe('PDF decrypt test', () => {
     assert(Buffer.from(decryptedFile).equals(decryptedFileBuffer), 'PDF decrypted content should equal specific content');
   });
 
-  it('should decrypt and read encrypted force vended PDF content', () => {
+  it('should decrypt force vended PDF', () => {
     const fileBuffer = getMockedFileBuffer('force-vended.pdf.enc');
     const decryptedFileBuffer = getMockedFileBuffer('force-vended-decrypted.txt');
     const decryptedFile = pdfParser.decryptFile(mockData.decryptPDF.data, 'forceVended', fileBuffer);
     assert(Buffer.from(decryptedFile).equals(decryptedFileBuffer), 'PDF decrypted content should equal specific content');
   });
 
-  it('should fail at decrypting with no data', () => {
-    assert.isUndefined(pdfParser.decryptFile(), 'No decrypted file defined');
+  it('should return same file when no decryption key is passed', () => {
+    const fileBuffer = getMockedFileBuffer('force-vended.pdf.enc');
+    const decryptedFile = pdfParser.decryptFile(undefined, undefined, fileBuffer);
+    assert(Buffer.from(decryptedFile).equals(fileBuffer), 'Result content should equal initial content');
   });
 
-  it('should fail at decrypting when only redemtion key is passed', () => {
+  it('should fail at decrypting when only decryption key is passed', () => {
     assert.throws(
       () => pdfParser.decryptFile(mockData.decryptPDF.passphrase),
       mockData.decryptPDF.decryptionError
