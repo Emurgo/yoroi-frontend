@@ -36,8 +36,15 @@ export default class Wallet extends Component<Props> {
     if (!wallets.active) {
       return <MainLayout actions={actions} stores={stores}><LoadingSpinner /></MainLayout>;
     }
+
+    const footer = undefined;
+
     return (
-      <MainLayout actions={actions} stores={stores}>
+      <MainLayout
+        actions={actions}
+        stores={stores}
+        footer={footer}
+      >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
