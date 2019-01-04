@@ -11,6 +11,8 @@ import type {
 import {
   stringifyError
 } from '../../../utils/logging';
+import type { TransactionExportRow } from '../../export';
+import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();
@@ -105,4 +107,41 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   } catch (e) {
     throw new Error('Failed to decode a rust tx! Cause: ' + stringifyError(e));
   }
+}
+
+export function convertAdaTransactionsToExportRows(
+  transactions: Array<AdaTransaction>
+): Array<TransactionExportRow> {
+  return transactions
+    .filter(tx => tx.ctCondition === 'CPtxInBlocks')
+    .map(tx => {
+      const fullValue = new BigNumber(tx.ctAmount.getCCoin);
+      const sumInputs: BigNumber = sumInputsOutputs(tx.ctInputs);
+      const sumOutputs: BigNumber = sumInputsOutputs(tx.ctOutputs);
+      const fee: BigNumber = tx.ctIsOutgoing ? sumInputs.sub(sumOutputs) : new BigNumber(0);
+      const value: BigNumber = tx.ctIsOutgoing ? fullValue.sub(fee) : fullValue;
+      return {
+        date: tx.ctMeta.ctmDate,
+        type: tx.ctIsOutgoing ? 'out' : 'in',
+        amount: formatBigNumberToFloatString(value.dividedBy(LOVELACES_PER_ADA)),
+        fee: formatBigNumberToFloatString(fee.dividedBy(LOVELACES_PER_ADA)),
+      };
+    });
+}
+
+/**
+ * Ignore first string parts of inputs/outputs and just sum coin values.
+ */
+export function sumInputsOutputs(ios: Array<AdaTransactionInputOutput>): BigNumber {
+  return ios
+    .map(io => new BigNumber(io[1].getCCoin))
+    .reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
+}
+
+/**
+ * If specified number is integer - append `.0` to it.
+ * Otherwise - just float representation.
+ */
+export function formatBigNumberToFloatString(x: BigNumber): string {
+  return x.isInteger() ? x.toFixed(1) : x.toString();
 }

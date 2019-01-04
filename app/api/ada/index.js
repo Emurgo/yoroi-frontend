@@ -64,7 +64,6 @@ import type {
   AdaWallets,
   AdaAssurance,
   AdaFeeEstimateResponse,
-  AdaTransactionInputOutput,
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -89,6 +88,7 @@ import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
 import type { TransactionExportRow } from '../export';
+import { convertAdaTransactionsToExportRows } from './lib/utils';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -565,44 +565,14 @@ export default class AdaApi {
     try {
       await refreshTxs();
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
-      return AdaApi.convertAdaTransactionsToExportRows(history[0]);
+      return convertAdaTransactionsToExportRows(history[0]);
     } catch (e) {
       Logger.error('AdaApi::exportTransactionsToFile: ' + stringifyError(e));
       throw e;
     }
   }
-
-  static convertAdaTransactionsToExportRows(
-    transactions: Array<AdaTransaction>
-  ): Array<TransactionExportRow> {
-    return transactions
-      .filter(tx => tx.ctCondition === 'CPtxInBlocks')
-      .map(tx => {
-        const fullValue = new BigNumber(tx.ctAmount.getCCoin);
-        const sumInputs: BigNumber = sumInputsOutputs(tx.ctInputs);
-        const sumOutputs: BigNumber = sumInputsOutputs(tx.ctOutputs);
-        const fee: BigNumber = tx.ctIsOutgoing ? sumInputs.sub(sumOutputs) : new BigNumber(0);
-        const value: BigNumber = tx.ctIsOutgoing ? fullValue.sub(fee) : fullValue;
-        return {
-          date: tx.ctMeta.ctmDate,
-          type: tx.ctIsOutgoing ? 'out' : 'in',
-          amount: _formatNumber(value.dividedBy(LOVELACES_PER_ADA)),
-          fee: _formatNumber(fee.dividedBy(LOVELACES_PER_ADA)),
-        };
-      });
-  }
 }
 // ========== End of class AdaApi =========
-
-function sumInputsOutputs(ios: Array<AdaTransactionInputOutput>): BigNumber {
-  return ios
-    .map(io => new BigNumber(io[1].getCCoin))
-    .reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
-}
-
-function _formatNumber(x: BigNumber): string {
-  return x.isInteger() ? x.toFixed(1) : x.toString();
-}
 
 // ========== TRANSFORM SERVER DATA INTO FRONTEND MODELS =========
 
