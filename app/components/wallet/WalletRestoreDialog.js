@@ -15,6 +15,7 @@ import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
+import InputOwnSkin from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   title: {
@@ -83,6 +84,7 @@ type Props = {
   mnemonicValidator: Function,
   error?: ?LocalizableError,
   validWords: Array<string>,
+  oldTheme: boolean
 };
 
 @observer
@@ -177,7 +179,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error, onCancel } = this.props;
+    const { validWords, isSubmitting, error, onCancel, oldTheme } = this.props;
 
     const dialogClasses = classnames([
       styles.component,
@@ -223,7 +225,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={<SimpleInputSkin />}
+          skin={oldTheme ? <InputOwnSkin /> : <SimpleInputSkin />}
         />
 
         <Autocomplete
@@ -242,13 +244,13 @@ export default class WalletRestoreDialog extends Component<Props> {
               className="walletPassword"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={oldTheme ? <InputOwnSkin /> : <SimpleInputSkin />}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={oldTheme ? <InputOwnSkin /> : <SimpleInputSkin />}
             />
             <p className={styles.passwordInstructions}>
               {intl.formatMessage(globalMessages.passwordInstructions)}

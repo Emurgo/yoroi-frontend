@@ -61,7 +61,6 @@ export default class App extends Component<{
         <ThemeManager variables={theme} />
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
         <ThemeProvider key={currentTheme} theme={yoroiTheme(currentTheme)}>
-        {/* <ThemeProvider theme={yoroiRenewedTheme}> */}
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             <div style={{ height: '100%' }}>
               <input type="checkbox" onChange={this.handleChange} checked={stores.theme.old} /><span> - old design </span>

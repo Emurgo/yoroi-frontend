@@ -36,8 +36,7 @@ type Props = {
 @observer
 export default class LanguageSelectionForm extends Component<Props> {
   static defaultProps = {
-    error: undefined,
-    oldTheme: undefined
+    error: undefined
   };
 
   static contextTypes = {

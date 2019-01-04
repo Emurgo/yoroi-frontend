@@ -64,21 +64,23 @@ type Props = {
 
 @observer
 export default class ConnectDialog extends Component<Props> {
-  static defaultProps = {
-    oldTheme: false
-  }
-
   static contextTypes = {
     intl: intlShape.isRequired
   };
 
   render() {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, goBack, submit, cancel, oldTheme } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      goBack,
+      submit,
+      cancel,
+      oldTheme
+    } = this.props;
     const headerBlockClasses = oldTheme ? styles.headerBlockOld : styles.headerBlock;
-    const middleBlockClasses = oldTheme 
-      ? classnames([styles.middleBlockOld, styles.middleConnectLoadBlock])
-      : classnames([styles.middleBlock, styles.middleConnectLoadBlock]);
+    const middleBlockClasses = oldTheme ? styles.middleBlockOld : styles.middleBlock;
 
     const introBlock = (
       <div className={headerBlockClasses}>
@@ -94,21 +96,21 @@ export default class ConnectDialog extends Component<Props> {
       case StepState.LOAD:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
+          <div className={classnames([middleBlockClasses, styles.middleConnectLoadBlock])}>
             {oldTheme ? <img src={connectLoadGIF} alt="" /> : <SvgInline svg={connectLoadImage} cleanup={['title']} />}
           </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
-          <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
+          <div className={classnames([middleBlockClasses, styles.middleConnectProcessBlock])}>
             {oldTheme ? <img src={connectStartGIF} alt="" /> : <SvgInline svg={connectLoadImage} cleanup={['title']} />}
           </div>);
         break;
       case StepState.ERROR:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
+          <div className={classnames([middleBlockClasses, styles.middleConnectErrorBlock])}>
             <SvgInline svg={oldTheme ? connectErrorSVG : connectErrorImage} cleanup={['title']} />
           </div>);
         break;
@@ -139,12 +141,16 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} oldTheme={oldTheme} />
         {introBlock}
         {middleBlock}
-        
-        {!oldTheme && <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />}
-        
+
+        {!oldTheme && (
+          <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />
+        )}
+
         <HelpLinkBlock progressInfo={progressInfo} oldTheme={oldTheme} />
-        
-        {oldTheme && <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />}
+
+        {oldTheme && (
+          <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />
+        )}
       </Dialog>);
   }
 }

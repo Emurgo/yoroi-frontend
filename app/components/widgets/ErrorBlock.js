@@ -15,6 +15,9 @@ type Props = {
 
 @observer
 export default class ErrorBlock extends Component<Props> {
+  static defaultProps = {
+    oldTheme: false
+  }
 
   static contextTypes = {
     intl: intlShape.isRequired

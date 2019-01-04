@@ -83,7 +83,7 @@ export default {
   '--theme-modal-overlay-background-color': 'rgba(0, 0, 0, 0.4)',
   '--theme-modal-background-color': '#ffffff',
 
-//   '--theme-topbar-category-background-color-hover': '#4760ff',
+  //   '--theme-topbar-category-background-color-hover': '#4760ff',
   '--theme-topbar-category-text-color': '#ffffff',
   '--theme-topbar-background-color': 'linear-gradient(to right, #1e46bd, #4760ff)',
   '--theme-topbar-wallet-name-color': '#ffffff',

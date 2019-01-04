@@ -11,10 +11,6 @@ type Props = {
 
 @observer
 export default class TermsOfUseText extends Component<Props> {
-  static defaultProps = {
-    oldTheme: undefined
-  };
-
   render() {
     const { oldTheme } = this.props;
     return (

@@ -65,10 +65,6 @@ type State = {
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {
-  static defaultProps = {
-    oldTheme: false
-  }
-
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -160,7 +156,12 @@ export default class WalletCreateDialog extends Component<Props, State> {
   render() {
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
-    const { condition1, condition2, condition3, condition4 } = walletPasswordConditions(walletPassword);
+    const {
+      condition1,
+      condition2,
+      condition3,
+      condition4
+    } = walletPasswordConditions(walletPassword);
     const { intl } = this.context;
     const { onCancel, oldTheme } = this.props;
     const { isSubmitting } = this.state;
@@ -178,7 +179,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
       && isValidWalletPassword(walletPassword)
       && isValidRepeatPassword(walletPassword, repeatPassword)
     );
-    
+
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
@@ -192,7 +193,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
     const walletNameField = form.$('walletName');
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
-    
 
     return (
       <Dialog

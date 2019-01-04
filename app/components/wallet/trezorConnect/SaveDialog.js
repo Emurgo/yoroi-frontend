@@ -68,10 +68,6 @@ type Props = {
 
 @observer
 export default class SaveDialog extends Component<Props> {
-  static defaultProps = {
-    oldTheme: false
-  }
-
   static contextTypes = {
     intl: intlShape.isRequired
   };
@@ -113,7 +109,9 @@ export default class SaveDialog extends Component<Props> {
       styles.walletName,
     ]);
     const walletNameField = this.form.$('walletName');
-    const headerBlockClasses = oldTheme ? classnames([styles.headerBlockOld, styles.headerSaveBlockOld]) : styles.headerBlock; 
+    const headerBlockClasses = oldTheme
+      ? classnames([styles.headerBlockOld, styles.headerSaveBlockOld])
+      : styles.headerBlock;
 
     const walletNameBlock = (
       <div className={headerBlockClasses}>
@@ -123,7 +121,9 @@ export default class SaveDialog extends Component<Props> {
           skin={<SimpleInputSkin />}
           error={walletNameField.error}
         />
-        {/* {oldTheme && <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>} */}
+        {/* {oldTheme && (
+          <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
+        )} */}
         <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);
 
@@ -174,12 +174,16 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} oldTheme={oldTheme} />
         {walletNameBlock}
         {middleBlock}
-        
-        {!oldTheme && <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />}
-        
+
+        {!oldTheme && (
+          <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />
+        )}
+
         <HelpLinkBlock progressInfo={progressInfo} oldTheme={oldTheme} />
-        
-        {oldTheme && <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />}
+
+        {oldTheme && (
+          <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />
+        )}
       </Dialog>);
   }
 

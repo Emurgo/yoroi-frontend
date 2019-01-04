@@ -31,8 +31,7 @@ export default class Dialog extends Component<Props> {
     backButton: undefined,
     className: undefined,
     onClose: undefined,
-    closeOnOverlayClick: undefined,
-    oldTheme: undefined
+    closeOnOverlayClick: undefined
   };
 
   render() {
@@ -48,7 +47,6 @@ export default class Dialog extends Component<Props> {
       oldTheme
     } = this.props;
     const titleClasses = oldTheme ? styles.titleOld : styles.title;
-    
 
     return (
       <Modal

@@ -1,5 +1,5 @@
 // @flow
-import { observable, action, computed } from 'mobx';
+import { observable, action } from 'mobx';
 import Store from '../base/Store';
 
 export default class ThemeStore extends Store {

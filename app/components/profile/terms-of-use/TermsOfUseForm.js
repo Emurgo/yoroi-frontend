@@ -28,8 +28,7 @@ type Props = {
   localizedTermsOfUse: string,
   onSubmit: Function,
   isSubmitting: boolean,
-  error?: ?LocalizableError,
-  oldTheme: boolean
+  error?: ?LocalizableError
 };
 
 type State = {
@@ -64,7 +63,9 @@ export default class TermsOfUseForm extends Component<Props, State> {
     const { isSubmitting, error, localizedTermsOfUse, oldTheme } = this.props;
     const { areTermsOfUseAccepted } = this.state;
     const submitButtonClass = oldTheme ? styles.submitButtonOld : styles.submitButton;
-    const submitButtonSpinningClass = oldTheme ? styles.submitButtonSpinningOld : styles.submitButtonSpinning;
+    const submitButtonSpinningClass = oldTheme
+      ? styles.submitButtonSpinningOld
+      : styles.submitButtonSpinning;
     const buttonClasses = classnames([
       'primary',
       isSubmitting ? submitButtonSpinningClass : submitButtonClass,

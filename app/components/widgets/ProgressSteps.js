@@ -61,7 +61,6 @@ export default class ProgressSteps extends Component<Props> {
           styles.stepTextActive
         ]);
       }
-      
 
       steps.push(
         <div key={idx} className={styles.stepBlock}>

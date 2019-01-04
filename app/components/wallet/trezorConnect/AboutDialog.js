@@ -108,10 +108,6 @@ type Props = {
 
 @observer
 export default class AboutDialog extends Component<Props> {
-  static defaultProps = {
-    oldTheme: false
-  }
-
   static contextTypes = {
     intl: intlShape.isRequired
   };
@@ -127,7 +123,7 @@ export default class AboutDialog extends Component<Props> {
       oldTheme
     } = this.props;
     const headerBlockClasses = oldTheme ? styles.headerBlockOld : classnames([styles.headerBlock, 'small']);
-    const middleBlockClasses = oldTheme 
+    const middleBlockClasses = oldTheme
       ? classnames([styles.middleBlockOld, styles.middleAboutBlockOld])
       : classnames([styles.middleBlock, styles.middleAboutBlock]);
 
@@ -141,7 +137,7 @@ export default class AboutDialog extends Component<Props> {
     const middleBlock = (
       <div className={middleBlockClasses}>
         {!oldTheme && <SvgInline svg={aboutTrezorSvg} cleanup={['title']} />}
-        
+
         <div className={styles.prerequisiteBlock}>
           <div>
             <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />

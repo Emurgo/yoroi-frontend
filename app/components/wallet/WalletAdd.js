@@ -53,11 +53,6 @@ type Props = {
 
 @observer
 export default class WalletAdd extends Component<Props> {
-  static defaultProps = {
-    oldTheme: undefined,
-    title: undefined
-  }
-
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -85,7 +80,7 @@ export default class WalletAdd extends Component<Props> {
     ]);
     const buttonsContainerClasses = classnames([
       oldTheme ? styles.buttonsContainerOld : styles.buttonsContainer
-    ])
+    ]);
 
     let activeNotification = null;
     if (isCreateTrezorWalletActive) {
@@ -96,7 +91,7 @@ export default class WalletAdd extends Component<Props> {
 
     return (
       <div className={componentClasses}>
-        <div className={buttonsContainerClasses}>          
+        <div className={buttonsContainerClasses}>
           {!oldTheme && (
             <div className={styles.title}>{title}</div>
           )}
@@ -129,25 +124,25 @@ export default class WalletAdd extends Component<Props> {
           ) : null}
 
         </div>
-        
+
         {!oldTheme && (
           <div className={styles.footer}>
-            <a href='/' className={styles.link}>
+            <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.buyIcon])} />
               <span>Buy Trezor</span>
             </a>
 
-            <a href='/' className={styles.link}>
+            <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.connectIcon])} />
               <span>How to connect Trezor</span>
             </a>
 
-            <a href='/' className={styles.link}>
+            <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.createIcon])} />
               <span>How to create wallet</span>
             </a>
 
-            <a href='/' className={styles.link}>
+            <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.restoreIcon])} />
               <span>How to restore wallet</span>
             </a>

@@ -10,8 +10,8 @@ type Props = {
   children?: ?Node,
   notification?: ?Node,
   banner?: Node,
-  isTopBarVisible: boolean,
-  isBannerVisible: boolean,
+  isTopBarVisible?: boolean,
+  isBannerVisible?: boolean,
   languageSelectionBackground?: boolean,
   oldTheme?: boolean
 };
@@ -24,7 +24,9 @@ export default class TopBarLayout extends Component<Props> {
     notification: undefined,
     banner: undefined,
     isTopBarVisible: true,
-    isBannerVisible: true
+    isBannerVisible: true,
+    languageSelectionBackground: false,
+    oldTheme: false
   };
 
   render() {
