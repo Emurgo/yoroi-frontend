@@ -1,3 +1,7 @@
 {
-  "PDFContent": "opqrmev edroxpwghg IS ELIGIBLE FOR 12345 TO BE REDEEMED WITH THE VENDING ADDRESS PcnwlQMQzjRtKvBCz38k-wMoIWZSBtzTT7rvfoARaF8= txboqa —————— TRANSACTION ID —————— llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw= —————— REDEMPTION KEY —————— "
+  "parsePDF": {
+    "PDFContent": "opqrmev edroxpwghg IS ELIGIBLE FOR 12345 TO BE REDEEMED WITH THE VENDING ADDRESS PcnwlQMQzjRtKvBCz38k-wMoIWZSBtzTT7rvfoARaF8= txboqa —————— TRANSACTION ID —————— llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw= —————— REDEMPTION KEY —————— ",
+    "noKeyPDFContent": "opqrmev edroxpwghg IS ELIGIBLE FOR 12345 TO BE REDEEMED WITH THE VENDING ADDRESS PcnwlQMQzjRtKvBCz38k-wMoIWZSBtzTT7rvfoARaF8= txboqa —————— TRANSACTION ID —————— llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw= —————— NO KEY —————— ",
+    "secretKey": "llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw="
+  }
 }

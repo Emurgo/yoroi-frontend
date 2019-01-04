@@ -116,6 +116,11 @@ const messages = defineMessages({
     id: 'api.errors.invalidWitnessError',
     defaultMessage: '!!!The signature is invalid.',
     description: '"The signature is invalid." error message'
+  },
+  invalidCertificateError: {
+    id: 'api.errors.invalidCertificateError',
+    defaultMessage: '!!!Invalid certificate.',
+    description: '"Invalid certificate." error message'
   }
 });
 
@@ -322,6 +327,15 @@ export class InvalidWitnessError extends LocalizableError {
     super({
       id: messages.invalidWitnessError.id,
       defaultMessage: messages.invalidWitnessError.defaultMessage
+    });
+  }
+}
+
+export class InvalidCertificateError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.invalidCertificateError.id,
+      defaultMessage: messages.invalidCertificateError.defaultMessage
     });
   }
 }
