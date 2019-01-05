@@ -204,4 +204,7 @@ export default {
   '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
+
+  '--theme-footer-block-background-color': 'rgba(218, 164, 154, 0.06)',
+  '--theme-footer-block-background-color-hover': 'rgba(218, 164, 154, 0.16)',
 };
