@@ -33,6 +33,16 @@ export type DecodedAddress = {
   checksum: number
 }
 
+type CheckSum = number
+type Coin = number
+type CborAddress = [cbor.Tagged, CheckSum]
+type CborTxInput = [number, cbor.Tagged]
+type CborTxOutput = [CborAddress, Coin]
+type CborTxAttributes = {}
+type CborTxBase = [Array<CborTxInput>, Array<CborTxOutput>, CborTxAttributes];
+type CborTxWitnesses = Array<any>
+type CborTxSigned = [CborTxBase, CborTxWitnesses];
+
 export const toAdaTx = function (
   amount: BigNumber,
   tx: Transaction,
@@ -67,7 +77,7 @@ const _getTxCondition = (state: string): AdaTransactionCondition => {
   return 'CPtxWontApply';
 };
 
-export class CborIndefiniteLengthArray {
+class CborIndefiniteLengthArray {
   elements: Array<any>;
   constructor(elements: Array<any>) {
     this.elements = elements;
@@ -88,7 +98,8 @@ export function rustRawTxToId(rustTxBody: RustRawTxBody): string {
     throw new Error('Cannot decode inputs from undefined transaction!');
   }
   try {
-    const [inputs, outputs, attributes] = decodedTxToAux(cbor.decode(Buffer.from(rustTxBody)));
+    const [inputs, outputs, attributes]: CborTxBase =
+      decodedTxToBase(cbor.decode(Buffer.from(rustTxBody)));
     const enc = cbor.encode([
       new CborIndefiniteLengthArray(inputs),
       new CborIndefiniteLengthArray(outputs),
@@ -101,12 +112,21 @@ export function rustRawTxToId(rustTxBody: RustRawTxBody): string {
   }
 }
 
-function decodedTxToAux(decodedTx) {
-  switch (decodedTx.length) {
-    case 2: return decodedTx[0]; // signed
-    case 3: return decodedTx; // unsigned
-    default: throw new Error('Unexpected decoded tx structure! ' + JSON.stringify(decodedTx));
+function decodedTxToBase(decodedTx: any): CborTxBase {
+  if (Array.isArray(decodedTx)) {
+    // eslint-disable-next-line default-case
+    switch (decodedTx.length) {
+      case 2: {
+        const signed: CborTxSigned = decodedTx;
+        return signed[0];
+      }
+      case 3: {
+        const base: CborTxBase = decodedTx;
+        return base;
+      }
+    }
   }
+  throw new Error('Unexpected decoded tx structure! ' + JSON.stringify(decodedTx));
 }
 
 export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
