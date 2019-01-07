@@ -36,6 +36,9 @@ jobs:
       - run: npm run flow
       - run: npm run eslint
 
+      # run jest tests
+      - run: npm run jest
+
       # create extensions to be consumed by browsers
       - run: npm run test-prepare
 
