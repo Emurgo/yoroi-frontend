@@ -16,6 +16,11 @@ export const CATEGORIES = [
     icon: daedalusTransferIcon,
   },
   {
+    name: 'ADA_REDEMPTION',
+    route: ROUTES.ADA_REDEMPTION,
+    icon: daedalusTransferIcon, // TODO change icon
+  },
+  {
     name: 'SETTINGS',
     route: ROUTES.SETTINGS.ROOT,
     icon: settingsIcon,
