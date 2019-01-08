@@ -1,7 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import type { InjectedProps } from '../../types/injectedPropsType';
 
-export default class AdaRedemptionPage extends Component {
+type Props = InjectedProps;
+
+export default class AdaRedemptionPage extends Component<Props> {
   render() {
     return (
       <div>
