@@ -30,8 +30,12 @@ export const messages = defineMessages({
   },
 });
 
+type Props = {
+  oldTheme: ?boolean,
+};
+
 @observer
-export default class TestnetWarningBanner extends Component<{}> {
+export default class TestnetWarningBanner extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,

@@ -8,13 +8,15 @@ import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import Autocomplete from 'react-polymorph/lib/components/Autocomplete';
 import SimpleAutocompleteSkin from 'react-polymorph/lib/skins/simple/raw/AutocompleteSkin';
 import { defineMessages, intlShape } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
-import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../utils/validations';
+import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword, walletPasswordConditions } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
+import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
 import InputOwnSkin from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
@@ -179,7 +181,14 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error, onCancel, oldTheme } = this.props;
+    const { validWords, isSubmitting, error, onCancel, oldTheme, mnemonicValidator } = this.props;
+    const { walletName, walletPassword, repeatPassword, recoveryPhrase } = form.values();
+    const {
+      condition1,
+      condition2,
+      condition3,
+      condition4
+    } = walletPasswordConditions(walletPassword);
 
     const dialogClasses = classnames([
       styles.component,
@@ -190,13 +199,18 @@ export default class WalletRestoreDialog extends Component<Props> {
       'walletName',
       oldTheme ? styles.walletNameOld : styles.walletName,
     ]);
-
     const walletPasswordFieldsClasses = classnames([
       styles.walletPasswordFields,
       styles.show,
     ]);
-
     const walletPasswordClasses = oldTheme ? styles.walletPasswordOld : styles.walletPassword;
+
+    const disabledCondition = !(
+      isValidWalletName(walletName)
+      && mnemonicValidator(join(recoveryPhrase, ' '))
+      && isValidWalletPassword(walletPassword)
+      && isValidRepeatPassword(walletPassword, repeatPassword)
+    );
 
     const walletNameField = form.$('walletName');
     const recoveryPhraseField = form.$('recoveryPhrase');
@@ -208,7 +222,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(messages.importButtonLabel),
         primary: true,
-        disabled: isSubmitting,
+        disabled: isSubmitting || (!oldTheme && disabledCondition),
         onClick: this.submit,
       },
     ];
@@ -225,6 +239,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         <Input
           className={walletNameFieldClasses}
+          done={isValidWalletName(walletName)}
           {...walletNameField.bind()}
           error={walletNameField.error}
           skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
@@ -244,19 +259,47 @@ export default class WalletRestoreDialog extends Component<Props> {
           <div className={walletPasswordFieldsClasses}>
             <Input
               className="walletPassword"
+              done={isValidWalletPassword(walletPassword)}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
               skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
             />
             <Input
               className="repeatedPassword"
+              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
               skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
             />
-            <p className={styles.passwordInstructions}>
-              {intl.formatMessage(globalMessages.passwordInstructions)}
-            </p>
+
+            {oldTheme ? (
+              <p className={styles.passwordInstructions}>
+                {intl.formatMessage(globalMessages.passwordInstructions)}
+              </p>
+            ) : (
+              <div className={styles.passwordInstructions}>
+                <p>{intl.formatMessage(globalMessages.passwordInstructionsHeader)}</p>
+
+                <ul>
+                  <li className={classnames({ [styles.successCondition]: condition1 })}>
+                    {condition1 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
+                    {intl.formatMessage(globalMessages.passwordInstructionsCondition1)}
+                  </li>
+                  <li className={classnames({ [styles.successCondition]: condition2 })}>
+                    {condition2 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
+                    {intl.formatMessage(globalMessages.passwordInstructionsCondition2)}
+                  </li>
+                  <li className={classnames({ [styles.successCondition]: condition3 })}>
+                    {condition3 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
+                    {intl.formatMessage(globalMessages.passwordInstructionsCondition3)}
+                  </li>
+                  <li className={classnames({ [styles.successCondition]: condition4 })}>
+                    {condition4 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
+                    {intl.formatMessage(globalMessages.passwordInstructionsCondition4)}
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 
