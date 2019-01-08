@@ -1,3 +1,5 @@
+// @flow
+import '../ada/lib/test-config'; // TODO: https://github.com/Emurgo/yoroi-frontend/issues/250
 import type { CsvData } from './index';
 import ExportApi, { COIN_TRACKING_HEADERS } from './index';
 
@@ -48,8 +50,10 @@ async function extractStringFromBlob(b): Promise<string> {
   return new Promise(resolve => {
     const reader = new FileReader();
     reader.addEventListener('loadend', () => {
-      resolve(String.fromCharCode.apply(null, new Uint8Array(reader.result)));
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      }
     });
-    reader.readAsArrayBuffer(b);
+    reader.readAsText(b);
   });
 }

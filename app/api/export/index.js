@@ -1,5 +1,18 @@
+// @flow
 import moment from 'moment';
+
+import {
+  Logger,
+  stringifyError,
+} from '../../utils/logging';
+import LocalizableError from '../../i18n/LocalizableError';
+
 import { sendFileToUser } from './utils';
+import { GenericApiError } from '../common';
+import type {
+  ExportTransactionsRequest,
+  ExportTransactionsResponse,
+} from '../common';
 
 export type TransactionExportRow = {
   type: 'in' | 'out',
@@ -13,13 +26,24 @@ export type CsvData = {
   rows: Array<Array<string>>
 }
 
-export type TransactionExportFileType = 'csv';
-export type TransactionExportDataFormat = 'CoinTracking';
+const TRANSACTION_EXPORT_FILE_TYPE = Object.freeze({
+  csv: 'csv'
+});
+export type TransactionExportFileType = $Values<typeof TRANSACTION_EXPORT_FILE_TYPE>;
+
+const TRANSACTION_EXPORT_DATA_FORMAT = Object.freeze({
+  CoinTracking: 'CoinTracking'
+});
+export type TransactionExportDataFormat = $Values<typeof TRANSACTION_EXPORT_DATA_FORMAT>;
 
 export type ExportFileResponse = {
   data: Blob,
   fileType: TransactionExportFileType
 }
+
+const DEFAULT_FILE_NAME_PREFIX = 'Yoroi-Transaction-History';
+const FN_SEPARATOR = '_';
+const FN_TIME_FORMAT = 'YYYY-MM-DD';
 
 /**
  * This api provides functions to export abstract lists of transactions
@@ -27,26 +51,38 @@ export type ExportFileResponse = {
  *
  * Also provides functionality to send abstract byte-blobs as files for user to download.
  */
-
 export default class ExportApi {
 
   /**
    * Request object MUST contains:
    * - rows: array of export-data
-   * - fileName: only name without extension
    *
    * No result will be returned. File is sent to user as side-effect.
    */
-  async exportTransactions(request : {
-    rows: Array<TransactionExportRow>,
-    format?: TransactionExportDataFormat,
-    fileType?: TransactionExportFileType,
-    fileName: string
-  }): Promise<void> {
-    const { rows, format, fileType, fileName } = request;
-    const data = ExportApi.convertExportRowsToCsv(rows, format);
-    const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
-    return await this.sendFileToUser(fileResponse.data, `${fileName}.${fileResponse.fileType}`);
+  exportTransactions = async (
+    request : ExportTransactionsRequest
+  ): Promise<ExportTransactionsResponse> => {
+    try {
+      Logger.debug('ExportApi::exportTransactions: called');
+
+      const { rows, format, fileType, fileName } = request;
+      const dlFileName = fileName || ExportApi.createDefaultFileName();
+      const data = ExportApi.convertExportRowsToCsv(rows, format);
+      const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
+
+      Logger.debug('ExportApi::exportTransactions: success');
+      return await this.sendFileToUser(fileResponse.data, `${dlFileName}.${fileResponse.fileType}`);
+    } catch (error) {
+      Logger.error('ExportApi::exportTransactions: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
+    }
   }
 
   /**
@@ -54,10 +90,11 @@ export default class ExportApi {
    */
   static convertExportRowsToCsv(
     rows: Array<TransactionExportRow>,
-    format?: TransactionExportDataFormat
+    format?: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking
   ): CsvData {
-    switch (format || 'CoinTracking') {
-      case 'CoinTracking': return _formatExportRowsIntoCoinTrackingFormat(rows);
+    switch (format) {
+      case TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking:
+        return _formatExportRowsIntoCoinTrackingFormat(rows);
       default: throw new Error('Unexpected export data format: ' + format);
     }
   }
@@ -67,17 +104,25 @@ export default class ExportApi {
    */
   static convertCsvDataToFile(
     data: CsvData,
-    fileType?: TransactionExportFileType
+    fileType?: TransactionExportFileType = TRANSACTION_EXPORT_FILE_TYPE.csv
   ): ExportFileResponse {
-    fileType = fileType || 'csv';
     switch (fileType) {
-      case 'csv': return {
-        data: _convertCsvDataIntoCsvBlob(data),
-        fileType
-      };
+      case TRANSACTION_EXPORT_FILE_TYPE.csv:
+        return {
+          fileType,
+          data: _convertCsvDataIntoCsvBlob(data),
+        };
       default: throw new Error('Unexpected file type: ' + fileType);
     }
   }
+
+  /** Creates a default export file name
+    * SYNTAX: Yoroi-Transaction-History_YYYY-MM-DD
+    * TODO: https://github.com/Emurgo/yoroi-frontend/issues/250 */
+  static createDefaultFileName = (): string => (
+    DEFAULT_FILE_NAME_PREFIX
+    + FN_SEPARATOR
+    + moment().format(FN_TIME_FORMAT));
 
   // noinspection JSMethodCanBeStatic
   /**

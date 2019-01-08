@@ -1,3 +1,4 @@
+// @flow
 import type { ConfigType } from '../../../../config/config-types';
 
 const CONFIG: ConfigType = {

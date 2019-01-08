@@ -29,6 +29,7 @@
   "api.errors.unusedAddressesError": "您不能产生超过20个连续的未使用地址。",
   "api.errors.updateAdaTxsHistoryError": "更新 ada 交易历史时发生错误。",
   "api.errors.updateAdaWalletError": "更新 ada 钱包时发生错误。",
+  "app.errors.unexpectedError": "意想不到的事情发生了。请重试。",  
   "app.errors.unknowError": "未知错误。",
   "daedalusTransfer.error.noTransferTxError": "没有要发送的交易。",
   "daedalusTransfer.error.transferFundsError": "无法转账。",
@@ -229,6 +230,10 @@
   "wallet.transaction.confirmations": "确认",
   "wallet.transaction.conversion.rate": "汇价",
   "wallet.transaction.fee": "Fee",
+  "wallet.transaction.export.dialog.exportButton.label": "输出",
+  "wallet.transaction.export.dialog.infoText1": "钱包中的所有交易记录将输出到文件中。",
+  "wallet.transaction.export.dialog.title": "输出交易记录至文件",
+  "wallet.transaction.export.exportIcon.tooltip": "输出文件",  
   "wallet.transaction.received": "已接收 {currency}",
   "wallet.transaction.sent": "已发送 {currency}",
   "wallet.transaction.state.failed": "交易失败",
@@ -269,6 +274,5 @@
   "wallet.trezor.dialog.title.label": "连接到Trezor硬件钱包",
   "wallet.trezor.error.101": "无法连接 trezor.io。请检查您的互联网连接, 然后重试。",
   "wallet.trezor.error.102": "用户未授予必要的权限。请重试。",
-  "wallet.trezor.error.103": "取消。请重试。",
-  "wallet.trezor.error.999": "意想不到的事情发生了。请重试。"
+  "wallet.trezor.error.103": "取消。请重试。"
 }

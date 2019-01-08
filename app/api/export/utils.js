@@ -1,5 +1,8 @@
+// @flow
+
 /**
  * Make browser to download the specified blob of bytes as a file with the specified name
+ * TODO: https://github.com/Emurgo/yoroi-frontend/issues/250
  */
 export async function sendFileToUser(data: Blob, fileName: string): Promise<void> {
   const a = window.document.createElement('a');

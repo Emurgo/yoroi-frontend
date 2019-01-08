@@ -1,3 +1,4 @@
+// @flow
 import './test-config';
 import BigNumber from 'bignumber.js';
 import {
@@ -70,9 +71,14 @@ const _tx = (
   ctOutputs: outputs.map(x => ['qwe', _coin(x)]),
   ctIsOutgoing: out === 'out',
   ctMeta: {
-    ctmDate: new Date(date)
+    ctmDate: new Date(date),
+    ctmDescription: '',  // TODO
+    ctmTitle: '',  // TODO
+    ctmUpdate: new Date()  // TODO
   },
-  ctCondition: condition || 'CPtxInBlocks'
+  ctCondition: condition || 'CPtxInBlocks',
+  ctBlockNumber: 0, // TODO
+  ctId: '' // TODO
 });
 
 const _coin = (x: number): AdaAmount => ({
