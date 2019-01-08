@@ -29,7 +29,6 @@ export const Routes = (
     <Route path={ROUTES.ROOT} component={LoadingPage} />
     <Route path={ROUTES.PROFILE.LANGUAGE_SELECTION} component={LanguageSelectionPage} />
     <Route path={ROUTES.PROFILE.TERMS_OF_USE} component={TermsOfUsePage} />
-    <Route path={ROUTES.ADA_REDEMPTION} component={AdaRedemptionPage} />
     <Route path={ROUTES.NO_WALLETS} component={NoWalletsPage} />
     <Route path={ROUTES.WALLETS.ADD} component={WalletAddPage} />
     <Route path={ROUTES.WALLETS.ROOT} component={Wallet}>
@@ -43,6 +42,7 @@ export const Routes = (
       <Route path="terms-of-use" component={TermsOfUseSettingsPage} />
       <Route path={ROUTES.SETTINGS.WALLET} component={WalletSettingsPage} />
       <Route path="support" component={SupportSettingsPage} />
+      <Route path="ada-redemption" component={AdaRedemptionPage} />
     </Route>
     <Route path={ROUTES.DAEDALUS_TRANFER.ROOT} component={DaedalusTransferPage} />
   </div>

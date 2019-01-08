@@ -1,8 +1,7 @@
 // @flow
 export const ROUTES = {
   ROOT: '/',
-  STAKING: '/staking',
-  ADA_REDEMPTION: '/ada-redemption',
+  STAKING: '/staking',  
   NO_WALLETS: '/no-wallets',
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
@@ -24,6 +23,7 @@ export const ROUTES = {
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
     DISPLAY: '/settings/display',
+    ADA_REDEMPTION: '/settings/ada-redemption',
   },
   DAEDALUS_TRANFER: {
     ROOT: '/daedalus-transfer',
