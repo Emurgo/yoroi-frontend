@@ -7,6 +7,7 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
+import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 
 const messages = defineMessages({
   title: {
@@ -43,6 +44,8 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     return (
       <TopBarLayout
         topbar={topbarElement}
+        isBannerVisible={!theme.old}
+        banner={<TestnetWarningBanner oldTheme={theme.old} />}
       >
         <TermsOfUseForm
           oldTheme={theme.old}

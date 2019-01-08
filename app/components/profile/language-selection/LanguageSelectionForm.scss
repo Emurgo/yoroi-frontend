@@ -1,8 +1,16 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.component {
+.componentOld {
   align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.component {
+  // align-items: center;
+  padding-top: 222px;
   display: flex;
   height: 100%;
   justify-content: center;

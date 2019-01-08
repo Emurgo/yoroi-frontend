@@ -47,6 +47,8 @@ export default class TopBarLayout extends Component<Props> {
     const topbarClasses = classnames([
       oldTheme ? styles.topbarOld : styles.topbar,
     ]);
+    console.log('isBannerVisible', isBannerVisible);
+    console.log('banner', banner);
 
     return (
       <div className={componentClasses}>

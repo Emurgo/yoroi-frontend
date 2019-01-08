@@ -63,7 +63,7 @@ class FormFieldOwnSkin extends Component<Props, State> {
         <div className={this.props.theme.inputWrapper}>
           {this.props.input(isPasswordShown ? 'text' : this.props.type)}
 
-          <div>
+          <div className={this.props.theme.iconsWrapper}>
             {this.props.done && <SvgInline svg={SuccessSvg} cleanup={['title']} />}
             {this.props.type === 'password' && !this.props.error ? (
               <button type="button" onClick={this.showPassword}>

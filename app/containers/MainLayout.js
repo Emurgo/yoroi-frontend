@@ -25,7 +25,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
     return (
       <TopBarLayout
-        banner={<TestnetWarningBanner />}
+        banner={<TestnetWarningBanner oldTheme={oldTheme} />}
         topbar={topbarComponent}
         notification={<div />}
         oldTheme={oldTheme}

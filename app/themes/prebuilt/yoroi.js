@@ -18,6 +18,17 @@ export default {
 
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
+  '--theme-autocomplete-bg-color': '#f3f3f5',
+  '--theme-autocomplete-border': '1px solid #9b9b9b',
+  '--theme-autocomplete-border-focus-color': '#15d1aa',
+  '--theme-autocomplete-search-color': '#353535',
+  '--theme-autocomplete-placeholder-color': 'rgba(94, 96, 102, 0.5)',
+  '--theme-autocomplete-selected-word-text-color': '#353535',
+  '--theme-autocomplete-selected-word-box-background-color': '#f0f3f5',
+  '--theme-autocomplete-focus-border-color': '#15d1aa',
+  '--theme-autocomplete-hover-border-color': '#353535',
+  '--theme-autocomplete-error-color': '#ea4c5b',
+
   '--theme-button-primary-background-color': '#17d1aa',
   '--theme-button-primary-background-color-hover': '#17e2b8',
   '--theme-button-primary-background-color-active': '#12b190',

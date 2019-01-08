@@ -13,6 +13,21 @@ export const messages = defineMessages({
     defaultMessage: '!!!Warning: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
     description: 'Message alerting users the wallet is not running in mainnet.'
   },
+  testnetLabelWarning: {
+    id: 'testnet.labelWarning.message',
+    defaultMessage: '!!!Warning:',
+    description: 'Message alerting users the wallet is not running in mainnet.'
+  },
+  testnetLabelMain: {
+    id: 'testnet.labelMain.message',
+    defaultMessage: '!!!This is a testnet. ADA on the testnet has no monetary value. For more information, {faqLink}',
+    description: 'Message alerting users the wallet is not running in mainnet.'
+  },
+  testnetLabelLink: {
+    id: 'testnet.labelLink.message',
+    defaultMessage: '!!!Check out the FAQ',
+    description: 'Message alerting users the wallet is not running in mainnet.'
+  },
 });
 
 @observer
@@ -24,13 +39,23 @@ export default class TestnetWarningBanner extends Component<{}> {
 
   render() {
     const { intl } = this.context;
+    const { oldTheme } = this.props;
 
-    const faqLink = (
+    const testnetClasses = oldTheme ? styles.testnetWarningOld : styles.testnetWarning;
+
+    const faqLink = oldTheme ? (
       <a
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => handleExternalLinkClick(event)}
       >
         {intl.formatMessage(globalMessages.faqLinkUrl)}
+      </a>
+    ) : (
+      <a
+        href={intl.formatMessage(globalMessages.faqLinkUrl)}
+        onClick={event => handleExternalLinkClick(event)}
+      >
+        {intl.formatMessage(messages.testnetLabelLink)}
       </a>
     );
 
@@ -38,8 +63,16 @@ export default class TestnetWarningBanner extends Component<{}> {
       <div>
         {
           environment.isMainnet() ? null : (
-            <div className={styles.testnetWarning}>
-              <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
+            <div className={testnetClasses}>
+              {oldTheme ? (
+                <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
+              ) : ([
+                <span key="1">
+                  {intl.formatMessage(messages.testnetLabelWarning)}
+                  &nbsp;
+                </span>,
+                <FormattedMessage {...messages.testnetLabelMain} values={{ faqLink }} key="2" />
+              ])}
             </div>
           )
         }

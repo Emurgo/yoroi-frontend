@@ -235,24 +235,24 @@ export default class WalletCreateDialog extends Component<Props, State> {
               </p>
             ) : (
               <div className={styles.passwordInstructions}>
-                <p>The password needs to contain at least:</p>
+                <p>{intl.formatMessage(globalMessages.passwordInstructionsHeader)}</p>
 
                 <ul>
                   <li className={classnames({ [styles.successCondition]: condition1 })}>
                     {condition1 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
-                    7 characters
+                    {intl.formatMessage(globalMessages.passwordInstructionsCondition1)}
                   </li>
                   <li className={classnames({ [styles.successCondition]: condition2 })}>
                     {condition2 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
-                    one uppercase character
+                    {intl.formatMessage(globalMessages.passwordInstructionsCondition2)}
                   </li>
                   <li className={classnames({ [styles.successCondition]: condition3 })}>
                     {condition3 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
-                    one number
+                    {intl.formatMessage(globalMessages.passwordInstructionsCondition3)}
                   </li>
                   <li className={classnames({ [styles.successCondition]: condition4 })}>
                     {condition4 && <SvgInline svg={iconTickGreenSVG} cleanup={['title']} />}
-                    one lowercase character
+                    {intl.formatMessage(globalMessages.passwordInstructionsCondition4)}
                   </li>
                 </ul>
               </div>

@@ -172,6 +172,31 @@ export default defineMessages({
     defaultMessage: '!!!Cancelled. Please retry.',
     description: '<Cancelled. Please retry.>'
   },
+  passwordInstructionsHeader: {
+    id: 'global.passwordInstructionsHeader',
+    defaultMessage: '!!!The password needs to contain at least:',
+    description: 'Password instructions header.',
+  },
+  passwordInstructionsCondition1: {
+    id: 'global.passwordInstructionsCondition1',
+    defaultMessage: '!!!7 characters',
+    description: 'Password instructions condition 1.',
+  },
+  passwordInstructionsCondition2: {
+    id: 'global.passwordInstructionsCondition2',
+    defaultMessage: '!!!one uppercase character',
+    description: 'Password instructions condition 2.',
+  },
+  passwordInstructionsCondition3: {
+    id: 'global.passwordInstructionsCondition3',
+    defaultMessage: '!!!one number',
+    description: 'Password instructions condition 3.',
+  },
+  passwordInstructionsCondition4: {
+    id: 'global.passwordInstructionsCondition4',
+    defaultMessage: '!!!one lowercase character',
+    description: 'Password instructions condition 4.',
+  },
 });
 
 export const environmentSpecificMessages = {

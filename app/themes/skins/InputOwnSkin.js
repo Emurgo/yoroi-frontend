@@ -18,15 +18,15 @@ type Props = {
   done?: boolean
 };
 
-type DefaultProps = {
+const DefaultProps = {
   disabled: undefined,
   error: undefined,
   label: undefined,
   done: undefined
-}
+};
 
 export const inputSkinFactory = (FormFieldSkin: Function) => (
-  (props: Props & DefaultProps) => (
+  (props: Props & typeof DefaultProps) => (
     <FormFieldSkin
       input={(type) => (
         <input

@@ -191,9 +191,7 @@ export default class AboutDialog extends Component<Props> {
         {introBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} oldTheme={oldTheme} />
-        {oldTheme ? <TrezorErrorBlock progressInfo={progressInfo} error={error} /> : (
-          error && <TrezorErrorBlock progressInfo={progressInfo} error={error} />
-        )}
+        <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />
       </Dialog>);
   }
 }

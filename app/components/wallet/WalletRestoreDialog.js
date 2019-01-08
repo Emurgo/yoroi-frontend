@@ -188,13 +188,15 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const walletNameFieldClasses = classnames([
       'walletName',
-      styles.walletName,
+      oldTheme ? styles.walletNameOld : styles.walletName,
     ]);
 
     const walletPasswordFieldsClasses = classnames([
       styles.walletPasswordFields,
       styles.show,
     ]);
+
+    const walletPasswordClasses = oldTheme ? styles.walletPasswordOld : styles.walletPassword;
 
     const walletNameField = form.$('walletName');
     const recoveryPhraseField = form.$('recoveryPhrase');
@@ -225,7 +227,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={oldTheme ? <InputOwnSkin /> : <SimpleInputSkin />}
+          skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
         />
 
         <Autocomplete
@@ -238,19 +240,19 @@ export default class WalletRestoreDialog extends Component<Props> {
           skin={<SimpleAutocompleteSkin />}
         />
 
-        <div className={styles.walletPassword}>
+        <div className={walletPasswordClasses}>
           <div className={walletPasswordFieldsClasses}>
             <Input
               className="walletPassword"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={oldTheme ? <InputOwnSkin /> : <SimpleInputSkin />}
+              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              skin={oldTheme ? <InputOwnSkin /> : <SimpleInputSkin />}
+              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
             />
             <p className={styles.passwordInstructions}>
               {intl.formatMessage(globalMessages.passwordInstructions)}

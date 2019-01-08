@@ -28,7 +28,8 @@ type Props = {
   localizedTermsOfUse: string,
   onSubmit: Function,
   isSubmitting: boolean,
-  error?: ?LocalizableError
+  error?: ?LocalizableError,
+  oldTheme: boolean
 };
 
 type State = {
@@ -38,8 +39,7 @@ type State = {
 @observer
 export default class TermsOfUseForm extends Component<Props, State> {
   static defaultProps = {
-    error: undefined,
-    oldTheme: undefined
+    error: undefined
   };
 
   static contextTypes = {

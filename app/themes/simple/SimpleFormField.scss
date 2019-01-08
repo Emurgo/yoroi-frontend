@@ -4,13 +4,13 @@
 // Css module overrides go here …
 
 .root {
-  margin: 10px 0 20px;
+  padding: 10px 0 20px;
   // position: relative;
 }
 
 .error {
   position: absolute;
-  bottom: -18px;
+  bottom: 3px;
   left: 15px;
   margin: 0;
   line-height: 1.33;
@@ -31,7 +31,7 @@
 .label {
   position: absolute;
   background: white;
-  top: -8px;
+  top: 3px;
   left: 10px;
   color: var(--theme-input-label-color);
   font-family: var(--font-regular);
@@ -41,7 +41,7 @@
   z-index: 1;
 }
 
-.inputWrapper > div {
+.inputWrapper .iconsWrapper {
   height: 100%;
   right: 13px;
   top: 0;

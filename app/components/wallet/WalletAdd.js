@@ -38,6 +38,26 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.createTrezorWalletNotificationMessage',
     defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
+  },
+  buyTrezorMessage: {
+    id: 'footer.buyTrezorMessage',
+    defaultMessage: '!!!Buy Trezor',
+    description: 'Buy Trezor message shown in footer on the wallet add screen.',
+  },
+  howToConnectTrezorMessage: {
+    id: 'footer.howToConnectTrezorMessage',
+    defaultMessage: '!!!How to connect Trezor',
+    description: 'How to connect Trezor message shown in footer on the wallet add screen.',
+  },
+  howToCreateWalletMessage: {
+    id: 'footer.howToCreateWalletMessage',
+    defaultMessage: '!!!How to create wallet',
+    description: 'How to create wallet message shown in footer on the wallet add screen.',
+  },
+  howToRestoreWalletMessage: {
+    id: 'footer.howToRestoreWalletMessage',
+    defaultMessage: '!!!How to restore wallet',
+    description: 'How to restore wallet message shown in footer on the wallet add screen.',
   }
 });
 
@@ -129,22 +149,22 @@ export default class WalletAdd extends Component<Props> {
           <div className={styles.footer}>
             <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.buyIcon])} />
-              <span>Buy Trezor</span>
+              <span>{intl.formatMessage(messages.buyTrezorMessage)}</span>
             </a>
 
             <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.connectIcon])} />
-              <span>How to connect Trezor</span>
+              <span>{intl.formatMessage(messages.howToConnectTrezorMessage)}</span>
             </a>
 
             <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.createIcon])} />
-              <span>How to create wallet</span>
+              <span>{intl.formatMessage(messages.howToCreateWalletMessage)}</span>
             </a>
 
             <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.restoreIcon])} />
-              <span>How to restore wallet</span>
+              <span>{intl.formatMessage(messages.howToRestoreWalletMessage)}</span>
             </a>
           </div>
         )}

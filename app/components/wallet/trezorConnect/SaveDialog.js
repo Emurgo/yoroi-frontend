@@ -121,9 +121,6 @@ export default class SaveDialog extends Component<Props> {
           skin={<SimpleInputSkin />}
           error={walletNameField.error}
         />
-        {/* {oldTheme && (
-          <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
-        )} */}
         <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);
 
