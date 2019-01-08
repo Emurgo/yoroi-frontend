@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import AdaRedemptionChoices from '../../components/wallet/ada-redemption/AdaRedemptionChoices';
+import type { RedemptionTypeChoices } from '../../types/redemptionTypes';
 
 @inject('stores', 'actions') @observer
 export default class AdaRedemptionPage extends Component<InjectedProps> {
@@ -22,7 +23,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
         {/* TODO: move this component to Ada Redemption Form once it's created */}
         <AdaRedemptionChoices
           activeChoice={redemptionType}
-          onSelectChoice={(choice: string) => {
+          onSelectChoice={(choice: RedemptionTypeChoices) => {
             /* TODO: reset form */
             onChooseRedemptionType(choice);
           }}
