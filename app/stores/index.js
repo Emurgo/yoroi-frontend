@@ -10,8 +10,10 @@ import LoadingStore from './LoadingStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
+import AdaRedemptionStore from './AdaRedemptionStore';
 
 export const storeClasses = {
+  adaRedemption: AdaRedemptionStore,
   profile: ProfileStore,
   app: AppStore,
   sidebar: SidebarStore,
@@ -22,6 +24,7 @@ export const storeClasses = {
 };
 
 export type StoresMap = {
+  adaRedemption: AdaRedemptionStore,
   profile: ProfileStore,
   app: AppStore,
   sidebar: SidebarStore,
@@ -35,6 +38,7 @@ export type StoresMap = {
 
 // Constant that does never change during lifetime
 const stores = observable({
+  adaRedemption: null,
   profile: null,
   app: null,
   sidebar: null,
