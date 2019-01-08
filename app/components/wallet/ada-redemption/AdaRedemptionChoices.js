@@ -46,12 +46,11 @@ export default class AdaRedemptionChoices extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  renderChoiceButton(adaRedemptionType: RedemptionTypeChoices, index: number) {
+  renderChoiceButton(adaRedemptionType: RedemptionTypeChoices) {
     const { intl } = this.context;
     const { activeChoice, onSelectChoice } = this.props;
     return (
       <button
-        key={index}
         className={activeChoice === adaRedemptionType ? styles.activeButton : ''}
         onClick={() => onSelectChoice(adaRedemptionType)}
       >
@@ -60,16 +59,14 @@ export default class AdaRedemptionChoices extends Component<Props> {
     );
   }
 
-  getAdaRedemptionTypes() {
-    const adaRedemptionTypes: Array<RedemptionTypeChoices> =
-      (Object.values(ADA_REDEMPTION_TYPES) : any);
-    return adaRedemptionTypes;
-  }
-
   render() {
     return (
       <div className={styles.component}>
-        {this.getAdaRedemptionTypes().map(this.renderChoiceButton.bind(this))}
+        {this.renderChoiceButton(ADA_REDEMPTION_TYPES.REGULAR)}
+        {this.renderChoiceButton(ADA_REDEMPTION_TYPES.FORCE_VENDED)}
+        {this.renderChoiceButton(ADA_REDEMPTION_TYPES.PAPER_VENDED)}
+        {this.renderChoiceButton(ADA_REDEMPTION_TYPES.RECOVERY_REGULAR)}
+        {this.renderChoiceButton(ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED)}
       </div>
     );
   }

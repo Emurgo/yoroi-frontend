@@ -5,6 +5,7 @@ import type { InjectedProps } from '../../types/injectedPropsType';
 import AdaRedemptionChoices from '../../components/wallet/ada-redemption/AdaRedemptionChoices';
 import type { RedemptionTypeChoices } from '../../types/redemptionTypes';
 
+// FIXME: the inject will have to be changed
 @inject('stores', 'actions') @observer
 export default class AdaRedemptionPage extends Component<InjectedProps> {
   static defaultProps = { actions: null, stores: null };
