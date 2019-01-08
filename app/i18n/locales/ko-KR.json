@@ -107,6 +107,7 @@
   "settings.menu.general.link.label": "일반",
   "settings.menu.support.link.label": "지원",
   "settings.menu.termsOfUse.link.label": "이용 약관",
+  "settings.menu.adaRedemption.link.label": "!!!Ada Redemption",
   "settings.menu.wallet.link.label": "지갑",
   "settings.support.faq.content": "문제가 있으면 {faqLink}을(를) 참조하여 알려진 문제에서 도움을 받으십시오.",
   "settings.support.faq.faqLink": "Yoroi 웹사이트에 대한 FAQ",
@@ -229,6 +230,5 @@
   "wallet.transaction.transactionId": "거래 ID",
   "wallet.transaction.type": "{currency} 거래",
   "wallet.transaction.type.card": "카드 결제",
-  "wallet.transaction.type.exchange": "환율",
-  "wallet.redeem.dialog.title": "!!!Ada Redemption"
+  "wallet.transaction.type.exchange": "환율"
 }

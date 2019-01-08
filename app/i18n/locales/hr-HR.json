@@ -107,6 +107,7 @@
   "settings.menu.general.link.label": "!!!General",
   "settings.menu.support.link.label": "!!!Support",
   "settings.menu.termsOfUse.link.label": "!!!Terms of use",
+  "settings.menu.adaRedemption.link.label": "!!!Ada Redemption",
   "settings.menu.wallet.link.label": "!!!Wallet",
   "settings.support.faq.content": "!!!If you are experiencing issues, please see the {faqLink} for guidance on known issues.",
   "settings.support.faq.faqLink": "!!!FAQ on Yoroi website",
@@ -229,6 +230,5 @@
   "wallet.transaction.transactionId": "!!!Transaction ID",
   "wallet.transaction.type": "!!!{currency} transaction",
   "wallet.transaction.type.card": "!!!Card payment",
-  "wallet.transaction.type.exchange": "!!!Exchange",
-  "wallet.redeem.dialog.title": "!!!Ada Redemption"
+  "wallet.transaction.type.exchange": "!!!Exchange"
 }

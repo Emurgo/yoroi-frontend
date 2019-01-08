@@ -107,6 +107,7 @@
   "settings.menu.general.link.label": "一般",
   "settings.menu.support.link.label": "サポート",
   "settings.menu.termsOfUse.link.label": "利用規約",
+  "settings.menu.adaRedemption.link.label": "!!!Ada Redemption",
   "settings.menu.wallet.link.label": "ウォレット",
   "settings.support.faq.content": "ご不明な点がある場合は、こちら{faqLink}をご覧ください。",
   "settings.support.faq.faqLink": "ヨロイウォレットのウェブサイトに関する「よくある質問」",
@@ -229,6 +230,5 @@
   "wallet.transaction.transactionId": "取引ID",
   "wallet.transaction.type": "{currency} 取引",
   "wallet.transaction.type.card": "カード支払い",
-  "wallet.transaction.type.exchange": "交換",
-  "wallet.redeem.dialog.title": "!!!Ada Redemption"
+  "wallet.transaction.type.exchange": "交換"
 }
