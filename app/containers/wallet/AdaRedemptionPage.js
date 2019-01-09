@@ -23,7 +23,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
       redeemAdaRequest, redeemPaperVendedAdaRequest,
       isCertificateEncrypted, redemptionType
     } = adaRedemption;
-    const { chooseRedemptionType } = this.props.actions.ada.adaRedemption;
+    const { chooseRedemptionType, setRedemptionCode } = this.props.actions.ada.adaRedemption;
 
     const selectableWallets = wallets.all.map((w) => ({
       value: w.id, label: w.name
@@ -65,12 +65,18 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
       <div>
         <AdaRedemptionForm
           wallets={selectableWallets}
+          isCertificateSelected={isCertificateSelected}
           redemptionType={redemptionType}
           redemptionCode={adaRedemption.redemptionCode}
           getSelectedWallet={walletId => wallets.getWalletById(walletId)}
           onChooseRedemptionType={(choice) => {
             chooseRedemptionType.trigger({ redemptionType: choice });
           }}
+          onRedemptionCodeChanged={(redemptionCode) => {
+            setRedemptionCode.trigger({ redemptionCode });
+          }}
+          error={adaRedemption.error}
+          isSubmitting={false} // TODO: for now this is a mock just to test the UI
         />
       </div>
     );

@@ -4,6 +4,11 @@ import { observer } from 'mobx-react';
 import { join } from 'lodash';
 import { isEmail, isEmpty } from 'validator';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import classnames from 'classnames';
+import Button from 'react-polymorph/lib/components/Button';
+import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import Input from 'react-polymorph/lib/components/Input';
+import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { InvalidMnemonicError, InvalidEmailError, FieldRequiredError } from '../../../i18n/errors';
@@ -14,6 +19,7 @@ import { ADA_REDEMPTION_PASSPHRASE_LENGTH } from '../../../config/cryptoConfig';
 import { ADA_REDEMPTION_TYPES } from '../../../types/redemptionTypes';
 import BorderedBox from '../../widgets/BorderedBox';
 import AdaRedemptionChoices from './AdaRedemptionChoices';
+import { submitOnEnter } from '../../../utils/form';
 import styles from './AdaRedemptionForm.scss';
 
 const messages = defineMessages({
@@ -384,7 +390,8 @@ export default class AdaRedemptionForm extends Component<Props> {
     const { intl } = this.context;
     const { form, resetForm, submit } = this;
     const {
-      wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType
+      wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType,
+      onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting
     } = this.props;
 
     const certificateField = form.$('certificate');
@@ -458,10 +465,10 @@ export default class AdaRedemptionForm extends Component<Props> {
         instructionMessage = messages.instructionsRegular;
     }
 
-    // const submitButtonClasses = classnames([
-    //   'primary',
-    //   isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
-    // ]);
+    const submitButtonClasses = classnames([
+      'primary',
+      isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
+    ]);
 
     return (
       <div>
@@ -481,6 +488,50 @@ export default class AdaRedemptionForm extends Component<Props> {
             <div className={styles.instructions}>
               <FormattedHTMLMessage {...instructionMessage} values={instructionValues} />
             </div>
+
+            <div className={styles.redemption}>
+              <div className={styles.inputs}>
+                {redemptionType !== ADA_REDEMPTION_TYPES.PAPER_VENDED ? (
+                  <Input
+                    onKeyPress={submitOnEnter.bind(this, submit)}
+                    className="redemption-key"
+                    {...redemptionKeyField.bind()}
+                    placeholder={
+                      intl.formatMessage(messages[
+                        isRecovery ? 'recoveryRedemptionKeyHint' : 'redemptionKeyHint'
+                      ])
+                    }
+                    value={redemptionCode}
+                    onChange={(value) => {
+                      onRedemptionCodeChanged(value);
+                      redemptionKeyField.onChange(value);
+                    }}
+                    disabled={isRecovery || isCertificateSelected}
+                    error={redemptionKeyField.error}
+                    skin={<SimpleInputSkin />}
+                  />
+                ) : (
+                  <Input
+                    onKeyPress={submitOnEnter.bind(this, submit)}
+                    className="shielded-redemption-key"
+                    {...shieldedRedemptionKeyField.bind()}
+                    disabled={isCertificateSelected}
+                    error={shieldedRedemptionKeyField.error}
+                    skin={<SimpleInputSkin />}
+                  />
+                )}
+              </div>
+            </div>
+
+            {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
+
+            <Button
+              className={submitButtonClasses}
+              label={intl.formatMessage(messages.submitLabel)}
+              onClick={submit}
+              disabled={!canSubmit}
+              skin={<SimpleButtonSkin />}
+            />
           </BorderedBox>
         </div>
       </div>
