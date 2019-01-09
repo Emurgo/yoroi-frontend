@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { join } from 'lodash';
 import { isEmail, isEmpty } from 'validator';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { InvalidMnemonicError, InvalidEmailError, FieldRequiredError } from '../../../i18n/errors';
@@ -477,6 +477,10 @@ export default class AdaRedemptionForm extends Component<Props> {
                 onChooseRedemptionType(choice);
               }}
             />
+
+            <div className={styles.instructions}>
+              <FormattedHTMLMessage {...instructionMessage} values={instructionValues} />
+            </div>
           </BorderedBox>
         </div>
       </div>
