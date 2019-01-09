@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="yoroi" version="4">
+  <OBJECT>
+    <ID name="yoroi" mc="Standard.Project" uid="795c269c-d8d1-4502-977d-f3b395ab502c"/>
+    <ATTRIBUTES>
+      <ATT name="ProjectContext"></ATT>
+      <ATT name="ProjectDescr"></ATT>
+      <ATT name="Name"><![CDATA[yoroi]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="Model">
+        <COMPID name="yoroi" mc="Standard.Package" uid="2ed385a1-bc51-4161-8521-452ac9b28378"/>
+      </COMP>
+      <COMP relation="DiagramRoot">
+        <COMPID name="yoroi" mc="Infrastructure.DiagramSet" uid="344553d2-b449-4f04-a15c-c53b66bdbaec"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>

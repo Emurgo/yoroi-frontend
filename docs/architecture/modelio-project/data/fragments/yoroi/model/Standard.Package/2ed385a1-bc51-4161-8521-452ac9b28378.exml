@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="yoroi" version="4">
+  <OBJECT>
+    <ID name="yoroi" mc="Standard.Package" uid="2ed385a1-bc51-4161-8521-452ac9b28378"/>
+    <PID name="yoroi" mc="Standard.Project" uid="795c269c-d8d1-4502-977d-f3b395ab502c"/>
+    <ATTRIBUTES>
+      <ATT name="IsInstantiable">false</ATT>
+      <ATT name="IsAbstract">false</ATT>
+      <ATT name="IsLeaf">false</ATT>
+      <ATT name="IsRoot">false</ATT>
+      <ATT name="Visibility">Public</ATT>
+      <ATT name="Name"><![CDATA[yoroi]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="OwnedBehavior">
+        <COMPID name="Activity" mc="Standard.Activity" uid="8da7f1c0-8f21-43b2-8ffb-ca5278250f66"/>
+      </COMP>
+      <COMP relation="OwnedElement">
+        <COMPID name="components" mc="Standard.Component" uid="1fca0c95-9ecc-4413-a678-eca05a37be24"/>
+        <COMPID name="containers" mc="Standard.Component" uid="198ee0a7-972a-4317-ac99-d09b9af26b07"/>
+        <COMPID name="actions" mc="Standard.Component" uid="ff824184-fe2f-4075-9273-9adcfc5d5c0d"/>
+        <COMPID name="stores" mc="Standard.Component" uid="f2632dc4-bc45-464c-8ff0-076cfc44fb1e"/>
+        <COMPID name="api" mc="Standard.Component" uid="8f4b0885-24ba-41c7-ad53-b02f271220df"/>
+      </COMP>
+      <COMP relation="Product">
+        <COMPID name="Component Diagram" mc="Standard.ClassDiagram" uid="7104a036-da0b-4654-a559-ec219d8937a7"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>
