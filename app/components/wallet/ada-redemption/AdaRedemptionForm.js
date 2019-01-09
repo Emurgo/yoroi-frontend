@@ -12,6 +12,9 @@ import type { RedemptionTypeChoices } from '../../../types/redemptionTypes';
 import { FORM_VALIDATION_DEBOUNCE_WAIT } from '../../../config/timingConfig';
 import { ADA_REDEMPTION_PASSPHRASE_LENGTH } from '../../../config/cryptoConfig';
 import { ADA_REDEMPTION_TYPES } from '../../../types/redemptionTypes';
+import BorderedBox from '../../widgets/BorderedBox';
+import AdaRedemptionChoices from './AdaRedemptionChoices';
+import styles from './AdaRedemptionForm.scss';
 
 const messages = defineMessages({
   headline: {
@@ -354,9 +357,129 @@ export default class AdaRedemptionForm extends Component<Props> {
     },
   });
 
+  submit = () => {}
+
+  resetForm = () => {
+    const { form } = this;
+
+    // Cancel all debounced field validations
+    form.each((field) => { field.debouncedValidation.cancel(); });
+
+    // We can not user form.reset() call here as it would reset selected walletId
+    // which is a bad UX since we are calling resetForm on certificate add/remove
+    form.$('spendingPassword').reset();
+    form.$('adaAmount').reset();
+    form.$('adaPasscode').reset();
+    form.$('certificate').reset();
+    form.$('email').reset();
+    form.$('passPhrase').reset();
+    form.$('redemptionKey').reset();
+    form.$('shieldedRedemptionKey').reset();
+    form.$('decryptionKey').reset();
+
+    form.showErrors(false);
+  }
+
   render() {
+    const { intl } = this.context;
+    const { form, resetForm, submit } = this;
+    const {
+      wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType
+    } = this.props;
+
+    const certificateField = form.$('certificate');
+    const passPhraseField = form.$('passPhrase');
+    const redemptionKeyField = form.$('redemptionKey');
+    const shieldedRedemptionKeyField = form.$('shieldedRedemptionKey');
+    const walletId = form.$('walletId');
+    const emailField = form.$('email');
+    const adaPasscodeField = form.$('adaPasscode');
+    const adaAmountField = form.$('adaAmount');
+    const spendingPasswordField = form.$('spendingPassword');
+    const decryptionKeyField = form.$('decryptionKey');
+    // const componentClasses = classnames([
+    //   styles.component,
+    //   isSubmitting ? styles.isSubmitting : null
+    // ]);
+
+    const selectedWallet = getSelectedWallet(walletId.value);
+    const walletHasPassword = selectedWallet.hasPassword;
+
+    const showUploadWidget = redemptionType !== ADA_REDEMPTION_TYPES.PAPER_VENDED;
+    const isRecovery = (
+      redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_REGULAR ||
+      redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED
+    );
+
+    const passwordSubmittable = !walletHasPassword || spendingPasswordField.value !== '';
+
+    let canSubmit = false;
+    if ((
+      redemptionType === ADA_REDEMPTION_TYPES.REGULAR ||
+      redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_REGULAR) &&
+      redemptionCode !== '' &&
+      passwordSubmittable
+    ) canSubmit = true;
+    if ((
+      redemptionType === ADA_REDEMPTION_TYPES.FORCE_VENDED ||
+      redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED) &&
+      redemptionCode !== '' &&
+      passwordSubmittable
+    ) canSubmit = true;
+    if (
+      redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED &&
+      shieldedRedemptionKeyField.isDirty &&
+      passPhraseField.isDirty &&
+      passwordSubmittable
+    ) canSubmit = true;
+
+    let instructionMessage = '';
+    let instructionValues = {};
+    switch (redemptionType) {
+      case ADA_REDEMPTION_TYPES.REGULAR:
+        instructionMessage = messages.instructionsRegular;
+        instructionValues = { adaRedemptionPassphraseLength: ADA_REDEMPTION_PASSPHRASE_LENGTH };
+        break;
+      case ADA_REDEMPTION_TYPES.FORCE_VENDED:
+        instructionMessage = messages.instructionsForceVended;
+        break;
+      case ADA_REDEMPTION_TYPES.PAPER_VENDED:
+        instructionMessage = messages.instructionsPaperVended;
+        instructionValues = { adaRedemptionPassphraseLength: ADA_REDEMPTION_PASSPHRASE_LENGTH };
+        break;
+      case ADA_REDEMPTION_TYPES.RECOVERY_REGULAR:
+        instructionMessage = messages.instructionsRecoveryRegular;
+        instructionValues = { adaRedemptionPassphraseLength: ADA_REDEMPTION_PASSPHRASE_LENGTH };
+        break;
+      case ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED:
+        instructionMessage = messages.instructionsRecoveryForceVended;
+        break;
+      default:
+        instructionMessage = messages.instructionsRegular;
+    }
+
+    // const submitButtonClasses = classnames([
+    //   'primary',
+    //   isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
+    // ]);
+
     return (
-      <div>Ada redemption form</div>
+      <div>
+        <div className={styles.scrollableContent}>
+          <BorderedBox>
+            <h1 className={styles.headline}>{intl.formatMessage(messages.headline)}</h1>
+
+            <AdaRedemptionChoices
+              activeChoice={redemptionType}
+              onSelectChoice={(choice: string) => {
+                const isRedemptionTypeChanged = redemptionType !== choice;
+                if (isRedemptionTypeChanged) resetForm();
+                onChooseRedemptionType(choice);
+              }}
+            />
+          </BorderedBox>
+        </div>
+      </div>
     );
   }
 }
