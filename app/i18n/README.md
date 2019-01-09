@@ -18,6 +18,101 @@ Since the `defineMessages` occur inside our code, it means you have to compile t
 
 One advantage is that this setup allows us to include the `translation-manager` results as part of our CI build (not done as of Oct 30th)
 
+## How to add a new i18n text
+
+Let's see an example of how to add a new i18n text. For this example let's **assume** we have 3 supported locales.
+1. [en-US](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/en-US.json)
+2. [ja-JP](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/ja-JP.json)
+3. [ko-KR](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/ko-KR.json)
+
+The text we want to add is `I am testing i18n`
+
+#### Steps
+1. In [en-US](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/en-US.json) add a new key and the text.
+```
+{
+    .
+    .
+    .
+    "test.text": "I am testing i18n"
+    .
+    .
+    .
+}
+```
+
+2. Next you have to register the definitions using `defineMessages` method of `react-intl` module. If this text is going to be used in multiple components then you have to define it in [global-messages.js](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/global-messages.js) otherwise define it in the target component. Let's assume that our target component is `TestText.js`. We have to modify `TestText.js` like below.
+```
+// @flow
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
+
+const messages = defineMessages({
+  testText: {
+    id: 'test.text',
+    defaultMessage: '!!!I am testing i18n',
+    description: 'Random test text'
+  }
+});
+
+@observer
+export default class TestText extends Component {
+
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
+
+  render() {
+    const { intl } = this.context;
+    return (<div>{intl.formatMessage(messages.testText)}</div>);
+  }
+}
+```
+
+**WARNING:** If you did not register the definition using `defineMessages` method and try to [Rebuilding language cache](https://github.com/Emurgo/yoroi-frontend/tree/develop/app/i18n#rebuilding-language-cache) then your newly added keys will be deleted.
+
+3. Follow steps of [Rebuilding language cache](https://github.com/Emurgo/yoroi-frontend/tree/develop/app/i18n#rebuilding-language-cache). New key for every locale will be added like below.
+
+[en-US](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/en-US.json)
+```
+{
+    .
+    .
+    .
+    "test.text": "I am testing i18n"
+    .
+    .
+    .
+}
+```
+
+[AUTO-ADDED] [ja-JP](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/ja-JP.json)
+```
+{
+    .
+    .
+    .
+    "test.text": "!!!I am testing i18n"
+    .
+    .
+    .
+}
+```
+
+[AUTO-ADDED] [ko-KR](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/ko-KR.json)
+```
+{
+    .
+    .
+    .
+    "test.text": "!!!I am testing i18n"
+    .
+    .
+    .
+}
+```
+
 ## Rebuilding language cache
 
 After making changes that affect the languages files, please do the following **AFTER** backing up your work (these actions may edit your files in a way you would like to reverse).
