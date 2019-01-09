@@ -44,6 +44,7 @@ import {
 import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import type { AdaAddressMap } from '../adaAddress';
+import type { SignedResponse } from '../lib/yoroi-backend-api';
 
 declare var CONFIG: ConfigType;
 
@@ -79,7 +80,7 @@ export async function newAdaTransaction(
   receiver: string,
   amount: string,
   password: string
-): Promise<Array<void>> {
+): Promise<SignedResponse> {
   const masterKey = getWalletMasterKey();
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
   // eslint-disable-next-line camelcase

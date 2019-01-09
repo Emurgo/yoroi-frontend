@@ -127,7 +127,7 @@ declare module 'rust-cardano-crypto' {
   }
 }
 
-declare type RustRawTxBody = Array<number>
+declare type RustRawTxBody = Array<number> | Buffer
 
 declare type SpendResponse = {
   cbor_encoded_tx: RustRawTxBody,
