@@ -9,6 +9,8 @@ import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import Select from 'react-polymorph/lib/components/Select';
+import SelectSkin from 'react-polymorph/lib/skins/simple/raw/SelectSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { InvalidMnemonicError, InvalidEmailError, FieldRequiredError } from '../../../i18n/errors';
@@ -386,6 +388,12 @@ export default class AdaRedemptionForm extends Component<Props> {
     form.showErrors(false);
   }
 
+  onWalletChange = (walletId: string) => {
+    const { form } = this;
+    form.$('walletId').value = walletId;
+    form.$('spendingPassword').value = '';
+  }
+
   render() {
     const { intl } = this.context;
     const { form, resetForm, submit } = this;
@@ -520,6 +528,15 @@ export default class AdaRedemptionForm extends Component<Props> {
                     skin={<SimpleInputSkin />}
                   />
                 )}
+
+                <Select
+                  className={styles.walletSelect}
+                  options={wallets}
+                  {...walletId.bind()}
+                  onChange={this.onWalletChange}
+                  isOpeningUpward
+                  skin={<SelectSkin />}
+                />
               </div>
             </div>
 
