@@ -1,10 +1,17 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages } from 'react-intl';
+import { join } from 'lodash';
+import { isEmail, isEmpty } from 'validator';
+import { defineMessages, intlShape } from 'react-intl';
+import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
+import { InvalidMnemonicError, InvalidEmailError, FieldRequiredError } from '../../../i18n/errors';
 import globalMessages from '../../../i18n/global-messages';
 import type { RedemptionTypeChoices } from '../../../types/redemptionTypes';
+import { FORM_VALIDATION_DEBOUNCE_WAIT } from '../../../config/timingConfig';
+import { ADA_REDEMPTION_PASSPHRASE_LENGTH } from '../../../config/cryptoConfig';
+import { ADA_REDEMPTION_TYPES } from '../../../types/redemptionTypes';
 
 const messages = defineMessages({
   headline: {
@@ -207,6 +214,146 @@ type Props = {
 
 @observer
 export default class AdaRedemptionForm extends Component<Props> {
+
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
+
+  form = new ReactToolboxMobxForm({
+    fields: {
+      certificate: {
+        label: this.context.intl.formatMessage(messages.certificateLabel),
+        placeholder: this.context.intl.formatMessage(messages.certificateHint),
+        type: 'file',
+      },
+      passPhrase: {
+        label: this.context.intl.formatMessage(messages.passphraseLabel),
+        placeholder: this.context.intl.formatMessage(messages.passphraseHint, {
+          length: ADA_REDEMPTION_PASSPHRASE_LENGTH
+        }),
+        value: [],
+        validators: [({ field }) => {
+          // Don't validate No pass phrase needed when certificate is not encrypted
+          if (!this.props.showPassPhraseWidget) return [true];
+          // Otherwise check mnemonic
+          const passPhrase = join(field.value, ' ');
+          if (!isEmpty(passPhrase)) this.props.onPassPhraseChanged(passPhrase);
+          return [
+            this.props.mnemonicValidator(passPhrase),
+            this.context.intl.formatMessage(new InvalidMnemonicError())
+          ];
+        }]
+      },
+      redemptionKey: {
+        label: this.context.intl.formatMessage(messages.redemptionKeyLabel),
+        value: '',
+        validators: ({ field }) => {
+          if (this.props.redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED) return [true];
+          const value = this.props.redemptionCode || field.value;
+          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          return [
+            this.props.redemptionCodeValidator(value),
+            this.context.intl.formatMessage(messages.redemptionKeyError)
+          ];
+        },
+      },
+      shieldedRedemptionKey: {
+        label: this.context.intl.formatMessage(messages.shieldedRedemptionKeyLabel),
+        placeholder: this.context.intl.formatMessage(messages.shieldedRedemptionKeyHint),
+        value: '',
+        validators: ({ field }) => {
+          if (this.props.redemptionType !== ADA_REDEMPTION_TYPES.PAPER_VENDED) return [true];
+          const value = field.value;
+          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          return [
+            this.props.postVendRedemptionCodeValidator(value),
+            this.context.intl.formatMessage(messages.shieldedRedemptionKeyError)
+          ];
+        },
+      },
+      walletId: {
+        label: this.context.intl.formatMessage(messages.walletSelectLabel),
+        value: this.props.wallets[0].value,
+      },
+      email: {
+        label: this.context.intl.formatMessage(messages.emailLabel),
+        placeholder: this.context.intl.formatMessage(messages.emailHint),
+        value: '',
+        validators: [({ field }) => {
+          if (!this.props.showInputsForDecryptingForceVendedCertificate) return [true];
+          const email = field.value;
+          if (isEmail(email)) this.props.onEmailChanged(email);
+          return [
+            isEmail(email),
+            this.context.intl.formatMessage(new InvalidEmailError())
+          ];
+        }]
+      },
+      adaPasscode: {
+        label: this.context.intl.formatMessage(messages.adaPasscodeLabel),
+        placeholder: this.context.intl.formatMessage(messages.adaPasscodeHint),
+        value: '',
+        validators: [({ field }) => {
+          if (!this.props.showInputsForDecryptingForceVendedCertificate) return [true];
+          const adaPasscode = field.value;
+          if (!isEmpty(adaPasscode)) this.props.onAdaPasscodeChanged(adaPasscode);
+          return [
+            !isEmpty(adaPasscode),
+            this.context.intl.formatMessage(new FieldRequiredError())
+          ];
+        }],
+      },
+      adaAmount: {
+        label: this.context.intl.formatMessage(messages.adaAmountLabel),
+        placeholder: this.context.intl.formatMessage(messages.adaAmountHint),
+        value: '',
+        validators: [({ field }) => {
+          if (!this.props.showInputsForDecryptingForceVendedCertificate) return [true];
+          const adaAmount = field.value;
+          if (!isEmpty(adaAmount)) this.props.onAdaAmountChanged(adaAmount);
+          return [
+            !isEmpty(adaAmount),
+            this.context.intl.formatMessage(new FieldRequiredError())
+          ];
+        }],
+      },
+      spendingPassword: {
+        type: 'password',
+        label: this.context.intl.formatMessage(messages.spendingPasswordLabel),
+        placeholder: this.context.intl.formatMessage(messages.spendingPasswordPlaceholder),
+        value: '',
+        validators: [({ field, form }) => {
+          const password = field.value;
+          const walletId = form.$('walletId').value;
+          const wallet = this.props.getSelectedWallet(walletId);
+          if (wallet && wallet.hasPassword && password === '') {
+            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          }
+          return [true];
+        }],
+      },
+      decryptionKey: {
+        label: this.context.intl.formatMessage(messages.decryptionKeyLabel),
+        placeholder: this.context.intl.formatMessage(messages.decryptionKeyHint),
+        value: '',
+        validators: ({ field }) => {
+          if (!this.props.showInputForDecryptionKey) return [true];
+          const decryptionKey = field.value;
+          if (!isEmpty(decryptionKey)) this.props.onDecryptionKeyChanged(decryptionKey);
+          return [
+            !isEmpty(decryptionKey),
+            this.context.intl.formatMessage(new FieldRequiredError())
+          ];
+        },
+      },
+    }
+  }, {
+    options: {
+      validateOnChange: true,
+      validationDebounceWait: FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+  });
+
   render() {
     return (
       <div>Ada redemption form</div>

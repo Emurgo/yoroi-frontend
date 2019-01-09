@@ -37,7 +37,10 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
 
     return (
       <div>
-        <AdaRedemptionForm />
+        <AdaRedemptionForm
+          wallets={selectableWallets}
+          getSelectedWallet={() => {}} // TODO: remove, mock function
+        />
       </div>
     );
   }
