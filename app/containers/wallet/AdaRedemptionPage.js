@@ -6,6 +6,7 @@ import AdaRedemptionForm from '../../components/wallet/ada-redemption/AdaRedempt
 import AdaRedemptionNoWallets from '../../components/wallet/ada-redemption/AdaRedemptionNoWallets';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
+import { AdaRedemptionCertificateParseError } from '../../i18n/errors';
 import { ROUTES } from '../../routes-config';
 
 @observer
@@ -21,9 +22,11 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
     const { wallets } = ada;
     const {
       redeemAdaRequest, redeemPaperVendedAdaRequest,
-      isCertificateEncrypted, redemptionType
+      isCertificateEncrypted, redemptionType, error
     } = adaRedemption;
-    const { chooseRedemptionType, setRedemptionCode } = this.props.actions.ada.adaRedemption;
+    const {
+      chooseRedemptionType, setRedemptionCode, setCertificate
+    } = this.props.actions.ada.adaRedemption;
 
     const selectableWallets = wallets.all.map((w) => ({
       value: w.id, label: w.name
@@ -64,8 +67,12 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
     return (
       <div>
         <AdaRedemptionForm
+          onCertificateSelected={(certificate) => {}} // TODO: for now this is a mock just to test the UI
           wallets={selectableWallets}
           isCertificateSelected={isCertificateSelected}
+          isCertificateEncrypted={isCertificateEncrypted}
+          isCertificateInvalid={error instanceof AdaRedemptionCertificateParseError}
+          onRemoveCertificate={() => {}} // TODO: for now this is a mock just to test the UI
           redemptionType={redemptionType}
           redemptionCode={adaRedemption.redemptionCode}
           getSelectedWallet={walletId => wallets.getWalletById(walletId)}

@@ -21,6 +21,7 @@ import { ADA_REDEMPTION_PASSPHRASE_LENGTH } from '../../../config/cryptoConfig';
 import { ADA_REDEMPTION_TYPES } from '../../../types/redemptionTypes';
 import BorderedBox from '../../widgets/BorderedBox';
 import AdaRedemptionChoices from './AdaRedemptionChoices';
+import AdaCertificateUploadWidget from '../../widgets/forms/AdaCertificateUploadWidget';
 import { submitOnEnter } from '../../../utils/form';
 import styles from './AdaRedemptionForm.scss';
 
@@ -399,7 +400,8 @@ export default class AdaRedemptionForm extends Component<Props> {
     const { form, resetForm, submit } = this;
     const {
       wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType,
-      onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting
+      onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting, onCertificateSelected,
+      isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate
     } = this.props;
 
     const certificateField = form.$('certificate');
@@ -538,6 +540,27 @@ export default class AdaRedemptionForm extends Component<Props> {
                   skin={<SelectSkin />}
                 />
               </div>
+
+              {showUploadWidget ? (
+                <div className={styles.certificate}>
+                  <AdaCertificateUploadWidget
+                    {...certificateField.bind()}
+                    selectedFile={certificateField.value}
+                    onFileSelected={(file) => {
+                      resetForm();
+                      onCertificateSelected(file);
+                      certificateField.set(file);
+                    }}
+                    isCertificateEncrypted={isCertificateEncrypted}
+                    isCertificateSelected={isCertificateSelected}
+                    isCertificateInvalid={isCertificateInvalid}
+                    onRemoveCertificate={() => {
+                      resetForm();
+                      onRemoveCertificate();
+                    }}
+                  />
+                </div>
+              ) : null}
             </div>
 
             {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
