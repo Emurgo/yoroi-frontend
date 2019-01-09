@@ -7,13 +7,8 @@ export const isValidWalletName = (walletName) => {
 };
 
 export const isValidWalletPassword = (walletPassword) => {
-  // Validation rules:
-  // - should contain at least one digit: (?=.*\d)
-  // - should contain at least one lower case: (?=.*[a-z])
-  // - should contain at least one upper case: (?=.*[A-Z])
-  // - should contain at least 7 characters long: .{7,}
-  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{7,}$/;
-  return passwordRegex.test(walletPassword);
+  // https://xkcd.com/936/
+  return walletPassword.length >= 12;
 };
 
 // eslint-disable-next-line max-len

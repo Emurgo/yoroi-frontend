@@ -64,7 +64,7 @@
   "global.language.japanese": "日本語",
   "global.language.korean": "한국어",
   "global.language.russian": "Pусский",
-  "global.passwordInstructions": "암호는 최소 7자여야 하며, 적어도 1개의 대문자, 소문자, 숫자를 각각 포함해야 합니다. ",
+  "global.passwordInstructions": "!!!Note: Password needs to be at least 12 characters long.",
   "global.unit.ada": "ADA",
   "inline.editing.input.cancel.label": "취소",
   "inline.editing.input.change.label": "변경",
