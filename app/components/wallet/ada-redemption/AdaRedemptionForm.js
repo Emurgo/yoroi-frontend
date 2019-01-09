@@ -11,6 +11,8 @@ import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
 import Select from 'react-polymorph/lib/components/Select';
 import SelectSkin from 'react-polymorph/lib/skins/simple/raw/SelectSkin';
+import Autocomplete from 'react-polymorph/lib/components/Autocomplete';
+import SimpleAutocompleteSkin from 'react-polymorph/lib/skins/simple/raw/AutocompleteSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { InvalidMnemonicError, InvalidEmailError, FieldRequiredError } from '../../../i18n/errors';
@@ -401,7 +403,8 @@ export default class AdaRedemptionForm extends Component<Props> {
     const {
       wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType,
       onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting, onCertificateSelected,
-      isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate
+      isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate, showPassPhraseWidget,
+      suggestedMnemonics
     } = this.props;
 
     const certificateField = form.$('certificate');
@@ -571,6 +574,22 @@ export default class AdaRedemptionForm extends Component<Props> {
                   {...spendingPasswordField.bind()}
                   error={spendingPasswordField.error}
                   skin={<SimpleInputSkin />}
+                />
+              </div>
+            ) : null}
+
+            {showPassPhraseWidget ? (
+              <div className={styles.passPhrase}>
+                <Autocomplete
+                  className="pass-phrase"
+                  options={suggestedMnemonics}
+                  maxSelections={ADA_REDEMPTION_PASSPHRASE_LENGTH}
+                  {...passPhraseField.bind()}
+                  error={passPhraseField.error}
+                  maxVisibleOptions={5}
+                  noResultsMessage={intl.formatMessage(messages.passphraseNoResults)}
+                  isOpeningUpward
+                  skin={<SimpleAutocompleteSkin />}
                 />
               </div>
             ) : null}

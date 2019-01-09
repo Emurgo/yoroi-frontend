@@ -7,6 +7,7 @@ import AdaRedemptionNoWallets from '../../components/wallet/ada-redemption/AdaRe
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
 import { AdaRedemptionCertificateParseError } from '../../i18n/errors';
+import validWords from '../../api/ada/lib/valid-words.en';
 import { ROUTES } from '../../routes-config';
 
 @observer
@@ -71,6 +72,8 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           wallets={selectableWallets}
           isCertificateSelected={isCertificateSelected}
           isCertificateEncrypted={isCertificateEncrypted}
+          showPassPhraseWidget={showPassPhraseWidget}
+          suggestedMnemonics={validWords}
           isCertificateInvalid={error instanceof AdaRedemptionCertificateParseError}
           onRemoveCertificate={() => {}} // TODO: for now this is a mock just to test the UI
           redemptionType={redemptionType}
