@@ -322,6 +322,20 @@
           "column": 23,
           "line": 115
         }
+      },
+      {
+        "defaultMessage": "!!!Invalid certificate.",
+        "description": "\"Invalid certificate.\" error message",
+        "end": {
+          "column": 3,
+          "line": 124
+        },
+        "file": "app/api/ada/errors.js",
+        "id": "api.errors.invalidCertificateError",
+        "start": {
+          "column": 27,
+          "line": 120
+        }
       }
     ],
     "path": "app/api/ada/errors.json"
@@ -933,7 +947,7 @@
         }
       },
       {
-        "defaultMessage": "!!!https://daedaluswallet.io/faq/",
+        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
         "description": "URL for the \"FAQ on Yoroi website\". link in the testnet banner",
         "end": {
           "column": 3,
@@ -1093,7 +1107,7 @@
         }
       },
       {
-        "defaultMessage": "!!!https://daedaluswallet.io/faq/",
+        "defaultMessage": "!!!https://yoroi-wallet.com/faq/",
         "description": "URL for the \"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
         "end": {
           "column": 3,
@@ -1264,9 +1278,145 @@
           "column": 14,
           "line": 25
         }
+      },
+      {
+        "defaultMessage": "!!!Ada Redemption",
+        "description": "Label for the \"Ada Redemption\" link in the settings menu.",
+        "end": {
+          "column": 3,
+          "line": 34
+        },
+        "file": "app/components/settings/menu/SettingsMenu.js",
+        "id": "settings.menu.adaRedemption.link.label",
+        "start": {
+          "column": 17,
+          "line": 30
+        }
       }
     ],
     "path": "app/components/settings/menu/SettingsMenu.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Regular",
+        "description": "Tab title \"Regular\" on Ada redemption page.",
+        "end": {
+          "column": 3,
+          "line": 14
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionChoices.js",
+        "id": "wallet.redeem.choices.tab.title.regularVended",
+        "start": {
+          "column": 19,
+          "line": 10
+        }
+      },
+      {
+        "defaultMessage": "!!!Force vended",
+        "description": "Tab title \"Force vended\" on Ada redemption page.",
+        "end": {
+          "column": 3,
+          "line": 19
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionChoices.js",
+        "id": "wallet.redeem.choices.tab.title.forceVended",
+        "start": {
+          "column": 23,
+          "line": 15
+        }
+      },
+      {
+        "defaultMessage": "!!!Paper vended",
+        "description": "Tab title \"Paper vended\" on Ada redemption page.",
+        "end": {
+          "column": 3,
+          "line": 24
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionChoices.js",
+        "id": "wallet.redeem.choices.tab.title.paperVended",
+        "start": {
+          "column": 23,
+          "line": 20
+        }
+      },
+      {
+        "defaultMessage": "!!!Recovery - regular",
+        "description": "Tab title \"Recovery - regular\" on Ada redemption page.",
+        "end": {
+          "column": 3,
+          "line": 29
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionChoices.js",
+        "id": "wallet.redeem.choices.tab.title.recoveryRegular",
+        "start": {
+          "column": 27,
+          "line": 25
+        }
+      },
+      {
+        "defaultMessage": "!!!Recovery - force vended",
+        "description": "Tab title \"Recovery - force vended\" on Ada redemption page.",
+        "end": {
+          "column": 3,
+          "line": 34
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionChoices.js",
+        "id": "wallet.redeem.choices.tab.title.recoveryForceVended",
+        "start": {
+          "column": 31,
+          "line": 30
+        }
+      }
+    ],
+    "path": "app/components/wallet/ada-redemption/AdaRedemptionChoices.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Ada redemption is not available because you don't have any wallets.",
+        "description": "\"No wallets\" headLine on the Ada Redemption Page.",
+        "end": {
+          "column": 3,
+          "line": 16
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionNoWallets.js",
+        "id": "wallet.redeem.noWallets.headLine",
+        "start": {
+          "column": 12,
+          "line": 12
+        }
+      },
+      {
+        "defaultMessage": "!!!Create a new wallet (or restore an existing one), come back here and choose it for Ada redemption.",
+        "description": "\"No wallets\" instructions on the Ada Redemption Page.",
+        "end": {
+          "column": 3,
+          "line": 21
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionNoWallets.js",
+        "id": "wallet.redeem.noWallets.instructions",
+        "start": {
+          "column": 16,
+          "line": 17
+        }
+      },
+      {
+        "defaultMessage": "!!!Create your first wallet",
+        "description": "URL for the \"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
+        "end": {
+          "column": 3,
+          "line": 26
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionNoWallets.js",
+        "id": "wallet.redeem.noWallets.createWalletLink",
+        "start": {
+          "column": 20,
+          "line": 22
+        }
+      }
+    ],
+    "path": "app/components/wallet/ada-redemption/AdaRedemptionNoWallets.json"
   },
   {
     "descriptors": [
@@ -2963,6 +3113,25 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Ada Redemption",
+        "description": "Headline \"Ada redemption\" dialog.",
+        "end": {
+          "column": 3,
+          "line": 16
+        },
+        "file": "app/containers/wallet/AdaRedemptionPage.js",
+        "id": "wallet.redeem.dialog.title",
+        "start": {
+          "column": 9,
+          "line": 12
+        }
+      }
+    ],
+    "path": "app/containers/wallet/AdaRedemptionPage.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!Add Wallet",
         "description": "Add Wallet Title.",
         "end": {
@@ -3412,13 +3581,13 @@
         "description": "\"Unable to transfer funds.\" error message",
         "end": {
           "column": 3,
-          "line": 190
+          "line": 200
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.transferFundsError",
         "start": {
           "column": 22,
-          "line": 186
+          "line": 196
         }
       },
       {
@@ -3426,13 +3595,13 @@
         "description": "\"There is no transfer transaction to send.\" error message",
         "end": {
           "column": 3,
-          "line": 195
+          "line": 205
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.noTransferTxError",
         "start": {
           "column": 21,
-          "line": 191
+          "line": 201
         }
       },
       {
@@ -3440,13 +3609,13 @@
         "description": "Any reason why the websocket transferring could failed",
         "end": {
           "column": 3,
-          "line": 200
+          "line": 210
         },
         "file": "app/stores/ada/DaedalusTransferStore.js",
         "id": "daedalusTransfer.error.webSocketRestoreError",
         "start": {
           "column": 25,
-          "line": 196
+          "line": 206
         }
       }
     ],

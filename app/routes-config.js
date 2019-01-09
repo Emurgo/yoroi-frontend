@@ -1,7 +1,7 @@
 // @flow
 export const ROUTES = {
   ROOT: '/',
-  STAKING: '/staking',  
+  STAKING: '/staking',
   NO_WALLETS: '/no-wallets',
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
