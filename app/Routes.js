@@ -3,6 +3,9 @@ import React from 'react';
 import { Route, IndexRedirect } from 'react-router';
 import { ROUTES } from './routes-config';
 import resolver from './utils/imports';
+import type { StoresMap } from './stores/index';
+import type { ActionsMap } from './actions/index';
+import type { Node } from 'react';
 
 // PAGES
 import NoWalletsPage from './containers/wallet/NoWalletsPage';
@@ -25,6 +28,9 @@ const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
 const DaedalusTransferPage = resolver('containers/daedalusTransfer/DaedalusTransferPage');
 
 export const Routes = (
+  stores: StoresMap,
+  actions: ActionsMap
+): Node => (
   <div>
     <Route path={ROUTES.ROOT} component={LoadingPage} />
     <Route path={ROUTES.PROFILE.LANGUAGE_SELECTION} component={LanguageSelectionPage} />
@@ -42,7 +48,10 @@ export const Routes = (
       <Route path="terms-of-use" component={TermsOfUseSettingsPage} />
       <Route path={ROUTES.SETTINGS.WALLET} component={WalletSettingsPage} />
       <Route path="support" component={SupportSettingsPage} />
-      <Route path="ada-redemption" component={AdaRedemptionPage} />
+      <Route
+        path="ada-redemption"
+        component={(props) => <AdaRedemptionPage {...props} stores={stores} actions={actions} />}
+      />
     </Route>
     <Route path={ROUTES.DAEDALUS_TRANFER.ROOT} component={DaedalusTransferPage} />
   </div>
