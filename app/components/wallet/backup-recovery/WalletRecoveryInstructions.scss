@@ -1,10 +1,24 @@
-.component {
+.componentOld {
   font-family: var(--font-light);
   font-size: 16px;
   line-height: 1.38;
   color: var(--theme-instructions-text-color);
   margin-bottom: 10px;
   text-align: center;
+
+  strong {
+    font-family: var(--font-medium);
+  }
+}
+
+.component {
+  font-family: var(--font-regular);
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--theme-instructions-recovery-text-color);
+  margin-bottom: 10px;
+  text-align: center;
+  letter-spacing: 0;
 
   strong {
     font-family: var(--font-medium);

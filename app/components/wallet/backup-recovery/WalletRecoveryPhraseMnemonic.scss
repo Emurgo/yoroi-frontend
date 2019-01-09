@@ -1,4 +1,4 @@
-.component {
+.componentOld {
   padding: 14px;
   border-radius: 2px;
   text-align: center;
@@ -10,4 +10,23 @@
   min-height: 50px;
   word-spacing: 10px;
   -webkit-user-select: none;
+}
+
+.component {
+  padding: 14px;
+  text-align: center;
+  font-family: var(--font-regular);
+  font-size: 16px;
+  line-height: 1.38;
+  color: var(--theme-instructions-recovery-text-color);
+  min-height: 50px;
+  word-spacing: 10px;
+  -webkit-user-select: none;
+  border-radius: 8px;
+  border: 1px solid var(--theme-mnemonic-border-color);
+}
+
+.filled {
+  padding: 14px;
+  border: 2px solid var(--theme-mnemonic-border-filled-color);
 }

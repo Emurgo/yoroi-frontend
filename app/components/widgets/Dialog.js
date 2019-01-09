@@ -47,6 +47,8 @@ export default class Dialog extends Component<Props> {
       oldTheme
     } = this.props;
     const titleClasses = oldTheme ? styles.titleOld : styles.title;
+    console.log('oldTheme in dialog', oldTheme);
+    const secondaryButton = oldTheme ? 'flat' : 'outlined';
 
     return (
       <Modal
@@ -74,7 +76,7 @@ export default class Dialog extends Component<Props> {
               {_.map(actions, (action, key) => {
                 const buttonClasses = classnames([
                   action.className ? action.className : null,
-                  action.primary ? 'primary' : 'flat',
+                  action.primary ? 'primary' : secondaryButton,
                 ]);
                 return (
                   <Button

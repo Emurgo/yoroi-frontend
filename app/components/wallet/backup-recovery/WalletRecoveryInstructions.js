@@ -6,15 +6,16 @@ import styles from './WalletRecoveryInstructions.scss';
 
 type Props = {
   instructionsText: string | Element<any>,
+  oldTheme: boolean
 };
 
 @observer
 export default class WalletRecoveryInstructions extends Component<Props> {
 
   render() {
-    const { instructionsText } = this.props;
+    const { instructionsText, oldTheme } = this.props;
     return (
-      <div className={styles.component}>{instructionsText}</div>
+      <div className={oldTheme ? styles.componentOld : styles.component}>{instructionsText}</div>
     );
   }
 

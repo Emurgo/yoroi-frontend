@@ -1,4 +1,4 @@
-.component {
+.componentOld {
   background-color: var(--theme-mnemonic-background-color) !important;
   font-size: 15px !important;
   margin: 5px 0;
@@ -7,9 +7,33 @@
   width: 140px !important;
 }
 
-.inactive {
+.inactiveOld {
   cursor: default !important;
   opacity: 0.3;
+}
+
+.activeOld {
+  cursor: pointer;
+  &:hover {
+    background-color: var(--theme-mnemonic-background-color-hover) !important;
+  }
+}
+
+.component {
+  background-color: var(--theme-mnemonic-background-color) !important;
+  font-size: 14px;
+  font-family: var(--font-regular);
+  margin: 5px 10px 5px 0;
+  height: 30px;
+  padding: 3px 13px;
+  width: auto;
+  color: var(--theme-mnemonic-button-text-color);
+  text-transform: none;
+}
+
+.inactive {
+  cursor: default !important;
+  opacity: 0;
 }
 
 .active {
@@ -18,3 +42,4 @@
     background-color: var(--theme-mnemonic-background-color-hover) !important;
   }
 }
+

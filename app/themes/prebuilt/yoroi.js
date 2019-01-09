@@ -109,9 +109,16 @@ export default {
   '--theme-error-text-color': '#ff1351',
 
   '--theme-instructions-text-color': '#adaeb6',
+  '--theme-instructions-recovery-text-color': '#2b2c32',
   '--theme-password-condition-text-color': '#17d1aa',
 
   '--theme-terms-of-use-text-color': '#9b9b9b',
+
+  '--theme-mnemonic-background-color': '#f0f3f5',
+  '--theme-mnemonic-background-color-hover': '#f0f3f5',
+  '--theme-mnemonic-border-color': '#9b9b9b',
+  '--theme-mnemonic-border-filled-color': '#4a4a4a',
+  '--theme-mnemonic-button-text-color': '#353535',
 
   '--theme-banner-warning-background-color': '#f5a623',
   '--theme-trezor-connect-dialog-middle-block-common-background-color': '#ffffff',

@@ -58,6 +58,7 @@ type Props = {
   onRestartBackup: Function,
   onCancelBackup: Function,
   onFinishBackup: Function,
+  oldTheme: boolean
 };
 
 @observer
@@ -83,12 +84,14 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       canFinishBackup,
       onRestartBackup,
       onCancelBackup,
-      onFinishBackup
+      onFinishBackup,
+      oldTheme
     } = this.props;
     const dialogClasses = classnames([
-      styles.component,
+      oldTheme ? styles.componentOld : styles.component,
       'WalletRecoveryPhraseEntryDialog',
     ]);
+    const wordsClasses = oldTheme ? styles.wordsOld : styles.words;
 
     const enteredPhraseString = enteredPhrase.reduce((phrase, { word }) => `${phrase} ${word}`, '');
 
@@ -110,6 +113,19 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       });
     }
 
+    const phraseOld = enteredPhraseString;
+    const phrase = enteredPhrase.length ? (
+      <div className={styles.phraseWrapper}>
+        {enteredPhrase.map((item) => (
+          <div key={item.word} className={styles.phraseWord}>{item.word}</div>
+        ))}
+      </div>
+    ) : (
+      <p className={styles.phrasePlaceholder}>
+        {intl.formatMessage(messages.verificationInstructions)}
+      </p>
+    );
+
     return (
       <Dialog
         className={dialogClasses}
@@ -119,17 +135,23 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={!isValid ? <DialogBackButton onBack={onRestartBackup} /> : null}
+        oldTheme={oldTheme}
       >
-        {!isValid && (
+        {!isValid && oldTheme ? (
           <WalletRecoveryInstructions
             instructionsText={intl.formatMessage(messages.verificationInstructions)}
+            oldTheme={oldTheme}
           />
-        )}
+        ) : null}
 
-        <WalletRecoveryPhraseMnemonic phrase={enteredPhraseString} />
+        <WalletRecoveryPhraseMnemonic
+          filled={!oldTheme && Boolean(enteredPhrase.length)}
+          phrase={oldTheme ? phraseOld : phrase}
+          oldTheme={oldTheme}
+        />
 
         {!isValid && (
-          <div className={styles.words}>
+          <div className={wordsClasses}>
             {recoveryPhraseSorted.map(({ word, isActive }, index) => (
               <MnemonicWord
                 key={index} // eslint-disable-line react/no-array-index-key
@@ -137,6 +159,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
                 index={index}
                 isActive={isActive}
                 onClick={(value) => isActive && onAddWord(value)}
+                oldTheme={oldTheme}
               />
             ))}
           </div>

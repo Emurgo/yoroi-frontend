@@ -5,11 +5,13 @@ import classnames from 'classnames';
 import Checkbox from 'react-polymorph/lib/components/Checkbox';
 import SimpleCheckboxSkin from 'react-polymorph/lib/skins/simple/raw/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletBackupPrivacyWarningDialog.scss';
+import recoveryWatchingSvg from '../../../assets/images/recovery-watching.inline.svg';
 
 const messages = defineMessages({
   recoveryPhraseInstructions: {
@@ -38,6 +40,7 @@ type Props = {
   onAcceptPrivacyNotice: Function,
   onContinue: Function,
   onCancelBackup: Function,
+  oldTheme: boolean
 };
 
 @observer
@@ -55,13 +58,15 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       onAcceptPrivacyNotice,
       onCancelBackup,
       isPrivacyNoticeAccepted,
-      onContinue
+      onContinue,
+      oldTheme
     } = this.props;
     const countdownDisplay = countdownRemaining > 0 ? ` (${countdownRemaining})` : '';
     const dialogClasses = classnames([
       styles.component,
       'WalletBackupPrivacyWarningDialog',
     ]);
+    const checkboxClasses = oldTheme ? styles.checkboxOld : styles.checkbox;
 
     const actions = [
       {
@@ -80,11 +85,14 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         closeOnOverlayClick
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
+        oldTheme={oldTheme}
       >
+        {!oldTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} cleanup={['title']} />}
         <WalletRecoveryInstructions
           instructionsText={intl.formatMessage(messages.recoveryPhraseInstructions)}
+          oldTheme={oldTheme}
         />
-        <div className={styles.checkbox}>
+        <div className={checkboxClasses}>
           <Checkbox
             label={intl.formatMessage(messages.termNobodyWatching)}
             onChange={onAcceptPrivacyNotice}

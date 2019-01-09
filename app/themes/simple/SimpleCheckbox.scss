@@ -4,6 +4,8 @@
 // Css module overrides go here …
 
 .root {
+  align-items: center;
+
   .checked {
     background-color: var(--theme-checkbox-background-color-checked);
     border: 0px solid var(--theme-checkbox-background-color-checked);
@@ -23,8 +25,10 @@
 
 .label {
   color: var(--theme-checkbox-label-color);
-  font-size: 15px;
-  line-height: 28px;
+  font-size: 16px;
+  font-family: var(--font-regular);
+  line-height: 1.5;
+  letter-spacing: 0;
 
   strong {
     font-family: var(--font-medium);
