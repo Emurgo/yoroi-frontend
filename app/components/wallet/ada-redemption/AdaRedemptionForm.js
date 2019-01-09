@@ -563,6 +563,18 @@ export default class AdaRedemptionForm extends Component<Props> {
               ) : null}
             </div>
 
+            {walletHasPassword ? (
+              <div className={styles.passwordInput}>
+                <Input
+                  onKeyPress={submitOnEnter.bind(this, submit)}
+                  className="spendingPassword"
+                  {...spendingPasswordField.bind()}
+                  error={spendingPasswordField.error}
+                  skin={<SimpleInputSkin />}
+                />
+              </div>
+            ) : null}
+
             {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
 
             <Button
