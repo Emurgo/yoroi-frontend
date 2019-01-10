@@ -71,6 +71,7 @@ import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
+import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -458,6 +459,24 @@ export default class AdaApi {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
+      throw new GenericApiError();
+    }
+  }
+
+  async getPDFSecretKey(
+    file: Blob,
+    decryptionKey: string,
+    redemptionType: string
+  ): Promise<string> {
+    Logger.debug('AdaApi::getPDFSecretKey called');
+    try {
+      const fileBuffer = await readFile(file);
+      const decryptedFileBuffer = decryptFile(decryptionKey, redemptionType, fileBuffer);
+      const parsedPDFString = await parsePDFFile(decryptedFileBuffer);
+      return getSecretKey(parsedPDFString);
+    } catch (error) {
+      // FIXME: fix error handling like in daedalus
+      Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

@@ -15,6 +15,7 @@ export const getSecretKey = (parsedPDF: string): string => {
   return splitArray[2].trim();
 };
 
+// TODO: check if method is necessary
 export const getSelectedFile = (event: FileEvent): Blob => event.target.files[0];
 
 export const readFile = (file: Blob): Promise<Uint8Array> =>
