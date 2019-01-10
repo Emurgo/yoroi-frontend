@@ -69,10 +69,12 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
       <div>
         <AdaRedemptionForm
           onCertificateSelected={(certificate) => {}} // TODO: for now this is a mock just to test the UI
+          mnemonicValidator={() => { return false; }} // TODO: for now this is a mock just to test the UI
           wallets={selectableWallets}
           isCertificateSelected={isCertificateSelected}
           isCertificateEncrypted={isCertificateEncrypted}
           showPassPhraseWidget={showPassPhraseWidget}
+          showInputForDecryptionKey={showInputForDecryptionKey}
           suggestedMnemonics={validWords}
           isCertificateInvalid={error instanceof AdaRedemptionCertificateParseError}
           onRemoveCertificate={() => {}} // TODO: for now this is a mock just to test the UI

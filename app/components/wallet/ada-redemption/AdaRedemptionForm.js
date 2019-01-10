@@ -404,7 +404,7 @@ export default class AdaRedemptionForm extends Component<Props> {
       wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType,
       onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting, onCertificateSelected,
       isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate, showPassPhraseWidget,
-      suggestedMnemonics
+      suggestedMnemonics, showInputForDecryptionKey
     } = this.props;
 
     const certificateField = form.$('certificate');
@@ -590,6 +590,18 @@ export default class AdaRedemptionForm extends Component<Props> {
                   noResultsMessage={intl.formatMessage(messages.passphraseNoResults)}
                   isOpeningUpward
                   skin={<SimpleAutocompleteSkin />}
+                />
+              </div>
+            ) : null}
+
+            {showInputForDecryptionKey ? (
+              <div className={styles.decryptionKey}>
+                <Input
+                  onKeyPress={submitOnEnter.bind(this, submit)}
+                  className="decryption-key"
+                  {...decryptionKeyField.bind()}
+                  error={decryptionKeyField.error}
+                  skin={<SimpleInputSkin />}
                 />
               </div>
             ) : null}
