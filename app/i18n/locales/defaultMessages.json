@@ -1374,17 +1374,78 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Daedalus Redemption Disclamer",
+        "description": "Title of \"Redemption disclaimer\" on Ada redemption page.",
+        "end": {
+          "column": 3,
+          "line": 18
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionDisclaimer.js",
+        "id": "wallet.redeem.disclaimerOverlay.title",
+        "start": {
+          "column": 19,
+          "line": 14
+        }
+      },
+      {
+        "defaultMessage": "!!!ATTENTION: Redeeming on the Cardano Test-net will validate that your certificate or redemption key is correct and will allow you to redeem TEST-ADA for testing purposes only. KEEP your certificate or redemption key safe and secure. You will need to redeem again when Cardano SL launches the mainnet. TEST-ADA holds no value and cannot be exchanged.",
+        "description": "Disclaimer text for \"Redemption disclaimer\" on Ada redemption page.",
+        "end": {
+          "column": 3,
+          "line": 23
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionDisclaimer.js",
+        "id": "wallet.redeem.disclaimerOverlay.disclaimerText",
+        "start": {
+          "column": 18,
+          "line": 19
+        }
+      },
+      {
+        "defaultMessage": "!!!I’ve understood the information above",
+        "description": "Label for \"I’ve understood the information above\" checkbox on Ada redemption page \"Redemption disclaimer\".",
+        "end": {
+          "column": 3,
+          "line": 28
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionDisclaimer.js",
+        "id": "wallet.redeem.disclaimerOverlay.checkboxLabel",
+        "start": {
+          "column": 17,
+          "line": 24
+        }
+      },
+      {
+        "defaultMessage": "!!!Continue",
+        "description": "Label for \"Continue\" button on Ada redemption page \"Redemption disclaimer\".",
+        "end": {
+          "column": 3,
+          "line": 33
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionDisclaimer.js",
+        "id": "wallet.redeem.disclaimerOverlay.submitLabel",
+        "start": {
+          "column": 15,
+          "line": 29
+        }
+      }
+    ],
+    "path": "app/components/wallet/ada-redemption/AdaRedemptionDisclaimer.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!Ada Redemption",
         "description": "Headline \"Ada redemption\" dialog.",
         "end": {
           "column": 3,
-          "line": 39
+          "line": 36
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.headline",
         "start": {
           "column": 12,
-          "line": 35
+          "line": 32
         }
       },
       {
@@ -1392,13 +1453,13 @@
         "description": "Detailed instructions for redeeming Ada from the regular vending",
         "end": {
           "column": 3,
-          "line": 49
+          "line": 46
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.instructions.regular",
         "start": {
           "column": 23,
-          "line": 40
+          "line": 37
         }
       },
       {
@@ -1406,13 +1467,13 @@
         "description": "Detailed instructions for redeeming Ada from the force vending",
         "end": {
           "column": 3,
-          "line": 58
+          "line": 55
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.instructions.forceVended",
         "start": {
           "column": 27,
-          "line": 50
+          "line": 47
         }
       },
       {
@@ -1420,13 +1481,13 @@
         "description": "Detailed instructions for redeeming Ada from the regular vending via Recovery service",
         "end": {
           "column": 3,
-          "line": 64
+          "line": 61
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.instructions.recoveryRegular",
         "start": {
           "column": 31,
-          "line": 59
+          "line": 56
         }
       },
       {
@@ -1434,13 +1495,13 @@
         "description": "Detailed instructions for redeeming Ada from the force vending via Recovery service",
         "end": {
           "column": 3,
-          "line": 71
+          "line": 68
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.instructions.recoveryForceVended",
         "start": {
           "column": 35,
-          "line": 65
+          "line": 62
         }
       },
       {
@@ -1448,13 +1509,13 @@
         "description": "Detailed instructions for redeeming Ada from the paper vending",
         "end": {
           "column": 3,
-          "line": 77
+          "line": 74
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.instructions.paperVended",
         "start": {
           "column": 27,
-          "line": 72
+          "line": 69
         }
       },
       {
@@ -1462,13 +1523,13 @@
         "description": "Label for the certificate file upload",
         "end": {
           "column": 3,
-          "line": 82
+          "line": 79
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.certificateLabel",
         "start": {
           "column": 20,
-          "line": 78
+          "line": 75
         }
       },
       {
@@ -1476,13 +1537,13 @@
         "description": "Hint for the certificate file upload",
         "end": {
           "column": 3,
-          "line": 87
+          "line": 84
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.certificateHint",
         "start": {
           "column": 19,
-          "line": 83
+          "line": 80
         }
       },
       {
@@ -1490,13 +1551,13 @@
         "description": "Label for the wallet select field on Ada redemption form",
         "end": {
           "column": 3,
-          "line": 92
+          "line": 89
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.walletSelectLabel",
         "start": {
           "column": 21,
-          "line": 88
+          "line": 85
         }
       },
       {
@@ -1504,13 +1565,13 @@
         "description": "Label for the passphrase to decrypt Ada voucher certificate input",
         "end": {
           "column": 3,
-          "line": 97
+          "line": 94
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.passphraseLabel",
         "start": {
           "column": 19,
-          "line": 93
+          "line": 90
         }
       },
       {
@@ -1518,13 +1579,13 @@
         "description": "Hint for the mnemonic passphrase input",
         "end": {
           "column": 3,
-          "line": 102
+          "line": 99
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.passphraseHint",
         "start": {
           "column": 18,
-          "line": 98
+          "line": 95
         }
       },
       {
@@ -1532,13 +1593,13 @@
         "description": "\"No results\" message for the passphrase input search results.",
         "end": {
           "column": 3,
-          "line": 107
+          "line": 104
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.passphrase.input.noResults",
         "start": {
           "column": 23,
-          "line": 103
+          "line": 100
         }
       },
       {
@@ -1546,13 +1607,13 @@
         "description": "Label for ada redemption key input",
         "end": {
           "column": 3,
-          "line": 112
+          "line": 109
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.redemptionKeyLabel",
         "start": {
           "column": 22,
-          "line": 108
+          "line": 105
         }
       },
       {
@@ -1560,13 +1621,13 @@
         "description": "Label for shielded redemption key input",
         "end": {
           "column": 3,
-          "line": 117
+          "line": 114
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.shieldedRedemptionKeyLabel",
         "start": {
           "column": 30,
-          "line": 113
+          "line": 110
         }
       },
       {
@@ -1574,13 +1635,13 @@
         "description": "Label for decryption key input",
         "end": {
           "column": 3,
-          "line": 122
+          "line": 119
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.decryptionKeyLabel",
         "start": {
           "column": 22,
-          "line": 118
+          "line": 115
         }
       },
       {
@@ -1588,13 +1649,13 @@
         "description": "Error \"Invalid redemption key\" for ada redemption code input",
         "end": {
           "column": 3,
-          "line": 127
+          "line": 124
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.redemptionCodeError",
         "start": {
           "column": 22,
-          "line": 123
+          "line": 120
         }
       },
       {
@@ -1602,13 +1663,13 @@
         "description": "Error \"Invalid shielded vending key\" for ada redemption code input",
         "end": {
           "column": 3,
-          "line": 132
+          "line": 129
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.shieldedRedemptionCodeError",
         "start": {
           "column": 30,
-          "line": 128
+          "line": 125
         }
       },
       {
@@ -1616,13 +1677,13 @@
         "description": "Hint for ada redemption key input",
         "end": {
           "column": 3,
-          "line": 137
+          "line": 134
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.redemptionCodeHint",
         "start": {
           "column": 21,
-          "line": 133
+          "line": 130
         }
       },
       {
@@ -1630,13 +1691,13 @@
         "description": "Hint for ada redemption key input shown on Recovery tabs",
         "end": {
           "column": 3,
-          "line": 142
+          "line": 139
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.recoveryRedemptionKeyHint",
         "start": {
           "column": 29,
-          "line": 138
+          "line": 135
         }
       },
       {
@@ -1644,13 +1705,13 @@
         "description": "Hint for shielded vending key input",
         "end": {
           "column": 3,
-          "line": 147
+          "line": 144
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.shieldedRedemptionKeyHint",
         "start": {
           "column": 29,
-          "line": 143
+          "line": 140
         }
       },
       {
@@ -1658,13 +1719,13 @@
         "description": "Hint for decryption key input",
         "end": {
           "column": 3,
-          "line": 152
+          "line": 149
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.decryptionKeyHint",
         "start": {
           "column": 21,
-          "line": 148
+          "line": 145
         }
       },
       {
@@ -1672,13 +1733,13 @@
         "description": "Label for the \"Ada redemption\" dialog submit button.",
         "end": {
           "column": 3,
-          "line": 157
+          "line": 154
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.submitLabel",
         "start": {
           "column": 15,
-          "line": 153
+          "line": 150
         }
       },
       {
@@ -1686,13 +1747,13 @@
         "description": "Label for the email input field.",
         "end": {
           "column": 3,
-          "line": 162
+          "line": 159
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.emailLabel",
         "start": {
           "column": 14,
-          "line": 158
+          "line": 155
         }
       },
       {
@@ -1700,13 +1761,13 @@
         "description": "Hint for the email input field.",
         "end": {
           "column": 3,
-          "line": 167
+          "line": 164
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.emailHint",
         "start": {
           "column": 13,
-          "line": 163
+          "line": 160
         }
       },
       {
@@ -1714,13 +1775,13 @@
         "description": "Label for the ada passcode input field.",
         "end": {
           "column": 3,
-          "line": 172
+          "line": 169
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.adaPasscodeLabel",
         "start": {
           "column": 20,
-          "line": 168
+          "line": 165
         }
       },
       {
@@ -1728,13 +1789,13 @@
         "description": "Hint for the Ada passcode input field.",
         "end": {
           "column": 3,
-          "line": 177
+          "line": 174
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.adaPasscodeHint",
         "start": {
           "column": 19,
-          "line": 173
+          "line": 170
         }
       },
       {
@@ -1742,13 +1803,13 @@
         "description": "Label for the ada amount input field.",
         "end": {
           "column": 3,
-          "line": 182
+          "line": 179
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.adaAmountLabel",
         "start": {
           "column": 18,
-          "line": 178
+          "line": 175
         }
       },
       {
@@ -1756,13 +1817,13 @@
         "description": "Hint for the Ada amount input field.",
         "end": {
           "column": 3,
-          "line": 187
+          "line": 184
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.adaAmountHint",
         "start": {
           "column": 17,
-          "line": 183
+          "line": 180
         }
       },
       {
@@ -1770,13 +1831,13 @@
         "description": "Placeholder for \"spending password\"",
         "end": {
           "column": 3,
-          "line": 192
+          "line": 189
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.spendingPasswordPlaceholder",
         "start": {
           "column": 31,
-          "line": 188
+          "line": 185
         }
       },
       {
@@ -1784,17 +1845,64 @@
         "description": "Label for \"spending password\"",
         "end": {
           "column": 3,
-          "line": 197
+          "line": 194
         },
-        "file": "app/components/wallet/ada-redemption/RegularAdaRedemption.js",
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
         "id": "wallet.redeem.dialog.spendingPasswordLabel",
         "start": {
           "column": 25,
-          "line": 193
+          "line": 190
         }
       }
     ],
-    "path": "app/components/wallet/ada-redemption/RegularAdaRedemption.json"
+    "path": "app/components/wallet/ada-redemption/AdaRedemptionForm.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "!!!Ada redemption is not available because you don't have any wallets.",
+        "description": "\"No wallets\" headLine on the Ada Redemption Page.",
+        "end": {
+          "column": 3,
+          "line": 16
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionNoWallets.js",
+        "id": "wallet.redeem.noWallets.headLine",
+        "start": {
+          "column": 12,
+          "line": 12
+        }
+      },
+      {
+        "defaultMessage": "!!!Create a new wallet (or restore an existing one), come back here and choose it for Ada redemption.",
+        "description": "\"No wallets\" instructions on the Ada Redemption Page.",
+        "end": {
+          "column": 3,
+          "line": 21
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionNoWallets.js",
+        "id": "wallet.redeem.noWallets.instructions",
+        "start": {
+          "column": 16,
+          "line": 17
+        }
+      },
+      {
+        "defaultMessage": "!!!Create your first wallet",
+        "description": "URL for the \"FAQ on Daedalus website\" link in the FAQ section on the support settings page",
+        "end": {
+          "column": 3,
+          "line": 26
+        },
+        "file": "app/components/wallet/ada-redemption/AdaRedemptionNoWallets.js",
+        "id": "wallet.redeem.noWallets.createWalletLink",
+        "start": {
+          "column": 20,
+          "line": 22
+        }
+      }
+    ],
+    "path": "app/components/wallet/ada-redemption/AdaRedemptionNoWallets.json"
   },
   {
     "descriptors": [
@@ -3349,6 +3457,39 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "!!!Drop file here",
+        "description": "Label \"Drop file here\" on the file upload widget.",
+        "end": {
+          "column": 3,
+          "line": 12
+        },
+        "file": "app/components/widgets/forms/ImageUploadWidget.js",
+        "id": "ImageUploadWidget.dropFileHint",
+        "start": {
+          "column": 16,
+          "line": 8
+        }
+      },
+      {
+        "defaultMessage": "!!!or click to upload",
+        "description": "Label \"or click to upload\" on the file upload widget.",
+        "end": {
+          "column": 3,
+          "line": 17
+        },
+        "file": "app/components/widgets/forms/ImageUploadWidget.js",
+        "id": "ImageUploadWidget.clickToUploadLabel",
+        "start": {
+          "column": 19,
+          "line": 13
+        }
+      }
+    ],
+    "path": "app/components/widgets/forms/ImageUploadWidget.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "!!!change",
         "description": "Label \"change\" on inline editing inputs in inactive state.",
         "end": {
@@ -3495,13 +3636,13 @@
         "description": "Headline \"Ada redemption\" dialog.",
         "end": {
           "column": 3,
-          "line": 17
+          "line": 16
         },
         "file": "app/containers/wallet/AdaRedemptionPage.js",
         "id": "wallet.redeem.dialog.title",
         "start": {
           "column": 9,
-          "line": 13
+          "line": 12
         }
       }
     ],
@@ -3581,17 +3722,31 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "!!!This field is required.",
-        "description": "Error message when required fields are left empty.",
+        "defaultMessage": "!!!Invalid phrase entered, please check.",
+        "description": "Error message shown when invalid bip39 mnemonic was entered.",
         "end": {
           "column": 3,
           "line": 8
         },
         "file": "app/i18n/global-messages.js",
-        "id": "global.errors.fieldIsRequired",
+        "id": "global.errors.invalidMnemonic",
         "start": {
           "column": 19,
           "line": 4
+        }
+      },
+      {
+        "defaultMessage": "!!!This field is required.",
+        "description": "Error message when required fields are left empty.",
+        "end": {
+          "column": 3,
+          "line": 13
+        },
+        "file": "app/i18n/global-messages.js",
+        "id": "global.errors.fieldIsRequired",
+        "start": {
+          "column": 19,
+          "line": 9
         }
       },
       {
@@ -3599,13 +3754,13 @@
         "description": "Error message shown when invalid wallet name was entered in create wallet dialog.",
         "end": {
           "column": 3,
-          "line": 13
+          "line": 18
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.errors.invalidWalletName",
         "start": {
           "column": 21,
-          "line": 9
+          "line": 14
         }
       },
       {
@@ -3613,13 +3768,13 @@
         "description": "Error message shown when invalid wallet password was entered in create wallet dialog.",
         "end": {
           "column": 3,
-          "line": 18
+          "line": 23
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.errors.invalidWalletPassword",
         "start": {
           "column": 25,
-          "line": 14
+          "line": 19
         }
       },
       {
@@ -3627,13 +3782,13 @@
         "description": "Error message shown when wallet password and repeat passwords don't match in create wallet dialog.",
         "end": {
           "column": 3,
-          "line": 23
+          "line": 28
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.errors.invalidRepeatPassword",
         "start": {
           "column": 25,
-          "line": 19
+          "line": 24
         }
       },
       {
@@ -3641,13 +3796,13 @@
         "description": "Password instructions note.",
         "end": {
           "column": 3,
-          "line": 28
+          "line": 33
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.passwordInstructions",
         "start": {
           "column": 24,
-          "line": 24
+          "line": 29
         }
       },
       {
@@ -3655,13 +3810,13 @@
         "description": "The word \"cancel\" reused at several places (like cancel buttons)",
         "end": {
           "column": 3,
-          "line": 33
+          "line": 38
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.cancel",
         "start": {
           "column": 10,
-          "line": 29
+          "line": 34
         }
       },
       {
@@ -3669,13 +3824,13 @@
         "description": "The word \"change\" reused at several places (like change buttons)",
         "end": {
           "column": 3,
-          "line": 38
+          "line": 43
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.change",
         "start": {
           "column": 10,
-          "line": 34
+          "line": 39
         }
       },
       {
@@ -3683,13 +3838,13 @@
         "description": "The word \"create\" reused at several places (like create buttons)",
         "end": {
           "column": 3,
-          "line": 43
+          "line": 48
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.create",
         "start": {
           "column": 10,
-          "line": 39
+          "line": 44
         }
       },
       {
@@ -3697,13 +3852,13 @@
         "description": "The word \"remove\" reused at several places (like remove buttons)",
         "end": {
           "column": 3,
-          "line": 48
+          "line": 53
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.remove",
         "start": {
           "column": 10,
-          "line": 44
+          "line": 49
         }
       },
       {
@@ -3711,13 +3866,13 @@
         "description": "The word \"save\" reused at several places (like save buttons)",
         "end": {
           "column": 3,
-          "line": 53
+          "line": 58
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.labels.save",
         "start": {
           "column": 8,
-          "line": 49
+          "line": 54
         }
       },
       {
@@ -3725,13 +3880,13 @@
         "description": "Language name for \"English\" language.",
         "end": {
           "column": 3,
-          "line": 58
+          "line": 63
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.english",
         "start": {
           "column": 19,
-          "line": 54
+          "line": 59
         }
       },
       {
@@ -3739,13 +3894,13 @@
         "description": "Language name for \"Japanese\" language.",
         "end": {
           "column": 3,
-          "line": 63
+          "line": 68
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.japanese",
         "start": {
           "column": 20,
-          "line": 59
+          "line": 64
         }
       },
       {
@@ -3753,13 +3908,13 @@
         "description": "Language name for \"Simplified Chinese\" language.",
         "end": {
           "column": 3,
-          "line": 68
+          "line": 73
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.chinese.simplified",
         "start": {
           "column": 29,
-          "line": 64
+          "line": 69
         }
       },
       {
@@ -3767,13 +3922,13 @@
         "description": "Language name for \"Traditional Chinese\" language.",
         "end": {
           "column": 3,
-          "line": 73
+          "line": 78
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.chinese.traditional",
         "start": {
           "column": 30,
-          "line": 69
+          "line": 74
         }
       },
       {
@@ -3781,13 +3936,13 @@
         "description": "Language name for \"Korean\" language.",
         "end": {
           "column": 3,
-          "line": 78
+          "line": 83
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.korean",
         "start": {
           "column": 18,
-          "line": 74
+          "line": 79
         }
       },
       {
@@ -3795,13 +3950,13 @@
         "description": "Language name for \"German\" language.",
         "end": {
           "column": 3,
-          "line": 83
+          "line": 88
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.german",
         "start": {
           "column": 18,
-          "line": 79
+          "line": 84
         }
       },
       {
@@ -3809,13 +3964,13 @@
         "description": "Language name for \"Croatian\" language.",
         "end": {
           "column": 3,
-          "line": 88
+          "line": 93
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.language.croatian",
         "start": {
           "column": 20,
-          "line": 84
+          "line": 89
         }
       },
       {
@@ -3823,13 +3978,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 3,
-          "line": 93
+          "line": 98
         },
         "file": "app/i18n/global-messages.js",
         "id": "global.unit.ada",
         "start": {
           "column": 11,
-          "line": 89
+          "line": 94
         }
       },
       {
@@ -3837,13 +3992,13 @@
         "description": "Title for the \"Recovery Phrase\" dialog.",
         "end": {
           "column": 3,
-          "line": 98
+          "line": 103
         },
         "file": "app/i18n/global-messages.js",
         "id": "wallet.backup.recovery.phrase.dialog.title",
         "start": {
           "column": 29,
-          "line": 94
+          "line": 99
         }
       },
       {
@@ -3851,13 +4006,13 @@
         "description": "Name for \"Ada\" unit.",
         "end": {
           "column": 5,
-          "line": 107
+          "line": 112
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.ada",
         "start": {
           "column": 14,
-          "line": 103
+          "line": 108
         }
       },
       {
@@ -3865,13 +4020,13 @@
         "description": "Name for \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 112
+          "line": 117
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.cardano",
         "start": {
           "column": 13,
-          "line": 108
+          "line": 113
         }
       },
       {
@@ -3879,13 +4034,13 @@
         "description": "Version of \"Cardano\" client.",
         "end": {
           "column": 5,
-          "line": 117
+          "line": 122
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.cardano",
         "start": {
           "column": 16,
-          "line": 113
+          "line": 118
         }
       },
       {
@@ -3893,13 +4048,13 @@
         "description": "Name for \"Etc\" unit.",
         "end": {
           "column": 5,
-          "line": 124
+          "line": 129
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.currency.etc",
         "start": {
           "column": 14,
-          "line": 120
+          "line": 125
         }
       },
       {
@@ -3907,13 +4062,13 @@
         "description": "Name for \"Mantis\" client.",
         "end": {
           "column": 5,
-          "line": 129
+          "line": 134
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiName.mantis",
         "start": {
           "column": 13,
-          "line": 125
+          "line": 130
         }
       },
       {
@@ -3921,13 +4076,13 @@
         "description": "Version of \"Mantis\" client.",
         "end": {
           "column": 5,
-          "line": 134
+          "line": 139
         },
         "file": "app/i18n/global-messages.js",
         "id": "environment.apiVersion.mantis",
         "start": {
           "column": 16,
-          "line": 130
+          "line": 135
         }
       }
     ],

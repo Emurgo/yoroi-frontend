@@ -12,6 +12,7 @@ export default class Wallet {
   @observable amount: BigNumber;
   @observable assurance: AssuranceModeOption;
   @observable passwordUpdateDate: ?Date;
+  @observable hasPassword: boolean;
 
   constructor(data: {
     id: string,

@@ -37,7 +37,7 @@ export default class App extends Component<{
           <ThemeProvider theme={daedalusTheme}>
             <IntlProvider {...{ locale, key: locale, messages: translations[locale] }}>
               <div style={{ height: '100%' }}>
-                <Router history={history} routes={Routes} />
+                <Router history={history} routes={Routes(stores, actions)} />
               </div>
             </IntlProvider>
           </ThemeProvider>
