@@ -1,4 +1,6 @@
 {
+  "ImageUploadWidget.clickToUploadLabel": "!!!or click to upload",
+  "ImageUploadWidget.dropFileHint": "!!!Drop file here",
   "api.errors.ApiMethodNotYetImplementedError": "ご指定のAPIに対応しておりません。",
   "api.errors.GenericApiError": "エラーが発生しました。後ほど再度お試しください。",
   "api.errors.IncorrectPasswordError": "ウォレットのパスワードが誤っています。",
@@ -75,6 +77,7 @@
   "environment.currency.ada": "ADA",
   "environment.currency.etc": "ETC",
   "global.errors.fieldIsRequired": "この項目は必須です。",
+  "global.errors.invalidMnemonic": "!!!Invalid phrase entered, please check.",
   "global.errors.invalidRepeatPassword": "一致しません。",
   "global.errors.invalidWalletName": "3文字以上40文字以下のウォレット名を入力してください。",
   "global.errors.invalidWalletPassword": "無効なパスワード",

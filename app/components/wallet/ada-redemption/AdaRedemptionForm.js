@@ -404,7 +404,7 @@ export default class AdaRedemptionForm extends Component<Props> {
       wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType,
       onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting, onCertificateSelected,
       isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate, showPassPhraseWidget,
-      suggestedMnemonics, showInputForDecryptionKey
+      suggestedMnemonics, showInputForDecryptionKey, showInputsForDecryptingForceVendedCertificate
     } = this.props;
 
     const certificateField = form.$('certificate');
@@ -601,6 +601,42 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="decryption-key"
                   {...decryptionKeyField.bind()}
                   error={decryptionKeyField.error}
+                  skin={<SimpleInputSkin />}
+                />
+              </div>
+            ) : null}
+
+            {showInputsForDecryptingForceVendedCertificate ? (
+              <div className={styles.email}>
+                <Input
+                  onKeyPress={submitOnEnter.bind(this, submit)}
+                  className="email"
+                  {...emailField.bind()}
+                  error={emailField.error}
+                  skin={<SimpleInputSkin />}
+                />
+              </div>
+            ) : null}
+
+            {showInputsForDecryptingForceVendedCertificate ? (
+              <div className={styles.adaPasscode}>
+                <Input
+                  onKeyPress={submitOnEnter.bind(this, submit)}
+                  className="ada-passcode"
+                  {...adaPasscodeField.bind()}
+                  error={adaPasscodeField.error}
+                  skin={<SimpleInputSkin />}
+                />
+              </div>
+            ) : null}
+
+            {showInputsForDecryptingForceVendedCertificate ? (
+              <div className={styles.adaAmount}>
+                <Input
+                  onKeyPress={submitOnEnter.bind(this, submit)}
+                  className="ada-amount"
+                  {...adaAmountField.bind()}
+                  error={adaAmountField.error}
                   skin={<SimpleInputSkin />}
                 />
               </div>

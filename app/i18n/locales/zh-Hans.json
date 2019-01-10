@@ -1,4 +1,6 @@
 {
+  "ImageUploadWidget.clickToUploadLabel": "!!!or click to upload",
+  "ImageUploadWidget.dropFileHint": "!!!Drop file here",
   "api.errors.ApiMethodNotYetImplementedError": "尚未实现此 API 方法。",
   "api.errors.GenericApiError": "发生错误，请稍后重试。",
   "api.errors.IncorrectPasswordError": "钱包密码不正确。",
@@ -75,6 +77,7 @@
   "environment.currency.ada": "ADA",
   "environment.currency.etc": "ETC",
   "global.errors.fieldIsRequired": "该字段为必填字段。",
+  "global.errors.invalidMnemonic": "!!!Invalid phrase entered, please check.",
   "global.errors.invalidRepeatPassword": "不匹配。",
   "global.errors.invalidWalletName": "钱包名称需要最少 3 个，最多 40 个字母。",
   "global.errors.invalidWalletPassword": "密码无效",

@@ -75,6 +75,9 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           isCertificateEncrypted={isCertificateEncrypted}
           showPassPhraseWidget={showPassPhraseWidget}
           showInputForDecryptionKey={showInputForDecryptionKey}
+          showInputsForDecryptingForceVendedCertificate={
+            showInputsForDecryptingForceVendedCertificate
+          }
           suggestedMnemonics={validWords}
           isCertificateInvalid={error instanceof AdaRedemptionCertificateParseError}
           onRemoveCertificate={() => {}} // TODO: for now this is a mock just to test the UI

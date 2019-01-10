@@ -1,4 +1,6 @@
 {
+  "ImageUploadWidget.clickToUploadLabel": "!!!or click to upload",
+  "ImageUploadWidget.dropFileHint": "!!!Drop file here",
   "api.errors.ApiMethodNotYetImplementedError": "!!!This API method is not yet implemented.",
   "api.errors.GenericApiError": "!!!An error occurred, please try again later.",
   "api.errors.IncorrectPasswordError": "!!!Incorrect wallet password.",
@@ -75,6 +77,7 @@
   "environment.currency.ada": "!!!ADA",
   "environment.currency.etc": "!!!ETC",
   "global.errors.fieldIsRequired": "!!!This field is required.",
+  "global.errors.invalidMnemonic": "!!!Invalid phrase entered, please check.",
   "global.errors.invalidRepeatPassword": "!!!Doesn't match.",
   "global.errors.invalidWalletName": "!!!Wallet name requires at least 3 and at most 40 letters.",
   "global.errors.invalidWalletPassword": "!!!Invalid password",

@@ -1,6 +1,11 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  invalidMnemonic: {
+    id: 'global.errors.invalidMnemonic',
+    defaultMessage: '!!!Invalid phrase entered, please check.',
+    description: 'Error message shown when invalid bip39 mnemonic was entered.'
+  },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
     defaultMessage: '!!!This field is required.',

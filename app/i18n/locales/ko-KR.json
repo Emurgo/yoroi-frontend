@@ -1,4 +1,6 @@
 {
+  "ImageUploadWidget.clickToUploadLabel": "!!!or click to upload",
+  "ImageUploadWidget.dropFileHint": "!!!Drop file here",
   "api.errors.ApiMethodNotYetImplementedError": "이 API 방식은 아직 사용되고 있지 않습니다.",
   "api.errors.GenericApiError": "오류가 발생했습니다. 나중에 다시 시도하십시오.",
   "api.errors.IncorrectPasswordError": "지갑 암호가 틀렸습니다.",
@@ -75,6 +77,7 @@
   "environment.currency.ada": "ADA",
   "environment.currency.etc": "ETC",
   "global.errors.fieldIsRequired": "이 필드는 필수입니다.",
+  "global.errors.invalidMnemonic": "!!!Invalid phrase entered, please check.",
   "global.errors.invalidRepeatPassword": "일치하지 않습니다.",
   "global.errors.invalidWalletName": "지갑 이름은 3~40자 사이여야 합니다.",
   "global.errors.invalidWalletPassword": "잘못된 암호",
