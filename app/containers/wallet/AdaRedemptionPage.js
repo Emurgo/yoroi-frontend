@@ -9,6 +9,7 @@ import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
 import { AdaRedemptionCertificateParseError } from '../../i18n/errors';
 import validWords from '../../api/ada/lib/valid-words.en';
 import { ROUTES } from '../../routes-config';
+import environment from '../../environment';
 
 @observer
 export default class AdaRedemptionPage extends Component<InjectedProps> {
@@ -19,11 +20,14 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
   };
 
   render() {
+    console.log("ss", environment);
     const { ada, adaRedemption } = this.props.stores;
+    const isMainnet = environment.isMainnet();
     const { wallets } = ada;
     const {
       redeemAdaRequest, redeemPaperVendedAdaRequest,
-      isCertificateEncrypted, redemptionType, error
+      isCertificateEncrypted, redemptionType, error,
+      isRedemptionDisclaimerAccepted
     } = adaRedemption;
     const {
       chooseRedemptionType, setRedemptionCode, setCertificate
@@ -92,6 +96,8 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           }}
           error={adaRedemption.error}
           isSubmitting={false} // TODO: for now this is a mock just to test the UI
+          isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
+          onAcceptRedemptionDisclaimer={() => {}} // TODO: for now this is a mock just to test the UI
         />
       </div>
     );

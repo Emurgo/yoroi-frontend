@@ -23,6 +23,7 @@ import { ADA_REDEMPTION_PASSPHRASE_LENGTH } from '../../../config/cryptoConfig';
 import { ADA_REDEMPTION_TYPES } from '../../../types/redemptionTypes';
 import BorderedBox from '../../widgets/BorderedBox';
 import AdaRedemptionChoices from './AdaRedemptionChoices';
+import AdaRedemptionDisclaimer from './AdaRedemptionDisclaimer';
 import AdaCertificateUploadWidget from '../../widgets/forms/AdaCertificateUploadWidget';
 import { submitOnEnter } from '../../../utils/form';
 import styles from './AdaRedemptionForm.scss';
@@ -404,7 +405,8 @@ export default class AdaRedemptionForm extends Component<Props> {
       wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType,
       onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting, onCertificateSelected,
       isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate, showPassPhraseWidget,
-      suggestedMnemonics, showInputForDecryptionKey, showInputsForDecryptingForceVendedCertificate
+      suggestedMnemonics, showInputForDecryptionKey, showInputsForDecryptingForceVendedCertificate,
+      isRedemptionDisclaimerAccepted, onAcceptRedemptionDisclaimer
     } = this.props;
 
     const certificateField = form.$('certificate');
@@ -653,6 +655,12 @@ export default class AdaRedemptionForm extends Component<Props> {
             />
           </BorderedBox>
         </div>
+
+        {!isRedemptionDisclaimerAccepted ? (
+          <AdaRedemptionDisclaimer
+            onSubmit={onAcceptRedemptionDisclaimer}
+          />
+        ) : null}
       </div>
     );
   }
