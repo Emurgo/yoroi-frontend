@@ -20,7 +20,6 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
   };
 
   render() {
-    console.log("ss", environment);
     const { ada, adaRedemption } = this.props.stores;
     const isMainnet = environment.isMainnet();
     const { wallets } = ada;
