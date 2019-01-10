@@ -20,7 +20,6 @@ export default class Wallet {
     amount: BigNumber,
     assurance: AssuranceModeOption,
     passwordUpdateDate: ?Date,
-    hasPassword: boolean,
   }) {
     Object.assign(this, data);
   }
