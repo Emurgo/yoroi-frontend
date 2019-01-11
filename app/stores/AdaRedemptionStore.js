@@ -7,11 +7,20 @@ import type { RedemptionTypeChoices } from '../types/redemptionTypes';
 import { Logger } from '../utils/logging';
 import { InvalidMnemonicError } from '../i18n/errors';
 import { AdaRedemptionEncryptedCertificateParseError, AdaRedemptionCertificateParseError, NoCertificateError } from '../api/ada/errors';
+import LocalizableError from '../i18n/LocalizableError';
 
 export default class AdaRedemptionStore extends Store {
 
   @observable redemptionType: RedemptionTypeChoices = ADA_REDEMPTION_TYPES.REGULAR;
   @observable redemptionCode: string = '';
+  @observable certificate: ?Blob = null;
+  @observable decryptionKey: ?string = null;
+  @observable error: ?LocalizableError = null;
+  @observable isCertificateEncrypted = false;
+  @observable passPhrase: ?string = null;
+  @observable email: ?string = null;
+  @observable adaAmount: ?string = null;
+  @observable adaPasscode: ?string = null;
 
   setup() {
     const actions = this.actions.ada.adaRedemption;
@@ -48,7 +57,7 @@ export default class AdaRedemptionStore extends Store {
       if (!this.decryptionKey && this.isCertificateEncrypted) return;
     }
     if (this.redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED) return;
-    if (this.certificate == null) throw new NoCertificateError();
+    if (this.certificate === null) throw new NoCertificateError();
     let decryptionKey = null;
     if ((
       this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR ||
@@ -61,7 +70,7 @@ export default class AdaRedemptionStore extends Store {
       this.redemptionType === ADA_REDEMPTION_TYPES.FORCE_VENDED &&
       this.isCertificateEncrypted
     ) {
-      decryptionKey = [this.email, this.adaPasscode, this.adaAmount];
+      decryptionKey = [this.email, this.adaPasscode, this.adaAmount].toString();
     }
     if (
       this.redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED &&

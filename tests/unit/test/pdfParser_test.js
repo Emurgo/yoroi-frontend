@@ -63,7 +63,7 @@ describe('PDF decrypt test', () => {
   it('should decrypt force vended PDF', () => {
     const fileBuffer = getMockedFileBuffer('force-vended.pdf.enc');
     const decryptedFileBuffer = getMockedFileBuffer('force-vended-decrypted.txt');
-    const decryptedFile = pdfParser.decryptFile(mockData.decryptPDF.data, 'forceVended', fileBuffer);
+    const decryptedFile = pdfParser.decryptFile(mockData.decryptPDF.data.toString(), 'forceVended', fileBuffer);
     assert(Buffer.from(decryptedFile).equals(decryptedFileBuffer), 'PDF decrypted content should equal specific content');
   });
 

@@ -464,9 +464,9 @@ export default class AdaApi {
   }
 
   async getPDFSecretKey(
-    file: Blob,
-    decryptionKey: string,
-    redemptionType: string
+    file: ?Blob,
+    decryptionKey: ?string,
+    redemptionType: ?string
   ): Promise<string> {
     Logger.debug('AdaApi::getPDFSecretKey called');
     try {
