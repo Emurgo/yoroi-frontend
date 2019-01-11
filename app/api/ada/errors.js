@@ -121,6 +121,26 @@ const messages = defineMessages({
     id: 'api.errors.invalidCertificateError',
     defaultMessage: '!!!Invalid certificate.',
     description: '"Invalid certificate." error message'
+  },
+  readFileError: {
+    id: 'api.errors.readFileError',
+    defaultMessage: '!!!Error while reading file.',
+    description: '"Error while reading file." error message'
+  },
+  decryptionError: {
+    id: 'api.errors.decryptionError',
+    defaultMessage: '!!!Error while decrypting file.',
+    description: '"Error while decrypting file." error message'
+  },
+  parsePDFFileError: {
+    id: 'api.errors.parsePDFFileError',
+    defaultMessage: '!!!Error while parsing PDF file.',
+    description: '"Error while parsing PDF file." error message'
+  },
+  parsePDFPageError: {
+    id: 'api.errors.parsePDFPageError',
+    defaultMessage: '!!!Error while parsing PDF file page.',
+    description: '"Error while parsing PDF file page." error message'
   }
 });
 
@@ -336,6 +356,42 @@ export class InvalidCertificateError extends LocalizableError {
     super({
       id: messages.invalidCertificateError.id,
       defaultMessage: messages.invalidCertificateError.defaultMessage
+    });
+  }
+}
+
+export class ReadFileError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.readFileError.id,
+      defaultMessage: messages.readFileError.defaultMessage
+    });
+  }
+}
+
+export class DecryptionError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.decryptionError.id,
+      defaultMessage: messages.decryptionError.defaultMessage
+    });
+  }
+}
+
+export class ParsePDFFileError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.parsePDFFileError.id,
+      defaultMessage: messages.parsePDFFileError.defaultMessage
+    });
+  }
+}
+
+export class ParsePDFPageError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.parsePDFPageError.id,
+      defaultMessage: messages.parsePDFPageError.defaultMessage
     });
   }
 }
