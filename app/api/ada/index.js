@@ -72,6 +72,14 @@ import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
 import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
+import {
+  isValidRedemptionKey,
+  isValidPaperVendRedemptionKey
+} from '../../utils/redemption-key-validation';
+import {
+  ADA_REDEMPTION_PASSPHRASE_LENGTH
+} from '../../config/cryptoConfig';
+
 
 // ADA specific Request / Response params
 export type GetAddressesResponse = {
@@ -479,6 +487,16 @@ export default class AdaApi {
       throw new GenericApiError();
     }
   }
+
+  isValidRedemptionKey = (mnemonic: string): boolean => (isValidRedemptionKey(mnemonic));
+
+  isValidPaperVendRedemptionKey = (mnemonic: string): boolean => (
+    isValidPaperVendRedemptionKey(mnemonic)
+  );
+
+  isValidRedemptionMnemonic = (mnemonic: string): boolean => (
+    isValidMnemonic(mnemonic, ADA_REDEMPTION_PASSPHRASE_LENGTH)
+  );
 
 }
 

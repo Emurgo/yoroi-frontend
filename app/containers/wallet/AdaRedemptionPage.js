@@ -26,11 +26,12 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
     const {
       redeemAdaRequest, redeemPaperVendedAdaRequest,
       isCertificateEncrypted, redemptionType, error,
-      isRedemptionDisclaimerAccepted
+      isRedemptionDisclaimerAccepted, isValidRedemptionMnemonic,
+      isValidRedemptionKey, isValidPaperVendRedemptionKey
     } = adaRedemption;
     const {
       chooseRedemptionType, setRedemptionCode, setCertificate, setPassPhrase, setEmail,
-      setAdaAmount, setAdaPasscode, setDecryptionKey
+      setAdaAmount, setAdaPasscode, setDecryptionKey, acceptRedemptionDisclaimer
     } = this.props.actions.ada.adaRedemption;
 
     const selectableWallets = wallets.all.map((w) => ({
@@ -81,7 +82,9 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           onAdaAmountChanged={(adaAmount) => setAdaAmount.trigger({ adaAmount })}
           onAdaPasscodeChanged={(adaPasscode) => setAdaPasscode.trigger({ adaPasscode })}
           onDecryptionKeyChanged={(decryptionKey) => setDecryptionKey.trigger({ decryptionKey })}
-          mnemonicValidator={() => { return false; }} // TODO: for now this is a mock just to test the UI
+          mnemonicValidator={isValidRedemptionMnemonic}
+          redemptionCodeValidator={isValidRedemptionKey}
+          postVendRedemptionCodeValidator={isValidPaperVendRedemptionKey}
           wallets={selectableWallets}
           isCertificateSelected={isCertificateSelected}
           isCertificateEncrypted={isCertificateEncrypted}
@@ -99,13 +102,11 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           onChooseRedemptionType={(choice) => {
             chooseRedemptionType.trigger({ redemptionType: choice });
           }}
-          onRedemptionCodeChanged={(redemptionCode) => {
-            setRedemptionCode.trigger({ redemptionCode });
-          }}
           error={adaRedemption.error}
           isSubmitting={false} // TODO: for now this is a mock just to test the UI
+          onSubmit={() => {}} // TODO: for now this is a mock just to test the UI
           isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
-          onAcceptRedemptionDisclaimer={() => {}} // TODO: for now this is a mock just to test the UI
+          onAcceptRedemptionDisclaimer={() => acceptRedemptionDisclaimer.trigger()}
         />
       </div>
     );
