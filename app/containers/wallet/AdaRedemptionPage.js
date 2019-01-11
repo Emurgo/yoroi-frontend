@@ -29,7 +29,8 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
       isRedemptionDisclaimerAccepted
     } = adaRedemption;
     const {
-      chooseRedemptionType, setRedemptionCode, setCertificate
+      chooseRedemptionType, setRedemptionCode, setCertificate, setPassPhrase, setEmail,
+      setAdaAmount, setAdaPasscode, setDecryptionKey
     } = this.props.actions.ada.adaRedemption;
 
     const selectableWallets = wallets.all.map((w) => ({
@@ -71,7 +72,15 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
     return (
       <div>
         <AdaRedemptionForm
-          onCertificateSelected={(certificate) => {}} // TODO: for now this is a mock just to test the UI
+          onCertificateSelected={(certificate) => setCertificate.trigger({ certificate })}
+          onPassPhraseChanged={(passPhrase) => setPassPhrase.trigger({ passPhrase })}
+          onRedemptionCodeChanged={(redemptionCode) => {
+            setRedemptionCode.trigger({ redemptionCode });
+          }}
+          onEmailChanged={(email) => setEmail.trigger({ email })}
+          onAdaAmountChanged={(adaAmount) => setAdaAmount.trigger({ adaAmount })}
+          onAdaPasscodeChanged={(adaPasscode) => setAdaPasscode.trigger({ adaPasscode })}
+          onDecryptionKeyChanged={(decryptionKey) => setDecryptionKey.trigger({ decryptionKey })}
           mnemonicValidator={() => { return false; }} // TODO: for now this is a mock just to test the UI
           wallets={selectableWallets}
           isCertificateSelected={isCertificateSelected}
