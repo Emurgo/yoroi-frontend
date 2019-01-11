@@ -1,7 +1,7 @@
 // @flow
 import ExtendableError from 'es6-error';
 
-class CardanoCryptoError extends ExtendableError {
+export class CardanoCryptoError extends ExtendableError {
   constructor(message: ?string = 'Cardano crypto error') {
     super(message);
   }
@@ -12,5 +12,3 @@ export class WrongPassphraseError extends CardanoCryptoError {
     super(message);
   }
 }
-
-export default CardanoCryptoError;

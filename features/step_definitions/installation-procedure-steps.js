@@ -1,12 +1,9 @@
+// @flow
+
 import { Given, When, Then } from 'cucumber';
 import { expect } from 'chai';
-import termsOfUse from '../support/helpers/terms-of-use-helpers';
 
 const TERMS_OF_USE_FORM = '.TermsOfUseForm_component';
-
-Given(/^I have accepted "Terms of use"$/, async function () {
-  await termsOfUse.acceptTerms(this.driver);
-});
 
 Given(/^I am on the "Terms of use" screen$/, async function () {
   await this.waitForElement(TERMS_OF_USE_FORM);

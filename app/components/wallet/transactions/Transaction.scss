@@ -51,21 +51,21 @@
 }
 
 .amountSent {
-  color: #eb6d7a;
+  color: var(--theme-transactions-sent-color);
 
   .currencySymbol {
     & > svg > g > g {
-      stroke: #eb6d7a;
+      stroke: var(--theme-transactions-sent-color);
     }
   }
 }
 
 .amountReceived {
-  color: #54ca87;
+  color: var(--theme-transactions-received-color);
 
   .currencySymbol {
     & > svg > g > g {
-      stroke: #54ca87;
+      stroke: var(--theme-transactions-received-color);
     }
   }
 }

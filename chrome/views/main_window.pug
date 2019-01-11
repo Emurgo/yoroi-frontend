@@ -2,6 +2,8 @@ doctype html
 
 html
   head
+    if env == 'development'
+      script(src="http://localhost:8097")
     meta(charset='UTF-8')
     title Yoroi
     style.

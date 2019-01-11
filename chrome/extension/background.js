@@ -19,7 +19,7 @@ function promisifyAll(obj, list) {
 }
 
 // let chrome extension api support Promise
-promisifyAll(chrome, ['tabs', 'windows', 'browserAction', 'contextMenus']);
+promisifyAll(chrome, ['tabs', 'windows', 'browserAction']);
 promisifyAll(chrome.storage, ['local']);
 
 

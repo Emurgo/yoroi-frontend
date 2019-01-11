@@ -11,7 +11,7 @@ const hotScript =
   'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
 const baseDevConfig = () => ({
-  devtool: 'eval-cheap-module-source-map',
+  devtool: 'eval-source-map',
   entry: {
     yoroi: [
       customPath,
@@ -57,6 +57,9 @@ const baseDevConfig = () => ({
       }
     })
   ],
+  node: {
+    fs: 'empty'
+  },
   resolve: {
     extensions: ['*', '.js']
   },
@@ -110,7 +113,7 @@ const baseDevConfig = () => ({
         loader: 'raw-loader',
       },
       {
-        test: /\.(eot|otf|ttf|woff|woff2)$/,
+        test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
         loader: 'file-loader'
       },
       {

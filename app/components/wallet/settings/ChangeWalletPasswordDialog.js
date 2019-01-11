@@ -73,25 +73,10 @@ type Props = {
   error: ?LocalizableError,
 };
 
-type State = {
-  removePassword: boolean,
-};
-
 @observer
-export default class ChangeWalletPasswordDialog extends Component<Props, State> {
-
-  static defaultProps = {
-    currentPasswordValue: '',
-    newPasswordValue: '',
-    repeatedPasswordValue: '',
-  };
-
+export default class ChangeWalletPasswordDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
-  };
-
-  state = {
-    removePassword: false,
   };
 
   form = new ReactToolboxMobxForm({
@@ -112,7 +97,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
         placeholder: this.context.intl.formatMessage(messages.newPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
-          if (this.state.removePassword) return [true];
           const repeatPasswordField = form.$('repeatPassword');
           if (repeatPasswordField.value.length > 0) {
             repeatPasswordField.validate({ showErrors: true });
@@ -129,7 +113,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
         placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
-          if (this.state.removePassword) return [true];
           const walletPassword = form.$('walletPassword').value;
           if (walletPassword.length === 0) return [true];
           return [
@@ -149,11 +132,10 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
   submit = () => {
     this.form.submit({
       onSuccess: (form) => {
-        const { removePassword } = this.state;
         const { currentPassword, walletPassword } = form.values();
         const passwordData = {
           oldPassword: currentPassword || null,
-          newPassword: removePassword ? null : walletPassword,
+          newPassword: walletPassword,
         };
         this.props.onSave(passwordData);
       },
@@ -176,18 +158,15 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
       isSubmitting,
       error,
     } = this.props;
-    const { removePassword } = this.state;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
 
     const walletPasswordFieldsClasses = classnames([
-      styles.walletPasswordFields,
-      removePassword ? styles.hidden : null
+      styles.walletPasswordFields
     ]);
 
     const confirmButtonClasses = classnames([
       'confirmButton',
-      removePassword ? styles.removeButton : null,
       isSubmitting ? styles.isSubmitting : null,
     ]);
 
@@ -198,7 +177,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props, State> 
 
     const actions = [
       {
-        label: intl.formatMessage(globalMessages[removePassword ? 'remove' : 'save']),
+        label: intl.formatMessage(globalMessages.save),
         onClick: this.submit,
         primary: true,
         className: confirmButtonClasses,

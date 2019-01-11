@@ -1,3 +1,5 @@
+// @flow
+
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
@@ -60,7 +62,7 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
   for (let i = 0; i < webElements.length; i++) {
     await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);
   }
-  let expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
+  const expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
   expect(expectedElements.length).to.be.equal(0);
 });
 

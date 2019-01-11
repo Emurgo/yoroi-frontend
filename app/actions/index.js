@@ -1,6 +1,6 @@
 // @flow
 import RouterActions from './router-actions';
-import SidebarActions from './sidebar-actions';
+import TopbarActions from './topbar-actions';
 import WalletBackupActions from './wallet-backup-actions';
 import ProfileActions from './profile-actions';
 import DialogsActions from './dialogs-actions';
@@ -10,7 +10,7 @@ import type { AdaActionsMap } from './ada/index';
 
 export type ActionsMap = {
   router: RouterActions,
-  sidebar: SidebarActions,
+  topbar: TopbarActions,
   walletBackup: WalletBackupActions,
   profile: ProfileActions,
   dialogs: DialogsActions,
@@ -20,7 +20,7 @@ export type ActionsMap = {
 
 const actionsMap: ActionsMap = {
   router: new RouterActions(),
-  sidebar: new SidebarActions(),
+  topbar: new TopbarActions(),
   walletBackup: new WalletBackupActions(),
   profile: new ProfileActions(),
   dialogs: new DialogsActions(),
