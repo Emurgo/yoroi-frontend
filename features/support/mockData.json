@@ -14,7 +14,7 @@
     ],
     "usedAddresses": [],
     "masterKey": "1bfed8ddba1b405397664593d6b7b05bd630fa903fa554532b141a8a3f741118a2c15cd524f8f279e1c4b8b6cce1bb8203f1860e14d65a9047e709d6e6585d0c1e8df66c05c31db4b1673b1978fe5f08e5dedbacb8be25ce991a44766f38708a47e9b2285d0533a0f71b5528e45ea8a899b655274626cad429d83963cb68b40612dd45341d20f0e14146befe4df6c40c1fd1e4c8d51c566b040aaaaf",
-    "password": "Secret_123",
+    "password": "aaSecret_123",
     "wallet": {
       "cwAccountsNumber": 1,
       "cwAmount": {
