@@ -5,6 +5,8 @@ import Store from './lib/Store';
 import { ADA_REDEMPTION_TYPES } from '../types/redemptionTypes';
 import type { RedemptionTypeChoices } from '../types/redemptionTypes';
 import { Logger } from '../utils/logging';
+import { InvalidMnemonicError } from '../i18n/errors';
+import { AdaRedemptionEncryptedCertificateParseError, AdaRedemptionCertificateParseError, NoCertificateError } from '../api/ada/errors';
 
 export default class AdaRedemptionStore extends Store {
 
@@ -46,11 +48,7 @@ export default class AdaRedemptionStore extends Store {
       if (!this.decryptionKey && this.isCertificateEncrypted) return;
     }
     if (this.redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED) return;
-    // FIXME: fix error handler
-    if (this.certificate == null) throw new Error('Certificate File is required for parsing.');
-    // FIXME: file is needed, not the path
-    const path = this.certificate.path; // eslint-disable-line
-    Logger.debug('Parsing ADA Redemption code from certificate: ' + path);
+    if (this.certificate == null) throw new NoCertificateError();
     let decryptionKey = null;
     if ((
       this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR ||
@@ -71,7 +69,6 @@ export default class AdaRedemptionStore extends Store {
     ) {
       decryptionKey = this.decryptionKey;
     }
-    // TODO: Check if this.certificate is of type Blob
     this.api.ada.getPDFSecretKey(this.certificate, decryptionKey, this.redemptionType)
       .then(code => this._onCodeParsed(code))
       .catch(error => this._onParseError(error));
@@ -84,15 +81,15 @@ export default class AdaRedemptionStore extends Store {
 
   _onParseError = action(error => {
     const errorMessage = isString(error) ? error : error.message;
-    // if (errorMessage.includes('Invalid mnemonic')) {
-    //   this.error = new InvalidMnemonicError();
-    // } else if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
-    //   if (this.isCertificateEncrypted) {
-    //     this.error = new AdaRedemptionEncryptedCertificateParseError();
-    //   } else {
-    //     this.error = new AdaRedemptionCertificateParseError();
-    //   }
-    // }
+    if (errorMessage.includes('Invalid mnemonic')) {
+      this.error = new InvalidMnemonicError();
+    } else if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
+      if (this.isCertificateEncrypted) {
+        this.error = new AdaRedemptionEncryptedCertificateParseError();
+      } else {
+        this.error = new AdaRedemptionCertificateParseError();
+      }
+    }
     this.redemptionCode = '';
     this.passPhrase = null;
     this.decryptionKey = null;

@@ -475,7 +475,6 @@ export default class AdaApi {
       const parsedPDFString = await parsePDFFile(decryptedFileBuffer);
       return getSecretKey(parsedPDFString);
     } catch (error) {
-      // FIXME: fix error handling like in daedalus
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
     }

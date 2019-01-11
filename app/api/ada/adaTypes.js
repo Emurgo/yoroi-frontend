@@ -134,12 +134,6 @@ export type UTXO = {
   amount: string
 }
 
-export type FileEvent = {
-  target: {
-    files: Array<Blob>
-  }
-}
-
 export type PDF = {
   getPage: Function
 }
