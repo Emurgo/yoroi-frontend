@@ -197,6 +197,31 @@ export default defineMessages({
     defaultMessage: '!!!one lowercase character',
     description: 'Password instructions condition 4.',
   },
+  buyTrezorMessage: {
+    id: 'footer.buyTrezorMessage',
+    defaultMessage: '!!!Buy Trezor',
+    description: 'Buy Trezor message shown in footer on the wallet add screen.',
+  },
+  howToConnectTrezorMessage: {
+    id: 'footer.howToConnectTrezorMessage',
+    defaultMessage: '!!!How to connect Trezor',
+    description: 'How to connect Trezor message shown in footer on the wallet add screen.',
+  },
+  howToCreateWalletMessage: {
+    id: 'footer.howToCreateWalletMessage',
+    defaultMessage: '!!!How to create wallet',
+    description: 'How to create wallet message shown in footer on the wallet add screen.',
+  },
+  howToRestoreWalletMessage: {
+    id: 'footer.howToRestoreWalletMessage',
+    defaultMessage: '!!!How to restore wallet',
+    description: 'How to restore wallet message shown in footer on the wallet add screen.',
+  },
+  whatIsAHarwareWalletMessage: {
+    id: 'footer.whatIsAHarwareWalletMessage',
+    defaultMessage: '!!!What is a harware wallet?',
+    description: 'What is a harware wallet message shown in footer on the wallet screen.',
+  }
 });
 
 export const environmentSpecificMessages = {

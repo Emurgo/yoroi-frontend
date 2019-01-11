@@ -12,7 +12,7 @@
   }
 }
 
-.component {
+.componentOld {
   text-align: center;
   border-bottom: 1px solid var(--theme-separation-border-color);
   margin: 0 auto;
@@ -80,4 +80,26 @@
 
 .numberOfTransactions {
   @extend %smallText;
+}
+
+.component {
+  :global {
+    .BorderedBox_component {
+      background: none;
+      border: none;
+      padding: 55px 30px;
+
+      > div {
+        height: auto;
+        font-family: var(--font-regular);
+        font-size: 30px;
+        letter-spacing: 0;
+      }
+
+      svg {
+        height: 21px;
+        width: 21px;
+      }
+    }
+  }
 }

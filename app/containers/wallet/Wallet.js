@@ -33,14 +33,20 @@ export default class Wallet extends Component<Props> {
   render() {
     const { wallets } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
+    const { theme } = stores;
     if (!wallets.active) {
-      return <MainLayout actions={actions} stores={stores}><LoadingSpinner /></MainLayout>;
+      return (
+        <MainLayout actions={actions} stores={stores} oldTheme={theme.old}>
+          <LoadingSpinner />
+        </MainLayout>
+      );
     }
     return (
-      <MainLayout actions={actions} stores={stores}>
+      <MainLayout actions={actions} stores={stores} oldTheme={theme.old} withFooter={!theme.old}>
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
+          oldTheme={theme.old}
         >
           {this.props.children}
         </WalletWithNavigation>

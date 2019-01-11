@@ -36,6 +36,7 @@ export default class WalletSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const { theme } = this.props.stores;
     const actions = this.props.actions;
     const { wallets, transactions } = this.props.stores.substores.ada;
     const {
@@ -70,9 +71,13 @@ export default class WalletSummaryPage extends Component<Props> {
           />
         );
       } else if (!hasAny) {
-        walletTransactions = <WalletNoTransactions label={noTransactionsFoundLabel} />;
+        walletTransactions = (
+          <WalletNoTransactions label={noTransactionsFoundLabel} oldTheme={theme.old} />
+        );
       } else if (!hasAny) {
-        walletTransactions = <WalletNoTransactions label={noTransactionsLabel} />;
+        walletTransactions = (
+          <WalletNoTransactions label={noTransactionsLabel} oldTheme={theme.old} />
+        );
       }
     }
 
@@ -82,6 +87,7 @@ export default class WalletSummaryPage extends Component<Props> {
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
+          oldTheme={theme.old}
         />
         {walletTransactions}
       </VerticalFlexContainer>

@@ -29,6 +29,16 @@
   text-transform: uppercase;
 }
 
+.label {
+  font-size: 16px;
+  font-family: var(--font-medium);
+  font-weight: 500;
+  display: block;
+  letter-spacing: 0;
+  overflow: visible;
+  text-transform: uppercase;
+}
+
 .icon {
   margin-right: 10px;
   & > svg {

@@ -5,6 +5,7 @@ import Button from 'react-polymorph/lib/components/Button';
 import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import globalMessages from '../../i18n/global-messages';
 import styles from './WalletAdd.scss';
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 
@@ -38,26 +39,6 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.createTrezorWalletNotificationMessage',
     defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
-  },
-  buyTrezorMessage: {
-    id: 'footer.buyTrezorMessage',
-    defaultMessage: '!!!Buy Trezor',
-    description: 'Buy Trezor message shown in footer on the wallet add screen.',
-  },
-  howToConnectTrezorMessage: {
-    id: 'footer.howToConnectTrezorMessage',
-    defaultMessage: '!!!How to connect Trezor',
-    description: 'How to connect Trezor message shown in footer on the wallet add screen.',
-  },
-  howToCreateWalletMessage: {
-    id: 'footer.howToCreateWalletMessage',
-    defaultMessage: '!!!How to create wallet',
-    description: 'How to create wallet message shown in footer on the wallet add screen.',
-  },
-  howToRestoreWalletMessage: {
-    id: 'footer.howToRestoreWalletMessage',
-    defaultMessage: '!!!How to restore wallet',
-    description: 'How to restore wallet message shown in footer on the wallet add screen.',
   }
 });
 
@@ -149,22 +130,22 @@ export default class WalletAdd extends Component<Props> {
           <div className={styles.footer}>
             <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.buyIcon])} />
-              <span>{intl.formatMessage(messages.buyTrezorMessage)}</span>
+              <span>{intl.formatMessage(globalMessages.buyTrezorMessage)}</span>
             </a>
 
             <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.connectIcon])} />
-              <span>{intl.formatMessage(messages.howToConnectTrezorMessage)}</span>
+              <span>{intl.formatMessage(globalMessages.howToConnectTrezorMessage)}</span>
             </a>
 
             <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.createIcon])} />
-              <span>{intl.formatMessage(messages.howToCreateWalletMessage)}</span>
+              <span>{intl.formatMessage(globalMessages.howToCreateWalletMessage)}</span>
             </a>
 
             <a href="/" className={styles.link}>
               <div className={classnames([styles.footerIcon, styles.restoreIcon])} />
-              <span>{intl.formatMessage(messages.howToRestoreWalletMessage)}</span>
+              <span>{intl.formatMessage(globalMessages.howToRestoreWalletMessage)}</span>
             </a>
           </div>
         )}

@@ -9,8 +9,10 @@ const Layout = resolver('containers/MainLayout');
 export default class NoWalletsPage extends Component<any> {
 
   render() {
+    const { stores } = this.props;
+    const { theme } = stores;
     return (
-      <Layout>
+      <Layout oldTheme={theme.old}>
         <div />
       </Layout>
     );

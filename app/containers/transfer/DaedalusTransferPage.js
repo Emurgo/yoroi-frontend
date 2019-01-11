@@ -85,7 +85,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   render() {
     const { stores, actions } = this.props;
-    const { topbar } = stores;
+    const { topbar, theme } = stores;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -97,6 +97,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        oldTheme={theme.old}
       />
     );
     const wallets = this._getWalletsStore();
@@ -104,7 +105,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} oldTheme={theme.old} withFooter={!theme.old}>
             <DaedalusTransferInstructionsPage
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               onAnswerYes={this.goToReceiveScreen}
@@ -115,7 +116,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case 'gettingMnemonics':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} oldTheme={theme.old}>
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFunds}
               onBack={this.backToUninitialized}
@@ -128,7 +129,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
       case 'checkingAddresses':
       case 'generatingTx':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} oldTheme={theme.old}>
             <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
           </MainLayout>
         );
@@ -137,7 +138,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           return null; // TODO: throw error? Shoudln't happen
         }
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} oldTheme={theme.old}>
             <DaedalusTransferSummaryPage
               formattedWalletAmount={formattedWalletAmount}
               transferTx={daedalusTransfer.transferTx}
@@ -150,7 +151,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case 'error':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} oldTheme={theme.old}>
             <DaedalusTransferErrorPage
               error={daedalusTransfer.error}
               onCancel={this.cancelTransferFunds}

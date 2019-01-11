@@ -29,6 +29,10 @@ export default {
   '--theme-autocomplete-hover-border-color': '#353535',
   '--theme-autocomplete-error-color': '#ea4c5b',
 
+  '--theme-bordered-box-background-color': '#f3f3f5',
+  '--theme-bordered-box-border': '1px solid #f3f3f5',
+  '--theme-bordered-box-text-color': '#2b2c32',
+
   '--theme-button-primary-background-color': '#17d1aa',
   '--theme-button-primary-background-color-hover': '#17e2b8',
   '--theme-button-primary-background-color-active': '#12b190',
@@ -94,12 +98,25 @@ export default {
   '--theme-modal-overlay-background-color': 'rgba(0, 0, 0, 0.4)',
   '--theme-modal-background-color': '#ffffff',
 
-  //   '--theme-topbar-category-background-color-hover': '#4760ff',
+  '--theme-nav-item-background-color': '#f0f3f5',
+  '--theme-nav-item-background-color-hover': '#f9f9fa',
+  '--theme-nav-item-background-color-active': '#fff',
+  '--theme-nav-item-text-color': '#adaeb6',
+  '--theme-nav-item-text-color-active': '#2b2c32',
+
+  '--theme-topbar-category-background-color-hover': 'transparent',
   '--theme-topbar-category-text-color': '#ffffff',
   '--theme-topbar-background-color': 'linear-gradient(to right, #1e46bd, #4760ff)',
   '--theme-topbar-wallet-name-color': '#ffffff',
   '--theme-topbar-wallet-info-color': '#ffffff',
   '--theme-topbar-layout-body-background-color': '#ffffff',
+
+  '--theme-icon-nav-color': 'rgba(18, 19, 39, 0.6)',
+  '--theme-icon-nav-color-active': '#ffffff',
+  '--theme-icon-topbar-color': '#ffffff',
+  '--theme-icon-toggle-menu-color': '#ffffff',
+  '--theme-icon-ada-summary-wallet-amount-symbol-color': '#2b2c32',
+  '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#2b2c32',
 
   '--theme-wallet-add-color': '#ffffff',
   '--theme-wallet-add-translucent-color': 'rgba(255, 255, 255, 0.5)',
@@ -119,6 +136,8 @@ export default {
   '--theme-mnemonic-border-color': '#9b9b9b',
   '--theme-mnemonic-border-filled-color': '#4a4a4a',
   '--theme-mnemonic-button-text-color': '#353535',
+
+  '--theme-separation-border-color': '#dfe4e8',
 
   '--theme-banner-warning-background-color': '#f5a623',
   '--theme-trezor-connect-dialog-middle-block-common-background-color': '#ffffff',

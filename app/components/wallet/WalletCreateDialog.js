@@ -202,6 +202,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         closeOnOverlayClick
         onClose={!isSubmitting ? onCancel : null}
         closeButton={<DialogCloseButton />}
+        oldTheme={oldTheme}
       >
         <Input
           className="walletName"

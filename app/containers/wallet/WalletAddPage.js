@@ -57,7 +57,7 @@ export default class WalletAddPage extends Component<Props> {
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
         oldTheme={theme.old}
-        areCategoriesVisible={theme.old}
+        areCategoriesHidden={!theme.old}
       />);
 
     const wallets = this._getWalletsStore();

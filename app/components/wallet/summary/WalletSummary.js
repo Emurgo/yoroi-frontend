@@ -31,6 +31,7 @@ type Props = {
   numberOfTransactions: number,
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
+  oldTheme: boolean
 };
 
 @observer
@@ -44,11 +45,13 @@ export default class WalletSummary extends Component<Props> {
     const {
       pendingAmount,
       numberOfTransactions,
-      isLoadingTransactions
+      isLoadingTransactions,
+      oldTheme
     } = this.props;
     const { intl } = this.context;
+    const componentClasses = oldTheme ? styles.componentOld : styles.component;
     return (
-      <div className={styles.component}>
+      <div className={componentClasses}>
         <BorderedBox>
           {pendingAmount.incoming.greaterThan(0) &&
             <div className={styles.pendingConfirmation}>

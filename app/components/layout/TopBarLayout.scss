@@ -1,5 +1,6 @@
 $topBarOldHeight: 64px;
 $topBarHeight: 58px;
+$footerHeight: 60px;
 
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
@@ -38,6 +39,10 @@ $topBarHeight: 58px;
 // .content {
 //   height: calc(100% - #{$topBarHeight});
 // }
+
+.contentFooter {
+  height: calc(100% - #{$footerHeight});
+}
 
 .contentWrapper {
   height: 100%;

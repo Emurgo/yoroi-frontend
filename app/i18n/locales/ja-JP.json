@@ -51,6 +51,7 @@
   "footer.howToConnectTrezorMessage": "!!!How to connect Trezor",
   "footer.howToCreateWalletMessage": "!!!How to create wallet",
   "footer.howToRestoreWalletMessage": "!!!How to restore wallet",
+  "footer.whatIsAHarwareWalletMessage": "!!!What is a harware wallet?",
   "global.errors.fieldIsRequired": "この項目は必須です。",
   "global.errors.invalidHardwareWalletName": "1文字以上40文字以下のウォレット名を入力してください。",
   "global.errors.invalidRepeatPassword": "一致しません。",

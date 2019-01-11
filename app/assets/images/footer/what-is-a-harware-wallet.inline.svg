@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>what-is-a-harware-wallet.inline</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="20" height="19"></rect>
+    </defs>
+    <g id="what-is-a-harware-wallet.inline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="wallet-copy-2">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Rectangle" opacity="0"></g>
+            <g id="wallet-(1)-copy-3" mask="url(#mask-2)">
+                <g transform="translate(1.000000, 0.000000)">
+                    <rect id="Rectangle" stroke="#4A4A4A" stroke-width="1.3" fill="none" x="0.65" y="6.65" width="16.7" height="11.7" rx="2"></rect>
+                    <path d="M15.2132133,3.79557993 C14.8939506,2.94921212 13.8517721,2.4897832 12.8854845,2.76941082 L5.58181311,4.92595321 L15.6162379,4.92595321 L15.2132133,3.79557993 Z" id="Path" stroke="none" fill="#4A4A4A" fill-rule="evenodd"></path>
+                    <path d="M4.19071338,4.32375113 L12.2114374,2.46244986 L11.7886698,1.76643904 C11.5120719,1.31403201 10.8374428,1.12720805 10.2819982,1.35249576 L3.13542729,4.23727745 L4.19071338,4.32375113 Z" id="Path" stroke="none" fill="#4A4A4A" fill-rule="evenodd" transform="translate(7.673432, 2.790322) rotate(-6.000000) translate(-7.673432, -2.790322) "></path>
+                    <polyline id="Path-2" stroke="#4A4A4A" stroke-width="1" fill="none" points="5.44262608 18.5064866 5.44262608 16 3.44141667 13.9664792 3.44141667 10.3777922"></polyline>
+                    <polyline id="Path-2-Copy-2" stroke="#4A4A4A" stroke-width="1" fill="none" points="7.44262608 18.5064866 7.44262608 15.384117 7.44262608 12.2588235"></polyline>
+                    <polyline id="Path-2-Copy-3" stroke="#4A4A4A" stroke-width="1" fill="none" points="12 10.2476631 12 8.62459147 12 7"></polyline>
+                    <circle id="Oval" stroke="none" fill="#4A4A4A" fill-rule="evenodd" cx="3.5" cy="10" r="1"></circle>
+                    <circle id="Oval-Copy" stroke="none" fill="#4A4A4A" fill-rule="evenodd" cx="7.5" cy="12" r="1"></circle>
+                    <circle id="Oval-Copy-2" stroke="none" fill="#4A4A4A" fill-rule="evenodd" cx="15" cy="14" r="1"></circle>
+                    <circle id="Oval-Copy-3" stroke="none" fill="#4A4A4A" fill-rule="evenodd" cx="12" cy="10" r="1"></circle>
+                    <polyline id="Path-2-Copy" stroke="#4A4A4A" stroke-width="1" fill="none" points="9.44262608 18.5064866 9.44262608 16 11.097712 14.0175728 14.0928755 14.0175728"></polyline>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

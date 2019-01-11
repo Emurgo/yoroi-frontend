@@ -10,14 +10,15 @@ type Props = {
   active: boolean,
   onClick: Function,
   className: string,
+  oldTheme: boolean
 };
 
 @observer
 export default class TopBarCategory extends Component<Props> {
   render() {
-    const { icon, active, onClick, className } = this.props;
+    const { icon, active, onClick, className, oldTheme } = this.props;
     const componentStyles = classNames([
-      styles.component,
+      oldTheme ? styles.componentOld : styles.component,
       active ? styles.active : null,
       className
     ]);

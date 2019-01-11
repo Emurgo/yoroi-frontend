@@ -51,6 +51,7 @@
   "footer.howToConnectTrezorMessage": "!!!How to connect Trezor",
   "footer.howToCreateWalletMessage": "!!!How to create wallet",
   "footer.howToRestoreWalletMessage": "!!!How to restore wallet",
+  "footer.whatIsAHarwareWalletMessage": "!!!What is a harware wallet?",
   "global.errors.fieldIsRequired": "该字段为必填字段。",
   "global.errors.invalidHardwareWalletName": "钱包名称需要最少 1 个，最多 40 个字母。",
   "global.errors.invalidRepeatPassword": "不匹配。",

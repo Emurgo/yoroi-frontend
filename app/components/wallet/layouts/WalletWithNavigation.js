@@ -9,6 +9,7 @@ type Props = {
   children?: Node,
   isActiveScreen: Function,
   onWalletNavItemClick: Function,
+  oldTheme: boolean
 };
 
 @observer
@@ -18,13 +19,14 @@ export default class WalletWithNavigation extends Component<Props> {
   };
 
   render() {
-    const { children, isActiveScreen, onWalletNavItemClick } = this.props;
+    const { children, isActiveScreen, onWalletNavItemClick, oldTheme } = this.props;
     return (
       <div className={styles.component}>
         <div className={styles.navigation}>
           <WalletNavigation
             isActiveNavItem={isActiveScreen}
             onNavItemClick={onWalletNavItemClick}
+            oldTheme={oldTheme}
           />
         </div>
         <div className={styles.page}>

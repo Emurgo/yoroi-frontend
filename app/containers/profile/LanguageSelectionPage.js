@@ -38,6 +38,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        oldTheme={theme.old}
       />);
     return (
       <TopBarLayout

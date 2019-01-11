@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
+import Footer from '../footer/Footer';
 import styles from './TopBarLayout.scss';
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
   isTopBarVisible?: boolean,
   isBannerVisible?: boolean,
   languageSelectionBackground?: boolean,
+  withFooter? : boolean,
   oldTheme?: boolean
 };
 
@@ -26,6 +28,7 @@ export default class TopBarLayout extends Component<Props> {
     isTopBarVisible: true,
     isBannerVisible: true,
     languageSelectionBackground: false,
+    withFooter: false,
     oldTheme: false
   };
 
@@ -38,6 +41,7 @@ export default class TopBarLayout extends Component<Props> {
       isTopBarVisible,
       isBannerVisible,
       languageSelectionBackground,
+      withFooter,
       oldTheme
     } = this.props;
     const componentClasses = classnames([
@@ -46,6 +50,10 @@ export default class TopBarLayout extends Component<Props> {
     ]);
     const topbarClasses = classnames([
       oldTheme ? styles.topbarOld : styles.topbar,
+    ]);
+    const contentClasses = classnames([
+      styles.content,
+      withFooter ? styles.contentFooter : ''
     ]);
 
     return (
@@ -61,10 +69,12 @@ export default class TopBarLayout extends Component<Props> {
 
           {notification}
           <div className={styles.contentWrapper}>
-            <div className={styles.content}>
+            <div className={contentClasses}>
               {children}
             </div>
           </div>
+
+          {withFooter && <Footer />}
         </div>
       </div>
     );

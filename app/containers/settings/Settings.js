@@ -36,7 +36,7 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { topbar } = stores;
+    const { topbar, theme } = stores;
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
@@ -57,8 +57,11 @@ export default class Settings extends Component<InjectedContainerProps> {
             }}
             categories={topbar.CATEGORIES}
             activeTopbarCategory={topbar.activeTopbarCategory}
+            oldTheme={theme.old}
           />
         )}
+        oldTheme={theme.old}
+        withFooter={!theme.old}
       >
         <SettingsLayout menu={menu}>
           {children}

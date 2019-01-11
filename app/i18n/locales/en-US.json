@@ -51,6 +51,7 @@
   "footer.howToConnectTrezorMessage": "!!!How to connect Trezor",
   "footer.howToCreateWalletMessage": "!!!How to create wallet",
   "footer.howToRestoreWalletMessage": "!!!How to restore wallet",
+  "footer.whatIsAHarwareWalletMessage": "!!!What is a harware wallet?",
   "global.errors.fieldIsRequired": "This field is required.",
   "global.errors.invalidHardwareWalletName": "Wallet name requires at least 1 and at most 40 letters.",
   "global.errors.invalidRepeatPassword": "Doesn't match.",
