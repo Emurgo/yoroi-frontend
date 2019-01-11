@@ -2,7 +2,7 @@
   "parsePDF": {
     "PDFContent": "opqrmev edroxpwghg IS ELIGIBLE FOR 12345 TO BE REDEEMED WITH THE VENDING ADDRESS PcnwlQMQzjRtKvBCz38k-wMoIWZSBtzTT7rvfoARaF8= txboqa —————— TRANSACTION ID —————— llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw= —————— REDEMPTION KEY —————— ",
     "parametersError": "Invalid parameter in getDocument, need either Uint8Array, string or a parameter object",
-    "structureError": "Invalid PDF structure",
+    "structureError": "api.errors.parsePDFFileError: {}",
     "noKeyPDFContent": "opqrmev edroxpwghg IS ELIGIBLE FOR 12345 TO BE REDEEMED WITH THE VENDING ADDRESS PcnwlQMQzjRtKvBCz38k-wMoIWZSBtzTT7rvfoARaF8= txboqa —————— TRANSACTION ID —————— llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw= —————— NO KEY —————— ",
     "secretKey": "llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw="
   },
@@ -12,6 +12,6 @@
     "regularTitle": "regular",
     "forceVendedPDFContent": "opqrmev edroxpwghg IS ELIGIBLE FOR 12345 TO BE REDEEMED WITH THE VENDING ADDRESS PcnwlQMQzjRtKvBCz38k-wMoIWZSBtzTT7rvfoARaF8= txboqa —————— TRANSACTION ID —————— llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw= —————— REDEMPTION KEY —————— ",
     "data": ["nnmbsds@example.org", "uilfeet", "12345"],
-    "decryptionError": "Cannot read property 'buffer' of undefined"
+    "decryptionError": "DecryptionError: api.errors.decryptionError: {}"
   }
 }

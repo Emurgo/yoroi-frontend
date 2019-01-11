@@ -13,7 +13,7 @@ describe('PDF get secret key tests', () => {
     const { parsePDF } = mockData;
     const secretKey = pdfParser.getSecretKey(parsePDF.PDFContent);
 
-    assert.equal(secretKey, parsePDF.secretKey, 'Secret key does not equal content');
+    assert.equal(secretKey, parsePDF.secretKey, 'Secret key should equal specific content');
   });
 
   it('should fail if PDF is missing', () => {
