@@ -101,7 +101,4 @@ Feature: Wallet creation
     | global.errors.invalidWalletPassword |
   Examples:
   | wrongPassword |                         |
-  | aaSecret_123  | without upper case letters|
-  | aaSecret_123  | without lower case letters|
   | Secre1      | too short                 |
-  | SecretSecret| without numbers           |
