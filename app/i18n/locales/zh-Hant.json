@@ -64,7 +64,7 @@
   "global.language.japanese": "日本語",
   "global.language.korean": "한국어",
   "global.language.russian": "Pусский",
-  "global.passwordInstructions": "請注意，密碼要求具備至少 7 個字元，而且至少具備 1 個大寫字母、1 個小寫字母以及 1 數字。",
+  "global.passwordInstructions": "!!!Note: Password needs to be at least 12 characters long.",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "取消",
   "inline.editing.input.change.label": "變更",
