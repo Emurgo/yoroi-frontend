@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SettingsLayout from '../../components/settings/SettingsLayout';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
-import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
+import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
+import TopBar from '../../components/topbar/TopBar';
 import resolver from '../../utils/imports';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
@@ -18,10 +19,8 @@ const messages = defineMessages({
   },
 });
 
-@inject('stores', 'actions') @observer
+@observer
 export default class Settings extends Component<InjectedContainerProps> {
-
-  static defaultProps = { actions: null, stores: null };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -37,26 +36,29 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { sidebar } = stores;
+    const { topbar } = stores;
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
         isActiveItem={this.isActivePage}
-        hasActiveWallet={stores.ada.wallets.hasActiveWallet}
+        hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
       />
+    );
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
     return (
       <Layout
-        topbar={
-          <TextOnlyTopBar
-            title={this.context.intl.formatMessage(messages.title)}
+        topbar={(
+          <TopBar
+            title={topbarTitle}
             onCategoryClicked={category => {
-              actions.sidebar.activateSidebarCategory.trigger({ category });
+              actions.topbar.activateTopbarCategory.trigger({ category });
             }}
-            categories={sidebar.CATEGORIES}
-            activeSidebarCategory={sidebar.activeSidebarCategory}
+            categories={topbar.CATEGORIES}
+            activeTopbarCategory={topbar.activeTopbarCategory}
           />
-        }
+        )}
       >
         <SettingsLayout menu={menu}>
           {children}

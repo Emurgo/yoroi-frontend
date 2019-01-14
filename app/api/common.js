@@ -1,6 +1,15 @@
+// @flow
+
+// Define types that are exposed to connect to the API layer
+
+import BigNumber from 'bignumber.js';
 import { defineMessages } from 'react-intl';
+import type { Features } from 'trezor-connect';
+
 import LocalizableError from '../i18n/LocalizableError';
-import { WalletTransaction, Wallet } from '../domain/WalletTransaction';
+import WalletTransaction from '../domain/WalletTransaction';
+import WalletAddress from '../domain/WalletAddress';
+import Wallet from '../domain/Wallet';
 
 const messages = defineMessages({
   genericApiError: {
@@ -75,60 +84,69 @@ export class UnusedAddressesError extends LocalizableError {
   }
 }
 
-export type CreateTransactionResponse = any;
-export type CreateWalletResponse = Wallet;
-export type DeleteWalletResponse = boolean;
-export type GetLocalTimeDifferenceResponse = number;
-export type GetWalletsResponse = Array<Wallet>;
-export type GetWalletRecoveryPhraseResponse = Array<string>;
-export type RestoreWalletResponse = Wallet;
-export type UpdateWalletResponse = Wallet;
-export type UpdateWalletPasswordResponse = boolean;
+export type GetAddressesRequest = {
+  walletId: string
+};
+export type GetAddressesResponse = {
+  accountId: ?string,
+  addresses: Array<WalletAddress>
+};
+
+export type GetTransactionsRequesOptions = {
+  skip: number,
+  limit: number,
+};
+export type GetTransactionsRequest = {
+  walletId: string,
+} & GetTransactionsRequesOptions;
+export type GetTransactionsResponse = {
+  transactions: Array<WalletTransaction>,
+  total: number,
+};
 
 export type CreateWalletRequest = {
   name: string,
   mnemonic: string,
   password: string,
 };
-
-export type UpdateWalletPasswordRequest = {
-  walletId: string,
-  oldPassword: string,
-  newPassword: string,
-};
+export type CreateWalletResponse = Wallet;
 
 export type DeleteWalletRequest = {
   walletId: string,
 };
+export type DeleteWalletResponse = boolean;
 
 export type RestoreWalletRequest = {
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
 };
+export type RestoreWalletResponse = Wallet;
 
-export type GetSyncProgressResponse = {
-  localDifficulty: ?number,
-  networkDifficulty: ?number,
+export type CreateTrezorWalletRequest = {
+  publicMasterKey: string,
+  walletName: string,
+  deviceFeatures: Features
 };
+export type CreateTrezorWalletResponse = Wallet;
 
-export type GetTransactionsRequest = {
+export type UpdateWalletPasswordRequest = {
   walletId: string,
-  skip: number,
-  limit: number,
+  oldPassword: string,
+  newPassword: string,
 };
+export type UpdateWalletPasswordResponse = boolean;
 
-export type GetTransactionsResponse = {
-  transactions: Array<WalletTransaction>,
-  total: number,
-};
+export type UpdateWalletResponse = Wallet;
+
+export type CreateTransactionResponse = Array<void>;
+
+export type SendTrezorSignedTxResponse = Array<void>;
+
+export type GetWalletsResponse = Array<Wallet>;
+
+export type GenerateWalletRecoveryPhraseResponse = Array<string>;
+
+export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 
 export type GetBalanceResponse = BigNumber;
-
-export type SendBugReportRequest = {
-  email: string,
-  subject: string,
-  problem: string,
-  logs: Array<string>,
-};
-export type SendBugReportResponse = any;

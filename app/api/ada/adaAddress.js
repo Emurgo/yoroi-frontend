@@ -1,4 +1,8 @@
 // @flow
+
+// Handles "Addresses" as defined in the bip44 specification
+// Also handles interfacing with the LovefieldDB for everything related purely to addresses.
+
 import { Wallet } from 'rust-cardano-crypto';
 import _ from 'lodash';
 import config from '../../config';
@@ -12,6 +16,9 @@ import {
   getAddressesList,
   getAddressesListByType,
   deleteAddress
+} from './lib/lovefieldDatabase';
+import type {
+  AddressesTableRow
 } from './lib/lovefieldDatabase';
 import {
   UnusedAddressesError,
@@ -32,7 +39,7 @@ const { MAX_ALLOWED_UNUSED_ADDRESSES } = config.wallets;
 
 export function isValidAdaAddress(address: string): Promise<boolean> {
   try {
-    const result = getResultOrFail(Wallet.checkAddress(getAddressInHex(address)));
+    const result: boolean = getResultOrFail(Wallet.checkAddress(getAddressInHex(address)));
     return Promise.resolve(result);
   } catch (validateAddressError) {
     Logger.error('adaAddress::isValidAdaAddress error: ' +
@@ -43,21 +50,27 @@ export function isValidAdaAddress(address: string): Promise<boolean> {
   }
 }
 
-/* Just return all existing addresses because we are using a SINGLE account */
-export function getAdaAddressesMap() {
-  return getAddresses().then(addresses => {
-    const addressesMap = {};
-    addresses.forEach(address => {
-      addressesMap[address.id] = address.value;
-    });
-    return addressesMap;
-  });
+export type AdaAddressMap = {[key: string]:AdaAddress}
+
+/** Get a mapping of address hash to AdaAddress */
+export function getAdaAddressesMap(): Promise<AdaAddressMap> {
+  // Just return all existing addresses because we are using a SINGLE account
+  // TODO: make this work for multiple accounts in case we add multiple accounts eventually
+  return getAddresses().then(
+    addresses => addressesToAddressMap(addresses.map(r => r.value))
+  );
 }
 
-export function getAdaAddressesList() {
+export function addressesToAddressMap(addresses: Array<AdaAddress>): AdaAddressMap {
+  return _.keyBy(addresses, a => a.cadId);
+}
+
+/** Wrapper function for LovefieldDB call to get all AdaAddresses */
+export function getAdaAddressesList(): Promise<Array<AdaAddress>> {
   return getAddressesList();
 }
 
+/** Wrapper function for LovefieldDB call to get all AdaAddresses by type */
 export function getAdaAddressesByType(addressType: AddressType): Promise<AdaAddresses> {
   return getAddressesListByType(addressType);
 }
@@ -65,55 +78,69 @@ export function getAdaAddressesByType(addressType: AddressType): Promise<AdaAddr
 export async function newExternalAdaAddress(
   cryptoAccount: CryptoAccount
 ): Promise<AdaAddress> {
-  const addresses: AdaAddresses = await getAdaAddressesByType('External');
-  const lastUsedAddressIndex = _.findLastIndex(addresses, address => address.cadIsUsed) + 1;
-  // TODO Move this to a config file
-  const unusedSpan = addresses.length - lastUsedAddressIndex;
-  if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) {
-    throw new UnusedAddressesError();
-  }
-  const newAddress: AdaAddress = await newAdaAddress(cryptoAccount, addresses, 'External');
-  return newAddress;
+  return await newAdaAddress(cryptoAccount, 'External', addresses => {
+    // We use the isUsed status to now find the next unused address
+    const lastUsedAddressIndex = _.findLastIndex(addresses, address => address.cadIsUsed) + 1;
+    // TODO Move this to a config file
+    const unusedSpan = addresses.length - lastUsedAddressIndex;
+    if (unusedSpan >= MAX_ALLOWED_UNUSED_ADDRESSES) {
+      throw new UnusedAddressesError();
+    }
+  });
 }
 
-/* Create and save the next address for the given account */
+/** Create and save the next address for the given account */
 export async function newAdaAddress(
   cryptoAccount: CryptoAccount,
-  addresses: AdaAddresses,
-  addressType: AddressType
+  addressType: AddressType,
+  addrValidation?: (AdaAddresses => void)
 ): Promise<AdaAddress> {
-  const address: AdaAddress = await createAdaAddress(cryptoAccount, addresses, addressType);
+  const address: AdaAddress = await createAdaAddress(cryptoAccount, addressType, addrValidation);
   await saveAdaAddress(address, addressType);
   return address;
 }
 
+/** Create new wallet address based off bip44 and then convert it to an AdaAddress */
 export async function createAdaAddress(
   cryptoAccount: CryptoAccount,
-  addresses: AdaAddresses,
-  addressType: AddressType
+  addressType: AddressType,
+  addrValidation?: (AdaAddresses => void)
 ): Promise<AdaAddress> {
+  // Note this function doesn't just get the addresses but also calculates their isUsed status
   const filteredAddresses = await getAdaAddressesByType(addressType);
+  if (addrValidation) {
+    addrValidation(filteredAddresses);
+  }
   const addressIndex = filteredAddresses.length;
-  const [address] = getResultOrFail(
-    Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex]));
+  const [address]: Array<string> = getResultOrFail(
+    Wallet.generateAddresses(cryptoAccount, addressType, [addressIndex])
+  );
   return toAdaAddress(cryptoAccount.account, addressType, addressIndex, address);
 }
 
-export function saveAdaAddress(address: AdaAddress, addressType: AddressType): Promise<void> {
+/** Wrapper function to save addresses to LovefieldDB */
+export function saveAdaAddress(
+  address: AdaAddress,
+  addressType: AddressType
+): Promise<Array<AddressesTableRow>> {
   return saveAddresses([address], addressType);
 }
 
-export function removeAdaAddress(address: AdaAddress): void {
-  deleteAddress(address.cadId);
+/** Wrapper function to remove an addresse from LovefieldDB */
+export function removeAdaAddress(
+  address: AdaAddress
+): Promise<Array<void>> {
+  return deleteAddress(address.cadId);
 }
 
+/** Save list of addresses from lovefieldDB */
 export async function saveAsAdaAddresses(
   cryptoAccount: CryptoAccount,
   addresses: Array<string>,
   addressType: AddressType
-): Promise<void> {
-  const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) =>
+): Promise<Array<AddressesTableRow>> {
+  const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) => (
     toAdaAddress(cryptoAccount.account, addressType, index, hash)
-  );
+  ));
   return saveAddresses(mappedAddresses, addressType);
 }

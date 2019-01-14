@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import TopBar from '../components/layout/TopBar';
+import TopBar from '../components/topbar/TopBar';
+import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
 import resolver from '../utils/imports';
@@ -12,23 +13,24 @@ type Props = InjectedProps;
 
 @observer
 export default class TopBarContainer extends Component<Props> {
-  static defaultProps = { actions: null, stores: null };
 
   render() {
     const { actions, stores } = this.props;
-    const { app, sidebar } = stores;
+    const { app, topbar } = stores;
 
+    const title = (<WalletTopbarTitle
+      wallet={stores.substores[environment.API].wallets.active}
+      currentRoute={app.currentRoute}
+      formattedWalletAmount={formattedWalletAmount}
+    />);
     return (
       <TopBar
-        wallets={stores[environment.API].wallets}
-        currentRoute={app.currentRoute}
-        showSubMenus={false}
-        formattedWalletAmount={formattedWalletAmount}
+        title={title}
         onCategoryClicked={category => {
-          actions.sidebar.activateSidebarCategory.trigger({ category });
+          actions.topbar.activateTopbarCategory.trigger({ category });
         }}
-        categories={sidebar.CATEGORIES}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
+        categories={topbar.CATEGORIES}
+        activeTopbarCategory={topbar.activeTopbarCategory}
       />
     );
   }

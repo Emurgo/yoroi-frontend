@@ -1,16 +1,14 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 
 type Props = InjectedDialogContainerProps;
 
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletBackupDialogContainer extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null, children: null, onClose: () => {} };
 
   onCancelBackup = () => {
     this.props.onClose();
@@ -24,7 +22,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       enteredPhrase,
       isRecoveryPhraseValid,
       countdownRemaining,
-      recoveryPhraseShuffled,
+      recoveryPhraseSorted,
       isTermDeviceAccepted,
       isTermRecoveryAccepted,
       isPrivacyNoticeAccepted,
@@ -41,7 +39,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       acceptPrivacyNoticeForWalletBackup,
       continueToRecoveryPhraseForWalletBackup
     } = actions.walletBackup;
-    const { createWalletRequest } = stores[environment.API].wallets;
+    const { createWalletRequest } = stores.substores[environment.API].wallets;
     return (
       <WalletBackupDialog
         // Global props for all dialogs
@@ -71,7 +69,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
           finishWalletBackup.trigger();
         }}
         onRestartBackup={restartWalletBackup.trigger}
-        recoveryPhraseShuffled={recoveryPhraseShuffled}
+        recoveryPhraseSorted={recoveryPhraseSorted}
       />
     );
   }

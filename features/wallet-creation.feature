@@ -81,12 +81,11 @@ Feature: Wallet creation
     And I enter the name "<invalidWalletName>"
     And I click the "Create personal wallet" button
     Then I should stay in the create wallet dialog
-    And I should see "Wallet name requires at least 3 and at most 40 letters." error message:
+    And I should see "Wallet name requires at least 1 and at most 40 letters." error message:
     | message                             |
     | global.errors.invalidWalletName     |
     Examples:
     | invalidWalletName                        |               |
-    | ab                                       |2 letters name |
     | qwertyuiopasdfghjklzxcvbnmzxcvbnmlkjhgfds|41 letters name| 
 
   @it-7

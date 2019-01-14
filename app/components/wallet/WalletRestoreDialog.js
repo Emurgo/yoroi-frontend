@@ -82,11 +82,14 @@ type Props = {
   isSubmitting: boolean,
   mnemonicValidator: Function,
   error?: ?LocalizableError,
-  suggestedMnemonics: Array<string>,
+  validWords: Array<string>,
 };
 
 @observer
 export default class WalletRestoreDialog extends Component<Props> {
+  static defaultProps = {
+    error: undefined
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -174,7 +177,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { suggestedMnemonics, isSubmitting, error, onCancel } = this.props;
+    const { validWords, isSubmitting, error, onCancel } = this.props;
 
     const dialogClasses = classnames([
       styles.component,
@@ -224,7 +227,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         />
 
         <Autocomplete
-          options={suggestedMnemonics}
+          options={validWords}
           maxSelections={15}
           {...recoveryPhraseField.bind()}
           error={recoveryPhraseField.error}

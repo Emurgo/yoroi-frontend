@@ -1,7 +1,9 @@
+// @flow
+
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 
 async function checkErrorByTranslationId(client, errorSelector, error) {
   await client.waitUntilText(errorSelector, await client.intl(error.message));
@@ -54,9 +56,9 @@ When(/^I enter random mnemonic phrase$/, async function () {
     await this.click(`//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${i}]`, By.xpath);
   }
   const words = await this.driver.findElement(By.xpath("//div[@class='WalletRecoveryPhraseMnemonic_component']"));
-  words.getText().then(function (text) {
-    expect(text).to.not.equal("");
-  });
+  words.getText().then(text => (
+    expect(text).to.not.equal('')
+  )).catch(err => assert.fail(err.message));
 });
 
 Then(/^I click Clear button$/, async function () {
@@ -64,7 +66,7 @@ Then(/^I click Clear button$/, async function () {
 });
 
 Then(/^I see All selected words are cleared$/, async function () {
-  await this.waitUntilText('.WalletRecoveryPhraseMnemonic_component', "", 5000);
+  await this.waitUntilText('.WalletRecoveryPhraseMnemonic_component', '', 5000);
 });
 
 Then(/^I should stay in the create wallet dialog$/, async function () {
@@ -72,7 +74,7 @@ Then(/^I should stay in the create wallet dialog$/, async function () {
   await this.waitUntilText('.Dialog_title', createMessage.toUpperCase(), 2000);
 });
 
-Then(/^I should see "Wallet name requires at least 3 and at most 40 letters." error message:$/, async function (data) {
+Then(/^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/, async function (data) {
   const error = data.hashes()[0];
   const errorSelector = '.SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);

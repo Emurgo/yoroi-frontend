@@ -1,40 +1,41 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import TopBarContainer from './TopBarContainer';
-import SidebarLayout from '../components/layout/SidebarLayout';
-import type { StoresMap } from '../stores/index';
-import type { ActionsMap } from '../actions/index';
+import TopBarLayout from '../components/layout/TopBarLayout';
+import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBanner';
+import type { InjectedContainerProps } from '../types/injectedPropsType';
 
-export type MainLayoutProps = {
-  stores: any | StoresMap,
-  actions: any | ActionsMap,
-  children: Node,
-  topbar: ?any
+export type MainLayoutProps = InjectedContainerProps & {
+  topbar: ?Node,
+  footer: ?Node,
 };
 
-@inject('stores', 'actions') @observer
+@observer
 export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
-    actions: null,
-    stores: null,
-    children: null,
     topbar: null,
-    onClose: () => {}
+    footer: null,
   };
 
   render() {
-    const { actions, stores, topbar } = this.props;
+    const {
+      actions,
+      stores,
+      topbar,
+      footer,
+    } = this.props;
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
     return (
-      <SidebarLayout
+      <TopBarLayout
+        banner={<TestnetWarningBanner />}
         topbar={topbarComponent}
         notification={<div />}
-        contentDialogs={[]}
+        footer={footer}
       >
         {this.props.children}
-      </SidebarLayout>
+      </TopBarLayout>
     );
   }
 }
