@@ -58,7 +58,7 @@ jobs:
       - run: sudo rm -f /usr/local/bin/firefox
       - run: sudo apt install firefox-esr
       - run: sudo ln -s /usr/bin/firefox-esr /usr/local/bin/firefox
-      
+
       - run: npm run test-e2e-firefox
 
   deploy-testnet:
@@ -80,6 +80,12 @@ workflows:
   build-deploy:
     jobs:
       - build-setup
+      - test-chrome:
+          requires:
+            - build-setup
+      - test-firefox:
+          requires:
+            - build-setup
       - deploy-testnet:
           requires:
             - build-setup
