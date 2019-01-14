@@ -7,7 +7,7 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import styles from './TestnetWarningBanner.scss';
 import environment from '../../../environment';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   testnetLabel: {
     id: 'testnet.label.message',
     defaultMessage: '!!!Warning: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
