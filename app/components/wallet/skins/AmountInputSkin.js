@@ -17,6 +17,7 @@ type Props = {
   fees: BigNumber,
   total: BigNumber,
   error: boolean,
+  oldTheme: boolean
 };
 
 export default class AmountInputSkin extends Component<Props> {
@@ -26,18 +27,21 @@ export default class AmountInputSkin extends Component<Props> {
   };
 
   render() {
-    const { error, fees, total, currency } = this.props;
+    const { error, fees, total, currency, oldTheme } = this.props;
     const { intl } = this.context;
+
+    const feesClasses = oldTheme ? styles.feesOld : styles.fees;
+    const totalClasses = oldTheme ? styles.totalOld : styles.total;
 
     return (
       <div className={styles.root}>
         <InputSkin {...this.props} />
         {!error && (
-          <span className={styles.fees}>
+          <span className={feesClasses}>
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
           </span>
         )}
-        <span className={styles.total}>
+        <span className={totalClasses}>
           {!error && `= ${total} `}{currency}
         </span>
       </div>

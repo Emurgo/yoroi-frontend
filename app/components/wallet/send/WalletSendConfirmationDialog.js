@@ -7,6 +7,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import Input from 'react-polymorph/lib/components/Input';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import InputOwnSkin from '../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import Dialog from '../../widgets/Dialog';
@@ -46,6 +47,7 @@ type Props = {
   isSubmitting: boolean,
   error: ?LocalizableError,
   currencyUnit: string,
+  oldTheme: boolean
 };
 
 @observer
@@ -105,7 +107,8 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       transactionFee,
       isSubmitting,
       error,
-      currencyUnit
+      currencyUnit,
+      oldTheme
     } = this.props;
 
     const confirmButtonClasses = classnames([
@@ -133,8 +136,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         actions={actions}
         closeOnOverlayClick
         onClose={!isSubmitting ? onCancel : null}
-        className={styles.dialog}
+        className={oldTheme ? styles.dialogOld : styles.dialog}
         closeButton={<DialogCloseButton />}
+        oldTheme={oldTheme}
       >
         <div className={styles.walletPasswordFields}>
           <div className={styles.addressToLabelWrapper}>
@@ -179,7 +183,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
             />
           }
         </div>

@@ -59,7 +59,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   render() {
     const { copiedAddress } = this.state;
     const actions = this.props.actions;
-    const { uiNotifications } = this.props.stores;
+    const { uiNotifications, theme } = this.props.stores;
     const { wallets, addresses } = this.props.stores.substores.ada;
     const wallet = wallets.active;
 
@@ -80,6 +80,14 @@ export default class WalletReceivePage extends Component<Props, State> {
         />
       ),
     };
+    const notificationComponent = (
+      <NotificationMessage
+        icon={successIcon}
+        show={uiNotifications.isOpen(notification.id)}
+      >
+        {notification.message}
+      </NotificationMessage>
+    );
 
     return (
       <VerticalFlexContainer>
@@ -98,14 +106,11 @@ export default class WalletReceivePage extends Component<Props, State> {
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
+          oldTheme={theme.old}
+          notification={notificationComponent}
         />
 
-        <NotificationMessage
-          icon={successIcon}
-          show={uiNotifications.isOpen(notification.id)}
-        >
-          {notification.message}
-        </NotificationMessage>
+        {theme.old && notificationComponent}
 
       </VerticalFlexContainer>
     );

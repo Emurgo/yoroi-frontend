@@ -20,7 +20,8 @@ type Props = {
   onSubmit: Function,
   isSubmitting: boolean,
   onCancel: Function,
-  error: ?LocalizableError
+  error: ?LocalizableError,
+  oldTheme: boolean
 };
 
 /** Show user what the transfer would do to get final confirmation */
@@ -34,7 +35,7 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { transferTx, isSubmitting, error, formattedWalletAmount,
-      onSubmit, onCancel } = this.props;
+      onSubmit, onCancel, oldTheme } = this.props;
 
     return (
       <TransferSummaryPage
@@ -45,6 +46,7 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
         onCancel={onCancel}
         error={error}
         addressFromSubLabel={intl.formatMessage(messages.addressFromSubLabel)}
+        oldTheme={oldTheme}
       />
     );
   }

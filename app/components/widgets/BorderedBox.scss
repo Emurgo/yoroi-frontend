@@ -1,5 +1,16 @@
-.component {
+.componentOld {
   background: var(--theme-bordered-box-background-color);
   border: var(--theme-bordered-box-border);
   padding: 20px;
+}
+
+.component {
+  background: var(--theme-bordered-box-background-color);
+  border: var(--theme-bordered-box-border);
+  padding: 30px;
+  border-radius: 8px;
+
+  label {
+    background: var(--theme-bordered-box-background-color);
+  }
 }

@@ -24,6 +24,7 @@ type Props = {
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
   disableTransferFunds: boolean,
+  oldTheme: boolean
 };
 
 @observer
@@ -39,6 +40,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
       onFollowInstructionsPrerequisites,
       onConfirm,
       disableTransferFunds,
+      oldTheme
     } = this.props;
 
     return (
@@ -48,6 +50,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
         disableTransferFunds={disableTransferFunds}
         attentionText={intl.formatMessage(messages.attentionText)}
         confirmationText={intl.formatMessage(messages.confirmationText)}
+        oldTheme={oldTheme}
       />
     );
   }

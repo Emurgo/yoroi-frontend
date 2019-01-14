@@ -17,16 +17,17 @@ type Props = {
 export default class TopBarCategory extends Component<Props> {
   render() {
     const { icon, active, onClick, className, oldTheme } = this.props;
+    const activeClasses = oldTheme ? styles.activeOld : styles.active;
     const componentStyles = classNames([
       oldTheme ? styles.componentOld : styles.component,
-      active ? styles.active : null,
+      active ? activeClasses : null,
       className
     ]);
 
     const iconStyles = classNames([
       className === 'wallets' ? styles.walletsIcon : null,
       className === 'with-trezor-t' ? styles.withTrezorTIcon : null,
-      styles.icon
+      oldTheme ? styles.iconOld : styles.icon
     ]);
 
     return (

@@ -6,6 +6,7 @@ import environment from '../../environment';
 import { WITH_TREZOR_T_CATEGORIE } from '../../config/topbarConfig';
 
 const topbarConfig = resolver('config/topbarConfig');
+const topbarNewConfig = resolver('config/topbarNewConfig');
 
 export default class TopbarStore extends Store {
 
@@ -23,8 +24,8 @@ export default class TopbarStore extends Store {
   }
 
   /** Dynamic Initialization of Topbar Categories */
-  @action initCategories() {
-    this.CATEGORIES = topbarConfig.CATEGORIES;
+  @action initCategories(oldTheme: ?boolean) {
+    this.CATEGORIES = oldTheme ? topbarConfig.CATEGORIES : topbarNewConfig.CATEGORIES;
 
     // If active wallet is TrezorTWallet then show with Trezor Icon
     const { wallets } = this.stores.substores[environment.API];

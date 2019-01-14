@@ -10,6 +10,9 @@
   }
 
 .testnetWarning {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-family: var(--font-regular);
   text-align: center;
   color: white;
@@ -29,5 +32,10 @@
     font-family: var(--font-bold);
     text-transform: uppercase;
   }
+}
+
+.warningIcon {
+  display: inline-flex;
+  margin-right: 5px;
 }
   

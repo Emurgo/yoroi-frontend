@@ -111,6 +111,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               onAnswerYes={this.goToReceiveScreen}
               onConfirm={this.startTransferFunds}
               disableTransferFunds={daedalusTransfer.disableTransferFunds}
+              oldTheme={theme.old}
             />
           </MainLayout>
         );
@@ -122,6 +123,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               onBack={this.backToUninitialized}
               mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic, 12)}
               validWords={validWords}
+              oldTheme={theme.old}
             />
           </MainLayout>
         );
@@ -146,6 +148,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
               onCancel={this.cancelTransferFunds}
               error={daedalusTransfer.error}
+              oldTheme={theme.old}
             />
           </MainLayout>
         );

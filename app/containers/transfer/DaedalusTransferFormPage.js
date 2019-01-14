@@ -20,6 +20,7 @@ type Props = {
   onBack: Function,
   mnemonicValidator: Function,
   validWords: Array<string>,
+  oldTheme: boolean
 };
 
 @observer
@@ -31,7 +32,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { validWords, onBack, onSubmit, mnemonicValidator } = this.props;
+    const { validWords, onBack, onSubmit, mnemonicValidator, oldTheme } = this.props;
 
     return (
       <TransferMnemonicPage
@@ -41,6 +42,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
         validWords={validWords}
         step0={intl.formatMessage(messages.step0)}
         mnemonicLength={12}
+        oldTheme={oldTheme}
       />
     );
   }

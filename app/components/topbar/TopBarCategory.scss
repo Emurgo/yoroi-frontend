@@ -28,14 +28,38 @@
   }
 }
 
-.active {
-  // background: #2f57d7;
-
-  .icon:not(.withTrezorTIcon) path {
+.activeOld {
+  .iconOld:not(.withTrezorTIcon) path, {
     stroke: var(--theme-button-primary-background-color);
     fill: var(--theme-button-primary-background-color);
-    // stroke: white;
-    // fill: white;
+  }
+
+  .iconOld:not(.walletsIcon):not(.withTrezorTIcon) path {
+    fill: var(--theme-button-primary-background-color);
+  }
+
+  .withTrezorTIcon {
+    & > svg {
+      // plus-logo
+      & > g > g:nth-child(1) {
+        stroke: none;
+        fill: var(--theme-button-primary-background-color);
+      }
+      // trezor-t-logo
+      & > g > g:nth-child(2) {
+        stroke: var(--theme-button-primary-background-color);
+      }
+    }
+  }  
+
+  &:hover {
+    cursor: default;
+  }
+}
+
+.active {
+  .icon:not(.withTrezorTIcon) path, .icon:not(.withTrezorTIcon) polygon {
+    fill: var(--theme-button-primary-background-color);
   }
 
   .icon:not(.walletsIcon):not(.withTrezorTIcon) path {
@@ -61,7 +85,7 @@
   }
 }
 
-.icon {
+.iconOld {
   flex-shrink: 0;
   & > svg {
     width: 24px;
@@ -75,6 +99,10 @@
       stroke: var(--theme-icon-topbar-color);
     }
   }
+}
+
+.icon {
+  flex-shrink: 0;
 }
 
 .walletsIcon {
@@ -103,7 +131,7 @@
 }
 
 :global {
-  .TopBarCategory_component {
+  .TopBarCategory_component, .TopBarCategory_componentOld {
     position: absolute;
     top: 0;
 

@@ -68,6 +68,7 @@ export default class WalletSummaryPage extends Component<Props> {
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
+            oldTheme={theme.old}
           />
         );
       } else if (!hasAny) {

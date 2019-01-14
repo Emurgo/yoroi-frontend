@@ -1,7 +1,7 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/error-message';
 
-.component {
+.componentOld {
   flex: 1;
   overflow-x: hidden;
   overflow-y: overlay;
@@ -12,9 +12,20 @@
   }
 
   :global {
-    .BorderedBox_component {
+    .BorderedBox_componentOld {
       padding-bottom: 6px;
     }
+  }
+}
+
+.component {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: overlay;
+  padding: 30px;
+  &::-webkit-scrollbar-button {
+    height: 7px;
+    display: block;
   }
 }
 
@@ -46,7 +57,7 @@
   }
 }
 
-.qrCodeAndInstructions {
+.qrCodeAndInstructionsOld {
   border-bottom: 1px solid var(--theme-separation-border-color);
   display: flex;
   flex-direction: row;
@@ -116,7 +127,113 @@
   }
 }
 
-.generatedAddresses {
+.qrCodeAndInstructions {
+  border-bottom: 1px solid var(--theme-separation-border-color);
+  display: flex;
+  flex-direction: row;
+  margin: 0 0 50px;
+  padding-bottom: 50px;
+  position: relative;
+
+  .qrCode {
+    align-items: flex-start;
+    display: flex;
+    margin-left: 56px;
+
+    canvas {
+      border: 4px solid var(--theme-receive-qr-code-background-color);
+      box-sizing: content-box;
+    }
+  }
+
+  .instructions {
+    color: var(--theme-bordered-box-text-color);
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-regular);
+    font-size: 14px;
+    justify-content: space-between;
+    line-height: 19px;
+    letter-spacing: 0;
+
+    .hash {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-family: var(--font-medium);
+      line-height: 1.57;
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+
+    :global {
+      .NotificationMessage_component {
+        position: relative;
+        display: inline-block;
+        width: auto;
+        margin-left: 25px;
+        padding-left: 25px;
+        background: transparent;
+      }
+
+      .NotificationMessage_show {
+        height: 21px;
+
+        svg {
+          position: absolute;
+          top: -10px;
+          left: -10px;
+        }
+
+        path:last-child {
+          fill: var(--theme-notification-message-receive-text-color);
+        }
+      }
+
+      .NotificationMessage_message {
+        color: var(--theme-notification-message-receive-text-color);
+        line-height: 21px;
+        font-size: 13px;
+      }
+    }
+
+    .usedHash {
+      opacity: 0.4;
+    }
+
+    .hashLabel {
+      font-size: 16px;
+      font-family: var(--font-medium);
+      line-height: 1.31;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+    }
+
+    .instructionsText {
+      font-size: 14px;
+      letter-spacing: 0;
+      line-height: 1.57;
+      margin-bottom: 25px;
+      word-break: break-word;
+    }
+
+    .submitWithPasswordButton {
+      max-width: 310px;
+      width: calc(50% - 10px);
+      &.spinning {
+        @include loading-spinner("../../assets/images/spinner-light.svg");
+      }
+    }
+
+    .error {
+      height: 21px;
+      margin-bottom: 53px;
+      text-align: left;
+    }
+  }
+}
+
+.generatedAddressesOld {
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
   font-size: 15px;
@@ -178,6 +295,93 @@
           margin-left: 6px;
           opacity: 0.65;
         }
+      }
+    }
+  }
+
+  .usedWalletAddress {
+    .addressId,
+    .addressActions .copyAddress img {
+      opacity: 0.4;
+    }
+
+    .addressActions .copyAddress span {
+      opacity: 0.2;
+    }
+  }
+}
+
+.generatedAddresses {
+  color: var(--theme-bordered-box-text-color);
+  font-family: var(--font-regular);
+  font-size: 14px;
+  line-height: 22px;
+
+  h2 {
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 1.31;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    margin-bottom: 20px;
+
+    button {
+      color: var(--theme-label-button-color);
+      cursor: pointer;
+      float: right;
+      font-family: var(--font-medium);
+      font-size: 14px;
+      line-height: 22px;
+      margin-left: 12px;
+      text-transform: uppercase;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .walletAddress {
+    box-sizing: border-box;
+    display: flex;
+    padding: 12px 0;
+    word-break: break-all;
+
+    & + .walletAddress {
+      border-top: 1px solid var(--theme-separation-border-color);
+    }
+
+    .addressId {
+      flex-grow: 1;
+      margin-right: 32.5px;
+      opacity: 0.4;
+    }
+
+    .addressActions {
+      .copyAddress {
+        cursor: pointer;
+        display: inline-block;
+        letter-spacing: 0.5px;
+        line-height: 20px;
+        vertical-align: top;
+        white-space: nowrap;
+
+        * {
+          vertical-align: middle;
+        }
+
+        span {
+          color: var(--theme-label-button-color);
+          font-family: var(--font-medium);
+          font-size: 14px;
+          margin-left: 6px;
+          opacity: 0.4;
+          text-transform: uppercase;
+        }
+      }
+
+      .copyIcon {
+        display: inline-flex;
       }
     }
   }

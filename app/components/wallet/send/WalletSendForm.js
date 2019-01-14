@@ -8,6 +8,7 @@ import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
 import Input from 'react-polymorph/lib/components/Input';
 import NumericInput from 'react-polymorph/lib/components/NumericInput';
 import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import InputOwnSkin from '../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import SvgInline from 'react-svg-inline';
@@ -117,6 +118,7 @@ type Props = {
   isDialogOpen: Function,
   webWalletConfirmationDialogRenderCallback: Function,
   trezorTWalletConfirmationDialogRenderCallback: Function,
+  oldTheme: boolean
 };
 
 type State = {
@@ -224,6 +226,7 @@ export default class WalletSendForm extends Component<Props, State> {
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
       hasAnyPending,
+      oldTheme,
     } = this.props;
     const {
       transactionFee,
@@ -243,18 +246,18 @@ export default class WalletSendForm extends Component<Props, State> {
     );
 
     return (
-      <div className={styles.component}>
+      <div className={oldTheme ? styles.componentOld : styles.component}>
 
         {hasAnyPending && hasPendingTxWarning}
 
-        <BorderedBox>
+        <BorderedBox oldTheme={oldTheme}>
 
           <div className={styles.receiverInput}>
             <Input
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              skin={<SimpleInputSkin />}
+              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
             />
           </div>
 
@@ -270,7 +273,7 @@ export default class WalletSendForm extends Component<Props, State> {
               currency={currencyUnit}
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
-              skin={<AmountInputSkin />}
+              skin={<AmountInputSkin oldTheme={oldTheme} />}
             />
           </div>
 

@@ -13,5 +13,6 @@ export default class ThemeStore extends Store {
     { theme }: { theme: boolean }
   ): void => {
     this.old = theme;
+    this.stores.topbar.initCategories(theme);
   };
 }

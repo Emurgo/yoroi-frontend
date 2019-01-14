@@ -1,8 +1,12 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.component {
+.componentOld {
   padding: 20px;
+}
+
+.component {
+  padding: 30px;
 }
 
 .amountInput,

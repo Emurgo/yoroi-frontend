@@ -39,7 +39,8 @@ type Props = {
   onConfirm: Function,
   disableTransferFunds: boolean,
   attentionText: string,
-  confirmationText: string
+  confirmationText: string,
+  oldTheme: boolean
 };
 
 @observer
@@ -56,7 +57,8 @@ export default class TransferInstructionsPage extends Component<Props> {
       onConfirm,
       disableTransferFunds,
       attentionText,
-      confirmationText
+      confirmationText,
+      oldTheme
     } = this.props;
 
     const instructionsButtonClasses = classnames([
@@ -76,7 +78,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
         <div className={styles.component}>
-          <BorderedBox>
+          <BorderedBox oldTheme={oldTheme}>
 
             <div className={styles.body}>
 
@@ -105,7 +107,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         { /* Confirm transferring funds */ }
         <div className={styles.component}>
-          <BorderedBox>
+          <BorderedBox oldTheme={oldTheme}>
 
             <div className={styles.body}>
 

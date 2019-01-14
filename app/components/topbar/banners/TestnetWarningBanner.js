@@ -2,10 +2,12 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 import globalMessages from '../../../i18n/global-messages';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import styles from './TestnetWarningBanner.scss';
 import environment from '../../../environment';
+import warningSvg from '../../../assets/images/warning.inline.svg';
 
 export const messages = defineMessages({
   testnetLabel: {
@@ -71,6 +73,7 @@ export default class TestnetWarningBanner extends Component<Props> {
               {oldTheme ? (
                 <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
               ) : ([
+                <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} cleanup={['title']} />,
                 <span key="1">
                   {intl.formatMessage(messages.testnetLabelWarning)}
                   &nbsp;

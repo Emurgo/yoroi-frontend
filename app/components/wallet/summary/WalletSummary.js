@@ -52,7 +52,7 @@ export default class WalletSummary extends Component<Props> {
     const componentClasses = oldTheme ? styles.componentOld : styles.component;
     return (
       <div className={componentClasses}>
-        <BorderedBox>
+        <BorderedBox oldTheme={oldTheme}>
           {pendingAmount.incoming.greaterThan(0) &&
             <div className={styles.pendingConfirmation}>
               {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
