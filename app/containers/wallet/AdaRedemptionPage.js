@@ -20,10 +20,10 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
   };
 
   render() {
-    console.log("s", this.props.stores);
-    const { ada, adaRedemption } = this.props.stores;
+    const { substores } = this.props.stores;
+    const { ada } = substores;
+    const { wallets, adaRedemption } = ada;
     const isMainnet = environment.isMainnet();
-    const { wallets } = ada;
     const {
       redeemAdaRequest, redeemPaperVendedAdaRequest,
       isCertificateEncrypted, redemptionType, error,
@@ -72,6 +72,14 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
     return (
       <div>
         <AdaRedemptionForm
+          redemptionCodeValidator={() => {}} // TODO: for now this is a mock just to test the UI
+          postVendRedemptionCodeValidator={() => {}} // TODO: for now this is a mock just to test the UI
+          onSubmit={() => {}} // TODO: for now this is a mock just to test the UI
+          onPassPhraseChanged={() => {}} // TODO: for now this is a mock just to test the UI
+          onEmailChanged={() => {}} // TODO: for now this is a mock just to test the UI
+          onDecryptionKeyChanged={() => {}} // TODO: for now this is a mock just to test the UI
+          onAdaPasscodeChanged={() => {}} // TODO: for now this is a mock just to test the UI
+          onAdaAmountChanged={() => {}} // TODO: for now this is a mock just to test the UI
           onCertificateSelected={(certificate) => {}} // TODO: for now this is a mock just to test the UI
           mnemonicValidator={() => { return false; }} // TODO: for now this is a mock just to test the UI
           wallets={selectableWallets}

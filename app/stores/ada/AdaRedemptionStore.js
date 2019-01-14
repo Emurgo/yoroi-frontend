@@ -2,7 +2,7 @@
 import { action, observable } from 'mobx';
 import Store from '../base/Store';
 import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
-import type { RedemptionTypeChoices } from '../types/redemptionTypes';
+import type { RedemptionTypeChoices } from '../../types/redemptionTypes';
 
 export default class AdaRedemptionStore extends Store {
 

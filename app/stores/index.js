@@ -32,7 +32,6 @@ export type StoresMap = {
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
-  ada: AdaStoresMap,
   loading: LoadingStore,
 
   substores: { ada: AdaStoresMap },
@@ -41,14 +40,12 @@ export type StoresMap = {
 
 /** Constant that represents the stores across the lifetime of the application */
 const stores = observable({
-  adaRedemption: null,
   profile: null,
   app: null,
   topbar: null,
   walletBackup: null,
   uiDialogs: null,
   uiNotifications: null,
-  ada: null,
   loading: null,
 
   substores: {},
