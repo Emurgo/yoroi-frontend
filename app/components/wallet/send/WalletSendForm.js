@@ -24,7 +24,7 @@ import {
 } from '../../../utils/formatters';
 import dangerIcon from '../../../assets/images/danger.inline.svg';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   titleLabel: {
     id: 'wallet.send.form.title.label',
     defaultMessage: '!!!Title',

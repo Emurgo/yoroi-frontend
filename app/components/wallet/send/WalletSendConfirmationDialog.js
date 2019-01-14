@@ -15,7 +15,7 @@ import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   walletPasswordLabel: {
     id: 'wallet.send.confirmationDialog.walletPasswordLabel',
     defaultMessage: '!!!Spending password',

@@ -11,7 +11,7 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletSettings.scss';
 import type { Node } from 'react';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   name: {
     id: 'wallet.settings.name.label',
     defaultMessage: '!!!Name',
