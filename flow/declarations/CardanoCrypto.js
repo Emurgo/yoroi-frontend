@@ -1,4 +1,4 @@
-import PasswordProtect from "../../js-cardano-wasm/js/PasswordProtect";
+import type { AdaAddress } from '../../app/api/ada/adaTypes';
 
 declare module 'rust-cardano-crypto' {
   declare module.exports: {
@@ -79,9 +79,7 @@ declare module 'rust-cardano-crypto' {
         msg: ?string
       },
       newAccount(w: CryptoWallet, accountIndex: number): {
-        result: {
-          Ok: CryptoAccount
-        },
+        result: CryptoAccount,
         failed: boolean,
         msg: ?string
       },
@@ -100,11 +98,7 @@ declare module 'rust-cardano-crypto' {
         outputs: Array<TxOutput>,
         changeAddr: string
       ): {
-        result: {
-          cbor_encoded_tx: Array<number>,
-          changed_used: boolean,
-          fee: number
-        },
+        result: SpendResponse,
         failed: boolean,
         msg: ?string
       },
@@ -113,11 +107,7 @@ declare module 'rust-cardano-crypto' {
         inputs: Array<TxDaedalusInput>,
         output: string
       ): {
-        result: {
-          cbor_encoded_tx: Array<number>,
-          fee: number,
-          tx: CryptoTransaction
-        },
+        result: MoveResponse,
         failed: boolean,
         msg: ?string
       }
@@ -137,17 +127,30 @@ declare module 'rust-cardano-crypto' {
   }
 }
 
+declare type RustRawTxBody = Array<number>
+
+declare type SpendResponse = {
+  cbor_encoded_tx: RustRawTxBody,
+  changed_used: boolean,
+  fee: number
+}
+
+declare type MoveResponse = {
+  cbor_encoded_tx: Array<number>,
+  fee: number,
+  tx: CryptoTransaction
+}
+
 declare type CryptoWallet = {
   root_key: string,
-  cached_root_key: string,
+  root_cached_key: string, // Encrypted MasterPrivateKey
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: string
 }
 
 declare type CryptoDaedalusWallet = {
-  root_key: string,
-  cached_root_key: string,
+  root_cached_key: string, // equal to `root_key` in CryptoWallet
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: DerivationScheme
@@ -155,18 +158,25 @@ declare type CryptoDaedalusWallet = {
 
 declare type CryptoAccount = {
   account: number,
-  cached_account_key: string,
+  root_cached_key: string, // MasterPublicKey
   derivation_scheme: string
 }
 
 declare type CryptoTransaction = {
   tx: {
-    tx: {
-      inputs: Array<TxInputPtr>,
-      outputs: Array<TxOutput>
-    },
+    tx: UnsignedTransaction,
     witnesses: Array<TxWitness>
   }
+}
+
+declare type UnsignedTransaction = {
+  inputs: Array<TxInputPtr>,
+  outputs: Array<TxOutput>
+}
+
+declare type UnsignedTransactionExt = {
+  inputs: Array<TxInput>,
+  outputs: Array<TxOutput>
 }
 
 declare type CryptoAddress = any // TODO: Complete with specific type
@@ -177,14 +187,23 @@ declare type CryptoAddressChecker = {
   payload_key: Array<number>
 }
 
+/**Daedalus uses a randomly generated 2-level addressing (V1 scheme) 
+ * Addressing(account | 0x80000000, index | 0x80000000)
+ * 
+ * You can find more at 
+ * https://github.com/input-output-hk/rust-cardano/blob/a82e65d1a63ae/cardano/src/wallet/rindex.rs
+*/
+declare type AddressingSchemeV1 = Array<number>;
+
 declare type CryptoDaedalusAddressRestored = {
   address: string,
-  addressing: Array<number>
+  addressing: AddressingSchemeV1
 }
 
 declare type TxInput = {
   ptr: TxInputPtr,
   value: TxOutput,
+  // bip 44 sequencial addressing which has 3 levels derivation
   addressing: {
     account: number,
     change: number,
@@ -195,12 +214,14 @@ declare type TxInput = {
 declare type TxDaedalusInput = {
   ptr: TxInputPtr,
   value: string,
-  addressing: Array<number>
+  addressing: AddressingSchemeV1
 }
 
 declare type TxOutput = {
   address: string,
-  value: string
+  value: string,
+  isChange?: boolean,
+  fullAddress?: AdaAddress
 }
 
 declare type AddressType = "External" | "Internal";
@@ -220,4 +241,5 @@ declare type CryptoConfig = {
 
 declare type SelectionPolicy = 'FirstMatchFirst';
 
+/** V1 in intial version of Daedalus. V2 is used by Yoroi */
 declare type DerivationScheme = 'V1' | 'V2';

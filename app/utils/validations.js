@@ -3,7 +3,7 @@ import isInt from 'validator/lib/isInt';
 
 export const isValidWalletName = (walletName) => {
   const nameLength = walletName.length;
-  return nameLength >= 3 && nameLength <= 40;
+  return nameLength >= 1 && nameLength <= 40;
 };
 
 export const isValidWalletPassword = (walletPassword) => {

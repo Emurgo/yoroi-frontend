@@ -19,6 +19,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Create a new wallet',
     description: 'Description for the "Create" button on the wallet add dialog.',
   },
+  useTrezorDescription: {
+    id: 'wallet.add.dialog.trezor.description',
+    defaultMessage: '!!!Connect to Trezor',
+    description: 'Description for the "Trezor" button on the wallet add dialog.',
+  },
   restoreDescription: {
     id: 'wallet.add.dialog.restore.description',
     defaultMessage: '!!!Restore wallet from backup',
@@ -28,10 +33,17 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
     description: 'Restore notification message shown during async wallet restore on the wallet add screen.',
+  },
+  createTrezorWalletNotificationMessage: {
+    id: 'wallet.add.dialog.createTrezorWalletNotificationMessage',
+    defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
+    description: 'Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
   }
 });
 
 type Props = {
+  onTrezor: Function,
+  isCreateTrezorWalletActive: boolean,
   onCreate: Function,
   onRestore: Function,
   isRestoreActive: boolean,
@@ -47,21 +59,31 @@ export default class WalletAdd extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
+      onTrezor,
+      isCreateTrezorWalletActive,
       onCreate,
       onRestore,
-      isRestoreActive
+      isRestoreActive,
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
 
     let activeNotification = null;
-    if (isRestoreActive) {
+    if (isCreateTrezorWalletActive) {
+      activeNotification = 'createTrezorWalletNotificationMessage';
+    } else if (isRestoreActive) {
       activeNotification = 'restoreNotificationMessage';
     }
 
     return (
       <div className={componentClasses}>
         <div className={styles.buttonsContainer}>
+          <Button
+            className="primary trezorWalletButton"
+            label={intl.formatMessage(messages.useTrezorDescription)}
+            onMouseUp={onTrezor}
+            skin={<SimpleButtonSkin />}
+          />
           <Button
             className="primary createWalletButton"
             label={intl.formatMessage(messages.createDescription)}

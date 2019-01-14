@@ -1,14 +1,14 @@
 // @flow
 
-import { mapToList } from '../api/ada/lib/utils';
+/* eslint no-await-in-loop: 0 */  // not a big deal since this is just a script for testing
+
 import { getCryptoWalletFromMasterKey } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { newAdaAddress, getAdaAddressesMap, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
+import { newAdaAddress, saveAdaAddress, removeAdaAddress } from '../api/ada/adaAddress';
 import { getAdaTransactionFromSenders, newAdaTransaction } from '../api/ada/adaTransactions/adaNewTransactions';
 import { getSingleCryptoAccount, getWalletMasterKey } from '../api/ada/adaLocalStorage';
 
 const CONFIRMATION_TIME = 40 * 1000; // 40 seconds
-const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be bigger than
-                                     //           the fee of the txs (In general ≃0.17)
+const AMOUNT_SENT = '180000';        // 0.18 ada. This amount should be >= the fee of the txs (In general ≃0.17)
 const AMOUNT_TO_BE_SENT = '1';       // 0.000001 ada. Amount transfered on the generated stxs.
 
 /**
@@ -22,9 +22,11 @@ const AMOUNT_TO_BE_SENT = '1';       // 0.000001 ada. Amount transfered on the g
  * @requires being called in a context where a wallet has been stored on local storage,
  *           with it having 'numberOfTxs * 0.36' ada.
  */
-export async function generateSTxs(password: string,
-                                   numberOfTxs: number,
-                                   debugging: boolean = false) {
+export async function generateSTxs(
+  password: string,
+  numberOfTxs: number,
+  debugging: boolean = false
+) {
   const log = _logIfDebugging(debugging);
   const cryptoAccount = getSingleCryptoAccount();
 
@@ -39,6 +41,7 @@ export async function generateSTxs(password: string,
   log('[generateSTxs] Generated addresses');
 
   // Delete addresses so that their funds are not used for any of the txs sent
+  // note: not awaiting on this
   _removeAdaAddresses(cryptoAccount, adaAddresses);
 
   for (let i = 0; i < numberOfTxs; i++) {
@@ -47,7 +50,7 @@ export async function generateSTxs(password: string,
     log(`[generateSTxs] Giving funds to ${newWalletAddr}`);
 
     // Wait fot the tx to be confirmed so that its inputs are not used by the next txs
-    // FIXME: Improve querying the explorer or using the tx history
+    // TODO: Improve querying the explorer or using the tx history
     await new Promise(resolve => setTimeout(resolve, CONFIRMATION_TIME));
     log('[generateSTxs] Tx that provided funds was confirmed');
   }
@@ -89,8 +92,7 @@ function _logIfDebugging(debugging) {
 }
 
 async function _generateNewAddress(cryptoAccount) {
-  const addresses = mapToList(getAdaAddressesMap());
-  return newAdaAddress(cryptoAccount, addresses, 'External');
+  return newAdaAddress(cryptoAccount, 'External');
 }
 
 async function _removeAdaAddresses(cryptoAccount, addresses) {
@@ -101,5 +103,6 @@ async function _removeAdaAddresses(cryptoAccount, addresses) {
 
 // The same index from the AdaAddresses is used when saving them
 function _saveAdaAddresses(cryptoAccount, adaAddresses) {
+  // Note: calling async function in loop
   adaAddresses.forEach((adaAddress) => saveAdaAddress(adaAddress, 'External'));
 }

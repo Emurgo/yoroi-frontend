@@ -1,23 +1,37 @@
+// @flow
+
 import { IntlProvider } from 'react-intl';
 
 const DEFAULT_LANGUAGE = 'en-US';
 
+declare var yoroi;
+
 export default {
-  setActiveLanguage: async (client, { language } = {}) =>
+  setActiveLanguage: async (
+    client: any,
+    { language }: { language: string } = {}
+  ) => (
     await client.executeScript(locale => {
       yoroi.actions.profile.updateLocale.trigger({ locale });
-    }, language || DEFAULT_LANGUAGE),
+    }, language || DEFAULT_LANGUAGE)
+  ),
 
-  getActiveLanguage: async client =>
-    await client.executeScript(() => yoroi.stores.profile.currentLocale),
+  getActiveLanguage: async (
+    client: any
+  ) => (
+    await client.executeScript(() => yoroi.stores.profile.currentLocale)
+  ),
 
-  formatMessage: async (client, { id, values }) => {
-    const [locale, messages] = await client.executeScript(() =>
+  formatMessage: async (
+    client: any,
+    { id, values }: any
+  ) => {
+    const [locale, messages] = await client.executeScript(() => (
       [yoroi.stores.profile.currentLocale, yoroi.translations]
-    );
+    ));
     const intlProvider = new IntlProvider({ locale, messages: messages[locale] }, {});
     const translation = intlProvider.getChildContext()
-        .intl.formatMessage({ id }, values || {});
+      .intl.formatMessage({ id }, values || {});
     return translation;
   }
 };

@@ -1,3 +1,5 @@
+// @flow
+
 import { When, Then } from 'cucumber';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {
@@ -10,10 +12,10 @@ When(/^I clear the name "([^"]*)"$/, async function (walletName) {
 
 When(/^I navigate to wallet transactions screen$/, async function () {
   await this.click('.TopBarCategory_component.wallets');
-  await this.waitForElement('.TopBar_walletName');
+  await this.waitForElement('.WalletTopbarTitle_walletName');
 });
 
 Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (walletName) {
   const walletNameFormatted = walletName.toUpperCase();
-  await this.waitUntilText('.TopBar_walletName', walletNameFormatted);
+  await this.waitUntilText('.WalletTopbarTitle_walletName', walletNameFormatted);
 });

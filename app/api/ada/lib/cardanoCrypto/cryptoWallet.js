@@ -1,5 +1,7 @@
 // @flow
 
+// Utility functions for handling the private master key
+
 import bip39 from 'bip39';
 
 import { HdWallet, Wallet } from 'rust-cardano-crypto';
@@ -12,16 +14,22 @@ declare var CONFIG : ConfigType;
 
 const protocolMagic = CONFIG.network.protocolMagic;
 
+/** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
 
-export const isValidAdaMnemonic = (
+/** Check validty of mnemonic (including checksum) */
+export const isValidEnglishAdaMnemonic = (
   phrase: string,
   numberOfWords: ?number = 15
-) =>
-  phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase);
+) => (
+  // Note: splitting on spaces will not work for Japanese-encoded mnemonics who use \u3000 instead
+  // We only use English mnemonics in Yoroi so this is okay.
+  phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase)
+);
 
+/** Generate and encrypt HD wallet */
 export function generateWalletMasterKey(secretWords : string, password : string): string {
-  const entropy = new Buffer(bip39.mnemonicToEntropy(secretWords), 'hex');
+  const entropy = Buffer.from(bip39.mnemonicToEntropy(secretWords), 'hex');
   const masterKey: Uint8Array = HdWallet.fromEnhancedEntropy(entropy, '');
   return encryptWithPassword(password, masterKey);
 }
@@ -35,6 +43,7 @@ export function updateWalletMasterKeyPassword(
   return encryptWithPassword(newPassword, masterKey);
 }
 
+/** Decrypt a /wallet/ to create transactions. Do not save this. Regenerate every time. */
 export function getCryptoWalletFromMasterKey(
   encryptedMasterKey: string,
   password: string
@@ -47,11 +56,12 @@ export function getCryptoWalletFromMasterKey(
   return wallet;
 }
 
-/* FIXME: Should be pass a encrypted mnemonic and also the password to decrypt it*/
+/** Generate a Daedalus /wallet/ to create transactions. Do not save this. Regenerate every time. */
 export function getCryptoDaedalusWalletFromMnemonics(
   secretWords: string,
 ): CryptoDaedalusWallet {
-  const wallet = getResultOrFail(Wallet.fromDaedalusMnemonic(secretWords));
+  // TODO: Should use an encrypted mnemonic and also a password to decrypt it
+  const wallet: CryptoDaedalusWallet = getResultOrFail(Wallet.fromDaedalusMnemonic(secretWords));
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }

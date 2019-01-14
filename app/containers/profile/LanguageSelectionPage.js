@@ -1,8 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import TextOnlyTopBar from '../../components/layout/TextOnlyTopbar';
+import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
+import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -15,10 +16,8 @@ const messages = defineMessages({
   },
 });
 
-@inject('stores', 'actions') @observer
+@observer
 export default class LanguageSelectionPage extends Component<InjectedProps> {
-
-  static defaultProps = { actions: null, stores: null };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -31,11 +30,14 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   render() {
     const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const { sidebar } = this.props.stores;
+    const { topbar } = this.props.stores;
+    const topBartitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
     const topBar = (
-      <TextOnlyTopBar
-        title={this.context.intl.formatMessage(messages.title)}
-        activeSidebarCategory={sidebar.activeSidebarCategory}
+      <TopBar
+        title={topBartitle}
+        activeTopbarCategory={topbar.activeTopbarCategory}
       />);
     return (
       <TopBarLayout

@@ -1,8 +1,10 @@
+// @flow
+
 import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 
-var walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
+const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
 Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dialogType) {
   const selector = '.' + dialogType + 'PasswordDialog';
@@ -56,7 +58,7 @@ Then(/^I should not see the change password dialog anymore$/, async function () 
 });
 
 Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText('.TopBar_walletName', walletName.toUpperCase());
+  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
 });
 
 Then(/^I should see the following error messages:$/, async function (data) {
@@ -92,5 +94,3 @@ Then(/^I should see support screen$/, async function () {
   await this.waitForElement("//h1[contains(text(), 'Reporting a problem')]", By.xpath);
   await this.waitForElement("//h1[contains(text(), 'Logs')]", By.xpath);
 });
-
-
