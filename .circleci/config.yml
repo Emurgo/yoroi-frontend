@@ -4,6 +4,11 @@
 #
 version: 2
 
+aliases:
+  - &attach_workspace
+      attach_workspace:
+        at: ~/repo
+
 jobs:
   build-setup:
     working_directory: ~/repo
@@ -27,8 +32,17 @@ jobs:
       - run: npm run build-js-cardano-wasm
       - run: npm install
       
+      # code quality checks
       - run: npm run flow
       - run: npm run eslint
+
+      # create extensions to be consumed by browsers
+      - run: npm run test-prepare
+
+      # persist results to then use them in tests
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
 
   test-chrome:
     working_directory: ~/repo
@@ -36,10 +50,9 @@ jobs:
       - image: circleci/node:8-browsers
 
     steps:
-      - attach_workspace:
-          at: ~/build
-
-      - run: npm run test-e2e
+      - checkout
+      - *attach_workspace
+      - run: npm run test-e2e-chrome
 
   test-firefox:
     working_directory: ~/repo
@@ -47,8 +60,8 @@ jobs:
       - image: circleci/node:8-browsers
 
     steps:
-      - attach_workspace:
-          at: ~/build
+      - checkout
+      - *attach_workspace
 
       # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
       # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr
@@ -67,8 +80,7 @@ jobs:
       - image: circleci/node:8-browsers
 
     steps:
-      - attach_workspace:
-          at: ~/build
+      - *attach_workspace
 
       - run: npm run build -- --env "staging"
       - run: npm run compress -- --env "staging" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/yoroi-extension.crx"
@@ -88,7 +100,8 @@ workflows:
             - build-setup
       - deploy-testnet:
           requires:
-            - build-setup
+            - test-chrome
+            - test-firefox
           filters:
             branches:
               only: staging
