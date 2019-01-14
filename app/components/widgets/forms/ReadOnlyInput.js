@@ -50,6 +50,7 @@ export default class ReadOnlyInput extends Component<Props> {
         />
 
         <button
+          type="button"
           className={styles.button}
           onClick={onClick}
         >

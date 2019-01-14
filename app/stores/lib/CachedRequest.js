@@ -70,6 +70,9 @@ export default class CachedRequest<Result, Error> extends Request<Result, Error>
     return this;
   }
 
+  /** Invalidate cache so the request can get reissued.
+   * @param immediately call the request right away after invalidating
+   */
   invalidate(
     options: { immediately: boolean } = { immediately: false }
   ): CachedRequest<Result, Error> {
@@ -94,6 +97,7 @@ export default class CachedRequest<Result, Error> extends Request<Result, Error>
     return this._apiCalls.find(c => isEqual(c.args, args));
   }
 
+  /** Reset request properties including cache */
   reset(): CachedRequest<Result, Error> {
     super.reset();
     this._isInvalidated = true;

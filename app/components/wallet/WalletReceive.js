@@ -62,7 +62,6 @@ type Props = {
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
   onCopyAddress: Function,
-  isSidebarExpanded: boolean,
   isSubmitting: boolean,
   error?: ?LocalizableError,
 };
@@ -73,6 +72,9 @@ type State = {
 
 @observer
 export default class WalletReceive extends Component<Props, State> {
+  static defaultProps = {
+    error: undefined
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -83,10 +85,10 @@ export default class WalletReceive extends Component<Props, State> {
   };
 
   toggleUsedAddresses = () => {
-    this.setState({ showUsed: !this.state.showUsed });
+    this.setState(prevState => ({ showUsed: !prevState.showUsed }));
   };
 
-  submit() {
+  submit = () => {
     this.props.onGenerateAddress();
   }
 
@@ -95,7 +97,7 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress, isSidebarExpanded,
+      onCopyAddress,
       isSubmitting, error, isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
@@ -106,10 +108,6 @@ export default class WalletReceive extends Component<Props, State> {
       isWalletAddressUsed ? styles.usedHash : null,
     ]);
 
-    const generateAddressWrapperClasses = classnames([
-      isSidebarExpanded ? styles.fullWidthOnSmallScreen : null,
-    ]);
-
     const generateAddressButtonClasses = classnames([
       'primary',
       'generateAddressButton',
@@ -118,14 +116,12 @@ export default class WalletReceive extends Component<Props, State> {
     ]);
 
     const generateAddressForm = (
-      <div className={generateAddressWrapperClasses}>
-        <Button
-          className={generateAddressButtonClasses}
-          label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
-          onMouseUp={this.submit.bind(this)}
-          skin={<SimpleButtonSkin />}
-        />
-      </div>
+      <Button
+        className={generateAddressButtonClasses}
+        label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
+        onMouseUp={this.submit}
+        skin={<SimpleButtonSkin />}
+      />
     );
 
     // Get QRCode color value from active theme's CSS variable
@@ -165,10 +161,11 @@ export default class WalletReceive extends Component<Props, State> {
             />
           </div>
         </div>
+
         <div className={styles.generatedAddresses}>
           <h2>
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
-            <button onClick={this.toggleUsedAddresses}>
+            <button type="button" onClick={this.toggleUsedAddresses}>
               {intl.formatMessage(messages[showUsed ? 'hideUsedLabel' : 'showUsedLabel'])}
             </button>
           </h2>
@@ -181,7 +178,7 @@ export default class WalletReceive extends Component<Props, State> {
               address.isUsed ? styles.usedWalletAddress : null,
             ]);
             return (
-              <div key={index} className={addressClasses}>
+              <div key={`gen-${address.id}`} className={addressClasses}>
                 <div className={styles.addressId}>{address.id}</div>
                 <div className={styles.addressActions}>
                   <CopyToClipboard

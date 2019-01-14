@@ -4,11 +4,12 @@ import moment from 'moment';
 import type {
   AdaWallet,
   AdaAddress,
-  AdaWalletInitData
+  AdaWalletInitData,
+  AdaHardwareWalletInitData
 } from '../../adaTypes';
+import { AdaWalletTypeOption } from '../../config/AdaTypesConfig';
 
-
-/* @note: Ada wallet is the abstraction for Daedalus */
+/** Convert uesr-inputted data during wallet creation to internal web wallet representation */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
@@ -22,7 +23,28 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
       cwName,
       cwUnit
     },
-    cwPassphraseLU: moment().format()
+    cwType: AdaWalletTypeOption.WEB_WALLET,
+    cwPassphraseLU: moment().format(),
+  };
+}
+
+/** Convert uesr-inputted data during wallet creation to internal hardware wallet representation */
+export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData): AdaWallet {
+  const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
+  return {
+    cwAccountsNumber: 1,
+    cwAmount: {
+      getCCoin: 0
+    },
+    cwId: '1',
+    cwMeta: {
+      cwAssurance,
+      cwName,
+      cwUnit
+    },
+    cwType: AdaWalletTypeOption.HARDWARE_WALLET,
+    cwPassphraseLU: moment().format(),
+    cwHardwareInfo: walletInitData.cwHardwareInfo,
   };
 }
 
@@ -46,5 +68,5 @@ export function toAdaAddress(
 
 export function getAddressTypeIndex(addressType: AddressType): number {
   if (addressType === 'External') return 0;
-  return 1; // addressType === 'Internal;
+  return 1; // addressType === 'Internal';
 }

@@ -1,16 +1,13 @@
 // @flow
 import React, { Component } from 'react';
-import { inject, observer } from 'mobx-react';
-import type { StoresMap } from '../../../stores/index';
-import type { ActionsMap } from '../../../actions/index';
+import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import resolver from '../../../utils/imports';
+import type { InjectedProps } from '../../../types/injectedPropsType';
 
-const WalletSendConfirmationDialog = resolver('components/wallet/WalletSendConfirmationDialog');
+const WalletSendConfirmationDialog = resolver('components/wallet/send/WalletSendConfirmationDialog');
 
-type Props = {
-  stores: any | StoresMap,
-  actions: any | ActionsMap,
+export type DialogProps = {
   amount: string,
   receiver: string,
   totalAmount: string,
@@ -18,11 +15,10 @@ type Props = {
   amountToNaturalUnits: (amountWithFractions: string) => string,
   currencyUnit: string,
 };
+type Props = InjectedProps & DialogProps;
 
-@inject('actions', 'stores') @observer
+@observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
-
-  static defaultProps = { actions: null, stores: null };
 
   handleWalletSendFormSubmit = (values: Object) => {
     this.props.actions[environment.API].wallets.sendMoney.trigger(values);
@@ -33,7 +29,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       actions, amount, receiver, totalAmount,
       transactionFee, amountToNaturalUnits, currencyUnit
     } = this.props;
-    const { wallets } = this.props.stores[environment.API];
+    const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
     const activeWallet = wallets.active;
 
@@ -57,5 +53,4 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       />
     );
   }
-
 }

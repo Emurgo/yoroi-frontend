@@ -5,7 +5,10 @@
   flex: 1;
   overflow-x: hidden;
   overflow-y: overlay;
-  padding: 20px;
+  padding-top: 40px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  padding-left: 20px;
   &::-webkit-scrollbar-button {
     height: 7px;
     display: block;
@@ -47,7 +50,7 @@
 }
 
 .qrCodeAndInstructions {
-  border-bottom: 1px solid #dfe4e8;
+  border-bottom: 1px solid var(--theme-separation-border-color);
   display: flex;
   flex-direction: row;
   margin: 0 0 18px;

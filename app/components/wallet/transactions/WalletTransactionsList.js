@@ -11,6 +11,7 @@ import Transaction from './Transaction';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
+import { Logger } from '../../../utils/logging';
 
 const messages = defineMessages({
   today: {
@@ -65,7 +66,9 @@ export default class WalletTransactionsList extends Component<Props> {
     const groups = [];
     for (const transaction of transactions) {
       const date = moment(transaction.date).format(dateFormat);
+      // find the group this transaction belongs in
       let group = groups.find((g) => g.date === date);
+      // if first transaltion in this group, create the group
       if (!group) {
         group = { date, transactions: [] };
         groups.push(group);
@@ -77,16 +80,6 @@ export default class WalletTransactionsList extends Component<Props> {
     );
   }
 
-  isSpinnerVisible() {
-    const spinner = this.loadingSpinner;
-    if (spinner == null || spinner.root == null) return false;
-    const spinnerRect = spinner.root.getBoundingClientRect();
-    const clientHeight = document.documentElement ? document.documentElement.clientHeight : 0;
-    const windowHeight = window.innerHeight;
-    const viewHeight = Math.max(clientHeight, windowHeight);
-    return !(spinnerRect.bottom < 0 || spinnerRect.top - viewHeight >= 0);
-  }
-
   localizedDate(date: string) {
     const { intl } = this.context;
     const today = moment().format(dateFormat);
@@ -94,6 +87,18 @@ export default class WalletTransactionsList extends Component<Props> {
     const yesterday = moment().subtract(1, 'days').format(dateFormat);
     if (date === yesterday) return intl.formatMessage(messages.yesterday);
     return moment(date).format(this.localizedDateFormat);
+  }
+
+  getTransactionKey(transactions: Array<WalletTransaction>): string {
+    if (transactions.length) {
+      const firstTransaction = transactions[0];
+      return firstTransaction.id + '-' + firstTransaction.type;
+    }
+    // this branch should not happen
+    Logger.error(
+      '[WalletTransactionsList::getTransactionKey] tried to render empty transaction group'
+    );
+    return '';
   }
 
   render() {
@@ -121,12 +126,12 @@ export default class WalletTransactionsList extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        {transactionsGroups.map((group, groupIndex) => (
-          <div className={styles.group} key={walletId + '-' + groupIndex}>
+        {transactionsGroups.map(group => (
+          <div className={styles.group} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
             <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
             <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
-                <div key={walletId + '-' + transaction.id}>
+                <div key={`${walletId}-${transaction.id}-${transaction.type}`}>
                   <Transaction
                     data={transaction}
                     isLastInList={transactionIndex === group.transactions.length - 1}

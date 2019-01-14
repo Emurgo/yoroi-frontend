@@ -1,4 +1,7 @@
 // @flow
+
+// Handle data created by wallets using the v1 address scheme
+
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import {
@@ -9,7 +12,7 @@ import {
   Logger,
   stringifyError,
 } from '../../utils/logging';
-import { getResultOrFail } from '../ada/lib//cardanoCrypto/cryptoUtils';
+import { getResultOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import { getBalance } from './adaWallet';
 import {
@@ -31,18 +34,23 @@ import type {
 } from './adaTypes';
 import type {
   TransferTx
-} from '../../types/daedalusTransferTypes';
+} from '../../types/TransferTypes';
 
+/** Go through the whole UTXO and see which belong to the walet and have non-empty balance
+ * @param fullUtxo the full utxo of the Cardano blockchain
+ */
 export function getAddressesWithFunds(payload: {
   secretWords: string,
-  addresses: Array<string>
+  fullUtxo: Array<string>
 }): Array<CryptoDaedalusAddressRestored> {
   try {
-    const { secretWords, addresses } = payload;
-    const checker =
-      getResultOrFail(RandomAddressChecker.newCheckerFromMnemonics(secretWords));
-    const addressesWithFunds =
-      getResultOrFail(RandomAddressChecker.checkAddresses(checker, addresses));
+    const { secretWords, fullUtxo } = payload;
+    const checker: CryptoAddressChecker = getResultOrFail(
+      RandomAddressChecker.newCheckerFromMnemonics(secretWords)
+    );
+    const addressesWithFunds: Array<CryptoDaedalusAddressRestored> = getResultOrFail(
+      RandomAddressChecker.checkAddresses(checker, fullUtxo)
+    );
     return addressesWithFunds;
   } catch (error) {
     Logger.error(`daedalusTransfer::getAddressesWithFunds ${stringifyError(error)}`);
@@ -50,28 +58,39 @@ export function getAddressesWithFunds(payload: {
   }
 }
 
+/** Generate transaction including all addresses with no change */
 export async function generateTransferTx(payload: {
   secretWords: string,
   addressesWithFunds: Array<CryptoDaedalusAddressRestored>
 }): Promise<TransferTx> {
   try {
+
     const { secretWords, addressesWithFunds } = payload;
+
+    // fetch data to make transaction
     const senders = addressesWithFunds.map(a => a.address);
     const senderUtxos = await getAllUTXOsForAddresses(senders);
     if (_.isEmpty(senderUtxos)) {
       throw new NoInputsError();
     }
     const recoveredBalance = await getBalance(senders);
-    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
-    const inputs = _getInputs(senderUtxos, addressesWithFunds);
+    const inputWrappers: Array<DaedalusInputWrapper> = _getInputs(senderUtxos, addressesWithFunds);
+    const inputs = inputWrappers.map(w => w.input);
+
+    // pick which address to send transfer to
     const output = await _getReceiverAddress();
-    const tx = getResultOrFail(Wallet.move(wallet, inputs, output));
+
+    // get wallet and make transaction
+    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
+    const tx: MoveResponse = getResultOrFail(Wallet.move(wallet, inputs, output));
+
+    // return summary of transaction
     return {
       recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
       fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),
       cborEncodedTx: tx.cbor_encoded_tx,
       senders,
-      receiver: output
+      receiver: output,
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
@@ -82,27 +101,37 @@ export async function generateTransferTx(payload: {
   }
 }
 
+/** Follow heuristic to pick which address to send Daedalus transfer to */
 async function _getReceiverAddress(): Promise<string> {
+  // Note: Current heuristic is to pick the first address in the wallet
+  // rationale & better heuristic described at https://github.com/Emurgo/yoroi-frontend/issues/96
   const addresses = await getAdaAddressesByType('External');
   return addresses[0].cadId;
 }
 
+declare type DaedalusInputWrapper = {
+  input: TxDaedalusInput,
+  address: string
+}
+
+/** Create V1 addressing scheme inputs from Daedalus restoration info */
 function _getInputs(
   utxos: Array<UTXO>,
   addressesWithFunds: Array<CryptoDaedalusAddressRestored>
-): Array<TxDaedalusInput> {
+): Array<DaedalusInputWrapper> {
   const addressingByAddress = {};
   addressesWithFunds.forEach(a => {
     addressingByAddress[a.address] = a.addressing;
   });
-  return utxos.map(utxo => (
-    {
+  return utxos.map(utxo => ({
+    input: {
       ptr: {
         index: utxo.tx_index,
         id: utxo.tx_hash
       },
       value: utxo.amount,
       addressing: addressingByAddress[utxo.receiver]
-    }
-  ));
+    },
+    address: utxo.receiver
+  }));
 }

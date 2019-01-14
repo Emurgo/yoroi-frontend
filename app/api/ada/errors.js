@@ -2,11 +2,6 @@ import { defineMessages } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 
 const messages = defineMessages({
-  apiMethodNotYetImplementedError: {
-    id: 'api.errors.ApiMethodNotYetImplementedError',
-    defaultMessage: '!!!This API method is not yet implemented.',
-    description: '"This API method is not yet implemented." error message.'
-  },
   walletAlreadyImportedError: {
     id: 'api.errors.WalletAlreadyImportedError',
     defaultMessage: '!!!Wallet you are trying to import already exists.',
@@ -77,6 +72,16 @@ const messages = defineMessages({
     defaultMessage: '!!!Error received from api method call while getting utxos.',
     description: '"Error received from api method call while getting utxos." error message'
   },
+  getTxsBodiesForUTXOsError: {
+    id: 'api.errors.getTxsBodiesForUTXOsError',
+    defaultMessage: '!!!Error received from api method call while getting TxBodies.',
+    description: '"Error received from api method call while getting TxBodies." error message'
+  },
+  getTxsBodiesForUTXOsApiError: {
+    id: 'api.errors.getTxsBodiesForUTXOsApiError',
+    defaultMessage: '!!!Error received from server while getting TxBodies.',
+    description: '"Error received from server while getting TxBodies." error message'
+  },
   discoverAddressesError: {
     id: 'api.errors.discoverAddressesError',
     defaultMessage: '!!!Error received from api method call while discovering addresses.',
@@ -106,11 +111,6 @@ const messages = defineMessages({
     id: 'api.errors.checkAdressesInUseApiError',
     defaultMessage: '!!!Error received from server while checking used addresses.',
     description: '"Error received from server while checking used addresses." error message'
-  },
-  getPendingTxsForAddressesApiError: {
-    id: 'api.errors.getPendingTxsForAddressesApiError',
-    defaultMessage: '!!!Error received from server while getting pending txs.',
-    description: '"Error received from server while getting pending txs." error message'
   },
   invalidWitnessError: {
     id: 'api.errors.invalidWitnessError',
@@ -168,15 +168,6 @@ const messages = defineMessages({
     description: '"Certificate File is required for parsing." error message'
   }
 });
-
-export class ApiMethodNotYetImplementedError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.apiMethodNotYetImplementedError.id,
-      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage,
-    });
-  }
-}
 
 export class WalletAlreadyImportedError extends LocalizableError {
   constructor() {
@@ -322,6 +313,24 @@ export class GetUtxosForAddressesApiError extends LocalizableError {
   }
 }
 
+export class GetTxsBodiesForUTXOsError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getTxsBodiesForUTXOsError.id,
+      defaultMessage: messages.getTxsBodiesForUTXOsError.defaultMessage
+    });
+  }
+}
+
+export class GetTxsBodiesForUTXOsApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getTxsBodiesForUTXOsApiError.id,
+      defaultMessage: messages.getTxsBodiesForUTXOsApiError.defaultMessage
+    });
+  }
+}
+
 export class GetUtxosSumsForAddressesApiError extends LocalizableError {
   constructor() {
     super({
@@ -354,15 +363,6 @@ export class CheckAdressesInUseApiError extends LocalizableError {
     super({
       id: messages.checkAdressesInUseApiError.id,
       defaultMessage: messages.checkAdressesInUseApiError.defaultMessage
-    });
-  }
-}
-
-export class GetPendingTxsForAddressesApiError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getPendingTxsForAddressesApiError.id,
-      defaultMessage: messages.getPendingTxsForAddressesApiError.defaultMessage
     });
   }
 }

@@ -23,26 +23,25 @@ export const getSecretKey = (parsedPDF: string): string => {
   }
 };
 
-export const readFile = (file: ?Blob): Promise<Uint8Array> =>
-  new Promise((resolve, reject) => {
-    try {
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function () {
-          const { result } = reader;
-          const buffer = typeof result === 'string' ? JSON.parse(result) : result;
-          const fileBuffer = new Uint8Array(buffer);
-          resolve(fileBuffer);
-        };
-        reader.readAsArrayBuffer(file);
-      } else {
-        throw new Error();
-      }
-    } catch (error) {
-      console.log('pdfParser::readFile error: ' + JSON.stringify(error));
-      reject(new ReadFileError());
+export const readFile = (file: ?Blob): Promise<Uint8Array> => new Promise((resolve, reject) => {
+  try {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const { result } = reader;
+        const buffer = typeof result === 'string' ? JSON.parse(result) : result;
+        const fileBuffer = new Uint8Array(buffer);
+        resolve(fileBuffer);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      throw new Error();
     }
-  });
+  } catch (error) {
+    console.log('pdfParser::readFile error: ' + JSON.stringify(error));
+    reject(new ReadFileError());
+  }
+});
 
 export const decryptFile = (
   decryptionKey: ?string,

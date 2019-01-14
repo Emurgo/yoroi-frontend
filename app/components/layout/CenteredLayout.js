@@ -5,14 +5,14 @@ import { observer } from 'mobx-react';
 import styles from './CenteredLayout.scss';
 
 type Props = {
-  children: Node,
+  children?: Node,
 };
 
 @observer
 export default class CenteredLayout extends Component<Props> {
 
   static defaultProps = {
-    children: null
+    children: undefined
   };
 
   render() {
