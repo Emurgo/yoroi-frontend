@@ -1,16 +1,18 @@
 // @flow
 import { observable, action } from 'mobx';
 import _ from 'lodash';
-import WalletSettingsStore from '../WalletSettingsStore';
+import WalletSettingsStore from '../base/WalletSettingsStore';
 import Request from '../lib/LocalizedRequest';
 import type { UpdateWalletPasswordResponse, UpdateWalletResponse } from '../../api/common';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
-  /* eslint-disable max-len */
-  @observable updateWalletRequest: Request<UpdateWalletResponse> = new Request(this.api.ada.updateWallet);
-  @observable updateWalletPasswordRequest: Request<UpdateWalletPasswordResponse> = new Request(this.api.ada.updateWalletPassword);
-  /* eslint-enable max-len */
+  @observable updateWalletMetaRequest: Request<UpdateWalletResponse> = new Request(
+    this.api.ada.updateWalletMeta
+  );
+  @observable updateWalletPasswordRequest: Request<UpdateWalletPasswordResponse> = new Request(
+    this.api.ada.updateWalletPassword
+  );
 
   setup() {
     const a = this.actions.ada.walletSettings;
@@ -21,28 +23,48 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     a.updateWalletPassword.listen(this._updateWalletPassword);
   }
 
-  @action _updateWalletPassword = async ({ walletId, oldPassword, newPassword }: {
-    walletId: string, oldPassword: ?string, newPassword: ?string,
-  }) => {
+  @action _updateWalletPassword = async (
+    {
+      walletId,
+      oldPassword,
+      newPassword
+    }: {
+      walletId: string,
+      oldPassword: ?string,
+      newPassword: ?string
+    }
+  ): Promise<void> => {
     await this.updateWalletPasswordRequest.execute({ walletId, oldPassword, newPassword });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.updateWalletPasswordRequest.reset();
-    this.stores.ada.wallets.refreshWalletsData();
+    this.stores.substores.ada.wallets.refreshWalletsData();
   };
 
-  @action _updateWalletField = async ({ field, value }: { field: string, value: string }) => {
-    const activeWallet = this.stores.ada.wallets.active;
+  /** Updates meta-parameters for the internal wallet representation */
+  @action _updateWalletField = async (
+    { field, value }: { field: string, value: string }
+  ): Promise<void> => {
+    // get wallet
+    const activeWallet = this.stores.substores.ada.wallets.active;
     if (!activeWallet) return;
     const { id: walletId, name, assurance } = activeWallet;
+
+    // update field
     const walletData = { walletId, name, assurance };
     walletData[field] = value;
-    const wallet = await this.updateWalletRequest.execute(walletData).promise;
+
+    // update the meta-parameters in the internal wallet representation
+    const wallet = await this.updateWalletMetaRequest.execute(walletData).promise;
     if (!wallet) return;
-    await this.stores.ada.wallets.walletsRequest.patch(result => {
+
+    // replace wallet with new modified version
+    await this.stores.substores.ada.wallets.walletsRequest.patch(result => {
       const walletIndex = _.findIndex(result, { id: walletId });
       result[walletIndex] = wallet;
     });
-    this.stores.ada.wallets._setActiveWallet({ walletId });
+
+    // replace active wallet with new modified version
+    this.stores.substores.ada.wallets._setActiveWallet({ walletId });
   };
 
 }

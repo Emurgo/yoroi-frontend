@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import WalletBackupPrivacyWarningDialog from '../../components/wallet/backup-recovery/WalletBackupPrivacyWarningDialog';
-import WalletRecoveryPhraseDisplayDialog from '../../components/wallet/backup-recovery/WalletRecoveryPhraseDisplayDialog';
-import WalletRecoveryPhraseEntryDialog from '../../components/wallet/backup-recovery/WalletRecoveryPhraseEntryDialog';
+import WalletBackupPrivacyWarningDialog from './backup-recovery/WalletBackupPrivacyWarningDialog';
+import WalletRecoveryPhraseDisplayDialog from './backup-recovery/WalletRecoveryPhraseDisplayDialog';
+import WalletRecoveryPhraseEntryDialog from './backup-recovery/WalletRecoveryPhraseEntryDialog';
 
 type Props = {
   currentStep: ?string,
@@ -16,7 +16,7 @@ type Props = {
   isValid: boolean,
   isSubmitting: boolean,
   recoveryPhrase: string,
-  recoveryPhraseShuffled: Array<{ word: string, isActive: boolean }>,
+  recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
   enteredPhrase: Array<{ word: string }>,
   onCancelBackup: Function,
   onAcceptPrivacyNotice: Function,
@@ -44,7 +44,7 @@ export default class WalletBackupDialog extends Component<Props> {
       isTermRecoveryAccepted, isValid, isSubmitting,
       onAcceptTermDevice, onAcceptTermRecovery,
       onAddWord, onClear, onFinishBackup,
-      onRestartBackup, recoveryPhraseShuffled,
+      onRestartBackup, recoveryPhraseSorted,
     } = this.props;
 
     if (currentStep === 'privacyWarning') {
@@ -86,9 +86,13 @@ export default class WalletBackupDialog extends Component<Props> {
           onClear={onClear}
           onFinishBackup={onFinishBackup}
           onRestartBackup={onRestartBackup}
-          recoveryPhraseShuffled={recoveryPhraseShuffled}
+          recoveryPhraseSorted={recoveryPhraseSorted}
         />
       );
     }
+
+    // We should never get to this point
+    // TODO: use proper types to make sure this is not possible
+    return <br />;
   }
 }

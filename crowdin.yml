@@ -1,0 +1,10 @@
+files:
+  - source: /app/i18n/locales/en-US.json
+    translation: /app/i18n/locales/%language%.json
+    languages_mapping:
+      language:
+        zh-CN: zh-Hans
+        zh-TW: zh-Hant
+        ja: ja-JP
+        ko: ko-KR
+        ru: ru-RU

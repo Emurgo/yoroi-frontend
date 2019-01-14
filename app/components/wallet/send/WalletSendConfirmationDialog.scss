@@ -1,0 +1,105 @@
+@import '../../../themes/mixins/loading-spinner';
+@import '../../../themes/mixins/error-message';
+
+.dialog {
+  font-family: var(--font-medium);
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 20px;
+    }
+  }
+
+  .currencySymbol {
+    font-family: var(--font-light);
+    text-transform: uppercase;
+  }
+
+  .addressToLabelWrapper,
+  .amountFeesWrapper {
+    margin-bottom: 20px;
+  }
+
+  .addressToLabel {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+    margin-left: 10px;
+    text-transform: uppercase;
+  }
+
+  .addressTo {
+    font-family: var(--font-light);
+    font-size: 15px;
+    line-height: 1.38;
+    margin-top: 6px;
+    opacity: 0.5;
+    word-wrap: break-word;
+  }
+
+  .amountFeesWrapper {
+    display: flex;
+    flex-direction: row;
+    .amountWrapper,
+    .feesWrapper {
+      width: 50%;
+    }
+    .amountWrapper {
+      margin-right: 10px;
+    }
+    .feesWrapper {
+      margin-left: 10px;
+    }
+    .amountLabel,
+    .feesLabel {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      line-height: 1.38;
+      margin-left: 10px;
+      text-transform: uppercase;
+    }
+    .amount,
+    .fees {
+      color: var(--theme-send-confirmation-dialog-send-values-color);
+      font-size: 15px;
+      line-height: 1.38;
+      margin-top: 6px;
+      word-break: break-word;
+    }
+    .fees {
+      opacity: 0.5;
+    }
+  }
+
+  .totalAmountLabel {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+    margin-left: 10px;
+    text-transform: uppercase;
+  }
+
+  .totalAmount {
+    color: var(--theme-send-confirmation-dialog-send-values-color);
+    line-height: 1.38;
+    margin-top: 6px;
+    word-break: break-word;
+  }
+
+  .walletPassword {
+    margin-top: 20px;
+  }
+
+  .error {
+    @include error-message;
+    text-align: center;
+    margin-top: 17px;
+  }
+}
+
+.submitButtonSpinning {
+  @include loading-spinner("../../../assets/images/spinner-light.svg");
+}

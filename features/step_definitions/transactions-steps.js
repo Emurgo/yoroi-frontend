@@ -1,3 +1,5 @@
+// @flow
+
 import { Given, When, Then, Before, After } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
