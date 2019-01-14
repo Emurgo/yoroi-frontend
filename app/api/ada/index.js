@@ -62,7 +62,6 @@ import type {
   AdaTransactions,
   AdaWallet,
   AdaWallets,
-  AdaWalletInitData,
   AdaAssurance,
   AdaFeeEstimateResponse
 } from './adaTypes';
@@ -153,11 +152,6 @@ export type ExportWalletToFileResponse = [];
 export type UpdateWalletPasswordRequest = {
   oldPassword: string,
   newPassword: string,
-};
-
-export type AdaWalletParams = {
-  walletPassword: string,
-  walletInitData: AdaWalletInitData
 };
 
 export type ChangeAdaWalletSpendingPasswordParams = {
