@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-css-themr';
-import { Router } from 'react-router';
+import { Router } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
@@ -53,14 +53,14 @@ class App extends Component<{
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
     return (
-      <div>
+      <div style={{ height: '100%' }}>
         <ThemeManager variables={theme} />
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
         <ThemeProvider theme={yoroiTheme}>
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            <div style={{ height: '100%' }}>
-              <Router history={history} routes={Routes(stores, actions)} />
-            </div>
+            <Router history={history}>
+              {Routes(stores, actions)}
+            </Router>
           </IntlProvider>
         </ThemeProvider>
         {mobxDevTools}
