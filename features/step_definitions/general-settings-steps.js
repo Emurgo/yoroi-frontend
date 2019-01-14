@@ -1,3 +1,5 @@
+// @flow
+
 import { When, Then } from 'cucumber';
 import _ from 'lodash';
 import {

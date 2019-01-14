@@ -1,8 +1,12 @@
 // @flow
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import type { InjectedContainerProps } from '../../types/injectedPropsType';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import type { Notification } from '../../types/notificationType';
+import NotificationMessage from '../../components/widgets/NotificationMessage';
+import globalMessages from '../../i18n/global-messages';
+import successIcon from '../../assets/images/success-small.inline.svg';
+import type { InjectedProps } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
@@ -12,7 +16,7 @@ import { Logger } from '../../utils/logging';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 
-type Props = InjectedContainerProps
+type Props = InjectedProps
 
 export const messages = defineMessages({
   noTransactions: {
@@ -28,10 +32,14 @@ export const messages = defineMessages({
   }
 });
 
-@inject('stores', 'actions') @observer
-export default class WalletSummaryPage extends Component<Props> {
-  static defaultProps = { actions: null, stores: null };
+const targetNotificationIds = [
+  globalMessages.walletCreatedNotificationMessage.id,
+  globalMessages.walletRestoredNotificationMessage.id,
+  globalMessages.trezorTWalletIntegratedNotificationMessage.id,
+];
 
+@observer
+export default class WalletSummaryPage extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired
   };
@@ -39,7 +47,7 @@ export default class WalletSummaryPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const actions = this.props.actions;
-    const { wallets, transactions } = this.props.stores.ada;
+    const { wallets, transactions } = this.props.stores.substores.ada;
     const {
       hasAny,
       totalAvailable,
@@ -56,7 +64,7 @@ export default class WalletSummaryPage extends Component<Props> {
       return null;
     }
     if (searchOptions) {
-      const { searchLimit } = searchOptions;
+      const { limit } = searchOptions;
       const noTransactionsLabel = intl.formatMessage(messages.noTransactions);
       const noTransactionsFoundLabel = intl.formatMessage(messages.noTransactionsFound);
       if (recentTransactionsRequest.isExecutingFirstTime || hasAny) {
@@ -64,7 +72,7 @@ export default class WalletSummaryPage extends Component<Props> {
           <WalletTransactionsList
             transactions={recent}
             isLoadingTransactions={recentTransactionsRequest.isExecuting}
-            hasMoreToLoad={totalAvailable > searchLimit}
+            hasMoreToLoad={totalAvailable > limit}
             onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
@@ -78,15 +86,41 @@ export default class WalletSummaryPage extends Component<Props> {
       }
     }
 
+    const notification = this._getThisPageActiveNotification();
+
     return (
       <VerticalFlexContainer>
+
+        <NotificationMessage
+          icon={successIcon}
+          show={!!notification}
+        >
+          {!!notification && <FormattedHTMLMessage {...notification.message} />}
+        </NotificationMessage>
+
         <WalletSummary
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
         />
+
         {walletTransactions}
+
       </VerticalFlexContainer>
     );
+  }
+
+  _getThisPageActiveNotification = (): ?Notification => {
+    let notification = null;
+
+    const { mostRecentActiveNotification } = this.props.stores.uiNotifications;
+    const activeNotificationId = mostRecentActiveNotification ?
+      mostRecentActiveNotification.id :
+      '';
+    if (targetNotificationIds.includes(activeNotificationId)) {
+      notification = mostRecentActiveNotification;
+    }
+
+    return notification;
   }
 }

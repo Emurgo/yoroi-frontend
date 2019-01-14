@@ -1,4 +1,5 @@
 $topBarHeight: 64px;
+$footerHeight: 52px;
 
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
@@ -11,10 +12,42 @@ $topBarHeight: 64px;
 }
 
 .topbar {
-  flex-shrink: 0;
   height: $topBarHeight;
+  flex-shrink: 0;
+  // Show elements that overflow the topbar above the content area
+  z-index: 1;
 }
 
 .content {
-  height: calc(100% - #{$topBarHeight});
+  height: 100%;
+}
+
+.contentWithFooter {
+  height: calc(100% - #{$footerHeight});
+}
+
+.contentWrapper {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  position: relative;
+  &::-webkit-scrollbar-button {
+    height: 7px;
+    display: block;
+  }
+}
+
+.footer {
+  z-index: 1;
+  margin-top: (-$footerHeight);
+  height: $footerHeight;
+}
+
+.main {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }

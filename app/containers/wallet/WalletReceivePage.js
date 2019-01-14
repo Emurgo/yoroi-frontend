@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { defineMessages, FormattedHTMLMessage } from 'react-intl';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { ellipsis } from '../../utils/strings';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
@@ -24,11 +24,8 @@ type State = {
   copiedAddress: string,
 };
 
-@inject('stores', 'actions') @observer
+@observer
 export default class WalletReceivePage extends Component<Props, State> {
-
-  static defaultProps = { actions: null, stores: null };
-
   state = {
     copiedAddress: '',
   };
@@ -39,7 +36,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   }
 
   handleGenerateAddress = () => {
-    const { wallets } = this.props.stores.ada;
+    const { wallets } = this.props.stores.substores.ada;
     const walletIsActive = !!wallets.active;
     if (walletIsActive) {
       this.props.actions.ada.addresses.createAddress.trigger();
@@ -51,7 +48,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   };
 
   closeNotification = () => {
-    const { wallets } = this.props.stores.ada;
+    const { wallets } = this.props.stores.substores.ada;
     const wallet = wallets.active;
     if (wallet) {
       const notificationId = `${wallet.id}-copyNotification`;
@@ -63,7 +60,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     const { copiedAddress } = this.state;
     const actions = this.props.actions;
     const { uiNotifications } = this.props.stores;
-    const { wallets, addresses } = this.props.stores.ada;
+    const { wallets, addresses } = this.props.stores.substores.ada;
     const wallet = wallets.active;
 
     // Guard against potential null values
@@ -87,6 +84,13 @@ export default class WalletReceivePage extends Component<Props, State> {
     return (
       <VerticalFlexContainer>
 
+        <NotificationMessage
+          icon={successIcon}
+          show={uiNotifications.isOpen(notification.id)}
+        >
+          {notification.message}
+        </NotificationMessage>
+
         <WalletReceive
           walletAddress={walletAddress}
           isWalletAddressUsed={isWalletAddressUsed}
@@ -97,19 +101,12 @@ export default class WalletReceivePage extends Component<Props, State> {
             actions.notifications.open.trigger({
               id: notification.id,
               duration: notification.duration,
+              message: messages.message
             });
           }}
-          isSidebarExpanded={false}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
         />
-
-        <NotificationMessage
-          icon={successIcon}
-          show={uiNotifications.isOpen(notification.id)}
-        >
-          {notification.message}
-        </NotificationMessage>
 
       </VerticalFlexContainer>
     );

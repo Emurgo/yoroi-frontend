@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
 import styles from './SupportSettings.scss';
 
 const messages = defineMessages({
@@ -17,13 +18,8 @@ const messages = defineMessages({
   },
   faqLink: {
     id: 'settings.support.faq.faqLink',
-    defaultMessage: '!!!FAQ on Daedalus website',
-    description: '"FAQ on Daedalus website" link in the FAQ section on the support settings page',
-  },
-  faqLinkUrl: {
-    id: 'settings.support.faq.faqLinkURL',
-    defaultMessage: '!!!https://yoroi-wallet.com/faq/',
-    description: 'URL for the "FAQ on Daedalus website" link in the FAQ section on the support settings page',
+    defaultMessage: '!!!FAQ on Yoroi website',
+    description: '"FAQ on Yoroi website" link in the FAQ section on the support settings page',
   },
   reportProblemTitle: {
     id: 'settings.support.reportProblem.title',
@@ -80,7 +76,7 @@ export default class SupportSettings extends Component<Props> {
 
     const faqLink = (
       <a
-        href={intl.formatMessage(messages.faqLinkUrl)}
+        href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
         {intl.formatMessage(messages.faqLink)}
@@ -97,7 +93,7 @@ export default class SupportSettings extends Component<Props> {
     );
 
     const downloadLogsLink = (
-      <button onClick={onDownloadLogs}>
+      <button type="button" onClick={onDownloadLogs}>
         {intl.formatMessage(messages.downloadLogsLink)}
       </button>
     );

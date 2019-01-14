@@ -1,30 +1,33 @@
 // @flow
 import WalletsActions from './wallets-actions';
-import AdaRedemptionActions from './ada-redemption-actions';
 import TransactionsActions from './transactions-actions';
-import NodeUpdateActions from './node-update-actions';
 import WalletSettingsActions from './wallet-settings-actions';
 import AddressesActions from './addresses-actions';
 import DaedalusTransferActions from './daedalus-transfer-actions';
+import TrezorConnectActions from './trezor-connect-actions';
+import TrezorSendActions from './trezor-send-actions';
+import AdaRedemptionActions from './ada-redemption-actions';
 
 export type AdaActionsMap = {
-  wallets: WalletsActions,
   adaRedemption: AdaRedemptionActions,
+  wallets: WalletsActions,
   transactions: TransactionsActions,
-  nodeUpdate: NodeUpdateActions,
   walletSettings: WalletSettingsActions,
   addresses: AddressesActions,
   daedalusTransfer: DaedalusTransferActions,
+  trezorConnect: TrezorConnectActions,
+  trezorSend: TrezorSendActions,
 };
 
 const adaActionsMap: AdaActionsMap = {
-  wallets: new WalletsActions(),
   adaRedemption: new AdaRedemptionActions(),
+  wallets: new WalletsActions(),
   transactions: new TransactionsActions(),
-  nodeUpdate: new NodeUpdateActions(),
   walletSettings: new WalletSettingsActions(),
   addresses: new AddressesActions(),
-  daedalusTransfer: new DaedalusTransferActions()
+  daedalusTransfer: new DaedalusTransferActions(),
+  trezorConnect: new TrezorConnectActions(),
+  trezorSend: new TrezorSendActions(),
 };
 
 export default adaActionsMap;

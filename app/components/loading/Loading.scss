@@ -23,9 +23,7 @@
 }
 
 .ada-logo,
-.ada-apiLogo,
-.etc-logo,
-.etc-apiLogo {
+.ada-apiLogo {
   & > svg {
     display: block;
     width: 48px;
@@ -54,7 +52,7 @@ $adaLogoWidth: 43px;
     width: 100px;
     margin: 0 114px;
     & > path {
-      fill: #daa49a;
+      fill: var(--theme-button-primary-background-color);
     }
   }
 }

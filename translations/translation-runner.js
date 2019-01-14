@@ -1,8 +1,30 @@
 const manageTranslations = require('react-intl-translations-manager').default;
 
+const fs = require('fs');
+
+const messagesDirectory = 'translations/messages';
+if (!fs.existsSync(messagesDirectory)) {
+  console.log('Run `npm run dev` once to build your translation cache');
+  return;
+}
+
+function disableWhitelistFile(langResults) {
+  // we hijack this hook to modify an otherwise unrelated property
+  // this causes a downstream function that writes whitelists to write to dev/null
+  // kind of hacky but this suprpesses generation of pointless whitelist files
+
+  // TBD: does this work on Windows? Maybe there is a more platform-independent way to do this
+  langResults.whitelistFilepath = '/dev/null';
+  return undefined;
+}
+
 manageTranslations({
-  messagesDirectory: 'translations/messages',
+  messagesDirectory,
   translationsDirectory: 'app/i18n/locales',
   singleMessagesFile: true,
-  languages: ['en-US', 'hr-HR', 'de-DE', 'zh-Hans', 'zh-Hant', 'ko-KR', 'ja-JP']
+  languages: ['en-US', 'zh-Hans', 'zh-Hant', 'ko-KR', 'ja-JP', 'ru-RU'],
+  overrideCoreMethods: {
+    provideWhitelistFile: (langResults) => { disableWhitelistFile(langResults); },
+    outputSingleFile: (combinedFiles) => { /* do nothing to suppress defaultMessages.json */ }
+  }
 });

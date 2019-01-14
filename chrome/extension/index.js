@@ -14,6 +14,7 @@ import '../../app/themes/index.global.scss';
 // run MobX in strict mode
 useStrict(true);
 
+// Entry point into our application
 const initializeYoroi = async () => {
   const api = setupApi();
   const router = new RouterStore();

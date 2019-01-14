@@ -14,6 +14,10 @@ type Props = {
 
 @observer
 export default class SettingsMenuItem extends Component<Props> {
+  static defaultProps = {
+    disabled: false
+  };
+
   render() {
     const { label, active, disabled, onClick, className } = this.props;
     let state = styles.enabled;
@@ -24,7 +28,7 @@ export default class SettingsMenuItem extends Component<Props> {
     }
     const componentClasses = classNames([styles.component, state, className]);
     return (
-      <button className={componentClasses} onClick={onClick}>{label}</button>
+      <button type="button" className={componentClasses} onClick={onClick}>{label}</button>
     );
   }
 

@@ -1,19 +1,17 @@
 // @flow
 import React, { Component } from 'react';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 
-@inject('actions', 'stores') @observer
+@observer
 export default class ChangeWalletPasswordDialogContainer extends Component<InjectedProps> {
-
-  static defaultProps = { actions: null, stores: null };
 
   render() {
     const { actions } = this.props;
     const { uiDialogs } = this.props.stores;
-    const { wallets, walletSettings } = this.props.stores[environment.API];
+    const { wallets, walletSettings } = this.props.stores.substores[environment.API];
     const dialogData = uiDialogs.dataForActiveDialog;
     const { updateDataForActiveDialog } = actions.dialogs;
     const activeWallet = wallets.active;

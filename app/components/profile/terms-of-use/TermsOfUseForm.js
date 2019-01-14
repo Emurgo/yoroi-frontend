@@ -10,18 +10,12 @@ import SimpleCheckboxSkin from 'react-polymorph/lib/skins/simple/raw/CheckboxSki
 import LocalizableError from '../../../i18n/LocalizableError';
 import TermsOfUseText from './TermsOfUseText';
 import styles from './TermsOfUseForm.scss';
-import environment from '../../../environment';
 
 const messages = defineMessages({
   checkboxLabel: {
     id: 'profile.termsOfUse.checkboxLabel',
     defaultMessage: '!!!I agree with terms of use',
     description: 'Label for the "I agree with terms of use" checkbox.'
-  },
-  checkboxLabelWithDisclaimer: {
-    id: 'profile.termsOfUse.checkboxLabelWithDisclaimer',
-    defaultMessage: '!!!I understand that the terms of use are only available in English and agree to the terms of use',
-    description: 'Label for the "I agree with terms of use" checkbox when terms of use are not translated.'
   },
   submitLabel: {
     id: 'profile.termsOfUse.submitLabel',
@@ -43,6 +37,9 @@ type State = {
 
 @observer
 export default class TermsOfUseForm extends Component<Props, State> {
+  static defaultProps = {
+    error: undefined
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -53,7 +50,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
   };
 
   toggleAcceptance() {
-    this.setState({ areTermsOfUseAccepted: !this.state.areTermsOfUseAccepted });
+    this.setState(prevState => ({ areTermsOfUseAccepted: !prevState.areTermsOfUseAccepted }));
   }
 
   submit = () => {
@@ -69,7 +66,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
       isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
     ]);
 
-    const checkboxLabel = environment.isEtcApi() ? 'checkboxLabelWithDisclaimer' : 'checkboxLabel';
+    const checkboxLabel = 'checkboxLabel';
 
     return (
       <div className={styles.component}>
