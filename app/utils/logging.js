@@ -38,7 +38,7 @@ export const downloadLogs = () => {
   const header = generateLogHeader();
   let errorLogs = logs.peekN(logs.size());
   if (errorLogs.length === 0) {
-    errorLogs = ['No errors logged.'];
+    errorLogs = [`[${moment().format()}] No errors logged.`];
   }
   errorLogs.unshift(header);
   const blob = new Blob(errorLogs, { type: 'text/plain;charset=utf-8' });
