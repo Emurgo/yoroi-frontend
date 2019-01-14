@@ -36,7 +36,9 @@ export default class DaedalusTransferStore extends Store {
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<SignedResponse> = new Request(this._transferFundsRequest);
+  @observable transferFundsRequest: Request<SignedResponse>= new Request(
+    this._transferFundsRequest
+  );
   @observable ws: any = null;
 
   setup(): void {

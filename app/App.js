@@ -11,7 +11,7 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import { Routes } from './Routes';
 import { yoroiTheme } from './themes/yoroi';
-import { themeOverrides } from './themes/overrides/index.js';
+import { themeOverrides } from './themes/overrides/index';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';

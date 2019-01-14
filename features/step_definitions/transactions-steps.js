@@ -1,7 +1,6 @@
 // @flow
 
 import { Given, When, Then, Before, After } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { getMockServer, closeMockServer } from '../support/mockServer';
 import i18n from '../support/helpers/i18n-helpers';
