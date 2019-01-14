@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-css-themr';
-import { Router } from 'react-router';
+import { Router } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
@@ -16,12 +16,13 @@ import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
+import { hot } from 'react-hot-loader';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru]);
 
 @observer
-export default class App extends Component<{
+class App extends Component<{
   stores: StoresMap,
   actions: ActionsMap,
   history: Object,
@@ -52,14 +53,14 @@ export default class App extends Component<{
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
     return (
-      <div>
+      <div style={{ height: '100%' }}>
         <ThemeManager variables={theme} />
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
         <ThemeProvider theme={yoroiTheme}>
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            <div style={{ height: '100%' }}>
-              <Router history={history} routes={Routes(stores, actions)} />
-            </div>
+            <Router history={history}>
+              {Routes(stores, actions)}
+            </Router>
           </IntlProvider>
         </ThemeProvider>
         {mobxDevTools}
@@ -67,3 +68,5 @@ export default class App extends Component<{
     );
   }
 }
+
+export default hot(module)(App);
