@@ -10,7 +10,7 @@ import environment from '../../../environment';
 export const messages = defineMessages({
   testnetLabel: {
     id: 'testnet.label.message',
-    defaultMessage: '!!!Warning: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
+    defaultMessage: '!!!WARNING: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
     description: 'Message alerting users the wallet is not running in mainnet.'
   },
 });
