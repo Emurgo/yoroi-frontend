@@ -86,10 +86,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         label: this.context.intl.formatMessage(messages.currentPasswordLabel),
         placeholder: this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder),
         value: '',
-        validators: [({ field }) => [
-          isValidWalletPassword(field.value),
-          this.context.intl.formatMessage(globalMessages.invalidWalletPassword)
-        ]],
       },
       walletPassword: {
         type: 'password',
