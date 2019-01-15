@@ -68,7 +68,11 @@ function refreshWallet(client) {
 }
 
 async function storeWallet(client, walletName) {
-  const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = getFeatureData();
+  const featureData = getFeatureData();
+  if (!featureData) {
+    return;
+  }
+  const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = featureData;
   if (wallet === undefined) {
     return;
   }

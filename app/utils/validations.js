@@ -6,10 +6,10 @@ export const isValidWalletName = (walletName) => {
   return nameLength >= 1 && nameLength <= 40;
 };
 
-export const isValidWalletPassword = (walletPassword) => {
+export const isValidWalletPassword = (walletPassword) => (
   // https://xkcd.com/936/
-  return walletPassword.length >= 12;
-};
+  walletPassword.length >= 12
+);
 
 // eslint-disable-next-line max-len
 export const isValidRepeatPassword = (walletPassword, repeatPassword) => walletPassword === repeatPassword;

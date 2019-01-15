@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import styles from './TransferSummaryPage.scss';
@@ -166,7 +166,7 @@ export default class TransferSummaryPage extends Component<Props> {
                 label={intl.formatMessage(messages.cancelTransferButtonLabel)}
                 onClick={this.props.onCancel}
                 disabled={isSubmitting}
-                skin={<SimpleButtonSkin />}
+                skin={ButtonSkin}
               />
 
               <Button
@@ -174,7 +174,7 @@ export default class TransferSummaryPage extends Component<Props> {
                 label={intl.formatMessage(messages.transferButtonLabel)}
                 onClick={this.props.onSubmit}
                 disabled={isSubmitting}
-                skin={<SimpleButtonSkin />}
+                skin={ButtonSkin}
               />
             </div>
 

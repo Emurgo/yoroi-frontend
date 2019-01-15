@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
-import Input from 'react-polymorph/lib/components/Input';
-import NumericInput from 'react-polymorph/lib/components/NumericInput';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import SvgInline from 'react-svg-inline';
@@ -254,7 +254,7 @@ export default class WalletSendForm extends Component<Props, State> {
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              skin={<SimpleInputSkin />}
+              skin={InputSkin}
             />
           </div>
 
@@ -270,7 +270,7 @@ export default class WalletSendForm extends Component<Props, State> {
               currency={currencyUnit}
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
-              skin={<AmountInputSkin />}
+              skin={AmountInputSkin}
             />
           </div>
 
@@ -322,7 +322,7 @@ export default class WalletSendForm extends Component<Props, State> {
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
         disabled={!isTransactionFeeCalculated || hasAnyPending}
-        skin={<SimpleButtonSkin />}
+        skin={ButtonSkin}
       />);
   }
 

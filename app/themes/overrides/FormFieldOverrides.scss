@@ -1,18 +1,12 @@
-@import "_config";
-// Theme config overrides go here …
-@import "~react-polymorph/lib/themes/simple/SimpleFormField";
 // Css module overrides go here …
 
 .error {
-  color: var(--theme-input-error-color);
   font-size: 11px;
   line-height: 1.38;
   margin: 0 10px 6px;
-  opacity: 0.75;
 }
 
 .label {
-  color: var(--theme-input-label-color);
   font-size: 11px;
   font-weight: 600;
   margin-bottom: 6px;

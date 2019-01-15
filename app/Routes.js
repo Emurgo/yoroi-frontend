@@ -72,7 +72,7 @@ export const Routes = (
           <Settings {...props} stores={stores} actions={actions}>
             {SettingsSubpages(stores, actions)}
           </Settings>
-        )} 
+        )}
       />
       <Route
         exact

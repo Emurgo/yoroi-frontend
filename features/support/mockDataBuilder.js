@@ -12,7 +12,7 @@ import type {
 
 let builtMockData: FeatureData;
 
-export function getFeatureData(): FeatureData {
+export function getFeatureData(): ?FeatureData {
   return builtMockData;
 }
 
@@ -40,7 +40,11 @@ export function getFakeAddresses(
 export function getLovefieldTxs(
   walletName: string
 ): Array<LovefieldShownWalletTx> {
-  const { walletInitialData, lovefieldShownTxs } = getFeatureData();
+  const featureData = getFeatureData();
+  if (!featureData) {
+    return [];
+  }
+  const { walletInitialData, lovefieldShownTxs } = featureData;
   if (walletInitialData === undefined || lovefieldShownTxs === undefined) {
     return [];
   }
@@ -92,7 +96,7 @@ function _getTxs(
     .slice(0, txsNumber + pendingTxsNumber)
     .map((txHash, index) => {
       const featureData = getFeatureData();
-      const currentTime = featureData.currentDateExample === undefined
+      const currentTime = (!featureData || !featureData.currentDateExample)
         ? new Date(0)
         : new Date(featureData.currentDateExample);
       const txTime = currentTime.setDate(currentTime.getDate() + index);
@@ -129,8 +133,7 @@ function _getLovefieldTxs(
   return listOfHashesReversed
     .map((txHash, index) => {
       const featureData = getFeatureData();
-
-      const currentTime = featureData.currentDateExample === undefined
+      const currentTime = (!featureData || !featureData.currentDateExample)
         ? new Date(0)
         : new Date(featureData.currentDateExample);
       const txTime = currentTime.setDate(currentTime.getDate() + index);
@@ -153,7 +156,11 @@ function _getLovefieldTxs(
 function _getWallet(
   addressesStartingWith: string
 ): ?InitialData {
-  const initialData = getFeatureData().walletInitialData;
+  const featureData = getFeatureData();
+  if (!featureData) {
+    return undefined;
+  }
+  const initialData = featureData.walletInitialData;
   if (!initialData) {
     return undefined;
   }

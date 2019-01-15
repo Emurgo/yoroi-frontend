@@ -20,7 +20,7 @@ When(/^I open language selection dropdown$/, async function () {
 });
 
 When(/^I select Japanese language$/, async function () {
-  await this.click('//li[contains(text(), "日本語")]', By.xpath);
+  return this.click('//*[@class="SimpleOptions_label"][contains(text(), "日本語")]', By.xpath);
 });
 
 When(/^I submit the language selection form$/, async function () {

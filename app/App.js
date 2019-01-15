@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { ThemeProvider } from 'react-css-themr';
+import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { Router } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -11,6 +11,7 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import { Routes } from './Routes';
 import { yoroiTheme } from './themes/yoroi';
+import { themeOverrides } from './themes/overrides/index';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
@@ -48,15 +49,15 @@ class App extends Component<{
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
     const currentTheme = 'yoroi';
-    const theme = require(`./themes/prebuilt/${currentTheme}.js`); // eslint-disable-line
+    const themeVars = require(`./themes/prebuilt/${currentTheme}.js`); // eslint-disable-line
 
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager variables={theme} />
+        <ThemeManager variables={themeVars} />
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
-        <ThemeProvider theme={yoroiTheme}>
+        <ThemeProvider theme={yoroiTheme} themeOverrides={themeOverrides}>
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             <Router history={history}>
               {Routes(stores, actions)}
