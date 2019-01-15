@@ -63,7 +63,7 @@ import type {
   AdaWallet,
   AdaWallets,
   AdaAssurance,
-  AdaFeeEstimateResponse,
+  AdaFeeEstimateResponse
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -87,8 +87,8 @@ import { InvalidWitnessError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
+import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
 
-// ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
 export type CreateTransactionRequest = {
   receiver: string,
@@ -112,6 +112,19 @@ export type UpdateWalletRequest = {
   name: string,
   assurance: AdaAssurance
 };
+export type RedeemAdaRequest = {
+  redemptionCode: string,
+  accountId: string,
+  walletPassword: ?string
+};
+export type RedeemAdaResponse = Wallet;
+export type RedeemPaperVendedAdaRequest = {
+  shieldedRedemptionKey: string,
+  mnemonics: string,
+  accountId: string,
+  walletPassword: ?string
+};
+export type RedeemPaperVendedAdaResponse = RedeemPaperVendedAdaRequest;
 export type ImportWalletFromKeyRequest = {
   filePath: string,
   walletPassword: ?string
@@ -557,8 +570,25 @@ export default class AdaApi {
       }
     }
   }
+
+  async getPDFSecretKey(
+    file: ?Blob,
+    decryptionKey: ?string,
+    redemptionType: string
+  ): Promise<string> {
+    Logger.debug('AdaApi::getPDFSecretKey called');
+    try {
+      const fileBuffer = await readFile(file);
+      const decryptedFileBuffer = decryptFile(decryptionKey, redemptionType, fileBuffer);
+      const parsedPDFString = await parsePDFFile(decryptedFileBuffer);
+      return getSecretKey(parsedPDFString);
+    } catch (error) {
+      Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
 }
-// ========== End of class AdaApi =========
 
 // ========== TRANSFORM SERVER DATA INTO FRONTEND MODELS =========
 

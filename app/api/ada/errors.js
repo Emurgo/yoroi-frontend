@@ -141,6 +141,31 @@ const messages = defineMessages({
     id: 'api.errors.parsePDFPageError',
     defaultMessage: '!!!Error while parsing PDF file page.',
     description: '"Error while parsing PDF file page." error message'
+  },
+  parsePDFKeyError: {
+    id: 'api.errors.parsePDFKeyError',
+    defaultMessage: '!!!Error while parsing secret key.',
+    description: '"Error while parsing secret key." error message'
+  },
+  invalidMnemonicError: {
+    id: 'api.errors.invalidMnemonicError',
+    defaultMessage: '!!!Invalid phrase entered, please check.',
+    description: '"Invalid phrase entered, please check." error message'
+  },
+  adaRedemptionEncryptedCertificateParseError: {
+    id: 'api.errors.adaRedemptionEncryptedCertificateParseError',
+    defaultMessage: '!!!The ADA redemption code could not be parsed, please check your passphrase.',
+    description: '"The ADA redemption code could not be parsed, please check your passphrase." error message'
+  },
+  adaRedemptionCertificateParseError: {
+    id: 'api.errors.adaRedemptionCertificateParseError',
+    defaultMessage: '!!!The ADA redemption code could not be parsed from the given document.',
+    description: '"The ADA redemption code could not be parsed from the given document." error message'
+  },
+  noCertificateError: {
+    id: 'api.errors.noCertificateError',
+    defaultMessage: '!!!Certificate File is required for parsing.',
+    description: '"Certificate File is required for parsing." error message'
   }
 });
 
@@ -392,6 +417,51 @@ export class ParsePDFPageError extends LocalizableError {
     super({
       id: messages.parsePDFPageError.id,
       defaultMessage: messages.parsePDFPageError.defaultMessage
+    });
+  }
+}
+
+export class ParsePDFKeyError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.parsePDFKeyError.id,
+      defaultMessage: messages.parsePDFKeyError.defaultMessage
+    });
+  }
+}
+
+export class InvalidMnemonicError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.invalidMnemonicError.id,
+      defaultMessage: messages.invalidMnemonicError.defaultMessage
+    });
+  }
+}
+
+export class AdaRedemptionEncryptedCertificateParseError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.adaRedemptionEncryptedCertificateParseError.id,
+      defaultMessage: messages.adaRedemptionEncryptedCertificateParseError.defaultMessage
+    });
+  }
+}
+
+export class AdaRedemptionCertificateParseError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.adaRedemptionCertificateParseError.id,
+      defaultMessage: messages.adaRedemptionCertificateParseError.defaultMessage
+    });
+  }
+}
+
+export class NoCertificateError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.noCertificateError.id,
+      defaultMessage: messages.noCertificateError.defaultMessage
     });
   }
 }

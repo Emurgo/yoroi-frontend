@@ -1,25 +1,31 @@
 // @flow
 import pdfjsLib from 'pdfjs-dist';
-import type { FileEvent, PDF } from '../adaTypes';
+import type { PDF } from '../adaTypes';
 import { decryptForceVend, decryptRecoveryRegularVend, decryptRecoveryForceVend, decryptRegularVend } from './decrypt';
-import { InvalidCertificateError, ReadFileError, DecryptionError, ParsePDFFileError, ParsePDFPageError } from '../errors';
+import { InvalidCertificateError, ReadFileError, DecryptionError, ParsePDFFileError, ParsePDFPageError, ParsePDFKeyError } from '../errors';
 
 export const getSecretKey = (parsedPDF: string): string => {
-  const splitArray = parsedPDF.split('——————');
-  const redemptionKeyLabel = splitArray[3].trim();
+  try {
+    const splitArray = parsedPDF.split('——————');
+    const redemptionKeyLabel = splitArray[3].trim();
 
-  if (redemptionKeyLabel !== 'REDEMPTION KEY') {
-    throw new InvalidCertificateError();
+    if (redemptionKeyLabel !== 'REDEMPTION KEY') {
+      throw new InvalidCertificateError();
+    }
+
+    return splitArray[2].trim();
+  } catch (error) {
+    console.log('pdfParser::getSecretKey error: ' + JSON.stringify(error));
+    if (error instanceof InvalidCertificateError) {
+      throw error;
+    }
+    throw new ParsePDFKeyError();
   }
-
-  return splitArray[2].trim();
 };
 
-export const getSelectedFile = (event: FileEvent): Blob => event.target.files[0];
-
-export const readFile = (file: Blob): Promise<Uint8Array> =>
-  new Promise((resolve, reject) => {
-    try {
+export const readFile = (file: ?Blob): Promise<Uint8Array> => new Promise((resolve, reject) => {
+  try {
+    if (file) {
       const reader = new FileReader();
       reader.onload = function () {
         const { result } = reader;
@@ -28,14 +34,17 @@ export const readFile = (file: Blob): Promise<Uint8Array> =>
         resolve(fileBuffer);
       };
       reader.readAsArrayBuffer(file);
-    } catch (error) {
-      console.log('pdfParser::readFile error: ' + JSON.stringify(error));
-      reject(new ReadFileError());
+    } else {
+      throw new Error();
     }
-  });
+  } catch (error) {
+    console.log('pdfParser::readFile error: ' + JSON.stringify(error));
+    reject(new ReadFileError());
+  }
+});
 
 export const decryptFile = (
-  decryptionKey: string | Array<string>,
+  decryptionKey: ?string,
   redemptionType: string,
   file: Uint8Array
 ): Uint8Array => {
@@ -45,9 +54,11 @@ export const decryptFile = (
       // Decrypt the file
       let decryptedFile;
       switch (redemptionType) {
-        case 'forceVended':
-          decryptedFile = decryptForceVend(decryptionKey, file);
+        case 'forceVended': {
+          const decryptionKeyArray = decryptionKey.split(',');
+          decryptedFile = decryptForceVend(decryptionKeyArray, file);
           break;
+        }
         case 'recoveryRegular':
           decryptedFile = decryptRecoveryRegularVend(decryptionKey, file);
           break;
