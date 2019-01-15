@@ -4,8 +4,13 @@
 #
 version: 2
 
+aliases:
+  - &attach_workspace
+      attach_workspace:
+        at: ~/repo
+
 jobs:
-  build:
+  build-setup:
     working_directory: ~/repo
     docker:
       - image: circleci/node:8-browsers
@@ -27,13 +32,36 @@ jobs:
       - run: npm run build-js-cardano-wasm
       - run: npm install
       
-      # code checks // TODO: Not runnning on this branch :/
+      # code quality checks
       - run: npm run flow
       - run: npm run eslint
 
-      # run tests!
-      - run: npm run test-e2e
-      # todo: run firefox tests in parallel
+      # create extensions to be consumed by browsers
+      - run: npm run test-prepare
+
+      # persist results to then use them in tests
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
+  test-chrome:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+
+    steps:
+      - checkout
+      - *attach_workspace
+      - run: npm run test-e2e-chrome
+
+  test-firefox:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+
+    steps:
+      - checkout
+      - *attach_workspace
 
       # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
       # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr
@@ -43,17 +71,8 @@ jobs:
       - run: sudo rm -f /usr/local/bin/firefox
       - run: sudo apt install firefox-esr
       - run: sudo ln -s /usr/bin/firefox-esr /usr/local/bin/firefox
-      - run: npm run test-e2e-firefox
-      
-      - run: npm run build -- --env "staging"
-      - run: npm run compress -- --env "staging" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/yoroi-extension.crx"
 
-      # Persist the specified paths (~/repo) into the workspace for use in downstream job. 
-      # TODO:
-      #- persist_to_workspace:
-      #    root: ~/
-      #    paths:
-      #      - ./repo/yoroi.zip
+      - run: npm run test-e2e-firefox
 
   deploy-testnet:
     working_directory: ~/repo
@@ -61,9 +80,10 @@ jobs:
       - image: circleci/node:8-browsers
 
     steps:
-      - attach_workspace:
-          at: ~/build
+      - *attach_workspace
 
+      - run: npm run build -- --env "staging"
+      - run: npm run compress -- --env "staging" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/yoroi-extension.crx"
       - run: sudo npm install -g chrome-webstore-upload-cli
       - run: cd ~/build/repo/ && webstore upload --source yoroi.zip --extension-id="${APP_ID}" --client-id="${CLIENT_ID}" --client-secret="${CLIENT_SECRET}" --refresh-token="${REFRESH_TOKEN}" --auto-publish --trusted-testers
 
@@ -71,10 +91,17 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      - build
+      - build-setup
+      - test-chrome:
+          requires:
+            - build-setup
+      - test-firefox:
+          requires:
+            - build-setup
       - deploy-testnet:
           requires:
-            - build
+            - test-chrome
+            - test-firefox
           filters:
             branches:
               only: staging
