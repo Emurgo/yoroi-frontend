@@ -45,7 +45,7 @@ export const readFile = (file: ?Blob): Promise<Uint8Array> => new Promise((resol
 
 export const decryptFile = (
   decryptionKey: ?string,
-  redemptionType: ?string,
+  redemptionType: string,
   file: Uint8Array
 ): Uint8Array => {
   try {
