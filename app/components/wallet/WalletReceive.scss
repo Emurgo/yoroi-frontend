@@ -197,7 +197,7 @@
       }
     }
 
-    .usedHash {
+    .usedHash > span {
       opacity: 0.4;
     }
 
@@ -354,7 +354,7 @@
     .addressId {
       flex-grow: 1;
       margin-right: 32.5px;
-      opacity: 0.4;
+      color: var(--theme-transactions-received-address-color);
     }
 
     .addressActions {

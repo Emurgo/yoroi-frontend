@@ -238,6 +238,10 @@ export default class WalletSendForm extends Component<Props, State> {
     const amountFieldProps = amountField.bind();
     const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
 
+    const componentClasses = oldTheme ? styles.componentOld : styles.component;
+    const receiverInputClasses = oldTheme ? styles.receiverInputOld : styles.receiverInput;
+    const amountInputClasses = oldTheme ? styles.amountInputOld : styles.amountInput;
+
     const hasPendingTxWarning = (
       <div className={styles.contentWarning}>
         <SvgInline svg={dangerIcon} className={styles.icon} cleanup={['title']} />
@@ -246,13 +250,13 @@ export default class WalletSendForm extends Component<Props, State> {
     );
 
     return (
-      <div className={oldTheme ? styles.componentOld : styles.component}>
+      <div className={componentClasses}>
 
         {hasAnyPending && hasPendingTxWarning}
 
         <BorderedBox oldTheme={oldTheme}>
 
-          <div className={styles.receiverInput}>
+          <div className={receiverInputClasses}>
             <Input
               className="receiver"
               {...receiverField.bind()}
@@ -261,7 +265,7 @@ export default class WalletSendForm extends Component<Props, State> {
             />
           </div>
 
-          <div className={styles.amountInput}>
+          <div className={amountInputClasses}>
             <NumericInput
               {...amountFieldProps}
               className="amount"
@@ -293,10 +297,11 @@ export default class WalletSendForm extends Component<Props, State> {
     * CASE 2: Trezor Model T Wallet */
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
+    const { oldTheme } = this.props;
 
     const buttonClasses = classnames([
       'primary',
-      styles.nextButton,
+      oldTheme ? styles.nextButtonOld : styles.nextButton,
     ]);
 
     const {

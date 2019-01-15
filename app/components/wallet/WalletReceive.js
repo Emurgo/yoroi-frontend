@@ -151,7 +151,7 @@ export default class WalletReceive extends Component<Props, State> {
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
             <div className={walletAddressClasses}>
-              {walletAddress}
+              <span>{walletAddress}</span>
               <CopyToClipboard
                 text={walletAddress}
                 onCopy={onCopyAddress.bind(this, walletAddress)}

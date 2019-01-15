@@ -133,10 +133,10 @@
   text-transform: uppercase;
 }
 
-// .pendingLabel, .failedLabel, .low, .medium, .high {
 .label {
   height: 25px;
-  width: 90px;
+  min-width: 90px;
+  padding: 0 15px;
   display: inline-block;
   line-height: 25px;
   text-align: center;
@@ -147,9 +147,9 @@
   border-radius: 15px;
 }
 
-.pendingLabel {
+.pendingLabelOld {
   :global {
-    @keyframes pending-label-animation {
+    @keyframes pending-label-animation-old {
       0% {
         background-position: 0 0;
       }
@@ -172,11 +172,40 @@
         transparent
     );
   background-size:50px 50px;
-  animation: pending-label-animation 2s linear infinite;
+  animation: pending-label-animation-old 2s linear infinite;
   overflow: hidden;
 }
 
-.failedLabel {
+.pendingLabel {
+  :global {
+    @keyframes pending-label-animation {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 70px 50px;
+      }
+    }
+  }
+
+  background-color: var(--theme-transactions-state-pending-background-color);
+  background-image:
+    linear-gradient(
+        55deg,
+        transparent  33.4%,
+        var(--theme-transactions-state-pending-stripes-color) 33.4%,
+        var(--theme-transactions-state-pending-stripes-color) 50%,
+        transparent 50%,
+        transparent 83.4%,
+        var(--theme-transactions-state-pending-stripes-color) 83.4%,
+        var(--theme-transactions-state-pending-stripes-color)
+    );
+  background-size: 35px 50px;
+  animation: pending-label-animation 1s linear infinite;
+  overflow: hidden;
+}
+
+.failedLabelOld, .failedLabel {
   background-color: var(--theme-transactions-state-failed-background-color);
 }
 
@@ -229,7 +258,7 @@
   border: none;
 }
 
-.details {
+.detailsOld {
   height: auto;
   * + h2,
   * + .row {
@@ -246,6 +275,32 @@
     font-family: var(--font-light);
     font-size: 14px;
     word-break: break-all;
+
+    &.address {
+      display: block;
+      line-height: 19px;
+    }
+  }
+}
+
+.details {
+  height: auto;
+  * + h2,
+  * + .row {
+    margin-top: 20px;
+  }
+  h2 {
+    font-family: var(--font-regular);
+    font-size: 16px;
+    line-height: 1.38;
+    margin-bottom: 2px;
+  }
+  span {
+    color: var(--theme-transactions-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    word-break: break-all;
+    line-height: 1.57;
 
     &.address {
       display: block;

@@ -9,10 +9,15 @@
   padding: 30px;
 }
 
+.amountInputOld,
+.receiverInputOld {
+  position: relative;
+  margin-bottom: 20px;
+}
+
 .amountInput,
 .receiverInput {
   position: relative;
-  margin-bottom: 20px;
 }
 
 .adaLabel {
@@ -24,9 +29,14 @@
   text-transform: uppercase;
 }
 
-.nextButton {
+.nextButtonOld {
   display: block !important;
   margin: 30px auto 0;
+}
+
+.nextButton {
+  display: block !important;
+  margin: 20px auto 0;
 }
 
 .contentWarning{

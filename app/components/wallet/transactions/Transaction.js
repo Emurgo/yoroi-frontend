@@ -161,7 +161,7 @@ export default class Transaction extends Component<Props, State> {
     ]);
 
     const detailsStyles = classNames([
-      styles.details,
+      oldTheme ? styles.detailsOld : styles.details,
       isExpanded ? styles.expanded : styles.closed
     ]);
 
@@ -179,7 +179,7 @@ export default class Transaction extends Component<Props, State> {
     ]);
     const labelClasses = classNames([
       oldTheme ? styles.labelOld : styles.label,
-      styles[`${state}Label`]
+      oldTheme ? styles[`${state}LabelOld`] : styles[`${state}Label`]
     ]);
     const currencySymbolClasses = oldTheme ? styles.currencySymbolOld : styles.currencySymbol;
 
@@ -210,6 +210,34 @@ export default class Transaction extends Component<Props, State> {
                   {intl.formatMessage(stateTranslations[state])}
                 </div>
               )}
+
+              {/* <div
+                className={classNames([
+                  oldTheme ? styles.labelOld : styles.label,
+                  oldTheme ? styles.pendingLabelOld : styles.pendingLabel
+                ])}
+              >
+                {intl.formatMessage(stateTranslations.pending)}
+              </div> */}
+
+              {/* <div
+                className={classNames([
+                  oldTheme ? styles.labelOld : styles.label,
+                  oldTheme ? styles.failedLabelOld : styles.failedlabel
+                ])}
+              >
+                {intl.formatMessage(stateTranslations.failed)}
+              </div> */}
+
+              {/* <div
+                className={classNames([
+                  oldTheme ? styles.labelOld : styles.label,
+                  styles.medium
+                ])}
+              >
+                {intl.formatMessage(stateTranslations.failed)}
+              </div> */}
+
               <div className={amountStyles}>
                 {
                   // hide currency (we are showing symbol instead)
