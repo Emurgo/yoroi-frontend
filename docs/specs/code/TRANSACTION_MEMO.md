@@ -39,7 +39,7 @@ The user flow is the following:
      - If user clicks "Yes", the dialog window closes and the textarea become cleared and closes too.
 5. If user have entered the memo and makes a transaction, memo will be saved to localStorage and also to user's external storage.
 6. When user goes to his summary - `/containers/wallet/WalletSummaryPage.js` and clicks on the transaction to expand it, he or she will see his memo at the very bottom of Transaction item (if memo exists).
-7. When user links his external storage account to Yoroi, we check if there are some memos in his external storage. If there are, we save these memos to localStorage. In this way we can make user be able to install Yoroi on the another device, link his or her external storage account and get user's memos so they can be displayed in WalletSummary.
+7. When user links his external storage account to Yoroi, we check if there are some memos in his external storage. If there are, we download a content of each memo file via Dropbox API, read the content with FileReader object, then we save these memos to localStorage. In this way we can make user be able to install Yoroi on the another device, link his or her external storage account and get user's memos so they can be displayed in WalletSummary.
 
 ### Tech spec
 
