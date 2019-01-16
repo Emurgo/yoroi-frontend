@@ -3,10 +3,10 @@ import _ from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node } from 'react';
-import Modal from 'react-polymorph/lib/components/Modal';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
-import SimpleModalSkin from 'react-polymorph/lib/skins/simple/raw/ModalSkin';
+import { Modal } from 'react-polymorph/lib/components/Modal';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
 type Props = {
@@ -55,7 +55,7 @@ export default class Dialog extends Component<Props> {
         isOpen
         triggerCloseOnOverlayClick={closeOnOverlayClick}
         onClose={onClose}
-        skin={<SimpleModalSkin />}
+        skin={ModalSkin}
       >
 
         <div className={classnames([styles.dialogWrapper, className])}>
@@ -85,7 +85,7 @@ export default class Dialog extends Component<Props> {
                     label={action.label}
                     onClick={action.onClick}
                     disabled={action.disabled}
-                    skin={<SimpleButtonSkin />}
+                    skin={ButtonSkin}
                   />
                 );
               })}

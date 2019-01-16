@@ -12,7 +12,8 @@ export type MainLayoutProps = InjectedContainerProps & {
   oldTheme: boolean,
   isTopBarVisible?: boolean,
   isBannerVisible?: boolean,
-  withFooter? : boolean
+  withFooter? : boolean,
+  footer: ?Node,
 };
 
 @observer
@@ -21,7 +22,8 @@ export default class MainLayout extends Component<MainLayoutProps> {
     topbar: null,
     isTopBarVisible: undefined,
     isBannerVisible: undefined,
-    withFooter: undefined
+    withFooter: undefined,
+    footer: null,
   };
 
   render() {
@@ -32,7 +34,8 @@ export default class MainLayout extends Component<MainLayoutProps> {
       oldTheme,
       isTopBarVisible,
       isBannerVisible,
-      withFooter
+      withFooter,
+      footer
     } = this.props;
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
     return (
@@ -44,6 +47,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
         isTopBarVisible={isTopBarVisible}
         isBannerVisible={isBannerVisible}
         withFooter={withFooter}
+        footer={footer}
       >
         {this.props.children}
       </TopBarLayout>

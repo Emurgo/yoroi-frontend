@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
-import Autocomplete from 'react-polymorph/lib/components/Autocomplete';
-import SimpleAutocompleteSkin from 'react-polymorph/lib/skins/simple/raw/AutocompleteSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
+import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
@@ -17,7 +17,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
-import InputOwnSkin from '../../themes/skins/InputOwnSkin';
+// import InputOwnSkin from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   title: {
@@ -243,7 +243,8 @@ export default class WalletRestoreDialog extends Component<Props> {
           done={isValidWalletName(walletName)}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+          // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+          skin={InputSkin}
         />
 
         <Autocomplete
@@ -253,7 +254,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-          skin={<SimpleAutocompleteSkin />}
+          skin={AutocompleteSkin}
         />
 
         <div className={walletPasswordClasses}>
@@ -263,14 +264,16 @@ export default class WalletRestoreDialog extends Component<Props> {
               done={isValidWalletPassword(walletPassword)}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              skin={InputSkin}
             />
             <Input
               className="repeatedPassword"
               done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              skin={InputSkin}
             />
 
             {oldTheme ? (

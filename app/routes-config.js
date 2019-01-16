@@ -1,12 +1,10 @@
 // @flow
 export const ROUTES = {
   ROOT: '/',
-  STAKING: '/staking',
   NO_WALLETS: '/no-wallets',
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
     TERMS_OF_USE: '/profile/terms-of-use',
-    SEND_LOGS: '/profile/send-logs-choice',
   },
   WALLETS: {
     ROOT: '/wallets',
@@ -22,7 +20,6 @@ export const ROUTES = {
     GENERAL: '/settings/general',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
-    DISPLAY: '/settings/display',
   },
   DAEDALUS_TRANFER: {
     ROOT: '/daedalus-transfer',

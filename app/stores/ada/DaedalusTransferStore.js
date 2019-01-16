@@ -16,14 +16,14 @@ import LocalizableError, {
 } from '../../i18n/LocalizableError';
 import type {
   TransferStatus,
-  TransferTx,
-  TxValidation
+  TransferTx
 } from '../../types/TransferTypes';
 import {
   getAddressesWithFunds,
   generateTransferTx
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
+import type { SignedResponse } from '../../api/ada/lib/yoroi-backend-api';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -36,7 +36,9 @@ export default class DaedalusTransferStore extends Store {
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<Array<void>> = new Request(this._transferFundsRequest);
+  @observable transferFundsRequest: Request<SignedResponse>= new Request(
+    this._transferFundsRequest
+  );
   @observable ws: any = null;
 
   setup(): void {
@@ -158,12 +160,11 @@ export default class DaedalusTransferStore extends Store {
 
   /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (payload: {
-    cborEncodedTx: Array<number>,
-    txValidation: TxValidation
-  }): Promise<Array<void>> => {
-    const { cborEncodedTx, txValidation } = payload;
+    cborEncodedTx: Array<number>
+  }): Promise<SignedResponse> => {
+    const { cborEncodedTx } = payload;
     const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-    return sendTx({ signedTx, txValidation });
+    return sendTx({ signedTx });
   }
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
@@ -176,8 +177,7 @@ export default class DaedalusTransferStore extends Store {
         throw new NoTransferTxError();
       }
       await this.transferFundsRequest.execute({
-        cborEncodedTx: this.transferTx.cborEncodedTx,
-        txValidation: this.transferTx.txValidation
+        cborEncodedTx: this.transferTx.cborEncodedTx
       });
       // TBD: why do we need a continuation instead of just pustting the code here directly?
       next();

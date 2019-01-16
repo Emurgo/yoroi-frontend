@@ -1,6 +1,164 @@
 //  ==== Theme: Yoroi Renewed === //
 
+// FONTS
+const rpFonts = {
+  '--rp-theme-font-thin': 'Rubik-Light',
+  '--rp-theme-font-light': 'Rubik-Light',
+  '--rp-theme-font-medium': 'Rubik-Medium',
+  '--rp-theme-font-regular': 'Rubik-Regular',
+  '--rp-theme-font-bold': 'Rubik-Bold',
+};
+
+// AUTOCOMPLETE
+const rpAutocomplete = {
+  '--rp-autocomplete-bg-color': '#f3f3f5',
+  '--rp-autocomplete-border': '1px solid #c6cdd6',
+  '--rp-autocomplete-border-color-opened': '#121327',
+  '--rp-autocomplete-input-text-color': '#121327',
+  '--rp-autocomplete-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
+  '--rp-autocomplete-selected-word-box-bg-color': 'rgba(218, 164, 154, 1)', // #DAA49A
+  '--rp-autocomplete-selected-word-text-color': '#fafbfc',
+};
+
+// BUBBLE
+const rpBubble = {
+  '--rp-bubble-bg-color': '#fff',
+  '--rp-bubble-border-color': '#fff',
+  '--rp-bubble-border-radius': '8px',
+};
+
+// BUTTON
+const rpButton = {
+  '--rp-button-bg-color': '#daa49a',
+  '--rp-button-bg-color-active': '#c4948b',
+  '--rp-button-bg-color-disabled': 'rgba(218, 164, 154, 0.3)', // #DAA49A
+  '--rp-button-bg-color-hover': '#edb3a8',
+  '--rp-button-font-family': rpFonts['--rp-theme-font-medium'],
+  '--rp-button-font-size': '14px',
+  '--rp-button-height': '40px',
+  '--rp-button-line-height': '20px',
+  '--rp-button-padding': '12px 20px',
+  '--rp-button-text-color': '#fff',
+  '--rp-button-text-transform': 'none',
+  '--rp-button-width': '400px',
+};
+
+// CHECKBOX
+const rpCheckbox = {
+  '--rp-checkbox-border': '2px solid #353535',
+  '--rp-checkbox-border-color-disabled': 'rgba(218, 164, 154, 0.2)', // #DAA49A
+  '--rp-checkbox-check-bg-color': '#15d1aa',
+  '--rp-checkbox-label-text-color': '#353535',
+  '--rp-checkbox-label-text-color-disabled': 'rgba(18, 19, 39, 0.3)', // #121327
+};
+
+// COLORS
+const rpColors = {
+  '--rp-theme-color-error': '#ea4c5b',
+};
+
+// FORMFIELD
+const rpFormfield = {
+  '--rp-formfield-bg-color-disabled': 'none',
+  '--rp-formfield-label-text-color': '#121327',
+  '--rp-formfield-label-text-color-disabled': '#121327',
+  '--rp-formfield-error-text-color': '#ea4c5b',
+  '--rp-formfield-error-text-opacity': '0.75',
+};
+
+// INPUT
+const rpInput = {
+  '--rp-input-bg-color': '#f3f3f5',
+  '--rp-input-bg-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
+  '--rp-input-border-color': '#c6cdd6',
+  '--rp-input-border-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
+  '--rp-input-border-color-errored': '#ea4c5b',
+  '--rp-input-border-color-focus': '#121327',
+  '--rp-input-line-height': '22px',
+  '--rp-input-padding': '10px',
+  '--rp-input-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
+  '--rp-input-placeholder-color-disabled': 'rgba(94, 96, 102, 0.5)', // #5E6066
+  '--rp-input-text-color': '#121327',
+  '--rp-input-text-color-disabled': 'rgba(94, 96, 102, 0.5)', // #5E6066
+  '--rp-input-font-family': rpFonts['--rp-theme-font-light'],
+};
+
+// MODAL
+const rpModal = {
+  '--rp-modal-bg-color': '#fff',
+  '--rp-modal-max-height': '97%',
+  '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
+};
+
+// OPTIONS
+const rpOptions = {
+  '--rp-option-bg-color': '#fff',
+  '--rp-option-bg-color-highlighted': '#edeeef',
+  '--rp-option-border-color': '#c6cdd6',
+  '--rp-option-checkmark-color': '#353535',
+  '--rp-option-line-height': '22px',
+  '--rp-option-text-color': '#353535',
+  '--rp-options-border-color': '#c6cdd6',
+  '--rp-options-shadow': 'none',
+};
+
+// SELECT
+const rpSelect = {
+  '--rp-select-arrow-bg-color': '#9b9b9b',
+  '--rp-select-arrow-bg-color-open': '#353535',
+  '--rp-select-input-bg-color': '#fafbfc',
+  '--rp-select-input-border-color': '#9b9b9b',
+  '--rp-select-input-border-color-focus': '#4a4a4a',
+  '--rp-select-input-text-color': '#353535',
+};
+
+// SWITCH
+const rpSwitch = {
+  '--rp-switch-bg-color-off': '#daa49a',
+  '--rp-switch-bg-color-on': '#daa49a',
+  '--rp-switch-label-margin': '0 30px 0 0',
+  '--rp-switch-label-opacity': '0.5',
+  '--rp-switch-label-text-color': '#c6cdd6',
+  '--rp-switch-label-width': '100%',
+  '--rp-switch-opacity-off': '0.3',
+  '--rp-switch-root-margin': '0 0 30px 0',
+  '--rp-switch-thumb-bg-color': '#fff',
+};
+
+// TEXTAREA
+const rpTextArea = {
+  '--rp-textarea-bg-color': '#fafbfc',
+  '--rp-textarea-bg-color-disabled': 'rgba(94, 96, 102, 0.05)', // #5E6066
+  '--rp-textarea-border': '1px solid #c6cdd6',
+  '--rp-textarea-border-color-disabled': 'rgba(94, 96, 102, 0.05)', // #5E6066
+  '--rp-textarea-border-color-errored': '#ea4c5b',
+  '--rp-textarea-border-color-focus': '#121327',
+  '--rp-textarea-border-radius': '2px',
+  '--rp-textarea-line-height': '20px',
+  '--rp-textarea-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
+  '--rp-textarea-resize': 'none',
+  '--rp-textarea-text-color': '#121327',
+};
+
+const rpYoroiTheme = {
+  ...rpAutocomplete,
+  ...rpBubble,
+  ...rpButton,
+  ...rpCheckbox,
+  ...rpColors,
+  ...rpFonts,
+  ...rpFormfield,
+  ...rpInput,
+  ...rpModal,
+  ...rpOptions,
+  ...rpSelect,
+  ...rpSwitch,
+  ...rpTextArea,
+};
+
+
 export default {
+  ...rpYoroiTheme,
   '--preferred-font': '"Times New Roman", serif',
 
   '--font-ultralight': 'Rubik-Light',
@@ -83,9 +241,6 @@ export default {
   '--theme-input-label-color': '#353535',
   '--theme-input-text-color': '#353535',
   '--theme-input-right-floating-text-color': 'rgba(94, 96, 102, 0.5)',
-  '--theme-input-placeholder-color': 'rgba(94, 96, 102, 0.5)',
-  '--theme-input-error-color': '#ea4c5b',
-  '--theme-input-remove-color-dark': '#d34452',
   '--theme-input-remove-color-light': '#ea4c5b',
   '--theme-input-remove-color-lighter': '#ec5d6b',
   '--theme-input-remove-color-lightest': '#fac8ce',
@@ -161,7 +316,7 @@ export default {
   '--theme-icon-transactions-ada-symbol-color': '#2b2c32',
   // '--theme-icon-transaction-type-color': '#fafbfc',
 
-  '--theme-icon-nav-color': 'rgba(18, 19, 39, 0.6)',
+  '--theme-icon-nav-color': 'rgba(18, 19, 39, 0.6)', // #121327
   '--theme-icon-nav-color-active': '#ffffff',
   '--theme-icon-topbar-color': '#ffffff',
   '--theme-icon-toggle-menu-color': '#ffffff',

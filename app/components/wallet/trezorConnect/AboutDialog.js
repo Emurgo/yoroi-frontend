@@ -72,23 +72,18 @@ const messages = defineMessages({
   },
   aboutPrerequisite3: {
     id: 'wallet.trezor.dialog.step.about.prerequisite.3',
-    defaultMessage: '!!!The computer needs to be connected to the Internet throughout the process',
+    defaultMessage: '!!!The Trezor device screen must be unlocked.',
     description: 'Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite4: {
     id: 'wallet.trezor.dialog.step.about.prerequisite.4',
-    defaultMessage: '!!!Only one Trezor device can be connected to the computer at any time',
+    defaultMessage: '!!!Your computer must remain connected to the Internet throughout the process.',
     description: 'Fourth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite5: {
     id: 'wallet.trezor.dialog.step.about.prerequisite.5',
-    defaultMessage: '!!!Trezor device screen must be unlocked',
-    description: 'Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  aboutPrerequisite6: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.6',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
-    description: 'Sixth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   nextButtonLabel: {
     id: 'wallet.trezor.dialog.next.button.label',
@@ -158,7 +153,6 @@ export default class AboutDialog extends Component<Props> {
             <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
             <li key="4">{intl.formatMessage(messages.aboutPrerequisite4)}</li>
             <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
-            <li key="6">{intl.formatMessage(messages.aboutPrerequisite6)}</li>
           </ul>
         </div>
 

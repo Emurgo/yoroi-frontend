@@ -1,7 +1,6 @@
 // @flow
 
 import { Given, When, Then, Before, After } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { getMockServer, closeMockServer } from '../support/mockServer';
 import i18n from '../support/helpers/i18n-helpers';
@@ -62,7 +61,7 @@ When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  await this.waitForElement(`//label[contains(text(), 'Amount')]//following::span[contains(text(), '+ ${fee} of fees')]`, By.xpath);
+  await this.waitUntilText('.AmountInputSkin_fees', `+ ${fee} of fees`);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
@@ -87,7 +86,7 @@ Then(/^I should see the summary screen$/, async function () {
 });
 
 Then(/^I should see an invalid address error$/, async function () {
-  await this.waitForElement('.receiver.SimpleInput_errored');
+  await this.waitForElement('.receiver .SimpleInput_errored');
 });
 
 Then(/^I should see a not enough ada error$/, async function () {

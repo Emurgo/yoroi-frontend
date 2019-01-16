@@ -4,8 +4,8 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -24,7 +24,7 @@ import saveLoadImage from '../../../assets/images/wallet-connect/save-load.inlin
 import saveErrorImage from '../../../assets/images/wallet-connect/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { isValidHardwareWalletName } from '../../../utils/validations';
+import { isValidWalletName } from '../../../utils/validations';
 
 import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
 import { StepState } from '../../../stores/ada/TrezorConnectStore';
@@ -86,8 +86,8 @@ export default class SaveDialog extends Component<Props> {
           value: defaultWalletName,
           validators: [({ field }) => (
             [
-              isValidHardwareWalletName(field.value),
-              intl.formatMessage(globalMessages.invalidHardwareWalletName)
+              isValidWalletName(field.value),
+              intl.formatMessage(globalMessages.invalidWalletName)
             ]
           )],
         },
@@ -118,8 +118,8 @@ export default class SaveDialog extends Component<Props> {
         <Input
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
-          skin={<SimpleInputSkin />}
           error={walletNameField.error}
+          skin={InputSkin}
         />
         <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);

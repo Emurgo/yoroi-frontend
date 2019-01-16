@@ -125,6 +125,10 @@ class WalletBackupStore extends Store {
 
   @action _finishWalletBackup = async () => {
     this.inProgress = false;
+
+    // show success notification
+    const { wallets } = this.stores.substores[environment.API];
+    wallets.showWalletCreatedNotification();
   }
 
 }

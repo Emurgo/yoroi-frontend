@@ -1,6 +1,3 @@
-@import "_config";
-// Theme config overrides go here …
-@import "~react-polymorph/lib/themes/simple/SimpleSelect";
 // Css module overrides go here …
 
 .selectInput {
@@ -10,15 +7,25 @@
   }
 
   input {
+    height: 52px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    padding: 0 15px;
     background: none;
     text-transform: uppercase;
   }
 }
 
 .isOpen {
-  input {
+  input, input:hover {
     border-width: 2px;
     padding-left: 14px;
     color: var(--theme-input-focus-border-color);
+    border-color: var(--theme-input-focus-border-color);
+  }
+
+  .selectInput::after {
+    background-color: var(--theme-input-focus-border-color);
+    bottom: 42px;
   }
 }

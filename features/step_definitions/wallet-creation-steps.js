@@ -43,7 +43,7 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
   const recoveryPhrase = mnemonic.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.click(`(//button[contains(@class, 'MnemonicWord_active') and @label = '${word}'])[1]`, By.xpath);
+    await this.click(`(//button[contains(@class, 'MnemonicWord_root') and @label = '${word}'])[1]`, By.xpath);
   }
   const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
   checkboxes.forEach((box) => box.click());
@@ -74,7 +74,7 @@ Then(/^I should stay in the create wallet dialog$/, async function () {
   await this.waitUntilText('.Dialog_title', createMessage.toUpperCase(), 2000);
 });
 
-Then(/^I should see "Wallet name requires at least 3 and at most 40 letters." error message:$/, async function (data) {
+Then(/^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/, async function (data) {
   const error = data.hashes()[0];
   const errorSelector = '.SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);

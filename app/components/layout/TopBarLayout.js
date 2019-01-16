@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Footer from '../footer/Footer';
+// import Footer from '../footer/Footer';
 import styles from './TopBarLayout.scss';
 
 type Props = {
@@ -15,7 +15,8 @@ type Props = {
   isBannerVisible?: boolean,
   languageSelectionBackground?: boolean,
   withFooter? : boolean,
-  oldTheme?: boolean
+  oldTheme?: boolean,
+  footer?: Node,
 };
 
 /** Adds a top bar above the wrapped node */
@@ -29,7 +30,8 @@ export default class TopBarLayout extends Component<Props> {
     isBannerVisible: true,
     languageSelectionBackground: false,
     withFooter: false,
-    oldTheme: false
+    oldTheme: false,
+    footer: undefined,
   };
 
   render() {
@@ -42,6 +44,7 @@ export default class TopBarLayout extends Component<Props> {
       isBannerVisible,
       languageSelectionBackground,
       withFooter,
+      footer,
       oldTheme
     } = this.props;
     const componentClasses = classnames([
@@ -53,7 +56,8 @@ export default class TopBarLayout extends Component<Props> {
     ]);
     const contentClasses = classnames([
       styles.content,
-      withFooter ? styles.contentFooter : ''
+      withFooter ? styles.contentFooter : null,
+      footer ? styles.contentWithFooter : null,
     ]);
 
     return (
@@ -68,13 +72,18 @@ export default class TopBarLayout extends Component<Props> {
           {isBannerVisible && banner}
 
           {notification}
+
           <div className={styles.contentWrapper}>
             <div className={contentClasses}>
               {children}
             </div>
           </div>
 
-          {withFooter && <Footer />}
+          {/* {withFooter && <Footer />} */}
+          {footer &&
+            <div className={styles.footer}>
+              {footer}
+            </div>}
         </div>
       </div>
     );

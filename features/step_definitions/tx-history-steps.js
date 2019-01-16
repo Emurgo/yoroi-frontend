@@ -35,7 +35,10 @@ function mapPendingTxFields(txExpectedStatus, pendingTxFields) {
 }
 
 Given(/^There are transactions already stored$/, async function () {
-  const storedTxs = getFeatureData().lovefieldStoredTxs;
+  const featureData = getFeatureData();
+  const storedTxs = featureData
+    ? featureData.lovefieldStoredTxs
+    : undefined;
   chai.assert(storedTxs !== undefined);
   // refine type
   if (storedTxs === undefined) return;

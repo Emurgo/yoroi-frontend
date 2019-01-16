@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
@@ -13,7 +13,7 @@ import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword, wallet
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
-import InputOwnSkin from '../../themes/skins/InputOwnSkin';
+// import InputOwnSkin from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -74,7 +74,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
   };
 
   componentDidMount() {
-    setTimeout(() => { this.walletNameInput.focus(); });
+    setTimeout(() => { this.walletNameInput.getRef().focus(); });
   }
 
   walletNameInput: Input;
@@ -211,7 +211,8 @@ export default class WalletCreateDialog extends Component<Props, State> {
           ref={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+          // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+          skin={InputSkin}
         />
 
         <div className={styles.walletPassword}>
@@ -221,14 +222,16 @@ export default class WalletCreateDialog extends Component<Props, State> {
               done={isValidWalletPassword(walletPassword)}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              skin={InputSkin}
             />
             <Input
               className="repeatedPassword"
               done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              skin={InputSkin}
             />
             {oldTheme ? (
               <p className={styles.passwordInstructions}>

@@ -1,6 +1,3 @@
-@import "_config";
-// Theme config overrides go here …
-@import "~react-polymorph/lib/themes/simple/SimpleModal";
 // Css module overrides go here …
 
 .overlay {
@@ -12,7 +9,6 @@
   padding: 25px 30px 30px;
   display: flex;
   flex-direction: column;
-  max-height: 97%;
   min-width: 465px;
   max-width: 465px;
 

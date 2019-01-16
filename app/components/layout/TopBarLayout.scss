@@ -1,6 +1,7 @@
 $topBarOldHeight: 64px;
 $topBarHeight: 58px;
 $footerHeight: 60px;
+$footerHeight: 52px;
 
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
@@ -40,19 +41,25 @@ $footerHeight: 60px;
 //   height: calc(100% - #{$topBarHeight});
 // }
 
-.contentFooter {
+.contentWithFooter, .contentFooter {
   height: calc(100% - #{$footerHeight});
 }
 
 .contentWrapper {
   height: 100%;
   overflow-x: hidden;
-  overflow-y: overlay;
+  overflow-y: hidden;
   position: relative;
   &::-webkit-scrollbar-button {
     height: 7px;
     display: block;
   }
+}
+
+.footer {
+  z-index: 1;
+  margin-top: (-$footerHeight);
+  height: $footerHeight;
 }
 
 .main {

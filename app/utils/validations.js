@@ -1,28 +1,18 @@
 import BigNumber from 'bignumber.js';
 import isInt from 'validator/lib/isInt';
 
-export const isValidHardwareWalletName = (walletName) => {
+export const isValidWalletName = (walletName) => {
   const nameLength = walletName.length;
   return nameLength >= 1 && nameLength <= 40;
 };
 
-export const isValidWalletName = (walletName) => {
-  const nameLength = walletName.length;
-  return nameLength >= 3 && nameLength <= 40;
-};
-
-export const isValidWalletPassword = (walletPassword) => {
-  // Validation rules:
-  // - should contain at least one digit: (?=.*\d)
-  // - should contain at least one lower case: (?=.*[a-z])
-  // - should contain at least one upper case: (?=.*[A-Z])
-  // - should contain at least 7 characters long: .{7,}
-  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{7,}$/;
-  return passwordRegex.test(walletPassword);
-};
+export const isValidWalletPassword = (walletPassword) => (
+  // https://xkcd.com/936/
+  walletPassword.length >= 12
+);
 
 export const walletPasswordConditions = (walletPassword) => ({
-  condition1: walletPassword.length >= 7,
+  condition1: walletPassword.length >= 12,
   condition2: walletPassword.match(/[A-Z]/),
   condition3: walletPassword.match(/\d/),
   condition4: walletPassword.match(/[a-z]/)

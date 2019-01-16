@@ -22,7 +22,7 @@ import type {
   UTXO,
   Transaction
 } from '../adaTypes';
-import type { TxValidation } from '../../../types/TransferTypes';
+import { rustRawTxToId } from './utils';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
@@ -117,36 +117,34 @@ export const getTransactionsHistoryForAddresses = (
 );
 
 export type SignedRequest = {
-  signedTx: string,
-  txValidation?: TxValidation
+  signedTx: string
 };
-export type SignedResponse = Array<void>;
+export type SignedResponse = {
+  txId: string
+};
 
 export const sendTx = (
   body: SignedRequest
-): Promise<SignedResponse> => {
-  let txValidation = body.txValidation;
-  if (txValidation && !txValidation.errors.length) {
-    txValidation = { ok: true };
-  }
-  return axios(
+): Promise<SignedResponse> => (
+  axios(
     `${backendUrl}/api/txs/signed`,
     {
       method: 'post',
       data: {
-        signedTx: body.signedTx,
-        validation: txValidation
+        signedTx: body.signedTx
       }
     }
-  ).then(response => response.data)
+  ).then(() => ({
+    txId: rustRawTxToId(Buffer.from(body.signedTx, 'base64'))
+  }))
     .catch((error) => {
       Logger.error('yoroi-backend-api::sendTx error: ' + stringifyError(error));
       if (error.request.response.includes('Invalid witness')) {
         throw new InvalidWitnessError();
       }
       throw new SendTransactionApiError();
-    });
-};
+    })
+);
 
 export type FilterUsedRequest = {
   addresses: Array<string>

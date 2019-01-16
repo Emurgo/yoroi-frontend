@@ -1,0 +1,33 @@
+// Css module overrides go here …
+
+.root {
+    align-items: center;
+  
+    .checked {
+      background-color: var(--rp-checkbox-check-bg-color);
+      border: 0px solid black;
+  
+      &:after {
+        top: 6px;
+        left: 11px;
+      }
+    }
+  }
+  
+  .check {
+    width: 28px;
+    height: 28px;
+    border: (--rp-checkbox-border);
+  }
+  
+  .label {
+    color: var(--theme-checkbox-label-color);
+    font-size: 16px;
+    font-family: var(--font-regular);
+    line-height: 1.5;
+    letter-spacing: 0;
+  
+    strong {
+      font-family: var(--font-medium);
+    }
+  }

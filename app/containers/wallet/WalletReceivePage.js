@@ -10,7 +10,7 @@ import NotificationMessage from '../../components/widgets/NotificationMessage';
 import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedProps } from '../../types/injectedPropsType';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   message: {
     id: 'wallet.receive.page.addressCopyNotificationMessage',
     defaultMessage: '!!!You have successfully copied wallet address',
@@ -92,6 +92,13 @@ export default class WalletReceivePage extends Component<Props, State> {
     return (
       <VerticalFlexContainer>
 
+        <NotificationMessage
+          icon={successIcon}
+          show={uiNotifications.isOpen(notification.id)}
+        >
+          {notification.message}
+        </NotificationMessage>
+
         <WalletReceive
           walletAddress={walletAddress}
           isWalletAddressUsed={isWalletAddressUsed}
@@ -102,6 +109,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             actions.notifications.open.trigger({
               id: notification.id,
               duration: notification.duration,
+              message: messages.message
             });
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
@@ -111,7 +119,6 @@ export default class WalletReceivePage extends Component<Props, State> {
         />
 
         {theme.old && notificationComponent}
-
       </VerticalFlexContainer>
     );
   }

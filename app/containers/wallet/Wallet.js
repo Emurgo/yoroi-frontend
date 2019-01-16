@@ -41,8 +41,18 @@ export default class Wallet extends Component<Props> {
         </MainLayout>
       );
     }
+
+    const footer = undefined;
+
     return (
-      <MainLayout actions={actions} stores={stores} oldTheme={theme.old} withFooter={!theme.old}>
+      <MainLayout
+        actions={actions}
+        stores={stores}
+        footer={footer}
+        // my changes!
+        oldTheme={theme.old}
+        withFooter={!theme.old}
+      >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}

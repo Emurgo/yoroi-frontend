@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
-import InputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import styles from './AmountInputSkin.scss';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   feesLabel: {
     id: 'wallet.amountInput.feesLabel',
     defaultMessage: '!!!+ {amount} of fees',

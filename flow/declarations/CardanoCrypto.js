@@ -127,7 +127,7 @@ declare module 'rust-cardano-crypto' {
   }
 }
 
-declare type RustRawTxBody = Array<number>
+declare type RustRawTxBody = Array<number> | Buffer
 
 declare type SpendResponse = {
   cbor_encoded_tx: RustRawTxBody,
@@ -150,8 +150,7 @@ declare type CryptoWallet = {
 }
 
 declare type CryptoDaedalusWallet = {
-  root_key: string,
-  root_cached_key: string,
+  root_cached_key: string, // equal to `root_key` in CryptoWallet
   config: CryptoConfig,
   selection_policy: SelectionPolicy,
   derivation_scheme: DerivationScheme

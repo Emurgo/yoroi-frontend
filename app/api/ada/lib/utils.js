@@ -11,12 +11,8 @@ import type {
 import {
   stringifyError
 } from '../../../utils/logging';
-import {
-  blake2b,
-  // eslint-disable-next-line camelcase
-  _sha3_256,
-  isValidAddress
-} from 'cardano-crypto.js';
+// eslint-disable-next-line
+import { Blake2b } from 'rust-cardano-crypto';
 
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();
@@ -37,28 +33,15 @@ export type DecodedAddress = {
   checksum: number
 }
 
-export function decodeAddress(address: string): DecodedAddress {
-  if (!isValidAddress(address)) {
-    throw new Error(`Invalid Cardano address`);
-  }
-  try {
-    const bytes = bs58.decode(address);
-    const [addressData, checksum] = cbor.decode(bytes);
-    const [root, attr, type] = cbor.decode(addressData.value);
-    return { root: root.toString('hex'), attr, type, checksum };
-  } catch (e) {
-    throw new Error('Failed to decode an address! Cause: ' + stringifyError(e));
-  }
-}
-
-export function createAddressRoot(pubKey: Buffer, type: number, attr: any): Buffer {
-  try {
-    const newRootData = cbor.encode([type, [type, pubKey], attr]);
-    return blake2b(_sha3_256(newRootData), 28);
-  } catch (e) {
-    throw new Error('Failed to create address root! Cause: ' + stringifyError(e));
-  }
-}
+type CheckSum = number
+type Coin = number
+type CborAddress = [cbor.Tagged, CheckSum]
+type CborTxInput = [number, cbor.Tagged]
+type CborTxOutput = [CborAddress, Coin]
+type CborTxAttributes = {}
+type CborTxBase = [Array<CborTxInput>, Array<CborTxOutput>, CborTxAttributes];
+type CborTxWitnesses = Array<any>
+type CborTxSigned = [CborTxBase, CborTxWitnesses];
 
 export const toAdaTx = function (
   amount: BigNumber,
@@ -93,6 +76,58 @@ const _getTxCondition = (state: string): AdaTransactionCondition => {
   if (state === 'Pending') return 'CPtxApplying';
   return 'CPtxWontApply';
 };
+
+class CborIndefiniteLengthArray {
+  elements: Array<any>;
+  constructor(elements: Array<any>) {
+    this.elements = elements;
+  }
+  encodeCBOR(encoder: cbor.Encoder) {
+    return encoder.push(
+      Buffer.concat([
+        Buffer.from([0x9f]), // indefinite array prefix
+        ...this.elements.map((e) => cbor.encode(e)),
+        Buffer.from([0xff]), // end of array
+      ])
+    );
+  }
+}
+
+export function rustRawTxToId(rustTxBody: RustRawTxBody): string {
+  if (!rustTxBody) {
+    throw new Error('Cannot decode inputs from undefined transaction!');
+  }
+  try {
+    const [inputs, outputs, attributes]: CborTxBase =
+      decodedTxToBase(cbor.decode(Buffer.from(rustTxBody)));
+    const enc = cbor.encode([
+      new CborIndefiniteLengthArray(inputs),
+      new CborIndefiniteLengthArray(outputs),
+      attributes
+    ]);
+    // eslint-disable-next-line
+    return Buffer.from(Blake2b.blake2b_256(enc)).toString('hex');
+  } catch (e) {
+    throw new Error('Failed to convert raw transaction to ID! ' + stringifyError(e));
+  }
+}
+
+function decodedTxToBase(decodedTx: any): CborTxBase {
+  if (Array.isArray(decodedTx)) {
+    // eslint-disable-next-line default-case
+    switch (decodedTx.length) {
+      case 2: {
+        const signed: CborTxSigned = decodedTx;
+        return signed[0];
+      }
+      case 3: {
+        const base: CborTxBase = decodedTx;
+        return base;
+      }
+    }
+  }
+  throw new Error('Unexpected decoded tx structure! ' + JSON.stringify(decodedTx));
+}
 
 export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   if (!rustTxBody) {
