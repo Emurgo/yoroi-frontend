@@ -100,9 +100,6 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           onChooseRedemptionType={(choice) => {
             chooseRedemptionType.trigger({ redemptionType: choice });
           }}
-          onRedemptionCodeChanged={(redemptionCode) => {
-            setRedemptionCode.trigger({ redemptionCode });
-          }}
           error={adaRedemption.error}
           isSubmitting={false} // TODO: for now this is a mock just to test the UI
           isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
