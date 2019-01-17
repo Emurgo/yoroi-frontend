@@ -14,11 +14,6 @@ import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
 
 const messages = defineMessages({
-  card: {
-    id: 'wallet.transaction.type.card',
-    defaultMessage: '!!!Card payment',
-    description: 'Transaction type shown for credit card payments.',
-  },
   type: {
     id: 'wallet.transaction.type',
     defaultMessage: '!!!{currency} transaction',
@@ -60,12 +55,12 @@ const messages = defineMessages({
     description: 'Label "{currency} received" for the transaction.',
   },
   intrawallet: {
-    id: 'wallet.transaction.intrawallet',
+    id: 'wallet.transaction.type.intrawallet',
     defaultMessage: '!!!{currency} intrawallet transaction',
     description: 'both sender & receiver are yourself',
   },
   multiparty: {
-    id: 'wallet.transaction.multiparty',
+    id: 'wallet.transaction.type.multiparty',
     defaultMessage: '!!!{currency} multiparty transaction',
     description: 'only some inputs of tx belong to you',
   },
@@ -260,9 +255,9 @@ export default class Transaction extends Component<Props, State> {
               <h2>
                 Fee:
               </h2>
-              {formattedWalletAmount(data.fee, false)}
+              <span>{formattedWalletAmount(data.fee.abs(), false)}</span>
               <h2>
-                <span>{intl.formatMessage(messages.fromAddresses)}</span>
+                {intl.formatMessage(messages.fromAddresses)}
               </h2>
               {uniq(data.addresses.from).map(address => (
                 <span key={`${data.id}-from-${address}`} className={styles.address}>{address}</span>
