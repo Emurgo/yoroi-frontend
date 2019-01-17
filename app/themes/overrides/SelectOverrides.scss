@@ -13,6 +13,10 @@
     padding: 0 15px;
     background: none;
     text-transform: uppercase;
+
+    &:hover {
+      border-color: var(--rp-input-border-color-focus);
+    }
   }
 }
 
@@ -20,12 +24,12 @@
   input, input:hover {
     border-width: 2px;
     padding-left: 14px;
-    color: var(--theme-input-focus-border-color);
-    border-color: var(--theme-input-focus-border-color);
+    color: var(--rp-input-border-color-focus);
+    border-color: var(--rp-input-border-color-focus);
   }
 
   .selectInput::after {
-    background-color: var(--theme-input-focus-border-color);
+    background-color: var(--rp-input-border-color-focus);
     bottom: 42px;
   }
 }

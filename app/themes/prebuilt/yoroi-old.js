@@ -71,7 +71,7 @@ const rpInput = {
   '--rp-input-bg-color': '#f3f3f5',
   '--rp-input-bg-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
   '--rp-input-border-color': '#c6cdd6',
-  '--rp-input-border-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
+  '--rp-input-border-color-disabled': 'rgba(207, 207, 207, 0.2)', // #cfcfcf
   '--rp-input-border-color-errored': '#ea4c5b',
   '--rp-input-border-color-focus': '#121327',
   '--rp-input-line-height': '22px',

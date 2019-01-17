@@ -11,16 +11,16 @@
   margin: 0;
   line-height: 1.33;
   font-size: 12px;
-  color: var(--theme-input-error-color);  
+  // color: var(--theme-input-error-color);
 }
 
 .errored {
   input:hover {
-    border: 1px solid var(--theme-input-error-color);
+    border: 1px solid var(--rp-theme-color-error);
   }
 
   input:focus, input:active {
-    border: 2px solid var(--theme-input-error-color);
+    border: 2px solid var(--rp-theme-color-error);
   }
 }
 
@@ -29,10 +29,9 @@
   background: white;
   top: 3px;
   left: 10px;
-  color: var(--theme-input-label-color);
-  font-family: var(--font-regular);
+  font-family: var(--rp-theme-font-regular);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: normal;
   padding: 0 6px;
   z-index: 1;
 }

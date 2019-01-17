@@ -7,6 +7,7 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
+import HelpLinkFooter from '../../components/footer/HelpLinkFooter';
 
 type Props = InjectedContainerProps;
 
@@ -42,14 +43,19 @@ export default class Wallet extends Component<Props> {
       );
     }
 
-    const footer = undefined;
+    // const footer = undefined;
+    const footer = (
+      <HelpLinkFooter
+        showBuyTrezorHardwareWallet
+        showWhatIsHardwareWallet
+      />
+    );
 
     return (
       <MainLayout
         actions={actions}
         stores={stores}
         footer={footer}
-        // my changes!
         oldTheme={theme.old}
         withFooter={!theme.old}
       >

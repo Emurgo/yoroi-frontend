@@ -80,10 +80,11 @@ export default class TopBarLayout extends Component<Props> {
           </div>
 
           {/* {withFooter && <Footer />} */}
-          {footer &&
+          {footer && withFooter ? (
             <div className={styles.footer}>
               {footer}
-            </div>}
+            </div>
+          ) : null}
         </div>
       </div>
     );

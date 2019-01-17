@@ -3,7 +3,7 @@
   text-align: justify;
 
   h1, h2 {
-    font-family: var(--font-medium);
+    font-family: var(--rp-theme-font-medium);
     font-size: 17px;
     margin-bottom: 11px;
   }
@@ -18,7 +18,7 @@
   }
 
   p, li {
-    font-family: var(--font-regular);
+    font-family: var(--rp-theme-font-regular);
     font-size: 14px;
     letter-spacing: 0.5px;
     line-height: 1.38;
@@ -34,7 +34,7 @@
   text-align: justify;
 
   h1, h2 {
-    font-family: var(--font-medium);
+    font-family: var(--rp-theme-font-medium);
     font-size: 16px;
     margin-bottom: 11px;
   }
@@ -54,7 +54,7 @@
 
   p, li {
     color: var(--theme-terms-of-use-text-color);
-    font-family: var(--font-regular);
+    font-family: var(--rp-theme-font-regular);
     font-size: 13px;
     letter-spacing: 0.5px;
     line-height: 1.54;

@@ -9,7 +9,6 @@
 }
 
 .component {
-  // align-items: center;
   padding-top: 222px;
   display: flex;
   height: 100%;
@@ -35,7 +34,29 @@
     text-align: center;
     font-size: 16px;
     text-transform: uppercase;
-    font-family: var(--font-medium);
+    font-family: var(--rp-theme-font-medium);
+  }
+}
+
+:global {
+  .SelectOverrides_isOpen .SelectOverrides_selectInput {
+    input, input:hover {
+      border-color: var(--theme-select-language-color);
+      color: var(--theme-select-language-color);
+    }
+
+    &::after {
+      background-color: var(--theme-select-language-color)!important;
+    }
+  }
+
+  .LanguageSelectionForm_languageSelect {
+    .InputOverrides_input:not([disabled]):focus,
+    .InputOverrides_input:not([disabled]):active,
+    .InputOverrides_input:not([disabled]):focus:hover,
+    .InputOverrides_input:not([disabled]):active:hover {
+      border-color: var(--theme-select-language-color);
+    }
   }
 }
 

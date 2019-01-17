@@ -1,5 +1,5 @@
 .testnetWarningOld {
-    font-family: var(--font-bold);
+    font-family: var(--rp-theme-font-bold);
     text-align: center;
     color: white;
     background-color: var(--theme-banner-warning-background-color);
@@ -13,7 +13,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: var(--font-regular);
+  font-family: var(--rp-theme-font-regular);
   text-align: center;
   color: white;
   background-color: var(--theme-banner-warning-background-color);
@@ -22,14 +22,14 @@
   font-size: 14px;
   line-height: 21px;
 
-  span:first-child {
-    font-family: var(--font-bold);
+  span:nth-child(2) {
+    font-family: var(--rp-theme-font-bold);
     text-transform: uppercase;
   }
 
   a {
     color: white;
-    font-family: var(--font-bold);
+    font-family: var(--rp-theme-font-bold);
     text-transform: uppercase;
   }
 }

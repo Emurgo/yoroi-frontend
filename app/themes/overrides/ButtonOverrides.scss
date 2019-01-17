@@ -3,22 +3,12 @@
 .root {
   background: transparent;
   font-size: 16px;
-  font-family: var(--font-medium);
   height: 52px;
   border-radius: 8px;
   padding: 12px 20px;
   position: relative;
   text-transform: uppercase;
   width: 400px;
-
-  // &:not([disabled]) {
-  //   &:hover {
-  //     background: transparent;
-  //   }
-  //   &:active {
-  //     background: transparent;
-  //   }
-  // }
 }
 
 :global {
@@ -40,30 +30,6 @@
       }
       &:active {
         background: var(--theme-button-primary-background-color-active);
-      }
-    }
-  }
-
-
-  .flat {
-    &[disabled] {
-      background: var(--theme-button-flat-background-color-disabled);
-      color: var(--theme-button-flat-text-color-disabled);
-      cursor: default !important;
-      &:hover,
-      &:active {
-        background: var(--theme-button-flat-background-color-disabled);
-      }
-    }
-    &:not([disabled]) {
-      background-color: var(--theme-button-flat-background-color);
-      color: var(--theme-button-flat-text-color);
-      &:hover {
-        background-color: var(--theme-button-flat-background-color-hover);
-        color: var(--theme-button-flat-text-color);
-      }
-      &:active {
-        background-color: var(--theme-button-flat-background-color-active);
       }
     }
   }

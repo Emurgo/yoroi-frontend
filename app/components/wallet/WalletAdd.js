@@ -5,7 +5,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
+// import globalMessages from '../../i18n/global-messages';
 import styles from './WalletAdd.scss';
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 
@@ -125,30 +125,6 @@ export default class WalletAdd extends Component<Props> {
           ) : null}
 
         </div>
-
-        {!oldTheme && (
-          <div className={styles.footer}>
-            <a href="/" className={styles.link}>
-              <div className={classnames([styles.footerIcon, styles.buyIcon])} />
-              <span>{intl.formatMessage(globalMessages.buyTrezorMessage)}</span>
-            </a>
-
-            <a href="/" className={styles.link}>
-              <div className={classnames([styles.footerIcon, styles.connectIcon])} />
-              <span>{intl.formatMessage(globalMessages.howToConnectTrezorMessage)}</span>
-            </a>
-
-            <a href="/" className={styles.link}>
-              <div className={classnames([styles.footerIcon, styles.createIcon])} />
-              <span>{intl.formatMessage(globalMessages.howToCreateWalletMessage)}</span>
-            </a>
-
-            <a href="/" className={styles.link}>
-              <div className={classnames([styles.footerIcon, styles.restoreIcon])} />
-              <span>{intl.formatMessage(globalMessages.howToRestoreWalletMessage)}</span>
-            </a>
-          </div>
-        )}
 
         {!oldTheme && <div className={styles.background} />}
 

@@ -29,18 +29,13 @@ const rpBubble = {
 
 // BUTTON
 const rpButton = {
-  '--rp-button-bg-color': '#daa49a',
-  '--rp-button-bg-color-active': '#c4948b',
+  '--rp-button-bg-color': '#17d1aa',
+  '--rp-button-bg-color-active': '#12b190',
   '--rp-button-bg-color-disabled': 'rgba(218, 164, 154, 0.3)', // #DAA49A
-  '--rp-button-bg-color-hover': '#edb3a8',
+  '--rp-button-bg-color-hover': '#17e2b8',
   '--rp-button-font-family': rpFonts['--rp-theme-font-medium'],
-  '--rp-button-font-size': '14px',
-  '--rp-button-height': '40px',
-  '--rp-button-line-height': '20px',
-  '--rp-button-padding': '12px 20px',
   '--rp-button-text-color': '#fff',
   '--rp-button-text-transform': 'none',
-  '--rp-button-width': '400px',
 };
 
 // CHECKBOX
@@ -54,33 +49,31 @@ const rpCheckbox = {
 
 // COLORS
 const rpColors = {
-  '--rp-theme-color-error': '#ea4c5b',
+  '--rp-theme-color-error': '#ff1351',
 };
 
 // FORMFIELD
 const rpFormfield = {
   '--rp-formfield-bg-color-disabled': 'none',
-  '--rp-formfield-label-text-color': '#121327',
-  '--rp-formfield-label-text-color-disabled': '#121327',
-  '--rp-formfield-error-text-color': '#ea4c5b',
-  '--rp-formfield-error-text-opacity': '0.75',
+  '--rp-formfield-label-text-color': '#353535',
+  '--rp-formfield-label-text-color-disabled': 'rgba(53, 53, 53, 0.5)', // '#353535
+  '--rp-formfield-error-text-color': '#ff1351',
+  '--rp-formfield-error-text-opacity': '1',
 };
 
 // INPUT
 const rpInput = {
-  '--rp-input-bg-color': '#f3f3f5',
-  '--rp-input-bg-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
-  '--rp-input-border-color': '#c6cdd6',
-  '--rp-input-border-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
-  '--rp-input-border-color-errored': '#ea4c5b',
-  '--rp-input-border-color-focus': '#121327',
-  '--rp-input-line-height': '22px',
-  '--rp-input-padding': '10px',
+  '--rp-input-bg-color': 'transparent',
+  '--rp-input-bg-color-disabled': 'transparent',
+  '--rp-input-border-color': '#9b9b9b',
+  '--rp-input-border-color-disabled': 'rgba(155, 155, 155, 0.5)', // #9b9b9b
+  '--rp-input-border-color-errored': '#ff1351',
+  '--rp-input-border-color-focus': '#4a4a4a',
   '--rp-input-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
   '--rp-input-placeholder-color-disabled': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-input-text-color': '#121327',
+  '--rp-input-text-color': '#353535',
   '--rp-input-text-color-disabled': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-input-font-family': rpFonts['--rp-theme-font-light'],
+  '--rp-input-font-family': rpFonts['--rp-theme-font-regular'],
 };
 
 // MODAL
@@ -200,13 +193,6 @@ export default {
   '--theme-button-primary-text-color-disabled': '#ffffff',
   '--theme-button-primary-text-color': '#ffffff',
 
-  '--theme-button-flat-background-color': 'rgba(218, 164, 154, 0.1)',
-  '--theme-button-flat-background-color-hover': 'rgba(242, 183, 172, 0.1)',
-  '--theme-button-flat-background-color-active': 'rgba(191, 144, 136, 0.1)',
-  '--theme-button-flat-background-color-disabled': 'rgba(240, 243, 245, 0.3)',
-  '--theme-button-flat-text-color-disabled': '#353535',
-  '--theme-button-flat-text-color': '#353535',
-
   '--theme-button-outlined-background-color': '#15d1aa',
   '--theme-button-outlined-background-color-hover': 'rgba(23, 226, 184, 0.1)',
   '--theme-button-outlined-border-color-hover': 'rgb(23, 226, 184)',
@@ -220,13 +206,7 @@ export default {
   '--theme-checkbox-border-color': '#353535',
   '--theme-checkbox-background-color-checked': '#17d1aa',
 
-  '--theme-select-arrow-color': '#353535',
-  '--theme-select-arrow-color-open': '#15d1aa',
-  '--theme-select-background-color': '#ffffff',
-  '--theme-select-option-highlight-color': '#edeeef',
-  '--theme-select-option-text-color': '#353535',
-  '--theme-select-options-border-color': '#ffffff',
-  '--theme-select-options-shadow': 'none',
+  '--theme-select-language-color': '#15d1aa',
 
   '--theme-dialog-choice-tabs-text-color': '#353535',
   '--theme-dialog-choice-tabs-text-color-active': '#353535',
@@ -351,4 +331,7 @@ export default {
   '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#ffffff',
 
   '--theme-widgets-progress-step-common-color': '#15d1aa',
+
+  '--theme-footer-block-background-color': '#fff',
+  '--theme-footer-block-background-color-hover': 'rgba(21, 209, 170, 0.16)',
 };
