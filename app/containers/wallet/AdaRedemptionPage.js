@@ -30,7 +30,8 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
       isRedemptionDisclaimerAccepted
     } = adaRedemption;
     const {
-      chooseRedemptionType, setRedemptionCode, setCertificate
+      chooseRedemptionType, setRedemptionCode, setCertificate, setPassPhrase, setEmail,
+      setAdaAmount, setAdaPasscode, setDecryptionKey
     } = this.props.actions.ada.adaRedemption;
 
     const selectableWallets = wallets.all.map((w) => ({
@@ -72,15 +73,15 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
     return (
       <div>
         <AdaRedemptionForm
-          redemptionCodeValidator={() => {}} // TODO: for now this is a mock just to test the UI
-          postVendRedemptionCodeValidator={() => {}} // TODO: for now this is a mock just to test the UI
-          onSubmit={() => {}} // TODO: for now this is a mock just to test the UI
-          onPassPhraseChanged={() => {}} // TODO: for now this is a mock just to test the UI
-          onEmailChanged={() => {}} // TODO: for now this is a mock just to test the UI
-          onDecryptionKeyChanged={() => {}} // TODO: for now this is a mock just to test the UI
-          onAdaPasscodeChanged={() => {}} // TODO: for now this is a mock just to test the UI
-          onAdaAmountChanged={() => {}} // TODO: for now this is a mock just to test the UI
-          onCertificateSelected={(certificate) => {}} // TODO: for now this is a mock just to test the UI
+          onCertificateSelected={(certificate) => setCertificate.trigger({ certificate })}
+          onPassPhraseChanged={(passPhrase) => setPassPhrase.trigger({ passPhrase })}
+          onRedemptionCodeChanged={(redemptionCode) => {
+            setRedemptionCode.trigger({ redemptionCode });
+          }}
+          onEmailChanged={(email) => setEmail.trigger({ email })}
+          onAdaAmountChanged={(adaAmount) => setAdaAmount.trigger({ adaAmount })}
+          onAdaPasscodeChanged={(adaPasscode) => setAdaPasscode.trigger({ adaPasscode })}
+          onDecryptionKeyChanged={(decryptionKey) => setDecryptionKey.trigger({ decryptionKey })}
           mnemonicValidator={() => { return false; }} // TODO: for now this is a mock just to test the UI
           wallets={selectableWallets}
           isCertificateSelected={isCertificateSelected}
@@ -98,9 +99,6 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           getSelectedWallet={walletId => wallets.getWalletById(walletId)}
           onChooseRedemptionType={(choice) => {
             chooseRedemptionType.trigger({ redemptionType: choice });
-          }}
-          onRedemptionCodeChanged={(redemptionCode) => {
-            setRedemptionCode.trigger({ redemptionCode });
           }}
           error={adaRedemption.error}
           isSubmitting={false} // TODO: for now this is a mock just to test the UI

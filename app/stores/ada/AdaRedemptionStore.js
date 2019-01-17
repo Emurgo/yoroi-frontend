@@ -29,8 +29,19 @@ export default class AdaRedemptionStore extends Store {
   setup() {
     const actions = this.actions.ada.adaRedemption;
     actions.chooseRedemptionType.listen(this._chooseRedemptionType);
+    actions.setCertificate.listen(this._setCertificate);
+    actions.setPassPhrase.listen(this._setPassPhrase);
     actions.setRedemptionCode.listen(this._setRedemptionCode);
+    actions.setEmail.listen(this._setEmail);
+    actions.setAdaPasscode.listen(this._setAdaPasscode);
+    actions.setAdaAmount.listen(this._setAdaAmount);
+    actions.setDecryptionKey.listen(this._setDecryptionKey);
   }
+
+  isValidRedemptionMnemonic = (passPhrase: string) => (
+    // TODO: implement method
+    true
+  );
 
   @action _chooseRedemptionType = (params: {
     redemptionType: RedemptionTypeChoices,
@@ -41,8 +52,45 @@ export default class AdaRedemptionStore extends Store {
     }
   };
 
-  _setRedemptionCode = action(({ redemptionCode }: { redemptionCode: string }) => {
+  _setCertificate = action(({ certificate }) => {
+    this.certificate = certificate;
+    this.isCertificateEncrypted = certificate.type !== 'application/pdf';
+    if (this.isCertificateEncrypted && (!this.passPhrase || !this.decryptionKey)) {
+      this.redemptionCode = '';
+      this.passPhrase = null;
+      this.decryptionKey = null;
+      return; // We cannot decrypt it yet!
+    }
+    this._parseCodeFromCertificate();
+  });
+
+  _setPassPhrase = action(({ passPhrase } : { passPhrase: string }) => {
+    this.passPhrase = passPhrase;
+    if (this.isValidRedemptionMnemonic(passPhrase)) this._parseCodeFromCertificate();
+  });
+
+  _setRedemptionCode = action(({ redemptionCode } : { redemptionCode: string }) => {
     this.redemptionCode = redemptionCode;
+  });
+
+  _setEmail = action(({ email } : { email: string }) => {
+    this.email = email;
+    this._parseCodeFromCertificate();
+  });
+
+  _setAdaPasscode = action(({ adaPasscode } : { adaPasscode: string }) => {
+    this.adaPasscode = adaPasscode;
+    this._parseCodeFromCertificate();
+  });
+
+  _setAdaAmount = action(({ adaAmount } : { adaAmount: string }) => {
+    this.adaAmount = adaAmount;
+    this._parseCodeFromCertificate();
+  });
+
+  _setDecryptionKey = action(({ decryptionKey } : { decryptionKey: string }) => {
+    this.decryptionKey = decryptionKey;
+    this._parseCodeFromCertificate();
   });
 
   _parseCodeFromCertificate() {
