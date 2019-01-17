@@ -11,6 +11,7 @@ import { assuranceLevels } from '../../../config/transactionAssuranceConfig';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionState } from '../../../domain/WalletTransaction';
 import environment from '../../../environment';
+import { Logger } from '../../../utils/logging';
 
 const messages = defineMessages({
   card: {
@@ -57,6 +58,16 @@ const messages = defineMessages({
     id: 'wallet.transaction.received',
     defaultMessage: '!!!{currency} received',
     description: 'Label "{currency} received" for the transaction.',
+  },
+  intrawallet: {
+    id: 'wallet.transaction.intrawallet',
+    defaultMessage: '!!!{currency} intrawallet transaction',
+    description: 'both sender & receiver are yourself',
+  },
+  multiparty: {
+    id: 'wallet.transaction.multiparty',
+    defaultMessage: '!!!{currency} multiparty transaction',
+    description: 'only some inputs of tx belong to you',
   },
   fromAddress: {
     id: 'wallet.transaction.address.from',
@@ -142,6 +153,36 @@ export default class Transaction extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   }
 
+  getTransactionHeaderMsg(intl, currency: string, type: TransactionType): string {
+    if (type === transactionTypes.EXPEND) {
+      return intl.formatMessage(messages.sent, { currency });
+    }
+    if (type === transactionTypes.INCOME) {
+      return intl.formatMessage(messages.received, { currency });
+    }
+    if (type === transactionTypes.SELF) {
+      return intl.formatMessage(messages.intrawallet, { currency });
+    }
+    if (type === transactionTypes.MULTI) {
+      Logger.error('MULTI type transaction detected.');
+      return intl.formatMessage(messages.multiparty, { currency });
+    }
+    // unused
+    if (type === transactionTypes.EXCHANGE) {
+      Logger.error('EXCHANGE type transactions not supported');
+      return '???';
+    }
+  }
+
+  getAmountStyle(amt: BigNumber) {
+    return classNames([
+      styles.amount,
+      amt.lt(0)
+        ? styles.amountSent
+        : styles.amountReceived
+    ]);
+  }
+
   render() {
     const data = this.props.data;
     const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
@@ -164,11 +205,6 @@ export default class Transaction extends Component<Props, State> {
       isExpanded ? styles.expanded : styles.closed
     ]);
 
-    const amountStyles = classNames([
-      styles.amount,
-      data.type === transactionTypes.EXPEND ? styles.amountSent : styles.amountReceived
-    ]);
-
     const status = intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
     const symbol = adaSymbol;
@@ -181,10 +217,7 @@ export default class Transaction extends Component<Props, State> {
           <div className={styles.togglerContent}>
             <div className={styles.header}>
               <div className={styles.title}>
-                {data.type === transactionTypes.EXPEND ?
-                  intl.formatMessage(messages.sent, { currency }) :
-                  intl.formatMessage(messages.received, { currency })
-                }
+                { this.getTransactionHeaderMsg(intl, currency, data.type) }
               </div>
               <div className={styles.type}>
                 {moment(data.date).format('hh:mm:ss A')}
@@ -196,7 +229,7 @@ export default class Transaction extends Component<Props, State> {
                   {intl.formatMessage(stateTranslations[state])}
                 </div>
               )}
-              <div className={amountStyles}>
+              <div className={this.getAmountStyle(data.amount)}>
                 {
                   // hide currency (we are showing symbol instead)
                   formattedWalletAmount(data.amount, false)
@@ -225,7 +258,11 @@ export default class Transaction extends Component<Props, State> {
             )}
             <div>
               <h2>
-                {intl.formatMessage(messages.fromAddresses)}
+                Fee:
+              </h2>
+              {formattedWalletAmount(data.fee, false)}
+              <h2>
+                <span>{intl.formatMessage(messages.fromAddresses)}</span>
               </h2>
               {uniq(data.addresses.from).map(address => (
                 <span key={`${data.id}-from-${address}`} className={styles.address}>{address}</span>
