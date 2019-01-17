@@ -1,8 +1,14 @@
 // @flow
 import pdfjsLib from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min';
 import type { PDF } from '../adaTypes';
 import { decryptForceVend, decryptRecoveryRegularVend, decryptRecoveryForceVend, decryptRegularVend } from './decrypt';
 import { InvalidCertificateError, ReadFileError, DecryptionError, ParsePDFFileError, ParsePDFPageError, ParsePDFKeyError } from '../errors';
+
+// Pdfjs Worker is initialized
+const pdfjsWorkerBlob = new Blob([pdfjsWorker]);
+const pdfjsWorkerBlobURL = URL.createObjectURL(pdfjsWorkerBlob);
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerBlobURL;
 
 export const getSecretKey = (parsedPDF: string): string => {
   try {
@@ -88,7 +94,7 @@ export const parsePDFFile = (file: Uint8Array): Promise<string> => (
       }
       return resolve(pagesText);
     }).catch(error => {
-      console.log('pdfParser::parsePDFFile error: ' + JSON.stringify(error));
+      console.log('pdfParser::parsePDFFile error: ', error);
       reject(new ParsePDFFileError());
     });
   })
