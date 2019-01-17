@@ -5,7 +5,7 @@ import type { PDF } from '../adaTypes';
 import { decryptForceVend, decryptRecoveryRegularVend, decryptRecoveryForceVend, decryptRegularVend } from './decrypt';
 import { InvalidCertificateError, ReadFileError, DecryptionError, ParsePDFFileError, ParsePDFPageError, ParsePDFKeyError } from '../errors';
 
-// Pdfjs Worker is initialized
+// Pdfjs Worker is initialized, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
 const pdfjsWorkerBlob = new Blob([pdfjsWorker]);
 const pdfjsWorkerBlobURL = URL.createObjectURL(pdfjsWorkerBlob);
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerBlobURL;
