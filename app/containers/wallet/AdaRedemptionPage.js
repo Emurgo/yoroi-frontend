@@ -32,7 +32,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
     } = adaRedemption;
     const {
       chooseRedemptionType, setRedemptionCode, setCertificate, setPassPhrase, setEmail,
-      setAdaAmount, setAdaPasscode, setDecryptionKey, acceptRedemptionDisclaimer
+      setAdaAmount, setAdaPasscode, setDecryptionKey, acceptRedemptionDisclaimer, removeCertificate
     } = this.props.actions.ada.adaRedemption;
 
     const selectableWallets = wallets.all.map((w) => ({
@@ -96,7 +96,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           }
           suggestedMnemonics={validWords}
           isCertificateInvalid={error instanceof AdaRedemptionCertificateParseError}
-          onRemoveCertificate={() => {}} // TODO: for now this is a mock just to test the UI
+          onRemoveCertificate={removeCertificate.trigger}
           redemptionType={redemptionType}
           redemptionCode={adaRedemption.redemptionCode}
           getSelectedWallet={walletId => wallets.getWalletById(walletId)}

@@ -1,5 +1,5 @@
 // @flow
-import { action, observable } from 'mobx';
+import { action, observable, computed } from 'mobx';
 import { isString } from 'lodash';
 import Store from '../base/Store';
 import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
@@ -12,6 +12,8 @@ import {
   NoCertificateError
 } from '../../api/ada/errors';
 import LocalizableError from '../../i18n/LocalizableError';
+import { ROUTES } from '../../routes-config';
+import { matchRoute } from '../../utils/routing';
 
 export default class AdaRedemptionStore extends Store {
 
@@ -26,6 +28,8 @@ export default class AdaRedemptionStore extends Store {
   @observable adaAmount: ?string = null;
   @observable adaPasscode: ?string = null;
   @observable isRedemptionDisclaimerAccepted = false;
+  @observable walletId: ?string = null;
+  @observable shieldedRedemptionKey: ?string = null;
 
   setup() {
     const actions = this.actions.ada.adaRedemption;
@@ -37,7 +41,11 @@ export default class AdaRedemptionStore extends Store {
     actions.setAdaPasscode.listen(this._setAdaPasscode);
     actions.setAdaAmount.listen(this._setAdaAmount);
     actions.setDecryptionKey.listen(this._setDecryptionKey);
+    actions.removeCertificate.listen(this._onRemoveCertificate);
     actions.acceptRedemptionDisclaimer.listen(this._onAcceptRedemptionDisclaimer);
+    this.registerReactions([
+      this._resetRedemptionFormValuesOnAdaRedemptionPageLoad,
+    ]);
   }
 
   isValidRedemptionKey = (redemptionKey: string) => (
@@ -51,6 +59,10 @@ export default class AdaRedemptionStore extends Store {
   isValidPaperVendRedemptionKey = (mnemonic: string) => (
     this.api.ada.isValidPaperVendRedemptionKey(mnemonic)
   );
+
+  @computed get isAdaRedemptionPage(): boolean {
+    return matchRoute(ROUTES.SETTINGS.ADA_REDEMPTION, this.stores.app.currentRoute);
+  }
 
   @action _chooseRedemptionType = (params: {
     redemptionType: RedemptionTypeChoices,
@@ -169,9 +181,34 @@ export default class AdaRedemptionStore extends Store {
     this.decryptionKey = null;
   });
 
+  _resetRedemptionFormValuesOnAdaRedemptionPageLoad = () => {
+    if (this.isAdaRedemptionPage) this._reset();
+  };
+
+  _onRemoveCertificate = action(() => {
+    this.error = null;
+    this.certificate = null;
+    this.redemptionCode = '';
+    this.passPhrase = null;
+    this.email = null;
+    this.adaPasscode = null;
+    this.adaAmount = null;
+    this.decryptionKey = null;
+  });
+
   @action _reset = () => {
+    this.error = null;
+    this.certificate = null;
+    this.isCertificateEncrypted = false;
+    this.walletId = null;
     this.redemptionType = ADA_REDEMPTION_TYPES.REGULAR;
     this.redemptionCode = '';
+    this.shieldedRedemptionKey = null;
+    this.passPhrase = null;
+    this.email = null;
+    this.adaPasscode = null;
+    this.adaAmount = null;
+    this.decryptionKey = null;
   };
 
 }
