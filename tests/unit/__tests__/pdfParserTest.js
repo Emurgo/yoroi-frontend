@@ -1,12 +1,20 @@
 import chai, { assert } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import mockData from './mockData/mockData.json';
-import { getMockedFileBuffer } from './mockData/mockDataBuilder';
-
-const pdfParser = require('../../../app/api/ada/lib/pdfParser');
+import mockData from '../mockData/mockData.json';
+import { getMockedFileBuffer } from '../mockData/mockDataBuilder';
+// This import will initialize pdfjs worker:
+import '../../../node_modules/pdfjs-dist/build/pdf.worker.entry';
 
 chai.use(chaiAsPromised);
 const should = chai.should(); // eslint-disable-line
+const expect = chai.expect(); // eslint-disable-line
+
+// CreateObjectUrl is mocked since it is not supported by Jest
+Object.defineProperty(window.URL, 'createObjectURL', {
+  value: () => {}
+});
+
+const pdfParser = require('../../../app/api/ada/lib/pdfParser');
 
 describe('PDF get secret key tests', () => {
   it('should get the secret key from a parsed PDF', () => {
