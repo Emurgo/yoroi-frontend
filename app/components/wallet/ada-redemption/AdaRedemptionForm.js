@@ -419,10 +419,6 @@ export default class AdaRedemptionForm extends Component<Props> {
     const adaAmountField = form.$('adaAmount');
     const spendingPasswordField = form.$('spendingPassword');
     const decryptionKeyField = form.$('decryptionKey');
-    // const componentClasses = classnames([
-    //   styles.component,
-    //   isSubmitting ? styles.isSubmitting : null
-    // ]);
 
     const selectedWallet = getSelectedWallet(walletId.value);
     const walletHasPassword = selectedWallet.hasPassword;
