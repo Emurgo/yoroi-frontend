@@ -297,6 +297,7 @@ export default {
 
   '--theme-backup-mnemonic-background-color': '#f3f3f5',
 
+  '--theme-color-error': '#ea4c5b',
   '--theme-error-text-color': '#daa49a',
 
   '--theme-instructions-text-color': '#121327',
