@@ -25,6 +25,7 @@ export default class AdaRedemptionStore extends Store {
   @observable email: ?string = null;
   @observable adaAmount: ?string = null;
   @observable adaPasscode: ?string = null;
+  @observable isRedemptionDisclaimerAccepted = false;
 
   setup() {
     const actions = this.actions.ada.adaRedemption;
@@ -36,11 +37,19 @@ export default class AdaRedemptionStore extends Store {
     actions.setAdaPasscode.listen(this._setAdaPasscode);
     actions.setAdaAmount.listen(this._setAdaAmount);
     actions.setDecryptionKey.listen(this._setDecryptionKey);
+    actions.acceptRedemptionDisclaimer.listen(this._onAcceptRedemptionDisclaimer);
   }
 
-  isValidRedemptionMnemonic = (passPhrase: string) => (
-    // TODO: implement method
-    true
+  isValidRedemptionKey = (redemptionKey: string) => (
+    this.api.ada.isValidRedemptionKey(redemptionKey)
+  );
+
+  isValidRedemptionMnemonic = (mnemonic: string) => (
+    this.api.ada.isValidRedemptionMnemonic(mnemonic)
+  );
+
+  isValidPaperVendRedemptionKey = (mnemonic: string) => (
+    this.api.ada.isValidPaperVendRedemptionKey(mnemonic)
   );
 
   @action _chooseRedemptionType = (params: {
@@ -51,6 +60,10 @@ export default class AdaRedemptionStore extends Store {
       this.redemptionType = params.redemptionType;
     }
   };
+
+  _onAcceptRedemptionDisclaimer = action(() => {
+    this.isRedemptionDisclaimerAccepted = true;
+  });
 
   _setCertificate = action(({ certificate }) => {
     this.certificate = certificate;

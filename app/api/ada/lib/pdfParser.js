@@ -13,14 +13,24 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerBlobURL;
 
 export const getSecretKey = (parsedPDF: string): string => {
   try {
-    const splitArray = parsedPDF.split('——————');
-    const redemptionKeyLabel = splitArray[3].trim();
+    const splitArray = parsedPDF.trim().split(' ');
+    const lastItem = splitArray[splitArray.length - 1];
 
-    if (redemptionKeyLabel !== 'REDEMPTION KEY') {
+    if (lastItem !== '——————' && lastItem !== 'KEY') {
       throw new InvalidCertificateError();
     }
 
-    return splitArray[2].trim();
+    let index = 0;
+
+    if (lastItem === '——————') {
+      index = splitArray.length - 5;
+    }
+
+    if (lastItem === 'KEY') {
+      index = splitArray.length - 3;
+    }
+
+    return splitArray[index];
   } catch (error) {
     Logger.error('pdfParser::getSecretKey error: ' + stringifyError(error));
     if (error instanceof InvalidCertificateError) {
