@@ -4,6 +4,7 @@ import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min';
 import type { PDF } from '../adaTypes';
 import { decryptForceVend, decryptRecoveryRegularVend, decryptRecoveryForceVend, decryptRegularVend } from './decrypt';
 import { InvalidCertificateError, ReadFileError, DecryptionError, ParsePDFFileError, ParsePDFPageError, ParsePDFKeyError } from '../errors';
+import { Logger, stringifyError } from '../../../utils/logging';
 
 // Pdfjs Worker is initialized, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
 const pdfjsWorkerBlob = new Blob([pdfjsWorker]);
@@ -21,7 +22,7 @@ export const getSecretKey = (parsedPDF: string): string => {
 
     return splitArray[2].trim();
   } catch (error) {
-    console.log('pdfParser::getSecretKey error: ' + JSON.stringify(error));
+    Logger.error('pdfParser::getSecretKey error: ' + stringifyError(error));
     if (error instanceof InvalidCertificateError) {
       throw error;
     }
@@ -44,7 +45,7 @@ export const readFile = (file: ?Blob): Promise<Uint8Array> => new Promise((resol
       throw new Error();
     }
   } catch (error) {
-    console.log('pdfParser::readFile error: ' + JSON.stringify(error));
+    Logger.error('pdfParser::readFile error: ' + stringifyError(error));
     reject(new ReadFileError());
   }
 });
@@ -78,7 +79,7 @@ export const decryptFile = (
     }
     return file;
   } catch (error) {
-    console.log('pdfParser::decryptFile error: ' + JSON.stringify(error));
+    Logger.error('pdfParser::decryptFile error: ' + stringifyError(error));
     throw new DecryptionError();
   }
 };
@@ -94,7 +95,7 @@ export const parsePDFFile = (file: Uint8Array): Promise<string> => (
       }
       return resolve(pagesText);
     }).catch(error => {
-      console.log('pdfParser::parsePDFFile error: ', error);
+      Logger.error('pdfParser::parsePDFFile error: ' + stringifyError(error));
       reject(new ParsePDFFileError());
     });
   })
@@ -116,7 +117,7 @@ const _readPage = (pdf: PDF, pageNumber: number): Promise<string> => (
         return resolve(finalString);
       })
       .catch(error => {
-        console.log('pdfParser::_readPage error: ' + JSON.stringify(error));
+        Logger.error('pdfParser::_readPage error: ' + stringifyError(error));
         reject(new ParsePDFPageError());
       });
   })
