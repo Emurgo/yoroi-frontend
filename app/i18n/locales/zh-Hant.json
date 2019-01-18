@@ -228,6 +228,7 @@
   "wallet.transaction.assuranceLevel.medium": "適中",
   "wallet.transaction.confirmations": "確認",
   "wallet.transaction.conversion.rate": "匯率",
+  "wallet.transaction.fee": "!!!Fee",
   "wallet.transaction.received": "已收到 {currency}",
   "wallet.transaction.sent": "已傳送 {currency}",
   "wallet.transaction.state.failed": "交易失敗",

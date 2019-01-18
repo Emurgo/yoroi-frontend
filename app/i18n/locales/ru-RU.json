@@ -228,6 +228,7 @@
   "wallet.transaction.assuranceLevel.medium": "средний",
   "wallet.transaction.confirmations": "подтверждения",
   "wallet.transaction.conversion.rate": "Обменный курс",
+  "wallet.transaction.fee": "!!!Fee",
   "wallet.transaction.received": "{currency} получено",
   "wallet.transaction.sent": "{currency} отправлено",
   "wallet.transaction.state.failed": "Не удалось провести транзакцию",

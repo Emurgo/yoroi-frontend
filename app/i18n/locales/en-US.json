@@ -228,6 +228,7 @@
   "wallet.transaction.assuranceLevel.medium": "medium",
   "wallet.transaction.confirmations": "confirmations",
   "wallet.transaction.conversion.rate": "Conversion rate",
+  "wallet.transaction.fee": "Fee",
   "wallet.transaction.received": "{currency} received",
   "wallet.transaction.sent": "{currency} sent",
   "wallet.transaction.state.failed": "Transaction failed",

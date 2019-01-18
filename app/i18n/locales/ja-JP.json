@@ -228,6 +228,7 @@
   "wallet.transaction.assuranceLevel.medium": "中",
   "wallet.transaction.confirmations": "確認",
   "wallet.transaction.conversion.rate": "コンバージョン率",
+  "wallet.transaction.fee": "!!!Fee",
   "wallet.transaction.received": "{currency} 受信済",
   "wallet.transaction.sent": "{currency} 送信済",
   "wallet.transaction.state.failed": "処理に失敗しました",

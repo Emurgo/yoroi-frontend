@@ -579,6 +579,7 @@ async function _getTxFinancialInfo(
   fee: BigNumber
 }> {
   // Note: logic taken from the mobile version of Yoroi
+  // https://github.com/Emurgo/yoroi-mobile/blob/a3d72218b1e63f6362152aae2f03c8763c168795/src/crypto/transactionUtils.js#L73-L103
 
   const adaAddresses = await getAdaAddressesList();
   const addresses: Array<string> = adaAddresses.map(addr => addr.cadId);

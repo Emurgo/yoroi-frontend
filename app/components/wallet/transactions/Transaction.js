@@ -69,6 +69,11 @@ const messages = defineMessages({
     defaultMessage: '!!!From address',
     description: 'From address',
   },
+  fee: {
+    id: 'wallet.transaction.fee',
+    defaultMessage: '!!!Fee',
+    description: 'label for fee for tx',
+  },
   fromAddresses: {
     id: 'wallet.transaction.addresses.from',
     defaultMessage: '!!!From addresses',
@@ -253,7 +258,7 @@ export default class Transaction extends Component<Props, State> {
             )}
             <div>
               <h2>
-                Fee:
+                {intl.formatMessage(messages.fee)}
               </h2>
               <span>{formattedWalletAmount(data.fee.abs(), false)}</span>
               <h2>

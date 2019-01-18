@@ -228,6 +228,7 @@
   "wallet.transaction.assuranceLevel.medium": "중간",
   "wallet.transaction.confirmations": "확인",
   "wallet.transaction.conversion.rate": "환율",
+  "wallet.transaction.fee": "!!!Fee",
   "wallet.transaction.received": "{currency} 받음",
   "wallet.transaction.sent": "{currency} 보냄",
   "wallet.transaction.state.failed": "거래 실패",
