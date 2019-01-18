@@ -1,7 +1,7 @@
 Feature: Wallet UI Settings
 
   Background:
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I have completed the basic setup
 
   @it-12

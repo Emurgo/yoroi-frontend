@@ -12,7 +12,7 @@ $ npm run build -- --env "${network}"
 $ npm run compress -- --env "${network}" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx"
 ```
 
-## Signed build (CRX)
+## (Chrome) Signed build (CRX)
 
 Crx are compressed and signed chrome extension bundles
 
@@ -23,3 +23,7 @@ $ npm run compress -- --env "${network}" --app-id "APP_ID" --codebase "https://w
 ```
 
 Note: Chrome extensions [update automatically](https://developer.chrome.com/extensions/autoupdate)
+
+## (Firefox) Signed build (XPI)
+
+TODO: Firefox
