@@ -144,6 +144,7 @@ function _getLovefieldTxs(
           txTimeTitle: 'ADA transaction,',
           txTime: new Date(txTime).toISOString(),
           txStatus: index < pendingTxsNumber ? 'TRANSACTION PENDING' : 'HIGH',
+          txFee: '0.000000',
           txFrom: ['Ae2dddwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv'],
           txTo: [addressesStartingWith + 'W'],
           txConfirmations: 'High. 45 confirmations.',

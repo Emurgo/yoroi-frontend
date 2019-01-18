@@ -10,6 +10,9 @@ import Wallet from '../../domain/Wallet';
 import WalletTransaction, {
   transactionTypes
 } from '../../domain/WalletTransaction';
+import type {
+  TransactionType
+} from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import {
@@ -24,6 +27,7 @@ import {
   isValidAdaAddress,
   newExternalAdaAddress,
   getAdaAddressesByType,
+  getAdaAddressesList,
   saveAdaAddress
 } from './adaAddress';
 import {
@@ -59,6 +63,7 @@ import type {
   AdaTransaction,
   AdaTransactionCondition,
   AdaTransactionFee,
+  AdaTransactionInputOutput,
   AdaTransactions,
   AdaWallet,
   AdaWallets,
@@ -219,13 +224,15 @@ export default class AdaApi {
       const transactions = limit
         ? history[0].slice(skip, skip + limit)
         : history[0];
-      const mappedTransactions = transactions.map(data => (
-        _createTransactionFromServerData(data)
-      ));
-      return Promise.resolve({
-        transactions: mappedTransactions,
-        total: history[1]
+
+      const mappedTransactions = transactions.map(async data => {
+        const { type, amount, fee } = await _getTxFinancialInfo(data);
+        return _createTransactionFromServerData(data, type, amount, fee);
       });
+      return Promise.all(mappedTransactions).then(mappedTxs => Promise.resolve({
+        transactions: mappedTxs,
+        total: history[1]
+      }));
     } catch (error) {
       Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -237,9 +244,10 @@ export default class AdaApi {
     try {
       const pendingTxs = await getPendingAdaTxs();
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
-      return pendingTxs.map(data => (
-        _createTransactionFromServerData(data)
-      ));
+      return Promise.all(pendingTxs.map(async data => {
+        const { type, amount, fee } = await _getTxFinancialInfo(data);
+        return _createTransactionFromServerData(data, type, amount, fee);
+      }));
     } catch (error) {
       Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -563,6 +571,78 @@ export default class AdaApi {
 
 // ========== TRANSFORM SERVER DATA INTO FRONTEND MODELS =========
 
+async function _getTxFinancialInfo(
+  data: AdaTransaction
+): Promise<{
+  type: TransactionType,
+  amount: BigNumber,
+  fee: BigNumber
+}> {
+  // Note: logic taken from the mobile version of Yoroi
+  // https://github.com/Emurgo/yoroi-mobile/blob/a3d72218b1e63f6362152aae2f03c8763c168795/src/crypto/transactionUtils.js#L73-L103
+
+  const adaAddresses = await getAdaAddressesList();
+  const addresses: Array<string> = adaAddresses.map(addr => addr.cadId);
+
+  const ownInputs = data.ctInputs.filter(input => (
+    addresses.includes(input[0])
+  ));
+
+  const ownOutputs = data.ctOutputs.filter(output => (
+    addresses.includes(output[0])
+  ));
+
+  const _sum = (IOs: Array<AdaTransactionInputOutput>): BigNumber => (
+    IOs.reduce(
+      (accum: BigNumber, io) => accum.plus(new BigNumber(io[1].getCCoin, 10)),
+      new BigNumber(0),
+    )
+  );
+
+  const totalIn = _sum(data.ctInputs);
+  const totalOut = _sum(data.ctOutputs);
+  const ownIn = _sum(ownInputs);
+  const ownOut = _sum(ownOutputs);
+
+  const hasOnlyOwnInputs = ownInputs.length === data.ctInputs.length;
+  const hasOnlyOwnOutputs = ownOutputs.length === data.ctOutputs.length;
+  const isIntraWallet = hasOnlyOwnInputs && hasOnlyOwnOutputs;
+  const isMultiParty =
+    ownInputs.length > 0 && ownInputs.length !== data.ctInputs.length;
+
+  const brutto = ownOut.minus(ownIn);
+  const totalFee = totalOut.minus(totalIn); // should be negative
+
+  if (isIntraWallet) {
+    return {
+      type: transactionTypes.SELF,
+      amount: new BigNumber(0),
+      fee: totalFee
+    };
+  }
+  if (isMultiParty) {
+    return {
+      type: transactionTypes.MULTI,
+      amount: brutto,
+      // note: fees not accurate but no good way of finding which UTXO paid the fees in Yoroi
+      fee: new BigNumber(0)
+    };
+  }
+  if (hasOnlyOwnInputs) {
+    return {
+      type: transactionTypes.EXPEND,
+      amount: brutto.minus(totalFee),
+      fee: totalFee
+    };
+  }
+
+  return {
+    type: transactionTypes.INCOME,
+    amount: brutto,
+    fee: new BigNumber(0)
+  };
+}
+
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
   (adaWallet: AdaWallet) => {
@@ -608,18 +688,14 @@ const _conditionToTxState = (condition: AdaTransactionCondition) => {
 
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
-  (data: AdaTransaction) => {
-    const coins = new BigNumber(data.ctAmount.getCCoin);
+  (data: AdaTransaction, type: TransactionType, amount: BigNumber, fee: BigNumber) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,
       title: ctmTitle || data.ctIsOutgoing ? 'Ada sent' : 'Ada received',
-      type: data.ctIsOutgoing
-        ? transactionTypes.EXPEND
-        : transactionTypes.INCOME,
-      amount: (data.ctIsOutgoing ? coins.negated() : coins).dividedBy(
-        LOVELACES_PER_ADA
-      ),
+      type,
+      amount: amount.dividedBy(LOVELACES_PER_ADA).plus(fee.dividedBy(LOVELACES_PER_ADA)),
+      fee: fee.dividedBy(LOVELACES_PER_ADA),
       date: new Date(ctmDate),
       description: ctmDescription || '',
       numberOfConfirmations: getLastBlockNumber() - data.ctBlockNumber,
