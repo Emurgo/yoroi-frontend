@@ -14,6 +14,15 @@ Object.defineProperty(window.URL, 'createObjectURL', {
   value: () => {}
 });
 
+Object.defineProperty(window, 'CONFIG', {
+  value: {
+    network: {
+      name: 'test'
+    },
+    app: {}
+  }
+});
+
 const pdfParser = require('../../../app/api/ada/lib/pdfParser');
 
 describe('PDF get secret key tests', () => {

@@ -18,7 +18,7 @@
     "flow": "flow .",
     "eslint": "eslint app features chrome scripts webpack/*.js",
     "test-e2e": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature",
-    "test-unit": "jest",
+    "test-unit": "jest --silent",
     "test-by-tag": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register features/*.feature --tags ",
     "test-by-feature": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests && cucumber-js --require-module 'babel-core/register' --compiler es6:babel-core/register ",
     "localci-setup": "sudo /bin/bash ./features/localCI/setup.sh",
