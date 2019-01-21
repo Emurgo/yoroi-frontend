@@ -81,7 +81,6 @@
     "markdown-loader": "2.0.0",
     "minimist": "1.2.0",
     "mobx-react-devtools": "^6.0.3",
-    "mocha": "5.2.0",
     "node-sass": "4.9.3",
     "postcss-loader": "1.2.1",
     "pug-cli": "1.0.0-alpha6",
