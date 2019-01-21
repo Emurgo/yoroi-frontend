@@ -10,6 +10,9 @@
 }
 
 .check {
+  // manually setting the z-index is a temporary fix until this PR is merged & we upgrade the lib
+  // https://github.com/input-output-hk/react-polymorph/pull/99
+  z-index: 1;
   border: 1px solid var(--theme-checkbox-border-color);
 }
 

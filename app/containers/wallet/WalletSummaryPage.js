@@ -18,7 +18,7 @@ const { formattedWalletAmount } = resolver('utils/formatters');
 
 type Props = InjectedProps
 
-export const messages = defineMessages({
+const messages = defineMessages({
   noTransactions: {
     id: 'wallet.summary.no.transactions',
     defaultMessage: '!!!No recent transactions',

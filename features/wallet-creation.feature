@@ -1,7 +1,7 @@
 Feature: Wallet creation
 
   Background:
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I have completed the basic setup
     And There is no wallet stored
 
@@ -11,19 +11,19 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | Secret_123 | Secret_123        |
+    | aaSecret_123 | aaSecret_123        |
     And I click the "Create personal wallet" button
     And I accept the creation terms
     And I copy and enter the displayed mnemonic phrase
     Then I should see the opened wallet with name "Created Wallet"
 
   @it-9
-  Scenario: Wallet access after Chrome restart (IT-9)
+  Scenario: Wallet access after browser restart (IT-9)
     When I click the create button
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | Secret_123 | Secret_123        |
+    | aaSecret_123 | aaSecret_123        |
     And I click the "Create personal wallet" button
     And I accept the creation terms
     And I copy and enter the displayed mnemonic phrase
@@ -37,7 +37,7 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | Secret_123 | Secret_123        |
+    | aaSecret_123 | aaSecret_123        |
     And I click the "Create personal wallet" button
     And I accept the creation terms
     And I enter random mnemonic phrase
@@ -50,8 +50,8 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | Secret_123 | Secret_123        |
-    And I clear the created wallet password Secret_123
+    | aaSecret_123 | aaSecret_123        |
+    And I clear the created wallet password aaSecret_123
     And I click the "Create personal wallet" button
     Then I should stay in the create wallet dialog
 
@@ -61,7 +61,7 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | Secret_123 | Secret_123        |
+    | aaSecret_123 | aaSecret_123        |
     And I click the "Create personal wallet" button
     Then I see the security warning prior:
     | message                             |
@@ -73,7 +73,7 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | Secret_123 | Secret_123        |
+    | aaSecret_123 | aaSecret_123        |
     And I clear the name "Created Wallet"
     And I click the "Create personal wallet" button
     Then I should stay in the create wallet dialog
@@ -101,7 +101,4 @@ Feature: Wallet creation
     | global.errors.invalidWalletPassword |
   Examples:
   | wrongPassword |                         |
-  | secret_123  | without upper case letters|
-  | SECRET_123  | without lower case letters|
   | Secre1      | too short                 |
-  | SecretSecret| without numbers           |
