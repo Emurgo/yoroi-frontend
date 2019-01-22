@@ -15,6 +15,18 @@ import environment from '../../environment';
 export default class AdaRedemptionPage extends Component<InjectedProps> {
   static defaultProps = { actions: null, stores: null };
 
+  onSubmit = (values: { walletId: string, spendingPassword: ?string }) => {
+    this.props.actions.ada.adaRedemption.redeemAda.trigger(values);
+  };
+
+  onSubmitPaperVended = (values: {
+    walletId: string,
+    shieldedRedemptionKey: string,
+    spendingPassword: ?string,
+  }) => {
+    this.props.actions.ada.adaRedemption.redeemPaperVendedAda.trigger(values);
+  };
+
   handleGoToCreateWalletClick = () => {
     this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
   };
@@ -104,8 +116,10 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
             chooseRedemptionType.trigger({ redemptionType: choice });
           }}
           error={adaRedemption.error}
-          isSubmitting={false} // TODO: for now this is a mock just to test the UI
-          onSubmit={() => {}} // TODO: for now this is a mock just to test the UI
+          isSubmitting={request.isExecuting}
+          onSubmit={(redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED ?
+            this.onSubmitPaperVended : this.onSubmit
+          )}
           isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
           onAcceptRedemptionDisclaimer={() => acceptRedemptionDisclaimer.trigger()}
         />

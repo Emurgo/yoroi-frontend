@@ -2,6 +2,7 @@
 import bs58 from 'bs58';
 import cbor from 'cbor';
 import BigNumber from 'bignumber.js';
+import blakejs from 'blakejs';
 import type {
   AdaTransactionInputOutput,
   Transaction,
@@ -106,3 +107,15 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
     throw new Error('Failed to decode a rust tx! Cause: ' + stringifyError(e));
   }
 }
+
+export const encryptPassphrase = (passphrase: ?string) => (
+  _bytesToB16(_blake2b(passphrase))
+);
+
+export const base64StringToUint8Array = (base64String) => (
+  Uint8Array.from(atob(base64String), c => c.charCodeAt(0))
+);
+
+// new Uint8Array
+const _bytesToB16 = (bytes) => Buffer.from(bytes).toString('hex');
+const _blake2b = (data) => blakejs.blake2b(data, null, 32);

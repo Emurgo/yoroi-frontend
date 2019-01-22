@@ -369,7 +369,19 @@ export default class AdaRedemptionForm extends Component<Props> {
     },
   });
 
-  submit = () => {}
+  submit = () => {
+    this.form.submit({
+      onSuccess: (form) => {
+        const { walletId, shieldedRedemptionKey, spendingPassword } = form.values();
+        this.props.onSubmit({
+          walletId,
+          shieldedRedemptionKey,
+          spendingPassword: spendingPassword || null,
+        });
+      },
+      onError: () => {},
+    });
+  };
 
   resetForm = () => {
     const { form } = this;
