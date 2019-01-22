@@ -18,6 +18,7 @@
     "flow": "flow .",
     "eslint": "eslint app features chrome scripts webpack/*.js",
     "test-prepare": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests",
+    "jest": "jest .",
     "test-common": "cucumber-js --require-module '@babel/register' --compiler es6:@babel/register",
     "test-e2e-chrome": "npm run test-common -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature",
     "test-by-tag-chrome": "npm run test-common -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags",
@@ -49,6 +50,7 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "7.1.6",
+    "babel-core": "7.0.0-bridge.0",
     "@babel/plugin-proposal-class-properties": "7.1.0",
     "@babel/plugin-proposal-decorators": "7.1.6",
     "@babel/plugin-proposal-export-default-from": "7.0.0",
@@ -82,7 +84,9 @@
     "file-loader": "1.1.11",
     "flow-bin": "0.86.0",
     "geckodriver": "1.14.1",
+    "flow-typed": "2.5.1",
     "html-loader": "0.4.5",
+    "jest": "23.6.0",
     "json-server": "0.13.0",
     "markdown-loader": "2.0.0",
     "minimist": "1.2.0",
@@ -146,5 +150,11 @@
   "engine": {
     "node": "~8.9.4",
     "npm": "~5.6.0"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/js-cardano-wasm/"
+    ]
   }
 }

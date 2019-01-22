@@ -29,6 +29,7 @@
   "api.errors.unusedAddressesError": "未使用アドレスは20件まで作成が可能です。",
   "api.errors.updateAdaTxsHistoryError": "ADA取引履歴の更新中にエラーが発生しました。",
   "api.errors.updateAdaWalletError": "ADAウォレットの更新中にエラーが発生しました。",
+  "app.errors.unexpectedError": "予期せぬエラーが発生しました。再試行してください。",  
   "app.errors.unknowError": "不明なエラー。",
   "daedalusTransfer.error.noTransferTxError": "送信する取引はありません。",
   "daedalusTransfer.error.transferFundsError": "送金できません。",
@@ -229,6 +230,10 @@
   "wallet.transaction.confirmations": "確認",
   "wallet.transaction.conversion.rate": "コンバージョン率",
   "wallet.transaction.fee": "手数料",
+  "wallet.transaction.export.dialog.exportButton.label": "出力",
+  "wallet.transaction.export.dialog.infoText1": "ウォレット内の全取引履歴がファイルに出力されます。",
+  "wallet.transaction.export.dialog.title": "トランザクションをファイルに出力",
+  "wallet.transaction.export.exportIcon.tooltip": "ファイルに出力",
   "wallet.transaction.received": "{currency} 受信済",
   "wallet.transaction.sent": "{currency} 送信済",
   "wallet.transaction.state.failed": "処理に失敗しました",
@@ -269,6 +274,5 @@
   "wallet.trezor.dialog.title.label": "Trezorハードウェアウォレットに接続",
   "wallet.trezor.error.101": "Trezor.ioへの接続に失敗しました。インターネット接続を確認して再試行してください。",
   "wallet.trezor.error.102": "アクセス許可が得られませんでした。再試行してください。",
-  "wallet.trezor.error.103": "キャンセルされました。再試行してください。",
-  "wallet.trezor.error.999": "予期せぬエラーが発生しました。再試行してください。"
+  "wallet.trezor.error.103": "キャンセルされました。再試行してください。"
 }
