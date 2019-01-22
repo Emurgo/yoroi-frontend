@@ -1,12 +1,29 @@
 import chai, { assert } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import mockData from './mockData/mockData.json';
-import { getMockedFileBuffer } from './mockData/mockDataBuilder';
-
-const pdfParser = require('../../../app/api/ada/lib/pdfParser');
+import mockData from '../mockData/mockData.json';
+import { getMockedFileBuffer } from '../mockData/mockDataBuilder';
+// This import will correctly initialize pdfjs worker:
+// Reference to issue: https://github.com/mozilla/pdf.js/issues/9579
+import 'pdfjs-dist/build/pdf.worker.entry';
 
 chai.use(chaiAsPromised);
 const should = chai.should(); // eslint-disable-line
+const expect = chai.expect(); // eslint-disable-line
+
+// URL.createObjectUrl is mocked since it is used in pdfParser, and it is not supported by Jest
+// Reference to issue: https://stackoverflow.com/questions/52968969/jest-url-createobjecturl-is-not-a-function
+global.URL.createObjectURL = () => {};
+
+// The variable CONFIG is set as an environment variable before running the app.
+// If its value is undefined, the Logger in pdfParser will break, so we have to mock it.
+global.CONFIG = {
+  network: {
+    name: 'test'
+  },
+  app: {}
+};
+
+const pdfParser = require('../../../app/api/ada/lib/pdfParser');
 
 describe('PDF get secret key tests', () => {
   it('should get the secret key from a parsed PDF', () => {
