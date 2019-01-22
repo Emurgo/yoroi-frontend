@@ -112,10 +112,6 @@ export const encryptPassphrase = (passphrase: ?string) => (
   _bytesToB16(_blake2b(passphrase))
 );
 
-export const base64StringToUint8Array = (base64String) => (
-  Uint8Array.from(atob(base64String), c => c.charCodeAt(0))
-);
-
 // new Uint8Array
 const _bytesToB16 = (bytes) => Buffer.from(bytes).toString('hex');
 const _blake2b = (data) => blakejs.blake2b(data, null, 32);

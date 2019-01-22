@@ -4,9 +4,9 @@ import {
   Logger,
   stringifyError,
 } from '../../utils/logging';
-// import { getAddressFromRedemptionKey } from './lib/cardanoCrypto/cryptoRedemption';
-import { base64StringToUint8Array } from './lib/utils';
+import { getAddressFromRedemptionKey } from './lib/cardanoCrypto/cryptoRedemption';
 import type { AdaTransaction } from './adaTypes';
+import bs58 from 'bs58';
 
 export type RedeemAdaParams = {
   redemptionCode: string,
@@ -25,8 +25,9 @@ export async function redeemAda(
   redemptionParams: RedeemAdaParams
 ) : Promise<AdaTransaction> {
   try {
-    const redemptionKey = base64StringToUint8Array(redemptionParams.redemptionCode);
-    // TODO: get address from redemption key: const address = getAddressFromRedemptionKey(redemptionKey);
+    const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
+    const addressBuffer = getAddressFromRedemptionKey(redemptionKey);
+    const address = bs58.encode(Buffer.from(addressBuffer));
     // TODO: get adresse's utxo
     // TODO: generate tx
     // TODO: publish tx
@@ -41,8 +42,9 @@ export async function redeemPaperVendedAda(
   redemptionParams: RedeemPaperVendedAdaParams
 ) : Promise<AdaTransaction> {
   try {
-    const redemptionKey = base64StringToUint8Array(redemptionParams.redemptionCode);
-    // TODO: get address from redemption key: const address = getAddressFromRedemptionKey(redemptionKey);
+    const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
+    const addressBuffer = getAddressFromRedemptionKey(redemptionKey);
+    const address = bs58.encode(Buffer.from(addressBuffer));
     // TODO: get adresse's utxo
     // TODO: generate tx
     // TODO: publish tx
