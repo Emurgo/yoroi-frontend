@@ -625,13 +625,14 @@ export default class AdaApi {
     const { spendingPassword: passwordString } = request;
     const spendingPassword = passwordString ? encryptPassphrase(passwordString) : '';
     try {
-      const transaction: AdaTransaction = await redeemAda(
+      const transaction = await redeemAda(
         { ...request, spendingPassword }
       );
       Logger.debug('AdaApi::redeemAda success');
-      return _createTransactionFromServerData(transaction);
+      // TODO: call the following function once the tx is broadcasted:
+      // return _createTransactionFromServerData(transaction);
     } catch (error) {
-      Logger.debug('AdaApi::redeemAda error: ' + stringifyError(error));
+      Logger.debug('AdaApi::redeemAda error: ', error);
       if (error.message === 'CannotCreateAddress') {
         throw new IncorrectSpendingPasswordError();
       }
@@ -646,11 +647,12 @@ export default class AdaApi {
     const { spendingPassword: passwordString } = request;
     const spendingPassword = passwordString ? encryptPassphrase(passwordString) : '';
     try {
-      const transaction: AdaTransaction = await redeemPaperVendedAda(
+      const transaction = await redeemPaperVendedAda(
         { ...request, spendingPassword }
       );
       Logger.debug('AdaApi::redeemAdaPaperVend success');
-      return _createTransactionFromServerData(transaction);
+      // TODO: call the following function once the tx is broadcasted:
+      // return _createTransactionFromServerData(transaction);
     } catch (error) {
       Logger.debug('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
       if (error.message === 'CannotCreateAddress') {

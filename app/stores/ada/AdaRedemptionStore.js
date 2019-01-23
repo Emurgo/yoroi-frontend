@@ -56,6 +56,8 @@ export default class AdaRedemptionStore extends Store {
     actions.acceptRedemptionDisclaimer.listen(this._onAcceptRedemptionDisclaimer);
     actions.redeemAda.listen(this._redeemAda);
     actions.redeemPaperVendedAda.listen(this._redeemPaperVendedAda);
+    actions.adaSuccessfullyRedeemed.listen(this._onAdaSuccessfullyRedeemed);
+    actions.closeAdaRedemptionSuccessOverlay.listen(this._onCloseAdaRedemptionSuccessOverlay);
     this.registerReactions([
       this._resetRedemptionFormValuesOnAdaRedemptionPageLoad,
     ]);
@@ -217,7 +219,8 @@ export default class AdaRedemptionStore extends Store {
       this._reset();
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
         walletId,
-        amount: transaction.amount.toFormat(DECIMAL_PLACES_IN_ADA),
+        // TODO: pass amount once tx has been broadcasted
+        // amount: transaction.amount.toFormat(DECIMAL_PLACES_IN_ADA),
       });
     } catch (error) {
       runInAction(() => { this.error = error; });
@@ -244,9 +247,11 @@ export default class AdaRedemptionStore extends Store {
         mnemonics: this.passPhrase && this.passPhrase.split(' ')
       });
       this._reset();
+      console.log(this.actions.ada.adaRedemption.adaSuccessfullyRedeemed);
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
         walletId,
-        amount: transaction.amount.toFormat(DECIMAL_PLACES_IN_ADA)
+        // TODO: pass amount once tx has been broadcasted
+        // amount: transaction.amount.toFormat(DECIMAL_PLACES_IN_ADA)
       });
     } catch (error) {
       runInAction(() => { this.error = error; });
@@ -261,7 +266,8 @@ export default class AdaRedemptionStore extends Store {
 
     Logger.debug('ADA successfully redeemed for wallet: ' + walletId);
     wallets.goToWalletRoute(walletId);
-    this.amountRedeemed = amount;
+    // TODO: assign amount once tx has been broadcasted
+    // this.amountRedeemed = amount;
     this.showAdaRedemptionSuccessMessage = true;
     this.redemptionCode = '';
     this.passPhrase = null;
