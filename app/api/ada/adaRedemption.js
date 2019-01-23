@@ -7,6 +7,7 @@ import {
 import { getAddressFromRedemptionKey } from './lib/cardanoCrypto/cryptoRedemption';
 import type { AdaTransaction } from './adaTypes';
 import bs58 from 'bs58';
+import { getUTXOsForAddresses } from './lib/yoroi-backend-api';
 
 export type RedeemAdaParams = {
   redemptionCode: string,
@@ -28,7 +29,7 @@ export async function redeemAda(
     const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
     const addressBuffer = getAddressFromRedemptionKey(redemptionKey);
     const address = bs58.encode(Buffer.from(addressBuffer));
-    // TODO: get adresse's utxo
+    const utxos = await getUTXOsForAddresses({ addresses: [address] });
     // TODO: generate tx
     // TODO: publish tx
   } catch (error) {
@@ -45,7 +46,7 @@ export async function redeemPaperVendedAda(
     const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
     const addressBuffer = getAddressFromRedemptionKey(redemptionKey);
     const address = bs58.encode(Buffer.from(addressBuffer));
-    // TODO: get adresse's utxo
+    const utxos = await getUTXOsForAddresses([address]);
     // TODO: generate tx
     // TODO: publish tx
   } catch (error) {
