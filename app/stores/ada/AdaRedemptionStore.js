@@ -19,6 +19,7 @@ import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import environment from '../../environment';
 import WalletTransaction from '../../domain/WalletTransaction';
 import Request from '../lib/LocalizedRequest';
+import { getSingleCryptoAccount } from '../../api/ada/adaLocalStorage';
 
 export default class AdaRedemptionStore extends Store {
 
@@ -200,15 +201,16 @@ export default class AdaRedemptionStore extends Store {
 
     runInAction(() => { this.walletId = walletId; });
 
-    // FIXME
-    // const accountId = await this.stores.addresses.getAccountIndexByWalletId(walletId);
-    const accountId = 1;
-    if (!accountId) throw new Error('Active account required before redeeming Ada.');
+    // Since there's no support for multiwallet yet, the only account index present in localStorage
+    // is used.
+    const accountData = getSingleCryptoAccount();
+    const accountIndex = accountData.account;
+    if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
 
     try {
       const transaction: WalletTransaction = await this.redeemAdaRequest.execute({
         walletId,
-        accountId,
+        accountIndex,
         spendingPassword,
         redemptionCode: this.redemptionCode
       });
@@ -229,10 +231,9 @@ export default class AdaRedemptionStore extends Store {
   }) => {
     runInAction(() => { this.walletId = walletId; });
 
-    // FIXME
-    // const accountIndex = await this.stores.addresses.getAccountIndexByWalletId(walletId);
-    const accountIndex = 1;
-    if (!accountIndex) throw new Error('Active account required before redeeming Ada.');
+    const accountData = getSingleCryptoAccount();
+    const accountIndex = accountData.account;
+    if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
 
     try {
       const transaction: WalletTransaction = await this.redeemPaperVendedAdaRequest.execute({

@@ -9,8 +9,8 @@ declare var CONFIG : ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
 export function getAddressFromRedemptionKey(
-  redemptionKey: string,
-): string {
+  redemptionKey: Buffer,
+): Uint8Array {
   const address = Redemption.redemptionKeyToAddress(redemptionKey, protocolMagic);
   if (!address) {
     throw new SeedWithInvalidLengthError();
