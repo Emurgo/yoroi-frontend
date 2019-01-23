@@ -8,7 +8,7 @@ import adaLogo from '../assets/images/ada-logo.inline.svg';
 import cardanoLogo from '../assets/images/cardano-logo.inline.svg';
 import type { InjectedProps } from '../types/injectedPropsType';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   loading: {
     id: 'loading.screen.loading',
     defaultMessage: '!!!loading components',

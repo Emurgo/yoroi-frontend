@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import moment from 'moment';
 import styles from './WalletTransactionsList.scss';
 import Transaction from './Transaction';
@@ -151,7 +151,7 @@ export default class WalletTransactionsList extends Component<Props> {
             className={buttonClasses}
             label={intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
             onClick={onLoadMore}
-            skin={<SimpleButtonSkin />}
+            skin={ButtonSkin}
           />
         }
       </div>

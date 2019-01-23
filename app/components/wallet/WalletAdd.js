@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './WalletAdd.scss';
@@ -82,19 +82,19 @@ export default class WalletAdd extends Component<Props> {
             className="primary trezorWalletButton"
             label={intl.formatMessage(messages.useTrezorDescription)}
             onMouseUp={onTrezor}
-            skin={<SimpleButtonSkin />}
+            skin={ButtonSkin}
           />
           <Button
             className="primary createWalletButton"
             label={intl.formatMessage(messages.createDescription)}
             onMouseUp={onCreate}
-            skin={<SimpleButtonSkin />}
+            skin={ButtonSkin}
           />
           <Button
             className="primary restoreWalletButton"
             label={intl.formatMessage(messages.restoreDescription)}
             onMouseUp={onRestore}
-            skin={<SimpleButtonSkin />}
+            skin={ButtonSkin}
           />
           {activeNotification ? (
             <div className={styles.notification}>

@@ -1,7 +1,7 @@
 Feature: Restore Wallet
 
   Background:
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I have completed the basic setup
     And I am testing "Restore wallet"
     And There is no wallet stored
@@ -15,7 +15,7 @@ Feature: Restore Wallet
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | Secret_123 | Secret_123       |
+    | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
@@ -41,7 +41,7 @@ Feature: Restore Wallet
     | shoe rose battle fine shoulder address kite coffee jaguar proof practice area party sphere train |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | Secret_123 | Secret_123       |
+    | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
@@ -59,7 +59,7 @@ Feature: Restore Wallet
     | offer liberty horror emerge twice behind tag agree october dismiss vehicle obtain anchor endorse town |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | Secret_123 | Secret_123       |
+    | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
@@ -80,7 +80,7 @@ Feature: Restore Wallet
     | grace saddle snake vocal amateur coin inside ginger leopard place liar patrol usual joy around |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | Secret_123 | Secret_123       |
+    | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
@@ -97,8 +97,8 @@ Feature: Restore Wallet
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | Secret_123 | Secret_123       |
-    And I clear the restored wallet password Secret_123
+    | aaSecret_123 | aaSecret_123       |
+    And I clear the restored wallet password aaSecret_123
     And I click the "Restore Wallet" button
     Then I should stay in the restore wallet dialog
     
@@ -111,7 +111,7 @@ Feature: Restore Wallet
     | <recoveryPhrase> |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | Secret_123 | Secret_123       |
+    | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
     Then I should stay in the restore wallet dialog
     And I should see an "Invalid recovery phrase" error message:

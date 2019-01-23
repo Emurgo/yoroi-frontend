@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
-import Autocomplete from 'react-polymorph/lib/components/Autocomplete';
-import SimpleAutocompleteSkin from 'react-polymorph/lib/skins/simple/raw/AutocompleteSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
+import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -223,7 +223,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={<SimpleInputSkin />}
+          skin={InputSkin}
         />
 
         <Autocomplete
@@ -233,7 +233,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-          skin={<SimpleAutocompleteSkin />}
+          skin={AutocompleteSkin}
         />
 
         <div className={styles.walletPassword}>
@@ -242,13 +242,13 @@ export default class WalletRestoreDialog extends Component<Props> {
               className="walletPassword"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={InputSkin}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={InputSkin}
             />
             <p className={styles.passwordInstructions}>
               {intl.formatMessage(globalMessages.passwordInstructions)}

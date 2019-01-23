@@ -118,7 +118,9 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.walletSendConfirmationBackButtonLabel),
-        onClick: !isSubmitting && onCancel,
+        onClick: isSubmitting
+          ? () => {} // noop
+          : onCancel
       },
       {
         label: intl.formatMessage(messages.sendUsingTrezorButtonLabel),

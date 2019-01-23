@@ -32,6 +32,7 @@ export type LovefieldShownWalletTx = {
     txTimeTitle: string,
     txTime: string,
     txStatus: string,
+    txFee: string,
     txFrom: Array<string>,
     txTo: Array<string>,
     txConfirmations: string,

@@ -11,6 +11,8 @@ import type {
 import {
   stringifyError
 } from '../../../utils/logging';
+// eslint-disable-next-line
+import { Blake2b } from 'rust-cardano-crypto';
 
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();
@@ -30,6 +32,16 @@ export type DecodedAddress = {
   type: number,
   checksum: number
 }
+
+type CheckSum = number
+type Coin = number
+type CborAddress = [cbor.Tagged, CheckSum]
+type CborTxInput = [number, cbor.Tagged]
+type CborTxOutput = [CborAddress, Coin]
+type CborTxAttributes = {}
+type CborTxBase = [Array<CborTxInput>, Array<CborTxOutput>, CborTxAttributes];
+type CborTxWitnesses = Array<any>
+type CborTxSigned = [CborTxBase, CborTxWitnesses];
 
 export const toAdaTx = function (
   amount: BigNumber,
@@ -64,6 +76,58 @@ const _getTxCondition = (state: string): AdaTransactionCondition => {
   if (state === 'Pending') return 'CPtxApplying';
   return 'CPtxWontApply';
 };
+
+class CborIndefiniteLengthArray {
+  elements: Array<any>;
+  constructor(elements: Array<any>) {
+    this.elements = elements;
+  }
+  encodeCBOR(encoder: cbor.Encoder) {
+    return encoder.push(
+      Buffer.concat([
+        Buffer.from([0x9f]), // indefinite array prefix
+        ...this.elements.map((e) => cbor.encode(e)),
+        Buffer.from([0xff]), // end of array
+      ])
+    );
+  }
+}
+
+export function rustRawTxToId(rustTxBody: RustRawTxBody): string {
+  if (!rustTxBody) {
+    throw new Error('Cannot decode inputs from undefined transaction!');
+  }
+  try {
+    const [inputs, outputs, attributes]: CborTxBase =
+      decodedTxToBase(cbor.decode(Buffer.from(rustTxBody)));
+    const enc = cbor.encode([
+      new CborIndefiniteLengthArray(inputs),
+      new CborIndefiniteLengthArray(outputs),
+      attributes
+    ]);
+    // eslint-disable-next-line
+    return Buffer.from(Blake2b.blake2b_256(enc)).toString('hex');
+  } catch (e) {
+    throw new Error('Failed to convert raw transaction to ID! ' + stringifyError(e));
+  }
+}
+
+function decodedTxToBase(decodedTx: any): CborTxBase {
+  if (Array.isArray(decodedTx)) {
+    // eslint-disable-next-line default-case
+    switch (decodedTx.length) {
+      case 2: {
+        const signed: CborTxSigned = decodedTx;
+        return signed[0];
+      }
+      case 3: {
+        const base: CborTxBase = decodedTx;
+        return base;
+      }
+    }
+  }
+  throw new Error('Unexpected decoded tx structure! ' + JSON.stringify(decodedTx));
+}
 
 export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   if (!rustTxBody) {
