@@ -17,7 +17,7 @@
     "clean": "rimraf build/ dev/ *.zip *.crx dll/",
     "flow": "flow .",
     "eslint": "eslint app features chrome scripts webpack/*.js",
-    "test-unit": "jest --silent",
+    "test-unit": "jest",
     "test-prepare": "npm run clean && npm run build-dll && npm run build -- --env 'test' && npm run compress-e2e-tests",
     "test-common": "cucumber-js --require-module '@babel/register' --compiler es6:@babel/register",
     "test-e2e-chrome": "npm run test-common -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature",

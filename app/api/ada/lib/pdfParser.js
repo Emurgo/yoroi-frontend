@@ -13,6 +13,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerBlobURL;
 
 export const getSecretKey = (parsedPDF: string): string => {
   try {
+    console.log('================ getSecretKey', parsedPDF);
     const splitArray = parsedPDF.trim().split(' ');
     const lastItem = splitArray[splitArray.length - 1];
 
