@@ -5,8 +5,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import Dialog from '../../widgets/Dialog';
@@ -15,7 +15,7 @@ import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   walletPasswordLabel: {
     id: 'wallet.send.confirmationDialog.walletPasswordLabel',
     defaultMessage: '!!!Spending password',
@@ -116,7 +116,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.walletSendConfirmationBackButtonLabel),
-        onClick: !isSubmitting && onCancel,
+        onClick: isSubmitting
+          ? () => {} // noop
+          : onCancel
       },
       {
         label: intl.formatMessage(messages.sendButtonLabel),
@@ -179,7 +181,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={InputSkin}
             />
           }
         </div>

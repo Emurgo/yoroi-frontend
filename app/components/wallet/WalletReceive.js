@@ -6,8 +6,8 @@ import SvgInline from 'react-svg-inline';
 import classnames from 'classnames';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import QRCode from 'qrcode.react';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
@@ -120,7 +120,7 @@ export default class WalletReceive extends Component<Props, State> {
         className={generateAddressButtonClasses}
         label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
         onMouseUp={this.submit}
-        skin={<SimpleButtonSkin />}
+        skin={ButtonSkin}
       />
     );
 

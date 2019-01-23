@@ -26,7 +26,7 @@ $ npm run dev
 $ npm run build -- --env "mainnet"
 ```
 
-- Testnet
+- Testnet (not supported yet)
 ```bash
 # build files to './build'
 $ npm run build -- --env "testnet"
@@ -40,6 +40,12 @@ $ npm run build -- --env "testnet"
 4. Select either `dev` or `build` folder (depending which `npm` command you ran)
 
 _Note_: `dev` should hot reload on code change
+
+## Run Yoroi Firefox extension
+
+Debug builds are not maintained for Firefox as firefox rejects manifest files with non-https `localhost` in them.
+You can bypass this by manually adding the extension into your Firefox folder but this is kind of tedious.
+I suggest instead installing the `mainnet` build as it does not use `localhost`. (through `about:debugging` or `about:addons`). See [SETUP.md](docs/SETUP.md) for how to makes the unittests pass.
 
 ## Build release candidate
 
@@ -55,7 +61,8 @@ $ npm run flow
 # lint
 $ npm run eslint
 # features (command to run all existing tests)
-$ npm run test-e2e
+$ npm run test-prepare
+$ npm run test-e2e-chrome
 # How to run one .feature file (One feature file = one covered component from youtrack)
 $ npm run test-by-feature feature/wallet-creation.feature
 # How to run one test. Instead of '@it-10' you can use any tag from youtrack

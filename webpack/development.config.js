@@ -68,10 +68,7 @@ const baseDevConfig = () => ({
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node_modules/,
-        options: {
-          presets: ['react-hmre']
-        }
+        exclude: /node_modules/
       },
       // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
       {

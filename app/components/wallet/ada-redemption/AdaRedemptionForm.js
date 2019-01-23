@@ -5,14 +5,14 @@ import { join } from 'lodash';
 import { isEmail, isEmpty } from 'validator';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
-import Select from 'react-polymorph/lib/components/Select';
-import SelectSkin from 'react-polymorph/lib/skins/simple/raw/SelectSkin';
-import Autocomplete from 'react-polymorph/lib/components/Autocomplete';
-import SimpleAutocompleteSkin from 'react-polymorph/lib/skins/simple/raw/AutocompleteSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { Select } from 'react-polymorph/lib/components/Select';
+import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
+import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
+import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { InvalidMnemonicError, InvalidEmailError, FieldRequiredError } from '../../../i18n/errors';
@@ -531,7 +531,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     }}
                     disabled={isRecovery || isCertificateSelected}
                     error={redemptionKeyField.error}
-                    skin={<SimpleInputSkin />}
+                    skin={InputSkin}
                   />
                 ) : (
                   <Input
@@ -540,7 +540,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     {...shieldedRedemptionKeyField.bind()}
                     disabled={isCertificateSelected}
                     error={shieldedRedemptionKeyField.error}
-                    skin={<SimpleInputSkin />}
+                    skin={InputSkin}
                   />
                 )}
 
@@ -550,7 +550,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   {...walletId.bind()}
                   onChange={this.onWalletChange}
                   isOpeningUpward
-                  skin={<SelectSkin />}
+                  skin={SelectSkin}
                 />
               </div>
 
@@ -583,7 +583,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="spendingPassword"
                   {...spendingPasswordField.bind()}
                   error={spendingPasswordField.error}
-                  skin={<SimpleInputSkin />}
+                  skin={InputSkin}
                 />
               </div>
             ) : null}
@@ -599,7 +599,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   maxVisibleOptions={5}
                   noResultsMessage={intl.formatMessage(messages.passphraseNoResults)}
                   isOpeningUpward
-                  skin={<SimpleAutocompleteSkin />}
+                  skin={AutocompleteSkin}
                 />
               </div>
             ) : null}
@@ -611,7 +611,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="decryption-key"
                   {...decryptionKeyField.bind()}
                   error={decryptionKeyField.error}
-                  skin={<SimpleInputSkin />}
+                  skin={InputSkin}
                 />
               </div>
             ) : null}
@@ -623,7 +623,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="email"
                   {...emailField.bind()}
                   error={emailField.error}
-                  skin={<SimpleInputSkin />}
+                  skin={InputSkin}
                 />
               </div>
             ) : null}
@@ -635,7 +635,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-passcode"
                   {...adaPasscodeField.bind()}
                   error={adaPasscodeField.error}
-                  skin={<SimpleInputSkin />}
+                  skin={InputSkin}
                 />
               </div>
             ) : null}
@@ -647,7 +647,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-amount"
                   {...adaAmountField.bind()}
                   error={adaAmountField.error}
-                  skin={<SimpleInputSkin />}
+                  skin={InputSkin}
                 />
               </div>
             ) : null}
@@ -659,7 +659,7 @@ export default class AdaRedemptionForm extends Component<Props> {
               label={intl.formatMessage(messages.submitLabel)}
               onClick={submit}
               disabled={!canSubmit}
-              skin={<SimpleButtonSkin />}
+              skin={ButtonSkin}
             />
           </BorderedBox>
         </div>
