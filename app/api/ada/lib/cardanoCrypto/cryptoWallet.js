@@ -4,7 +4,7 @@
 
 import bip39 from 'bip39';
 
-import { Logger, stringifyError } from '../../../../utils/logging'
+import { Logger, stringifyError } from '../../../../utils/logging';
 
 // $FlowFixMe
 import { HdWallet, Wallet, PaperWallet } from 'rust-cardano-crypto';
@@ -12,8 +12,8 @@ import { encryptWithPassword, decryptWithPassword } from '../../../../utils/pass
 import { getResultOrFail } from './cryptoUtils';
 
 import type { ConfigType } from '../../../../../config/config-types';
-import * as unorm from "unorm";
-import { pbkdf2Sync as pbkdf2 } from "pbkdf2";
+import * as unorm from 'unorm';
+import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 
 declare var CONFIG : ConfigType;
 

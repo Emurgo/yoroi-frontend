@@ -91,7 +91,8 @@ export default class DaedalusTransferStore extends Store {
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
-      const [newSecretWords, unscrambledLen] = this.api.ada.unscramblePaperMnemonic(secretWords, 27);
+      const [newSecretWords, unscrambledLen] =
+        this.api.ada.unscramblePaperMnemonic(secretWords, 27);
       if (!newSecretWords || !unscrambledLen) {
         throw new Error('Failed to unscramble paper mnemonics!');
       }
