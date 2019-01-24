@@ -136,7 +136,7 @@ export const isValidPaperMnemonic = (
 export const unscramblePaperMnemonic = (
   phrase: string,
   numberOfWords: ?number
-): [string, number] => (
+): [?string, number] => (
   unscramblePaperAdaMnemonic(phrase, numberOfWords)
 );
 

@@ -5,7 +5,9 @@
 import bip39 from 'bip39';
 
 import { Logger, stringifyError } from '../../../../utils/logging'
-import { HdWallet, PaperWallet, Wallet } from 'rust-cardano-crypto';
+
+// $FlowFixMe
+import { HdWallet, Wallet, PaperWallet } from 'rust-cardano-crypto';
 import { encryptWithPassword, decryptWithPassword } from '../../../../utils/passwordCipher';
 import { getResultOrFail } from './cryptoUtils';
 
@@ -46,7 +48,7 @@ export const isValidEnglishAdaPaperMnemonic = (
 export const unscramblePaperAdaMnemonic = (
   phrase: string,
   numberOfWords: ?number = 27
-): [string, number] => {
+): [?string, number] => {
   const words = phrase.split(' ');
   if (words.length === numberOfWords) {
     if (numberOfWords === 27) {

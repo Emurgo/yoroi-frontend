@@ -92,7 +92,7 @@ export default class DaedalusTransferStore extends Store {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
       const [newSecretWords, unscrambledLen] = this.api.ada.unscramblePaperMnemonic(secretWords, 27);
-      if (!unscrambledLen) {
+      if (!newSecretWords || !unscrambledLen) {
         throw new Error('Failed to unscramble paper mnemonics!');
       }
       secretWords = newSecretWords;

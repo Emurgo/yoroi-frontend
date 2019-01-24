@@ -429,7 +429,7 @@ export default class AdaApi {
     return isValidPaperMnemonic(mnemonic, numberOfWords);
   }
 
-  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number): [string, number] {
+  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number): [?string, number] {
     return unscramblePaperMnemonic(mnemonic, numberOfWords);
   }
 
