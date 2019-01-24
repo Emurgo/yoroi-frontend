@@ -13,6 +13,8 @@ import {
   generateWalletMasterKey,
   generateAdaMnemonic,
   isValidEnglishAdaMnemonic,
+  isValidEnglishAdaPaperMnemonic,
+  unscramblePaperAdaMnemonic,
   updateWalletMasterKeyPassword,
 } from './lib/cardanoCrypto/cryptoWallet';
 import { toAdaWallet, toAdaHardwareWallet } from './lib/cardanoCrypto/cryptoToModel';
@@ -120,6 +122,22 @@ export const isValidMnemonic = (
   numberOfWords: ?number
 ): boolean => (
   isValidEnglishAdaMnemonic(phrase, numberOfWords)
+);
+
+/** Wrapper function to check paper mnemonic validity according to bip39 */
+export const isValidPaperMnemonic = (
+  phrase: string,
+  numberOfWords: ?number
+): boolean => (
+  isValidEnglishAdaPaperMnemonic(phrase, numberOfWords)
+);
+
+/** Wrapper function to check paper mnemonic validity according to bip39 */
+export const unscramblePaperMnemonic = (
+  phrase: string,
+  numberOfWords: ?number
+): [string, number] => (
+  unscramblePaperAdaMnemonic(phrase, numberOfWords)
 );
 
 /** Wrapper function to create new Trezor ADA hardware wallet object */

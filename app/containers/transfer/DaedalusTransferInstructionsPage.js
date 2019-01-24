@@ -15,7 +15,12 @@ const messages = defineMessages({
     id: 'daedalusTransfer.instructions.attention.confirmation',
     defaultMessage: '!!!Transfer all funds from Daedalus wallet',
     description: 'Label "Transfer all funds from Daedalus wallet" on the Daedalus transfer instructions page.'
-  }
+  },
+  confirmationPaperText: {
+    id: 'daedalusTransfer.instructions.attention.confirmationPaper',
+    defaultMessage: '!!!Transfer all funds from Daedalus Paper wallet',
+    description: 'Label "Transfer all funds from Daedalus Paper wallet" on the Daedalus transfer instructions page.'
+  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
@@ -23,6 +28,7 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 type Props = {
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
+  onPaperConfirm: Function,
   disableTransferFunds: boolean,
 };
 
@@ -38,6 +44,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
     const {
       onFollowInstructionsPrerequisites,
       onConfirm,
+      onPaperConfirm,
       disableTransferFunds,
     } = this.props;
 
@@ -45,9 +52,11 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
       <TransferInstructionsPage
         onFollowInstructionsPrerequisites={onFollowInstructionsPrerequisites}
         onConfirm={onConfirm}
+        onPaperConfirm={onPaperConfirm}
         disableTransferFunds={disableTransferFunds}
         attentionText={intl.formatMessage(messages.attentionText)}
         confirmationText={intl.formatMessage(messages.confirmationText)}
+        confirmationPaperText={intl.formatMessage(messages.confirmationPaperText)}
       />
     );
   }

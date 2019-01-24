@@ -47,6 +47,7 @@ export default class DaedalusTransferStore extends Store {
     ]);
     const actions = this.actions.ada.daedalusTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
+    actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
     actions.setupTransferFunds.listen(this._setupTransferFunds);
     actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._transferFunds);
@@ -60,6 +61,10 @@ export default class DaedalusTransferStore extends Store {
 
   _startTransferFunds = (): void => {
     this._updateStatus('gettingMnemonics');
+  }
+
+  _startTransferPaperFunds = (): void => {
+    this._updateStatus('gettingPaperMnemonics');
   }
 
   /** @Attention:
@@ -84,7 +89,14 @@ export default class DaedalusTransferStore extends Store {
    * Finally, generate the tx to transfer the wallet to Yoroi
    */
   _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
-    const { recoveryPhrase: secretWords } = payload;
+    let { recoveryPhrase: secretWords } = payload;
+    if (secretWords.split(' ').length === 27) {
+      const [newSecretWords, unscrambledLen] = this.api.ada.unscramblePaperMnemonic(secretWords, 27);
+      if (!unscrambledLen) {
+        throw new Error('Failed to unscramble paper mnemonics!');
+      }
+      secretWords = newSecretWords;
+    }
     this._updateStatus('restoringAddresses');
     this.ws = new WebSocket(websocketUrl);
     this.ws.addEventListener('open', () => {
