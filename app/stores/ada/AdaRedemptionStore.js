@@ -247,7 +247,6 @@ export default class AdaRedemptionStore extends Store {
         mnemonics: this.passPhrase && this.passPhrase.split(' ')
       });
       this._reset();
-      console.log(this.actions.ada.adaRedemption.adaSuccessfullyRedeemed);
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
         walletId,
         // TODO: pass amount once tx has been broadcasted

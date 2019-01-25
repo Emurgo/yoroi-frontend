@@ -6,6 +6,8 @@ import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
 
+const fs = require('fs');
+
 /**
  * Chrome extension URLs are fixed and never change. This is a security problem as it allows
  * websites to check if you have certain known extensions installed by monitoring the browser's
@@ -203,6 +205,25 @@ function CustomWorld(cmdInput: WorldInput) {
     this.driver.executeScript(txs => {
       window.yoroi.api.ada.saveTxs(txs);
     }, transactions);
+  };
+
+  this.chooseFile = async filePath => {
+    const regularAdaCertificateFileContent = fs.readFileSync(filePath);
+    await this.driver.executeScript((fileContent) => {
+      const content = new Uint8Array(fileContent);
+      const certificate = new File(content, 'fileName.pdf');
+      window.yoroi.actions.ada.adaRedemption.setCertificate.trigger({ certificate });
+    }, regularAdaCertificateFileContent);
+  };
+
+  this.enterPassphrase = async passphrase => {
+    for (let i = 0; i < passphrase.length; i++) {
+      const word = passphrase[i];
+      await this.input('.AdaRedemptionForm_scrollableContent .pass-phrase input', word);
+      await this.waitForElement(`//li[contains(text(), '${word}')]`, By.xpath);
+      await this.click(`//li[contains(text(), '${word}')]`, By.xpath);
+      await this.waitForElement(`//span[contains(text(), '${word}')]`, By.xpath);
+    }
   };
 }
 
