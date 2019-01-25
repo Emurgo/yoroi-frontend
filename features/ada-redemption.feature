@@ -19,8 +19,7 @@ Feature: Ada Redemption
     And I enter a valid "Regular" redemption key
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
-    # # FIXME
-    # Then I should see the summary screen
+    Then I should see the summary screen
 
   Scenario: User tries to redeem manually entered "Regular" invalid redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -31,9 +30,8 @@ Feature: Ada Redemption
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I select a valid "Regular" PDF certificate
     And ada redemption form submit button is no longer disabled
-    # # FIXME
-    # When I submit the ada redemption form
-    # Then I should see the "Ada Redemption Success Overlay"
+    When I submit the ada redemption form
+    Then I should see the "Ada Redemption Success Overlay"
 
   Scenario: User redeems "Regular" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -50,17 +48,15 @@ Feature: Ada Redemption
     And I enter a valid "Force vended" redemption key
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
-    # # FIXME
-    # Then I should see the summary screen
+    Then I should see the summary screen
 
   Scenario: User redeems "Force vended" PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I click on ada redemption choices "Force vended" tab
     And I select a valid "Force vended" PDF certificate
     And ada redemption form submit button is no longer disabled
-    # # FIXME
-    # When I submit the ada redemption form
-    # Then I should see the summary screen
+    When I submit the ada redemption form
+    Then I should see the summary screen
 
   Scenario: User redeems "Force vended" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -97,10 +93,9 @@ Feature: Ada Redemption
     And I click on ada redemption choices "Recovery - force vended" tab
     And I select a valid "Force vended" encrypted PDF certificate
     And I enter a valid "Force vended" encrypted PDF certificate decryption key "<KEY>"
-    # # FIXME
-    # And ada redemption form submit button is no longer disabled
-    # When I submit the ada redemption form
-    # Then I should see the summary screen
+    And ada redemption form submit button is no longer disabled
+    When I submit the ada redemption form
+    Then I should see the summary screen
 
     Examples:
     | KEY                                                                                                                                                |
