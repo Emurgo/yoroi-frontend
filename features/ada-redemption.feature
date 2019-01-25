@@ -27,14 +27,13 @@ Feature: Ada Redemption
     And I enter an invalid "Regular" redemption key
     Then I should see invalid redemption key message
 
-  # # FIXME
-  # Scenario: User redeems "Regular" PDF certificate
-  #   Given I am on the ada redemption screen
-  #   And I have accepted "Daedalus Redemption Disclaimer"
-  #   And I select a valid "Regular" PDF certificate
-  #   And ada redemption form submit button is no longer disabled
-  #   When I submit the ada redemption form
-  #   Then I should see the "Ada Redemption Success Overlay"
+  Scenario: User redeems "Regular" PDF certificate
+    Given I have accepted "Daedalus Redemption Disclaimer"
+    And I select a valid "Regular" PDF certificate
+    And ada redemption form submit button is no longer disabled
+    # # FIXME
+    # When I submit the ada redemption form
+    # Then I should see the "Ada Redemption Success Overlay"
 
   Scenario: User redeems "Regular" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -54,14 +53,14 @@ Feature: Ada Redemption
     # # FIXME
     # Then I should see the summary screen
 
-  # FIXME
-  # Scenario: User redeems "Force vended" PDF certificate
-  #   Given I have accepted "Daedalus Redemption Disclaimer"
-  #   And I click on ada redemption choices "Force vended" tab
-  #   And I select a valid "Force vended" PDF certificate
-  #   And ada redemption form submit button is no longer disabled
-  #   When I submit the ada redemption form
-  #   # Then I should see the summary screen
+  Scenario: User redeems "Force vended" PDF certificate
+    Given I have accepted "Daedalus Redemption Disclaimer"
+    And I click on ada redemption choices "Force vended" tab
+    And I select a valid "Force vended" PDF certificate
+    And ada redemption form submit button is no longer disabled
+    # # FIXME
+    # When I submit the ada redemption form
+    # Then I should see the summary screen
 
   Scenario: User redeems "Force vended" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"

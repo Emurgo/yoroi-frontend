@@ -207,13 +207,14 @@ function CustomWorld(cmdInput: WorldInput) {
     }, transactions);
   };
 
-  this.chooseFile = async filePath => {
-    const regularAdaCertificateFileContent = fs.readFileSync(filePath);
-    await this.driver.executeScript((fileContent) => {
-      const content = new Uint8Array(fileContent);
-      const certificate = new File(content, 'fileName.pdf');
+  this.chooseFile = async (filePath, fileType) => {
+    const certificateFileContent = fs.readFileSync(filePath);
+    await this.driver.executeScript((fileContent, type) => {
+      const content = new Uint8Array(fileContent.data);
+      const certificate = new Blob([content], { type });
+      console.log(certificate);
       window.yoroi.actions.ada.adaRedemption.setCertificate.trigger({ certificate });
-    }, regularAdaCertificateFileContent);
+    }, certificateFileContent, fileType);
   };
 
   this.enterPassphrase = async passphrase => {

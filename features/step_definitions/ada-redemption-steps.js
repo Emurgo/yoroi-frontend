@@ -57,9 +57,9 @@ When(/^I enter an invalid "Regular" redemption key$/, async function () {
   await this.input('#redemptionKey--5', redemptionKey);
 });
 
-// When(/^I select a valid "Regular" PDF certificate$/, async function () {
-//   await this.chooseFile(regularAdaCertificateFilePath);
-// });
+When(/^I select a valid "Regular" PDF certificate$/, async function () {
+  await this.chooseFile(regularAdaCertificateFilePath, 'application/pdf');
+});
 
 When(/^I select a valid "Regular" encrypted PDF certificate$/, async function () {
   await this.chooseFile(regularEncryptedAdaCertificateFilePath);
@@ -70,9 +70,9 @@ When(/^I enter a valid "Force vended" redemption key$/, async function () {
   await this.input('#redemptionKey--5', redemptionKey);
 });
 
-// When(/^I select a valid "Force vended" PDF certificate$/, async function () {
-//   await this.chooseFile(forceVendedAdaCertificateFilePath);
-// });
+When(/^I select a valid "Force vended" PDF certificate$/, async function () {
+  await this.chooseFile(forceVendedAdaCertificateFilePath, 'application/pdf');
+});
 
 When(/^I select a valid "Force vended" encrypted PDF certificate$/, async function () {
   await this.chooseFile(forceVendedEncryptedAdaCertificateFilePath);
