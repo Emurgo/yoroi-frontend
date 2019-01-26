@@ -8,7 +8,7 @@ import TransferInstructionsPage from '../../components/transfer/TransferInstruct
 const messages = defineMessages({
   attentionText: {
     id: 'daedalusTransfer.instructions.attention.text',
-    defaultMessage: '!!!Yoroi and Daedalus wallets use different key derivation scheme and they each have a separate format for addresses. For this reason, Daedalus wallets cannot be restored and continued to be used in Icarus and vice versa. This will change in the future. For now, to use funds from your Daedalus wallet, you need to transfer them to your Icarus wallet. Daedalus and Icarus wallets are fully compatible for transferring of funds. If you don’t have a working copy of Daedalus, you can use your 12-word recovery phrase (or 27-words for a paper wallet) used to restore and transfer the balance from Daedalus into Icarus.',
+    defaultMessage: '!!!Yoroi and Daedalus wallets use different key derivation scheme and they each have a separate format for addresses. For this reason, Daedalus wallets cannot be restored and continued to be used in Yoroi and vice versa. This will change in the future. For now, to use funds from your Daedalus wallet, you need to transfer them to your Yoroi wallet. Daedalus and Yoroi wallets are fully compatible for transferring of funds. If you don’t have a working copy of Daedalus, you can use your 12-word recovery phrase (or 27-words for a paper wallet) used to restore and transfer the balance from Daedalus into Yoroi.',
     description: 'Attention text on the Daedalus transfer instructions page.'
   },
   confirmationText: {
