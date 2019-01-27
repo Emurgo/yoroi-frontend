@@ -34,6 +34,7 @@ export default class Wallet {
     passwordUpdateDate: ?Date,
   }) {
     Object.assign(this, data);
+    this.type = this.type || WalletTypeOption.WEB_WALLET;
   }
 
   updateAmount(amount: BigNumber): void {

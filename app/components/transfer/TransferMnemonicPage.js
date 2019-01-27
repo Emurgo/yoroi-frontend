@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Autocomplete from 'react-polymorph/lib/components/Autocomplete';
-import SimpleAutocompleteSkin from 'react-polymorph/lib/skins/simple/raw/AutocompleteSkin';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
+import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
@@ -157,7 +157,7 @@ export default class TransferMnemonicPage extends Component<Props> {
               error={recoveryPhraseField.error}
               maxVisibleOptions={5}
               noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={<SimpleAutocompleteSkin />}
+              skin={AutocompleteSkin}
             />
 
             <div className={styles.buttonsWrapper}>
@@ -165,14 +165,14 @@ export default class TransferMnemonicPage extends Component<Props> {
                 className={nextButtonClasses}
                 label={intl.formatMessage(messages.nextButtonLabel)}
                 onClick={this.submit}
-                skin={<SimpleButtonSkin />}
+                skin={ButtonSkin}
               />
 
               <Button
                 className={backButtonClasses}
                 label={intl.formatMessage(messages.backButtonLabel)}
                 onClick={onBack}
-                skin={<SimpleButtonSkin />}
+                skin={ButtonSkin}
               />
             </div>
 

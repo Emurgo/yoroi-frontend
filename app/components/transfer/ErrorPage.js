@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import Button from 'react-polymorph/lib/components/Button';
-import SimpleButtonSkin from 'react-polymorph/lib/skins/simple/raw/ButtonSkin';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './ErrorPage.scss';
 
@@ -50,7 +50,7 @@ export default class ErrorPage extends Component<Props> {
                 className={backButtonClasses}
                 label={backButtonLabel}
                 onClick={onCancel}
-                skin={<SimpleButtonSkin />}
+                skin={ButtonSkin}
               />
             </div>
 

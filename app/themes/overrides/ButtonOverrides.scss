@@ -1,18 +1,8 @@
-@import "_config";
-// Theme config overrides go here …
-@import "~react-polymorph/lib/themes/simple/SimpleButton";
 // Css module overrides go here …
 
 .root {
-  background: var(--theme-button-primary-background-color);
   border-radius: 0;
-  font-size: 14px;
-  font-family: var(--font-medium);
-  height: 40px;
-  padding: 12px 20px;
   position: relative;
-  text-transform: none;
-  width: 400px;
 }
 
 :global {

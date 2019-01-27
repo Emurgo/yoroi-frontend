@@ -29,7 +29,7 @@ export default defineMessages({
   },
   passwordInstructions: {
     id: 'global.passwordInstructions',
-    defaultMessage: '!!!Note that password needs to be at least 7 characters long, and have at least 1 uppercase, 1 lowercase letter and 1 number.',
+    defaultMessage: '!!!Note: Password needs to be at least 12 characters long.',
     description: 'Password instructions note.',
   },
   cancel: {
@@ -147,11 +147,6 @@ export default defineMessages({
     defaultMessage: '!!!Connect to Trezor Hardware Wallet',
     description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
   },
-  trezorError999: {
-    id: 'wallet.trezor.error.999',
-    defaultMessage: '!!!Something unexpected happened, please retry.',
-    description: '<Something unexpected happened, please retry.>'
-  },
   trezorError101: {
     id: 'wallet.trezor.error.101',
     defaultMessage: '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
@@ -181,6 +176,11 @@ export default defineMessages({
     id: 'wallet.summary.page.trezorTWalletIntegratedNotificationMessage',
     defaultMessage: '!!!You have successfully integrated with your Trezor Model T device',
     description: 'Notification Message for successful integration with Trezor Model T device.',
+  },
+  noTransactionsFound: {
+    id: 'wallet.summary.no.transaction',
+    defaultMessage: '!!!No transactions found',
+    description: 'Message shown when wallet transaction search returns zero results.'
   },
 });
 

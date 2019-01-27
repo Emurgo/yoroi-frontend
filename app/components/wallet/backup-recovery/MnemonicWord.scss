@@ -1,20 +1,22 @@
-.component {
-  background-color: var(--theme-mnemonic-background-color) !important;
+.root {
+  background-color: var(--theme-mnemonic-background-color);
   font-size: 15px !important;
   margin: 5px 0;
   height: 40px;
   padding: 10px 20px;
   width: 140px !important;
-}
 
-.inactive {
-  cursor: default !important;
-  opacity: 0.3;
-}
+  &.disabled {
+    cursor: default !important;
+    opacity: 0.3;
+  }
 
-.active {
-  cursor: pointer;
-  &:hover {
-    background-color: var(--theme-mnemonic-background-color-hover) !important;
+  &:not(.disabled) {
+    &:active {
+      cursor: pointer;
+      &:hover {
+        background-color: var(--theme-mnemonic-background-color-hover) !important;
+      }
+    }
   }
 }

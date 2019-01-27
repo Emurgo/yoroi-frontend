@@ -1,3 +1,6 @@
+$leftBlockWidth: 72px;
+$rightBlockWidth: $leftBlockWidth;
+
 %smallText {
   height: 19px;
   font-family: var(--font-light);
@@ -13,14 +16,40 @@
 }
 
 .component {
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.leftBlock {
+  float: left;
+  padding-top: 20px;
+  width: $leftBlockWidth;
+}
+
+.rightBlock {
+  float: right;
+  padding-top: 20px;
+  width: $rightBlockWidth;
+
+  .exportTxToFileSvg {
+    pointer-events: auto;
+    float: right;
+  }
+
+  .exportTxToFileSvg:hover {
+    cursor: pointer;
+    circle {
+      fill: var(--theme-export-transactions-to-file);
+    }
+  }
+}
+
+.middleBlock {
+  display: inline-block;
   text-align: center;
   border-bottom: 1px solid var(--theme-separation-border-color);
-  margin: 0 auto;
-  width: 80%;
-  padding-top: 20px;
-  padding-right: 0px;
-  padding-bottom: 0px;
-  padding-left: 0px;
+  width: calc(100% - #{$leftBlockWidth + $rightBlockWidth});
 
   :global {
     .BorderedBox_component {

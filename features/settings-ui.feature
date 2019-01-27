@@ -1,7 +1,7 @@
 Feature: Wallet UI Settings
 
   Background:
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I have completed the basic setup
 
   @it-12
@@ -21,10 +21,7 @@ Feature: Wallet UI Settings
     | global.errors.invalidWalletPassword |
   Examples:
   | currentPassword | password    | repeatedPassword | |
-  | Secret_123      | secret_123  | secret_123       | without upper case letters|
-  | Secret_123      | SECRET_123  | SECRET_123       | without lower case letters|
-  | Secret_123      | SecretSecret| SecretSecret     | without numbers           |
-  | Secret_123      | Secre1      | Secre1           | too short                 |
+  | aaSecret_123      | Secre1      | Secre1           | too short                 |
 
 @it-94
   Scenario Outline: User is able to change spending password (IT-94)
@@ -37,7 +34,7 @@ Feature: Wallet UI Settings
     And I should see the "change" wallet password dialog
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword |
-    | Secret_123         | newSecret123 | newSecret123     |
+    | aaSecret_123         | newSecret123 | newSecret123     |
     And I submit the wallet password dialog
     Then I should not see the change password dialog anymore
 
@@ -76,9 +73,9 @@ Feature: Wallet UI Settings
     | <errorMessage> |
   Examples:
   | currentPassword | password         |repeatedPassword |errorMessage|
-  | SecreT_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
-  | seCReT_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
-  | SEcRET_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
+  | aaSecreT_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
+  | aaseCReT_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
+  | aaSEcRET_123      | ValidPassword123 |ValidPassword123 |api.errors.IncorrectPasswordError|
 
   
   @it-8
@@ -131,8 +128,8 @@ Feature: Wallet UI Settings
     And I should see the "change" wallet password dialog
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword |
-    | Secret_123         | newSecret123 | newSecret123     |
-    And I clear the current wallet password Secret_123
+    | aaSecret_123         | newSecret123 | newSecret123     |
+    And I clear the current wallet password aaSecret_123
     And I submit the wallet password dialog
     Then I should stay in the change password dialog
 
@@ -146,7 +143,7 @@ Feature: Wallet UI Settings
     And I should see the "change" wallet password dialog
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword |
-    | Secret_123         | newSecret123 | newSecret123     |
+    | aaSecret_123         | newSecret123 | newSecret123     |
     And I clear the current wallet repeat password newSecret123 
     And I submit the wallet password dialog
     Then I should stay in the change password dialog

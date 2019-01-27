@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { action, useStrict } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
-import { hashHistory } from 'react-router';
+import createHashHistory from 'history/createHashHistory';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
 import translations from '../../app/i18n/translations';
@@ -18,6 +18,7 @@ useStrict(true);
 const initializeYoroi = async () => {
   const api = setupApi();
   const router = new RouterStore();
+  const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
   const stores = createStores(api, actions, router);
 
