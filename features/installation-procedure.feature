@@ -2,7 +2,7 @@ Feature: Installation procedure
 
   @it-98
   Scenario: User Selects Language at first launch (IT-98)
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I am on the language selection screen
     And I open language selection dropdown
     And I select Japanese language
@@ -12,7 +12,7 @@ Feature: Installation procedure
 
   @it-51
   Scenario: Terms of Use are not accepted if user didn’t confirm it and close/reload the browser page (IT-51)
-    Given I have opened the chrome extension
+    Given I have opened the extension
     And I have selected English language
     Given I am on the "Terms of use" screen
     When I refresh the page

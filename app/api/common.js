@@ -10,6 +10,12 @@ import LocalizableError from '../i18n/LocalizableError';
 import WalletTransaction from '../domain/WalletTransaction';
 import WalletAddress from '../domain/WalletAddress';
 import Wallet from '../domain/Wallet';
+import type { SignedResponse } from './ada/lib/yoroi-backend-api';
+import type {
+  TransactionExportRow,
+  TransactionExportDataFormat,
+  TransactionExportFileType
+} from './export';
 
 const messages = defineMessages({
   genericApiError: {
@@ -104,6 +110,17 @@ export type GetTransactionsResponse = {
   total: number,
 };
 
+export type GetTransactionRowsToExportRequest = void; // TODO: Implement in the Next iteration
+export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
+
+export type ExportTransactionsRequest = {
+  rows: Array<TransactionExportRow>,
+  format?: TransactionExportDataFormat,
+  fileType?: TransactionExportFileType,
+  fileName?: string
+};
+export type ExportTransactionsResponse = void;  // TODO: Implement in the Next iteration
+
 export type CreateWalletRequest = {
   name: string,
   mnemonic: string,
@@ -139,9 +156,9 @@ export type UpdateWalletPasswordResponse = boolean;
 
 export type UpdateWalletResponse = Wallet;
 
-export type CreateTransactionResponse = Array<void>;
+export type CreateTransactionResponse = SignedResponse;
 
-export type SendTrezorSignedTxResponse = Array<void>;
+export type SendTrezorSignedTxResponse = SignedResponse;
 
 export type GetWalletsResponse = Array<Wallet>;
 

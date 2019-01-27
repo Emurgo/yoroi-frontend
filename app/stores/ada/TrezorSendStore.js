@@ -7,7 +7,7 @@ import Store from '../base/Store';
 import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
-import LocalizableError from '../../i18n/LocalizableError';
+import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 
 import type {
@@ -155,17 +155,17 @@ export default class TrezorSendStore extends Store {
           break;
         default:
           /** we are not able to figure out why Error is thrown
-            * make it, trezorError999 = Something unexpected happened */
+            * make it, Something unexpected happened */
           Logger.error(`TrezorSendStore::_convertToLocalizableError::error: ${error.message}`);
-          localizableError = new LocalizableError(globalMessages.trezorError999);
+          localizableError = new UnexpectedError();
           break;
       }
     }
 
     if (!localizableError) {
       /** we are not able to figure out why Error is thrown
-        * make it, trezorError999 = Something unexpected happened */
-      localizableError = new LocalizableError(globalMessages.trezorError999);
+        * make it, Something unexpected happened */
+      localizableError = new UnexpectedError();
     }
 
     return localizableError;

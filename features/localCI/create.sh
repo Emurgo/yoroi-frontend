@@ -16,3 +16,9 @@ sudo apt-get install -y wget
 
 # Install wmctrl.
 sudo apt-get install -y wmctrl
+
+# replace Firefox w/ Firefox-esr
+sudo rm -f /opt/firefox/firefox
+sudo rm -f /usr/local/bin/firefox
+sudo apt install firefox-esr
+sudo ln -s /usr/bin/firefox-esr /usr/local/bin/firefox

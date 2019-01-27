@@ -6,7 +6,7 @@ import { assuranceLevels } from '../config/transactionAssuranceConfig';
 
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
 export type TransactionState = 'pending' | 'failed' | 'ok';
-export type TransactionType = 'card' | 'expend' | 'income' | 'exchange';
+export type TransactionType = 'card' | 'expend' | 'income' | 'exchange' | 'self' | 'multi';
 
 export const transactionStates: {
   PENDING: TransactionState,
@@ -19,15 +19,17 @@ export const transactionStates: {
 };
 
 export const transactionTypes: {
-  CARD: TransactionType,
   EXPEND: TransactionType,
   INCOME: TransactionType,
   EXCHANGE: TransactionType,
+  SELF: TransactionType,
+  MULTI: TransactionType
 } = {
-  CARD: 'card',
   EXPEND: 'expend',
   INCOME: 'income',
   EXCHANGE: 'exchange',
+  SELF: 'self',
+  MULTI: 'multi'
 };
 
 export default class WalletTransaction {
@@ -35,7 +37,8 @@ export default class WalletTransaction {
   @observable id: string = '';
   @observable type: TransactionType;
   @observable title: string = '';
-  @observable amount: BigNumber;
+  @observable amount: BigNumber; // fee included
+  @observable fee: BigNumber;
   @observable date: Date;
   @observable description: string = '';
   @observable numberOfConfirmations: number = 0;
@@ -47,6 +50,7 @@ export default class WalletTransaction {
     type: TransactionType,
     title: string,
     amount: BigNumber,
+    fee: BigNumber,
     date: Date,
     description: string,
     numberOfConfirmations: number,
@@ -65,5 +69,4 @@ export default class WalletTransaction {
     }
     return assuranceLevels.HIGH;
   }
-
 }

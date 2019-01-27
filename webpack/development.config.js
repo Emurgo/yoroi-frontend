@@ -68,10 +68,7 @@ const baseDevConfig = () => ({
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node_modules/,
-        options: {
-          presets: ['react-hmre']
-        }
+        exclude: /node_modules/
       },
       {
         test: /\.css$/,

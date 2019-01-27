@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import Input from 'react-polymorph/lib/components/Input';
-import SimpleInputSkin from 'react-polymorph/lib/skins/simple/raw/InputSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -71,7 +71,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
   };
 
   componentDidMount() {
-    setTimeout(() => { this.walletNameInput.focus(); });
+    setTimeout(() => { this.walletNameInput.getRef().focus(); });
   }
 
   walletNameInput: Input;
@@ -193,7 +193,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
           ref={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={<SimpleInputSkin />}
+          skin={InputSkin}
         />
 
         <div className={styles.walletPassword}>
@@ -202,13 +202,13 @@ export default class WalletCreateDialog extends Component<Props, State> {
               className="walletPassword"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={InputSkin}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              skin={<SimpleInputSkin />}
+              skin={InputSkin}
             />
             <p className={styles.passwordInstructions}>
               {intl.formatMessage(globalMessages.passwordInstructions)}
