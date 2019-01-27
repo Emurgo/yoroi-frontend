@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RUST_TOOLCHAIN="$(cat rust-toolchain)"
+RUST_TOOLCHAIN="nightly"
 
 set +e
 pushd wallet-wasm
