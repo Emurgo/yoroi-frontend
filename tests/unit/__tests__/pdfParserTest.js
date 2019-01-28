@@ -2,6 +2,8 @@ import chai, { assert } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import mockData from '../mockData/mockData.json';
 import { getMockedFileBuffer } from '../mockData/mockDataBuilder';
+import { ParsePDFKeyError, InvalidCertificateError } from '../../../app/api/ada/errors';
+
 // This import will correctly initialize pdfjs worker:
 // Reference to issue: https://github.com/mozilla/pdf.js/issues/9579
 import 'pdfjs-dist/build/pdf.worker.entry';
@@ -36,7 +38,7 @@ describe('PDF get secret key tests', () => {
   it('should fail if PDF is missing', () => {
     assert.throws(
       () => { pdfParser.getSecretKey(); },
-      Error
+      ParsePDFKeyError
     );
   });
 
@@ -45,7 +47,7 @@ describe('PDF get secret key tests', () => {
 
     assert.throws(
       () => { pdfParser.getSecretKey(parsePDF.noKeyPDFContent); },
-      'api.errors.invalidCertificateError: {}'
+      InvalidCertificateError
     );
   });
 });
@@ -69,9 +71,7 @@ describe('PDF parse test', () => {
 });
 
 describe('PDF decrypt test', () => {
-  // TODO fix this test
-  // Issue https://trello.com/c/d71yVLdk/49-fix-unit-tests-after-updating-yoroi
-  it.skip('should decrypt regular PDF', () => {
+  it('should decrypt regular PDF', () => {
     const fileBuffer = getMockedFileBuffer('regular.pdf.enc');
     const decryptedFileBuffer = getMockedFileBuffer('regular-decrypted.txt');
     const { decryptPDF } = mockData;
