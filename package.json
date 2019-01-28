@@ -73,7 +73,7 @@
     "config-webpack": "1.0.4",
     "crx": "3.2.1",
     "css-loader": "0.25.0",
-    "cucumber": "4.2.1",
+    "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
     "eslint": "5.8.0",
     "eslint-config-airbnb": "17.1.0",
     "eslint-plugin-flowtype": "3.2.0",
