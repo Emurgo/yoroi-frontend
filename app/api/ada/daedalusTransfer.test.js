@@ -35,7 +35,7 @@ test('Daedalus transfer from old invalid address', () => {
   expect(inputs[0].id).toEqual(txId);
   expect(inputs[0].index).toEqual(txIndex);
   expect(outputs[0].address).toEqual(outAddress);
-  expect(1000000 - outputs[0].value).toEqual(parseInt(fee));
+  expect(1000000 - parseInt(outputs[0].value)).toEqual(parseInt(fee));
   expect('PkWitness' in witnesses[0]).toEqual(true);
   const [pub] = witnesses[0]['PkWitness'];
   const [addressRoot, addressAttr] = cbor.decode(cbor.decode(bs58.decode(address))[0].value);
