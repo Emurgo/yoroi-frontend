@@ -24,8 +24,8 @@ jobs:
       # use nightly version. 
       # // TODO: This is hardcoded but taken from js-cardano-wasm repo
       # which is checked out later
-      - run: rustup install nightly
-      - run: rustup target add wasm32-unknown-unknown --toolchain nightly
+      - run: rustup install 1.32.0
+      - run: rustup target add wasm32-unknown-unknown --toolchain 1.32.0
 
       # Because npm link will write in this path
       - run: sudo chown -R "$(whoami):$(whoami)" /usr/local/lib/node_modules
