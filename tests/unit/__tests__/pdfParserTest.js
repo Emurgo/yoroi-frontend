@@ -2,6 +2,8 @@ import chai, { assert } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import mockData from '../mockData/mockData.json';
 import { getMockedFileBuffer } from '../mockData/mockDataBuilder';
+import { ParsePDFKeyError, InvalidCertificateError } from '../../../app/api/ada/errors';
+
 // This import will correctly initialize pdfjs worker:
 // Reference to issue: https://github.com/mozilla/pdf.js/issues/9579
 import 'pdfjs-dist/build/pdf.worker.entry';
@@ -36,7 +38,7 @@ describe('PDF get secret key tests', () => {
   it('should fail if PDF is missing', () => {
     assert.throws(
       () => { pdfParser.getSecretKey(); },
-      Error
+      ParsePDFKeyError
     );
   });
 
@@ -45,7 +47,7 @@ describe('PDF get secret key tests', () => {
 
     assert.throws(
       () => { pdfParser.getSecretKey(parsePDF.noKeyPDFContent); },
-      'api.errors.invalidCertificateError: {}'
+      InvalidCertificateError
     );
   });
 });
