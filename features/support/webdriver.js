@@ -212,7 +212,6 @@ function CustomWorld(cmdInput: WorldInput) {
     await this.driver.executeScript((fileContent, type) => {
       const content = new Uint8Array(fileContent.data);
       const certificate = new Blob([content], { type });
-      console.log(certificate);
       window.yoroi.actions.ada.adaRedemption.setCertificate.trigger({ certificate });
     }, certificateFileContent, fileType);
   };

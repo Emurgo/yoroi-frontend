@@ -19,7 +19,8 @@ Feature: Ada Redemption
     And I enter a valid "Regular" redemption key
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
-    Then I should see the summary screen
+    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    And I should see the summary screen
 
   Scenario: User tries to redeem manually entered "Regular" invalid redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -31,7 +32,8 @@ Feature: Ada Redemption
     And I select a valid "Regular" PDF certificate
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
-    Then I should see the "Ada Redemption Success Overlay"
+    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    And I should see the summary screen
 
   Scenario: User redeems "Regular" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -40,7 +42,8 @@ Feature: Ada Redemption
     # # FIXME
     # And ada redemption form submit button is no longer disabled
     # When I submit the ada redemption form
-    # Then I should see the summary screen
+    # Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    # And I should see the summary screen
 
   Scenario: User redeems manually entered "Force vended" redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -48,7 +51,8 @@ Feature: Ada Redemption
     And I enter a valid "Force vended" redemption key
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
-    Then I should see the summary screen
+    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    And I should see the summary screen
 
   Scenario: User redeems "Force vended" PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -56,7 +60,8 @@ Feature: Ada Redemption
     And I select a valid "Force vended" PDF certificate
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
-    Then I should see the summary screen
+    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    And I should see the summary screen
 
   Scenario: User redeems "Force vended" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -66,7 +71,8 @@ Feature: Ada Redemption
     # # FIXME
     # And ada redemption form submit button is no longer disabled
     # When I submit the ada redemption form
-    # Then I should see the summary screen
+    # Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    # And I should see the summary screen
 
   Scenario: User redeems manually entered "Paper vended" shielded vending key and passphrase
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -76,7 +82,8 @@ Feature: Ada Redemption
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
     # # FIXME
-    # Then I should see the summary screen
+    # Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    # And I should see the summary screen
 
   Scenario: User redeems "Recovery - regular" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -86,7 +93,8 @@ Feature: Ada Redemption
     # # FIXME
     # And ada redemption form submit button is no longer disabled
     # When I submit the ada redemption form
-    # Then I should see the summary screen
+    # Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    # And I should see the summary screen
 
   Scenario Outline: User redeems "Recovery - force vended" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -95,7 +103,8 @@ Feature: Ada Redemption
     And I enter a valid "Force vended" encrypted PDF certificate decryption key "<KEY>"
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
-    Then I should see the summary screen
+    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    And I should see the summary screen
 
     Examples:
     | KEY                                                                                                                                                |

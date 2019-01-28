@@ -117,3 +117,8 @@ Then(/^I should see invalid redemption key message$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.redeem.dialog.redemptionCodeError' });
   await this.waitUntilText('.SimpleFormField_error', errorMessage);
 });
+
+Then(/^I should see the "Ada Redemption Success Overlay" and close the dialogue$/, async function () {
+  await this.waitForElement('.AdaRedemptionSuccessOverlay_component');
+  await this.click('.AdaRedemptionSuccessOverlay_confirmButton');
+});
