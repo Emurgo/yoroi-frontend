@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
-import {defineMessages, FormattedMessage, intlShape} from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
@@ -30,6 +30,26 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.blog',
     defaultMessage: '!!!Emurgo blog',
     description: 'Label for Emurgo blog link.'
+  },
+  aboutYoroiTwitter: {
+    id: 'settings.general.aboutYoroi.twitter',
+    defaultMessage: '!!!Twitter',
+    description: 'Label for Yoroi Twitter link.'
+  },
+  aboutYoroiGithub: {
+    id: 'settings.general.aboutYoroi.github',
+    defaultMessage: '!!!GitHub',
+    description: 'Label for Yoroi GitHub link.'
+  },
+  aboutYoroiYoutube: {
+    id: 'settings.general.aboutYoroi.youtube',
+    defaultMessage: '!!!YouTube',
+    description: 'Label for Yoroi YouTube link.'
+  },
+  aboutYoroiTelegramSupport: {
+    id: 'settings.general.aboutYoroi.tgsupport',
+    defaultMessage: '!!!Telegram community support',
+    description: 'Label for Telegram Community Support group link.'
   },
   generalSettingsLabel: {
     id: 'settings.general.generalSettings.label',
@@ -93,6 +113,10 @@ export default class GeneralSettings extends Component<Props> {
       isSubmitting ? styles.submitLanguageSpinner : null,
     ]);
 
+    const mkLink = (addr: string, text: ?string = addr) => (
+      <a target="_blank" rel="noopener noreferrer" href={addr}>{text}</a>
+    );
+
     return (
       <div className={componentClassNames}>
 
@@ -100,9 +124,13 @@ export default class GeneralSettings extends Component<Props> {
 
         <div>
           <ul>
-            <li>{intl.formatMessage(messages.aboutYoroiVersion)}: <a target={'_blank'} href={'https://github.com/Emurgo/yoroi-frontend/releases/tag/1.2.0'}>1.2.0</a></li>
-            <li>{intl.formatMessage(messages.aboutYoroiWebsite)}: <a target={'_blank'} href={'https://yoroi-wallet.com'}>https://yoroi-wallet.com</a></li>
-            <li>{intl.formatMessage(messages.aboutYoroiBlog)}: <a target={'_blank'} href={'https://medium.com/@emurgo_io'}>https://medium.com/@emurgo_io</a></li>
+            <li>{intl.formatMessage(messages.aboutYoroiVersion)}: {mkLink('https://github.com/Emurgo/yoroi-frontend/releases/tag/1.2.0', '1.2.0')}</li>
+            <li>{intl.formatMessage(messages.aboutYoroiWebsite)}: {mkLink('https://yoroi-wallet.com')}</li>
+            <li>{intl.formatMessage(messages.aboutYoroiBlog)}: {mkLink('https://medium.com/@emurgo_io')}</li>
+            <li>{intl.formatMessage(messages.aboutYoroiTwitter)}: {mkLink('https://twitter.com/YoroiWallet')}</li>
+            <li>{intl.formatMessage(messages.aboutYoroiGithub)}: {mkLink('https://github.com/Emurgo/yoroi-frontend')}</li>
+            <li>{intl.formatMessage(messages.aboutYoroiYoutube)}: {mkLink('https://www.youtube.com/watch?v=GLNgpr-3t2E&list=PLFLTrdAG7xRZUmi04s44T1VEF20xKquF2')}</li>
+            <li>{intl.formatMessage(messages.aboutYoroiTelegramSupport)}: {mkLink('https://t.me/CardanoCommunityTechSupport')}</li>
           </ul>
         </div>
 
