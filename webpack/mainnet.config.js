@@ -56,6 +56,15 @@ module.exports = {
         }
       },
       {
+        test: /pdf\.worker(\.min)?\.js$/,
+        use: 'raw-loader',
+      },
+      {
+        test: /\.(js|jsx)$/,
+        exclude: [/node_modules/, /pdf\.worker(\.min)?\.js$/],
+        use: 'babel-loader',
+      },
+      {
         test: /\.css$/,
         use: [
           'style-loader',
