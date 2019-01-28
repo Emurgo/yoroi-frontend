@@ -9,6 +9,7 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import { version } from '../../../utils/logging';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -124,7 +125,7 @@ export default class GeneralSettings extends Component<Props> {
 
         <div>
           <ul>
-            <li>{intl.formatMessage(messages.aboutYoroiVersion)}: {mkLink('https://github.com/Emurgo/yoroi-frontend/releases/tag/1.2.0', '1.2.0')}</li>
+            <li>{intl.formatMessage(messages.aboutYoroiVersion)}: {mkLink(`https://github.com/Emurgo/yoroi-frontend/releases/tag/${version}`, version)}</li>
             <li>{intl.formatMessage(messages.aboutYoroiWebsite)}: {mkLink('https://yoroi-wallet.com')}</li>
             <li>{intl.formatMessage(messages.aboutYoroiBlog)}: {mkLink('https://medium.com/@emurgo_io')}</li>
             <li>{intl.formatMessage(messages.aboutYoroiTwitter)}: {mkLink('https://twitter.com/YoroiWallet')}</li>
