@@ -4,13 +4,38 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import {defineMessages, FormattedMessage, intlShape} from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
 
 const messages = defineMessages({
+  aboutYoroiLabel: {
+    id: 'settings.general.aboutYoroi.label',
+    defaultMessage: '!!!About Yoroi',
+    description: 'Label for the About Yoroi section.'
+  },
+  aboutYoroiVersion: {
+    id: 'settings.general.aboutYoroi.version',
+    defaultMessage: '!!!Yoroi version',
+    description: 'Label for current Yoroi version.'
+  },
+  aboutYoroiWebsite: {
+    id: 'settings.general.aboutYoroi.website',
+    defaultMessage: '!!!Website',
+    description: 'Label for Yoroi website link.'
+  },
+  aboutYoroiBlog: {
+    id: 'settings.general.aboutYoroi.blog',
+    defaultMessage: '!!!Emurgo blog',
+    description: 'Label for Emurgo blog link.'
+  },
+  generalSettingsLabel: {
+    id: 'settings.general.generalSettings.label',
+    defaultMessage: '!!!General Settings',
+    description: 'Label for the General Settings section.'
+  },
   languageSelectLabel: {
     id: 'settings.general.languageSelect.label',
     defaultMessage: '!!!Language',
@@ -67,8 +92,21 @@ export default class GeneralSettings extends Component<Props> {
       styles.language,
       isSubmitting ? styles.submitLanguageSpinner : null,
     ]);
+
     return (
       <div className={componentClassNames}>
+
+        <h1>{intl.formatMessage(messages.aboutYoroiLabel)}</h1>
+
+        <div>
+          <ul>
+            <li>{intl.formatMessage(messages.aboutYoroiVersion)}: <a target={'_blank'} href={'https://github.com/Emurgo/yoroi-frontend/releases/tag/1.2.0'}>1.2.0</a></li>
+            <li>{intl.formatMessage(messages.aboutYoroiWebsite)}: <a target={'_blank'} href={'https://yoroi-wallet.com'}>https://yoroi-wallet.com</a></li>
+            <li>{intl.formatMessage(messages.aboutYoroiBlog)}: <a target={'_blank'} href={'https://medium.com/@emurgo_io'}>https://medium.com/@emurgo_io</a></li>
+          </ul>
+        </div>
+
+        <h1>{intl.formatMessage(messages.generalSettingsLabel)}</h1>
 
         <Select
           className={languageSelectClassNames}
