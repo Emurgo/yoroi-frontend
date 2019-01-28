@@ -1,14 +1,14 @@
+/* eslint-disable camelcase */
 // @flow
 import './lib/test-config';
 import {
-  Blake2b,
   Wallet,
 } from 'rust-cardano-crypto';
 import {
-  getCryptoDaedalusWalletFromMnemonics
+  getCryptoDaedalusWalletFromMnemonics,
 } from './lib/cardanoCrypto/cryptoWallet';
 import {
-  decodeRustTx
+  decodeRustTx,
 } from './lib/utils';
 import cbor from 'cbor';
 import bs58 from 'bs58';
@@ -35,9 +35,9 @@ test('Daedalus transfer from old invalid address', () => {
   expect(inputs[0].id).toEqual(txId);
   expect(inputs[0].index).toEqual(txIndex);
   expect(outputs[0].address).toEqual(outAddress);
-  expect(1000000 - parseInt(outputs[0].value)).toEqual(parseInt(fee));
+  expect(1000000 - parseInt(outputs[0].value, 10)).toEqual(parseInt(fee, 10));
   expect('PkWitness' in witnesses[0]).toEqual(true);
-  const [pub] = witnesses[0]['PkWitness'];
+  const [pub] = witnesses[0].PkWitness;
   const [addressRoot, addressAttr] = cbor.decode(cbor.decode(bs58.decode(address))[0].value);
   const addressRootHex = addressRoot.toString('hex');
   const ext = [0, [0, Buffer.from(pub, 'hex')], addressAttr];
