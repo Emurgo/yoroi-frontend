@@ -22,6 +22,14 @@ const protocolMagic = CONFIG.network.protocolMagic;
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
 
+/** Generate a random mnemonic based on 96-bits of entropy (9 words), and also return hexed seed */
+export const generatePasswordAndMnemonic = () => {
+  const mnemonic = bip39.generateMnemonic(96);
+  const words = mnemonic.split(' ');
+  const seed = mnemonicToSeedHex(mnemonic);
+  return { words, seed };
+};
+
 /** Check validty of mnemonic (including checksum) */
 export const isValidEnglishAdaMnemonic = (
   phrase: string,
@@ -47,15 +55,43 @@ export const isValidEnglishAdaPaperMnemonic = (
 /** Check validty of paper mnemonic (including checksum) */
 export const unscramblePaperAdaMnemonic = (
   phrase: string,
-  numberOfWords: ?number = 27
+  numberOfWords: ?number = 27,
+  password?: string,
 ): [?string, number] => {
   const words = phrase.split(' ');
   if (words.length === numberOfWords) {
     if (numberOfWords === 27) {
+      if (password) {
+        throw new Error('Password is not expected for a 27-word paper!');
+      }
       const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 18), words.slice(18)];
       try {
-        const password = mnemonicToSeedHex(passwordMnemonics.join(' '));
+        password = mnemonicToSeedHex(passwordMnemonics.join(' '));
         return [PaperWallet.unscrambleStrings(password, scrambledMnemonics.join(' ')), 12];
+      } catch (e) {
+        Logger.error('Failed to unscramble paper mnemonic! ' + stringifyError(e));
+        return [undefined, 0];
+      }
+    }
+    if (numberOfWords === 30) {
+      if (password) {
+        throw new Error('Password is not expected for a 30-word paper!');
+      }
+      const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 21), words.slice(21)];
+      try {
+        password = mnemonicToSeedHex(passwordMnemonics.join(' '));
+        return [PaperWallet.unscrambleStrings(password, scrambledMnemonics.join(' ')), 15];
+      } catch (e) {
+        Logger.error('Failed to unscramble paper mnemonic! ' + stringifyError(e));
+        return [undefined, 0];
+      }
+    }
+    if (numberOfWords === 21) {
+      if (!password) {
+        throw new Error('Password is expected for a 21-word paper!');
+      }
+      try {
+        return [PaperWallet.unscrambleStrings(password, words.join(' ')), 15];
       } catch (e) {
         Logger.error('Failed to unscramble paper mnemonic! ' + stringifyError(e));
         return [undefined, 0];
@@ -63,6 +99,16 @@ export const unscramblePaperAdaMnemonic = (
     }
   }
   return [undefined, 0];
+};
+
+/** Scramble provided mnemonic with the provided password */
+export const scramblePaperAdaMnemonic = (
+  phrase: string,
+  password: string,
+): string => {
+  const iv = new Uint8Array(8);
+  window.crypto.getRandomValues(iv);
+  return PaperWallet.scrambleStrings(iv, password, phrase);
 };
 
 const mnemonicToSeedHex = (mnemonic: string, password: ?string) => {
@@ -110,3 +156,15 @@ export function getCryptoDaedalusWalletFromMnemonics(
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }
+
+export const mnemonicsToAddresses = (
+  mnemonic: string,
+  count?: number = 1,
+  type?: AddressType = 'External'
+): Array<string> => {
+  const seed = mnemonicToSeedHex(mnemonic);
+  const { result: wallet } = Wallet.fromSeed([...Buffer.from(seed, 'hex')]);
+  const { result: account } = Wallet.newAccount(wallet, 0);
+  const { result: addresses } = Wallet.generateAddresses(account, type, [...Array(count).keys()]);
+  return addresses;
+};

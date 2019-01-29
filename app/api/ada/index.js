@@ -23,7 +23,9 @@ import {
   newAdaWallet,
   updateAdaWalletMetaParams,
   updateAdaWalletBalance,
-  changeAdaWalletSpendingPassword
+  changeAdaWalletSpendingPassword,
+  generatePaperWalletSecret,
+  mnemonicsToExternalAddresses,
 } from './adaWallet';
 import {
   isValidAdaAddress,
@@ -98,6 +100,7 @@ import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaL
 import { saveTxs } from './lib/lovefieldDatabase';
 import type { SignedResponse } from './lib/yoroi-backend-api';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
+import type { PaperWalletPass } from './adaWallet';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -161,7 +164,21 @@ export type UpdateWalletPasswordResponse = boolean;
 
 export type AdaWalletRecoveryPhraseResponse = Array<string>;
 
+export type AdaPaper = {
+  addresses: Array<string>,
+  scrambledWords: Array<string>,
+  pass: PaperWalletPass
+}
+
+export const DEFAULT_ADDRESSES_PER_PAPER = 5;
+
 export default class AdaApi {
+
+  createAdaPaper(password?: string): AdaPaper {
+    const { words, scrambledWords, pass } = generatePaperWalletSecret(password);
+    const addresses = mnemonicsToExternalAddresses(words.join(' '), DEFAULT_ADDRESSES_PER_PAPER);
+    return { addresses, scrambledWords, pass };
+  }
 
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
@@ -429,8 +446,8 @@ export default class AdaApi {
     return isValidPaperMnemonic(mnemonic, numberOfWords);
   }
 
-  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number): [?string, number] {
-    return unscramblePaperMnemonic(mnemonic, numberOfWords);
+  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number, password?: string): [?string, number] {
+    return unscramblePaperMnemonic(mnemonic, numberOfWords, password);
   }
 
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {

@@ -16,6 +16,9 @@ import {
   isValidEnglishAdaPaperMnemonic,
   unscramblePaperAdaMnemonic,
   updateWalletMasterKeyPassword,
+  generatePasswordAndMnemonic,
+  scramblePaperAdaMnemonic,
+  mnemonicsToAddresses
 } from './lib/cardanoCrypto/cryptoWallet';
 import { toAdaWallet, toAdaHardwareWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
@@ -135,9 +138,10 @@ export const isValidPaperMnemonic = (
 /** Wrapper function to check paper mnemonic validity according to bip39 */
 export const unscramblePaperMnemonic = (
   phrase: string,
-  numberOfWords: ?number
+  numberOfWords: ?number,
+  password?: string,
 ): [?string, number] => (
-  unscramblePaperAdaMnemonic(phrase, numberOfWords)
+  unscramblePaperAdaMnemonic(phrase, numberOfWords, password)
 );
 
 /** Wrapper function to create new Trezor ADA hardware wallet object */
@@ -152,6 +156,36 @@ export function createAdaHardwareWallet({
 export const generateAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse => (
   generateAdaMnemonic()
 );
+
+export type PaperWalletPass = {
+  passphrase: Array<string>
+} | {
+  password: string
+}
+
+export type PaperWalletSecret = {
+  words: Array<string>,
+  scrambledWords: Array<string>,
+  pass: PaperWalletPass,
+};
+
+export const generatePaperWalletSecret = (password?: string): PaperWalletSecret => {
+  const words = generateAdaMnemonic();
+  const [pass, passString] = _paperPass(password);
+  const scrambledWords = scramblePaperAdaMnemonic(words.join(' '), passString).split(' ');
+  return { words, scrambledWords, pass };
+};
+
+function _paperPass(password?: string): [PaperWalletPass, string] {
+  if (password) {
+    return [{ password }, password];
+  }
+  const { words, seed } = generatePasswordAndMnemonic();
+  return [{ passphrase: words }, seed];
+}
+
+export const mnemonicsToExternalAddresses =
+  (mnemonics: string, count?: number): string => mnemonicsToAddresses(mnemonics, count);
 
 /** Call backend-service to get the balances of addresses and then sum them */
 export async function getBalance(
