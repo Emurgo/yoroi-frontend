@@ -29,6 +29,7 @@
   "api.errors.unusedAddressesError": "Es ist nicht möglich mehr als 20 Adressen hintereinander zu erstellen ohne sie zu verwenden.",
   "api.errors.updateAdaTxsHistoryError": "Fehler beim Aktualisieren des ADA Transaktions-Verlaufes.",
   "api.errors.updateAdaWalletError": "Fehler beim Aktualisieren der ADA Wallet.",
+  "app.errors.unexpectedError": "!!!Something unexpected happened. Please retry.",
   "app.errors.unknowError": "unbekannter Fehler.",
   "daedalusTransfer.error.noTransferTxError": "Es gibt keine Transaktion zum versenden.",
   "daedalusTransfer.error.transferFundsError": "Es ist nicht möglich den Geldwert zu übertragen.",
@@ -228,6 +229,11 @@
   "wallet.transaction.assuranceLevel.medium": "mittel",
   "wallet.transaction.confirmations": "Bestätigungen",
   "wallet.transaction.conversion.rate": "Konversionsrate",
+  "wallet.transaction.export.dialog.exportButton.label": "!!!Export",
+  "wallet.transaction.export.dialog.infoText1": "!!!The entire transaction history within your wallet will be exported to a file",
+  "wallet.transaction.export.dialog.title": "!!!Export transactions to file",
+  "wallet.transaction.export.exportIcon.tooltip": "!!!Export to file",
+  "wallet.transaction.fee": "!!!Fee",
   "wallet.transaction.received": "{currency} empfangen",
   "wallet.transaction.sent": "{currency} gesendet",
   "wallet.transaction.state.failed": "Transaktion fehlgeschlagen",
@@ -235,8 +241,9 @@
   "wallet.transaction.transactionAmount": "Transaktions-Betrag",
   "wallet.transaction.transactionId": "Transaktions-ID",
   "wallet.transaction.type": "{currency} Transaktion",
-  "wallet.transaction.type.card": "Kartenzahlung",
   "wallet.transaction.type.exchange": "Börse",
+  "wallet.transaction.type.intrawallet": "!!!{currency} intrawallet transaction",
+  "wallet.transaction.type.multiparty": "!!!{currency} multiparty transaction",
   "wallet.trezor.dialog.common.step.link.helpYoroiWithTrezor": "https://youtu.be/Dp0wXwtToX0",
   "wallet.trezor.dialog.common.step.link.helpYoroiWithTrezor.text": "Klicke hier um mehr über die Nutzung von Yoroi mit dem Trezor zu erfahren",
   "wallet.trezor.dialog.connect.button.label": "Verbinden",
@@ -267,6 +274,5 @@
   "wallet.trezor.dialog.title.label": "MIT DEM TREZOR HARDWARE WALLET VERBINDEN",
   "wallet.trezor.error.101": "Verbindung zu trezor.io fehlgeschlagen. Bitte die Internetverbindung prüfen und erneut versuchen.",
   "wallet.trezor.error.102": "Es sind keine ausreichenden Berechtigungen erteilt worden. Bitte erneut versuchen.",
-  "wallet.trezor.error.103": "Abgebrochen. Bitte wiederholen.",
-  "wallet.trezor.error.999": "Etwas unvorhergesehenes ist passiert. Bitte wiederholen."
+  "wallet.trezor.error.103": "Abgebrochen. Bitte wiederholen."
 }
