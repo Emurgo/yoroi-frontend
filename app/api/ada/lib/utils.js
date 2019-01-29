@@ -172,7 +172,7 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   }
 }
 
-export const encryptPassphrase = (passphrase: ?string) => (
+export const encryptPassphrase = (passphrase: string) => (
   _bytesToB16(_blake2b(passphrase))
 );
 

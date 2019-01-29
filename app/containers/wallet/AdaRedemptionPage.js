@@ -15,14 +15,14 @@ import environment from '../../environment';
 export default class AdaRedemptionPage extends Component<InjectedProps> {
   static defaultProps = { actions: null, stores: null };
 
-  onSubmit = (values: { walletId: string, spendingPassword: ?string }) => {
+  onSubmit = (values: { walletId: string, spendingPassword: string }) => {
     this.props.actions.ada.adaRedemption.redeemAda.trigger(values);
   };
 
   onSubmitPaperVended = (values: {
     walletId: string,
     shieldedRedemptionKey: string,
-    spendingPassword: ?string,
+    spendingPassword: string,
   }) => {
     this.props.actions.ada.adaRedemption.redeemPaperVendedAda.trigger(values);
   };

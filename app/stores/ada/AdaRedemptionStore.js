@@ -198,7 +198,7 @@ export default class AdaRedemptionStore extends Store {
 
   _redeemAda = async ({ walletId, spendingPassword } : {
     walletId: string,
-    spendingPassword: ?string,
+    spendingPassword: string,
   }) => {
 
     runInAction(() => { this.walletId = walletId; });
@@ -230,7 +230,7 @@ export default class AdaRedemptionStore extends Store {
   _redeemPaperVendedAda = async ({ walletId, shieldedRedemptionKey, spendingPassword } : {
     walletId: string,
     shieldedRedemptionKey: string,
-    spendingPassword: ?string,
+    spendingPassword: string,
   }) => {
     runInAction(() => { this.walletId = walletId; });
 
