@@ -92,10 +92,10 @@ export default defineMessages({
     defaultMessage: '!!!German',
     description: 'Language name for "German" language.'
   },
-  languageCroatian: {
-    id: 'global.language.croatian',
-    defaultMessage: '!!!Croatian',
-    description: 'Language name for "Croatian" language.'
+  languageFrench: {
+    id: 'global.language.french',
+    defaultMessage: '!!!French',
+    description: 'Language name for "French" language.'
   },
   unitAda: {
     id: 'global.unit.ada',

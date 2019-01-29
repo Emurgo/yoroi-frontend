@@ -20,7 +20,7 @@ import environment from './environment';
 import { hot } from 'react-hot-loader';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr]);
 
 @observer
 class App extends Component<{
