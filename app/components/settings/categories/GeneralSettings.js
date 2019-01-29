@@ -9,12 +9,21 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import ChangeWalletPasswordDialog from '../../wallet/settings/ChangeWalletPasswordDialog';
+import type { Node } from 'react';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 const messages = defineMessages({
   languageSelectLabel: {
     id: 'settings.general.languageSelect.label',
     defaultMessage: '!!!Language',
     description: 'Label for the language select.'
+  },
+  createPaperLabel: {
+    id: 'settings.general.createPaper.label',
+    defaultMessage: '!!!Create Yoroi Paper Wallet',
+    description: 'Label for the paper wallet creation button.'
   },
 });
 
@@ -24,6 +33,9 @@ type Props = {
   onSelectLanguage: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
+  openDialogAction: Function,
+  isDialogOpen: Function,
+  dialog: Node,
 };
 
 @observer
@@ -54,7 +66,7 @@ export default class GeneralSettings extends Component<Props> {
   });
 
   render() {
-    const { languages, isSubmitting, error } = this.props;
+    const { languages, isSubmitting, error, openDialogAction, isDialogOpen, dialog } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const languageId = form.$('languageId');
@@ -67,6 +79,11 @@ export default class GeneralSettings extends Component<Props> {
       styles.language,
       isSubmitting ? styles.submitLanguageSpinner : null,
     ]);
+    const buttonClasses = classNames([
+      'transferButton',
+      isSubmitting ? styles.isSubmitting : 'primary',
+      styles.button,
+    ]);
     return (
       <div className={componentClassNames}>
 
@@ -77,6 +94,21 @@ export default class GeneralSettings extends Component<Props> {
           onChange={this.selectLanguage}
           skin={SelectSkin}
         />
+
+        <br />
+
+        <Button
+          className={buttonClasses}
+          label={intl.formatMessage(messages.createPaperLabel)}
+          onClick={() => openDialogAction({
+            dialog: ChangeWalletPasswordDialog
+          })}
+          skin={ButtonSkin}
+        />
+
+        {isDialogOpen(ChangeWalletPasswordDialog) ? (
+          <div>{dialog}</div>
+        ) : null}
 
         {error && <p className={styles.error}>{error}</p>}
 
