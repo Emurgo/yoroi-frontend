@@ -9,6 +9,8 @@ import ko from 'react-intl/locale-data/ko';
 import ja from 'react-intl/locale-data/ja';
 import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
+import de from 'react-intl/locale-data/de';
+import fr from 'react-intl/locale-data/fr';
 import { Routes } from './Routes';
 import { yoroiTheme } from './themes/yoroi';
 import { themeOverrides } from './themes/overrides/index';
