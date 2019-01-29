@@ -223,7 +223,7 @@
   "wallet.transaction.address.to": "受信アドレス",
   "wallet.transaction.addresses.from": "送信アドレス",
   "wallet.transaction.addresses.to": "受信アドレス",
-  "wallet.transaction.assuranceLevel": "取引保証レベル",
+  "wallet.transaction.assuranceLevel": "トランザクション確信度",
   "wallet.transaction.assuranceLevel.high": "高",
   "wallet.transaction.assuranceLevel.low": "低",
   "wallet.transaction.assuranceLevel.medium": "中",
