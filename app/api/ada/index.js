@@ -88,7 +88,7 @@ import type {
   CreateTrezorWalletResponse,
   SendTrezorSignedTxResponse,
 } from '../common';
-import { InvalidWitnessError } from './errors';
+import { InvalidWitnessError, IncorrectSpendingPasswordError, RedeemAdaError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
@@ -101,6 +101,9 @@ import {
 import {
   ADA_REDEMPTION_PASSPHRASE_LENGTH
 } from '../../config/cryptoConfig';
+import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
+import { encryptPassphrase } from './lib/utils';
+import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -614,6 +617,51 @@ export default class AdaApi {
   isValidRedemptionMnemonic = (mnemonic: string): boolean => (
     isValidMnemonic(mnemonic, ADA_REDEMPTION_PASSPHRASE_LENGTH)
   );
+
+  redeemAda = async (
+    request: RedeemAdaParams
+  ) => {
+    Logger.debug('AdaApi::redeemAda called');
+    const { spendingPassword: passwordString } = request;
+    const spendingPassword = encryptPassphrase(passwordString);
+    try {
+      const transaction = await redeemAda(
+        { ...request, spendingPassword }
+      );
+      Logger.debug('AdaApi::redeemAda success');
+      // TODO: call the following function once the tx is broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
+      // return _createTransactionFromServerData(transaction);
+    } catch (error) {
+      Logger.debug('AdaApi::redeemAda error: ' + stringifyError(error));
+      console.log(error);
+      if (error.message === 'CannotCreateAddress') {
+        throw new IncorrectSpendingPasswordError();
+      }
+      throw new RedeemAdaError();
+    }
+  };
+
+  redeemPaperVendedAda = async (
+    request: RedeemPaperVendedAdaParams
+  ) => {
+    Logger.debug('AdaApi::redeemAdaPaperVend called');
+    const { spendingPassword: passwordString } = request;
+    const spendingPassword = encryptPassphrase(passwordString);
+    try {
+      const transaction = await redeemPaperVendedAda(
+        { ...request, spendingPassword }
+      );
+      Logger.debug('AdaApi::redeemAdaPaperVend success');
+      // TODO: call the following function once the tx is broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
+      // return _createTransactionFromServerData(transaction);
+    } catch (error) {
+      Logger.debug('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
+      if (error.message === 'CannotCreateAddress') {
+        throw new IncorrectSpendingPasswordError();
+      }
+      throw new RedeemAdaError();
+    }
+  };
 
 }
 // ========== End of class AdaApi =========

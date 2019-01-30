@@ -2,9 +2,9 @@
 
 git submodule update --init --recursive && \
 cd js-cardano-wasm && \
-git checkout def5d9a0ebd69435d29e737c7e99ea04f692ab70 && \
+git checkout 386cc1ebe9cba1a1bf90304a491221d6986cd865 && \
 cd rust && \
-git checkout 8b441cbbeba32ada20d065399083a16d85a5fe29 && \
+git checkout 9bef10d1bbd1321d98aa6b30ba030631806ad153 && \
 cd .. && \
 npm install && \
 ../js-cardano-wasm-build && \
