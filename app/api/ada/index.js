@@ -629,7 +629,7 @@ export default class AdaApi {
         { ...request, spendingPassword }
       );
       Logger.debug('AdaApi::redeemAda success');
-      // TODO: call the following function once the tx is broadcasted:
+      // TODO: call the following function once the tx is broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
       // return _createTransactionFromServerData(transaction);
     } catch (error) {
       Logger.debug('AdaApi::redeemAda error: ' + stringifyError(error));
@@ -652,7 +652,7 @@ export default class AdaApi {
         { ...request, spendingPassword }
       );
       Logger.debug('AdaApi::redeemAdaPaperVend success');
-      // TODO: call the following function once the tx is broadcasted:
+      // TODO: call the following function once the tx is broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
       // return _createTransactionFromServerData(transaction);
     } catch (error) {
       Logger.debug('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
