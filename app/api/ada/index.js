@@ -101,6 +101,7 @@ import { saveTxs } from './lib/lovefieldDatabase';
 import type { SignedResponse } from './lib/yoroi-backend-api';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
 import type { PaperWalletPass } from './adaWallet';
+import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -178,6 +179,13 @@ export default class AdaApi {
     const { words, scrambledWords, pass } = generatePaperWalletSecret(password);
     const addresses = mnemonicsToExternalAddresses(words.join(' '), DEFAULT_ADDRESSES_PER_PAPER);
     return { addresses, scrambledWords, pass };
+  }
+
+  async createAdaPaperPdf(paper: AdaPaper): Promise<void> {
+    const { addresses, scrambledWords, pass } = paper;
+    await generateAdaPaperPdf({
+      words: scrambledWords, addresses, pass, isMainnet: true
+    });
   }
 
   async getWallets(): Promise<GetWalletsResponse> {

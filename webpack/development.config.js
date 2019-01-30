@@ -110,7 +110,7 @@ const baseDevConfig = () => ({
         loader: 'raw-loader',
       },
       {
-        test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
+        test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
         loader: 'file-loader'
       },
       {
