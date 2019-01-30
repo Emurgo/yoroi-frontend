@@ -18,3 +18,8 @@ export class SeedWithInvalidLengthError extends CardanoCryptoError {
     super(message);
   }
 }
+export class CreateRedeemTransactionError extends CardanoCryptoError {
+  constructor(message: ?string = 'Error while creating redeem transaction') {
+    super(message);
+  }
+}
