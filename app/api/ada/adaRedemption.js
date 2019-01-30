@@ -9,7 +9,6 @@ import { RedemptionKeyAlreadyUsedError } from './errors';
 
 export type RedeemAdaParams = {
   redemptionCode: string,
-  mnemonic: ?Array<string>,
   spendingPassword: string,
   walletId: string,
   accountIndex: number
@@ -20,10 +19,10 @@ export type RedeemPaperVendedAdaParams = {
   spendingPassword: string,
   walletId: string,
   accountIndex: number,
-  mnemonic: Array<string>,
+  mnemonics: Array<string>,
 };
 
-// TODO: return a Promise of AdaTransaction instead of Object
+// TODO: return a Promise of AdaTransaction instead of Object, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
 export async function redeemAda(
   redemptionParams: RedeemAdaParams
 ) : Promise<Object> {
@@ -37,14 +36,14 @@ export async function redeemAda(
   const receiverAddress = await getReceiverAddress();
   const redemptionSignedTransaction: RedeemResponse =
     getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
-  // TODO: broadcast tx with sendTx endpoint
+  // TODO: broadcast tx with sendTx endpoint, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
   // const { cborEncodedTx } = redemptionSignedTransaction.result;
   // const signedTx = Buffer.from(cborEncodedTx).toString('base64');
   // return sendTx({ signedTx });
   return {};
 }
 
-// TODO: return a Promise of AdaTransaction instead of Object
+// TODO: return a Promise of AdaTransaction instead of Object, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
 export async function redeemPaperVendedAda(
   redemptionParams: RedeemPaperVendedAdaParams
 ) : Promise<Object> {
@@ -58,8 +57,9 @@ export async function redeemPaperVendedAda(
   const receiverAddress = await getReceiverAddress();
   const redemptionSignedTransaction: RedeemResponse =
     getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
-  // TODO: broadcast tx with sendTx endpoint
+  // TODO: broadcast tx with sendTx endpoint, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
   // const { cborEncodedTx } = redemptionSignedTransaction.result;
   // const signedTx = Buffer.from(cborEncodedTx).toString('base64');
   // return sendTx({ signedTx });
+  return {};
 }
