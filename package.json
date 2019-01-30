@@ -147,6 +147,7 @@
     "ringbufferjs": "1.1.0",
     "route-parser": "0.0.5",
     "rust-cardano-crypto": "file:js-cardano-wasm",
+    "supercop.js": "2.0.1",
     "trezor-connect": "6.0.2",
     "validator": "6.3.0"
   },
