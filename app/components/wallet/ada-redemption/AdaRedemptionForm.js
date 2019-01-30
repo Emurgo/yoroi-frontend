@@ -341,7 +341,7 @@ export default class AdaRedemptionForm extends Component<Props> {
           const password = field.value;
           const walletId = form.$('walletId').value;
           const wallet = this.props.getSelectedWallet(walletId);
-          if (wallet && wallet.hasPassword && password === '') {
+          if (wallet && password === '') {
             return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
           }
           return [true];
@@ -376,10 +376,10 @@ export default class AdaRedemptionForm extends Component<Props> {
         this.props.onSubmit({
           walletId,
           shieldedRedemptionKey,
-          spendingPassword: spendingPassword || null,
+          spendingPassword
         });
       },
-      onError: () => {},
+      onError: (error) => console.log(error),
     });
   };
 
@@ -414,7 +414,7 @@ export default class AdaRedemptionForm extends Component<Props> {
     const { intl } = this.context;
     const { form, resetForm, submit } = this;
     const {
-      wallets, getSelectedWallet, redemptionType, redemptionCode, onChooseRedemptionType,
+      wallets, redemptionType, redemptionCode, onChooseRedemptionType,
       onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting, onCertificateSelected,
       isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate, showPassPhraseWidget,
       suggestedMnemonics, showInputForDecryptionKey, showInputsForDecryptingForceVendedCertificate,
@@ -432,16 +432,13 @@ export default class AdaRedemptionForm extends Component<Props> {
     const spendingPasswordField = form.$('spendingPassword');
     const decryptionKeyField = form.$('decryptionKey');
 
-    const selectedWallet = getSelectedWallet(walletId.value);
-    const walletHasPassword = selectedWallet.hasPassword;
-
     const showUploadWidget = redemptionType !== ADA_REDEMPTION_TYPES.PAPER_VENDED;
     const isRecovery = (
       redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_REGULAR ||
       redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED
     );
 
-    const passwordSubmittable = !walletHasPassword || spendingPasswordField.value !== '';
+    const passwordSubmittable = spendingPasswordField.value !== '';
 
     let canSubmit = false;
     if ((
@@ -576,17 +573,15 @@ export default class AdaRedemptionForm extends Component<Props> {
               ) : null}
             </div>
 
-            {walletHasPassword ? (
-              <div className={styles.passwordInput}>
-                <Input
-                  onKeyPress={submitOnEnter.bind(this, submit)}
-                  className="spendingPassword"
-                  {...spendingPasswordField.bind()}
-                  error={spendingPasswordField.error}
-                  skin={InputSkin}
-                />
-              </div>
-            ) : null}
+            <div className={styles.passwordInput}>
+              <Input
+                onKeyPress={submitOnEnter.bind(this, submit)}
+                className="spendingPassword"
+                {...spendingPasswordField.bind()}
+                error={spendingPasswordField.error}
+                skin={InputSkin}
+              />
+            </div>
 
             {showPassPhraseWidget ? (
               <div className={styles.passPhrase}>
