@@ -88,7 +88,7 @@ import type {
   CreateTrezorWalletResponse,
   SendTrezorSignedTxResponse,
 } from '../common';
-import { InvalidWitnessError, IncorrectSpendingPasswordError, RedeemAdaError } from './errors';
+import { InvalidWitnessError, IncorrectSpendingPasswordError, RedeemAdaError, RedemptionKeyAlreadyUsedError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
@@ -636,6 +636,8 @@ export default class AdaApi {
       console.log(error);
       if (error.message === 'CannotCreateAddress') {
         throw new IncorrectSpendingPasswordError();
+      } else if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
       }
       throw new RedeemAdaError();
     }
@@ -658,6 +660,8 @@ export default class AdaApi {
       Logger.debug('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
       if (error.message === 'CannotCreateAddress') {
         throw new IncorrectSpendingPasswordError();
+      } else if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
       }
       throw new RedeemAdaError();
     }

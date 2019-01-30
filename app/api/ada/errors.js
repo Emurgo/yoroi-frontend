@@ -171,7 +171,12 @@ const messages = defineMessages({
     id: 'api.errors.IncorrectPasswordError',
     defaultMessage: '!!!Incorrect wallet password.',
     description: '"Incorrect wallet password." error message.'
-  }
+  },
+  redemptionKeyAlreadyUsedError: {
+    id: 'api.errors.redemptionKeyAlreadyUsedError',
+    defaultMessage: '!!!Redemption key has already been used.',
+    description: '"Redemption key has already been used." error message.'
+  },
 });
 
 export class WalletAlreadyImportedError extends LocalizableError {
@@ -476,6 +481,15 @@ export class IncorrectSpendingPasswordError extends LocalizableError {
     super({
       id: messages.incorrectSpendingPasswordError.id,
       defaultMessage: messages.incorrectSpendingPasswordError.defaultMessage,
+    });
+  }
+}
+
+export class RedemptionKeyAlreadyUsedError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.redemptionKeyAlreadyUsedError.id,
+      defaultMessage: messages.redemptionKeyAlreadyUsedError.defaultMessage,
     });
   }
 }

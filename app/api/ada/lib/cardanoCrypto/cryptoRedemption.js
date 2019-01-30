@@ -26,8 +26,9 @@ export function getRedemptionSignedTransaction(
   address: string,
   utxo: UTXO
 ): RedeemResponse {
-  const input = { id: utxo.utxo_id, index: utxo.tx_index };
-  const output = { address, value: JSON.stringify(utxo.amount) };
+  const utxoIdBuffer = Buffer.from(utxo.tx_hash, 'hex');
+  const input = { id: utxoIdBuffer, index: utxo.tx_index };
+  const output = { address, value: JSON.stringify(parseInt(utxo.amount, 10)) };
   const redeemResponse = Redemption.createRedemptionTransaction(
     redemptionKey,
     input,
