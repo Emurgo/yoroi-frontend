@@ -166,6 +166,11 @@ const messages = defineMessages({
     id: 'api.errors.noCertificateError',
     defaultMessage: '!!!Certificate File is required for parsing.',
     description: '"Certificate File is required for parsing." error message'
+  },
+  redemptionKeyAlreadyUsedError: {
+    id: 'api.errors.redemptionKeyAlreadyUsedError',
+    defaultMessage: '!!!Redemption key has already been used.',
+    description: '"Redemption key has already been used." error message.'
   }
 });
 
@@ -462,6 +467,15 @@ export class NoCertificateError extends LocalizableError {
     super({
       id: messages.noCertificateError.id,
       defaultMessage: messages.noCertificateError.defaultMessage
+    });
+  }
+}
+
+export class RedemptionKeyAlreadyUsedError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.redemptionKeyAlreadyUsedError.id,
+      defaultMessage: messages.redemptionKeyAlreadyUsedError.defaultMessage,
     });
   }
 }

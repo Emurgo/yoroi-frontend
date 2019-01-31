@@ -1,8 +1,11 @@
 // @flow
 
-import { getAddressFromRedemptionKey } from './lib/cardanoCrypto/cryptoRedemption';
+import { getAddressFromRedemptionKey, getRedemptionSignedTransaction } from './lib/cardanoCrypto/cryptoRedemption';
 import bs58 from 'bs58';
 import { getUTXOsForAddresses } from './lib/yoroi-backend-api';
+import type { RedeemResponse } from '../../../flow/declarations/CardanoCrypto';
+import { getReceiverAddress } from './adaAddress';
+import { RedemptionKeyAlreadyUsedError } from './errors';
 
 export type RedeemAdaParams = {
   redemptionCode: string,
@@ -23,10 +26,18 @@ export async function redeemAda(
 ) : Promise<Object> {
   const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
   const uint8ArrayAddress = getAddressFromRedemptionKey(redemptionKey);
-  const address = bs58.encode(Buffer.from(uint8ArrayAddress));
-  const utxos = await getUTXOsForAddresses({ addresses: [address] });
-  // TODO: generate ada redeem tx with createRedemptionTransaction function from cardanoCrypto, https://trello.com/c/iAmeNvGk/11-create-a-redeem-tx
+  const senderAddress = bs58.encode(Buffer.from(uint8ArrayAddress));
+  const utxos = await getUTXOsForAddresses({ addresses: [senderAddress] });
+  if (utxos.length === 0) {
+    throw new RedemptionKeyAlreadyUsedError();
+  }
+  const receiverAddress = await getReceiverAddress();
+  const redemptionSignedTransaction: RedeemResponse =
+    getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
   // TODO: broadcast tx with sendTx endpoint, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
+  // const { cborEncodedTx } = redemptionSignedTransaction.result;
+  // const signedTx = Buffer.from(cborEncodedTx).toString('base64');
+  // return sendTx({ signedTx });
   return {};
 }
 
@@ -36,8 +47,17 @@ export async function redeemPaperVendedAda(
 ) : Promise<Object> {
   const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
   const uint8ArrayAddress = getAddressFromRedemptionKey(redemptionKey);
-  const address = bs58.encode(Buffer.from(uint8ArrayAddress));
-  const utxos = await getUTXOsForAddresses({ addresses: [address] });
-  // TODO: generate ada redeem tx with createRedemptionTransaction function from cardanoCrypto, https://trello.com/c/iAmeNvGk/11-create-a-redeem-tx
+  const senderAddress = bs58.encode(Buffer.from(uint8ArrayAddress));
+  const utxos = await getUTXOsForAddresses({ addresses: [senderAddress] });
+  if (utxos.length === 0) {
+    throw new RedemptionKeyAlreadyUsedError();
+  }
+  const receiverAddress = await getReceiverAddress();
+  const redemptionSignedTransaction: RedeemResponse =
+    getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
   // TODO: broadcast tx with sendTx endpoint, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
+  // const { cborEncodedTx } = redemptionSignedTransaction.result;
+  // const signedTx = Buffer.from(cborEncodedTx).toString('base64');
+  // return sendTx({ signedTx });
+  return {};
 }

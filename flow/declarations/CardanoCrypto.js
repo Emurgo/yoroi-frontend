@@ -141,6 +141,13 @@ declare type MoveResponse = {
   tx: CryptoTransaction
 }
 
+declare type RedeemResponse = {
+  failed: boolean,
+  result: {
+    cbor_encoded_tx: Array<number>
+  }
+}
+
 declare type CryptoWallet = {
   root_key: string,
   root_cached_key: string, // Encrypted MasterPrivateKey

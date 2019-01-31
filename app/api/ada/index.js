@@ -88,7 +88,7 @@ import type {
   CreateTrezorWalletResponse,
   SendTrezorSignedTxResponse,
 } from '../common';
-import { InvalidWitnessError, RedeemAdaError } from './errors';
+import { InvalidWitnessError, RedeemAdaError, RedemptionKeyAlreadyUsedError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
@@ -102,7 +102,6 @@ import {
   ADA_REDEMPTION_PASSPHRASE_LENGTH
 } from '../../config/cryptoConfig';
 import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
-import { encryptPassphrase } from './lib/utils';
 import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
 
 // ADA specific Request / Response params
@@ -629,6 +628,10 @@ export default class AdaApi {
       // return _createTransactionFromServerData(transaction);
     } catch (error) {
       Logger.debug('AdaApi::redeemAda error: ' + stringifyError(error));
+      console.log(error);
+      if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
+      }
       throw new RedeemAdaError();
     }
   };
@@ -644,6 +647,9 @@ export default class AdaApi {
       // return _createTransactionFromServerData(transaction);
     } catch (error) {
       Logger.debug('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
+      if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
+      }
       throw new RedeemAdaError();
     }
   };
