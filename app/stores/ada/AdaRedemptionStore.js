@@ -196,9 +196,8 @@ export default class AdaRedemptionStore extends Store {
     this.decryptionKey = null;
   });
 
-  _redeemAda = async ({ walletId, spendingPassword } : {
-    walletId: string,
-    spendingPassword: string,
+  _redeemAda = async ({ walletId } : {
+    walletId: string
   }) => {
 
     runInAction(() => { this.walletId = walletId; });
@@ -213,7 +212,6 @@ export default class AdaRedemptionStore extends Store {
       const transaction: WalletTransaction = await this.redeemAdaRequest.execute({
         walletId,
         accountIndex,
-        spendingPassword,
         redemptionCode: this.redemptionCode
       });
       this._reset();
@@ -227,10 +225,9 @@ export default class AdaRedemptionStore extends Store {
     }
   };
 
-  _redeemPaperVendedAda = async ({ walletId, shieldedRedemptionKey, spendingPassword } : {
+  _redeemPaperVendedAda = async ({ walletId, shieldedRedemptionKey } : {
     walletId: string,
-    shieldedRedemptionKey: string,
-    spendingPassword: string,
+    shieldedRedemptionKey: string
   }) => {
     runInAction(() => { this.walletId = walletId; });
 
@@ -242,7 +239,6 @@ export default class AdaRedemptionStore extends Store {
       const transaction: WalletTransaction = await this.redeemPaperVendedAdaRequest.execute({
         walletId,
         accountIndex,
-        spendingPassword,
         redemptionCode: shieldedRedemptionKey,
         mnemonics: this.passPhrase && this.passPhrase.split(' ')
       });

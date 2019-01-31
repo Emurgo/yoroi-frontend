@@ -88,7 +88,7 @@ When(/^I enter a valid "Force vended" encrypted PDF certificate email, passcode 
 });
 
 When(/^I enter a valid "Force vended" encrypted PDF certificate decryption key "([^"]*)"$/, async function (decryptionKey) {
-  await this.input('#decryptionKey--12', decryptionKey);
+  await this.input('#decryptionKey--11', decryptionKey);
 });
 
 When(/^I enter a valid "Paper vended" shielded vending key$/, async function () {
