@@ -167,16 +167,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Certificate File is required for parsing.',
     description: '"Certificate File is required for parsing." error message'
   },
-  incorrectSpendingPasswordError: {
-    id: 'api.errors.IncorrectPasswordError',
-    defaultMessage: '!!!Incorrect wallet password.',
-    description: '"Incorrect wallet password." error message.'
-  },
   redemptionKeyAlreadyUsedError: {
     id: 'api.errors.redemptionKeyAlreadyUsedError',
     defaultMessage: '!!!Redemption key has already been used.',
     description: '"Redemption key has already been used." error message.'
-  },
+  }
 });
 
 export class WalletAlreadyImportedError extends LocalizableError {
@@ -472,15 +467,6 @@ export class NoCertificateError extends LocalizableError {
     super({
       id: messages.noCertificateError.id,
       defaultMessage: messages.noCertificateError.defaultMessage
-    });
-  }
-}
-
-export class IncorrectSpendingPasswordError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.incorrectSpendingPasswordError.id,
-      defaultMessage: messages.incorrectSpendingPasswordError.defaultMessage,
     });
   }
 }

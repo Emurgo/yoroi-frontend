@@ -221,8 +221,6 @@
   "wallet.redeem.dialog.shieldedRedemptionCodeError": "!!!Invalid shielded vending key",
   "wallet.redeem.dialog.shieldedRedemptionKeyHint": "!!!Enter your shielded vending key",
   "wallet.redeem.dialog.shieldedRedemptionKeyLabel": "!!!Shielded redemption key",
-  "wallet.redeem.dialog.spendingPasswordLabel": "!!!Password",
-  "wallet.redeem.dialog.spendingPasswordPlaceholder": "!!!Password",
   "wallet.redeem.dialog.submitLabel": "!!!Redeem your money",
   "wallet.redeem.dialog.title": "!!!Ada Redemption",
   "wallet.redeem.dialog.walletSelectLabel": "!!!Choose Wallet",

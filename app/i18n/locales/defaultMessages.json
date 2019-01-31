@@ -1825,34 +1825,6 @@
           "column": 17,
           "line": 180
         }
-      },
-      {
-        "defaultMessage": "!!!Password",
-        "description": "Placeholder for \"spending password\"",
-        "end": {
-          "column": 3,
-          "line": 189
-        },
-        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
-        "id": "wallet.redeem.dialog.spendingPasswordPlaceholder",
-        "start": {
-          "column": 31,
-          "line": 185
-        }
-      },
-      {
-        "defaultMessage": "!!!Password",
-        "description": "Label for \"spending password\"",
-        "end": {
-          "column": 3,
-          "line": 194
-        },
-        "file": "app/components/wallet/ada-redemption/AdaRedemptionForm.js",
-        "id": "wallet.redeem.dialog.spendingPasswordLabel",
-        "start": {
-          "column": 25,
-          "line": 190
-        }
       }
     ],
     "path": "app/components/wallet/ada-redemption/AdaRedemptionForm.json"

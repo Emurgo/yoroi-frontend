@@ -9,14 +9,12 @@ import { RedemptionKeyAlreadyUsedError } from './errors';
 
 export type RedeemAdaParams = {
   redemptionCode: string,
-  spendingPassword: string,
   walletId: string,
   accountIndex: number
 };
 
 export type RedeemPaperVendedAdaParams = {
   redemptionCode: string,
-  spendingPassword: string,
   walletId: string,
   accountIndex: number,
   mnemonics: Array<string>,
