@@ -181,17 +181,7 @@ where Ada should be redeemed and enter {adaRedemptionPassphraseLength} word mnem
     id: 'wallet.redeem.dialog.adaAmountHint',
     defaultMessage: '!!!Enter your Ada amount',
     description: 'Hint for the Ada amount input field.'
-  },
-  spendingPasswordPlaceholder: {
-    id: 'wallet.redeem.dialog.spendingPasswordPlaceholder',
-    defaultMessage: '!!!Password',
-    description: 'Placeholder for "spending password"',
-  },
-  spendingPasswordLabel: {
-    id: 'wallet.redeem.dialog.spendingPasswordLabel',
-    defaultMessage: '!!!Password',
-    description: 'Label for "spending password"',
-  },
+  }
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
@@ -332,21 +322,6 @@ export default class AdaRedemptionForm extends Component<Props> {
           ];
         }],
       },
-      spendingPassword: {
-        type: 'password',
-        label: this.context.intl.formatMessage(messages.spendingPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.spendingPasswordPlaceholder),
-        value: '',
-        validators: [({ field, form }) => {
-          const password = field.value;
-          const walletId = form.$('walletId').value;
-          const wallet = this.props.getSelectedWallet(walletId);
-          if (wallet && password === '') {
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
-          }
-          return [true];
-        }],
-      },
       decryptionKey: {
         label: this.context.intl.formatMessage(messages.decryptionKeyLabel),
         placeholder: this.context.intl.formatMessage(messages.decryptionKeyHint),
@@ -372,11 +347,10 @@ export default class AdaRedemptionForm extends Component<Props> {
   submit = () => {
     this.form.submit({
       onSuccess: (form) => {
-        const { walletId, shieldedRedemptionKey, spendingPassword } = form.values();
+        const { walletId, shieldedRedemptionKey } = form.values();
         this.props.onSubmit({
           walletId,
-          shieldedRedemptionKey,
-          spendingPassword
+          shieldedRedemptionKey
         });
       },
       onError: (error) => console.log(error),
@@ -391,7 +365,6 @@ export default class AdaRedemptionForm extends Component<Props> {
 
     // We can not user form.reset() call here as it would reset selected walletId
     // which is a bad UX since we are calling resetForm on certificate add/remove
-    form.$('spendingPassword').reset();
     form.$('adaAmount').reset();
     form.$('adaPasscode').reset();
     form.$('certificate').reset();
@@ -407,7 +380,6 @@ export default class AdaRedemptionForm extends Component<Props> {
   onWalletChange = (walletId: string) => {
     const { form } = this;
     form.$('walletId').value = walletId;
-    form.$('spendingPassword').value = '';
   }
 
   render() {
@@ -429,7 +401,6 @@ export default class AdaRedemptionForm extends Component<Props> {
     const emailField = form.$('email');
     const adaPasscodeField = form.$('adaPasscode');
     const adaAmountField = form.$('adaAmount');
-    const spendingPasswordField = form.$('spendingPassword');
     const decryptionKeyField = form.$('decryptionKey');
 
     const showUploadWidget = redemptionType !== ADA_REDEMPTION_TYPES.PAPER_VENDED;
@@ -438,26 +409,21 @@ export default class AdaRedemptionForm extends Component<Props> {
       redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED
     );
 
-    const passwordSubmittable = spendingPasswordField.value !== '';
-
     let canSubmit = false;
     if ((
       redemptionType === ADA_REDEMPTION_TYPES.REGULAR ||
       redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_REGULAR) &&
-      redemptionCode !== '' &&
-      passwordSubmittable
+      redemptionCode !== ''
     ) canSubmit = true;
     if ((
       redemptionType === ADA_REDEMPTION_TYPES.FORCE_VENDED ||
       redemptionType === ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED) &&
-      redemptionCode !== '' &&
-      passwordSubmittable
+      redemptionCode !== ''
     ) canSubmit = true;
     if (
       redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED &&
       shieldedRedemptionKeyField.isDirty &&
-      passPhraseField.isDirty &&
-      passwordSubmittable
+      passPhraseField.isDirty
     ) canSubmit = true;
 
     let instructionMessage = '';
@@ -571,16 +537,6 @@ export default class AdaRedemptionForm extends Component<Props> {
                   />
                 </div>
               ) : null}
-            </div>
-
-            <div className={styles.passwordInput}>
-              <Input
-                onKeyPress={submitOnEnter.bind(this, submit)}
-                className="spendingPassword"
-                {...spendingPasswordField.bind()}
-                error={spendingPasswordField.error}
-                skin={InputSkin}
-              />
             </div>
 
             {showPassPhraseWidget ? (

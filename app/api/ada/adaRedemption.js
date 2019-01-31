@@ -6,14 +6,12 @@ import { getUTXOsForAddresses } from './lib/yoroi-backend-api';
 
 export type RedeemAdaParams = {
   redemptionCode: string,
-  spendingPassword: string,
   walletId: string,
   accountIndex: number
 };
 
 export type RedeemPaperVendedAdaParams = {
   redemptionCode: string,
-  spendingPassword: string,
   walletId: string,
   accountIndex: number,
   mnemonics: Array<string>,
