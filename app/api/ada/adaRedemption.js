@@ -2,10 +2,11 @@
 
 import { getAddressFromRedemptionKey, getRedemptionSignedTransaction } from './lib/cardanoCrypto/cryptoRedemption';
 import bs58 from 'bs58';
-import { getUTXOsForAddresses } from './lib/yoroi-backend-api';
+import { getUTXOsForAddresses, sendTx } from './lib/yoroi-backend-api';
 import type { RedeemResponse } from '../../../flow/declarations/CardanoCrypto';
 import { getReceiverAddress } from './adaAddress';
 import { RedemptionKeyAlreadyUsedError } from './errors';
+import BigNumber from 'bignumber.js';
 
 export type RedeemAdaParams = {
   redemptionCode: string,
@@ -20,10 +21,9 @@ export type RedeemPaperVendedAdaParams = {
   mnemonics: Array<string>,
 };
 
-// TODO: return a Promise of AdaTransaction instead of Object, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
 export async function redeemAda(
   redemptionParams: RedeemAdaParams
-) : Promise<Object> {
+) : Promise<BigNumber> {
   const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
   const uint8ArrayAddress = getAddressFromRedemptionKey(redemptionKey);
   const senderAddress = bs58.encode(Buffer.from(uint8ArrayAddress));
@@ -34,17 +34,16 @@ export async function redeemAda(
   const receiverAddress = await getReceiverAddress();
   const redemptionSignedTransaction: RedeemResponse =
     getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
-  // TODO: broadcast tx with sendTx endpoint, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
-  // const { cborEncodedTx } = redemptionSignedTransaction.result;
-  // const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-  // return sendTx({ signedTx });
-  return {};
+  const cborEncodedTx = redemptionSignedTransaction.result.cbor_encoded_tx;
+  const signedTx = Buffer.from(cborEncodedTx).toString('base64');
+  // FIXME: Uncomment the endpoint call once everything was previously tested
+  // await sendTx({ signedTx });
+  return new BigNumber(utxos[0].amount);
 }
 
-// TODO: return a Promise of AdaTransaction instead of Object, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
 export async function redeemPaperVendedAda(
   redemptionParams: RedeemPaperVendedAdaParams
-) : Promise<Object> {
+) : Promise<BigNumber> {
   const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
   const uint8ArrayAddress = getAddressFromRedemptionKey(redemptionKey);
   const senderAddress = bs58.encode(Buffer.from(uint8ArrayAddress));
@@ -55,9 +54,9 @@ export async function redeemPaperVendedAda(
   const receiverAddress = await getReceiverAddress();
   const redemptionSignedTransaction: RedeemResponse =
     getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
-  // TODO: broadcast tx with sendTx endpoint, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
-  // const { cborEncodedTx } = redemptionSignedTransaction.result;
-  // const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-  // return sendTx({ signedTx });
-  return {};
+  const cborEncodedTx = redemptionSignedTransaction.result.cbor_encoded_tx;
+  const signedTx = Buffer.from(cborEncodedTx).toString('base64');
+  // FIXME: Uncomment the endpoint call once everything was previously tested
+  // await sendTx({ signedTx });
+  return new BigNumber(utxos[0].amount);
 }

@@ -17,7 +17,7 @@ import { matchRoute } from '../../utils/routing';
 import type { RedeemAdaParams, RedeemPaperVendedAdaParams } from '../../api/ada/adaRedemption';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import environment from '../../environment';
-import WalletTransaction from '../../domain/WalletTransaction';
+import BigNumber from 'bignumber.js';
 import Request from '../lib/LocalizedRequest';
 import { getSingleCryptoAccount } from '../../api/ada/adaLocalStorage';
 
@@ -209,7 +209,7 @@ export default class AdaRedemptionStore extends Store {
     if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
 
     try {
-      const transaction: WalletTransaction = await this.redeemAdaRequest.execute({
+      const transactionAmount: BigNumber = await this.redeemAdaRequest.execute({
         walletId,
         accountIndex,
         redemptionCode: this.redemptionCode
@@ -217,8 +217,7 @@ export default class AdaRedemptionStore extends Store {
       this._reset();
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
         walletId,
-        // TODO: pass amount once tx has been broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
-        // amount: transaction.amount.toFormat(DECIMAL_PLACES_IN_ADA),
+        amount: transactionAmount.shift(-DECIMAL_PLACES_IN_ADA).toFormat(DECIMAL_PLACES_IN_ADA).toString(),
       });
     } catch (error) {
       runInAction(() => { this.error = error; });
@@ -236,7 +235,7 @@ export default class AdaRedemptionStore extends Store {
     if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
 
     try {
-      const transaction: WalletTransaction = await this.redeemPaperVendedAdaRequest.execute({
+      const transactionAmount: BigNumber = await this.redeemPaperVendedAdaRequest.execute({
         walletId,
         accountIndex,
         redemptionCode: shieldedRedemptionKey,
@@ -245,8 +244,7 @@ export default class AdaRedemptionStore extends Store {
       this._reset();
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
         walletId,
-        // TODO: pass amount once tx has been broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
-        // amount: transaction.amount.toFormat(DECIMAL_PLACES_IN_ADA)
+        amount: transactionAmount.shift(-DECIMAL_PLACES_IN_ADA).toFormat(DECIMAL_PLACES_IN_ADA).toString(),
       });
     } catch (error) {
       runInAction(() => { this.error = error; });
@@ -261,8 +259,7 @@ export default class AdaRedemptionStore extends Store {
 
     Logger.debug('ADA successfully redeemed for wallet: ' + walletId);
     wallets.goToWalletRoute(walletId);
-    // TODO: assign amount once tx has been broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
-    // this.amountRedeemed = amount;
+    this.amountRedeemed = amount;
     this.showAdaRedemptionSuccessMessage = true;
     this.redemptionCode = '';
     this.passPhrase = null;
