@@ -41,7 +41,7 @@ export default class AdaRedemptionNoWallets extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <SVGInline svg={icon} className={styles.icon} />
+        <SVGInline svg={icon} className={styles.icon} cleanup={['title']} />
         <h1>{intl.formatMessage(messages.headLine)}</h1>
         <p>{intl.formatMessage(messages.instructions)}</p>
         <p>

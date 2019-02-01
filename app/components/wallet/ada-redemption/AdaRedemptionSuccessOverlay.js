@@ -41,7 +41,7 @@ export default class AdaRedemptionSuccessOverlay extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <SVGInline svg={successIcon} className={styles.icon} />
+        <SVGInline svg={successIcon} className={styles.icon} cleanup={['title']} />
         <div className={styles.text}>
           <h1 className={styles.headline}>{intl.formatMessage(messages.headline)}</h1>
           <div className={styles.amount}>{amount} ADA</div>

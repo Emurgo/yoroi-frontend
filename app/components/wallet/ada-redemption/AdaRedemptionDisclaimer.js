@@ -64,7 +64,7 @@ export default class AdaRedemptionDisclaimer extends Component<Props, State> {
     return (
       <div className={styles.component}>
 
-        <SVGInline svg={attentionIcon} className={styles.icon} />
+        <SVGInline svg={attentionIcon} className={styles.icon} cleanup={['title']} />
 
         <h1>{intl.formatMessage(messages.disclaimerTitle)}</h1>
 
