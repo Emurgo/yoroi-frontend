@@ -57,6 +57,11 @@ When(/^I enter an invalid "Regular" redemption key$/, async function () {
   await this.input('#redemptionKey--5', redemptionKey);
 });
 
+When(/^I enter an already used "Regular" redemption key$/, async function () {
+  const redemptionKey = 'Dhpd0rMtOTcRoHO62BFAb47il3zjtsICfsjUuFLiTS0=';
+  await this.input('#redemptionKey--5', redemptionKey);
+});
+
 When(/^I select a valid "Regular" PDF certificate$/, async function () {
   await this.chooseFile(regularAdaCertificateFilePath, 'application/pdf');
 });
@@ -116,6 +121,11 @@ When(/^I submit the ada redemption form$/, async function () {
 Then(/^I should see invalid redemption key message$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.redeem.dialog.redemptionCodeError' });
   await this.waitUntilText('.SimpleFormField_error', errorMessage);
+});
+
+Then(/^I should see already used redemption key message$/, async function () {
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.redemptionKeyAlreadyUsedError' });
+  await this.waitUntilText('.AdaRedemptionForm_error', errorMessage);
 });
 
 Then(/^I should see the "Ada Redemption Success Overlay" and close the dialogue$/, async function () {
