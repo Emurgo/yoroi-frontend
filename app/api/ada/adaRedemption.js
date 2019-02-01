@@ -36,8 +36,7 @@ export async function redeemAda(
     getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
   const cborEncodedTx = redemptionSignedTransaction.result.cbor_encoded_tx;
   const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-  // FIXME: Uncomment the endpoint call once everything was previously tested
-  // await sendTx({ signedTx });
+  await sendTx({ signedTx });
   return new BigNumber(utxos[0].amount);
 }
 
@@ -56,7 +55,6 @@ export async function redeemPaperVendedAda(
     getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
   const cborEncodedTx = redemptionSignedTransaction.result.cbor_encoded_tx;
   const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-  // FIXME: Uncomment the endpoint call once everything was previously tested
-  // await sendTx({ signedTx });
+  await sendTx({ signedTx });
   return new BigNumber(utxos[0].amount);
 }
