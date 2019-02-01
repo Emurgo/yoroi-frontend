@@ -209,15 +209,16 @@ export default class AdaRedemptionStore extends Store {
     if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
 
     try {
-      const transactionAmount: BigNumber = await this.redeemAdaRequest.execute({
+      const transactionAmountInLovelace: BigNumber = await this.redeemAdaRequest.execute({
         walletId,
         accountIndex,
         redemptionCode: this.redemptionCode
       });
       this._reset();
+      const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
         walletId,
-        amount: transactionAmount.shift(-DECIMAL_PLACES_IN_ADA).toFormat(DECIMAL_PLACES_IN_ADA).toString(),
+        amount: transactionAmountInAda.toFormat(DECIMAL_PLACES_IN_ADA),
       });
     } catch (error) {
       runInAction(() => { this.error = error; });
@@ -235,16 +236,18 @@ export default class AdaRedemptionStore extends Store {
     if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
 
     try {
-      const transactionAmount: BigNumber = await this.redeemPaperVendedAdaRequest.execute({
-        walletId,
-        accountIndex,
-        redemptionCode: shieldedRedemptionKey,
-        mnemonics: this.passPhrase && this.passPhrase.split(' ')
-      });
+      const transactionAmountInLovelace: BigNumber =
+        await this.redeemPaperVendedAdaRequest.execute({
+          walletId,
+          accountIndex,
+          redemptionCode: shieldedRedemptionKey,
+          mnemonics: this.passPhrase && this.passPhrase.split(' ')
+        });
       this._reset();
+      const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
         walletId,
-        amount: transactionAmount.shift(-DECIMAL_PLACES_IN_ADA).toFormat(DECIMAL_PLACES_IN_ADA).toString(),
+        amount: transactionAmountInAda.toFormat(DECIMAL_PLACES_IN_ADA),
       });
     } catch (error) {
       runInAction(() => { this.error = error; });
@@ -299,5 +302,9 @@ export default class AdaRedemptionStore extends Store {
     this.adaAmount = null;
     this.decryptionKey = null;
   };
+
+  _getTransactionAmountInAda = (transactionAmountInLovelace: BigNumber): BigNumber => (
+    transactionAmountInLovelace.shift(-DECIMAL_PLACES_IN_ADA)
+  );
 
 }
