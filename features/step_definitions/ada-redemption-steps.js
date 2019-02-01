@@ -128,6 +128,11 @@ Then(/^I should see already used redemption key message$/, async function () {
   await this.waitUntilText('.AdaRedemptionForm_error', errorMessage);
 });
 
+Then(/^I should see the ada redemption error message$/, async function () {
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.RedeemAdaError' });
+  await this.waitUntilText('.AdaRedemptionForm_error', errorMessage);
+});
+
 Then(/^I should see the "Ada Redemption Success Overlay" and close the dialogue$/, async function () {
   await this.waitForElement('.AdaRedemptionSuccessOverlay_component');
   await this.click('.AdaRedemptionSuccessOverlay_confirmButton');

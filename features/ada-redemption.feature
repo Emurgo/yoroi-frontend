@@ -115,3 +115,11 @@ Feature: Ada Redemption
     | qXQWDxI3JrlFRtC4SeQjeGzLbVXWBomYPbNO1Vfm1T4=                                                                                                       |
     | A974160F123726B94546D0B849E423786CCB6D55D60689983DB34ED557E6D53E                                                                                   |
     | [ 169, 116, 22, 15, 18, 55, 38, 185, 69, 70, 208, 184, 73, 228, 35, 120, 108, 203, 109, 85, 214, 6, 137, 152, 61, 179, 78, 213, 87, 230, 213, 62 ] |
+
+  @invalidWitnessTest
+  Scenario: User tries to redeem ada and receives an invalid signature error from the server
+    Given I have accepted "Daedalus Redemption Disclaimer"
+    And I enter a valid "Regular" redemption key
+    And ada redemption form submit button is no longer disabled
+    When I submit the ada redemption form
+    Then I should see the ada redemption error message
