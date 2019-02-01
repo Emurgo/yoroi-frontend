@@ -62,16 +62,15 @@ Feature: Ada Redemption
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue
     And I should see the summary screen
 
-  # #FIXME : https://trello.com/c/dxRSMoLz/51-fix-force-vended-redemption
-  # Scenario: User redeems "Force vended" encrypted PDF certificate
-  #   Given I have accepted "Daedalus Redemption Disclaimer"
-  #   And I click on ada redemption choices "Force vended" tab
-  #   And I select a valid "Force vended" encrypted PDF certificate
-  #   And I enter a valid "Force vended" encrypted PDF certificate email, passcode and amount
-  #   And ada redemption form submit button is no longer disabled
-  #   When I submit the ada redemption form
-  #   Then I should see the "Ada Redemption Success Overlay" and close the dialogue
-  #   And I should see the summary screen
+  Scenario: User redeems "Force vended" encrypted PDF certificate
+    Given I have accepted "Daedalus Redemption Disclaimer"
+    And I click on ada redemption choices "Force vended" tab
+    And I select a valid "Force vended" encrypted PDF certificate
+    And I enter a valid "Force vended" encrypted PDF certificate email, passcode and amount
+    And ada redemption form submit button is no longer disabled
+    When I submit the ada redemption form
+    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    And I should see the summary screen
 
   # #FIXME : https://trello.com/c/xyXihfA9/52-fix-paper-vended-redemption
   # Scenario: User redeems manually entered "Paper vended" shielded vending key and passphrase

@@ -39,13 +39,14 @@ export const isValidMnemonic = (phrase, numberOfWords = 9) => (
 const hashData = (data) => {
   const hash = crypto.createHash('sha256');
   hash.update(data, 'utf8');
-  return hash.digest();
+  // The hash is digested with hex enoding, so slice can be applied afterwards instead of hexSlice
+  return hash.digest('hex');
 };
 
 export const decryptRegularVend = (key, data) => decryptWithAES(blake2b(fromMnemonic(key)), data);
 export const decryptForceVend = (key, data) => (
   decryptWithAES(blake2b(key[0].trim().toLowerCase() +
-    hashData(key[1].trim()).hexSlice() + key[2].trim()), data)
+    hashData(key[1].trim()) + key[2].trim()), data)
 );
 
 // Recovery service certificates decryption
