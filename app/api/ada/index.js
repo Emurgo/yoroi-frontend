@@ -619,13 +619,12 @@ export default class AdaApi {
 
   redeemAda = async (
     request: RedeemAdaParams
-  ) => {
+  ): BigNumber => {
     Logger.debug('AdaApi::redeemAda called');
     try {
-      const transaction = await redeemAda(request);
+      const transactionAmount = await redeemAda(request);
       Logger.debug('AdaApi::redeemAda success');
-      // TODO: call the following function once the tx is broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
-      // return _createTransactionFromServerData(transaction);
+      return transactionAmount;
     } catch (error) {
       Logger.debug('AdaApi::redeemAda error: ' + stringifyError(error));
       console.log(error);
@@ -638,13 +637,12 @@ export default class AdaApi {
 
   redeemPaperVendedAda = async (
     request: RedeemPaperVendedAdaParams
-  ) => {
+  ): BigNumber => {
     Logger.debug('AdaApi::redeemAdaPaperVend called');
     try {
-      const transaction = await redeemPaperVendedAda(request);
+      const transactionAmount = await redeemPaperVendedAda(request);
       Logger.debug('AdaApi::redeemAdaPaperVend success');
-      // TODO: call the following function once the tx is broadcasted, https://trello.com/c/0FOFzcfy/12-broadcast-redeem-tx
-      // return _createTransactionFromServerData(transaction);
+      return transactionAmount;
     } catch (error) {
       Logger.debug('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
       if (error instanceof RedemptionKeyAlreadyUsedError) {
