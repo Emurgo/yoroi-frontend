@@ -2,7 +2,6 @@
 import bs58 from 'bs58';
 import cbor from 'cbor';
 import BigNumber from 'bignumber.js';
-import blakejs from 'blakejs';
 import type {
   AdaTransactionInputOutput,
   Transaction,
@@ -14,6 +13,8 @@ import {
 } from '../../../utils/logging';
 // eslint-disable-next-line
 import { Blake2b } from 'rust-cardano-crypto';
+import type { TransactionExportRow } from '../../export';
+import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
 export const localeDateToUnixTimestamp =
   (localeDate: string) => new Date(localeDate).getTime();
@@ -172,10 +173,39 @@ export function decodeRustTx(rustTxBody: RustRawTxBody): CryptoTransaction {
   }
 }
 
-export const encryptPassphrase = (passphrase: string) => (
-  _bytesToB16(_blake2b(passphrase))
-);
+export function convertAdaTransactionsToExportRows(
+  transactions: Array<AdaTransaction>
+): Array<TransactionExportRow> {
+  return transactions
+    .filter(tx => tx.ctCondition === 'CPtxInBlocks')
+    .map(tx => {
+      const fullValue = new BigNumber(tx.ctAmount.getCCoin);
+      const sumInputs: BigNumber = sumInputsOutputs(tx.ctInputs);
+      const sumOutputs: BigNumber = sumInputsOutputs(tx.ctOutputs);
+      const fee: BigNumber = tx.ctIsOutgoing ? sumInputs.sub(sumOutputs) : new BigNumber(0);
+      const value: BigNumber = tx.ctIsOutgoing ? fullValue.sub(fee) : fullValue;
+      return {
+        date: tx.ctMeta.ctmDate,
+        type: tx.ctIsOutgoing ? 'out' : 'in',
+        amount: formatBigNumberToFloatString(value.dividedBy(LOVELACES_PER_ADA)),
+        fee: formatBigNumberToFloatString(fee.dividedBy(LOVELACES_PER_ADA)),
+      };
+    });
+}
 
-// new Uint8Array
-const _bytesToB16 = (bytes) => Buffer.from(bytes).toString('hex');
-const _blake2b = (data) => blakejs.blake2b(data, null, 32);
+/**
+ * Ignore first string parts of inputs/outputs and just sum coin values.
+ */
+export function sumInputsOutputs(ios: Array<AdaTransactionInputOutput>): BigNumber {
+  return ios
+    .map(io => new BigNumber(io[1].getCCoin))
+    .reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
+}
+
+/**
+ * If specified number is integer - append `.0` to it.
+ * Otherwise - just float representation.
+ */
+export function formatBigNumberToFloatString(x: BigNumber): string {
+  return x.isInteger() ? x.toFixed(1) : x.toString();
+}

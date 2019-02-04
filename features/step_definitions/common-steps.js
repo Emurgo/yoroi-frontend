@@ -1,11 +1,27 @@
 // @flow
 
-import { BeforeAll, Given, After, AfterAll, Before } from 'cucumber';
+import { Before, BeforeAll, Given, After, AfterAll, setDefinitionFunctionWrapper } from 'cucumber';
 import { getMockServer, closeMockServer } from '../support/mockServer';
 import { buildFeatureData, getFeatureData, getFakeAddresses } from '../support/mockDataBuilder';
 import i18nHelper from '../support/helpers/i18n-helpers';
 
+const { promisify } = require('util');
+const fs = require('fs');
+const rimraf = require('rimraf');
+
+const screenshotsDir = './screenshots/';
+
+/** We need to keep track of our progress in testing to give unique names to screenshots */
+const testProgress = {
+  scenarioName: '',
+  lineNum: 0, // we need this to differentiate scenarios with multiple "examples"
+  step: 0
+};
+
 BeforeAll(() => {
+  rimraf.sync(screenshotsDir);
+  fs.mkdirSync(screenshotsDir);
+
   getMockServer({});
 });
 
@@ -13,8 +29,11 @@ AfterAll(() => {
   closeMockServer();
 });
 
-After(async function () {
-  await this.driver.quit();
+Before((scenario) => {
+  // cleanup scenario name so it is folder-name friendly
+  testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
+  testProgress.lineNum = scenario.sourceLocation.line;
+  testProgress.step = 0;
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {
@@ -31,6 +50,41 @@ Before({ tags: '@invalidWitnessTest' }, () => {
 After({ tags: '@invalidWitnessTest' }, () => {
   closeMockServer();
   getMockServer({});
+});
+
+After(async function () {
+  await this.driver.quit();
+});
+
+const writeFile = promisify(fs.writeFile);
+
+/** Wrap every step to take screenshots for UI-based testing */
+setDefinitionFunctionWrapper((fn, _, pattern) => {
+  if (!pattern) {
+    return fn;
+  }
+  return async function (...args) {
+    const ret = await fn.apply(this, args);
+
+    // Regex patterns contain non-ascii characters.
+    // We want to remove this to get a filename-friendly string
+    const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
+
+    if (cleanString.includes('I should see')) {
+      // path logic
+      const dir = `${screenshotsDir}/${testProgress.scenarioName}`;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+      }
+      const path = `${dir}/${testProgress.step}_${testProgress.lineNum}-${cleanString}.png`;
+
+      const screenshot = await this.driver.takeScreenshot();
+      await writeFile(path, screenshot, 'base64');
+    }
+
+    testProgress.step += 1;
+    return ret;
+  };
 });
 
 Given(/^I am testing "([^"]*)"$/, feature => {

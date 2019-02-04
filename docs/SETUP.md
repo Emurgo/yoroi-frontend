@@ -21,11 +21,11 @@ $ source $HOME/.cargo/env
 
 Toolchain install:
 ```bash
-$ rustup install nightly-2018-10-30
-$ rustup target add wasm32-unknown-unknown --toolchain nightly-2018-10-30
+$ rustup install 1.32.0
+$ rustup target add wasm32-unknown-unknown --toolchain 1.32.0
 ```
 
-If you having trouble with `nightly-2018-10-30` version, try to update to the latest one and provide target info:
+If you having trouble with `1.32.0` version, try to update to the latest one and provide target info:
 ```bash
 $ rustup toolchain install nightly
 $ rustup update

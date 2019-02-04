@@ -75,6 +75,8 @@ import type {
   CreateWalletResponse,
   GetTransactionsRequest,
   GetTransactionsResponse,
+  GetTransactionRowsToExportRequest,
+  GetTransactionRowsToExportResponse,
   GetAddressesRequest,
   GetAddressesResponse,
   GetBalanceResponse,
@@ -93,6 +95,7 @@ import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
 import type { SignedResponse } from './lib/yoroi-backend-api';
+import { convertAdaTransactionsToExportRows } from './lib/utils';
 import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
 import {
   isValidRedemptionKey,
@@ -590,6 +593,31 @@ export default class AdaApi {
     }
   }
 
+  // noinspection JSMethodCanBeStatic
+  // TODO: https://github.com/Emurgo/yoroi-frontend/pull/222
+  async getTransactionRowsToExport(
+    request: GetTransactionRowsToExportRequest // eslint-disable-line no-unused-vars
+  ): Promise<GetTransactionRowsToExportResponse> {
+    try {
+      Logger.debug('AdaApi::getTransactionRowsToExport: called');
+      await refreshTxs();
+      const history: AdaTransactions = await getAdaTxsHistoryByWallet();
+
+      Logger.debug('AdaApi::getTransactionRowsToExport: success');
+      return convertAdaTransactionsToExportRows(history[0]);
+    } catch (error) {
+      Logger.error('AdaApi::getTransactionRowsToExport: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
+    }
+  }
+
   async getPDFSecretKey(
     file: ?Blob,
     decryptionKey: ?string,
@@ -651,7 +679,6 @@ export default class AdaApi {
       throw new RedeemAdaError();
     }
   };
-
 }
 // ========== End of class AdaApi =========
 

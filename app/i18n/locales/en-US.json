@@ -42,6 +42,7 @@
   "api.errors.unusedAddressesError": "You cannot generate more than 20 consecutive unused addresses.",
   "api.errors.updateAdaTxsHistoryError": "Error while updating Ada transactions history.",
   "api.errors.updateAdaWalletError": "Error while updating Ada wallet.",
+  "app.errors.unexpectedError": "Something unexpected happened. Please retry.",
   "app.errors.unknowError": "Unknown error.",
   "daedalusTransfer.error.noTransferTxError": "There is no transaction to be sent.",
   "daedalusTransfer.error.transferFundsError": "Unable to transfer funds.",
@@ -312,6 +313,10 @@
   "wallet.transaction.assuranceLevel.medium": "medium",
   "wallet.transaction.confirmations": "confirmations",
   "wallet.transaction.conversion.rate": "Conversion rate",
+  "wallet.transaction.export.dialog.exportButton.label": "Export",
+  "wallet.transaction.export.dialog.infoText1": "The entire transaction history within your wallet will be exported to a file.",
+  "wallet.transaction.export.dialog.title": "Export transactions to file",
+  "wallet.transaction.export.exportIcon.tooltip": "Export to file",
   "wallet.transaction.fee": "Fee",
   "wallet.transaction.received": "{currency} received",
   "wallet.transaction.sent": "{currency} sent",
@@ -354,6 +359,5 @@
   "wallet.trezor.dialog.title.label": "CONNECT TO TREZOR HARDWARE WALLET",
   "wallet.trezor.error.101": "Failed to connect trezor.io. Please check your Internet connection and retry.",
   "wallet.trezor.error.102": "Necessary permissions were not granted by the user. Please retry.",
-  "wallet.trezor.error.103": "Cancelled. Please retry.",
-  "wallet.trezor.error.999": "Something unexpected happened. Please retry."
+  "wallet.trezor.error.103": "Cancelled. Please retry."
 }

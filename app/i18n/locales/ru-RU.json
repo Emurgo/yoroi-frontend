@@ -42,6 +42,7 @@
   "api.errors.unusedAddressesError": "Вы не можете генерировать более 20 последовательных неиспользованных адресов.",
   "api.errors.updateAdaTxsHistoryError": "Ошибка при обновлении истории транзакций Ada.",
   "api.errors.updateAdaWalletError": "Ошибка при обновлении Ada кошелька.",
+  "app.errors.unexpectedError": "Случилось что-то непредвиденное. Пожалуйста, повторите попытку.",
   "app.errors.unknowError": "Неизвестная ошибка.",
   "daedalusTransfer.error.noTransferTxError": "Нет транзакций для отправки.",
   "daedalusTransfer.error.transferFundsError": "Не удается перевести средства.",
@@ -312,6 +313,10 @@
   "wallet.transaction.assuranceLevel.medium": "средний",
   "wallet.transaction.confirmations": "подтверждения",
   "wallet.transaction.conversion.rate": "Обменный курс",
+  "wallet.transaction.export.dialog.exportButton.label": "Экспорт",
+  "wallet.transaction.export.dialog.infoText1": "Вся история транзакций в Вашем кошельке будет экспортирована в файл.",
+  "wallet.transaction.export.dialog.title": "Экспорт транзакций в файл",
+  "wallet.transaction.export.exportIcon.tooltip": "Экспорт в файл",
   "wallet.transaction.fee": "Комиссия",
   "wallet.transaction.received": "{currency} получено",
   "wallet.transaction.sent": "{currency} отправлено",
@@ -354,6 +359,5 @@
   "wallet.trezor.dialog.title.label": "ПОДКЛЮЧИТЬСЯ К АППАРАТНОМУ КОШЕЛЬКУ TREZOR",
   "wallet.trezor.error.101": "Не удалось подключиться к trezor.io. Пожалуйста, проверьте Ваше подключение к Интернету и повторите попытку.",
   "wallet.trezor.error.102": "Необходимые разрешения не были предоставлены пользователем. Повторите попытку.",
-  "wallet.trezor.error.103": "Отменено. Пожалуйста, повторите попытку.",
-  "wallet.trezor.error.999": "Случилось что-то непредвиденное. Пожалуйста, повторите попытку."
+  "wallet.trezor.error.103": "Отменено. Пожалуйста, повторите попытку."
 }

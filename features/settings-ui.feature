@@ -158,9 +158,9 @@ Feature: Wallet UI Settings
     When I navigate to the general settings screen
     And I open General Settings language selection dropdown
     And I select Japanese language
-    Then I should see Japanese language as selected
+    Then The Japanese language should be selected
     When I refresh the page
-    Then I should see Japanese language as selected
+    Then The Japanese language should be selected
 
   @it-3
   Scenario: Yoroi Settings Screen / Terms of Use in Default English(IT-3)
