@@ -20,18 +20,10 @@ export type PaperRequest = {
 export const generateAdaPaperPdf = async (request: PaperRequest) => {
   // Prepare params
   const { addresses, words, isMainnet, pass } = request;
-  const address = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
 
   // Helpers
   const printMnemonic = (index) => `${index + 1}. ${words[index]}`;
 
-  // Generate QR image for wallet address
-  const qrCodeImage = Buffer.from(qr.imageSync(address, {
-    type: 'png',
-    size: 10,
-    ec_level: 'L',
-    margin: 0
-  })).toString('base64');
   const width = 595.28;
   const height = 841.98;
   const doc = new Pdf({
@@ -52,14 +44,30 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
 
     doc.setFontSize(8);
     doc.setTextColor(59, 92, 155);
-    textCenter(doc, 195, address, null, 180, true);
 
-    await addImageBase64(doc, qrCodeImage, {
-      x: (pageWidthPx / 2) - 15,
-      y: 205,
-      w: 30,
-      h: 30
-    });
+    if (addresses.length === 1) {
+
+      const address = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
+      textCenter(doc, 195, address, null, 180, true);
+
+      // Generate QR image for wallet address
+      const qrCodeImage = Buffer.from(qr.imageSync(address, {
+        type: 'png',
+        size: 10,
+        ec_level: 'L',
+        margin: 0
+      })).toString('base64');
+
+      addImageBase64(doc, qrCodeImage, {
+        x: (pageWidthPx / 2) - 15,
+        y: 205,
+        w: 30,
+        h: 30
+      });
+    } else if (addresses.length > 1) {
+
+      // TODO: implement multiple addresses
+    }
 
     // second page
     doc.addPage();
@@ -135,7 +143,7 @@ async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise
   return addImageBase64(doc, await loadImage(url), params);
 }
 
-async function addImageBase64(doc: Pdf, img: string, params?: AddImageParams): Promise<void> {
+function addImageBase64(doc: Pdf, img: string, params?: AddImageParams): Promise<void> {
   const { x, y, w, h } = params || {};
   doc.addImage(img, 'png', x || 0, y || 0, w, h);
   return null;
