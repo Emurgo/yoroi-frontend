@@ -122,4 +122,4 @@ Feature: Ada Redemption
     And I enter a valid "Regular" redemption key
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
-    Then I should see the ada redemption error message
+    Then I should see an error message saying that ADA could not be redeemed correctly

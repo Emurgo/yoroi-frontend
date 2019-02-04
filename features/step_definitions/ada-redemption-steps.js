@@ -128,7 +128,7 @@ Then(/^I should see already used redemption key message$/, async function () {
   await this.waitUntilText('.AdaRedemptionForm_error', errorMessage);
 });
 
-Then(/^I should see the ada redemption error message$/, async function () {
+Then(/^I should see an error message saying that ADA could not be redeemed correctly$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.RedeemAdaError' });
   await this.waitUntilText('.AdaRedemptionForm_error', errorMessage);
 });
