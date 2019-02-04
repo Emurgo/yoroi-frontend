@@ -27,6 +27,13 @@ Feature: Ada Redemption
     And I enter an invalid "Regular" redemption key
     Then I should see invalid redemption key message
 
+  Scenario: User tries to redeem manually entered "Regular" already used redemption key
+    Given I have accepted "Daedalus Redemption Disclaimer"
+    And I enter an already used "Regular" redemption key
+    And ada redemption form submit button is no longer disabled
+    When I submit the ada redemption form
+    Then I should see already used redemption key message
+
   Scenario: User redeems "Regular" PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I select a valid "Regular" PDF certificate
