@@ -51,6 +51,7 @@ export default class AdaRedemptionChoices extends Component<Props> {
     const { activeChoice, onSelectChoice } = this.props;
     return (
       <button
+        type="button"
         className={activeChoice === adaRedemptionType ? styles.activeButton : ''}
         onClick={() => onSelectChoice(adaRedemptionType)}
       >

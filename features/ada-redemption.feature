@@ -27,6 +27,13 @@ Feature: Ada Redemption
     And I enter an invalid "Regular" redemption key
     Then I should see invalid redemption key message
 
+  Scenario: User tries to redeem manually entered "Regular" already used redemption key
+    Given I have accepted "Daedalus Redemption Disclaimer"
+    And I enter an already used "Regular" redemption key
+    And ada redemption form submit button is no longer disabled
+    When I submit the ada redemption form
+    Then I should see already used redemption key message
+
   Scenario: User redeems "Regular" PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I select a valid "Regular" PDF certificate
@@ -72,16 +79,15 @@ Feature: Ada Redemption
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue
     And I should see the summary screen
 
-  # #FIXME : https://trello.com/c/xyXihfA9/52-fix-paper-vended-redemption
-  # Scenario: User redeems manually entered "Paper vended" shielded vending key and passphrase
-  #   Given I have accepted "Daedalus Redemption Disclaimer"
-  #   And I click on ada redemption choices "Paper vended" tab
-  #   And I enter a valid "Paper vended" shielded vending key
-  #   And I enter a valid "Paper vended" shielded vending key passphrase
-  #   And ada redemption form submit button is no longer disabled
-  #   When I submit the ada redemption form
-  #   Then I should see the "Ada Redemption Success Overlay" and close the dialogue
-  #   And I should see the summary screen
+  Scenario: User redeems manually entered "Paper vended" shielded vending key and passphrase
+    Given I have accepted "Daedalus Redemption Disclaimer"
+    And I click on ada redemption choices "Paper vended" tab
+    And I enter a valid "Paper vended" shielded vending key
+    And I enter a valid "Paper vended" shielded vending key passphrase
+    And ada redemption form submit button is no longer disabled
+    When I submit the ada redemption form
+    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
+    And I should see the summary screen
 
   Scenario: User redeems "Recovery - regular" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
@@ -108,3 +114,11 @@ Feature: Ada Redemption
     | qXQWDxI3JrlFRtC4SeQjeGzLbVXWBomYPbNO1Vfm1T4=                                                                                                       |
     | A974160F123726B94546D0B849E423786CCB6D55D60689983DB34ED557E6D53E                                                                                   |
     | [ 169, 116, 22, 15, 18, 55, 38, 185, 69, 70, 208, 184, 73, 228, 35, 120, 108, 203, 109, 85, 214, 6, 137, 152, 61, 179, 78, 213, 87, 230, 213, 62 ] |
+
+  @invalidWitnessTest
+  Scenario: User tries to redeem ada and receives an invalid signature error from the server
+    Given I have accepted "Daedalus Redemption Disclaimer"
+    And I enter a valid "Regular" redemption key
+    And ada redemption form submit button is no longer disabled
+    When I submit the ada redemption form
+    Then I should see an error message saying that ADA could not be redeemed correctly
