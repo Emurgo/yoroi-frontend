@@ -50,7 +50,7 @@ export default class AdaCertificateUploadWidget extends Component<Props> {
         <div className={styles.uploadBox}>
           {isCertificateSelected ? (
             <div className={styles.certificateUploaded}>
-              <button className={styles.removeFileButton} onClick={onRemoveCertificate}>
+              <button type="button" className={styles.removeFileButton} onClick={onRemoveCertificate}>
                 <SVGInline svg={closeCrossIcon} className={styles.closeCrossIcon} />
               </button>
               <SVGInline svg={certificateIcon} className={styles.certificateIcon} />
