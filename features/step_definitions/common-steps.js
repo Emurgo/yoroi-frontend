@@ -1,6 +1,6 @@
 // @flow
 
-import { BeforeAll, Given, After, AfterAll } from 'cucumber';
+import { BeforeAll, Given, After, AfterAll, Before } from 'cucumber';
 import { getMockServer, closeMockServer } from '../support/mockServer';
 import { buildFeatureData, getFeatureData, getFakeAddresses } from '../support/mockDataBuilder';
 import i18nHelper from '../support/helpers/i18n-helpers';
@@ -15,6 +15,22 @@ AfterAll(() => {
 
 After(async function () {
   await this.driver.quit();
+});
+
+Before({ tags: '@invalidWitnessTest' }, () => {
+  closeMockServer();
+  getMockServer({
+    signedTransaction: (req, res) => {
+      res.status(400).jsonp({
+        message: 'Invalid witness'
+      });
+    }
+  });
+});
+
+After({ tags: '@invalidWitnessTest' }, () => {
+  closeMockServer();
+  getMockServer({});
 });
 
 Given(/^I am testing "([^"]*)"$/, feature => {
