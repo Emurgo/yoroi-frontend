@@ -72,7 +72,7 @@ Feature: Ada Redemption
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue
     And I should see the summary screen
 
-  # #FIXME : https://trello.com/c/xyXihfA9/52-fix-paper-vended-redemption
+  # #FIXME : https://trello.com/c/BNHN9Ufz/56-fix-paper-vended-redemption-test
   # Scenario: User redeems manually entered "Paper vended" shielded vending key and passphrase
   #   Given I have accepted "Daedalus Redemption Disclaimer"
   #   And I click on ada redemption choices "Paper vended" tab
