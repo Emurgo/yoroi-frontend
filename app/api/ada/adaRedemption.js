@@ -3,6 +3,7 @@
 import { getAddressFromRedemptionKey, getRedemptionSignedTransaction } from './lib/cardanoCrypto/cryptoRedemption';
 import bs58 from 'bs58';
 import { getUTXOsForAddresses, sendTx } from './lib/yoroi-backend-api';
+import { decryptRegularVend } from './lib/decrypt';
 import type { RedeemResponse } from '../../../flow/declarations/CardanoCrypto';
 import { getReceiverAddress } from './adaAddress';
 import { RedemptionKeyAlreadyUsedError } from './errors';
@@ -43,8 +44,10 @@ export async function redeemAda(
 export async function redeemPaperVendedAda(
   redemptionParams: RedeemPaperVendedAdaParams
 ) : Promise<BigNumber> {
-  const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
-  const uint8ArrayAddress = getAddressFromRedemptionKey(redemptionKey);
+  const redemptionCodeBuffer = bs58.decode(redemptionParams.redemptionCode);
+  const mnemonicAsString = redemptionParams.mnemonics.join(' ');
+  const seed = decryptRegularVend(mnemonicAsString, redemptionCodeBuffer);
+  const uint8ArrayAddress = getAddressFromRedemptionKey(Buffer.from(seed, 'base64'));
   const senderAddress = bs58.encode(Buffer.from(uint8ArrayAddress));
   const utxos = await getUTXOsForAddresses({ addresses: [senderAddress] });
   if (utxos.length === 0) {
@@ -52,7 +55,7 @@ export async function redeemPaperVendedAda(
   }
   const receiverAddress = await getReceiverAddress();
   const redemptionSignedTransaction: RedeemResponse =
-    getRedemptionSignedTransaction(redemptionKey, receiverAddress, utxos[0]);
+    getRedemptionSignedTransaction(redemptionCodeBuffer, receiverAddress, utxos[0]);
   const cborEncodedTx = redemptionSignedTransaction.result.cbor_encoded_tx;
   const signedTx = Buffer.from(cborEncodedTx).toString('base64');
   await sendTx({ signedTx });
