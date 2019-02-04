@@ -1,6 +1,6 @@
 // @flow
 import Pdf from 'jspdf';
-// import qr from 'qr-image';
+import qr from 'qr-image';
 import paperWalletPage1Path from '../../../assets/pdf/paper-wallet-certificate-page-1.png';
 import paperWalletPage1PathTestnet from '../../../assets/pdf/paper-wallet-certificate-page-1-testnet.png';
 import paperWalletPage2Path from '../../../assets/pdf/paper-wallet-certificate-page-2.png';
@@ -20,19 +20,18 @@ export type PaperRequest = {
 export const generateAdaPaperPdf = async (request: PaperRequest) => {
   // Prepare params
   const { addresses, words, isMainnet, pass } = request;
-  const address = addresses[0];
+  const address = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
 
   // Helpers
   const printMnemonic = (index) => `${index + 1}. ${words[index]}`;
 
   // Generate QR image for wallet address
-  // const qrCodeImage = qr.imageSync(address, {
-  //   type: 'png',
-  //   size: 10,
-  //   ec_level: 'L',
-  //   margin: 0
-  // });
-  const textColor = '#3b5c9b';
+  const qrCodeImage = Buffer.from(qr.imageSync(address, {
+    type: 'png',
+    size: 10,
+    ec_level: 'L',
+    margin: 0
+  })).toString('base64');
   const width = 595.28;
   const height = 841.98;
   const doc = new Pdf({
@@ -40,40 +39,34 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
   });
   const [pageWidthPx, pageHeightPx] =
     [doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight()];
+  const pageSize = { w: pageWidthPx, h: pageHeightPx };
   try {
-    // // font family
-    // const fontBuffer = paperWalletFontPath;
-    // doc.font(fontBuffer);
+    // font family
 
     // background images
-    const img = await loadImage(paperWalletCertificateBgPath);
-    doc.addImage(img, 'png', 0, 0, pageWidthPx, pageHeightPx);
-    // doc.image(backgroundUri, 0, 0, { fit: [width, height] });
+    await addImage(doc, paperWalletCertificateBgPath, pageSize);
 
     // first page
-    // const page1Uri = isMainnet ? paperWalletPage1Path : paperWalletPage1PathTestnet;
-    //
-    // doc.image(page1Uri, 0, 0, { fit: [width, height] });
-    // doc.rotate(180, { origin: [width / 2, height / 2] });
-    // doc.fillColor(textColor);
-    // doc.fontSize(10).text('AddressLabel?', 0, 160, {
-    //   width: 595,
-    //   align: 'center'
-    // });
-    // doc.image(qrCodeImage, (width / 2) - 80 / 2, 180, { fit: [80, 80] });
-    // doc.fontSize(8).text(address, (width - 250) / 2, 274, {
-    //   width: 250,
-    //   align: 'center',
-    //   lineGap: 2
-    // });
-    //
-    // // revert document rotation
-    // doc.rotate(-180, { origin: [width / 2, height / 2] });
-    //
-    // // second page
-    // doc.addPage();
-    // const page2Uri = isMainnet ? paperWalletPage2Path : paperWalletPage2PathTestnet;
-    // doc.image(page2Uri, 0, 0, { fit: [width, height] });
+    const page1Uri = isMainnet ? paperWalletPage1Path : paperWalletPage1PathTestnet;
+    await addImage(doc, page1Uri, pageSize);
+
+    doc.setFontSize(8);
+    doc.setTextColor(59, 92, 155);
+    textCenter(doc, 195, address, null, 180, true);
+
+    await addImageBase64(doc, qrCodeImage, {
+      x: (pageWidthPx / 2) - 15,
+      y: 205,
+      w: 30,
+      h: 30
+    });
+
+    // second page
+    doc.addPage();
+
+    const page2Uri = isMainnet ? paperWalletPage2Path : paperWalletPage2PathTestnet;
+    await addImage(doc, page2Uri, pageSize);
+
     // doc.rotate(180, { origin: [width / 2, height / 2] });
     // doc.fillColor(textColor);
     // doc.fontSize(10).text('RecoveryLabel?', 0, 535, {
@@ -121,7 +114,34 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
   saver.saveAs(blob, 'test.pdf');
 };
 
-async function loadImage(url): Promise<Image> {
+type AddImageParams = {
+  x?: number,
+  y?: number,
+  w?: number,
+  h?: number,
+}
+
+function textCenter(doc: Pdf, y: number, text: string, m, r, isReverseCentering?: boolean) {
+  const unit = doc.getStringUnitWidth(text);
+  const fontSize = doc.internal.getFontSize();
+  const scaleFactor = doc.internal.scaleFactor;
+  const textWidth = unit * fontSize / scaleFactor;
+  const pageWidth = doc.internal.pageSize.width;
+  const textOffset = (pageWidth / 2) - ((textWidth / 2) * (isReverseCentering ? -1 : +1));
+  doc.text(textOffset, y, text, m, r);
+}
+
+async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise<void> {
+  return addImageBase64(doc, await loadImage(url), params);
+}
+
+async function addImageBase64(doc: Pdf, img: string, params?: AddImageParams): Promise<void> {
+  const { x, y, w, h } = params || {};
+  doc.addImage(img, 'png', x || 0, y || 0, w, h);
+  return null;
+}
+
+async function loadImage(url: string): Promise<string> {
   return new Promise<Image>((resolve, reject) => {
     try {
       const img = new Image();
