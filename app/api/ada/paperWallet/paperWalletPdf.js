@@ -23,6 +23,10 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
   const words = bip39.generateMnemonic(224).split(' ');
   const addresses = [
     'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk',
+    'Ae2tdPwUPEYzDLR8zduvsULnjpZqQN2f67na68XkXMYbU7nSoxYmM6HyujC',
+    // 'Ae2tdPwUPEZHwifNUbb9eGitrkEiuMJZRyeeq22hLCZMse4iSW7xAdjcyfE',
+    // 'Ae2tdPwUPEZL98o7rECwL4FtMYD43YPRuZFqnYYdJS4yKBdUB6pLHjQTAxu',
+    // 'Ae2tdPwUPEZ1SfVxRHxS882JGxMC58Y98bNkNhc2uxrbSpCa8L92VtX1ntU',
   ];
   console.log(words);
 
@@ -35,7 +39,6 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
     [doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight()];
   const pageSize = { w: pageWidthPx, h: pageHeightPx };
   try {
-    // font family
 
     // background images
     await addImage(doc, paperWalletCertificateBgPath, pageSize);
@@ -43,52 +46,14 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
     // first page
     const page1Uri = isMainnet ? paperWalletPage1Path : paperWalletPage1PathTestnet;
     await addImage(doc, page1Uri, pageSize);
-
-    doc.setFontSize(8);
-    doc.setTextColor(59, 92, 155);
-
-    if (addresses.length === 1) {
-      const [address] = addresses;
-      textCenter(doc, 195, address, null, 180, true);
-      // Generate QR image for wallet address
-      const qrCodeImage = Buffer.from(qr.imageSync(address, {
-        type: 'png',
-        size: 10,
-        ec_level: 'L',
-        margin: 0
-      })).toString('base64');
-      addImageBase64(doc, qrCodeImage, {
-        x: (pageWidthPx / 2) - 15,
-        y: 205,
-        w: 30,
-        h: 30
-      });
-    } else if (addresses.length > 1) {
-
-      // TODO: implement multiple addresses
-    }
+    printAddresses(doc, addresses);
 
     // second page
     doc.addPage();
 
     const page2Uri = isMainnet ? paperWalletPage2Path : paperWalletPage2PathTestnet;
     await addImage(doc, page2Uri, pageSize);
-
-    // mnemonics
-    doc.setFont('courier');
-    doc.setFontSize(7);
-    const [pA, pB] = [{ x:56, y:82 }, { x:153, y:105 }];
-
-    const lineHeight = (pB.y - pA.y) / 3;
-
-    for (let r = 0; r < 3; r++) {
-      const rowIndex = r * 7;
-      const rowWords = words.slice(rowIndex, rowIndex + 7);
-      const rowLetters = rowWords.reduce((a, s) => a + s.length, 0);
-      const rowString = rowWords.join(' '.repeat((64 - rowLetters) / 7));
-      const y = (pB.y - (lineHeight / 2)) - (lineHeight * r);
-      textCenter(doc, y, rowString, null, 180, true);
-    }
+    printMnemonics(doc, words)
 
   } catch (error) {
     Logger.error('Failed to render paper wallet! ' + stringifyError(error));
@@ -100,6 +65,84 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
   const blob = doc.output('blob');
   saver.saveAs(blob, 'test.pdf');
 };
+
+function printAddresses(doc: Pdf, addresses: Array<string>) {
+  const pageWidthPx = doc.internal.pageSize.getWidth();
+  const [pA, pB] = [{ x:40, y:187 }, { x:170, y:249 }];
+  doc.text(pA.x, pA.y, 'x');
+  doc.text(pB.x, pA.y, 'x');
+  doc.text(pB.x, pB.y, 'x');
+  doc.text(pA.x, pB.y, 'x');
+
+  doc.setTextColor(59, 92, 155);
+  if (addresses.length === 1) {
+
+    doc.setFontSize(9);
+    const [address] = addresses;
+    textCenter(doc, pA.y + 7, address, null, 180, true);
+    // Generate QR image for wallet address
+    const qrCodeImage = Buffer.from(qr.imageSync(address, {
+      type: 'png',
+      size: 10,
+      ec_level: 'L',
+      margin: 0
+    })).toString('base64');
+    addImageBase64(doc, qrCodeImage, {
+      x: (pageWidthPx / 2) - 15,
+      y: pA.y + 17,
+      w: 30,
+      h: 30
+    });
+
+  } else if (addresses.length > 1) {
+
+    if (addresses.length > 5) {
+      throw new Error('Maximum number of addresses supported: 5');
+    }
+
+    doc.setFontSize(8);
+    const addrPad = 22;
+    const qrSize = {
+      2: 14,
+      3: 14,
+      4: 12,
+      5: 10,
+    }[addresses.length];
+
+    const rowHeight = (pB.y - pA.y) / addresses.length;
+    for (let r = 0; r < addresses.length; r++) {
+      const y = (pB.y - (rowHeight / 2)) - (rowHeight * r);
+      doc.text(pB.x - addrPad, y, addresses[r], null, 180);
+      const qrCodeImage = Buffer.from(qr.imageSync(addresses[r], {
+        type: 'png',
+        size: 10,
+        ec_level: 'L',
+        margin: 0
+      })).toString('base64');
+      addImageBase64(doc, qrCodeImage, {
+        x: (pB.x - addrPad) + 4,
+        y: y - ((qrSize / 2) - 1),
+        w: qrSize,
+        h: qrSize
+      });
+    }
+  }
+}
+
+function printMnemonics(doc: Pdf, words: Array<string>) {
+  doc.setFont('courier');
+  doc.setFontSize(7);
+  const [pA, pB] = [{ x:56, y:82 }, { x:153, y:105 }];
+  const lineHeight = (pB.y - pA.y) / 3;
+  for (let r = 0; r < 3; r++) {
+    const rowIndex = r * 7;
+    const rowWords = words.slice(rowIndex, rowIndex + 7);
+    const rowLetters = rowWords.reduce((a, s) => a + s.length, 0);
+    const rowString = rowWords.join(' '.repeat((64 - rowLetters) / 7));
+    const y = (pB.y - (lineHeight / 2)) - (lineHeight * r);
+    textCenter(doc, y, rowString, null, 180, true);
+  }
+}
 
 type AddImageParams = {
   x?: number,
