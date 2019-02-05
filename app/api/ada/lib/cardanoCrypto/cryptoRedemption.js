@@ -4,7 +4,6 @@ import { Redemption } from 'rust-cardano-crypto';
 import { SeedWithInvalidLengthError, CreateRedeemTransactionError } from './cryptoErrors';
 import type { ConfigType } from '../../../../../config/config-types';
 import type { UTXO } from '../../adaTypes';
-import type { RedeemResponse } from '../../../../../flow/declarations/CardanoCrypto';
 import { Logger } from '../../../../utils/logging';
 
 declare var CONFIG : ConfigType;
