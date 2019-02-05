@@ -51,9 +51,9 @@ export default class AdaCertificateUploadWidget extends Component<Props> {
           {isCertificateSelected ? (
             <div className={styles.certificateUploaded}>
               <button type="button" className={styles.removeFileButton} onClick={onRemoveCertificate}>
-                <SVGInline svg={closeCrossIcon} className={styles.closeCrossIcon} />
+                <SVGInline svg={closeCrossIcon} className={styles.closeCrossIcon} cleanup={['title']} />
               </button>
-              <SVGInline svg={certificateIcon} className={styles.certificateIcon} />
+              <SVGInline svg={certificateIcon} className={styles.certificateIcon} cleanup={['title']} />
             </div>
           ) : (
             <Dropzone
