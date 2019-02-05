@@ -36,11 +36,14 @@ test('Unscramble Daedalus paper produces 12 valid words', () => {
 
 test('Unscramble Daedalus paper matches expected address', () => {
   const [words] = unscramblePaperMnemonic(VALID_DD_PAPER.words, 27);
-  const { result: checker } = RandomAddressChecker.newCheckerFromMnemonics(words);
-  const { result } = RandomAddressChecker.checkAddresses(checker,
-    [VALID_DD_PAPER.address, UNEXPECTED_DD_ADDRESS]);
-  const resultMap = result.reduce((m, v) => { m[v.address] = v.addressing; return m; }, {});
-  expect(VALID_DD_PAPER.address in resultMap).toEqual(true);
-  expect(UNEXPECTED_DD_ADDRESS in resultMap).toEqual(false);
-  expect(resultMap[VALID_DD_PAPER.address]).toEqual([0x80000000, 0x80000000]);
+  expect(words).toBeTruthy();
+  if (words) {
+    const { result: checker } = RandomAddressChecker.newCheckerFromMnemonics(words);
+    const { result } = RandomAddressChecker.checkAddresses(checker,
+      [VALID_DD_PAPER.address, UNEXPECTED_DD_ADDRESS]);
+    const resultMap = result.reduce((m, v) => { m[v.address] = v.addressing; return m; }, {});
+    expect(VALID_DD_PAPER.address in resultMap).toEqual(true);
+    expect(UNEXPECTED_DD_ADDRESS in resultMap).toEqual(false);
+    expect(resultMap[VALID_DD_PAPER.address]).toEqual([0x80000000, 0x80000000]);
+  }
 });
