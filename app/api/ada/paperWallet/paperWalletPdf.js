@@ -6,23 +6,25 @@ import paperWalletPage1PathTestnet from '../../../assets/pdf/paper-wallet-certif
 import paperWalletPage2Path from '../../../assets/pdf/paper-wallet-certificate-page-2.png';
 import paperWalletPage2PathTestnet from '../../../assets/pdf/paper-wallet-certificate-page-2-testnet.png';
 import paperWalletCertificateBgPath from '../../../assets/pdf/paper-wallet-certificate-background.png';
-import type { PaperWalletPass } from '../adaWallet';
 import { Logger, stringifyError } from '../../../utils/logging';
 import saver from 'file-saver';
+import bip39 from 'bip39';
 
 export type PaperRequest = {
   words: Array<string>,
-  pass: PaperWalletPass,
   addresses: Array<string>,
-  isMainnet: boolean
+  isMainnet: boolean,
+  isCustomPass: boolean,
 }
 
 export const generateAdaPaperPdf = async (request: PaperRequest) => {
   // Prepare params
-  const { addresses, words, isMainnet, pass } = request;
-
-  // Helpers
-  const printMnemonic = (index) => `${index + 1}. ${words[index]}`;
+  const { isMainnet } = request;
+  const words = bip39.generateMnemonic(224).split(' ');
+  const addresses = [
+    'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk',
+  ];
+  console.log(words);
 
   const width = 595.28;
   const height = 841.98;
@@ -46,10 +48,8 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
     doc.setTextColor(59, 92, 155);
 
     if (addresses.length === 1) {
-
-      const address = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
+      const [address] = addresses;
       textCenter(doc, 195, address, null, 180, true);
-
       // Generate QR image for wallet address
       const qrCodeImage = Buffer.from(qr.imageSync(address, {
         type: 'png',
@@ -57,7 +57,6 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
         ec_level: 'L',
         margin: 0
       })).toString('base64');
-
       addImageBase64(doc, qrCodeImage, {
         x: (pageWidthPx / 2) - 15,
         y: 205,
@@ -75,42 +74,22 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
     const page2Uri = isMainnet ? paperWalletPage2Path : paperWalletPage2PathTestnet;
     await addImage(doc, page2Uri, pageSize);
 
-    // doc.rotate(180, { origin: [width / 2, height / 2] });
-    // doc.fillColor(textColor);
-    // doc.fontSize(10).text('RecoveryLabel?', 0, 535, {
-    //   width: 595,
-    //   align: 'center'
-    // });
-    //
-    // // mnemonics
-    // doc.fontSize(7);
-    // doc.text(printMnemonic(0), 168, 560);
-    // doc.text(printMnemonic(1), 212, 560);
-    // doc.text(printMnemonic(2), 256, 560);
-    // doc.text(printMnemonic(3), 300, 560);
-    // doc.text(printMnemonic(4), 344, 560);
-    // doc.text(printMnemonic(5), 388, 560);
-    //
-    // doc.text(printMnemonic(6), 168, 581);
-    // doc.text(printMnemonic(7), 212, 581);
-    // doc.text(printMnemonic(8), 256, 581);
-    // doc.text(printMnemonic(9), 300, 581);
-    // doc.text(printMnemonic(10), 344, 581);
-    // doc.text(printMnemonic(11), 388, 581);
-    //
-    // doc.text(printMnemonic(12), 168, 602);
-    // doc.text(printMnemonic(13), 212, 602);
-    // doc.text(printMnemonic(14), 256, 602);
-    // doc.text(printMnemonic(15), 300, 602);
-    // doc.text(printMnemonic(16), 344, 602);
-    // doc.text(printMnemonic(17), 388, 602);
-    //
-    // doc.fontSize(7).text('BuildLabel?', (width - 270) / 2, 705, {
-    //   width: 270,
-    //   align: 'left'
-    // });
-    //
-    // doc.rotate(-180, { origin: [width / 2, height / 2] });
+    // mnemonics
+    doc.setFont('courier');
+    doc.setFontSize(7);
+    const [pA, pB] = [{ x:56, y:82 }, { x:153, y:105 }];
+
+    const lineHeight = (pB.y - pA.y) / 3;
+
+    for (let r = 0; r < 3; r++) {
+      const rowIndex = r * 7;
+      const rowWords = words.slice(rowIndex, rowIndex + 7);
+      const rowLetters = rowWords.reduce((a, s) => a + s.length, 0);
+      const rowString = rowWords.join(' '.repeat((64 - rowLetters) / 7));
+      const y = (pB.y - (lineHeight / 2)) - (lineHeight * r);
+      textCenter(doc, y, rowString, null, 180, true);
+    }
+
   } catch (error) {
     Logger.error('Failed to render paper wallet! ' + stringifyError(error));
     throw error;
