@@ -4,7 +4,6 @@ import { getAddressFromRedemptionKey, getRedemptionSignedTransaction } from './l
 import bs58 from 'bs58';
 import { getUTXOsForAddresses, sendTx } from './lib/yoroi-backend-api';
 import { decryptRegularVend } from './lib/decrypt';
-import type { RedeemResponse } from '../../../flow/declarations/CardanoCrypto';
 import { getReceiverAddress } from './adaAddress';
 import { RedemptionKeyAlreadyUsedError } from './errors';
 import BigNumber from 'bignumber.js';
