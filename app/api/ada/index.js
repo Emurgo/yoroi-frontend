@@ -185,7 +185,7 @@ export default class AdaApi {
     const { addresses, scrambledWords, pass } = paper;
     await generateAdaPaperPdf({
       words: scrambledWords, addresses, pass, isMainnet: true
-    });
+    }, s => Logger.info('[PaperWalletRender] ' + s));
   }
 
   async getWallets(): Promise<GetWalletsResponse> {

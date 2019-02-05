@@ -17,8 +17,10 @@ export type PaperRequest = {
   isCustomPass: boolean,
 }
 
-export const generateAdaPaperPdf = async (request: PaperRequest) => {
+export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function) => {
   // Prepare params
+  const logback = callback || (() => {});
+  logback('Reading parameters');
   const { isMainnet } = request;
   const words = bip39.generateMnemonic(224).split(' ');
   const addresses = [
@@ -30,6 +32,7 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
   ];
   console.log(words);
 
+  logback('Initializing the document');
   const width = 595.28;
   const height = 841.98;
   const doc = new Pdf({
@@ -40,19 +43,23 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
   const pageSize = { w: pageWidthPx, h: pageHeightPx };
   try {
 
+    logback('Drawing pretty background');
     // background images
     await addImage(doc, paperWalletCertificateBgPath, pageSize);
 
+    logback('Preparing the face page');
     // first page
     const page1Uri = isMainnet ? paperWalletPage1Path : paperWalletPage1PathTestnet;
     await addImage(doc, page1Uri, pageSize);
-    printAddresses(doc, addresses);
+    printAddresses(doc, addresses, logback);
 
     // second page
     doc.addPage();
 
+    logback('Preparing the back page');
     const page2Uri = isMainnet ? paperWalletPage2Path : paperWalletPage2PathTestnet;
     await addImage(doc, page2Uri, pageSize);
+    logback('Printing mnemonics');
     printMnemonics(doc, words)
 
   } catch (error) {
@@ -60,13 +67,16 @@ export const generateAdaPaperPdf = async (request: PaperRequest) => {
     throw error;
   }
 
+  logback('Downloading');
   // Write file to disk
   console.log(doc);
   const blob = doc.output('blob');
   saver.saveAs(blob, 'test.pdf');
+
+  logback('All done');
 };
 
-function printAddresses(doc: Pdf, addresses: Array<string>) {
+function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function) {
   const pageWidthPx = doc.internal.pageSize.getWidth();
   const [pA, pB] = [{ x:40, y:187 }, { x:170, y:249 }];
   doc.text(pA.x, pA.y, 'x');
@@ -76,6 +86,8 @@ function printAddresses(doc: Pdf, addresses: Array<string>) {
 
   doc.setTextColor(59, 92, 155);
   if (addresses.length === 1) {
+
+    logback('Drawing the address');
 
     doc.setFontSize(9);
     const [address] = addresses;
@@ -111,6 +123,7 @@ function printAddresses(doc: Pdf, addresses: Array<string>) {
 
     const rowHeight = (pB.y - pA.y) / addresses.length;
     for (let r = 0; r < addresses.length; r++) {
+      logback(`Drawing address #${r + 1}`);
       const y = (pB.y - (rowHeight / 2)) - (rowHeight * r);
       doc.text(pB.x - addrPad, y, addresses[r], null, 180);
       const qrCodeImage = Buffer.from(qr.imageSync(addresses[r], {
