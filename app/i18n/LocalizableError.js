@@ -8,6 +8,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Unknow error.',
     description: 'Unknow error message.'
   },
+  unexpectedError: {
+    id: 'app.errors.unexpectedError',
+    defaultMessage: '!!!Something unexpected happened. Please retry.',
+    description: '"Something unexpected happened. Please retry." error message.'
+  },
 });
 
 // Base class to allow wrapping a localizable message into an ES6-error
@@ -32,6 +37,15 @@ class UnknowError extends LocalizableError {
     super({
       id: messages.unknowError.id,
       defaultMessage: messages.unknowError.defaultMessage,
+    });
+  }
+}
+
+export class UnexpectedError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.unexpectedError.id,
+      defaultMessage: messages.unexpectedError.defaultMessage,
     });
   }
 }

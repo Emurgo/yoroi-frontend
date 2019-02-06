@@ -53,7 +53,12 @@ I suggest instead installing the `mainnet` build as it does not use `localhost`.
 
 ## Test
 
-* `features`: E2E tests (use [chromedriver](https://www.npmjs.com/package/chromedriver), [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver))
+### Selenium + Cucumber
+You **must** run `npm run test-prepare` **before** running the tests!
+
+`test-prepare` will *BUILD* the extension and then the tests will *LOAD* the extension.
+
+Rerun `test-prepare` anytime you make changes to the application itself. If you only change test files, you do not need to rerun it.
 
 ```bash
 # flow
@@ -61,7 +66,6 @@ $ npm run flow
 # lint
 $ npm run eslint
 # features (command to run all existing tests)
-$ npm run test-prepare
 $ npm run test-e2e-chrome
 # How to run one .feature file (One feature file = one covered component from youtrack)
 $ npm run test-by-feature feature/wallet-creation.feature
@@ -69,7 +73,13 @@ $ npm run test-by-feature feature/wallet-creation.feature
 $ npm run test-by-tag @it-10
 ```
 
- 
+### Jest
+
+We use Jest for unittests.
+
+```bash
+$ npm run jest
+```
 
 ## Update Cardano crypto library
 

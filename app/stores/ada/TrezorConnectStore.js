@@ -16,7 +16,7 @@ import Wallet from '../../domain/Wallet';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import globalMessages from '../../i18n/global-messages';
-import LocalizableError from '../../i18n/LocalizableError';
+import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 
 import {
@@ -276,18 +276,18 @@ export default class TrezorConnectStore extends Store {
           trezorValidity.error = new LocalizableError(globalMessages.trezorError103);
           break;
         default:
-          // trezorError999 = Something unexpected happened
+          // Something unexpected happened
           Logger.error(`TrezorConnectStore::_validateTrezor::error: ${trezorResp.payload.error}`);
-          trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
+          trezorValidity.error = new UnexpectedError();
           break;
       }
     }
 
     if (!trezorValidity.error
       && trezorResp.payload.publicKey.length <= 0) {
-      // trezorError999 = Something unexpected happened
+      // Something unexpected happened
       Logger.error(`TrezorConnectStore::_validateTrezor::error: invalid public key`);
-      trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
+      trezorValidity.error = new UnexpectedError();
     }
 
     if (!trezorValidity.error
@@ -295,9 +295,9 @@ export default class TrezorConnectStore extends Store {
       || trezorEventDevice.payload == null
       || trezorEventDevice.payload.type !== 'acquired'
       || trezorEventDevice.payload.features == null)) {
-      // trezorError999 = Something unexpected happened
+      // Something unexpected happened
       Logger.error(`TrezorConnectStore::_validateTrezor::error: invalid device event`);
-      trezorValidity.error = new LocalizableError(globalMessages.trezorError999);
+      trezorValidity.error = new UnexpectedError();
     }
 
     if (!trezorValidity.error) {
