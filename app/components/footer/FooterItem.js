@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import SvgInline from 'react-svg-inline';
 import { intlShape } from 'react-intl';
-
 import styles from './FooterItem.scss';
 
 
