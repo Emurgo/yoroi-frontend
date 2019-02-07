@@ -20,17 +20,19 @@ export const getSecretKey = (parsedPDF: string): string => {
       throw new InvalidCertificateError();
     }
 
-    let index = 0;
+    let redemptionKeyIndex = 0;
 
     if (lastItem === '——————') {
-      index = splitArray.length - 5;
+      const elementsAfterRedemptionKey = 5;
+      redemptionKeyIndex = splitArray.length - elementsAfterRedemptionKey;
     }
 
     if (lastItem === 'KEY') {
-      index = splitArray.length - 3;
+      const elementsAfterRedemptionKey = 3;
+      redemptionKeyIndex = splitArray.length - elementsAfterRedemptionKey;
     }
 
-    return splitArray[index];
+    return splitArray[redemptionKeyIndex];
   } catch (error) {
     Logger.error('pdfParser::getSecretKey error: ' + stringifyError(error));
     if (error instanceof InvalidCertificateError) {
