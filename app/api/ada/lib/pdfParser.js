@@ -96,7 +96,6 @@ export const decryptFile = (
 
 // It was based in the following example: https://ourcodeworld.com/articles/read/405/how-to-convert-pdf-to-text-extract-text-from-pdf-with-javascript
 export const parsePDFFile = (file: Uint8Array): Promise<string> => (
-  // TODO: Handle errors
   new Promise((resolve, reject) => {
     pdfjsLib.getDocument(file).then(async pdf => {
       let pagesText = '';
@@ -112,7 +111,6 @@ export const parsePDFFile = (file: Uint8Array): Promise<string> => (
 );
 
 const _readPage = (pdf: PDF, pageNumber: number): Promise<string> => (
-  // TODO: Handle errors
   new Promise((resolve, reject) => {
     pdf.getPage(pageNumber)
       .then(pdfPage => pdfPage.getTextContent())
