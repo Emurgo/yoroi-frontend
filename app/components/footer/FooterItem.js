@@ -3,7 +3,6 @@ import SvgInline from 'react-svg-inline';
 import { intlShape } from 'react-intl';
 import styles from './FooterItem.scss';
 
-
 type Props = {
   url: string,
   svg: string,
@@ -36,7 +35,8 @@ export default class FooterItem extends Component<Props> {
             <div className={styles.text}>
               {intl.formatMessage(message)}
             </div>
-          </a>}
+          </a>
+        }
       </div>
     );
   }

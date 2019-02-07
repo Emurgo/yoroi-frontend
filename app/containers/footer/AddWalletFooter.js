@@ -10,7 +10,6 @@ import howRestoreWalletSvg from '../../assets/images/footer/how-to-restore-walle
 
 import { defineMessages } from 'react-intl';
 
-
 const messages = defineMessages({
   buyTrezorHardwareWallet: {
     id: 'wallet.footer.buyTrezorHardwareWallet.text',
@@ -38,7 +37,6 @@ const messages = defineMessages({
     description: 'Footer How to restore a wallet link text.'
   },
 });
-
 
 export default class AddWalletFooter extends Component {
 
