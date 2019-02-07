@@ -6,8 +6,8 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './DisplaySettings.scss';
-import SvgInline from 'react-svg-inline';
-import themeYoroiClassicPreview from '../../../assets/images/themes/yoroi-classic.inline.svg';
+// import SvgInline from 'react-svg-inline';
+// import themeYoroiClassicPreview from '../../../assets/images/themes/yoroi-classic.inline.svg';
 import { THEMES } from '../../../themes/index';
 import ThemeThumbnail from './display/ThemeThumbnail';
 
@@ -97,7 +97,6 @@ export default class DisplaySettings extends Component<Props> {
             onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
           >
             <div>
-              {/* <SvgInline svg={themeYoroiClassicPreview} className={styles.icon} cleanup={['title']} /> */}
               <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
             </div>
             <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
@@ -109,7 +108,6 @@ export default class DisplaySettings extends Component<Props> {
             onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
           >
             <div>
-              {/* <SvgInline svg={themeYoroiClassicPreview} className={styles.icon} cleanup={['title']} /> */}
               <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
             </div>
             <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
@@ -121,7 +119,6 @@ export default class DisplaySettings extends Component<Props> {
             onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
           >
             <div>
-              {/* <SvgInline svg={themeYoroiClassicPreview} className={styles.icon} cleanup={['title']} /> */}
               <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
             </div>
             <span>{intl.formatMessage(messages.themeYoroiModern)}</span>

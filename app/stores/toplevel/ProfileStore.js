@@ -130,16 +130,16 @@ export default class SettingsStore extends Store {
 
   _updateTheme = async ({ theme }: { theme: string }) => {
     await this.unsetCustomThemeRequest.execute();
+    await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);
     await this.getThemeRequest.execute(); // eagerly cache
   };
 
   _exportTheme = async () => {
-    //TODO: It should be ok to access DOM Style from here
-    //but not sure about project conventions about accessing the DOM (Clark)
-    const html = document.querySelector("html");
-    if (html)
-    {
+    // TODO: It should be ok to access DOM Style from here
+    // but not sure about project conventions about accessing the DOM (Clark)
+    const html = document.querySelector('html');
+    if (html) {
       const attributes: any = html.attributes;
       await this.unsetCustomThemeRequest.execute();
       await this.setCustomThemeRequest.execute(attributes.style.value);
@@ -148,7 +148,7 @@ export default class SettingsStore extends Store {
   };
 
 
-  //TODO: not sure where to put this method (Clark)
+  // TODO: not sure where to put this method (Clark)
   getThemeVars = ({ theme }: { theme: string }) => {
     if (theme) return require(`../../themes/prebuilt/${theme}.js`);
     return require(`../../themes/prebuilt/${THEMES.YOROI_CLASSIC}.js`); // default

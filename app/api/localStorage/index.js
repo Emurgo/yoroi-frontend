@@ -99,7 +99,6 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
-  
   // ========== Custom User Theme ========== //
 
   getCustomUserTheme = (): Promise<string> => new Promise((resolve, reject) => {
@@ -114,16 +113,16 @@ export default class LocalStorageApi {
 
   setCustomUserTheme = (themeVars: string): Promise<void> => new Promise((resolve, reject) => {
     try {
-      //Convert CSS String into Javascript Object 
+      // Convert CSS String into Javascript Object 
       const vars = themeVars.split(';');
-      let themeObject = {};
+      const themeObject = {};
       vars.forEach(v => {
-        let varData = v.split(':');
-        let key = varData[0];
-        let value = varData[1];
+        const varData = v.split(':');
+        const key = varData[0];
+        const value = varData[1];
         if (key && value) themeObject[key.trim()] = value.trim();
       });
-      //Save Theme Object
+      // Save Theme Object
       localStorage.setItem(storageKeys.CUSTOM_THEME, JSON.stringify(themeObject));
       resolve();
     } catch (error) {
