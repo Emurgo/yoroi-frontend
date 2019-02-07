@@ -22,7 +22,7 @@ manageTranslations({
   messagesDirectory,
   translationsDirectory: 'app/i18n/locales',
   singleMessagesFile: true,
-  languages: ['en-US', 'zh-Hans', 'zh-Hant', 'ko-KR', 'ja-JP', 'ru-RU'],
+  languages: ['en-US', 'zh-Hans', 'zh-Hant', 'ko-KR', 'ja-JP', 'ru-RU', 'de-DE', 'fr-FR'],
   overrideCoreMethods: {
     provideWhitelistFile: (langResults) => { disableWhitelistFile(langResults); },
     outputSingleFile: (combinedFiles) => { /* do nothing to suppress defaultMessages.json */ }
