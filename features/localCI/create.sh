@@ -22,3 +22,6 @@ sudo rm -f /opt/firefox/firefox
 sudo rm -f /usr/local/bin/firefox
 sudo apt install firefox-esr
 sudo ln -s /usr/bin/firefox-esr /usr/local/bin/firefox
+
+# need gedit to quickly edit inside docker
+sudo apt-get install gedit
