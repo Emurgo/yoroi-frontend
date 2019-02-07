@@ -6,8 +6,6 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './DisplaySettings.scss';
-// import SvgInline from 'react-svg-inline';
-// import themeYoroiClassicPreview from '../../../assets/images/themes/yoroi-classic.inline.svg';
 import { THEMES } from '../../../themes/index';
 import ThemeThumbnail from './display/ThemeThumbnail';
 
@@ -101,28 +99,7 @@ export default class DisplaySettings extends Component<Props> {
             </div>
             <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
           </button>
-
-          <button
-            type="button"
-            className={themeYoroiModernClasses}
-            onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
-          >
-            <div>
-              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
-            </div>
-            <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
-          </button>
-
-          <button
-            type="button"
-            className={themeYoroiModernClasses}
-            onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
-          >
-            <div>
-              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
-            </div>
-            <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
-          </button>
+            
         </div>
 
       </div>

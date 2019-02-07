@@ -148,10 +148,5 @@ export default class LocalStorageApi {
     await this.unsetUserLocale(); // TODO: remove after saving locale to API is restored
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
-    // TODO:  Not sure about this (Clark)
-    await this.unsetCustomUserTheme();
-
   }
-
-
 }
