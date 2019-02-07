@@ -125,7 +125,6 @@ export default class LocalStorageApi {
           themeObject[key.trim()] = value.trim();
       });
       //Save Theme Object
-      console.log("background", themeObject["--theme-topbar-background-color"]);
       localStorage.setItem(storageKeys.CUSTOM_THEME, JSON.stringify(themeObject));
       resolve();
     } catch (error) {

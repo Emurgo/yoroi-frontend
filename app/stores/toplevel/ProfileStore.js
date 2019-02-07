@@ -89,8 +89,6 @@ export default class SettingsStore extends Store {
 
   @computed get currentThemeVars(): string {
     const { result } = this.getCustomThemeRequest.execute();
-    console.log("custom theme", result !== '' ? JSON.parse(result) : result);
-    console.log("real theme", this.getThemeVars({ theme: this.currentTheme }));
     if(result !== '') return JSON.parse(result);
     return this.getThemeVars({ theme: this.currentTheme });
   }
