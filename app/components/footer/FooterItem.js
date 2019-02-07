@@ -19,7 +19,7 @@ export default class FooterItem extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { url, svg, message } = this.props;
-    
+
     return (
       <div className={styles.component}>
         {/* Buy a Trezor Hardware wallet */}

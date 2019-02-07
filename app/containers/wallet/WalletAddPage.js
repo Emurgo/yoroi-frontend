@@ -24,7 +24,7 @@ type Props = InjectedProps;
 const MainLayout = resolver('containers/MainLayout');
 
 const messages = defineMessages({
-  title: { 
+  title: {
     id: 'wallet.add.page.title',
     defaultMessage: '!!!Add Wallet',
     description: 'Add Wallet Title.'
