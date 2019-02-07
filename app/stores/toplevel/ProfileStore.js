@@ -135,11 +135,16 @@ export default class SettingsStore extends Store {
   };
 
   _exportTheme = async () => {
-    await this.unsetCustomThemeRequest.execute();
     //TODO: It should be ok to access DOM Style from here
     //but not sure about project conventions about accessing the DOM (Clark)
-    await this.setCustomThemeRequest.execute(document.querySelector("html").attributes["style"].value);
-    await this.getCustomThemeRequest.execute(); // eagerly cache
+    const html = document.querySelector("html");
+    if(html)
+    {
+      const attributes: any = html.attributes;
+      await this.unsetCustomThemeRequest.execute();
+      await this.setCustomThemeRequest.execute(attributes["style"].value);
+      await this.getCustomThemeRequest.execute(); // eagerly cache
+    }
   };
 
 
