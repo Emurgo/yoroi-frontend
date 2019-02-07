@@ -29,7 +29,7 @@ const {
 } = IDENTIFIERS;
 
 // package all our overrides into one theme
-export const yoroiTheme = {
+export const yoroiPolymorphTheme = {
   [AUTOCOMPLETE]: SimpleAutocomplete,
   [BUBBLE]: SimpleBubble,
   [BUTTON]: SimpleButton,
@@ -40,5 +40,5 @@ export const yoroiTheme = {
   [OPTIONS]: SimpleOptions,
   [SELECT]: SimpleSelect,
   [SWITCH]: SimpleSwitch,
-  [TEXT_AREA]: SimpleTextArea,
+  [TEXT_AREA]: SimpleTextArea
 };

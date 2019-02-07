@@ -17,6 +17,8 @@ This folder serves a few independent theme (css) related concepts
 
 A) Have a folder called `overrides` which overrides the default properties of `simple` (to see what the defaults are, go see the `simple` theme in the [`react-polymorph` repo](https://github.com/input-output-hk/react-polymorph/tree/develop/source/themes/simple))\
 B) Rebundle this modified `simple` theme into a new theme called `yoroiTheme`.\
+<!-- A) Have a folder called `simple` which imports the default themes (css) and provides us the ability to override what we need.
+B) Rebundle this modified `simple` theme into a new theme called `yoroiPolymorphTheme`. -->
 C) Use the `ThemeProvider` to automatically override the default theme on all React-Polymorph componenets at the top-level of our `App`.
 
 ## 2) Store prebuild themes

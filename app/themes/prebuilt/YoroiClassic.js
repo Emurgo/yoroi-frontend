@@ -1,4 +1,4 @@
-//  ==== Theme: Yoroi === //
+//  ==== Theme: Yoroi Classic === //
 
 // FONTS
 const rpFonts = {

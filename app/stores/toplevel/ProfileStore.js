@@ -5,6 +5,7 @@ import moment from 'moment/moment';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
+import { THEMES } from '../../themes/index';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 
@@ -31,6 +32,11 @@ export default class SettingsStore extends Store {
   /* eslint-disable max-len */
   @observable getProfileLocaleRequest: Request<string> = new Request(this.api.localStorage.getUserLocale);
   @observable setProfileLocaleRequest: Request<string> = new Request(this.api.localStorage.setUserLocale);
+  @observable getThemeRequest: Request<string> = new Request(this.api.localStorage.getUserTheme);
+  @observable setThemeRequest: Request<string> = new Request(this.api.localStorage.setUserTheme);
+  @observable getCustomThemeRequest: Request<string> = new Request(this.api.localStorage.getCustomUserTheme);
+  @observable setCustomThemeRequest: Request<string> = new Request(this.api.localStorage.setCustomUserTheme);
+  @observable unsetCustomThemeRequest: Request<string> = new Request(this.api.localStorage.unsetCustomUserTheme);
   @observable getTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.getTermsOfUseAcceptance);
   @observable setTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.setTermsOfUseAcceptance);
   /* eslint-enable max-len */
@@ -38,6 +44,8 @@ export default class SettingsStore extends Store {
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
+    this.actions.profile.updateTheme.listen(this._updateTheme);
+    this.actions.profile.exportTheme.listen(this._exportTheme);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -73,6 +81,35 @@ export default class SettingsStore extends Store {
     return (this.getProfileLocaleRequest.result !== null && this.getProfileLocaleRequest.result !== '');
   }
 
+  @computed get currentTheme(): string {
+    const { result } = this.getThemeRequest.execute();
+    if (this.isCurrentThemeSet) return result;
+    return THEMES.YOROI_CLASSIC; // default
+  }
+
+  @computed get currentThemeVars(): string {
+    const { result } = this.getCustomThemeRequest.execute();
+    console.log("custom theme", result !== '' ? JSON.parse(result) : result);
+    console.log("real theme", this.getThemeVars({ theme: this.currentTheme }));
+    if(result !== '') return JSON.parse(result);
+    return this.getThemeVars({ theme: this.currentTheme });
+  }
+
+
+  @computed get isCurrentThemeSet(): boolean {
+    return (
+      this.getThemeRequest.result !== null &&
+      this.getThemeRequest.result !== ''
+    );
+  }
+
+  @computed get hasLoadedCurrentTheme(): boolean {
+    return (
+      this.getThemeRequest.wasExecuted &&
+      this.getThemeRequest.result !== null
+    );
+  }
+
   @computed get termsOfUse(): string {
     return require(`../../i18n/locales/terms-of-use/${environment.API}/${this.currentLocale}.md`);
   }
@@ -91,6 +128,27 @@ export default class SettingsStore extends Store {
   _updateLocale = async ({ locale }: { locale: string }) => {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
+  };
+
+  _updateTheme = async ({ theme }: { theme: string }) => {
+    await this.unsetCustomThemeRequest.execute();
+    await this.setThemeRequest.execute(theme);
+    await this.getThemeRequest.execute(); // eagerly cache
+  };
+
+  _exportTheme = async () => {
+    await this.unsetCustomThemeRequest.execute();
+    //TODO: It should be ok to access DOM Style from here
+    //but not sure about project conventions about accessing the DOM (Clark)
+    await this.setCustomThemeRequest.execute(document.querySelector("html").attributes["style"].value);
+    await this.getCustomThemeRequest.execute(); // eagerly cache
+  };
+
+
+  //TODO: not sure where to put this method (Clark)
+  getThemeVars = ({ theme }: { theme: string }) => {
+    if (theme) return require(`../../themes/prebuilt/${theme}.js`);
+    return require(`../../themes/prebuilt/${THEMES.YOROI_CLASSIC}.js`); // default
   };
 
   _updateMomentJsLocaleAfterLocaleChange = () => {

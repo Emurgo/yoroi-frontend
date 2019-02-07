@@ -4,7 +4,8 @@ const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
-  THEME: networkForLocalStorage + '-THEME'
+  THEME: networkForLocalStorage + '-THEME',
+  CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME'
 };
 
 /**
@@ -13,6 +14,8 @@ const storageKeys = {
  */
 
 export default class LocalStorageApi {
+
+  // ========== Locale ========== //
 
   getUserLocale = (): Promise<string> => new Promise((resolve, reject) => {
     try {
@@ -40,6 +43,8 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== Terms of Use ========== //
+
   getTermsOfUseAcceptance = (): Promise<boolean> => new Promise((resolve, reject) => {
     try {
       const accepted = localStorage.getItem(storageKeys.TERMS_OF_USE_ACCEPTANCE);
@@ -66,9 +71,90 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== User Theme ========== //
+
+  getUserTheme = (): Promise<string> => new Promise((resolve, reject) => {
+    try {
+      const theme = localStorage.getItem(storageKeys.THEME);
+      if (!theme) return resolve('');
+      resolve(theme);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setUserTheme = (theme: string): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.THEME, theme);
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetUserTheme = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.THEME);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
+  
+  // ========== Custom User Theme ========== //
+
+  getCustomUserTheme = (): Promise<string> => new Promise((resolve, reject) => {
+    try {
+      const themeVars = localStorage.getItem(storageKeys.CUSTOM_THEME);
+      if (!themeVars) return resolve('');
+      resolve(themeVars);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setCustomUserTheme = (themeVars: string): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      //Convert CSS String into Javascript Object 
+      const vars = themeVars.split(';');
+      let themeObject = {};
+      vars.forEach(v => {
+        let varData = v.split(':');
+        let key = varData[0];
+        let value = varData[1];
+        if(key && value)
+          themeObject[key.trim()] = value.trim();
+      });
+      //Save Theme Object
+      console.log("background", themeObject["--theme-topbar-background-color"]);
+      localStorage.setItem(storageKeys.CUSTOM_THEME, JSON.stringify(themeObject));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+  
+  unsetCustomUserTheme = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.CUSTOM_THEME);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+  
+  unsetUserTheme = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.THEME);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
   async reset() {
     await this.unsetUserLocale(); // TODO: remove after saving locale to API is restored
     await this.unsetTermsOfUseAcceptance();
+    await this.unsetUserTheme();
+    // TODO:  Not sure about this (Clark)
+    await this.unsetCustomUserTheme();
+
   }
+
 
 }

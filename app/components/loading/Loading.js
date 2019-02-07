@@ -11,8 +11,6 @@ import type { ReactIntlMessage } from '../../types/i18nTypes';
 import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
 
-type State = {};
-
 type Props = {
   currencyIcon: string,
   apiIcon: string,
@@ -24,7 +22,7 @@ type Props = {
 };
 
 @observer
-export default class Loading extends Component<Props, State> {
+export default class Loading extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
