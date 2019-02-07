@@ -131,6 +131,7 @@ export default class SettingsStore extends Store {
   };
 
   _updateTheme = async ({ theme }: { theme: string }) => {
+    // Unset / Clear the Customized Theme from LocalStorage
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);
