@@ -74,7 +74,8 @@ export default class DisplaySettings extends Component<Props> {
         <div className={styles.label}>
           {intl.formatMessage(messages.themeLabel)}
         </div>
-        <Button className={exportButtonClasses}
+        <Button
+          className={exportButtonClasses}
           label={intl.formatMessage(messages.themeExportButton)}
           skin={ButtonSkin}
           onClick={exportTheme.bind(this, {})}

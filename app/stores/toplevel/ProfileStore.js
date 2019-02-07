@@ -89,7 +89,7 @@ export default class SettingsStore extends Store {
 
   @computed get currentThemeVars(): string {
     const { result } = this.getCustomThemeRequest.execute();
-    if(result !== '') return JSON.parse(result);
+    if (result !== '') return JSON.parse(result);
     return this.getThemeVars({ theme: this.currentTheme });
   }
 
@@ -138,11 +138,11 @@ export default class SettingsStore extends Store {
     //TODO: It should be ok to access DOM Style from here
     //but not sure about project conventions about accessing the DOM (Clark)
     const html = document.querySelector("html");
-    if(html)
+    if (html)
     {
       const attributes: any = html.attributes;
       await this.unsetCustomThemeRequest.execute();
-      await this.setCustomThemeRequest.execute(attributes["style"].value);
+      await this.setCustomThemeRequest.execute(attributes.style.value);
       await this.getCustomThemeRequest.execute(); // eagerly cache
     }
   };

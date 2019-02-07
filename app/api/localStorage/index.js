@@ -121,8 +121,7 @@ export default class LocalStorageApi {
         let varData = v.split(':');
         let key = varData[0];
         let value = varData[1];
-        if(key && value)
-          themeObject[key.trim()] = value.trim();
+        if (key && value) themeObject[key.trim()] = value.trim();
       });
       //Save Theme Object
       localStorage.setItem(storageKeys.CUSTOM_THEME, JSON.stringify(themeObject));
