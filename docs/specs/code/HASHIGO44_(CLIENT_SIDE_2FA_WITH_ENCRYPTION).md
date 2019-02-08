@@ -1,4 +1,4 @@
-# "Hashigo44" - single-interaction single-parallel-ratchet 44bit evolving client-side "2FA" private key encryption (Proof of owning the same secret on another device)
+# "Hashigo44" - single-interaction single-symmetric-ratchet 44bit evolving client-side "2FA" private key encryption (Proof of owning the same secret on another device)
 
 ## About
 
