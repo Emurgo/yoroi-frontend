@@ -1,4 +1,4 @@
-# "Hashigo44" - single-interaction single-symmetric-ratchet 44bit evolving client-side "2FA" private key encryption protocol (Proof of owning the same secret on another device)
+# "Timid44" - single-interaction single-symmetric-ratchet 44bit evolving client-side "2FA" private key encryption protocol (Proof of owning the same secret on another device)
 
 ## About
 
@@ -42,7 +42,7 @@ Which means that our scheme describes the way to have symmetric shared-secret cr
 
 ## The proposal
 
-### "Hashigo44" (same wallet on both devices)
+### "Timid44" (same wallet on both devices)
 
 Two devices with a shared key: desktop (D) - assumed to be less secure and requires 2FA; and mobile (M) - assumed to be more secure and already has secure storage and 2FA with biometrics. User has the same wallet restored on both devices, so D and M assumed to have a shared secret (private key).
 
@@ -56,9 +56,9 @@ If user loses access to M - they have no way to access the same instance of D, t
 
 ![image](https://user-images.githubusercontent.com/5585355/52477905-a393f080-2bb4-11e9-8691-2e213e1651b8.png)
 
-### "Hashigo44ES" (without the same wallet on mobile)
+### "Timid44ES" (without the same wallet on mobile)
 
-So the original "Hashigo44" implies the initial setup where both parties already have a shared secret. This setup is super convinient to work with, but we might want to not force users to necessarily have the same wallet restored on mobile, in order for the 2FA to work. For case like this we introduce sub-protocol called **"Hashigo44ES"** ("External Secret").
+So the original "Timid44" implies the initial setup where both parties already have a shared secret. This setup is super convinient to work with, but we might want to not force users to necessarily have the same wallet restored on mobile, in order for the 2FA to work. For case like this we introduce sub-protocol called **"Timid44ES"** ("External Secret").
 
 In this protocol we assume existence of the same desktop setup (D) with a wallet we want to protect with 2FA, and a mobile client (M), which provides special functionality, but does not have the same wallet restored in it (and does not require it). This setup is a bit weaker, because now we need to also establish the initial shared secret, in order for the main protocol to work, but it is tolerable, because it is done thru the user in our case, and now a compromised network.
 
