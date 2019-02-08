@@ -1,4 +1,4 @@
-# "Hashigo44" - single-interaction single-symmetric-ratchet 44bit evolving client-side "2FA" private key encryption (Proof of owning the same secret on another device)
+# "Hashigo44" - single-interaction single-symmetric-ratchet 44bit evolving client-side "2FA" private key encryption protocol (Proof of owning the same secret on another device)
 
 ## About
 
@@ -42,9 +42,9 @@ Which means that our scheme describes the way to have symmetric shared-secret cr
 
 ## The proposal
 
-### Idea
+### "Hashigo44" (same wallet on both devices)
 
-Two devices with a shared key: desktop (D) - assumed to be less secure and requires 2FA; and mobile (M) - assumed to be more secure and already has secure storage and 2FA with biometrics.
+Two devices with a shared key: desktop (D) - assumed to be less secure and requires 2FA; and mobile (M) - assumed to be more secure and already has secure storage and 2FA with biometrics. User has the same wallet restored on both devices, so D and M assumed to have a shared secret (private key).
 
 Devices use single initial one-way interaction (thru user) where they share any random number (44 bit) - the ratchet seed. And after this D derives a hash from this random number **and** the private key, and uses 44 bits of the resulting hash as the password to encrypt the key, and then also encrypts the result with the usual password. Any information about the ratchet seed is forgotten. Now D is two-level encrypted and cannot be used until two passwords are provided. M just stores the ratchet seed under some name (S) and optionally encrypted, and does nothing.
 
@@ -54,9 +54,17 @@ When user wants to send next transaction - they enter spending password again, D
 
 If user loses access to M - they have no way to access the same instance of D, they should immediatelly re-restore the wallet from the full mnemonics, and move funds to a new safe wallet. If user loses access to D - they are basically now secured by their spending password and additional 44 bits of a password, which is not **ideal**, so they should immediatelly use the mobile instance of the same wallet to move their funds to a new safe wallet.
 
-### Without using the same wallet on mobile
+![image](https://user-images.githubusercontent.com/5585355/52477905-a393f080-2bb4-11e9-8691-2e213e1651b8.png)
+
+### "Hashigo44ES" (without the same wallet on mobile)
+
+So the original "Hashigo44" implies the initial setup where both parties already have a shared secret. This setup is super convinient to work with, but we might want to not force users to necessarily have the same wallet restored on mobile, in order for the 2FA to work. For case like this we introduce sub-protocol called **"Hashigo44ES"** ("External Secret").
+
+In this protocol we assume existence of the same desktop setup (D) with a wallet we want to protect with 2FA, and a mobile client (M), which provides special functionality, but does not have the same wallet restored in it (and does not require it). This setup is a bit weaker, because now we need to also establish the initial shared secret, in order for the main protocol to work, but it is tolerable, because it is done thru the user in our case, and now a compromised network.
 
 TODO
+
+![image](https://user-images.githubusercontent.com/5585355/52478125-6a0fb500-2bb5-11e9-95ea-4a24bdf1cd55.png)
 
 ### Tech-spec
 
