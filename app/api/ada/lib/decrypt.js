@@ -2,7 +2,7 @@ import aesjs from 'aes-js';
 import bip39 from 'bip39';
 import blakejs from 'blakejs';
 import crypto from 'crypto';
-import validWords from './valid-words.en';
+import validWords from 'bip39/wordlists/english.json';
 
 const iv = Buffer.alloc(16); // it's iv = 0 simply
 

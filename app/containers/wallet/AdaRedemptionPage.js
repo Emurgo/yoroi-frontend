@@ -7,7 +7,7 @@ import AdaRedemptionNoWallets from '../../components/wallet/ada-redemption/AdaRe
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
 import { AdaRedemptionCertificateParseError } from '../../i18n/errors';
-import validWords from '../../api/ada/lib/valid-words.en';
+import validWords from 'bip39/wordlists/english.json';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 
