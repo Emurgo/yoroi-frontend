@@ -46,4 +46,26 @@ Which means that our scheme describes the way to have symmetric shared-secret cr
 
 Two devices with a shared key: desktop (D) - assumed to be less secure and requires 2FA; and mobile (M) - assumed to be more secure and already has secure storage and 2FA with biometrics.
 
-Devices use single initial one-way interaction (thru user) where they share any random number (44 bit) - the ratchet seed. And after this D derives a hash from this random number **and** the private key, and uses 44 bits of the resulting hash as the password to encrypt the key, and then also encrypts the result with the usual password. Any information about the ratchet seed is forgotten. Now D is two-level encrypted and cannot be used until two passwords are provided. M just remembers the ratched seed number and does nothing so far.
+Devices use single initial one-way interaction (thru user) where they share any random number (44 bit) - the ratchet seed. And after this D derives a hash from this random number **and** the private key, and uses 44 bits of the resulting hash as the password to encrypt the key, and then also encrypts the result with the usual password. Any information about the ratchet seed is forgotten. Now D is two-level encrypted and cannot be used until two passwords are provided. M just stores the ratchet seed under some name (S) and optionally encrypted, and does nothing.
+
+Next time when user tries to send a transactions from the D - they enter their usual spending password, when D decrypts the key - it detects that it's encrypted with the second level, and asks user to enter the second password (44 bit). At this point user opens M and selects the previously stored S, and clicks "generate next key" - now M asks user for their usual spending password, decrypts the local private key, and **performs the same matching operation** by deriving the hash of the ratchet seed **and** the private key, and then takes the same 44 bit of the result and uses english bip39 disctionary to display user 4 mnemonic words (no checksum validation is involved). User enters the 4 words into the D, which turnes them back into the 44 bit password (P) and uses it to decrypt the key, and send the transaction. At this short period of time D has access to the private key, and it creates the hash of the private key **and** the P, and then uses 44 bit of the result as the next password (P'), to encrypt the key again, and then second-encrypt it back with the spending password, and store it in the storage. M at this point **stores the generated key P** and does nothing else.
+
+When user wants to send next transaction - they enter spending password again, D again detects the second-level decryption and asks the user for the 4-word password. User opens M, selects binding S and clicks "generate next key" and enters their spending password, at which point M now takes the hash of the private key and **P** - the previously generated key, and produces new 4-word password P'. D again decrypts private key with the P' and uses hash of private key **and** P' to produce next password (P'') and encrypt the private key again.
+
+If user loses access to M - they have no way to access the same instance of D, they should immediatelly re-restore the wallet from the full mnemonics, and move funds to a new safe wallet. If user loses access to D - they are basically now secured by their spending password and additional 44 bits of a password, which is not **ideal**, so they should immediatelly use the mobile instance of the same wallet to move their funds to a new safe wallet.
+
+### Without using the same wallet on mobile
+
+TODO
+
+### Tech-spec
+
+TODO
+
+### UX
+
+TODO
+
+#### Numbered chain
+
+TODO
