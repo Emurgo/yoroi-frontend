@@ -99,7 +99,6 @@ export default class DisplaySettings extends Component<Props> {
             </div>
             <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
           </button>
-            
         </div>
 
       </div>
