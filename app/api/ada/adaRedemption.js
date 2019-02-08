@@ -21,10 +21,9 @@ export type RedeemPaperVendedAdaParams = {
   mnemonics: Array<string>,
 };
 
-export async function redeemAda(
-  redemptionParams: RedeemAdaParams
+async function createAndSendTx(
+  redemptionKey: Buffer
 ) : Promise<BigNumber> {
-  const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
   const uint8ArrayAddress = getAddressFromRedemptionKey(redemptionKey);
   const senderAddress = bs58.encode(Buffer.from(uint8ArrayAddress));
   const utxos = await getUTXOsForAddresses({ addresses: [senderAddress] });
@@ -40,23 +39,21 @@ export async function redeemAda(
   return new BigNumber(utxos[0].amount);
 }
 
+export async function redeemAda(
+  redemptionParams: RedeemAdaParams
+) : Promise<BigNumber> {
+  const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
+
+  return createAndSendTx(redemptionKey);
+}
+
 export async function redeemPaperVendedAda(
   redemptionParams: RedeemPaperVendedAdaParams
 ) : Promise<BigNumber> {
   const redemptionCodeBuffer = bs58.decode(redemptionParams.redemptionCode);
   const mnemonicAsString = redemptionParams.mnemonics.join(' ');
   const seed = decryptRegularVend(mnemonicAsString, redemptionCodeBuffer);
-  const uint8ArrayAddress = getAddressFromRedemptionKey(Buffer.from(seed, 'base64'));
-  const senderAddress = bs58.encode(Buffer.from(uint8ArrayAddress));
-  const utxos = await getUTXOsForAddresses({ addresses: [senderAddress] });
-  if (utxos.length === 0) {
-    throw new RedemptionKeyAlreadyUsedError();
-  }
-  const receiverAddress = await getReceiverAddress();
-  const redemptionSignedTransaction: RedeemResponse =
-    getRedemptionSignedTransaction(redemptionCodeBuffer, receiverAddress, utxos[0]);
-  const cborEncodedTx = redemptionSignedTransaction.result.cbor_encoded_tx;
-  const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-  await sendTx({ signedTx });
-  return new BigNumber(utxos[0].amount);
+  const redemptionKey = Buffer.from(seed, 'base64');
+
+  return createAndSendTx(redemptionKey);
 }
