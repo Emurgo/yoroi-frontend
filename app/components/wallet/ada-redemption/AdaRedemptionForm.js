@@ -27,7 +27,7 @@ import AdaRedemptionDisclaimer from './AdaRedemptionDisclaimer';
 import AdaCertificateUploadWidget from '../../widgets/forms/AdaCertificateUploadWidget';
 import { submitOnEnter } from '../../../utils/form';
 import styles from './AdaRedemptionForm.scss';
-import { Logger } from '../../../utils/logging';
+import { Logger, stringifyError } from '../../../utils/logging';
 
 const messages = defineMessages({
   headline: {
@@ -354,7 +354,7 @@ export default class AdaRedemptionForm extends Component<Props> {
           shieldedRedemptionKey
         });
       },
-      onError: (error) => Logger.error(error),
+      onError: (error) => Logger.error(`adaRedeem::submit ${stringifyError(error)}`),
     });
   };
 
