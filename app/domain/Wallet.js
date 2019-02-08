@@ -17,7 +17,6 @@ export default class Wallet {
   @observable amount: BigNumber;
   @observable assurance: AssuranceModeOption;
   @observable passwordUpdateDate: ?Date;
-  @observable hasPassword: boolean;
 
   /**
    * When creating Wallet object we can skip typeInfo,
