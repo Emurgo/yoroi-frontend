@@ -8,6 +8,10 @@ This spec describes how we can implement "2FA" authentication for desktop Yoroi,
 
 ### Name explanation
 
+#### Timid
+
+Protocol is called so because we have the private key on the main party being kinda hidden (encrypted) by itself, and then it only can be unlocked with participation of another copy of the same key. So key is locked by itself, and only can be unlocked back by itself too )
+
 #### Single-interaction
 
 Because this scheme requires only a single initial **one-way** direct exchange of data in order to initiate the "binding seed" on both sides, that is then used in the non-interactive mode, where devices don't require direct data-exchange, **apart** from the "2FA"-component itself, where user enters the secret message every time they want to send a transaction (or use the private key in any other way).
@@ -54,15 +58,31 @@ When user wants to send next transaction - they enter spending password again, D
 
 If user loses access to M - they have no way to access the same instance of D, they should immediatelly re-restore the wallet from the full mnemonics, and move funds to a new safe wallet. If user loses access to D - they are basically now secured by their spending password and additional 44 bits of a password, which is not **ideal**, so they should immediatelly use the mobile instance of the same wallet to move their funds to a new safe wallet.
 
+So in this protocol we have a "timid private key" that locks itself away from everyone else.
+
 ![image](https://user-images.githubusercontent.com/5585355/52477905-a393f080-2bb4-11e9-8691-2e213e1651b8.png)
 
 ### "Timid44ES" (without the same wallet on mobile)
 
-So the original "Timid44" implies the initial setup where both parties already have a shared secret. This setup is super convinient to work with, but we might want to not force users to necessarily have the same wallet restored on mobile, in order for the 2FA to work. For case like this we introduce sub-protocol called **"Timid44ES"** ("External Secret").
+So the original "Timid44" implies the initial setup where both parties already have a shared secret. This setup is super convinient to work with, but we might want to not force users to necessarily have the same wallet restored on mobile, in order for the 2FA to work. For case like this we introduce sub-protocol called **"Timid44ES"** ("External Secret"), which requires double initial interaction.
 
-In this protocol we assume existence of the same desktop setup (D) with a wallet we want to protect with 2FA, and a mobile client (M), which provides special functionality, but does not have the same wallet restored in it (and does not require it). This setup is a bit weaker, because now we need to also establish the initial shared secret, in order for the main protocol to work, but it is tolerable, because it is done thru the user in our case, and now a compromised network.
+In this protocol we assume existence of the same desktop setup (D) with a wallet we want to protect with 2FA, and a mobile client (M), which provides special functionality, but does not have the same wallet restored in it (and does not require it). This setup is a bit weaker, because now we need to also establish the initial shared secret, in order for the main protocol to work, but it is tolerable, because it is done thru the user in our case, and not thru a compromised network.
 
-TODO
+So when user decides to initiate the desktop 2FA thru a mobile client without having a shared secret - user opens the M and initiates a new "2FA binding". At this point M generates 44-bit 4-word bip39 secret and displays it to the user. User initiates the "2FA binding" on D (for existing wallet) - and it asks him to enter the 4-word secret. When user enters the secret - we basically end up in a setting somewhat similar to the original "Timid44", **but** with this custom secret being shared, instead of the private key itself (private key we have **only** on D now), so the following protocol is **basically** the same but with some changes which we will describe exclusively.
+
+So D now generates back the 44-bit 4-word **ratched seed**, and user now enters it back into M. Now we have this setup:
+
+| Desktop       | Mobile            |
+|---------------|-------------------|
+| Shared secret | Shared secret     |
+| Ratchet key   | Ratchet key       |
+| Private key   |                   |
+
+So what D now does is gets the hash of the secret **and** the ratchet key, and uses 44 bits of the resulting hash as the password to encrypt **the tuple of `(secret, private key)`**, and then the result is encrypted with the spending password, and the ratchet key is forgotten. So D now still has a single secret it needs to store, but this secret containes both the actual private key **and** the custom secret, which makes them both 2FA-protected. At this point M just stores the (secret, ratcher-key) pair with a password. When user calls M to "Generate Next Key" - it asks for the password and then runs the same procedure of getting a hash of secret **and** the ratchet key, and then generates a 4-word phrase (P) using the 44-bits of the result, which can be used to decrrypt the `(secret, private key)` tuple on D. After this hash of the secret **and** the P is used to get the 44 bits of the next key.
+
+So in this protocol we have a "timid external secret" which also takes the private key along, when it locks itself.
+
+**Note:** that in this scheme we still have the evolving "ratched key" (second interaction from D to M), but static secret (similar to static private key), even tho the secret is custom and meaningless in this case. But it is simpler to have it consistent with how the original protocol works.
 
 ![image](https://user-images.githubusercontent.com/5585355/52478125-6a0fb500-2bb5-11e9-95ea-4a24bdf1cd55.png)
 
