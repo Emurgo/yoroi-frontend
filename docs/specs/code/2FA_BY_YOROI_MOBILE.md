@@ -40,4 +40,10 @@ Which means that our scheme describes the way to have symmetric shared-secret cr
 
 <img src="https://user-images.githubusercontent.com/5585355/52449639-1ebfbd00-2b49-11e9-97d7-104d9ae506d3.png" width="300" />
 
-## The protocol
+## The proposal
+
+### Idea
+
+Two devices with a shared key: desktop (D) - assumed to be less secure and requires 2FA; and mobile (M) - assumed to be more secure and already has secure storage and 2FA with biometrics.
+
+Devices use single initial one-way interaction (thru user) where they share any random number (44 bit) - the ratchet seed. And after this D derives a hash from this random number **and** the private key, and uses 44 bits of the resulting hash as the password to encrypt the key, and then also encrypts the result with the usual password. Any information about the ratchet seed is forgotten. Now D is two-level encrypted and cannot be used until two passwords are provided. M just remembers the ratched seed number and does nothing so far.
