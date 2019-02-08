@@ -8,6 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
+import GeneralSettingsFooter from '../../../containers/footer/GeneralSettingsFooter';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
 
 const messages = defineMessages({
@@ -15,6 +16,11 @@ const messages = defineMessages({
     id: 'settings.general.languageSelect.label',
     defaultMessage: '!!!Language',
     description: 'Label for the language select.'
+  },
+  aboutYoroiLabel: {
+    id: 'settings.general.aboutYoroi.label',
+    defaultMessage: '!!!About Yoroi',
+    description: 'Label for the About Yoroi section.'
   },
 });
 
@@ -77,8 +83,11 @@ export default class GeneralSettings extends Component<Props> {
           onChange={this.selectLanguage}
           skin={SelectSkin}
         />
-
         {error && <p className={styles.error}>{error}</p>}
+
+        <h1>{intl.formatMessage(messages.aboutYoroiLabel)}</h1>
+        
+        <GeneralSettingsFooter />
 
       </div>
     );
