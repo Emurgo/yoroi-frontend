@@ -77,6 +77,7 @@
   "profile.termsOfUse.checkboxLabel": "Я согласен с условиями использования",
   "profile.termsOfUse.submitLabel": "Продолжить",
   "profile.termsOfUse.title": "Условия использования",
+  "settings.display.themeExportButton": "!!!EXPORT THEME",
   "settings.display.themeLabel": "!!!Theme",
   "settings.display.themeNames.yoroiClassic": "!!!Yoroi classic",
   "settings.display.themeNames.yoroiModern": "!!!Yoroi modern",

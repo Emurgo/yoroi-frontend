@@ -77,6 +77,7 @@
   "profile.termsOfUse.checkboxLabel": "我同意接受使用條款",
   "profile.termsOfUse.submitLabel": "繼續",
   "profile.termsOfUse.title": "使用條款",
+  "settings.display.themeExportButton": "!!!EXPORT THEME",
   "settings.display.themeLabel": "!!!Theme",
   "settings.display.themeNames.yoroiClassic": "!!!Yoroi classic",
   "settings.display.themeNames.yoroiModern": "!!!Yoroi modern",
