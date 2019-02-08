@@ -12,7 +12,7 @@ This spec describes how we can implement "2FA" authentication for desktop Yoroi,
 
 Because this scheme requires only a single initial **one-way** direct exchange of data in order to initiate the "binding seed" on both sides, that is then used in the non-interactive mode, where devices don't require direct data-exchange, **apart** from the "2FA"-component itself, where user enters the secret message every time they want to send a transaction (or use the private key in any other way).
 
-#### Single-parallel-ratchet
+#### Single-symmetric-ratchet
 
 After the initial binding interaction both sides set-up the single KES-ratchet, which is used in the matching way on both sides which allows devices to arrive to a deterministic shared key-scheme in the non-interactive way.
 
