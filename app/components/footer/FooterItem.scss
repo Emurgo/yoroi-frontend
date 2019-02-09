@@ -6,6 +6,7 @@ $blockHeight: 52px;
   font-size: 14px;
   font-family: var(--font-regular);
   a {
+    display: block;
     opacity: 0.7;
     color: var(--font-black);
   }
@@ -33,3 +34,11 @@ $blockHeight: 52px;
   background-color: var(--theme-footer-block-background-color-hover);
   cursor: pointer;
 };
+
+@media screen and (max-width: 1450px) {
+  .block {
+    .text {
+      display: none;
+    }
+  }
+}

@@ -21,13 +21,13 @@ export default class FooterItem extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        {/* Buy a Trezor Hardware wallet */}
         {
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.block}
+            title={intl.formatMessage(message)}
           >
             <div className={styles.icon}>
               <SvgInline svg={svg} cleanup={['title']} />
