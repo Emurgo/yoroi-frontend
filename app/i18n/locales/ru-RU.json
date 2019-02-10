@@ -142,7 +142,7 @@
   "wallet.footer.howToConnectTrezor.text": "Как подключить Trezor",
   "wallet.footer.howToCreateWallet.text": "Как создать кошелек",
   "wallet.footer.howToRestoreWallet.text": "Как восстановить кошелек",
-  "wallet.footer.whatIsHardwareWallet.text": "Что такое аппаратный кошелек?",
+  "wallet.footer.whatIsHardwareWallet.text": "Что такое аппаратный кошелек",
   "wallet.navigation.receive": "Получить",
   "wallet.navigation.send": "Отправить",
   "wallet.navigation.transactions": "Транзакции",
