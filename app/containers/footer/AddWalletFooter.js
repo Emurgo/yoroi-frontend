@@ -18,7 +18,7 @@ const messages = defineMessages({
   },
   whatIsHardwareWallet: {
     id: 'wallet.footer.whatIsHardwareWallet.text',
-    defaultMessage: '!!!What is a hardware wallet?',
+    defaultMessage: '!!!What is a hardware wallet',
     description: 'Footer What is a hardware wallet? link text.'
   },
   howToConnectTrezor: {
