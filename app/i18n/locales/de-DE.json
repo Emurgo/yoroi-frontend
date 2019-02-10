@@ -147,7 +147,7 @@
   "wallet.footer.howToConnectTrezor.text": "Wie man einen Trezor anschließt",
   "wallet.footer.howToCreateWallet.text": "Wie man eine Wallet erstellt",
   "wallet.footer.howToRestoreWallet.text": "Wie man eine Wallet wieder herstellt",
-  "wallet.footer.whatIsHardwareWallet.text": "Was ist eine Hardware wallet?",
+  "wallet.footer.whatIsHardwareWallet.text": "Was ist eine Hardware wallet",
   "wallet.navigation.receive": "Empfangen",
   "wallet.navigation.send": "Senden",
   "wallet.navigation.transactions": "Transaktionen",
