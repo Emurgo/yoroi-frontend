@@ -101,7 +101,7 @@ export default class DisplaySettings extends Component<Props> {
             <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
           </button>
 
-          <button
+          {/* <button
             type="button"
             className={themeYoroiModernClasses}
             onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
@@ -114,7 +114,7 @@ export default class DisplaySettings extends Component<Props> {
             }
             <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
             <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
-          </button>
+          </button> */}
         </div>
 
       </div>
