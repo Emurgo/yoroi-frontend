@@ -81,6 +81,7 @@
   "settings.display.themeLabel": "!!!Theme",
   "settings.display.themeNames.yoroiClassic": "!!!Yoroi classic",
   "settings.display.themeNames.yoroiModern": "!!!Yoroi modern",
+  "settings.display.themeWarning": "!!!CHANGING THEME WILL REMOVE CUSTOMIZATION",
   "settings.general.languageSelect.label": "语言",
   "settings.general.title": "一般设置",
   "settings.menu.display.link.label": "!!!Themes",

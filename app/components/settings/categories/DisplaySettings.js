@@ -30,6 +30,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Yoroi modern',
     description: 'Name of the "Yoroi modern" theme on the display settings page.',
   },
+  themeWarning: {
+    id: 'settings.display.themeWarning',
+    defaultMessage: '!!!CHANGING THEME WILL REMOVE CUSTOMIZATION',
+    description: 'Label for the "CHANGING THEME WILL REMOVE CUSTOMIZATION" message.',
+  },
 });
 
 type Props = {
@@ -89,7 +94,7 @@ export default class DisplaySettings extends Component<Props> {
             {(theme === THEMES.YOROI_CLASSIC
               && hasCustomTheme() &&
                 <div className={styles.themeWarning}>
-                  CHANGING THEME WILL REMOVE CUSTOMIZATION
+                  {intl.formatMessage(messages.themeWarning)}
                 </div>)
             }
             <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} />
@@ -104,7 +109,7 @@ export default class DisplaySettings extends Component<Props> {
             {(theme === THEMES.YOROI_MODERN
               && hasCustomTheme() &&
                 <div className={styles.themeWarning}>
-                  CHANGING THEME WILL REMOVE CUSTOMIZATION
+                  {intl.formatMessage(messages.themeWarning)}
                 </div>)
             }
             <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
