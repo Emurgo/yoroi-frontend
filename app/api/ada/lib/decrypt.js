@@ -4,6 +4,8 @@ import blakejs from 'blakejs';
 import crypto from 'crypto';
 import validWords from 'bip39/wordlists/english.json';
 
+const BASE64_REGEX = /^[A-Za-z0-9=+/]{1,50}$/;
+
 const iv = Buffer.alloc(16); // it's iv = 0 simply
 
 function decryptWithAES(aesKey, bytes) {
@@ -65,8 +67,12 @@ export const decryptRecoveryForceVend = (key, data) => {
   // 1) base64 string: "qXQWDxI3JrlFRtC4SeQjeGzLbVXWBomYPbNO1Vfm1T4="
   try {
     const decodedKey = trimmedKey.replace(/-/g, '+').replace(/_/g, '/');
-    bufferKey = Buffer.from(decodedKey, 'base64');
-    decryptedData = decryptWithAES(bufferKey, data);
+    const isKeyValid = BASE64_REGEX.test(decodedKey);
+
+    if (isKeyValid) {
+      bufferKey = Buffer.from(decodedKey, 'base64');
+      decryptedData = decryptWithAES(bufferKey, data);
+    }
   } catch (e) {} // eslint-disable-line
 
   // 2) hex string: "A974160F123726B94546D0B849E423786CCB6D55D60689983DB34ED557E6D53E"
