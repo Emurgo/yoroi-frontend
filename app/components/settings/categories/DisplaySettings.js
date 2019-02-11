@@ -36,7 +36,8 @@ type Props = {
   theme: string,
   selectTheme: Function,
   exportTheme: Function,
-  getThemeVars: Function
+  getThemeVars: Function,
+  hasCustomTheme: Function
 };
 
 @observer
