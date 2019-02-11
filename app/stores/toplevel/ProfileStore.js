@@ -155,8 +155,6 @@ export default class SettingsStore extends Store {
     }
   };
 
-
-  // TODO: not sure where to put this method (Clark)
   getThemeVars = ({ theme }: { theme: string }) => {
     if (theme) return require(`../../themes/prebuilt/${theme}.js`);
     return require(`../../themes/prebuilt/${THEMES.YOROI_CLASSIC}.js`); // default
