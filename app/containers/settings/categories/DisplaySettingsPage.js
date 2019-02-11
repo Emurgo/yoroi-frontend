@@ -19,6 +19,10 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
     return this.props.stores.profile.getThemeVars(theme);
   }
 
+  hasCustomTheme = (): boolean => {
+    return this.props.stores.profile.hasCustomTheme();
+  }
+
   render() {
     const { currentTheme } = this.props.stores.profile;
     return (
@@ -27,6 +31,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
         selectTheme={this.selectTheme}
         getThemeVars={this.getThemeVars}
         exportTheme={this.exportTheme}
+        hasCustomTheme={this.hasCustomTheme}
       />
     );
   }

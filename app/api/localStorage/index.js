@@ -111,16 +111,19 @@ export default class LocalStorageApi {
     }
   });
 
-  setCustomUserTheme = (themeVars: string): Promise<void> => new Promise((resolve, reject) => {
+  setCustomUserTheme = (customThemeVars: string, currentThemeVars: Object)
+  : Promise<void> => new Promise((resolve, reject) => {
     try {
-      // Convert CSS String into Javascript Object 
-      const vars = themeVars.split(';');
+      // Convert CSS String into Javascript Object
+      const vars = customThemeVars.split(';');
       const themeObject = {};
       vars.forEach(v => {
         const varData = v.split(':');
         const key = varData[0];
         const value = varData[1];
-        if (key && value) themeObject[key.trim()] = value.trim();
+        if (key && value && currentThemeVars[key.trim()] !== value.trim()) {
+          themeObject[key.trim()] = value.trim();
+        }
       });
       // Save Theme Object
       localStorage.setItem(storageKeys.CUSTOM_THEME, JSON.stringify(themeObject));
@@ -129,14 +132,14 @@ export default class LocalStorageApi {
       return reject(error);
     }
   });
-  
+
   unsetCustomUserTheme = (): Promise<void> => new Promise((resolve) => {
     try {
       localStorage.removeItem(storageKeys.CUSTOM_THEME);
       resolve();
     } catch (error) {} // eslint-disable-line
   });
-  
+
   unsetUserTheme = (): Promise<void> => new Promise((resolve) => {
     try {
       localStorage.removeItem(storageKeys.THEME);

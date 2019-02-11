@@ -47,7 +47,7 @@ export default class DisplaySettings extends Component<Props> {
   };
 
   render() {
-    const { theme, selectTheme, getThemeVars, exportTheme } = this.props;
+    const { theme, selectTheme, getThemeVars, exportTheme, hasCustomTheme } = this.props;
     const { intl } = this.context;
 
     const themeYoroiClassicClasses = classnames([
@@ -79,12 +79,18 @@ export default class DisplaySettings extends Component<Props> {
           onClick={exportTheme.bind(this, {})}
         />
         <div className={styles.themesWrapper}>
-
+          {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
           <button
             type="button"
             className={themeYoroiClassicClasses}
             onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
           >
+            {(theme === THEMES.YOROI_CLASSIC
+              && hasCustomTheme() &&
+                <div className={styles.themeWarning}>
+                  CHANGING THEME WILL REMOVE CUSTOMIZATION
+                </div>)
+            }
             <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} />
             <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
           </button>
@@ -94,9 +100,13 @@ export default class DisplaySettings extends Component<Props> {
             className={themeYoroiModernClasses}
             onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
           >
-            <div>
-              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
-            </div>
+            {(theme === THEMES.YOROI_MODERN
+              && hasCustomTheme() &&
+                <div className={styles.themeWarning}>
+                  CHANGING THEME WILL REMOVE CUSTOMIZATION
+                </div>)
+            }
+            <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
             <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
           </button>
         </div>

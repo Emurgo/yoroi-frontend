@@ -89,10 +89,14 @@ export default class SettingsStore extends Store {
     return THEMES.YOROI_CLASSIC; // default
   }
 
+  /* @Returns Merged Pre-Built Theme and Custom Theme */
   @computed get currentThemeVars(): string {
     const { result } = this.getCustomThemeRequest.execute();
-    if (result !== '') return JSON.parse(result);
-    return this.getThemeVars({ theme: this.currentTheme });
+    const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
+    let customThemeVars = {};
+    if (result !== '') customThemeVars = JSON.parse(result);
+    // Merge Custom Theme and Current Theme
+    return { ...currentThemeVars, ...customThemeVars };
   }
 
 
@@ -145,7 +149,8 @@ export default class SettingsStore extends Store {
     if (html) {
       const attributes: any = html.attributes;
       await this.unsetCustomThemeRequest.execute();
-      await this.setCustomThemeRequest.execute(attributes.style.value);
+      await this.setCustomThemeRequest.execute(attributes.style.value,
+        this.getThemeVars({ theme: this.currentTheme }));
       await this.getCustomThemeRequest.execute(); // eagerly cache
     }
   };
@@ -155,6 +160,11 @@ export default class SettingsStore extends Store {
   getThemeVars = ({ theme }: { theme: string }) => {
     if (theme) return require(`../../themes/prebuilt/${theme}.js`);
     return require(`../../themes/prebuilt/${THEMES.YOROI_CLASSIC}.js`); // default
+  };
+
+  hasCustomTheme = (): boolean => {
+    const { result } = this.getCustomThemeRequest.execute();
+    return result !== '';
   };
 
   _updateMomentJsLocaleAfterLocaleChange = () => {
