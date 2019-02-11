@@ -8,6 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import styles from './DisplaySettings.scss';
 import { THEMES } from '../../../themes/index';
 import ThemeThumbnail from './display/ThemeThumbnail';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   themeLabel: {
@@ -101,20 +102,24 @@ export default class DisplaySettings extends Component<Props> {
             <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
           </button>
 
-          {/* <button
-            type="button"
-            className={themeYoroiModernClasses}
-            onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
-          >
-            {(theme === THEMES.YOROI_MODERN
-              && hasCustomTheme() &&
-                <div className={styles.themeWarning}>
-                  {intl.formatMessage(messages.themeWarning)}
-                </div>)
-            }
-            <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
-            <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
-          </button> */}
+          {environment.isDev() &&
+            (
+              <button
+                type="button"
+                className={themeYoroiModernClasses}
+                onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
+              >
+                {(theme === THEMES.YOROI_MODERN
+                  && hasCustomTheme() &&
+                    <div className={styles.themeWarning}>
+                      {intl.formatMessage(messages.themeWarning)}
+                    </div>)
+                }
+                <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
+                <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
+              </button>
+            )
+          }
         </div>
 
       </div>
