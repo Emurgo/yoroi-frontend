@@ -9,7 +9,8 @@ import { InvalidMnemonicError } from '../../i18n/errors';
 import {
   AdaRedemptionEncryptedCertificateParseError,
   AdaRedemptionCertificateParseError,
-  NoCertificateError
+  NoCertificateError,
+  ActiveAccountRequiredError
 } from '../../api/ada/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
@@ -180,11 +181,8 @@ export default class AdaRedemptionStore extends Store {
     this.redemptionCode = code;
   });
 
-  _onParseError = action(error => {
-    const errorMessage = isString(error) ? error : error.message;
-    if (errorMessage.includes('Invalid mnemonic')) {
-      this.error = new InvalidMnemonicError();
-    } else if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
+  _onParseError = action(() => {
+    if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
       if (this.isCertificateEncrypted) {
         this.error = new AdaRedemptionEncryptedCertificateParseError();
       } else {
@@ -206,7 +204,7 @@ export default class AdaRedemptionStore extends Store {
     // is used.
     const accountData = getSingleCryptoAccount();
     const accountIndex = accountData.account;
-    if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
+    if (!accountIndex && accountIndex !== 0) throw new ActiveAccountRequiredError();
 
     try {
       const transactionAmountInLovelace: BigNumber = await this.redeemAdaRequest.execute({
@@ -233,7 +231,7 @@ export default class AdaRedemptionStore extends Store {
 
     const accountData = getSingleCryptoAccount();
     const accountIndex = accountData.account;
-    if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
+    if (!accountIndex && accountIndex !== 0) throw new ActiveAccountRequiredError();
 
     try {
       const transactionAmountInLovelace: BigNumber =

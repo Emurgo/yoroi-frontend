@@ -655,7 +655,6 @@ export default class AdaApi {
       return transactionAmount;
     } catch (error) {
       Logger.debug('AdaApi::redeemAda error: ' + stringifyError(error));
-      console.log(error);
       if (error instanceof RedemptionKeyAlreadyUsedError) {
         throw error;
       }

@@ -171,6 +171,11 @@ const messages = defineMessages({
     id: 'api.errors.redemptionKeyAlreadyUsedError',
     defaultMessage: '!!!Redemption key has already been used.',
     description: '"Redemption key has already been used." error message.'
+  },
+  activeAccountRequiredError: {
+    id: 'api.errors.activeAccountRequiredError',
+    defaultMessage: '!!!Active account required before redeeming Ada.',
+    description: '"Active account required before redeeming Ada." error message'
   }
 });
 
@@ -476,6 +481,15 @@ export class RedemptionKeyAlreadyUsedError extends LocalizableError {
     super({
       id: messages.redemptionKeyAlreadyUsedError.id,
       defaultMessage: messages.redemptionKeyAlreadyUsedError.defaultMessage,
+    });
+  }
+}
+
+export class ActiveAccountRequiredError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.activeAccountRequiredError.id,
+      defaultMessage: messages.activeAccountRequiredError.defaultMessage,
     });
   }
 }
