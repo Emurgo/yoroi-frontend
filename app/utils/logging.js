@@ -30,7 +30,7 @@ export const Logger = {
   },
 
   warn: (data : string) => {
-    logger.info(data);
+    logger.warn(data);
   }
 };
 
