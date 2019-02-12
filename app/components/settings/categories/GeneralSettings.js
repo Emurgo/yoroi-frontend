@@ -17,11 +17,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Language',
     description: 'Label for the language select.'
   },
-  aboutYoroiLabel: {
-    id: 'settings.general.aboutYoroi.label',
-    defaultMessage: '!!!About Yoroi',
-    description: 'Label for the About Yoroi section.'
-  },
+
 });
 
 type Props = {
@@ -84,10 +80,6 @@ export default class GeneralSettings extends Component<Props> {
           skin={SelectSkin}
         />
         {error && <p className={styles.error}>{error}</p>}
-
-        <h1>{intl.formatMessage(messages.aboutYoroiLabel)}</h1>
-        
-        <GeneralSettingsFooter />
 
       </div>
     );
