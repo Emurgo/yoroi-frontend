@@ -142,7 +142,7 @@
   "wallet.footer.howToConnectTrezor.text": "Trezorと接続する方法",
   "wallet.footer.howToCreateWallet.text": "ウォレットを作成する方法",
   "wallet.footer.howToRestoreWallet.text": "ウォレットを復元する方法",
-  "wallet.footer.whatIsHardwareWallet.text": "What is a hardware wallet",
+  "wallet.footer.whatIsHardwareWallet.text": "ハードウェアウォレットとは？",
   "wallet.navigation.receive": "受信",
   "wallet.navigation.send": "送信",
   "wallet.navigation.transactions": "取引",
