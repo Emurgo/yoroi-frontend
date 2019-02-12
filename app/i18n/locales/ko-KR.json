@@ -142,7 +142,7 @@
   "wallet.footer.howToConnectTrezor.text": "Trezor 연결 방법",
   "wallet.footer.howToCreateWallet.text": "지갑 생성 방법",
   "wallet.footer.howToRestoreWallet.text": "지갑 복구 방법",
-  "wallet.footer.whatIsHardwareWallet.text": "What is a hardware wallet",
+  "wallet.footer.whatIsHardwareWallet.text": "하드웨어 지갑이란",
   "wallet.navigation.receive": "받기",
   "wallet.navigation.send": "보내기",
   "wallet.navigation.transactions": "거래",
