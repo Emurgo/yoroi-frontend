@@ -101,11 +101,9 @@ import {
   isValidRedemptionKey,
   isValidPaperVendRedemptionKey
 } from '../../utils/redemption-key-validation';
-import {
-  ADA_REDEMPTION_PASSPHRASE_LENGTH
-} from '../../config/cryptoConfig';
 import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
 import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
+import config from '../../config';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -642,7 +640,7 @@ export default class AdaApi {
   );
 
   isValidRedemptionMnemonic = (mnemonic: string): boolean => (
-    isValidMnemonic(mnemonic, ADA_REDEMPTION_PASSPHRASE_LENGTH)
+    isValidMnemonic(mnemonic, config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH)
   );
 
   redeemAda = async (

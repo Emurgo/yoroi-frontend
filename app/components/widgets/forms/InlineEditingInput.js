@@ -74,7 +74,7 @@ export default class InlineEditingInput extends Component<Props, State> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: config.FORM_VALIDATION_DEBOUNCE_WAIT,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 
