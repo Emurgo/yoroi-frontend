@@ -431,18 +431,24 @@ export default class AdaRedemptionForm extends Component<Props> {
     switch (redemptionType) {
       case ADA_REDEMPTION_TYPES.REGULAR:
         instructionMessage = messages.instructionsRegular;
-        instructionValues = { adaRedemptionPassphraseLength: config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH };
+        instructionValues = {
+          adaRedemptionPassphraseLength: config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH
+        };
         break;
       case ADA_REDEMPTION_TYPES.FORCE_VENDED:
         instructionMessage = messages.instructionsForceVended;
         break;
       case ADA_REDEMPTION_TYPES.PAPER_VENDED:
         instructionMessage = messages.instructionsPaperVended;
-        instructionValues = { adaRedemptionPassphraseLength: config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH };
+        instructionValues = {
+          adaRedemptionPassphraseLength: config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH
+        };
         break;
       case ADA_REDEMPTION_TYPES.RECOVERY_REGULAR:
         instructionMessage = messages.instructionsRecoveryRegular;
-        instructionValues = { adaRedemptionPassphraseLength: config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH };
+        instructionValues = {
+          adaRedemptionPassphraseLength: config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH
+        };
         break;
       case ADA_REDEMPTION_TYPES.RECOVERY_FORCE_VENDED:
         instructionMessage = messages.instructionsRecoveryForceVended;
