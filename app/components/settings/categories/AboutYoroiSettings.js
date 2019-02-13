@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettings.scss';
 import { observer } from 'mobx-react';
-import classNames from 'classnames';
 
 import GridFlexContainer from '../../layout/GridFlexContainer';
 import FooterItem from '../../footer/FooterItem';
@@ -67,9 +66,6 @@ export default class AboutYoroiSettings extends Component {
 
   render() {
     const { intl } = this.context;
-    const yoroiLogoStyles = classNames([
-      styles.yoroiLogo
-    ]);
 
     return (
       <div className={styles.component}>
@@ -81,7 +77,7 @@ export default class AboutYoroiSettings extends Component {
             message={messages.aboutYoroiTwitter}
           />
           <FooterItem
-            className={yoroiLogoStyles}
+            className={styles.yoroiLogo}
             url="https://yoroi-wallet.com"
             svg={yoroiSvg}
             message={messages.aboutYoroiWebsite}

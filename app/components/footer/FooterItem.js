@@ -17,7 +17,7 @@ export default class FooterItem extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { url, svg, message } = this.props;
+    const { url, svg, message, className } = this.props;
 
     return (
       <div className={styles.component}>
@@ -30,7 +30,7 @@ export default class FooterItem extends Component<Props> {
             title={intl.formatMessage(message)}
           >
             <div className={styles.icon}>
-              <SvgInline svg={svg} cleanup={['title']} width="20" height="52" />
+              <SvgInline svg={svg} cleanup={['title']} className={className} width="20" height="52" />
             </div>
             <div className={styles.text}>
               {intl.formatMessage(message)}
