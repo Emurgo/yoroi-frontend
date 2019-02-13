@@ -27,6 +27,34 @@ global.CONFIG = {
 
 const pdfParser = require('../../../app/api/ada/lib/pdfParser');
 
+const getMockedRegularBuffer = () => getMockedFileBuffer('regular.pdf');
+const getMockedInvalidRegularBuffer = () => getMockedFileBuffer('regular.txt');
+const getMockedRegularEncryptedBuffer = () => getMockedFileBuffer('regular.pdf.enc');
+const getMockedRegularDecryptedBuffer = () => getMockedFileBuffer('regular-decrypted.txt');
+const getMockedForceVendedEncryptedBuffer = () => getMockedFileBuffer('force-vended.pdf.enc');
+const getMockedForceVendedDecryptedBuffer = () => getMockedFileBuffer('force-vended-decrypted.txt');
+
+describe('Get mocked file buffer without errors test', () => {
+  it('should get the mocked regular buffer without errors', () => (
+    Promise.resolve(getMockedRegularBuffer())
+  ));
+  it('should get the mocked invalid regular buffer without errors', () => (
+    Promise.resolve(getMockedInvalidRegularBuffer())
+  ));
+  it('should get the mocked regular encrypted buffer without errors', () => (
+    Promise.resolve(getMockedRegularEncryptedBuffer())
+  ));
+  it('should get the mocked regular decrypted buffer without errors', () => (
+    Promise.resolve(getMockedRegularDecryptedBuffer())
+  ));
+  it('should get the mocked force vended encrypted buffer without errors', () => (
+    Promise.resolve(getMockedForceVendedEncryptedBuffer())
+  ));
+  it('should get the mocked force vended decrypted buffer without errors', () => (
+    Promise.resolve(getMockedForceVendedDecryptedBuffer())
+  ));
+});
+
 describe('PDF get secret key tests', () => {
   it('should get the secret key from a parsed PDF', () => {
     const { parsePDF } = mockData;
@@ -54,7 +82,7 @@ describe('PDF get secret key tests', () => {
 
 describe('PDF parse test', () => {
   it('should parse PDF content', async () => {
-    const fileBuffer = getMockedFileBuffer('regular.pdf');
+    const fileBuffer = getMockedRegularBuffer();
     const result = await pdfParser.parsePDFFile(fileBuffer);
     assert.equal(result, mockData.parsePDF.PDFContent, 'PDF parser result should equal content');
   });
@@ -64,7 +92,7 @@ describe('PDF parse test', () => {
   ));
 
   it('should fail parsing PDF content when an invalid file is passed', () => {
-    const fileBuffer = getMockedFileBuffer('regular.txt');
+    const fileBuffer = getMockedInvalidRegularBuffer();
     return pdfParser.parsePDFFile(Buffer.from(fileBuffer))
       .should.be.rejectedWith(mockData.parsePDF.structureError);
   });
@@ -72,8 +100,8 @@ describe('PDF parse test', () => {
 
 describe('PDF decrypt test', () => {
   it('should decrypt regular PDF', () => {
-    const fileBuffer = getMockedFileBuffer('regular.pdf.enc');
-    const decryptedFileBuffer = getMockedFileBuffer('regular-decrypted.txt');
+    const fileBuffer = getMockedRegularEncryptedBuffer();
+    const decryptedFileBuffer = getMockedRegularDecryptedBuffer();
     const { decryptPDF } = mockData;
     const { passphrase, regularTitle } = decryptPDF;
     const decryptedFile = pdfParser.decryptFile(passphrase, regularTitle, fileBuffer);
@@ -82,14 +110,14 @@ describe('PDF decrypt test', () => {
   });
 
   it('should decrypt force vended PDF', () => {
-    const fileBuffer = getMockedFileBuffer('force-vended.pdf.enc');
-    const decryptedFileBuffer = getMockedFileBuffer('force-vended-decrypted.txt');
+    const fileBuffer = getMockedForceVendedEncryptedBuffer();
+    const decryptedFileBuffer = getMockedForceVendedDecryptedBuffer();
     const decryptedFile = pdfParser.decryptFile(mockData.decryptPDF.data.toString(), 'forceVended', fileBuffer);
     assert(Buffer.from(decryptedFile).equals(decryptedFileBuffer), 'PDF decrypted content should equal specific content');
   });
 
   it('should return same file when no decryption key is passed', () => {
-    const fileBuffer = getMockedFileBuffer('force-vended.pdf.enc');
+    const fileBuffer = getMockedForceVendedEncryptedBuffer();
     const decryptedFile = pdfParser.decryptFile(undefined, undefined, fileBuffer);
     assert(Buffer.from(decryptedFile).equals(fileBuffer), 'Result content should equal initial content');
   });
