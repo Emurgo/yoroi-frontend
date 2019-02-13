@@ -1,8 +1,4 @@
-@import '../../../themes/mixins/error-message';
-
 .component {
-  margin-bottom: 20px;
-
   h1 {
     color: var(--theme-support-settings-text-color);
     font-family: var(--font-semibold);
@@ -13,9 +9,10 @@
   }
 }
 
-.error {
-  @include error-message;
-  text-align: center;
+.yoroiLogo {
+  & > svg {
+    & > path {
+      fill: #000;
+    }
+  }
 }
-
-
