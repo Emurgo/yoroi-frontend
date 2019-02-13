@@ -341,7 +341,7 @@ export default class AdaRedemptionForm extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: FORM_VALIDATION_DEBOUNCE_WAIT,
+      validationDebounceWait: 250,
     },
   });
 
