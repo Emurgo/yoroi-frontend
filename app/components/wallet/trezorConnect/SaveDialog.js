@@ -30,6 +30,7 @@ import { StepState } from '../../../stores/ada/TrezorConnectStore';
 import { Logger } from '../../../utils/logging';
 
 import styles from './SaveDialog.scss';
+import config from '../../../config';
 
 const messages = defineMessages({
   saveWalletNameInputLabel: {
@@ -93,7 +94,7 @@ export default class SaveDialog extends Component<Props> {
     }, {
       options: {
         validateOnChange: true,
-        validationDebounceWait: 250,
+        validationDebounceWait: config.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
     });
   }

@@ -23,6 +23,7 @@ import {
   formattedAmountToNaturalUnits
 } from '../../../utils/formatters';
 import dangerIcon from '../../../assets/images/danger.inline.svg';
+import config from '../../../config';
 
 const messages = defineMessages({
   titleLabel: {
@@ -211,7 +212,7 @@ export default class WalletSendForm extends Component<Props, State> {
     options: {
       validateOnBlur: false,
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 

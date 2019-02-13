@@ -18,7 +18,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import { InvalidMnemonicError, InvalidEmailError, FieldRequiredError } from '../../../i18n/errors';
 import globalMessages from '../../../i18n/global-messages';
 import type { RedemptionTypeChoices } from '../../../types/redemptionTypes';
-import { FORM_VALIDATION_DEBOUNCE_WAIT } from '../../../config/timingConfig';
 import { ADA_REDEMPTION_PASSPHRASE_LENGTH } from '../../../config/cryptoConfig';
 import { ADA_REDEMPTION_TYPES } from '../../../types/redemptionTypes';
 import BorderedBox from '../../widgets/BorderedBox';
@@ -28,6 +27,7 @@ import AdaCertificateUploadWidget from '../../widgets/forms/AdaCertificateUpload
 import { submitOnEnter } from '../../../utils/form';
 import styles from './AdaRedemptionForm.scss';
 import { Logger, stringifyError } from '../../../utils/logging';
+import config from '../../../config';
 
 const messages = defineMessages({
   headline: {
@@ -341,7 +341,7 @@ export default class AdaRedemptionForm extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 
