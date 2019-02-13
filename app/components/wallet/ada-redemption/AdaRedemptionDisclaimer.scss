@@ -48,8 +48,8 @@
     opacity: 0.8;
   }
 
-  :global .adaRedemptionDisclaimerCheckbox {
-    .SimpleCheckbox_root {
+  .adaRedemptionDisclaimerCheckbox {
+    :global .SimpleCheckbox_root {
       margin-bottom: 30px;
       opacity: 0.8;
       padding-top: 20px;
