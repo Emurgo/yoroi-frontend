@@ -13,6 +13,9 @@ import yoroiSvg from '../../../assets/images/yoroi-logo-shape-white.inline.svg';
 import facebookSvg from '../../../assets/images/social/facebook.inline.svg';
 import mediumSvg from '../../../assets/images/social/medium.inline.svg';
 
+import environment from '../../../environment';
+
+const version = require('../../../../chrome/manifest.' + environment.NETWORK + '.json').version;
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -55,7 +58,21 @@ const messages = defineMessages({
     defaultMessage: '!!!EMURGO Medium',
     description: 'Label for EMURGO Medium link.'
   },
-
+  versionLabel: {
+    id: 'settings.general.aboutYoroi.versionLabel',
+    defaultMessage: '!!!Current version:',
+    description: 'Label for current version.'
+  },
+  networkLabel: {
+    id: 'settings.general.aboutYoroi.networkLabel',
+    defaultMessage: '!!!Network:',
+    description: 'Label for network in use.'
+  },
+  commitLabel: {
+    id: 'settings.general.aboutYoroi.commitLabel',
+    defaultMessage: '!!!Commit:',
+    description: 'Label for current commit.'
+  },
 });
 
 @observer
@@ -70,6 +87,20 @@ export default class AboutYoroiSettings extends Component {
     return (
       <div className={styles.component}>
         <h1>{intl.formatMessage(messages.aboutYoroiLabel)}</h1>
+
+        <p>
+          {intl.formatMessage(messages.versionLabel)}&nbsp;
+          {version}
+        </p>
+        <p>
+          {intl.formatMessage(messages.networkLabel)}&nbsp;
+          {environment.NETWORK}
+        </p>
+        <p>
+          {intl.formatMessage(messages.commitLabel)}&nbsp;
+          {environment.commit}
+        </p>
+        <br />
         <GridFlexContainer rowSize={3}>
           <FooterItem
             url="https://twitter.com/YoroiWallet"
@@ -83,6 +114,11 @@ export default class AboutYoroiSettings extends Component {
             message={messages.aboutYoroiWebsite}
           />
           <FooterItem
+            url="https://www.facebook.com/Yoroi-wallet-399386000586822/"
+            svg={facebookSvg}
+            message={messages.aboutYoroiFacebook}
+          />
+          <FooterItem
             url="https://www.youtube.com/watch?v=GLNgpr-3t2E&list=PLFLTrdAG7xRZUmi04s44T1VEF20xKquF2"
             svg={youtubeSvg}
             message={messages.aboutYoroiYoutube}
@@ -91,11 +127,6 @@ export default class AboutYoroiSettings extends Component {
             url="https://t.me/emurgo"
             svg={telegramSvg}
             message={messages.aboutEmurgoTelegram}
-          />
-          <FooterItem
-            url="https://www.facebook.com/Yoroi-wallet-399386000586822/"
-            svg={facebookSvg}
-            message={messages.aboutYoroiFacebook}
           />
           <FooterItem
             url="https://medium.com/@emurgo_io"
