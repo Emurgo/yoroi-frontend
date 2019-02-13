@@ -654,7 +654,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::redeemAda success');
       return transactionAmount;
     } catch (error) {
-      Logger.debug('AdaApi::redeemAda error: ' + stringifyError(error));
+      Logger.error('AdaApi::redeemAda error: ' + stringifyError(error));
       if (error instanceof RedemptionKeyAlreadyUsedError) {
         throw error;
       }
@@ -671,7 +671,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::redeemAdaPaperVend success');
       return transactionAmount;
     } catch (error) {
-      Logger.debug('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
+      Logger.error('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
       if (error instanceof RedemptionKeyAlreadyUsedError) {
         throw error;
       }

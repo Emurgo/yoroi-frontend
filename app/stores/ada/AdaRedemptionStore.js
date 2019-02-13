@@ -21,6 +21,7 @@ import environment from '../../environment';
 import BigNumber from 'bignumber.js';
 import Request from '../lib/LocalizedRequest';
 import { getSingleCryptoAccount } from '../../api/ada/adaLocalStorage';
+import { stringify } from 'querystring';
 
 export default class AdaRedemptionStore extends Store {
 
@@ -181,7 +182,8 @@ export default class AdaRedemptionStore extends Store {
     this.redemptionCode = code;
   });
 
-  _onParseError = action(() => {
+  _onParseError = action((error) => {
+    Logger.error('Error received from certificate parsing: ' + stringify(error));
     if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
       if (this.isCertificateEncrypted) {
         this.error = new AdaRedemptionEncryptedCertificateParseError();
