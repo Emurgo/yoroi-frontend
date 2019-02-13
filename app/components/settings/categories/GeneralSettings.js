@@ -8,7 +8,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
-import GeneralSettingsFooter from '../../../containers/footer/GeneralSettingsFooter';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
 
 const messages = defineMessages({
