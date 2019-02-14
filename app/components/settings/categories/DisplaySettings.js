@@ -102,7 +102,7 @@ export default class DisplaySettings extends Component<Props> {
             <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
           </button>
 
-          {environment.isDev() &&
+          {!environment.isMainnet() &&
             (
               <button
                 type="button"
