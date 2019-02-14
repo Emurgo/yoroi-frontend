@@ -1,11 +1,9 @@
 // @flow
 import { action, observable, computed, runInAction } from 'mobx';
-import { isString } from 'lodash';
 import Store from '../base/Store';
 import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
 import type { RedemptionTypeChoices } from '../../types/redemptionTypes';
-import { Logger } from '../../utils/logging';
-import { InvalidMnemonicError } from '../../i18n/errors';
+import { Logger, stringifyError } from '../../utils/logging';
 import {
   AdaRedemptionEncryptedCertificateParseError,
   AdaRedemptionCertificateParseError,
@@ -21,7 +19,6 @@ import environment from '../../environment';
 import BigNumber from 'bignumber.js';
 import Request from '../lib/LocalizedRequest';
 import { getSingleCryptoAccount } from '../../api/ada/adaLocalStorage';
-import { stringify } from 'querystring';
 
 export default class AdaRedemptionStore extends Store {
 
@@ -183,7 +180,7 @@ export default class AdaRedemptionStore extends Store {
   });
 
   _onParseError = action((error) => {
-    Logger.error('Error received from certificate parsing: ' + stringify(error));
+    Logger.error('Error received from certificate parsing: ' + stringifyError(error));
     if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
       if (this.isCertificateEncrypted) {
         this.error = new AdaRedemptionEncryptedCertificateParseError();
