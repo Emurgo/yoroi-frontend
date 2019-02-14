@@ -96,9 +96,7 @@ export default class AdaRedemptionStore extends Store {
     this.certificate = certificate;
     this.isCertificateEncrypted = certificate.type !== 'application/pdf';
     if (this.isCertificateEncrypted && (!this.passPhrase || !this.decryptionKey)) {
-      this.redemptionCode = '';
-      this.passPhrase = null;
-      this.decryptionKey = null;
+      this._resetDecryptionFields();
       return; // We cannot decrypt it yet!
     }
     this._parseCodeFromCertificate();
@@ -191,9 +189,7 @@ export default class AdaRedemptionStore extends Store {
         this.error = new AdaRedemptionCertificateParseError();
       }
     }
-    this.redemptionCode = '';
-    this.passPhrase = null;
-    this.decryptionKey = null;
+    this._resetDecryptionFields();
   });
 
   _redeemAda = async ({ walletId } : {
@@ -264,9 +260,7 @@ export default class AdaRedemptionStore extends Store {
     wallets.goToWalletRoute(walletId);
     this.amountRedeemed = amount;
     this.showAdaRedemptionSuccessMessage = true;
-    this.redemptionCode = '';
-    this.passPhrase = null;
-    this.decryptionKey = null;
+    this._resetDecryptionFields();
   });
 
   _onCloseAdaRedemptionSuccessOverlay = action(() => {
@@ -280,11 +274,15 @@ export default class AdaRedemptionStore extends Store {
   _onRemoveCertificate = action(() => {
     this.error = null;
     this.certificate = null;
-    this.redemptionCode = '';
-    this.passPhrase = null;
     this.email = null;
     this.adaPasscode = null;
     this.adaAmount = null;
+    this._resetDecryptionFields();
+  });
+
+  _resetDecryptionFields = action(() => {
+    this.redemptionCode = '';
+    this.passPhrase = null;
     this.decryptionKey = null;
   });
 
@@ -294,13 +292,11 @@ export default class AdaRedemptionStore extends Store {
     this.isCertificateEncrypted = false;
     this.walletId = null;
     this.redemptionType = ADA_REDEMPTION_TYPES.REGULAR;
-    this.redemptionCode = '';
     this.shieldedRedemptionKey = null;
-    this.passPhrase = null;
     this.email = null;
     this.adaPasscode = null;
     this.adaAmount = null;
-    this.decryptionKey = null;
+    this._resetDecryptionFields();
   };
 
   _getTransactionAmountInAda = (transactionAmountInLovelace: BigNumber): BigNumber => (
