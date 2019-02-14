@@ -12,6 +12,7 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMnemonicPage.scss';
+import config from '../../config';
 
 const messages = defineMessages({
   title: {
@@ -93,7 +94,7 @@ export default class TransferMnemonicPage extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 

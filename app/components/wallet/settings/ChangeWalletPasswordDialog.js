@@ -12,6 +12,7 @@ import { isValidWalletPassword, isValidRepeatPassword } from '../../../utils/val
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
+import config from '../../../config';
 
 const messages = defineMessages({
   dialogTitleSetPassword: {
@@ -121,7 +122,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 

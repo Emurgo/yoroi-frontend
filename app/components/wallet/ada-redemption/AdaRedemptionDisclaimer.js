@@ -70,7 +70,7 @@ export default class AdaRedemptionDisclaimer extends Component<Props, State> {
 
         <p>{intl.formatMessage(messages.disclaimerText)}</p>
 
-        <div className="adaRedemptionDisclaimerCheckbox">
+        <div className={styles.adaRedemptionDisclaimerCheckbox}>
           <Checkbox
             label={intl.formatMessage(messages.checkboxLabel)}
             onChange={this.onAcceptToggle}

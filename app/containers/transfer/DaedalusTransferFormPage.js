@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import TransferMnemonicPage from '../../components/transfer/TransferMnemonicPage';
+import config from '../../config';
 
 const messages = defineMessages({
   step0: {
@@ -40,7 +41,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
         mnemonicValidator={mnemonicValidator}
         validWords={validWords}
         step0={intl.formatMessage(messages.step0)}
-        mnemonicLength={12}
+        mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
       />
     );
   }

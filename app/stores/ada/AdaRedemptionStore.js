@@ -7,8 +7,7 @@ import { Logger, stringifyError } from '../../utils/logging';
 import {
   AdaRedemptionEncryptedCertificateParseError,
   AdaRedemptionCertificateParseError,
-  NoCertificateError,
-  ActiveAccountRequiredError
+  NoCertificateError
 } from '../../api/ada/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
@@ -18,7 +17,6 @@ import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import environment from '../../environment';
 import BigNumber from 'bignumber.js';
 import Request from '../lib/LocalizedRequest';
-import { getSingleCryptoAccount } from '../../api/ada/adaLocalStorage';
 
 export default class AdaRedemptionStore extends Store {
 
@@ -95,9 +93,7 @@ export default class AdaRedemptionStore extends Store {
     this.certificate = certificate;
     this.isCertificateEncrypted = certificate.type !== 'application/pdf';
     if (this.isCertificateEncrypted && (!this.passPhrase || !this.decryptionKey)) {
-      this.redemptionCode = '';
-      this.passPhrase = null;
-      this.decryptionKey = null;
+      this._resetDecryptionFields();
       return; // We cannot decrypt it yet!
     }
     this._parseCodeFromCertificate();
@@ -188,9 +184,7 @@ export default class AdaRedemptionStore extends Store {
         this.error = new AdaRedemptionCertificateParseError();
       }
     }
-    this.redemptionCode = '';
-    this.passPhrase = null;
-    this.decryptionKey = null;
+    this._resetDecryptionFields();
   });
 
   _redeemAda = async ({ walletId } : {
@@ -199,16 +193,8 @@ export default class AdaRedemptionStore extends Store {
 
     runInAction(() => { this.walletId = walletId; });
 
-    // Since there's no support for multiwallet yet, the only account index present in localStorage
-    // is used.
-    const accountData = getSingleCryptoAccount();
-    const accountIndex = accountData.account;
-    if (!accountIndex && accountIndex !== 0) throw new ActiveAccountRequiredError();
-
     try {
       const transactionAmountInLovelace: BigNumber = await this.redeemAdaRequest.execute({
-        walletId,
-        accountIndex,
         redemptionCode: this.redemptionCode
       });
       this._reset();
@@ -228,15 +214,9 @@ export default class AdaRedemptionStore extends Store {
   }) => {
     runInAction(() => { this.walletId = walletId; });
 
-    const accountData = getSingleCryptoAccount();
-    const accountIndex = accountData.account;
-    if (!accountIndex && accountIndex !== 0) throw new ActiveAccountRequiredError();
-
     try {
       const transactionAmountInLovelace: BigNumber =
         await this.redeemPaperVendedAdaRequest.execute({
-          walletId,
-          accountIndex,
           redemptionCode: shieldedRedemptionKey,
           mnemonics: this.passPhrase && this.passPhrase.split(' ')
         });
@@ -261,9 +241,7 @@ export default class AdaRedemptionStore extends Store {
     wallets.goToWalletRoute(walletId);
     this.amountRedeemed = amount;
     this.showAdaRedemptionSuccessMessage = true;
-    this.redemptionCode = '';
-    this.passPhrase = null;
-    this.decryptionKey = null;
+    this._resetDecryptionFields();
   });
 
   _onCloseAdaRedemptionSuccessOverlay = action(() => {
@@ -277,11 +255,15 @@ export default class AdaRedemptionStore extends Store {
   _onRemoveCertificate = action(() => {
     this.error = null;
     this.certificate = null;
-    this.redemptionCode = '';
-    this.passPhrase = null;
     this.email = null;
     this.adaPasscode = null;
     this.adaAmount = null;
+    this._resetDecryptionFields();
+  });
+
+  _resetDecryptionFields = action(() => {
+    this.redemptionCode = '';
+    this.passPhrase = null;
     this.decryptionKey = null;
   });
 
@@ -291,13 +273,11 @@ export default class AdaRedemptionStore extends Store {
     this.isCertificateEncrypted = false;
     this.walletId = null;
     this.redemptionType = ADA_REDEMPTION_TYPES.REGULAR;
-    this.redemptionCode = '';
     this.shieldedRedemptionKey = null;
-    this.passPhrase = null;
     this.email = null;
     this.adaPasscode = null;
     this.adaAmount = null;
-    this.decryptionKey = null;
+    this._resetDecryptionFields();
   };
 
   _getTransactionAmountInAda = (transactionAmountInLovelace: BigNumber): BigNumber => (
