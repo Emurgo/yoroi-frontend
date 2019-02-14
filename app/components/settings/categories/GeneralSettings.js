@@ -16,6 +16,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Language',
     description: 'Label for the language select.'
   },
+
 });
 
 type Props = {
@@ -77,7 +78,6 @@ export default class GeneralSettings extends Component<Props> {
           onChange={this.selectLanguage}
           skin={SelectSkin}
         />
-
         {error && <p className={styles.error}>{error}</p>}
 
       </div>

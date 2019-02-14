@@ -17,6 +17,8 @@ import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import {
   isValidMnemonic,
+  isValidPaperMnemonic,
+  unscramblePaperMnemonic,
   generateAdaAccountRecoveryPhrase,
   newAdaWallet,
   updateAdaWalletMetaParams,
@@ -442,6 +444,14 @@ export default class AdaApi {
 
   isValidMnemonic(mnemonic: string, numberOfWords: ?number): boolean {
     return isValidMnemonic(mnemonic, numberOfWords);
+  }
+
+  isValidPaperMnemonic(mnemonic: string, numberOfWords: ?number): boolean {
+    return isValidPaperMnemonic(mnemonic, numberOfWords);
+  }
+
+  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number): [?string, number] {
+    return unscramblePaperMnemonic(mnemonic, numberOfWords);
   }
 
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {
