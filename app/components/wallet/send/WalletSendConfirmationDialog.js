@@ -14,6 +14,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
+import config from '../../../config';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -73,7 +74,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 
