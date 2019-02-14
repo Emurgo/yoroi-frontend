@@ -17,6 +17,7 @@ import SupportSettingsPage from './containers/settings/categories/SupportSetting
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
+import AboutYoroiSettings from './components/settings/categories/AboutYoroiSettings';
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 const LoadingPage = resolver('containers/LoadingPage');
@@ -126,6 +127,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.SUPPORT}
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.ABOUT_YOROI}
+      component={(props) => <AboutYoroiSettings {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>

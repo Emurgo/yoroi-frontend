@@ -4,11 +4,16 @@
 
 import bip39 from 'bip39';
 
-import { HdWallet, Wallet } from 'rust-cardano-crypto';
+import { Logger, stringifyError } from '../../../../utils/logging';
+
+// $FlowFixMe
+import { HdWallet, Wallet, PaperWallet } from 'rust-cardano-crypto';
 import { encryptWithPassword, decryptWithPassword } from '../../../../utils/passwordCipher';
 import { getResultOrFail } from './cryptoUtils';
 
 import type { ConfigType } from '../../../../../config/config-types';
+import * as unorm from 'unorm';
+import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 
 declare var CONFIG : ConfigType;
 
@@ -26,6 +31,46 @@ export const isValidEnglishAdaMnemonic = (
   // We only use English mnemonics in Yoroi so this is okay.
   phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase)
 );
+
+/** Check validty of paper mnemonic (including checksum) */
+export const isValidEnglishAdaPaperMnemonic = (
+  phrase: string,
+  numberOfWords: ?number = 27
+) => {
+  const [unscrambled, unscrambledLen] = unscramblePaperAdaMnemonic(phrase, numberOfWords);
+  if (unscrambled && unscrambledLen) {
+    return isValidEnglishAdaMnemonic(unscrambled, unscrambledLen);
+  }
+  return false;
+};
+
+/** Check validty of paper mnemonic (including checksum) */
+export const unscramblePaperAdaMnemonic = (
+  phrase: string,
+  numberOfWords: ?number = 27
+): [?string, number] => {
+  const words = phrase.split(' ');
+  if (words.length === numberOfWords) {
+    if (numberOfWords === 27) {
+      const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 18), words.slice(18)];
+      try {
+        const password = mnemonicToSeedHex(passwordMnemonics.join(' '));
+        return [PaperWallet.unscrambleStrings(password, scrambledMnemonics.join(' ')), 12];
+      } catch (e) {
+        Logger.error('Failed to unscramble paper mnemonic! ' + stringifyError(e));
+        return [undefined, 0];
+      }
+    }
+  }
+  return [undefined, 0];
+};
+
+const mnemonicToSeedHex = (mnemonic: string, password: ?string) => {
+  const mnemonicBuffer = Buffer.from(unorm.nfkd(mnemonic), 'utf8');
+  const salt = 'mnemonic' + (unorm.nfkd(password) || '');
+  const saltBuffer = Buffer.from(salt, 'utf8');
+  return pbkdf2(mnemonicBuffer, saltBuffer, 2048, 32, 'sha512').toString('hex');
+};
 
 /** Generate and encrypt HD wallet */
 export function generateWalletMasterKey(secretWords : string, password : string): string {
