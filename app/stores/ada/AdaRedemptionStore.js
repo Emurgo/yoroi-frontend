@@ -1,11 +1,9 @@
 // @flow
 import { action, observable, computed, runInAction } from 'mobx';
-import { isString } from 'lodash';
 import Store from '../base/Store';
 import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
 import type { RedemptionTypeChoices } from '../../types/redemptionTypes';
-import { Logger } from '../../utils/logging';
-import { InvalidMnemonicError } from '../../i18n/errors';
+import { Logger, stringifyError } from '../../utils/logging';
 import {
   AdaRedemptionEncryptedCertificateParseError,
   AdaRedemptionCertificateParseError,
@@ -177,11 +175,9 @@ export default class AdaRedemptionStore extends Store {
     this.redemptionCode = code;
   });
 
-  _onParseError = action(error => {
-    const errorMessage = isString(error) ? error : error.message;
-    if (errorMessage.includes('Invalid mnemonic')) {
-      this.error = new InvalidMnemonicError();
-    } else if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
+  _onParseError = action((error) => {
+    Logger.error('Error received from certificate parsing: ' + stringifyError(error));
+    if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
       if (this.isCertificateEncrypted) {
         this.error = new AdaRedemptionEncryptedCertificateParseError();
       } else {
@@ -194,6 +190,7 @@ export default class AdaRedemptionStore extends Store {
   _redeemAda = async ({ walletId } : {
     walletId: string
   }) => {
+
     runInAction(() => { this.walletId = walletId; });
 
     try {
