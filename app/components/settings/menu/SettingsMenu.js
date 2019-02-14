@@ -32,6 +32,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Themes',
     description: 'Label for the "Themes" link in the settings menu.',
   },
+  AnoutYoroi: {
+    id: 'settings.menu.aboutYroi.link.label',
+    defaultMessage: '!!!About Yoroi',
+    description: 'Label for the "About Yoroi" link in the settings menu.',
+  }
 });
 
 type Props = {
@@ -92,6 +97,13 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.AnoutYoroi)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
+            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
+            className="AboutYoroi"
           />
         </div>
       </div>

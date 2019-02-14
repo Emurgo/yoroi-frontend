@@ -21,6 +21,7 @@ export const ROUTES = {
     DISPLAY: '/settings/display',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
+    ABOUT_YOROI: '/settings/about-yoroi',
   },
   DAEDALUS_TRANFER: {
     ROOT: '/daedalus-transfer',
