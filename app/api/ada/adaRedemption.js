@@ -9,15 +9,11 @@ import { RedemptionKeyAlreadyUsedError } from './errors';
 import BigNumber from 'bignumber.js';
 
 export type RedeemAdaParams = {
-  redemptionCode: string,
-  walletId: string,
-  accountIndex: number
+  redemptionCode: string
 };
 
 export type RedeemPaperVendedAdaParams = {
   redemptionCode: string,
-  walletId: string,
-  accountIndex: number,
   mnemonics: Array<string>,
 };
 

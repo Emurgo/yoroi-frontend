@@ -19,7 +19,6 @@ import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import environment from '../../environment';
 import BigNumber from 'bignumber.js';
 import Request from '../lib/LocalizedRequest';
-import { getSingleCryptoAccount } from '../../api/ada/adaLocalStorage';
 
 export default class AdaRedemptionStore extends Store {
 
@@ -195,19 +194,10 @@ export default class AdaRedemptionStore extends Store {
   _redeemAda = async ({ walletId } : {
     walletId: string
   }) => {
-
     runInAction(() => { this.walletId = walletId; });
-
-    // Since there's no support for multiwallet yet, the only account index present in localStorage
-    // is used.
-    const accountData = getSingleCryptoAccount();
-    const accountIndex = accountData.account;
-    if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
 
     try {
       const transactionAmountInLovelace: BigNumber = await this.redeemAdaRequest.execute({
-        walletId,
-        accountIndex,
         redemptionCode: this.redemptionCode
       });
       this._reset();
@@ -227,15 +217,9 @@ export default class AdaRedemptionStore extends Store {
   }) => {
     runInAction(() => { this.walletId = walletId; });
 
-    const accountData = getSingleCryptoAccount();
-    const accountIndex = accountData.account;
-    if (!accountIndex && accountIndex !== 0) throw new Error('Active account required before redeeming Ada.');
-
     try {
       const transactionAmountInLovelace: BigNumber =
         await this.redeemPaperVendedAdaRequest.execute({
-          walletId,
-          accountIndex,
           redemptionCode: shieldedRedemptionKey,
           mnemonics: this.passPhrase && this.passPhrase.split(' ')
         });
