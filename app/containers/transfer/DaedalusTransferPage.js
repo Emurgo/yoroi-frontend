@@ -55,6 +55,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this._getDaedalusTransferActions().startTransferFunds.trigger();
   }
 
+  startTransferPaperFunds = () => {
+    this._getDaedalusTransferActions().startTransferPaperFunds.trigger();
+  }
+
   setupTransferFunds = (payload: { recoveryPhrase: string }) => {
     this._getDaedalusTransferActions().setupTransferFunds.trigger(payload);
   };
@@ -110,6 +114,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               onAnswerYes={this.goToReceiveScreen}
               onConfirm={this.startTransferFunds}
+              onPaperConfirm={this.startTransferPaperFunds}
               disableTransferFunds={daedalusTransfer.disableTransferFunds}
             />
           </MainLayout>
@@ -125,6 +130,19 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
               )}
               validWords={validWords}
+              mnemonicLength={12}
+            />
+          </MainLayout>
+        );
+      case 'gettingPaperMnemonics':
+        return (
+          <MainLayout topbar={topBar}>
+            <DaedalusTransferFormPage
+              onSubmit={this.setupTransferFunds}
+              onBack={this.backToUninitialized}
+              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
+              validWords={validWords}
+              mnemonicLength={27}
             />
           </MainLayout>
         );

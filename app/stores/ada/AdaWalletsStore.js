@@ -99,6 +99,11 @@ export default class AdaWalletsStore extends WalletStore {
     numberOfWords: ?number
   ): boolean => this.api.ada.isValidMnemonic(mnemonic, numberOfWords);
 
+  isValidPaperMnemonic = (
+    mnemonic: string,
+    numberOfWords: ?number
+  ): boolean => this.api.ada.isValidPaperMnemonic(mnemonic, numberOfWords);
+
   // =================== WALLET RESTORATION ==================== //
 
   @action _setIsRestoreActive = (active: boolean) => {

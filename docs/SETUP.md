@@ -59,11 +59,11 @@ $ npm run build-dll
 ### Firefox
 
 Adding unsigned extensions is not supported for the regular version of Firefox.
-You can test Yoroi as a temporary extension, but the extension will disappear after every uninstall.
+You can test Yoroi as a temporary extension, but the extension will disappear every time you close your browser.
 To avoid this, we recommend the following:
 1) [setting up Firefox-dev](https://askubuntu.com/questions/548003/how-do-i-install-the-firefox-developer-edition)
 2) Setting `xpinstall.signatures.required` to `false` in `about:config`.
-3) Makeing sure typing `firefox` in your terminal opens firefox-dev (otherwise the unittests will not pass)
+3) Make sure typing `firefox` in your terminal opens firefox-dev (otherwise the unittests will not pass)
 
 ### Git hooks
 

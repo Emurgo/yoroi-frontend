@@ -18,7 +18,7 @@ import resolver from '../../utils/imports';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
 import TrezorConnectStore from '../../stores/ada/TrezorConnectStore';
-import HelpLinkFooter from '../../components/footer/HelpLinkFooter';
+import AddWalletFooter from '../footer/AddWalletFooter';
 
 type Props = InjectedProps;
 const MainLayout = resolver('containers/MainLayout');
@@ -101,18 +101,10 @@ export default class WalletAddPage extends Component<Props> {
       );
     }
 
-    const footer = (
-      <HelpLinkFooter
-        showBuyTrezorHardwareWallet
-        showHowToConnectTrezor
-        showHowToCreateWallet
-        showHowToRestoreWallet
-      />);
-
     return (
       <MainLayout
         topbar={topBar}
-        footer={footer}
+        footer={<AddWalletFooter />}
       >
         {content}
       </MainLayout>

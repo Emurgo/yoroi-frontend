@@ -37,9 +37,11 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 type Props = {
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
+  onPaperConfirm: Function,
   disableTransferFunds: boolean,
   attentionText: string,
-  confirmationText: string
+  confirmationText: string,
+  confirmationPaperText: string,
 };
 
 @observer
@@ -54,9 +56,11 @@ export default class TransferInstructionsPage extends Component<Props> {
     const {
       onFollowInstructionsPrerequisites,
       onConfirm,
+      onPaperConfirm,
       disableTransferFunds,
       attentionText,
-      confirmationText
+      confirmationText,
+      confirmationPaperText,
     } = this.props;
 
     const instructionsButtonClasses = classnames([
@@ -122,6 +126,14 @@ export default class TransferInstructionsPage extends Component<Props> {
                 className={confirmButtonClasses}
                 label={confirmationText}
                 onClick={onConfirm}
+                disabled={disableTransferFunds}
+                skin={ButtonSkin}
+              />
+
+              <Button
+                className={confirmButtonClasses}
+                label={confirmationPaperText}
+                onClick={onPaperConfirm}
                 disabled={disableTransferFunds}
                 skin={ButtonSkin}
               />

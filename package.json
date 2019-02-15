@@ -152,7 +152,9 @@
     "route-parser": "0.0.5",
     "rust-cardano-crypto": "file:js-cardano-wasm",
     "trezor-connect": "6.0.2",
-    "validator": "6.3.0"
+    "validator": "6.3.0",
+    "unorm": "1.4.1",
+    "pbkdf2": "3.0.17"
   },
   "engineStrict": true,
   "engine": {
