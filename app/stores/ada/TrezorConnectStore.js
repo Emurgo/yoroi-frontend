@@ -106,7 +106,7 @@ export default class TrezorConnectStore extends Store {
     const trezorConnectAction = this.actions.ada.trezorConnect;
     trezorConnectAction.cancel.listen(this._cancel);
     trezorConnectAction.submitAbout.listen(this._submitAbout);
-    trezorConnectAction.goBacktToAbout.listen(this._goBacktToAbout);
+    trezorConnectAction.goBackToAbout.listen(this._goBackToAbout);
     trezorConnectAction.submitConnect.listen(this._submitConnect);
     trezorConnectAction.submitSave.listen(this._submitSave);
 
@@ -165,7 +165,7 @@ export default class TrezorConnectStore extends Store {
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBacktToAbout = (): void => {
+  @action _goBackToAbout = (): void => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.ABOUT;
     this.progressInfo.stepState = StepState.LOAD;
