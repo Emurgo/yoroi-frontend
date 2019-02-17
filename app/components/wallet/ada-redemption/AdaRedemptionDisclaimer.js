@@ -18,7 +18,7 @@ const messages = defineMessages({
   },
   disclaimerText: {
     id: 'wallet.redeem.disclaimerOverlay.disclaimerText',
-    defaultMessage: '!!!ATTENTION: Redeeming on the Cardano Test-net will validate that your certificate or redemption key is correct and will allow you to redeem TEST-ADA for testing purposes only. KEEP your certificate or redemption key safe and secure. You will need to redeem again when Cardano SL launches the mainnet. TEST-ADA holds no value and cannot be exchanged.',
+    defaultMessage: '!!!ATTENTION: Redeeming on the Cardano testnet will validate that your certificate or redemption key is correct and will allow you to redeem TEST-ADA for testing purposes only. KEEP your certificate or redemption key safe and secure. You will need to redeem on the mainnet. TEST-ADA holds no value.',
     description: 'Disclaimer text for "Redemption disclaimer" on Ada redemption page.'
   },
   checkboxLabel: {
