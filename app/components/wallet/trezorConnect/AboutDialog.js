@@ -13,7 +13,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
-import TrezorErrorBlock from './common/TrezorErrorBlock';
+import HWErrorBlock from './common/HWErrorBlock';
 
 import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
 import aboutPrerequisiteIconSVG from '../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
@@ -173,7 +173,7 @@ export default class AboutDialog extends Component<Props> {
         {introBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} />
-        <TrezorErrorBlock progressInfo={progressInfo} error={error} />
+        <HWErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
 }

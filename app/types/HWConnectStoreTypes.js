@@ -32,7 +32,7 @@ export type ProgressInfo = {
   stepState: StepStateEnum,
 };
 
-interface HWFeatures {
+export interface HWFeatures {
   vendor: string,
   major_version: number,
   minor_version: number,
@@ -75,7 +75,7 @@ export interface HWConnectStoreTypes {
 
   // =================== API RELATED =================== //
   // TODO: add later
-  createWalletRequest: LocalizedRequest<any>;
+  createHWRequest: LocalizedRequest<any>;
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
     * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
@@ -130,10 +130,10 @@ export interface HWConnectStoreTypes {
   _saveHW(params: {
     publicMasterKey: string,
     walletName: string,
-    deviceFeatures: Features,
+    deviceFeatures: HWFeatures,
   }): Promise<void>;
 
-  _onSaveSucess(HWWallet: Wallet): void;
+  _onSaveSucess(HWWallet: Wallet): Promise<void>;
   // =================== SAVE =================== //
 
   // =================== API =================== //
