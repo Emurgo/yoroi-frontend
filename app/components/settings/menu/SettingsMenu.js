@@ -32,6 +32,11 @@ const messages = defineMessages({
     defaultMessage: '!!!About Yoroi',
     description: 'Label for the "About Yoroi" link in the settings menu.',
   },
+  adaRedemption: {
+    id: 'settings.menu.adaRedemption.link.label',
+    defaultMessage: '!!!Ada Redemption',
+    description: 'Label for the "Ada Redemption" link in the settings menu.',
+  }
 });
 
 type Props = {
@@ -92,6 +97,13 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
             active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
             className="AboutYoroi"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.adaRedemption)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
+            active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
+            className="adaRedemption"
           />
         </div>
       </div>

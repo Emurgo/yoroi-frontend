@@ -26,6 +26,7 @@ const WalletSummaryPage = resolver('containers/wallet/WalletSummaryPage');
 const WalletSendPage = resolver('containers/wallet/WalletSendPage');
 const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
 const DaedalusTransferPage = resolver('containers/transfer/DaedalusTransferPage');
+const AdaRedemptionPage = resolver('containers/wallet/AdaRedemptionPage');
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -132,6 +133,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.ABOUT_YOROI}
       component={(props) => <AboutYoroiSettings {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.ADA_REDEMPTION}
+      component={(props) => <AdaRedemptionPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
