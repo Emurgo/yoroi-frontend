@@ -7,6 +7,7 @@ import DaedalusTransferActions from './daedalus-transfer-actions';
 import HWConnectActions from './hw-connect-actions';
 import TrezorSendActions from './trezor-send-actions';
 import AdaRedemptionActions from './ada-redemption-actions';
+import LedgerSendActions from './ledger-send-actions';
 
 export type AdaActionsMap = {
   adaRedemption: AdaRedemptionActions,
@@ -17,6 +18,8 @@ export type AdaActionsMap = {
   daedalusTransfer: DaedalusTransferActions,
   trezorConnect: HWConnectActions,
   trezorSend: TrezorSendActions,
+  ledgerConnect: HWConnectActions,
+  ledgerSend: LedgerSendActions,
 };
 
 const adaActionsMap: AdaActionsMap = {
@@ -28,6 +31,8 @@ const adaActionsMap: AdaActionsMap = {
   daedalusTransfer: new DaedalusTransferActions(),
   trezorConnect: new HWConnectActions(),
   trezorSend: new TrezorSendActions(),
+  ledgerConnect: new HWConnectActions(),
+  ledgerSend: new LedgerSendActions(),
 };
 
 export default adaActionsMap;

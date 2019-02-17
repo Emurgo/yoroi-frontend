@@ -17,7 +17,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 
 // This is actually just an interface
 import { HWConnectStoreTypes, StepState, ProgressStep } from '../../types/HWConnectStoreTypes';
-import type { ProgressInfo, StepStateEnum, ProgressStepEnum, HWDeviceInfo } from '../../types/HWConnectStoreTypes';
+import type { ProgressInfo, HWDeviceInfo, HWFeatures } from '../../types/HWConnectStoreTypes'; // StepStateEnum, ProgressStepEnum,
 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -61,8 +61,8 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   // =================== API RELATED =================== //
   // TODO: type CreateLedgerWalletResponse
-  // createLedgerWalletRequest: LocalizedRequest<any> =
-  //   new LocalizedRequest(this.api.ada.createLedgerWallet);
+  createHWRequest: LocalizedRequest<any> =
+    new LocalizedRequest(this.api.ada.createTrezorWallet); // Update to Ledger
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
     * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
@@ -222,6 +222,10 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     // }
   };
 
+  _validateResponse = (): void => {
+    
+  }
+
   /** Validates the compatibility of data which we have received from Trezor */
   _validateHW = (
     ledgerResp: any,
@@ -315,68 +319,68 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     walletName: string,
     deviceFeatures: HWFeatures,
   }): Promise<void>  => {
-    try {
-      Logger.debug('TrezorConnectStore::_saveTrezor:: stated');
-      this._setIsCreateTrezorWalletActive(true);
-      this.createLedgerWalletRequest.reset();
+    // try {
+    //   Logger.debug('TrezorConnectStore::_saveTrezor:: stated');
+    //   this._setIsCreateTrezorWalletActive(true);
+    //   this.createLedgerWalletRequest.reset();
 
-      const trezorWallet: Wallet = await this.createLedgerWalletRequest.execute(params).promise;
-      if (trezorWallet) {
-        await this._onSaveSucess(trezorWallet);
-      } else {
-        // this Error will be converted to LocalizableError()
-        throw new Error();
-      }
-    } catch (error) {
-      if (error instanceof CheckAdressesInUseApiError) {
-        // redirecting CheckAdressesInUseApiError -> saveError101
-        // because for user saveError101 is more meaningful in this context
-        this.error = new LocalizableError(messages.saveError101);
-      } else if (error instanceof LocalizableError) {
-        this.error = error;
-      } else {
-        // some unknow error
-        this.error = new LocalizableError(messages.error999);
-      }
-      this._goToSaveError();
-      Logger.error(`TrezorConnectStore::_saveTrezor::error ${stringifyError(error)}`);
-    } finally {
-      this.createLedgerWalletRequest.reset();
-      this._setIsCreateTrezorWalletActive(false);
-    }
+    //   const trezorWallet: Wallet = await this.createLedgerWalletRequest.execute(params).promise;
+    //   if (trezorWallet) {
+    //     await this._onSaveSucess(trezorWallet);
+    //   } else {
+    //     // this Error will be converted to LocalizableError()
+    //     throw new Error();
+    //   }
+    // } catch (error) {
+    //   if (error instanceof CheckAdressesInUseApiError) {
+    //     // redirecting CheckAdressesInUseApiError -> saveError101
+    //     // because for user saveError101 is more meaningful in this context
+    //     this.error = new LocalizableError(messages.saveError101);
+    //   } else if (error instanceof LocalizableError) {
+    //     this.error = error;
+    //   } else {
+    //     // some unknow error
+    //     this.error = new LocalizableError(messages.error999);
+    //   }
+    //   this._goToSaveError();
+    //   Logger.error(`TrezorConnectStore::_saveTrezor::error ${stringifyError(error)}`);
+    // } finally {
+    //   this.createLedgerWalletRequest.reset();
+    //   this._setIsCreateTrezorWalletActive(false);
+    // }
   };
 
-  // _onSaveSucess = async (trezorWallet: Wallet) => {
-  //   // close the active dialog
-  //   Logger.debug('TrezorConnectStore::_saveTrezor success, closing dialog');
-  //   this.actions.dialogs.closeActiveDialog.trigger();
+  async _onSaveSucess(HWWallet: Wallet): Promise<void> {
+    // close the active dialog
+    Logger.debug('TrezorConnectStore::_saveTrezor success, closing dialog');
+    this.actions.dialogs.closeActiveDialog.trigger();
 
-  //   const { wallets } = this.stores.substores[environment.API];
-  //   await wallets._patchWalletRequestWithNewWallet(trezorWallet);
+    const { wallets } = this.stores.substores[environment.API];
+    await wallets._patchWalletRequestWithNewWallet(HWWallet);
 
-  //   // goto the wallet transactions page
-  //   Logger.debug('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
-  //   wallets.goToWalletRoute(trezorWallet.id);
+    // goto the wallet transactions page
+    Logger.debug('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
+    wallets.goToWalletRoute(HWWallet.id);
 
-  //   // fetch its data
-  //   Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
-  //   wallets.refreshWalletsData();
+    // fetch its data
+    Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
+    wallets.refreshWalletsData();
 
-  //   // Load the Yoroi with Trezor Icon
-  //   this.stores.topbar.initCategories();
+    // Load the Yoroi with Trezor Icon
+    this.stores.topbar.initCategories();
 
-  //   // show success notification
-  //   wallets.showTrezorTWalletIntegratedNotification();
+    // show success notification
+    wallets.showTrezorTWalletIntegratedNotification();
 
-  //   // TODO: [TREZOR] not sure if it actully destroying this Store ??
-  //   this.teardown();
-  //   Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');
-  // };
-  // // =================== SAVE =================== //
+    // TODO: [TREZOR] not sure if it actully destroying this Store ??
+    this.teardown();
+    Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');
+  }
+  // =================== SAVE =================== //
 
-  // // =================== API =================== //
-  // @action _setIsCreateTrezorWalletActive = (active: boolean): void => {
-  //   this.isCreateTrezorWalletActive = active;
-  // };
-  // // =================== API =================== //
+  // =================== API =================== //
+  @action _setIsCreateHWActive = (active: boolean): void => {
+    // this.isCreateTrezorWalletActive = active;
+  };
+  // =================== API =================== //
 }
