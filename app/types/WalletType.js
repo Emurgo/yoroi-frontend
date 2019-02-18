@@ -11,4 +11,23 @@ export type WalletHardwareInfo = {
   patchVersion: number,
   language: string,
   publicMasterKey: string,
+  chainCodeHex: string,
+};
+
+export const WalletTypeOption : {
+  WEB_WALLET: WalletType,
+  HARDWARE_WALLET: WalletType
+} = {
+  WEB_WALLET: 'CWTWeb',
+  HARDWARE_WALLET: 'CWTHardware'
+};
+
+export const TrezorT = {
+  vendor: 'trezor.io',
+  model: 'T'
+};
+
+export const LedgerNanoS = {
+  vendor: 'ledger.com',
+  model: 'NanoS'
 };

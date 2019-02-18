@@ -21,7 +21,7 @@ import { createHardwareWalletAccount } from '../adaAccount';
  * Caches the fetched address results locally (into lovefieldDatabase)
  * @returns a new AdaWallet
  */
-export async function createTrezorWallet({
+export async function createWallet({
   walletInitData
 }: AdaHardwareWalletParams): Promise<AdaWallet> {
   try {

@@ -10,12 +10,12 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 
-// import type {
-//   CreateTrezorSignTxDataRequest,
-//   CreateTrezorSignTxDataResponse,
-//   SendTrezorSignedTxRequest,
-// } from '../../api/ada';
-import type { SendTrezorSignedTxResponse } from '../../api/common';
+import type {
+  CreateLedgerSignTxDataRequest,
+  CreateLedgerSignTxDataResponse,
+  SendLedgerSignedTxRequest,
+} from '../../api/ada';
+import type { SendLedgerSignedTxResponse } from '../../api/common';
 
 import {
   Logger,
@@ -38,11 +38,11 @@ export default class LedgerSendStore extends Store {
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  // createTrezorSignTxDataRequest: LocalizedRequest<CreateLedgerSignTxDataResponse> =
-  //   new LocalizedRequest(this.api.ada.createTrezorSignTxData);
+  createLedgerSignTxDataRequest: LocalizedRequest<CreateLedgerSignTxDataResponse> =
+    new LocalizedRequest(this.api.ada.createLedgerSignTxData);
 
-  // sendTrezorSignedTxRequest: LocalizedRequest<SendTrezorSignedTxResponse> =
-  //   new LocalizedRequest(this.api.ada.sendTrezorSignedTx);
+  sendLedgerSignedTxRequest: LocalizedRequest<SendLedgerSignedTxResponse> =
+    new LocalizedRequest(this.api.ada.sendLedgerSignedTx);
   // =================== API RELATED =================== //
 
   setup() {

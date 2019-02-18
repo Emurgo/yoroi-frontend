@@ -62,7 +62,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   // =================== API RELATED =================== //
   // TODO: type CreateLedgerWalletResponse
   createHWRequest: LocalizedRequest<any> =
-    new LocalizedRequest(this.api.ada.createTrezorWallet); // Update to Ledger
+    new LocalizedRequest(this.api.ada.createHardwareWallet); // Update to Ledger
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
     * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
@@ -92,7 +92,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     //   this.createLedgerWalletRequest.reset();
     // }
 
-    this._removeLedgerConnectEventListeners();
+    // this._removeLedgerConnectEventListeners();
 
     this._reset();
     super.teardown();
