@@ -119,7 +119,7 @@ export default class AboutYoroiSettings extends Component {
             message={messages.aboutYoroiFacebook}
           />
           <FooterItem
-            url="https://www.youtube.com/watch?v=GLNgpr-3t2E&list=PLFLTrdAG7xRZUmi04s44T1VEF20xKquF2"
+            url="https://www.youtube.com/channel/UCgFQ0hHuPO1QDcyP6t9KZTQ"
             svg={youtubeSvg}
             message={messages.aboutYoroiYoutube}
           />
