@@ -1,6 +1,6 @@
 {
-  "ImageUploadWidget.clickToUploadLabel": "or click to upload",
-  "ImageUploadWidget.dropFileHint": "Drop file here",
+  "ImageUploadWidget.clickToUploadLabel": "またはクリックしてアップロードしてください",
+  "ImageUploadWidget.dropFileHint": "ファイルをここにドラッグ＆ドロップする",
   "api.errors.ApiMethodNotYetImplementedError": "ご指定のAPIに対応しておりません。",
   "api.errors.GenericApiError": "エラーが発生しました。後ほど再度お試しください。",
   "api.errors.IncorrectPasswordError": "ウォレットのパスワードが誤っています。",
