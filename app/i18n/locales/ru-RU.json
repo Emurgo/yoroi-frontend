@@ -216,7 +216,7 @@
   "wallet.redeem.dialog.shieldedRedemptionCodeError": "Неверный ICO-ключ",
   "wallet.redeem.dialog.shieldedRedemptionKeyHint": "Введите ICO-ключ",
   "wallet.redeem.dialog.shieldedRedemptionKeyLabel": "ICO-ключ",
-  "wallet.redeem.dialog.submitLabel": "Redeem your money",
+  "wallet.redeem.dialog.submitLabel": "Обналичить ICO-сертификат",
   "wallet.redeem.dialog.walletSelectLabel": "Выбрать кошелек",
   "wallet.redeem.disclaimerOverlay.checkboxLabel": "Я понял указанную выше информацию",
   "wallet.redeem.disclaimerOverlay.disclaimerText": "ВНИМАНИЕ: Выкуп в тестнете Cardano подтвердит правильность вашего сертификата или ключа выкупа и позволит вам выкупить TEST-ADA только для целей тестирования. ХРАНИТЕ свой сертификат или ключ выкупа в целости и сохранности. Вам нужно будет выкупить в мейннете. ТЕСТ-АДА не имеет денежной стоимости.\n",
