@@ -26,18 +26,18 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
   };
 
   render() {
-    const trezorConnectStore = this._getLedgerConnectStore();
+    const ledgerConnectStore = this._getLedgerConnectStore();
     const hwConnectActions = this._getHWConnectActions();
 
     let component = null;
 
-    switch (trezorConnectStore.progressInfo.currentStep) {
+    switch (ledgerConnectStore.progressInfo.currentStep) {
       case ProgressStep.ABOUT:
         component = (
           <AboutDialog
-            progressInfo={trezorConnectStore.progressInfo}
-            isActionProcessing={trezorConnectStore.isActionProcessing}
-            error={trezorConnectStore.error}
+            progressInfo={ledgerConnectStore.progressInfo}
+            isActionProcessing={ledgerConnectStore.isActionProcessing}
+            error={ledgerConnectStore.error}
             submit={hwConnectActions.submitAbout.trigger}
             cancel={this.cancel}
           />);
@@ -45,9 +45,9 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
       case ProgressStep.CONNECT:
         component = (
           <ConnectDialog
-            progressInfo={trezorConnectStore.progressInfo}
-            isActionProcessing={trezorConnectStore.isActionProcessing}
-            error={trezorConnectStore.error}
+            progressInfo={ledgerConnectStore.progressInfo}
+            isActionProcessing={ledgerConnectStore.isActionProcessing}
+            error={ledgerConnectStore.error}
             goBack={hwConnectActions.goBackToAbout.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
@@ -56,16 +56,16 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
       case ProgressStep.SAVE:
         component = (
           <SaveDialog
-            progressInfo={trezorConnectStore.progressInfo}
-            isActionProcessing={trezorConnectStore.isActionProcessing}
-            error={trezorConnectStore.error}
-            defaultWalletName={trezorConnectStore.defaultWalletName}
+            progressInfo={ledgerConnectStore.progressInfo}
+            isActionProcessing={ledgerConnectStore.isActionProcessing}
+            error={ledgerConnectStore.error}
+            defaultWalletName={ledgerConnectStore.defaultWalletName}
             submit={hwConnectActions.submitSave.trigger}
             cancel={this.cancel}
           />);
         break;
       default:
-        Logger.error('WalletTrezorConnectDialogContainer::render: something unexpected happened');
+        Logger.error('WalletLedgerConnectDialogContainer::render: something unexpected happened');
         break;
     }
 
