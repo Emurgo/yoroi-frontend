@@ -195,7 +195,7 @@
   "wallet.redeem.dialog.adaPasscodeHint": "ADAパスコードを入力してください",
   "wallet.redeem.dialog.adaPasscodeLabel": "ADAパスコード",
   "wallet.redeem.dialog.certificateHint": "証明書のあるファイルをここにドラッグ＆ドロップまたはクリックしてアップロードする",
-  "wallet.redeem.dialog.certificateLabel": "Certificate",
+  "wallet.redeem.dialog.certificateLabel": "証明書",
   "wallet.redeem.dialog.decryptionKeyHint": "Enter your decryption key",
   "wallet.redeem.dialog.decryptionKeyLabel": "Decryption key",
   "wallet.redeem.dialog.emailHint": "Enter your email address",
