@@ -36,8 +36,8 @@ import {
   restoreAdaWallet
 } from './restoreAdaWallet';
 import {
-  createTrezorWallet
-} from './hardwareWallet/createTrezorWallet';
+  createWallet,
+} from './hardwareWallet/createWallet';
 import {
   getAdaTxsHistoryByWallet,
   getAdaTxLastUpdatedDate,
@@ -48,11 +48,18 @@ import {
   getAdaTransactionFee,
   newAdaTransaction
 } from './adaTransactions/adaNewTransactions';
-import type { TrezorSignTxPayload } from '../../domain/TrezorSignTx';
+import type {
+  TrezorSignTxPayload,
+  LedgerSignTxPayload,
+} from '../../domain/TrezorSignTx';
 import {
   createTrezorSignTxPayload,
   newTrezorTransaction,
 } from './hardwareWallet/trezorNewTransactions';
+import {
+  createLedgerSignTxPayload,
+  newLedgerTransaction,
+} from './hardwareWallet/ledgerNewTransactions';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -88,9 +95,10 @@ import type {
   RestoreWalletRequest,
   RestoreWalletResponse,
   UpdateWalletResponse,
-  CreateTrezorWalletRequest,
-  CreateTrezorWalletResponse,
+  CreateHardwareWalletRequest,
+  CreateHardwareWalletResponse,
   SendTrezorSignedTxResponse,
+  SendLedgerSignedTxResponse,
 } from '../common';
 import { InvalidWitnessError, RedeemAdaError, RedemptionKeyAlreadyUsedError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
@@ -125,6 +133,14 @@ export type CreateTrezorSignTxDataRequest = {
 export type CreateTrezorSignTxDataResponse = {
   trezorSignTxPayload: TrezorSignTxPayload,
   changeAddress: AdaAddress
+};
+export type CreateLedgerSignTxDataRequest = {
+  receiver: string,
+  amount: string
+};
+export type CreateLedgerSignTxDataResponse = {
+  ledgerSignTxPayload: LedgerSignTxPayload,
+  // changeAddress: AdaAddress
 };
 export type UpdateWalletRequest = {
   walletId: string,
@@ -383,6 +399,57 @@ export default class AdaApi {
     }
   }
 
+  async createLedgerSignTxData(
+    request: CreateLedgerSignTxDataRequest
+  ): Promise<CreateLedgerSignTxDataResponse> {
+    try {
+      Logger.debug('AdaApi::createLedgerSignTxData called');
+      const { receiver, amount } = request;
+
+      const { txExt }: AdaFeeEstimateResponse = await getAdaTransactionFee(receiver, amount);
+      const ledgerSignTxPayload: LedgerSignTxPayload = await createLedgerSignTxPayload(txExt);
+
+      Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
+      return {
+        ledgerSignTxPayload,
+        // changeAddress: changeAdaAddress
+      };
+    } catch (error) {
+      Logger.error('AdaApi::createLedgerSignTxData error: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
+    }
+  }
+
+  async sendLedgerSignedTx(
+    request: SendLedgerSignedTxRequest
+  ): Promise<SendLedgerSignedTxResponse> {
+    Logger.debug('AdaApi::sendLedgerSignedTx called');
+    const { signedTxHex, changeAdaAddr } = request;
+    try {
+      const response = await newLedgerTransaction(signedTxHex, changeAdaAddr);
+      Logger.debug('AdaApi::sendLedgerSignedTx success: ' + stringifyData(response));
+
+      return response;
+    } catch (error) {
+      Logger.error('AdaApi::sendLedgerSignedTx error: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
+    }
+  }
+
   async calculateTransactionFee(
     request: TransactionFeeRequest
   ): Promise<TransactionFeeResponse> {
@@ -557,12 +624,12 @@ export default class AdaApi {
     }
   }
 
-  async createTrezorWallet(
-    request: CreateTrezorWalletRequest
-  ): Promise<CreateTrezorWalletResponse> {
+  async createHardwareWallet(
+    request: CreateHardwareWalletRequest
+  ): Promise<CreateHardwareWalletResponse> {
     try {
-      Logger.debug('AdaApi::connectTrezor called');
-      const { walletName, publicMasterKey, deviceFeatures } = request;
+      Logger.debug('AdaApi::createHardwareWallet called');
+      const { walletName, walletHardwareInfo } = request;
       const assurance = 'CWANormal';
       const unit = 0;
 
@@ -572,24 +639,14 @@ export default class AdaApi {
           cwAssurance: assurance,
           cwUnit: unit
         },
-        cwHardwareInfo: {
-          vendor: deviceFeatures.vendor,
-          model: deviceFeatures.model,
-          deviceId: deviceFeatures.device_id,
-          label: deviceFeatures.label,
-          majorVersion: deviceFeatures.major_version,
-          minorVersion: deviceFeatures.minor_version,
-          patchVersion: deviceFeatures.patch_version,
-          language: deviceFeatures.language,
-          publicMasterKey,
-        },
+        cwHardwareInfo: walletHardwareInfo,
       };
-      const wallet: AdaWallet = await createTrezorWallet({ walletInitData });
+      const wallet: AdaWallet = await createWallet({ walletInitData });
 
-      Logger.debug('AdaApi::connectTrezor success');
+      Logger.debug('AdaApi::createHardwareWallet success');
       return _createWalletFromServerData(wallet);
     } catch (error) {
-      Logger.error('AdaApi::connectTrezor error: ' + stringifyError(error));
+      Logger.error('AdaApi::createHardwareWallet error: ' + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.

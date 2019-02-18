@@ -4,12 +4,12 @@
 
 import BigNumber from 'bignumber.js';
 import { defineMessages } from 'react-intl';
-import type { Features } from 'trezor-connect';
 
 import LocalizableError from '../i18n/LocalizableError';
 import WalletTransaction from '../domain/WalletTransaction';
 import WalletAddress from '../domain/WalletAddress';
 import Wallet from '../domain/Wallet';
+import type { WalletHardwareInfo } from '../types/WalletType';
 import type { SignedResponse } from './ada/lib/yoroi-backend-api';
 import type {
   TransactionExportRow,
@@ -140,12 +140,11 @@ export type RestoreWalletRequest = {
 };
 export type RestoreWalletResponse = Wallet;
 
-export type CreateTrezorWalletRequest = {
-  publicMasterKey: string,
+export type CreateHardwareWalletRequest = {
   walletName: string,
-  deviceFeatures: Features
+  walletHardwareInfo: WalletHardwareInfo,
 };
-export type CreateTrezorWalletResponse = Wallet;
+export type CreateHardwareWalletResponse = Wallet;
 
 export type UpdateWalletPasswordRequest = {
   walletId: string,
@@ -159,6 +158,8 @@ export type UpdateWalletResponse = Wallet;
 export type CreateTransactionResponse = SignedResponse;
 
 export type SendTrezorSignedTxResponse = SignedResponse;
+
+export type SendLedgerSignedTxResponse = SignedResponse;
 
 export type GetWalletsResponse = Array<Wallet>;
 

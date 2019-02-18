@@ -32,17 +32,13 @@ import type {
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
 
-declare var CONFIG: ConfigType;
-
-// TODO: [TREZOR] add trezor payload format. Maybe as a README in the same folder?
-
-/** Generate a payload for Trezor SignTx */
-export async function createTrezorSignTxPayload(
+/** Generate a payload for Ledger SignTx */
+export async function createLedgerSignTxPayload(
   txExt: UnsignedTransactionExt
 ): Promise<TrezorSignTxPayload> {
 
   // Inputs
-  const trezorInputs = _transformToTrezorInputs(txExt.inputs);
+  const trezorInputs = _transformToLedgerInputs(txExt.inputs);
 
   // Outputs
   const trezorOutputs = _generateTrezorOutputs(txExt.outputs);
@@ -50,16 +46,43 @@ export async function createTrezorSignTxPayload(
   // Transactions
   const txsBodies = await txsBodiesForInputs(txExt.inputs);
 
-  // Network
-  const network = CONFIG.network.trezorNetwork;
-
   return {
-    // TODO [TREZOR] change network -> protocol_magic
-    network,
-    transactions: txsBodies,
     inputs: trezorInputs,
     outputs: trezorOutputs,
   };
+}
+
+function _derivePath(change: number, index: number): string {
+  // Assumes this is only for Cardano and Web Yoroi (only one account).
+  return `${Config.trezor.DEFAULT_CARDANO_PATH}/${change}/${index}`;
+}
+
+function _transformToLedgerInputs(inputs: Array<TxInput>): Array<TrezorInput> {
+  return inputs.map((input: TxInput) => ({
+    path: _derivePath(input.addressing.change, input.addressing.index),
+    prev_hash: input.ptr.id,
+    prev_index: input.ptr.index,
+    type: 0
+  }));
+}
+
+function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
+  return outputs.map(x => ({
+    amount: x.value.toString(),
+    ..._outputAddressOrPath(x)
+  }));
+}
+
+function _outputAddressOrPath(out: TxOutput) {
+  if (out.isChange) {
+    const fullAddress: ?AdaAddress = out.fullAddress;
+    if (fullAddress) {
+      return { path: _derivePath(fullAddress.change, fullAddress.index) };
+    }
+    Logger.debug('trezorNewTransactions::_outputAddressOrPath: ' +
+      `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
+  }
+  return { address: out.address };
 }
 
 /** List of Body hashes for a list of utxos by batching backend requests */
@@ -92,7 +115,7 @@ export async function txsBodiesForInputs(
 }
 
 /** Send a transaction and save the new change address */
-export async function newTrezorTransaction(
+export async function newLedgerTransaction(
   signedTxHex: string,
   changeAdaAddr: AdaAddress,
 ): Promise<SendTrezorSignedTxResponse> {
@@ -120,37 +143,4 @@ export async function newTrezorTransaction(
     }
     throw new SendTransactionError();
   }
-}
-
-function _derivePath(change: number, index: number): string {
-  // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return `${Config.trezor.DEFAULT_CARDANO_PATH}/${change}/${index}`;
-}
-
-function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
-  return inputs.map((input: TxInput) => ({
-    path: _derivePath(input.addressing.change, input.addressing.index),
-    prev_hash: input.ptr.id,
-    prev_index: input.ptr.index,
-    type: 0
-  }));
-}
-
-function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
-  return outputs.map(x => ({
-    amount: x.value.toString(),
-    ..._outputAddressOrPath(x)
-  }));
-}
-
-function _outputAddressOrPath(out: TxOutput) {
-  if (out.isChange) {
-    const fullAddress: ?AdaAddress = out.fullAddress;
-    if (fullAddress) {
-      return { path: _derivePath(fullAddress.change, fullAddress.index) };
-    }
-    Logger.debug('trezorNewTransactions::_outputAddressOrPath: ' +
-      `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
-  }
-  return { address: out.address };
 }

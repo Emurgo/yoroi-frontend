@@ -24,7 +24,10 @@ import {
   stringifyError
 } from '../../utils/logging';
 
-import type { CreateTrezorWalletResponse } from '../../api/common';
+import type {
+  CreateHarwareWalletRequest,
+  CreateHardwareWalletResponse,
+} from '../../api/common';
 
 const messages = defineMessages({
   saveError101: {
@@ -93,8 +96,8 @@ export default class TrezorConnectStore extends Store {
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  createTrezorWalletRequest: LocalizedRequest<CreateTrezorWalletResponse> =
-    new LocalizedRequest(this.api.ada.createTrezorWallet);
+  createTrezorWalletRequest: LocalizedRequest<CreateHardwareWalletResponse> =
+    new LocalizedRequest(this.api.ada.createHardwareWallet);
 
   /** While trezor wallet creation is taking place, we need to block users from starting a
     * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
@@ -349,7 +352,10 @@ export default class TrezorConnectStore extends Store {
       this._setIsCreateTrezorWalletActive(true);
       this.createTrezorWalletRequest.reset();
 
-      const trezorWallet: Wallet = await this.createTrezorWalletRequest.execute(params).promise;
+      const formattedParams = this._prepareCreateTrezorReqParams(params);
+      const trezorWallet: Wallet =
+        await this.createTrezorWalletRequest.execute(formattedParams).promise;
+
       if (trezorWallet) {
         await this._onSaveSucess(trezorWallet);
       } else {
@@ -374,6 +380,29 @@ export default class TrezorConnectStore extends Store {
       this._setIsCreateTrezorWalletActive(false);
     }
   };
+
+  _prepareCreateTrezorReqParams = (params: {
+    publicMasterKey: string,
+    walletName: string,
+    deviceFeatures: Features,
+  }): CreateHarwareWalletRequest => {
+    const { walletName, publicMasterKey, deviceFeatures } = params;
+    return {
+      walletName,
+      walletHardwareInfo: {
+        publicMasterKey,
+        vendor: deviceFeatures.vendor,
+        model: deviceFeatures.model,
+        deviceId: deviceFeatures.device_id,
+        label: deviceFeatures.label,
+        majorVersion: deviceFeatures.major_version,
+        minorVersion: deviceFeatures.minor_version,
+        patchVersion: deviceFeatures.patch_version,
+        language: deviceFeatures.language,
+        chainCodeHex: '',
+      }
+    };
+  }
 
   _onSaveSucess = async (trezorWallet: Wallet) => {
     // close the active dialog

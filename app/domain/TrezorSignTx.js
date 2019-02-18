@@ -18,3 +18,26 @@ export type TrezorSignTxPayload = {
   transactions: Array<any>,
   network: 1 | 2 // 1 = Testnet | 2 = Mainnet
 }
+
+export type BIP32Path = Array<number>;
+
+export type InputTypeUTxO = {|
+  txDataHex: string,
+  outputIndex: number,
+  path: BIP32Path
+|};
+
+export type OutputTypeAddress = {|
+  amountStr: string,
+  address58: string
+|};
+
+export type OutputTypeChange = {|
+  amountStr: string,
+  path: BIP32Path
+|};
+
+export type LedgerSignTxPayload = {
+  inputs: Array<InputTypeUTxO>,
+  outputs: Array<OutputTypeAddress | OutputTypeChange>,
+}
