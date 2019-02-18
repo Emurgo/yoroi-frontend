@@ -24,6 +24,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Connect to Trezor',
     description: 'Description for the "Trezor" button on the wallet add dialog.',
   },
+  useLedgerDescription: {
+    id: 'wallet.add.dialog.ledger.description',
+    defaultMessage: '!!!Connect to Ledger',
+    description: 'Description for the "Ledger" button on the wallet add dialog.',
+  },
   restoreDescription: {
     id: 'wallet.add.dialog.restore.description',
     defaultMessage: '!!!Restore wallet from backup',
