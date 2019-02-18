@@ -43,6 +43,7 @@ type Props = {
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
+  currentLocale: string,
 };
 
 @observer
@@ -54,7 +55,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
 
     return (
       <div>
@@ -99,12 +100,14 @@ export default class SettingsMenu extends Component<Props> {
             className="AboutYoroi"
           />
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.adaRedemption)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
-            active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
-            className="adaRedemption"
-          />
+          {(currentLocale === 'en-US' || currentLocale === 'ja-JP') &&
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.adaRedemption)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
+              active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
+              className="adaRedemption"
+            />
+          }
         </div>
       </div>
     );
