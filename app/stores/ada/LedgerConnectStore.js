@@ -71,12 +71,12 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   setup() {
     this._reset();
-    // const trezorConnectAction = this.actions.ada.trezorConnect;
-    // trezorConnectAction.cancel.listen(this._cancel);
-    // trezorConnectAction.submitAbout.listen(this._submitAbout);
-    // trezorConnectAction.goBackToAbout.listen(this._goBackToAbout);
-    // trezorConnectAction.submitConnect.listen(this._submitConnect);
-    // trezorConnectAction.submitSave.listen(this._submitSave);
+    const ledgerConnectAction = this.actions.ada.ledgerConnect;
+    ledgerConnectAction.cancel.listen(this._cancel);
+    ledgerConnectAction.submitAbout.listen(this._submitAbout);
+    ledgerConnectAction.goBackToAbout.listen(this._goBackToAbout);
+    ledgerConnectAction.submitConnect.listen(this._submitConnect);
+    ledgerConnectAction.submitSave.listen(this._submitSave);
 
     // /** Preinitialization of TrezorConnect API will result in faster first response */
     // try {
@@ -92,7 +92,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     //   this.createLedgerWalletRequest.reset();
     // }
 
-    // this._removeLedgerConnectEventListeners();
+    this._removeLedgerConnectEventListeners();
 
     this._reset();
     super.teardown();
@@ -223,7 +223,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   };
 
   _validateResponse = (): void => {
-    
+
   }
 
   /** Validates the compatibility of data which we have received from Trezor */
