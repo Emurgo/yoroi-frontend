@@ -42,6 +42,7 @@ import Config from '../../../config';
 
 declare var CONFIG: ConfigType;
 
+// ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
   txExt: UnsignedTransactionExt
@@ -91,7 +92,7 @@ export async function txsBodiesForInputs(
         groupsOfTxBodies.reduce((acc, groupOfTxBodies) => acc.concat(groupOfTxBodies), [])
       ));
   } catch (getTxBodiesError) {
-    Logger.error('trezorNewTransactions::txsBodiesForInputs error: ' +
+    Logger.error('newTransaction::txsBodiesForInputs error: ' +
       stringifyError(getTxBodiesError));
     throw new GetTxsBodiesForUTXOsError();
   }
@@ -102,7 +103,7 @@ export async function newTrezorTransaction(
   signedTxHex: string,
   changeAdaAddr: AdaAddress,
 ): Promise<SendTrezorSignedTxResponse> {
-  Logger.debug('trezorNewTransactions::newTrezorTransaction error: called');
+  Logger.debug('newTransaction::newTrezorTransaction: called');
   const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
 
   // We assume a change address is used. Currently, there is no way to perfectly match the tx.
@@ -113,11 +114,11 @@ export async function newTrezorTransaction(
   try {
     const body = { signedTx };
     const backendResponse = await sendTx(body);
-    Logger.debug('trezorNewTransactions::newTrezorTransaction error: success');
+    Logger.debug('newTransaction::newTrezorTransaction: success');
 
     return backendResponse;
   } catch (sendTxError) {
-    Logger.error('trezorNewTransactions::newTrezorTransaction error: ' + stringifyError(sendTxError));
+    Logger.error('newTransaction::newTrezorTransaction error: ' + stringifyError(sendTxError));
     // On failure, we have to remove the change address we eagerly added
     // Note: we don't await on this
     removeAdaAddress(changeAdaAddr);
@@ -155,12 +156,13 @@ function _outputAddressOrPath(out: TxOutput) {
     if (fullAddress) {
       return { path: _derivePath(fullAddress.change, fullAddress.index) };
     }
-    Logger.debug('trezorNewTransactions::_outputAddressOrPath: ' +
+    Logger.debug('newTransaction::_outputAddressOrPath: ' +
       `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
   }
   return { address: out.address };
 }
 
+// ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
 export async function createLedgerSignTxPayload(
   txExt: UnsignedTransactionExt
@@ -183,7 +185,7 @@ export async function createLedgerSignTxPayload(
 }
 
 function _transformToLedgerInputs(
-  inputs: Array<TxInput>, 
+  inputs: Array<TxInput>,
   txDataHexList: Array<string>
 ): Array<LedgerInputTypeUTxO> {
   return inputs.map((input: TxInput, idx: number) => ({
@@ -210,7 +212,7 @@ function _ledgerOutputAddressOrPath(out: TxOutput) {
       return { path: strToPath(_derivePath(fullAddress.change, fullAddress.index)) };
     }
 
-    Logger.debug('ledgerNewTransactions::_ledgerOutputAddressOrPath: ' +
+    Logger.debug('newTransaction::_ledgerOutputAddressOrPath: ' +
       `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
   }
 
@@ -218,11 +220,13 @@ function _ledgerOutputAddressOrPath(out: TxOutput) {
 }
 
 /** Send a transaction and save the new change address */
+// TODO
 export async function newLedgerTransaction(
   signedTxHex: string,
   changeAdaAddr: AdaAddress,
 ): Promise<SendLedgerSignedTxResponse> {
-  Logger.debug('ledgerNewTransactions::newTrezorTransaction error: called');
+  Logger.debug('newTransaction::newTrezorTransaction: called');
+
   const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
 
   // We assume a change address is used. Currently, there is no way to perfectly match the tx.
@@ -233,17 +237,19 @@ export async function newLedgerTransaction(
   try {
     const body = { signedTx };
     const backendResponse = await sendTx(body);
-    Logger.debug('ledgerNewTransactions::newTrezorTransaction error: success');
+    Logger.debug('newTransaction::newTrezorTransaction: success');
 
     return backendResponse;
   } catch (sendTxError) {
-    Logger.error('ledgerNewTransactions::newTrezorTransaction error: ' + stringifyError(sendTxError));
+    Logger.error('newTransaction::newTrezorTransaction error: ' + stringifyError(sendTxError));
+
     // On failure, we have to remove the change address we eagerly added
     // Note: we don't await on this
     removeAdaAddress(changeAdaAddr);
     if (sendTxError instanceof InvalidWitnessError) {
       throw new InvalidWitnessError();
     }
+
     throw new SendTransactionError();
   }
 }

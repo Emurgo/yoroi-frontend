@@ -91,7 +91,6 @@
     "html-loader": "0.4.5",
     "jest": "23.6.0",
     "json-server": "0.13.0",
-    "yoroi-extension-ledger-bridge": "git+https://github.com/Emurgo/yoroi-extension-ledger-bridge.git",
     "markdown-loader": "2.0.0",
     "minimist": "1.2.0",
     "mobx-react-devtools": "^6.0.3",
@@ -155,7 +154,8 @@
     "trezor-connect": "6.0.2",
     "validator": "6.3.0",
     "unorm": "1.4.1",
-    "pbkdf2": "3.0.17"
+    "pbkdf2": "3.0.17",
+    "yoroi-extension-ledger-bridge": "git+https://github.com/Emurgo/yoroi-extension-ledger-bridge.git"
   },
   "engineStrict": true,
   "engine": {
