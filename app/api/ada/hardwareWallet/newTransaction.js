@@ -22,19 +22,24 @@ import {
   InvalidWitnessError,
   GetTxsBodiesForUTXOsError
 } from '../errors';
-import type { SendTrezorSignedTxResponse } from '../../common';
+import type {
+  SendTrezorSignedTxResponse,
+  SendLedgerSignedTxResponse
+} from '../../common';
 import type {
   TrezorInput,
   TrezorOutput,
-  TrezorSignTxPayload
-} from '../../../domain/TrezorSignTx';
+  TrezorSignTxPayload,
+  LedgerInputTypeUTxO,
+  LedgerOutputTypeAddress,
+  LedgerOutputTypeChange,
+  LedgerSignTxPayload,
+} from '../../../domain/SignTx';
 
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
 
 declare var CONFIG: ConfigType;
-
-// TODO: [TREZOR] add trezor payload format. Maybe as a README in the same folder?
 
 /** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
@@ -54,7 +59,7 @@ export async function createTrezorSignTxPayload(
   const network = CONFIG.network.trezorNetwork;
 
   return {
-    // TODO [TREZOR] change network -> protocol_magic
+    // TODO [TREZOR] change (network -> protocol_magic)
     network,
     transactions: txsBodies,
     inputs: trezorInputs,
@@ -122,9 +127,9 @@ export async function newTrezorTransaction(
   }
 }
 
-function _derivePath(change: number, index: number): string {
+export function _derivePath(change: number, index: number): string {
   // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return `${Config.trezor.DEFAULT_CARDANO_PATH}/${change}/${index}`;
+  return `${Config.wallets.CARDANO_FIRST_BIP_PATH}/${change}/${index}`;
 }
 
 function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
@@ -153,4 +158,91 @@ function _outputAddressOrPath(out: TxOutput) {
       `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
   }
   return { address: out.address };
+}
+
+/** Generate a payload for Ledger SignTx */
+export async function createLedgerSignTxPayload(
+  txExt: UnsignedTransactionExt
+): Promise<LedgerSignTxPayload> {
+
+  // Transactions Hash
+  const txDataHexList = await txsBodiesForInputs(txExt.inputs);
+
+  // Inputs
+  const ledgerInputs: Array<LedgerInputTypeUTxO> =
+    _transformToLedgerInputs(txExt.inputs, txDataHexList);
+
+  // Outputs
+  const ledgerOutputs = _transformToLedgerOutputs(txExt.outputs);
+
+  return {
+    inputs: ledgerInputs,
+    outputs: ledgerOutputs,
+  };
+}
+
+function _transformToLedgerInputs(
+  inputs: Array<TxInput>, 
+  txDataHexList: Array<string>
+): Array<LedgerInputTypeUTxO> {
+  return inputs.map((input: TxInput, idx: number) => ({
+    txDataHex: txDataHexList[idx],
+    outputIndex: input.ptr.index,
+    path: _derivePath(input.addressing.change, input.addressing.index),
+  }));
+}
+
+function _transformToLedgerOutputs(
+  outputs: Array<TxOutput>
+): Array<LedgerOutputTypeAddress | LedgerOutputTypeChange> {
+  return outputs.map(x => ({
+    amountStr: x.value.toString(),
+    ..._ledgerOutputAddressOrPath(x)
+  }));
+}
+
+function _ledgerOutputAddressOrPath(out: TxOutput) {
+  if (out.isChange) {
+    // It's a change output
+    const fullAddress: ?AdaAddress = out.fullAddress;
+    if (fullAddress) {
+      return { path: _derivePath(fullAddress.change, fullAddress.index) };
+    }
+
+    Logger.debug('ledgerNewTransactions::_ledgerOutputAddressOrPath: ' +
+      `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
+  }
+
+  return { address58: out.address };
+}
+
+/** Send a transaction and save the new change address */
+export async function newLedgerTransaction(
+  signedTxHex: string,
+  changeAdaAddr: AdaAddress,
+): Promise<SendLedgerSignedTxResponse> {
+  Logger.debug('ledgerNewTransactions::newTrezorTransaction error: called');
+  const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
+
+  // We assume a change address is used. Currently, there is no way to perfectly match the tx.
+  // tentatively assume that the transaction will succeed,
+  // so we save the change address to the wallet
+  await saveAdaAddress(changeAdaAddr, 'Internal');
+
+  try {
+    const body = { signedTx };
+    const backendResponse = await sendTx(body);
+    Logger.debug('ledgerNewTransactions::newTrezorTransaction error: success');
+
+    return backendResponse;
+  } catch (sendTxError) {
+    Logger.error('ledgerNewTransactions::newTrezorTransaction error: ' + stringifyError(sendTxError));
+    // On failure, we have to remove the change address we eagerly added
+    // Note: we don't await on this
+    removeAdaAddress(changeAdaAddr);
+    if (sendTxError instanceof InvalidWitnessError) {
+      throw new InvalidWitnessError();
+    }
+    throw new SendTransactionError();
+  }
 }

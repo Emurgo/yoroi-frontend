@@ -6,7 +6,10 @@ export default {
     WALLET_RESTORED_NOTIFICATION_DURATION: 8,
     MAX_ALLOWED_UNUSED_ADDRESSES: 20,
     TRANSACTION_REQUEST_SIZE: 20,
-    WALLET_RECOVERY_PHRASE_WORD_COUNT: 12
+    WALLET_RECOVERY_PHRASE_WORD_COUNT: 12,
+    // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoGetPublicKey.md
+    // https://cardanolaunch.com/assets/Ed25519_BIP.pdf    
+    CARDANO_FIRST_BIP_PATH: 'm/44\'/1815\'/0\'',
   },
   forms: {
     FORM_VALIDATION_DEBOUNCE_WAIT: 250
@@ -14,9 +17,4 @@ export default {
   adaRedemption: {
     ADA_REDEMPTION_PASSPHRASE_LENGTH: 9
   },
-  trezor: {
-    // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoGetPublicKey.md
-    // https://cardanolaunch.com/assets/Ed25519_BIP.pdf
-    DEFAULT_CARDANO_PATH: 'm/44\'/1815\'/0\''
-  }
 };
