@@ -25,7 +25,7 @@ import {
 } from '../../utils/logging';
 
 import type {
-  CreateHarwareWalletRequest,
+  CreateHardwareWalletRequest,
   CreateHardwareWalletResponse,
 } from '../../api/common';
 
@@ -392,7 +392,7 @@ export default class TrezorConnectStore extends Store {
     publicMasterKey: string,
     walletName: string,
     deviceFeatures: Features,
-  }): CreateHarwareWalletRequest => {
+  }): CreateHardwareWalletRequest => {
     const { walletName, publicMasterKey, deviceFeatures } = params;
     return {
       walletName,

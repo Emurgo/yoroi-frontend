@@ -1,3 +1,4 @@
 /js-cardano-wasm
 /dll
 /chrome/3rd-party/trezor
+app/api/ada/hardwareWallet/utils.js

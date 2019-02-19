@@ -40,6 +40,6 @@ export type LedgerOutputTypeChange = {
 };
 
 export type LedgerSignTxPayload = {
-  inputs: Array<InputTypeUTxO>,
+  inputs: Array<LedgerInputTypeUTxO>,
   outputs: Array<LedgerOutputTypeAddress | LedgerOutputTypeChange>,
 }

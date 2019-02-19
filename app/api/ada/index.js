@@ -140,6 +140,10 @@ export type CreateLedgerSignTxDataResponse = {
   ledgerSignTxPayload: LedgerSignTxPayload,
   changeAdaAddr: AdaAddress
 };
+export type SendLedgerSignedTxRequest = {
+  signedTxHex: string,
+  changeAdaAddr: AdaAddress
+};
 export type UpdateWalletRequest = {
   walletId: string,
   name: string,
@@ -360,11 +364,10 @@ export default class AdaApi {
 
       const { changeAdaAddress, txExt }: AdaFeeEstimateResponse =
           await getAdaTransactionFee(receiver, amount);
-      console.log('txExt' + JSON.stringify(txExt, null, 5));
+
       const trezorSignTxPayload: TrezorSignTxPayload = await createTrezorSignTxPayload(txExt);
-      console.log('CHANGE-ADDRESS' + JSON.stringify(changeAdaAddress, null, 5));
-      console.log('TREZOR-SIGN-TX-PAYLOAD' + JSON.stringify(trezorSignTxPayload, null, 5));
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
+
       return {
         trezorSignTxPayload,
         changeAddress: changeAdaAddress
@@ -406,14 +409,15 @@ export default class AdaApi {
       Logger.debug('AdaApi::createLedgerSignTxData called');
       const { receiver, amount } = request;
 
-      const { changeAddress, txExt }: AdaFeeEstimateResponse = await getAdaTransactionFee(receiver, amount);
+      const { changeAdaAddress, txExt }: AdaFeeEstimateResponse
+        = await getAdaTransactionFee(receiver, amount);
 
       const ledgerSignTxPayload: LedgerSignTxPayload = await createLedgerSignTxPayload(txExt);
 
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
       return {
         ledgerSignTxPayload,
-        changeAddress
+        changeAdaAddr: changeAdaAddress
       };
     } catch (error) {
       Logger.error('AdaApi::createLedgerSignTxData error: ' + stringifyError(error));

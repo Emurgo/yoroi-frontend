@@ -35,6 +35,7 @@ import type {
   LedgerOutputTypeChange,
   LedgerSignTxPayload,
 } from '../../../domain/SignTx';
+import { str_to_path as strToPath } from './utils'; // TODO [LEDGER] later replace this with npm module
 
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
@@ -184,7 +185,7 @@ function _transformToLedgerInputs(
   return inputs.map((input: TxInput, idx: number) => ({
     txDataHex: txDataHexList[idx],
     outputIndex: input.ptr.index,
-    path: _derivePath(input.addressing.change, input.addressing.index),
+    path: strToPath(_derivePath(input.addressing.change, input.addressing.index)),
   }));
 }
 
@@ -202,7 +203,7 @@ function _ledgerOutputAddressOrPath(out: TxOutput) {
     // It's a change output
     const fullAddress: ?AdaAddress = out.fullAddress;
     if (fullAddress) {
-      return { path: _derivePath(fullAddress.change, fullAddress.index) };
+      return { path: strToPath(_derivePath(fullAddress.change, fullAddress.index)) };
     }
 
     Logger.debug('ledgerNewTransactions::_ledgerOutputAddressOrPath: ' +
