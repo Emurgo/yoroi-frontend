@@ -192,7 +192,7 @@ export default class TrezorConnectStore extends Store {
     let trezorResp: any;
     try {
       trezorResp = await TrezorConnect.cardanoGetPublicKey({
-        path: Config.trezor.DEFAULT_CARDANO_PATH
+        path: Config.wallets.CARDANO_FIRST_BIP_PATH
       });
     } catch (error) {
       Logger.error(`TrezorConnectStore::_checkAndStoreTrezorDeviceInfo ${stringifyError(error)}`);

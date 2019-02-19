@@ -152,7 +152,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     //   // TODO: Change for the connect.
     //   // getExtendedPublicKey
     //   ledgerResp = await HWConnect.cardanoGetPublicKey({
-    //     path: Config.trezor.DEFAULT_CARDANO_PATH
+    //     path: Config.wallets.CARDANO_FIRST_BIP_PATH
     //   });
     // } catch (error) {
     //   Logger.error(`TrezorConnectStore::_checkAndStoreledgerDeviceInfo ${stringifyError(error)}`);

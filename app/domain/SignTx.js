@@ -23,23 +23,23 @@ export type TrezorSignTxPayload = {
 
 export type BIP32Path = Array<number>;
 
-export type InputTypeUTxO = {|
+export type LedgerInputTypeUTxO = {
   txDataHex: string,
   outputIndex: number,
   path: BIP32Path
-|};
+};
 
-export type OutputTypeAddress = {|
+export type LedgerOutputTypeAddress = {
   amountStr: string,
   address58: string
-|};
+};
 
-export type OutputTypeChange = {|
+export type LedgerOutputTypeChange = {
   amountStr: string,
   path: BIP32Path
-|};
+};
 
 export type LedgerSignTxPayload = {
   inputs: Array<InputTypeUTxO>,
-  outputs: Array<OutputTypeAddress | OutputTypeChange>,
+  outputs: Array<LedgerOutputTypeAddress | LedgerOutputTypeChange>,
 }

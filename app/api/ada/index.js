@@ -51,15 +51,13 @@ import {
 import type {
   TrezorSignTxPayload,
   LedgerSignTxPayload,
-} from '../../domain/TrezorSignTx';
+} from '../../domain/SignTx';
 import {
   createTrezorSignTxPayload,
   newTrezorTransaction,
-} from './hardwareWallet/trezorNewTransactions';
-import {
   createLedgerSignTxPayload,
   newLedgerTransaction,
-} from './hardwareWallet/ledgerNewTransactions';
+} from './hardwareWallet/newTransaction';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -122,17 +120,17 @@ export type CreateTransactionRequest = {
   amount: string,
   password: string
 };
-export type SendTrezorSignedTxRequest = {
-  signedTxHex: string,
-  changeAdaAddr: AdaAddress
-};
 export type CreateTrezorSignTxDataRequest = {
   receiver: string,
   amount: string
 };
 export type CreateTrezorSignTxDataResponse = {
-  trezorSignTxPayload: TrezorSignTxPayload,
+  trezorSignTxPayload: TrezorSignTxPayload, // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   changeAddress: AdaAddress
+};
+export type SendTrezorSignedTxRequest = {
+  signedTxHex: string,
+  changeAdaAddr: AdaAddress
 };
 export type CreateLedgerSignTxDataRequest = {
   receiver: string,
@@ -140,7 +138,7 @@ export type CreateLedgerSignTxDataRequest = {
 };
 export type CreateLedgerSignTxDataResponse = {
   ledgerSignTxPayload: LedgerSignTxPayload,
-  // changeAddress: AdaAddress
+  changeAdaAddr: AdaAddress
 };
 export type UpdateWalletRequest = {
   walletId: string,
@@ -362,8 +360,10 @@ export default class AdaApi {
 
       const { changeAdaAddress, txExt }: AdaFeeEstimateResponse =
           await getAdaTransactionFee(receiver, amount);
+      console.log('txExt' + JSON.stringify(txExt, null, 5));
       const trezorSignTxPayload: TrezorSignTxPayload = await createTrezorSignTxPayload(txExt);
-
+      console.log('CHANGE-ADDRESS' + JSON.stringify(changeAdaAddress, null, 5));
+      console.log('TREZOR-SIGN-TX-PAYLOAD' + JSON.stringify(trezorSignTxPayload, null, 5));
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
       return {
         trezorSignTxPayload,
@@ -406,13 +406,14 @@ export default class AdaApi {
       Logger.debug('AdaApi::createLedgerSignTxData called');
       const { receiver, amount } = request;
 
-      const { txExt }: AdaFeeEstimateResponse = await getAdaTransactionFee(receiver, amount);
+      const { changeAddress, txExt }: AdaFeeEstimateResponse = await getAdaTransactionFee(receiver, amount);
+
       const ledgerSignTxPayload: LedgerSignTxPayload = await createLedgerSignTxPayload(txExt);
 
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
       return {
         ledgerSignTxPayload,
-        // changeAddress: changeAdaAddress
+        changeAddress
       };
     } catch (error) {
       Logger.error('AdaApi::createLedgerSignTxData error: ' + stringifyError(error));
@@ -420,19 +421,20 @@ export default class AdaApi {
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
         throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
       }
+
+      // We don't know what the problem was so throw a generic error
+      throw new GenericApiError();
     }
   }
 
   async sendLedgerSignedTx(
     request: SendLedgerSignedTxRequest
   ): Promise<SendLedgerSignedTxResponse> {
-    Logger.debug('AdaApi::sendLedgerSignedTx called');
-    const { signedTxHex, changeAdaAddr } = request;
     try {
+      Logger.debug('AdaApi::sendLedgerSignedTx called');
+
+      const { signedTxHex, changeAdaAddr } = request;
       const response = await newLedgerTransaction(signedTxHex, changeAdaAddr);
       Logger.debug('AdaApi::sendLedgerSignedTx success: ' + stringifyData(response));
 
@@ -443,10 +445,10 @@ export default class AdaApi {
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
         throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
       }
+
+      // We don't know what the problem was so throw a generic error
+      throw new GenericApiError();
     }
   }
 
