@@ -1,6 +1,6 @@
 // @flow
 
-// TODO: if possilbe for Trezor and Ledger import flow definition from their module
+// TODO [LEDGER] : if possilbe for Trezor and Ledger import flow definition from their module
 
 export type TrezorInput = {
   path: string,
@@ -41,6 +41,6 @@ export type LedgerOutputTypeChange = {
 };
 
 export type LedgerSignTxPayload = {
-  inputs: Array<InputTypeUTxO>,
+  inputs: Array<LedgerInputTypeUTxO>,
   outputs: Array<LedgerOutputTypeAddress | LedgerOutputTypeChange>,
 }
