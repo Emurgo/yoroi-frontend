@@ -36,5 +36,5 @@
       "js": ["js/trezor-content-script.js"]
     }
   ],
-  "content_security_policy": "default-src 'self'; frame-src https://connect.trezor.io/ https://emurgo.github.io/yoroi-extension-ledger-bridge/; script-src 'self' 'unsafe-eval'; connect-src https://18.207.22.26:8080 wss://18.207.22.26:8080; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "content_security_policy": "default-src 'self'; frame-src https://connect.trezor.io/ https://emurgo.github.io/yoroi-extension-ledger-bridge; script-src 'self' 'unsafe-eval'; connect-src https://18.207.22.26:8080 wss://18.207.22.26:8080; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
 }
