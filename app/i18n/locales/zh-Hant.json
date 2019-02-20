@@ -219,7 +219,7 @@
   "wallet.redeem.dialog.submitLabel": "兌換你的錢",
   "wallet.redeem.dialog.walletSelectLabel": "選擇錢包",
   "wallet.redeem.disclaimerOverlay.checkboxLabel": "我已經理解了以上的信息",
-  "wallet.redeem.disclaimerOverlay.disclaimerText": "ATTENTION: Redeeming on the Cardano testnet will validate that your certificate or redemption key is correct and will allow you to redeem TEST-ADA for testing purposes only. KEEP your certificate or redemption key safe and secure. You will need to redeem on the mainnet. TEST-ADA holds no value.",
+  "wallet.redeem.disclaimerOverlay.disclaimerText": "注意：於Cardano測試網兌換將驗證您的證書或兌換密鑰是否正確，並允許您兌換TEST-ADA作為測試目的。請保證您的證書或兌換鑰匙安全無虞。 您需要在主網上兌換。 TEST-ADA沒有任何價值。",
   "wallet.redeem.disclaimerOverlay.submitLabel": "繼續",
   "wallet.redeem.disclaimerOverlay.title": "Daedalus 兌換免責聲明",
   "wallet.redeem.noWallets.createWalletLink": "創建你的第一個錢包",
