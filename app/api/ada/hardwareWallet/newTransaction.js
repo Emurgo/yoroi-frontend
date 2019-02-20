@@ -223,7 +223,7 @@ function _ledgerOutputAddress58OrPath(
 }
 
 /** Send a transaction and save the new change address */
-// TODO
+// TODO [TREZOR] try to merge this function with createTrezorSignTxPayload() 
 export async function newLedgerTransaction(
   signedTxHex: string,
   changeAdaAddr: AdaAddress,
