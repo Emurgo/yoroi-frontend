@@ -425,10 +425,10 @@ export default class AdaApi {
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
         throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
       }
-
-      // We don't know what the problem was so throw a generic error
-      throw new GenericApiError();
     }
   }
 
@@ -449,10 +449,10 @@ export default class AdaApi {
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
         throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
       }
-
-      // We don't know what the problem was so throw a generic error
-      throw new GenericApiError();
     }
   }
 
