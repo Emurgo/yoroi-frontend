@@ -1,6 +1,6 @@
 {
-  "ImageUploadWidget.clickToUploadLabel": "or click to upload",
-  "ImageUploadWidget.dropFileHint": "Drop file here",
+  "ImageUploadWidget.clickToUploadLabel": "或點擊上傳",
+  "ImageUploadWidget.dropFileHint": "把檔案拉到此處",
   "api.errors.ApiMethodNotYetImplementedError": "此 API 方法尚未實作。",
   "api.errors.GenericApiError": "已發生錯誤，請稍候再試一次。",
   "api.errors.IncorrectPasswordError": "錢包密碼不正確。",
