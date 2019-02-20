@@ -51,7 +51,7 @@ import {
 import type {
   TrezorSignTxPayload,
   LedgerSignTxPayload,
-} from '../../domain/SignTx';
+} from '../../domain/HWSignTx';
 import {
   createTrezorSignTxPayload,
   newTrezorTransaction,

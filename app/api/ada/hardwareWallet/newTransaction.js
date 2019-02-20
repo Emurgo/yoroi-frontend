@@ -34,7 +34,7 @@ import type {
   LedgerOutputTypeAddress,
   LedgerOutputTypeChange,
   LedgerSignTxPayload,
-} from '../../../domain/SignTx';
+} from '../../../domain/HWSignTx';
 import { str_to_path as strToPath } from './utils'; // TODO [LEDGER] later replace this with npm module
 
 import type { ConfigType } from '../../../../config/config-types';
@@ -127,7 +127,7 @@ export async function newTrezorTransaction(
 
 export function _derivePath(change: number, index: number): string {
   // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return `${Config.wallets.CARDANO_FIRST_BIP_PATH}/${change}/${index}`;
+  return `${Config.wallets.BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH}/${change}/${index}`;
 }
 
 function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
@@ -146,7 +146,9 @@ function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
   }));
 }
 
-function _outputAddressOrPath(out: TxOutput) {
+function _outputAddressOrPath(
+  out: TxOutput
+): { path: string } | { address: string } {
   if (out.isChange) {
     const fullAddress: ?AdaAddress = out.fullAddress;
     if (fullAddress) {
@@ -196,13 +198,14 @@ function _transformToLedgerOutputs(
 ): Array<LedgerOutputTypeAddress | LedgerOutputTypeChange> {
   return outputs.map(x => ({
     amountStr: x.value.toString(),
-    ..._ledgerOutputAddressOrPath(x)
+    ..._ledgerOutputAddress58OrPath(x)
   }));
 }
 
-function _ledgerOutputAddressOrPath(out: TxOutput) {
+function _ledgerOutputAddress58OrPath(
+  out: TxOutput
+): { address58: string } | { path: string }  {
   if (out.isChange) {
-    // It's a change output
     const fullAddress: ?AdaAddress = out.fullAddress;
     if (fullAddress) {
       return { path: strToPath(_derivePath(fullAddress.change, fullAddress.index)) };
