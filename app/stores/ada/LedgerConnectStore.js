@@ -157,9 +157,14 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     this.progressInfo.stepState = StepState.ERROR;
   };
 
+  _wait = async ms => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     try {
       const ledgerBridge = new LedgerBridge();
+      await this._wait(5000);
       const version: GetVersionResponse = await ledgerBridge.getVersion();
       console.log(JSON.stringify(version, null, 2));
 
