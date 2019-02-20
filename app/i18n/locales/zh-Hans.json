@@ -30,7 +30,7 @@
   "api.errors.invalidWitnessError": "签名无效。",
   "api.errors.noCertificateError": "分析时需要证书档案",
   "api.errors.noInputsError": "从恢复短语恢复的钱包是空的。 请先检查您的恢复短语，并再次尝试恢复。",
-  "api.errors.parsePDFFileError": "Error while parsing PDF file.",
+  "api.errors.parsePDFFileError": "分析PDF档案时出错",
   "api.errors.parsePDFKeyError": "Error while parsing secret key.",
   "api.errors.parsePDFPageError": "Error while parsing PDF file page.",
   "api.errors.pendingTransactionError": "更新暂挂交易时发生错误。",
