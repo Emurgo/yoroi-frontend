@@ -6,6 +6,8 @@ import { observable, action } from 'mobx';
 import { defineMessages } from 'react-intl';
 
 import LedgerBridge from 'yoroi-extension-ledger-bridge';
+// TODO [LEDGER]: replace types by npm module import
+import type { GetVersionResponse } from 'yoroi-extension-ledger-bridge/lib/adaTypes';
 
 // import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
 // import type { DeviceMessage, Features, UiMessage } from 'trezor-connect';
@@ -157,10 +159,9 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     try {
-      // let ledgerBridge = new LedgerBridge();
-
-      // let version = ledgerBridge.getVersion();
-      // console.log('ledger version');
+      const ledgerBridge = new LedgerBridge();
+      const version: GetVersionResponse = await ledgerBridge.getVersion();
+      console.log(JSON.stringify(version, null, 2));
 
     } catch (error) {
       Logger.error(`LedgerConnectStore::_checkAndStoreledgerDeviceInfo ${stringifyError(error)}`);
