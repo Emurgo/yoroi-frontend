@@ -40,7 +40,6 @@ export type AdaWalletHardwareInfo = {
   patchVersion: number,
   language: string,
   publicMasterKey: string,
-  chainCodeHex: string,
 };
 
 // Based on TxState from the Importer

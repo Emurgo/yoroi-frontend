@@ -185,7 +185,7 @@ export default class TrezorConnectStore extends Store {
     let trezorResp: any;
     try {
       trezorResp = await TrezorConnect.cardanoGetPublicKey({
-        path: Config.wallets.CARDANO_FIRST_BIP_PATH
+        path: Config.wallets.BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH
       });
     } catch (error) {
       Logger.error(`TrezorConnectStore::_checkAndStoreTrezorDeviceInfo ${stringifyError(error)}`);
@@ -363,6 +363,8 @@ export default class TrezorConnectStore extends Store {
         throw new Error();
       }
     } catch (error) {
+      Logger.error(`TrezorConnectStore::_saveTrezor::error ${stringifyError(error)}`);
+
       if (error instanceof CheckAdressesInUseApiError) {
         // redirecting CheckAdressesInUseApiError -> saveError101
         // because for user saveError101 is more meaningful in this context
@@ -371,10 +373,9 @@ export default class TrezorConnectStore extends Store {
         this.error = error;
       } else {
         // some unknow error
-        this.error = new LocalizableError(messages.error999);
+        this.error = new UnexpectedError();
       }
       this._goToSaveError();
-      Logger.error(`TrezorConnectStore::_saveTrezor::error ${stringifyError(error)}`);
     } finally {
       this.createTrezorWalletRequest.reset();
       this._setIsCreateTrezorWalletActive(false);
