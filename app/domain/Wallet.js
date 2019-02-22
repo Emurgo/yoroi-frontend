@@ -4,7 +4,8 @@ import BigNumber from 'bignumber.js';
 import type { AssuranceMode, AssuranceModeOption } from '../types/transactionAssuranceTypes';
 import { assuranceModes, assuranceModeOptions } from '../config/transactionAssuranceConfig';
 import type { WalletType, WalletHardwareInfo } from '../types/WalletType';
-import { WalletTypeOption, TrezorT, LedgerNanoS } from '../types/WalletType';
+import { WalletTypeOption } from '../types/WalletType';
+import Config from '../config';
 
 /** External representation of the internal Wallet in the API layer  */
 export default class Wallet {
@@ -52,15 +53,15 @@ export default class Wallet {
   @computed get isTrezorTWallet(): boolean {
     return (this.isHardwareWallet
       && !!this.hardwareInfo
-      && this.hardwareInfo.vendor === TrezorT.vendor
-      && this.hardwareInfo.model === TrezorT.model);
+      && this.hardwareInfo.vendor === Config.wallets.hardwareWallet.trezorT.VENDOR
+      && this.hardwareInfo.model === Config.wallets.hardwareWallet.trezorT.MODEL);
   }
 
   @computed get isLedgerNanoSWallet(): boolean {
     return (this.isHardwareWallet
       && !!this.hardwareInfo
-      && this.hardwareInfo.vendor === LedgerNanoS.vendor
-      && this.hardwareInfo.model === LedgerNanoS.model);
+      && this.hardwareInfo.vendor === Config.wallets.hardwareWallet.ledgerNanoS.VENDOR
+      && this.hardwareInfo.model === Config.wallets.hardwareWallet.ledgerNanoS.MODEL);
   }  
 
   @computed get assuranceMode(): AssuranceMode {

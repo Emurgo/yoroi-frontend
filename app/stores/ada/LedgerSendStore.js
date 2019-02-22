@@ -1,7 +1,7 @@
 // @flow
 import { action, observable } from 'mobx';
 import { defineMessages } from 'react-intl';
-import LedgerBridge from 'yoroi-extension-ledger-bridge';
+import { LedgerBridge } from 'yoroi-extension-ledger-bridge';
 
 import Store from '../base/Store';
 import environment from '../../environment';

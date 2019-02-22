@@ -2,15 +2,19 @@
 
 // Handles Connect to Ledger Hardware Wallet dialog
 
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import { defineMessages } from 'react-intl';
 
-import LedgerBridge from 'yoroi-extension-ledger-bridge';
+import {
+  LedgerBridge,
+  makeCardanoBIP44Path
+} from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace types by npm module import
-import type { GetVersionResponse } from 'yoroi-extension-ledger-bridge/lib/adaTypes';
-
-// import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
-// import type { DeviceMessage, Features, UiMessage } from 'trezor-connect';
+import type {
+  GetVersionResponse,
+  GetExtendedPublicKeyResponse,
+  BIP32Path
+} from 'yoroi-extension-ledger-bridge/lib/adaTypes';
 
 import Config from '../../config';
 import environment from '../../environment';
@@ -18,6 +22,11 @@ import environment from '../../environment';
 import Store from '../base/Store';
 import Wallet from '../../domain/Wallet';
 import LocalizedRequest from '../lib/LocalizedRequest';
+
+import type {
+  CreateHardwareWalletRequest,
+  CreateHardwareWalletResponse,
+} from '../../api/common';
 
 // This is actually just an interface
 import {
@@ -37,10 +46,9 @@ import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 
 import {
   Logger,
+  stringifyData,
   stringifyError
 } from '../../utils/logging';
-
-// import type { CreateTrezorWalletResponse } from '../../api/common';
 
 const messages = defineMessages({
   saveError101: {
@@ -61,23 +69,21 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     return this.progressInfo.stepState === StepState.PROCESS;
   }
 
-  HWDeviceInfo: ?HWDeviceInfo;
+  hwDeviceInfo: ?HWDeviceInfo;
 
-  // Ledger device label
+  // Ledger doesn’t provide any device name so using hard-coded name
   get defaultWalletName(): string {
-    // Ledger doesn’t provide any name
-    return '';
+    return Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_WALLET_NAME;
   }
 
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  // TODO: type CreateLedgerWalletResponse
   createHWRequest: LocalizedRequest<any> =
-    new LocalizedRequest(this.api.ada.createHardwareWallet); // Update to Ledger
+    new LocalizedRequest(this.api.ada.createHardwareWallet);
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
-    * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
+    * ledger wallet creation on a seperate wallet and explain to them why the action is blocked */
   @observable isCreateWalletActive: boolean = false;
   // =================== API RELATED =================== //
 
@@ -90,22 +96,14 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
 
-    // /** Preinitialization of TrezorConnect API will result in faster first response */
-    // try {
-    //   LedgerConnect.init({});
-    // } catch (error) {
-    //   Logger.error(`LedgerConnectStore::setup:error: ${stringifyError(error)}`);
-    // }
+    this.hwDeviceInfo = {
+      valid: false,
+      publicKey: null,
+      features: null
+    };
   }
 
   teardown(): void {
-    // if (!this.createLedgerWalletRequest.isExecuting) {
-    //   // Ledger Connect request should be reset only in case connect is finished/errored
-    //   this.createLedgerWalletRequest.reset();
-    // }
-
-    // this._removeLedgerConnectEventListeners();
-
     this._reset();
     super.teardown();
   }
@@ -115,9 +113,9 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
       currentStep: ProgressStep.ABOUT,
       stepState: StepState.LOAD,
     };
+
     this.error = undefined;
-    this.HWDeviceInfo = undefined;
-    // this.ledgerEventDevice = undefined;
+    this.hwDeviceInfo = undefined;
   };
 
   @action _cancel = (): void => {
@@ -128,9 +126,6 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   /** ABOUT dialog submit(Next button) */
   @action _submitAbout = (): void => {
     this.error = undefined;
-    // this.HWEventDevice = undefined;
-    // this._removeHWConnectEventListeners();
-    // this._addHWConnectEventListeners();
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
   };
@@ -152,120 +147,77 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     this._checkAndStoreHWDeviceInfo();
   };
 
-  @action _goToConnectError = (): void => {
-    this.progressInfo.currentStep = ProgressStep.CONNECT;
-    this.progressInfo.stepState = StepState.ERROR;
-  };
-
-  _wait = async ms => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  };
+  // TODO [TREZOR]: this is temporary solution, fix later
+  _wait = async ms => new Promise((resolve) => setTimeout(resolve, ms));
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     try {
       const ledgerBridge = new LedgerBridge();
-      await this._wait(5000);
-      const version: GetVersionResponse = await ledgerBridge.getVersion();
-      console.log(JSON.stringify(version, null, 2));
+      // TODO [TREZOR]: for iframe not initialized (this is temporary solution, fix later)
+      await this._wait(1000);
 
+      this.hwDeviceInfo = undefined;
+
+      const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
+      Logger.debug(stringifyData(versionResp));
+
+      // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
+      const hdPath: BIP32Path = makeCardanoBIP44Path(0, false, 0);
+      Logger.debug(stringifyData(hdPath));
+
+      // get Cardano's first account's first public key(non change)
+      // i.e hdPath = [2147483692, 2147485463, 2147483648, 0, 0]
+      const extendedPublicKeyResp: GetExtendedPublicKeyResponse
+        = await ledgerBridge.getExtendedPublicKey(hdPath);
+      Logger.debug(stringifyData(extendedPublicKeyResp));
+
+      if (this._isValidHW(versionResp, extendedPublicKeyResp)) {
+        this.hwDeviceInfo = {
+          valid: true,
+          publicKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
+          features: {
+            vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
+            model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
+            label: '',
+            deviceId: '',
+            language: '',
+            majorVersion: parseInt(versionResp.major, 10),
+            minorVersion: parseInt(versionResp.minor, 10),
+            patchVersion: parseInt(versionResp.patch, 10),
+          }
+        };
+
+        Logger.info('Ledger device OK');
+        this._goToSaveLoad();
+      }
     } catch (error) {
-      Logger.error(`LedgerConnectStore::_checkAndStoreledgerDeviceInfo ${stringifyError(error)}`);
-    } finally {
-      console.log('_checkAndStoreHWDeviceInfo');
+      Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
+      this._handleConnectError(error);
     }
   };
 
-  _addHWConnectEventListeners = (): void => {
-    // if (TrezorConnect) {
-    //   TrezorConnect.on(DEVICE_EVENT, this._onTrezorDeviceEvent);
-    //   TrezorConnect.on(UI_EVENT, this._onTrezorUIEvent);
-    // } else {
-    Logger.error('LedgerConnectStore::_addTrezorConnectEventListeners:: TrezorConnect not installed');
-    // }
+  _isValidHW = (
+    versionResp: GetVersionResponse,
+    extendedPublicKeyResp: GetExtendedPublicKeyResponse
+  ): boolean => {
+    let valid = true;
+
+    // TODO [LEDGER]: check validity
+    return valid;
   };
 
-  _removeHWConnectEventListeners = (): void => {
-    // if (TrezorConnect) {
-    //   TrezorConnect.off(DEVICE_EVENT, this._onTrezorDeviceEvent);
-    //   TrezorConnect.off(UI_EVENT, this._onTrezorUIEvent);
-    // }
+  _handleConnectError = (error): void => {
+    if (error instanceof LocalizableError) {
+      this.error = error;
+    } else {
+      this.error = new UnexpectedError();
+    }
+    this._goToConnectError();
   };
 
-  _onHWDeviceEvent = (event: any): void => {
-    // Logger.debug(`LedgerConnectStore:: DEVICE_EVENT: ${event.type}`);
-    // this.HWEventDevice = event;
-  };
-
-  _onHWUIEvent = (event: any): void => {
-    // Logger.debug(`LedgerConnectStore:: UI_EVENT: ${event.type}`);
-    // TODO: [TREZOR] https://github.com/Emurgo/yoroi-frontend/issues/126
-    // if(event.type === CLOSE_UI_WINDOW &&
-    //   this.progressState === ProgressStateOption.CONNECT_START &&
-    //   this.publicKeyInfo.valid === false) {
-    //   this.progressState = ProgressStateOption.CONNECT_ERROR;
-    //   this.publicKeyInfo.errorId = 'trezord forcefully stopped';
-    //   this._updateState();
-    // }
-  };
-
-  _validateResponse = (): void => {
-
-  }
-
-  /** Validates the compatibility of data which we have received from Trezor */
-  _validateHW = (
-    ledgerResp: any,
-    ledgerEventDevice: any, // DeviceMessage
-  ): {
-      valid: boolean,
-      error: ?LocalizableError
-    } => {
-    const ledgerValidity = {};
-    ledgerValidity.valid = false;
-    ledgerValidity.error = null;
-
-    // if (!trezorResp.success) {
-    //   switch (trezorResp.payload.error) {
-    //     case 'Iframe timeout':
-    //       trezorValidity.error = new LocalizableError(globalMessages.trezorError101);
-    //       break;
-    //     case 'Permissions not granted':
-    //       trezorValidity.error = new LocalizableError(globalMessages.trezorError102);
-    //       break;
-    //     case 'Cancelled':
-    //     case 'Popup closed':
-    //       trezorValidity.error = new LocalizableError(globalMessages.trezorError103);
-    //       break;
-    //     default:
-    //       // Something unexpected happened
-    //       Logger.error(`LedgerConnectStore::_validateTrezor::error: ${trezorResp.payload.error}`);
-    //       trezorValidity.error = new UnexpectedError();
-    //       break;
-    //   }
-    // }
-
-    // if (!trezorValidity.error
-    //   && trezorResp.payload.publicKey.length <= 0) {
-    //   // Something unexpected happened
-    //   Logger.error(`LedgerConnectStore::_validateTrezor::error: invalid public key`);
-    //   trezorValidity.error = new UnexpectedError();
-    // }
-
-    // if (!trezorValidity.error
-    //   && (ledgerEventDevice == null
-    //   || ledgerEventDevice.payload == null
-    //   || ledgerEventDevice.payload.type !== 'acquired'
-    //   || ledgerEventDevice.payload.features == null)) {
-    //   // Something unexpected happened
-    //   Logger.error(`LedgerConnectStore::_validateTrezor::error: invalid device event`);
-    //   trezorValidity.error = new UnexpectedError();
-    // }
-
-    // if (!trezorValidity.error) {
-    //   trezorValidity.valid = true;
-    // }
-
-    return ledgerValidity;
+  @action _goToConnectError = (): void => {
+    this.progressInfo.currentStep = ProgressStep.CONNECT;
+    this.progressInfo.stepState = StepState.ERROR;
   };
   // =================== CONNECT =================== //
 
@@ -281,75 +233,81 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
-
-    if (this.HWDeviceInfo
-      && this.HWDeviceInfo.publicKey
-      && this.HWDeviceInfo.features) {
-      const walletData = {
-        walletName,
-        publicMasterKey: this.HWDeviceInfo.publicKey,
-        deviceFeatures: this.HWDeviceInfo.features
-      };
-      this._saveHW(walletData);
-    }
-  };
-
-  @action _goToSaveError = (): void => {
-    this.progressInfo.currentStep = ProgressStep.SAVE;
-    this.progressInfo.stepState = StepState.ERROR;
+    this._saveHW(walletName);
   };
 
   /** creates new wallet and loads it */
-  _saveHW = async (params: {
-    publicMasterKey: string,
-    walletName: string,
-    deviceFeatures: HWFeatures,
-  }): Promise<void>  => {
-    // try {
-    //   Logger.debug('LedgerConnectStore::_saveTrezor:: stated');
-    //   this._setIsCreateTrezorWalletActive(true);
-    //   this.createLedgerWalletRequest.reset();
+  _saveHW = async (walletName: string): Promise<void>  => {
+    try {
+      Logger.debug('LedgerConnectStore::_saveHW:: stated');
+      this._setIsCreateHWActive(true);
+      this.createHWRequest.reset();
 
-    //   const trezorWallet: Wallet = await this.createLedgerWalletRequest.execute(params).promise;
-    //   if (trezorWallet) {
-    //     await this._onSaveSucess(trezorWallet);
-    //   } else {
-    //     // this Error will be converted to LocalizableError()
-    //     throw new Error();
-    //   }
-    // } catch (error) {
-    //   if (error instanceof CheckAdressesInUseApiError) {
-    //     // redirecting CheckAdressesInUseApiError -> saveError101
-    //     // because for user saveError101 is more meaningful in this context
-    //     this.error = new LocalizableError(messages.saveError101);
-    //   } else if (error instanceof LocalizableError) {
-    //     this.error = error;
-    //   } else {
-    //     // some unknow error
-    //     this.error = new LocalizableError(messages.error999);
-    //   }
-    //   this._goToSaveError();
-    //   Logger.error(`LedgerConnectStore::_saveTrezor::error ${stringifyError(error)}`);
-    // } finally {
-    //   this.createLedgerWalletRequest.reset();
-    //   this._setIsCreateTrezorWalletActive(false);
-    // }
+      const params = this._prepareCreateHWReqParams(walletName);
+      const ledgerWallet: CreateHardwareWalletResponse = await this.createHWRequest.execute(params).promise;
+      if (ledgerWallet) {
+        await this._onSaveSucess(ledgerWallet);
+      } else {
+        // this Error will be converted to LocalizableError()
+        throw new Error();
+      }
+    } catch (error) {
+      Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
+
+      if (error instanceof CheckAdressesInUseApiError) {
+        // redirecting CheckAdressesInUseApiError -> saveError101
+        // because for user saveError101 is more meaningful in this context
+        this.error = new LocalizableError(messages.saveError101);
+      } else if (error instanceof LocalizableError) {
+        this.error = error;
+      } else {
+        // some unknow error
+        this.error = new UnexpectedError();
+      }
+      this._goToSaveError();
+    } finally {
+      this.createHWRequest.reset();
+      this._setIsCreateHWActive(false);
+    }
+  };
+
+  _prepareCreateHWReqParams = (walletName: string): CreateHardwareWalletRequest => {
+    if (this.hwDeviceInfo == null
+      || this.hwDeviceInfo.publicKey == null
+      || this.hwDeviceInfo.features == null) {
+      throw new UnexpectedError();
+    }
+
+    return {
+      walletName,
+      walletHardwareInfo: {
+        publicMasterKey: this.hwDeviceInfo.publicKey,
+        vendor: this.hwDeviceInfo.features.vendor,
+        model: this.hwDeviceInfo.features.vendor,
+        deviceId: this.hwDeviceInfo.features.deviceId,
+        label: this.hwDeviceInfo.features.label,
+        majorVersion: this.hwDeviceInfo.features.majorVersion,
+        minorVersion: this.hwDeviceInfo.features.minorVersion,
+        patchVersion: this.hwDeviceInfo.features.patchVersion,
+        language: this.hwDeviceInfo.features.language,
+      }
+    };
   };
 
   async _onSaveSucess(HWWallet: Wallet): Promise<void> {
     // close the active dialog
-    Logger.debug('LedgerConnectStore::_saveTrezor success, closing dialog');
+    Logger.debug('LedgerConnectStore::_onSaveSucess success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
 
     const { wallets } = this.stores.substores[environment.API];
     await wallets._patchWalletRequestWithNewWallet(HWWallet);
 
     // goto the wallet transactions page
-    Logger.debug('LedgerConnectStore::_saveTrezor setting new walles as active wallet');
+    Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');
     wallets.goToWalletRoute(HWWallet.id);
 
     // fetch its data
-    Logger.debug('LedgerConnectStore::_saveTrezor loading wallet data');
+    Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
     wallets.refreshWalletsData();
 
     // Load the Yoroi with Trezor Icon
@@ -360,13 +318,18 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
     // TODO: [TREZOR] not sure if it actully destroying this Store ??
     this.teardown();
-    Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');
+    Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
   }
+
+  @action _goToSaveError = (): void => {
+    this.progressInfo.currentStep = ProgressStep.SAVE;
+    this.progressInfo.stepState = StepState.ERROR;
+  };
   // =================== SAVE =================== //
 
   // =================== API =================== //
   @action _setIsCreateHWActive = (active: boolean): void => {
-    // this.isCreateTrezorWalletActive = active;
+    this.isCreateWalletActive = active;
   };
   // =================== API =================== //
 }

@@ -9,6 +9,18 @@ export default {
     WALLET_RECOVERY_PHRASE_WORD_COUNT: 12,
     // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki  
     BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH: 'm/44\'/1815\'/0\'',
+    hardwareWallet: {
+      trezorT: {
+        VENDOR: 'trezor.io',
+        MODEL: 'T'
+      },
+      ledgerNanoS: {
+        // Ledger doesn’t provide any device name so using hard-coded name
+        DEFAULT_WALLET_NAME: 'Yoroi-Ledger',
+        VENDOR: 'ledger.com',
+        MODEL: 'NanoS'
+      }
+    }
   },
   forms: {
     FORM_VALIDATION_DEBOUNCE_WAIT: 250
