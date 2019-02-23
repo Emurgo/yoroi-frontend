@@ -10,8 +10,10 @@ import AddressesStore from './AdaAddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
+import AdaRedemptionStore from './AdaRedemptionStore';
 
 export const adaStoreClasses = {
+  adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
@@ -22,6 +24,7 @@ export const adaStoreClasses = {
 };
 
 export type AdaStoresMap = {
+  adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
@@ -32,6 +35,7 @@ export type AdaStoresMap = {
 };
 
 const adaStores = observable({
+  adaRedemption: null,
   wallets: null,
   transactions: null,
   walletSettings: null,

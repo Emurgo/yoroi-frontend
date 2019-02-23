@@ -36,6 +36,21 @@ Before((scenario) => {
   testProgress.step = 0;
 });
 
+Before({ tags: '@invalidWitnessTest' }, () => {
+  closeMockServer();
+  getMockServer({
+    signedTransaction: (req, res) => {
+      res.status(400).jsonp({
+        message: 'Invalid witness'
+      });
+    }
+  });
+});
+
+After({ tags: '@invalidWitnessTest' }, () => {
+  closeMockServer();
+  getMockServer({});
+});
 
 After(async function () {
   await this.driver.quit();
