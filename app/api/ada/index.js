@@ -17,6 +17,8 @@ import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import {
   isValidMnemonic,
+  isValidPaperMnemonic,
+  unscramblePaperMnemonic,
   generateAdaAccountRecoveryPhrase,
   newAdaWallet,
   updateAdaWalletMetaParams,
@@ -90,12 +92,20 @@ import type {
   CreateTrezorWalletResponse,
   SendTrezorSignedTxResponse,
 } from '../common';
-import { InvalidWitnessError } from './errors';
+import { InvalidWitnessError, RedeemAdaError, RedemptionKeyAlreadyUsedError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
 import type { SignedResponse } from './lib/yoroi-backend-api';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
+import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
+import {
+  isValidRedemptionKey,
+  isValidPaperVendRedemptionKey
+} from '../../utils/redemption-key-validation';
+import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
+import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
+import config from '../../config';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -121,6 +131,19 @@ export type UpdateWalletRequest = {
   name: string,
   assurance: AdaAssurance
 };
+export type RedeemAdaRequest = {
+  redemptionCode: string,
+  accountId: string,
+  walletPassword: ?string
+};
+export type RedeemAdaResponse = Wallet;
+export type RedeemPaperVendedAdaRequest = {
+  shieldedRedemptionKey: string,
+  mnemonics: string,
+  accountId: string,
+  walletPassword: ?string
+};
+export type RedeemPaperVendedAdaResponse = RedeemPaperVendedAdaRequest;
 export type ImportWalletFromKeyRequest = {
   filePath: string,
   walletPassword: ?string
@@ -423,6 +446,14 @@ export default class AdaApi {
     return isValidMnemonic(mnemonic, numberOfWords);
   }
 
+  isValidPaperMnemonic(mnemonic: string, numberOfWords: ?number): boolean {
+    return isValidPaperMnemonic(mnemonic, numberOfWords);
+  }
+
+  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number): [?string, number] {
+    return unscramblePaperMnemonic(mnemonic, numberOfWords);
+  }
+
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {
     Logger.debug('AdaApi::generateWalletRecoveryPhrase called');
     try {
@@ -594,6 +625,67 @@ export default class AdaApi {
       }
     }
   }
+
+  async getPDFSecretKey(
+    file: ?Blob,
+    decryptionKey: ?string,
+    redemptionType: string
+  ): Promise<string> {
+    Logger.debug('AdaApi::getPDFSecretKey called');
+    try {
+      const fileBuffer = await readFile(file);
+      const decryptedFileBuffer = decryptFile(decryptionKey, redemptionType, fileBuffer);
+      const parsedPDFString = await parsePDFFile(decryptedFileBuffer);
+      return getSecretKey(parsedPDFString);
+    } catch (error) {
+      Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  isValidRedemptionKey = (mnemonic: string): boolean => (isValidRedemptionKey(mnemonic));
+
+  isValidPaperVendRedemptionKey = (mnemonic: string): boolean => (
+    isValidPaperVendRedemptionKey(mnemonic)
+  );
+
+  isValidRedemptionMnemonic = (mnemonic: string): boolean => (
+    isValidMnemonic(mnemonic, config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH)
+  );
+
+  redeemAda = async (
+    request: RedeemAdaParams
+  ): BigNumber => {
+    Logger.debug('AdaApi::redeemAda called');
+    try {
+      const transactionAmount = await redeemAda(request);
+      Logger.debug('AdaApi::redeemAda success');
+      return transactionAmount;
+    } catch (error) {
+      Logger.error('AdaApi::redeemAda error: ' + stringifyError(error));
+      if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
+      }
+      throw new RedeemAdaError();
+    }
+  };
+
+  redeemPaperVendedAda = async (
+    request: RedeemPaperVendedAdaParams
+  ): BigNumber => {
+    Logger.debug('AdaApi::redeemAdaPaperVend called');
+    try {
+      const transactionAmount = await redeemPaperVendedAda(request);
+      Logger.debug('AdaApi::redeemAdaPaperVend success');
+      return transactionAmount;
+    } catch (error) {
+      Logger.error('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
+      if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
+      }
+      throw new RedeemAdaError();
+    }
+  };
 }
 // ========== End of class AdaApi =========
 

@@ -27,12 +27,23 @@ const messages = defineMessages({
     defaultMessage: '!!!Terms of use',
     description: 'Label for the "Terms of use" link in the settings menu.',
   },
+  AnoutYoroi: {
+    id: 'settings.menu.aboutYroi.link.label',
+    defaultMessage: '!!!About Yoroi',
+    description: 'Label for the "About Yoroi" link in the settings menu.',
+  },
+  adaRedemption: {
+    id: 'settings.menu.adaRedemption.link.label',
+    defaultMessage: '!!!Ada Redemption',
+    description: 'Label for the "Ada Redemption" link in the settings menu.',
+  }
 });
 
 type Props = {
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
+  currentLocale: string,
 };
 
 @observer
@@ -44,7 +55,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
 
     return (
       <div>
@@ -81,6 +92,22 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
           />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.AnoutYoroi)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
+            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
+            className="AboutYoroi"
+          />
+
+          {(currentLocale === 'en-US' || currentLocale === 'ja-JP') &&
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.adaRedemption)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
+              active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
+              className="adaRedemption"
+            />
+          }
         </div>
       </div>
     );

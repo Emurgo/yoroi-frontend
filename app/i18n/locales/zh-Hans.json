@@ -171,7 +171,7 @@
   "wallet.footer.howToConnectTrezor.text": "如何连接Trezor",
   "wallet.footer.howToCreateWallet.text": "如何创建钱包",
   "wallet.footer.howToRestoreWallet.text": "如何恢复钱包",
-  "wallet.footer.whatIsHardwareWallet.text": "什么是硬件钱包？",
+  "wallet.footer.whatIsHardwareWallet.text": "什么是硬件钱包",
   "wallet.navigation.receive": "接收",
   "wallet.navigation.send": "发送",
   "wallet.navigation.transactions": "交易",

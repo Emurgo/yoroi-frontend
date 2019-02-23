@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 export type TransferStatus =
     'uninitialized'
   | 'gettingMnemonics'
+  | 'gettingPaperMnemonics'
   | 'restoringAddresses'
   | 'checkingAddresses'
   | 'generatingTx'

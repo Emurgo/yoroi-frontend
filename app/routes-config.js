@@ -20,6 +20,8 @@ export const ROUTES = {
     GENERAL: '/settings/general',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
+    ABOUT_YOROI: '/settings/about-yoroi',
+    ADA_REDEMPTION: '/settings/ada-redemption',
   },
   DAEDALUS_TRANFER: {
     ROOT: '/daedalus-transfer',
