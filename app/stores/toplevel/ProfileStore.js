@@ -18,7 +18,7 @@ export default class SettingsStore extends Store {
     { value: 'zh-Hant', label: globalMessages.languageChineseTraditional },
     { value: 'ru-RU', label: globalMessages.languageRussian },
     // { value: 'de-DE', label: globalMessages.languageGerman },
-    // { value: 'fr-FR', label: globalMessages.languageFrench },
+    { value: 'fr-FR', label: globalMessages.languageFrench },
   ];
 
   @observable bigNumberDecimalFormat = {

@@ -5,6 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   general: {
@@ -43,7 +44,6 @@ type Props = {
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
-  currentLocale: string,
 };
 
 @observer
@@ -55,7 +55,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
 
     return (
       <div>
@@ -100,7 +100,7 @@ export default class SettingsMenu extends Component<Props> {
             className="AboutYoroi"
           />
 
-          {(currentLocale === 'en-US' || currentLocale === 'ja-JP') &&
+          {!environment.isMainnet() &&
             <SettingsMenuItem
               label={intl.formatMessage(messages.adaRedemption)}
               onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
