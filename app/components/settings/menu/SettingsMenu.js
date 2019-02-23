@@ -28,6 +28,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Terms of use',
     description: 'Label for the "Terms of use" link in the settings menu.',
   },
+  display: {
+    id: 'settings.menu.display.link.label',
+    defaultMessage: '!!!Themes',
+    description: 'Label for the "Themes" link in the settings menu.',
+  },
   AnoutYoroi: {
     id: 'settings.menu.aboutYroi.link.label',
     defaultMessage: '!!!About Yoroi',
@@ -65,6 +70,13 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}
             active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
             className="general"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.display)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
+            active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
+            className="display"
           />
 
           <SettingsMenuItem

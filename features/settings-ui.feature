@@ -183,3 +183,10 @@ Feature: Wallet UI Settings
     And I navigate to the general settings screen
     And I click on secondary menu "support" item
     Then I should see support screen
+
+  @it-10
+  Scenario: Change theme in General Settings
+    And I navigate to the general settings screen
+    And I click on secondary menu "display" item
+    And I select second theme
+    Then I should see second theme as selected

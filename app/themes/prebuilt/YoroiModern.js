@@ -1,4 +1,4 @@
-//  ==== Theme: Yoroi === //
+//  ==== Theme: Yoroi Modern === //
 
 // FONTS
 const rpFonts = {
@@ -254,7 +254,7 @@ export default {
 
   '--theme-topbar-category-background-color-hover': '#373f52',
   '--theme-topbar-category-text-color': '#fafbfc',
-  '--theme-topbar-background-color': '#373f52',
+  '--theme-topbar-background-color': '#dc1144',
   '--theme-topbar-wallet-name-color': '#fafbfc',
   '--theme-topbar-wallet-info-color': '#fafbfc',
   '--theme-topbar-layout-body-background-color': '#ffffff',
@@ -283,37 +283,12 @@ export default {
   '--theme-transactions-sent-color': '#eb6d7a',
   '--theme-transactions-received-color': '#54ca87',
 
-  '--theme-ada-redemption-headline-color': '#121327',
-  '--theme-ada-redemption-instructions-color': '#121327',
-  '--theme-ada-redemption-success-overlay-background-color': 'rgba(218, 164, 154, 0.88)',
-  '--theme-ada-redemption-success-overlay-border-color': '#fafbfc',
-  '--theme-ada-redemption-success-overlay-message-color': '#fafbfc',
-  '--theme-ada-redemption-success-overlay-button-text-color': '#fafbfc',
-  '--theme-ada-redemption-success-overlay-button-text-color-hover': '#daa49a',
-  '--theme-ada-redemption-success-overlay-button-background-color-hover': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-background-color': 'rgba(171, 23, 0, 0.94)',
-  '--theme-ada-redemption-disclaimer-text-color': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-button-background-color': '#ab1700',
-  '--theme-ada-redemption-disclaimer-button-text-color': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-button-background-color-hover': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-button-text-color-hover': '#ab1700',
-  '--theme-ada-redemption-disclaimer-checkbox-color-check': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-checkbox-color-checked': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-checkbox-color-after': '#ab1700',
-  '--theme-ada-redemption-disclaimer-checkbox-label-color': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-button-border-color': '#fafbfc',
-  '--theme-ada-redemption-no-wallets-instructions-color': '#121327',
-
   '--theme-icon-nav-color': 'rgba(18, 19, 39, 0.6)', // #121327
   '--theme-icon-nav-color-active': '#ffffff',
   '--theme-icon-topbar-color': '#fafbfc',
   '--theme-icon-toggle-menu-color': '#fafbfc',
   '--theme-icon-ada-summary-wallet-amount-symbol-color': '#121327',
   '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#121327',
-  '--theme-icon-ada-redemption-attention-color': '#fafbfc',
-  '--theme-icon-ada-redemption-success-color': '#fafbfc',
-  '--theme-icon-ada-redemption-certificate-color': '#9eabbb',
-  '--theme-icon-ada-redemption-no-wallets': '#121327',
   '--theme-icon-copy-address-color': '#121327',
   '--theme-icon-back-button-color': '#121327',
   '--theme-icon-close-button-color': '#121327',
