@@ -1,35 +1,45 @@
 # Abstract
-An user would be able to use a Trezor Hardware Wallet with Yoroi.
+
+1. Users would be able to use a Trezor Hardware Wallet with Yoroi Wallet.
+2. Hardware wallet can be integrated by creating new Yoroi wallet, by using `Connect to Trezor Hardware Wallet` on `Add Wallet` page.
+3. [TrezorConnect](https://github.com/trezor/connect) API will be used to communicate with hardware device.
 
 # Motivation
-1. Improved security by using an external hardware.
-2. No need to remember spending passowrd.
+
+1. Since private key never leave the hardware wallet so it's considered as one of the most secured way of using cryptocurrency wallets.
+2. No need to remember spending passowrd, so its easy to use.
 
 # Background
+
+Much needed functionality.
 
 # Iteration-1
 
 # Proposal
 User will be able to:
-1. Setup a new Yoroi Wallet without exposing its private key/ mnemonics in a computer.
+1. Setup a new Yoroi Wallet without exposing its private key/ mnemonics.
 2. Send ADA using the Trezor Wallet Security.
 
 ## Prerequisite
+
 1. Trezor Model T - Version 2.0.8 or later. (Support for Trezor One is supposed to come by mid-next year according to some information in Reddit).
 2. Initial configuration of the Trezor should have been already done.
 
 ## Trezor Integrated Wallet Creation
+
 1. Install or update to a supported version of Yoroi.
-2. Select Connect to Trezor Hardware Wallet in the main Yoroi page - where Restore Wallet and Create Wallet also appears -.
+2. Select `Connect to Trezor Hardware Wallet` in the `Add Wallet` page - where Restore Wallet and Create Wallet also appears.
 4. Connect the Trezor device to the computer and follow the steps to export the master public key for a Cardano Wallet.
 5. By default, Yoroi will use the Trezor device name as the wallet name, but it can be modified by the user.
 
 ## Send ADA using Trezor
+
 1. Go to the Send Tab as usual, fill with the receiver's address and desire amount.
-2. Press NEXT button and select option to sign transaction.
+2. Press NEXT button and select option to Send using Trezor.
 3. Approve the transaction on the Trezor device.
 
 ## Low Level Implementation Design
+
 We will use [TrezorConnect](https://github.com/trezor/connect) API for integration.<br/>
 For setup:
 - PART1: add npm module using `npm -i trezor-connect`
@@ -40,6 +50,7 @@ We will use following TrezorConnect API:
 - For Send ADA using Trezor Sign Transaction: [TrezorConnect.cardanoSignTransaction(params)](https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md)
 
 ### Trezor Integrated Wallet Creation
+
 * getting public key from Trezor Wallet(sequence diagram).<br/>
 ![trezort-getpublickey-sequence](https://user-images.githubusercontent.com/19986226/51812399-b07f2d00-22f4-11e9-8c5f-00b673d11840.jpg)
 
@@ -158,6 +169,7 @@ export type WalletHardwareInfo = {
 ```
 
 ### Send ADA using Trezor Sign Transaction
+
 * Amount and Reciever's wallet address will be fetched from user(and passed to API) and need to prepare data as following<br>
 [TrezorConnect.cardanoSignTransaction(params)](https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md)
 **NOTE: atm this [example](https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md#example) seems to be outdated**
@@ -182,6 +194,7 @@ export type WalletHardwareInfo = {
 Response will be passed to backend API through [signTx](https://github.com/Emurgo/yoroi-frontend/blob/bbbdad033b567f0298f61e59a985c1c26f30ee07/app/api/ada/lib/yoroi-backend-api.js#L126)
 
 ### other changes
+
 we need to change following modules similar to `restoreWallet` implementation. 
 ```
 app/action => Action for Connect to Trezor
@@ -206,9 +219,11 @@ scripts => change build script to move static files(js/html) needed for Trezor c
 ```
 
 # Iteration-2
+
 TBD
 
 # Reference
+
 1. https://github.com/trezor/connect
 2. https://github.com/trezor/trezor-core
 3. https://github.com/trezor/trezord-go

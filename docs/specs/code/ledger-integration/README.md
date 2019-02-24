@@ -1,71 +1,80 @@
 # Abstract
 
-Briefly describe the proposal
+1. Users would be able to use a Ledger Hardware Wallet with Yoroi Wallet.
+2. Hardware wallet can be integrated by creating new Yoroi wallet, by using `Connect to Ledger Hardware Wallet` on `Add Wallet` page.
+3. [yoroi-extension-ledger-bridge](https://github.com/Emurgo/yoroi-extension-ledger-bridge) API will be used to communicate with hardware device.
 
 # Motivation
 
-Why you think the proposal is necessary
+1. Since private key never leaves the hardware wallet so it's considered as one of the most secuired way to use cryptocurrency wallets.
+2. No need to remember spending passowrd, so its easy to use.
 
 # Background
 
-Background information related to the proposal (current implementation, rationale for the implementation you will propose)
+As Yorio wallet has Trezor Hardware wallet support, Ledger Hardware wallet support will add up to the scope of user reach.
 
 # Iteration-1
 
 # Proposal
+
 User will be able to:
-1. Setup a new Yoroi Wallet without exposing its private key/ mnemonics in a computer.
-2. Send ADA using the Ledger Nano S Wallet Security.
+1. Setup a new Yoroi Wallet without exposing its private key/ mnemonics.
+2. Send ADA using the Ledger Wallet Security.
 
 ## Prerequisite
-TBD
+
+1. [Only Ledger Nano S model is supported for now.](https://www.ledger.com/products/ledger-nano-s)
+2. Cardano ADA app must be installed on Ledger device.<br>
+![image](https://user-images.githubusercontent.com/19986226/53296899-4b1d4e00-3858-11e9-9bf4-3829498676c2.png)
+3. [Additional setting may be need depending on your OS.](https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues)
+
 
 ## Ledger Integrated Wallet Creation
-TBD
+
+1. Install or update to a supported version of Yoroi.
+2. Select `Connect to Ledger Hardware Wallet` in the `Add Wallet` page - where Restore Wallet and Create Wallet also appears.
+4. Connect the Ledger device to the computer and follow the steps to export the master public key for a Cardano Wallet.
+5. Default wallet name will be provided to be used as wallet name, but it can be modified by the user.
 
 ## Send ADA using Ledger Sign Transaction
+
 1. Go to the Send Tab as usual, fill with the receiver's address and desire amount.
-2. Press NEXT button and select option to sign transaction.
+2. Press NEXT button and select option to Send using Ledger.
 3. Approve the transaction on the Ledger device.
 
 ## Low Level Implementation Design
-For current development we will be using [vacuumlabs/ledgerjs-cardano](https://github.com/vacuumlabs/ledgerjs-cardano).<br/>
-Later on we will adopt to [LedgerHQ/ledgerjs](https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-ada) API for integration ([NPM package](https://www.npmjs.com/package/@ledgerhq/hw-app-ada)).<br/>
 
-Ledger device app installation:
-- Update [ledger device frimware](./FRIMWARE_UPDATE.md) to `FRIMWARE_VERSION = 1.5.5` and `MCU_VERSION = 1.7`.
+For communication with device We will be using [Emurgo/yoroi-extension-ledger-bridge](https://github.com/Emurgo/yoroi-extension-ledger-bridge), which is a wrapper of https://github.com/cardano-foundation/ledgerjs-hw-app-cardano<br/>
+
+Transport layer can be:
+- [hw-transport-u2f](https://www.npmjs.com/package/@ledgerhq/hw-transport-u2f)
+- [hw-transport-webusb](https://www.npmjs.com/package/@ledgerhq/hw-transport-webusb)
+
+Manual Ledger device Cardano ADA app installation:
+- Update [ledger device FIRMWARE](./FIRMWARE_UPDATE.md) to `FIRMWARE_VERSION = 1.5.5` and `MCU_VERSION = 1.7`.
 - BOLOS development environment [set up](./BOLOS_SDK_SETUP.md)
-- [Clone](https://github.com/vacuumlabs/ledger-cardano-app) for the Ledger APP, `make load` should do the job assuming your BOLOS env is correct.
-- [Clone](https://github.com/vacuumlabs/ledgerjs) and check out `cardano_app` branch
-- `yarn watch` there, now you should be able to run `packages/example-node/lib/index.js`
-
-At this moment we have:
-- https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L70
-- https://github.com/vacuumlabs/ledgerjs/blob/3dedc966c65166d677f78d0dd0e1f326025c9312/packages/hw-app-ada/src/Ada.js#L67
-- https://github.com/vacuumlabs/ledger-cardano-app
-- https://github.com/LedgerHQ/ledgerjs/blob/ba896756a54bd45d175029ab5dc98aa66694c848/packages/hw-app-ada/src/Ada.js#L59
-
-**NOTE: Actual API endpoint name may change in very near future**
+- [Clone](https://github.com/cardano-foundation/ledger-app-cardano) and `make load` should do the job assuming your BOLOS env is correct.
 
 We will use following API:
 * For Ledger Integrated Wallet Creation:
-  - [Ada.getExtendedPublicKey(index: number)](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L70)
-  - [Ada.getVersion()](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L88)
+  - [Ada.getExtendedPublicKey(hdPath: BIP32Path)](https://github.com/Emurgo/yoroi-extension-ledger-bridge/blob/4d573b50825d81927aca76b9b2a552e322647e4e/src/index.js#L66)
+  - [Ada.getVersion()](https://github.com/Emurgo/yoroi-extension-ledger-bridge/blob/4d573b50825d81927aca76b9b2a552e322647e4e/src/index.js#L49)
 
 * For Send ADA using Ledger Sign Transaction:
-  - [Ada.signTransaction(inputs: Array<InputTypeUTxO>, outputs: Array<OutputTypeAddress | OutputTypeChange>)](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L284)
+  - [Ada.signTransaction(inputs: Array<InputTypeUTxO>, outputs: Array<OutputTypeAddress | OutputTypeChange>)](https://github.com/Emurgo/yoroi-extension-ledger-bridge/blob/4d573b50825d81927aca76b9b2a552e322647e4e/src/index.js#L106)
 
 ### Ledger Integrated Wallet Creation
-* [Ada.getExtendedPublicKey(index: number)](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L70) will return<br/>
+* [Ada.getExtendedPublicKey(hdPath: BIP32Path)](https://github.com/Emurgo/yoroi-extension-ledger-bridge/blob/4d573b50825d81927aca76b9b2a552e322647e4e/src/index.js#L66) will return<br/>
 ```
 {
-  publicKeyHex: string, // <-- we will use this as [root_cached_key: master public key]
+  publicKeyHex: string,
   chainCodeHex: string
 }
+ // we will use this as [root_cached_key: ( publicKeyHex + chainCodeHex )master public key]
 ```
-  `index = 0`, will always be first `44'/1815'/0'/[index] => 44'/1815'/0'/0` BIP 32 index (**similar to Trezor Integration**)
+  [BIP32Path](https://github.com/cardano-foundation/ledgerjs-hw-app-cardano/blob/511a674a0801e4fdbf503bea6cfd96d565d2223a/src/Ada.js#L38) = [2147483692, 2147485463, 2147483648, 0, 0]
 
-* [Ada.getVersion()](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L88) will return<br/>
+* [Ada.getVersion()](https://github.com/Emurgo/yoroi-extension-ledger-bridge/blob/4d573b50825d81927aca76b9b2a552e322647e4e/src/index.js#L49) will return<br/>
 ```
 {
   major: string,
@@ -90,7 +99,7 @@ const cryptoAccount = {
 ```
 ACCOUNT = {
 "account": 0,
-"root_cached_key": "master public key",  // root_cached_key => Ada.getExtendedPublicKey(index: number).publicKeyHex
+"root_cached_key": "master public key",  // root_cached_key => Ada.getExtendedPublicKey()
 "derivation_scheme": "V2"
 }
 ```
@@ -118,16 +127,16 @@ WALLET = {
       "minorVersion": 0,      // minorVersion => getVersion().minor
       "patchVersion": 8,      // patchVersion => getVersion().patch
       "model": "NanoS",       // presently there is no way get model, but if possible will try to figure out 
-      "publicMasterKey": "master public key" // publicMasterKey => Ada.getExtendedPublicKey(index: number).publicKeyHex
-      "chainCodeHex": "chain code Hex"       // chainCodeHex => Ada.getExtendedPublicKey(index: number).chainCodeHex
+      "publicMasterKey": "master public key" // publicMasterKey => Ada.getExtendedPublicKey()
     }
   }
 }
 ```
 
 ### Send ADA using Ledger Sign Transaction
+
 * Amount and Reciever's wallet address will be fetched from user(and passed to API) and need to prepare data as following
-  - `inputs: Array<InputTypeUTxO>` ([InputTypeUTxO](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L46))
+  - `inputs: Array<InputTypeUTxO>` ([InputTypeUTxO](https://github.com/cardano-foundation/ledgerjs-hw-app-cardano/blob/511a674a0801e4fdbf503bea6cfd96d565d2223a/src/Ada.js#L40))
   ```
   Example:
   inputs = [
@@ -145,7 +154,7 @@ WALLET = {
     }
   ];
   ```
-  - `outputs: Array<OutputTypeAddress | OutputTypeChange>` ([OutputTypeAddress](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L46) , [OutputTypeChange](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L51))
+  - `outputs: Array<OutputTypeAddress | OutputTypeChange>` ([OutputTypeAddress](https://github.com/cardano-foundation/ledgerjs-hw-app-cardano/blob/511a674a0801e4fdbf503bea6cfd96d565d2223a/src/Ada.js#L46) , [OutputTypeChange](https://github.com/cardano-foundation/ledgerjs-hw-app-cardano/blob/511a674a0801e4fdbf503bea6cfd96d565d2223a/src/Ada.js#L51))
   ```
   Example:
   outputs = [
@@ -162,7 +171,7 @@ WALLET = {
   ];
   ```
 
-  - By calling [Ada.signTransaction(inputs: Array< InputTypeUTxO >, outputs: Array<OutputTypeAddress | OutputTypeChange>)](https://github.com/vacuumlabs/ledgerjs-cardano/blob/efb244fd07dac79f71f7a81e56f57a9b3bf0500b/hw-app-ada/src/Ada.js#L284) will return
+  - By calling [Ada.signTransaction(inputs: Array< InputTypeUTxO >, outputs: Array<OutputTypeAddress | OutputTypeChange>)](https://github.com/Emurgo/yoroi-extension-ledger-bridge/blob/4d573b50825d81927aca76b9b2a552e322647e4e/src/index.js#L106) will return
   ```
   Example:
   {
@@ -177,7 +186,8 @@ WALLET = {
   ```
   Response will be passed to backend API through [signTx](https://github.com/Emurgo/yoroi-frontend/blob/bbbdad033b567f0298f61e59a985c1c26f30ee07/app/api/ada/lib/yoroi-backend-api.js#L126)
   
-### other changes 
+### other changes
+
 we need to change following modules similar to Trezor integration implementation.
 ```
 app/api => Wallet creation and Send SignedTx
@@ -196,12 +206,13 @@ app/components => View base components
 ```  
 
 # Iteration-2
+
 TBD
 
 # Reference
-1. https://github.com/vacuumlabs/ledgerjs-cardano/blob/master/hw-app-ada/src/Ada.js
-2. https://github.com/vacuumlabs/ledgerjs/blob/cardano_app/packages/hw-app-ada/src/Ada.js
-3. https://github.com/vacuumlabs/ledgerjs/blob/cardano_app/packages/example-node-ada/src/index.js
+
+1. https://github.com/cardano-foundation/ledgerjs-hw-app-cardano
+2. https://github.com/cardano-foundation/ledger-app-cardano
 4. https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-ada
 5. http://ledgerhq.github.io/ledgerjs/docs/#ada
 6. https://ledger-dev.slack.com/

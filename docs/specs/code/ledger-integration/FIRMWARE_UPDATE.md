@@ -24,14 +24,14 @@ udev rules setup: [download and run](https://github.com/LedgerHQ/udev-rules/blob
 | MCU,any version | 0x01000001 |
 +-----------------+------------+
 
-#### Frimware update<br/>
-CURRENT_FRIMWARE_VERSION(aka Secure Element) = 1.4.2<br/>
+#### FIRMWARE update<br/>
+CURRENT_FIRMWARE_VERSION(aka Secure Element) = 1.4.2<br/>
 CURRENT_MCU_VERSION = 1.6<br/>
 
-UPDATE_TO_FRIMWARE_VERSION = 1.5.5<br/>
+UPDATE_TO_FIRMWARE_VERSION = 1.5.5<br/>
 UPDATE_TO_MCU_VERSION = 1.7<br/>
 
-DEVICE_TARGET_ID = 0x31100003 (if CURRENT_FRIMWARE_VERSION < 1.5.x ) other wise 0x31100004<br/>
+DEVICE_TARGET_ID = 0x31100003 (if CURRENT_FIRMWARE_VERSION < 1.5.x ) other wise 0x31100004<br/>
 
 **Reboot the ledger device in recovery mode by pressing right button when starting(unlock with pin if prompted)**<br/>
 **SYNTAX**:<br/> 
@@ -39,8 +39,8 @@ python -m ledgerblue.updateFirmware<br/>
 --target DEVICE_TARGET_ID<br/>
 --url https://hsmprod.hardwarewallet.com/hsm/process<br/>
 --perso perso_11<br/>
---firmware nanos/UPDATE_TO_FRIMWARE_VERSION/fw_CURRENT_FRIMWARE_VERSION/upgrade_osu_UPDATE_TO_FRIMWARE_VERSION<br/>
---firmwareKey nanos/UPDATE_TO_FRIMWARE_VERSION/fw_CURRENT_FRIMWARE_VERSION/upgrade_osu_UPDATE_TO_FRIMWARE_VERSION_key<br/>
+--firmware nanos/UPDATE_TO_FIRMWARE_VERSION/fw_CURRENT_FIRMWARE_VERSION/upgrade_osu_UPDATE_TO_FIRMWARE_VERSION<br/>
+--firmwareKey nanos/UPDATE_TO_FIRMWARE_VERSION/fw_CURRENT_FIRMWARE_VERSION/upgrade_osu_UPDATE_TO_FIRMWARE_VERSION_key<br/>
 run:<br/>
 `python -m ledgerblue.updateFirmware --target 0x31100003 --url https://hsmprod.hardwarewallet.com/hsm/process --perso perso_11 --firmware nanos/1.5.5/fw_1.4.2/upgrade_osu_1.5.5 --firmwareKey nanos/1.5.5/fw_1.4.2/upgrade_osu_1.5.5_key`<br/>
 and:<br/>
