@@ -2,7 +2,7 @@
 
 To create a release candidate you must compress a local build.
 
-## Unsigned build (zip)
+## Unsigned build
 
 Zip files can be shared
 
@@ -12,14 +12,14 @@ $ npm run build -- --env "${network}"
 $ npm run compress -- --env "${network}" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx"
 ```
 
-## (Chrome) Signed build (CRX)
+## (Chrome) Signed build
 
 Crx are compressed and signed chrome extension bundles
 
 ```bash
 # compress build folder to {manifest.name}.zip and crx
 $ npm run build -- --env "${network}"
-$ npm run compress -- --env "${network}" --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx" --key ./production-key.pem
+$ npm run compress -- --env "${network}"  --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx" --key ./production-key.pem
 ```
 
 Note: Chrome extensions [update automatically](https://developer.chrome.com/extensions/autoupdate)
@@ -27,3 +27,12 @@ Note: Chrome extensions [update automatically](https://developer.chrome.com/exte
 ## (Firefox) Signed build (XPI)
 
 TODO: Firefox
+
+# Deploying new version
+
+**Note**: You must repeat these steps with the `network` changed for:
+- `mainnet`
+- `staging`
+
+1) Create a new [release on Github](https://github.com/Emurgo/yoroi-frontend/releases/)
+2) Upload to [Chrome store](https://chrome.google.com/webstore/developer/dashboard)
