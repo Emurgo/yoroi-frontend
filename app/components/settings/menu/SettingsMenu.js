@@ -73,13 +73,6 @@ export default class SettingsMenu extends Component<Props> {
           />
 
           <SettingsMenuItem
-            label={intl.formatMessage(messages.display)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
-            active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
-            className="display"
-          />
-
-          <SettingsMenuItem
             label={intl.formatMessage(messages.wallet)}
             onClick={() => {
               if (hasActiveWallet) {
@@ -111,6 +104,15 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
             className="AboutYoroi"
           />
+
+          {!environment.isMainnet() &&
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.display)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
+              active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
+              className="display"
+            />
+          }
 
           {!environment.isMainnet() &&
             <SettingsMenuItem
