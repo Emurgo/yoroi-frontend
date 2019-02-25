@@ -10,7 +10,7 @@
   "api.errors.ReportRequestError": "Es gab ein Problem beim Senden der Support-Anfrage.",
   "api.errors.WalletAlreadyImportedError": "Das Wallet, das Sie zu importieren versuchen, existiert bereits.",
   "api.errors.WalletAlreadyRestoredError": "Das Wallet, das Sie wiederherzustellen versuchen, existiert bereits.",
-  "api.errors.WalletFileImportError": "Das Wallet kann nicht importiert werden. Bitte sicherstellen, dass die richtige Datei verwendet wird.",
+  "api.errors.WalletFileImportError": "Das Wallet kann nicht importiert werden. Bitte stellen Sie sicher, dass die angegebene Datei korrekt ist.",
   "api.errors.adaRedemptionCertificateParseError": "Do not translate.",
   "api.errors.adaRedemptionEncryptedCertificateParseError": "Do not translate.",
   "api.errors.checkAdressesInUseApiError": "Fehler vom Server während der Prüfung der verwendeten Adresse.",
