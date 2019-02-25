@@ -268,7 +268,7 @@
   "wallet.send.form.title.hint": "z.B. Geld für Frank",
   "wallet.send.form.title.label": "Titel",
   "wallet.send.form.transactionFeeError": "Nicht genug ADA für die Gebühren. Versuchen Sie, einen kleineren Betrag zu senden.",
-  "wallet.send.trezor.confirmationDialog.info.line.1": "Nachdem ihr Trezor mit dem Computer verbunden ist, bitte den Senden Knopf auf dem Trezor drücken.",
+  "wallet.send.trezor.confirmationDialog.info.line.1": "Nachdem ihr Trezor mit Ihrem Computer verbunden ist, bitte die Schaltfläche 'Mit Trezor senden' drücken.",
   "wallet.send.trezor.confirmationDialog.info.line.2": "Eine neue Seite wird erscheinen. Bitte der Anleitung darin folgen.",
   "wallet.send.trezor.confirmationDialog.submit": "Sende mit dem Trezor",
   "wallet.send.trezor.error.101": "Die Signierung wurde auf dem Trezor abgebrochen. Bitte erneut versuchen",
