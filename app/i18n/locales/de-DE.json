@@ -339,7 +339,7 @@
   "wallet.trezor.dialog.step.about.prerequisite.4": "Ihr Computer muss für den gesamten Prozess mit dem Internet verbunden bleiben.",
   "wallet.trezor.dialog.step.about.prerequisite.5": "Das Trezor-Gerät muss für den gesamten Prozess mit den Computer verbunden bleiben.",
   "wallet.trezor.dialog.step.about.prerequisite.header": "Voraussetzungen",
-  "wallet.trezor.dialog.step.connect.introText.line.1": "Nachdem sie den Trezor mit dem Computer verbunden haben, drücken sie bitte den Verbinden-Knopf.",
+  "wallet.trezor.dialog.step.connect.introText.line.1": "Nachdem sie den Trezor mit dem Computer verbunden haben, drücken Sie bitte den Verbinden-Knopf.",
   "wallet.trezor.dialog.step.connect.introText.line.2": "Eine neue Seite wird erscheinen. Bitte die Anweisungen darauf befolgen.",
   "wallet.trezor.dialog.step.connect.introText.line.3": "Dieser Prozess teilt den öffentlichen Schlüssel von Cardano mit Yoroi..",
   "wallet.trezor.dialog.step.connect.label": "VERBINDEN",
