@@ -3,7 +3,7 @@
   "ImageUploadWidget.dropFileHint": "Do not translate",
   "api.errors.ApiMethodNotYetImplementedError": "Dieser API-Aufruf ist noch nicht implementiert.",
   "api.errors.GenericApiError": "Ein Fehler ist aufgetreten, bitte versuchen sie es später erneut.",
-  "api.errors.IncorrectPasswordError": "Ungültiges Wallet Kennwort.",
+  "api.errors.IncorrectPasswordError": "Ungültiges Wallet-Passwort.",
   "api.errors.NotEnoughMoneyToSendError": "Zu wenig Guthaben, um diese Transaktion durchzuführen.",
   "api.errors.PromiseNotCalledYetError": "Es muss Request::execute aufgerufen werden, bevor es als 'promise' verwendet werden kann.",
   "api.errors.RedeemAdaError": "Ihre ADA konnten nicht korrekt abgerufen werden.",
@@ -350,6 +350,6 @@
   "wallet.trezor.dialog.step.save.walletName.label": "WALLET NAMEN",
   "wallet.trezor.dialog.title.label": "MIT DEM TREZOR HARDWARE WALLET VERBINDEN",
   "wallet.trezor.error.101": "Verbindung zu trezor.io fehlgeschlagen. Bitte die Internetverbindung prüfen und erneut versuchen.",
-  "wallet.trezor.error.102": "Es sind keine ausreichenden Berechtigungen erteilt worden. Bitte erneut versuchen.",
+  "wallet.trezor.error.102": "Es wurden keine ausreichenden Berechtigungen erteilt. Bitte erneut versuchen.",
   "wallet.trezor.error.103": "Abgebrochen. Bitte wiederholen."
 }
