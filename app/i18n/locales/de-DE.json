@@ -40,7 +40,7 @@
   "api.errors.sendTransactionError": "Fehler von der API beim Senden der Transaktion.",
   "api.errors.transactionError": "Fehler beim Erstellen der Transaktion.",
   "api.errors.unusedAddressesError": "Es ist nicht möglich mehr als 20 Adressen hintereinander zu erstellen, ohne sie zu verwenden.",
-  "api.errors.updateAdaTxsHistoryError": "Fehler beim Aktualisieren des ADA Transaktions-Verlaufes.",
+  "api.errors.updateAdaTxsHistoryError": "Fehler beim Aktualisieren des ADA Transaktionsverlaufs.",
   "api.errors.updateAdaWalletError": "Fehler beim Aktualisieren der ADA Wallet.",
   "app.errors.unexpectedError": "Etwas Unerwartetes ist passiert. Versuchen Sie es erneut.",
   "app.errors.unknowError": "Unbekannter Fehler.",
