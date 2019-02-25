@@ -7,14 +7,14 @@ import { defineMessages } from 'react-intl';
 
 import {
   LedgerBridge,
-  makeCardanoBIP44Path
+  makeCardanoBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace types by npm module import
 import type {
   GetVersionResponse,
   GetExtendedPublicKeyResponse,
   BIP32Path
-} from 'yoroi-extension-ledger-bridge/lib/adaTypes';
+} from 'yoroi-extension-ledger-bridge';
 
 import Config from '../../config';
 import environment from '../../environment';
@@ -154,7 +154,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     try {
       const ledgerBridge = new LedgerBridge();
       // TODO [TREZOR]: for iframe not initialized (this is temporary solution, fix later)
-      await this._wait(1000);
+      await this._wait(5000);
 
       this.hwDeviceInfo = undefined;
 
