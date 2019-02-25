@@ -1,8 +1,8 @@
 {
   "ImageUploadWidget.clickToUploadLabel": "Do not translate",
   "ImageUploadWidget.dropFileHint": "Do not translate",
-  "api.errors.ApiMethodNotYetImplementedError": "Dieser API Aufruf ist noch nicht implementiert.",
-  "api.errors.GenericApiError": "Ein Fehler ist aufgetreten, bitte versuchen sie es später wieder.",
+  "api.errors.ApiMethodNotYetImplementedError": "Dieser API-Aufruf ist noch nicht implementiert.",
+  "api.errors.GenericApiError": "Ein Fehler ist aufgetreten, bitte versuchen sie es später erneut.",
   "api.errors.IncorrectPasswordError": "Ungültiges Wallet Kennwort.",
   "api.errors.NotEnoughMoneyToSendError": "Zu wenig Guthaben, um diese Transaktion durchzuführen.",
   "api.errors.PromiseNotCalledYetError": "Es muss Request::execute aufgerufen werden, bevor es als 'promise' verwendet werden kann.",
