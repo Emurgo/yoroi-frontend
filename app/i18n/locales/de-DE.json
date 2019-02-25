@@ -43,7 +43,7 @@
   "api.errors.updateAdaTxsHistoryError": "Fehler beim Aktualisieren des ADA Transaktions-Verlaufes.",
   "api.errors.updateAdaWalletError": "Fehler beim Aktualisieren der ADA Wallet.",
   "app.errors.unexpectedError": "Etwas Unerwartetes ist passiert. Versuchen Sie es erneut.",
-  "app.errors.unknowError": "unbekannter Fehler.",
+  "app.errors.unknowError": "Unbekannter Fehler.",
   "daedalusTransfer.error.noTransferTxError": "Es gibt keine Transaktion zum versenden.",
   "daedalusTransfer.error.transferFundsError": "Es ist nicht möglich den Geldwert zu übertragen.",
   "daedalusTransfer.error.webSocketRestoreError": "Fehler beim Wiederherstellen der Blockchain-Adressen.",
