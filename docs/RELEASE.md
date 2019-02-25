@@ -30,9 +30,10 @@ TODO: Firefox
 
 # Deploying new version
 
+Update the version number in `manifest` files and in `package.json`
+
 **Note**: You must repeat these steps with the `network` changed for:
 - `mainnet`
 - `staging`
-
 1) Create a new [release on Github](https://github.com/Emurgo/yoroi-frontend/releases/)
-2) Upload to [Chrome store](https://chrome.google.com/webstore/developer/dashboard)
+1) Upload to [Chrome store](https://chrome.google.com/webstore/developer/dashboard)

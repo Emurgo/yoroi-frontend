@@ -15,13 +15,13 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
     this.props.actions.profile.exportTheme.trigger();
   };
 
-  getThemeVars = (theme: { theme: string}) => {
-    return this.props.stores.profile.getThemeVars(theme);
-  }
+  getThemeVars = (theme: { theme: string}) => (
+    this.props.stores.profile.getThemeVars(theme)
+  )
 
-  hasCustomTheme = (): boolean => {
-    return this.props.stores.profile.hasCustomTheme();
-  }
+  hasCustomTheme = (): boolean => (
+    this.props.stores.profile.hasCustomTheme()
+  )
 
   render() {
     const { currentTheme } = this.props.stores.profile;
