@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import isInt from 'validator/lib/isInt';
-import TOTAL_SUPPLY from '../config/numbersConfig';
+import { TOTAL_SUPPLY } from '../config/numbersConfig';
 
 export const isValidWalletName = (walletName) => {
   const nameLength = walletName.length;
