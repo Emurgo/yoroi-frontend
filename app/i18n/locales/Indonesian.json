@@ -1,5 +1,5 @@
 {
-  "ImageUploadWidget.clickToUploadLabel": "or click to upload",
+  "ImageUploadWidget.clickToUploadLabel": "atau klik untuk meng-upload",
   "ImageUploadWidget.dropFileHint": "Drop file here",
   "api.errors.ApiMethodNotYetImplementedError": "This API method is not yet implemented.",
   "api.errors.GenericApiError": "An error occurred, please try again later.",
