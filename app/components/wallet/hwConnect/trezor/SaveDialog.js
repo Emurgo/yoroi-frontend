@@ -7,30 +7,30 @@ import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 
-import globalMessages from '../../../i18n/global-messages';
-import LocalizableError from '../../../i18n/LocalizableError';
+import globalMessages from '../../../../i18n/global-messages';
+import LocalizableError from '../../../../i18n/LocalizableError';
 
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../../widgets/Dialog';
+import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
-import saveLoadGIF from '../../../assets/images/trezor/connect/save-load.inline.svg';
-import saveStartSVG from '../../../assets/images/trezor/connect/save-start.inline.svg';
-import saveErrorSVG from '../../../assets/images/trezor/connect/save-error.inline.svg';
+import saveLoadGIF from '../../../../assets/images/trezor/connect/save-load.inline.svg';
+import saveStartSVG from '../../../../assets/images/trezor/connect/save-start.inline.svg';
+import saveErrorSVG from '../../../../assets/images/trezor/connect/save-error.inline.svg';
 
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { isValidWalletName } from '../../../utils/validations';
+import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import { isValidWalletName } from '../../../../utils/validations';
 
-import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
-import { StepState } from '../../../stores/ada/TrezorConnectStore';
+import type { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { StepState } from '../../../../types/HWConnectStoreTypes';
 
-import { Logger } from '../../../utils/logging';
+import { Logger } from '../../../../utils/logging';
 
 import styles from './SaveDialog.scss';
-import config from '../../../config';
+import config from '../../../../config';
 
 const messages = defineMessages({
   saveWalletNameInputLabel: {

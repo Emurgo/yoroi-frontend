@@ -9,7 +9,7 @@ import LocalizableError from '../i18n/LocalizableError';
 import WalletTransaction from '../domain/WalletTransaction';
 import WalletAddress from '../domain/WalletAddress';
 import Wallet from '../domain/Wallet';
-import type { WalletHardwareInfo } from '../types/WalletType';
+import { HWFeatures } from '../types/HWConnectStoreTypes';
 import type { SignedResponse } from './ada/lib/yoroi-backend-api';
 import type {
   TransactionExportRow,
@@ -142,7 +142,8 @@ export type RestoreWalletResponse = Wallet;
 
 export type CreateHardwareWalletRequest = {
   walletName: string,
-  walletHardwareInfo: WalletHardwareInfo,
+  publicMasterKey: string,
+  hwFeatures: HWFeatures,
 };
 export type CreateHardwareWalletResponse = Wallet;
 

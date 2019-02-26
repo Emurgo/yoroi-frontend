@@ -31,6 +31,7 @@ const messages = defineMessages({
 const targetNotificationIds = [
   globalMessages.walletCreatedNotificationMessage.id,
   globalMessages.walletRestoredNotificationMessage.id,
+  globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
   globalMessages.trezorTWalletIntegratedNotificationMessage.id,
 ];
 

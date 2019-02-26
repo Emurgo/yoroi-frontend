@@ -35,6 +35,7 @@ export type ProgressInfo = {
   stepState: StepStateEnum,
 };
 
+// Hardware wallet device Features object
 export interface HWFeatures {
   vendor: string,
   model: string,
@@ -48,29 +49,23 @@ export interface HWFeatures {
 
 // TODO: this could be better with generics, but flow goes crazy.
 export type HWDeviceInfo = {
-  valid: boolean,
   publicKey: ?string,
-  // Hardware wallet device Features object
-  features: ?HWFeatures
+  hwFeatures: ?HWFeatures
 };
 
 export interface HWConnectStoreTypes {
   // =================== VIEW RELATED =================== //
-  // /** the only observable which manages state change */
-  // // TODO: improve any to something that fits: @observable progressInfo: ProgressInfo;
-  // progressInfo: any;
+  /** the only observable which manages state change */
+  // TODO: improve any to something that fits: @observable progressInfo: ProgressInfo;
+  progressInfo: any;
 
-  // /** only in ERROR state it will hold LocalizableError object */
-  // error: ?LocalizableError;
+  /** only in ERROR state it will hold LocalizableError object */
+  error: ?LocalizableError;
 
-  // /** device info which will be used to create wallet (except wallet name)
-  //   * also it holds Ledger device label which is used as default wallet name
-  //   * final wallet name will be fetched from the user */
-  // hwDeviceInfo: ?HWDeviceInfo;
-
-  // /** holds Ledger device DeviceMessage event object, device features will be fetched
-  //   * from this object and will be cloned to HWDeviceInfo object */
-  // hwEventDevice?: ?DeviceMessage | any; // TODO: This seems to not apply to Ledger
+  /** device info which will be used to create wallet (except wallet name)
+    * also it holds Ledger device label which is used as default wallet name
+    * final wallet name will be fetched from the user */
+  hwDeviceInfo: ?HWDeviceInfo;
 
   // Ledger device label
   get defaultWalletName(): string;
@@ -79,12 +74,12 @@ export interface HWConnectStoreTypes {
   // // =================== VIEW RELATED =================== //
 
   // // =================== API RELATED =================== //
-  // // TODO: add later
-  // createHWRequest: LocalizedRequest<any>;
+  // TODO: add later
+  createHWRequest: LocalizedRequest<any>;
 
-  // /** While ledger wallet creation is taking place, we need to block users from starting a
-  //   * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
-  // isCreateWalletActive: boolean;
+  /** While ledger wallet creation is taking place, we need to block users from starting a
+    * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
+  isCreateHWActive: boolean;
   // // =================== API RELATED =================== //
 
   setup(): void;
@@ -111,12 +106,12 @@ export interface HWConnectStoreTypes {
 
   _checkAndStoreHWDeviceInfo(): Promise<void>;
 
-  _onHWDeviceEvent?: (event: DeviceMessage | any) => void;
+  /** Validates the compatibility of data which we have received from hardware wallet */
+  _validateHWResponse(any, any): boolean;
 
-  _onHWUIEvent?: (event: UiMessage | any) => void;
-
-  /** Validates the compatibility of data which we have received from Trezor */
-  // _validateResponse(): void;
+  /** Converts a valid hardware wallet response to a common storable format
+    * later the same format will be used to create wallet */
+  _normalizeHWResponse(any, any): HWDeviceInfo;
   // =================== CONNECT =================== //
 
   // =================== SAVE =================== //

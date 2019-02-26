@@ -635,7 +635,7 @@ export default class AdaApi {
   ): Promise<CreateHardwareWalletResponse> {
     try {
       Logger.debug('AdaApi::createHardwareWallet called');
-      const { walletName, walletHardwareInfo } = request;
+      const { walletName, publicMasterKey, hwFeatures } = request;
       const assurance = 'CWANormal';
       const unit = 0;
 
@@ -645,7 +645,17 @@ export default class AdaApi {
           cwAssurance: assurance,
           cwUnit: unit
         },
-        cwHardwareInfo: walletHardwareInfo,
+        cwHardwareInfo: {
+          publicMasterKey,
+          vendor: hwFeatures.vendor,
+          model: hwFeatures.model,
+          deviceId: hwFeatures.deviceId,
+          label: hwFeatures.label,
+          majorVersion: hwFeatures.majorVersion,
+          minorVersion: hwFeatures.minorVersion,
+          patchVersion: hwFeatures.patchVersion,
+          language: hwFeatures.language,
+        },
       };
       const wallet: AdaWallet = await createWallet({ walletInitData });
 

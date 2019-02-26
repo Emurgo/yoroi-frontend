@@ -96,14 +96,14 @@ export default class WalletAdd extends Component<Props> {
         <div className={styles.buttonsContainer}>
           <Button
             className="primary"
-            label={intl.formatMessage(messages.useTrezorDescription)}
-            onMouseUp={onTrezor}
+            label={intl.formatMessage(messages.useLedgerDescription)}
+            onMouseUp={onLedger}
             skin={ButtonSkin}
           />
           <Button
             className="primary"
-            label={intl.formatMessage(messages.useLedgerDescription)}
-            onMouseUp={onLedger}
+            label={intl.formatMessage(messages.useTrezorDescription)}
+            onMouseUp={onTrezor}
             skin={ButtonSkin}
           />
           <Button

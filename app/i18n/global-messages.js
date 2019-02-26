@@ -177,6 +177,11 @@ export default defineMessages({
     defaultMessage: '!!!You have successfully restored your Wallet',
     description: 'Notification Message for successful wallet restoration.',
   },
+  ledgerNanoSWalletIntegratedNotificationMessage: {
+    id: 'wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage',
+    defaultMessage: '!!!You have successfully integrated with your Ledger Nano S device',
+    description: 'Notification Message for successful integration with Ledger Nano S device.',
+  },
   trezorTWalletIntegratedNotificationMessage: {
     id: 'wallet.summary.page.trezorTWalletIntegratedNotificationMessage',
     defaultMessage: '!!!You have successfully integrated with your Trezor Model T device',

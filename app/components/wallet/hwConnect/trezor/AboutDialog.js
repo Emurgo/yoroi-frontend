@@ -5,21 +5,21 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 
-import globalMessages from '../../../i18n/global-messages';
-import LocalizableError from '../../../i18n/LocalizableError';
+import globalMessages from '../../../../i18n/global-messages';
+import LocalizableError from '../../../../i18n/LocalizableError';
 
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../../widgets/Dialog';
+import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
-import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
-import aboutPrerequisiteIconSVG from '../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
-import aboutPrerequisiteTrezorSVG from '../../../assets/images/trezor/connect/about-trezor.inline.svg';
+import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
+import aboutPrerequisiteIconSVG from '../../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
+import aboutPrerequisiteTrezorSVG from '../../../../assets/images/trezor/connect/about-trezor.inline.svg';
 
-import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
+import type { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
 import styles from './AboutDialog.scss';
 

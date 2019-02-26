@@ -5,25 +5,25 @@ import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
 
-import globalMessages from '../../../i18n/global-messages';
-import LocalizableError from '../../../i18n/LocalizableError';
+import globalMessages from '../../../../i18n/global-messages';
+import LocalizableError from '../../../../i18n/LocalizableError';
 
-import Dialog from '../../widgets/Dialog';
-import DialogBackButton from '../../widgets/DialogBackButton';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../../widgets/Dialog';
+import DialogBackButton from '../../../widgets/DialogBackButton';
+import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
-import connectLoadGIF from '../../../assets/images/trezor/connect/connect-load.gif';
-import connectStartGIF from '../../../assets/images/trezor/connect/connect-start.gif';
-import connectErrorSVG from '../../../assets/images/trezor/connect/connect-error.inline.svg';
+import connectLoadGIF from '../../../../assets/images/trezor/connect/connect-load.gif';
+import connectStartGIF from '../../../../assets/images/trezor/connect/connect-start.gif';
+import connectErrorSVG from '../../../../assets/images/trezor/connect/connect-error.inline.svg';
 
-import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
-import { StepState } from '../../../stores/ada/TrezorConnectStore';
+import type { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { StepState } from '../../../../types/HWConnectStoreTypes';
 
-import { Logger } from '../../../utils/logging';
+import { Logger } from '../../../../utils/logging';
 
 import styles from './ConnectDialog.scss';
 
@@ -99,7 +99,7 @@ export default class ConnectDialog extends Component<Props> {
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            <SvgInline svg={connectErrorSVG} cleanup={['title']} />
+            <SvgInline svg={connectErrorSVG} />
           </div>);
         break;
       default:
