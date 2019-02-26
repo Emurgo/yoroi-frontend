@@ -39,7 +39,7 @@
   "api.errors.sendTransactionApiError": "Fehler vom Server beim Senden der Transaktion.",
   "api.errors.sendTransactionError": "Fehler von der API beim Senden der Transaktion.",
   "api.errors.transactionError": "Fehler beim Erstellen der Transaktion.",
-  "api.errors.unusedAddressesError": "Sie können nicht mehr als 20 aufeinanderfolgende unbenutzte Adressen generieren.",
+  "api.errors.unusedAddressesError": "Es ist nicht möglich, mehr als 20 Adressen hintereinander zu generieren, ohne sie zu verwenden.",
   "api.errors.updateAdaTxsHistoryError": "Fehler beim Aktualisieren des ADA-Transaktionsverlaufs.",
   "api.errors.updateAdaWalletError": "Fehler beim Aktualisieren der ADA-Wallet.",
   "app.errors.unexpectedError": "Etwas Unerwartetes ist passiert. Bitte versuchen Sie es erneut.",
