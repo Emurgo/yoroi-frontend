@@ -5,13 +5,14 @@ import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 
-import AboutDialog from '../../../components/wallet/trezorConnect/AboutDialog';
-import ConnectDialog from '../../../components/wallet/trezorConnect/ConnectDialog';
-import SaveDialog from '../../../components/wallet/trezorConnect/SaveDialog';
+import AboutDialog from '../../../components/wallet/hwConnect/trezor/AboutDialog';
+import ConnectDialog from '../../../components/wallet/hwConnect/trezor/ConnectDialog';
+import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
 import { Logger } from '../../../utils/logging';
 
-import TrezorConnectStore, { ProgressStep } from '../../../stores/ada/TrezorConnectStore';
+import TrezorConnectStore from '../../../stores/ada/TrezorConnectStore';
+import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import HWConnectActions from '../../../actions/ada/hw-connect-actions';
 
 type Props = InjectedDialogContainerProps;

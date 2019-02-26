@@ -172,11 +172,20 @@ export default class AdaWalletsStore extends WalletStore {
   };
 
   // =================== NOTIFICATION ==================== //
+  showLedgerNanoSWalletIntegratedNotification = (): void => {
+    const notification: Notification = {
+      id: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
+      message: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage,
+      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
+
   showTrezorTWalletIntegratedNotification = (): void => {
     const notification: Notification = {
       id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
       message: globalMessages.trezorTWalletIntegratedNotificationMessage,
-      duration: config.wallets.TREZOR_WALLET_INTEGRATED_NOTIFICATION_DURATION,
+      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
     };
     this.actions.notifications.open.trigger(notification);
   }

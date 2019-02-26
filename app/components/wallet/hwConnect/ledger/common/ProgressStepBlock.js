@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import ProgressSteps from '../../../widgets/ProgressSteps';
-import type { ProgressInfo } from '../../../../stores/ada/TrezorConnectStore';
+import ProgressSteps from '../../../../widgets/ProgressSteps';
+import type { ProgressInfo } from '../../../../../types/HWConnectStoreTypes';
 
 const messages = defineMessages({
   stepAboutLabel: {

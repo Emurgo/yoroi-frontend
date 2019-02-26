@@ -65,8 +65,8 @@ export default class WalletAddPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
     const { isRestoreActive } = wallets;
-    const { isCreateTrezorWalletActive } = this._getTrezorConnectStore();
-    const isCreateLedgerWalletActive = this._getLedgerConnectStore().isCreateWalletActive;
+    const isCreateTrezorWalletActive = this._getTrezorConnectStore().isCreateHWActive;
+    const isCreateLedgerWalletActive = this._getLedgerConnectStore().isCreateHWActive;
     const openTrezorConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
     };

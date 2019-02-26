@@ -9,7 +9,7 @@ import {
   LedgerBridge,
   makeCardanoBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
-// TODO [LEDGER]: replace types by npm module import
+// TODO [LEDGER]: replace by npm module import
 import type {
   GetVersionResponse,
   GetExtendedPublicKeyResponse,
@@ -36,9 +36,8 @@ import {
 } from '../../types/HWConnectStoreTypes';
 import type {
   ProgressInfo,
-  HWDeviceInfo,
-  HWFeatures
-} from '../../types/HWConnectStoreTypes'; // StepStateEnum, ProgressStepEnum,
+  HWDeviceInfo
+} from '../../types/HWConnectStoreTypes';
 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -65,17 +64,16 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   error: ?LocalizableError;
 
-  get isActionProcessing(): boolean {
-    return this.progressInfo.stepState === StepState.PROCESS;
-  }
-
   hwDeviceInfo: ?HWDeviceInfo;
 
-  // Ledger doesn’t provide any device name so using hard-coded name
   get defaultWalletName(): string {
+    // Ledger doesn’t provide any device name so using hard-coded name
     return Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_WALLET_NAME;
   }
 
+  get isActionProcessing(): boolean {
+    return this.progressInfo.stepState === StepState.PROCESS;
+  }
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
@@ -84,7 +82,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
     * ledger wallet creation on a seperate wallet and explain to them why the action is blocked */
-  @observable isCreateWalletActive: boolean = false;
+  @observable isCreateHWActive: boolean = false;
   // =================== API RELATED =================== //
 
   setup() {
@@ -99,7 +97,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     this.hwDeviceInfo = {
       valid: false,
       publicKey: null,
-      features: null
+      hwFeatures: null
     };
   }
 
@@ -171,32 +169,17 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
         = await ledgerBridge.getExtendedPublicKey(hdPath);
       Logger.debug(stringifyData(extendedPublicKeyResp));
 
-      if (this._isValidHW(versionResp, extendedPublicKeyResp)) {
-        this.hwDeviceInfo = {
-          valid: true,
-          publicKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
-          features: {
-            vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
-            model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
-            label: '',
-            deviceId: '',
-            language: '',
-            majorVersion: parseInt(versionResp.major, 10),
-            minorVersion: parseInt(versionResp.minor, 10),
-            patchVersion: parseInt(versionResp.patch, 10),
-          }
-        };
-
+      if (this._validateHWResponse(versionResp, extendedPublicKeyResp)) {
+        this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
         Logger.info('Ledger device OK');
         this._goToSaveLoad();
       }
     } catch (error) {
-      Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
       this._handleConnectError(error);
     }
   };
 
-  _isValidHW = (
+  _validateHWResponse = (
     versionResp: GetVersionResponse,
     extendedPublicKeyResp: GetExtendedPublicKeyResponse
   ): boolean => {
@@ -206,7 +189,35 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     return valid;
   };
 
+  _normalizeHWResponse = (
+    versionResp: GetVersionResponse,
+    extendedPublicKeyResp: GetExtendedPublicKeyResponse
+  ): HWDeviceInfo => {
+    let hwDeviceInfo;
+
+    if (versionResp && extendedPublicKeyResp) {
+      hwDeviceInfo = {
+        publicKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
+        hwFeatures: {
+          vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
+          model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
+          label: '',
+          deviceId: '',
+          language: '',
+          majorVersion: parseInt(versionResp.major, 10),
+          minorVersion: parseInt(versionResp.minor, 10),
+          patchVersion: parseInt(versionResp.patch, 10),
+        }
+      };
+    } else {
+      throw new UnexpectedError();
+    }
+
+    return hwDeviceInfo;
+  }
+
   _handleConnectError = (error): void => {
+    Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
     if (error instanceof LocalizableError) {
       this.error = error;
     } else {
@@ -239,12 +250,14 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   /** creates new wallet and loads it */
   _saveHW = async (walletName: string): Promise<void>  => {
     try {
-      Logger.debug('LedgerConnectStore::_saveHW:: stated');
+      Logger.debug('LedgerConnectStore::_saveHW:: called');
       this._setIsCreateHWActive(true);
       this.createHWRequest.reset();
 
-      const params = this._prepareCreateHWReqParams(walletName);
-      const ledgerWallet: CreateHardwareWalletResponse = await this.createHWRequest.execute(params).promise;
+      const reqParams = this._prepareCreateHWReqParams(walletName);
+      const ledgerWallet: CreateHardwareWalletResponse =
+        await this.createHWRequest.execute(reqParams).promise;
+
       if (ledgerWallet) {
         await this._onSaveSucess(ledgerWallet);
       } else {
@@ -274,37 +287,28 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   _prepareCreateHWReqParams = (walletName: string): CreateHardwareWalletRequest => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicKey == null
-      || this.hwDeviceInfo.features == null) {
+      || this.hwDeviceInfo.hwFeatures == null) {
       throw new UnexpectedError();
     }
 
     return {
       walletName,
-      walletHardwareInfo: {
-        publicMasterKey: this.hwDeviceInfo.publicKey,
-        vendor: this.hwDeviceInfo.features.vendor,
-        model: this.hwDeviceInfo.features.vendor,
-        deviceId: this.hwDeviceInfo.features.deviceId,
-        label: this.hwDeviceInfo.features.label,
-        majorVersion: this.hwDeviceInfo.features.majorVersion,
-        minorVersion: this.hwDeviceInfo.features.minorVersion,
-        patchVersion: this.hwDeviceInfo.features.patchVersion,
-        language: this.hwDeviceInfo.features.language,
-      }
+      publicMasterKey: this.hwDeviceInfo.publicKey,
+      hwFeatures: this.hwDeviceInfo.hwFeatures
     };
   };
 
-  async _onSaveSucess(HWWallet: Wallet): Promise<void> {
+  async _onSaveSucess(ledgerWallet: Wallet): Promise<void> {
     // close the active dialog
     Logger.debug('LedgerConnectStore::_onSaveSucess success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
 
     const { wallets } = this.stores.substores[environment.API];
-    await wallets._patchWalletRequestWithNewWallet(HWWallet);
+    await wallets._patchWalletRequestWithNewWallet(ledgerWallet);
 
     // goto the wallet transactions page
     Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');
-    wallets.goToWalletRoute(HWWallet.id);
+    wallets.goToWalletRoute(ledgerWallet.id);
 
     // fetch its data
     Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
@@ -314,7 +318,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     this.stores.topbar.initCategories();
 
     // show success notification
-    wallets.showTrezorTWalletIntegratedNotification();
+    wallets.showLedgerNanoSWalletIntegratedNotification();
 
     // TODO: [TREZOR] not sure if it actully destroying this Store ??
     this.teardown();
@@ -329,7 +333,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   // =================== API =================== //
   @action _setIsCreateHWActive = (active: boolean): void => {
-    this.isCreateWalletActive = active;
+    this.isCreateHWActive = active;
   };
   // =================== API =================== //
 }

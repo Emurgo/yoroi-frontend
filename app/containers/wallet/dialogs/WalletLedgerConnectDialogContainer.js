@@ -5,9 +5,9 @@ import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 
-import AboutDialog from '../../../components/wallet/ledgerConnect/AboutDialog';
-import ConnectDialog from '../../../components/wallet/ledgerConnect/ConnectDialog';
-import SaveDialog from '../../../components/wallet/ledgerConnect/SaveDialog';
+import AboutDialog from '../../../components/wallet/hwConnect/ledger/AboutDialog';
+import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDialog';
+import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
 
 import { Logger } from '../../../utils/logging';
 

@@ -5,87 +5,87 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 
-import globalMessages from '../../../i18n/global-messages';
-import LocalizableError from '../../../i18n/LocalizableError';
+import globalMessages from '../../../../i18n/global-messages';
+import LocalizableError from '../../../../i18n/LocalizableError';
 
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../../widgets/Dialog';
+import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
-import externalLinkSVG from '../../../assets/images/link-external.inline.svg';
-import aboutPrerequisiteIconSVG from '../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
-import aboutPrerequisiteTrezorSVG from '../../../assets/images/trezor/connect/about-trezor.inline.svg';
+import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
+import aboutPrerequisiteIconSVG from '../../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
+import aboutPrerequisiteTrezorSVG from '../../../../assets/images/trezor/connect/about-trezor.inline.svg';
 
-import type { ProgressInfo } from '../../../stores/ada/TrezorConnectStore';
+import type { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
 import styles from './AboutDialog.scss';
 
 const messages = defineMessages({
   aboutIntroTextLine1: {
-    id: 'wallet.trezor.dialog.step.about.introText.line.1',
+    id: 'wallet.ledger.dialog.step.about.introText.line.1',
     defaultMessage: '!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutIntroTextLine2: {
-    id: 'wallet.trezor.dialog.step.about.introText.line.2',
+    id: 'wallet.ledger.dialog.step.about.introText.line.2',
     defaultMessage: '!!!It is more secure because your private key never leaves the hardware wallet.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutIntroTextLine3: {
-    id: 'wallet.trezor.dialog.step.about.introText.line.3',
+    id: 'wallet.ledger.dialog.step.about.introText.line.3',
     defaultMessage: '!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisiteHeader: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.header',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.header',
     defaultMessage: '!!!Prerequisites',
     description: 'Prerequisite header on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part1: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.1.part1',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.1.part1',
     defaultMessage: '!!!Only Supports',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2Link: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.1.part2.link',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.1.part2.link',
     defaultMessage: '!!!https://github.com/trezor/trezor-core/blob/master/ChangeLog',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2LinkText: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.1.part2.link.text',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.1.part2.link.text',
     defaultMessage: '!!!Trezor Model T with version 2.0.8',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part3: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.1.part3',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.1.part3',
     defaultMessage: '!!!or later',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite2: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.2',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.2',
     defaultMessage: '!!!Trezor device must be pre-initialized',
     description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.3',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.3',
     defaultMessage: '!!!The Trezor device screen must be unlocked.',
     description: 'Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite4: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.4',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.4',
     defaultMessage: '!!!Your computer must remain connected to the Internet throughout the process.',
     description: 'Fourth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite5: {
-    id: 'wallet.trezor.dialog.step.about.prerequisite.5',
+    id: 'wallet.ledger.dialog.step.about.prerequisite.5',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
     description: 'Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   nextButtonLabel: {
-    id: 'wallet.trezor.dialog.next.button.label',
+    id: 'wallet.ledger.dialog.next.button.label',
     defaultMessage: '!!!Next',
     description: 'Label for the "Next" button on the Connect to Trezor Hardware Wallet dialog.'
   },

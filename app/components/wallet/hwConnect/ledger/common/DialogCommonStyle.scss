@@ -7,7 +7,7 @@ $opacityCommon: 0.7;
 }
 
 .processing {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
+  @include loading-spinner("../../../../assets/images/spinner-light.svg");
 }
 
 .actions {
