@@ -15,20 +15,20 @@
 }
 
 .active {
-  .icon:not(.withTrezorTIcon) path {
+  .icon:not(.withHardwareWalletIcon) path {
     stroke: var(--theme-button-primary-background-color);
     fill: var(--theme-button-primary-background-color);
   }
 
-  .icon:not(.walletsIcon):not(.withTrezorTIcon) path {
+  .icon:not(.walletsIcon):not(.withHardwareWalletIcon) path {
     fill: var(--theme-button-primary-background-color);
   }
 
-  .icon:not(.walletsIcon):not(.withTrezorTIcon) polygon {
+  .icon:not(.walletsIcon):not(.withHardwareWalletIcon) polygon {
     fill: var(--theme-button-primary-background-color);
   }
 
-  .withTrezorTIcon {
+  .withHardwareWalletIcon {
     & > svg {
       // plus-logo
       & > g > g:nth-child(1) {
@@ -68,7 +68,7 @@
   }
 }
 
-.withTrezorTIcon {
+.withHardwareWalletIcon {
   flex-shrink: 0;
   & > svg {
     width: 64px;
@@ -79,6 +79,7 @@
       fill: var(--theme-icon-topbar-color);
     }
     // trezor-t-logo
+    // TODO [LEDGER] need to take care if it has same SVG structure
     & > g > g:nth-child(2) {
       stroke: var(--theme-icon-topbar-color);
     }    
@@ -95,6 +96,10 @@
     }
 
     &.with-trezor-t {
+      left: 64px;
+    }
+
+    &.with-ledger-nano-s {
       left: 64px;
     }    
 
