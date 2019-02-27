@@ -30,18 +30,16 @@ export default class TopbarStore extends Store {
     this.CATEGORIES = topbarConfig.CATEGORIES;
 
     const { wallets } = this.stores.substores[environment.API];
-    if (wallets && wallets.first) {
-      // If active wallet is TrezorTWallet then show with Trezor T Icon
-      if (wallets.first.isTrezorTWallet
-        && !this.CATEGORIES.find(category => category.name === WITH_TREZOR_T.name)) {
-        this.CATEGORIES.push(WITH_TREZOR_T);
-      }
+    // If active wallet is TrezorTWallet then show with Trezor T Icon
+    if (wallets && wallets.first && wallets.first.isTrezorTWallet
+      && !this.CATEGORIES.find(category => category.name === WITH_TREZOR_T.name)) {
+      this.CATEGORIES.push(WITH_TREZOR_T);
+    }
 
-      // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
-      if (wallets.first.isLedgerNanoSWallet
-        && !this.CATEGORIES.find(category => category.name === WITH_LEDGER_NANO_S.name)) {
-        this.CATEGORIES.push(WITH_LEDGER_NANO_S);
-      }
+    // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
+    if (wallets && wallets.first && wallets.first.isLedgerNanoSWallet
+      && !this.CATEGORIES.find(category => category.name === WITH_LEDGER_NANO_S.name)) {
+      this.CATEGORIES.push(WITH_LEDGER_NANO_S);
     }
 
     this.activeTopbarCategory = this.CATEGORIES[0].route;

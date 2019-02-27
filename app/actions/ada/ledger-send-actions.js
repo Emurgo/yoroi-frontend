@@ -6,7 +6,7 @@ export type SendUsingLedgerParams = {
   amount: string
 };
 
-// ======= Sending ADA using Trezor ACTIONS =======
+// ======= Sending ADA using Ledger ACTIONS =======
 
 export default class LedgerSendActions {
   cancel: Action<void> = new Action();

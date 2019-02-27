@@ -2,34 +2,17 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
+import type { MessageDescriptorMap } from 'react-intl';
 
-import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import ErrorBlock from '../../../widgets/ErrorBlock';
+import Dialog from '../../widgets/Dialog';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import ErrorBlock from '../../widgets/ErrorBlock';
 
-import globalMessages from '../../../../i18n/global-messages';
-import LocalizableError from '../../../../i18n/LocalizableError';
+import globalMessages from '../../../i18n/global-messages';
+import LocalizableError from '../../../i18n/LocalizableError';
 
-import styles from './TrezorSendConfirmationDialog.scss';
-
-const messages = defineMessages({
-  infoLine1: {
-    id: 'wallet.send.trezor.confirmationDialog.info.line.1',
-    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
-    description: 'Informative message line 1 in the wallet trezor send confirmation dialog.'
-  },
-  infoLine2: {
-    id: 'wallet.send.trezor.confirmationDialog.info.line.2',
-    defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
-    description: 'Informative message line 2 in the wallet trezor send confirmation dialog.'
-  },
-  sendUsingTrezorButtonLabel: {
-    id: 'wallet.send.trezor.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Trezor',
-    description: 'Label for the send button in the wallet send confirmation dialog.'
-  },
-});
+import styles from './HWSendConfirmationDialog.scss';
 
 type Props = {
   amount: string,
@@ -38,6 +21,7 @@ type Props = {
   transactionFee: string,
   currencyUnit: string,
   amountToNaturalUnits: Function,
+  messages: MessageDescriptorMap,
   isSubmitting: boolean,
   error: ?LocalizableError,
   onSubmit: Function,
@@ -45,7 +29,7 @@ type Props = {
 };
 
 @observer
-export default class TrezorSendConfirmationDialog extends Component<Props> {
+export default class HWSendConfirmationDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -60,6 +44,7 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
       transactionFee,
       currencyUnit,
       isSubmitting,
+      messages,
       error,
       onCancel,
     } = this.props;
@@ -123,7 +108,7 @@ export default class TrezorSendConfirmationDialog extends Component<Props> {
           : onCancel
       },
       {
-        label: intl.formatMessage(messages.sendUsingTrezorButtonLabel),
+        label: intl.formatMessage(messages.sendUsingHWButtonLabel),
         onClick: this.submit,
         primary: true,
         className: confirmButtonClasses,

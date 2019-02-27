@@ -1,4 +1,4 @@
-@import '../../../../themes/mixins/loading-spinner';
+@import '../../../themes/mixins/loading-spinner';
 
 .dialog {
   font-family: var(--font-medium);
@@ -11,11 +11,11 @@
   };
 
   .submitButtonSpinning {
-    @include loading-spinner("../../../../assets/images/spinner-light.svg");
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
   }
 
   .infoBlock {
-    background-color: var(--theme-trezor-send-confirmation-info-block-background-color);
+    background-color: var(--theme-hw-send-confirmation-info-block-background-color);
     font-family: var(--font-regular);
     padding: 5px;
     margin-bottom: 20px;

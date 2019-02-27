@@ -153,7 +153,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
       Logger.debug(stringifyData(versionResp));
 
       // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
-      const hdPath: BIP32Path = makeCardanoBIP44Path(0, false, 0);
+      const hdPath: BIP32Path = makeCardanoBIP44Path(0, 0, 0);
       Logger.debug(stringifyData(hdPath));
 
       // get Cardano's first account's first public key(non change)

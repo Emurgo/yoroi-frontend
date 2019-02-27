@@ -30,12 +30,16 @@ import type {
   TrezorInput,
   TrezorOutput,
   TrezorSignTxPayload,
-  LedgerInputTypeUTxO,
-  LedgerOutputTypeAddress,
-  LedgerOutputTypeChange,
   LedgerSignTxPayload,
 } from '../../../domain/HWSignTx';
-import { str_to_path as strToPath } from './utils'; // TODO [LEDGER] later replace this with npm module
+// TODO [LEDGER] replace types of yoroi-extension-ledger-bridge with npm package
+import type {
+  BIP32Path,
+  InputTypeUTxO,
+  OutputTypeAddress,
+  OutputTypeChange,
+} from 'yoroi-extension-ledger-bridge';
+import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
 
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
@@ -129,14 +133,14 @@ export async function newTrezorTransaction(
   }
 }
 
-export function _derivePath(change: number, index: number): string {
+function _derivePathAsString(chain: number, addressIndex: number): string {
   // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return `${Config.wallets.BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH}/${change}/${index}`;
+  return `${Config.wallets.BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH}/${chain}/${addressIndex}`;
 }
 
 function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
   return inputs.map((input: TxInput) => ({
-    path: _derivePath(input.addressing.change, input.addressing.index),
+    path: _derivePathAsString(input.addressing.change, input.addressing.index),
     prev_hash: input.ptr.id,
     prev_index: input.ptr.index,
     type: 0
@@ -151,17 +155,17 @@ function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
 }
 
 function _outputAddressOrPath(
-  out: TxOutput
+  txOutput: TxOutput
 ): { path: string } | { address: string } {
-  if (out.isChange) {
-    const fullAddress: ?AdaAddress = out.fullAddress;
+  if (txOutput.isChange) {
+    const fullAddress: ?AdaAddress = txOutput.fullAddress;
     if (fullAddress) {
-      return { path: _derivePath(fullAddress.change, fullAddress.index) };
+      return { path: _derivePathAsString(fullAddress.change, fullAddress.index) };
     }
-    Logger.debug('newTransaction::_outputAddressOrPath: ' +
-      `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
+    Logger.debug(`newTransaction::_outputAddressOrPath:[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(txOutput)}`);
   }
-  return { address: out.address };
+
+  return { address: txOutput.address };
 }
 
 // ==================== LEDGER ==================== //
@@ -174,11 +178,12 @@ export async function createLedgerSignTxPayload(
   const txDataHexList = await txsBodiesForInputs(txExt.inputs);
 
   // Inputs
-  const ledgerInputs: Array<LedgerInputTypeUTxO> =
+  const ledgerInputs: Array<InputTypeUTxO> =
     _transformToLedgerInputs(txExt.inputs, txDataHexList);
 
   // Outputs
-  const ledgerOutputs = _transformToLedgerOutputs(txExt.outputs);
+  const ledgerOutputs: Array<OutputTypeAddress | OutputTypeChange> =
+    _transformToLedgerOutputs(txExt.outputs);
 
   return {
     inputs: ledgerInputs,
@@ -186,44 +191,50 @@ export async function createLedgerSignTxPayload(
   };
 }
 
+function _derivePathAsBIP32Path(
+  chain: number,
+  addressIndex: number
+): BIP32Path {
+  // Assumes this is only for Cardano and Web Yoroi (only one account).
+  return makeCardanoBIP44Path(0, chain, addressIndex);
+}
+
 function _transformToLedgerInputs(
   inputs: Array<TxInput>,
   txDataHexList: Array<string>
-): Array<LedgerInputTypeUTxO> {
+): Array<InputTypeUTxO> {
   return inputs.map((input: TxInput, idx: number) => ({
     txDataHex: txDataHexList[idx],
     outputIndex: input.ptr.index,
-    path: strToPath(_derivePath(input.addressing.change, input.addressing.index)),
+    path: _derivePathAsBIP32Path(input.addressing.change, input.addressing.index),
   }));
 }
 
 function _transformToLedgerOutputs(
-  outputs: Array<TxOutput>
-): Array<LedgerOutputTypeAddress | LedgerOutputTypeChange> {
-  return outputs.map(x => ({
-    amountStr: x.value.toString(),
-    ..._ledgerOutputAddress58OrPath(x)
+  txOutputs: Array<TxOutput>
+): Array<OutputTypeAddress | OutputTypeChange> {
+  return txOutputs.map(txOutput => ({
+    amountStr: txOutput.value.toString(),
+    ..._ledgerOutputAddress58OrPath(txOutput)
   }));
 }
 
 function _ledgerOutputAddress58OrPath(
-  out: TxOutput
-): { address58: string } | { path: string }  {
-  if (out.isChange) {
-    const fullAddress: ?AdaAddress = out.fullAddress;
+  txOutput: TxOutput
+): { address58: string } | { path: BIP32Path }  {
+  if (txOutput.isChange) {
+    const fullAddress: ?AdaAddress = txOutput.fullAddress;
     if (fullAddress) {
-      return { path: strToPath(_derivePath(fullAddress.change, fullAddress.index)) };
+      return { path: _derivePathAsBIP32Path(fullAddress.change, fullAddress.index) };
     }
-
-    Logger.debug('newTransaction::_ledgerOutputAddressOrPath: ' +
-      `[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(out)}`);
+    Logger.debug(`newTransaction::_ledgerOutputAddressOrPath:[WEIRD] Ledger got a change output without a full 'Ada Address': ${stringifyData(txOutput)}`);
   }
 
-  return { address58: out.address };
+  return { address58: txOutput.address };
 }
 
 /** Send a transaction and save the new change address */
-// TODO [TREZOR] try to merge this function with createTrezorSignTxPayload() 
+// TODO [TREZOR] try to merge this function with createTrezorSignTxPayload()
 export async function newLedgerTransaction(
   signedTxHex: string,
   changeAdaAddr: AdaAddress,

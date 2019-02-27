@@ -62,7 +62,7 @@ export default class Wallet {
       && !!this.hardwareInfo
       && this.hardwareInfo.vendor === Config.wallets.hardwareWallet.ledgerNanoS.VENDOR
       && this.hardwareInfo.model === Config.wallets.hardwareWallet.ledgerNanoS.MODEL);
-  }  
+  }
 
   @computed get assuranceMode(): AssuranceMode {
     switch (this.assurance) {
