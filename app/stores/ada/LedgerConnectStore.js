@@ -1,8 +1,7 @@
 // @flow
-
 // Handles Connect to Ledger Hardware Wallet dialog
 
-import { observable, action, computed } from 'mobx';
+import { observable, action } from 'mobx';
 import { defineMessages } from 'react-intl';
 
 import {
@@ -32,9 +31,7 @@ import type {
 import {
   HWConnectStoreTypes,
   StepState,
-  ProgressStep
-} from '../../types/HWConnectStoreTypes';
-import type {
+  ProgressStep,
   ProgressInfo,
   HWDeviceInfo
 } from '../../types/HWConnectStoreTypes';
@@ -57,6 +54,8 @@ const messages = defineMessages({
   },
 });
 
+/** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
+  * try to make a common base class */
 export default class LedgerConnectStore extends Store implements HWConnectStoreTypes {
 
   // =================== VIEW RELATED =================== //
@@ -93,12 +92,6 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     ledgerConnectAction.goBackToAbout.listen(this._goBackToAbout);
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
-
-    this.hwDeviceInfo = {
-      valid: false,
-      publicKey: null,
-      hwFeatures: null
-    };
   }
 
   teardown(): void {
@@ -169,15 +162,36 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
         = await ledgerBridge.getExtendedPublicKey(hdPath);
       Logger.debug(stringifyData(extendedPublicKeyResp));
 
-      if (this._validateHWResponse(versionResp, extendedPublicKeyResp)) {
-        this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
-        Logger.info('Ledger device OK');
-        this._goToSaveLoad();
-      }
+      this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
+      this._goToSaveLoad();
+      Logger.info('Ledger device OK');
     } catch (error) {
       this._handleConnectError(error);
     }
   };
+
+  _normalizeHWResponse = (
+    versionResp: GetVersionResponse,
+    extendedPublicKeyResp: GetExtendedPublicKeyResponse
+  ): HWDeviceInfo => {
+    if (!this._validateHWResponse(versionResp, extendedPublicKeyResp)) {
+      throw new UnexpectedError();
+    }
+
+    return {
+      publicMasterKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
+      hwFeatures: {
+        vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
+        model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
+        label: '',
+        deviceId: '',
+        language: '',
+        majorVersion: parseInt(versionResp.major, 10),
+        minorVersion: parseInt(versionResp.minor, 10),
+        patchVersion: parseInt(versionResp.patch, 10),
+      }
+    };
+  }
 
   _validateHWResponse = (
     versionResp: GetVersionResponse,
@@ -189,40 +203,17 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     return valid;
   };
 
-  _normalizeHWResponse = (
-    versionResp: GetVersionResponse,
-    extendedPublicKeyResp: GetExtendedPublicKeyResponse
-  ): HWDeviceInfo => {
-    let hwDeviceInfo;
-
-    if (versionResp && extendedPublicKeyResp) {
-      hwDeviceInfo = {
-        publicKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
-        hwFeatures: {
-          vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
-          model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
-          label: '',
-          deviceId: '',
-          language: '',
-          majorVersion: parseInt(versionResp.major, 10),
-          minorVersion: parseInt(versionResp.minor, 10),
-          patchVersion: parseInt(versionResp.patch, 10),
-        }
-      };
-    } else {
-      throw new UnexpectedError();
-    }
-
-    return hwDeviceInfo;
-  }
-
   _handleConnectError = (error): void => {
     Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
+
+    this.hwDeviceInfo = undefined;
+
     if (error instanceof LocalizableError) {
       this.error = error;
     } else {
       this.error = new UnexpectedError();
     }
+
     this._goToConnectError();
   };
 
@@ -286,14 +277,14 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   _prepareCreateHWReqParams = (walletName: string): CreateHardwareWalletRequest => {
     if (this.hwDeviceInfo == null
-      || this.hwDeviceInfo.publicKey == null
+      || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new UnexpectedError();
     }
 
     return {
       walletName,
-      publicMasterKey: this.hwDeviceInfo.publicKey,
+      publicMasterKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures
     };
   };

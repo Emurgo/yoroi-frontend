@@ -1,12 +1,11 @@
 // @flow
-
 // Handles Connect to Trezor Hardware Wallet dialog
 
 import { observable, action } from 'mobx';
 import { defineMessages } from 'react-intl';
 
 import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
-import type { DeviceMessage, Features, UiMessage } from 'trezor-connect';
+import type { DeviceMessage, UiMessage } from 'trezor-connect';
 
 import Config from '../../config';
 import environment from '../../environment';
@@ -23,9 +22,7 @@ import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 import {
   HWConnectStoreTypes,
   StepState,
-  ProgressStep
-} from '../../types/HWConnectStoreTypes';
-import type {
+  ProgressStep,
   ProgressInfo,
   HWDeviceInfo
 } from '../../types/HWConnectStoreTypes';
@@ -48,6 +45,8 @@ const messages = defineMessages({
   },
 });
 
+/** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
+  * try to make a common base class */
 export default class TrezorConnectStore extends Store implements HWConnectStoreTypes {
 
   // =================== VIEW RELATED =================== //
@@ -98,7 +97,9 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     trezorConnectAction.submitConnect.listen(this._submitConnect);
     trezorConnectAction.submitSave.listen(this._submitSave);
 
-    /** Preinitialization of TrezorConnect API will result in faster first response */
+    /** Preinitialization of TrezorConnect API will result in faster first response
+      * TODO [TREZOR] this can be moved to a new method which would be
+      * called when connect dialog loads(before About state) */
     try {
       /** Starting from v7 Trezor Connect Manifest has been made mandatory
         * https://github.com/trezor/connect/blob/develop/docs/index.md#trezor-connect-manifest */
@@ -183,25 +184,50 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
       const trezorEventDevice: DeviceMessage = { ...this.trezorEventDevice };
 
-      if (this._validateHWResponse(trezorResp, trezorEventDevice)) {
-        /** Converts a valid hardware wallet response to a common storable format
-          * later the same format will be used to create wallet */
-        this.hwDeviceInfo = this._normalizeHWResponse(trezorResp, trezorEventDevice);
+      /** Converts a valid hardware wallet response to a common storable format
+        * later the same format will be used to create wallet */
+      this.hwDeviceInfo = this._normalizeHWResponse(trezorResp, trezorEventDevice);
 
-        // It's a valid trezor device, go to Save Load state
-        this._goToSaveLoad();
-        Logger.info('Trezor device OK');
+      // It's a valid trezor device, go to Save Load state
+      this._goToSaveLoad();
 
-        /** TODO: [TREZOR] handle when user forcefully close Connect to Trezor Hardware Wallet
-          * while connection in in progress */
-        this._removeTrezorConnectEventListeners();
-      } else {
-        throw new UnexpectedError();
-      }
+      /** TODO: [TREZOR] handle when user forcefully close Connect to Trezor Hardware Wallet
+       * while connection in in progress */
+      this._removeTrezorConnectEventListeners();
+      Logger.info('Trezor device OK');
     } catch (error) {
       this._handleConnectError(error);
     }
   };
+
+  _normalizeHWResponse = (
+    trezorResp: any,
+    trezorEventDevice: DeviceMessage
+  ): HWDeviceInfo => {
+    if (trezorResp == null
+      || trezorResp.payload == null
+      || trezorEventDevice == null
+      || trezorEventDevice.payload == null
+      || trezorEventDevice.payload.features == null
+      || !this._validateHWResponse(trezorResp, trezorEventDevice)) {
+      throw new UnexpectedError();
+    }
+
+    const deviceFeatures = trezorEventDevice.payload.features;
+    return {
+      publicMasterKey: trezorResp.payload.publicKey,
+      hwFeatures: {
+        vendor: deviceFeatures.vendor,
+        model: deviceFeatures.model,
+        deviceId: deviceFeatures.device_id,
+        label: deviceFeatures.label,
+        majorVersion: deviceFeatures.major_version,
+        minorVersion: deviceFeatures.minor_version,
+        patchVersion: deviceFeatures.patch_version,
+        language: deviceFeatures.language,
+      }
+    };
+  }
 
   /** Validates the compatibility of data which we have received from Trezor device */
   _validateHWResponse = (
@@ -246,41 +272,9 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     return true;
   };
 
-  _normalizeHWResponse = (
-    trezorResp: any,
-    trezorEventDevice: DeviceMessage
-  ): HWDeviceInfo => {
-    let hwDeviceInfo;
-
-    if (trezorResp
-      && trezorResp.payload
-      && trezorEventDevice.payload
-      && trezorEventDevice.payload.features) {
-      const deviceFeatures = trezorEventDevice.payload.features;
-      hwDeviceInfo = {
-        publicKey: trezorResp.payload.publicKey,
-        hwFeatures: {
-          vendor: deviceFeatures.vendor,
-          model: deviceFeatures.model,
-          deviceId: deviceFeatures.device_id,
-          label: deviceFeatures.label,
-          majorVersion: deviceFeatures.major_version,
-          minorVersion: deviceFeatures.minor_version,
-          patchVersion: deviceFeatures.patch_version,
-          language: deviceFeatures.language,
-        }
-      };
-    } else {
-      throw new UnexpectedError();
-    }
-
-    return hwDeviceInfo;
-  }
-
   _handleConnectError = (error): void => {
     Logger.error(`TrezorConnectStore::_handleConnectError ${stringifyError(error)}`);
 
-    this.hwDeviceInfo = undefined;
     this.hwDeviceInfo = undefined;
 
     if (error instanceof LocalizableError) {
@@ -356,8 +350,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       if (trezorWallet) {
         await this._onSaveSucess(trezorWallet);
       } else {
-        // this Error will be converted to LocalizableError()
-        throw new Error();
+        throw new UnexpectedError();
       }
     } catch (error) {
       Logger.error(`TrezorConnectStore::_saveHW::error ${stringifyError(error)}`);
@@ -381,14 +374,14 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
   _prepareCreateHWReqParams = (walletName: string): CreateHardwareWalletRequest => {
     if (this.hwDeviceInfo == null
-      || this.hwDeviceInfo.publicKey == null
+      || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new UnexpectedError();
     }
 
     return {
       walletName,
-      publicMasterKey: this.hwDeviceInfo.publicKey,
+      publicMasterKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures
     };
   }

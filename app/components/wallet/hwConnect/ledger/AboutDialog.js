@@ -19,7 +19,7 @@ import externalLinkSVG from '../../../../assets/images/link-external.inline.svg'
 import aboutPrerequisiteIconSVG from '../../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
 import aboutPrerequisiteTrezorSVG from '../../../../assets/images/trezor/connect/about-trezor.inline.svg';
 
-import type { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
 import styles from './AboutDialog.scss';
 
