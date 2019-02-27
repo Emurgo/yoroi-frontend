@@ -147,6 +147,11 @@ export default defineMessages({
     defaultMessage: '!!!Back',
     description: 'Label for the back button in the wallet send confirmation dialog.'
   },
+  ledgerConnectAllDialogTitle: {
+    id: 'wallet.ledger.dialog.title.label',
+    defaultMessage: '!!!Connect to Ledger Hardware Wallet',
+    description: 'Label "Connect to Ledger Hardware Wallet" on the Connect to Ledger Hardware Wallet dialog.'
+  },
   trezorConnectAllDialogTitle: {
     id: 'wallet.trezor.dialog.title.label',
     defaultMessage: '!!!Connect to Trezor Hardware Wallet',
