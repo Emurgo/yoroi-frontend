@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
 import ProgressSteps from '../../../../widgets/ProgressSteps';
-import type { ProgressInfo } from '../../../../../types/HWConnectStoreTypes';
+import { ProgressInfo } from '../../../../../types/HWConnectStoreTypes';
 
 const messages = defineMessages({
   stepAboutLabel: {

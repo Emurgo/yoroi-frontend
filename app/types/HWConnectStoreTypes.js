@@ -1,20 +1,12 @@
 // @flow
+// Interface of Hardware Wallet Connect dialog
 
-import config from '../config';
-import environment from '../environment';
-
-import Store from '../stores/base/Store';
 import Wallet from '../domain/Wallet';
 import LocalizedRequest from '../stores/lib/LocalizedRequest';
 
-import LocalizableError, { UnexpectedError } from '../i18n/LocalizableError';
+import LocalizableError from '../i18n/LocalizableError';
 
-import type { DeviceMessage, Features, UiMessage } from 'trezor-connect';
-
-import type {
-  CreateHardwareWalletRequest,
-  CreateHardwareWalletResponse,
-} from '../api/common';
+import type { CreateHardwareWalletRequest } from '../api/common';
 
 export type ProgressStepEnum = 0 | 1 | 2;
 export const ProgressStep = {
@@ -30,10 +22,10 @@ export const StepState = {
   ERROR: 9,
 };
 
-export type ProgressInfo = {
+export interface ProgressInfo {
   currentStep: ProgressStepEnum,
   stepState: StepStateEnum,
-};
+}
 
 // Hardware wallet device Features object
 export interface HWFeatures {
@@ -47,17 +39,15 @@ export interface HWFeatures {
   patchVersion: number,
 }
 
-// TODO: this could be better with generics, but flow goes crazy.
-export type HWDeviceInfo = {
-  publicKey: ?string,
-  hwFeatures: ?HWFeatures
-};
+export interface HWDeviceInfo {
+  publicMasterKey: string,
+  hwFeatures: HWFeatures
+}
 
 export interface HWConnectStoreTypes {
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
-  // TODO: improve any to something that fits: @observable progressInfo: ProgressInfo;
-  progressInfo: any;
+  progressInfo: ProgressInfo;
 
   /** only in ERROR state it will hold LocalizableError object */
   error: ?LocalizableError;
@@ -71,16 +61,15 @@ export interface HWConnectStoreTypes {
   get defaultWalletName(): string;
 
   get isActionProcessing(): boolean;
-  // // =================== VIEW RELATED =================== //
+  // =================== VIEW RELATED =================== //
 
-  // // =================== API RELATED =================== //
-  // TODO: add later
-  createHWRequest: LocalizedRequest<any>;
+  // =================== API RELATED =================== //
+  createHWRequest: LocalizedRequest<CreateHardwareWalletRequest>;
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
     * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
   isCreateHWActive: boolean;
-  // // =================== API RELATED =================== //
+  // =================== API RELATED =================== //
 
   setup(): void;
 

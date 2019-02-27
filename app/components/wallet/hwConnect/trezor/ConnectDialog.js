@@ -20,8 +20,7 @@ import connectLoadGIF from '../../../../assets/images/trezor/connect/connect-loa
 import connectStartGIF from '../../../../assets/images/trezor/connect/connect-start.gif';
 import connectErrorSVG from '../../../../assets/images/trezor/connect/connect-error.inline.svg';
 
-import type { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
-import { StepState } from '../../../../types/HWConnectStoreTypes';
+import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
 
 import { Logger } from '../../../../utils/logging';
 
