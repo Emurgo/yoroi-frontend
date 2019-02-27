@@ -46,7 +46,7 @@ const messages = defineMessages({
   },
   aboutPrerequisite1Part1: {
     id: 'wallet.ledger.dialog.step.about.prerequisite.1.part1',
-    defaultMessage: '!!!Only Supports',
+    defaultMessage: '!!!At present only',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2Link: {
@@ -64,9 +64,19 @@ const messages = defineMessages({
     defaultMessage: '!!!or later',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
-  aboutPrerequisite2: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.2',
-    defaultMessage: '!!!Trezor device must be pre-initialized',
+  aboutPrerequisite2Part1Link: {
+    id: 'wallet.ledger.dialog.step.about.prerequisite.2.part1.link',
+    defaultMessage: '!!!https://github.com/cardano-foundation/ledger-app-cardano',
+    description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  aboutPrerequisite2Part1LinkText: {
+    id: 'wallet.ledger.dialog.step.about.prerequisite.2.part1.link.text',
+    defaultMessage: '!!!Cardano ADA',
+    description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  aboutPrerequisite2Part2: {
+    id: 'wallet.ledger.dialog.step.about.prerequisite.2.part2',
+    defaultMessage: '!!!app must be pre-installed on the Ledger device.',
     description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
@@ -141,7 +151,13 @@ export default class AboutDialog extends Component<Props> {
               </a>
               {intl.formatMessage(messages.aboutPrerequisite1Part3)}
             </li>
-            <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
+            <li key="2">
+              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite2Part1Link)}>
+                {intl.formatMessage(messages.aboutPrerequisite2Part1LinkText)}
+                <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+              </a>
+              {intl.formatMessage(messages.aboutPrerequisite2Part2)}
+            </li>
             <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
             <li key="4">{intl.formatMessage(messages.aboutPrerequisite4)}</li>
             <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
@@ -163,7 +179,7 @@ export default class AboutDialog extends Component<Props> {
     return (
       <Dialog
         className={classnames([styles.component, 'AboutDialog'])}
-        title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
+        title={intl.formatMessage(globalMessages.ledgerConnectAllDialogTitle)}
         actions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
