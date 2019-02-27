@@ -59,6 +59,8 @@ export default class TrezorSendStore extends Store {
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
   _sendUsingTrezor = async (params: CreateTrezorSignTxDataRequest): Promise<void> => {
     try {
+      this.createTrezorSignTxDataRequest.reset();
+      this.sendTrezorSignedTxRequest.reset();
 
       if (this.isActionProcessing) {
         // this Error will be converted to LocalizableError()
@@ -74,13 +76,12 @@ export default class TrezorSendStore extends Store {
         // this Error will be converted to LocalizableError()
         throw new Error('Active wallet required before sending.');
       }
+
       const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
       if (!accountId) {
         // this Error will be converted to LocalizableError()
         throw new Error('Active account required before sending.');
       }
-
-      this.createTrezorSignTxDataRequest.reset();
 
       const trezorSignTxDataResp =
         await this.createTrezorSignTxDataRequest.execute(params).promise;
@@ -107,25 +108,30 @@ export default class TrezorSendStore extends Store {
     }
   };
 
-  _sendTrezorSignedTx = async (trezorSignTxDataResp: CreateTrezorSignTxDataResponse,
-    trezorResp: any): Promise<void> => {
+  _sendTrezorSignedTx = async (
+    trezorSignTxDataResp: CreateTrezorSignTxDataResponse,
+    trezorResp: any
+  ): Promise<void> => {
     // TODO: [TREZOR] fix type if possible
     const payload: any = trezorResp.payload;
-    this.sendTrezorSignedTxRequest.reset();
     const reqParams: SendTrezorSignedTxRequest = {
       signedTxHex: payload.body,
       changeAdaAddr: trezorSignTxDataResp.changeAddress
     };
+
     // TODO: [TREZOR] add error check
     await this.sendTrezorSignedTxRequest.execute(reqParams).promise;
+
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
     wallets.refreshWalletsData();
+
     const activeWallet = wallets.active;
     if (activeWallet) {
       // go to transaction screen
       wallets.goToWalletRoute(activeWallet.id);
     }
+
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }
 

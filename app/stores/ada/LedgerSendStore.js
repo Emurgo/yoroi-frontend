@@ -1,7 +1,10 @@
 // @flow
 import { action, observable } from 'mobx';
 import { defineMessages } from 'react-intl';
+
 import { LedgerBridge } from 'yoroi-extension-ledger-bridge';
+// TODO [LEDGER]: replace by npm module import
+import type { SignTransactionResponse } from 'yoroi-extension-ledger-bridge';
 
 import Store from '../base/Store';
 import environment from '../../environment';
@@ -24,7 +27,7 @@ import {
 
 const messages = defineMessages({
   signTxError101: {
-    id: 'wallet.send.trezor.error.101',
+    id: 'wallet.send.ledger.error.101',
     defaultMessage: '!!!Signing cancelled on Ledger device. Please retry.',
     description: '<Signing cancelled on Ledger device. Please retry.> on the Trezor send ADA confirmation dialog.'
   },
@@ -56,78 +59,93 @@ export default class LedgerSendStore extends Store {
     this._setError(null);
   }
 
+  // TODO [TREZOR]: this is temporary solution, fix later
+  _wait = async ms => new Promise((resolve) => setTimeout(resolve, ms));
+
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
-  _send = async (params: any): Promise<void> => { //CreateLedgerSignTxDataRequest
-    // try {
+  _send = async (params: CreateLedgerSignTxDataRequest): Promise<void> => {
+    try {
+      this.createLedgerSignTxDataRequest.reset();
+      this.sendLedgerSignedTxRequest.reset();
 
-    //   if (this.isActionProcessing) {
-    //     // this Error will be converted to LocalizableError()
-    //     throw new Error('Can\'t send another transaction if one transaction is in progress.');
-    //   }
+      if (this.isActionProcessing) {
+        // this Error will be converted to LocalizableError()
+        throw new Error('Can\'t send another transaction if one transaction is in progress.');
+      }
 
-    //   this._setError(null);
-    //   this._setActionProcessing(true);
+      this._setError(null);
+      this._setActionProcessing(true);
 
-    //   const { wallets, addresses } = this.stores.substores[environment.API];
-    //   const activeWallet = wallets.active;
-    //   if (!activeWallet) {
-    //     // this Error will be converted to LocalizableError()
-    //     throw new Error('Active wallet required before sending.');
-    //   }
-    //   const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
-    //   if (!accountId) {
-    //     // this Error will be converted to LocalizableError()
-    //     throw new Error('Active account required before sending.');
-    //   }
+      const { wallets, addresses } = this.stores.substores[environment.API];
+      const activeWallet = wallets.active;
+      if (!activeWallet) {
+        // this Error will be converted to LocalizableError()
+        throw new Error('Active wallet required before sending.');
+      }
 
-    //   this.createTrezorSignTxDataRequest.reset();
+      const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
+      if (!accountId) {
+        // this Error will be converted to LocalizableError()
+        throw new Error('Active account required before sending.');
+      }
 
-    //   const trezorSignTxDataResp =
-    //     await this.createTrezorSignTxDataRequest.execute(params).promise;
+      const ledgerSignTxDataResp: CreateLedgerSignTxDataResponse =
+        await this.createLedgerSignTxDataRequest.execute(params).promise;
+      console.log(`ledgerSignTxDataResp: ${JSON.stringify(ledgerSignTxDataResp, null, 2)}`);
 
-    //   // TODO: [TREZOR] fix type if possible
-    //   const trezorResp = await TrezorConnect.cardanoSignTransaction({
-    //     ...trezorSignTxDataResp.trezorSignTxPayload
-    //   });
+      const ledgerBridge = new LedgerBridge();
+      // TODO [TREZOR]: for iframe not initialized (this is temporary solution, fix later)
+      await this._wait(5000);
 
-    //   if (trezorResp && trezorResp.payload && trezorResp.payload.error) {
-    //     // this Error will be converted to LocalizableError()
-    //     throw new Error(trezorResp.payload.error);
-    //   }
+      const ledgerResp: SignTransactionResponse = await ledgerBridge.signTransaction(
+        ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
+        ledgerSignTxDataResp.ledgerSignTxPayload.outputs
+      );
 
-    //   await this._sendTrezorSignedTx(trezorSignTxDataResp, trezorResp);
+      // TODO validate
+      if (!ledgerResp) {
+        // this Error will be converted to LocalizableError()
+        throw new Error(ledgerResp.payload.error);
+      }
 
-    // } catch (error) {
-    //   Logger.error('TrezorSendStore::_sendUsingTrezor error: ' + stringifyError(error));
-    //   this._setError(this._convertToLocalizableError(error));
-    // } finally {
-    //   this.createTrezorSignTxDataRequest.reset();
-    //   this.sendTrezorSignedTxRequest.reset();
-    //   this._setActionProcessing(false);
-    // }
+      await this._broadcastSignedTx(ledgerSignTxDataResp, ledgerResp);
+
+    } catch (error) {
+      Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
+      this._setError(this._convertToLocalizableError(error));
+    } finally {
+      this.createLedgerSignTxDataRequest.reset();
+      this.sendLedgerSignedTxRequest.reset();
+      this._setActionProcessing(false);
+    }
   };
 
-  _broadcastSignedTx = async (trezorSignTxDataResp: any, //CreateTrezorSignTxDataResponse
-    trezorResp: any): Promise<void> => {
+  _broadcastSignedTx = async (
+    ledgerSignTxDataResp: CreateLedgerSignTxDataResponse,
+    ledgerResp: SignTransactionResponse
+  ): Promise<void> => {
 
     // TODO: [TREZOR] fix type if possible
     // const payload: any = trezorResp.payload;
     // this.sendTrezorSignedTxRequest.reset();
-    // const reqParams: SendTrezorSignedTxRequest = {
+    // const reqParams: SendLedgerSignedTxRequest = {
     //   signedTxHex: payload.body,
     //   changeAdaAddr: trezorSignTxDataResp.changeAddress
     // };
-    // // TODO: [TREZOR] add error check
-    // await this.sendTrezorSignedTxRequest.execute(reqParams).promise;
-    // this.actions.dialogs.closeActiveDialog.trigger();
-    // const { wallets } = this.stores.substores[environment.API];
-    // wallets.refreshWalletsData();
-    // const activeWallet = wallets.active;
-    // if (activeWallet) {
-    //   // go to transaction screen
-    //   wallets.goToWalletRoute(activeWallet.id);
-    // }
-    // Logger.info('SUCCESS: ADA sent using Trezor SignTx');
+
+    // TODO: [TREZOR] add error check
+    // await this.sendLedgerSignedTxRequest.execute(reqParams).promise;
+    this.actions.dialogs.closeActiveDialog.trigger();
+
+    const { wallets } = this.stores.substores[environment.API];
+    wallets.refreshWalletsData();
+    const activeWallet = wallets.active;
+    if (activeWallet) {
+      // go to transaction screen
+      wallets.goToWalletRoute(activeWallet.id);
+    }
+
+    Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }
 
   /** Converts error(from API or Trezor API) to LocalizableError */
