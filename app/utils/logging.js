@@ -7,7 +7,7 @@ import type { ConfigType } from '../../config/config-types';
 
 import environment from '../environment';
 
-export const version = require('../../chrome/manifest.' + environment.NETWORK + '.json').version;
+const version = require('../../chrome/manifest.' + environment.NETWORK + '.json').version;
 
 const logger = console;
 declare var CONFIG: ConfigType;
@@ -30,7 +30,7 @@ export const Logger = {
   },
 
   warn: (data : string) => {
-    logger.info(data);
+    logger.warn(data);
   }
 };
 

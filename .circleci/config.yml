@@ -21,7 +21,7 @@ jobs:
       # install rustup
       - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
       - run: echo 'export PATH=$HOME/.cargo/bin/:$PATH' >> $BASH_ENV
-      # use nightly version. 
+      # use 1.32.0 version. 
       # // TODO: This is hardcoded but taken from js-cardano-wasm repo
       # which is checked out later
       - run: rustup install 1.32.0

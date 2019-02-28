@@ -8,9 +8,14 @@ import TransferMnemonicPage from '../../components/transfer/TransferMnemonicPage
 const messages = defineMessages({
   step0: {
     id: 'daedalusTransfer.form.instructions.step0.text',
-    defaultMessage: '!!!Enter the 12-word recovery phrase used to back up your Daedalus wallet to restore the balance and transfer all the funds from Daedalus to Icarus.',
+    defaultMessage: '!!!Enter the 12-word recovery phrase used to back up your Daedalus wallet to restore the balance and transfer all the funds from Daedalus to Yoroi.',
     description: 'Text for instructions step 0 on the Daedalus transfer form page.'
-  }
+  },
+  step0Paper: {
+    id: 'daedalusTransfer.form.instructions.step0Paper.text',
+    defaultMessage: '!!!Enter the 27-word recovery phrase used to back up your Daedalus Paper wallet to restore the balance and transfer all the funds from Daedalus to Yoroi.',
+    description: 'Text for instructions step 0 on the Daedalus Paper transfer form page.'
+  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
@@ -20,6 +25,7 @@ type Props = {
   onBack: Function,
   mnemonicValidator: Function,
   validWords: Array<string>,
+  mnemonicLength: number,
 };
 
 @observer
@@ -31,7 +37,8 @@ export default class DaedalusTransferFormPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { validWords, onBack, onSubmit, mnemonicValidator } = this.props;
+    const { validWords, onBack, onSubmit, mnemonicValidator, mnemonicLength } = this.props;
+    const message = mnemonicLength === 27 ? messages.step0Paper : messages.step0;
 
     return (
       <TransferMnemonicPage
@@ -39,8 +46,8 @@ export default class DaedalusTransferFormPage extends Component<Props> {
         onBack={onBack}
         mnemonicValidator={mnemonicValidator}
         validWords={validWords}
-        step0={intl.formatMessage(messages.step0)}
-        mnemonicLength={12}
+        step0={intl.formatMessage(message)}
+        mnemonicLength={mnemonicLength}
       />
     );
   }

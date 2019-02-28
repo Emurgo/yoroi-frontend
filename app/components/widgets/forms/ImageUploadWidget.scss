@@ -1,0 +1,38 @@
+%base {
+  font-size: 16px;
+  line-height: 1.38;
+  font-family: var(--font-regular);
+  color: var(--theme-uploader-text-color);
+}
+
+.label {
+  @extend %base;
+  font-family: var(--font-semibold);
+  margin-bottom: 10px;
+}
+
+.uploadBox {
+  width: 154px;
+  height: 154px;
+  border-radius: 2px;
+  border: solid 1px var(--theme-uploader-border-color);
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.instructions {
+  width: 100%;
+  text-align: center;
+
+  .title {
+    @extend %base;
+    font-family: var(--font-semibold);
+  }
+
+  .subtitle {
+    @extend %base;
+    font-size: 12px;
+    line-height: 1.33;
+  }
+}

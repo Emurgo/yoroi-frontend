@@ -14,6 +14,7 @@ import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
 import { ROUTES } from '../../routes-config';
+import config from '../../config';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 const MainLayout = resolver('containers/MainLayout');
@@ -52,6 +53,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   startTransferFunds = () => {
     this._getDaedalusTransferActions().startTransferFunds.trigger();
+  }
+
+  startTransferPaperFunds = () => {
+    this._getDaedalusTransferActions().startTransferPaperFunds.trigger();
   }
 
   setupTransferFunds = (payload: { recoveryPhrase: string }) => {
@@ -109,6 +114,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               onAnswerYes={this.goToReceiveScreen}
               onConfirm={this.startTransferFunds}
+              onPaperConfirm={this.startTransferPaperFunds}
               disableTransferFunds={daedalusTransfer.disableTransferFunds}
             />
           </MainLayout>
@@ -119,8 +125,24 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFunds}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic, 12)}
+              mnemonicValidator={mnemonic => wallets.isValidMnemonic(
+                mnemonic,
+                config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
+              )}
               validWords={validWords}
+              mnemonicLength={12}
+            />
+          </MainLayout>
+        );
+      case 'gettingPaperMnemonics':
+        return (
+          <MainLayout topbar={topBar}>
+            <DaedalusTransferFormPage
+              onSubmit={this.setupTransferFunds}
+              onBack={this.backToUninitialized}
+              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
+              validWords={validWords}
+              mnemonicLength={27}
             />
           </MainLayout>
         );

@@ -43,7 +43,13 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
   const recoveryPhrase = mnemonic.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.click(`(//button[contains(@class, 'MnemonicWord_root') and @label = '${word}'])[1]`, By.xpath);
+
+    // same word can occur many times, so we look for any copy of the desired word still unselected
+    await this.click(
+      "(//button[contains(@class, 'MnemonicWord_root') " + // any word
+      "and not(contains(@class, 'MnemonicWord_disabled'))" + // unselected word
+      ` and @label = '${word}'])[1]`, By.xpath // correct word
+    );
   }
   const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
   checkboxes.forEach((box) => box.click());

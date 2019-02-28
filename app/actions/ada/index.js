@@ -6,8 +6,10 @@ import AddressesActions from './addresses-actions';
 import DaedalusTransferActions from './daedalus-transfer-actions';
 import TrezorConnectActions from './trezor-connect-actions';
 import TrezorSendActions from './trezor-send-actions';
+import AdaRedemptionActions from './ada-redemption-actions';
 
 export type AdaActionsMap = {
+  adaRedemption: AdaRedemptionActions,
   wallets: WalletsActions,
   transactions: TransactionsActions,
   walletSettings: WalletSettingsActions,
@@ -18,6 +20,7 @@ export type AdaActionsMap = {
 };
 
 const adaActionsMap: AdaActionsMap = {
+  adaRedemption: new AdaRedemptionActions(),
   wallets: new WalletsActions(),
   transactions: new TransactionsActions(),
   walletSettings: new WalletSettingsActions(),

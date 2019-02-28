@@ -37,6 +37,7 @@ export default class Settings extends Component<InjectedContainerProps> {
   render() {
     const { actions, stores, children } = this.props;
     const { topbar } = stores;
+
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}

@@ -5,6 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   general: {
@@ -27,6 +28,16 @@ const messages = defineMessages({
     defaultMessage: '!!!Terms of use',
     description: 'Label for the "Terms of use" link in the settings menu.',
   },
+  AnoutYoroi: {
+    id: 'settings.menu.aboutYroi.link.label',
+    defaultMessage: '!!!About Yoroi',
+    description: 'Label for the "About Yoroi" link in the settings menu.',
+  },
+  adaRedemption: {
+    id: 'settings.menu.adaRedemption.link.label',
+    defaultMessage: '!!!Ada Redemption',
+    description: 'Label for the "Ada Redemption" link in the settings menu.',
+  }
 });
 
 type Props = {
@@ -81,6 +92,22 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
           />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.AnoutYoroi)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
+            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
+            className="AboutYoroi"
+          />
+
+          {!environment.isMainnet() &&
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.adaRedemption)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
+              active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
+              className="adaRedemption"
+            />
+          }
         </div>
       </div>
     );
