@@ -16,6 +16,7 @@ import GeneralSettingsPage from './containers/settings/categories/GeneralSetting
 import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
+import DisplaySettingsPage from './containers/settings/categories/DisplaySettingsPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
 import AboutYoroiSettings from './components/settings/categories/AboutYoroiSettings';
 
@@ -130,9 +131,14 @@ const SettingsSubpages = (stores, actions) => (
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
+      path={ROUTES.SETTINGS.DISPLAY}
+      component={(props) => <DisplaySettingsPage {...props} stores={stores} actions={actions} />}
       exact
+    />
+    <Route
       path={ROUTES.SETTINGS.ABOUT_YOROI}
       component={(props) => <AboutYoroiSettings {...props} stores={stores} actions={actions} />}
+      exact
     />
     <Route
       exact
