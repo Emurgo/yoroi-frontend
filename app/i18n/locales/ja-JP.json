@@ -213,7 +213,7 @@
   "wallet.redeem.dialog.instructions.recoveryRegular": "<p>リカバリーサービスを通じて入手した通常ヴェンドされた証明書を用いてADAを還元するには、暗号化された証明書をアップロードし、{adaRedemptionPassphraseLength}つのパスフレーズを入力してください。</p><p><strong>暗号化された証明書</strong>をアップロードし、<strong>{adaRedemptionPassphraseLength}つのパスフレーズ</strong>を入力後、還元キーは自動的に抽出され、指定されたウォレットにADAが還元できるようになります。</p>",
   "wallet.redeem.dialog.instructions.regular": "<p>ADAを還元するには、証明書をアップロードするか、証明書から還元キーをコピーして貼り付けてください。\n以下は還元キーの例です。 お客様のキーは似たようなものになります。</p><p><strong>B_GQOAffMBeRIn6vh1hJmeOT3ViS_TmaT4XAHAfDVH0=</strong></p>\n<p>証明書が含まれるPDFファイルをアップロードすると、還元キーが自動的に読み取られます</p>\n<p><strong>暗号化された証明書</strong>をアップロードする場合は、<strong>{adaRedemptionPassphraseLength} つのパスフレーズ</strong>を入力する必要があります。証明書がパスフレーズによって解読されると、還元キーが自動的に読み取られます。</p>",
   "wallet.redeem.dialog.passphrase.input.noResults": "結果がありません",
-  "wallet.redeem.dialog.passphraseHint": "ここに {length} つのパスフレーズを入力してください",
+  "wallet.redeem.dialog.passphraseHint": "ここに {length}つのパスフレーズを入力してください",
   "wallet.redeem.dialog.passphraseLabel": "ADAバウチャー証明書を解読するためのパスフレーズ",
   "wallet.redeem.dialog.recoveryRedemptionKeyHint": "証明書をアップロードしてください",
   "wallet.redeem.dialog.redemptionCodeError": "還元キーが無効です",
