@@ -138,7 +138,7 @@ export type CreateLedgerSignTxDataRequest = {
 };
 export type CreateLedgerSignTxDataResponse = {
   ledgerSignTxPayload: LedgerSignTxPayload,
-  changeAdaAddr: AdaAddress
+  changeAddress: AdaAddress
 };
 export type SendLedgerSignedTxRequest = {
   signedTxHex: string,
@@ -417,7 +417,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
       return {
         ledgerSignTxPayload,
-        changeAdaAddr: changeAdaAddress
+        changeAddress: changeAdaAddress
       };
     } catch (error) {
       Logger.error('AdaApi::createLedgerSignTxData error: ' + stringifyError(error));
