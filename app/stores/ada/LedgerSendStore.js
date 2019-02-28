@@ -102,12 +102,6 @@ export default class LedgerSendStore extends Store {
         ledgerSignTxDataResp.ledgerSignTxPayload.outputs
       );
 
-      // TODO validate
-      if (!ledgerResp) {
-        // this Error will be converted to LocalizableError()
-        throw new Error(ledgerResp.payload.error);
-      }
-
       await this._broadcastSignedTx(ledgerSignTxDataResp, ledgerResp);
 
     } catch (error) {
@@ -125,20 +119,18 @@ export default class LedgerSendStore extends Store {
     ledgerResp: SignTransactionResponse
   ): Promise<void> => {
 
-    // TODO: [TREZOR] fix type if possible
-    // const payload: any = trezorResp.payload;
-    // this.sendTrezorSignedTxRequest.reset();
-    // const reqParams: SendLedgerSignedTxRequest = {
-    //   signedTxHex: payload.body,
-    //   changeAdaAddr: trezorSignTxDataResp.changeAddress
-    // };
+    const reqParams: SendLedgerSignedTxRequest = {
+      signedTxHex: ledgerResp.txHashHex,
+      changeAdaAddr: ledgerSignTxDataResp.changeAddress
+    };
 
     // TODO: [TREZOR] add error check
-    // await this.sendLedgerSignedTxRequest.execute(reqParams).promise;
-    this.actions.dialogs.closeActiveDialog.trigger();
+    await this.sendLedgerSignedTxRequest.execute(reqParams).promise;
 
+    this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
     wallets.refreshWalletsData();
+
     const activeWallet = wallets.active;
     if (activeWallet) {
       // go to transaction screen
