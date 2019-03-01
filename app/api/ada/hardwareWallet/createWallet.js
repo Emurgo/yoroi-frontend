@@ -25,21 +25,22 @@ export async function createWallet({
   walletInitData
 }: AdaHardwareWalletParams): Promise<AdaWallet> {
   try {
-    Logger.debug('createTrezorWallet::createTrezorWallet called');
+    Logger.debug('hardwareWallet::createWallet called');
 
     // create ada wallet object for hardware wallet
-    const [adaWallet] = createAdaHardwareWallet({ walletInitData });
+    const [hardwareWallet] = createAdaHardwareWallet({ walletInitData });
+
     // create crypto account object for hardware wallet
-    // eslint-disable-next-line max-len
-    const cryptoAccount = createHardwareWalletAccount(walletInitData.cwHardwareInfo.publicMasterKey);
+    const { publicMasterKey } = walletInitData.cwHardwareInfo;
+    const cryptoAccount = createHardwareWalletAccount(publicMasterKey);
 
     // Restore transactions and Save wallet + cryptoAccount to localstorage
-    await restoreTransactionsAndSave(cryptoAccount, adaWallet);
+    await restoreTransactionsAndSave(cryptoAccount, hardwareWallet);
 
-    Logger.debug('createTrezorWallet::createTrezorWallet success');
-    return adaWallet;
+    Logger.debug('hardwareWallet::createWallet success');
+    return hardwareWallet;
   } catch (error) {
-    Logger.error(`createTrezorWallet::createTrezorWallet error: ${stringifyError(error)}`);
+    Logger.error(`hardwareWallet::createWallet error: ${stringifyError(error)}`);
     throw error;
   }
 }

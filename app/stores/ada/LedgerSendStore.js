@@ -4,7 +4,9 @@ import { defineMessages } from 'react-intl';
 
 import { LedgerBridge } from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace by npm module import
-import type { SignTransactionResponse } from 'yoroi-extension-ledger-bridge';
+import type {
+  SignTransactionResponse as LedgerSignTxResponse
+} from 'yoroi-extension-ledger-bridge';
 
 import Store from '../base/Store';
 import environment from '../../environment';
@@ -16,9 +18,9 @@ import globalMessages from '../../i18n/global-messages';
 import type {
   CreateLedgerSignTxDataRequest,
   CreateLedgerSignTxDataResponse,
-  SendLedgerSignedTxRequest,
+  BroadcastLedgerSignedTxRequest,
 } from '../../api/ada';
-import type { SendLedgerSignedTxResponse } from '../../api/common';
+import type { BroadcastLedgerSignedTxResponse } from '../../api/common';
 
 import {
   Logger,
@@ -44,8 +46,8 @@ export default class LedgerSendStore extends Store {
   createLedgerSignTxDataRequest: LocalizedRequest<CreateLedgerSignTxDataResponse> =
     new LocalizedRequest(this.api.ada.createLedgerSignTxData);
 
-  sendLedgerSignedTxRequest: LocalizedRequest<SendLedgerSignedTxResponse> =
-    new LocalizedRequest(this.api.ada.sendLedgerSignedTx);
+  broadcastLedgerSignedTxRequest: LocalizedRequest<BroadcastLedgerSignedTxResponse> =
+    new LocalizedRequest(this.api.ada.broadcastLedgerSignedTx);
   // =================== API RELATED =================== //
 
   setup() {
@@ -66,7 +68,7 @@ export default class LedgerSendStore extends Store {
   _send = async (params: CreateLedgerSignTxDataRequest): Promise<void> => {
     try {
       this.createLedgerSignTxDataRequest.reset();
-      this.sendLedgerSignedTxRequest.reset();
+      this.broadcastLedgerSignedTxRequest.reset();
 
       if (this.isActionProcessing) {
         // this Error will be converted to LocalizableError()
@@ -97,35 +99,35 @@ export default class LedgerSendStore extends Store {
       // TODO [TREZOR]: for iframe not initialized (this is temporary solution, fix later)
       await this._wait(5000);
 
-      const ledgerResp: SignTransactionResponse = await ledgerBridge.signTransaction(
+      const ledgerSignTxResp: LedgerSignTxResponse = await ledgerBridge.signTransaction(
         ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
         ledgerSignTxDataResp.ledgerSignTxPayload.outputs
       );
 
-      await this._broadcastSignedTx(ledgerSignTxDataResp, ledgerResp);
+      await this._broadcastSignedTx(ledgerSignTxResp, ledgerSignTxDataResp);
 
     } catch (error) {
       Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
       this._setError(this._convertToLocalizableError(error));
     } finally {
       this.createLedgerSignTxDataRequest.reset();
-      this.sendLedgerSignedTxRequest.reset();
+      this.broadcastLedgerSignedTxRequest.reset();
       this._setActionProcessing(false);
     }
   };
 
   _broadcastSignedTx = async (
-    ledgerSignTxDataResp: CreateLedgerSignTxDataResponse,
-    ledgerResp: SignTransactionResponse
+    ledgerSignTxResp: LedgerSignTxResponse,
+    createLedgerSignTxDataResp: CreateLedgerSignTxDataResponse
   ): Promise<void> => {
 
-    const reqParams: SendLedgerSignedTxRequest = {
-      signedTxHex: ledgerResp.txHashHex,
-      changeAdaAddr: ledgerSignTxDataResp.changeAddress
+    const reqParams: BroadcastLedgerSignedTxRequest = {
+      ledgerSignTxResp,
+      changeAdaAddr: createLedgerSignTxDataResp.changeAddress
     };
 
     // TODO: [TREZOR] add error check
-    await this.sendLedgerSignedTxRequest.execute(reqParams).promise;
+    await this.broadcastLedgerSignedTxRequest.execute(reqParams).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
