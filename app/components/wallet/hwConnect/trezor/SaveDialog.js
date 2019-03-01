@@ -17,9 +17,9 @@ import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
-import saveLoadGIF from '../../../../assets/images/trezor/connect/save-load.inline.svg';
-import saveStartSVG from '../../../../assets/images/trezor/connect/save-start.inline.svg';
-import saveErrorSVG from '../../../../assets/images/trezor/connect/save-error.inline.svg';
+import saveLoadGIF from '../../../../assets/images/hardware-wallet/trezor/save-load.inline.svg';
+import saveStartSVG from '../../../../assets/images/hardware-wallet/trezor/save-start.inline.svg';
+import saveErrorSVG from '../../../../assets/images/hardware-wallet/trezor/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import { isValidWalletName } from '../../../../utils/validations';

@@ -16,9 +16,9 @@ import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
-import connectLoadGIF from '../../../../assets/images/trezor/connect/connect-load.gif';
-import connectStartGIF from '../../../../assets/images/trezor/connect/connect-start.gif';
-import connectErrorSVG from '../../../../assets/images/trezor/connect/connect-error.inline.svg';
+import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
+import connectStartGIF from '../../../../assets/images/hardware-wallet/trezor/connect-start.gif';
+import connectErrorSVG from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
 
 import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
 

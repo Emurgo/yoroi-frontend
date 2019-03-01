@@ -23,8 +23,8 @@ import {
   GetTxsBodiesForUTXOsError
 } from '../errors';
 import type {
-  SendTrezorSignedTxResponse,
-  SendLedgerSignedTxResponse
+  BroadcastTrezorSignedTxResponse,
+  BroadcastLedgerSignedTxResponse
 } from '../../common';
 import type {
   TrezorInput,
@@ -38,6 +38,8 @@ import type {
   InputTypeUTxO,
   OutputTypeAddress,
   OutputTypeChange,
+  SignTransactionResponse as LedgerSignTxResponse,
+  Witness
 } from 'yoroi-extension-ledger-bridge';
 import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
 
@@ -99,11 +101,11 @@ export async function txsBodiesForInputs(
 }
 
 /** Send a transaction and save the new change address */
-export async function newTrezorTransaction(
+export async function broadcastTrezorSignedTx(
   signedTxHex: string,
   changeAdaAddr: AdaAddress,
-): Promise<SendTrezorSignedTxResponse> {
-  Logger.debug('newTransaction::newTrezorTransaction: called');
+): Promise<BroadcastTrezorSignedTxResponse> {
+  Logger.debug('newTransaction::broadcastTrezorSignedTx: called');
   const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
 
   // We assume a change address is used. Currently, there is no way to perfectly match the tx.
@@ -114,11 +116,11 @@ export async function newTrezorTransaction(
   try {
     const body = { signedTx };
     const backendResponse = await sendTx(body);
-    Logger.debug('newTransaction::newTrezorTransaction: success');
+    Logger.debug('newTransaction::broadcastTrezorSignedTx: success');
 
     return backendResponse;
   } catch (sendTxError) {
-    Logger.error('newTransaction::newTrezorTransaction error: ' + stringifyError(sendTxError));
+    Logger.error('newTransaction::broadcastTrezorSignedTx error: ' + stringifyError(sendTxError));
     // On failure, we have to remove the change address we eagerly added
     // Note: we don't await on this
     removeAdaAddress(changeAdaAddr);
@@ -230,36 +232,58 @@ function _ledgerOutputAddress58OrPath(
 }
 
 /** Send a transaction and save the new change address */
-// TODO [TREZOR] try to merge this function with createTrezorSignTxPayload()
-export async function newLedgerTransaction(
-  signedTxHex: string,
+export async function broadcastLedgerSignedTx(
+  ledgerSignTxResp: LedgerSignTxResponse,
   changeAdaAddr: AdaAddress,
-): Promise<SendLedgerSignedTxResponse> {
-  Logger.debug('newTransaction::newTrezorTransaction: called');
-
-  const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
-
-  // We assume a change address is used. Currently, there is no way to perfectly match the tx.
-  // tentatively assume that the transaction will succeed,
-  // so we save the change address to the wallet
-  await saveAdaAddress(changeAdaAddr, 'Internal');
-
+): Promise<BroadcastLedgerSignedTxResponse> {
   try {
+    Logger.debug('newTransaction::broadcastLedgerSignedTx: called');
+
+    // Since Ledger only provide witness signature
+    // need to make full broadcastable signed Tx
+    const signedTx: string = prepareLedgerSignedTxBody(ledgerSignTxResp, changeAdaAddr);
+
+    // We assume a change address is used. Currently, there is no way to perfectly match the tx.
+    // tentatively assume that the transaction will succeed,
+    // so we save the change address to the wallet
+    await saveAdaAddress(changeAdaAddr, 'Internal');
     const body = { signedTx };
     const backendResponse = await sendTx(body);
-    Logger.debug('newTransaction::newTrezorTransaction: success');
+    Logger.debug('newTransaction::broadcastLedgerSignedTx: success');
 
     return backendResponse;
   } catch (sendTxError) {
-    Logger.error('newTransaction::newTrezorTransaction error: ' + stringifyError(sendTxError));
+    Logger.error('newTransaction::broadcastLedgerSignedTx error: ' + stringifyError(sendTxError));
 
     // On failure, we have to remove the change address we eagerly added
     // Note: we don't await on this
     removeAdaAddress(changeAdaAddr);
     if (sendTxError instanceof InvalidWitnessError) {
       throw new InvalidWitnessError();
+    } else {
+      throw new SendTransactionError();
     }
-
-    throw new SendTransactionError();
   }
+}
+
+function prepareLedgerSignedTxBody(
+  ledgerSignTxResp: LedgerSignTxResponse,
+  changeAdaAddr: AdaAddress,
+): string {
+
+  // serialize signed transaction for submission
+  const txWitnesses = ledgerSignTxResp.witnesses.map((witness) => prepareWitness(witness));
+
+  // prepareBody
+  // return cbor.encode(SignedTransactionStructured(unsignedTx, txWitnesses)).toString('hex')
+  // https://github.com/vacuumlabs/adalite/blob/f14899d7a7bab2b6d55f607b94529cc65587e9ed/app/frontend/wallet/cardano-ledger-crypto-provider.js#L77
+
+  return '';
+}
+
+function prepareWitness(witness: Witness): any {
+  // get extended public key
+
+  // make TxWitness(extendedPublicKey, Buffer.from(witness.witnessSignatureHex, 'hex'))
+  // https://github.com/vacuumlabs/adalite/blob/f14899d7a7bab2b6d55f607b94529cc65587e9ed/app/frontend/wallet/cardano-ledger-crypto-provider.js#L73
 }

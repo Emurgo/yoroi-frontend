@@ -158,9 +158,9 @@ export type UpdateWalletResponse = Wallet;
 
 export type CreateTransactionResponse = SignedResponse;
 
-export type SendTrezorSignedTxResponse = SignedResponse;
+export type BroadcastTrezorSignedTxResponse = SignedResponse;
 
-export type SendLedgerSignedTxResponse = SignedResponse;
+export type BroadcastLedgerSignedTxResponse = SignedResponse;
 
 export type GetWalletsResponse = Array<Wallet>;
 

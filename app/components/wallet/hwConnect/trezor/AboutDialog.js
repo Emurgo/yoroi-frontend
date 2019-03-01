@@ -16,8 +16,8 @@ import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
-import aboutPrerequisiteIconSVG from '../../../../assets/images/trezor/connect/about-prerequisite-header-icon.inline.svg';
-import aboutPrerequisiteTrezorSVG from '../../../../assets/images/trezor/connect/about-trezor.inline.svg';
+import aboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/about-prerequisite-header-icon.inline.svg';
+import aboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-wallet/trezor/about.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 

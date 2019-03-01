@@ -54,9 +54,9 @@ import type {
 } from '../../domain/HWSignTx';
 import {
   createTrezorSignTxPayload,
-  newTrezorTransaction,
+  broadcastTrezorSignedTx,
   createLedgerSignTxPayload,
-  newLedgerTransaction,
+  broadcastLedgerSignedTx,
 } from './hardwareWallet/newTransaction';
 import {
   GenericApiError,
@@ -95,9 +95,12 @@ import type {
   UpdateWalletResponse,
   CreateHardwareWalletRequest,
   CreateHardwareWalletResponse,
-  SendTrezorSignedTxResponse,
-  SendLedgerSignedTxResponse,
+  BroadcastTrezorSignedTxResponse,
+  BroadcastLedgerSignedTxResponse,
 } from '../common';
+import type {
+  SignTransactionResponse as LedgerSignTxResponse
+} from 'yoroi-extension-ledger-bridge';
 import { InvalidWitnessError, RedeemAdaError, RedemptionKeyAlreadyUsedError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
@@ -128,7 +131,7 @@ export type CreateTrezorSignTxDataResponse = {
   trezorSignTxPayload: TrezorSignTxPayload, // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   changeAddress: AdaAddress
 };
-export type SendTrezorSignedTxRequest = {
+export type BroadcastTrezorSignedTxRequest = {
   signedTxHex: string,
   changeAdaAddr: AdaAddress
 };
@@ -140,8 +143,8 @@ export type CreateLedgerSignTxDataResponse = {
   ledgerSignTxPayload: LedgerSignTxPayload,
   changeAddress: AdaAddress
 };
-export type SendLedgerSignedTxRequest = {
-  signedTxHex: string,
+export type BroadcastLedgerSignedTxRequest = {
+  ledgerSignTxResp: LedgerSignTxResponse,
   changeAdaAddr: AdaAddress
 };
 export type UpdateWalletRequest = {
@@ -380,18 +383,18 @@ export default class AdaApi {
     }
   }
 
-  async sendTrezorSignedTx(
-    request: SendTrezorSignedTxRequest
-  ): Promise<SendTrezorSignedTxResponse> {
-    Logger.debug('AdaApi::sendTrezorSignedTx called');
+  async broadcastTrezorSignedTx(
+    request: BroadcastTrezorSignedTxRequest
+  ): Promise<BroadcastTrezorSignedTxResponse> {
+    Logger.debug('AdaApi::broadcastTrezorSignedTx called');
     const { signedTxHex, changeAdaAddr } = request;
     try {
-      const response = await newTrezorTransaction(signedTxHex, changeAdaAddr);
-      Logger.debug('AdaApi::sendTrezorSignedTx success: ' + stringifyData(response));
+      const response = await broadcastTrezorSignedTx(signedTxHex, changeAdaAddr);
+      Logger.debug('AdaApi::broadcastTrezorSignedTx success: ' + stringifyData(response));
 
       return response;
     } catch (error) {
-      Logger.error('AdaApi::sendTrezorSignedTx error: ' + stringifyError(error));
+      Logger.error('AdaApi::broadcastTrezorSignedTx error: ' + stringifyError(error));
 
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
@@ -432,19 +435,19 @@ export default class AdaApi {
     }
   }
 
-  async sendLedgerSignedTx(
-    request: SendLedgerSignedTxRequest
-  ): Promise<SendLedgerSignedTxResponse> {
+  async broadcastLedgerSignedTx(
+    request: BroadcastLedgerSignedTxRequest
+  ): Promise<BroadcastLedgerSignedTxResponse> {
     try {
       Logger.debug('AdaApi::sendLedgerSignedTx called');
 
-      const { signedTxHex, changeAdaAddr } = request;
-      const response = await newLedgerTransaction(signedTxHex, changeAdaAddr);
-      Logger.debug('AdaApi::sendLedgerSignedTx success: ' + stringifyData(response));
+      const { ledgerSignTxResp, changeAdaAddr } = request;
+      const response = await broadcastLedgerSignedTx(ledgerSignTxResp, changeAdaAddr);
+      Logger.debug('AdaApi::broadcastLedgerSignedTx success: ' + stringifyData(response));
 
       return response;
     } catch (error) {
-      Logger.error('AdaApi::sendLedgerSignedTx error: ' + stringifyError(error));
+      Logger.error('AdaApi::broadcastLedgerSignedTx error: ' + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
