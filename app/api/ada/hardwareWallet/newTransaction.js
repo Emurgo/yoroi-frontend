@@ -41,12 +41,21 @@ import type {
   SignTransactionResponse as LedgerSignTxResponse,
   Witness
 } from 'yoroi-extension-ledger-bridge';
-import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
+import { LedgerBridge, makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
 
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
 
+// Probably this needs to be moved somewhere else
+import { getSingleCryptoAccount } from '../adaLocalStorage';
+import cbor from 'cbor';
+import { HdWallet } from 'rust-cardano-crypto';
+import { CborIndefiniteLengthArray } from '../lib/utils';
+import { blake2b } from 'cardano-crypto.js';
+
 declare var CONFIG: ConfigType;
+
+export type UnsignedLedgerTx = {inputs: Array<any>, outputs: Array<any>, attributes: {}};
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -236,16 +245,22 @@ function _ledgerOutputAddress58OrPath(
 }
 
 /** Send a transaction and save the new change address */
+// TODO: Change name. This does way moer than ”broadcast”
 export async function broadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
   changeAdaAddr: AdaAddress,
+  unsignedTx: any,
 ): Promise<BroadcastLedgerSignedTxResponse> {
   try {
     Logger.debug('newTransaction::broadcastLedgerSignedTx: called');
 
     // Since Ledger only provide witness signature
     // need to make full broadcastable signed Tx
-    const signedTx: string = prepareLedgerSignedTxBody(ledgerSignTxResp, changeAdaAddr);
+    Logger.debug(`newTransaction::broadcastLedgerSignedTx unsignedTx: ${stringifyData(unsignedTx)}`);
+    const signedTxHex: string = prepareLedgerSignedTxBody(ledgerSignTxResp, unsignedTx);
+
+    Logger.debug('newTransaction::broadcastLedgerSignedTx: called');
+    const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
 
     // We assume a change address is used. Currently, there is no way to perfectly match the tx.
     // tentatively assume that the transaction will succeed,
@@ -272,22 +287,95 @@ export async function broadcastLedgerSignedTx(
 
 function prepareLedgerSignedTxBody(
   ledgerSignTxResp: LedgerSignTxResponse,
-  changeAdaAddr: AdaAddress,
+  unsignedTx: any
 ): string {
+  // TODO: add type to unsignedTx
+  const txAux = TxAux(unsignedTx.inputs, unsignedTx.outputs, {}); //unsignedTx.attributes
 
-  // serialize signed transaction for submission
+  // if (ledgerSignTxResp.txHashHex !== txAux.getId()) {
+  //   throw new Error('Tx serialization mismatch between Ledger and Yoroi');
+  // }
+
   const txWitnesses = ledgerSignTxResp.witnesses.map((witness) => prepareWitness(witness));
+  Logger.debug(`newTransaction::prepareLedgerSignedTxBody txWitnesses: ${stringifyData(txWitnesses)}`);
 
-  // prepareBody
-  // return cbor.encode(SignedTransactionStructured(unsignedTx, txWitnesses)).toString('hex')
-  // https://github.com/vacuumlabs/adalite/blob/f14899d7a7bab2b6d55f607b94529cc65587e9ed/app/frontend/wallet/cardano-ledger-crypto-provider.js#L77
+  const txBody = prepareBody(txAux, txWitnesses);
+  Logger.debug(`newTransaction::prepareLedgerSignedTxBody txBody: ${stringifyData(txBody)}`);
 
-  return '';
+  return txBody;
 }
 
-function prepareWitness(witness: Witness): any {
-  // get extended public key
+/* Stuff from VacuumLabs */
+function prepareWitness(witness) {
+  const cryptoAccount = getSingleCryptoAccount();
+  const masterXPubAccount0 = cryptoAccount.root_cached_key;
 
-  // make TxWitness(extendedPublicKey, Buffer.from(witness.witnessSignatureHex, 'hex'))
-  // https://github.com/vacuumlabs/adalite/blob/f14899d7a7bab2b6d55f607b94529cc65587e9ed/app/frontend/wallet/cardano-ledger-crypto-provider.js#L73
+  const deriveXpub = function XPubFactory(absDerivationPath: Array<number>) {
+    const masterXPubAccount0Buffer = Buffer.from(masterXPubAccount0, 'hex');
+    const changeXpub = HdWallet.derivePublic(masterXPubAccount0Buffer, [absDerivationPath[3]]);
+    const addressXpub = HdWallet.derivePublic(changeXpub, [absDerivationPath[4]]);
+    return addressXpub;
+  };
+
+  const extendedPublicKey = deriveXpub(witness.path);
+  Logger.debug(`newTransaction::prepareWitness extendedPublicKey: ${stringifyData(extendedPublicKey)}`);
+  return TxWitness(extendedPublicKey, Buffer.from(witness.witnessSignatureHex, 'hex'));
+}
+
+function TxWitness(extendedPublicKey, signature) {
+  // default - PkWitness
+  const type = 0;
+
+  function encodeCBOR(encoder) {
+    return encoder.pushAny([type, new cbor.Tagged(24, cbor.encode([extendedPublicKey, signature]))]);
+  }
+
+  return {
+    extendedPublicKey,
+    signature,
+    encodeCBOR,
+  };
+}
+
+function prepareBody(txAux, txWitnesses) {
+  return cbor.encode(SignedTransactionStructured(txAux, txWitnesses)).toString('hex');
+}
+
+function TxAux(inputs: Array<any>, outputs: Array<any>, attributes: any) {
+  function getId() {
+    return blake2b(cbor.encode(TxAux(inputs, outputs, attributes)), 32).toString('hex');
+  }
+
+  function encodeCBOR(encoder) {
+    return encoder.pushAny([
+      new CborIndefiniteLengthArray(inputs),
+      new CborIndefiniteLengthArray(outputs),
+      attributes,
+    ]);
+  }
+
+  return {
+    getId,
+    inputs,
+    outputs,
+    attributes,
+    encodeCBOR,
+  };
+}
+
+function SignedTransactionStructured(txAux, witnesses) {
+  function getId() {
+    return txAux.getId();
+  }
+
+  function encodeCBOR(encoder) {
+    return encoder.pushAny([txAux, witnesses]);
+  }
+
+  return {
+    getId,
+    witnesses,
+    txAux,
+    encodeCBOR,
+  };
 }
