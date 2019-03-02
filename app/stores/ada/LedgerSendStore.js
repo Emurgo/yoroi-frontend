@@ -95,16 +95,25 @@ export default class LedgerSendStore extends Store {
         await this.createLedgerSignTxDataRequest.execute(params).promise;
       console.log(`ledgerSignTxDataResp: ${JSON.stringify(ledgerSignTxDataResp, null, 2)}`);
 
+      // TODO: This is bad because it’s creating a new iframe.
       const ledgerBridge = new LedgerBridge();
       // TODO [TREZOR]: for iframe not initialized (this is temporary solution, fix later)
       await this._wait(5000);
 
-      const ledgerSignTxResp: LedgerSignTxResponse = await ledgerBridge.signTransaction(
-        ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
-        ledgerSignTxDataResp.ledgerSignTxPayload.outputs
-      );
+      // TODO: Fix types
+      //   inputs: Array<InputTypeUTxO>,
+      // outputs: Array<OutputTypeAddress | OutputTypeChange>
+      const unsignedTx = {
+        inputs: ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
+        outputs: ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
+        // attributes: {},
+      };
 
-      await this._broadcastSignedTx(ledgerSignTxResp, ledgerSignTxDataResp);
+      const ledgerSignTxResp: LedgerSignTxResponse = await ledgerBridge.signTransaction(unsignedTx.inputs, unsignedTx.outputs);
+
+      console.log(`ledgerSignTxResp!!!: ${JSON.stringify(ledgerSignTxResp, null, 2)}`);
+
+      await this._broadcastSignedTx(ledgerSignTxResp, ledgerSignTxDataResp, unsignedTx);
 
     } catch (error) {
       Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
@@ -118,11 +127,13 @@ export default class LedgerSendStore extends Store {
 
   _broadcastSignedTx = async (
     ledgerSignTxResp: LedgerSignTxResponse,
-    createLedgerSignTxDataResp: CreateLedgerSignTxDataResponse
+    createLedgerSignTxDataResp: CreateLedgerSignTxDataResponse,
+    unsignedTx: any
   ): Promise<void> => {
 
     const reqParams: BroadcastLedgerSignedTxRequest = {
       ledgerSignTxResp,
+      unsignedTx,
       changeAdaAddr: createLedgerSignTxDataResp.changeAddress
     };
 

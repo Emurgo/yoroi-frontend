@@ -145,7 +145,8 @@ export type CreateLedgerSignTxDataResponse = {
 };
 export type BroadcastLedgerSignedTxRequest = {
   ledgerSignTxResp: LedgerSignTxResponse,
-  changeAdaAddr: AdaAddress
+  changeAdaAddr: AdaAddress,
+  unsignedTx: any
 };
 export type UpdateWalletRequest = {
   walletId: string,
@@ -441,8 +442,8 @@ export default class AdaApi {
     try {
       Logger.debug('AdaApi::sendLedgerSignedTx called');
 
-      const { ledgerSignTxResp, changeAdaAddr } = request;
-      const response = await broadcastLedgerSignedTx(ledgerSignTxResp, changeAdaAddr);
+      const { ledgerSignTxResp, unsignedTx, changeAdaAddr } = request;
+      const response = await broadcastLedgerSignedTx(ledgerSignTxResp, changeAdaAddr, unsignedTx);
       Logger.debug('AdaApi::broadcastLedgerSignedTx success: ' + stringifyData(response));
 
       return response;

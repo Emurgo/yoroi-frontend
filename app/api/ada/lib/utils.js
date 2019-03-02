@@ -79,7 +79,7 @@ const _getTxCondition = (state: string): AdaTransactionCondition => {
   return 'CPtxWontApply';
 };
 
-class CborIndefiniteLengthArray {
+export class CborIndefiniteLengthArray {
   elements: Array<any>;
   constructor(elements: Array<any>) {
     this.elements = elements;
