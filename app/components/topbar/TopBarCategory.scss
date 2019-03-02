@@ -24,6 +24,10 @@
     fill: var(--theme-button-primary-background-color);
   }
 
+  .icon:not(.walletsIcon):not(.withTrezorTIcon) polygon {
+    fill: var(--theme-button-primary-background-color);
+  }
+
   .withTrezorTIcon {
     & > svg {
       // plus-logo
@@ -46,10 +50,13 @@
 .icon {
   flex-shrink: 0;
   & > svg {
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 42.5px;
 
     & > g > path {
+      fill: var(--theme-icon-topbar-color);
+    }
+    & > g > polygon {
       fill: var(--theme-icon-topbar-color);
     }
     // ada.svg icon needs stroke attribute
