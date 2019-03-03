@@ -2,7 +2,7 @@
 import { action, observable } from 'mobx';
 import { defineMessages } from 'react-intl';
 
-import { LedgerBridge } from 'yoroi-extension-ledger-bridge';
+import { LedgerBridge, IFRAME_NAME } from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace by npm module import
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -26,6 +26,8 @@ import {
   Logger,
   stringifyError,
 } from '../../utils/logging';
+
+import { getIFrame } from '../../utils/iframeHandler';
 
 const messages = defineMessages({
   signTxError101: {
@@ -64,6 +66,21 @@ export default class LedgerSendStore extends Store {
   // TODO [TREZOR]: this is temporary solution, fix later
   _wait = async ms => new Promise((resolve) => setTimeout(resolve, ms));
 
+  _preSendValidation = (): void => {
+    const { wallets, addresses } = this.stores.substores[environment.API];
+    const activeWallet = wallets.active;
+    if (!activeWallet) {
+      // this Error will be converted to LocalizableError()
+      throw new Error('Active wallet required before sending.');
+    }
+
+    const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
+    if (!accountId) {
+      // this Error will be converted to LocalizableError()
+      throw new Error('Active account required before sending.');
+    }
+  }
+
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   _send = async (params: CreateLedgerSignTxDataRequest): Promise<void> => {
     try {
@@ -78,25 +95,15 @@ export default class LedgerSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      const { wallets, addresses } = this.stores.substores[environment.API];
-      const activeWallet = wallets.active;
-      if (!activeWallet) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Active wallet required before sending.');
-      }
-
-      const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
-      if (!accountId) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Active account required before sending.');
-      }
+      this._preSendValidation();
 
       const ledgerSignTxDataResp: CreateLedgerSignTxDataResponse =
         await this.createLedgerSignTxDataRequest.execute(params).promise;
       console.log(`ledgerSignTxDataResp: ${JSON.stringify(ledgerSignTxDataResp, null, 2)}`);
 
-      // TODO: This is bad because it’s creating a new iframe.
-      const ledgerBridge = new LedgerBridge();
+      const iframe = getIFrame(IFRAME_NAME);
+      const ledgerBridge = new LedgerBridge(iframe);
+
       // TODO [TREZOR]: for iframe not initialized (this is temporary solution, fix later)
       await this._wait(5000);
 
