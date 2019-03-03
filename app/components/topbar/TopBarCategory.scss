@@ -50,13 +50,7 @@
 .icon {
   flex-shrink: 0;
   & > svg {
-    width: 36px;
-    height: 42.5px;
-
     & > g > path {
-      fill: var(--theme-icon-topbar-color);
-    }
-    & > g > polygon {
       fill: var(--theme-icon-topbar-color);
     }
     // ada.svg icon needs stroke attribute
