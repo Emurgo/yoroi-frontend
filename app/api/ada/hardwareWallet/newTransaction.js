@@ -31,6 +31,8 @@ import type {
   TrezorOutput,
   TrezorSignTxPayload,
   LedgerSignTxPayload,
+  LedgerUnsignedOutput,
+  LedgerUnsignedUtxo,
 } from '../../../domain/HWSignTx';
 // TODO [LEDGER] replace types of yoroi-extension-ledger-bridge with npm package
 import type {
@@ -42,6 +44,7 @@ import type {
   Witness
 } from 'yoroi-extension-ledger-bridge';
 import { LedgerBridge, makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
+import bs58 from 'bs58';
 
 import type { ConfigType } from '../../../../config/config-types';
 import Config from '../../../config';
@@ -246,6 +249,7 @@ export async function broadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
   changeAdaAddr: AdaAddress,
   unsignedTx: any,
+  txExt: UnsignedTransactionExt
 ): Promise<BroadcastLedgerSignedTxResponse> {
   try {
     Logger.debug('newTransaction::broadcastLedgerSignedTx: called');
@@ -253,7 +257,12 @@ export async function broadcastLedgerSignedTx(
     // Since Ledger only provide witness signature
     // need to make full broadcastable signed Tx
     Logger.debug(`newTransaction::broadcastLedgerSignedTx unsignedTx: ${stringifyData(unsignedTx)}`);
-    const signedTxHex: string = prepareLedgerSignedTxBody(ledgerSignTxResp, unsignedTx);
+    const signedTxHex: string = await prepareLedgerSignedTxBody(
+      ledgerSignTxResp,
+      unsignedTx,
+      txExt,
+      changeAdaAddr
+    );
 
     Logger.debug('newTransaction::broadcastLedgerSignedTx: called');
     const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
@@ -283,14 +292,36 @@ export async function broadcastLedgerSignedTx(
 
 function prepareLedgerSignedTxBody(
   ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: any
+  unsignedTx: any,
+  txExt: UnsignedTransactionExt,
+  changeAdaAddr: AdaAddress
 ): string {
   // TODO: add type to unsignedTx
-  const txAux = TxAux(unsignedTx.inputs, unsignedTx.outputs, {}); //unsignedTx.attributes
 
-  // if (ledgerSignTxResp.txHashHex !== txAux.getId()) {
-  //   throw new Error('Tx serialization mismatch between Ledger and Yoroi');
-  // }
+  const txAux = TxAux(
+    unsignedTx.inputs
+      .map(input => {
+        const change = input.path[3];
+        const index = input.path[4];
+        const extInfo = txExt.inputs.find(txInput => (
+          // Note: assume only one account
+          txInput.addressing.change === change && txInput.addressing.index === index
+        ));
+        if (!extInfo) {
+          throw new Error('newTransaction::prepareLedgerSignedTxBody failed to match txinput');
+        }
+        const transformedInput = InputToLedgerUnsignedFormat(extInfo);
+        Logger.debug(`newTransaction::transformedInput: ${stringifyData(transformedInput)}`);
+        return TxInputFromUtxo(transformedInput);
+      }),
+    unsignedTx.outputs
+      .map(output => {
+        const transformedOutput = OutputToLedgerUnsignedFormat(output, changeAdaAddr);
+        Logger.debug(`newTransaction::transformedOutput: ${stringifyData(transformedOutput)}`);
+        return TxOutput(transformedOutput);
+      }),
+    {} // attributes
+  );
 
   const txWitnesses = ledgerSignTxResp.witnesses.map((witness) => prepareWitness(witness));
   Logger.debug(`newTransaction::prepareLedgerSignedTxBody txWitnesses: ${stringifyData(txWitnesses)}`);
@@ -301,7 +332,82 @@ function prepareLedgerSignedTxBody(
   return txBody;
 }
 
+function InputToLedgerUnsignedFormat(txInput: TxInput): LedgerUnsignedUtxo {
+  return {
+    txHash: txInput.ptr.id,
+    address: txInput.value.address,
+    coins: Number(txInput.value.value),
+    outputIndex: txInput.ptr.index
+  };
+}
+
+function OutputToLedgerUnsignedFormat(
+  output: any,
+  changeAdaAddr: AdaAddress
+): LedgerUnsignedOutput {
+  let isChange;
+  let address;
+  if (output.address58) {
+    isChange = false;
+    address = output.address58;
+  } else {
+    isChange = true;
+    address = changeAdaAddr.cadId;
+  }
+  return {
+    address,
+    coins: Number(output.amountStr),
+    isChange
+  };
+}
 /* Stuff from VacuumLabs */
+
+function TxInputFromUtxo(utxo: LedgerUnsignedUtxo) {
+  // default input type
+  const type = 0;
+  const coins = utxo.coins;
+  const txHash = utxo.txHash;
+  const outputIndex = utxo.outputIndex;
+
+  function encodeCBOR(encoder) {
+    return encoder.pushAny([
+      type,
+      new cbor.Tagged(24, cbor.encode([Buffer.from(txHash, 'hex'), outputIndex])),
+    ]);
+  }
+
+  return {
+    coins,
+    txHash,
+    outputIndex,
+    utxo,
+    encodeCBOR,
+  };
+}
+
+function AddressCborWrapper(address: string) {
+  function encodeCBOR(encoder) {
+    return encoder.push(bs58.decode(address));
+  }
+
+  return {
+    address,
+    encodeCBOR,
+  };
+}
+function TxOutput(output: LedgerUnsignedOutput) {
+  function encodeCBOR(encoder) {
+    return encoder.pushAny([AddressCborWrapper(output.address), output.coins]);
+  }
+
+  return {
+    address: output.address,
+    coins: output.coins,
+    isChange: output.isChange,
+    encodeCBOR,
+  };
+}
+
 function prepareWitness(witness) {
   const cryptoAccount = getSingleCryptoAccount();
   const masterXPubAccount0 = cryptoAccount.root_cached_key;
@@ -323,7 +429,9 @@ function TxWitness(extendedPublicKey, signature) {
   const type = 0;
 
   function encodeCBOR(encoder) {
-    return encoder.pushAny([type, new cbor.Tagged(24, cbor.encode([extendedPublicKey, signature]))]);
+    return encoder.pushAny(
+      [type, new cbor.Tagged(24, cbor.encode([extendedPublicKey, signature]))]
+    );
   }
 
   return {

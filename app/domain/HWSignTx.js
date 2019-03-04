@@ -31,3 +31,21 @@ export type LedgerSignTxPayload = {
   inputs: Array<InputTypeUTxO>,
   outputs: Array<OutputTypeAddress | OutputTypeChange>,
 }
+
+export type LedgerUnsignedUtxo = {
+  txHash: string,
+  address: string,
+  coins: number,
+  outputIndex: number
+};
+export type LedgerUnsignedInput = {
+  coins: number,
+  txHash: string,
+  outputIndex: number,
+  utxo: LedgerUnsignedUtxo
+}
+export type LedgerUnsignedOutput = {
+  address: string,
+  coins: number,
+  isChange: boolean
+}
