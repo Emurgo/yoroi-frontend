@@ -17,8 +17,7 @@ import ProgressStepBlock from './common/ProgressStepBlock';
 import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
-import saveLoadGIF from '../../../../assets/images/hardware-wallet/trezor/save-load.inline.svg';
-import saveStartSVG from '../../../../assets/images/hardware-wallet/trezor/save-start.inline.svg';
+import saveLoadSVG from '../../../../assets/images/hardware-wallet/trezor/save-load.inline.svg';
 import saveErrorSVG from '../../../../assets/images/hardware-wallet/trezor/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
@@ -30,6 +29,8 @@ import { Logger } from '../../../../utils/logging';
 
 import styles from './SaveDialog.scss';
 import config from '../../../../config';
+
+const saveStartSVG = saveLoadSVG;
 
 const messages = defineMessages({
   saveWalletNameInputLabel: {
@@ -125,7 +126,7 @@ export default class SaveDialog extends Component<Props> {
       case StepState.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
-            <SvgInline svg={saveLoadGIF} cleanup={['title']} />
+            <SvgInline svg={saveLoadSVG} cleanup={['title']} />
           </div>);
         break;
       case StepState.PROCESS:
