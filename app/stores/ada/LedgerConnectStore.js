@@ -6,13 +6,13 @@ import { defineMessages } from 'react-intl';
 
 import {
   LedgerBridge,
-  makeCardanoBIP44Path,
+  TARGET_IFRAME_NAME,
+  BIP44_HARDENED_CARDANO_FIRST_ACCOUNT_SUB_PATH as CARDANO_FIRST_ACCOUNT_SUB_PATH
 } from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace by npm module import
 import type {
   GetVersionResponse,
   GetExtendedPublicKeyResponse,
-  BIP32Path
 } from 'yoroi-extension-ledger-bridge';
 
 import Config from '../../config';
@@ -39,6 +39,8 @@ import {
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
+
+import { getIFrame, prepareLedgerBridger } from '../../utils/iframeHandler';
 
 import {
   Logger,
@@ -87,11 +89,22 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   setup() {
     this._reset();
     const ledgerConnectAction = this.actions.ada.ledgerConnect;
+    ledgerConnectAction.init.listen(this._init);
     ledgerConnectAction.cancel.listen(this._cancel);
     ledgerConnectAction.submitAbout.listen(this._submitAbout);
     ledgerConnectAction.goBackToAbout.listen(this._goBackToAbout);
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
+  }
+
+
+  /** setup() is called when stores are being created
+    * _init() is called when connect dailog is about to show */
+  _init = (): void => {
+    Logger.debug('LedgerConnectStore::_init called');
+    if (this.ledgerBridge == null) {
+      this.ledgerBridge = new LedgerBridge(getIFrame(TARGET_IFRAME_NAME));
+    }
   }
 
   teardown(): void {
@@ -138,37 +151,31 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     this._checkAndStoreHWDeviceInfo();
   };
 
-  // TODO [TREZOR]: this is temporary solution, fix later
-  _wait = async ms => new Promise((resolve) => setTimeout(resolve, ms));
-
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     try {
-      const ledgerBridge = new LedgerBridge();
-      // TODO [TREZOR]: for iframe not initialized (this is temporary solution, fix later)
-      await this._wait(5000);
+      await prepareLedgerBridger(this.ledgerBridge);
 
       this.hwDeviceInfo = undefined;
 
-      const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
+      const versionResp: GetVersionResponse = await this.ledgerBridge.getVersion();
       Logger.debug(stringifyData(versionResp));
 
       // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
-      // TODO: Add function in yoroi-extension-ledger-bridge to generate this. The slice is pretty ugly
-      const hdPath: BIP32Path = makeCardanoBIP44Path(0, 0, 0).slice(0, 3);
-      Logger.debug(stringifyData(hdPath));
+      Logger.debug(stringifyData(CARDANO_FIRST_ACCOUNT_SUB_PATH));
 
       // get Cardano's first account's
       // i.e hdPath = [2147483692, 2147485463, 2147483648]
       const extendedPublicKeyResp: GetExtendedPublicKeyResponse
-        = await ledgerBridge.getExtendedPublicKey(hdPath);
+        = await this.ledgerBridge.getExtendedPublicKey(CARDANO_FIRST_ACCOUNT_SUB_PATH);
       Logger.debug(stringifyData(extendedPublicKeyResp));
 
       // TODP: Delete. Debug purposes
-      const firstAdressHDPath = [...hdPath, 0, 0];
-      const address = await ledgerBridge.deriveAddress(firstAdressHDPath);
+      const firstAdressHDPath = [...CARDANO_FIRST_ACCOUNT_SUB_PATH, 0, 0];
+      const address = await this.ledgerBridge.deriveAddress(firstAdressHDPath);
       Logger.debug(stringifyData(address));
 
       this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
+
       this._goToSaveLoad();
       Logger.info('Ledger device OK');
     } catch (error) {

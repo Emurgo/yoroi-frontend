@@ -69,9 +69,11 @@ export default class WalletAddPage extends Component<Props> {
     const isCreateLedgerWalletActive = this._getLedgerConnectStore().isCreateHWActive;
     const openTrezorConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
+      this.props.actions[environment.API].trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletLedgerConnectDialogContainer });
+      this.props.actions[environment.API].ledgerConnect.init.trigger();
     };
 
     let content = null;

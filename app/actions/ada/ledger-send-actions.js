@@ -9,6 +9,7 @@ export type SendUsingLedgerParams = {
 // ======= Sending ADA using Ledger ACTIONS =======
 
 export default class LedgerSendActions {
+  init: Action<void> = new Action();
   cancel: Action<void> = new Action();
   sendUsingLedger: Action<SendUsingLedgerParams> = new Action();
 }
