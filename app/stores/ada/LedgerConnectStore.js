@@ -67,6 +67,8 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   hwDeviceInfo: ?HWDeviceInfo;
 
+  ledgerBridge: LedgerBridge;
+
   get defaultWalletName(): string {
     // Ledger doesn’t provide any device name so using hard-coded name
     return Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_WALLET_NAME;
