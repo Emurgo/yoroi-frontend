@@ -122,7 +122,7 @@ export default class LedgerSendStore extends Store {
         // attributes: {},
       };
 
-      const ledgerSignTxResp: LedgerSignTxResponse = 
+      const ledgerSignTxResp: LedgerSignTxResponse =
         await this.ledgerBridge.signTransaction(unsignedTx.inputs, unsignedTx.outputs);
 
       await this._broadcastSignedTx(ledgerSignTxResp, ledgerSignTxDataResp, unsignedTx);
@@ -145,8 +145,9 @@ export default class LedgerSendStore extends Store {
 
     const reqParams: BroadcastLedgerSignedTxRequest = {
       ledgerSignTxResp,
+      changeAdaAddr: createLedgerSignTxDataResp.changeAddress,
       unsignedTx,
-      changeAdaAddr: createLedgerSignTxDataResp.changeAddress
+      txExt: createLedgerSignTxDataResp.txExt
     };
 
     // TODO: [TREZOR] add error check
