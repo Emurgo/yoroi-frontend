@@ -17,7 +17,6 @@ import HelpLinkBlock from './common/HelpLinkBlock';
 import HWErrorBlock from './common/HWErrorBlock';
 
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
-import connectStartGIF from '../../../../assets/images/hardware-wallet/trezor/connect-start.gif';
 import connectErrorSVG from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
 
 import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
@@ -25,6 +24,8 @@ import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
 import { Logger } from '../../../../utils/logging';
 
 import styles from './ConnectDialog.scss';
+
+const connectStartGIF = connectLoadGIF;
 
 const messages = defineMessages({
   connectIntroTextLine1: {
