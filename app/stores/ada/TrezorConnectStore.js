@@ -91,15 +91,22 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
   setup() {
     this._reset();
     const trezorConnectAction = this.actions.ada.trezorConnect;
+    trezorConnectAction.init.listen(this._init);
     trezorConnectAction.cancel.listen(this._cancel);
     trezorConnectAction.submitAbout.listen(this._submitAbout);
     trezorConnectAction.goBackToAbout.listen(this._goBackToAbout);
     trezorConnectAction.submitConnect.listen(this._submitConnect);
     trezorConnectAction.submitSave.listen(this._submitSave);
+  }
+
+  /** setup() is called when stores are being created
+    * _init() is called when connect dailog is about to show */
+  _init = (): void => {
+    Logger.debug('TrezorConnectStore::_init called');
 
     /** Preinitialization of TrezorConnect API will result in faster first response
-      * TODO [TREZOR] this can be moved to a new method which would be
-      * called when connect dialog loads(before About state) */
+     * TODO [TREZOR] this can be moved to a new method which would be
+     * called when connect dialog loads(before About state) */
     try {
       TrezorConnect.init({});
     } catch (error) {
@@ -185,7 +192,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       this._goToSaveLoad();
 
       /** TODO: [TREZOR] handle when user forcefully close Connect to Trezor Hardware Wallet
-       * while connection in in progress */
+        * while connection in in progress */
       this._removeTrezorConnectEventListeners();
       Logger.info('Trezor device OK');
     } catch (error) {

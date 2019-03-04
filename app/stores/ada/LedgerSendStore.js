@@ -2,7 +2,7 @@
 import { action, observable } from 'mobx';
 import { defineMessages } from 'react-intl';
 
-import { LedgerBridge, IFRAME_NAME } from 'yoroi-extension-ledger-bridge';
+import { LedgerBridge, TARGET_IFRAME_NAME } from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace by npm module import
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -25,9 +25,10 @@ import type { BroadcastLedgerSignedTxResponse } from '../../api/common';
 import {
   Logger,
   stringifyError,
+  stringifyData,
 } from '../../utils/logging';
 
-import { getIFrame } from '../../utils/iframeHandler';
+import { getIFrame, prepareLedgerBridger } from '../../utils/iframeHandler';
 
 const messages = defineMessages({
   signTxError101: {
@@ -42,6 +43,7 @@ export default class LedgerSendStore extends Store {
   // =================== VIEW RELATED =================== //
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError;
+  ledgerBridge: LedgerBridge;
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
@@ -54,17 +56,24 @@ export default class LedgerSendStore extends Store {
 
   setup() {
     const ledgerSendAction = this.actions.ada.ledgerSend;
+    ledgerSendAction.init.listen(this._init);
     ledgerSendAction.sendUsingLedger.listen(this._send);
     ledgerSendAction.cancel.listen(this._cancel);
+  }
+
+  /** setup() is called when stores are being created
+    * _init() is called when Confirmation dailog is about to show */
+  _init = (): void => {
+    Logger.debug('LedgerSendStore::_init called');
+    if (this.ledgerBridge == null) {
+      this.ledgerBridge = new LedgerBridge(getIFrame(TARGET_IFRAME_NAME));
+    }
   }
 
   _reset() {
     this._setActionProcessing(false);
     this._setError(null);
   }
-
-  // TODO [TREZOR]: this is temporary solution, fix later
-  _wait = async ms => new Promise((resolve) => setTimeout(resolve, ms));
 
   _preSendValidation = (): void => {
     const { wallets, addresses } = this.stores.substores[environment.API];
@@ -84,6 +93,8 @@ export default class LedgerSendStore extends Store {
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   _send = async (params: CreateLedgerSignTxDataRequest): Promise<void> => {
     try {
+      Logger.debug('LedgerSendStore::_send::called: ' + stringifyData(params));
+
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
 
@@ -99,16 +110,11 @@ export default class LedgerSendStore extends Store {
 
       const ledgerSignTxDataResp: CreateLedgerSignTxDataResponse =
         await this.createLedgerSignTxDataRequest.execute(params).promise;
-      console.log(`ledgerSignTxDataResp: ${JSON.stringify(ledgerSignTxDataResp, null, 2)}`);
 
-      const iframe = getIFrame(IFRAME_NAME);
-      const ledgerBridge = new LedgerBridge(iframe);
-
-      // TODO [TREZOR]: for iframe not initialized (this is temporary solution, fix later)
-      await this._wait(5000);
+      await prepareLedgerBridger(this.ledgerBridge);
 
       // TODO: Fix types
-      //   inputs: Array<InputTypeUTxO>,
+      // inputs: Array<InputTypeUTxO>,
       // outputs: Array<OutputTypeAddress | OutputTypeChange>
       const unsignedTx = {
         inputs: ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
@@ -116,9 +122,8 @@ export default class LedgerSendStore extends Store {
         // attributes: {},
       };
 
-      const ledgerSignTxResp: LedgerSignTxResponse = await ledgerBridge.signTransaction(unsignedTx.inputs, unsignedTx.outputs);
-
-      console.log(`ledgerSignTxResp!!!: ${JSON.stringify(ledgerSignTxResp, null, 2)}`);
+      const ledgerSignTxResp: LedgerSignTxResponse = 
+        await this.ledgerBridge.signTransaction(unsignedTx.inputs, unsignedTx.outputs);
 
       await this._broadcastSignedTx(ledgerSignTxResp, ledgerSignTxDataResp, unsignedTx);
 
