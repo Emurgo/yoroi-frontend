@@ -1,10 +1,10 @@
 {
   "network": {
-    "protocolMagic": 764824073,
-    "backendUrl": "https://iohk-mainnet.yoroiwallet.com",
-    "websocketUrl": "wss://iohk-mainnet.yoroiwallet.com:443",
-    "name": "mainnet",
-    "trezorNetwork": 2
+    "protocolMagic": 633343913,
+    "backendUrl": "https://iohk-staging.yoroiwallet.com",
+    "websocketUrl": "wss://iohk-staging.yoroiwallet.com:443",
+    "name": "testnet",
+    "trezorNetwork": 1
   },
   "app": {
     "walletRefreshInterval": 20000,
