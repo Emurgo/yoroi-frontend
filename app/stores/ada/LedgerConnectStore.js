@@ -105,7 +105,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   _init = (): void => {
     Logger.debug('LedgerConnectStore::_init called');
     if (this.ledgerBridge == null) {
-      this.ledgerBridge = new LedgerBridge(getIFrame(YOROI_LEDGER_BRIDGE_IFRAME_NAME));
+      this.ledgerBridge = new LedgerBridge();
     }
   }
 
@@ -334,7 +334,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     // show success notification
     wallets.showLedgerNanoSWalletIntegratedNotification();
 
-    // TODO: [TREZOR] not sure if it actully destroying this Store ??
+    // TODO: [LEDGER] not sure if it actully destroying this Store ??
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
   }

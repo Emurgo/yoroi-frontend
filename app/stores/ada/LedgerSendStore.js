@@ -69,7 +69,7 @@ export default class LedgerSendStore extends Store {
   _init = (): void => {
     Logger.debug('LedgerSendStore::_init called');
     if (this.ledgerBridge == null) {
-      this.ledgerBridge = new LedgerBridge(getIFrame(YOROI_LEDGER_BRIDGE_IFRAME_NAME));
+      this.ledgerBridge = new LedgerBridge();
     }
   }
 
