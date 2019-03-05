@@ -6,7 +6,7 @@ import { defineMessages } from 'react-intl';
 
 import {
   LedgerBridge,
-  TARGET_IFRAME_NAME,
+  YOROI_LEDGER_BRIDGE_IFRAME_NAME,
   BIP44_HARDENED_CARDANO_FIRST_ACCOUNT_SUB_PATH as CARDANO_FIRST_ACCOUNT_SUB_PATH
 } from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace by npm module import
@@ -105,7 +105,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   _init = (): void => {
     Logger.debug('LedgerConnectStore::_init called');
     if (this.ledgerBridge == null) {
-      this.ledgerBridge = new LedgerBridge(getIFrame(TARGET_IFRAME_NAME));
+      this.ledgerBridge = new LedgerBridge(getIFrame(YOROI_LEDGER_BRIDGE_IFRAME_NAME));
     }
   }
 

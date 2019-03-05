@@ -2,7 +2,10 @@
 import { action, observable } from 'mobx';
 import { defineMessages } from 'react-intl';
 
-import { LedgerBridge, TARGET_IFRAME_NAME } from 'yoroi-extension-ledger-bridge';
+import {
+  LedgerBridge,
+  YOROI_LEDGER_BRIDGE_IFRAME_NAME
+} from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace by npm module import
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -66,7 +69,7 @@ export default class LedgerSendStore extends Store {
   _init = (): void => {
     Logger.debug('LedgerSendStore::_init called');
     if (this.ledgerBridge == null) {
-      this.ledgerBridge = new LedgerBridge(getIFrame(TARGET_IFRAME_NAME));
+      this.ledgerBridge = new LedgerBridge(getIFrame(YOROI_LEDGER_BRIDGE_IFRAME_NAME));
     }
   }
 
