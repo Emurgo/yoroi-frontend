@@ -337,10 +337,7 @@ function InputToLedgerUnsignedFormat(txInput: TxInput): LedgerUnsignedUtxo {
 
 function OutputToLedgerUnsignedFormat(output: TxOutput): LedgerUnsignedOutput {
   // TODO: when does this actually happen
-  const isChange = output.isChange;
-  if (!isChange) {
-    throw Error(`OutputToLedgerUnsignedFormat Invalid isChange`);
-  }
+  const isChange = !!output.isChange;
   return {
     address: output.address,
     coins: Number(output.value),
