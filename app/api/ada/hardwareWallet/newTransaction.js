@@ -302,24 +302,15 @@ function prepareLedgerSignedTxBody(
   // TODO: add type to unsignedTx
 
   const txAux = TxAux(
-    unsignedTx.inputs
+    txExt.inputs
       .map(input => {
-        const change = input.path[3];
-        const index = input.path[4];
-        const extInfo = txExt.inputs.find(txInput => (
-          // Note: assume only one account
-          txInput.addressing.change === change && txInput.addressing.index === index
-        ));
-        if (!extInfo) {
-          throw new Error('newTransaction::prepareLedgerSignedTxBody failed to match txinput');
-        }
-        const transformedInput = InputToLedgerUnsignedFormat(extInfo);
+        const transformedInput = InputToLedgerUnsignedFormat(input);
         Logger.debug(`newTransaction::transformedInput: ${stringifyData(transformedInput)}`);
         return TxInputFromUtxo(transformedInput);
       }),
-    unsignedTx.outputs
+    txExt.outputs
       .map(output => {
-        const transformedOutput = OutputToLedgerUnsignedFormat(output, changeAdaAddr);
+        const transformedOutput = OutputToLedgerUnsignedFormat(output);
         Logger.debug(`newTransaction::transformedOutput: ${stringifyData(transformedOutput)}`);
         return LedgerTxOutput(transformedOutput);
       }),
@@ -344,22 +335,15 @@ function InputToLedgerUnsignedFormat(txInput: TxInput): LedgerUnsignedUtxo {
   };
 }
 
-function OutputToLedgerUnsignedFormat(
-  output: any,
-  changeAdaAddr: AdaAddress
-): LedgerUnsignedOutput {
-  let isChange;
-  let address;
-  if (output.address58) {
-    isChange = false;
-    address = output.address58;
-  } else {
-    isChange = true;
-    address = changeAdaAddr.cadId;
+function OutputToLedgerUnsignedFormat(output: TxOutput): LedgerUnsignedOutput {
+  // TODO: when does this actually happen
+  const isChange = output.isChange;
+  if (!isChange) {
+    throw Error(`OutputToLedgerUnsignedFormat Invalid isChange`);
   }
   return {
-    address,
-    coins: Number(output.amountStr),
+    address: output.address,
+    coins: Number(output.value),
     isChange
   };
 }
