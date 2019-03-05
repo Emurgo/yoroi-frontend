@@ -41,9 +41,8 @@ import type {
   OutputTypeAddress,
   OutputTypeChange,
   SignTransactionResponse as LedgerSignTxResponse,
-  Witness
 } from 'yoroi-extension-ledger-bridge';
-import { LedgerBridge, makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
+import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
 import bs58 from 'bs58';
 
 import type { ConfigType } from '../../../../config/config-types';
