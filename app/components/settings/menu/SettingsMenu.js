@@ -33,7 +33,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Themes',
     description: 'Label for the "Themes" link in the settings menu.',
   },
-  AnoutYoroi: {
+  AboutYoroi: {
     id: 'settings.menu.aboutYroi.link.label',
     defaultMessage: '!!!About Yoroi',
     description: 'Label for the "About Yoroi" link in the settings menu.',
@@ -99,13 +99,6 @@ export default class SettingsMenu extends Component<Props> {
             className="support"
           />
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.AnoutYoroi)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
-            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
-            className="AboutYoroi"
-          />
-
           {!environment.isMainnet() &&
             <SettingsMenuItem
               label={intl.formatMessage(messages.display)}
@@ -125,6 +118,13 @@ export default class SettingsMenu extends Component<Props> {
               className="adaRedemption"
             />
           }
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.AboutYoroi)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
+            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
+            className="AboutYoroi"
+          />
         </div>
       </div>
     );
