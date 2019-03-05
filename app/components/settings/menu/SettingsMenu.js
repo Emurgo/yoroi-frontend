@@ -49,6 +49,7 @@ type Props = {
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
+  currentLocale: string,
 };
 
 @observer
@@ -60,7 +61,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
 
     return (
       <div>
@@ -114,7 +115,9 @@ export default class SettingsMenu extends Component<Props> {
             />
           }
 
-          {!environment.isMainnet() &&
+          {(!environment.isMainnet() || currentLocale === 'ko-KR' || currentLocale === 'ja-JP') &&
+            // all unredemed Ada is held being either Japanese or Korean people
+            // avoid showing this menu option to all users to avoid confusing them
             <SettingsMenuItem
               label={intl.formatMessage(messages.adaRedemption)}
               onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
