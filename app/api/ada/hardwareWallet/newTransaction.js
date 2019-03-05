@@ -318,7 +318,7 @@ function prepareLedgerSignedTxBody(
       .map(output => {
         const transformedOutput = OutputToLedgerUnsignedFormat(output, changeAdaAddr);
         Logger.debug(`newTransaction::transformedOutput: ${stringifyData(transformedOutput)}`);
-        return TxOutput(transformedOutput);
+        return LedgerTxOutput(transformedOutput);
       }),
     {} // attributes
   );
@@ -395,7 +395,7 @@ function AddressCborWrapper(address: string) {
     encodeCBOR,
   };
 }
-function TxOutput(output: LedgerUnsignedOutput) {
+function LedgerTxOutput(output: LedgerUnsignedOutput) {
   function encodeCBOR(encoder) {
     return encoder.pushAny([AddressCborWrapper(output.address), output.coins]);
   }
