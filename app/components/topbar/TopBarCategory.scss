@@ -24,6 +24,10 @@
     fill: var(--theme-button-primary-background-color);
   }
 
+  .icon:not(.walletsIcon):not(.withTrezorTIcon) polygon {
+    fill: var(--theme-button-primary-background-color);
+  }
+
   .withTrezorTIcon {
     & > svg {
       // plus-logo
@@ -46,9 +50,6 @@
 .icon {
   flex-shrink: 0;
   & > svg {
-    width: 24px;
-    height: 24px;
-
     & > g > path {
       fill: var(--theme-icon-topbar-color);
     }

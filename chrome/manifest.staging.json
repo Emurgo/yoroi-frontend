@@ -1,6 +1,6 @@
 {
-  "version": "1.3.1",
-  "version_name": "st-1.3.1", 
+  "version": "1.3.2",
+  "version_name": "st-1.3.2", 
   "name": "Yoroi Staging",
   "manifest_version": 2,
   "description": "[staging] Cardano ADA wallet",
