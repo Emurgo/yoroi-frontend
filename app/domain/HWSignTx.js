@@ -4,7 +4,7 @@ import type {
   InputTypeUTxO,
   OutputTypeAddress,
   OutputTypeChange,
-} from 'yoroi-extension-ledger-bridge';
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 // TODO [TREZOR] : if possilbe for Trezor and Ledger import flow definition from their module
 

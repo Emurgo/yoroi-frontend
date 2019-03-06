@@ -8,11 +8,10 @@ import {
   LedgerBridge,
   BIP44_HARDENED_CARDANO_FIRST_ACCOUNT_SUB_PATH as CARDANO_FIRST_ACCOUNT_SUB_PATH
 } from 'yoroi-extension-ledger-bridge';
-// TODO [LEDGER]: replace by npm module import
 import type {
   GetVersionResponse,
   GetExtendedPublicKeyResponse,
-} from 'yoroi-extension-ledger-bridge';
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import Config from '../../config';
 import environment from '../../environment';

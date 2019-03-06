@@ -5,10 +5,9 @@ import { defineMessages } from 'react-intl';
 import {
   LedgerBridge,
 } from 'yoroi-extension-ledger-bridge';
-// TODO [LEDGER]: replace by npm module import
 import type {
   SignTransactionResponse as LedgerSignTxResponse
-} from 'yoroi-extension-ledger-bridge';
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import Store from '../base/Store';
 import environment from '../../environment';
