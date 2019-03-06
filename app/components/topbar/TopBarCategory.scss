@@ -35,7 +35,7 @@
         stroke: none;
         fill: var(--theme-button-primary-background-color);
       }
-      // trezor-t-logo
+      // hardware wallet (trezor/ledger)
       & > g > g:nth-child(2) {
         stroke: var(--theme-button-primary-background-color);
       }
@@ -78,8 +78,7 @@
       stroke: none;
       fill: var(--theme-icon-topbar-color);
     }
-    // trezor-t-logo
-    // TODO [LEDGER] need to take care if it has same SVG structure
+    // hardware wallet (trezor/ledger)
     & > g > g:nth-child(2) {
       stroke: var(--theme-icon-topbar-color);
     }    
