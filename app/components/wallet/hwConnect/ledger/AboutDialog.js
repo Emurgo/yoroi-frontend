@@ -46,22 +46,22 @@ const messages = defineMessages({
   },
   aboutPrerequisite1Part1: {
     id: 'wallet.ledger.dialog.step.about.prerequisite.1.part1',
-    defaultMessage: '!!!At present only',
+    defaultMessage: '!!!Only Supports ',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2Link: {
     id: 'wallet.ledger.dialog.step.about.prerequisite.1.part2.link',
-    defaultMessage: '!!!https://github.com/trezor/trezor-core/blob/master/ChangeLog',
+    defaultMessage: '!!!https://www.ledger.com/products/ledger-nano-s',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2LinkText: {
     id: 'wallet.ledger.dialog.step.about.prerequisite.1.part2.link.text',
-    defaultMessage: '!!!Trezor Model T with version 2.0.8',
+    defaultMessage: '!!!Ledger Nano S',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part3: {
     id: 'wallet.ledger.dialog.step.about.prerequisite.1.part3',
-    defaultMessage: '!!!or later',
+    defaultMessage: '!!! model.',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite2Part1Link: {
@@ -76,7 +76,7 @@ const messages = defineMessages({
   },
   aboutPrerequisite2Part2: {
     id: 'wallet.ledger.dialog.step.about.prerequisite.2.part2',
-    defaultMessage: '!!!app must be pre-installed on the Ledger device.',
+    defaultMessage: '!!!app must be installed on the Ledger device.',
     description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
