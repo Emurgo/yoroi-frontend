@@ -4,18 +4,18 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 
-import externalLinkSVG from '../../../../../assets/images/link-external.inline.svg';
-import { ProgressInfo } from '../../../../../types/HWConnectStoreTypes';
-import styles from './HelpLinkBlock.scss';
+import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import styles from '../common/HelpLinkBlock.scss';
 
 const messages = defineMessages({
   helpLinkYoroiWithTrezor: {
-    id: 'wallet.ledger.dialog.common.step.link.helpYoroiWithTrezor',
+    id: 'wallet.trezor.dialog.common.step.link.helpYoroiWithTrezor',
     defaultMessage: '!!!https://yoroi-wallet.com/',
     description: 'Tutorial link about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
   },
   helpLinkYoroiWithTrezorText: {
-    id: 'wallet.ledger.dialog.common.step.link.helpYoroiWithTrezor.text',
+    id: 'wallet.trezor.dialog.common.step.link.helpYoroiWithTrezor.text',
     defaultMessage: '!!!Click here to know more about how to use Yoroi with Trezor.',
     description: 'Tutorial link text about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
   },

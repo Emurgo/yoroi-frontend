@@ -343,8 +343,8 @@ export default {
   '--theme-wallet-password-switch-label-color': '#121327',
 
   '--theme-banner-warning-background-color': '#b54b4b',
-  '--theme-trezor-connect-dialog-middle-block-common-background-color': '#f3f3f5',
-  '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
+  '--theme-hw-connect-dialog-middle-block-common-background-color': '#f3f3f5',
+  '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
 

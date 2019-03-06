@@ -11,9 +11,9 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
-import ProgressStepBlock from './common/ProgressStepBlock';
-import HelpLinkBlock from './common/HelpLinkBlock';
-import HWErrorBlock from './common/HWErrorBlock';
+import ProgressStepBlock from '../common/ProgressStepBlock';
+import HelpLinkBlock from './HelpLinkBlock';
+import HWErrorBlock from '../common/HWErrorBlock';
 
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
 import aboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/about-prerequisite-header-icon.inline.svg';
@@ -21,7 +21,7 @@ import aboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-walle
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
-import styles from './AboutDialog.scss';
+import styles from '../common/AboutDialog.scss';
 
 const messages = defineMessages({
   aboutIntroTextLine1: {
@@ -147,7 +147,7 @@ export default class AboutDialog extends Component<Props> {
             <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
           </ul>
         </div>
-        <div className={styles.trezorImageBlock}>
+        <div className={styles.hwImageBlock}>
           <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
         </div>
       </div>);
