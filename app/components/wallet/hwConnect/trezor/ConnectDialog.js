@@ -12,9 +12,9 @@ import Dialog from '../../../widgets/Dialog';
 import DialogBackButton from '../../../widgets/DialogBackButton';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
-import ProgressStepBlock from './common/ProgressStepBlock';
-import HelpLinkBlock from './common/HelpLinkBlock';
-import HWErrorBlock from './common/HWErrorBlock';
+import ProgressStepBlock from '../common/ProgressStepBlock';
+import HelpLinkBlock from './HelpLinkBlock';
+import HWErrorBlock from '../common/HWErrorBlock';
 
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
 import connectErrorSVG from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
@@ -23,7 +23,7 @@ import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
 
 import { Logger } from '../../../../utils/logging';
 
-import styles from './ConnectDialog.scss';
+import styles from '../common/ConnectDialog.scss';
 
 const connectStartGIF = connectLoadGIF;
 

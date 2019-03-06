@@ -3,24 +3,24 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import ProgressSteps from '../../../../widgets/ProgressSteps';
-import { ProgressInfo } from '../../../../../types/HWConnectStoreTypes';
+import ProgressSteps from '../../../widgets/ProgressSteps';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
 const messages = defineMessages({
   stepAboutLabel: {
-    id: 'wallet.trezor.dialog.step.about.label',
+    id: 'wallet.hw.connect.dialog.step.about.label',
     defaultMessage: '!!!ABOUT',
-    description: 'Progress Step Label "About" on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Progress Step Label "About" on the Connect to Hardware Wallet dialog.'
   },
   stepConnectLabel: {
-    id: 'wallet.trezor.dialog.step.connect.label',
+    id: 'wallet.hw.connect.dialog.step.connect.label',
     defaultMessage: '!!!CONNECT',
-    description: 'Progress Step Label "Connect" on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Progress Step Label "Connect" on the Connect to Hardware Wallet dialog.'
   },
   stepSaveLabel: {
-    id: 'wallet.trezor.dialog.step.save.label',
+    id: 'wallet.hw.connect.dialog.step.save.label',
     defaultMessage: '!!!SAVE',
-    description: 'Progress Step Label "Save" on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Progress Step Label "Save" on the Connect to Hardware Wallet dialog.'
   },
 });
 

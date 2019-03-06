@@ -4,9 +4,9 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 
-import externalLinkSVG from '../../../../../assets/images/link-external.inline.svg';
-import { ProgressInfo } from '../../../../../types/HWConnectStoreTypes';
-import styles from './HelpLinkBlock.scss';
+import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import styles from '../common/HelpLinkBlock.scss';
 
 const messages = defineMessages({
   helpLinkYoroiWithTrezor: {

@@ -13,9 +13,9 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
-import ProgressStepBlock from './common/ProgressStepBlock';
-import HelpLinkBlock from './common/HelpLinkBlock';
-import HWErrorBlock from './common/HWErrorBlock';
+import ProgressStepBlock from '../common/ProgressStepBlock';
+import HelpLinkBlock from './HelpLinkBlock';
+import HWErrorBlock from '../common/HWErrorBlock';
 
 import saveLoadSVG from '../../../../assets/images/hardware-wallet/trezor/save-load.inline.svg';
 import saveErrorSVG from '../../../../assets/images/hardware-wallet/trezor/save-error.inline.svg';
@@ -27,7 +27,7 @@ import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
 
 import { Logger } from '../../../../utils/logging';
 
-import styles from './SaveDialog.scss';
+import styles from '../common/SaveDialog.scss';
 import config from '../../../../config';
 
 const saveStartSVG = saveLoadSVG;
