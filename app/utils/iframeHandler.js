@@ -1,5 +1,8 @@
 // @flow
-import { LedgerBridge } from 'yoroi-extension-ledger-bridge';
+import {
+  LedgerBridge,
+  YOROI_LEDGER_BRIDGE_IFRAME_NAME
+} from 'yoroi-extension-ledger-bridge';
 
 const LEDGER_BRIDGE_CHECK_INTERVAL = 500; // in ms (1000ms = 1sec)
 const LEDGER_BRIDGE_CHECK_COUNT = 10;
@@ -25,6 +28,22 @@ export async function prepareLedgerBridger(ledgerBridge: LedgerBridge): Promise<
   });
 }
 
-export function getIFrame(name: string): ?any {
-  return document.getElementById(name);
+export function getIFrame(id: string): ?HTMLIFrameElement {
+  const element = document.getElementById(id);
+  if (element instanceof HTMLIFrameElement) {
+    return element;
+  }
+}
+
+/** In order to keep all iframe related logic in iframeHandler
+  * softly restricting YOROI_LEDGER_BRIDGE_IFRAME_NAME use from outside */
+export function disposeLedgerBridgeIFrame() {
+  disposeIFrame(YOROI_LEDGER_BRIDGE_IFRAME_NAME);
+}
+
+export function disposeIFrame(id: string): void {
+  const element = document.getElementById(id);
+  if (element instanceof HTMLIFrameElement) {
+    element.remove();
+  }
 }
