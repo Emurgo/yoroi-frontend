@@ -34,14 +34,13 @@ import type {
   LedgerUnsignedOutput,
   LedgerUnsignedUtxo,
 } from '../../../domain/HWSignTx';
-// TODO [LEDGER] replace types of yoroi-extension-ledger-bridge with npm package
 import type {
   BIP32Path,
   InputTypeUTxO,
   OutputTypeAddress,
   OutputTypeChange,
   SignTransactionResponse as LedgerSignTxResponse,
-} from 'yoroi-extension-ledger-bridge';
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
 import bs58 from 'bs58';
 

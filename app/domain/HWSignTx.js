@@ -5,7 +5,7 @@ import type {
   InputTypeUTxO,
   OutputTypeAddress,
   OutputTypeChange,
-} from 'yoroi-extension-ledger-bridge';
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 export type TrezorInput = {
   path: string,
