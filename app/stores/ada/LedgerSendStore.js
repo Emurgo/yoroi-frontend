@@ -4,7 +4,6 @@ import { defineMessages } from 'react-intl';
 
 import {
   LedgerBridge,
-  YOROI_LEDGER_BRIDGE_IFRAME_NAME
 } from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace by npm module import
 import type {
@@ -31,7 +30,10 @@ import {
   stringifyData,
 } from '../../utils/logging';
 
-import { getIFrame, prepareLedgerBridger } from '../../utils/iframeHandler';
+import {
+  prepareLedgerBridger,
+  disposeLedgerBridgeIFrame
+} from '../../utils/iframeHandler';
 
 const messages = defineMessages({
   signTxError101: {
@@ -46,7 +48,7 @@ export default class LedgerSendStore extends Store {
   // =================== VIEW RELATED =================== //
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError;
-  ledgerBridge: LedgerBridge;
+  ledgerBridge: ?LedgerBridge;
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
@@ -69,16 +71,25 @@ export default class LedgerSendStore extends Store {
   _init = (): void => {
     Logger.debug('LedgerSendStore::_init called');
     if (this.ledgerBridge == null) {
+      Logger.debug('LedgerSendStore::_init new LedgerBridge created');
       this.ledgerBridge = new LedgerBridge();
     }
   }
 
   _reset() {
+    disposeLedgerBridgeIFrame();
+    this.ledgerBridge = undefined;
+
     this._setActionProcessing(false);
     this._setError(null);
   }
 
   _preSendValidation = (): void => {
+    if (this.isActionProcessing) {
+      // this Error will be converted to LocalizableError()
+      throw new Error('Can\'t send another transaction if one transaction is in progress.');
+    }
+
     const { wallets, addresses } = this.stores.substores[environment.API];
     const activeWallet = wallets.active;
     if (!activeWallet) {
@@ -101,35 +112,35 @@ export default class LedgerSendStore extends Store {
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
 
-      if (this.isActionProcessing) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Can\'t send another transaction if one transaction is in progress.');
-      }
+      this._preSendValidation();
 
       this._setError(null);
       this._setActionProcessing(true);
 
-      this._preSendValidation();
+      if (this.ledgerBridge) {
+        // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
+        const ledgerBridge: LedgerBridge = this.ledgerBridge;
 
-      const ledgerSignTxDataResp: CreateLedgerSignTxDataResponse =
-        await this.createLedgerSignTxDataRequest.execute(params).promise;
+        const ledgerSignTxDataResp: CreateLedgerSignTxDataResponse =
+          await this.createLedgerSignTxDataRequest.execute(params).promise;
 
-      await prepareLedgerBridger(this.ledgerBridge);
+        await prepareLedgerBridger(ledgerBridge);
 
-      // TODO: Fix types
-      // inputs: Array<InputTypeUTxO>,
-      // outputs: Array<OutputTypeAddress | OutputTypeChange>
-      const unsignedTx = {
-        inputs: ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
-        outputs: ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
-        // attributes: {},
-      };
+        // TODO: Fix types
+        // inputs: Array<InputTypeUTxO>,
+        // outputs: Array<OutputTypeAddress | OutputTypeChange>
+        const unsignedTx = {
+          inputs: ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
+          outputs: ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
+        };
 
-      const ledgerSignTxResp: LedgerSignTxResponse =
-        await this.ledgerBridge.signTransaction(unsignedTx.inputs, unsignedTx.outputs);
+        const ledgerSignTxResp: LedgerSignTxResponse =
+          await ledgerBridge.signTransaction(unsignedTx.inputs, unsignedTx.outputs);
 
-      await this._broadcastSignedTx(ledgerSignTxResp, ledgerSignTxDataResp, unsignedTx);
-
+        await this._broadcastSignedTx(ledgerSignTxResp, ledgerSignTxDataResp, unsignedTx);
+      } else {
+        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
+      }
     } catch (error) {
       Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
       this._setError(this._convertToLocalizableError(error));
@@ -166,6 +177,7 @@ export default class LedgerSendStore extends Store {
       wallets.goToWalletRoute(activeWallet.id);
     }
 
+    this._reset();
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }
 

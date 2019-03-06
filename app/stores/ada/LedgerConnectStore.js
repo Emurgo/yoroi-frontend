@@ -6,7 +6,6 @@ import { defineMessages } from 'react-intl';
 
 import {
   LedgerBridge,
-  YOROI_LEDGER_BRIDGE_IFRAME_NAME,
   BIP44_HARDENED_CARDANO_FIRST_ACCOUNT_SUB_PATH as CARDANO_FIRST_ACCOUNT_SUB_PATH
 } from 'yoroi-extension-ledger-bridge';
 // TODO [LEDGER]: replace by npm module import
@@ -36,11 +35,14 @@ import {
   HWDeviceInfo
 } from '../../types/HWConnectStoreTypes';
 
+import {
+  prepareLedgerBridger,
+  disposeLedgerBridgeIFrame
+} from '../../utils/iframeHandler';
+
 // import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
-
-import { getIFrame, prepareLedgerBridger } from '../../utils/iframeHandler';
 
 import {
   Logger,
@@ -62,12 +64,9 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
-
   error: ?LocalizableError;
-
   hwDeviceInfo: ?HWDeviceInfo;
-
-  ledgerBridge: LedgerBridge;
+  ledgerBridge: ?LedgerBridge;
 
   get defaultWalletName(): string {
     // Ledger doesn’t provide any device name so using hard-coded name
@@ -99,15 +98,19 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     ledgerConnectAction.submitSave.listen(this._submitSave);
   }
 
-
   /** setup() is called when stores are being created
     * _init() is called when connect dailog is about to show */
   _init = (): void => {
     Logger.debug('LedgerConnectStore::_init called');
     if (this.ledgerBridge == null) {
+      Logger.debug('LedgerConnectStore::_init new LedgerBridge created');
       this.ledgerBridge = new LedgerBridge();
     }
   }
+
+  @action _cancel = (): void => {
+    this.teardown();
+  };
 
   teardown(): void {
     this._reset();
@@ -115,6 +118,9 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   }
 
   @action _reset = (): void => {
+    disposeLedgerBridgeIFrame();
+    this.ledgerBridge = undefined;
+
     this.progressInfo = {
       currentStep: ProgressStep.ABOUT,
       stepState: StepState.LOAD,
@@ -122,10 +128,6 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
     this.error = undefined;
     this.hwDeviceInfo = undefined;
-  };
-
-  @action _cancel = (): void => {
-    this.teardown();
   };
 
   // =================== ABOUT =================== //
@@ -155,31 +157,36 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     try {
-      await prepareLedgerBridger(this.ledgerBridge);
+      if (this.ledgerBridge) {
+        // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
+        const ledgerBridge: LedgerBridge = this.ledgerBridge;
+        await prepareLedgerBridger(ledgerBridge);
 
-      this.hwDeviceInfo = undefined;
+        const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
 
-      const versionResp: GetVersionResponse = await this.ledgerBridge.getVersion();
-      Logger.debug(stringifyData(versionResp));
+        Logger.debug(stringifyData(versionResp));
+        // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
+        Logger.debug(stringifyData(CARDANO_FIRST_ACCOUNT_SUB_PATH));
 
-      // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
-      Logger.debug(stringifyData(CARDANO_FIRST_ACCOUNT_SUB_PATH));
+        // get Cardano's first account's
+        // i.e hdPath = [2147483692, 2147485463, 2147483648]
+        const extendedPublicKeyResp: GetExtendedPublicKeyResponse
+          = await ledgerBridge.getExtendedPublicKey(CARDANO_FIRST_ACCOUNT_SUB_PATH);
+        Logger.debug(stringifyData(extendedPublicKeyResp));
 
-      // get Cardano's first account's
-      // i.e hdPath = [2147483692, 2147485463, 2147483648]
-      const extendedPublicKeyResp: GetExtendedPublicKeyResponse
-        = await this.ledgerBridge.getExtendedPublicKey(CARDANO_FIRST_ACCOUNT_SUB_PATH);
-      Logger.debug(stringifyData(extendedPublicKeyResp));
+        // 🔻TOD0: Delete. Debug purposes
+        const firstAdressHDPath = [...CARDANO_FIRST_ACCOUNT_SUB_PATH, 0, 0];
+        const address = await ledgerBridge.deriveAddress(firstAdressHDPath);
+        Logger.debug(stringifyData(address));
+        // 🔺TOD0: Delete. Debug purposes
 
-      // TODP: Delete. Debug purposes
-      const firstAdressHDPath = [...CARDANO_FIRST_ACCOUNT_SUB_PATH, 0, 0];
-      const address = await this.ledgerBridge.deriveAddress(firstAdressHDPath);
-      Logger.debug(stringifyData(address));
+        this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
 
-      this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
-
-      this._goToSaveLoad();
-      Logger.info('Ledger device OK');
+        this._goToSaveLoad();
+        Logger.info('Ledger device OK');
+      } else {
+        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
+      }
     } catch (error) {
       this._handleConnectError(error);
     }
