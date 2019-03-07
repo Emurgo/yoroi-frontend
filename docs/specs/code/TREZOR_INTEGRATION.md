@@ -227,6 +227,7 @@ scripts => change build script to move static files(js/html) needed for Trezor c
 
 # Implementation
 https://github.com/Emurgo/yoroi-frontend/issues/277
+https://github.com/Emurgo/yoroi-frontend/pull/334
 
 
 # Iteration-3
@@ -236,7 +237,11 @@ TBD
 # Reference
 
 1. https://github.com/trezor/connect
-2. https://github.com/trezor/trezor-core
-3. https://github.com/trezor/trezord-go
-4. https://doc.satoshilabs.com/
-5. https://trezor.github.io/connect-explorer/#/
+2. https://github.com/trezor/connect/tree/develop/src/js/webextension
+3. https://github.com/trezor/connect-explorer/tree/webextensions
+4. https://github.com/trezor/connect/blob/develop/CHANGELOG.md
+5. https://github.com/trezor/connect/blob/develop/docs/index.md
+6. https://trezor.github.io/connect-explorer/#/
+7. https://github.com/trezor/trezor-core
+8. https://github.com/trezor/trezord-go
+9. https://doc.satoshilabs.com/

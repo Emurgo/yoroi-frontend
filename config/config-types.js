@@ -24,9 +24,9 @@ export type NetworkConfigType = {
   backendUrl: string,
   websocketUrl: string,
   name: Network,
-  trezorNetwork:
-  1 // testnet
-  | 2, // Mainnet
+  trezorProtocolMagic:
+    764824073   // mainnet
+  | 1097911063, // testnet
 };
 
 export type Network = 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';
