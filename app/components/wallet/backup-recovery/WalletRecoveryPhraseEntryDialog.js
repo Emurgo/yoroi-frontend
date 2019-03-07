@@ -20,10 +20,10 @@ const messages = defineMessages({
     defaultMessage: '!!!Tap each word in the correct order to verify your recovery phrase',
     description: 'Instructions for verifying wallet recovery phrase on dialog for entering wallet recovery phrase.'
   },
-  buttonLabelConfirm: {
-    id: 'wallet.recovery.phrase.show.entry.dialog.button.labelConfirm',
-    defaultMessage: '!!!Confirm',
-    description: 'Label for button "Confirm" on wallet backup dialog'
+  buttonLabelRemoveLast: {
+    id: 'wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast',
+    defaultMessage: '!!!Remove last',
+    description: 'Label for button "Remove Last" on wallet backup dialog'
   },
   buttonLabelClear: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelClear',
@@ -51,13 +51,13 @@ type Props = {
   isTermRecoveryAccepted: boolean,
   isSubmitting: boolean,
   onAddWord: Function,
-  canFinishBackup: boolean,
   onClear: Function,
   onAcceptTermDevice: Function,
   onAcceptTermRecovery: Function,
   onRestartBackup: Function,
   onCancelBackup: Function,
-  onFinishBackup: Function,
+  removeWord: Function,
+  hasWord: Function
 };
 
 @observer
@@ -80,10 +80,10 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       onClear,
       onAcceptTermDevice,
       onAcceptTermRecovery,
-      canFinishBackup,
+      removeWord,
       onRestartBackup,
       onCancelBackup,
-      onFinishBackup
+      hasWord
     } = this.props;
     const dialogClasses = classnames([
       styles.component,
@@ -95,10 +95,9 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
     const actions = [];
 
     actions.push({
-      className: isSubmitting ? styles.isSubmitting : null,
-      label: intl.formatMessage(messages.buttonLabelConfirm),
-      onClick: onFinishBackup,
-      disabled: !canFinishBackup,
+      label: intl.formatMessage(messages.buttonLabelRemoveLast),
+      onClick: removeWord,
+      disabled: !hasWord,
       primary: true
     });
 
@@ -107,6 +106,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       actions.unshift({
         label: intl.formatMessage(messages.buttonLabelClear),
         onClick: onClear,
+        primary: true
       });
     }
 
