@@ -1,4 +1,6 @@
 // @flow
+
+// https://github.com/trezor/connect/issues/350
 export type TrezorInput = {
   path: string,
   prev_hash: string,
