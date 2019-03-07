@@ -190,7 +190,7 @@
   "wallet.receive.page.walletAddressLabel": "Ihre Wallet-Adresse",
   "wallet.receive.page.walletReceiveInstructions": "Teile diese Wallet-Adresse mit, um Zahlungen zu erhalten. Um ihre Privatsphäre zu schützen, werden jedes Mal neue Adressen erzeugt, sobald sie genutzt worden sind.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Löschen",
-  "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Bestätigen",
+  "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "!!!Remove last",
   "wallet.redeem.choices.tab.title.forceVended": "do not translate",
   "wallet.redeem.choices.tab.title.paperVended": "do not translate",
   "wallet.redeem.choices.tab.title.recoveryForceVended": "do not translate",

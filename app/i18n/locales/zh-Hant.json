@@ -190,7 +190,7 @@
   "wallet.receive.page.walletAddressLabel": "您的錢包地址",
   "wallet.receive.page.walletReceiveInstructions": "分享此錢包地址，以接收付款。為保護您的隱私，一旦使用，就會自動產生新地址。",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "清除",
-  "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "確認",
+  "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "!!!Remove last",
   "wallet.redeem.choices.tab.title.forceVended": "強行執行",
   "wallet.redeem.choices.tab.title.paperVended": "Paper執行",
   "wallet.redeem.choices.tab.title.recoveryForceVended": "強行恢復",

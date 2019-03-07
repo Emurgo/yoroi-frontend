@@ -190,7 +190,7 @@
   "wallet.receive.page.walletAddressLabel": "あなたのウォレットのアドレス",
   "wallet.receive.page.walletReceiveInstructions": "上記アドレスを送信元に共有し、ADAの送金を依頼してください。セキュリティーの観点から、一度使用したアドレスを再度使用することはできません。新たなアドレスが自動的に生成されます。",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "クリア",
-  "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "確認",
+  "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "!!!Remove last",
   "wallet.redeem.choices.tab.title.forceVended": "強制ヴェンド",
   "wallet.redeem.choices.tab.title.paperVended": "紙ヴェンド",
   "wallet.redeem.choices.tab.title.recoveryForceVended": "リカバリー：強制ヴェンド",
