@@ -1,6 +1,11 @@
 .component {
 
-  position: relative;
+  .main {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
 
   & > .label {
     color: var(--theme-support-settings-text-color);
@@ -8,14 +13,6 @@
     font-size: 16px;
     line-height: 1.38;
     margin-bottom: 11px;
-  }
-
-  & > .exportStyleButton
-  {
-    position: absolute;
-    left: 0px;
-    bottom: -25px;
-    width: 100%;
   }
 
   a,
@@ -37,6 +34,7 @@
 }
 
 .themesWrapper {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 20px;
