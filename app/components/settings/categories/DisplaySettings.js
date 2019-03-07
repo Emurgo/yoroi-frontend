@@ -112,7 +112,7 @@ export default class DisplaySettings extends Component<Props> {
           {intl.formatMessage(messages.themeLabel)}
         </div>
 
-        <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p><br />
+        <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
 
         <Button
           className={exportButtonClasses}

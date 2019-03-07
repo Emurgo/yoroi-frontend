@@ -17,6 +17,23 @@
     bottom: -25px;
     width: 100%;
   }
+
+  a,
+  p {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 19px;
+  }
+
+  a {
+    color: var(--theme-support-settings-link-color);
+    text-decoration: underline;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
 }
 
 .themesWrapper {
