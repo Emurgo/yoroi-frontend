@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import styles from './DisplaySettings.scss';
 import { THEMES } from '../../../themes/index';
 import ThemeThumbnail from './display/ThemeThumbnail';
@@ -36,6 +36,21 @@ const messages = defineMessages({
     defaultMessage: '!!!CHANGING THEME WILL REMOVE CUSTOMIZATION',
     description: 'Label for the "CHANGING THEME WILL REMOVE CUSTOMIZATION" message.',
   },
+  blog: {
+    id: 'settings.display.blog',
+    defaultMessage: '!!!You can read our {blogLink} on how to use this feature.',
+    description: 'text to introduce blog post',
+  },
+  blogLinkUrl: {
+    id: 'settings.support.faq.blogLinkUrl',
+    defaultMessage: '!!!https://medium.com/@emurgo_io/custom-themes-in-yoroi-d3fa93f4b926',
+    description: 'link for blog post',
+  },
+  blogLinkWrapper: {
+    id: 'settings.support.faq.blogLinkWrapper',
+    defaultMessage: '!!!blog post',
+    description: 'clickable text to open link',
+  },
 });
 
 type Props = {
@@ -43,7 +58,8 @@ type Props = {
   selectTheme: Function,
   exportTheme: Function,
   getThemeVars: Function,
-  hasCustomTheme: Function
+  hasCustomTheme: Function,
+  onExternalLinkClick: Function,
 };
 
 @observer
@@ -54,7 +70,14 @@ export default class DisplaySettings extends Component<Props> {
   };
 
   render() {
-    const { theme, selectTheme, getThemeVars, exportTheme, hasCustomTheme } = this.props;
+    const {
+      theme,
+      selectTheme,
+      getThemeVars,
+      exportTheme,
+      hasCustomTheme,
+      onExternalLinkClick 
+    } = this.props;
     const { intl } = this.context;
 
     const themeYoroiClassicClasses = classnames([
@@ -73,12 +96,24 @@ export default class DisplaySettings extends Component<Props> {
       styles.button,
     ]);
 
+    const blogLink = (
+      <a
+        href={intl.formatMessage(messages.blogLinkUrl)}
+        onClick={event => onExternalLinkClick(event)}
+      >
+        {intl.formatMessage(messages.blogLinkWrapper)}
+      </a>
+    );
+
     return (
       <div className={styles.component}>
 
         <div className={styles.label}>
           {intl.formatMessage(messages.themeLabel)}
         </div>
+
+        <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p><br />
+
         <Button
           className={exportButtonClasses}
           label={intl.formatMessage(messages.themeExportButton)}
@@ -102,7 +137,7 @@ export default class DisplaySettings extends Component<Props> {
             <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
           </button>
 
-          {!environment.isMainnet() &&
+          {!environment.isMainnet() && // a second theme to allow testing switching themes
             (
               <button
                 type="button"

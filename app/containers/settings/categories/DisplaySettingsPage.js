@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { handleExternalLinkClick } from '../../../utils/routing';
 import DisplaySettings from '../../../components/settings/categories/DisplaySettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 
@@ -32,6 +33,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
         getThemeVars={this.getThemeVars}
         exportTheme={this.exportTheme}
         hasCustomTheme={this.hasCustomTheme}
+        onExternalLinkClick={handleExternalLinkClick}
       />
     );
   }
