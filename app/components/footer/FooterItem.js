@@ -30,7 +30,7 @@ export default class FooterItem extends Component<Props> {
             title={intl.formatMessage(message)}
           >
             <div className={styles.icon}>
-              <SvgInline svg={svg} cleanup={['title']} className={className} width="20" height="52" />
+              <SvgInline svg={svg} className={className} width="20" height="52" />
             </div>
             <div className={styles.text}>
               {intl.formatMessage(message)}

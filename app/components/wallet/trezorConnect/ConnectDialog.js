@@ -99,7 +99,7 @@ export default class ConnectDialog extends Component<Props> {
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            <SvgInline svg={connectErrorSVG} cleanup={['title']} />
+            <SvgInline svg={connectErrorSVG} />
           </div>);
         break;
       default:

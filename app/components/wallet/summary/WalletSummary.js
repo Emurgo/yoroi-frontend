@@ -64,14 +64,14 @@ export default class WalletSummary extends Component<Props> {
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
                 : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} cleanup={['title']} />
+                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
               </div>
             }
             {pendingAmount.outgoing.greaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
                 : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} cleanup={['title']} />
+                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
               </div>
             }
             {!isLoadingTransactions ? (
@@ -85,7 +85,7 @@ export default class WalletSummary extends Component<Props> {
           {!isLoadingTransactions ? (
             <SvgInline
               svg={exportTxToFileSvg}
-              cleanup={['title']}
+             
               className={styles.exportTxToFileSvg}
               title={intl.formatMessage(messages.exportIconTooltip)}
               onClick={openExportTxToFileDialog}
