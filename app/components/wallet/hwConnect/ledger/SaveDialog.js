@@ -33,25 +33,10 @@ import config from '../../../../config';
 const saveStartSVG = saveLoadSVG;
 
 const messages = defineMessages({
-  saveWalletNameInputLabel: {
-    id: 'wallet.ledger.dialog.step.save.walletName.label',
-    defaultMessage: '!!!Wallet name',
-    description: 'Label for the wallet name input on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  saveWalletNameInputPlaceholder: {
-    id: 'wallet.ledger.dialog.step.save.walletName.hint',
-    defaultMessage: '!!!Enter wallet name',
-    description: 'Placeholder "Enter wallet name" for the wallet name input on the wallet restore dialog.'
-  },
   saveWalletNameInputBottomInfo: {
-    id: 'wallet.ledger.dialog.step.save.walletName.info',
+    id: 'wallet.connect.ledger.dialog.step.save.walletName.info',
     defaultMessage: '!!!We have fetched Trezor device’s name for you; you can use as it is or assign a different name.',
     description: 'Hint for the wallet name input on the wallet restore dialog.'
-  },
-  saveButtonLabel: {
-    id: 'wallet.ledger.dialog.save.button.label',
-    defaultMessage: '!!!Save',
-    description: 'Label for the "Save" button on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
 
@@ -80,8 +65,8 @@ export default class SaveDialog extends Component<Props> {
     this.form = new ReactToolboxMobxForm({
       fields: {
         walletName: {
-          label: intl.formatMessage(messages.saveWalletNameInputLabel),
-          placeholder: intl.formatMessage(messages.saveWalletNameInputPlaceholder),
+          label: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputLabel),
+          placeholder: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputPH),
           value: defaultWalletName,
           validators: [({ field }) => (
             [
@@ -148,7 +133,7 @@ export default class SaveDialog extends Component<Props> {
 
     const dailogActions = [{
       className: isActionProcessing ? styles.processing : null,
-      label: intl.formatMessage(messages.saveButtonLabel),
+      label: intl.formatMessage(globalMessages.hwConnectDialogSaveButtonLabel),
       primary: true,
       disabled: isActionProcessing,
       onClick: this.save

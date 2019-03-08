@@ -147,30 +147,85 @@ export default defineMessages({
     defaultMessage: '!!!Back',
     description: 'Label for the back button in the wallet send confirmation dialog.'
   },
+  hwConnectDialogNextButtonLabel: {
+    id: 'wallet.connect.hw.dialog.next.button.label',
+    defaultMessage: '!!!Next',
+    description: 'Label for the "Next" button on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogConnectButtonLabel: {
+    id: 'wallet.connect.hw.dialog.connect.button.label',
+    defaultMessage: '!!!Connect',
+    description: 'Label for the "Connect" button on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogSaveButtonLabel: {
+    id: 'wallet.connect.hw.dialog.save.button.label',
+    defaultMessage: '!!!Save',
+    description: 'Label for the "Save" button on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutIntroTextLine1: {
+    id: 'wallet.connect.hw.dialog.step.about.introText.line.1',
+    defaultMessage: '!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.',
+    description: 'Header text of about step on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutIntroTextLine2: {
+    id: 'wallet.connect.hw.dialog.step.about.introText.line.2',
+    defaultMessage: '!!!It is more secure because your private key never leaves the hardware wallet.',
+    description: 'Header text of about step on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutIntroTextLine3: {
+    id: 'wallet.connect.hw.dialog.step.about.introText.line.3',
+    defaultMessage: '!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.',
+    description: 'Header text of about step on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutPrerequisite4: {
+    id: 'wallet.connect.hw.dialog.step.about.prerequisite.4',
+    defaultMessage: '!!!Your computer must remain connected to the Internet throughout the process.',
+    description: 'Fourth Prerequisite on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutPrerequisiteHeader: {
+    id: 'wallet.connect.hw.dialog.step.about.prerequisite.header',
+    defaultMessage: '!!!Prerequisites',
+    description: 'Prerequisite header on the Connect to Trezor Hardware Wallet dialog.'
+  },
+  hwConnectDialogSaveWalletNameInputLabel: {
+    id: 'wallet.connect.hw.dialog.step.save.walletName.label',
+    defaultMessage: '!!!Wallet name',
+    description: 'Label for the wallet name input on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogSaveWalletNameInputPH: {
+    id: 'wallet.connect.hw.dialog.step.save.walletName.hint',
+    defaultMessage: '!!!Enter wallet name',
+    description: 'Placeholder for the wallet name input on the Connect to any Hardware Wallet dialog.'
+  },
   ledgerConnectAllDialogTitle: {
-    id: 'wallet.ledger.dialog.title.label',
+    id: 'wallet.connect.ledger.dialog.title.label',
     defaultMessage: '!!!Connect to Ledger Hardware Wallet',
     description: 'Label "Connect to Ledger Hardware Wallet" on the Connect to Ledger Hardware Wallet dialog.'
   },
   trezorConnectAllDialogTitle: {
-    id: 'wallet.trezor.dialog.title.label',
+    id: 'wallet.connect.trezor.dialog.title.label',
     defaultMessage: '!!!Connect to Trezor Hardware Wallet',
     description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
   },
   trezorError101: {
-    id: 'wallet.trezor.error.101',
+    id: 'wallet.connect.trezor.error.101',
     defaultMessage: '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
     description: '<Failed to connect trezor.io. Please check your Internet connection and retry.>'
   },
   trezorError102: {
-    id: 'wallet.trezor.error.102',
+    id: 'wallet.connect.trezor.error.102',
     defaultMessage: '!!!Necessary permissions were not granted by the user. Please retry.',
     description: '<Necessary permissions were not granted by the user. Please retry.>'
   },
   trezorError103: {
-    id: 'wallet.trezor.error.103',
+    id: 'wallet.connect.trezor.error.103',
     defaultMessage: '!!!Cancelled. Please retry.',
     description: '<Cancelled. Please retry.>'
+  },
+  hwConnectDialogSaveError101: {
+    id: 'wallet.connect.hw.dialog.step.save.error.101',
+    defaultMessage: '!!!Failed to save. Please check your Internet connection and retry.',
+    description: '<Failed to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
   walletCreatedNotificationMessage: {
     id: 'wallet.summary.page.walletCreatedNotificationMessage',

@@ -2,7 +2,6 @@
 // Handles Connect to Trezor Hardware Wallet dialog
 
 import { observable, action } from 'mobx';
-import { defineMessages } from 'react-intl';
 
 import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
 import type { DeviceMessage, UiMessage } from 'trezor-connect';
@@ -36,14 +35,6 @@ import type {
   CreateHardwareWalletRequest,
   CreateHardwareWalletResponse,
 } from '../../api/common';
-
-const messages = defineMessages({
-  saveError101: {
-    id: 'wallet.trezor.dialog.step.save.error.101',
-    defaultMessage: '!!!Failed to save. Please check your Internet connection and retry.',
-    description: '<Failed to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
-  },
-});
 
 /** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
   * try to make a common base class */
@@ -104,10 +95,10 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
   _init = (): void => {
     Logger.debug('TrezorConnectStore::_init called');
 
-    /** Preinitialization of TrezorConnect API will result in faster first response
-     * TODO [TREZOR] this can be moved to a new method which would be
-     * called when connect dialog loads(before About state) */
+    /** Preinitialization of TrezorConnect API will result in faster first response */
     try {
+      // TODO [TREZOR]: sometimes when user does fast action initialization is still not complete
+      // try to use same approach as ledger
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
@@ -204,12 +195,12 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     trezorResp: any,
     trezorEventDevice: DeviceMessage
   ): HWDeviceInfo => {
-    if (trezorResp == null
-      || trezorResp.payload == null
-      || trezorEventDevice == null
+    this._validateHWResponse(trezorResp, trezorEventDevice);
+
+    /** This check aready done in _validateHWResponse but flow needs this */
+    if (trezorEventDevice == null
       || trezorEventDevice.payload == null
-      || trezorEventDevice.payload.features == null
-      || !this._validateHWResponse(trezorResp, trezorEventDevice)) {
+      || trezorEventDevice.payload.features == null) {
       throw new UnexpectedError();
     }
 
@@ -235,25 +226,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     trezorEventDevice: DeviceMessage
   ): boolean => {
 
-    if (trezorEventDevice == null
-      || trezorEventDevice.payload == null
-      || trezorEventDevice.payload.type !== 'acquired'
-      || trezorEventDevice.payload.features == null) {
-      // Something unexpected happened
-      Logger.error(`TrezorConnectStore::_validateTrezor::error: invalid device event`);
-      throw new UnexpectedError();
-    }
-
-    if (trezorResp == null
-      || trezorResp.payload == null
-      || trezorResp.payload.publicKey == null
-      || trezorResp.payload.publicKey.length <= 0) {
-      // Something unexpected happened
-      Logger.error(`TrezorConnectStore::_validateTrezor::error: invalid public key`);
-      throw new UnexpectedError();
-    }
-
-    if (!trezorResp.success) {
+    if (trezorResp && !trezorResp.success) {
       switch (trezorResp.payload.error) {
         case 'Iframe timeout':
           throw new LocalizableError(globalMessages.trezorError101);
@@ -264,9 +237,27 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
           throw new LocalizableError(globalMessages.trezorError103);
         default:
           // Something unexpected happened
-          Logger.error(`TrezorConnectStore::_validateTrezor::error: ${trezorResp.payload.error}`);
+          Logger.error(`TrezorConnectStore::_validateHWResponse::error: ${trezorResp.payload.error}`);
           throw new UnexpectedError();
       }
+    }
+
+    if (trezorResp == null
+      || trezorResp.payload == null
+      || trezorResp.payload.publicKey == null
+      || trezorResp.payload.publicKey.length <= 0) {
+      // Something unexpected happened
+      Logger.error(`TrezorConnectStore::_validateHWResponse::error: invalid public key`);
+      throw new UnexpectedError();
+    }
+
+    if (trezorEventDevice == null
+      || trezorEventDevice.payload == null
+      || trezorEventDevice.payload.type !== 'acquired'
+      || trezorEventDevice.payload.features == null) {
+      // Something unexpected happened
+      Logger.error(`TrezorConnectStore::_validateHWResponse::error: invalid device event`);
+      throw new UnexpectedError();
     }
 
     return true;
@@ -356,9 +347,9 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       Logger.error(`TrezorConnectStore::_saveHW::error ${stringifyError(error)}`);
 
       if (error instanceof CheckAdressesInUseApiError) {
-        // redirecting CheckAdressesInUseApiError -> saveError101
-        // because for user saveError101 is more meaningful in this context
-        this.error = new LocalizableError(messages.saveError101);
+        // redirecting CheckAdressesInUseApiError -> hwConnectDialogSaveError101
+        // because for user hwConnectDialogSaveError101 is more meaningful in this context
+        this.error = new LocalizableError(globalMessages.hwConnectDialogSaveError101);
       } else if (error instanceof LocalizableError) {
         this.error = error;
       } else {

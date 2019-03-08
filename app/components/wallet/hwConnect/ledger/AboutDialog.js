@@ -24,80 +24,50 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import styles from '../common/AboutDialog.scss';
 
 const messages = defineMessages({
-  aboutIntroTextLine1: {
-    id: 'wallet.ledger.dialog.step.about.introText.line.1',
-    defaultMessage: '!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.',
-    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  aboutIntroTextLine2: {
-    id: 'wallet.ledger.dialog.step.about.introText.line.2',
-    defaultMessage: '!!!It is more secure because your private key never leaves the hardware wallet.',
-    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  aboutIntroTextLine3: {
-    id: 'wallet.ledger.dialog.step.about.introText.line.3',
-    defaultMessage: '!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.',
-    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  aboutPrerequisiteHeader: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.header',
-    defaultMessage: '!!!Prerequisites',
-    description: 'Prerequisite header on the Connect to Trezor Hardware Wallet dialog.'
-  },
   aboutPrerequisite1Part1: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.1.part1',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1',
     defaultMessage: '!!!Only Supports ',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2Link: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.1.part2.link',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link',
     defaultMessage: '!!!https://www.ledger.com/products/ledger-nano-s',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2LinkText: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.1.part2.link.text',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link.text',
     defaultMessage: '!!!Ledger Nano S',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part3: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.1.part3',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3',
     defaultMessage: '!!! model.',
     description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite2Part1Link: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.2.part1.link',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part1.link',
     defaultMessage: '!!!https://github.com/cardano-foundation/ledger-app-cardano',
     description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite2Part1LinkText: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.2.part1.link.text',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part1.link.text',
     defaultMessage: '!!!Cardano ADA',
     description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite2Part2: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.2.part2',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part2',
     defaultMessage: '!!!app must be installed on the Ledger device.',
     description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.3',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.3',
     defaultMessage: '!!!The Trezor device screen must be unlocked.',
     description: 'Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
-  aboutPrerequisite4: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.4',
-    defaultMessage: '!!!Your computer must remain connected to the Internet throughout the process.',
-    description: 'Fourth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
-  },
   aboutPrerequisite5: {
-    id: 'wallet.ledger.dialog.step.about.prerequisite.5',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.5',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
     description: 'Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  nextButtonLabel: {
-    id: 'wallet.ledger.dialog.next.button.label',
-    defaultMessage: '!!!Next',
-    description: 'Label for the "Next" button on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
 
@@ -128,9 +98,9 @@ export default class AboutDialog extends Component<Props> {
 
     const introBlock = (
       <div className={styles.headerBlock}>
-        <span>{intl.formatMessage(messages.aboutIntroTextLine1)}</span><br />
-        <span>{intl.formatMessage(messages.aboutIntroTextLine2)}</span><br />
-        <span>{intl.formatMessage(messages.aboutIntroTextLine3)}</span><br />
+        <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine1)}</span><br />
+        <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine2)}</span><br />
+        <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine3)}</span><br />
       </div>);
 
     const middleBlock = (
@@ -139,7 +109,7 @@ export default class AboutDialog extends Component<Props> {
           <div>
             <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />
             <span className={styles.prerequisiteHeaderText}>
-              {intl.formatMessage(messages.aboutPrerequisiteHeader)}
+              {intl.formatMessage(globalMessages.hwConnectDialogAboutPrerequisiteHeader)}
             </span>
           </div>
           <ul>
@@ -159,7 +129,7 @@ export default class AboutDialog extends Component<Props> {
               {intl.formatMessage(messages.aboutPrerequisite2Part2)}
             </li>
             <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
-            <li key="4">{intl.formatMessage(messages.aboutPrerequisite4)}</li>
+            <li key="4">{intl.formatMessage(globalMessages.hwConnectDialogAboutPrerequisite4)}</li>
             <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
           </ul>
         </div>
@@ -170,7 +140,7 @@ export default class AboutDialog extends Component<Props> {
 
     const dailogActions = [{
       className: isActionProcessing ? styles.processing : null,
-      label: intl.formatMessage(messages.nextButtonLabel),
+      label: intl.formatMessage(globalMessages.hwConnectDialogNextButtonLabel),
       primary: true,
       disabled: false,
       onClick: submit,
