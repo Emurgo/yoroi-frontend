@@ -26,7 +26,7 @@ export type NetworkConfigType = {
   name: Network,
   trezorProtocolMagic:
     764824073   // mainnet
-  | 1097911063, // testnet
+  | 1097911063, // staging
 };
 
 export type Network = 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';

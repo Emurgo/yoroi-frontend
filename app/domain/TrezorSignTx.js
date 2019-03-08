@@ -18,5 +18,5 @@ export type TrezorSignTxPayload = {
   inputs: Array<TrezorInput>,
   outputs: Array<TrezorOutput>,
   transactions: Array<string>,
-  protocol_magic: 764824073 | 1097911063 // 764824073 = Mainnet | 1097911063 = Testnet
+  protocol_magic: 764824073 | 1097911063 // 764824073 = mainnet | 1097911063 = staging
 }

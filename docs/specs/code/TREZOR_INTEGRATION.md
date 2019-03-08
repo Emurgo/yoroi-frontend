@@ -7,7 +7,7 @@
 # Motivation
 
 1. Since private key never leave the hardware wallet so it's considered as one of the most secured way of using cryptocurrency wallets.
-2. No need to remember spending passowrd, so its easy to use.
+2. No need to remember spending passowrd, so its easy to use(although need to remember a pincode for screen unlocking).
 
 # Background
 
@@ -15,7 +15,7 @@ Much needed functionality.
 
 # Iteration-1
 
-# Proposal
+## Proposal
 User will be able to:
 1. Setup a new Yoroi Wallet without exposing its private key/ mnemonics.
 2. Send ADA using the Trezor Wallet Security.
@@ -220,12 +220,15 @@ scripts => change build script to move static files(js/html) needed for Trezor c
 
 # Iteration-2
 
-# Proposal
+## Proposal
 1. Update [TrezorConnect](https://github.com/trezor/connect) API from [v6](https://connect.trezor.io/6/trezor-connect.js) to [v7](https://connect.trezor.io/7/trezor-connect.js).
   - Starting from [v7](https://github.com/trezor/connect/blob/develop/docs/index.md) [Trezor Connect Manifest](https://github.com/trezor/connect/blob/develop/docs/index.md#trezor-connect-manifest) has been made mandatory.
   - trezor-connect NPM from [6.0.2](https://www.npmjs.com/package/trezor-connect/v/6.0.2) to [7.0.1](https://www.npmjs.com/package/trezor-connect/v/7.0.1)
 
-# Implementation
+## Prerequisite  
+  - Trezor device firmware must be updated to [2.1.0](https://github.com/trezor/trezor-core/releases/tag/v2.1.0)
+
+## Implementation
 https://github.com/Emurgo/yoroi-frontend/issues/277
 https://github.com/Emurgo/yoroi-frontend/pull/334
 
