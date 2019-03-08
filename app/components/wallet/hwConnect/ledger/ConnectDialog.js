@@ -29,24 +29,19 @@ const connectStartGIF = connectLoadGIF;
 
 const messages = defineMessages({
   connectIntroTextLine1: {
-    id: 'wallet.ledger.dialog.step.connect.introText.line.1',
+    id: 'wallet.connect.ledger.dialog.step.connect.introText.line.1',
     defaultMessage: '!!!After connecting your Trezor device to the computer press the Connect button.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectIntroTextLine2: {
-    id: 'wallet.ledger.dialog.step.connect.introText.line.2',
+    id: 'wallet.connect.ledger.dialog.step.connect.introText.line.2',
     defaultMessage: '!!!A new tab will appear, please follow the instructions in the new tab.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectIntroTextLine3: {
-    id: 'wallet.ledger.dialog.step.connect.introText.line.3',
+    id: 'wallet.connect.ledger.dialog.step.connect.introText.line.3',
     defaultMessage: '!!!This process shares the Cardano public key with Yoroi.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  connectButtonLabel: {
-    id: 'wallet.ledger.dialog.connect.button.label',
-    defaultMessage: '!!!Connect',
-    description: 'Label for the "Connect" button on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
 
@@ -109,7 +104,7 @@ export default class ConnectDialog extends Component<Props> {
 
     const dailogActions = [{
       className: isActionProcessing ? styles.processing : null,
-      label: intl.formatMessage(messages.connectButtonLabel),
+      label: intl.formatMessage(globalMessages.hwConnectDialogConnectButtonLabel),
       primary: true,
       disabled: isActionProcessing,
       onClick: submit

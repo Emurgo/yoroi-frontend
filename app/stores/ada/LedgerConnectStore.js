@@ -2,7 +2,6 @@
 // Handles Connect to Ledger Hardware Wallet dialog
 
 import { observable, action } from 'mobx';
-import { defineMessages } from 'react-intl';
 
 import {
   LedgerBridge,
@@ -39,7 +38,7 @@ import {
   disposeLedgerBridgeIFrame
 } from '../../utils/iframeHandler';
 
-// import globalMessages from '../../i18n/global-messages';
+import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 
@@ -48,14 +47,6 @@ import {
   stringifyData,
   stringifyError
 } from '../../utils/logging';
-
-const messages = defineMessages({
-  saveError101: {
-    id: 'wallet.ledger.dialog.step.save.error.101',
-    defaultMessage: '!!!Failed to save. Please check your Internet connection and retry.',
-    description: '<Failed to save. Please check your Internet connection and retry.> on the Connect to Ledger Hardware Wallet dialog.'
-  },
-});
 
 /** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
   * try to make a common base class */
@@ -236,15 +227,54 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;
-
-    if (error instanceof LocalizableError) {
-      this.error = error;
-    } else {
-      this.error = new UnexpectedError();
-    }
+    this.error = this._convertToLocalizableError(error);
 
     this._goToConnectError();
   };
+
+  /** Converts error(from API or Ledger API) to LocalizableError */
+  _convertToLocalizableError = (error: any): LocalizableError => {
+    let localizableError: ?LocalizableError = null;
+
+    console.log(JSON.stringify(error, null, 2));
+
+    if (error instanceof LocalizableError) {
+      // It means some API Error has been thrown
+      localizableError = error;
+    } else if (error && error.message) {
+      // // Trezor device related error happend, convert then to LocalizableError
+      // // TODO: [TREZOR] check for device not supported if needed
+      // switch (error.message) {
+      //   case 'Iframe timeout':
+      //     localizableError = new LocalizableError(globalMessages.trezorError101);
+      //     break;
+      //   case 'Permissions not granted':
+      //     localizableError = new LocalizableError(globalMessages.trezorError102);
+      //     break;
+      //   case 'Cancelled':
+      //   case 'Popup closed':
+      //     localizableError = new LocalizableError(globalMessages.trezorError103);
+      //     break;
+      //   case 'Signing cancelled':
+      //     localizableError = new LocalizableError(messages.signTxError101);
+      //     break;
+      //   default:
+      //     /** we are not able to figure out why Error is thrown
+      //       * make it, Something unexpected happened */
+      //     Logger.error(`TrezorSendStore::_convertToLocalizableError::error: ${error.message}`);
+      //     localizableError = new UnexpectedError();
+      //     break;
+      // }
+    }
+
+    if (!localizableError) {
+      /** we are not able to figure out why Error is thrown
+        * make it, Something unexpected happened */
+      localizableError = new UnexpectedError();
+    }
+
+    return localizableError;
+  }
 
   @action _goToConnectError = (): void => {
     this.progressInfo.currentStep = ProgressStep.CONNECT;
@@ -288,9 +318,9 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
       Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
 
       if (error instanceof CheckAdressesInUseApiError) {
-        // redirecting CheckAdressesInUseApiError -> saveError101
-        // because for user saveError101 is more meaningful in this context
-        this.error = new LocalizableError(messages.saveError101);
+        // redirecting CheckAdressesInUseApiError -> hwConnectDialogSaveError101
+        // because for user hwConnectDialogSaveError101 is more meaningful in this context
+        this.error = new LocalizableError(globalMessages.hwConnectDialogSaveError101);
       } else if (error instanceof LocalizableError) {
         this.error = error;
       } else {
