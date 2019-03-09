@@ -102,7 +102,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     ]);
     const actions = [
       {
-        label: intl.formatMessage(globalMessages.walletSendConfirmationBackButtonLabel),
+        label: intl.formatMessage(globalMessages.backButtonLabel),
         onClick: isSubmitting
           ? () => {} // noop
           : onCancel

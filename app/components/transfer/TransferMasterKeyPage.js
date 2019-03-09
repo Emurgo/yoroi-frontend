@@ -1,43 +1,38 @@
 // @flow
 import React, { Component } from 'react';
-import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
-import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
-import styles from './TransferMnemonicPage.scss';
+import styles from './TransferMasterKeyPage.scss';
 import config from '../../config';
 
 const messages = defineMessages({
-  recoveryPhraseInputLabel: {
-    id: 'transfer.form.recovery.phrase.input.label',
-    defaultMessage: '!!!Recovery phrase',
-    description: 'Label for the recovery phrase input on the transfer mnemonic page.'
+  masterKeyInputLabel: {
+    id: 'transfer.form.masterkey.input.label',
+    defaultMessage: '!!!Master key',
+    description: 'Label for the master key input on the transfer master key page.'
   },
-  recoveryPhraseInputHint: {
-    id: 'transfer.form.recovery.phrase.input.hint',
-    defaultMessage: '!!!Enter recovery phrase',
-    description: 'Hint "Enter recovery phrase" for the recovery phrase input on the transfer mnemonic page.'
+  masterKeyInputHint: {
+    id: 'transfer.form.masterkey.input.hint',
+    defaultMessage: '!!!Enter master key',
+    description: 'Hint "Enter master key" for the master keyinput on the transfer master key page.'
   },
-  recoveryPhraseNoResults: {
-    id: 'transfer.form.recovery.phrase.input.noResults',
-    defaultMessage: '!!!No results',
-    description: '"No results" message for the recovery phrase input search results.'
-  },
-  invalidRecoveryPhrase: {
-    id: 'transfer.form.errors.invalidRecoveryPhrase',
-    defaultMessage: '!!!Invalid recovery phrase',
-    description: 'Error message shown when invalid recovery phrase was entered.'
+  masterKeyRequirements: {
+    id: 'transfer.form.masterkey.requirement',
+    defaultMessage: '!!!Note: master keys are 192 characters and hexadecimal-encoded',
+    description: 'Description of master key format'
   },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
+messages.invalidMasterKey = globalMessages.invalidMasterKey;
 messages.nextButtonLabel = globalMessages.nextButtonLabel;
 messages.backButtonLabel = globalMessages.backButtonLabel;
 messages.step1 = globalMessages.step1;
@@ -46,14 +41,11 @@ messages.instructionTitle = globalMessages.instructionTitle;
 type Props = {
   onSubmit: Function,
   onBack: Function,
-  mnemonicValidator: Function,
-  validWords: Array<string>,
   step0: string,
-  mnemonicLength: number
 };
 
 @observer
-export default class TransferMnemonicPage extends Component<Props> {
+export default class TransferMasterKeyPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -61,17 +53,22 @@ export default class TransferMnemonicPage extends Component<Props> {
 
   form = new ReactToolboxMobxForm({
     fields: {
-      recoveryPhrase: {
-        label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.recoveryPhraseInputHint),
+      masterKey: {
+        label: this.context.intl.formatMessage(messages.masterKeyInputLabel),
+        placeholder: this.context.intl.formatMessage(messages.masterKeyInputHint),
         value: '',
         validators: [({ field }) => {
-          const value = join(field.value, ' ');
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
-          return [
-            this.props.mnemonicValidator(value),
-            this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
-          ];
+          const value = field.value;
+          if (value === '') {
+            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          }
+          if (value.length !== 192) {
+            return [false, this.context.intl.formatMessage(messages.invalidMasterKey)];
+          }
+          if (!value.match('^[0-9a-fA-F]+$')) {
+            return [false, this.context.intl.formatMessage(messages.invalidMasterKey)];
+          }
+          return true;
         }],
       },
     },
@@ -85,9 +82,9 @@ export default class TransferMnemonicPage extends Component<Props> {
   submit = () => {
     this.form.submit({
       onSuccess: (form) => {
-        const { recoveryPhrase } = form.values();
+        const { masterKey } = form.values();
         const payload = {
-          recoveryPhrase: join(recoveryPhrase, ' '),
+          masterKey,
         };
         this.props.onSubmit(payload);
       },
@@ -98,7 +95,7 @@ export default class TransferMnemonicPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, onBack, step0, mnemonicLength } = this.props;
+    const { onBack, step0 } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -111,7 +108,7 @@ export default class TransferMnemonicPage extends Component<Props> {
       styles.button,
     ]);
 
-    const recoveryPhraseField = form.$('recoveryPhrase');
+    const masterKeyField = form.$('masterKey');
 
     return (
       <div className={styles.component}>
@@ -130,19 +127,19 @@ export default class TransferMnemonicPage extends Component<Props> {
                   <div className={styles.text}>
                     {step0}
                     {intl.formatMessage(messages.step1)}
+                    <br /><br />
+                    {intl.formatMessage(messages.masterKeyRequirements)}
                   </div>
                 }
               </ul>
             </div>
 
-            <Autocomplete
-              options={validWords}
-              maxSelections={mnemonicLength}
-              {...recoveryPhraseField.bind()}
-              error={recoveryPhraseField.error}
-              maxVisibleOptions={5}
-              noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={AutocompleteSkin}
+            <Input
+              className="masterKey"
+              autoComplete="off"
+              {...masterKeyField.bind()}
+              error={masterKeyField.error}
+              skin={InputSkin}
             />
 
             <div className={styles.buttonsWrapper}>

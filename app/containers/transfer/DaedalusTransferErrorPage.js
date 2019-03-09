@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import ErrorPage from '../../components/transfer/ErrorPage';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
@@ -11,12 +12,9 @@ const messages = defineMessages({
     defaultMessage: '!!!Unable to restore Daedalus wallet',
     description: 'Label "Unable to restore Daedalus wallet" on the Daedalus transfer error page.'
   },
-  backButtonLabel: {
-    id: 'daedalusTransfer.errorPage.backButton.label',
-    defaultMessage: '!!!Back',
-    description: 'Label "Back" on the Daedalus transfer error page.'
-  },
 });
+
+messages.backButtonLabel = globalMessages.backButtonLabel;
 
 type Props = {
   error?: ?LocalizableError,

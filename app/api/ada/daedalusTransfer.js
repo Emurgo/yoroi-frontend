@@ -21,9 +21,6 @@ import {
   GenerateTransferTxError
 } from './errors';
 import {
-  getCryptoDaedalusWalletFromMnemonics
-} from './lib/cardanoCrypto/cryptoWallet';
-import {
   getAllUTXOsForAddresses
 } from './adaTransactions/adaNewTransactions';
 import type {
@@ -38,14 +35,11 @@ import { getReceiverAddress } from './adaAddress';
  * @param fullUtxo the full utxo of the Cardano blockchain
  */
 export function getAddressesWithFunds(payload: {
-  secretWords: string,
+  checker: CryptoAddressChecker,
   fullUtxo: Array<string>
 }): Array<CryptoDaedalusAddressRestored> {
   try {
-    const { secretWords, fullUtxo } = payload;
-    const checker: CryptoAddressChecker = getResultOrFail(
-      RandomAddressChecker.newCheckerFromMnemonics(secretWords)
-    );
+    const { checker, fullUtxo } = payload;
     const addressesWithFunds: Array<CryptoDaedalusAddressRestored> = getResultOrFail(
       RandomAddressChecker.checkAddresses(checker, fullUtxo)
     );
@@ -58,12 +52,12 @@ export function getAddressesWithFunds(payload: {
 
 /** Generate transaction including all addresses with no change */
 export async function generateTransferTx(payload: {
-  secretWords: string,
+  wallet: CryptoDaedalusWallet,
   addressesWithFunds: Array<CryptoDaedalusAddressRestored>
 }): Promise<TransferTx> {
   try {
 
-    const { secretWords, addressesWithFunds } = payload;
+    const { wallet, addressesWithFunds } = payload;
 
     // fetch data to make transaction
     const senders = addressesWithFunds.map(a => a.address);
@@ -78,8 +72,7 @@ export async function generateTransferTx(payload: {
     // pick which address to send transfer to
     const output = await getReceiverAddress();
 
-    // get wallet and make transaction
-    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
+    // make transaction
     const tx: MoveResponse = getResultOrFail(Wallet.move(wallet, inputs, output));
 
     // return summary of transaction

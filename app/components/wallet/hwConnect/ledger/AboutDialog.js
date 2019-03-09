@@ -124,7 +124,7 @@ export default class AboutDialog extends Component<Props> {
 
     const dailogActions = [{
       className: isActionProcessing ? styles.processing : null,
-      label: intl.formatMessage(globalMessages.hwConnectDialogNextButtonLabel),
+      label: intl.formatMessage(globalMessages.nextButtonLabel),
       primary: true,
       disabled: false,
       onClick: submit,

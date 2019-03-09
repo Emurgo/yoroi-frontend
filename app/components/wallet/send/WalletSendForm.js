@@ -66,11 +66,6 @@ const messages = defineMessages({
     defaultMessage: '!!!You can add a message if you want',
     description: 'Hint in the "description" text area in the wallet send form.'
   },
-  nextButtonLabel: {
-    id: 'wallet.send.form.next',
-    defaultMessage: '!!!Next',
-    description: 'Label for the next button on the wallet send form.'
-  },
   invalidAddress: {
     id: 'wallet.send.form.errors.invalidAddress',
     defaultMessage: '!!!Please enter a valid address.',
@@ -104,6 +99,7 @@ const messages = defineMessages({
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
+messages.nextButtonLabel = globalMessages.nextButtonLabel;
 
 type Props = {
   currencyUnit: string,
