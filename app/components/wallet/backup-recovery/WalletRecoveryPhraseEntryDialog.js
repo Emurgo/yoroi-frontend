@@ -25,6 +25,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Remove last',
     description: 'Label for button "Remove Last" on wallet backup dialog'
   },
+  buttonLabelConfirm: {
+    id: 'wallet.recovery.phrase.show.entry.dialog.button.labelConfirm',
+    defaultMessage: '!!!Confirm',
+    description: 'Label for button "Confirm" on wallet backup dialog'
+  },
   buttonLabelClear: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelClear',
     defaultMessage: '!!!Clear',
@@ -56,6 +61,7 @@ type Props = {
   onAcceptTermRecovery: Function,
   onRestartBackup: Function,
   onCancelBackup: Function,
+  onFinishBackup: Function,
   removeWord: Function,
   hasWord: Function
 };
@@ -83,6 +89,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       removeWord,
       onRestartBackup,
       onCancelBackup,
+      onFinishBackup,
       hasWord
     } = this.props;
     const dialogClasses = classnames([
@@ -94,18 +101,24 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
 
     const actions = [];
 
-    actions.push({
-      label: intl.formatMessage(messages.buttonLabelRemoveLast),
-      onClick: removeWord,
-      disabled: !hasWord,
-      primary: true
-    });
-
     // Only show "Clear" button when user is not yet done with entering mnemonic
     if (!isValid) {
       actions.unshift({
+        label: intl.formatMessage(messages.buttonLabelRemoveLast),
+        onClick: removeWord,
+        disabled: !hasWord,
+        primary: true
+      });
+      actions.unshift({
         label: intl.formatMessage(messages.buttonLabelClear),
         onClick: onClear,
+        primary: true
+      });
+    } else {
+      actions.push({
+        className: isSubmitting ? styles.isSubmitting : null,
+        label: intl.formatMessage(messages.buttonLabelConfirm),
+        onClick: onFinishBackup,
         primary: true
       });
     }

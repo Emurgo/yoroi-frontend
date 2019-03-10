@@ -35,6 +35,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       acceptWalletBackupTermDevice,
       acceptWalletBackupTermRecovery,
       restartWalletBackup,
+      finishWalletBackup,
       removeOneMnemonicWord,
       acceptPrivacyNoticeForWalletBackup,
       continueToRecoveryPhraseForWalletBackup
@@ -65,6 +66,9 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         onAcceptTermRecovery={acceptWalletBackupTermRecovery.trigger}
         onAddWord={addWordToWalletBackupVerification.trigger}
         onClear={clearEnteredRecoveryPhrase.trigger}
+        onFinishBackup={() => {
+          finishWalletBackup.trigger();
+        }}
         removeWord={() => {
           removeOneMnemonicWord.trigger();
         }}

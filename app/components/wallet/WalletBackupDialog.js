@@ -25,6 +25,7 @@ type Props = {
   onAcceptTermRecovery: Function,
   onAddWord: Function,
   onClear: Function,
+  onFinishBackup: Function,
   onRestartBackup: Function,
   removeWord: Function,
   hasWord: Function
@@ -43,7 +44,7 @@ export default class WalletBackupDialog extends Component<Props> {
       enteredPhrase, removeWord, hasWord,
       isTermRecoveryAccepted, isValid, isSubmitting,
       onAcceptTermDevice, onAcceptTermRecovery,
-      onAddWord, onClear,
+      onAddWord, onClear, onFinishBackup,
       onRestartBackup, recoveryPhraseSorted,
     } = this.props;
 
@@ -85,6 +86,7 @@ export default class WalletBackupDialog extends Component<Props> {
           onClear={onClear}
           onRestartBackup={onRestartBackup}
           recoveryPhraseSorted={recoveryPhraseSorted}
+          onFinishBackup={onFinishBackup}
           removeWord={removeWord}
           hasWord={hasWord}
         />

@@ -190,6 +190,7 @@
   "wallet.receive.page.walletAddressLabel": "Адрес Вашего кошелька",
   "wallet.receive.page.walletReceiveInstructions": "Поделитесь данным адресом кошелька для получения платежей. Для защиты Вашей конфиденциальности, новые адреса генерируются автоматически после того, как Вы их использовали.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Очистить",
+  "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Подтвердить",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "!!!Remove last",
   "wallet.redeem.choices.tab.title.forceVended": "Форсированная продажа",
   "wallet.redeem.choices.tab.title.paperVended": "Продажа документа",
