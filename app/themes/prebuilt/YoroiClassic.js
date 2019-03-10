@@ -308,7 +308,6 @@ export default {
   '--theme-icon-nav-color-active': '#ffffff',
   '--theme-icon-topbar-color': '#fafbfc',
   '--theme-icon-toggle-menu-color': '#fafbfc',
-  '--theme-icon-ada-summary-wallet-amount-symbol-color': '#121327',
   '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#121327',
   '--theme-icon-ada-redemption-attention-color': '#fafbfc',
   '--theme-icon-ada-redemption-success-color': '#fafbfc',

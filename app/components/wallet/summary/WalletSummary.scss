@@ -59,43 +59,6 @@ $rightBlockWidth: $leftBlockWidth;
   }
 }
 
-.walletName {
-  font-family: var(--font-regular);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.38;
-  letter-spacing: 0.5px;
-  color: var(--theme-bordered-box-text-color);
-  margin-bottom: 5px;
-  text-transform: uppercase;
-}
-
-.walletAmount {
-  font-family: var(--font-thin);
-  font-size: 40px;
-  line-height: 1.0;
-  color: var(--theme-bordered-box-text-color);
-  margin-bottom: 5px;
-  word-break: break-all;
-
-  & > .decimal {
-    font-family: var(--font-medium);
-    font-size: 18px;
-  }
-
-  & > .currencySymbolBig {
-    display: inline-block;
-    margin-left: 10px;
-    & > svg {
-      width: 25px;
-      height: 27.5px;
-      & > g > g {
-        stroke: var(--theme-icon-ada-summary-wallet-amount-symbol-color);
-      }
-    }
-  }
-}
-
 .pendingConfirmation {
   @extend %smallText;
   & > .currencySymbolSmallest {
