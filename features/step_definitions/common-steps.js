@@ -134,33 +134,72 @@ function refreshWallet(client) {
   });
 }
 
+/**
+ * Note: this function is called multiple times
+ * Once for each wallet in the inheritance hierarchy of the test
+ * Notably, if the test loads a wallet in "Background" and again in a specific test
+ */
 async function storeWallet(client, walletName) {
   const featureData = getFeatureData();
   if (!featureData) {
     return;
   }
-  const { masterKey, wallet, cryptoAccount, adaAddresses, walletInitialData } = featureData;
+  const {
+    masterKey,
+    wallet,
+    cryptoAccount,
+    adaAddresses,
+    walletInitialData,
+    usedAddresses
+  } = featureData;
+
   if (wallet === undefined) {
     return;
   }
   wallet.cwMeta.cwName = walletName;
 
-  await client.saveToLocalStorage('WALLET', { adaWallet: wallet, masterKey });
+  const totalGeneratedAddresses = (
+    walletName &&
+    walletInitialData &&
+    walletInitialData[walletName] &&
+    walletInitialData[walletName].totalAddresses
+  ) || 0;
+
+  await client.saveToLocalStorage('WALLET', {
+    adaWallet: wallet,
+    masterKey,
+    lastReceiveAddressIndex: Math.max(
+      usedAddresses ? usedAddresses.length - 1 : 0,
+      0
+    )
+  });
   await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
+
+  let externalAddressesToSave = [];
 
   /* Obs: If "with $number addresses" is include in the sentence,
      we override the wallet with fake addresses" */
-  if (walletName &&
-      walletInitialData &&
-      walletInitialData[walletName] &&
-      walletInitialData[walletName].totalAddresses
-  ) {
-    client.saveAddressesToDB(getFakeAddresses(
-      walletInitialData[walletName].totalAddresses,
-      walletInitialData[walletName].addressesStartingWith
-    ));
-  } else {
-    client.saveAddressesToDB(adaAddresses);
+  if (totalGeneratedAddresses) {
+    externalAddressesToSave = getFakeAddresses(
+      totalGeneratedAddresses,
+      // $FlowFixMe walletInitialData has to exist for this branch to be hit so ignore the error
+      walletInitialData[walletName].addressesStartingWith,
+    );
+  } else if (adaAddresses) {
+    externalAddressesToSave = adaAddresses;
   }
+
+  client.saveAddressesToDB(externalAddressesToSave, 'External');
+  client.saveAddressesToDB([{
+    cadAmount: {
+      getCCoin: '0'
+    },
+    cadId: 'Ae2tdPwUPEZJ9HwF8zATdjWcbMTpWAMSMLMxpzdwxiou6evpT57cixBaVyh',
+    cadIsUsed: false,
+    account: 0,
+    change: 1,
+    index: 0
+  }], 'Internal');
+
   await refreshWallet(client);
 }

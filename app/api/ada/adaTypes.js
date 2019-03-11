@@ -64,8 +64,16 @@ export type AdaAmount = {
 export type AdaTransactionTag = 'CTIn' | 'CTOut';
 
 export type AdaAddress = {
+  /**
+   * TODO: misleading as the value inside DB is always stale
+   * Is is only updated in-memory after DB fetch
+  */
   cadAmount: AdaAmount,
   cadId: string,
+  /**
+   * TODO: misleading as the value inside DB is always stale
+   * Is is only updated in-memory after DB fetch
+  */
   cadIsUsed: boolean,
   account: number,
   change: number,

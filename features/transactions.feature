@@ -144,6 +144,7 @@ Feature: Send transaction
   @it-89
   Scenario: Try to make a transactions from the empty wallet (IT-89)
     Given There is a wallet stored named empty-wallet
+    Given I cleared my local balance
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |

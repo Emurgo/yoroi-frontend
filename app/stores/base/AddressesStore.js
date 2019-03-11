@@ -102,5 +102,4 @@ export default class AddressesStore extends Store {
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
     return new CachedRequest(this.api[environment.API].getExternalAddresses);
   };
-
 }
