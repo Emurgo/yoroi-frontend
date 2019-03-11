@@ -54,7 +54,7 @@ export async function createTrezorSignTxPayload(
     inputs: trezorInputs,
     outputs: trezorOutputs,
     transactions: txsBodies,
-    protocol_magic: CONFIG.network.trezorProtocolMagic,
+    protocol_magic: CONFIG.network.protocolMagic,
   };
 }
 

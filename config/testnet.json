@@ -3,8 +3,7 @@
     "protocolMagic": 1097911063,
     "backendUrl": "https://18.207.22.26:8080",
     "websocketUrl": "wss://18.207.22.26:8080",
-    "name": "testnet",
-    "trezorProtocolMagic": 1097911063
+    "name": "testnet"
   },
   "app": {
     "walletRefreshInterval": 20000,

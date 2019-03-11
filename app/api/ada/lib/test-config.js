@@ -6,8 +6,7 @@ const CONFIG: ConfigType = {
     protocolMagic: 764824073,
     backendUrl: '',
     websocketUrl: '',
-    name: 'mainnet',
-    trezorProtocolMagic: 764824073
+    name: 'mainnet'
   },
   app: {
     walletRefreshInterval: 10,
