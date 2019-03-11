@@ -1,4 +1,6 @@
 // @flow
+
+// https://github.com/trezor/connect/issues/350
 export type TrezorInput = {
   path: string,
   prev_hash: string,
@@ -15,6 +17,6 @@ export type TrezorOutput = {
 export type TrezorSignTxPayload = {
   inputs: Array<TrezorInput>,
   outputs: Array<TrezorOutput>,
-  transactions: Array<any>,
-  network: 1 | 2 // 1 = Testnet | 2 = Mainnet
+  transactions: Array<string>,
+  protocol_magic: number // 764824073 = mainnet | 1097911063 = testnet (not yet supported)
 }
