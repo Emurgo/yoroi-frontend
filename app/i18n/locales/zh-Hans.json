@@ -353,6 +353,6 @@
   "wallet.connect.trezor.dialog.step.save.walletName.info": "我们已为您取了Trezor设备的名称。您可以按原样使用, 也可以指定不同的名称。",
   "wallet.connect.trezor.dialog.title.label": "连接到Trezor硬件钱包",
   "wallet.connect.trezor.error.101": "无法连接 trezor.io。请检查您的互联网连接, 然后重试。",
-  "wallet.connect.trezor.error.102": "用户未授予必要的权限。请重试。",
+  "wallet.hw.common.error.101": "用户未授予必要的权限。请重试。",
   "wallet.connect.trezor.error.103": "取消。请重试。"
 }

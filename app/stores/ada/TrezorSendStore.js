@@ -150,7 +150,7 @@ export default class TrezorSendStore extends Store {
           localizableError = new LocalizableError(globalMessages.trezorError101);
           break;
         case 'Permissions not granted':
-          localizableError = new LocalizableError(globalMessages.trezorError102);
+          localizableError = new LocalizableError(globalMessages.hwError101);
           break;
         case 'Cancelled':
         case 'Popup closed':

@@ -162,13 +162,6 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
         // i.e hdPath = [2147483692, 2147485463, 2147483648]
         const extendedPublicKeyResp: GetExtendedPublicKeyResponse
           = await ledgerBridge.getExtendedPublicKey(CARDANO_FIRST_ACCOUNT_SUB_PATH);
-        Logger.debug(stringifyData(extendedPublicKeyResp));
-
-        // 🔻TOD0: Delete. Debug purposes
-        const firstAdressHDPath = [...CARDANO_FIRST_ACCOUNT_SUB_PATH, 0, 0];
-        const address = await ledgerBridge.deriveAddress(firstAdressHDPath);
-        Logger.debug(stringifyData(address));
-        // 🔺TOD0: Delete. Debug purposes
 
         this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
 
@@ -223,7 +216,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     return true;
   };
 
-  _handleConnectError = (error): void => {
+  _handleConnectError = (error: any): void => {
     Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;
@@ -242,29 +235,21 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
       // It means some API Error has been thrown
       localizableError = error;
     } else if (error && error.message) {
-      // // Trezor device related error happend, convert then to LocalizableError
-      // // TODO: [TREZOR] check for device not supported if needed
-      // switch (error.message) {
-      //   case 'Iframe timeout':
-      //     localizableError = new LocalizableError(globalMessages.trezorError101);
-      //     break;
-      //   case 'Permissions not granted':
-      //     localizableError = new LocalizableError(globalMessages.trezorError102);
-      //     break;
-      //   case 'Cancelled':
-      //   case 'Popup closed':
-      //     localizableError = new LocalizableError(globalMessages.trezorError103);
-      //     break;
-      //   case 'Signing cancelled':
-      //     localizableError = new LocalizableError(messages.signTxError101);
-      //     break;
-      //   default:
-      //     /** we are not able to figure out why Error is thrown
-      //       * make it, Something unexpected happened */
-      //     Logger.error(`TrezorSendStore::_convertToLocalizableError::error: ${error.message}`);
-      //     localizableError = new UnexpectedError();
-      //     break;
-      // }
+      // Ledger device related error happend, convert then to LocalizableError
+      switch (error.message) {
+        case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
+          localizableError = new LocalizableError(globalMessages.ledgerError101);
+          break;
+        case 'TransportStatusError: Ledger device: Action rejected by user':
+          localizableError = new LocalizableError(globalMessages.hwError101);
+          break;
+        default:
+          /** we are not able to figure out why Error is thrown
+            * make it, Something unexpected happened */
+          Logger.error(`LedgerConnectStore::_convertToLocalizableError::error: ${error.message}`);
+          localizableError = new UnexpectedError();
+          break;
+      }
     }
 
     if (!localizableError) {

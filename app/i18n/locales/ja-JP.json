@@ -353,6 +353,6 @@
   "wallet.connect.trezor.dialog.step.save.walletName.info": "Trezorデバイス名を読み出しました。このまま使用するか、任意の名前を入力してください。",
   "wallet.connect.trezor.dialog.title.label": "Trezorハードウェアウォレットに接続",
   "wallet.connect.trezor.error.101": "Trezor.ioへの接続に失敗しました。インターネット接続を確認して再試行してください。",
-  "wallet.connect.trezor.error.102": "アクセス許可が得られませんでした。再試行してください。",
+  "wallet.hw.common.error.101": "アクセス許可が得られませんでした。再試行してください。",
   "wallet.connect.trezor.error.103": "キャンセルされました。再試行してください。"
 }

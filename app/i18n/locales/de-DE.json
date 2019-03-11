@@ -353,6 +353,6 @@
   "wallet.connect.trezor.dialog.step.save.walletName.info": "Wir haben den Namen des Trezor-Geräts abgerufen. Es kann so verwendet oder mit einem anderen Namen versehen werden.",
   "wallet.connect.trezor.dialog.title.label": "MIT DEM TREZOR HARDWARE WALLET VERBINDEN",
   "wallet.connect.trezor.error.101": "Verbindung zu trezor.io fehlgeschlagen. Bitte die Internetverbindung prüfen und erneut versuchen.",
-  "wallet.connect.trezor.error.102": "Es sind keine ausreichenden Berechtigungen erteilt worden. Bitte erneut versuchen.",
+  "wallet.hw.common.error.101": "Es sind keine ausreichenden Berechtigungen erteilt worden. Bitte erneut versuchen.",
   "wallet.connect.trezor.error.103": "Abgebrochen. Bitte wiederholen."
 }
