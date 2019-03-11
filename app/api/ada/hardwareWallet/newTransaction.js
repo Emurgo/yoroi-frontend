@@ -71,7 +71,8 @@ export async function createTrezorSignTxPayload(
   const trezorOutputs = _generateTrezorOutputs(txExt.outputs);
 
   // Transactions
-  const txsBodies = await txsBodiesForInputs(txExt.inputs);
+  const txsBodiesMap = await txsBodiesForInputs(txExt.inputs);
+  const txsBodies = txExt.inputs.map((x: TxInput) => txsBodiesMap[x.ptr.id]);
 
   return {
     inputs: trezorInputs,
@@ -84,7 +85,7 @@ export async function createTrezorSignTxPayload(
 /** List of Body hashes for a list of utxos by batching backend requests */
 export async function txsBodiesForInputs(
   inputs: Array<TxInput>
-): Promise<Array<string>> {
+): Promise<{[key: string]:string}> {
   if (!inputs) return [];
   try {
 
@@ -100,9 +101,14 @@ export async function txsBodiesForInputs(
 
     // Sum up all the utxo
     return Promise.all(promises)
-      .then(groupsOfTxBodies => (
-        groupsOfTxBodies.reduce((acc, groupOfTxBodies) => acc.concat(groupOfTxBodies), [])
-      ));
+      .then(groupsOfTxBodies => {
+        const bodies = groupsOfTxBodies
+          .reduce((acc, groupOfTxBodies) => Object.assign(acc, groupOfTxBodies), {});
+        if (txsHashes.length !== Object.keys(bodies).length) {
+          throw new GetTxsBodiesForUTXOsError();
+        }
+        return bodies;
+      });
   } catch (getTxBodiesError) {
     Logger.error('newTransaction::txsBodiesForInputs error: ' +
       stringifyError(getTxBodiesError));
@@ -183,11 +189,11 @@ export async function createLedgerSignTxPayload(
 ): Promise<LedgerSignTxPayload> {
 
   // Transactions Hash
-  const txDataHexList = await txsBodiesForInputs(txExt.inputs);
+  const txDataHexMap = await txsBodiesForInputs(txExt.inputs);
 
   // Inputs
   const ledgerInputs: Array<InputTypeUTxO> =
-    _transformToLedgerInputs(txExt.inputs, txDataHexList);
+    _transformToLedgerInputs(txExt.inputs, txDataHexMap);
 
   // Outputs
   const ledgerOutputs: Array<OutputTypeAddress | OutputTypeChange> =
@@ -209,10 +215,10 @@ function _derivePathAsBIP32Path(
 
 function _transformToLedgerInputs(
   inputs: Array<TxInput>,
-  txDataHexList: Array<string>
+  txDataHexMap: {[key: string]:string}
 ): Array<InputTypeUTxO> {
-  return inputs.map((input: TxInput, idx: number) => ({
-    txDataHex: txDataHexList[idx],
+  return inputs.map((input: TxInput) => ({
+    txDataHex: txDataHexMap[input.ptr.id],
     outputIndex: input.ptr.index,
     path: _derivePathAsBIP32Path(input.addressing.change, input.addressing.index),
   }));
