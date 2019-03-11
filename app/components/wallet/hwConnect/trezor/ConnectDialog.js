@@ -38,11 +38,6 @@ const messages = defineMessages({
     defaultMessage: '!!!A new tab will appear, please follow the instructions in the new tab.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
-  connectIntroTextLine3: {
-    id: 'wallet.connect.trezor.dialog.step.connect.introText.line.3',
-    defaultMessage: '!!!This process shares the Cardano public key with Yoroi.',
-    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
-  },
 });
 
 type Props = {
@@ -69,7 +64,7 @@ export default class ConnectDialog extends Component<Props> {
       <div className={styles.headerBlock}>
         <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
         <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br />
-        <span>{intl.formatMessage(messages.connectIntroTextLine3)}</span><br />
+        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span><br />
       </div>);
 
     let middleBlock = null;
