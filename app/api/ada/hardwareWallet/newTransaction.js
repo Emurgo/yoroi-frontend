@@ -24,7 +24,7 @@ import {
 } from '../errors';
 import type {
   BroadcastTrezorSignedTxResponse,
-  BroadcastLedgerSignedTxResponse
+  PrepareAndBroadcastLedgerSignedTxResponse
 } from '../../common';
 import type {
   TrezorInput,
@@ -242,27 +242,25 @@ function _ledgerOutputAddress58OrPath(
 }
 
 /** Send a transaction and save the new change address */
-// TODO: Change name. This does way moer than ”broadcast”
-export async function broadcastLedgerSignedTx(
+export async function prepareAndBroadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
   changeAdaAddr: AdaAddress,
   unsignedTx: any,
   txExt: UnsignedTransactionExt
-): Promise<BroadcastLedgerSignedTxResponse> {
+): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
   try {
-    Logger.debug('newTransaction::broadcastLedgerSignedTx: called');
+    Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');
 
     // Since Ledger only provide witness signature
     // need to make full broadcastable signed Tx
-    Logger.debug(`newTransaction::broadcastLedgerSignedTx unsignedTx: ${stringifyData(unsignedTx)}`);
+    Logger.debug(`newTransaction::prepareAndBroadcastLedgerSignedTx unsignedTx: ${stringifyData(unsignedTx)}`);
     const signedTxHex: string = await prepareLedgerSignedTxBody(
       ledgerSignTxResp,
       unsignedTx,
-      txExt,
-      changeAdaAddr
+      txExt
     );
 
-    Logger.debug('newTransaction::broadcastLedgerSignedTx: called');
+    Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');
     const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
 
     // We assume a change address is used. Currently, there is no way to perfectly match the tx.
@@ -271,11 +269,11 @@ export async function broadcastLedgerSignedTx(
     await saveAdaAddress(changeAdaAddr, 'Internal');
     const body = { signedTx };
     const backendResponse = await sendTx(body);
-    Logger.debug('newTransaction::broadcastLedgerSignedTx: success');
+    Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: success');
 
     return backendResponse;
   } catch (sendTxError) {
-    Logger.error('newTransaction::broadcastLedgerSignedTx error: ' + stringifyError(sendTxError));
+    Logger.error('newTransaction::prepareAndBroadcastLedgerSignedTx error: ' + stringifyError(sendTxError));
 
     // On failure, we have to remove the change address we eagerly added
     // Note: we don't await on this
@@ -291,8 +289,7 @@ export async function broadcastLedgerSignedTx(
 function prepareLedgerSignedTxBody(
   ledgerSignTxResp: LedgerSignTxResponse,
   unsignedTx: any,
-  txExt: UnsignedTransactionExt,
-  changeAdaAddr: AdaAddress
+  txExt: UnsignedTransactionExt
 ): string {
   // TODO: add type to unsignedTx
 

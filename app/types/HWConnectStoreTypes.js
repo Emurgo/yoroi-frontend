@@ -53,11 +53,12 @@ export interface HWConnectStoreTypes {
   error: ?LocalizableError;
 
   /** device info which will be used to create wallet (except wallet name)
-    * also it holds Ledger device label which is used as default wallet name
-    * final wallet name will be fetched from the user */
+    * it also holds hardware device label which can used as default wallet name
+    * although final wallet name will be fetched from the user */
   hwDeviceInfo: ?HWDeviceInfo;
 
-  // Ledger device label
+  /** Hardware device label to be used as default wallet name
+    * although user can opt to use user give name */
   get defaultWalletName(): string;
 
   get isActionProcessing(): boolean;
@@ -66,12 +67,16 @@ export interface HWConnectStoreTypes {
   // =================== API RELATED =================== //
   createHWRequest: LocalizedRequest<CreateHardwareWalletRequest>;
 
-  /** While ledger wallet creation is taking place, we need to block users from starting a
-    * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
+  /** While hardware wallet creation is taking place, we need to block users from starting a
+    * hardware wallet creation on a seperate wallet and explain to them why the action is blocked */
   isCreateHWActive: boolean;
   // =================== API RELATED =================== //
 
   setup(): void;
+
+  /** setup() is called when stores are being created
+    * _init() is called when connect dailog is about to show */
+  _init(): void;
 
   teardown(): void;
 

@@ -160,7 +160,7 @@ export type CreateTransactionResponse = SignedResponse;
 
 export type BroadcastTrezorSignedTxResponse = SignedResponse;
 
-export type BroadcastLedgerSignedTxResponse = SignedResponse;
+export type PrepareAndBroadcastLedgerSignedTxResponse = SignedResponse;
 
 export type GetWalletsResponse = Array<Wallet>;
 

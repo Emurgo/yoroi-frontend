@@ -56,7 +56,7 @@ import {
   createTrezorSignTxPayload,
   broadcastTrezorSignedTx,
   createLedgerSignTxPayload,
-  broadcastLedgerSignedTx,
+  prepareAndBroadcastLedgerSignedTx,
 } from './hardwareWallet/newTransaction';
 import {
   GenericApiError,
@@ -96,7 +96,7 @@ import type {
   CreateHardwareWalletRequest,
   CreateHardwareWalletResponse,
   BroadcastTrezorSignedTxResponse,
-  BroadcastLedgerSignedTxResponse,
+  PrepareAndBroadcastLedgerSignedTxResponse,
 } from '../common';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -144,7 +144,7 @@ export type CreateLedgerSignTxDataResponse = {
   changeAddress: AdaAddress,
   txExt: UnsignedTransactionExt
 };
-export type BroadcastLedgerSignedTxRequest = {
+export type PrepareAndBroadcastLedgerSignedTxRequest = {
   ledgerSignTxResp: LedgerSignTxResponse,
   changeAdaAddr: AdaAddress,
   unsignedTx: any,
@@ -439,24 +439,24 @@ export default class AdaApi {
     }
   }
 
-  async broadcastLedgerSignedTx(
-    request: BroadcastLedgerSignedTxRequest
-  ): Promise<BroadcastLedgerSignedTxResponse> {
+  async prepareAndBroadcastLedgerSignedTx(
+    request: PrepareAndBroadcastLedgerSignedTxRequest
+  ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
     try {
-      Logger.debug('AdaApi::sendLedgerSignedTx called');
+      Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
 
       const { ledgerSignTxResp, changeAdaAddr, unsignedTx, txExt } = request;
-      const response = await broadcastLedgerSignedTx(
+      const response = await prepareAndBroadcastLedgerSignedTx(
         ledgerSignTxResp,
         changeAdaAddr,
         unsignedTx,
         txExt
       );
-      Logger.debug('AdaApi::broadcastLedgerSignedTx success: ' + stringifyData(response));
+      Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx success: ' + stringifyData(response));
 
       return response;
     } catch (error) {
-      Logger.error('AdaApi::broadcastLedgerSignedTx error: ' + stringifyError(error));
+      Logger.error('AdaApi::prepareAndBroadcastLedgerSignedTx error: ' + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.

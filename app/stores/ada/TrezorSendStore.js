@@ -144,7 +144,6 @@ export default class TrezorSendStore extends Store {
       localizableError = error;
     } else if (error && error.message) {
       // Trezor device related error happend, convert then to LocalizableError
-      // TODO: [TREZOR] check for device not supported if needed
       switch (error.message) {
         case 'Iframe timeout':
           localizableError = new LocalizableError(globalMessages.trezorError101);

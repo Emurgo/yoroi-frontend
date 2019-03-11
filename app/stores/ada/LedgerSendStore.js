@@ -19,9 +19,9 @@ import globalMessages from '../../i18n/global-messages';
 import type {
   CreateLedgerSignTxDataRequest,
   CreateLedgerSignTxDataResponse,
-  BroadcastLedgerSignedTxRequest,
+  PrepareAndBroadcastLedgerSignedTxRequest,
 } from '../../api/ada';
-import type { BroadcastLedgerSignedTxResponse } from '../../api/common';
+import type { PrepareAndBroadcastLedgerSignedTxResponse } from '../../api/common';
 
 import {
   Logger,
@@ -54,8 +54,8 @@ export default class LedgerSendStore extends Store {
   createLedgerSignTxDataRequest: LocalizedRequest<CreateLedgerSignTxDataResponse> =
     new LocalizedRequest(this.api.ada.createLedgerSignTxData);
 
-  broadcastLedgerSignedTxRequest: LocalizedRequest<BroadcastLedgerSignedTxResponse> =
-    new LocalizedRequest(this.api.ada.broadcastLedgerSignedTx);
+  broadcastLedgerSignedTxRequest: LocalizedRequest<PrepareAndBroadcastLedgerSignedTxResponse> =
+    new LocalizedRequest(this.api.ada.prepareAndBroadcastLedgerSignedTx);
   // =================== API RELATED =================== //
 
   setup() {
@@ -136,7 +136,12 @@ export default class LedgerSendStore extends Store {
         const ledgerSignTxResp: LedgerSignTxResponse =
           await ledgerBridge.signTransaction(unsignedTx.inputs, unsignedTx.outputs);
 
-        await this._broadcastSignedTx(ledgerSignTxResp, ledgerSignTxDataResp, unsignedTx);
+        await this._prepareAndBroadcastSignedTx(
+          ledgerSignTxResp,
+          ledgerSignTxDataResp,
+          unsignedTx
+        );
+
       } else {
         throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
       }
@@ -150,13 +155,13 @@ export default class LedgerSendStore extends Store {
     }
   };
 
-  _broadcastSignedTx = async (
+  _prepareAndBroadcastSignedTx = async (
     ledgerSignTxResp: LedgerSignTxResponse,
     createLedgerSignTxDataResp: CreateLedgerSignTxDataResponse,
     unsignedTx: any
   ): Promise<void> => {
 
-    const reqParams: BroadcastLedgerSignedTxRequest = {
+    const reqParams: PrepareAndBroadcastLedgerSignedTxRequest = {
       ledgerSignTxResp,
       changeAdaAddr: createLedgerSignTxDataResp.changeAddress,
       unsignedTx,

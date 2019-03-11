@@ -99,7 +99,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
       /** Preinitialization of TrezorConnect API will result in faster first response */
       // TODO [TREZOR]: sometimes when user does fast action initialization is still not complete
-      // try to use same approach as ledger [for now move this from _init() to setup()]
+      // try to use same approach as ledger [for now moving this from _init() to setup()]
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
@@ -190,7 +190,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       this._goToSaveLoad();
 
       /** TODO: [TREZOR] handle when user forcefully close Connect to Trezor Hardware Wallet
-        * while connection in in progress */
+        * while connection in is progress */
       this._removeTrezorConnectEventListeners();
       Logger.info('Trezor device OK');
     } catch (error) {
