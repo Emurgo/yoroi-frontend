@@ -185,7 +185,12 @@ export default defineMessages({
   hwConnectDialogAboutPrerequisiteHeader: {
     id: 'wallet.connect.hw.dialog.step.about.prerequisite.header',
     defaultMessage: '!!!Prerequisites',
-    description: 'Prerequisite header on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Prerequisite header on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogConnectIntroTextLine3: {
+    id: 'wallet.connect.hw.dialog.step.connect.introText.line.3',
+    defaultMessage: '!!!This process shares the Cardano public key with Yoroi.',
+    description: 'Header text of about step on the Connect to any Hardware Wallet dialog.'
   },
   hwConnectDialogSaveWalletNameInputLabel: {
     id: 'wallet.connect.hw.dialog.step.save.walletName.label',

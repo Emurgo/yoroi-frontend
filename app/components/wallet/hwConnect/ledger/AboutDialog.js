@@ -27,47 +27,47 @@ const messages = defineMessages({
   aboutPrerequisite1Part1: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1',
     defaultMessage: '!!!Only Supports ',
-    description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2Link: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link',
     defaultMessage: '!!!https://www.ledger.com/products/ledger-nano-s',
-    description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2LinkText: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link.text',
     defaultMessage: '!!!Ledger Nano S',
-    description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part3: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3',
     defaultMessage: '!!! model.',
-    description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite2Part1Link: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part1.link',
     defaultMessage: '!!!https://github.com/cardano-foundation/ledger-app-cardano',
-    description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Second Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite2Part1LinkText: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part1.link.text',
     defaultMessage: '!!!Cardano ADA',
-    description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Second Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite2Part2: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part2',
     defaultMessage: '!!!app must be installed on the Ledger device.',
-    description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Second Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.3',
-    defaultMessage: '!!!The Trezor device screen must be unlocked.',
-    description: 'Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    defaultMessage: '!!!Cardano ADA app must remain open on the Ledger device.',
+    description: 'Third Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite5: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.5',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
-    description: 'Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
+    description: 'Fifth Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
 });
 
