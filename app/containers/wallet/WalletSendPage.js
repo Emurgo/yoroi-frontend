@@ -25,7 +25,7 @@ import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirm
 const messagesLedger: MessageDescriptorMap = defineMessages({
   infoLine1: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.1',
-    defaultMessage: '!!!After connecting your Ledger device to your computer\'s USB port, press the Send using Ledger button.',
+    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
     description: 'Informative message line 1 in the ledger wallet send confirmation dialog.'
   },
   infoLine2: {

@@ -9,6 +9,8 @@ import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
+import type { LedgerSignTxPayload } from '../../domain/HWSignTx';
+
 import Store from '../base/Store';
 import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
@@ -37,12 +39,12 @@ import {
 const messages = defineMessages({
   signTxError101: {
     id: 'wallet.send.ledger.error.101',
-    defaultMessage: '!!!Signing cancelled on Ledger device. Please retry.',
-    description: '<Signing cancelled on Ledger device. Please retry.> on the Trezor send ADA confirmation dialog.'
+    defaultMessage: '!!!Signing cancelled on Ledger device. Please retry or reconnect device.',
+    description: '<Signing cancelled on Ledger device. Please retry.> on the Ledger send ADA confirmation dialog.'
   },
 });
 
-/** Note: Handles Trezor Signing */
+/** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
   // =================== VIEW RELATED =================== //
   @observable isActionProcessing: boolean = false;
@@ -125,10 +127,7 @@ export default class LedgerSendStore extends Store {
 
         await prepareLedgerBridger(ledgerBridge);
 
-        // TODO: Fix types
-        // inputs: Array<InputTypeUTxO>,
-        // outputs: Array<OutputTypeAddress | OutputTypeChange>
-        const unsignedTx = {
+        const unsignedTx: LedgerSignTxPayload = {
           inputs: ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
           outputs: ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
         };
@@ -158,7 +157,7 @@ export default class LedgerSendStore extends Store {
   _prepareAndBroadcastSignedTx = async (
     ledgerSignTxResp: LedgerSignTxResponse,
     createLedgerSignTxDataResp: CreateLedgerSignTxDataResponse,
-    unsignedTx: any
+    unsignedTx: LedgerSignTxPayload,
   ): Promise<void> => {
 
     const reqParams: PrepareAndBroadcastLedgerSignedTxRequest = {
@@ -168,8 +167,11 @@ export default class LedgerSendStore extends Store {
       txExt: createLedgerSignTxDataResp.txExt
     };
 
-    // TODO: [LEDGER] add error check
-    await this.broadcastLedgerSignedTxRequest.execute(reqParams).promise;
+    try {
+      await this.broadcastLedgerSignedTxRequest.execute(reqParams).promise;
+    } catch (error) {
+      Logger.error('LedgerSendStore::_prepareAndBroadcastSignedTx error: ' + stringifyError(error));
+    }
 
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
@@ -182,7 +184,7 @@ export default class LedgerSendStore extends Store {
     }
 
     this._reset();
-    Logger.info('SUCCESS: ADA sent using Trezor SignTx');
+    Logger.info('SUCCESS: ADA sent using Ledger SignTx');
   }
 
   /** Converts error(from API or Ledger API) to LocalizableError */
@@ -195,10 +197,10 @@ export default class LedgerSendStore extends Store {
     } else if (error && error.message) {
       // Ledger device related error happend, convert then to LocalizableError
       switch (error.message) {
-        case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
+        case 'TransportError: Failed to sign with Ledger device - U2F TIMEOUT':
           localizableError = new LocalizableError(globalMessages.ledgerError101);
           break;
-        case 'TransportStatusError: Ledger device: Action rejected by user':
+        case 'TransportStatusError: Ledger device - Action rejected by user':
           localizableError = new LocalizableError(messages.signTxError101);
           break;
         default:

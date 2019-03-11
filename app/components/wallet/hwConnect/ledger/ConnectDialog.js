@@ -30,7 +30,7 @@ const connectStartGIF = connectLoadGIF;
 const messages = defineMessages({
   connectIntroTextLine1: {
     id: 'wallet.connect.ledger.dialog.step.connect.introText.line.1',
-    defaultMessage: '!!!After connecting your Ledger device to your computer\'s USB port, press the Connect button.',
+    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Connect button.',
     description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectIntroTextLine2: {
