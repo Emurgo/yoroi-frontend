@@ -35,7 +35,7 @@ const saveStartSVG = saveLoadSVG;
 const messages = defineMessages({
   saveWalletNameInputBottomInfo: {
     id: 'wallet.connect.ledger.dialog.step.save.walletName.info',
-    defaultMessage: '!!!We have fetched Trezor device’s name for you; you can use as it is or assign a different name.',
+    defaultMessage: '!!!We have fetched Ledger device’s name for you; you can use as it is or assign a different name.',
     description: 'Hint for the wallet name input on the wallet restore dialog.'
   },
 });

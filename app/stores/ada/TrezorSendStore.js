@@ -64,7 +64,7 @@ export default class TrezorSendStore extends Store {
 
       if (this.isActionProcessing) {
         // this Error will be converted to LocalizableError()
-        throw new Error('Can\'t send another transaction if one transaction is in progress.');
+        throw new Error('Can’t send another transaction if one transaction is in progress.');
       }
 
       this._setError(null);
