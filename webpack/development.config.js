@@ -117,7 +117,7 @@ const baseDevConfig = () => ({
       {
         test: /\.inline\.svg$/,
         issuer: /\.js$/,
-        loader: 'svg-inline-loader?removeSVGTagAttrs=false&removeTags=true&removingTags=title&removingTags=desc&idPrefix=[sha512:hash:hex:5]-',
+        loader: 'svg-inline-loader?removeSVGTagAttrs=false&removeTags=true&removingTags[]=title&removingTags[]=desc&idPrefix=[sha512:hash:hex:5]-',
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
