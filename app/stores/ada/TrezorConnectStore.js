@@ -231,7 +231,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
         case 'Iframe timeout':
           throw new LocalizableError(globalMessages.trezorError101);
         case 'Permissions not granted':
-          throw new LocalizableError(globalMessages.trezorError102);
+          throw new LocalizableError(globalMessages.hwError101);
         case 'Cancelled':
         case 'Popup closed':
           throw new LocalizableError(globalMessages.trezorError103);

@@ -202,6 +202,11 @@ export default defineMessages({
     defaultMessage: '!!!Connect to Ledger Hardware Wallet',
     description: 'Label "Connect to Ledger Hardware Wallet" on the Connect to Ledger Hardware Wallet dialog.'
   },
+  ledgerError101: {
+    id: 'wallet.connect.ledger.error.101',
+    defaultMessage: '!!!Failed to connect. Please check your ledger device and retry.',
+    description: '<Ledger device not found. Please check your ledger device and retry.>'
+  },
   trezorConnectAllDialogTitle: {
     id: 'wallet.connect.trezor.dialog.title.label',
     defaultMessage: '!!!Connect to Trezor Hardware Wallet',
@@ -212,8 +217,8 @@ export default defineMessages({
     defaultMessage: '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
     description: '<Failed to connect trezor.io. Please check your Internet connection and retry.>'
   },
-  trezorError102: {
-    id: 'wallet.connect.trezor.error.102',
+  hwError101: {
+    id: 'wallet.hw.common.error.101',
     defaultMessage: '!!!Necessary permissions were not granted by the user. Please retry.',
     description: '<Necessary permissions were not granted by the user. Please retry.>'
   },

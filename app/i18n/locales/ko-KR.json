@@ -344,6 +344,6 @@
   "wallet.connect.trezor.dialog.step.save.walletName.info": "TREZOR 디바이스의 이름을 가져왔습니다. 이름을 그대로 사용하거나 다른 이름을 지정할 수 있습니다.",
   "wallet.connect.trezor.dialog.title.label": "TREZOR 하드웨어 지갑에 연결하기",
   "wallet.connect.trezor.error.101": "trezor.io에 접속하지 못했습니다. 인터넷 연결상태를 확인하고 다시 시도해 주십시오.",
-  "wallet.connect.trezor.error.102": "필요한 권한이 주어지지 않았습니다. 다시 시도해 주십시오.",
+  "wallet.hw.common.error.101": "필요한 권한이 주어지지 않았습니다. 다시 시도해 주십시오.",
   "wallet.connect.trezor.error.103": "취소되었습니다. 다시 시도해 주십시오."
 }
