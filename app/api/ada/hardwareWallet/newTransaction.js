@@ -86,7 +86,7 @@ export async function createTrezorSignTxPayload(
 export async function txsBodiesForInputs(
   inputs: Array<TxInput>
 ): Promise<{[key: string]:string}> {
-  if (!inputs) return [];
+  if (!inputs) return {};
   try {
 
     // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
