@@ -44,19 +44,9 @@ const messages = defineMessages({
     defaultMessage: '!!! model.',
     description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
-  aboutPrerequisite2Part1Link: {
-    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part1.link',
-    defaultMessage: '!!!https://github.com/cardano-foundation/ledger-app-cardano',
-    description: 'Second Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
-  },
-  aboutPrerequisite2Part1LinkText: {
-    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part1.link.text',
-    defaultMessage: '!!!Cardano ADA',
-    description: 'Second Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
-  },
-  aboutPrerequisite2Part2: {
+  aboutPrerequisite2: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part2',
-    defaultMessage: '!!!app must be installed on the Ledger device.',
+    defaultMessage: '!!!Cardano ADA app must be installed on the Ledger device.',
     description: 'Second Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
@@ -121,13 +111,7 @@ export default class AboutDialog extends Component<Props> {
               </a>
               {intl.formatMessage(messages.aboutPrerequisite1Part3)}
             </li>
-            <li key="2">
-              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite2Part1Link)}>
-                {intl.formatMessage(messages.aboutPrerequisite2Part1LinkText)}
-                <SvgInline svg={externalLinkSVG} cleanup={['title']} />
-              </a>
-              {intl.formatMessage(messages.aboutPrerequisite2Part2)}
-            </li>
+            <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
             <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
             <li key="4">{intl.formatMessage(globalMessages.hwConnectDialogAboutPrerequisite4)}</li>
             <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
@@ -158,7 +142,7 @@ export default class AboutDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
+        {/* <HelpLinkBlock progressInfo={progressInfo} /> */}
         <HWErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }

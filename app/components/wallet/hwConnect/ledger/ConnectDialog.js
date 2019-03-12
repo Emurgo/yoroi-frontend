@@ -118,7 +118,7 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
+        {/* <HelpLinkBlock progressInfo={progressInfo} /> */}
         <HWErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
