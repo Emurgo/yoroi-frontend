@@ -14,7 +14,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
-import HelpLinkBlock from './HelpLinkBlock';
+// import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import saveLoadSVG from '../../../../assets/images/hardware-wallet/ledger/save-load.inline.svg';

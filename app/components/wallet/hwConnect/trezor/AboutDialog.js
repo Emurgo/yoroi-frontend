@@ -97,7 +97,7 @@ export default class AboutDialog extends Component<Props> {
       <div className={classnames([styles.middleBlock, styles.middleAboutBlock])}>
         <div className={styles.prerequisiteBlock}>
           <div>
-            <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />
+            <SvgInline svg={aboutPrerequisiteIconSVG} />
             <span className={styles.prerequisiteHeaderText}>
               {intl.formatMessage(globalMessages.hwConnectDialogAboutPrerequisiteHeader)}
             </span>
@@ -107,7 +107,7 @@ export default class AboutDialog extends Component<Props> {
               {intl.formatMessage(messages.aboutPrerequisite1Part1)}
               <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
                 {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText)}
-                <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+                <SvgInline svg={externalLinkSVG} />
               </a>
               {intl.formatMessage(messages.aboutPrerequisite1Part3)}
             </li>
@@ -118,7 +118,7 @@ export default class AboutDialog extends Component<Props> {
           </ul>
         </div>
         <div className={styles.hwImageBlock}>
-          <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
+          <SvgInline svg={aboutPrerequisiteTrezorSVG} />
         </div>
       </div>);
 

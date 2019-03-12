@@ -28,6 +28,7 @@ export async function prepareLedgerBridger(ledgerBridge: LedgerBridge): Promise<
   });
 }
 
+// TODO: not used, can remove getIFrame
 export function getIFrame(id: string): ?HTMLIFrameElement {
   const element = document.getElementById(id);
   if (element instanceof HTMLIFrameElement) {

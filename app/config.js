@@ -11,7 +11,11 @@ export default {
     hardwareWallet: {
       trezorT: {
         VENDOR: 'trezor.io',
-        MODEL: 'T'
+        MODEL: 'T',
+        manifest: {
+          EMAIL: 'systems@emurgo.io',
+          APP_URL: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb'
+        }
       },
       ledgerNanoS: {
         // Ledger doesn’t provide any device name so using hard-coded name
@@ -26,14 +30,5 @@ export default {
   },
   adaRedemption: {
     ADA_REDEMPTION_PASSPHRASE_LENGTH: 9
-  },
-  trezor: {
-    // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoGetPublicKey.md
-    // https://cardanolaunch.com/assets/Ed25519_BIP.pdf
-    DEFAULT_CARDANO_PATH: 'm/44\'/1815\'/0\'',
-    manifest: {
-      EMAIL: 'systems@emurgo.io',
-      APP_URL: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb'
-    }
   }
 };

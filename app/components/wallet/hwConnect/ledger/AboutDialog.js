@@ -12,7 +12,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
-import HelpLinkBlock from './HelpLinkBlock';
+// import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
@@ -118,7 +118,7 @@ export default class AboutDialog extends Component<Props> {
           </ul>
         </div>
         <div className={styles.hwImageBlock}>
-          <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
+          <SvgInline svg={aboutPrerequisiteTrezorSVG} />
         </div>
       </div>);
 

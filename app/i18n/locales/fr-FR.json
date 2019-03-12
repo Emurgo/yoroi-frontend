@@ -227,7 +227,7 @@
   "wallet.footer.howToCreateWallet.text": "Comment créer un wallet",
   "wallet.footer.howToRestoreWallet.text": "Comment récupérer un wallet",
   "wallet.footer.whatIsHardwareWallet.text": "Qu'est ce qu'un hardware wallet",
-  "wallet.hw.common.error.101": "!!!Necessary permissions were not granted by the user. Please retry.",
+  "wallet.hw.common.error.101": "Les autorisations nécessaires n'ont pas été fournies par l'utilisateur. Veuillez réessayer.",
   "wallet.navigation.receive": "Recevoir",
   "wallet.navigation.send": "Envoyer",
   "wallet.navigation.transactions": "Transactions",

@@ -92,9 +92,10 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     try {
       /** Starting from v7 Trezor Connect Manifest has been made mandatory
         * https://github.com/trezor/connect/blob/develop/docs/index.md#trezor-connect-manifest */
+      const trezorTConfig = Config.wallets.hardwareWallet.trezorT;
       TrezorConnect.manifest({
-        email: Config.trezor.manifest.EMAIL,
-        appUrl: Config.trezor.manifest.APP_URL
+        email: trezorTConfig.manifest.EMAIL,
+        appUrl: trezorTConfig.manifest.APP_URL
       });
 
       /** Preinitialization of TrezorConnect API will result in faster first response */
@@ -103,7 +104,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
-    }    
+    }
   }
 
   /** setup() is called when stores are being created
