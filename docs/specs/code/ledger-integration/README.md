@@ -7,7 +7,7 @@
 # Motivation
 
 1. Since private key never leaves the hardware wallet so it's considered as one of the most secuired way to use cryptocurrency wallets.
-2. No need to remember spending passowrd, so its easy to use.
+2. No need to remember spending passowrd, so its easy to use(although need to remember a pincode for screen unlocking).
 
 # Background
 
@@ -15,7 +15,7 @@ As Yorio wallet has Trezor Hardware wallet support, Ledger Hardware wallet suppo
 
 # Iteration-1
 
-# Proposal
+## Proposal
 
 User will be able to:
 1. Setup a new Yoroi Wallet without exposing its private key/ mnemonics.
@@ -44,15 +44,17 @@ User will be able to:
 
 ## Low Level Implementation Design
 
-For communication with device We will be using [Emurgo/yoroi-extension-ledger-bridge](https://github.com/Emurgo/yoroi-extension-ledger-bridge), which is a wrapper of https://github.com/cardano-foundation/ledgerjs-hw-app-cardano<br/>
+For communication with device We will be using [Emurgo/yoroi-extension-ledger-bridge](https://github.com/Emurgo/yoroi-extension-ledger-bridge), which is a wrapper of https://github.com/cardano-foundation/ledgerjs-hw-app-cardano.<br/>
+
+NPM [package](https://www.npmjs.com/package/@cardano-foundation/ledgerjs-hw-app-cardano).
 
 Transport layer can be:
 - [hw-transport-u2f](https://www.npmjs.com/package/@ledgerhq/hw-transport-u2f)
 - [hw-transport-webusb](https://www.npmjs.com/package/@ledgerhq/hw-transport-webusb)
 
 Manual Ledger device Cardano ADA app installation:
-- Update [ledger device FIRMWARE](./FIRMWARE_UPDATE.md) to `FIRMWARE_VERSION = 1.5.5` and `MCU_VERSION = 1.7`.
 - BOLOS development environment [set up](./BOLOS_SDK_SETUP.md)
+- Update [ledger device FIRMWARE](./FIRMWARE_UPDATE.md) to `FIRMWARE_VERSION = 1.5.5` and `MCU_VERSION = 1.7`.
 - [Clone](https://github.com/cardano-foundation/ledger-app-cardano) and `make load` should do the job assuming your BOLOS env is correct.
 
 We will use following API:
@@ -72,7 +74,7 @@ We will use following API:
 }
  // we will use this as [root_cached_key: ( publicKeyHex + chainCodeHex )master public key]
 ```
-  [BIP32Path](https://github.com/cardano-foundation/ledgerjs-hw-app-cardano/blob/511a674a0801e4fdbf503bea6cfd96d565d2223a/src/Ada.js#L38) = [2147483692, 2147485463, 2147483648, 0, 0]
+  [BIP32Path](https://github.com/cardano-foundation/ledgerjs-hw-app-cardano/blob/511a674a0801e4fdbf503bea6cfd96d565d2223a/src/Ada.js#L38) = [2147483692, 2147485463, 2147483648]
 
 * [Ada.getVersion()](https://github.com/Emurgo/yoroi-extension-ledger-bridge/blob/4d573b50825d81927aca76b9b2a552e322647e4e/src/index.js#L49) will return<br/>
 ```
@@ -123,9 +125,9 @@ WALLET = {
     "cwHardwareInfo": {
       "vendor": "ledger.com",
       "deviceId": "device id" // presently there is no way get deviceId, but if possible will try to figure out 
-      "majorVersion": 2,      // majorVersion => getVersion().major
+      "majorVersion": 1,      // majorVersion => getVersion().major
       "minorVersion": 0,      // minorVersion => getVersion().minor
-      "patchVersion": 8,      // patchVersion => getVersion().patch
+      "patchVersion": 0,      // patchVersion => getVersion().patch
       "model": "NanoS",       // presently there is no way get model, but if possible will try to figure out 
       "publicMasterKey": "master public key" // publicMasterKey => Ada.getExtendedPublicKey()
     }
@@ -184,7 +186,7 @@ WALLET = {
     ]
   }
   ```
-  Response will be passed to backend API through [signTx](https://github.com/Emurgo/yoroi-frontend/blob/bbbdad033b567f0298f61e59a985c1c26f30ee07/app/api/ada/lib/yoroi-backend-api.js#L126)
+  Response will be serialized(different from Trezor) and passed to backend API through [signTx](https://github.com/Emurgo/yoroi-frontend/blob/bbbdad033b567f0298f61e59a985c1c26f30ee07/app/api/ada/lib/yoroi-backend-api.js#L126) for broadcasting the transaction.
   
 ### other changes
 
@@ -216,3 +218,4 @@ TBD
 4. https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-ada
 5. http://ledgerhq.github.io/ledgerjs/docs/#ada
 6. https://ledger-dev.slack.com/
+7. https://www.npmjs.com/package/@cardano-foundation/ledgerjs-hw-app-cardano

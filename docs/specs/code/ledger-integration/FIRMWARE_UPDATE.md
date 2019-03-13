@@ -11,6 +11,7 @@ udev rules setup: [download and run](https://github.com/LedgerHQ/udev-rules/blob
 `wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_udev_rules.sh | sudo bash`
 
 #### Ledger's target ID
+```
 +-----------------+------------+
 |    FirmWare     | Target ID  |
 +-----------------+------------+
@@ -23,6 +24,7 @@ udev rules setup: [download and run](https://github.com/LedgerHQ/udev-rules/blob
 |                 |            |
 | MCU,any version | 0x01000001 |
 +-----------------+------------+
+```
 
 #### FIRMWARE update<br/>
 CURRENT_FIRMWARE_VERSION(aka Secure Element) = 1.4.2<br/>
