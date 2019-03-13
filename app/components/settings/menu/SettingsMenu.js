@@ -33,7 +33,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Themes',
     description: 'Label for the "Themes" link in the settings menu.',
   },
-  AnoutYoroi: {
+  AboutYoroi: {
     id: 'settings.menu.aboutYroi.link.label',
     defaultMessage: '!!!About Yoroi',
     description: 'Label for the "About Yoroi" link in the settings menu.',
@@ -49,6 +49,7 @@ type Props = {
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
+  currentLocale: string,
 };
 
 @observer
@@ -60,7 +61,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
 
     return (
       <div>
@@ -99,22 +100,15 @@ export default class SettingsMenu extends Component<Props> {
           />
 
           <SettingsMenuItem
-            label={intl.formatMessage(messages.AnoutYoroi)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
-            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
-            className="AboutYoroi"
+            label={intl.formatMessage(messages.display)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
+            active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
+            className="display"
           />
 
-          {!environment.isMainnet() &&
-            <SettingsMenuItem
-              label={intl.formatMessage(messages.display)}
-              onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
-              active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
-              className="display"
-            />
-          }
-
-          {!environment.isMainnet() &&
+          {(!environment.isMainnet() || currentLocale === 'ko-KR' || currentLocale === 'ja-JP') &&
+            // all unredemed Ada is held being either Japanese or Korean people
+            // avoid showing this menu option to all users to avoid confusing them
             <SettingsMenuItem
               label={intl.formatMessage(messages.adaRedemption)}
               onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
@@ -122,6 +116,13 @@ export default class SettingsMenu extends Component<Props> {
               className="adaRedemption"
             />
           }
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.AboutYoroi)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
+            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
+            className="AboutYoroi"
+          />
         </div>
       </div>
     );

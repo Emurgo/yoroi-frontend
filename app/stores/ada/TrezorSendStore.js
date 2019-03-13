@@ -13,9 +13,9 @@ import globalMessages from '../../i18n/global-messages';
 import type {
   CreateTrezorSignTxDataRequest,
   CreateTrezorSignTxDataResponse,
-  SendTrezorSignedTxRequest,
+  BroadcastTrezorSignedTxRequest,
 } from '../../api/ada';
-import type { SendTrezorSignedTxResponse } from '../../api/common';
+import type { BroadcastTrezorSignedTxResponse } from '../../api/common';
 
 import {
   Logger,
@@ -41,8 +41,8 @@ export default class TrezorSendStore extends Store {
   createTrezorSignTxDataRequest: LocalizedRequest<CreateTrezorSignTxDataResponse> =
     new LocalizedRequest(this.api.ada.createTrezorSignTxData);
 
-  sendTrezorSignedTxRequest: LocalizedRequest<SendTrezorSignedTxResponse> =
-    new LocalizedRequest(this.api.ada.sendTrezorSignedTx);
+  broadcastTrezorSignedTxRequest: LocalizedRequest<BroadcastTrezorSignedTxResponse> =
+    new LocalizedRequest(this.api.ada.broadcastTrezorSignedTx);
   // =================== API RELATED =================== //
 
   setup() {
@@ -59,10 +59,12 @@ export default class TrezorSendStore extends Store {
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
   _sendUsingTrezor = async (params: CreateTrezorSignTxDataRequest): Promise<void> => {
     try {
+      this.createTrezorSignTxDataRequest.reset();
+      this.broadcastTrezorSignedTxRequest.reset();
 
       if (this.isActionProcessing) {
         // this Error will be converted to LocalizableError()
-        throw new Error('Can\'t send another transaction if one transaction is in progress.');
+        throw new Error('Can’t send another transaction if one transaction is in progress.');
       }
 
       this._setError(null);
@@ -74,58 +76,61 @@ export default class TrezorSendStore extends Store {
         // this Error will be converted to LocalizableError()
         throw new Error('Active wallet required before sending.');
       }
+
       const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
       if (!accountId) {
         // this Error will be converted to LocalizableError()
         throw new Error('Active account required before sending.');
       }
 
-      this.createTrezorSignTxDataRequest.reset();
-
       const trezorSignTxDataResp =
         await this.createTrezorSignTxDataRequest.execute(params).promise;
 
       // TODO: [TREZOR] fix type if possible
-      const trezorResp = await TrezorConnect.cardanoSignTransaction({
+      const trezorSignTxResp = await TrezorConnect.cardanoSignTransaction({
         ...trezorSignTxDataResp.trezorSignTxPayload
       });
 
-      if (trezorResp && trezorResp.payload && trezorResp.payload.error) {
+      if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error) {
         // this Error will be converted to LocalizableError()
-        throw new Error(trezorResp.payload.error);
+        throw new Error(trezorSignTxResp.payload.error);
       }
 
-      await this._sendTrezorSignedTx(trezorSignTxDataResp, trezorResp);
+      await this._brodcastSignedTx(trezorSignTxResp, trezorSignTxDataResp);
 
     } catch (error) {
       Logger.error('TrezorSendStore::_sendUsingTrezor error: ' + stringifyError(error));
       this._setError(this._convertToLocalizableError(error));
     } finally {
       this.createTrezorSignTxDataRequest.reset();
-      this.sendTrezorSignedTxRequest.reset();
+      this.broadcastTrezorSignedTxRequest.reset();
       this._setActionProcessing(false);
     }
   };
 
-  _sendTrezorSignedTx = async (trezorSignTxDataResp: CreateTrezorSignTxDataResponse,
-    trezorResp: any): Promise<void> => {
+  _brodcastSignedTx = async (
+    trezorSignTxResp: any,
+    trezorSignTxDataResp: CreateTrezorSignTxDataResponse
+  ): Promise<void> => {
     // TODO: [TREZOR] fix type if possible
-    const payload: any = trezorResp.payload;
-    this.sendTrezorSignedTxRequest.reset();
-    const reqParams: SendTrezorSignedTxRequest = {
+    const payload: any = trezorSignTxResp.payload;
+    const reqParams: BroadcastTrezorSignedTxRequest = {
       signedTxHex: payload.body,
       changeAdaAddr: trezorSignTxDataResp.changeAddress
     };
-    // TODO: [TREZOR] add error check
-    await this.sendTrezorSignedTxRequest.execute(reqParams).promise;
+
+    await this.broadcastTrezorSignedTxRequest.execute(reqParams).promise;
+
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
     wallets.refreshWalletsData();
+
     const activeWallet = wallets.active;
     if (activeWallet) {
       // go to transaction screen
       wallets.goToWalletRoute(activeWallet.id);
     }
+
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }
 
@@ -138,13 +143,12 @@ export default class TrezorSendStore extends Store {
       localizableError = error;
     } else if (error && error.message) {
       // Trezor device related error happend, convert then to LocalizableError
-      // TODO: [TREZOR] check for device not supported if needed
       switch (error.message) {
         case 'Iframe timeout':
           localizableError = new LocalizableError(globalMessages.trezorError101);
           break;
         case 'Permissions not granted':
-          localizableError = new LocalizableError(globalMessages.trezorError102);
+          localizableError = new LocalizableError(globalMessages.hwError101);
           break;
         case 'Cancelled':
         case 'Popup closed':

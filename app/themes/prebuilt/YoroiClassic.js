@@ -228,7 +228,7 @@ export default {
   '--theme-receive-qr-code-foreground-color': '#121327',
 
   '--theme-send-confirmation-dialog-send-values-color': '#ea4c5b',
-  '--theme-trezor-send-confirmation-info-block-background-color': '#f3f3f5',
+  '--theme-hw-send-confirmation-info-block-background-color': '#f3f3f5',
 
   '--theme-settings-body-background-color': '#ffffff',
   '--theme-settings-pane-background-color': '#f3f3f5',
@@ -308,7 +308,6 @@ export default {
   '--theme-icon-nav-color-active': '#ffffff',
   '--theme-icon-topbar-color': '#fafbfc',
   '--theme-icon-toggle-menu-color': '#fafbfc',
-  '--theme-icon-ada-summary-wallet-amount-symbol-color': '#121327',
   '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#121327',
   '--theme-icon-ada-redemption-attention-color': '#fafbfc',
   '--theme-icon-ada-redemption-success-color': '#fafbfc',
@@ -343,8 +342,8 @@ export default {
   '--theme-wallet-password-switch-label-color': '#121327',
 
   '--theme-banner-warning-background-color': '#b54b4b',
-  '--theme-trezor-connect-dialog-middle-block-common-background-color': '#f3f3f5',
-  '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
+  '--theme-hw-connect-dialog-middle-block-common-background-color': '#f3f3f5',
+  '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
 

@@ -1,6 +1,11 @@
 .component {
 
-  position: relative;
+  .main {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
 
   & > .label {
     color: var(--theme-support-settings-text-color);
@@ -10,16 +15,26 @@
     margin-bottom: 11px;
   }
 
-  & > .exportStyleButton
-  {
-    position: absolute;
-    left: 0px;
-    bottom: -25px;
-    width: 100%;
+  a,
+  p {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 19px;
+  }
+
+  a {
+    color: var(--theme-support-settings-link-color);
+    text-decoration: underline;
+  }
+
+  p {
+    margin-bottom: 20px;
   }
 }
 
 .themesWrapper {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 20px;

@@ -26,7 +26,7 @@ export default class NotificationMessage extends Component<Props> {
     return (
       <div className={notificationMessageStyles}>
 
-        {icon && <SvgInline svg={icon} className={styles.icon} cleanup={['title']} />}
+        {icon && <SvgInline svg={icon} className={styles.icon} />}
 
         <div className={styles.message}>
           {children}

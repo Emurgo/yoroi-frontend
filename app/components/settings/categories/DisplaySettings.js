@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import styles from './DisplaySettings.scss';
 import { THEMES } from '../../../themes/index';
 import ThemeThumbnail from './display/ThemeThumbnail';
@@ -36,6 +36,21 @@ const messages = defineMessages({
     defaultMessage: '!!!CHANGING THEME WILL REMOVE CUSTOMIZATION',
     description: 'Label for the "CHANGING THEME WILL REMOVE CUSTOMIZATION" message.',
   },
+  blog: {
+    id: 'settings.display.blog',
+    defaultMessage: '!!!You can read our {blogLink} on how to use this feature.',
+    description: 'text to introduce blog post',
+  },
+  blogLinkUrl: {
+    id: 'settings.support.faq.blogLinkUrl',
+    defaultMessage: '!!!https://medium.com/@emurgo_io/custom-themes-in-yoroi-d3fa93f4b926',
+    description: 'link for blog post',
+  },
+  blogLinkWrapper: {
+    id: 'settings.support.faq.blogLinkWrapper',
+    defaultMessage: '!!!blog post',
+    description: 'clickable text to open link',
+  },
 });
 
 type Props = {
@@ -43,7 +58,8 @@ type Props = {
   selectTheme: Function,
   exportTheme: Function,
   getThemeVars: Function,
-  hasCustomTheme: Function
+  hasCustomTheme: Function,
+  onExternalLinkClick: Function,
 };
 
 @observer
@@ -54,7 +70,14 @@ export default class DisplaySettings extends Component<Props> {
   };
 
   render() {
-    const { theme, selectTheme, getThemeVars, exportTheme, hasCustomTheme } = this.props;
+    const {
+      theme,
+      selectTheme,
+      getThemeVars,
+      exportTheme,
+      hasCustomTheme,
+      onExternalLinkClick
+    } = this.props;
     const { intl } = this.context;
 
     const themeYoroiClassicClasses = classnames([
@@ -68,10 +91,18 @@ export default class DisplaySettings extends Component<Props> {
     ]);
 
     const exportButtonClasses = classnames([
-      styles.exportStyleButton,
       'primary',
       styles.button,
     ]);
+
+    const blogLink = (
+      <a
+        href={intl.formatMessage(messages.blogLinkUrl)}
+        onClick={event => onExternalLinkClick(event)}
+      >
+        {intl.formatMessage(messages.blogLinkWrapper)}
+      </a>
+    );
 
     return (
       <div className={styles.component}>
@@ -79,47 +110,52 @@ export default class DisplaySettings extends Component<Props> {
         <div className={styles.label}>
           {intl.formatMessage(messages.themeLabel)}
         </div>
-        <Button
-          className={exportButtonClasses}
-          label={intl.formatMessage(messages.themeExportButton)}
-          skin={ButtonSkin}
-          onClick={exportTheme.bind(this, {})}
-        />
-        <div className={styles.themesWrapper}>
-          {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
-          <button
-            type="button"
-            className={themeYoroiClassicClasses}
-            onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
-          >
-            {(theme === THEMES.YOROI_CLASSIC
-              && hasCustomTheme() &&
-                <div className={styles.themeWarning}>
-                  {intl.formatMessage(messages.themeWarning)}
-                </div>)
-            }
-            <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} />
-            <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
-          </button>
 
-          {!environment.isMainnet() &&
-            (
-              <button
-                type="button"
-                className={themeYoroiModernClasses}
-                onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
-              >
-                {(theme === THEMES.YOROI_MODERN
-                  && hasCustomTheme() &&
-                    <div className={styles.themeWarning}>
-                      {intl.formatMessage(messages.themeWarning)}
-                    </div>)
-                }
-                <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
-                <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
-              </button>
-            )
-          }
+        <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
+
+        <div className={styles.main}>
+          <div className={styles.themesWrapper}>
+            {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
+            <button
+              type="button"
+              className={themeYoroiClassicClasses}
+              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
+            >
+              {(theme === THEMES.YOROI_CLASSIC
+                && hasCustomTheme() &&
+                  <div className={styles.themeWarning}>
+                    {intl.formatMessage(messages.themeWarning)}
+                  </div>)
+              }
+              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} />
+              <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
+            </button>
+
+            {!environment.isMainnet() && // a second theme to allow testing switching themes
+              (
+                <button
+                  type="button"
+                  className={themeYoroiModernClasses}
+                  onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
+                >
+                  {(theme === THEMES.YOROI_MODERN
+                    && hasCustomTheme() &&
+                      <div className={styles.themeWarning}>
+                        {intl.formatMessage(messages.themeWarning)}
+                      </div>)
+                  }
+                  <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
+                  <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
+                </button>
+              )
+            }
+          </div>
+          <Button
+            className={exportButtonClasses}
+            label={intl.formatMessage(messages.themeExportButton)}
+            skin={ButtonSkin}
+            onClick={exportTheme.bind(this, {})}
+          />
         </div>
 
       </div>
