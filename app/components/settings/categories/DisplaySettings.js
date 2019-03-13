@@ -76,7 +76,7 @@ export default class DisplaySettings extends Component<Props> {
       getThemeVars,
       exportTheme,
       hasCustomTheme,
-      onExternalLinkClick 
+      onExternalLinkClick
     } = this.props;
     const { intl } = this.context;
 
