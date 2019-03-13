@@ -244,6 +244,7 @@
   "wallet.receive.page.walletReceiveInstructions": "Partagez cette adresse du wallet pour recevoir des paiements. Afin d'assurer votre sécurité, de nouvelles adresses sont générées à chaque utilisation.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Effacer",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Confirmer",
+  "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "!!!Remove last",
   "wallet.redeem.choices.tab.title.forceVended": "do not translate",
   "wallet.redeem.choices.tab.title.paperVended": "do not translate",
   "wallet.redeem.choices.tab.title.recoveryForceVended": "do not translate",

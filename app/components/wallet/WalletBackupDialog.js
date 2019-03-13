@@ -11,7 +11,6 @@ type Props = {
   isPrivacyNoticeAccepted: boolean,
   countdownRemaining: number,
   isTermDeviceAccepted: boolean,
-  canFinishBackup: boolean,
   isTermRecoveryAccepted: boolean,
   isValid: boolean,
   isSubmitting: boolean,
@@ -28,6 +27,8 @@ type Props = {
   onClear: Function,
   onFinishBackup: Function,
   onRestartBackup: Function,
+  removeWord: Function,
+  hasWord: Function
 };
 
 @observer
@@ -40,7 +41,7 @@ export default class WalletBackupDialog extends Component<Props> {
       countdownRemaining, onAcceptPrivacyNotice,
       onContinue, recoveryPhrase,
       onStartWalletBackup, isTermDeviceAccepted,
-      enteredPhrase, canFinishBackup,
+      enteredPhrase, removeWord, hasWord,
       isTermRecoveryAccepted, isValid, isSubmitting,
       onAcceptTermDevice, onAcceptTermRecovery,
       onAddWord, onClear, onFinishBackup,
@@ -75,7 +76,6 @@ export default class WalletBackupDialog extends Component<Props> {
         <WalletRecoveryPhraseEntryDialog
           isTermDeviceAccepted={isTermDeviceAccepted}
           enteredPhrase={enteredPhrase}
-          canFinishBackup={canFinishBackup}
           isTermRecoveryAccepted={isTermRecoveryAccepted}
           isValid={isValid}
           isSubmitting={isSubmitting}
@@ -84,9 +84,11 @@ export default class WalletBackupDialog extends Component<Props> {
           onAddWord={onAddWord}
           onCancelBackup={onCancelBackup}
           onClear={onClear}
-          onFinishBackup={onFinishBackup}
           onRestartBackup={onRestartBackup}
           recoveryPhraseSorted={recoveryPhraseSorted}
+          onFinishBackup={onFinishBackup}
+          removeWord={removeWord}
+          hasWord={hasWord}
         />
       );
     }

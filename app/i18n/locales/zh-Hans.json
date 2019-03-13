@@ -244,6 +244,7 @@
   "wallet.receive.page.walletReceiveInstructions": "共享此钱包地址以接收付款。为保护您的隐私，在您使用地址后会自动生成新地址。",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "清除",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "确认",
+  "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "!!!Remove last",
   "wallet.redeem.choices.tab.title.forceVended": "强行执行",
   "wallet.redeem.choices.tab.title.paperVended": "Paper執行",
   "wallet.redeem.choices.tab.title.recoveryForceVended": "强行恢复",

@@ -244,6 +244,7 @@
   "wallet.receive.page.walletReceiveInstructions": "Share this wallet address to receive payments. To protect your privacy, new addresses are generated automatically once you use them.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Clear",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Confirm",
+  "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "Remove last",
   "wallet.redeem.choices.tab.title.forceVended": "Force vended",
   "wallet.redeem.choices.tab.title.paperVended": "Paper vended",
   "wallet.redeem.choices.tab.title.recoveryForceVended": "Recovery - force vended",

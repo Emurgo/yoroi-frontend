@@ -15,4 +15,5 @@ export default class WalletBackupActions {
   restartWalletBackup: Action<any> = new Action();
   cancelWalletBackup: Action<any> = new Action();
   finishWalletBackup: Action<any> = new Action();
+  removeOneMnemonicWord: Action<any> = new Action();
 }
