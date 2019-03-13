@@ -7,10 +7,10 @@ import { defineMessages } from 'react-intl';
 */
 
 export default defineMessages({
-  invalidMnemonic: {
-    id: 'global.errors.invalidMnemonic',
-    defaultMessage: '!!!Invalid phrase entered, please check.',
-    description: 'Error message shown when invalid bip39 mnemonic was entered.'
+  invalidMasterKey: {
+    id: 'global.errors.invalidMasterKey',
+    defaultMessage: '!!!Invalid master key entered, please check.',
+    description: 'Error message shown when invalid master key was entered.'
   },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
@@ -36,6 +36,21 @@ export default defineMessages({
     id: 'global.passwordInstructions',
     defaultMessage: '!!!Note: Password needs to be at least 12 characters long.',
     description: 'Password instructions note.',
+  },
+  nextButtonLabel: {
+    id: 'global.labels.next',
+    defaultMessage: '!!!Next',
+    description: 'Label next button.'
+  },
+  backButtonLabel: {
+    id: 'global.labels.back',
+    defaultMessage: '!!!Back',
+    description: 'Label next button.'
+  },
+  instructionTitle: {
+    id: 'transfer.instructions.instructions.title.label',
+    defaultMessage: '!!!Instructions',
+    description: 'Label "Instructions"'
   },
   cancel: {
     id: 'global.labels.cancel',
@@ -141,16 +156,6 @@ export default defineMessages({
     id: 'wallet.send.confirmationDialog.totalLabel',
     defaultMessage: '!!!Total',
     description: 'Label for the "Total" in the wallet send confirmation dialog.',
-  },
-  walletSendConfirmationBackButtonLabel: {
-    id: 'wallet.send.confirmationDialog.back',
-    defaultMessage: '!!!Back',
-    description: 'Label for the back button in the wallet send confirmation dialog.'
-  },
-  hwConnectDialogNextButtonLabel: {
-    id: 'wallet.connect.hw.dialog.next.button.label',
-    defaultMessage: '!!!Next',
-    description: 'Label for the "Next" button on the Connect to any Hardware Wallet dialog.'
   },
   hwConnectDialogConnectButtonLabel: {
     id: 'wallet.connect.hw.dialog.connect.button.label',
@@ -261,6 +266,11 @@ export default defineMessages({
     id: 'wallet.summary.no.transaction',
     defaultMessage: '!!!No transactions found',
     description: 'Message shown when wallet transaction search returns zero results.'
+  },
+  step1: {
+    id: 'transfer.form.instructions.step1.text',
+    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
+    description: 'Text for instructions step 1 on the transfer mnemonic page.'
   },
 });
 

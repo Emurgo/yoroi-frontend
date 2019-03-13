@@ -61,6 +61,8 @@ const messages = defineMessages({
   },
 });
 
+messages.nextButtonLabel = globalMessages.nextButtonLabel;
+
 type Props = {
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
@@ -124,7 +126,7 @@ export default class AboutDialog extends Component<Props> {
 
     const dailogActions = [{
       className: isActionProcessing ? styles.processing : null,
-      label: intl.formatMessage(globalMessages.hwConnectDialogNextButtonLabel),
+      label: intl.formatMessage(globalMessages.nextButtonLabel),
       primary: true,
       disabled: false,
       onClick: submit,

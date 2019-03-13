@@ -8,6 +8,7 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import DaedalusTransferInstructionsPage from './DaedalusTransferInstructionsPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
+import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
 import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
 import DaedalusTransferSummaryPage from './DaedalusTransferSummaryPage';
 import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
@@ -59,8 +60,16 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this._getDaedalusTransferActions().startTransferPaperFunds.trigger();
   }
 
-  setupTransferFunds = (payload: { recoveryPhrase: string }) => {
-    this._getDaedalusTransferActions().setupTransferFunds.trigger(payload);
+  startTransferMasterKey = () => {
+    this._getDaedalusTransferActions().startTransferMasterKey.trigger();
+  }
+
+  setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }) => {
+    this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
+  };
+
+  setupTransferFundsWithMasterKey = (payload: { masterKey: string }) => {
+    this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger(payload);
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
@@ -115,6 +124,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               onAnswerYes={this.goToReceiveScreen}
               onConfirm={this.startTransferFunds}
               onPaperConfirm={this.startTransferPaperFunds}
+              onMasterKeyConfirm={this.startTransferMasterKey}
               disableTransferFunds={daedalusTransfer.disableTransferFunds}
             />
           </MainLayout>
@@ -123,7 +133,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         return (
           <MainLayout topbar={topBar}>
             <DaedalusTransferFormPage
-              onSubmit={this.setupTransferFunds}
+              onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
               mnemonicValidator={mnemonic => wallets.isValidMnemonic(
                 mnemonic,
@@ -138,11 +148,20 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         return (
           <MainLayout topbar={topBar}>
             <DaedalusTransferFormPage
-              onSubmit={this.setupTransferFunds}
+              onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
               mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
               validWords={validWords}
               mnemonicLength={27}
+            />
+          </MainLayout>
+        );
+      case 'gettingMasterKey':
+        return (
+          <MainLayout topbar={topBar}>
+            <DaedalusTransferMasterKeyFormPage
+              onSubmit={this.setupTransferFundsWithMasterKey}
+              onBack={this.backToUninitialized}
             />
           </MainLayout>
         );
