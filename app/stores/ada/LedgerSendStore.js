@@ -197,10 +197,10 @@ export default class LedgerSendStore extends Store {
     } else if (error && error.message) {
       // Ledger device related error happend, convert then to LocalizableError
       switch (error.message) {
-        case 'TransportError: Failed to sign with Ledger device - U2F TIMEOUT':
+        case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
           localizableError = new LocalizableError(globalMessages.ledgerError101);
           break;
-        case 'TransportStatusError: Ledger device - Action rejected by user':
+        case 'TransportStatusError: Ledger device: Action rejected by user':
           localizableError = new LocalizableError(messages.signTxError101);
           break;
         default:
