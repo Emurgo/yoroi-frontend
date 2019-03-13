@@ -21,6 +21,11 @@ const messages = defineMessages({
     defaultMessage: '!!!What is a hardware wallet',
     description: 'Footer What is a hardware wallet? link text.'
   },
+  buyLedgerHardwareWallet: {
+    id: 'wallet.footer.buyLedgerHardwareWallet.text',
+    defaultMessage: '!!!Buy a Ledger hardware wallet.',
+    description: 'Footer Buy a Ledger hardware wallet link text.'
+  },
   howToConnectTrezor: {
     id: 'wallet.footer.howToConnectTrezor.text',
     defaultMessage: '!!!How to connect a Trezor.',
@@ -54,10 +59,16 @@ export default class AddWalletFooter extends Component {
           message={messages.whatIsHardwareWallet}
         />
         <FooterItem
+          url="https://yoroi-wallet.com/get-ledger"
+          svg={buyTrezorSvg}
+          message={messages.buyLedgerHardwareWallet}
+        />
+        {/* It should be enable in the future with a video on how to connect Ledger */}
+        {/* <FooterItem
           url="https://youtu.be/Dp0wXwtToX0"
           svg={howConnetTrezorSvg}
           message={messages.howToConnectTrezor}
-        />
+        /> */}
         <FooterItem
           url="https://youtu.be/9jg8lsreIQ8?t=56"
           svg={howCreateWalletSvg}

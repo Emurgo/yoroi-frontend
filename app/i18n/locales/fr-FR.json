@@ -222,6 +222,7 @@
   "wallet.create.dialog.title": "Créer un nouveau wallet",
   "wallet.create.dialog.walletNameHint": "ex: Wallet de shopping",
   "wallet.create.dialog.walletPasswordLabel": "Mot de passe du wallet",
+  "wallet.footer.buyLedgerHardwareWallet.text": "!!!Buy a Ledger hardware wallet.",
   "wallet.footer.buyTrezorHardwareWallet.text": "Acheter un hardware wallet Trezor",
   "wallet.footer.howToConnectTrezor.text": "Comment connecter Trezor",
   "wallet.footer.howToCreateWallet.text": "Comment créer un wallet",

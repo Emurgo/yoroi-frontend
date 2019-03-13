@@ -222,6 +222,7 @@
   "wallet.create.dialog.title": "새 지갑 만들기",
   "wallet.create.dialog.walletNameHint": "예: 쇼핑 지갑",
   "wallet.create.dialog.walletPasswordLabel": "지갑 암호",
+  "wallet.footer.buyLedgerHardwareWallet.text": "!!!Buy a Ledger hardware wallet.",
   "wallet.footer.buyTrezorHardwareWallet.text": "Trezor 하드웨어 지갑 구매",
   "wallet.footer.howToConnectTrezor.text": "Trezor 연결 방법",
   "wallet.footer.howToCreateWallet.text": "지갑 생성 방법",

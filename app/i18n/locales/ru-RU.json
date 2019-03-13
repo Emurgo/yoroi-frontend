@@ -222,6 +222,7 @@
   "wallet.create.dialog.title": "Создать новый кошелек",
   "wallet.create.dialog.walletNameHint": "например: Кошелек для шоппинга",
   "wallet.create.dialog.walletPasswordLabel": "Пароль кошелька",
+  "wallet.footer.buyLedgerHardwareWallet.text": "!!!Buy a Ledger hardware wallet.",
   "wallet.footer.buyTrezorHardwareWallet.text": "Купить аппаратный кошелек Trezor",
   "wallet.footer.howToConnectTrezor.text": "Как подключить Trezor",
   "wallet.footer.howToCreateWallet.text": "Как создать кошелек",

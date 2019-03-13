@@ -222,6 +222,7 @@
   "wallet.create.dialog.title": "创建新钱包",
   "wallet.create.dialog.walletNameHint": "例如：购物钱包",
   "wallet.create.dialog.walletPasswordLabel": "钱包密码",
+  "wallet.footer.buyLedgerHardwareWallet.text": "!!!Buy a Ledger hardware wallet.",
   "wallet.footer.buyTrezorHardwareWallet.text": "购买Trezor硬件钱包",
   "wallet.footer.howToConnectTrezor.text": "如何连接Trezor",
   "wallet.footer.howToCreateWallet.text": "如何创建钱包",

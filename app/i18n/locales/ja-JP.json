@@ -222,6 +222,7 @@
   "wallet.create.dialog.title": "新しいウォレットを作成する",
   "wallet.create.dialog.walletNameHint": "例：ショッピングウォレット",
   "wallet.create.dialog.walletPasswordLabel": "ウォレットのパスワード",
+  "wallet.footer.buyLedgerHardwareWallet.text": "!!!Buy a Ledger hardware wallet.",
   "wallet.footer.buyTrezorHardwareWallet.text": "Trezorハードウェアウォレットを購入",
   "wallet.footer.howToConnectTrezor.text": "Trezorと接続する方法",
   "wallet.footer.howToCreateWallet.text": "ウォレットを作成する方法",
