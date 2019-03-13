@@ -179,9 +179,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     versionResp: GetVersionResponse,
     extendedPublicKeyResp: GetExtendedPublicKeyResponse
   ): HWDeviceInfo => {
-    if (!this._validateHWResponse(versionResp, extendedPublicKeyResp)) {
-      throw new UnexpectedError();
-    }
+    this._validateHWResponse(versionResp, extendedPublicKeyResp);
 
     return {
       publicMasterKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
@@ -203,11 +201,11 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     extendedPublicKeyResp: GetExtendedPublicKeyResponse
   ): boolean => {
     if (versionResp == null) {
-      throw new UnexpectedError();
+      throw new Error('Ledger device version response is undefined');
     }
 
     if (extendedPublicKeyResp == null) {
-      throw new UnexpectedError();
+      throw new Error('Ledger device extended public key response is undefined');
     }
 
     return true;
@@ -225,8 +223,6 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   /** Converts error(from API or Ledger API) to LocalizableError */
   _convertToLocalizableError = (error: any): LocalizableError => {
     let localizableError: ?LocalizableError = null;
-
-    console.log(JSON.stringify(error, null, 2));
 
     if (error instanceof LocalizableError) {
       // It means some API Error has been thrown
@@ -290,12 +286,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
       const ledgerWallet: CreateHardwareWalletResponse =
         await this.createHWRequest.execute(reqParams).promise;
 
-      if (ledgerWallet) {
-        await this._onSaveSucess(ledgerWallet);
-      } else {
-        // this Error will be converted to LocalizableError()
-        throw new Error();
-      }
+      await this._onSaveSucess(ledgerWallet);
     } catch (error) {
       Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
 
@@ -320,7 +311,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
-      throw new UnexpectedError();
+      throw new Error('Ledger device hardware info not valid');
     }
 
     return {
@@ -346,13 +337,12 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
     wallets.refreshWalletsData();
 
-    // Load the Yoroi with Trezor Icon
+    // Load the Yoroi with Ledger Icon
     this.stores.topbar.initCategories();
 
     // show success notification
     wallets.showLedgerNanoSWalletIntegratedNotification();
 
-    // TODO: [LEDGER] not sure if it actully destroying this Store ??
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
   }

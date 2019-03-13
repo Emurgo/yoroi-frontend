@@ -119,7 +119,6 @@ export default class TrezorSendStore extends Store {
       changeAdaAddr: trezorSignTxDataResp.changeAddress
     };
 
-    // TODO: [TREZOR] add error check
     await this.broadcastTrezorSignedTxRequest.execute(reqParams).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();

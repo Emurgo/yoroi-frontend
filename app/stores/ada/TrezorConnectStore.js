@@ -209,7 +209,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     if (trezorEventDevice == null
       || trezorEventDevice.payload == null
       || trezorEventDevice.payload.features == null) {
-      throw new UnexpectedError();
+      throw new Error('Trezor device hardware info not valid');
     }
 
     const deviceFeatures = trezorEventDevice.payload.features;
@@ -244,9 +244,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
         case 'Popup closed':
           throw new LocalizableError(globalMessages.trezorError103);
         default:
-          // Something unexpected happened
-          Logger.error(`TrezorConnectStore::_validateHWResponse::error: ${trezorResp.payload.error}`);
-          throw new UnexpectedError();
+          throw new Error(trezorResp.payload.error);
       }
     }
 
@@ -254,18 +252,14 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       || trezorResp.payload == null
       || trezorResp.payload.publicKey == null
       || trezorResp.payload.publicKey.length <= 0) {
-      // Something unexpected happened
-      Logger.error(`TrezorConnectStore::_validateHWResponse::error: invalid public key`);
-      throw new UnexpectedError();
+      throw new Error('Invalid public key received from Trezor device');
     }
 
     if (trezorEventDevice == null
       || trezorEventDevice.payload == null
       || trezorEventDevice.payload.type !== 'acquired'
       || trezorEventDevice.payload.features == null) {
-      // Something unexpected happened
-      Logger.error(`TrezorConnectStore::_validateHWResponse::error: invalid device event`);
-      throw new UnexpectedError();
+      throw new Error('Invalid trezor device event');
     }
 
     return true;
@@ -346,11 +340,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       const trezorWallet: Wallet =
         await this.createHWRequest.execute(reqParams).promise;
 
-      if (trezorWallet) {
-        await this._onSaveSucess(trezorWallet);
-      } else {
-        throw new UnexpectedError();
-      }
+      await this._onSaveSucess(trezorWallet);
     } catch (error) {
       Logger.error(`TrezorConnectStore::_saveHW::error ${stringifyError(error)}`);
 
@@ -375,7 +365,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
-      throw new UnexpectedError();
+      throw new Error('Trezor device hardware info not valid');
     }
 
     return {
@@ -412,7 +402,6 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     // show success notification
     wallets.showTrezorTWalletIntegratedNotification();
 
-    // TODO: [TREZOR] not sure if it actully destroying this Store ??
     this.teardown();
     Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');
   };
