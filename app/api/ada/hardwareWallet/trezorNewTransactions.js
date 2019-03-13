@@ -50,14 +50,11 @@ export async function createTrezorSignTxPayload(
   // Transactions
   const txsBodies = await txsBodiesForInputs(txExt.inputs);
 
-  // Network
-  const network = CONFIG.network.trezorNetwork;
-
   return {
-    network,
-    transactions: txsBodies,
     inputs: trezorInputs,
     outputs: trezorOutputs,
+    transactions: txsBodies,
+    protocol_magic: CONFIG.network.protocolMagic,
   };
 }
 

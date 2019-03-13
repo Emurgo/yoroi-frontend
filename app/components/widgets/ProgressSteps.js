@@ -60,8 +60,8 @@ export default class ProgressSteps extends Component<Props> {
           <div className={stepTopBarStyle} />
           <div className={styles.stepBottomBlock}>
             <div className={styles.stepStateIconContainer}>
-              {(displayIcon === 'done') && <SvgInline svg={iconTickSVG} cleanup={['title']} />}
-              {(displayIcon === 'error') && <SvgInline svg={iconCrossSVG} cleanup={['title']} />}
+              {(displayIcon === 'done') && <SvgInline svg={iconTickSVG} />}
+              {(displayIcon === 'error') && <SvgInline svg={iconCrossSVG} />}
             </div>
             <div className={styles.stepTextContainer}>
               <span className={stepTextStyle}>{stepText}</span>

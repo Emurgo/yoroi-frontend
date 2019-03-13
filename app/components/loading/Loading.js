@@ -61,9 +61,9 @@ export default class Loading extends Component<Props> {
     return (
       <div className={componentStyles}>
         <div className={styles.logos}>
-          <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} cleanup={['title']} />
-          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} cleanup={['title']} />
-          <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} cleanup={['title']} />
+          <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} />
+          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} />
+          <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} />
         </div>
         {hasLoadedCurrentLocale && (
           <div>

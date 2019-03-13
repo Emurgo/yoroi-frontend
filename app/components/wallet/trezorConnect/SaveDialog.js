@@ -126,19 +126,19 @@ export default class SaveDialog extends Component<Props> {
       case StepState.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
-            <SvgInline svg={saveLoadGIF} cleanup={['title']} />
+            <SvgInline svg={saveLoadGIF} />
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
-            <SvgInline svg={saveStartSVG} cleanup={['title']} />
+            <SvgInline svg={saveStartSVG} />
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
-            <SvgInline svg={saveErrorSVG} cleanup={['title']} />
+            <SvgInline svg={saveErrorSVG} />
           </div>);
         break;
       default:

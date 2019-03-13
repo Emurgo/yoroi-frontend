@@ -112,6 +112,13 @@ export default class TrezorConnectStore extends Store {
 
     /** Preinitialization of TrezorConnect API will result in faster first response */
     try {
+      /** Starting from v7 Trezor Connect Manifest has been made mandatory
+        * https://github.com/trezor/connect/blob/develop/docs/index.md#trezor-connect-manifest */
+      TrezorConnect.manifest({
+        email: Config.trezor.manifest.EMAIL,
+        appUrl: Config.trezor.manifest.APP_URL
+      });
+
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);

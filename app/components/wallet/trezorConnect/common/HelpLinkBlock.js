@@ -39,7 +39,7 @@ export default class HelpLinkBlock extends Component<Props> {
       <div className={styles.linkBlock}>
         <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
           {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
-          <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+          <SvgInline svg={externalLinkSVG} />
         </a>
       </div>);
   }

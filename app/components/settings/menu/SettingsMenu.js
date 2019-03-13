@@ -99,14 +99,12 @@ export default class SettingsMenu extends Component<Props> {
             className="support"
           />
 
-          {!environment.isMainnet() &&
-            <SettingsMenuItem
-              label={intl.formatMessage(messages.display)}
-              onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
-              active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
-              className="display"
-            />
-          }
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.display)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
+            active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
+            className="display"
+          />
 
           {(!environment.isMainnet() || currentLocale === 'ko-KR' || currentLocale === 'ja-JP') &&
             // all unredemed Ada is held being either Japanese or Korean people

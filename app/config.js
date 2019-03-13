@@ -17,6 +17,10 @@ export default {
   trezor: {
     // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoGetPublicKey.md
     // https://cardanolaunch.com/assets/Ed25519_BIP.pdf
-    DEFAULT_CARDANO_PATH: 'm/44\'/1815\'/0\''
+    DEFAULT_CARDANO_PATH: 'm/44\'/1815\'/0\'',
+    manifest: {
+      EMAIL: 'systems@emurgo.io',
+      APP_URL: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb'
+    }
   }
 };
