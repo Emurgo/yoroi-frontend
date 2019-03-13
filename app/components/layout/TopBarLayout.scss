@@ -37,10 +37,6 @@ $footerHeight: 52px;
   height: 100%;
 }
 
-// .content {
-//   height: calc(100% - #{$topBarHeight});
-// }
-
 .contentWithFooter, .contentFooter {
   height: calc(100% - #{$footerHeight});
 }
@@ -57,9 +53,11 @@ $footerHeight: 52px;
 }
 
 .footer {
-  z-index: 1;
-  margin-top: (-$footerHeight);
   height: $footerHeight;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  z-index: 1;
 }
 
 .main {

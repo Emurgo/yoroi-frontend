@@ -376,6 +376,7 @@ export default class TrezorConnectStore extends Store {
   };
 
   _onSaveSucess = async (trezorWallet: Wallet) => {
+    const { theme } = this.stores;
     // close the active dialog
     Logger.debug('TrezorConnectStore::_saveTrezor success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
@@ -392,7 +393,7 @@ export default class TrezorConnectStore extends Store {
     wallets.refreshWalletsData();
 
     // Load the Yoroi with Trezor Icon
-    this.stores.topbar.initCategories();
+    this.stores.topbar.initCategories(theme.old);
 
     // show success notification
     wallets.showTrezorTWalletIntegratedNotification();

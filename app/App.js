@@ -66,8 +66,6 @@ class App extends Component<{
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
         <ThemeProvider
           key={currentTheme}
-          // theme={yoroiTheme(currentTheme)}
-          // themeOverrides={themeOverrides}
           theme={yoroiTheme}
           themeOverrides={themeOverrides(currentTheme)}
         >

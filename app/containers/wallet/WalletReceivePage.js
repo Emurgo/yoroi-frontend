@@ -91,14 +91,6 @@ export default class WalletReceivePage extends Component<Props, State> {
 
     return (
       <VerticalFlexContainer>
-
-        <NotificationMessage
-          icon={successIcon}
-          show={uiNotifications.isOpen(notification.id)}
-        >
-          {notification.message}
-        </NotificationMessage>
-
         <WalletReceive
           walletAddress={walletAddress}
           isWalletAddressUsed={isWalletAddressUsed}

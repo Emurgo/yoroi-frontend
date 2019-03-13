@@ -17,6 +17,7 @@ export default class LoadingStore extends Store {
   @observable _loading: boolean = true;
 
   setup() {
+    console.log('setup inited');
     when(this._isRefresh, this._redirectToLoading);
     Promise.all([loadRustModule(), loadLovefieldDB()])
       .then(async () => {
@@ -48,7 +49,7 @@ export default class LoadingStore extends Store {
 
   /** Select which page to open after app is done loading */
   _openPageAfterLoad = async (): Promise<void> => {
-    const { app } = this.stores;
+    const { app, theme } = this.stores;
     const { wallets } = this.stores.substores[environment.API];
     await wallets.refreshWalletsData();
     if (app.currentRoute === ROUTES.ROOT) {
@@ -56,7 +57,7 @@ export default class LoadingStore extends Store {
         const firstWallet: Wallet = wallets.first;
 
         // Dynamic Initialization of Topbar Categories
-        this.stores.topbar.initCategories();
+        this.stores.topbar.initCategories(theme.old);
 
         this.actions.router.goToRoute.trigger({
           route: ROUTES.WALLETS.TRANSACTIONS,

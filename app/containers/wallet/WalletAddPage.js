@@ -155,6 +155,7 @@ export default class WalletAddPage extends Component<Props> {
         isTopBarVisible={topBarCondition}
         isBannerVisible={bannerCondition}
         footer={footer}
+        withFooter
       >
         {content}
       </MainLayout>

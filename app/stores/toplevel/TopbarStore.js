@@ -9,8 +9,7 @@ const topbarConfig = resolver('config/topbarConfig');
 const topbarNewConfig = resolver('config/topbarNewConfig');
 
 export default class TopbarStore extends Store {
-
-  CATEGORIES = topbarConfig.CATEGORIES;
+  CATEGORIES = this.stores.theme.old ? topbarConfig.CATEGORIES : topbarNewConfig.CATEGORIES;
 
   @observable activeTopbarCategory: string = this.CATEGORIES[0].route;
 

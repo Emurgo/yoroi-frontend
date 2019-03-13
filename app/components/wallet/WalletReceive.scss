@@ -177,16 +177,16 @@
         margin-left: 25px;
         padding-left: 25px;
         background: transparent;
-      }
-
-      .NotificationMessage_show {
-        height: 21px;
 
         svg {
           position: absolute;
           top: -10px;
           left: -10px;
         }
+      }
+
+      .NotificationMessage_show {
+        height: 21px;
 
         path:last-child {
           fill: var(--theme-notification-message-receive-text-color);
