@@ -321,7 +321,7 @@
   "wallet.send.form.title.label": "Title",
   "wallet.send.form.transactionFeeError": "Not enough Ada for fees. Try sending a smaller amount.",
   "wallet.send.ledger.confirmationDialog.info.line.1": "After connecting your Ledger device to your computer's USB port, press the Send using Ledger button.",
-  "wallet.send.ledger.confirmationDialog.info.line.2": "Make sure Cardano ADA app must remain open on the Ledger device throughout the process.",
+  "wallet.send.ledger.confirmationDialog.info.line.2": "Make sure the Cardano ADA app remains open on the Ledger device throughout the process.",
   "wallet.send.ledger.confirmationDialog.submit": "Send using Ledger",
   "wallet.send.ledger.error.101": "Signing cancelled on Ledger device. Please retry",
   "wallet.send.trezor.confirmationDialog.info.line.1": "After connecting your Trezor device to your computer, press the Send using Trezor button.",
