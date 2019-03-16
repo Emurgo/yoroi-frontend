@@ -94,12 +94,13 @@ export default class WalletAdd extends Component<Props> {
     return (
       <div className={componentClasses}>
         <div className={styles.buttonsContainer}>
-          <Button
+          {/* Enable this when Ledger is available */}
+          {/* <Button
             className="primary"
             label={intl.formatMessage(messages.useLedgerDescription)}
             onMouseUp={onLedger}
             skin={ButtonSkin}
-          />
+          /> */}
           <Button
             className="primary"
             label={intl.formatMessage(messages.useTrezorDescription)}
