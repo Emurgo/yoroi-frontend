@@ -15,16 +15,6 @@ import styles from './TransferMnemonicPage.scss';
 import config from '../../config';
 
 const messages = defineMessages({
-  title: {
-    id: 'transfer.form.instructions.title.label',
-    defaultMessage: '!!!Instructions',
-    description: 'Label "Instructions" on the transfer mnemonic page.'
-  },
-  step1: {
-    id: 'transfer.form.instructions.step1.text',
-    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
-    description: 'Text for instructions step 1 on the transfer mnemonic page.'
-  },
   recoveryPhraseInputLabel: {
     id: 'transfer.form.recovery.phrase.input.label',
     defaultMessage: '!!!Recovery phrase',
@@ -45,19 +35,13 @@ const messages = defineMessages({
     defaultMessage: '!!!Invalid recovery phrase',
     description: 'Error message shown when invalid recovery phrase was entered.'
   },
-  backButtonLabel: {
-    id: 'transfer.form.back',
-    defaultMessage: '!!!Back',
-    description: 'Label for the back button on the transfer mnemonic page.'
-  },
-  nextButtonLabel: {
-    id: 'transfer.form.next',
-    defaultMessage: '!!!Next',
-    description: 'Label for the next button on the transfer mnemonic page.'
-  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
+messages.nextButtonLabel = globalMessages.nextButtonLabel;
+messages.backButtonLabel = globalMessages.backButtonLabel;
+messages.step1 = globalMessages.step1;
+messages.instructionTitle = globalMessages.instructionTitle;
 
 type Props = {
   onSubmit: Function,
@@ -138,7 +122,7 @@ export default class TransferMnemonicPage extends Component<Props> {
             { /* Instructions for how to transfer */ }
             <div>
               <div className={styles.title}>
-                {intl.formatMessage(messages.title)}
+                {intl.formatMessage(messages.instructionTitle)}
               </div>
 
               <ul className={styles.instructionsList}>

@@ -24,6 +24,16 @@ import {
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/yoroi-backend-api';
+import {
+  getCryptoDaedalusWalletFromMnemonics,
+  getCryptoDaedalusWalletFromMasterKey
+} from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import {
+  getResultOrFail
+} from '../../api/ada/lib/cardanoCrypto/cryptoUtils';
+import {
+  RandomAddressChecker,
+} from 'rust-cardano-crypto';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -48,7 +58,9 @@ export default class DaedalusTransferStore extends Store {
     const actions = this.actions.ada.daedalusTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
     actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
-    actions.setupTransferFunds.listen(this._setupTransferFunds);
+    actions.startTransferMasterKey.listen(this._startTransferMasterKey);
+    actions.setupTransferFundsWithMnemonic.listen(this._setupTransferFundsWithMnemonic);
+    actions.setupTransferFundsWithMasterKey.listen(this._setupTransferFundsWithMasterKey);
     actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._transferFunds);
     actions.cancelTransferFunds.listen(this._reset);
@@ -65,6 +77,10 @@ export default class DaedalusTransferStore extends Store {
 
   _startTransferPaperFunds = (): void => {
     this._updateStatus('gettingPaperMnemonics');
+  }
+
+  _startTransferMasterKey = (): void => {
+    this._updateStatus('gettingMasterKey');
   }
 
   /** @Attention:
@@ -85,19 +101,14 @@ export default class DaedalusTransferStore extends Store {
     }
   }
 
-  /** Call the backend service to fetch all the UTXO then find which belong to the Daedalus wallet.
+  /**
+   * Call the backend service to fetch all the UTXO then find which belong to the Daedalus wallet.
    * Finally, generate the tx to transfer the wallet to Yoroi
    */
-  _setupTransferFunds = (payload: { recoveryPhrase: string }): void => {
-    let { recoveryPhrase: secretWords } = payload;
-    if (secretWords.split(' ').length === 27) {
-      const [newSecretWords, unscrambledLen] =
-        this.api.ada.unscramblePaperMnemonic(secretWords, 27);
-      if (!newSecretWords || !unscrambledLen) {
-        throw new Error('Failed to unscramble paper mnemonics!');
-      }
-      secretWords = newSecretWords;
-    }
+  _setupTransferWebSocket = (
+    checker: CryptoAddressChecker,
+    wallet: CryptoDaedalusWallet,
+  ): void => {
     this._updateStatus('restoringAddresses');
     this.ws = new WebSocket(websocketUrl);
     this.ws.addEventListener('open', () => {
@@ -119,22 +130,16 @@ export default class DaedalusTransferStore extends Store {
         Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
           this._updateStatus('checkingAddresses');
-          const addressesWithFunds = getAddressesWithFunds({
-            secretWords,
-            fullUtxo: data.addresses
-          });
+          const addressesWithFunds = getAddressesWithFunds({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
-          const transferTx = await generateTransferTx({
-            secretWords,
-            addressesWithFunds
-          });
+          const transferTx = await generateTransferTx({ wallet, addressesWithFunds });
           runInAction(() => {
             this.transferTx = transferTx;
           });
           this._updateStatus('readyToTransfer');
         }
       } catch (error) {
-        Logger.error(`DaedalusTransferStore::setupTransferFunds ${stringifyError(error)}`);
+        Logger.error(`DaedalusTransferStore::_setupTransferWebSocket ${stringifyError(error)}`);
         runInAction(() => {
           this.status = 'error';
           this.error = localizedError(error);
@@ -159,6 +164,36 @@ export default class DaedalusTransferStore extends Store {
         );
       }
     });
+  };
+
+  _setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }): void => {
+    let { recoveryPhrase: secretWords } = payload;
+    if (secretWords.split(' ').length === 27) {
+      const [newSecretWords, unscrambledLen] =
+        this.api.ada.unscramblePaperMnemonic(secretWords, 27);
+      if (!newSecretWords || !unscrambledLen) {
+        throw new Error('Failed to unscramble paper mnemonics!');
+      }
+      secretWords = newSecretWords;
+    }
+
+    this._setupTransferWebSocket(
+      getResultOrFail(
+        RandomAddressChecker.newCheckerFromMnemonics(secretWords)
+      ),
+      getCryptoDaedalusWalletFromMnemonics(secretWords)
+    );
+  }
+
+  _setupTransferFundsWithMasterKey = (payload: { masterKey: string }): void => {
+    const { masterKey: key } = payload;
+
+    this._setupTransferWebSocket(
+      getResultOrFail(
+        RandomAddressChecker.newChecker(key)
+      ),
+      getCryptoDaedalusWalletFromMasterKey(key)
+    );
   }
 
   _backToUninitialized = (): void => {

@@ -85,7 +85,7 @@ export default class WalletSummary extends Component<Props> {
           {!isLoadingTransactions ? (
             <SvgInline
               svg={exportTxToFileSvg}
-             
+
               className={styles.exportTxToFileSvg}
               title={intl.formatMessage(messages.exportIconTooltip)}
               onClick={openExportTxToFileDialog}

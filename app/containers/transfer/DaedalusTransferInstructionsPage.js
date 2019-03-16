@@ -18,8 +18,13 @@ const messages = defineMessages({
   },
   confirmationPaperText: {
     id: 'daedalusTransfer.instructions.attention.confirmationPaper',
-    defaultMessage: '!!!Transfer all funds from Daedalus Paper wallet',
-    description: 'Label "Transfer all funds from Daedalus Paper wallet" on the Daedalus transfer instructions page.'
+    defaultMessage: '!!!Transfer all funds from Daedalus paper wallet',
+    description: 'Label "Transfer all funds from Daedalus paper wallet" on the Daedalus transfer instructions page.'
+  },
+  confirmationMasterKeyText: {
+    id: 'daedalusTransfer.instructions.attention.confirmationMasterKey',
+    defaultMessage: '!!!Transfer all funds from Daedalus master key',
+    description: 'Label "Transfer all funds from Daedalus master key" on the Daedalus transfer instructions page.'
   },
 });
 
@@ -29,6 +34,7 @@ type Props = {
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
   onPaperConfirm: Function,
+  onMasterKeyConfirm: Function,
   disableTransferFunds: boolean,
 };
 
@@ -45,6 +51,7 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
       onFollowInstructionsPrerequisites,
       onConfirm,
       onPaperConfirm,
+      onMasterKeyConfirm,
       disableTransferFunds,
     } = this.props;
 
@@ -53,10 +60,12 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
         onFollowInstructionsPrerequisites={onFollowInstructionsPrerequisites}
         onConfirm={onConfirm}
         onPaperConfirm={onPaperConfirm}
+        onMasterKeyConfirm={onMasterKeyConfirm}
         disableTransferFunds={disableTransferFunds}
         attentionText={intl.formatMessage(messages.attentionText)}
         confirmationText={intl.formatMessage(messages.confirmationText)}
         confirmationPaperText={intl.formatMessage(messages.confirmationPaperText)}
+        confirmationMasterKeyText={intl.formatMessage(messages.confirmationMasterKeyText)}
       />
     );
   }

@@ -12,3 +12,11 @@ export type WalletHardwareInfo = {
   language: string,
   publicMasterKey: string,
 };
+
+export const WalletTypeOption : {
+  WEB_WALLET: WalletType,
+  HARDWARE_WALLET: WalletType
+} = {
+  WEB_WALLET: 'CWTWeb',
+  HARDWARE_WALLET: 'CWTHardware'
+};
