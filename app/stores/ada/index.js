@@ -10,18 +10,12 @@ import AddressesStore from './AdaAddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
+import AdaRedemptionStore from './AdaRedemptionStore';
+import LedgerConnectStore from './LedgerConnectStore';
+import LedgerSendStore from './LedgerSendStore';
 
 export const adaStoreClasses = {
-  wallets: AdaWalletsStore,
-  transactions: TransactionsStore,
-  walletSettings: AdaWalletSettingsStore,
-  addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore,
-  trezorConnect: TrezorConnectStore,
-  trezorSend: TrezorSendStore
-};
-
-export type AdaStoresMap = {
+  adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
@@ -29,9 +23,25 @@ export type AdaStoresMap = {
   daedalusTransfer: DaedalusTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
+  ledgerConnect: LedgerConnectStore,
+  ledgerSend: LedgerSendStore,
+};
+
+export type AdaStoresMap = {
+  adaRedemption: AdaRedemptionStore,
+  wallets: AdaWalletsStore,
+  transactions: TransactionsStore,
+  walletSettings: AdaWalletSettingsStore,
+  addresses: AddressesStore,
+  daedalusTransfer: DaedalusTransferStore,
+  trezorConnect: TrezorConnectStore,
+  trezorSend: TrezorSendStore,
+  ledgerConnect: LedgerConnectStore,
+  ledgerSend: LedgerSendStore,
 };
 
 const adaStores = observable({
+  adaRedemption: null,
   wallets: null,
   transactions: null,
   walletSettings: null,
@@ -39,6 +49,8 @@ const adaStores = observable({
   daedalusTransfer: null,
   trezorConnect: null,
   trezorSend: null,
+  ledgerConnect: null,
+  ledgerSend: null,
 });
 
 /** See `stores` index for description of this weird behavior

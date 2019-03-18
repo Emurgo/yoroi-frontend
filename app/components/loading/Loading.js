@@ -11,8 +11,6 @@ import type { ReactIntlMessage } from '../../types/i18nTypes';
 import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
 
-type State = {};
-
 type Props = {
   currencyIcon: string,
   apiIcon: string,
@@ -24,7 +22,7 @@ type Props = {
 };
 
 @observer
-export default class Loading extends Component<Props, State> {
+export default class Loading extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -63,9 +61,9 @@ export default class Loading extends Component<Props, State> {
     return (
       <div className={componentStyles}>
         <div className={styles.logos}>
-          <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} cleanup={['title']} />
-          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} cleanup={['title']} />
-          <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} cleanup={['title']} />
+          <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} />
+          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} />
+          <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} />
         </div>
         {hasLoadedCurrentLocale && (
           <div>

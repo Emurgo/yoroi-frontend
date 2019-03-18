@@ -5,6 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   general: {
@@ -27,12 +28,28 @@ const messages = defineMessages({
     defaultMessage: '!!!Terms of use',
     description: 'Label for the "Terms of use" link in the settings menu.',
   },
+  display: {
+    id: 'settings.menu.display.link.label',
+    defaultMessage: '!!!Themes',
+    description: 'Label for the "Themes" link in the settings menu.',
+  },
+  AboutYoroi: {
+    id: 'settings.menu.aboutYroi.link.label',
+    defaultMessage: '!!!About Yoroi',
+    description: 'Label for the "About Yoroi" link in the settings menu.',
+  },
+  adaRedemption: {
+    id: 'settings.menu.adaRedemption.link.label',
+    defaultMessage: '!!!Ada Redemption',
+    description: 'Label for the "Ada Redemption" link in the settings menu.',
+  }
 });
 
 type Props = {
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
+  currentLocale: string,
 };
 
 @observer
@@ -44,7 +61,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
 
     return (
       <div>
@@ -80,6 +97,31 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.display)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
+            active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
+            className="display"
+          />
+
+          {(!environment.isMainnet() || currentLocale === 'ko-KR' || currentLocale === 'ja-JP') &&
+            // all unredemed Ada is held being either Japanese or Korean people
+            // avoid showing this menu option to all users to avoid confusing them
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.adaRedemption)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
+              active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
+              className="adaRedemption"
+            />
+          }
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.AboutYoroi)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
+            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
+            className="AboutYoroi"
           />
         </div>
       </div>

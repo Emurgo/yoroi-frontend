@@ -11,6 +11,7 @@ import Dialog from '../widgets/Dialog';
 import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
+import config from '../../config';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -123,7 +124,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 

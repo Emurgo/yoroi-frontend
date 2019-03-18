@@ -69,7 +69,7 @@ $ npm run eslint
 $ npm run test-e2e-chrome
 # How to run one .feature file (One feature file = one covered component from youtrack)
 $ npm run test-by-feature feature/wallet-creation.feature
-# How to run one test. Instead of '@it-10' you can use any tag from youtrack
+# How to run one test.
 $ npm run test-by-tag @it-10
 ```
 

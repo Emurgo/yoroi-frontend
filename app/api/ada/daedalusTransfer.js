@@ -21,12 +21,6 @@ import {
   GenerateTransferTxError
 } from './errors';
 import {
-  getCryptoDaedalusWalletFromMnemonics
-} from './lib/cardanoCrypto/cryptoWallet';
-import {
-  getAdaAddressesByType
-} from './adaAddress';
-import {
   getAllUTXOsForAddresses
 } from './adaTransactions/adaNewTransactions';
 import type {
@@ -35,19 +29,17 @@ import type {
 import type {
   TransferTx
 } from '../../types/TransferTypes';
+import { getReceiverAddress } from './adaAddress';
 
 /** Go through the whole UTXO and see which belong to the walet and have non-empty balance
  * @param fullUtxo the full utxo of the Cardano blockchain
  */
 export function getAddressesWithFunds(payload: {
-  secretWords: string,
+  checker: CryptoAddressChecker,
   fullUtxo: Array<string>
 }): Array<CryptoDaedalusAddressRestored> {
   try {
-    const { secretWords, fullUtxo } = payload;
-    const checker: CryptoAddressChecker = getResultOrFail(
-      RandomAddressChecker.newCheckerFromMnemonics(secretWords)
-    );
+    const { checker, fullUtxo } = payload;
     const addressesWithFunds: Array<CryptoDaedalusAddressRestored> = getResultOrFail(
       RandomAddressChecker.checkAddresses(checker, fullUtxo)
     );
@@ -60,12 +52,12 @@ export function getAddressesWithFunds(payload: {
 
 /** Generate transaction including all addresses with no change */
 export async function generateTransferTx(payload: {
-  secretWords: string,
+  wallet: CryptoDaedalusWallet,
   addressesWithFunds: Array<CryptoDaedalusAddressRestored>
 }): Promise<TransferTx> {
   try {
 
-    const { secretWords, addressesWithFunds } = payload;
+    const { wallet, addressesWithFunds } = payload;
 
     // fetch data to make transaction
     const senders = addressesWithFunds.map(a => a.address);
@@ -78,10 +70,9 @@ export async function generateTransferTx(payload: {
     const inputs = inputWrappers.map(w => w.input);
 
     // pick which address to send transfer to
-    const output = await _getReceiverAddress();
+    const output = await getReceiverAddress();
 
-    // get wallet and make transaction
-    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
+    // make transaction
     const tx: MoveResponse = getResultOrFail(Wallet.move(wallet, inputs, output));
 
     // return summary of transaction
@@ -99,14 +90,6 @@ export async function generateTransferTx(payload: {
     }
     throw new GenerateTransferTxError();
   }
-}
-
-/** Follow heuristic to pick which address to send Daedalus transfer to */
-async function _getReceiverAddress(): Promise<string> {
-  // Note: Current heuristic is to pick the first address in the wallet
-  // rationale & better heuristic described at https://github.com/Emurgo/yoroi-frontend/issues/96
-  const addresses = await getAdaAddressesByType('External');
-  return addresses[0].cadId;
 }
 
 declare type DaedalusInputWrapper = {

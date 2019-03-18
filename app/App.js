@@ -9,8 +9,10 @@ import ko from 'react-intl/locale-data/ko';
 import ja from 'react-intl/locale-data/ja';
 import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
+import de from 'react-intl/locale-data/de';
+import fr from 'react-intl/locale-data/fr';
 import { Routes } from './Routes';
-import { yoroiTheme } from './themes/yoroi';
+import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
 import { themeOverrides } from './themes/overrides/index';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores/index';
@@ -20,7 +22,7 @@ import environment from './environment';
 import { hot } from 'react-hot-loader';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr]);
 
 @observer
 class App extends Component<{
@@ -48,16 +50,14 @@ class App extends Component<{
     // (missed in object keys) just stay in english
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
-    const currentTheme = 'yoroi';
-    const themeVars = require(`./themes/prebuilt/${currentTheme}.js`); // eslint-disable-line
-
+    const themeVars = stores.profile.currentThemeVars;
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
     return (
       <div style={{ height: '100%' }}>
         <ThemeManager variables={themeVars} />
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
-        <ThemeProvider theme={yoroiTheme} themeOverrides={themeOverrides}>
+        <ThemeProvider theme={yoroiPolymorphTheme} themeOverrides={themeOverrides}>
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             <Router history={history}>
               {Routes(stores, actions)}

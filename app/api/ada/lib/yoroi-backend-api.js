@@ -57,7 +57,7 @@ export type UtxoSumForAddressesResponse = {
 
 export const getTxsBodiesForUTXOs = (
   txsHashes: Array<string>
-): Promise<Array<string>> => (
+): Promise<{[key: string]:string}> => (
   axios(
     `${backendUrl}/api/txs/txBodies`,
     {
@@ -66,7 +66,7 @@ export const getTxsBodiesForUTXOs = (
         txsHashes
       }
     }
-  ).then(response => Object.values(response.data))
+  ).then(response => response.data)
     .catch((error) => {
       Logger.error('yoroi-backend-api::getTxsBodiesForUTXOs error: ' + stringifyError(error));
       throw new GetTxsBodiesForUTXOsApiError();

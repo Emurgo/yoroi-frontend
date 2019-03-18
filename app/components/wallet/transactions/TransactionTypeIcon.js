@@ -43,7 +43,7 @@ export default class TransactionTypeIcon extends Component<Props> {
 
     return (
       <div className={transactionTypeIconClasses}>
-        <SvgInline svg={icon} className={styles.transactionTypeIcon} cleanup={['title']} />
+        <SvgInline svg={icon} className={styles.transactionTypeIcon} />
       </div>
     );
   }

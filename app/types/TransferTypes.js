@@ -5,6 +5,7 @@ export type TransferStatus =
     'uninitialized'
   | 'gettingMnemonics'
   | 'gettingPaperMnemonics'
+  | 'gettingMasterKey'
   | 'restoringAddresses'
   | 'checkingAddresses'
   | 'generatingTx'

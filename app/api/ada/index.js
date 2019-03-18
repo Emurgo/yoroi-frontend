@@ -38,8 +38,8 @@ import {
   restoreAdaWallet
 } from './restoreAdaWallet';
 import {
-  createTrezorWallet
-} from './hardwareWallet/createTrezorWallet';
+  createWallet,
+} from './hardwareWallet/createWallet';
 import {
   getAdaTxsHistoryByWallet,
   getAdaTxLastUpdatedDate,
@@ -50,11 +50,16 @@ import {
   getAdaTransactionFee,
   newAdaTransaction
 } from './adaTransactions/adaNewTransactions';
-import type { TrezorSignTxPayload } from '../../domain/TrezorSignTx';
+import type {
+  TrezorSignTxPayload,
+  LedgerSignTxPayload,
+} from '../../domain/HWSignTx';
 import {
   createTrezorSignTxPayload,
-  newTrezorTransaction,
-} from './hardwareWallet/trezorNewTransactions';
+  broadcastTrezorSignedTx,
+  createLedgerSignTxPayload,
+  prepareAndBroadcastLedgerSignedTx,
+} from './hardwareWallet/newTransaction';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -90,16 +95,28 @@ import type {
   RestoreWalletRequest,
   RestoreWalletResponse,
   UpdateWalletResponse,
-  CreateTrezorWalletRequest,
-  CreateTrezorWalletResponse,
-  SendTrezorSignedTxResponse,
+  CreateHardwareWalletRequest,
+  CreateHardwareWalletResponse,
+  BroadcastTrezorSignedTxResponse,
+  PrepareAndBroadcastLedgerSignedTxResponse,
 } from '../common';
-import { InvalidWitnessError } from './errors';
+import type {
+  SignTransactionResponse as LedgerSignTxResponse
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { InvalidWitnessError, RedeemAdaError, RedemptionKeyAlreadyUsedError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
 import type { SignedResponse } from './lib/yoroi-backend-api';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
+import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
+import {
+  isValidRedemptionKey,
+  isValidPaperVendRedemptionKey
+} from '../../utils/redemption-key-validation';
+import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
+import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
+import config from '../../config';
 import type { PaperWalletPass } from './adaWallet';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 
@@ -110,23 +127,51 @@ export type CreateTransactionRequest = {
   amount: string,
   password: string
 };
-export type SendTrezorSignedTxRequest = {
-  signedTxHex: string,
-  changeAdaAddr: AdaAddress
-};
 export type CreateTrezorSignTxDataRequest = {
   receiver: string,
   amount: string
 };
 export type CreateTrezorSignTxDataResponse = {
-  trezorSignTxPayload: TrezorSignTxPayload,
+  trezorSignTxPayload: TrezorSignTxPayload, // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   changeAddress: AdaAddress
+};
+export type BroadcastTrezorSignedTxRequest = {
+  signedTxHex: string,
+  changeAdaAddr: AdaAddress
+};
+export type CreateLedgerSignTxDataRequest = {
+  receiver: string,
+  amount: string
+};
+export type CreateLedgerSignTxDataResponse = {
+  ledgerSignTxPayload: LedgerSignTxPayload,
+  changeAddress: AdaAddress,
+  txExt: UnsignedTransactionExt
+};
+export type PrepareAndBroadcastLedgerSignedTxRequest = {
+  ledgerSignTxResp: LedgerSignTxResponse,
+  changeAdaAddr: AdaAddress,
+  unsignedTx: any,
+  txExt: UnsignedTransactionExt,
 };
 export type UpdateWalletRequest = {
   walletId: string,
   name: string,
   assurance: AdaAssurance
 };
+export type RedeemAdaRequest = {
+  redemptionCode: string,
+  accountId: string,
+  walletPassword: ?string
+};
+export type RedeemAdaResponse = Wallet;
+export type RedeemPaperVendedAdaRequest = {
+  shieldedRedemptionKey: string,
+  mnemonics: string,
+  accountId: string,
+  walletPassword: ?string
+};
+export type RedeemPaperVendedAdaResponse = RedeemPaperVendedAdaRequest;
 export type ImportWalletFromKeyRequest = {
   filePath: string,
   walletPassword: ?string
@@ -350,9 +395,10 @@ export default class AdaApi {
 
       const { changeAdaAddress, txExt }: AdaFeeEstimateResponse =
           await getAdaTransactionFee(receiver, amount);
-      const trezorSignTxPayload: TrezorSignTxPayload = await createTrezorSignTxPayload(txExt);
 
+      const trezorSignTxPayload: TrezorSignTxPayload = await createTrezorSignTxPayload(txExt);
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
+
       return {
         trezorSignTxPayload,
         changeAddress: changeAdaAddress
@@ -365,18 +411,18 @@ export default class AdaApi {
     }
   }
 
-  async sendTrezorSignedTx(
-    request: SendTrezorSignedTxRequest
-  ): Promise<SendTrezorSignedTxResponse> {
-    Logger.debug('AdaApi::sendTrezorSignedTx called');
+  async broadcastTrezorSignedTx(
+    request: BroadcastTrezorSignedTxRequest
+  ): Promise<BroadcastTrezorSignedTxResponse> {
+    Logger.debug('AdaApi::broadcastTrezorSignedTx called');
     const { signedTxHex, changeAdaAddr } = request;
     try {
-      const response = await newTrezorTransaction(signedTxHex, changeAdaAddr);
-      Logger.debug('AdaApi::sendTrezorSignedTx success: ' + stringifyData(response));
+      const response = await broadcastTrezorSignedTx(signedTxHex, changeAdaAddr);
+      Logger.debug('AdaApi::broadcastTrezorSignedTx success: ' + stringifyData(response));
 
       return response;
     } catch (error) {
-      Logger.error('AdaApi::sendTrezorSignedTx error: ' + stringifyError(error));
+      Logger.error('AdaApi::broadcastTrezorSignedTx error: ' + stringifyError(error));
 
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
@@ -384,6 +430,66 @@ export default class AdaApi {
 
       // We don't know what the problem was so throw a generic error
       throw new GenericApiError();
+    }
+  }
+
+  async createLedgerSignTxData(
+    request: CreateLedgerSignTxDataRequest
+  ): Promise<CreateLedgerSignTxDataResponse> {
+    try {
+      Logger.debug('AdaApi::createLedgerSignTxData called');
+      const { receiver, amount } = request;
+
+      const { changeAdaAddress, txExt }: AdaFeeEstimateResponse
+        = await getAdaTransactionFee(receiver, amount);
+
+      const ledgerSignTxPayload: LedgerSignTxPayload = await createLedgerSignTxPayload(txExt);
+
+      Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
+      return {
+        ledgerSignTxPayload,
+        changeAddress: changeAdaAddress,
+        txExt
+      };
+    } catch (error) {
+      Logger.error('AdaApi::createLedgerSignTxData error: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
+    }
+  }
+
+  async prepareAndBroadcastLedgerSignedTx(
+    request: PrepareAndBroadcastLedgerSignedTxRequest
+  ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
+    try {
+      Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
+
+      const { ledgerSignTxResp, changeAdaAddr, unsignedTx, txExt } = request;
+      const response = await prepareAndBroadcastLedgerSignedTx(
+        ledgerSignTxResp,
+        changeAdaAddr,
+        unsignedTx,
+        txExt
+      );
+      Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx success: ' + stringifyData(response));
+
+      return response;
+    } catch (error) {
+      Logger.error('AdaApi::prepareAndBroadcastLedgerSignedTx error: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
     }
   }
 
@@ -561,12 +667,12 @@ export default class AdaApi {
     }
   }
 
-  async createTrezorWallet(
-    request: CreateTrezorWalletRequest
-  ): Promise<CreateTrezorWalletResponse> {
+  async createHardwareWallet(
+    request: CreateHardwareWalletRequest
+  ): Promise<CreateHardwareWalletResponse> {
     try {
-      Logger.debug('AdaApi::connectTrezor called');
-      const { walletName, publicMasterKey, deviceFeatures } = request;
+      Logger.debug('AdaApi::createHardwareWallet called');
+      const { walletName, publicMasterKey, hwFeatures } = request;
       const assurance = 'CWANormal';
       const unit = 0;
 
@@ -577,23 +683,23 @@ export default class AdaApi {
           cwUnit: unit
         },
         cwHardwareInfo: {
-          vendor: deviceFeatures.vendor,
-          model: deviceFeatures.model,
-          deviceId: deviceFeatures.device_id,
-          label: deviceFeatures.label,
-          majorVersion: deviceFeatures.major_version,
-          minorVersion: deviceFeatures.minor_version,
-          patchVersion: deviceFeatures.patch_version,
-          language: deviceFeatures.language,
           publicMasterKey,
+          vendor: hwFeatures.vendor,
+          model: hwFeatures.model,
+          deviceId: hwFeatures.deviceId,
+          label: hwFeatures.label,
+          majorVersion: hwFeatures.majorVersion,
+          minorVersion: hwFeatures.minorVersion,
+          patchVersion: hwFeatures.patchVersion,
+          language: hwFeatures.language,
         },
       };
-      const wallet: AdaWallet = await createTrezorWallet({ walletInitData });
+      const wallet: AdaWallet = await createWallet({ walletInitData });
 
-      Logger.debug('AdaApi::connectTrezor success');
+      Logger.debug('AdaApi::createHardwareWallet success');
       return _createWalletFromServerData(wallet);
     } catch (error) {
-      Logger.error('AdaApi::connectTrezor error: ' + stringifyError(error));
+      Logger.error('AdaApi::createHardwareWallet error: ' + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
@@ -629,6 +735,67 @@ export default class AdaApi {
       }
     }
   }
+
+  async getPDFSecretKey(
+    file: ?Blob,
+    decryptionKey: ?string,
+    redemptionType: string
+  ): Promise<string> {
+    Logger.debug('AdaApi::getPDFSecretKey called');
+    try {
+      const fileBuffer = await readFile(file);
+      const decryptedFileBuffer = decryptFile(decryptionKey, redemptionType, fileBuffer);
+      const parsedPDFString = await parsePDFFile(decryptedFileBuffer);
+      return getSecretKey(parsedPDFString);
+    } catch (error) {
+      Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  isValidRedemptionKey = (mnemonic: string): boolean => (isValidRedemptionKey(mnemonic));
+
+  isValidPaperVendRedemptionKey = (mnemonic: string): boolean => (
+    isValidPaperVendRedemptionKey(mnemonic)
+  );
+
+  isValidRedemptionMnemonic = (mnemonic: string): boolean => (
+    isValidMnemonic(mnemonic, config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH)
+  );
+
+  redeemAda = async (
+    request: RedeemAdaParams
+  ): BigNumber => {
+    Logger.debug('AdaApi::redeemAda called');
+    try {
+      const transactionAmount = await redeemAda(request);
+      Logger.debug('AdaApi::redeemAda success');
+      return transactionAmount;
+    } catch (error) {
+      Logger.error('AdaApi::redeemAda error: ' + stringifyError(error));
+      if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
+      }
+      throw new RedeemAdaError();
+    }
+  };
+
+  redeemPaperVendedAda = async (
+    request: RedeemPaperVendedAdaParams
+  ): BigNumber => {
+    Logger.debug('AdaApi::redeemAdaPaperVend called');
+    try {
+      const transactionAmount = await redeemPaperVendedAda(request);
+      Logger.debug('AdaApi::redeemAdaPaperVend success');
+      return transactionAmount;
+    } catch (error) {
+      Logger.error('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
+      if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
+      }
+      throw new RedeemAdaError();
+    }
+  };
 }
 // ========== End of class AdaApi =========
 

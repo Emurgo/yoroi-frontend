@@ -170,3 +170,7 @@ export type UTXO = {
   receiver: string,
   amount: string
 }
+
+export type PDF = {
+  getPage: Function
+}

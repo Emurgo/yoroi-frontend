@@ -42,6 +42,7 @@ class WalletBackupStore extends Store {
     a.restartWalletBackup.listen(this._restartWalletBackup);
     a.cancelWalletBackup.listen(this._cancelWalletBackup);
     a.finishWalletBackup.listen(this._finishWalletBackup);
+    a.removeOneMnemonicWord.listen(this._removeOneWord);
   }
 
   @action _initiateWalletBackup = (params: { recoveryPhrase: Array<string> }) => {
@@ -58,7 +59,7 @@ class WalletBackupStore extends Store {
     this.isEntering = false;
     this.isTermDeviceAccepted = false;
     this.isTermRecoveryAccepted = false;
-    this.countdownRemaining = environment.isTest() ? 0 : 10;
+    this.countdownRemaining = !environment.isMainnet() ? 0 : 10;
     if (this.countdownTimerInterval) clearInterval(this.countdownTimerInterval);
     this.countdownTimerInterval = setInterval(() => {
       if (this.countdownRemaining > 0) {
@@ -86,7 +87,7 @@ class WalletBackupStore extends Store {
 
   @action _addWordToWalletBackupVerification = (params: { word: string, index: number }) => {
     const { word, index } = params;
-    this.enteredPhrase.push({ word });
+    this.enteredPhrase.push({ word, index });
     const pickedWord = this.recoveryPhraseSorted[index];
     if (pickedWord && pickedWord.word === word) pickedWord.isActive = false;
   };
@@ -96,6 +97,14 @@ class WalletBackupStore extends Store {
     this.recoveryPhraseSorted = this.recoveryPhraseSorted.map(
       ({ word }) => ({ word, isActive: true })
     );
+  };
+
+  @action _removeOneWord = () => {
+    if (!this.enteredPhrase) {
+      return;
+    }
+    const poppedWord = this.enteredPhrase.pop();
+    this.recoveryPhraseSorted[poppedWord.index].isActive = true;
   };
 
   @computed get isRecoveryPhraseValid(): boolean {

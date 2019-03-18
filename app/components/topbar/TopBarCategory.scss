@@ -15,23 +15,27 @@
 }
 
 .active {
-  .icon:not(.withTrezorTIcon) path {
+  .icon:not(.withHardwareWalletIcon) path {
     stroke: var(--theme-button-primary-background-color);
     fill: var(--theme-button-primary-background-color);
   }
 
-  .icon:not(.walletsIcon):not(.withTrezorTIcon) path {
+  .icon:not(.walletsIcon):not(.withHardwareWalletIcon) path {
     fill: var(--theme-button-primary-background-color);
   }
 
-  .withTrezorTIcon {
+  .icon:not(.walletsIcon):not(.withHardwareWalletIcon) polygon {
+    fill: var(--theme-button-primary-background-color);
+  }
+
+  .withHardwareWalletIcon {
     & > svg {
       // plus-logo
       & > g > g:nth-child(1) {
         stroke: none;
         fill: var(--theme-button-primary-background-color);
       }
-      // trezor-t-logo
+      // hardware wallet (trezor/ledger)
       & > g > g:nth-child(2) {
         stroke: var(--theme-button-primary-background-color);
       }
@@ -46,9 +50,6 @@
 .icon {
   flex-shrink: 0;
   & > svg {
-    width: 24px;
-    height: 24px;
-
     & > g > path {
       fill: var(--theme-icon-topbar-color);
     }
@@ -67,7 +68,7 @@
   }
 }
 
-.withTrezorTIcon {
+.withHardwareWalletIcon {
   flex-shrink: 0;
   & > svg {
     width: 64px;
@@ -77,7 +78,7 @@
       stroke: none;
       fill: var(--theme-icon-topbar-color);
     }
-    // trezor-t-logo
+    // hardware wallet (trezor/ledger)
     & > g > g:nth-child(2) {
       stroke: var(--theme-icon-topbar-color);
     }    
@@ -94,6 +95,10 @@
     }
 
     &.with-trezor-t {
+      left: 64px;
+    }
+
+    &.with-ledger-nano-s {
       left: 64px;
     }    
 

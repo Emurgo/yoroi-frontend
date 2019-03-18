@@ -7,6 +7,11 @@ import { defineMessages } from 'react-intl';
 */
 
 export default defineMessages({
+  invalidMasterKey: {
+    id: 'global.errors.invalidMasterKey',
+    defaultMessage: '!!!Invalid master key entered, please check.',
+    description: 'Error message shown when invalid master key was entered.'
+  },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
     defaultMessage: '!!!This field is required.',
@@ -31,6 +36,21 @@ export default defineMessages({
     id: 'global.passwordInstructions',
     defaultMessage: '!!!Note: Password needs to be at least 12 characters long.',
     description: 'Password instructions note.',
+  },
+  nextButtonLabel: {
+    id: 'global.labels.next',
+    defaultMessage: '!!!Next',
+    description: 'Label next button.'
+  },
+  backButtonLabel: {
+    id: 'global.labels.back',
+    defaultMessage: '!!!Back',
+    description: 'Label next button.'
+  },
+  instructionTitle: {
+    id: 'transfer.instructions.instructions.title.label',
+    defaultMessage: '!!!Instructions',
+    description: 'Label "Instructions"'
   },
   cancel: {
     id: 'global.labels.cancel',
@@ -92,10 +112,10 @@ export default defineMessages({
     defaultMessage: '!!!German',
     description: 'Language name for "German" language.'
   },
-  languageCroatian: {
-    id: 'global.language.croatian',
-    defaultMessage: '!!!Croatian',
-    description: 'Language name for "Croatian" language.'
+  languageFrench: {
+    id: 'global.language.french',
+    defaultMessage: '!!!French',
+    description: 'Language name for "French" language.'
   },
   unitAda: {
     id: 'global.unit.ada',
@@ -137,30 +157,90 @@ export default defineMessages({
     defaultMessage: '!!!Total',
     description: 'Label for the "Total" in the wallet send confirmation dialog.',
   },
-  walletSendConfirmationBackButtonLabel: {
-    id: 'wallet.send.confirmationDialog.back',
-    defaultMessage: '!!!Back',
-    description: 'Label for the back button in the wallet send confirmation dialog.'
+  hwConnectDialogConnectButtonLabel: {
+    id: 'wallet.connect.hw.dialog.connect.button.label',
+    defaultMessage: '!!!Connect',
+    description: 'Label for the "Connect" button on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogSaveButtonLabel: {
+    id: 'wallet.connect.hw.dialog.save.button.label',
+    defaultMessage: '!!!Save',
+    description: 'Label for the "Save" button on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutIntroTextLine1: {
+    id: 'wallet.connect.hw.dialog.step.about.introText.line.1',
+    defaultMessage: '!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.',
+    description: 'Header text of about step on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutIntroTextLine2: {
+    id: 'wallet.connect.hw.dialog.step.about.introText.line.2',
+    defaultMessage: '!!!It is more secure because your private key never leaves the hardware wallet.',
+    description: 'Header text of about step on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutIntroTextLine3: {
+    id: 'wallet.connect.hw.dialog.step.about.introText.line.3',
+    defaultMessage: '!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.',
+    description: 'Header text of about step on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutPrerequisite4: {
+    id: 'wallet.connect.hw.dialog.step.about.prerequisite.4',
+    defaultMessage: '!!!Your computer must remain connected to the Internet throughout the process.',
+    description: 'Fourth Prerequisite on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogAboutPrerequisiteHeader: {
+    id: 'wallet.connect.hw.dialog.step.about.prerequisite.header',
+    defaultMessage: '!!!Prerequisites',
+    description: 'Prerequisite header on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogConnectIntroTextLine3: {
+    id: 'wallet.connect.hw.dialog.step.connect.introText.line.3',
+    defaultMessage: '!!!This process shares the Cardano public key with Yoroi.',
+    description: 'Header text of about step on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogSaveWalletNameInputLabel: {
+    id: 'wallet.connect.hw.dialog.step.save.walletName.label',
+    defaultMessage: '!!!Wallet name',
+    description: 'Label for the wallet name input on the Connect to any Hardware Wallet dialog.'
+  },
+  hwConnectDialogSaveWalletNameInputPH: {
+    id: 'wallet.connect.hw.dialog.step.save.walletName.hint',
+    defaultMessage: '!!!Enter wallet name',
+    description: 'Placeholder for the wallet name input on the Connect to any Hardware Wallet dialog.'
+  },
+  ledgerConnectAllDialogTitle: {
+    id: 'wallet.connect.ledger.dialog.title.label',
+    defaultMessage: '!!!Connect to Ledger Hardware Wallet',
+    description: 'Label "Connect to Ledger Hardware Wallet" on the Connect to Ledger Hardware Wallet dialog.'
+  },
+  ledgerError101: {
+    id: 'wallet.connect.ledger.error.101',
+    defaultMessage: '!!!Failed to connect. Please check your ledger device and retry.',
+    description: '<Ledger device not found. Please check your ledger device and retry.>'
   },
   trezorConnectAllDialogTitle: {
-    id: 'wallet.trezor.dialog.title.label',
+    id: 'wallet.connect.trezor.dialog.title.label',
     defaultMessage: '!!!Connect to Trezor Hardware Wallet',
     description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
   },
   trezorError101: {
-    id: 'wallet.trezor.error.101',
+    id: 'wallet.connect.trezor.error.101',
     defaultMessage: '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
     description: '<Failed to connect trezor.io. Please check your Internet connection and retry.>'
   },
-  trezorError102: {
-    id: 'wallet.trezor.error.102',
+  hwError101: {
+    id: 'wallet.hw.common.error.101',
     defaultMessage: '!!!Necessary permissions were not granted by the user. Please retry.',
     description: '<Necessary permissions were not granted by the user. Please retry.>'
   },
   trezorError103: {
-    id: 'wallet.trezor.error.103',
+    id: 'wallet.connect.trezor.error.103',
     defaultMessage: '!!!Cancelled. Please retry.',
     description: '<Cancelled. Please retry.>'
+  },
+  hwConnectDialogSaveError101: {
+    id: 'wallet.connect.hw.dialog.step.save.error.101',
+    defaultMessage: '!!!Failed to save. Please check your Internet connection and retry.',
+    description: '<Failed to save. Please check your Internet connection and retry.> on the Connect to Trezor Hardware Wallet dialog.'
   },
   walletCreatedNotificationMessage: {
     id: 'wallet.summary.page.walletCreatedNotificationMessage',
@@ -172,6 +252,11 @@ export default defineMessages({
     defaultMessage: '!!!You have successfully restored your Wallet',
     description: 'Notification Message for successful wallet restoration.',
   },
+  ledgerNanoSWalletIntegratedNotificationMessage: {
+    id: 'wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage',
+    defaultMessage: '!!!You have successfully integrated with your Ledger Nano S device',
+    description: 'Notification Message for successful integration with Ledger Nano S device.',
+  },
   trezorTWalletIntegratedNotificationMessage: {
     id: 'wallet.summary.page.trezorTWalletIntegratedNotificationMessage',
     defaultMessage: '!!!You have successfully integrated with your Trezor Model T device',
@@ -181,6 +266,11 @@ export default defineMessages({
     id: 'wallet.summary.no.transaction',
     defaultMessage: '!!!No transactions found',
     description: 'Message shown when wallet transaction search returns zero results.'
+  },
+  step1: {
+    id: 'transfer.form.instructions.step1.text',
+    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
+    description: 'Text for instructions step 1 on the transfer mnemonic page.'
   },
 });
 

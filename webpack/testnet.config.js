@@ -55,6 +55,16 @@ module.exports = {
           presets: []
         }
       },
+      // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
+      {
+        test: /pdf\.worker(\.min)?\.js$/,
+        use: 'raw-loader',
+      },
+      {
+        test: /\.(js|jsx)$/,
+        exclude: [/node_modules/, /pdf\.worker(\.min)?\.js$/],
+        use: 'babel-loader',
+      },
       {
         test: /\.css$/,
         use: [
@@ -92,7 +102,7 @@ module.exports = {
       {
         test: /\.inline\.svg$/,
         issuer: /\.js$/,
-        loader: 'raw-loader',
+        loader: 'svg-inline-loader?removeSVGTagAttrs=false&removeTags=true&removingTags[]=title&removingTags[]=desc&idPrefix=[sha512:hash:hex:5]-',
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif)$/,

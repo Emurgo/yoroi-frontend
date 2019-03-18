@@ -17,12 +17,13 @@ import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
-import TrezorSendConfirmationDialog from './trezor/TrezorSendConfirmationDialog';
+import HWSendConfirmationDialog from './HWSendConfirmationDialog';
 import {
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits
 } from '../../../utils/formatters';
 import dangerIcon from '../../../assets/images/danger.inline.svg';
+import config from '../../../config';
 
 const messages = defineMessages({
   titleLabel: {
@@ -65,11 +66,6 @@ const messages = defineMessages({
     defaultMessage: '!!!You can add a message if you want',
     description: 'Hint in the "description" text area in the wallet send form.'
   },
-  nextButtonLabel: {
-    id: 'wallet.send.form.next',
-    defaultMessage: '!!!Next',
-    description: 'Label for the next button on the wallet send form.'
-  },
   invalidAddress: {
     id: 'wallet.send.form.errors.invalidAddress',
     defaultMessage: '!!!Please enter a valid address.',
@@ -103,20 +99,21 @@ const messages = defineMessages({
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
+messages.nextButtonLabel = globalMessages.nextButtonLabel;
 
 type Props = {
   currencyUnit: string,
   currencyMaxIntegerDigits: number,
   currencyMaxFractionalDigits: number,
   hasAnyPending: boolean,
-  isTrezorTWallet: boolean,
+  isHardwareWallet: boolean,
   validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
   calculateTransactionFee: (receiver: string, amount: string) => Promise<BigNumber>,
   addressValidator: Function,
   openDialogAction: Function,
   isDialogOpen: Function,
   webWalletConfirmationDialogRenderCallback: Function,
-  trezorTWalletConfirmationDialogRenderCallback: Function,
+  hardwareWalletConfirmationDialogRenderCallback: Function,
 };
 
 type State = {
@@ -211,7 +208,7 @@ export default class WalletSendForm extends Component<Props, State> {
     options: {
       validateOnBlur: false,
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 
@@ -237,7 +234,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
     const hasPendingTxWarning = (
       <div className={styles.contentWarning}>
-        <SvgInline svg={dangerIcon} className={styles.icon} cleanup={['title']} />
+        <SvgInline svg={dangerIcon} className={styles.icon} />
         <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
       </div>
     );
@@ -287,7 +284,7 @@ export default class WalletSendForm extends Component<Props, State> {
   /** Makes custom button component depends on type of active wallet
     * basically controlles which confirmation dialog to open
     * CASE 1: Web Wallet
-    * CASE 2: Trezor Model T Wallet */
+    * CASE 2: Hardware Wallet (Trezor or Ledger) */
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
 
@@ -307,8 +304,8 @@ export default class WalletSendForm extends Component<Props, State> {
       * WalletSendForm.js is a component and we already have Send Confirmation dialog's containers
       * WalletSendForm.js tries to open a container but invoking it component
       * this whole logic should be in WalletSendForm's container */
-    const targetDialog =  this.props.isTrezorTWallet ?
-      TrezorSendConfirmationDialog :
+    const targetDialog =  this.props.isHardwareWallet ?
+      HWSendConfirmationDialog :
       WalletSendConfirmationDialog;
     const onMouseUp = () => openDialogAction({
       dialog: targetDialog
@@ -329,22 +326,22 @@ export default class WalletSendForm extends Component<Props, State> {
   /** Makes component for respective send confirmation dialog
     * returns null when dialog is not needed
     * CASE 1: Web Wallet
-    * CASE 2: Trezor Model T Wallet */
+    * CASE 2: Hardware Wallet (Trezor or Ledger) */
   _makeConfirmationDialogComponent(): Node {
     let component = null;
 
     const {
       isDialogOpen,
       webWalletConfirmationDialogRenderCallback,
-      trezorTWalletConfirmationDialogRenderCallback
+      hardwareWalletConfirmationDialogRenderCallback
     } = this.props;
 
     // this function is called from render hence it should return ASAP, hence using renderCB
     let renderCB = null;
     if (isDialogOpen(WalletSendConfirmationDialog)) {
       renderCB = webWalletConfirmationDialogRenderCallback;
-    } else if (isDialogOpen(TrezorSendConfirmationDialog)) {
-      renderCB = trezorTWalletConfirmationDialogRenderCallback;
+    } else if (isDialogOpen(HWSendConfirmationDialog)) {
+      renderCB = hardwareWalletConfirmationDialogRenderCallback;
     }
 
     if (renderCB) {

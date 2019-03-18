@@ -20,6 +20,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Tap each word in the correct order to verify your recovery phrase',
     description: 'Instructions for verifying wallet recovery phrase on dialog for entering wallet recovery phrase.'
   },
+  buttonLabelRemoveLast: {
+    id: 'wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast',
+    defaultMessage: '!!!Remove last',
+    description: 'Label for button "Remove Last" on wallet backup dialog'
+  },
   buttonLabelConfirm: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelConfirm',
     defaultMessage: '!!!Confirm',
@@ -51,13 +56,14 @@ type Props = {
   isTermRecoveryAccepted: boolean,
   isSubmitting: boolean,
   onAddWord: Function,
-  canFinishBackup: boolean,
   onClear: Function,
   onAcceptTermDevice: Function,
   onAcceptTermRecovery: Function,
   onRestartBackup: Function,
   onCancelBackup: Function,
   onFinishBackup: Function,
+  removeWord: Function,
+  hasWord: Function
 };
 
 @observer
@@ -80,10 +86,11 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       onClear,
       onAcceptTermDevice,
       onAcceptTermRecovery,
-      canFinishBackup,
+      removeWord,
       onRestartBackup,
       onCancelBackup,
-      onFinishBackup
+      onFinishBackup,
+      hasWord
     } = this.props;
     const dialogClasses = classnames([
       styles.component,
@@ -94,19 +101,25 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
 
     const actions = [];
 
-    actions.push({
-      className: isSubmitting ? styles.isSubmitting : null,
-      label: intl.formatMessage(messages.buttonLabelConfirm),
-      onClick: onFinishBackup,
-      disabled: !canFinishBackup,
-      primary: true
-    });
-
     // Only show "Clear" button when user is not yet done with entering mnemonic
     if (!isValid) {
       actions.unshift({
+        label: intl.formatMessage(messages.buttonLabelRemoveLast),
+        onClick: removeWord,
+        disabled: !hasWord,
+        primary: true
+      });
+      actions.unshift({
         label: intl.formatMessage(messages.buttonLabelClear),
         onClick: onClear,
+        primary: true
+      });
+    } else {
+      actions.push({
+        className: isSubmitting ? styles.isSubmitting : null,
+        label: intl.formatMessage(messages.buttonLabelConfirm),
+        onClick: onFinishBackup,
+        primary: true
       });
     }
 

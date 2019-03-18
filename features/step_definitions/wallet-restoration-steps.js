@@ -23,6 +23,11 @@ When(/^I enter the recovery phrase:$/, async function (table) {
   }
 });
 
+When(/^I enter the master key:$/, async function (table) {
+  const fields = table.hashes()[0];
+  await this.input('input[name="masterKey"]', fields.masterKey);
+});
+
 When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
   const words = table.hashes()[0];
   await this.input('.AutocompleteOverrides_autocompleteWrapper input', words.word);

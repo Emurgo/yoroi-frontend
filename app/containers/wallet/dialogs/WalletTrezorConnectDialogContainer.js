@@ -5,14 +5,15 @@ import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 
-import AboutDialog from '../../../components/wallet/trezorConnect/AboutDialog';
-import ConnectDialog from '../../../components/wallet/trezorConnect/ConnectDialog';
-import SaveDialog from '../../../components/wallet/trezorConnect/SaveDialog';
+import AboutDialog from '../../../components/wallet/hwConnect/trezor/AboutDialog';
+import ConnectDialog from '../../../components/wallet/hwConnect/trezor/ConnectDialog';
+import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
 import { Logger } from '../../../utils/logging';
 
-import TrezorConnectStore, { ProgressStep } from '../../../stores/ada/TrezorConnectStore';
-import TrezorConnectActions from '../../../actions/ada/trezor-connect-actions';
+import TrezorConnectStore from '../../../stores/ada/TrezorConnectStore';
+import { ProgressStep } from '../../../types/HWConnectStoreTypes';
+import HWConnectActions from '../../../actions/ada/hw-connect-actions';
 
 type Props = InjectedDialogContainerProps;
 @observer
@@ -20,12 +21,12 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
 
   cancel = () => {
     this.props.onClose();
-    this._getTrezorConnectActions().cancel.trigger();
+    this._getHWConnectActions().cancel.trigger();
   };
 
   render() {
     const trezorConnectStore = this._getTrezorConnectStore();
-    const trezorConnectActions = this._getTrezorConnectActions();
+    const hwConnectActions = this._getHWConnectActions();
 
     let component = null;
 
@@ -36,7 +37,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             progressInfo={trezorConnectStore.progressInfo}
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
-            submit={trezorConnectActions.submitAbout.trigger}
+            submit={hwConnectActions.submitAbout.trigger}
             cancel={this.cancel}
           />);
         break;
@@ -46,8 +47,8 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             progressInfo={trezorConnectStore.progressInfo}
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
-            goBack={trezorConnectActions.goBacktToAbout.trigger}
-            submit={trezorConnectActions.submitConnect.trigger}
+            goBack={hwConnectActions.goBackToAbout.trigger}
+            submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
           />);
         break;
@@ -58,7 +59,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
             defaultWalletName={trezorConnectStore.defaultWalletName}
-            submit={trezorConnectActions.submitSave.trigger}
+            submit={hwConnectActions.submitSave.trigger}
             cancel={this.cancel}
           />);
         break;
@@ -76,7 +77,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
   }
 
   /** Returns the action which is responsible for this Container */
-  _getTrezorConnectActions(): TrezorConnectActions {
+  _getHWConnectActions(): HWConnectActions {
     return this.props.actions[environment.API].trezorConnect;
   }
 }

@@ -66,6 +66,10 @@ When(/^I click on the transfer funds from Daedalus button$/, async function () {
   await this.click('.confirmButton');
 });
 
+When(/^I click on the transfer funds from Daedalus master key button$/, async function () {
+  await this.click('.masterKey');
+});
+
 When(/^I proceed with the recovery$/, async function () {
   await this.click('.proceedTransferButtonClasses');
 });

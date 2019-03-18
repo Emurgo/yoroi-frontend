@@ -63,6 +63,11 @@ declare module 'rust-cardano-crypto' {
         failed: boolean,
         msg: ?string
       },
+      fromDaedalusMasterKey(masterKey: Uint8Array): {
+        result: CryptoWallet,
+        failed: boolean,
+        msg: ?string
+      },
       fromSeed(seed: Array<mixed>): {
         result: CryptoWallet,
         failed: boolean,
@@ -123,7 +128,22 @@ declare module 'rust-cardano-crypto' {
         password: Uint8Array,
         data: Uint8Array
       ): ?Uint8Array | false
-    }
+    },
+    Redemption: {
+      redemptionKeyToAddress(
+        redemptionKey: Buffer,
+        protocolMagic: number
+      ): Uint8Array,
+      createRedemptionTransaction(
+        redemptionKey: Buffer,
+        input: {
+          id: Buffer,
+          index: number
+        },
+        output: TxOutput,
+        protocolMagic: number
+      ): RedeemResponse
+    },
   }
 }
 
@@ -139,6 +159,14 @@ declare type MoveResponse = {
   cbor_encoded_tx: Array<number>,
   fee: number,
   tx: CryptoTransaction
+}
+
+declare type RedeemResponse = {
+  failed: boolean,
+  msg: string,
+  result: {
+    cbor_encoded_tx: Array<number>
+  }
 }
 
 declare type CryptoWallet = {
