@@ -1,11 +1,12 @@
 // @flow
 import Pdf from 'jspdf';
 import qr from 'qr-image';
-import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1.png';
+import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1_2.png';
 import paperWalletPage1PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1-testnet.png';
-import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2.png';
+import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2.png';
+import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2_pass.png';
 import paperWalletPage2PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2-testnet.png';
-import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
+import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background_2.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 import saver from 'file-saver';
 
@@ -20,7 +21,7 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
   // Prepare params
   const logback = callback || (() => {});
   logback('Reading parameters');
-  const { isMainnet, addresses, words } = request;
+  const { isMainnet, addresses, words, isCustomPass } = request;
   console.log(words);
 
   logback('Initializing the document');
@@ -48,7 +49,9 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
     doc.addPage();
 
     logback('Preparing the back page');
-    const page2Uri = isMainnet ? paperWalletPage2Path : paperWalletPage2PathTestnet;
+    const page2Uri = isMainnet ?
+      (isCustomPass ? paperWalletPage2PassPath : paperWalletPage2Path)
+      : paperWalletPage2PathTestnet;
     await addImage(doc, page2Uri, pageSize);
     logback('Printing mnemonics');
     printMnemonics(doc, words)
@@ -70,12 +73,8 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
 function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function) {
   const pageWidthPx = doc.internal.pageSize.getWidth();
   const [pA, pB] = [{ x:40, y:187 }, { x:170, y:249 }];
-  doc.text(pA.x, pA.y, 'x');
-  doc.text(pB.x, pA.y, 'x');
-  doc.text(pB.x, pB.y, 'x');
-  doc.text(pA.x, pB.y, 'x');
 
-  doc.setTextColor(59, 92, 155);
+  doc.setTextColor(0, 0, 0);
   if (addresses.length === 1) {
 
     logback('Drawing the address');
