@@ -2,11 +2,13 @@
 import Pdf from 'jspdf';
 import qr from 'qr-image';
 import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1_2.png';
-import paperWalletPage1PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1-testnet.png';
+import paperWalletPage1PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1_2_testnet.png';
 import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2.png';
+import paperWalletPage2PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2_testnet.png';
 import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2_pass.png';
-import paperWalletPage2PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2-testnet.png';
+import paperWalletPage2PassPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2_pass_testnet.png';
 import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background_2.png';
+import paperWalletCertificateBgPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-background_2_testnet.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 import saver from 'file-saver';
 
@@ -34,10 +36,10 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
     [doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight()];
   const pageSize = { w: pageWidthPx, h: pageHeightPx };
   try {
-
     logback('Drawing pretty background');
     // background images
-    await addImage(doc, paperWalletCertificateBgPath, pageSize);
+    const bgUrl = isMainnet ? paperWalletCertificateBgPath : paperWalletCertificateBgPathTestnet;
+    await addImage(doc, bgUrl, pageSize);
 
     logback('Preparing the face page');
     // first page
@@ -51,7 +53,7 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
     logback('Preparing the back page');
     const page2Uri = isMainnet ?
       (isCustomPass ? paperWalletPage2PassPath : paperWalletPage2Path)
-      : paperWalletPage2PathTestnet;
+      : (isCustomPass ? paperWalletPage2PassPathTestnet : paperWalletPage2PathTestnet);
     await addImage(doc, page2Uri, pageSize);
     logback('Printing mnemonics');
     printMnemonics(doc, words)
