@@ -169,6 +169,8 @@ async function storeWallet(client, walletName) {
     adaWallet: wallet,
     masterKey,
     lastReceiveAddressIndex: Math.max(
+      // usedAddresses.length is not accurate here unless used addresses are all sequential
+      // good enough for our tests
       usedAddresses ? usedAddresses.length - 1 : 0,
       0
     )

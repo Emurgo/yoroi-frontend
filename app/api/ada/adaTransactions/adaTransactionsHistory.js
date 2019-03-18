@@ -22,7 +22,8 @@ import {
   getLatestUsedIndex
 } from '../lib/utils';
 import {
-  getAdaAddressesByType
+  getAdaAddressesByType,
+  getAdaAddressesList,
 } from '../adaAddress';
 import {
   UpdateAdaTxsHistoryError,
@@ -80,16 +81,20 @@ export async function refreshTxs(): Promise<void> {
   await syncAddresses(account, 'Internal');
   await syncAddresses(account, 'External');
 
-  await refreshChain(account, 'Internal');
-  await refreshChain(account, 'External');
+  await refreshChains();
 }
 
-async function refreshChain(
-  cryptoAccount: CryptoAccount,
-  type: AddressType
-): Promise<void> {
+async function refreshChains(): Promise<void> {
   try {
-    const adaAddresses = await getAdaAddressesByType(type);
+    /**
+     * Note: we refresh both chains at the same time because of how we optimize requests
+     * We only query the backend for transactions that happened AFTER the latest we've ever seen
+     * If you want to split this function into two: one for Internal and one for External
+     * You also need to split this optimization such that
+     * 1) It queries for all txs after the last tx that includes an Internal
+     * 2) It queries for all txs after the last tx that includes an External
+     */
+    const adaAddresses = await getAdaAddressesList();
     const rawAddresses: Array<string> = adaAddresses.map(addr => addr.cadId);
 
     const newTxs = await _updateAdaTxsHistory(
@@ -101,10 +106,7 @@ async function refreshChain(
     await saveTxs(transactions);
   } catch (error) {
     Logger.error(
-      'adaTransactionsHistory::refreshChain'
-      + JSON.stringify(type)
-      + ' '
-      + JSON.stringify(error)
+      'adaTransactionsHistory::refreshChains' + JSON.stringify(error)
     );
     throw new UpdateAdaTxsHistoryError();
   }

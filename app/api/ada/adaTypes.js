@@ -67,6 +67,7 @@ export type AdaAddress = {
   /**
    * TODO: misleading as the value inside DB is always stale
    * Is is only updated in-memory after DB fetch
+   * Is is, however, up-to-date in localstorage.
   */
   cadAmount: AdaAmount,
   cadId: string,
