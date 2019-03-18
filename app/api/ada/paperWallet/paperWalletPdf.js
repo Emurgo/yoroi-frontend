@@ -21,15 +21,7 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
   // Prepare params
   const logback = callback || (() => {});
   logback('Reading parameters');
-  const { isMainnet } = request;
-  const words = bip39.generateMnemonic(224).split(' ');
-  const addresses = [
-    'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk',
-    'Ae2tdPwUPEYzDLR8zduvsULnjpZqQN2f67na68XkXMYbU7nSoxYmM6HyujC',
-    // 'Ae2tdPwUPEZHwifNUbb9eGitrkEiuMJZRyeeq22hLCZMse4iSW7xAdjcyfE',
-    // 'Ae2tdPwUPEZL98o7rECwL4FtMYD43YPRuZFqnYYdJS4yKBdUB6pLHjQTAxu',
-    // 'Ae2tdPwUPEZ1SfVxRHxS882JGxMC58Y98bNkNhc2uxrbSpCa8L92VtX1ntU',
-  ];
+  const { isMainnet, addresses, words } = request;
   console.log(words);
 
   logback('Initializing the document');
