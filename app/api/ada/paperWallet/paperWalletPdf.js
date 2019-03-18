@@ -1,14 +1,14 @@
 // @flow
 import Pdf from 'jspdf';
 import qr from 'qr-image';
-import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1_2.png';
-import paperWalletPage1PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1_2_testnet.png';
-import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2.png';
-import paperWalletPage2PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2_testnet.png';
-import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2_pass.png';
-import paperWalletPage2PassPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_2_pass_testnet.png';
-import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background_2.png';
-import paperWalletCertificateBgPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-background_2_testnet.png';
+import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1.png';
+import paperWalletPage1PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1_testnet.png';
+import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2.png';
+import paperWalletPage2PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_testnet.png';
+import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_pass.png';
+import paperWalletPage2PassPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_pass_testnet.png';
+import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
+import paperWalletCertificateBgPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-background_testnet.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 import saver from 'file-saver';
 
