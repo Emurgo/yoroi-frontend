@@ -145,6 +145,9 @@ Feature: Send transaction
   Scenario: Try to make a transactions from the empty wallet (IT-89)
     Given There is a wallet stored named empty-wallet
     Given I cleared my local balance
+    # for some reason this fails the very first time on a machine
+    # ugly hack fix: just call it twice
+    Given I cleared my local balance
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
