@@ -1,14 +1,13 @@
 // @flow
 import Pdf from 'jspdf';
 import qr from 'qr-image';
-import paperWalletPage1Path from '../../../assets/pdf/paper-wallet-certificate-page-1.png';
-import paperWalletPage1PathTestnet from '../../../assets/pdf/paper-wallet-certificate-page-1-testnet.png';
-import paperWalletPage2Path from '../../../assets/pdf/paper-wallet-certificate-page-2.png';
-import paperWalletPage2PathTestnet from '../../../assets/pdf/paper-wallet-certificate-page-2-testnet.png';
-import paperWalletCertificateBgPath from '../../../assets/pdf/paper-wallet-certificate-background.png';
+import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1.png';
+import paperWalletPage1PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1-testnet.png';
+import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2.png';
+import paperWalletPage2PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2-testnet.png';
+import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 import saver from 'file-saver';
-import bip39 from 'bip39';
 
 export type PaperRequest = {
   words: Array<string>,
