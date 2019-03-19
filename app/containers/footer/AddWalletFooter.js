@@ -58,11 +58,12 @@ export default class AddWalletFooter extends Component {
           svg={whatIsHardwareWalletSvg}
           message={messages.whatIsHardwareWallet}
         />
-        <FooterItem
+        {/* Temporarily disable, re-enable when Ledger is ready to enable */}
+        {/* <FooterItem
           url="https://yoroi-wallet.com/get-ledger"
           svg={buyTrezorSvg}
           message={messages.buyLedgerHardwareWallet}
-        />
+        /> */}
         {/* It should be enable in the future with a video on how to connect Ledger */}
         {/* <FooterItem
           url="https://youtu.be/Dp0wXwtToX0"
