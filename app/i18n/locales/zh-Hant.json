@@ -122,7 +122,7 @@
   "settings.menu.support.link.label": "支援",
   "settings.menu.termsOfUse.link.label": "使用條款",
   "settings.menu.wallet.link.label": "錢包",
-  "settings.support.faq.blogLinkUrl": "!!!https://medium.com/@emurgo_io/custom-themes-in-yoroi-d3fa93f4b926",
+  "settings.support.faq.blogLinkUrl": "!!!https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "!!!blog post",
   "settings.support.faq.content": "若您遇到問題，請參閱 {faqLink}，瞭解已知問題處理指導。",
   "settings.support.faq.faqLink": "Yoroi 網站常見問題集",

@@ -122,7 +122,7 @@
   "settings.menu.support.link.label": "Поддержка",
   "settings.menu.termsOfUse.link.label": "Условия использования",
   "settings.menu.wallet.link.label": "Кошелек",
-  "settings.support.faq.blogLinkUrl": "!!!https://medium.com/@emurgo_io/custom-themes-in-yoroi-d3fa93f4b926",
+  "settings.support.faq.blogLinkUrl": "!!!https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "!!!blog post",
   "settings.support.faq.content": "Если Вы столкнулись с трудностями, пожалуйста, посетите раздел {faqLink} для поиска ответа на Ваш вопрос.",
   "settings.support.faq.faqLink": "FAQ на сайте Yoroi",
