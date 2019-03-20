@@ -1,7 +1,7 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.dialogOld {
+.dialogClassic {
   font-family: var(--font-medium);
 
   :global {
@@ -161,7 +161,7 @@
     }
     .amount,
     .fees {
-      // color: var(--theme-send-confirmation-dialog-send-values-color);
+      color: var(--theme-send-confirmation-dialog-send-values-color);
       font-size: 14px;
       line-height: 1.57;
       margin-top: 2px;

@@ -106,11 +106,11 @@ export default class WalletReceivePage extends Component<Props, State> {
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
-          oldTheme={theme.old}
+          classicTheme={theme.classic}
           notification={notificationComponent}
         />
 
-        {theme.old && notificationComponent}
+        {theme.classic && notificationComponent}
       </VerticalFlexContainer>
     );
   }

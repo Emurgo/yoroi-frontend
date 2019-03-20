@@ -12,3 +12,14 @@ export class WrongPassphraseError extends CardanoCryptoError {
     super(message);
   }
 }
+
+export class SeedWithInvalidLengthError extends CardanoCryptoError {
+  constructor(message: ?string = 'Seed has an invalid length') {
+    super(message);
+  }
+}
+export class CreateRedeemTransactionError extends CardanoCryptoError {
+  constructor(message: ?string = 'Error while creating redeem transaction') {
+    super(message);
+  }
+}

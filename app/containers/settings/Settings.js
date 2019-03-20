@@ -36,12 +36,14 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { topbar, theme } = stores;
+    const { profile, topbar, theme } = stores;
+
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
         isActiveItem={this.isActivePage}
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
+        currentLocale={profile.currentLocale}
       />
     );
     const topbarTitle = (
@@ -57,11 +59,11 @@ export default class Settings extends Component<InjectedContainerProps> {
             }}
             categories={topbar.CATEGORIES}
             activeTopbarCategory={topbar.activeTopbarCategory}
-            oldTheme={theme.old}
+            classicTheme={theme.classic}
           />
         )}
-        oldTheme={theme.old}
-        withFooter={!theme.old}
+        classicTheme={theme.classic}
+        withFooter={!theme.classic}
       >
         <SettingsLayout menu={menu}>
           {children}

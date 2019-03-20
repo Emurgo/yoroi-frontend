@@ -28,7 +28,7 @@ type Props = {
   onClear: Function,
   onFinishBackup: Function,
   onRestartBackup: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -45,7 +45,7 @@ export default class WalletBackupDialog extends Component<Props> {
       isTermRecoveryAccepted, isValid, isSubmitting,
       onAcceptTermDevice, onAcceptTermRecovery,
       onAddWord, onClear, onFinishBackup,
-      onRestartBackup, recoveryPhraseSorted, oldTheme
+      onRestartBackup, recoveryPhraseSorted, classicTheme
     } = this.props;
 
     if (currentStep === 'privacyWarning') {
@@ -57,7 +57,7 @@ export default class WalletBackupDialog extends Component<Props> {
           onAcceptPrivacyNotice={onAcceptPrivacyNotice}
           onCancelBackup={onCancelBackup}
           onContinue={onContinue}
-          oldTheme={oldTheme}
+          classicTheme={classicTheme}
         />
       );
     }
@@ -68,7 +68,7 @@ export default class WalletBackupDialog extends Component<Props> {
           recoveryPhrase={recoveryPhrase}
           onStartWalletBackup={onStartWalletBackup}
           onCancelBackup={onCancelBackup}
-          oldTheme={oldTheme}
+          classicTheme={classicTheme}
         />
       );
     }
@@ -90,7 +90,7 @@ export default class WalletBackupDialog extends Component<Props> {
           onFinishBackup={onFinishBackup}
           onRestartBackup={onRestartBackup}
           recoveryPhraseSorted={recoveryPhraseSorted}
-          oldTheme={oldTheme}
+          classicTheme={classicTheme}
         />
       );
     }

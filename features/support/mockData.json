@@ -348,6 +348,7 @@
           "txTimeTitle": "ADA transaction,",
           "txTime": "2018-01-01T00:02:00.000Z",
           "txStatus": "TRANSACTION PENDING",
+          "txFee": "0.000000",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
           "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z"
@@ -358,6 +359,7 @@
           "txTimeTitle": "ADA transaction,",
           "txTime": "2018-01-01T00:01:00.000Z",
           "txStatus": "TRANSACTION PENDING",
+          "txFee": "0.000000",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkabcde"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
           "txId": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Y"
@@ -368,6 +370,7 @@
           "txTimeTitle": "ADA transaction,",
           "txTime": "2018-01-01T00:00:00.000Z",
           "txStatus": "HIGH",
+          "txFee": "0.000000",
           "txFrom": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"],
           "txTo": ["Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9Eqkzyxwv"],
           "txConfirmations": "High. 11 confirmations.",
@@ -381,6 +384,7 @@
           "txTimeTitle": "ADA transaction,",
           "txTime": "2018-01-01T00:00:00.000Z",
           "txStatus": "HIGH",
+          "txFee": "0.000000",
           "txFrom": [
             "DFvfedPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oREqkSzxoU"
           ],
@@ -413,5 +417,33 @@
       }
     ]
   },
-  "General Settings": {}
+  "General Settings": {},
+  "Ada Redemption": {
+    "utxos": [
+      {
+        "tx_hash": "d2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04",
+        "tx_index": 1,
+        "receiver": "Ae2tdPwUPEZ2XP4BGUHeMDRohtbLMm8MgwwwW86a2Mozyh3oMhza2f1H6Lz",
+        "amount": "1000"
+      },
+      {
+        "tx_hash": "d2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04",
+        "tx_index": 1,
+        "receiver": "Ae2tdPwUPEZ8dx9F8nGyRmLCQEHjSjbL8pBVwPsiL5tiCLqZiYD5poMCUwJ",
+        "amount": "1000"
+      },
+      {
+        "tx_hash": "d2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04",
+        "tx_index": 1,
+        "receiver": "Ae2tdPwUPEZ2UnSp2Px3wqZGJs3AUn5vcRQCTpPrcxGBWkAnAvB9JNNEtAb",
+        "amount": "1000"
+      },
+      {
+        "tx_hash": "d2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04",
+        "tx_index": 1,
+        "receiver": "Ae2tdPwUPEZFS38pQd5nbC5vqyicSHSgRkjr5p3mFxRrVgVn2fMKSxDR1qY",
+        "amount": "1000"
+      }
+    ]
+  }
 }

@@ -32,6 +32,7 @@ import { StepState } from '../../../stores/ada/TrezorConnectStore';
 import { Logger } from '../../../utils/logging';
 
 import styles from './SaveDialog.scss';
+import config from '../../../config';
 
 const messages = defineMessages({
   saveWalletNameInputLabel: {
@@ -63,7 +64,7 @@ type Props = {
   defaultWalletName: string,
   submit: Function,
   cancel: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -95,22 +96,22 @@ export default class SaveDialog extends Component<Props> {
     }, {
       options: {
         validateOnChange: true,
-        validationDebounceWait: 250,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
     });
   }
 
   render() {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, cancel, oldTheme } = this.props;
+    const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
 
     const walletNameFieldClasses = classnames([
       'walletName',
       styles.walletName,
     ]);
     const walletNameField = this.form.$('walletName');
-    const headerBlockClasses = oldTheme
-      ? classnames([styles.headerBlockOld, styles.headerSaveBlockOld])
+    const headerBlockClasses = classicTheme
+      ? classnames([styles.headerBlockClassic, styles.headerSaveBlockClassic])
       : styles.headerBlock;
 
     const walletNameBlock = (
@@ -130,19 +131,19 @@ export default class SaveDialog extends Component<Props> {
       case StepState.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
-            <SvgInline svg={oldTheme ? saveLoadGIF : saveLoadImage} cleanup={['title']} />
+            <SvgInline svg={classicTheme ? saveLoadGIF : saveLoadImage} />
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
-            <SvgInline svg={oldTheme ? saveStartSVG : saveLoadImage} cleanup={['title']} />
+            <SvgInline svg={classicTheme ? saveStartSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
-            <SvgInline svg={oldTheme ? saveErrorSVG : saveErrorImage} cleanup={['title']} />
+            <SvgInline svg={classicTheme ? saveErrorSVG : saveErrorImage} />
           </div>);
         break;
       default:
@@ -166,20 +167,20 @@ export default class SaveDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={cancel}
         closeButton={<DialogCloseButton />}
-        oldTheme={oldTheme}
+        classicTheme={classicTheme}
       >
-        <ProgressStepBlock progressInfo={progressInfo} oldTheme={oldTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {walletNameBlock}
         {middleBlock}
 
-        {!oldTheme && (
-          <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />
+        {!classicTheme && (
+          <TrezorErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
         )}
 
-        <HelpLinkBlock progressInfo={progressInfo} oldTheme={oldTheme} />
+        <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
 
-        {oldTheme && (
-          <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />
+        {classicTheme && (
+          <TrezorErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
         )}
       </Dialog>);
   }

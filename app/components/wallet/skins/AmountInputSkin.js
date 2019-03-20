@@ -17,7 +17,7 @@ type Props = {
   fees: BigNumber,
   total: BigNumber,
   error: boolean,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 export default class AmountInputSkin extends Component<Props> {
@@ -27,11 +27,11 @@ export default class AmountInputSkin extends Component<Props> {
   };
 
   render() {
-    const { error, fees, total, currency, oldTheme } = this.props;
+    const { error, fees, total, currency, classicTheme } = this.props;
     const { intl } = this.context;
 
-    const feesClasses = oldTheme ? styles.feesOld : styles.fees;
-    const totalClasses = oldTheme ? styles.totalOld : styles.total;
+    const feesClasses = classicTheme ? styles.feesClassic : styles.fees;
+    const totalClasses = classicTheme ? styles.totalClassic : styles.total;
 
     return (
       <div className={styles.root}>

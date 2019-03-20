@@ -7,7 +7,7 @@ import moment from 'moment';
 import { getLovefieldTxs, getFeatureData } from '../support/mockDataBuilder';
 import i18n from '../support/helpers/i18n-helpers';
 
-function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFromList, txToList,
+function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, txFromList, txToList,
   txId, expectedTx, txConfirmations) {
   chai.expect(txType).to.equal(expectedTx.txType);
   chai.expect(txAmount.split(' ')[0]).to.equal(expectedTx.txAmount);
@@ -109,10 +109,10 @@ Then(
       await clickeableElement.click();
       const txData = await actualTxsList[i].getText();
       const txDataFields = txData.split('\n');
-      const [txType, txTime, txStatus, txAmount, , txFrom, , txTo, , ...pendingTxFields]
+      const [txType, txTime, txStatus, txAmount, , txFee, , txFrom, , txTo, , ...pendingTxFields]
         = txDataFields;
       const [txId, txConfirmations] = mapPendingTxFields(txExpectedStatus, pendingTxFields);
-      verifyAllTxsFields(txType, txAmount, txTime, txStatus, [txFrom],
+      verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, [txFrom],
         [txTo], txId, expectedTxsList[i], txConfirmations);
     }
   }

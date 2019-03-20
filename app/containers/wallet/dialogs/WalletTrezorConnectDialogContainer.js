@@ -39,7 +39,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             error={trezorConnectStore.error}
             submit={trezorConnectActions.submitAbout.trigger}
             cancel={this.cancel}
-            oldTheme={stores.theme.old}
+            classicTheme={stores.theme.classic}
           />);
         break;
       case ProgressStep.CONNECT:
@@ -51,7 +51,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             goBack={trezorConnectActions.goBacktToAbout.trigger}
             submit={trezorConnectActions.submitConnect.trigger}
             cancel={this.cancel}
-            oldTheme={stores.theme.old}
+            classicTheme={stores.theme.classic}
           />);
         break;
       case ProgressStep.SAVE:
@@ -63,7 +63,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             defaultWalletName={trezorConnectStore.defaultWalletName}
             submit={trezorConnectActions.submitSave.trigger}
             cancel={this.cancel}
-            oldTheme={stores.theme.old}
+            classicTheme={stores.theme.classic}
           />);
         break;
       default:

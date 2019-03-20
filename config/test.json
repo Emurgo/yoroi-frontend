@@ -3,8 +3,7 @@
     "protocolMagic": 633343913,
     "backendUrl": "http://localhost:8080",
     "websocketUrl": "ws://localhost:8080",
-    "name": "test",
-    "trezorNetwork": 1
+    "name": "test"
   },
   "app": {
     "walletRefreshInterval": 2000,

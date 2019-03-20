@@ -7,8 +7,10 @@ production-key.pem
 build/
 dev/
 dll/
+screenshots/
 
 *.zip
+*.xpi
 *.crx
 # pem files are used to sign the extension so we ignore the to avoid accidental leakage
 *.pem

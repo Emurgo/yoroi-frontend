@@ -39,16 +39,16 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
       <TopBar
         title={topbarTitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        oldTheme={theme.old}
+        classicTheme={theme.classic}
       />);
     return (
       <TopBarLayout
         topbar={topbarElement}
-        isBannerVisible={!theme.old}
-        banner={<TestnetWarningBanner oldTheme={theme.old} />}
+        isBannerVisible={!theme.classic}
+        banner={<TestnetWarningBanner classicTheme={theme.classic} />}
       >
         <TermsOfUseForm
-          oldTheme={theme.old}
+          classicTheme={theme.classic}
           localizedTermsOfUse={termsOfUse}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}

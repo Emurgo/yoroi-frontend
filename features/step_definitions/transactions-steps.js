@@ -1,25 +1,8 @@
 // @flow
 
-import { Given, When, Then, Before, After } from 'cucumber';
+import { Given, When, Then } from 'cucumber';
 import { expect } from 'chai';
-import { getMockServer, closeMockServer } from '../support/mockServer';
 import i18n from '../support/helpers/i18n-helpers';
-
-Before({ tags: '@invalidWitnessTest' }, () => {
-  closeMockServer();
-  getMockServer({
-    signedTransaction: (req, res) => {
-      res.status(400).jsonp({
-        message: 'Invalid witness'
-      });
-    }
-  });
-});
-
-After({ tags: '@invalidWitnessTest' }, () => {
-  closeMockServer();
-  getMockServer({});
-});
 
 Given(/^I have a wallet with funds$/, async function () {
   await this.driver.wait(async () => {

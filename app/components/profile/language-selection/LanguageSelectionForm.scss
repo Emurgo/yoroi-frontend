@@ -1,7 +1,7 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.componentOld {
+.componentClassic {
   align-items: center;
   display: flex;
   height: 100%;
@@ -20,7 +20,7 @@
   width: 400px;
 }
 
-.languageSelectOld {
+.languageSelectClassic {
   margin-bottom: 20px;
 }
 

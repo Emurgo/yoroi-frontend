@@ -40,7 +40,7 @@ type Props = {
   onAcceptPrivacyNotice: Function,
   onContinue: Function,
   onCancelBackup: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -59,14 +59,14 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       onCancelBackup,
       isPrivacyNoticeAccepted,
       onContinue,
-      oldTheme
+      classicTheme
     } = this.props;
     const countdownDisplay = countdownRemaining > 0 ? ` (${countdownRemaining})` : '';
     const dialogClasses = classnames([
       styles.component,
       'WalletBackupPrivacyWarningDialog',
     ]);
-    const checkboxClasses = oldTheme ? styles.checkboxOld : styles.checkbox;
+    const checkboxClasses = classicTheme ? styles.checkboxClassic : styles.checkbox;
 
     const actions = [
       {
@@ -85,12 +85,12 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         closeOnOverlayClick
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
-        oldTheme={oldTheme}
+        classicTheme={classicTheme}
       >
-        {!oldTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} cleanup={['title']} />}
+        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} cleanup={['title']} />}
         <WalletRecoveryInstructions
           instructionsText={intl.formatMessage(messages.recoveryPhraseInstructions)}
-          oldTheme={oldTheme}
+          classicTheme={classicTheme}
         />
         <div className={checkboxClasses}>
           <Checkbox

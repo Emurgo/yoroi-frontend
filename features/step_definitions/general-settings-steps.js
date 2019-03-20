@@ -21,6 +21,10 @@ When(/^I click on secondary menu "([^"]*)" item$/, async function (buttonName) {
   );
 });
 
+When(/^I select second theme$/, async function () {
+  await this.click('.DisplaySettings_themesWrapper > button:nth-child(2)');
+});
+
 When(/^I open General Settings language selection dropdown$/, async function () {
   await this.click('.SettingsLayout_settingsPane .SimpleInput_input');
 });
@@ -33,9 +37,13 @@ Then(/^I should see secondary menu (.*) item disabled$/, async function (buttonN
   await this.waitUntilText(buttonSelector, label);
 });
 
-Then(/^I should see Japanese language as selected$/, async function () {
+Then(/^The Japanese language should be selected$/, async function () {
   this.driver.wait(async () => {
     const activeLanguage = await i18n.getActiveLanguage(this.driver);
     return activeLanguage === 'ja-JP';
   });
+});
+
+Then(/^I should see second theme as selected$/, async function () {
+  await this.waitForElement('.DisplaySettings_themesWrapper button:nth-child(2).DisplaySettings_active');
 });

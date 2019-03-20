@@ -1,6 +1,6 @@
 @import '../../themes/mixins/buttons';
 
-.componentOld {
+.componentClassic {
   @include button;
   align-items: center;
   color: var(--theme-topbar-category-text-color);
@@ -28,13 +28,13 @@
   }
 }
 
-.activeOld {
-  .iconOld:not(.withTrezorTIcon) path, {
+.activeClassic {
+  .iconClassic:not(.withTrezorTIcon) path {
     stroke: var(--theme-button-primary-background-color);
     fill: var(--theme-button-primary-background-color);
   }
 
-  .iconOld:not(.walletsIcon):not(.withTrezorTIcon) path {
+  .iconClassic:not(.walletsIcon):not(.withTrezorTIcon) path {
     fill: var(--theme-button-primary-background-color);
   }
 
@@ -66,6 +66,10 @@
     fill: var(--theme-button-primary-background-color);
   }
 
+  .icon:not(.walletsIcon):not(.withTrezorTIcon) polygon {
+    fill: var(--theme-button-primary-background-color);
+  }
+
   .withTrezorTIcon {
     & > svg {
       // plus-logo
@@ -85,12 +89,9 @@
   }
 }
 
-.iconOld {
+.iconClassic {
   flex-shrink: 0;
   & > svg {
-    width: 24px;
-    height: 24px;
-
     & > g > path {
       fill: var(--theme-icon-topbar-color);
     }
@@ -131,7 +132,7 @@
 }
 
 :global {
-  .TopBarCategory_component, .TopBarCategory_componentOld {
+  .TopBarCategory_component, .TopBarCategory_componentClassic {
     position: absolute;
     top: 0;
 

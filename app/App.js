@@ -9,8 +9,10 @@ import ko from 'react-intl/locale-data/ko';
 import ja from 'react-intl/locale-data/ja';
 import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
+import de from 'react-intl/locale-data/de';
+import fr from 'react-intl/locale-data/fr';
 import { Routes } from './Routes';
-import { yoroiTheme } from './themes/yoroi';
+import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
 import { themeOverrides } from './themes/overrides/index';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores/index';
@@ -19,8 +21,10 @@ import ThemeManager from './ThemeManager';
 import environment from './environment';
 import { hot } from 'react-hot-loader';
 
+import { THEMES } from './themes/index';
+
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr]);
 
 @observer
 class App extends Component<{
@@ -39,8 +43,21 @@ class App extends Component<{
     }
   }
 
+  // temporary method
   handleChange = (e: { target: { checked: boolean } }) => {
+    const { stores } = this.props;
+    const currentTheme = stores.profile.currentTheme;
+    const theme = currentTheme === THEMES.YOROI_CLASSIC
+      ? THEMES.YOROI_MODERN
+      : THEMES.YOROI_CLASSIC;
     this.props.actions.theme.changeTheme.trigger({ theme: e.target.checked });
+    this.props.actions.profile.updateTheme.trigger({ theme });
+  }
+
+  setMarkup = () => {
+    const { stores } = this.props;
+    const currentTheme = stores.profile.currentTheme;
+    this.props.actions.theme.changeTheme.trigger({ theme: currentTheme === THEMES.YOROI_CLASSIC });
   }
 
   render() {
@@ -52,21 +69,25 @@ class App extends Component<{
     // (missed in object keys) just stay in english
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
-    const currentTheme = stores.theme.old ? 'yoroi-old' : 'yoroi';
-    const themeVars = require(`./themes/prebuilt/${currentTheme}.js`); // eslint-disable-line
-
+    const themeVars = stores.profile.currentThemeVars;
+    const currentTheme = stores.profile.currentTheme;
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
+    // console.log('stores.theme.classic', stores.theme.classic);
 
     return (
       <div style={{ height: '100%' }}>
-        <input type="checkbox" onChange={this.handleChange} checked={stores.theme.old} />
-        <span> - old design </span>
+        <ThemeManager
+          variables={themeVars}
+          setMarkup={this.setMarkup}
+          // temporary variables
+          handleChange={this.handleChange}
+          classic={stores.theme.classic}
+        />
 
-        <ThemeManager variables={themeVars} />
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
         <ThemeProvider
           key={currentTheme}
-          theme={yoroiTheme}
+          theme={yoroiPolymorphTheme}
           themeOverrides={themeOverrides(currentTheme)}
         >
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>

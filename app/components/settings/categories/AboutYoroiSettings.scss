@@ -1,0 +1,18 @@
+.component {
+  h1 {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-semibold);
+    font-size: 16px;
+    line-height: 1.38;
+    margin-bottom: 10px;
+    padding-top: 10px;
+  }
+}
+
+.yoroiLogo {
+  & > svg {
+    & > path {
+      fill: #000;
+    }
+  }
+}

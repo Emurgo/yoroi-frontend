@@ -29,7 +29,7 @@ $opacityCommon: 0.7;
   }
 }
 
-.headerBlockOld {
+.headerBlockClassic {
   width: 725px;
   height: 5em;
   padding-top: 1em;
@@ -58,7 +58,7 @@ $opacityCommon: 0.7;
   }
 }
 
-.middleBlockOld {
+.middleBlockClassic {
   overflow: hidden;  
   background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
   object-fit: contain;

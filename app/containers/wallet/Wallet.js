@@ -7,7 +7,8 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
-import HelpLinkFooter from '../../components/footer/HelpLinkFooter';
+import AdaRedemptionSuccessOverlay from '../../components/wallet/ada-redemption/AdaRedemptionSuccessOverlay';
+import AddWalletFooter from '../footer/AddWalletFooter';
 
 type Props = InjectedContainerProps;
 
@@ -32,40 +33,42 @@ export default class Wallet extends Component<Props> {
   };
 
   render() {
-    const { wallets } = this.props.stores.substores.ada;
+    const { wallets, adaRedemption } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
     const { theme } = stores;
+    const { showAdaRedemptionSuccessMessage, amountRedeemed } = adaRedemption;
     if (!wallets.active) {
       return (
-        <MainLayout actions={actions} stores={stores} oldTheme={theme.old}>
+        <MainLayout actions={actions} stores={stores} classicTheme={theme.classic}>
           <LoadingSpinner />
         </MainLayout>
       );
     }
 
-    // const footer = undefined;
-    const footer = (
-      <HelpLinkFooter
-        showBuyTrezorHardwareWallet
-        showWhatIsHardwareWallet
-      />
-    );
+    const footer = theme.classic ? undefined : <AddWalletFooter />;
 
     return (
       <MainLayout
         actions={actions}
         stores={stores}
+
         footer={footer}
-        oldTheme={theme.old}
-        withFooter={!theme.old}
+        classicTheme={theme.classic}
       >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
-          oldTheme={theme.old}
+          classicTheme={theme.classic}
         >
           {this.props.children}
         </WalletWithNavigation>
+
+        {showAdaRedemptionSuccessMessage ? (
+          <AdaRedemptionSuccessOverlay
+            amount={amountRedeemed}
+            onClose={actions.ada.adaRedemption.closeAdaRedemptionSuccessOverlay.trigger}
+          />
+        ) : null}
       </MainLayout>
     );
   }

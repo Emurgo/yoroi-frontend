@@ -1,8 +1,6 @@
-$topBarOldHeight: 64px;
+$topBarClassicHeight: 64px;
 $topBarHeight: 58px;
-$footerHeight: 60px;
-$footerHeight: 52px;
-
+$footerHeight: 56px;
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
   box-shadow: 0 0 70px 0 rgba(0,0,0,0.75);
@@ -19,8 +17,8 @@ $footerHeight: 52px;
   background-position-y: bottom;
 }
 
-.topbarOld {
-  height: $topBarOldHeight;
+.topbarClassic {
+  height: $topBarClassicHeight;
   flex-shrink: 0;
   // Show elements that overflow the topbar above the content area
   z-index: 1;
@@ -37,7 +35,7 @@ $footerHeight: 52px;
   height: 100%;
 }
 
-.contentWithFooter, .contentFooter {
+.contentWithFooter {
   height: calc(100% - #{$footerHeight});
 }
 

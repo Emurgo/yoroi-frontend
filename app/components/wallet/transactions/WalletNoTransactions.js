@@ -7,17 +7,17 @@ import noTransactionSvg from '../../../assets/images/transaction/no-transactions
 
 type Props = {
   label: string,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
 export default class WalletNoTransactions extends Component<Props> {
 
   render() {
-    const { oldTheme } = this.props;
+    const { classicTheme } = this.props;
     return (
-      <div className={oldTheme ? styles.componentOld : styles.component}>
-        {!oldTheme && <SvgInline className={styles.imageWrappper} svg={noTransactionSvg} cleanup={['title']} />}
+      <div className={classicTheme ? styles.componentClassic : styles.component}>
+        {!classicTheme && <SvgInline className={styles.imageWrappper} svg={noTransactionSvg} cleanup={['title']} />}
         <div className={styles.label}>{this.props.label}</div>
       </div>
     );

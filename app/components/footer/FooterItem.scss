@@ -1,0 +1,41 @@
+$blockHeight: 56px;
+
+.component {
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  font-family: var(--rp-theme-font-regular);
+  a {
+    display: block;
+    opacity: 0.7;
+    color: var(--rp-theme-font-black);
+  }
+}
+
+.block {
+  background-color: var(--theme-footer-block-background-color);
+  height: $blockHeight;
+  display: inline-block;
+  text-align: center;
+  .icon {
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .text {
+    display: inline-block;
+    vertical-align: middle;
+  }
+};
+.block:hover {
+  background-color: var(--theme-footer-block-background-color-hover);
+  cursor: pointer;
+};
+
+@media screen and (max-width: 1450px) {
+  .block {
+    .text {
+      display: none;
+    }
+  }
+}

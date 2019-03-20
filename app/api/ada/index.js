@@ -10,10 +10,15 @@ import Wallet from '../../domain/Wallet';
 import WalletTransaction, {
   transactionTypes
 } from '../../domain/WalletTransaction';
+import type {
+  TransactionType
+} from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import {
   isValidMnemonic,
+  isValidPaperMnemonic,
+  unscramblePaperMnemonic,
   generateAdaAccountRecoveryPhrase,
   newAdaWallet,
   updateAdaWalletMetaParams,
@@ -24,6 +29,7 @@ import {
   isValidAdaAddress,
   newExternalAdaAddress,
   getAdaAddressesByType,
+  getAdaAddressesList,
   saveAdaAddress
 } from './adaAddress';
 import {
@@ -59,6 +65,7 @@ import type {
   AdaTransaction,
   AdaTransactionCondition,
   AdaTransactionFee,
+  AdaTransactionInputOutput,
   AdaTransactions,
   AdaWallet,
   AdaWallets,
@@ -70,6 +77,8 @@ import type {
   CreateWalletResponse,
   GetTransactionsRequest,
   GetTransactionsResponse,
+  GetTransactionRowsToExportRequest,
+  GetTransactionRowsToExportResponse,
   GetAddressesRequest,
   GetAddressesResponse,
   GetBalanceResponse,
@@ -83,11 +92,20 @@ import type {
   CreateTrezorWalletResponse,
   SendTrezorSignedTxResponse,
 } from '../common';
-import { InvalidWitnessError } from './errors';
+import { InvalidWitnessError, RedeemAdaError, RedemptionKeyAlreadyUsedError } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import { getSingleCryptoAccount, getAdaWallet, getLastBlockNumber } from './adaLocalStorage';
 import { saveTxs } from './lib/lovefieldDatabase';
 import type { SignedResponse } from './lib/yoroi-backend-api';
+import { convertAdaTransactionsToExportRows } from './lib/utils';
+import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
+import {
+  isValidRedemptionKey,
+  isValidPaperVendRedemptionKey
+} from '../../utils/redemption-key-validation';
+import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
+import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
+import config from '../../config';
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -113,6 +131,19 @@ export type UpdateWalletRequest = {
   name: string,
   assurance: AdaAssurance
 };
+export type RedeemAdaRequest = {
+  redemptionCode: string,
+  accountId: string,
+  walletPassword: ?string
+};
+export type RedeemAdaResponse = Wallet;
+export type RedeemPaperVendedAdaRequest = {
+  shieldedRedemptionKey: string,
+  mnemonics: string,
+  accountId: string,
+  walletPassword: ?string
+};
+export type RedeemPaperVendedAdaResponse = RedeemPaperVendedAdaRequest;
 export type ImportWalletFromKeyRequest = {
   filePath: string,
   walletPassword: ?string
@@ -219,13 +250,15 @@ export default class AdaApi {
       const transactions = limit
         ? history[0].slice(skip, skip + limit)
         : history[0];
-      const mappedTransactions = transactions.map(data => (
-        _createTransactionFromServerData(data)
-      ));
-      return Promise.resolve({
-        transactions: mappedTransactions,
-        total: history[1]
+
+      const mappedTransactions = transactions.map(async data => {
+        const { type, amount, fee } = await _getTxFinancialInfo(data);
+        return _createTransactionFromServerData(data, type, amount, fee);
       });
+      return Promise.all(mappedTransactions).then(mappedTxs => Promise.resolve({
+        transactions: mappedTxs,
+        total: history[1]
+      }));
     } catch (error) {
       Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -237,9 +270,10 @@ export default class AdaApi {
     try {
       const pendingTxs = await getPendingAdaTxs();
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
-      return pendingTxs.map(data => (
-        _createTransactionFromServerData(data)
-      ));
+      return Promise.all(pendingTxs.map(async data => {
+        const { type, amount, fee } = await _getTxFinancialInfo(data);
+        return _createTransactionFromServerData(data, type, amount, fee);
+      }));
     } catch (error) {
       Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -412,6 +446,14 @@ export default class AdaApi {
     return isValidMnemonic(mnemonic, numberOfWords);
   }
 
+  isValidPaperMnemonic(mnemonic: string, numberOfWords: ?number): boolean {
+    return isValidPaperMnemonic(mnemonic, numberOfWords);
+  }
+
+  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number): [?string, number] {
+    return unscramblePaperMnemonic(mnemonic, numberOfWords);
+  }
+
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {
     Logger.debug('AdaApi::generateWalletRecoveryPhrase called');
     try {
@@ -558,10 +600,168 @@ export default class AdaApi {
       }
     }
   }
+
+  // noinspection JSMethodCanBeStatic
+  // TODO: https://github.com/Emurgo/yoroi-frontend/pull/222
+  async getTransactionRowsToExport(
+    request: GetTransactionRowsToExportRequest // eslint-disable-line no-unused-vars
+  ): Promise<GetTransactionRowsToExportResponse> {
+    try {
+      Logger.debug('AdaApi::getTransactionRowsToExport: called');
+      await refreshTxs();
+      const history: AdaTransactions = await getAdaTxsHistoryByWallet();
+
+      Logger.debug('AdaApi::getTransactionRowsToExport: success');
+      return convertAdaTransactionsToExportRows(history[0]);
+    } catch (error) {
+      Logger.error('AdaApi::getTransactionRowsToExport: ' + stringifyError(error));
+
+      if (error instanceof LocalizableError) {
+        // we found it as a LocalizableError, so could throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
+    }
+  }
+
+  async getPDFSecretKey(
+    file: ?Blob,
+    decryptionKey: ?string,
+    redemptionType: string
+  ): Promise<string> {
+    Logger.debug('AdaApi::getPDFSecretKey called');
+    try {
+      const fileBuffer = await readFile(file);
+      const decryptedFileBuffer = decryptFile(decryptionKey, redemptionType, fileBuffer);
+      const parsedPDFString = await parsePDFFile(decryptedFileBuffer);
+      return getSecretKey(parsedPDFString);
+    } catch (error) {
+      Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  isValidRedemptionKey = (mnemonic: string): boolean => (isValidRedemptionKey(mnemonic));
+
+  isValidPaperVendRedemptionKey = (mnemonic: string): boolean => (
+    isValidPaperVendRedemptionKey(mnemonic)
+  );
+
+  isValidRedemptionMnemonic = (mnemonic: string): boolean => (
+    isValidMnemonic(mnemonic, config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH)
+  );
+
+  redeemAda = async (
+    request: RedeemAdaParams
+  ): BigNumber => {
+    Logger.debug('AdaApi::redeemAda called');
+    try {
+      const transactionAmount = await redeemAda(request);
+      Logger.debug('AdaApi::redeemAda success');
+      return transactionAmount;
+    } catch (error) {
+      Logger.error('AdaApi::redeemAda error: ' + stringifyError(error));
+      if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
+      }
+      throw new RedeemAdaError();
+    }
+  };
+
+  redeemPaperVendedAda = async (
+    request: RedeemPaperVendedAdaParams
+  ): BigNumber => {
+    Logger.debug('AdaApi::redeemAdaPaperVend called');
+    try {
+      const transactionAmount = await redeemPaperVendedAda(request);
+      Logger.debug('AdaApi::redeemAdaPaperVend success');
+      return transactionAmount;
+    } catch (error) {
+      Logger.error('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
+      if (error instanceof RedemptionKeyAlreadyUsedError) {
+        throw error;
+      }
+      throw new RedeemAdaError();
+    }
+  };
 }
 // ========== End of class AdaApi =========
 
 // ========== TRANSFORM SERVER DATA INTO FRONTEND MODELS =========
+
+async function _getTxFinancialInfo(
+  data: AdaTransaction
+): Promise<{
+  type: TransactionType,
+  amount: BigNumber,
+  fee: BigNumber
+}> {
+  // Note: logic taken from the mobile version of Yoroi
+  // https://github.com/Emurgo/yoroi-mobile/blob/a3d72218b1e63f6362152aae2f03c8763c168795/src/crypto/transactionUtils.js#L73-L103
+
+  const adaAddresses = await getAdaAddressesList();
+  const addresses: Array<string> = adaAddresses.map(addr => addr.cadId);
+
+  const ownInputs = data.ctInputs.filter(input => (
+    addresses.includes(input[0])
+  ));
+
+  const ownOutputs = data.ctOutputs.filter(output => (
+    addresses.includes(output[0])
+  ));
+
+  const _sum = (IOs: Array<AdaTransactionInputOutput>): BigNumber => (
+    IOs.reduce(
+      (accum: BigNumber, io) => accum.plus(new BigNumber(io[1].getCCoin, 10)),
+      new BigNumber(0),
+    )
+  );
+
+  const totalIn = _sum(data.ctInputs);
+  const totalOut = _sum(data.ctOutputs);
+  const ownIn = _sum(ownInputs);
+  const ownOut = _sum(ownOutputs);
+
+  const hasOnlyOwnInputs = ownInputs.length === data.ctInputs.length;
+  const hasOnlyOwnOutputs = ownOutputs.length === data.ctOutputs.length;
+  const isIntraWallet = hasOnlyOwnInputs && hasOnlyOwnOutputs;
+  const isMultiParty =
+    ownInputs.length > 0 && ownInputs.length !== data.ctInputs.length;
+
+  const brutto = ownOut.minus(ownIn);
+  const totalFee = totalOut.minus(totalIn); // should be negative
+
+  if (isIntraWallet) {
+    return {
+      type: transactionTypes.SELF,
+      amount: new BigNumber(0),
+      fee: totalFee
+    };
+  }
+  if (isMultiParty) {
+    return {
+      type: transactionTypes.MULTI,
+      amount: brutto,
+      // note: fees not accurate but no good way of finding which UTXO paid the fees in Yoroi
+      fee: new BigNumber(0)
+    };
+  }
+  if (hasOnlyOwnInputs) {
+    return {
+      type: transactionTypes.EXPEND,
+      amount: brutto.minus(totalFee),
+      fee: totalFee
+    };
+  }
+
+  return {
+    type: transactionTypes.INCOME,
+    amount: brutto,
+    fee: new BigNumber(0)
+  };
+}
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
@@ -608,18 +808,14 @@ const _conditionToTxState = (condition: AdaTransactionCondition) => {
 
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
-  (data: AdaTransaction) => {
-    const coins = new BigNumber(data.ctAmount.getCCoin);
+  (data: AdaTransaction, type: TransactionType, amount: BigNumber, fee: BigNumber) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,
       title: ctmTitle || data.ctIsOutgoing ? 'Ada sent' : 'Ada received',
-      type: data.ctIsOutgoing
-        ? transactionTypes.EXPEND
-        : transactionTypes.INCOME,
-      amount: (data.ctIsOutgoing ? coins.negated() : coins).dividedBy(
-        LOVELACES_PER_ADA
-      ),
+      type,
+      amount: amount.dividedBy(LOVELACES_PER_ADA).plus(fee.dividedBy(LOVELACES_PER_ADA)),
+      fee: fee.dividedBy(LOVELACES_PER_ADA),
       date: new Date(ctmDate),
       description: ctmDescription || '',
       numberOfConfirmations: getLastBlockNumber() - data.ctBlockNumber,

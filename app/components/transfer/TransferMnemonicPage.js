@@ -12,6 +12,7 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMnemonicPage.scss';
+import config from '../../config';
 
 const messages = defineMessages({
   title: {
@@ -65,7 +66,7 @@ type Props = {
   validWords: Array<string>,
   step0: string,
   mnemonicLength: number,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -94,7 +95,7 @@ export default class TransferMnemonicPage extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 
@@ -114,7 +115,7 @@ export default class TransferMnemonicPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, onBack, step0, mnemonicLength, oldTheme } = this.props;
+    const { validWords, onBack, step0, mnemonicLength, classicTheme } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -131,7 +132,7 @@ export default class TransferMnemonicPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox oldTheme={oldTheme}>
+        <BorderedBox classicTheme={classicTheme}>
 
           <div className={styles.body}>
 

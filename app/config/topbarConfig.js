@@ -2,8 +2,8 @@
 import { ROUTES } from '../routes-config';
 import walletsIcon from '../assets/images/yoroi-logo-shape-white.inline.svg';
 import withTrezorIcon from '../assets/images/top-bar/with-trezor-logo-white.inline.svg';
-import settingsIcon from '../assets/images/top-bar/settings-ic.inline.svg';
-import daedalusTransferIcon from '../assets/images/top-bar/daedalus-transfer.inline.svg';
+import settingsIcon from '../assets/images/top-bar/setting-active.inline.svg';
+import daedalusTransferIcon from '../assets/images/top-bar/daedalus-migration-active.inline.svg';
 
 export type Category = {
   name: string,

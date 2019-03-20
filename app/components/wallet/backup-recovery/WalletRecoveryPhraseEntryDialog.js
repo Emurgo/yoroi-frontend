@@ -58,7 +58,7 @@ type Props = {
   onRestartBackup: Function,
   onCancelBackup: Function,
   onFinishBackup: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -85,13 +85,13 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       onRestartBackup,
       onCancelBackup,
       onFinishBackup,
-      oldTheme
+      classicTheme
     } = this.props;
     const dialogClasses = classnames([
-      oldTheme ? styles.componentOld : styles.component,
+      classicTheme ? styles.componentClassic : styles.component,
       'WalletRecoveryPhraseEntryDialog',
     ]);
-    const wordsClasses = oldTheme ? styles.wordsOld : styles.words;
+    const wordsClasses = classicTheme ? styles.wordsClassic : styles.words;
 
     const enteredPhraseString = enteredPhrase.reduce((phrase, { word }) => `${phrase} ${word}`, '');
 
@@ -135,19 +135,19 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={!isValid ? <DialogBackButton onBack={onRestartBackup} /> : null}
-        oldTheme={oldTheme}
+        classicTheme={classicTheme}
       >
-        {!isValid && oldTheme ? (
+        {!isValid && classicTheme ? (
           <WalletRecoveryInstructions
             instructionsText={intl.formatMessage(messages.verificationInstructions)}
-            oldTheme={oldTheme}
+            classicTheme={classicTheme}
           />
         ) : null}
 
         <WalletRecoveryPhraseMnemonic
-          filled={!oldTheme && Boolean(enteredPhrase.length)}
-          phrase={oldTheme ? phraseOld : phrase}
-          oldTheme={oldTheme}
+          filled={!classicTheme && Boolean(enteredPhrase.length)}
+          phrase={classicTheme ? phraseOld : phrase}
+          classicTheme={classicTheme}
         />
 
         {!isValid && (
@@ -159,7 +159,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
                 index={index}
                 isActive={isActive}
                 onClick={(value) => isActive && onAddWord(value)}
-                oldTheme={oldTheme}
+                classicTheme={classicTheme}
               />
             ))}
           </div>

@@ -24,6 +24,7 @@ import {
   formattedAmountToNaturalUnits
 } from '../../../utils/formatters';
 import dangerIcon from '../../../assets/images/danger.inline.svg';
+import config from '../../../config';
 
 const messages = defineMessages({
   titleLabel: {
@@ -118,7 +119,7 @@ type Props = {
   isDialogOpen: Function,
   webWalletConfirmationDialogRenderCallback: Function,
   trezorTWalletConfirmationDialogRenderCallback: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 type State = {
@@ -213,7 +214,7 @@ export default class WalletSendForm extends Component<Props, State> {
     options: {
       validateOnBlur: false,
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 
@@ -226,7 +227,7 @@ export default class WalletSendForm extends Component<Props, State> {
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
       hasAnyPending,
-      oldTheme,
+      classicTheme,
     } = this.props;
     const {
       transactionFee,
@@ -238,13 +239,13 @@ export default class WalletSendForm extends Component<Props, State> {
     const amountFieldProps = amountField.bind();
     const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
 
-    const componentClasses = oldTheme ? styles.componentOld : styles.component;
-    const receiverInputClasses = oldTheme ? styles.receiverInputOld : styles.receiverInput;
-    const amountInputClasses = oldTheme ? styles.amountInputOld : styles.amountInput;
+    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
+    const receiverInputClasses = classicTheme ? styles.receiverInputClassic : styles.receiverInput;
+    const amountInputClasses = classicTheme ? styles.amountInputClassic : styles.amountInput;
 
     const hasPendingTxWarning = (
       <div className={styles.contentWarning}>
-        <SvgInline svg={dangerIcon} className={styles.icon} cleanup={['title']} />
+        <SvgInline svg={dangerIcon} className={styles.icon} />
         <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
       </div>
     );
@@ -254,14 +255,14 @@ export default class WalletSendForm extends Component<Props, State> {
 
         {hasAnyPending && hasPendingTxWarning}
 
-        <BorderedBox oldTheme={oldTheme}>
+        <BorderedBox classicTheme={classicTheme}>
 
           <div className={receiverInputClasses}>
             <Input
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
               skin={InputSkin}
             />
           </div>
@@ -278,7 +279,7 @@ export default class WalletSendForm extends Component<Props, State> {
               currency={currencyUnit}
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
-              // skin={<AmountInputSkin oldTheme={oldTheme} />}
+              // skin={<AmountInputSkin classicTheme={classicTheme} />}
               skin={AmountInputSkin}
             />
           </div>
@@ -299,11 +300,11 @@ export default class WalletSendForm extends Component<Props, State> {
     * CASE 2: Trezor Model T Wallet */
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
-    const { oldTheme } = this.props;
+    const { classicTheme } = this.props;
 
     const buttonClasses = classnames([
       'primary',
-      oldTheme ? styles.nextButtonOld : styles.nextButton,
+      classicTheme ? styles.nextButtonClassic : styles.nextButton,
     ]);
 
     const {

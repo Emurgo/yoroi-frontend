@@ -56,7 +56,7 @@ type Props = {
   onCancel: Function,
   error: ?LocalizableError,
   addressFromSubLabel: string,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 /** Show user what the transfer would do to get final confirmation */
@@ -69,7 +69,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, addressFromSubLabel, oldTheme } = this.props;
+    const { transferTx, isSubmitting, error, addressFromSubLabel, classicTheme } = this.props;
 
     const receiver = transferTx.receiver;
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
@@ -92,7 +92,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox oldTheme={oldTheme}>
+        <BorderedBox classicTheme={classicTheme}>
 
           <div className={styles.body}>
 

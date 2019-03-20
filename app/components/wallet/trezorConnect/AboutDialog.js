@@ -98,7 +98,7 @@ type Props = {
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -115,11 +115,11 @@ export default class AboutDialog extends Component<Props> {
       error,
       submit,
       cancel,
-      oldTheme
+      classicTheme
     } = this.props;
-    const headerBlockClasses = oldTheme ? styles.headerBlockOld : classnames([styles.headerBlock, 'small']);
-    const middleBlockClasses = oldTheme
-      ? classnames([styles.middleBlockOld, styles.middleAboutBlockOld])
+    const headerBlockClasses = classicTheme ? styles.headerBlockClassic : classnames([styles.headerBlock, 'small']);
+    const middleBlockClasses = classicTheme
+      ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])
       : classnames([styles.middleBlock, styles.middleAboutBlock]);
 
     const introBlock = (
@@ -131,11 +131,11 @@ export default class AboutDialog extends Component<Props> {
 
     const middleBlock = (
       <div className={middleBlockClasses}>
-        {!oldTheme && <SvgInline svg={aboutTrezorSvg} cleanup={['title']} />}
+        {!classicTheme && <SvgInline svg={aboutTrezorSvg} cleanup={['title']} />}
 
         <div className={styles.prerequisiteBlock}>
           <div>
-            <SvgInline svg={aboutPrerequisiteIconSVG} cleanup={['title']} />
+            <SvgInline svg={aboutPrerequisiteIconSVG} />
             <span className={styles.prerequisiteHeaderText}>
               {intl.formatMessage(messages.aboutPrerequisiteHeader)}
             </span>
@@ -145,7 +145,7 @@ export default class AboutDialog extends Component<Props> {
               {intl.formatMessage(messages.aboutPrerequisite1Part1)}
               <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
                 {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText)}
-                <SvgInline svg={externalLinkSVG} cleanup={['title']} />
+                <SvgInline svg={externalLinkSVG} />
               </a>
               {intl.formatMessage(messages.aboutPrerequisite1Part3)}
             </li>
@@ -156,9 +156,9 @@ export default class AboutDialog extends Component<Props> {
           </ul>
         </div>
 
-        {oldTheme && (
+        {classicTheme && (
           <div className={styles.trezorImageBlock}>
-            <SvgInline svg={aboutPrerequisiteTrezorSVG} cleanup={['title']} />
+            <SvgInline svg={aboutPrerequisiteTrezorSVG} />
           </div>
         )}
       </div>);
@@ -179,13 +179,13 @@ export default class AboutDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        oldTheme={oldTheme}
+        classicTheme={classicTheme}
       >
-        <ProgressStepBlock progressInfo={progressInfo} oldTheme={oldTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} oldTheme={oldTheme} />
-        <TrezorErrorBlock progressInfo={progressInfo} error={error} oldTheme={oldTheme} />
+        <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <TrezorErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
       </Dialog>);
   }
 }

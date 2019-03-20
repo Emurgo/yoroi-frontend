@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-// import Footer from '../footer/Footer';
 import styles from './TopBarLayout.scss';
 
 type Props = {
@@ -11,11 +10,9 @@ type Props = {
   children?: ?Node,
   notification?: ?Node,
   banner?: Node,
-  isTopBarVisible?: boolean,
-  isBannerVisible?: boolean,
+  noTopbarNoBanner?: boolean,
   languageSelectionBackground?: boolean,
-  withFooter? : boolean,
-  oldTheme?: boolean,
+  classicTheme?: boolean,
   footer?: Node,
 };
 
@@ -26,11 +23,10 @@ export default class TopBarLayout extends Component<Props> {
     children: undefined,
     notification: undefined,
     banner: undefined,
-    isTopBarVisible: true,
-    isBannerVisible: true,
+    noTopbarNoBanner: undefined,
     languageSelectionBackground: false,
     withFooter: false,
-    oldTheme: false,
+    classicTheme: false,
     footer: undefined,
   };
 
@@ -40,36 +36,33 @@ export default class TopBarLayout extends Component<Props> {
       children,
       topbar,
       notification,
-      isTopBarVisible,
-      isBannerVisible,
+      noTopbarNoBanner,
       languageSelectionBackground,
-      withFooter,
       footer,
-      oldTheme
+      classicTheme
     } = this.props;
     const componentClasses = classnames([
       styles.component,
-      languageSelectionBackground && !oldTheme ? styles.languageSelectionBackground : '',
+      languageSelectionBackground && !classicTheme ? styles.languageSelectionBackground : '',
     ]);
     const topbarClasses = classnames([
-      oldTheme ? styles.topbarOld : styles.topbar,
+      classicTheme ? styles.topbarClassic : styles.topbar,
     ]);
     const contentClasses = classnames([
       styles.content,
-      withFooter ? styles.contentFooter : null,
       footer ? styles.contentWithFooter : null,
     ]);
 
     return (
       <div className={componentClasses}>
         <div className={styles.main}>
-          {isTopBarVisible ? (
+          {noTopbarNoBanner ? null : (
             <div className={topbarClasses}>
               {topbar}
             </div>
-          ) : null}
+          )}
 
-          {isBannerVisible && banner}
+          {noTopbarNoBanner ? null : banner}
 
           {notification}
 
@@ -79,8 +72,7 @@ export default class TopBarLayout extends Component<Props> {
             </div>
           </div>
 
-          {/* {withFooter && <Footer />} */}
-          {footer && withFooter ? (
+          {footer ? (
             <div className={styles.footer}>
               {footer}
             </div>

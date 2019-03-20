@@ -15,6 +15,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
+import config from '../../../config';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -47,7 +48,7 @@ type Props = {
   isSubmitting: boolean,
   error: ?LocalizableError,
   currencyUnit: string,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -75,7 +76,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 
@@ -108,7 +109,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       isSubmitting,
       error,
       currencyUnit,
-      oldTheme
+      classicTheme
     } = this.props;
 
     const confirmButtonClasses = classnames([
@@ -119,7 +120,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.walletSendConfirmationBackButtonLabel),
-        onClick: !isSubmitting && onCancel,
+        onClick: isSubmitting
+          ? () => {} // noop
+          : onCancel
       },
       {
         label: intl.formatMessage(messages.sendButtonLabel),
@@ -136,9 +139,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         actions={actions}
         closeOnOverlayClick
         onClose={!isSubmitting ? onCancel : null}
-        className={oldTheme ? styles.dialogOld : styles.dialog}
+        className={classicTheme ? styles.dialogClassic : styles.dialog}
         closeButton={<DialogCloseButton />}
-        oldTheme={oldTheme}
+        classicTheme={classicTheme}
       >
         <div className={styles.walletPasswordFields}>
           <div className={styles.addressToLabelWrapper}>
@@ -183,7 +186,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
               skin={InputSkin}
             />
           }

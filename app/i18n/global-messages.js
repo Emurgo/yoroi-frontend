@@ -7,6 +7,11 @@ import { defineMessages } from 'react-intl';
 */
 
 export default defineMessages({
+  invalidMnemonic: {
+    id: 'global.errors.invalidMnemonic',
+    defaultMessage: '!!!Invalid phrase entered, please check.',
+    description: 'Error message shown when invalid bip39 mnemonic was entered.'
+  },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
     defaultMessage: '!!!This field is required.',
@@ -92,10 +97,10 @@ export default defineMessages({
     defaultMessage: '!!!German',
     description: 'Language name for "German" language.'
   },
-  languageCroatian: {
-    id: 'global.language.croatian',
-    defaultMessage: '!!!Croatian',
-    description: 'Language name for "Croatian" language.'
+  languageFrench: {
+    id: 'global.language.french',
+    defaultMessage: '!!!French',
+    description: 'Language name for "French" language.'
   },
   unitAda: {
     id: 'global.unit.ada',
@@ -146,11 +151,6 @@ export default defineMessages({
     id: 'wallet.trezor.dialog.title.label',
     defaultMessage: '!!!Connect to Trezor Hardware Wallet',
     description: 'Label "Connect to Trezor Hardware Wallet" on the Connect to Trezor Hardware Wallet dialog.'
-  },
-  trezorError999: {
-    id: 'wallet.trezor.error.999',
-    defaultMessage: '!!!Something unexpected happened, please retry.',
-    description: '<Something unexpected happened, please retry.>'
   },
   trezorError101: {
     id: 'wallet.trezor.error.101',
@@ -231,6 +231,11 @@ export default defineMessages({
     id: 'footer.whatIsAHarwareWalletMessage',
     defaultMessage: '!!!What is a harware wallet?',
     description: 'What is a harware wallet message shown in footer on the wallet screen.',
+  },
+  noTransactionsFound: {
+    id: 'wallet.summary.no.transaction',
+    defaultMessage: '!!!No transactions found',
+    description: 'Message shown when wallet transaction search returns zero results.'
   },
 });
 

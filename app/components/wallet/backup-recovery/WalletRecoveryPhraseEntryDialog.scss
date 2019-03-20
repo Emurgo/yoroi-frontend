@@ -1,6 +1,6 @@
 @import '../../../themes/mixins/loading-spinner';
 
-.wordsOld {
+.wordsClassic {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
@@ -22,7 +22,7 @@
   }
 }
 
-.componentOld {
+.componentClassic {
   :global {
     .WalletRecoveryInstructions_component {
       text-align: center;

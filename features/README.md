@@ -1,6 +1,6 @@
 # Scenario Testing
 
-We use [Cucumber](https://cucumber.io/) to create scenarios and them run them using Selenium (Chrome Web driver)
+We use [Cucumber](https://cucumber.io/) to create scenarios and them run them using Selenium (Chrome Web driver and Gecko Web Driver)
 
 These tests mock the `backend-service` by spinning up a server on localhost that answers to `backend-service` requests.
 No other part of the application is mocked.

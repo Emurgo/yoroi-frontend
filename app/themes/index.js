@@ -1,4 +1,4 @@
 export const THEMES = {
-  YOROI_OLD: 'yoroi-old',
-  YOROI: 'yoroi'
+  YOROI_CLASSIC: 'YoroiClassic',
+  YOROI_MODERN: 'YoroiModern'
 };

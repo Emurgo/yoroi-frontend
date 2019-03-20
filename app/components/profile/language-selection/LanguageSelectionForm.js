@@ -30,7 +30,7 @@ type Props = {
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -69,7 +69,7 @@ export default class LanguageSelectionForm extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { languages, isSubmitting, error, oldTheme } = this.props;
+    const { languages, isSubmitting, error, classicTheme } = this.props;
     const languageId = form.$('languageId');
     const languageOptions = languages.map(language => ({
       value: language.value,
@@ -85,7 +85,7 @@ export default class LanguageSelectionForm extends Component<Props> {
         <div className={styles.centeredBox}>
 
           <Select
-            className={oldTheme ? styles.languageSelectOld : styles.languageSelect}
+            className={classicTheme ? styles.languageSelectClassic : styles.languageSelect}
             options={languageOptions}
             {...languageId.bind()}
             skin={SelectSkin}

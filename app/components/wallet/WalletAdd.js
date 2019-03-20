@@ -5,7 +5,6 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-// import globalMessages from '../../i18n/global-messages';
 import styles from './WalletAdd.scss';
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 
@@ -48,7 +47,7 @@ type Props = {
   onCreate: Function,
   onRestore: Function,
   isRestoreActive: boolean,
-  oldTheme: boolean,
+  classicTheme: boolean,
   title: string
 };
 
@@ -66,21 +65,21 @@ export default class WalletAdd extends Component<Props> {
       onCreate,
       onRestore,
       isRestoreActive,
-      oldTheme,
+      classicTheme,
       title
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
     const createWalletButtonClasses = classnames([
-      oldTheme ? 'primary' : 'outlined',
+      classicTheme ? 'primary' : 'outlined',
       'createWalletButton'
     ]);
     const restoreWalletButtonClasses = classnames([
-      oldTheme ? 'primary' : 'outlined',
+      classicTheme ? 'primary' : 'outlined',
       'restoreWalletButton'
     ]);
     const buttonsContainerClasses = classnames([
-      oldTheme ? styles.buttonsContainerOld : styles.buttonsContainer
+      classicTheme ? styles.buttonsContainerClassic : styles.buttonsContainer
     ]);
 
     let activeNotification = null;
@@ -93,7 +92,7 @@ export default class WalletAdd extends Component<Props> {
     return (
       <div className={componentClasses}>
         <div className={buttonsContainerClasses}>
-          {!oldTheme && (
+          {!classicTheme && (
             <div className={styles.title}>{title}</div>
           )}
 
@@ -126,9 +125,9 @@ export default class WalletAdd extends Component<Props> {
 
         </div>
 
-        {!oldTheme && <div className={styles.background} />}
+        {!classicTheme && <div className={styles.background} />}
 
-        {!oldTheme && <div className={styles.walletImage} />}
+        {!classicTheme && <div className={styles.walletImage} />}
       </div>
     );
   }

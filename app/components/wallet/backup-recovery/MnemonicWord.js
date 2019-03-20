@@ -11,18 +11,18 @@ type Props = {
   index: number,
   isActive: boolean,
   onClick: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
 export default class MnemonicWord extends Component<Props> {
   render() {
-    const { word, index, isActive, onClick, oldTheme } = this.props;
+    const { word, index, isActive, onClick, classicTheme } = this.props;
     const handleClick = onClick.bind(null, { word, index });
 
     const componentClasses = classnames([
-      oldTheme ? 'flat' : null,
-      oldTheme ? styles.componentOld : styles.component,
+      classicTheme ? 'flat' : null,
+      classicTheme ? styles.componentClassic : styles.component,
     ]);
 
     return (

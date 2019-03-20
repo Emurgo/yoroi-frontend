@@ -17,6 +17,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
+import config from '../../config';
 // import InputOwnSkin from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
@@ -86,7 +87,7 @@ type Props = {
   mnemonicValidator: Function,
   error?: ?LocalizableError,
   validWords: Array<string>,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -159,7 +160,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
 
@@ -181,7 +182,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error, onCancel, oldTheme, mnemonicValidator } = this.props;
+    const { validWords, isSubmitting, error, onCancel, classicTheme, mnemonicValidator } = this.props;
     const { walletName, walletPassword, repeatPassword, recoveryPhrase } = form.values();
     const {
       condition1,
@@ -197,13 +198,13 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const walletNameFieldClasses = classnames([
       'walletName',
-      oldTheme ? styles.walletNameOld : styles.walletName,
+      classicTheme ? styles.walletNameClassic : styles.walletName,
     ]);
     const walletPasswordFieldsClasses = classnames([
       styles.walletPasswordFields,
       styles.show,
     ]);
-    const walletPasswordClasses = oldTheme ? styles.walletPasswordOld : styles.walletPassword;
+    const walletPasswordClasses = classicTheme ? styles.walletPasswordClassic : styles.walletPassword;
 
     const disabledCondition = !(
       isValidWalletName(walletName)
@@ -222,7 +223,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(messages.importButtonLabel),
         primary: true,
-        disabled: isSubmitting || (!oldTheme && disabledCondition),
+        disabled: isSubmitting || (!classicTheme && disabledCondition),
         onClick: this.submit,
       },
     ];
@@ -235,7 +236,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         closeOnOverlayClick
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
-        oldTheme={oldTheme}
+        classicTheme={classicTheme}
       >
 
         <Input
@@ -243,7 +244,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           done={isValidWalletName(walletName)}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+          // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
           skin={InputSkin}
         />
 
@@ -264,7 +265,7 @@ export default class WalletRestoreDialog extends Component<Props> {
               done={isValidWalletPassword(walletPassword)}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
               skin={InputSkin}
             />
             <Input
@@ -272,11 +273,11 @@ export default class WalletRestoreDialog extends Component<Props> {
               done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              // skin={oldTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
+              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
               skin={InputSkin}
             />
 
-            {oldTheme ? (
+            {classicTheme ? (
               <p className={styles.passwordInstructions}>
                 {intl.formatMessage(globalMessages.passwordInstructions)}
               </p>

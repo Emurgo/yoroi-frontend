@@ -1,7 +1,7 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/error-message';
 
-.componentOld {
+.componentClassic {
   flex: 1;
   overflow-x: hidden;
   overflow-y: overlay;
@@ -15,7 +15,7 @@
   }
 
   :global {
-    .BorderedBox_componentOld {
+    .BorderedBox_componentClassic {
       padding-bottom: 6px;
     }
   }
@@ -60,7 +60,7 @@
   }
 }
 
-.qrCodeAndInstructionsOld {
+.qrCodeAndInstructionsClassic {
   border-bottom: 1px solid var(--theme-separation-border-color);
   display: flex;
   flex-direction: row;
@@ -236,7 +236,7 @@
   }
 }
 
-.generatedAddressesOld {
+.generatedAddressesClassic {
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
   font-size: 15px;

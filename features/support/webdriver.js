@@ -3,11 +3,31 @@
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
 import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
+import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
 
-// TODO: We should add methods to `this.driver` object, instead of use `this` directly
-function CustomWorld() {
-  this.driver = new seleniumWebdriver.Builder()
+const fs = require('fs');
+
+/**
+ * Chrome extension URLs are fixed and never change. This is a security problem as it allows
+ * websites to check if you have certain known extensions installed by monitoring the browser's
+ * response to resource access.
+ * https://www.ghacks.net/2017/08/29/browsers-leak-installed-extensions-to-sites/
+ *
+ * To tackle this, Firefox gives every extension a unique UUID to create a random URL on install
+ * However, this means Selenium tests cannot open the extension page based on a static url
+ *
+ * To solve this, we first note Firefox allows you to optionally specify your extension ID
+ * We then note the mapping of the extension ID to the random UUID is stored in about:config
+ * Under the key "extensions.webextensions.uuids".
+ * Therefore, we specify a fixed extension ID for Yoroi in the manifest
+ * Then we use Selenium to override the config to manually specify a a fixed UUID
+ */
+const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
+
+function getChromeBuilder() {
+  return new seleniumWebdriver.Builder()
     .withCapabilities({
       chromeOptions: {
         args: [
@@ -16,8 +36,59 @@ function CustomWorld() {
       }
     })
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')))
-    .build();
+    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
+}
+
+function getFirefoxBuilder() {
+  const profile = new firefox.Profile();
+
+  /**
+   * Firefox disallows unsigned extensions by default. We solve this through a config change
+   * The proper way to do this is to use the "temporary addon" feature of Firefox
+   * However, our version of selenium doesn't support this yet
+   * The config is deprecated and may be removed in the future.
+   */
+  profile.setPreference('xpinstall.signatures.required', false);
+  profile.setPreference('extensions.webextensions.uuids', firefoxUuidMapping);
+  profile.addExtension(path.resolve(__dirname, '../../yoroi-test.xpi'));
+  const options = new firefox.Options().setProfile(profile);
+
+  return new seleniumWebdriver.Builder()
+    .withCapabilities({
+      chromeOptions: {
+        args: [
+          'start-maximized'
+        ]
+      }
+    })
+    .forBrowser('firefox')
+    .setFirefoxOptions(options);
+}
+
+type WorldInput = {
+  parameters: {
+    browser: 'chrome' | 'firefox'
+  }
+};
+
+// TODO: We should add methods to `this.driver` object, instead of use `this` directly
+function CustomWorld(cmdInput: WorldInput) {
+  const builder = cmdInput.parameters.browser === 'chrome'
+    ? getChromeBuilder()
+    : getFirefoxBuilder();
+  this.driver = builder.build();
+
+  this.getExtensionUrl = (): string => {
+    if (cmdInput.parameters.browser === 'chrome') {
+      /**
+       * Extension id is determinisitically calculated based on pubKey used to generate the crx file
+       * so we can just hardcode this value if we keep e2etest-key.pem file
+       * https://stackoverflow.com/a/10089780/3329806
+       */
+      return 'chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg/main_window.html';
+    }
+    return `moz-extension://${firefoxExtensionId}/main_window.html`;
+  };
 
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
   this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
@@ -134,6 +205,25 @@ function CustomWorld() {
     this.driver.executeScript(txs => {
       window.yoroi.api.ada.saveTxs(txs);
     }, transactions);
+  };
+
+  this.chooseFile = async (filePath, fileType) => {
+    const certificateFileContent = fs.readFileSync(filePath);
+    await this.driver.executeScript((fileContent, type) => {
+      const content = new Uint8Array(fileContent.data);
+      const certificate = new Blob([content], { type });
+      window.yoroi.actions.ada.adaRedemption.setCertificate.trigger({ certificate });
+    }, certificateFileContent, fileType);
+  };
+
+  this.enterPassphrase = async passphrase => {
+    for (let i = 0; i < passphrase.length; i++) {
+      const word = passphrase[i];
+      await this.input('.AdaRedemptionForm_scrollableContent .pass-phrase input', word);
+      await this.waitForElement(`//li[contains(text(), '${word}')]`, By.xpath);
+      await this.click(`//li[contains(text(), '${word}')]`, By.xpath);
+      await this.waitForElement(`//span[contains(text(), '${word}')]`, By.xpath);
+    }
   };
 }
 

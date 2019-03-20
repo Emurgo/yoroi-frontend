@@ -65,7 +65,7 @@ type Props = {
   onCopyAddress: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-  oldTheme: boolean,
+  classicTheme: boolean,
   notification: Node
 };
 
@@ -102,7 +102,7 @@ export default class WalletReceive extends Component<Props, State> {
       walletAddress, walletAddresses,
       onCopyAddress,
       isSubmitting, error, isWalletAddressUsed,
-      oldTheme,
+      classicTheme,
       notification
     } = this.props;
     const { intl } = this.context;
@@ -120,12 +120,12 @@ export default class WalletReceive extends Component<Props, State> {
       isSubmitting ? styles.spinning : null,
     ]);
 
-    const qrCodeAndInstructionsClasses = oldTheme
-      ? styles.qrCodeAndInstructionsOld
+    const qrCodeAndInstructionsClasses = classicTheme
+      ? styles.qrCodeAndInstructionsClassic
       : styles.qrCodeAndInstructions;
 
-    const generatedAddressesClasses = oldTheme
-      ? styles.generatedAddressesOld
+    const generatedAddressesClasses = classicTheme
+      ? styles.generatedAddressesClassic
       : styles.generatedAddresses;
 
     const generateAddressForm = (
@@ -144,7 +144,7 @@ export default class WalletReceive extends Component<Props, State> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const walletReceiveContent = (
-      <BorderedBox oldTheme={oldTheme}>
+      <BorderedBox classicTheme={classicTheme}>
         <div className={qrCodeAndInstructionsClasses}>
           <div className={styles.instructions}>
             <div className={styles.hashLabel}>
@@ -156,10 +156,10 @@ export default class WalletReceive extends Component<Props, State> {
                 text={walletAddress}
                 onCopy={onCopyAddress.bind(this, walletAddress)}
               >
-                <SvgInline svg={iconCopy} className={styles.copyIconBig} cleanup={['title']} />
+                <SvgInline svg={iconCopy} className={styles.copyIconBig} />
               </CopyToClipboard>
 
-              {!oldTheme && notification}
+              {!classicTheme && notification}
             </div>
             <div className={styles.instructionsText}>
               {intl.formatMessage(messages.walletReceiveInstructions)}
@@ -203,7 +203,7 @@ export default class WalletReceive extends Component<Props, State> {
                     onCopy={onCopyAddress.bind(this, address.id)}
                   >
                     <span className={styles.copyAddress}>
-                      <SvgInline svg={iconCopy} className={styles.copyIcon} cleanup={['title']} />
+                      <SvgInline svg={iconCopy} className={styles.copyIcon} />
                       <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
                     </span>
                   </CopyToClipboard>
@@ -219,7 +219,7 @@ export default class WalletReceive extends Component<Props, State> {
       <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />;
 
     return (
-      <div className={oldTheme ? styles.componentOld : styles.component}>
+      <div className={classicTheme ? styles.componentClassic : styles.component}>
         {walletAddress ? walletReceiveContent : loadingSpinner}
       </div>
     );

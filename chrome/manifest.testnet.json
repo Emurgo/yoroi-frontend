@@ -1,11 +1,21 @@
 {
-  "version": "0.0.12",
-  "version_name": "tn-0.0.12#68.0_GC-w7",
+  "version": "1.3.3",
+  "version_name": "tn-1.3.3",
   "name": "yoroi",
   "manifest_version": 2,
   "description": "[testnet] Cardano ADA wallet",
   "browser_action": {
-    "default_title": "[testnet] Yoroi"
+    "default_title": "[testnet] Yoroi",
+    "default_icon": {
+      "16": "img/icon-16.png",
+      "48": "img/icon-48.png",
+      "128": "img/icon-128.png"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{530f7c6c-6077-4703-8f71-cb368c663e35}"
+    }
   },
   "icons": {
     "16": "img/icon-16.png",

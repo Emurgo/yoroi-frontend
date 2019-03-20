@@ -2,19 +2,20 @@
 
 cd /yoroi
 
-chown -R "$(whoami):$(whoami)" .
+user="circleci"
+chown -R "$user:$user" .
 
 curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 source $HOME/.cargo/env
-rustup install nightly
+rustup install 1.32.0
 
 # needed for js-cardano-wasm depedency
-rustup install nightly-2018-06-05-x86_64
+rustup install 1.32.0
 
-rustup target add wasm32-unknown-unknown --toolchain nightly
+rustup target add wasm32-unknown-unknown --toolchain 1.32.0
 
-chown -R "$(whoami):$(whoami)" /usr/local/lib/node_modules
+chown -R "$user:$user" /usr/local/lib/node_modules
 
 npm run build-js-cardano-wasm
 

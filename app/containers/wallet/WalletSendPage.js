@@ -53,7 +53,7 @@ export default class WalletSendPage extends Component<Props> {
         trezorTWalletConfirmationDialogRenderCallback={this.trezorTWalletDoConfirmation}
         hasAnyPending={hasAnyPending}
         isTrezorTWallet={activeWallet.isTrezorTWallet}
-        oldTheme={theme.old}
+        classicTheme={theme.classic}
       />
     );
   }

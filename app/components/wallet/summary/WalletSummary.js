@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import adaSymbolSmallest from '../../../assets/images/ada-symbol-smallest-dark.inline.svg';
+import exportTxToFileSvg from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
@@ -20,10 +21,15 @@ const messages = defineMessages({
     defaultMessage: '!!!Incoming pending confirmation',
     description: '"Incoming pending confirmation" label on Wallet summary page'
   },
-  transactionsLabel: {
+  numOfTxsLabel: {
     id: 'wallet.summary.page.transactionsLabel',
     defaultMessage: '!!!Number of transactions',
     description: '"Number of transactions" label on Wallet summary page'
+  },
+  exportIconTooltip: {
+    id: 'wallet.transaction.export.exportIcon.tooltip',
+    defaultMessage: '!!!Export to file',
+    description: '"Export" icon tooltip'
   }
 });
 
@@ -31,7 +37,8 @@ type Props = {
   numberOfTransactions: number,
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
-  oldTheme: boolean
+  openExportTxToFileDialog: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -46,35 +53,49 @@ export default class WalletSummary extends Component<Props> {
       pendingAmount,
       numberOfTransactions,
       isLoadingTransactions,
-      oldTheme
+      openExportTxToFileDialog,
+      classicTheme,
     } = this.props;
     const { intl } = this.context;
-    const componentClasses = oldTheme ? styles.componentOld : styles.component;
+    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
     return (
       <div className={componentClasses}>
-        <BorderedBox oldTheme={oldTheme}>
-          {pendingAmount.incoming.greaterThan(0) &&
-            <div className={styles.pendingConfirmation}>
-              {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
-              : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-              <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} cleanup={['title']} />
-            </div>
-          }
-          {pendingAmount.outgoing.greaterThan(0) &&
-            <div className={styles.pendingConfirmation}>
-              {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
-              : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-              <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} cleanup={['title']} />
-            </div>
-          }
+        <div className={styles.leftBlock} />
+        <div className={styles.middleBlock}>
+          <BorderedBox classicTheme={classicTheme}>
+            {pendingAmount.incoming.greaterThan(0) &&
+              <div className={styles.pendingConfirmation}>
+                {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
+                : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
+                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
+              </div>
+            }
+            {pendingAmount.outgoing.greaterThan(0) &&
+              <div className={styles.pendingConfirmation}>
+                {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
+                : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
+                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
+              </div>
+            }
+            {!isLoadingTransactions ? (
+              <div className={styles.numberOfTransactions}>
+                {intl.formatMessage(messages.numOfTxsLabel)}: <span>{numberOfTransactions}</span>
+              </div>
+            ) : null}
+          </BorderedBox>
+        </div>
+        <div className={styles.rightBlock}>
           {!isLoadingTransactions ? (
-            <div className={styles.numberOfTransactions}>
-              {intl.formatMessage(messages.transactionsLabel)}: <span>{numberOfTransactions}</span>
-            </div>
+            <SvgInline
+              svg={exportTxToFileSvg}
+
+              className={styles.exportTxToFileSvg}
+              title={intl.formatMessage(messages.exportIconTooltip)}
+              onClick={openExportTxToFileDialog}
+            />
           ) : null}
-        </BorderedBox>
+        </div>
       </div>
     );
   }
-
 }

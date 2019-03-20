@@ -29,7 +29,7 @@ type Props = {
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 type State = {
@@ -60,14 +60,14 @@ export default class TermsOfUseForm extends Component<Props, State> {
 
   render() {
     const { intl } = this.context;
-    const { isSubmitting, error, localizedTermsOfUse, oldTheme } = this.props;
+    const { isSubmitting, error, localizedTermsOfUse, classicTheme } = this.props;
     const { areTermsOfUseAccepted } = this.state;
 
-    const centeredBoxClasses = oldTheme ? styles.centeredBoxOld : styles.centeredBox;
-    const checkboxClasses = oldTheme ? styles.checkboxOld : styles.checkbox;
-    const submitButtonClass = oldTheme ? styles.submitButtonOld : styles.submitButton;
-    const submitButtonSpinningClass = oldTheme
-      ? styles.submitButtonSpinningOld
+    const centeredBoxClasses = classicTheme ? styles.centeredBoxClassic : styles.centeredBox;
+    const checkboxClasses = classicTheme ? styles.checkboxClassic : styles.checkbox;
+    const submitButtonClass = classicTheme ? styles.submitButtonClassic : styles.submitButton;
+    const submitButtonSpinningClass = classicTheme
+      ? styles.submitButtonSpinningClassic
       : styles.submitButtonSpinning;
     const buttonClasses = classnames([
       'primary',
@@ -79,7 +79,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
       <div className={styles.component}>
         <div className={centeredBoxClasses}>
 
-          <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} oldTheme={oldTheme} />
+          <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} classicTheme={classicTheme} />
 
           <div className={checkboxClasses}>
             <Checkbox

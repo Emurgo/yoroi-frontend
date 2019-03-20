@@ -16,7 +16,9 @@ import GeneralSettingsPage from './containers/settings/categories/GeneralSetting
 import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
+import DisplaySettingsPage from './containers/settings/categories/DisplaySettingsPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
+import AboutYoroiSettings from './components/settings/categories/AboutYoroiSettings';
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 const LoadingPage = resolver('containers/LoadingPage');
@@ -25,6 +27,7 @@ const WalletSummaryPage = resolver('containers/wallet/WalletSummaryPage');
 const WalletSendPage = resolver('containers/wallet/WalletSendPage');
 const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
 const DaedalusTransferPage = resolver('containers/transfer/DaedalusTransferPage');
+const AdaRedemptionPage = resolver('containers/wallet/AdaRedemptionPage');
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -126,6 +129,21 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.SUPPORT}
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      path={ROUTES.SETTINGS.DISPLAY}
+      component={(props) => <DisplaySettingsPage {...props} stores={stores} actions={actions} />}
+      exact
+    />
+    <Route
+      path={ROUTES.SETTINGS.ABOUT_YOROI}
+      component={(props) => <AboutYoroiSettings {...props} stores={stores} actions={actions} />}
+      exact
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.ADA_REDEMPTION}
+      component={(props) => <AdaRedemptionPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>

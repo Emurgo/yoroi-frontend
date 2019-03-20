@@ -33,7 +33,7 @@ const messages = defineMessages({
 });
 
 type Props = {
-  oldTheme: ?boolean,
+  classicTheme: ?boolean,
 };
 
 @observer
@@ -45,11 +45,11 @@ export default class TestnetWarningBanner extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { oldTheme } = this.props;
+    const { classicTheme } = this.props;
 
-    const testnetClasses = oldTheme ? styles.testnetWarningOld : styles.testnetWarning;
+    const testnetClasses = classicTheme ? styles.testnetWarningClassic : styles.testnetWarning;
 
-    const faqLink = oldTheme ? (
+    const faqLink = classicTheme ? (
       <a
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => handleExternalLinkClick(event)}
@@ -70,7 +70,7 @@ export default class TestnetWarningBanner extends Component<Props> {
         {
           environment.isMainnet() ? null : (
             <div className={testnetClasses}>
-              {oldTheme ? (
+              {classicTheme ? (
                 <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
               ) : ([
                 <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} cleanup={['title']} />,

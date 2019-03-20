@@ -26,7 +26,7 @@ $ npm run dev
 $ npm run build -- --env "mainnet"
 ```
 
-- Testnet
+- Testnet (not supported yet)
 ```bash
 # build files to './build'
 $ npm run build -- --env "testnet"
@@ -41,13 +41,24 @@ $ npm run build -- --env "testnet"
 
 _Note_: `dev` should hot reload on code change
 
+## Run Yoroi Firefox extension
+
+Debug builds are not maintained for Firefox as firefox rejects manifest files with non-https `localhost` in them.
+You can bypass this by manually adding the extension into your Firefox folder but this is kind of tedious.
+I suggest instead installing the `mainnet` build as it does not use `localhost`. (through `about:debugging` or `about:addons`). See [SETUP.md](docs/SETUP.md) for how to makes the unittests pass.
+
 ## Build release candidate
 
 [RELEASE.md](docs/RELEASE.md)
 
 ## Test
 
-* `features`: E2E tests (use [chromedriver](https://www.npmjs.com/package/chromedriver), [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver))
+### Selenium + Cucumber
+You **must** run `npm run test-prepare` **before** running the tests!
+
+`test-prepare` will *BUILD* the extension and then the tests will *LOAD* the extension.
+
+Rerun `test-prepare` anytime you make changes to the application itself. If you only change test files, you do not need to rerun it.
 
 ```bash
 # flow
@@ -55,14 +66,20 @@ $ npm run flow
 # lint
 $ npm run eslint
 # features (command to run all existing tests)
-$ npm run test-e2e
+$ npm run test-e2e-chrome
 # How to run one .feature file (One feature file = one covered component from youtrack)
 $ npm run test-by-feature feature/wallet-creation.feature
-# How to run one test. Instead of '@it-10' you can use any tag from youtrack
+# How to run one test.
 $ npm run test-by-tag @it-10
 ```
 
- 
+### Jest
+
+We use Jest for unittests.
+
+```bash
+$ npm run jest
+```
 
 ## Update Cardano crypto library
 

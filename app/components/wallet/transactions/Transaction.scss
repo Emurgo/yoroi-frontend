@@ -1,4 +1,4 @@
-.componentOld {
+.componentClassic {
   color: var(--theme-transactions-list-item-details-color);
 
   &.failed {
@@ -37,7 +37,7 @@
 
 // ========= TOGGLER =========
 
-.togglerOld {
+.togglerClassic {
   cursor: pointer;
   display: flex;
   padding: 20px;
@@ -63,7 +63,7 @@
   width: 100%;
 }
 
-.titleOld, .amountOld {
+.titleClassic, .amountClassic {
   color: var(--theme-transactions-list-item-details-color);
   font-size: 16px;
   font-family: var(--font-semibold);
@@ -72,7 +72,7 @@
   text-align: left;
 }
 
-.amountOld {
+.amountClassic {
   margin-left: auto;
   font-family: var(--font-medium);
   font-size: 16px;
@@ -120,7 +120,7 @@
   }
 }
 
-.labelOld {
+.labelClassic {
   color: var(--theme-transactions-priority-color);
   display: inline-block;
   font-family: var(--font-bold);
@@ -147,9 +147,9 @@
   border-radius: 15px;
 }
 
-.pendingLabelOld {
+.pendingLabelClassic {
   :global {
-    @keyframes pending-label-animation-old {
+    @keyframes pending-label-animation-classic {
       0% {
         background-position: 0 0;
       }
@@ -172,7 +172,7 @@
         transparent
     );
   background-size:50px 50px;
-  animation: pending-label-animation-old 2s linear infinite;
+  animation: pending-label-animation-classic 2s linear infinite;
   overflow: hidden;
 }
 
@@ -205,7 +205,7 @@
   overflow: hidden;
 }
 
-.failedLabelOld, .failedLabel {
+.failedLabelClassic, .failedLabel {
   background-color: var(--theme-transactions-state-failed-background-color);
 }
 
@@ -225,7 +225,7 @@
   text-transform: capitalize;
 }
 
-.typeOld {
+.typeClassic {
   font-family: var(--font-light);
   font-size: 14px;
   margin-left: 12px;
@@ -243,7 +243,7 @@
 
 // ========= DETAILS =========
 
-.contentOld {
+.contentClassic {
   border-bottom: 1px solid var(--theme-separation-border-color);
   margin-left: 20px;
   margin-right: 20px;
@@ -258,7 +258,7 @@
   border: none;
 }
 
-.detailsOld {
+.detailsClassic {
   height: auto;
   * + h2,
   * + .row {
@@ -328,7 +328,7 @@
   margin-left: 76px;
 }
 
-.currencySymbolOld {
+.currencySymbolClassic {
   display: inline-block;
   margin-bottom: -1px;
   margin-left: 4px;

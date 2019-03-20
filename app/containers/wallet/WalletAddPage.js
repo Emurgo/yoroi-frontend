@@ -18,7 +18,7 @@ import resolver from '../../utils/imports';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
 import TrezorConnectStore from '../../stores/ada/TrezorConnectStore';
-import HelpLinkFooter from '../../components/footer/HelpLinkFooter';
+import AddWalletFooter from '../footer/AddWalletFooter';
 
 type Props = InjectedProps;
 const MainLayout = resolver('containers/MainLayout');
@@ -57,8 +57,8 @@ export default class WalletAddPage extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        oldTheme={theme.old}
-        areCategoriesHidden={!theme.old}
+        classicTheme={theme.classic}
+        areCategoriesHidden={!theme.classic}
       />);
 
     const wallets = this._getWalletsStore();
@@ -70,6 +70,7 @@ export default class WalletAddPage extends Component<Props> {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
     };
     let content = null;
+    let isWalletAdd = false;
 
     if (uiDialogs.isOpen(WalletCreateDialog)) {
       content = (
@@ -77,7 +78,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          oldTheme={theme.old}
+          classicTheme={theme.classic}
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
@@ -86,7 +87,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          oldTheme={theme.old}
+          classicTheme={theme.classic}
         />
       );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
@@ -95,7 +96,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          oldTheme={theme.old}
+          classicTheme={theme.classic}
         />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
@@ -104,10 +105,11 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          oldTheme={theme.old}
+          classicTheme={theme.classic}
         />
       );
     } else {
+      isWalletAdd = true;
       content = (
         <WalletAdd
           onTrezor={openTrezorConnectDialog}
@@ -115,47 +117,18 @@ export default class WalletAddPage extends Component<Props> {
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           isRestoreActive={isRestoreActive}
-          oldTheme={theme.old}
+          classicTheme={theme.classic}
           title={this.context.intl.formatMessage(messages.title)}
         />
       );
     }
-    const topBarCondition = (
-      theme.old ||
-      uiDialogs.isOpen(WalletCreateDialog) ||
-      uiDialogs.isOpen(WalletRestoreDialog) ||
-      uiDialogs.isOpen(WalletBackupDialog) ||
-      uiDialogs.isOpen(WalletTrezorConnectDialogContainer)
-    ) ? topBar : false;
-
-    const bannerCondition = (
-      theme.old ||
-      uiDialogs.isOpen(WalletCreateDialog) ||
-      uiDialogs.isOpen(WalletRestoreDialog) ||
-      uiDialogs.isOpen(WalletBackupDialog) ||
-      uiDialogs.isOpen(WalletTrezorConnectDialogContainer)
-    );
-
-    const footer = (
-      <HelpLinkFooter
-        showBuyTrezorHardwareWallet
-        showHowToConnectTrezor
-        showHowToCreateWallet
-        showHowToRestoreWallet
-      />
-    );
-
 
     return (
       <MainLayout
         topbar={topBar}
-        oldTheme={theme.old}
-        actions={actions}
-        stores={stores}
-        isTopBarVisible={topBarCondition}
-        isBannerVisible={bannerCondition}
-        footer={footer}
-        withFooter
+        footer={<AddWalletFooter />}
+        noTopbarNoBanner={!theme.classic && isWalletAdd}
+        classicTheme={theme.classic}
       >
         {content}
       </MainLayout>

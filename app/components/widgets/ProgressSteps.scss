@@ -11,7 +11,7 @@ $common-color:var(--theme-widgets-progress-step-common-color);
   padding-right: 5px; 
 }
 
-.stepTopBarOld {
+.stepTopBarClassic {
   height: 6px;
   background-color: $common-color;
   border-radius: 3px;
@@ -33,7 +33,7 @@ $common-color:var(--theme-widgets-progress-step-common-color);
   opacity: 1.0;
 }
 
-.stepBottomBlockOld {
+.stepBottomBlockClassic {
   margin-top: 2px;
   padding-left: 24px;
   padding-right: 40px;
@@ -54,7 +54,7 @@ $common-color:var(--theme-widgets-progress-step-common-color);
   }
 }
 
-.stepStateIconContainerOld {
+.stepStateIconContainerClassic {
   display: inline-block;
   width: 16px;
   height: 16px;
@@ -72,7 +72,7 @@ $common-color:var(--theme-widgets-progress-step-common-color);
   vertical-align: top;
 }
 
-.stepTextOld {
+.stepTextClassic {
   color: $common-color;
   opacity: 0.3;
   font-size: 13px;

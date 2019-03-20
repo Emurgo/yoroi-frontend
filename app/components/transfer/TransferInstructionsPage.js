@@ -37,10 +37,12 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 type Props = {
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
+  onPaperConfirm: Function,
   disableTransferFunds: boolean,
   attentionText: string,
   confirmationText: string,
-  oldTheme: boolean
+  confirmationPaperText: string,
+  classicTheme: boolean,
 };
 
 @observer
@@ -55,10 +57,12 @@ export default class TransferInstructionsPage extends Component<Props> {
     const {
       onFollowInstructionsPrerequisites,
       onConfirm,
+      onPaperConfirm,
       disableTransferFunds,
       attentionText,
       confirmationText,
-      oldTheme
+      confirmationPaperText,
+      classicTheme,
     } = this.props;
 
     const instructionsButtonClasses = classnames([
@@ -78,7 +82,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
         <div className={styles.component}>
-          <BorderedBox oldTheme={oldTheme}>
+          <BorderedBox classicTheme={classicTheme}>
 
             <div className={styles.body}>
 
@@ -107,7 +111,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         { /* Confirm transferring funds */ }
         <div className={styles.component}>
-          <BorderedBox oldTheme={oldTheme}>
+          <BorderedBox classicTheme={classicTheme}>
 
             <div className={styles.body}>
 
@@ -124,6 +128,14 @@ export default class TransferInstructionsPage extends Component<Props> {
                 className={confirmButtonClasses}
                 label={confirmationText}
                 onClick={onConfirm}
+                disabled={disableTransferFunds}
+                skin={ButtonSkin}
+              />
+
+              <Button
+                className={confirmButtonClasses}
+                label={confirmationPaperText}
+                onClick={onPaperConfirm}
                 disabled={disableTransferFunds}
                 skin={ButtonSkin}
               />

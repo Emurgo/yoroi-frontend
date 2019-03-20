@@ -1,6 +1,6 @@
 @import '../../themes/mixins/error-message.scss';
 
-.errorBlockOld {
+.errorBlockClassic {
   @include error-message;
   margin-top: 10px;
   height: 20px;

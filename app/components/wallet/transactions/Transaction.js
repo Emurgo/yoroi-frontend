@@ -11,13 +11,9 @@ import { assuranceLevels } from '../../../config/transactionAssuranceConfig';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionState } from '../../../domain/WalletTransaction';
 import environment from '../../../environment';
+import { Logger } from '../../../utils/logging';
 
 const messages = defineMessages({
-  card: {
-    id: 'wallet.transaction.type.card',
-    defaultMessage: '!!!Card payment',
-    description: 'Transaction type shown for credit card payments.',
-  },
   type: {
     id: 'wallet.transaction.type',
     defaultMessage: '!!!{currency} transaction',
@@ -58,10 +54,25 @@ const messages = defineMessages({
     defaultMessage: '!!!{currency} received',
     description: 'Label "{currency} received" for the transaction.',
   },
+  intrawallet: {
+    id: 'wallet.transaction.type.intrawallet',
+    defaultMessage: '!!!{currency} intrawallet transaction',
+    description: 'both sender & receiver are yourself',
+  },
+  multiparty: {
+    id: 'wallet.transaction.type.multiparty',
+    defaultMessage: '!!!{currency} multiparty transaction',
+    description: 'only some inputs of tx belong to you',
+  },
   fromAddress: {
     id: 'wallet.transaction.address.from',
     defaultMessage: '!!!From address',
     description: 'From address',
+  },
+  fee: {
+    id: 'wallet.transaction.fee',
+    defaultMessage: '!!!Fee',
+    description: 'label for fee for tx',
   },
   fromAddresses: {
     id: 'wallet.transaction.addresses.from',
@@ -122,7 +133,7 @@ type Props = {
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 type State = {
@@ -143,45 +154,72 @@ export default class Transaction extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   }
 
+  getTransactionHeaderMsg(intl, currency: string, type: TransactionType): string {
+    if (type === transactionTypes.EXPEND) {
+      return intl.formatMessage(messages.sent, { currency });
+    }
+    if (type === transactionTypes.INCOME) {
+      return intl.formatMessage(messages.received, { currency });
+    }
+    if (type === transactionTypes.SELF) {
+      return intl.formatMessage(messages.intrawallet, { currency });
+    }
+    if (type === transactionTypes.MULTI) {
+      Logger.error('MULTI type transaction detected.');
+      return intl.formatMessage(messages.multiparty, { currency });
+    }
+    // unused
+    if (type === transactionTypes.EXCHANGE) {
+      Logger.error('EXCHANGE type transactions not supported');
+      return '???';
+    }
+  }
+
+  getAmountStyle(amt: BigNumber, classicTheme: boolean) {
+    return classNames([
+      classicTheme ? styles.amountClassic : styles.amount,
+      amt.lt(0)
+        ? styles.amountSent
+        : styles.amountReceived
+    ]);
+  }
+
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, formattedWalletAmount, oldTheme } = this.props;
+    const { isLastInList, state, assuranceLevel, formattedWalletAmount, classicTheme } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state === transactionStates.FAILED;
 
     const componentStyles = classNames([
-      oldTheme ? styles.componentOld : styles.component,
+      classicTheme ? styles.componentClassic : styles.component,
       isFailedTransaction ? styles.failed : null
     ]);
 
     const contentStyles = classNames([
-      oldTheme ? styles.contentOld : styles.content,
+      classicTheme ? styles.contentClassic : styles.content,
       isLastInList ? styles.last : null
     ]);
 
     const detailsStyles = classNames([
-      oldTheme ? styles.detailsOld : styles.details,
+      classicTheme ? styles.detailsClassic : styles.details,
       isExpanded ? styles.expanded : styles.closed
     ]);
 
-    const amountStyles = classNames([
-      oldTheme ? styles.amountOld : styles.amount,
-      data.type === transactionTypes.EXPEND ? styles.amountSent : styles.amountReceived
-    ]);
-
-    const togglerClasses = oldTheme ? styles.togglerOld : styles.toggler;
-    const titleClasses = oldTheme ? styles.titleOld : styles.title;
-    const typeClasses = oldTheme ? styles.typeOld : styles.type;
+    const togglerClasses = classicTheme ? styles.togglerClassic : styles.toggler;
+    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
+    const typeClasses = classicTheme ? styles.typeClassic : styles.type;
     const labelOkClasses = classNames([
-      oldTheme ? styles.labelOld : styles.label,
+      classicTheme ? styles.labelClassic : styles.label,
       styles[assuranceLevel]
     ]);
     const labelClasses = classNames([
-      oldTheme ? styles.labelOld : styles.label,
-      oldTheme ? styles[`${state}LabelOld`] : styles[`${state}Label`]
+      classicTheme ? styles.labelClassic : styles.label,
+      classicTheme ? styles[`${state}LabelClassic`] : styles[`${state}Label`]
     ]);
-    const currencySymbolClasses = oldTheme ? styles.currencySymbolOld : styles.currencySymbol;
+    const currencySymbolClasses = classicTheme
+      ? styles.currencySymbolClassic
+      : styles.currencySymbol;
 
     const status = intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
@@ -195,10 +233,7 @@ export default class Transaction extends Component<Props, State> {
           <div className={styles.togglerContent}>
             <div className={styles.header}>
               <div className={titleClasses}>
-                {data.type === transactionTypes.EXPEND ?
-                  intl.formatMessage(messages.sent, { currency }) :
-                  intl.formatMessage(messages.received, { currency })
-                }
+                { this.getTransactionHeaderMsg(intl, currency, data.type) }
               </div>
               <div className={typeClasses}>
                 {moment(data.date).format('hh:mm:ss A')}
@@ -211,39 +246,12 @@ export default class Transaction extends Component<Props, State> {
                 </div>
               )}
 
-              {/* <div
-                className={classNames([
-                  oldTheme ? styles.labelOld : styles.label,
-                  oldTheme ? styles.pendingLabelOld : styles.pendingLabel
-                ])}
-              >
-                {intl.formatMessage(stateTranslations.pending)}
-              </div> */}
-
-              {/* <div
-                className={classNames([
-                  oldTheme ? styles.labelOld : styles.label,
-                  oldTheme ? styles.failedLabelOld : styles.failedlabel
-                ])}
-              >
-                {intl.formatMessage(stateTranslations.failed)}
-              </div> */}
-
-              {/* <div
-                className={classNames([
-                  oldTheme ? styles.labelOld : styles.label,
-                  styles.medium
-                ])}
-              >
-                {intl.formatMessage(stateTranslations.failed)}
-              </div> */}
-
-              <div className={amountStyles}>
+              <div className={this.getAmountStyle(data.amount, classicTheme)}>
                 {
                   // hide currency (we are showing symbol instead)
                   formattedWalletAmount(data.amount, false)
                 }
-                <SvgInline svg={symbol} className={currencySymbolClasses} cleanup={['title']} />
+                <SvgInline svg={symbol} className={currencySymbolClasses} />
               </div>
             </div>
           </div>
@@ -266,6 +274,10 @@ export default class Transaction extends Component<Props, State> {
               </div>
             )}
             <div>
+              <h2>
+                {intl.formatMessage(messages.fee)}
+              </h2>
+              <span>{formattedWalletAmount(data.fee.abs(), false)}</span>
               <h2>
                 {intl.formatMessage(messages.fromAddresses)}
               </h2>

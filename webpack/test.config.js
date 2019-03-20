@@ -56,6 +56,15 @@ module.exports = {
         }
       },
       {
+        test: /pdf\.worker(\.min)?\.js$/,
+        use: 'raw-loader',
+      },
+      {
+        test: /\.(js|jsx)$/,
+        exclude: [/node_modules/, /pdf\.worker(\.min)?\.js$/],
+        use: 'babel-loader',
+      },
+      {
         test: /\.css$/,
         use: [
           'style-loader',
@@ -92,7 +101,7 @@ module.exports = {
       {
         test: /\.inline\.svg$/,
         issuer: /\.js$/,
-        loader: 'raw-loader',
+        loader: 'svg-inline-loader?removeSVGTagAttrs=false&removeTags=true&removingTags[]=title&removingTags[]=desc&idPrefix=[sha512:hash:hex:5]-',
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif)$/,

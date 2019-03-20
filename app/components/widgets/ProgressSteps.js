@@ -15,13 +15,13 @@ type Props = {
     currentStep : number, // example, 0 = pointing to stepsList[0]
     stepState: number, // has three states, 0 = LOAD | 1 = PROCESS | 9 = ERROR
   },
-  oldTheme: boolean
+  classicTheme: boolean
 };
 @observer
 export default class ProgressSteps extends Component<Props> {
 
   createSetps = (stepsList, progressInfo): Array<Element> => {
-    const { oldTheme } = this.props;
+    const { classicTheme } = this.props;
     const steps = [];
 
     // currentStep should not be less than 0
@@ -30,8 +30,8 @@ export default class ProgressSteps extends Component<Props> {
     for (let idx = 0; idx < stepsList.length; idx++) {
       const stepText = stepsList[idx];
 
-      const textClass = oldTheme ? styles.stepTextOld : styles.stepText;
-      const topBarClass = oldTheme ? styles.stepTopBarOld : styles.stepTopBar;
+      const textClass = classicTheme ? styles.stepTextClassic : styles.stepText;
+      const topBarClass = classicTheme ? styles.stepTopBarClassic : styles.stepTopBar;
 
       let stepTopBarStyle = classNames([topBarClass]);
       let stepTextStyle = classNames([textClass]);
@@ -67,8 +67,8 @@ export default class ProgressSteps extends Component<Props> {
           <div className={stepTopBarStyle} />
           <div className={styles.stepBottomBlock}>
             <div className={styles.stepStateIconContainer}>
-              {(displayIcon === 'done') && <SvgInline svg={oldTheme ? iconTickSVG : iconTickGreenSVG} cleanup={['title']} />}
-              {(displayIcon === 'error') && <SvgInline svg={oldTheme ? iconCrossSVG : iconCrossGreenSVG} cleanup={['title']} />}
+              {(displayIcon === 'done') && <SvgInline svg={classicTheme ? iconTickSVG : iconTickGreenSVG} />}
+              {(displayIcon === 'error') && <SvgInline svg={classicTheme ? iconCrossSVG : iconCrossGreenSVG} />}
             </div>
             <div className={styles.stepTextContainer}>
               <span className={stepTextStyle}>{stepText}</span>

@@ -41,7 +41,7 @@ type Props = {
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
-  oldTheme: boolean
+  classicTheme: boolean
 };
 
 @observer
@@ -112,17 +112,17 @@ export default class WalletTransactionsList extends Component<Props> {
       walletId,
       formattedWalletAmount,
       onLoadMore,
-      oldTheme
+      classicTheme
     } = this.props;
 
     const buttonClasses = classnames([
       'primary',
       styles.showMoreTransactionsButton,
     ]);
-    const componentClasses = oldTheme ? styles.componentOld : styles.component;
-    const groupClasses = oldTheme ? styles.groupOld : styles.group;
-    const groupDateClasses = oldTheme ? styles.groupDateOld : styles.groupDate;
-    const listClasses = oldTheme ? styles.listOld : styles.list;
+    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
+    const groupClasses = classicTheme ? styles.groupClassic : styles.group;
+    const groupDateClasses = classicTheme ? styles.groupDateClassic : styles.groupDate;
+    const listClasses = classicTheme ? styles.listClassic : styles.list;
 
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
@@ -144,7 +144,7 @@ export default class WalletTransactionsList extends Component<Props> {
                   state={transaction.state}
                   assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
                   formattedWalletAmount={formattedWalletAmount}
-                  oldTheme={oldTheme}
+                  classicTheme={classicTheme}
                 />
               ))}
             </div>
