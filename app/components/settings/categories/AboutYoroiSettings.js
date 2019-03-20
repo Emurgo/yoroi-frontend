@@ -15,8 +15,6 @@ import mediumSvg from '../../../assets/images/social/medium.inline.svg';
 
 import environment from '../../../environment';
 
-const version = require('../../../../chrome/manifest.' + environment.NETWORK + '.json').version;
-
 const messages = defineMessages({
   aboutYoroiLabel: {
     id: 'settings.general.aboutYoroi.label',
@@ -90,7 +88,7 @@ export default class AboutYoroiSettings extends Component {
 
         <p>
           {intl.formatMessage(messages.versionLabel)}&nbsp;
-          {version}
+          {environment.version}
         </p>
         <p>
           {intl.formatMessage(messages.networkLabel)}&nbsp;

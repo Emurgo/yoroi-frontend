@@ -33,14 +33,16 @@ export default class SettingsStore extends Store {
 
   /* eslint-disable max-len */
   @observable getProfileLocaleRequest: Request<string> = new Request(this.api.localStorage.getUserLocale);
-  @observable setProfileLocaleRequest: Request<string> = new Request(this.api.localStorage.setUserLocale);
+  @observable setProfileLocaleRequest: Request<void> = new Request(this.api.localStorage.setUserLocale);
   @observable getThemeRequest: Request<string> = new Request(this.api.localStorage.getUserTheme);
-  @observable setThemeRequest: Request<string> = new Request(this.api.localStorage.setUserTheme);
+  @observable setThemeRequest: Request<void> = new Request(this.api.localStorage.setUserTheme);
   @observable getCustomThemeRequest: Request<string> = new Request(this.api.localStorage.getCustomUserTheme);
-  @observable setCustomThemeRequest: Request<string> = new Request(this.api.localStorage.setCustomUserTheme);
-  @observable unsetCustomThemeRequest: Request<string> = new Request(this.api.localStorage.unsetCustomUserTheme);
+  @observable setCustomThemeRequest: Request<void> = new Request(this.api.localStorage.setCustomUserTheme);
+  @observable unsetCustomThemeRequest: Request<void> = new Request(this.api.localStorage.unsetCustomUserTheme);
   @observable getTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.getTermsOfUseAcceptance);
-  @observable setTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.setTermsOfUseAcceptance);
+  @observable setTermsOfUseAcceptanceRequest: Request<void> = new Request(this.api.localStorage.setTermsOfUseAcceptance);
+  @observable getLastLaunchVersionRequest: Request<string> = new Request(this.api.localStorage.getLastLaunchVersion);
+  @observable setLastLaunchVersionRequest: Request<void> = new Request(this.api.localStorage.setLastLaunchVersion);
   /* eslint-enable max-len */
 
   setup() {
@@ -51,12 +53,11 @@ export default class SettingsStore extends Store {
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
-      this._reloadAboutWindowOnLocaleChange,
       this._redirectToLanguageSelectionIfNoLocaleSet,
       this._redirectToTermsOfUseScreenIfTermsNotAccepted,
       this._redirectToMainUiAfterTermsAreAccepted,
     ]);
-    this._getTermsOfUseAcceptance();
+    this._getTermsOfUseAcceptance(); // eagerly cache
   }
 
   teardown() {
@@ -66,6 +67,8 @@ export default class SettingsStore extends Store {
   _setBigNumberFormat = () => {
     BigNumber.config({ FORMAT: this.bigNumberDecimalFormat });
   };
+
+  // ========== Locale ========== //
 
   @computed get currentLocale(): string {
     const { result } = this.getProfileLocaleRequest.execute();
@@ -82,6 +85,34 @@ export default class SettingsStore extends Store {
   @computed get isCurrentLocaleSet(): boolean {
     return (this.getProfileLocaleRequest.result !== null && this.getProfileLocaleRequest.result !== '');
   }
+
+  _updateLocale = async ({ locale }: { locale: string }) => {
+    await this.setProfileLocaleRequest.execute(locale);
+    await this.getProfileLocaleRequest.execute(); // eagerly cache
+  };
+
+  _updateMomentJsLocaleAfterLocaleChange = () => {
+    moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
+  };
+
+  _convertLocaleKeyToMomentJSLocalKey = (localeKey: string): string => {
+    // REF -> https://github.com/moment/moment/tree/develop/locale
+    let momentJSLocalKey = localeKey;
+    switch (localeKey) {
+      case 'zh-Hans':
+        momentJSLocalKey = 'zh-cn';
+        break;
+      case 'zh-Hant':
+        momentJSLocalKey = 'zh-tw';
+        break;
+      default:
+        momentJSLocalKey = localeKey;
+        break;
+    }
+    return momentJSLocalKey;
+  }
+
+  // ========== Current/Custom Theme ========== //
 
   @computed get currentTheme(): string {
     const { result } = this.getThemeRequest.execute();
@@ -114,26 +145,6 @@ export default class SettingsStore extends Store {
     );
   }
 
-  @computed get termsOfUse(): string {
-    return require(`../../i18n/locales/terms-of-use/${environment.API}/${this.currentLocale}.md`);
-  }
-
-  @computed get hasLoadedTermsOfUseAcceptance(): boolean {
-    return (
-      this.getTermsOfUseAcceptanceRequest.wasExecuted &&
-      this.getTermsOfUseAcceptanceRequest.result !== null
-    );
-  }
-
-  @computed get areTermsOfUseAccepted(): boolean {
-    return this.getTermsOfUseAcceptanceRequest.result === true;
-  }
-
-  _updateLocale = async ({ locale }: { locale: string }) => {
-    await this.setProfileLocaleRequest.execute(locale);
-    await this.getProfileLocaleRequest.execute(); // eagerly cache
-  };
-
   _updateTheme = async ({ theme }: { theme: string }) => {
     // Unset / Clear the Customized Theme from LocalStorage
     await this.unsetCustomThemeRequest.execute();
@@ -165,35 +176,52 @@ export default class SettingsStore extends Store {
     return result !== '';
   };
 
-  _updateMomentJsLocaleAfterLocaleChange = () => {
-    moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
-  };
+  // ========== Terms of Use ========== //
 
-  _convertLocaleKeyToMomentJSLocalKey = (localeKey: string): string => {
-    // REF -> https://github.com/moment/moment/tree/develop/locale
-    let momentJSLocalKey = localeKey;
-    switch (localeKey) {
-      case 'zh-Hans':
-        momentJSLocalKey = 'zh-cn';
-        break;
-      case 'zh-Hant':
-        momentJSLocalKey = 'zh-tw';
-        break;
-      default:
-        momentJSLocalKey = localeKey;
-        break;
-    }
-    return momentJSLocalKey;
+  @computed get termsOfUse(): string {
+    return require(`../../i18n/locales/terms-of-use/${environment.API}/${this.currentLocale}.md`);
+  }
+
+  @computed get hasLoadedTermsOfUseAcceptance(): boolean {
+    return (
+      this.getTermsOfUseAcceptanceRequest.wasExecuted &&
+      this.getTermsOfUseAcceptanceRequest.result !== null
+    );
+  }
+
+  @computed get areTermsOfUseAccepted(): boolean {
+    return this.getTermsOfUseAcceptanceRequest.result === true;
   }
 
   _acceptTermsOfUse = async () => {
     await this.setTermsOfUseAcceptanceRequest.execute();
-    await this.getTermsOfUseAcceptanceRequest.execute();
+    await this.getTermsOfUseAcceptanceRequest.execute(); // eagerly cache
   };
 
   _getTermsOfUseAcceptance = () => {
     this.getTermsOfUseAcceptanceRequest.execute();
   };
+
+  // ========== Last Launch Version ========== //
+
+  @computed get lastLaunchVersion(): string {
+    const { result } = this.getLastLaunchVersionRequest.execute();
+    return result;
+  }
+
+  setLastLaunchVersion = async (version: string) => {
+    await this.setLastLaunchVersionRequest.execute(version);
+    await this.getLastLaunchVersionRequest.execute(); // eagerly cache
+  };
+
+  @computed get hasLoadedLastLaunchVersion(): boolean {
+    return (
+      this.getLastLaunchVersionRequest.wasExecuted &&
+      this.getLastLaunchVersionRequest.result !== null
+    );
+  }
+
+  // ========== Redirec Logic ========== //
 
   _redirectToLanguageSelectionIfNoLocaleSet = () => {
     const { isLoading } = this.stores.loading;
@@ -211,11 +239,6 @@ export default class SettingsStore extends Store {
 
   _redirectToRoot = () => {
     this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
-  };
-
-  _reloadAboutWindowOnLocaleChange = () => {
-    // register mobx observer for currentLocale in order to trigger reaction on change
-    this.currentLocale; // eslint-disable-line
   };
 
   _isOnTermsOfUsePage = () => this.stores.app.currentRoute === ROUTES.PROFILE.TERMS_OF_USE;

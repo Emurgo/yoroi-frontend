@@ -9,18 +9,16 @@ import {
   sendTx
 } from '../lib/yoroi-backend-api';
 import {
-  decodeRustTx
+  decodeRustTx,
 } from '../lib/utils';
 import {
   Logger,
   stringifyError
 } from '../../../utils/logging';
 import {
-  saveAdaAddress,
-  removeAdaAddress,
-  createAdaAddress,
   addressesToAddressMap,
-  getAdaAddressesList
+  getAdaAddressesList,
+  popBip44Address
 } from '../adaAddress';
 import {
   getCryptoWalletFromMasterKey,
@@ -41,7 +39,7 @@ import {
   GetAllUTXOsForAddressesError,
   InvalidWitnessError
 } from '../errors';
-import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
+import { getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import type { AdaAddressMap } from '../adaAddress';
 import type { SignedResponse } from '../lib/yoroi-backend-api';
@@ -84,20 +82,12 @@ export async function newAdaTransaction(
   const masterKey = getWalletMasterKey();
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
   // eslint-disable-next-line camelcase
-  const [{ cbor_encoded_tx, changed_used }, changeAdaAddr] =
+  const [{ cbor_encoded_tx }] =
     await _getAdaTransaction(receiver, amount, cryptoWallet);
   const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-  if (changed_used) { // eslint-disable-line camelcase
-    // tentatively assume that the transaction will succeed,
-    // so we save the change address to the wallet
-    await saveAdaAddress(changeAdaAddr, 'Internal');
-  }
   try {
     return await sendTx({ signedTx });
   } catch (sendTxError) {
-    // On failure, we have to remove the change address we eagerly added
-    // Note: we don't await on this
-    removeAdaAddress(changeAdaAddr);
     Logger.error('adaNewTransactions::newAdaTransaction error: ' +
       stringifyError(sendTxError));
     if (sendTxError instanceof InvalidWitnessError) {
@@ -159,13 +149,6 @@ export async function getAdaTransactionInputsAndUtxos(
   return [inputs, senderUtxos];
 }
 
-/** fetch new internal address from HD Wallet for change */
-export async function getAdaTransactionChangeAddr(): Promise<AdaAddress> {
-  // Get all addresses in the single account to a list
-  const cryptoAccount = getSingleCryptoAccount();
-  return await createAdaAddress(cryptoAccount, 'Internal');
-}
-
 /** Perform the cryptography required to create a transaction */
 export async function getAdaTransactionFromSenders(
   senders: AdaAddresses,
@@ -174,7 +157,7 @@ export async function getAdaTransactionFromSenders(
   cryptoWallet: CryptoWallet
 ): Promise<[SpendResponse, AdaAddress, UnsignedTransactionExt]> {
   // fetch new internal address from HD Wallet for change
-  const changeAdaAddr: AdaAddress = await getAdaTransactionChangeAddr();
+  const changeAdaAddr: AdaAddress = await popBip44Address('Internal');
 
   // Consider any UTXO as a possible input
   const inputs = await getAdaTransactionInputs(senders);

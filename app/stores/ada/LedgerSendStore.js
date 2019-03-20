@@ -162,7 +162,6 @@ export default class LedgerSendStore extends Store {
 
     const reqParams: PrepareAndBroadcastLedgerSignedTxRequest = {
       ledgerSignTxResp,
-      changeAdaAddr: createLedgerSignTxDataResp.changeAddress,
       unsignedTx,
       txExt: createLedgerSignTxDataResp.txExt
     };

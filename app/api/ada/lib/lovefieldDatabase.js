@@ -104,6 +104,17 @@ export const loadLovefieldDB = () => {
   });
 };
 
+export const reset = (): Promise<void> => {
+  const txsTable = _getTxsTable();
+  const addressesTable = _getAddressesTable();
+  const txAddressesTable = _getTxAddressesTable();
+
+  // have to drop txAddresses first because of foreign keys
+  db.delete().from(txAddressesTable).exec();
+  db.delete().from(addressesTable).exec();
+  db.delete().from(txsTable).exec();
+};
+
 export const deleteAddress = (
   address: string
 ): Promise<Array<void>> => {
@@ -114,6 +125,7 @@ export const deleteAddress = (
     .exec();
 };
 
+/** Note: isUsed will be stable on all results */
 export const getAddresses = (): Promise<Array<AddressesTableRow>> => {
   const addressesTable = _getAddressesTable();
   return db.select()
@@ -121,6 +133,7 @@ export const getAddresses = (): Promise<Array<AddressesTableRow>> => {
     .exec();
 };
 
+/** Note: isUsed will be stable on all results */
 export const getAddressesList = (): Promise<Array<AdaAddress>> => {
   const addressesTable = _getAddressesTable();
   return db.select()

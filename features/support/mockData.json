@@ -10,6 +10,16 @@
         "account": 0,
         "change": 0,
         "index": 0
+      },
+      {
+        "cadAmount": {
+          "getCCoin": "0"
+        },
+        "cadId": "Ae2tdPwUPEZ6ydLWv4VPC1v7wuXeeWMFbDjTb3oHE2EuVojvoR7Vs1oQwDB",
+        "cadIsUsed": false,
+        "account": 0,
+        "change": 0,
+        "index": 1
       }
     ],
     "usedAddresses": [],
@@ -73,6 +83,7 @@
     ]
   },
   "Generate addresses": {
+    "currentDateExample": "2018-01-01T00:00:00.000Z",
     "utxos": [
       {
         "utxo_id": "12b19af453efc0222d8cb82028554105586c7d134b85490445b2c3c7e74f64290",
@@ -85,7 +96,7 @@
     "walletInitialData": {
       "wallet": {
         "addressesStartingWith": "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYW",
-        "totalAddresses": 1
+        "totalAddresses": 0
       }
     },
     "txs": {
@@ -96,7 +107,7 @@
             "hash": "e97Nafb63e9dc18a54b35cb51i63317461978bc7c90o02661d33lf2464ef693Z",
             "time": "2018-05-12T13:51:33.000Z",
             "inputs_address": [
-              "Ae2tdPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
+              "Ae2tzPwUPEZASB8nPKk1VsePbQZY8ZVv4mGebJ4UwmSBhRo9oR9EqkSzxoA"
             ],
             "inputs_amount": ["200"],
             "outputs_address": [
@@ -110,7 +121,9 @@
         }
       ]
     },
-    "usedAddresses": ["Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"]
+    "usedAddresses": [
+      "Ae2tdPwUPEYvr4nYAWxbYB8P5vw1BXYKpit7eEWYwzn5zG59bPtjWSmPYWt"
+    ]
   },
   "Main UI": {
     "walletInitialData": {
@@ -308,7 +321,7 @@
             "outputs_amount": [
               "9007199254720698"
             ],
-            "block_num": 70,
+            "block_num": "70",
             "best_block_num": "101",
             "last_update": "2018-01-01T00:00:00.000Z",
             "tx_state": "Successful"

@@ -96,7 +96,7 @@ export default class TrezorSendStore extends Store {
         throw new Error(trezorSignTxResp.payload.error);
       }
 
-      await this._brodcastSignedTx(trezorSignTxResp, trezorSignTxDataResp);
+      await this._brodcastSignedTx(trezorSignTxResp);
 
     } catch (error) {
       Logger.error('TrezorSendStore::_sendUsingTrezor error: ' + stringifyError(error));
@@ -110,13 +110,11 @@ export default class TrezorSendStore extends Store {
 
   _brodcastSignedTx = async (
     trezorSignTxResp: any,
-    trezorSignTxDataResp: CreateTrezorSignTxDataResponse
   ): Promise<void> => {
     // TODO: [TREZOR] fix type if possible
     const payload: any = trezorSignTxResp.payload;
     const reqParams: BroadcastTrezorSignedTxRequest = {
       signedTxHex: payload.body,
-      changeAdaAddr: trezorSignTxDataResp.changeAddress
     };
 
     await this.broadcastTrezorSignedTxRequest.execute(reqParams).promise;
