@@ -29,7 +29,6 @@ const messages = defineMessages({
   title: {
     id: 'wallet.add.page.title',
     defaultMessage: '!!!Add Wallet',
-    description: 'Add Wallet Title.'
   },
 });
 

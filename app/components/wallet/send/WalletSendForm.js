@@ -29,72 +29,58 @@ const messages = defineMessages({
   titleLabel: {
     id: 'wallet.send.form.title.label',
     defaultMessage: '!!!Title',
-    description: 'Label for the "Title" text input in the wallet send form.'
   },
   titleHint: {
     id: 'wallet.send.form.title.hint',
     defaultMessage: '!!!E.g: Money for Frank',
-    description: 'Hint inside the "Receiver" text input in the wallet send form.'
   },
   receiverLabel: {
     id: 'wallet.send.form.receiver.label',
     defaultMessage: '!!!Receiver',
-    description: 'Label for the "Receiver" text input in the wallet send form.'
   },
   receiverHint: {
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
-    description: 'Hint inside the "Receiver" text input in the wallet send form.'
   },
   amountLabel: {
     id: 'wallet.send.form.amount.label',
     defaultMessage: '!!!Amount',
-    description: 'Label for the "Amount" number input in the wallet send form.'
   },
   equalsAdaHint: {
     id: 'wallet.send.form.amount.equalsAda',
     defaultMessage: '!!!equals {amount} ADA',
-    description: 'Convertion hint for the "Amount" number input in the wallet send form.'
   },
   descriptionLabel: {
     id: 'wallet.send.form.description.label',
     defaultMessage: '!!!Description',
-    description: 'Label for the "description" text area in the wallet send form.'
   },
   descriptionHint: {
     id: 'wallet.send.form.description.hint',
     defaultMessage: '!!!You can add a message if you want',
-    description: 'Hint in the "description" text area in the wallet send form.'
   },
   invalidAddress: {
     id: 'wallet.send.form.errors.invalidAddress',
     defaultMessage: '!!!Please enter a valid address.',
-    description: 'Error message shown when invalid address was entered.'
   },
   invalidAmount: {
     id: 'wallet.send.form.errors.invalidAmount',
     defaultMessage: '!!!Please enter a valid amount.',
-    description: 'Error message shown when invalid amount was entered.',
   },
   invalidTitle: {
     id: 'wallet.send.form.errors.invalidTitle',
     defaultMessage: '!!!Please enter a title with at least 3 characters.',
-    description: 'Error message shown when invalid transaction title was entered.',
   },
   transactionFeeError: {
     id: 'wallet.send.form.transactionFeeError',
     defaultMessage: '!!!Not enough Ada for fees. Try sending a smaller amount.',
-    description: '"Not enough Ada for fees. Try sending a smaller amount." error message',
   },
   calculatingFee: {
     id: 'wallet.send.form.calculatingFee',
     defaultMessage: '!!!Calculating fee...',
-    description: 'Calculating fee...',
   },
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Cannot send a transaction while there is a pending one',
-    description: '"Cannot send a transaction while there is a pending one" error message',
   }
 });
 

@@ -14,7 +14,6 @@ const messages = defineMessages({
   message: {
     id: 'wallet.receive.page.addressCopyNotificationMessage',
     defaultMessage: '!!!You have successfully copied wallet address',
-    description: 'Message for the wallet address copy success notification.',
   },
 });
 

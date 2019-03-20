@@ -14,7 +14,6 @@ const messages = defineMessages({
   languageSelectLabel: {
     id: 'settings.general.languageSelect.label',
     defaultMessage: '!!!Language',
-    description: 'Label for the language select.'
   },
 
 });

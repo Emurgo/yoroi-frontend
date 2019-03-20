@@ -90,7 +90,6 @@ export class UnableToLoadError extends LocalizableError {
     super({
       id: 'app.errors.unableToLoad',
       defaultMessage: '!!!Unable to load',
-      description: '"Unable to load" error message'
     });
   }
 }

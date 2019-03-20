@@ -8,12 +8,10 @@ export const messages = defineMessages({
   dropFileHere: {
     id: 'ImageUploadWidget.dropFileHint',
     defaultMessage: '!!!Drop file here',
-    description: 'Label "Drop file here" on the file upload widget.'
   },
   orClickToUpload: {
     id: 'ImageUploadWidget.clickToUploadLabel',
     defaultMessage: '!!!or click to upload',
-    description: 'Label "or click to upload" on the file upload widget.'
   },
 });
 

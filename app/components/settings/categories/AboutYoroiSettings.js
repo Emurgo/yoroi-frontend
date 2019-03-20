@@ -19,57 +19,46 @@ const messages = defineMessages({
   aboutYoroiLabel: {
     id: 'settings.general.aboutYoroi.label',
     defaultMessage: '!!!About Yoroi',
-    description: 'Label for the About Yoroi section.'
   },
   aboutYoroiWebsite: {
     id: 'settings.general.aboutYoroi.website',
     defaultMessage: '!!!Yoroi website',
-    description: 'Label for Yoroi website link.'
   },
   aboutYoroiTwitter: {
     id: 'settings.general.aboutYoroi.twitter',
     defaultMessage: '!!!Yoroi Twitter',
-    description: 'Label for Yoroi Twitter link.'
   },
   aboutYoroiGithub: {
     id: 'settings.general.aboutYoroi.github',
     defaultMessage: '!!!Yoroi GitHub',
-    description: 'Label for Yoroi GitHub link.'
   },
   aboutYoroiYoutube: {
     id: 'settings.general.aboutYoroi.youtube',
     defaultMessage: '!!!EMURGO YouTube',
-    description: 'Label for Yoroi YouTube link.'
   },
   aboutEmurgoTelegram: {
     id: 'settings.general.aboutYoroi.telegram',
     defaultMessage: '!!!EMURGO Telegram',
-    description: 'Label for EMURGO Telegram link.'
   },
   aboutYoroiFacebook: {
     id: 'settings.general.aboutYoroi.facebook',
     defaultMessage: '!!!Yoroi facebook',
-    description: 'Label for Yoroi facebook link.'
   },
   aboutYoroiMedium: {
     id: 'settings.general.aboutYoroi.medium',
     defaultMessage: '!!!EMURGO Medium',
-    description: 'Label for EMURGO Medium link.'
   },
   versionLabel: {
     id: 'settings.general.aboutYoroi.versionLabel',
     defaultMessage: '!!!Current version:',
-    description: 'Label for current version.'
   },
   networkLabel: {
     id: 'settings.general.aboutYoroi.networkLabel',
     defaultMessage: '!!!Network:',
-    description: 'Label for network in use.'
   },
   commitLabel: {
     id: 'settings.general.aboutYoroi.commitLabel',
     defaultMessage: '!!!Commit:',
-    description: 'Label for current commit.'
   },
 });
 

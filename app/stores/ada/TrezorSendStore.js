@@ -26,7 +26,6 @@ const messages = defineMessages({
   signTxError101: {
     id: 'wallet.send.trezor.error.101',
     defaultMessage: '!!!Signing cancelled on Trezor device. Please retry.',
-    description: '<Signing cancelled on Trezor device. Please retry.> on the Trezor send ADA confirmation dialog.'
   },
 });
 
