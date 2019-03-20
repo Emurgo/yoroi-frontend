@@ -27,37 +27,30 @@ const messages = defineMessages({
   aboutPrerequisite1Part1: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part1',
     defaultMessage: '!!!Only Supports',
-    description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2Link: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link',
     defaultMessage: '!!!https://github.com/trezor/trezor-core/blob/master/ChangeLog',
-    description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2LinkText: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link.text',
     defaultMessage: '!!!Trezor Model T with version 2.0.8',
-    description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part3: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part3',
     defaultMessage: '!!!or later',
-    description: 'First Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite2: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.2',
     defaultMessage: '!!!Trezor device must be pre-initialized',
-    description: 'Second Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.3',
     defaultMessage: '!!!The Trezor device screen must be unlocked.',
-    description: 'Third Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
   aboutPrerequisite5: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.5',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
-    description: 'Fifth Prerequisite on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
 

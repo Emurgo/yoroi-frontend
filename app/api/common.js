@@ -21,27 +21,22 @@ const messages = defineMessages({
   genericApiError: {
     id: 'api.errors.GenericApiError',
     defaultMessage: '!!!An error occurred, please try again later.',
-    description: 'Generic error message.'
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
     defaultMessage: '!!!Incorrect wallet password.',
-    description: '"Incorrect wallet password." error message.'
   },
   walletAlreadyRestoredError: {
     id: 'api.errors.WalletAlreadyRestoredError',
     defaultMessage: '!!!Wallet you are trying to restore already exists.',
-    description: '"Wallet you are trying to restore already exists." error message.'
   },
   reportRequestError: {
     id: 'api.errors.ReportRequestError',
     defaultMessage: '!!!There was a problem sending the support request.',
-    description: '"There was a problem sending the support request." error message'
   },
   unusedAddressesError: {
     id: 'api.errors.unusedAddressesError',
     defaultMessage: '!!!You cannot generate more than 20 consecutive unused addresses.',
-    description: '"User cannot generate more unused addresses" error message'
   },
 });
 

@@ -12,42 +12,34 @@ const messages = defineMessages({
   title: {
     id: 'wallet.add.dialog.title.label',
     defaultMessage: '!!!Add wallet',
-    description: 'Label for the "Add wallet" title on the wallet add dialog.',
   },
   createDescription: {
     id: 'wallet.add.dialog.create.description',
     defaultMessage: '!!!Create a new wallet',
-    description: 'Description for the "Create" button on the wallet add dialog.',
   },
   useTrezorDescription: {
     id: 'wallet.add.dialog.trezor.description',
     defaultMessage: '!!!Connect to Trezor',
-    description: 'Description for the "Trezor" button on the wallet add dialog.',
   },
   useLedgerDescription: {
     id: 'wallet.add.dialog.ledger.description',
     defaultMessage: '!!!Connect to Ledger',
-    description: 'Description for the "Ledger" button on the wallet add dialog.',
   },
   restoreDescription: {
     id: 'wallet.add.dialog.restore.description',
     defaultMessage: '!!!Restore wallet from backup',
-    description: 'Description for the "Restore" button without paper wallet certificate on the wallet add dialog.',
   },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
-    description: 'Restore notification message shown during async wallet restore on the wallet add screen.',
   },
   createTrezorWalletNotificationMessage: {
     id: 'wallet.add.dialog.createTrezorWalletNotificationMessage',
     defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
-    description: 'Trezor Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
   },
   createLedgerWalletNotificationMessage: {
     id: 'wallet.add.dialog.createLedgerWalletNotificationMessage',
     defaultMessage: '!!!Ledger Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
-    description: 'Ledger Connect notification message shown during async wallet restore for Hardware wallet on the wallet add screen.',
   }
 });
 

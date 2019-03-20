@@ -18,22 +18,18 @@ const messages = defineMessages({
   recoveryPhraseInputLabel: {
     id: 'transfer.form.recovery.phrase.input.label',
     defaultMessage: '!!!Recovery phrase',
-    description: 'Label for the recovery phrase input on the transfer mnemonic page.'
   },
   recoveryPhraseInputHint: {
     id: 'transfer.form.recovery.phrase.input.hint',
     defaultMessage: '!!!Enter recovery phrase',
-    description: 'Hint "Enter recovery phrase" for the recovery phrase input on the transfer mnemonic page.'
   },
   recoveryPhraseNoResults: {
     id: 'transfer.form.recovery.phrase.input.noResults',
     defaultMessage: '!!!No results',
-    description: '"No results" message for the recovery phrase input search results.'
   },
   invalidRecoveryPhrase: {
     id: 'transfer.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
-    description: 'Error message shown when invalid recovery phrase was entered.'
   },
 });
 

@@ -255,17 +255,14 @@ const messages = defineMessages({
   transferFundsError: {
     id: 'daedalusTransfer.error.transferFundsError',
     defaultMessage: '!!!Unable to transfer funds.',
-    description: '"Unable to transfer funds." error message',
   },
   noTransferTxError: {
     id: 'daedalusTransfer.error.noTransferTxError',
     defaultMessage: '!!!There is no transfer transaction to send.',
-    description: '"There is no transfer transaction to send." error message'
   },
   webSocketRestoreError: {
     id: 'daedalusTransfer.error.webSocketRestoreError',
     defaultMessage: '!!!Error while restoring blockchain addresses',
-    description: 'Any reason why the websocket transferring could failed'
   }
 });
 

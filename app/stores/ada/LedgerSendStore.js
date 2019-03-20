@@ -40,7 +40,6 @@ const messages = defineMessages({
   signTxError101: {
     id: 'wallet.send.ledger.error.101',
     defaultMessage: '!!!Signing cancelled on Ledger device. Please retry or reconnect device.',
-    description: '<Signing cancelled on Ledger device. Please retry.> on the Ledger send ADA confirmation dialog.'
   },
 });
 
@@ -162,7 +161,6 @@ export default class LedgerSendStore extends Store {
 
     const reqParams: PrepareAndBroadcastLedgerSignedTxRequest = {
       ledgerSignTxResp,
-      changeAdaAddr: createLedgerSignTxDataResp.changeAddress,
       unsignedTx,
       txExt: createLedgerSignTxDataResp.txExt
     };

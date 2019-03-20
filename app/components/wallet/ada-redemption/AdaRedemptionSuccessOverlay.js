@@ -14,12 +14,10 @@ const messages = defineMessages({
   headline: {
     id: 'wallet.redeem.success.overlay.headline',
     defaultMessage: '!!!You have successfully redeemed',
-    description: 'Headline for the ada redemption success overlay.'
   },
   confirmButton: {
     id: 'wallet.redeem.success.overlay.confirmButton',
     defaultMessage: '!!!Great',
-    description: 'Confirm button text'
   },
 });
 

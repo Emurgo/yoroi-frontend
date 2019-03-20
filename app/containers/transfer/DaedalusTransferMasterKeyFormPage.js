@@ -9,7 +9,6 @@ const messages = defineMessages({
   step0: {
     id: 'daedalusTransfer.form.instructions.step0MasterKey.text',
     defaultMessage: '!!!Enter the unencrypted master key for your Daedalus wallet to restore the balance and transfer all the funds from Daedalus to Yoroi.',
-    description: 'Text for instructions step 0 on the Daedalus transfer master key form page.'
   },
 });
 

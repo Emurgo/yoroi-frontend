@@ -8,12 +8,10 @@ const messages = defineMessages({
   apiMethodNotYetImplementedError: {
     id: 'api.errors.ApiMethodNotYetImplementedError',
     defaultMessage: '!!!This API method is not yet implemented.',
-    description: '"This API method is not yet implemented." error message.'
   },
   promiseNotCalledYetError: {
     id: 'api.errors.PromiseNotCalledYetError',
     defaultMessage: '!!!You have to call Request::execute before you can access it as promise.',
-    description: 'When call chain is not correct.'
   }
 });
 

@@ -12,7 +12,6 @@ const messages = defineMessages({
   loading: {
     id: 'loading.screen.loading',
     defaultMessage: '!!!loading components',
-    description: 'Message "loading components" on the loading screen.'
   },
 });
 

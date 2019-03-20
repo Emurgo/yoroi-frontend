@@ -31,12 +31,10 @@ const messages = defineMessages({
   connectIntroTextLine1: {
     id: 'wallet.connect.ledger.dialog.step.connect.introText.line.1',
     defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Connect button.',
-    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectIntroTextLine2: {
     id: 'wallet.connect.ledger.dialog.step.connect.introText.line.2',
     defaultMessage: '!!!Make sure Cardano ADA app is open on the Ledger device.',
-    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
 

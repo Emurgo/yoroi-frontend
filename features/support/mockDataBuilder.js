@@ -22,18 +22,20 @@ export function buildFeatureData(feature: string): void {
 
 export function getFakeAddresses(
   totalAddresses: number,
-  addressesStartingWith: string
+  addressesStartingWith: string,
+  change: number = 0,
+  startIndex: number = 0
 ): Array<AdaAddress> {
   const addresses = _generateListOfStrings(addressesStartingWith);
-  return addresses.slice(0, totalAddresses).map((address) => ({
+  return addresses.slice(0, totalAddresses).map((address, i) => ({
     cadAmount: {
       getCCoin: '0'
     },
     cadId: address,
     cadIsUsed: false,
     account: 0,
-    change: 0,
-    index: 0
+    change,
+    index: startIndex + i
   }));
 }
 
