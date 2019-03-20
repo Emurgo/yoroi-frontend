@@ -3,12 +3,10 @@
 // Handles "Addresses" as defined in the bip44 specification
 // Also handles interfacing with the LovefieldDB for everything related purely to addresses.
 
-import { Wallet } from 'rust-cardano-crypto';
 import _ from 'lodash';
 import {
   toAdaAddress
 } from './lib/cardanoCrypto/cryptoToModel';
-import { getResultOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import {
   saveAddresses,
   getAddresses,
@@ -16,7 +14,8 @@ import {
   getAddressesListByType,
 } from './lib/lovefieldDatabase';
 import type {
-  AddressesTableRow
+  AddressesTableRow,
+  CryptoAccount,
 } from './lib/lovefieldDatabase';
 import {
   getLastReceiveAddressIndex,
@@ -26,22 +25,23 @@ import {
   UnusedAddressesError,
 } from '../common';
 import {
-  getAddressInHex,
   getLatestUsedIndex
 } from './lib/utils';
 import type {
   AdaAddresses,
-  AdaAddress
+  AdaAddress,
+  AddressType
 } from './adaTypes';
 import {
   Logger,
   stringifyError
 } from '../../utils/logging';
+import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 export function isValidAdaAddress(address: string): Promise<boolean> {
   try {
-    const result: boolean = getResultOrFail(Wallet.checkAddress(getAddressInHex(address)));
-    return Promise.resolve(result);
+    RustModule.Wallet.Address.from_base58(address);
+    return Promise.resolve(true);
   } catch (validateAddressError) {
     Logger.error('adaAddress::isValidAdaAddress error: ' +
       stringifyError(validateAddressError));
@@ -85,8 +85,8 @@ export function getAdaAddressesByType(addressType: AddressType): Promise<AdaAddr
  */
 export async function popBip44Address(type: AddressType): Promise<AdaAddress> {
   return type === 'Internal'
-    ? popBip44InternalAddress()
-    : popBip44ExternalAddress();
+    ? await popBip44InternalAddress()
+    : await popBip44ExternalAddress();
 }
 
 async function popBip44InternalAddress(): Promise<AdaAddress> {
@@ -137,7 +137,7 @@ export async function saveAsAdaAddresses(
   return saveAddresses(mappedAddresses, addressType);
 }
 
-/** Follow heuristic to pick which address to send Daedalus transfer to */
+/** Follow heuristic to pick which address to send Daedalus/Redemption transfer to */
 export async function getReceiverAddress(): Promise<string> {
   // Note: Current heuristic is to pick the first address in the wallet
   // rationale & better heuristic described at https://github.com/Emurgo/yoroi-frontend/issues/96

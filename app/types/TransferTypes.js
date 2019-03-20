@@ -1,5 +1,6 @@
 // @flow
 import BigNumber from 'bignumber.js';
+import { RustModule } from '../api/ada/lib/cardanoCrypto/rustLoader';
 
 export type TransferStatus =
     'uninitialized'
@@ -16,7 +17,7 @@ export type TransferStatus =
 export type TransferTx = {
   recoveredBalance: BigNumber,
   fee: BigNumber,
-  cborEncodedTx: Array<number>,
+  signedTx: RustModule.Wallet.SignedTransaction,
   senders: Array<string>,
   receiver: string,
 }

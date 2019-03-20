@@ -30,6 +30,7 @@ import {
 } from '../errors';
 import type
 {
+  AddressType,
   AdaTransaction,
   AdaTransactions,
   Transaction
@@ -41,6 +42,9 @@ import {
   saveLastBlockNumber,
   getLastBlockNumber,
   getSingleCryptoAccount
+} from '../adaLocalStorage';
+import type {
+  CryptoAccount,
 } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import config from '../../../config';

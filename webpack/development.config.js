@@ -11,6 +11,11 @@ const hotScript =
   'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
 const baseDevConfig = () => ({
+  mode: 'development',
+  optimization: {
+    // https://github.com/webpack/webpack/issues/7470
+    nodeEnv: false,
+  },
   devtool: 'eval-source-map',
   entry: {
     yoroi: [
@@ -38,8 +43,18 @@ const baseDevConfig = () => ({
   output: {
     path: path.join(__dirname, '../dev/js'),
     filename: '[name].bundle.js',
+    webassemblyModuleFilename: '[modulehash].wasm',
   },
   plugins: [
+    /**
+     * We need CardanoWallet for flow to get the WASM binding types.
+     * However, the flow definitions aren't available to webpack at runtime
+     * so we have to mock them out with a noop
+     */
+    new webpack.NormalModuleReplacementPlugin(
+      /CardanoWallet/,
+      'lodash/noop.js'
+    ),
     new ConfigWebpackPlugin(),
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
@@ -61,7 +76,7 @@ const baseDevConfig = () => ({
     fs: 'empty'
   },
   resolve: {
-    extensions: ['*', '.js']
+    extensions: ['*', '.js', '.wasm']
   },
   module: {
     rules: [
@@ -130,6 +145,10 @@ const baseDevConfig = () => ({
           'markdown-loader',
         ]
       },
+      {
+        test: /\.wasm$/,
+        type: 'webassembly/experimental'
+      }
     ]
   }
 });

@@ -5,10 +5,11 @@ import {
   isValidPaperMnemonic,
   unscramblePaperMnemonic
 } from './adaWallet';
-import {
-  RandomAddressChecker,
-} from 'rust-cardano-crypto';
 import bip39 from 'bip39';
+
+import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+
+const RandomAddressChecker = {}; // TODO: remove
 
 const VALID_DD_PAPER = {
   words: 'fire shaft radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree',
@@ -44,6 +45,8 @@ test('Unscramble Daedalus paper matches expected address', () => {
     const resultMap = result.reduce((m, v) => { m[v.address] = v.addressing; return m; }, {});
     expect(VALID_DD_PAPER.address in resultMap).toEqual(true);
     expect(UNEXPECTED_DD_ADDRESS in resultMap).toEqual(false);
-    expect(resultMap[VALID_DD_PAPER.address]).toEqual([0x80000000, 0x80000000]);
+    expect(resultMap[VALID_DD_PAPER.address]).toEqual(
+      [HARD_DERIVATION_START, HARD_DERIVATION_START]
+    );
   }
 });

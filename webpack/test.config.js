@@ -7,6 +7,11 @@ const shell = require('shelljs');
 const customPath = path.join(__dirname, './customPublicPath');
 
 module.exports = {
+  mode: 'development',
+  optimization: {
+    // https://github.com/webpack/webpack/issues/7470
+    nodeEnv: false,
+  },
   entry: {
     yoroi: [
       customPath,
