@@ -20,37 +20,30 @@ const messages = defineMessages({
   walletAddressLabel: {
     id: 'wallet.receive.page.walletAddressLabel',
     defaultMessage: '!!!Your wallet address',
-    description: 'Label for wallet address on the wallet "Receive page"',
   },
   walletReceiveInstructions: {
     id: 'wallet.receive.page.walletReceiveInstructions',
     defaultMessage: '!!!Share this wallet address to receive payments. To protect your privacy, new addresses are generated automatically once you use them.',
-    description: 'Wallet receive payments instructions on the wallet "Receive page"',
   },
   generateNewAddressButtonLabel: {
     id: 'wallet.receive.page.generateNewAddressButtonLabel',
     defaultMessage: '!!!Generate new address',
-    description: 'Label for "Generate new address" button on the wallet "Receive page"',
   },
   generatedAddressesSectionTitle: {
     id: 'wallet.receive.page.generatedAddressesSectionTitle',
     defaultMessage: '!!!Generated addresses',
-    description: '"Generated addresses" section title on the wallet "Receive page"',
   },
   hideUsedLabel: {
     id: 'wallet.receive.page.hideUsedLabel',
     defaultMessage: '!!!hide used',
-    description: 'Label for "hide used" wallet addresses link on the wallet "Receive page"',
   },
   showUsedLabel: {
     id: 'wallet.receive.page.showUsedLabel',
     defaultMessage: '!!!show used',
-    description: 'Label for "show used" wallet addresses link on the wallet "Receive page"',
   },
   copyAddressLabel: {
     id: 'wallet.receive.page.copyAddressLabel',
     defaultMessage: '!!!Copy address',
-    description: 'Label for "Copy address" link on the wallet "Receive page"',
   },
 });
 

@@ -13,17 +13,14 @@ const messages = defineMessages({
   instructionsText: {
     id: 'transfer.instructions.instructions.text',
     defaultMessage: '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
-    description: 'Instructions text on the transfer instructions page.'
   },
   instructionsButton: {
     id: 'transfer.instructions.instructions.button.label',
     defaultMessage: '!!!Create Yoroi wallet',
-    description: 'Label "Create Yoroi wallet" on the transfer instructions page.'
   },
   attentionTitle: {
     id: 'transfer.instructions.attention.title.label',
     defaultMessage: '!!!Attention',
-    description: 'Label "Attention" on the transfer instructions page.'
   },
 });
 

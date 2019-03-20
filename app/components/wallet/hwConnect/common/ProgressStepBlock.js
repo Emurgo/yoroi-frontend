@@ -10,17 +10,14 @@ const messages = defineMessages({
   stepAboutLabel: {
     id: 'wallet.connect.hw.dialog.step.about.label',
     defaultMessage: '!!!ABOUT',
-    description: 'Progress Step Label "About" on the Connect to any Hardware Wallet dialog.'
   },
   stepConnectLabel: {
     id: 'wallet.connect.hw.dialog.step.connect.label',
     defaultMessage: '!!!CONNECT',
-    description: 'Progress Step Label "Connect" on the Connect to any Hardware Wallet dialog.'
   },
   stepSaveLabel: {
     id: 'wallet.connect.hw.dialog.step.save.label',
     defaultMessage: '!!!SAVE',
-    description: 'Progress Step Label "Save" on the Connect to any Hardware Wallet dialog.'
   },
 });
 

@@ -13,17 +13,14 @@ const messages = defineMessages({
   change: {
     id: 'inline.editing.input.change.label',
     defaultMessage: '!!!change',
-    description: 'Label "change" on inline editing inputs in inactive state.'
   },
   cancel: {
     id: 'inline.editing.input.cancel.label',
     defaultMessage: '!!!cancel',
-    description: 'Label "cancel" on inline editing inputs in inactive state.'
   },
   changesSaved: {
     id: 'inline.editing.input.changesSaved',
     defaultMessage: '!!!Your changes have been saved',
-    description: 'Message "Your changes have been saved" for inline editing (eg. on Profile Settings page).'
   }
 });
 
