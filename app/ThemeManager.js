@@ -23,7 +23,7 @@ export default class ThemeManager extends Component {
   render() {
     return (
       <div>
-        <input
+        {/* <input
           type="checkbox"
           onChange={(e) => {
             this.updateCSSVariables(this.props.variables);
@@ -31,7 +31,7 @@ export default class ThemeManager extends Component {
           }}
           checked={this.props.classic}
         />
-        <span> - classic design </span>
+        <span> - classic design </span> */}
         {this.props.children}
       </div>
     );
