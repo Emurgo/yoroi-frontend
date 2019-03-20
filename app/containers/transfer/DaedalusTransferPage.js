@@ -24,7 +24,6 @@ const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.title',
     defaultMessage: '!!!Transfer funds from Daedalus',
-    description: 'Transfer from Daedalus Title.'
   },
 });
 

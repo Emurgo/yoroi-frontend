@@ -12,7 +12,6 @@ const messages = defineMessages({
   title: {
     id: 'profile.termsOfUse.title',
     defaultMessage: '!!!Terms Of Use',
-    description: 'Terms of Use Title.'
   },
 });
 

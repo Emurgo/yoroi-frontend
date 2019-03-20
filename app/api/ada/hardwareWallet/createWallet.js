@@ -31,8 +31,9 @@ export async function createWallet({
     const [hardwareWallet] = createAdaHardwareWallet({ walletInitData });
 
     // create crypto account object for hardware wallet
-    const { publicMasterKey } = walletInitData.cwHardwareInfo;
-    const cryptoAccount = createHardwareWalletAccount(publicMasterKey);
+    const cryptoAccount = createHardwareWalletAccount(
+      walletInitData.cwHardwareInfo.publicMasterKey
+    );
 
     // Restore transactions and Save wallet + cryptoAccount to localstorage
     await restoreTransactionsAndSave(cryptoAccount, hardwareWallet);

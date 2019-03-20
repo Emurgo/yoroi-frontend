@@ -10,7 +10,6 @@ const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.errorPage.title.label',
     defaultMessage: '!!!Unable to restore Daedalus wallet',
-    description: 'Label "Unable to restore Daedalus wallet" on the Daedalus transfer error page.'
   },
 });
 

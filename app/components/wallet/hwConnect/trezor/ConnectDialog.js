@@ -31,12 +31,10 @@ const messages = defineMessages({
   connectIntroTextLine1: {
     id: 'wallet.connect.trezor.dialog.step.connect.introText.line.1',
     defaultMessage: '!!!After connecting your Trezor device to the computer press the Connect button.',
-    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
   connectIntroTextLine2: {
     id: 'wallet.connect.trezor.dialog.step.connect.introText.line.2',
     defaultMessage: '!!!A new tab will appear, please follow the instructions in the new tab.',
-    description: 'Header text of about step on the Connect to Trezor Hardware Wallet dialog.'
   },
 });
 

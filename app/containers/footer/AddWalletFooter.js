@@ -14,32 +14,26 @@ const messages = defineMessages({
   buyTrezorHardwareWallet: {
     id: 'wallet.footer.buyTrezorHardwareWallet.text',
     defaultMessage: '!!!Buy a Trezor hardware wallet.',
-    description: 'Footer Buy a Trezor hardware wallet link text.'
   },
   whatIsHardwareWallet: {
     id: 'wallet.footer.whatIsHardwareWallet.text',
     defaultMessage: '!!!What is a hardware wallet',
-    description: 'Footer What is a hardware wallet? link text.'
   },
   buyLedgerHardwareWallet: {
     id: 'wallet.footer.buyLedgerHardwareWallet.text',
     defaultMessage: '!!!Buy a Ledger hardware wallet.',
-    description: 'Footer Buy a Ledger hardware wallet link text.'
   },
   howToConnectTrezor: {
     id: 'wallet.footer.howToConnectTrezor.text',
     defaultMessage: '!!!How to connect a Trezor.',
-    description: 'Footer How to connect a Trezor link text.'
   },
   howToCreateWallet: {
     id: 'wallet.footer.howToCreateWallet.text',
     defaultMessage: '!!!How to create a wallet.',
-    description: 'Footer How to create a wallet link text.'
   },
   howToRestoreWallet: {
     id: 'wallet.footer.howToRestoreWallet.text',
     defaultMessage: '!!!How to restore a wallet.',
-    description: 'Footer How to restore a wallet link text.'
   },
 });
 
@@ -58,11 +52,12 @@ export default class AddWalletFooter extends Component {
           svg={whatIsHardwareWalletSvg}
           message={messages.whatIsHardwareWallet}
         />
-        <FooterItem
+        {/* Temporarily disable, re-enable when Ledger is ready to enable */}
+        {/* <FooterItem
           url="https://yoroi-wallet.com/get-ledger"
           svg={buyTrezorSvg}
           message={messages.buyLedgerHardwareWallet}
-        />
+        /> */}
         {/* It should be enable in the future with a video on how to connect Ledger */}
         {/* <FooterItem
           url="https://youtu.be/Dp0wXwtToX0"

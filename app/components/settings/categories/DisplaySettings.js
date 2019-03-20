@@ -14,42 +14,34 @@ const messages = defineMessages({
   themeLabel: {
     id: 'settings.display.themeLabel',
     defaultMessage: '!!!Theme',
-    description: 'Label for the "Theme" selection on the display settings page.',
   },
   themeExportButton: {
     id: 'settings.display.themeExportButton',
     defaultMessage: '!!!EXPORT THEME',
-    description: 'Label for the "Export Theme" button.'
   },
   themeYoroiClassic: {
     id: 'settings.display.themeNames.yoroiClassic',
     defaultMessage: '!!!Yoroi classic',
-    description: 'Name of the "Yoroi classic" theme on the display settings page.',
   },
   themeYoroiModern: {
     id: 'settings.display.themeNames.yoroiModern',
     defaultMessage: '!!!Yoroi modern',
-    description: 'Name of the "Yoroi modern" theme on the display settings page.',
   },
   themeWarning: {
     id: 'settings.display.themeWarning',
     defaultMessage: '!!!CHANGING THEME WILL REMOVE CUSTOMIZATION',
-    description: 'Label for the "CHANGING THEME WILL REMOVE CUSTOMIZATION" message.',
   },
   blog: {
     id: 'settings.display.blog',
     defaultMessage: '!!!You can read our {blogLink} on how to use this feature.',
-    description: 'text to introduce blog post',
   },
   blogLinkUrl: {
     id: 'settings.support.faq.blogLinkUrl',
-    defaultMessage: '!!!https://medium.com/@emurgo_io/custom-themes-in-yoroi-d3fa93f4b926',
-    description: 'link for blog post',
+    defaultMessage: '!!!https://emurgo.io/#/en/blog/yoroi-custom-themes',
   },
   blogLinkWrapper: {
     id: 'settings.support.faq.blogLinkWrapper',
     defaultMessage: '!!!blog post',
-    description: 'clickable text to open link',
   },
 });
 

@@ -93,6 +93,11 @@ export default action(
         .forEach(store => store.initialize());
     }
 
+    // Perform load after all setup is done to ensure migration can modify store state
+    if (stores.loading) { // if condition to please flow (avoid thinkin "loading" is null)
+      stores.loading.load();
+    }
+
     return (stores: any);
   }
 );

@@ -1,0 +1,31 @@
+// @flow
+
+import { Then } from 'cucumber';
+
+const lastestVersion = require('../../chrome/manifest.test.json').version;
+
+Then(/^Last launch version is updated$/, async function () {
+  this.driver.wait(async () => {
+    const lastLaunchVersion = await getLastLaunchVersion(this.driver);
+    return lastLaunchVersion === lastestVersion;
+  });
+});
+
+Then(/^I decreast last launch version$/, async function () {
+  this.driver.wait(async () => {
+    await setLastLaunchVersion(this.driver, '0.0.0');
+    return true;
+  });
+});
+
+declare var yoroi;
+
+async function getLastLaunchVersion(client: any) {
+  return await client.executeScript(() => yoroi.stores.profile.lastLaunchVersion);
+}
+
+async function setLastLaunchVersion(client: any, version: string) {
+  return await client.executeScript(
+    (ver) => yoroi.stores.profile.setLastLaunchVersion(ver), version
+  );
+}
