@@ -7,6 +7,11 @@ export const isValidWalletName = (walletName) => {
   return nameLength >= 1 && nameLength <= 40;
 };
 
+export const isValidPaperPassword = (paperPassword) => (
+  // non-empty
+  paperPassword.length > 0
+);
+
 export const isValidWalletPassword = (walletPassword) => (
   // https://xkcd.com/936/
   walletPassword.length >= 12

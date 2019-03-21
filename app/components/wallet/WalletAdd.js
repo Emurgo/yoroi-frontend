@@ -31,7 +31,7 @@ const messages = defineMessages({
   },
   restorePaperDescription: {
     id: 'wallet.add.dialog.restore.paper.description',
-    defaultMessage: '!!!Restore Yoroi paper wallet from backup',
+    defaultMessage: '!!!Restore Yoroi paper wallet',
   },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',

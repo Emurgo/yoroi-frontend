@@ -23,6 +23,10 @@ export default defineMessages({
     id: 'global.errors.invalidWalletPassword',
     defaultMessage: '!!!Invalid password',
   },
+  invalidPaperPassword: {
+    id: 'global.errors.invalidPaperPassword',
+    defaultMessage: '!!!Invalid Paper Wallet password',
+  },
   invalidRepeatPassword: {
     id: 'global.errors.invalidRepeatPassword',
     defaultMessage: '!!!Doesn\'t match.',

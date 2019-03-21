@@ -11,7 +11,12 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
-import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../utils/validations';
+import {
+  isValidWalletName,
+  isValidWalletPassword,
+  isValidRepeatPassword,
+  isValidPaperPassword,
+} from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
@@ -53,6 +58,10 @@ const messages = defineMessages({
   invalidRecoveryPhrase: {
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
+  },
+  paperPasswordLabel: {
+    id: 'wallet.restore.dialog.paperPasswordLabel',
+    defaultMessage: '!!!Paper wallet password',
   },
   walletPasswordLabel: {
     id: 'wallet.restore.dialog.walletPasswordLabel',
@@ -117,6 +126,22 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
+      paperPassword: this.props.isPaper ? {
+        type: 'password',
+        label: this.context.intl.formatMessage(messages.paperPasswordLabel),
+        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        value: '',
+        validators: [({ field, form }) => {
+          const repeatPasswordField = form.$('repeatPassword');
+          if (repeatPasswordField.value.length > 0) {
+            repeatPasswordField.validate({ showErrors: true });
+          }
+          return [
+            isValidPaperPassword(field.value),
+            this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
+          ];
+        }],
+      } : undefined,
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.walletPasswordLabel),
@@ -185,6 +210,11 @@ export default class WalletRestoreDialog extends Component<Props> {
       styles.walletName,
     ]);
 
+    const paperPasswordFieldClasses = classnames([
+      'paperPassword',
+      styles.paperPassword,
+    ]);
+
     const walletPasswordFieldsClasses = classnames([
       styles.walletPasswordFields,
       styles.show,
@@ -192,6 +222,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const walletNameField = form.$('walletName');
     const recoveryPhraseField = form.$('recoveryPhrase');
+    const paperPasswordField = form.$('paperPassword');
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
 
@@ -231,6 +262,19 @@ export default class WalletRestoreDialog extends Component<Props> {
           noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
           skin={AutocompleteSkin}
         />
+
+        {isPaper ? (
+          <div className={styles.walletPassword}>
+            <div className={paperPasswordFieldClasses}>
+              <Input
+                className="paperPassword"
+                {...paperPasswordField.bind()}
+                error={paperPasswordField.error}
+                skin={InputSkin}
+              />
+            </div>
+          </div>
+        ) : ''}
 
         <div className={styles.walletPassword}>
           <div className={walletPasswordFieldsClasses}>
