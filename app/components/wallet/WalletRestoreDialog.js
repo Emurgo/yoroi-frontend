@@ -88,6 +88,7 @@ type Props = {
   error?: ?LocalizableError,
   validWords: Array<string>,
   isPaper: boolean,
+  isPaperPassword: boolean,
 };
 
 @observer
@@ -126,7 +127,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
-      paperPassword: this.props.isPaper ? {
+      paperPassword: (this.props.isPaper && this.props.isPaperPassword) ? {
         type: 'password',
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
         placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
@@ -183,11 +184,12 @@ export default class WalletRestoreDialog extends Component<Props> {
   submit = () => {
     this.form.submit({
       onSuccess: (form) => {
-        const { recoveryPhrase, walletName, walletPassword } = form.values();
+        const { recoveryPhrase, walletName, walletPassword, paperPassword } = form.values();
         const walletData = {
           recoveryPhrase: join(recoveryPhrase, ' '),
           walletName,
           walletPassword,
+          paperPassword,
         };
         this.props.onSubmit(walletData);
       },
@@ -198,7 +200,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error, onCancel, isPaper } = this.props;
+    const { validWords, isSubmitting, error, onCancel, isPaper, isPaperPassword } = this.props;
 
     const dialogClasses = classnames([
       styles.component,
@@ -263,7 +265,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           skin={AutocompleteSkin}
         />
 
-        {isPaper ? (
+        {(isPaper && isPaperPassword) ? (
           <div className={styles.walletPassword}>
             <div className={paperPasswordFieldClasses}>
               <Input

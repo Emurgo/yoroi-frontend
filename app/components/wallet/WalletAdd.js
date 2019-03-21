@@ -31,7 +31,11 @@ const messages = defineMessages({
   },
   restorePaperDescription: {
     id: 'wallet.add.dialog.restore.paper.description',
-    defaultMessage: '!!!Restore Yoroi paper wallet',
+    defaultMessage: '!!!Restore Yoroi Paper Wallet',
+  },
+  restorePaperPasswordDescription: {
+    id: 'wallet.add.dialog.restore.paper.password.description',
+    defaultMessage: '!!!Restore Yoroi Paper Wallet with Password',
   },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',
@@ -55,6 +59,7 @@ type Props = {
   onCreate: Function,
   onRestore: Function,
   onPaperRestore: Function,
+  onPaperPasswordRestore: Function,
   isRestoreActive: boolean,
 };
 
@@ -75,6 +80,7 @@ export default class WalletAdd extends Component<Props> {
       onCreate,
       onRestore,
       onPaperRestore,
+      onPaperPasswordRestore,
       isRestoreActive,
     } = this.props;
 
@@ -121,6 +127,12 @@ export default class WalletAdd extends Component<Props> {
             className="primary restorePaperWalletButton"
             label={intl.formatMessage(messages.restorePaperDescription)}
             onMouseUp={onPaperRestore}
+            skin={ButtonSkin}
+          />
+          <Button
+            className="primary restorePaperPasswordWalletButton"
+            label={intl.formatMessage(messages.restorePaperPasswordDescription)}
+            onMouseUp={onPaperPasswordRestore}
             skin={ButtonSkin}
           />
           {activeNotification ? (
