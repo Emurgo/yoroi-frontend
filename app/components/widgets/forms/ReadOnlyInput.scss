@@ -1,4 +1,4 @@
-.component {
+.componentClassic {
   margin-bottom: 32px;
   position: relative;
 
@@ -9,7 +9,7 @@
   }
 
   .button {
-    bottom: 10px;
+    bottom: 20px;
     color: var(--theme-label-button-color);
     cursor: pointer;
     font-family: var(--font-light);
@@ -23,4 +23,35 @@
       opacity: 1;
     }
   }
+}
+
+.component {
+  margin-bottom: 32px;
+  position: relative;
+
+  .disabled {
+    background-color: transparent;
+    border-color: var(--theme-input-border-color);
+    color: var(--theme-input-text-color);
+  }
+
+  .button {
+    bottom: 37px;
+    color: var(--theme-label-button-color);
+    cursor: pointer;
+    font-family: var(--font-light);
+    font-size: 16px;
+    line-height: 1.38;
+    opacity: 0.5;
+    position: absolute;
+    right: 22px;
+    text-transform: lowercase;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.icon svg {
+  vertical-align: bottom;
 }

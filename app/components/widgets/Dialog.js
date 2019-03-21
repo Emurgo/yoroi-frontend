@@ -47,7 +47,6 @@ export default class Dialog extends Component<Props> {
       classicTheme
     } = this.props;
     const titleClasses = classicTheme ? styles.titleClassic : styles.title;
-    console.log('classicTheme in dialog', classicTheme);
     const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
     return (

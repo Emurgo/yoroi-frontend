@@ -8,7 +8,6 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
-// import InputOwnSkin from '../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import SvgInline from 'react-svg-inline';
@@ -25,6 +24,7 @@ import {
 } from '../../../utils/formatters';
 import dangerIcon from '../../../assets/images/danger.inline.svg';
 import config from '../../../config';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   titleLabel: {
@@ -262,8 +262,7 @@ export default class WalletSendForm extends Component<Props, State> {
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
           </div>
 
@@ -279,8 +278,8 @@ export default class WalletSendForm extends Component<Props, State> {
               currency={currencyUnit}
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
-              // skin={<AmountInputSkin classicTheme={classicTheme} />}
               skin={AmountInputSkin}
+              classicTheme={classicTheme}
             />
           </div>
 

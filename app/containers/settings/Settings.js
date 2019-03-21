@@ -8,6 +8,7 @@ import TopBar from '../../components/topbar/TopBar';
 import resolver from '../../utils/imports';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
+import AddWalletFooter from '../footer/AddWalletFooter';
 
 const Layout = resolver('containers/MainLayout');
 
@@ -44,6 +45,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         isActiveItem={this.isActivePage}
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
         currentLocale={profile.currentLocale}
+        classicTheme={theme.classic}
       />
     );
     const topbarTitle = (
@@ -63,9 +65,9 @@ export default class Settings extends Component<InjectedContainerProps> {
           />
         )}
         classicTheme={theme.classic}
-        withFooter={!theme.classic}
+        footer={theme.classic ? undefined : <AddWalletFooter />}
       >
-        <SettingsLayout menu={menu}>
+        <SettingsLayout menu={menu} classicTheme={theme.classic}>
           {children}
         </SettingsLayout>
       </Layout>

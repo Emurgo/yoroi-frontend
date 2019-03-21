@@ -39,7 +39,7 @@
 }
 
 :global {
-  .SelectOverrides_isOpen .SelectOverrides_selectInput {
+  .LanguageSelectionForm_languageSelect.SelectOverrides_isOpen .SelectOverrides_selectInput {
     input, input:hover {
       border-color: var(--theme-select-language-color);
       color: var(--theme-select-language-color);

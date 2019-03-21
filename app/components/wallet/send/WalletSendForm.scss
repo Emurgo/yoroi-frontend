@@ -15,7 +15,7 @@
 .amountInputClassic,
 .receiverInputClassic {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .amountInput,
@@ -64,5 +64,5 @@
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 0.5em;
-  color: var(--theme-error-text-color);
+  color: var(--rp-theme-color-error);
 }

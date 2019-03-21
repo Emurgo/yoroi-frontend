@@ -2,14 +2,6 @@
 
 .root {
   padding: 10px 0 20px;
-
-  &.disabled {
-    opacity: 0.5;
-
-    .inputWrapper {
-      border-color: var(--rp-input-border-color);
-    }
-  }
 }
 
 .error {

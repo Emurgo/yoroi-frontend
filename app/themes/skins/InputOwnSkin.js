@@ -39,7 +39,6 @@ type State = {
   focused: boolean,
 };
 
-// export const InputOwnSkin = (props: Props) => (
 export const InputOwnSkin = class extends React.Component<Props, State> {
   static defaultProps = {
     className: '',
@@ -97,46 +96,3 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
     );
   }
 };
-
-// InputOwnSkin.defaultProps = {
-//   className: '',
-//   disabled: undefined,
-//   error: undefined,
-//   label: undefined,
-//   onBlur: undefined,
-//   onChange: undefined,
-//   onFocus: undefined,
-//   onKeyPress: undefined,
-//   placeholder: undefined,
-//   readOnly: undefined,
-//   done: undefined,
-// };
-
-// (
-//   <FormField
-//     className={props.className}
-//     disabled={props.disabled}
-//     label={props.label}
-//     error={props.error}
-//     inputRef={props.inputRef}
-//     skin={FormFieldOwnSkin}
-//     theme={props.theme}
-//     done={props.done}
-//     type={props.type}
-//     render={({ inputType }) => (
-//       <input
-//         ref={props.inputRef}
-//         {...pickDOMProps(props)}
-//         type={inputType}
-//         className={classnames([
-//           props.theme[props.themeId].input,
-//           props.disabled ? props.theme[props.themeId].disabled : null,
-//           props.error ? props.theme[props.themeId].errored : null,
-//           (props.error || props.type === 'password' || props.done) ? styles.icon : null,
-//           ((props.error || props.type === 'password') && props.done) ? styles.doubleIcon : null
-//         ])}
-//         readOnly={props.readOnly}
-//       />
-//     )}
-//   />
-// );

@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
-// import InputOwnSkin from '../../../themes/skins/InputOwnSkin';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import Dialog from '../../widgets/Dialog';
@@ -186,8 +186,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
           }
         </div>
