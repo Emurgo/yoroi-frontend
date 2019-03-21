@@ -22,6 +22,10 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.title.label',
     defaultMessage: '!!!Restore wallet',
   },
+  titlePaper: {
+    id: 'wallet.restore.dialog.title.paper.label',
+    defaultMessage: '!!!Restore Yoroi paper wallet',
+  },
   walletNameInputLabel: {
     id: 'wallet.restore.dialog.wallet.name.input.label',
     defaultMessage: '!!!Wallet name',
@@ -74,6 +78,7 @@ type Props = {
   numberOfMnemonics: number,
   error?: ?LocalizableError,
   validWords: Array<string>,
+  isPaper: boolean,
 };
 
 @observer
@@ -168,7 +173,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error, onCancel } = this.props;
+    const { validWords, isSubmitting, error, onCancel, isPaper } = this.props;
 
     const dialogClasses = classnames([
       styles.component,
@@ -203,7 +208,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     return (
       <Dialog
         className={dialogClasses}
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(isPaper ? messages.titlePaper : messages.title)}
         actions={actions}
         closeOnOverlayClick
         onClose={onCancel}
