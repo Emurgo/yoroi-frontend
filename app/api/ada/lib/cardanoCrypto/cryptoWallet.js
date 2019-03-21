@@ -175,8 +175,8 @@ export const mnemonicsToAddresses = (
   count?: number = 1,
   type?: AddressType = 'External'
 ): Array<string> => {
-  const seed = mnemonicToSeedHex(mnemonic);
-  const { result: wallet } = Wallet.fromSeed([...Buffer.from(seed, 'hex')]);
+  const masterKey = generateWalletMasterKey(mnemonic, '');
+  const wallet = getCryptoWalletFromMasterKey(masterKey, '');
   const { result: account } = Wallet.newAccount(wallet, 0);
   const { result: addresses } = Wallet.generateAddresses(account, type, [...Array(count).keys()]);
   return addresses;
