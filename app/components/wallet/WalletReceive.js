@@ -10,11 +10,16 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
+import magnifyingGlass from '../../assets/images/search-ic-dark.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
+import {
+  toDerivationPathString,
+} from 'yoroi-extension-ledger-bridge';
+
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -172,13 +177,20 @@ export default class WalletReceive extends Component<Props, State> {
             ]);
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
+                { /* <div className={styles.addressId}>
+                  {address.path + ' ' + toDerivationPathString(address.path)}
+                </div> */ }
                 <div className={styles.addressId}>{address.id}</div>
                 <div className={styles.addressActions}>
+                  <span className={styles.addressIcon}>
+                    <SvgInline svg={magnifyingGlass} className={styles.copyIcon} />
+                  </span>
+                  &nbsp;
                   <CopyToClipboard
                     text={address.id}
                     onCopy={onCopyAddress.bind(this, address.id)}
                   >
-                    <span className={styles.copyAddress}>
+                    <span className={styles.addressIcon}>
                       <SvgInline svg={iconCopy} className={styles.copyIcon} />
                       <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
                     </span>
