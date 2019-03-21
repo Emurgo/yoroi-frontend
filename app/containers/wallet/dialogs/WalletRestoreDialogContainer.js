@@ -5,13 +5,22 @@ import validWords from 'bip39/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
+import {
+  unscramblePaperAdaMnemonic
+} from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 
-type Props = InjectedDialogContainerProps;
+type Props = InjectedDialogContainerProps & {
+  mode: "regular" | "paper"
+};
 
 @observer
 export default class WalletRestoreDialogContainer extends Component<Props> {
 
   onSubmit = (values: { recoveryPhrase: string, walletName: string, walletPassword: string }) => {
+    if (this.props.mode === "paper") {
+      const [newPhrase] = unscramblePaperAdaMnemonic(values.recoveryPhrase, 30);
+      values.recoveryPhrase = newPhrase;
+    }
     this.props.actions[environment.API].wallets.restoreWallet.trigger(values);
   };
 
@@ -23,13 +32,26 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   };
 
   render() {
+
     const wallets = this._getWalletsStore();
     const { restoreRequest } = wallets;
 
+    const isPaper = this.props.mode === "paper";
+    if (!isPaper && this.props.mode !== "regular") {
+      throw new Error("Unexpected restore mode: " + this.props.mode);
+    }
+
     return (
       <WalletRestoreDialog
-        mnemonicValidator={mnemonic => wallets.isValidMnemonic(mnemonic)}
+        mnemonicValidator={mnemonic => {
+          if (isPaper) {
+            return wallets.isValidPaperMnemonic(mnemonic, 30);
+          } else {
+            return wallets.isValidMnemonic(mnemonic);
+          }
+        }}
         validWords={validWords}
+        numberOfMnemonics={isPaper ? 30 : 15}
         isSubmitting={restoreRequest.isExecuting}
         onSubmit={this.onSubmit}
         onCancel={this.onCancel}

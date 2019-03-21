@@ -34,6 +34,11 @@ const messages = defineMessages({
     defaultMessage: '!!!Restore wallet from backup',
     description: 'Description for the "Restore" button without paper wallet certificate on the wallet add dialog.',
   },
+  restorePaperDescription: {
+    id: 'wallet.add.dialog.restore.paper.description',
+    defaultMessage: '!!!Restore Yoroi paper wallet from backup',
+    description: 'Description for the "Restore" button without paper wallet certificate on the wallet add dialog.',
+  },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
@@ -58,6 +63,7 @@ type Props = {
   isCreateLedgerWalletActive: boolean,
   onCreate: Function,
   onRestore: Function,
+  onPaperRestore: Function,
   isRestoreActive: boolean,
 };
 
@@ -77,6 +83,7 @@ export default class WalletAdd extends Component<Props> {
       isCreateLedgerWalletActive,
       onCreate,
       onRestore,
+      onPaperRestore,
       isRestoreActive,
     } = this.props;
 
@@ -117,6 +124,12 @@ export default class WalletAdd extends Component<Props> {
             className="primary restoreWalletButton"
             label={intl.formatMessage(messages.restoreDescription)}
             onMouseUp={onRestore}
+            skin={ButtonSkin}
+          />
+          <Button
+            className="primary restorePaperWalletButton"
+            label={intl.formatMessage(messages.restorePaperDescription)}
+            onMouseUp={onPaperRestore}
             skin={ButtonSkin}
           />
           {activeNotification ? (

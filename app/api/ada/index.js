@@ -221,7 +221,7 @@ export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 export default class AdaApi {
 
   // noinspection JSMethodCanBeStatic
-  createAdaPaper({ password, numAddresses }: { password?: string, numAddresses?: number }): AdaPaper {
+  createAdaPaper({ password, numAddresses }: { password?: string, numAddresses?: number } = {}): AdaPaper {
     const { words, scrambledWords, pass } = generatePaperWalletSecret(password);
     const addresses = mnemonicsToExternalAddresses(words.join(' '), numAddresses || DEFAULT_ADDRESSES_PER_PAPER);
     return { addresses, scrambledWords, pass };

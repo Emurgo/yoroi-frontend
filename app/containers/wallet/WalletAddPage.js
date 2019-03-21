@@ -82,9 +82,18 @@ export default class WalletAddPage extends Component<Props> {
         <WalletCreateDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      content = (
-        <WalletRestoreDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
-      );
+      const restoreType = uiDialogs.getParam("restoreType");
+      if (!restoreType || restoreType === "regular") {
+        content = (
+          <WalletRestoreDialogContainer actions={actions} stores={stores} onClose={this.onClose} mode={"regular"}/>
+        );
+      } else if (restoreType === "paper") {
+        content = (
+          <WalletRestoreDialogContainer actions={actions} stores={stores} onClose={this.onClose} mode={"paper"}/>
+        );
+      } else {
+        throw new Error("Unexpected restore type: " + restoreType);
+      }
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       content = (
         <WalletBackupDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
@@ -114,6 +123,7 @@ export default class WalletAddPage extends Component<Props> {
           isCreateLedgerWalletActive={isCreateLedgerWalletActive}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: "paper" } })}
           isRestoreActive={isRestoreActive}
         />
       );

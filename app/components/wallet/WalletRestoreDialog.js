@@ -82,6 +82,7 @@ type Props = {
   onCancel: Function,
   isSubmitting: boolean,
   mnemonicValidator: Function,
+  numberOfMnemonics: number,
   error?: ?LocalizableError,
   validWords: Array<string>,
 };
@@ -229,7 +230,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         <Autocomplete
           options={validWords}
-          maxSelections={15}
+          maxSelections={this.props.numberOfMnemonics}
           {...recoveryPhraseField.bind()}
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
