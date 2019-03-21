@@ -36,7 +36,6 @@ const messages = defineMessages({
   saveWalletNameInputBottomInfo: {
     id: 'wallet.connect.trezor.dialog.step.save.walletName.info',
     defaultMessage: '!!!We have fetched Trezor device’s name for you; you can use as it is or assign a different name.',
-    description: 'Hint for the wallet name input on the wallet restore dialog.'
   },
 });
 

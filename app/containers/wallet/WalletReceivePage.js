@@ -14,7 +14,6 @@ const messages = defineMessages({
   message: {
     id: 'wallet.receive.page.addressCopyNotificationMessage',
     defaultMessage: '!!!You have successfully copied wallet address',
-    description: 'Message for the wallet address copy success notification.',
   },
 });
 
@@ -66,8 +65,10 @@ export default class WalletReceivePage extends Component<Props, State> {
     // Guard against potential null values
     if (!wallet) throw new Error('Active wallet required for WalletReceivePage.');
 
+    // get info about the lattest address generated for special rendering
     const walletAddress = addresses.active ? addresses.active.id : '';
     const isWalletAddressUsed = addresses.active ? addresses.active.isUsed : false;
+
     const walletAddresses = addresses.all.reverse();
 
     const notification = {

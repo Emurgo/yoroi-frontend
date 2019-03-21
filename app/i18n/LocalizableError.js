@@ -6,12 +6,10 @@ const messages = defineMessages({
   unknowError: {
     id: 'app.errors.unknowError',
     defaultMessage: '!!!Unknow error.',
-    description: 'Unknow error message.'
   },
   unexpectedError: {
     id: 'app.errors.unexpectedError',
     defaultMessage: '!!!Something unexpected happened. Please retry.',
-    description: '"Something unexpected happened. Please retry." error message.'
   },
 });
 

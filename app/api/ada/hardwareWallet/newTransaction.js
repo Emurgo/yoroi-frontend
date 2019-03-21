@@ -6,10 +6,6 @@ import {
   stringifyError,
   stringifyData
 } from '../../../utils/logging';
-import {
-  saveAdaAddress,
-  removeAdaAddress,
-} from '../adaAddress';
 import type {
   AdaAddress,
 } from '../adaTypes';
@@ -119,15 +115,9 @@ export async function txsBodiesForInputs(
 /** Send a transaction and save the new change address */
 export async function broadcastTrezorSignedTx(
   signedTxHex: string,
-  changeAdaAddr: AdaAddress,
 ): Promise<BroadcastTrezorSignedTxResponse> {
   Logger.debug('newTransaction::broadcastTrezorSignedTx: called');
   const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
-
-  // We assume a change address is used. Currently, there is no way to perfectly match the tx.
-  // tentatively assume that the transaction will succeed,
-  // so we save the change address to the wallet
-  await saveAdaAddress(changeAdaAddr, 'Internal');
 
   try {
     const body = { signedTx };
@@ -137,9 +127,6 @@ export async function broadcastTrezorSignedTx(
     return backendResponse;
   } catch (sendTxError) {
     Logger.error('newTransaction::broadcastTrezorSignedTx error: ' + stringifyError(sendTxError));
-    // On failure, we have to remove the change address we eagerly added
-    // Note: we don't await on this
-    removeAdaAddress(changeAdaAddr);
     if (sendTxError instanceof InvalidWitnessError) {
       throw new InvalidWitnessError();
     }
@@ -250,7 +237,6 @@ function _ledgerOutputAddress58OrPath(
 /** Send a transaction and save the new change address */
 export async function prepareAndBroadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
-  changeAdaAddr: AdaAddress,
   unsignedTx: any,
   txExt: UnsignedTransactionExt
 ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
@@ -269,10 +255,6 @@ export async function prepareAndBroadcastLedgerSignedTx(
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');
     const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
 
-    // We assume a change address is used. Currently, there is no way to perfectly match the tx.
-    // tentatively assume that the transaction will succeed,
-    // so we save the change address to the wallet
-    await saveAdaAddress(changeAdaAddr, 'Internal');
     const body = { signedTx };
     const backendResponse = await sendTx(body);
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: success');
@@ -280,10 +262,6 @@ export async function prepareAndBroadcastLedgerSignedTx(
     return backendResponse;
   } catch (sendTxError) {
     Logger.error('newTransaction::prepareAndBroadcastLedgerSignedTx error: ' + stringifyError(sendTxError));
-
-    // On failure, we have to remove the change address we eagerly added
-    // Note: we don't await on this
-    removeAdaAddress(changeAdaAddr);
     if (sendTxError instanceof InvalidWitnessError) {
       throw new InvalidWitnessError();
     } else {

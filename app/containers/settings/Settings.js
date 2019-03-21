@@ -15,7 +15,6 @@ const messages = defineMessages({
   title: {
     id: 'settings.general.title',
     defaultMessage: '!!!General Settings',
-    description: 'General Settings Title.'
   },
 });
 

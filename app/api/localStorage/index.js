@@ -5,7 +5,8 @@ const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
   THEME: networkForLocalStorage + '-THEME',
-  CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME'
+  CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
+  VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER'
 };
 
 /**
@@ -147,9 +148,46 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== Last Launch Version Number ========== //
+
+  getLastLaunchVersion = (): Promise<string> => new Promise((resolve, reject) => {
+    try {
+      const versionNum = localStorage.getItem(storageKeys.VERSION);
+
+      // if unset, assume lowest version possible to make sure migration always triggers
+      if (!versionNum) return resolve('0.0.0');
+      resolve(versionNum);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setLastLaunchVersion = (version: string): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.VERSION, version);
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetLastLaunchVersion = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.VERSION);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
+  isEmpty = (): Promise<boolean> => new Promise((resolve) => {
+    try {
+      resolve(localStorage.length === 0);
+    } catch (error) {} // eslint-disable-line
+  });
+
   async reset() {
     await this.unsetUserLocale(); // TODO: remove after saving locale to API is restored
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
+    await this.unsetVerionNumber();
   }
 }

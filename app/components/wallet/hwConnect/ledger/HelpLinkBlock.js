@@ -9,15 +9,13 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import styles from '../common/HelpLinkBlock.scss';
 
 const messages = defineMessages({
-  helpLinkYoroiWithTrezor: {
-    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithTrezor',
+  helpLinkYoroiWithLedger: {
+    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger',
     defaultMessage: '!!!https://yoroi-wallet.com/',
-    description: 'Tutorial link about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
   },
-  helpLinkYoroiWithTrezorText: {
-    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithTrezor.text',
-    defaultMessage: '!!!Click here to know more about how to use Yoroi with Trezor.',
-    description: 'Tutorial link text about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
+  helpLinkYoroiWithLedgerText: {
+    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text',
+    defaultMessage: '!!!Click here to know more about how to use Yoroi with Ledger.',
   },
 });
 

@@ -49,7 +49,6 @@ const messages = defineMessages({
   testText: {
     id: 'test.text',
     defaultMessage: '!!!I am testing i18n',
-    description: 'Random test text'
   }
 });
 

@@ -17,17 +17,14 @@ const messages = defineMessages({
   masterKeyInputLabel: {
     id: 'transfer.form.masterkey.input.label',
     defaultMessage: '!!!Master key',
-    description: 'Label for the master key input on the transfer master key page.'
   },
   masterKeyInputHint: {
     id: 'transfer.form.masterkey.input.hint',
     defaultMessage: '!!!Enter master key',
-    description: 'Hint "Enter master key" for the master keyinput on the transfer master key page.'
   },
   masterKeyRequirements: {
     id: 'transfer.form.masterkey.requirement',
     defaultMessage: '!!!Note: master keys are 192 characters and hexadecimal-encoded',
-    description: 'Description of master key format'
   },
 });
 
