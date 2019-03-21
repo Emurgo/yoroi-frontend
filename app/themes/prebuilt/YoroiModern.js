@@ -13,7 +13,7 @@ const rpFonts = {
 const rpAutocomplete = {
   '--rp-autocomplete-bg-color': '#fff',
   '--rp-autocomplete-border': '1px solid #9b9b9b',
-  '--rp-autocomplete-border-color-opened': '#4a4a4a',
+  '--rp-autocomplete-border-color-opened': '#353535',
   '--rp-autocomplete-input-text-color': '#353535',
   '--rp-autocomplete-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
   '--rp-autocomplete-selected-word-box-bg-color': '#f0f3f5',
@@ -171,17 +171,6 @@ export default {
 
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
-  // '--theme-autocomplete-bg-color': '#f0f3f5',
-  // '--theme-autocomplete-border': '1px solid #9b9b9b',
-  // '--theme-autocomplete-border-focus-color': '#15d1aa',
-  // '--theme-autocomplete-search-color': '#353535',
-  // '--theme-autocomplete-placeholder-color': 'rgba(94, 96, 102, 0.5)',
-  // '--theme-autocomplete-selected-word-text-color': '#353535',
-  // '--theme-autocomplete-selected-word-box-background-color': '#f0f3f5',
-  // '--theme-autocomplete-focus-border-color': '#15d1aa',
-  // '--theme-autocomplete-hover-border-color': '#353535',
-  // '--theme-autocomplete-error-color': '#ea4c5b',
-
   '--theme-bordered-box-background-color': '#f0f3f5',
   '--theme-bordered-box-border': '1px solid #f0f3f5',
   '--theme-bordered-box-text-color': '#2b2c32',
@@ -216,18 +205,6 @@ export default {
   '--theme-dialog-big-button-label-color': '#353535',
   '--theme-dialog-big-button-description-color': '#353535',
   '--theme-dialog-title-color': '#2b2c32',
-
-  // '--theme-input-border-color': '#9b9b9b',
-  // '--theme-input-label-color': '#353535',
-  // '--theme-input-text-color': '#353535',
-  // '--theme-input-right-floating-text-color': 'rgba(94, 96, 102, 0.5)',
-  // '--theme-input-remove-color-light': '#ea4c5b',
-  // '--theme-input-remove-color-lighter': '#ec5d6b',
-  // '--theme-input-remove-color-lightest': '#fac8ce',
-  // '--theme-input-background-color': '#f0f3f5',
-  // '--theme-input-disabled-background-color': '#cfcfcf',
-  // '--theme-input-focus-border-color': '#15d1aa',
-  // '--theme-input-hover-border-color': '#353535',
 
   '--theme-main-body-background-color': '#ffffff',
   '--theme-main-body-messages-color': '#353535',

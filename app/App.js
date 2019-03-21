@@ -54,7 +54,7 @@ class App extends Component<{
     this.props.actions.profile.updateTheme.trigger({ theme });
   }
 
-  setMarkup = () => {
+  updateMarkup = () => {
     const { stores } = this.props;
     const currentTheme = stores.profile.currentTheme;
     this.props.actions.theme.changeTheme.trigger({ theme: currentTheme === THEMES.YOROI_CLASSIC });
@@ -72,13 +72,12 @@ class App extends Component<{
     const themeVars = stores.profile.currentThemeVars;
     const currentTheme = stores.profile.currentTheme;
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
-    // console.log('stores.theme.classic', stores.theme.classic);
 
     return (
       <div style={{ height: '100%' }}>
         <ThemeManager
           variables={themeVars}
-          setMarkup={this.setMarkup}
+          updateMarkup={this.updateMarkup}
           // temporary variables
           handleChange={this.handleChange}
           classic={stores.theme.classic}

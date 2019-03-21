@@ -1,32 +1,13 @@
 // Css module overrides go here …
 
 .input {
-  height: 56px;
-  font-size: 16px;
-  box-sizing: border-box;
-  line-height: 56px;
-  padding: 0 15px;
-  border-radius: 8px;
-  border-width: 1px;
+  border: none;
 
   &:not([disabled]):hover {
     border-color: var(--rp-input-border-color-focus);
   }
 
-  &:not([disabled]):focus, &:not([disabled]):active {
-    padding-left: 14px;
-    border-width: 2px;
-  }
-
   &.errored:hover {
     border-color: var(--rp-input-border-color-errored);
-  }
-
-  &.icon {
-    padding-right: 46px;
-  }
-
-  &.doubleIcon {
-    padding-right: 79px;
   }
 }

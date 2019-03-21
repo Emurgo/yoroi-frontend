@@ -7,24 +7,19 @@
     border-radius: 8px;
 
     &:hover {
-      // border-color: var(--theme-autocomplete-hover-border-color);
+      border-color: var(--theme-autocomplete-hover-border-color);
     }
 
     &:focus, &:active, &.opened {
       padding: 9px 14px;
       border-width: 2px;
-      // border-color: var(--theme-autocomplete-focus-border-color);
     }
 
     &.errored {
-      // border: 1px solid var(--theme-autocomplete-error-color);
+      border-color: var(--rp-theme-color-error);
 
       &:active {
         border-width: 2px;
-      }
-
-      &.opened {
-        // border: 2px solid var(--theme-autocomplete-error-color)!important;
       }
     }  
 

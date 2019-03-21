@@ -1,51 +1,142 @@
-// // @flow
-// import React from 'react';
-// import type { Element } from 'react';
-// import classnames from 'classnames';
-// import { themr } from 'react-css-themr';
-// import { pickDOMProps } from 'react-polymorph/lib/utils/props';
-// import Input from 'react-polymorph/lib/components/Input';
-// import { INPUT } from 'react-polymorph/lib/skins/simple/identifiers';
-// import FormFieldOwnSkin from './FormFieldOwnSkin';
+// @flow
+import React from 'react';
+import type { Ref, Element } from 'react';
 
-// type Props = {
-//   disabled?: boolean,
-//   error?: string,
-//   label?: string | Element<any>,
-//   component: Object,
-//   theme: Object,
-//   type: string,
-//   done?: boolean
-// };
+// external libraries
+import classnames from 'classnames';
 
-// const DefaultProps = {
+// components
+import { FormField } from 'react-polymorph/lib/components/FormField';
+
+// skins
+import { FormFieldOwnSkin } from './FormFieldOwnSkin';
+
+// internal utility functions
+import { pickDOMProps } from 'react-polymorph/lib/utils/props';
+
+import styles from './InputOwnSkin.scss';
+
+type Props = {
+  className?: ?string,
+  disabled?: boolean,
+  error?: string,
+  label?: string | Element<any>,
+  inputRef: Ref<'input'>,
+  onBlur?: Function,
+  onChange?: Function,
+  onFocus?: Function,
+  onKeyPress?: Function,
+  placeholder?: string,
+  readOnly?: boolean,
+  theme: Object,
+  themeId: string,
+  value: string,
+  done?: boolean,
+  type: string,
+};
+
+type State = {
+  focused: boolean,
+};
+
+// export const InputOwnSkin = (props: Props) => (
+export const InputOwnSkin = class extends React.Component<Props, State> {
+  static defaultProps = {
+    className: '',
+    disabled: undefined,
+    error: undefined,
+    label: undefined,
+    onBlur: undefined,
+    onChange: undefined,
+    onFocus: undefined,
+    onKeyPress: undefined,
+    placeholder: undefined,
+    readOnly: undefined,
+    done: undefined,
+  };
+
+  state = {
+    focused: false,
+  }
+
+  handleFocus = () => this.setState({ focused: true })
+
+  handleBlur = () => this.setState({ focused: false })
+
+  render() {
+    return (
+      <FormField
+        className={this.props.className}
+        disabled={this.props.disabled}
+        label={this.props.label}
+        error={this.props.error}
+        inputRef={this.props.inputRef}
+        skin={FormFieldOwnSkin}
+        theme={this.props.theme}
+        done={this.props.done}
+        type={this.props.type}
+        focused={this.state.focused}
+        render={({ inputType }) => (
+          <input
+            ref={this.props.inputRef}
+            {...pickDOMProps(this.props)}
+            type={inputType}
+            className={classnames([
+              this.props.theme[this.props.themeId].input,
+              this.props.disabled ? this.props.theme[this.props.themeId].disabled : null,
+              this.props.error ? this.props.theme[this.props.themeId].errored : null,
+              (this.props.error || this.props.type === 'password' || this.props.done) ? styles.icon : null,
+              ((this.props.error || this.props.type === 'password') && this.props.done) ? styles.doubleIcon : null
+            ])}
+            readOnly={this.props.readOnly}
+            onFocus={this.handleFocus}
+            onBlur={this.handleBlur}
+          />
+        )}
+      />
+    );
+  }
+};
+
+// InputOwnSkin.defaultProps = {
+//   className: '',
 //   disabled: undefined,
 //   error: undefined,
 //   label: undefined,
-//   done: undefined
+//   onBlur: undefined,
+//   onChange: undefined,
+//   onFocus: undefined,
+//   onKeyPress: undefined,
+//   placeholder: undefined,
+//   readOnly: undefined,
+//   done: undefined,
 // };
 
-// export const inputSkinFactory = (FormFieldSkin: Function) => (
-//   (props: Props & typeof DefaultProps) => (
-//     <FormFieldSkin
-//       input={(type) => (
-//         <input
-//           {...pickDOMProps(props)}
-//           type={type}
-//           className={classnames([
-//             props.theme.input,
-//             props.disabled ? props.theme.disabled : null,
-//             props.error ? props.theme.errored : null,
-//             (props.error || props.type === 'password' || props.done) ? props.theme.icon : null,
-//             ((props.error || props.type === 'password') && props.done)
-//                ? props.theme.doubleIcon : null
-//           ])}
-//           ref={input => props.component.registerSkinPart(Input.SKIN_PARTS.INPUT, input)}
-//         />)
-//       }
-//       {...props}
-//     />
-//   )
+// (
+//   <FormField
+//     className={props.className}
+//     disabled={props.disabled}
+//     label={props.label}
+//     error={props.error}
+//     inputRef={props.inputRef}
+//     skin={FormFieldOwnSkin}
+//     theme={props.theme}
+//     done={props.done}
+//     type={props.type}
+//     render={({ inputType }) => (
+//       <input
+//         ref={props.inputRef}
+//         {...pickDOMProps(props)}
+//         type={inputType}
+//         className={classnames([
+//           props.theme[props.themeId].input,
+//           props.disabled ? props.theme[props.themeId].disabled : null,
+//           props.error ? props.theme[props.themeId].errored : null,
+//           (props.error || props.type === 'password' || props.done) ? styles.icon : null,
+//           ((props.error || props.type === 'password') && props.done) ? styles.doubleIcon : null
+//         ])}
+//         readOnly={props.readOnly}
+//       />
+//     )}
+//   />
 // );
-
-// export default themr(INPUT)(inputSkinFactory(FormFieldOwnSkin));

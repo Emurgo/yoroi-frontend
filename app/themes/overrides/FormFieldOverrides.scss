@@ -2,6 +2,14 @@
 
 .root {
   padding: 10px 0 20px;
+
+  &.disabled {
+    opacity: 0.5;
+
+    .inputWrapper {
+      border-color: var(--rp-input-border-color);
+    }
+  }
 }
 
 .error {
@@ -11,16 +19,9 @@
   margin: 0;
   line-height: 1.33;
   font-size: 12px;
-  // color: var(--theme-input-error-color);
-}
 
-.errored {
-  input:hover {
-    border: 1px solid var(--rp-theme-color-error);
-  }
-
-  input:focus, input:active {
-    border: 2px solid var(--rp-theme-color-error);
+  & + label {
+    color: var(--rp-theme-color-error);
   }
 }
 
@@ -34,17 +35,4 @@
   font-weight: normal;
   padding: 0 6px;
   z-index: 1;
-}
-
-.inputWrapper .iconsWrapper {
-  height: 100%;
-  right: 13px;
-  top: 0;
-  display: flex;
-  align-items: center;
-  position: absolute;
-
-  > span, > button {
-    margin-left: 9px;
-  }
 }

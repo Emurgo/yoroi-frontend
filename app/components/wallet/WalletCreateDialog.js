@@ -14,7 +14,7 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
 import config from '../../config';
-// import InputOwnSkin from '../../themes/skins/InputOwnSkin';
+import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -212,8 +212,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
           ref={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
-          skin={InputSkin}
+          skin={classicTheme ? InputSkin : InputOwnSkin}
         />
 
         <div className={styles.walletPassword}>
@@ -223,16 +222,14 @@ export default class WalletCreateDialog extends Component<Props, State> {
               done={isValidWalletPassword(walletPassword)}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
             <Input
               className="repeatedPassword"
               done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               {...repeatedPasswordField.bind()}
               error={repeatedPasswordField.error}
-              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
             {classicTheme ? (
               <p className={styles.passwordInstructions}>

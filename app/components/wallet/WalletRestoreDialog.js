@@ -18,7 +18,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
 import config from '../../config';
-// import InputOwnSkin from '../../themes/skins/InputOwnSkin';
+import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   title: {
@@ -182,7 +182,8 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error, onCancel, classicTheme, mnemonicValidator } = this.props;
+    const { validWords, isSubmitting, error,
+      onCancel, classicTheme, mnemonicValidator } = this.props;
     const { walletName, walletPassword, repeatPassword, recoveryPhrase } = form.values();
     const {
       condition1,
@@ -204,7 +205,9 @@ export default class WalletRestoreDialog extends Component<Props> {
       styles.walletPasswordFields,
       styles.show,
     ]);
-    const walletPasswordClasses = classicTheme ? styles.walletPasswordClassic : styles.walletPassword;
+    const walletPasswordClasses = classicTheme
+      ? styles.walletPasswordClassic
+      : styles.walletPassword;
 
     const disabledCondition = !(
       isValidWalletName(walletName)
@@ -241,11 +244,10 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         <Input
           className={walletNameFieldClasses}
-          done={isValidWalletName(walletName)}
           {...walletNameField.bind()}
+          done={isValidWalletName(walletName)}
           error={walletNameField.error}
-          // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
-          skin={InputSkin}
+          skin={classicTheme ? InputSkin : InputOwnSkin}
         />
 
         <Autocomplete
@@ -262,19 +264,17 @@ export default class WalletRestoreDialog extends Component<Props> {
           <div className={walletPasswordFieldsClasses}>
             <Input
               className="walletPassword"
-              done={isValidWalletPassword(walletPassword)}
               {...walletPasswordField.bind()}
+              done={isValidWalletPassword(walletPassword)}
               error={walletPasswordField.error}
-              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
             <Input
               className="repeatedPassword"
-              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               {...repeatedPasswordField.bind()}
+              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               error={repeatedPasswordField.error}
-              // skin={classicTheme ? <SimpleInputSkin /> : <InputOwnSkin />}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
 
             {classicTheme ? (
