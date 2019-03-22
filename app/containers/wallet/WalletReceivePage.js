@@ -7,6 +7,7 @@ import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
+import HWAddressConfirmDialog from '../../components/wallet/receive/HWAddressConfirmDialog';
 import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedProps } from '../../types/injectedPropsType';
 
@@ -58,7 +59,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   render() {
     const { copiedAddress } = this.state;
     const actions = this.props.actions;
-    const { uiNotifications } = this.props.stores;
+    const { uiNotifications, uiDialogs } = this.props.stores;
     const { wallets, addresses } = this.props.stores.substores.ada;
     const wallet = wallets.active;
 
@@ -105,11 +106,30 @@ export default class WalletReceivePage extends Component<Props, State> {
               message: messages.message
             });
           }}
+          onVerifyAddress={({ address, derivedPath }) => {
+            actions.ada.addresses.verifyAddress.trigger({ address, derivedPath });
+            this.openVerifyAddressDialog();
+          }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
         />
 
+        {uiDialogs.isOpen(HWAddressConfirmDialog) ? (
+          <HWAddressConfirmDialog
+            error={null}
+            submit={() => actions.ada.addresses.closeVerifyAddressDialog.trigger()}
+            cancel={() => actions.ada.addresses.closeVerifyAddressDialog.trigger()}
+            walletAddress={addresses.verifyAddress.address}
+            walletDerivedPath={addresses.verifyAddress.derivedPath}
+          />
+        ) : null}
+
       </VerticalFlexContainer>
     );
+  }
+
+  openVerifyAddressDialog = (): void => {
+    const { actions } = this.props;
+    actions.dialogs.open.trigger({ dialog: HWAddressConfirmDialog });
   }
 }

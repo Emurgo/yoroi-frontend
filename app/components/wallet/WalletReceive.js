@@ -60,6 +60,7 @@ type Props = {
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
   onCopyAddress: Function,
+  onVerifyAddress: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
 };
@@ -95,7 +96,7 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress,
+      onCopyAddress, onVerifyAddress,
       isSubmitting, error, isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
@@ -177,13 +178,17 @@ export default class WalletReceive extends Component<Props, State> {
             ]);
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
-                { /* <div className={styles.addressId}>
-                  {address.path + ' ' + toDerivationPathString(address.path)}
-                </div> */ }
                 <div className={styles.addressId}>{address.id}</div>
                 <div className={styles.addressActions}>
+                  { /* <div className={styles.addressId}>
+                  {address.path + ' ' + toDerivationPathString(address.path)}
+                </div> */ }
                   <span className={styles.addressIcon}>
-                    <SvgInline svg={magnifyingGlass} className={styles.copyIcon} />
+                    <SvgInline
+                      svg={magnifyingGlass}
+                      className={styles.copyIcon}
+                      onClick={onVerifyAddress.bind(this, { address: address.id, derivedPath: toDerivationPathString(address.path) })}
+                    />
                   </span>
                   &nbsp;
                   <CopyToClipboard
@@ -212,5 +217,4 @@ export default class WalletReceive extends Component<Props, State> {
       </div>
     );
   }
-
 }
