@@ -203,8 +203,8 @@ export default class LedgerSendStore extends Store {
         const ledgerBridge: LedgerBridge = this.ledgerBridge;
 
         await prepareLedgerBridger(ledgerBridge);
-        ledgerBridge.showAddress(path);
-
+        Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
+        await ledgerBridge.showAddress(path);
       } else {
         throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
       }
@@ -212,6 +212,7 @@ export default class LedgerSendStore extends Store {
       Logger.error('AddressStore::_verifyAddress::error: ' + stringifyError(error));
       this._setError(this._convertToLocalizableError(error));
     } finally {
+      Logger.info('AddressStore::_verifyAddress disposing iframe');
       disposeLedgerBridgeIFrame();
       this.ledgerBridge = undefined;
       this._setActionProcessing(false);

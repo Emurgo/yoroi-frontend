@@ -129,7 +129,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             walletAddress={addresses.selectedAddress.address}
             walletPath={addresses.selectedAddress.path}
             isHardware={isHardware}
-            verify={() => actions.ada.addresses.closeAddressDetailDialog.trigger()}
+            verify={() => actions.ada.addresses.verifyAddress.trigger({ wallet })}
             cancel={() => actions.ada.addresses.closeAddressDetailDialog.trigger()}
           />
         ) : null}

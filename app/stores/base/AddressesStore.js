@@ -1,5 +1,5 @@
 // @flow
-import { observable, computed, action, runInAction } from 'mobx';
+import { observable, computed, action, runInAction, toJS } from 'mobx';
 import _ from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
@@ -63,7 +63,8 @@ export default class AddressesStore extends Store {
     if (!this.selectedAddress) {
       throw new Error('AddressStore::_verifyAddress called with no address selected');
     }
-    const path = this.selectedAddress.path;
+    // need to unwrap observable otherwise bridge will fail
+    const path = toJS(this.selectedAddress.path);
 
     if (!params.wallet.hardwareInfo) {
       throw new Error('AddressStore::_verifyAddress called with no hardware wallet active');
