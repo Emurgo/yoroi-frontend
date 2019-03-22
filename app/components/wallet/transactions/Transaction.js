@@ -12,6 +12,7 @@ import { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionState } from '../../../domain/WalletTransaction';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
+import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
 
 const messages = defineMessages({
   type: {
@@ -190,10 +191,12 @@ export default class Transaction extends Component<Props, State> {
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state === transactionStates.FAILED;
+    const isPendingTransaction = state === transactionStates.PENDING;
 
     const componentStyles = classNames([
       classicTheme ? styles.componentClassic : styles.component,
-      isFailedTransaction ? styles.failed : null
+      isFailedTransaction ? styles.failed : null,
+      isPendingTransaction ? styles.pending : null,
     ]);
 
     const contentStyles = classNames([
@@ -220,6 +223,7 @@ export default class Transaction extends Component<Props, State> {
     const currencySymbolClasses = classicTheme
       ? styles.currencySymbolClassic
       : styles.currencySymbol;
+    const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
     const status = intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
@@ -253,6 +257,12 @@ export default class Transaction extends Component<Props, State> {
                 }
                 <SvgInline svg={symbol} className={currencySymbolClasses} />
               </div>
+
+              {!classicTheme && (
+                <div className={styles.expandArrowBox}>
+                  <SvgInline className={arrowClasses} svg={expandArrow} />
+                </div>
+              )}
             </div>
           </div>
         </div>

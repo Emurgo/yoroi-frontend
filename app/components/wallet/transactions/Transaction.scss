@@ -24,12 +24,16 @@
   }
 
   &.failed {
-    .title, .amount, .details {
-      color: var(--theme-transactions-state-failed-text-color);
+    background-color: var(--theme-transactions-list-failed-background-color);
+  }
+
+  &.pending {
+    .title, .type, .amount, .details {
+      color: var(--theme-transactions-state-pending-text-color);
     }
     .currencySymbol {
       & > svg > g > g {
-        stroke: var(--theme-transactions-state-failed-text-color);
+        stroke: var(--theme-transactions-state-pending-text-color);
       }
     }
   }
@@ -118,6 +122,21 @@
       stroke: var(--theme-transactions-received-color);
     }
   }
+}
+
+.expandArrowBox {
+  margin-left: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.expandArrow svg {
+  height: 8px;
+}
+
+.collapseArrow svg {
+  height: 8px;
+  transform: rotate(180deg);
 }
 
 .labelClassic {
