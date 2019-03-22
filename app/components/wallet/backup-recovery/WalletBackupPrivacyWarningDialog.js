@@ -87,7 +87,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         classicTheme={classicTheme}
       >
-        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} cleanup={['title']} />}
+        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} />}
         <WalletRecoveryInstructions
           instructionsText={intl.formatMessage(messages.recoveryPhraseInstructions)}
           classicTheme={classicTheme}

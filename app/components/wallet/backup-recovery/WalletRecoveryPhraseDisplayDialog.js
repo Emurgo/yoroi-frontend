@@ -71,7 +71,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         classicTheme={classicTheme}
       >
-        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryPhraseSvg} cleanup={['title']} />}
+        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryPhraseSvg} />}
 
         <WalletRecoveryInstructions
           instructionsText={<FormattedHTMLMessage {...messages.backupInstructions} />}

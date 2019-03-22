@@ -17,7 +17,7 @@ export default class WalletNoTransactions extends Component<Props> {
     const { classicTheme } = this.props;
     return (
       <div className={classicTheme ? styles.componentClassic : styles.component}>
-        {!classicTheme && <SvgInline className={styles.imageWrappper} svg={noTransactionSvg} cleanup={['title']} />}
+        {!classicTheme && <SvgInline className={styles.imageWrappper} svg={noTransactionSvg} />}
         <div className={styles.label}>{this.props.label}</div>
       </div>
     );

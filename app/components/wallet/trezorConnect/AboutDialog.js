@@ -131,7 +131,7 @@ export default class AboutDialog extends Component<Props> {
 
     const middleBlock = (
       <div className={middleBlockClasses}>
-        {!classicTheme && <SvgInline svg={aboutTrezorSvg} cleanup={['title']} />}
+        {!classicTheme && <SvgInline svg={aboutTrezorSvg} />}
 
         <div className={styles.prerequisiteBlock}>
           <div>

@@ -97,14 +97,14 @@ export default class ConnectDialog extends Component<Props> {
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([middleBlockClasses, styles.middleConnectLoadBlock])}>
-            {classicTheme ? <img src={connectLoadGIF} alt="" /> : <SvgInline svg={connectLoadImage} cleanup={['title']} />}
+            {classicTheme ? <img src={connectLoadGIF} alt="" /> : <SvgInline svg={connectLoadImage} />}
           </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([middleBlockClasses, styles.middleConnectProcessBlock])}>
-            {classicTheme ? <img src={connectStartGIF} alt="" /> : <SvgInline svg={connectLoadImage} cleanup={['title']} />}
+            {classicTheme ? <img src={connectStartGIF} alt="" /> : <SvgInline svg={connectLoadImage} />}
           </div>);
         break;
       case StepState.ERROR:

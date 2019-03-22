@@ -73,7 +73,7 @@ export default class TestnetWarningBanner extends Component<Props> {
               {classicTheme ? (
                 <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
               ) : ([
-                <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} cleanup={['title']} />,
+                <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
                 <span key="1">
                   {intl.formatMessage(messages.testnetLabelWarning)}
                   &nbsp;
