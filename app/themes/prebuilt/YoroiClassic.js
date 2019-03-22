@@ -333,6 +333,7 @@ export default {
   '--theme-separation-border-color': '#dfe4e8',
 
   '--theme-support-settings-text-color': '#121327',
+  '--theme-support-settings-link-color': '#121327',
 
   '--theme-terms-of-use-text-color': '#121327',
 

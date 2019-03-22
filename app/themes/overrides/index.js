@@ -5,6 +5,7 @@ import ButtonOverrides from './ButtonOverrides.scss';
 import CheckboxOverrides from './CheckboxOverrides.scss';
 import FormFieldOverrides from './FormFieldOverrides.scss';
 import InputOverrides from './InputOverrides.scss';
+import TextAreaOverrides from './TextAreaOverrides.scss';
 import ModalOverrides from './ModalOverrides.scss';
 import OptionsOverrides from './OptionsOverrides.scss';
 import SelectOverrides from './SelectOverrides.scss';
@@ -16,6 +17,7 @@ import ButtonOverridesClassic from './ButtonOverridesClassic.scss';
 import CheckboxOverridesClassic from './CheckboxOverridesClassic.scss';
 import FormFieldOverridesClassic from './FormFieldOverridesClassic.scss';
 import InputOverridesClassic from './InputOverridesClassic.scss';
+import TextAreaOverridesClassic from './TextAreaOverridesClassic.scss';
 import ModalOverridesClassic from './ModalOverridesClassic.scss';
 import OptionsOverridesClassic from './OptionsOverridesClassic.scss';
 import SelectOverridesClassic from './SelectOverridesClassic.scss';
@@ -30,6 +32,7 @@ const {
   CHECKBOX,
   FORM_FIELD,
   INPUT,
+  TEXT_AREA,
   MODAL,
   OPTIONS,
   SELECT,
@@ -43,6 +46,7 @@ export const themeOverrides = (theme) => (theme === THEMES.YOROI_MODERN ? ({
   [CHECKBOX]: CheckboxOverrides,
   [FORM_FIELD]: FormFieldOverrides,
   [INPUT]: InputOverrides,
+  [TEXT_AREA]: TextAreaOverrides,
   [MODAL]: ModalOverrides,
   [OPTIONS]: OptionsOverrides,
   [SELECT]: SelectOverrides,
@@ -54,6 +58,7 @@ export const themeOverrides = (theme) => (theme === THEMES.YOROI_MODERN ? ({
   [CHECKBOX]: CheckboxOverridesClassic,
   [FORM_FIELD]: FormFieldOverridesClassic,
   [INPUT]: InputOverridesClassic,
+  [TEXT_AREA]: TextAreaOverridesClassic,
   [MODAL]: ModalOverridesClassic,
   [OPTIONS]: OptionsOverridesClassic,
   [SELECT]: SelectOverridesClassic,

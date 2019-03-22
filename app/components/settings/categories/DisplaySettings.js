@@ -60,6 +60,7 @@ type Props = {
   getThemeVars: Function,
   hasCustomTheme: Function,
   onExternalLinkClick: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -76,7 +77,8 @@ export default class DisplaySettings extends Component<Props> {
       getThemeVars,
       exportTheme,
       hasCustomTheme,
-      onExternalLinkClick 
+      onExternalLinkClick,
+      classicTheme,
     } = this.props;
     const { intl } = this.context;
 
@@ -105,7 +107,7 @@ export default class DisplaySettings extends Component<Props> {
     );
 
     return (
-      <div className={styles.component}>
+      <div className={classicTheme ? styles.componentClassic : styles.component}>
 
         <div className={styles.label}>
           {intl.formatMessage(messages.themeLabel)}

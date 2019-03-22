@@ -31,7 +31,7 @@ const rpBubble = {
 const rpButton = {
   '--rp-button-bg-color': '#17d1aa',
   '--rp-button-bg-color-active': '#12b190',
-  '--rp-button-bg-color-disabled': 'rgba(218, 164, 154, 0.3)', // #DAA49A
+  '--rp-button-bg-color-disabled': 'rgba(23, 209, 170, 0.3)', // #17d1aa
   '--rp-button-bg-color-hover': '#17e2b8',
   '--rp-button-font-family': rpFonts['--rp-theme-font-medium'],
   '--rp-button-text-color': '#fff',
@@ -41,10 +41,10 @@ const rpButton = {
 // CHECKBOX
 const rpCheckbox = {
   '--rp-checkbox-border': '2px solid #353535',
-  '--rp-checkbox-border-color-disabled': 'rgba(218, 164, 154, 0.2)', // #DAA49A
+  '--rp-checkbox-border-color-disabled': 'rgba(21, 209, 170, 0.2)', // #15d1aa
   '--rp-checkbox-check-bg-color': '#15d1aa',
   '--rp-checkbox-label-text-color': '#353535',
-  '--rp-checkbox-label-text-color-disabled': 'rgba(18, 19, 39, 0.3)', // #121327
+  '--rp-checkbox-label-text-color-disabled': 'rgba(53, 53, 53, 0.3)', // #353535
 };
 
 // COLORS
@@ -120,17 +120,17 @@ const rpSwitch = {
 
 // TEXTAREA
 const rpTextArea = {
-  '--rp-textarea-bg-color': '#fafbfc',
-  '--rp-textarea-bg-color-disabled': 'rgba(94, 96, 102, 0.05)', // #5E6066
-  '--rp-textarea-border': '1px solid #c6cdd6',
-  '--rp-textarea-border-color-disabled': 'rgba(94, 96, 102, 0.05)', // #5E6066
-  '--rp-textarea-border-color-errored': '#ea4c5b',
-  '--rp-textarea-border-color-focus': '#121327',
-  '--rp-textarea-border-radius': '2px',
+  '--rp-textarea-bg-color': 'transparent',
+  '--rp-textarea-bg-color-disabled': 'transparent',
+  '--rp-textarea-border': '1px solid #9b9b9b',
+  '--rp-textarea-border-color-disabled': 'rgba(155, 155, 155, 1)', // #9b9b9b
+  '--rp-textarea-border-color-errored': '#ff1351',
+  '--rp-textarea-border-color-focus': '#4a4a4a',
+  '--rp-textarea-border-radius': '8px',
   '--rp-textarea-line-height': '20px',
   '--rp-textarea-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
   '--rp-textarea-resize': 'none',
-  '--rp-textarea-text-color': '#121327',
+  '--rp-textarea-text-color': '#353535',
 };
 
 const rpYoroiTheme = {
@@ -335,6 +335,9 @@ export default {
   '--theme-mnemonic-button-text-color': '#353535',
 
   '--theme-separation-border-color': '#dfe4e8',
+
+  '--theme-support-settings-text-color': '#2b2c32',
+  '--theme-support-settings-link-color': '#2b2c32',
 
   '--theme-banner-warning-background-color': '#f5a623',
   '--theme-trezor-connect-dialog-middle-block-common-background-color': '#ffffff',
