@@ -105,14 +105,14 @@ export default class AddressDetailsDialog extends Component<Props> {
             </div>
             <br />
             <br />
-            <span className="SimpleFormField_label FormFieldOverrides_label">
+            <span className="SimpleFormField_label FormFieldOverrides_label AddressDetailsDialog_header">
               {intl.formatMessage(messages.addressLabel)}
             </span>
             <div className={styles.infoBlock}>
               <p>{walletAddress}</p>
             </div>
             <br />
-            <span className="SimpleFormField_label FormFieldOverrides_label">
+            <span className="SimpleFormField_label FormFieldOverrides_label AddressDetailsDialog_header">
               {intl.formatMessage(messages.derivationPathLabel)}
             </span>
             <div className={styles.infoBlock}>

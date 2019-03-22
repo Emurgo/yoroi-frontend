@@ -60,7 +60,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     const { copiedAddress } = this.state;
     const actions = this.props.actions;
     const { uiNotifications, uiDialogs } = this.props.stores;
-    const { wallets, addresses } = this.props.stores.substores.ada;
+    const { wallets, addresses, hwVerifyAddress } = this.props.stores.substores.ada;
     const wallet = wallets.active;
 
     // Guard against potential null values
@@ -116,21 +116,21 @@ export default class WalletReceivePage extends Component<Props, State> {
             });
           }}
           onAddressDetail={({ address, path }) => {
-            actions.ada.addresses.selectAddress.trigger({ address, path });
+            actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
             this.openAddressDetailsDialog();
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
         />
 
-        {uiDialogs.isOpen(AddressDetailsDialog) && addresses.selectedAddress ? (
+        {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
           <AddressDetailsDialog
             error={null}
-            walletAddress={addresses.selectedAddress.address}
-            walletPath={addresses.selectedAddress.path}
+            walletAddress={hwVerifyAddress.selectedAddress.address}
+            walletPath={hwVerifyAddress.selectedAddress.path}
             isHardware={isHardware}
-            verify={() => actions.ada.addresses.verifyAddress.trigger({ wallet })}
-            cancel={() => actions.ada.addresses.closeAddressDetailDialog.trigger()}
+            verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger({ wallet })}
+            cancel={() => actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger()}
           />
         ) : null}
 

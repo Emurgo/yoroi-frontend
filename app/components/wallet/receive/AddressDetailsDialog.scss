@@ -10,6 +10,11 @@
   text-align: left;
 }
 
+.header {
+  padding-left: 0px !important;
+  padding-right: 0px;
+}
+
 .infoBlock {
   font-family: var(--font-regular);
   font-size: 15px;
@@ -19,6 +24,8 @@
   p {
     line-height: 30px;
     height: 30px;
+    padding-left: 5px;
+    padding-right: 5px;
     background-color: var(--theme-bordered-box-background-color);
     border: var(--theme-bordered-box-border);
   }

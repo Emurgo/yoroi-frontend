@@ -5,22 +5,10 @@ import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
 
-import {
-  LedgerBridge,
-} from 'yoroi-extension-ledger-bridge';
-
 import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
 import type { GetAddressesResponse } from '../../api/common';
 import environment from '../../environment';
-
-import type {
-  BIP32Path
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import {
-  Logger,
-} from '../../utils/logging';
-import Wallet from '../../domain/Wallet';
 
 export default class AddressesStore extends Store {
 
@@ -30,8 +18,6 @@ export default class AddressesStore extends Store {
     allRequest: CachedRequest<GetAddressesResponse>
   }> = [];
   @observable error: ?LocalizableError = null;
-  @observable selectedAddress: ?{ address: string, path: BIP32Path } = null;
-  ledgerBridge: ?LedgerBridge;
 
   // REQUESTS
   @observable createAddressRequest: Request<WalletAddress>;
@@ -39,10 +25,7 @@ export default class AddressesStore extends Store {
   setup() {
     const actions = this.actions[environment.API].addresses;
     actions.createAddress.listen(this._createAddress);
-    actions.selectAddress.listen(this._selectAddress);
-    actions.verifyAddress.listen(this._verifyAddress);
     actions.resetErrors.listen(this._resetErrors);
-    actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
   _createAddress = async () => {
@@ -56,37 +39,6 @@ export default class AddressesStore extends Store {
       runInAction('set error', () => { this.error = localizedError(error); });
     }
   };
-
-  @action _verifyAddress = async (params: { wallet: Wallet }): Promise<void> => {
-    Logger.info('AddressStore::_verifyAddress called');
-
-    if (!this.selectedAddress) {
-      throw new Error('AddressStore::_verifyAddress called with no address selected');
-    }
-    // need to unwrap observable otherwise bridge will fail
-    const path = toJS(this.selectedAddress.path);
-
-    if (!params.wallet.hardwareInfo) {
-      throw new Error('AddressStore::_verifyAddress called with no hardware wallet active');
-    }
-
-    // TODO: don't use hardcoded strings and maybe find a better way to do this?
-    let hwStore;
-    if (params.wallet.hardwareInfo.vendor === 'ledger.com') {
-      hwStore = this.stores.substores[environment.API].ledgerSend;
-    } else if (params.wallet.hardwareInfo.vendor === 'trezor.io') {
-      hwStore = this.stores.substores[environment.API].trezorSend;
-    } else {
-      throw new Error('AddressStore::_verifyAddress called with unrecognized hardware wallet');
-    }
-
-    await hwStore.verifyAddress(path);
-  }
-
-  @action _selectAddress = async (params: { address: string, path: BIP32Path }): Promise<void> => {
-    Logger.info('AddressStore::_selectAddress::called: ' + params.address);
-    this.selectedAddress = { address: params.address, path: params.path };
-  }
 
   @computed get all(): Array<WalletAddress> {
     const wallet = this.stores.substores[environment.API].wallets.active;
@@ -140,11 +92,6 @@ export default class AddressesStore extends Store {
   @action _resetErrors = () => {
     this.error = null;
   };
-
-  @action _closeAddressDetailDialog = (): void => {
-    this.selectedAddress = null;
-    this.actions.dialogs.closeActiveDialog.trigger();
-  }
 
   _getAccountIdByWalletId = (walletId: string): (?string) => {
     const result = this._getAddressesAllRequest(walletId).result;

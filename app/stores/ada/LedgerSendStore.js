@@ -6,7 +6,6 @@ import {
   LedgerBridge,
 } from 'yoroi-extension-ledger-bridge';
 import type {
-  BIP32Path,
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
@@ -185,39 +184,6 @@ export default class LedgerSendStore extends Store {
     this._reset();
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');
   }
-
-  verifyAddress = async (
-    path: BIP32Path,
-  ): Promise<void> => {
-    this._setError(null);
-    this._setActionProcessing(true);
-
-    if (this.ledgerBridge == null) {
-      Logger.info('AddressStore::_verifyAddress new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
-    }
-
-    try {
-      if (this.ledgerBridge) {
-        // trick to fix flow
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
-
-        await prepareLedgerBridger(ledgerBridge);
-        Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
-        await ledgerBridge.showAddress(path);
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
-      }
-    } catch (error) {
-      Logger.error('AddressStore::_verifyAddress::error: ' + stringifyError(error));
-      this._setError(this._convertToLocalizableError(error));
-    } finally {
-      Logger.info('AddressStore::_verifyAddress disposing iframe');
-      disposeLedgerBridgeIFrame();
-      this.ledgerBridge = undefined;
-      this._setActionProcessing(false);
-    }
-  };
 
   /** Converts error(from API or Ledger API) to LocalizableError */
   _convertToLocalizableError = (error: any): LocalizableError => {
