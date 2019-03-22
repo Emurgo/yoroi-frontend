@@ -2,20 +2,18 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import Dialog from '../../widgets/Dialog';
-import { isValidWalletPassword, isValidRepeatPassword, walletPasswordConditions } from '../../../utils/validations';
+import { isValidWalletPassword, isValidRepeatPassword } from '../../../utils/validations';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import iconTickGreenSVG from '../../../assets/images/widget/tick-green.inline.svg';
 
 const messages = defineMessages({
   dialogTitleSetPassword: {
@@ -177,19 +175,16 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       classicTheme ? styles.newPasswordClassic : '',
     ]);
 
+    const passwordInstructionsClasses = classicTheme
+      ? styles.passwordInstructionsClassic
+      : styles.passwordInstructions;
+
     const currentPasswordField = form.$('currentPassword');
     const newPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
 
     const newPassword = newPasswordField.value;
     const repeatedPassword = repeatedPasswordField.value;
-
-    const {
-      condition1,
-      condition2,
-      condition3,
-      condition4
-    } = walletPasswordConditions(newPasswordField.value);
 
     const disabledCondition = !(
       isValidWalletPassword(newPassword)
@@ -252,34 +247,9 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             skin={classicTheme ? InputSkin : InputOwnSkin}
           />
 
-          {classicTheme ? (
-            <p className={styles.passwordInstructionsClassic}>
-              {intl.formatMessage(globalMessages.passwordInstructions)}
-            </p>
-          ) : (
-            <div className={styles.passwordInstructions}>
-              <p>{intl.formatMessage(globalMessages.passwordInstructionsHeader)}</p>
-
-              <ul>
-                <li className={classnames({ [styles.successCondition]: condition1 })}>
-                  {condition1 && <SvgInline svg={iconTickGreenSVG} />}
-                  {intl.formatMessage(globalMessages.passwordInstructionsCondition1)}
-                </li>
-                <li className={classnames({ [styles.successCondition]: condition2 })}>
-                  {condition2 && <SvgInline svg={iconTickGreenSVG} />}
-                  {intl.formatMessage(globalMessages.passwordInstructionsCondition2)}
-                </li>
-                <li className={classnames({ [styles.successCondition]: condition3 })}>
-                  {condition3 && <SvgInline svg={iconTickGreenSVG} />}
-                  {intl.formatMessage(globalMessages.passwordInstructionsCondition3)}
-                </li>
-                <li className={classnames({ [styles.successCondition]: condition4 })}>
-                  {condition4 && <SvgInline svg={iconTickGreenSVG} />}
-                  {intl.formatMessage(globalMessages.passwordInstructionsCondition4)}
-                </li>
-              </ul>
-            </div>
-          )}
+          <p className={passwordInstructionsClasses}>
+            {intl.formatMessage(globalMessages.passwordInstructions)}
+          </p>
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

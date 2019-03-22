@@ -182,56 +182,6 @@ export default defineMessages({
     defaultMessage: '!!!You have successfully integrated with your Trezor Model T device',
     description: 'Notification Message for successful integration with Trezor Model T device.',
   },
-  passwordInstructionsHeader: {
-    id: 'global.passwordInstructionsHeader',
-    defaultMessage: '!!!The password needs to contain at least:',
-    description: 'Password instructions header.',
-  },
-  passwordInstructionsCondition1: {
-    id: 'global.passwordInstructionsCondition1',
-    defaultMessage: '!!!12 characters',
-    description: 'Password instructions condition 1.',
-  },
-  passwordInstructionsCondition2: {
-    id: 'global.passwordInstructionsCondition2',
-    defaultMessage: '!!!one uppercase character',
-    description: 'Password instructions condition 2.',
-  },
-  passwordInstructionsCondition3: {
-    id: 'global.passwordInstructionsCondition3',
-    defaultMessage: '!!!one number',
-    description: 'Password instructions condition 3.',
-  },
-  passwordInstructionsCondition4: {
-    id: 'global.passwordInstructionsCondition4',
-    defaultMessage: '!!!one lowercase character',
-    description: 'Password instructions condition 4.',
-  },
-  buyTrezorMessage: {
-    id: 'footer.buyTrezorMessage',
-    defaultMessage: '!!!Buy Trezor',
-    description: 'Buy Trezor message shown in footer on the wallet add screen.',
-  },
-  howToConnectTrezorMessage: {
-    id: 'footer.howToConnectTrezorMessage',
-    defaultMessage: '!!!How to connect Trezor',
-    description: 'How to connect Trezor message shown in footer on the wallet add screen.',
-  },
-  howToCreateWalletMessage: {
-    id: 'footer.howToCreateWalletMessage',
-    defaultMessage: '!!!How to create wallet',
-    description: 'How to create wallet message shown in footer on the wallet add screen.',
-  },
-  howToRestoreWalletMessage: {
-    id: 'footer.howToRestoreWalletMessage',
-    defaultMessage: '!!!How to restore wallet',
-    description: 'How to restore wallet message shown in footer on the wallet add screen.',
-  },
-  whatIsAHarwareWalletMessage: {
-    id: 'footer.whatIsAHarwareWalletMessage',
-    defaultMessage: '!!!What is a harware wallet?',
-    description: 'What is a harware wallet message shown in footer on the wallet screen.',
-  },
   noTransactionsFound: {
     id: 'wallet.summary.no.transaction',
     defaultMessage: '!!!No transactions found',
