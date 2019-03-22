@@ -357,5 +357,6 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   @action _setIsCreateHWActive = (active: boolean): void => {
     this.isCreateHWActive = active;
   };
+
   // =================== API =================== //
 }

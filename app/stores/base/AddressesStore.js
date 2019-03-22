@@ -9,27 +9,18 @@ import {
   LedgerBridge,
 } from 'yoroi-extension-ledger-bridge';
 
-import {
-  prepareLedgerBridger,
-  disposeLedgerBridgeIFrame
-} from '../../utils/iframeHandler';
-
 import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
 import type { GetAddressesResponse } from '../../api/common';
 import environment from '../../environment';
 
-import {
-  utils
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   Logger,
-  stringifyError,
-  stringifyData,
 } from '../../utils/logging';
+import Wallet from '../../domain/Wallet';
 
 export default class AddressesStore extends Store {
 
@@ -39,7 +30,7 @@ export default class AddressesStore extends Store {
     allRequest: CachedRequest<GetAddressesResponse>
   }> = [];
   @observable error: ?LocalizableError = null;
-  @observable verifyAddress: ?{ address: string, path: BIP32Path } = null;
+  @observable selectedAddress: ?{ address: string, path: BIP32Path } = null;
   ledgerBridge: ?LedgerBridge;
 
   // REQUESTS
@@ -48,9 +39,10 @@ export default class AddressesStore extends Store {
   setup() {
     const actions = this.actions[environment.API].addresses;
     actions.createAddress.listen(this._createAddress);
+    actions.selectAddress.listen(this._selectAddress);
     actions.verifyAddress.listen(this._verifyAddress);
     actions.resetErrors.listen(this._resetErrors);
-    actions.closeVerifyAddressDialog.listen(this._closeVerifyAddressDialog);
+    actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
   _createAddress = async () => {
@@ -65,40 +57,34 @@ export default class AddressesStore extends Store {
     }
   };
 
-  @action _verifyAddress = async (params: { address: string, path: BIP32Path }): Promise<void> => {
-    Logger.info('AddressStore::_init called');
+  @action _verifyAddress = async (params: { wallet: Wallet }): Promise<void> => {
+    Logger.info('AddressStore::_verifyAddress called');
 
-    if (this.ledgerBridge == null) {
-      Logger.info('AddressStore::_init new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
+    if (!this.selectedAddress) {
+      throw new Error('AddressStore::_verifyAddress called with no address selected');
+    }
+    const path = this.selectedAddress.path;
+
+    if (!params.wallet.hardwareInfo) {
+      throw new Error('AddressStore::_verifyAddress called with no hardware wallet active');
     }
 
-    try {
-      Logger.info('AddressStore::_send::called: ' + params.address);
-
-      if (this.ledgerBridge) {
-        // trick to fix flow
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
-        this.verifyAddress = { address: params.address, path: params.path };
-
-        // TODO: delete
-        console.log("verify params: ");
-        console.log(params.address);
-        console.log(params.path);
-
-        console.log("verify address:");
-        console.log(this.verifyAddress);
-
-        await prepareLedgerBridger(ledgerBridge);
-        ledgerBridge.showAddress(params.path);
-
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
-      }
-    } catch (error) {
-      Logger.error('AddressStore::_send::error: ' + stringifyError(error));
-      // this._setError(this._convertToLocalizableError(error));
+    // TODO: don't use hardcoded strings and maybe find a better way to do this?
+    let hwStore;
+    if (params.wallet.hardwareInfo.vendor === 'ledger.com') {
+      hwStore = this.stores.substores[environment.API].ledgerSend;
+    } else if (params.wallet.hardwareInfo.vendor === 'trezor.io') {
+      hwStore = this.stores.substores[environment.API].trezorSend;
+    } else {
+      throw new Error('AddressStore::_verifyAddress called with unrecognized hardware wallet');
     }
+
+    await hwStore.verifyAddress(path);
+  }
+
+  @action _selectAddress = async (params: { address: string, path: BIP32Path }): Promise<void> => {
+    Logger.info('AddressStore::_selectAddress::called: ' + params.address);
+    this.selectedAddress = { address: params.address, path: params.path };
   }
 
   @computed get all(): Array<WalletAddress> {
@@ -154,10 +140,8 @@ export default class AddressesStore extends Store {
     this.error = null;
   };
 
-  @action _closeVerifyAddressDialog = (): void => {
-    disposeLedgerBridgeIFrame();
-    this.ledgerBridge = undefined;
-    this.verifyAddress = null;
+  @action _closeAddressDetailDialog = (): void => {
+    this.selectedAddress = null;
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 

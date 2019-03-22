@@ -7,7 +7,7 @@ import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
-import HWAddressConfirmDialog from '../../components/wallet/receive/HWAddressConfirmDialog';
+import AddressDetailsDialog from '../../components/wallet/receive/AddressDetailsDialog';
 import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedProps } from '../../types/injectedPropsType';
 
@@ -70,6 +70,15 @@ export default class WalletReceivePage extends Component<Props, State> {
     const walletAddress = addresses.active ? addresses.active.id : '';
     const isWalletAddressUsed = addresses.active ? addresses.active.isUsed : false;
 
+    /**
+     * TODO: change this condition to simple
+     * wallet.cwType === HARDWARE_WALLET
+     * once we add support for this in Trezor also
+     */
+    const isHardware = wallet.hardwareInfo
+      ? wallet.hardwareInfo.model === 'NanoS'
+      : false;
+
     const walletAddresses = addresses.all.reverse();
 
     const notification = {
@@ -106,21 +115,22 @@ export default class WalletReceivePage extends Component<Props, State> {
               message: messages.message
             });
           }}
-          onVerifyAddress={({ address, path }) => {
-            actions.ada.addresses.verifyAddress.trigger({ address, path });
-            this.openVerifyAddressDialog();
+          onAddressDetail={({ address, path }) => {
+            actions.ada.addresses.selectAddress.trigger({ address, path });
+            this.openAddressDetailsDialog();
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
         />
 
-        {uiDialogs.isOpen(HWAddressConfirmDialog) ? (
-          <HWAddressConfirmDialog
+        {uiDialogs.isOpen(AddressDetailsDialog) && addresses.selectedAddress ? (
+          <AddressDetailsDialog
             error={null}
-            submit={() => actions.ada.addresses.closeVerifyAddressDialog.trigger()}
-            cancel={() => actions.ada.addresses.closeVerifyAddressDialog.trigger()}
-            walletAddress={addresses.verifyAddress.address}
-            walletPath={addresses.verifyAddress.path}
+            walletAddress={addresses.selectedAddress.address}
+            walletPath={addresses.selectedAddress.path}
+            isHardware={isHardware}
+            verify={() => actions.ada.addresses.closeAddressDetailDialog.trigger()}
+            cancel={() => actions.ada.addresses.closeAddressDetailDialog.trigger()}
           />
         ) : null}
 
@@ -128,8 +138,8 @@ export default class WalletReceivePage extends Component<Props, State> {
     );
   }
 
-  openVerifyAddressDialog = (): void => {
+  openAddressDetailsDialog = (): void => {
     const { actions } = this.props;
-    actions.dialogs.open.trigger({ dialog: HWAddressConfirmDialog });
+    actions.dialogs.open.trigger({ dialog: AddressDetailsDialog });
   }
 }

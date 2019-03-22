@@ -19,20 +19,16 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 
 import LocalizableError from '../../../i18n/LocalizableError';
-import styles from './HWAddressConfirmDialog.scss';
+import styles from './AddressDetailsDialog.scss';
 
 const messages = defineMessages({
-  verifyAddressTitleLabel: {
-    id: 'wallet.receive.confirmationDialog.verifyAddressTitleLabel',
-    defaultMessage: '!!!Verify Address.',
+  addressDetailsTitleLabel: {
+    id: 'wallet.receive.confirmationDialog.addressDetailsTitleLabel',
+    defaultMessage: '!!!Address details',
   },
-  verifyAddressLabel: {
-    id: 'wallet.receive.confirmationDialog.verifyAddressLabel',
-    defaultMessage: '!!!Verify that the following address match with the one displayed in your hardware device.',
-  },
-  dismissDialogLabel: {
-    id: 'wallet.receive.confirmationDialog.dismissDialogLabel',
-    defaultMessage: '!!!OK',
+  verifyAddressButtonLabel: {
+    id: 'wallet.receive.confirmationDialog.verifyAddressButtonLabel',
+    defaultMessage: '!!!Verify on hardware wallet',
   },
   addressLabel: {
     id: 'wallet.receive.confirmationDialog.addressLabel',
@@ -46,14 +42,15 @@ const messages = defineMessages({
 
 type Props = {
   error: ?LocalizableError,
-  submit: Function,
+  verify: Function,
   cancel: Function,
+  isHardware: boolean,
   walletAddress: string,
   walletPath: BIP32Path,
 };
 
 @observer
-export default class HWAddressConfirmDialog extends Component<Props> {
+export default class AddressDetailsDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -63,18 +60,22 @@ export default class HWAddressConfirmDialog extends Component<Props> {
     const { intl } = this.context;
     const {
       error,
-      submit,
+      verify,
       walletAddress,
       walletPath,
-      cancel
+      cancel,
+      isHardware
     } = this.props;
 
-    const dialogActions = [{
-      className: null,
-      label: intl.formatMessage(messages.dismissDialogLabel),
-      primary: true,
-      onClick: submit,
-    }];
+    const dialogActions = !isHardware
+      ? []
+      : [{
+        // TODO: add spinner while calling hardware wallet?
+        className: null,
+        label: intl.formatMessage(messages.verifyAddressButtonLabel),
+        primary: true,
+        onClick: verify,
+      }];
 
     // TODO: This should be refactored somehow so it’s not duplicated in multiple files.
     // Get QRCode color value from active theme's CSS variable
@@ -85,8 +86,8 @@ export default class HWAddressConfirmDialog extends Component<Props> {
 
     return (
       <Dialog
-        className={classnames([styles.component, 'HWAddressConfirmDialog'])}
-        title={intl.formatMessage(messages.verifyAddressTitleLabel)}
+        className={classnames([styles.component, 'AddressDetailsDialog'])}
+        title={intl.formatMessage(messages.addressDetailsTitleLabel)}
         actions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
@@ -103,9 +104,6 @@ export default class HWAddressConfirmDialog extends Component<Props> {
               />
             </div>
             <br />
-            <div className={styles.infoBlock}>
-              <span>{intl.formatMessage(messages.verifyAddressLabel)}</span>
-            </div>
             <br />
             <span className="SimpleFormField_label FormFieldOverrides_label">
               {intl.formatMessage(messages.addressLabel)}

@@ -16,10 +16,6 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
-import {
-  toDerivationPathString,
-} from 'yoroi-extension-ledger-bridge';
-
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -60,7 +56,7 @@ type Props = {
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
   onCopyAddress: Function,
-  onVerifyAddress: Function,
+  onAddressDetail: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
 };
@@ -96,7 +92,7 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress, onVerifyAddress,
+      onCopyAddress, onAddressDetail,
       isSubmitting, error, isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
@@ -184,7 +180,9 @@ export default class WalletReceive extends Component<Props, State> {
                     <SvgInline
                       svg={magnifyingGlass}
                       className={styles.copyIcon}
-                      onClick={onVerifyAddress.bind(this, { address: address.id, path: address.path })}
+                      onClick={
+                        onAddressDetail.bind(this, { address: address.id, path: address.path })
+                      }
                     />
                   </span>
                   &nbsp;
