@@ -7,6 +7,12 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import QRCode from 'qrcode.react';
+import type {
+  BIP32Path
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import {
+  toDerivationPathString,
+} from 'yoroi-extension-ledger-bridge';
 
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -28,14 +34,22 @@ const messages = defineMessages({
     id: 'wallet.receive.confirmationDialog.dismissDialogLabel',
     defaultMessage: '!!!OK',
   },
+  addressLabel: {
+    id: 'wallet.receive.confirmationDialog.addressLabel',
+    defaultMessage: '!!!Address',
+  },
+  derivationPathLabel: {
+    id: 'wallet.receive.confirmationDialog.derivationPathLabel',
+    defaultMessage: '!!!Derivation Path',
+  },
 });
 
 type Props = {
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
-  walletAddress: ?string,
-  walletDerivedPath: ?any,
+  walletAddress: string,
+  walletPath: BIP32Path,
 };
 
 @observer
@@ -51,7 +65,7 @@ export default class HWAddressConfirmDialog extends Component<Props> {
       error,
       submit,
       walletAddress,
-      walletDerivedPath,
+      walletPath,
       cancel
     } = this.props;
 
@@ -80,7 +94,7 @@ export default class HWAddressConfirmDialog extends Component<Props> {
       >
         {walletAddress ? (
           <div>
-            <div className={styles.qrCode}>
+            <div align="center">
               <QRCode
                 value={walletAddress}
                 bgColor={qrCodeBackgroundColor}
@@ -88,11 +102,23 @@ export default class HWAddressConfirmDialog extends Component<Props> {
                 size={152}
               />
             </div>
+            <br />
             <div className={styles.infoBlock}>
               <span>{intl.formatMessage(messages.verifyAddressLabel)}</span>
             </div>
+            <br />
+            <span className="SimpleFormField_label FormFieldOverrides_label">
+              {intl.formatMessage(messages.addressLabel)}
+            </span>
             <div className={styles.infoBlock}>
-              <span>{walletAddress}</span>
+              <p>{walletAddress}</p>
+            </div>
+            <br />
+            <span className="SimpleFormField_label FormFieldOverrides_label">
+              {intl.formatMessage(messages.derivationPathLabel)}
+            </span>
+            <div className={styles.infoBlock}>
+              <p>{toDerivationPathString(walletPath)}</p>
             </div>
           </div>
         ) : null}

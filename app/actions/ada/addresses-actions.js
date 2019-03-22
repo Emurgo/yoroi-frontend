@@ -10,6 +10,6 @@ import type {
 export default class AddressesActions {
   createAddress: Action<void> = new Action();
   closeVerifyAddressDialog: Action<void> = new Action();
-  verifyAddress: Action<{ address: string, derivedPath: string }> = new Action();
+  verifyAddress: Action<{ address: string, path: BIP32Path }> = new Action();
   resetErrors: Action<any> = new Action();
 }

@@ -7,8 +7,10 @@ import type {
 
 export default class WalletAddress {
 
-  @observable id: string = '';
-  @observable path: BIP32Path = [];
+  // should never change
+  id: string = '';
+  path: BIP32Path = [];
+
   @observable amount: BigNumber;
   @observable isUsed: boolean = false;
 

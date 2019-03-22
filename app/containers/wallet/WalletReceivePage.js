@@ -106,8 +106,8 @@ export default class WalletReceivePage extends Component<Props, State> {
               message: messages.message
             });
           }}
-          onVerifyAddress={({ address, derivedPath }) => {
-            actions.ada.addresses.verifyAddress.trigger({ address, derivedPath });
+          onVerifyAddress={({ address, path }) => {
+            actions.ada.addresses.verifyAddress.trigger({ address, path });
             this.openVerifyAddressDialog();
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
@@ -120,7 +120,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             submit={() => actions.ada.addresses.closeVerifyAddressDialog.trigger()}
             cancel={() => actions.ada.addresses.closeVerifyAddressDialog.trigger()}
             walletAddress={addresses.verifyAddress.address}
-            walletDerivedPath={addresses.verifyAddress.derivedPath}
+            walletPath={addresses.verifyAddress.path}
           />
         ) : null}
 

@@ -180,14 +180,11 @@ export default class WalletReceive extends Component<Props, State> {
               <div key={`gen-${address.id}`} className={addressClasses}>
                 <div className={styles.addressId}>{address.id}</div>
                 <div className={styles.addressActions}>
-                  { /* <div className={styles.addressId}>
-                  {address.path + ' ' + toDerivationPathString(address.path)}
-                </div> */ }
                   <span className={styles.addressIcon}>
                     <SvgInline
                       svg={magnifyingGlass}
                       className={styles.copyIcon}
-                      onClick={onVerifyAddress.bind(this, { address: address.id, derivedPath: toDerivationPathString(address.path) })}
+                      onClick={onVerifyAddress.bind(this, { address: address.id, path: address.path })}
                     />
                   </span>
                   &nbsp;

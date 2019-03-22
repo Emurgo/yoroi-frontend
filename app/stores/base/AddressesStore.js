@@ -22,7 +22,9 @@ import environment from '../../environment';
 import {
   utils
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-
+import type {
+  BIP32Path
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   Logger,
   stringifyError,
@@ -37,7 +39,7 @@ export default class AddressesStore extends Store {
     allRequest: CachedRequest<GetAddressesResponse>
   }> = [];
   @observable error: ?LocalizableError = null;
-  @observable verifyAddress: ?{ address: string, derivedPath: string } = null;
+  @observable verifyAddress: ?{ address: string, path: BIP32Path } = null;
   ledgerBridge: ?LedgerBridge;
 
   // REQUESTS
@@ -63,7 +65,7 @@ export default class AddressesStore extends Store {
     }
   };
 
-  @action _verifyAddress = async (params: { address: string, derivedPath: string }): Promise<void> => {
+  @action _verifyAddress = async (params: { address: string, path: BIP32Path }): Promise<void> => {
     Logger.info('AddressStore::_init called');
 
     if (this.ledgerBridge == null) {
@@ -77,23 +79,18 @@ export default class AddressesStore extends Store {
       if (this.ledgerBridge) {
         // trick to fix flow
         const ledgerBridge: LedgerBridge = this.ledgerBridge;
-        this.verifyAddress = { address: params.address, derivedPath: params.derivedPath };
+        this.verifyAddress = { address: params.address, path: params.path };
 
         // TODO: delete
         console.log("verify params: ");
         console.log(params.address);
-        console.log(params.derivedPath);
+        console.log(params.path);
 
         console.log("verify address:");
         console.log(this.verifyAddress);
 
-        console.log("deviredPath: ");
-        console.log(utils.str_to_path(params.derivedPath.slice(2)));
-
-        const pathBIP32 = utils.str_to_path(params.derivedPath.slice(2));
-
         await prepareLedgerBridger(ledgerBridge);
-        ledgerBridge.showAddress(pathBIP32);
+        ledgerBridge.showAddress(params.path);
 
       } else {
         throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
