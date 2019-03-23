@@ -1,5 +1,9 @@
 @import '../../../themes/mixins/loading-spinner.scss';
 
+.processing {
+  @include loading-spinner("../../../assets/images/spinner-light.svg");
+}
+
 .label {
   color:  var(--rp-formfield-label-text-color);
   display: block;

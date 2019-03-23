@@ -1,5 +1,5 @@
 // @flow
-import { observable, computed, action, runInAction, toJS } from 'mobx';
+import { observable, computed, action, runInAction } from 'mobx';
 import _ from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';

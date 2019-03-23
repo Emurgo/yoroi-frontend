@@ -125,7 +125,8 @@ export default class WalletReceivePage extends Component<Props, State> {
 
         {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
           <AddressDetailsDialog
-            error={null}
+            isActionProcessing={hwVerifyAddress.isActionProcessing}
+            error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
             isHardware={isHardware}

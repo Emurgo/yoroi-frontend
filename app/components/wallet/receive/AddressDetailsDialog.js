@@ -41,6 +41,7 @@ const messages = defineMessages({
 });
 
 type Props = {
+  isActionProcessing: boolean,
   error: ?LocalizableError,
   verify: Function,
   cancel: Function,
@@ -59,6 +60,7 @@ export default class AddressDetailsDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
+      isActionProcessing,
       error,
       verify,
       walletAddress,
@@ -70,10 +72,10 @@ export default class AddressDetailsDialog extends Component<Props> {
     const dialogActions = !isHardware
       ? []
       : [{
-        // TODO: add spinner while calling hardware wallet?
-        className: null,
+        className: isActionProcessing ? styles.processing : null,
         label: intl.formatMessage(messages.verifyAddressButtonLabel),
         primary: true,
+        disabled: isActionProcessing,
         onClick: verify,
       }];
 
@@ -120,7 +122,7 @@ export default class AddressDetailsDialog extends Component<Props> {
             </div>
           </div>
         ) : null}
-        <ErrorBlock error={error} />
+        { error ? (<ErrorBlock error={error} />) : null }
       </Dialog>);
   }
 }

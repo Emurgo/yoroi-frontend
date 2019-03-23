@@ -107,10 +107,14 @@ export default class AddressesStore extends Store {
 
         await prepareLedgerBridger(ledgerBridge);
         Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
+        await ledgerBridge.getVersion();
         await ledgerBridge.showAddress(path);
       } else {
         throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
       }
+    } catch (error) {
+      Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
+      this._setError(this._convertToLocalizableError(error));
     } finally {
       Logger.info('HWVerifyStore::ledgerVerifyAddress finalized ');
     }
