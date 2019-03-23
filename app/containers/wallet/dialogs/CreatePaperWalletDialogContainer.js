@@ -7,6 +7,7 @@ import environment from '../../../environment';
 import PaperWalletsActions from "../../../actions/ada/paper-wallets-actions";
 import PaperWalletCreateStore, { ProgressStep } from "../../../stores/ada/PaperWalletCreateStore";
 import { Logger } from "../../../utils/logging";
+import CreatePaperDialog from "../../../components/wallet/settings/paper-wallets/CreatePaperDialog";
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
@@ -22,6 +23,11 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
     const paperStore = this._getStore();
     const paperActions = this._getActions();
 
+    const onCancel = () => {
+      actions.dialogs.closeActiveDialog.trigger();
+      paperActions.cancel.trigger();
+    };
+
     if (paperStore.progressInfo === ProgressStep.INIT) {
       paperActions.submitInit.trigger({
         isCustomPassword: dialogData.isCustomPassword,
@@ -36,18 +42,24 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             passwordValue={dialogData.passwordValue}
             repeatedPasswordValue={dialogData.repeatedPasswordValue}
             onNext={paperActions.submitUserPassword.trigger}
-            onCancel={() => {
-              actions.dialogs.closeActiveDialog.trigger();
-              paperActions.cancel.trigger();
-            }}
+            onCancel={onCancel}
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
           />
         );
       case ProgressStep.CREATE:
-        console.log(42);
-        return null;
+        return (
+          <CreatePaperDialog
+            paperFile={dialogData.paperFile}
+            onNext={paperActions.submitCreate.trigger}
+            onCancel={onCancel}
+            onDownload={paperActions.downloadPaperWallet.trigger}
+            onDataChange={data => {
+              updateDataForActiveDialog.trigger({ data });
+            }}
+          />
+        );
       default:
         Logger.error('CreatePaperWalletDialogContainer::render: something unexpected happened');
         return null;

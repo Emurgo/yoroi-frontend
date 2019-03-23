@@ -27,10 +27,10 @@
     .SimpleSwitch_thumb {
       box-shadow: inset -1.5px -1.5px 0 var(--theme-input-remove-color-light) !important;
       box-shadow:
-        inset -1.5px -1.5px 0 var(--theme-input-remove-color-light),
-        inset 1.5px 1.5px 0 var(--theme-input-remove-color-light),
-        inset 1.5px -1.5px 0 var(--theme-input-remove-color-light),
-        inset -1.5px 1.5px 0 var(--theme-input-remove-color-light) !important;
+              inset -1.5px -1.5px 0 var(--theme-input-remove-color-light),
+              inset 1.5px 1.5px 0 var(--theme-input-remove-color-light),
+              inset 1.5px -1.5px 0 var(--theme-input-remove-color-light),
+              inset -1.5px 1.5px 0 var(--theme-input-remove-color-light) !important;
     }
   }
 
@@ -43,34 +43,4 @@
 
 .isSubmitting {
   @include loading-spinner("../../../../assets/images/spinner-light.svg");
-}
-
-$opacityCommon: 0.7;
-
-.headerBlock {
-  width: 725px;
-  height: 5em;
-  padding-top: 10px;
-  span {
-    font-family: var(--font-light);
-    line-height: 1.38;
-    font-size: 14px;
-    opacity: $opacityCommon;
-  }
-}
-
-.paperPassword {
-  margin-top: 20px;
-}
-
-.repeatedPassword {
-  margin-top: 20px;
-}
-
-.passwordInstructions {
-  color: var(--theme-instructions-text-color);
-  font-family: var(--font-light);
-  line-height: 1.38;
-  margin-top: 20px;
-  opacity: 0.5;
 }

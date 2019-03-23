@@ -15,9 +15,9 @@ import styles from './UserPasswordDialog.scss';
 import config from '../../../../config';
 
 const messages = defineMessages({
-  dialogTitleCreatePaperWallet: {
-    id: 'settings.paperWallet.dialog.title',
-    defaultMessage: '!!!Create Paper Wallet',
+  dialogTitleUserPaperPassword: {
+    id: 'settings.paperWallet.dialog.userPassword.title',
+    defaultMessage: '!!!Set custom paper wallet password',
   },
   paperPasswordLabel: {
     id: 'settings.paperWallet.dialog.paperPasswordLabel',
@@ -149,7 +149,7 @@ export default class UserPasswordDialog extends Component<Props> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
+        title={intl.formatMessage(messages.dialogTitleUserPaperPassword)}
         actions={actions}
         closeOnOverlayClick
         onClose={onCancel}

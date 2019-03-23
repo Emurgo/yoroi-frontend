@@ -56,7 +56,7 @@ export default class PaperWalletSettings extends Component<Props> {
   createPaper = () => {
     const { paperType, numAddresses } = this.form.values();
     const isCustomPassword = paperType === 'password';
-    this.props.onCreatePaper({ isCustomPassword, numAddresses });
+    this.props.onCreatePaper({ isCustomPassword, numAddresses: parseInt(numAddresses) });
   };
 
   form = new ReactToolboxMobxForm({

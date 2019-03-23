@@ -10,7 +10,6 @@ import paperWalletPage2PassPathTestnet from '../../../assets/images/paper-wallet
 import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
 import paperWalletCertificateBgPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-background_testnet.png';
 import { Logger, stringifyError } from '../../../utils/logging';
-import saver from 'file-saver';
 
 export type PaperRequest = {
   words: Array<string>,
@@ -19,7 +18,7 @@ export type PaperRequest = {
   isCustomPass: boolean,
 }
 
-export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function) => {
+export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function): Blob => {
   // Prepare params
   const logback = callback || (() => {});
   logback('Reading parameters');
@@ -67,9 +66,10 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
   // Write file to disk
   console.log(doc);
   const blob = doc.output('blob');
-  saver.saveAs(blob, 'test.pdf');
 
   logback('All done');
+
+  return blob;
 };
 
 function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function) {

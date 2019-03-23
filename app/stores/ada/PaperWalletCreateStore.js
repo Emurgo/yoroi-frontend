@@ -5,6 +5,7 @@ import Request from '../lib/LocalizedRequest';
 import type { UpdateWalletPasswordResponse, UpdateWalletResponse } from '../../api/common';
 import Store from "../base/Store";
 import LocalizableError from "../../i18n/LocalizableError";
+import type { AdaPaper } from "../../api/ada";
 
 export type ProgressStepEnum = 0 | 1 | 2 | 3 | 4;
 export const ProgressStep = {
@@ -17,14 +18,12 @@ export const ProgressStep = {
 
 export default class PaperWalletCreateStore extends Store {
 
-  @observable createPaperWalletRequest: Request<UpdateWalletResponse> =
-    new Request(this.api.ada.createAdaPaper);
-
   @observable progressInfo: ProgressStepEnum;
   error: ?LocalizableError;
   isCustomPassword: boolean;
   numAddresses: number;
   userPassword: string;
+  paper: AdaPaper;
 
   setup() {
     this._reset();
@@ -36,28 +35,28 @@ export default class PaperWalletCreateStore extends Store {
     a.cancel.listen(this._cancel);
   }
 
-  @action _submitInit = async ({ isCustomPassword, numAddresses }: { isCustomPassword: boolean, numAddresses: number }) => {
+  @action _submitInit = async ({ isCustomPassword, numAddresses }: { isCustomPassword: boolean, numAddresses: number }): Promise<void> => {
     this.isCustomPassword = isCustomPassword;
     this.numAddresses = numAddresses;
-    this.progressInfo = isCustomPassword ? ProgressStep.USER_PASSWORD : ProgressStep.CREATE;
+    if (isCustomPassword) {
+      this.progressInfo = ProgressStep.USER_PASSWORD;
+    } else {
+      this.actions.ada.paperWallets.createPaperWallet.trigger();
+      this.progressInfo = ProgressStep.CREATE;
+    }
   };
 
   @action _submitUserPassword = async ({ userPassword }: { userPassword: string }) => {
     this.userPassword = userPassword;
+    this.actions.ada.paperWallets.createPaperWallet.trigger();
     this.progressInfo = ProgressStep.CREATE;
   };
 
-  @action _createPaperWallet = async (
-    {
-      numAddresses,
-      password,
-    }: {
-      numAddresses: number,
-      password?: string,
-    }
-  ): Promise<void> => {
-    const paper = await this.createPaperWalletRequest.execute({ numAddresses, password });
-    this.createPaperWalletRequest.reset();
+  @action _createPaperWallet = async (): Promise<AdaPaper> => {
+    this.paper = this.api.ada.createAdaPaper({
+      numAddresses: this.numAddresses,
+      password: this.userPassword
+    });
   };
 
   @action _downloadPaperWallet = async () => {
@@ -79,5 +78,6 @@ export default class PaperWalletCreateStore extends Store {
     this.isCustomPassword = undefined;
     this.numAddresses = undefined;
     this.userPassword = undefined;
+    this.paper = undefined;
   };
 }

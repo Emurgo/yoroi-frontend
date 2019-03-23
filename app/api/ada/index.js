@@ -234,7 +234,7 @@ export default class AdaApi {
     return { addresses, scrambledWords, pass };
   }
 
-  async createAdaPaperPdf(paper: AdaPaper, isMainnet = true): Promise<void> {
+  async createAdaPaperPdf(paper: AdaPaper, isMainnet = true): Promise<Blob> {
     const { addresses, scrambledWords, pass } = paper;
     await generateAdaPaperPdf({
       words: scrambledWords, addresses, isMainnet, isCustomPass: !!pass.password
