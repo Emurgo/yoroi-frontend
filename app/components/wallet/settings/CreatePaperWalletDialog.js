@@ -35,6 +35,22 @@ const messages = defineMessages({
     id: 'settings.paperWallet.dialog.repeatPasswordPlaceholder',
     defaultMessage: '!!!Type paper wallet password again',
   },
+  paperPasswordIntroLine1: {
+    id: 'settings.paperWallet.dialog.password.intro.line1',
+    defaultMessage: '!!!You have selected a password-protected type of paper wallet.',
+  },
+  paperPasswordIntroLine2: {
+    id: 'settings.paperWallet.dialog.password.intro.line2',
+    defaultMessage: '!!!Your own custom password will be used to encrypt the printed secret words.',
+  },
+  paperPasswordIntroLine3: {
+    id: 'settings.paperWallet.dialog.password.intro.line3',
+    defaultMessage: '!!!Secret words without the password WILL NOT give access to funds!',
+  },
+  paperPasswordIntroLine4: {
+    id: 'settings.paperWallet.dialog.password.intro.line4',
+    defaultMessage: '!!!It is YOUR OWN responsibility to make sure you securely remember the password.',
+  },
 });
 
 type Props = {
@@ -127,10 +143,8 @@ export default class CreatePaperWalletDialog extends Component<Props> {
       'confirmButton',
       isSubmitting ? styles.isSubmitting : null,
     ]);
-    const paperPasswordClasses = classnames([
-      'newPassword',
-      styles.newPassword,
-    ]);
+    const paperPasswordClasses = classnames([styles.paperPassword]);
+    const repeatedPasswordClasses = classnames([styles.repeatedPassword]);
 
     const actions = [
       {
@@ -154,6 +168,13 @@ export default class CreatePaperWalletDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
 
+        <div className={styles.headerBlock}>
+          <span>{intl.formatMessage(messages.paperPasswordIntroLine1)}</span><br />
+          <span>{intl.formatMessage(messages.paperPasswordIntroLine2)}</span><br />
+          <span>{intl.formatMessage(messages.paperPasswordIntroLine3)}</span><br />
+          <span>{intl.formatMessage(messages.paperPasswordIntroLine4)}</span><br />
+        </div>
+
         <div className={paperPasswordClasses}>
           <Input
             type="password"
@@ -164,17 +185,19 @@ export default class CreatePaperWalletDialog extends Component<Props> {
             error={paperPasswordField.error}
             skin={InputSkin}
           />
-
+        </div>
+        <div className={repeatedPasswordClasses}>
           <Input
             type="password"
-            className="repeatedPassword"
+            className={repeatedPasswordClasses}
             value={repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
             {...repeatedPasswordField.bind()}
             error={repeatedPasswordField.error}
             skin={InputSkin}
           />
-
+        </div>
+        <div className={styles.passwordInstructions}>
           <p className={styles.passwordInstructions}>
             {intl.formatMessage(globalMessages.passwordInstructions)}
           </p>

@@ -3,6 +3,7 @@
 
 .dialog {
   font-family: var(--font-light);
+  height: 26rem;
   .walletPassword {
     .walletPasswordSwitch {
       & .passwordLabel {
@@ -37,18 +38,6 @@
     max-height: 300px;
     overflow: hidden;
     transition: all 400ms ease;
-
-    .newPassword {
-      margin-bottom: 20px;
-    }
-
-    .passwordInstructions {
-      color: var(--theme-instructions-text-color);
-      font-family: var(--font-light);
-      line-height: 1.38;
-      margin-top: 20px;
-      opacity: 0.5;
-    }
   }
 
   .error {
@@ -67,11 +56,27 @@ $opacityCommon: 0.7;
 .headerBlock {
   width: 725px;
   height: 5em;
-  padding-top: 1em;
+  padding-top: 10px;
   span {
     font-family: var(--font-light);
     line-height: 1.38;
     font-size: 14px;
     opacity: $opacityCommon;
   }
+}
+
+.paperPassword {
+  margin-top: 20px;
+}
+
+.repeatedPassword {
+  margin-top: 20px;
+}
+
+.passwordInstructions {
+  color: var(--theme-instructions-text-color);
+  font-family: var(--font-light);
+  line-height: 1.38;
+  margin-top: 20px;
+  opacity: 0.5;
 }
