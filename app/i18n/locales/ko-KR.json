@@ -206,7 +206,7 @@
   "wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor.text": "TREZOR를 이용한 요로이 사용법은 여기를 클릭하십시오.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1": " ",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link": "https://github.com/trezor/trezor-core/blob/master/ChangeLog",
-  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link.text": "Trezor Model T with version 2.1.0",
+  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link.text": "TREZOR 모델 T 2.1.0",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part3": " 이상의 버전만 대응 가능합니다.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.2": "TREZOR 디바이스를 사전에 초기화해야 합니다.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.3": "TREZOR 디바이스의 화면 잠금을 해제해야 합니다.",
