@@ -237,7 +237,7 @@
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Adressdaten",
   "wallet.receive.confirmationDialog.addressLabel": "Adresse",
   "wallet.receive.confirmationDialog.derivationPathLabel": "Ableitungspfad",
-  "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Verify on hardware wallet",
+  "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Auf der Hardware-Wallet prüfen",
   "wallet.receive.page.addressCopyNotificationMessage": "Die Wallet-Adresse wurde kopiert",
   "wallet.receive.page.copyAddressLabel": "Adresse kopieren",
   "wallet.receive.page.generateNewAddressButtonLabel": "Neue Adresse erzeugen",
