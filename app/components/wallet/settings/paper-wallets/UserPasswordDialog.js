@@ -5,14 +5,14 @@ import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import Dialog from '../../widgets/Dialog';
-import {isValidWalletPassword, isValidRepeatPassword, isValidPaperPassword} from '../../../utils/validations';
-import globalMessages from '../../../i18n/global-messages';
-import LocalizableError from '../../../i18n/LocalizableError';
-import styles from './CreatePaperWalletDialog.scss';
-import config from '../../../config';
+import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import DialogCloseButton from '../../../widgets/DialogCloseButton';
+import Dialog from '../../../widgets/Dialog';
+import {isValidWalletPassword, isValidRepeatPassword, isValidPaperPassword} from '../../../../utils/validations';
+import globalMessages from '../../../../i18n/global-messages';
+import LocalizableError from '../../../../i18n/LocalizableError';
+import styles from './UserPasswordDialog.scss';
+import config from '../../../../config';
 
 const messages = defineMessages({
   dialogTitleCreatePaperWallet: {
@@ -54,19 +54,15 @@ const messages = defineMessages({
 });
 
 type Props = {
-  numAddresses: number,
-  isCustomPassword: boolean,
   passwordValue: string,
   repeatedPasswordValue: string,
-  onSave: Function,
+  onNext: Function,
   onCancel: Function,
   onDataChange: Function,
-  isSubmitting: boolean,
-  error: ?LocalizableError,
 };
 
 @observer
-export default class CreatePaperWalletDialog extends Component<Props> {
+export default class UserPasswordDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -115,7 +111,7 @@ export default class CreatePaperWalletDialog extends Component<Props> {
     this.form.submit({
       onSuccess: (form) => {
         const { paperPassword } = form.values();
-        this.props.onSave({ passwordValue: paperPassword });
+        this.props.onNext({ userPassword: paperPassword });
       },
       onError: () => {},
     });
@@ -130,25 +126,18 @@ export default class CreatePaperWalletDialog extends Component<Props> {
     const { intl } = this.context;
     const {
       onCancel,
-      numAddresses,
-      isCustomPassword,
       passwordValue,
       repeatedPasswordValue,
-      isSubmitting,
-      error,
     } = this.props;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
-    const confirmButtonClasses = classnames([
-      'confirmButton',
-      isSubmitting ? styles.isSubmitting : null,
-    ]);
+    const confirmButtonClasses = classnames(['confirmButton']);
     const paperPasswordClasses = classnames([styles.paperPassword]);
     const repeatedPasswordClasses = classnames([styles.repeatedPassword]);
 
     const actions = [
       {
-        label: intl.formatMessage(globalMessages.save),
+        label: intl.formatMessage(globalMessages.nextButtonLabel),
         onClick: this.submit,
         primary: true,
         className: confirmButtonClasses,
@@ -163,7 +152,7 @@ export default class CreatePaperWalletDialog extends Component<Props> {
         title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
         actions={actions}
         closeOnOverlayClick
-        onClose={!isSubmitting ? onCancel : null}
+        onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
@@ -202,8 +191,6 @@ export default class CreatePaperWalletDialog extends Component<Props> {
             {intl.formatMessage(globalMessages.passwordInstructions)}
           </p>
         </div>
-
-        {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
 
       </Dialog>
     );

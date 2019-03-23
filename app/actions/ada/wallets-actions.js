@@ -12,7 +12,6 @@ export type WalletImportFromFileParams = {
 
 export default class WalletsActions {
   createWallet: Action<{ name: string, password: string }> = new Action();
-  createPaperWallet: Action<{ numAddresses: number, password?: string }> = new Action();
   // eslint-disable-next-line max-len
   restoreWallet: Action<{recoveryPhrase: string, walletName: string, walletPassword: string }> = new Action();
   importWalletFromFile: Action<WalletImportFromFileParams> = new Action();

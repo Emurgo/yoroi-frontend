@@ -13,10 +13,12 @@ import TrezorSendStore from './TrezorSendStore';
 import AdaRedemptionStore from './AdaRedemptionStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
+import PaperWalletCreateStore from "./PaperWalletCreateStore";
 
 export const adaStoreClasses = {
   adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
+  paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
@@ -30,6 +32,7 @@ export const adaStoreClasses = {
 export type AdaStoresMap = {
   adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
+  paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
@@ -43,6 +46,7 @@ export type AdaStoresMap = {
 const adaStores = observable({
   adaRedemption: null,
   wallets: null,
+  paperWallets: null,
   transactions: null,
   walletSettings: null,
   addresses: null,
