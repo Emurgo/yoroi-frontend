@@ -24,6 +24,10 @@ import type {
   CreateHardwareWalletResponse,
 } from '../../api/common';
 
+import {
+  convertToLocalizableError
+} from '../../domain/LedgerLocalizedError';
+
 // This is actually just an interface
 import {
   HWConnectStoreTypes,
@@ -215,44 +219,10 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;
-    this.error = this._convertToLocalizableError(error);
+    this.error = convertToLocalizableError(error);
 
     this._goToConnectError();
   };
-
-  /** Converts error(from API or Ledger API) to LocalizableError */
-  _convertToLocalizableError = (error: any): LocalizableError => {
-    let localizableError: ?LocalizableError = null;
-
-    if (error instanceof LocalizableError) {
-      // It means some API Error has been thrown
-      localizableError = error;
-    } else if (error && error.message) {
-      // Ledger device related error happend, convert then to LocalizableError
-      switch (error.message) {
-        case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
-          localizableError = new LocalizableError(globalMessages.ledgerError101);
-          break;
-        case 'TransportStatusError: Ledger device: Action rejected by user':
-          localizableError = new LocalizableError(globalMessages.hwError101);
-          break;
-        default:
-          /** we are not able to figure out why Error is thrown
-            * make it, Something unexpected happened */
-          Logger.error(`LedgerConnectStore::_convertToLocalizableError::error: ${error.message}`);
-          localizableError = new UnexpectedError();
-          break;
-      }
-    }
-
-    if (!localizableError) {
-      /** we are not able to figure out why Error is thrown
-        * make it, Something unexpected happened */
-      localizableError = new UnexpectedError();
-    }
-
-    return localizableError;
-  }
 
   @action _goToConnectError = (): void => {
     this.progressInfo.currentStep = ProgressStep.CONNECT;

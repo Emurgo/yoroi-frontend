@@ -26,6 +26,10 @@ import type {
 import type { PrepareAndBroadcastLedgerSignedTxResponse } from '../../api/common';
 
 import {
+  convertToLocalizableError
+} from '../../domain/LedgerLocalizedError';
+
+import {
   Logger,
   stringifyError,
   stringifyData,
@@ -35,13 +39,6 @@ import {
   prepareLedgerBridger,
   disposeLedgerBridgeIFrame
 } from '../../utils/iframeHandler';
-
-const messages = defineMessages({
-  signTxError101: {
-    id: 'wallet.send.ledger.error.101',
-    defaultMessage: '!!!Signing cancelled on Ledger device. Please retry or reconnect device.',
-  },
-});
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -145,7 +142,7 @@ export default class LedgerSendStore extends Store {
       }
     } catch (error) {
       Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
-      this._setError(this._convertToLocalizableError(error));
+      this._setError(convertToLocalizableError(error));
     } finally {
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
@@ -183,40 +180,6 @@ export default class LedgerSendStore extends Store {
 
     this._reset();
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');
-  }
-
-  /** Converts error(from API or Ledger API) to LocalizableError */
-  _convertToLocalizableError = (error: any): LocalizableError => {
-    let localizableError: ?LocalizableError = null;
-
-    if (error instanceof LocalizableError) {
-      // It means some API Error has been thrown
-      localizableError = error;
-    } else if (error && error.message) {
-      // Ledger device related error happend, convert then to LocalizableError
-      switch (error.message) {
-        case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
-          localizableError = new LocalizableError(globalMessages.ledgerError101);
-          break;
-        case 'TransportStatusError: Ledger device: Action rejected by user':
-          localizableError = new LocalizableError(messages.signTxError101);
-          break;
-        default:
-          /** we are not able to figure out why Error is thrown
-            * make it, Something unexpected happened */
-          Logger.error(`LedgerSendStore::_convertToLocalizableError::error: ${error.message}`);
-          localizableError = new UnexpectedError();
-          break;
-      }
-    }
-
-    if (!localizableError) {
-      /** we are not able to figure out why Error is thrown
-        * make it, Something unexpected happened */
-      localizableError = new UnexpectedError();
-    }
-
-    return localizableError;
   }
 
   _cancel = (): void => {
