@@ -4,7 +4,6 @@ import _ from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
-
 import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
 import type { GetAddressesResponse } from '../../api/common';

@@ -16,9 +16,6 @@ import type {
   BroadcastTrezorSignedTxRequest,
 } from '../../api/ada';
 import type { BroadcastTrezorSignedTxResponse } from '../../api/common';
-import type {
-  BIP32Path
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import {
   Logger,
@@ -133,12 +130,6 @@ export default class TrezorSendStore extends Store {
 
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }
-
-  verifyAddress = async (
-    path: BIP32Path,
-  ): Promise<void> => {
-    // TODO
-  };
 
   /** Converts error(from API or Trezor API) to LocalizableError */
   _convertToLocalizableError = (error: any): LocalizableError => {
