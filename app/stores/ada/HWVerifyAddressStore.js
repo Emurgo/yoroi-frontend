@@ -10,6 +10,7 @@ import {
 import {
   LedgerBridge,
 } from 'yoroi-extension-ledger-bridge';
+import TrezorConnect from 'trezor-connect';
 
 import LocalizableError from '../../i18n/LocalizableError';
 import environment from '../../environment';
@@ -24,8 +25,11 @@ import {
 } from '../../utils/logging';
 
 import {
-  convertToLocalizableError
+  convertToLocalizableError as ledgerErrorToLocalized
 } from '../../domain/LedgerLocalizedError';
+import {
+  convertToLocalizableError as trezorErrorToLocalized
+} from '../../domain/TrezorLocalizedError';
 
 import Wallet from '../../domain/Wallet';
 
@@ -49,8 +53,11 @@ export default class AddressesStore extends Store {
     if (!this.selectedAddress) {
       throw new Error('AddressStore::_verifyAddress called with no address selected');
     }
+    // remove null/undefined type to satisfy Flow
+    const selectedAddress = this.selectedAddress;
     // need to unwrap observable otherwise bridge will fail
-    const path = toJS(this.selectedAddress.path);
+    const path = toJS(selectedAddress.path);
+    const address = toJS(selectedAddress.address);
 
     if (!params.wallet.hardwareInfo) {
       throw new Error('AddressStore::_verifyAddress called with no hardware wallet active');
@@ -59,33 +66,32 @@ export default class AddressesStore extends Store {
     this._setError(null);
     this._setActionProcessing(true);
 
-    try {
-      // TODO: don't use hardcoded strings and maybe find a better way to do this?
-      // $FlowFixMe
-      if (params.wallet.hardwareInfo.vendor === 'ledger.com') {
-        await this.ledgerVerifyAddress(path);
-      } else if (params.wallet.hardwareInfo.vendor === 'trezor.io') {
-        // not implemented yet
-        await this.trezorVerifyAddress(path);
-      } else {
-        throw new Error('AddressStore::_verifyAddress called with unrecognized hardware wallet');
-      }
-    } catch (error) {
-      Logger.error('AddressStore::_verifyAddress::error: ' + stringifyError(error));
-      this._setError(convertToLocalizableError(error));
-    } finally {
-      this._setActionProcessing(false);
+    if (params.wallet.isLedgerNanoSWallet) {
+      await this.ledgerVerifyAddress(path);
+    } else if (params.wallet.isTrezorTWallet) {
+      await this.trezorVerifyAddress(path, address);
+    } else {
+      throw new Error('AddressStore::_verifyAddress called with unrecognized hardware wallet');
     }
+
+    this._setActionProcessing(false);
   }
 
   trezorVerifyAddress = async (
-    // eslint-disable-next-line no-unused-vars
-    path: BIP32Path
+    path: BIP32Path,
+    address: string
   ): Promise<void> => {
-    /**
-     * NOT IMPLEMENTED YET
-     */
-    throw new Error('AddressStore::_verifyAddress::Trezor not implemented yet');
+    try {
+      await TrezorConnect.cardanoGetAddress({
+        path,
+        address,
+      });
+    } catch (error) {
+      Logger.error('AddressStore::trezorVerifyAddress::error: ' + stringifyError(error));
+      this._setError(trezorErrorToLocalized(error));
+    } finally {
+      Logger.info('HWVerifyStore::trezorVerifyAddress finalized ');
+    }
   }
 
   ledgerVerifyAddress = async (
@@ -109,7 +115,7 @@ export default class AddressesStore extends Store {
       }
     } catch (error) {
       Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
-      this._setError(convertToLocalizableError(error));
+      this._setError(ledgerErrorToLocalized(error));
     } finally {
       Logger.info('HWVerifyStore::ledgerVerifyAddress finalized ');
     }
