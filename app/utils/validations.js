@@ -8,8 +8,7 @@ export const isValidWalletName = (walletName) => {
 };
 
 export const isValidPaperPassword = (paperPassword) => (
-  // non-empty
-  paperPassword.length > 0
+  isValidWalletPassword(paperPassword)
 );
 
 export const isValidWalletPassword = (walletPassword) => (

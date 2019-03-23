@@ -10,7 +10,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './PaperWalletSettings.scss';
-import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import CreatePaperWalletDialogContainer from "../../../containers/settings/categories/PaperWalletPage";
 
 const messages = defineMessages({
   paperTypeSelectLabel: {
@@ -37,6 +37,8 @@ const messages = defineMessages({
 
 type Props = {
   onCreatePaper: Function,
+  dialog: Node,
+  isDialogOpen: boolean,
   error?: ?LocalizableError,
 };
 
@@ -74,7 +76,7 @@ export default class GeneralSettings extends Component<Props> {
   });
 
   render() {
-    const { error } = this.props;
+    const { error, isDialogOpen, dialog } = this.props;
     const paperType = this.form.$('paperType');
     const numAddresses = this.form.$('numAddresses');
     const paperTypeOptions = [
@@ -112,6 +114,10 @@ export default class GeneralSettings extends Component<Props> {
           skin={ButtonSkin}
           onClick={this.createPaper}
         />
+
+        {isDialogOpen ? (
+          <div>{dialog}</div>
+        ) : null}
 
         {error && <p className={styles.error}>{error}</p>}
 

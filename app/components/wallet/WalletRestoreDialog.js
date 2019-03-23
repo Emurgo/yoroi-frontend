@@ -138,7 +138,7 @@ export default class WalletRestoreDialog extends Component<Props> {
             repeatPasswordField.validate({ showErrors: true });
           }
           return [
-            isValidPaperPassword(field.value),
+            field.value.length > 0,
             this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
           ];
         }],
