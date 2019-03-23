@@ -132,6 +132,7 @@ export default class AddressesStore extends Store {
     this._setError(null);
     this._setActionProcessing(false);
     disposeLedgerBridgeIFrame();
+    this.ledgerBridge = null;
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 }
