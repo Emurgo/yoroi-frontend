@@ -10,7 +10,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './PaperWalletSettings.scss';
-import CreatePaperWalletDialogContainer from "../../../containers/settings/categories/PaperWalletPage";
+import ReactMarkdown from 'react-markdown';
 
 const messages = defineMessages({
   paperTypeSelectLabel: {
@@ -38,12 +38,13 @@ const messages = defineMessages({
 type Props = {
   onCreatePaper: Function,
   dialog: Node,
+  paperWalletsIntroText: string,
   isDialogOpen: boolean,
   error?: ?LocalizableError,
 };
 
 @observer
-export default class GeneralSettings extends Component<Props> {
+export default class PaperWalletSettings extends Component<Props> {
   static defaultProps = {
     error: undefined
   };
@@ -76,7 +77,7 @@ export default class GeneralSettings extends Component<Props> {
   });
 
   render() {
-    const { error, isDialogOpen, dialog } = this.props;
+    const { error, isDialogOpen, dialog, paperWalletsIntroText } = this.props;
     const paperType = this.form.$('paperType');
     const numAddresses = this.form.$('numAddresses');
     const paperTypeOptions = [
@@ -93,6 +94,11 @@ export default class GeneralSettings extends Component<Props> {
     ]);
     return (
       <div className={componentClassNames}>
+
+        <div className={styles.intro}>
+          <ReactMarkdown
+            source={paperWalletsIntroText} />
+        </div>
 
         <Select
           className={paperTypeSelectClassNames}

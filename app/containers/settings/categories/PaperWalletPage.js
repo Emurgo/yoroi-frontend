@@ -18,9 +18,13 @@ export default class PaperWalletPage extends Component<InjectedProps> {
   render() {
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
+
+    const { paperWalletsIntro } = stores.profile;
+
     return (
       <PaperWalletSettings
         onCreatePaper={this.createPaperWallet}
+        paperWalletsIntroText={paperWalletsIntro}
         isDialogOpen={uiDialogs.isOpen(CreatePaperWalletDialog)}
         dialog={(
           <CreatePaperWalletDialogContainer stores={stores} actions={actions}/>

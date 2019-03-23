@@ -176,6 +176,12 @@ export default class SettingsStore extends Store {
     return result !== '';
   };
 
+  // ========== Paper Wallets ========== //
+
+  @computed get paperWalletsIntro(): string {
+    return require(`../../i18n/locales/paper-wallets/intro/${this.currentLocale}.md`);
+  }
+
   // ========== Terms of Use ========== //
 
   @computed get termsOfUse(): string {

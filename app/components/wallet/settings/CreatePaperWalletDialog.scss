@@ -61,3 +61,17 @@
 .isSubmitting {
   @include loading-spinner("../../../assets/images/spinner-light.svg");
 }
+
+$opacityCommon: 0.7;
+
+.headerBlock {
+  width: 725px;
+  height: 5em;
+  padding-top: 1em;
+  span {
+    font-family: var(--font-light);
+    line-height: 1.38;
+    font-size: 14px;
+    opacity: $opacityCommon;
+  }
+}

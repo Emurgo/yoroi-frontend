@@ -21,6 +21,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
         numAddresses={dialogData.numAddresses}
         isCustomPassword={dialogData.isCustomPassword}
         passwordValue={dialogData.passwordValue}
+        repeatedPasswordValue={dialogData.repeatedPasswordValue}
         onSave={(values: { paperPassword?: string }) => {
           const { paperPassword } = values;
           actions[environment.API].wallets.createPaperWallet.trigger({
