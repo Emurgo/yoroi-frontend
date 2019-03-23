@@ -59,7 +59,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         onCancel={this.onCancel}
         error={restoreRequest.error}
         isPaper={isPaper}
-        isPaperPassword={isPaperPasswordMode(this.props.mode)}
+        showPaperPassword={isPaperPasswordMode(this.props.mode)}
       />
     );
   }
