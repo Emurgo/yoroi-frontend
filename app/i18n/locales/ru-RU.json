@@ -206,7 +206,7 @@
   "wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor.text": "Нажмите здесь, чтобы узнать больше об использовании Yoroi с Trezor",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1": "Поддерживает только ",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link": "https://github.com/trezor/trezor-core/blob/master/ChangeLog",
-  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link.text": "Trezor Model T with version 2.1.0",
+  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link.text": "Trezor Model T с версией 2.1.0",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part3": " или более позднюю версию.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.2": "Trezor должен быть пре-инициализирован.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.3": "Экран устройства Trezor должен быть разблокирован.",
