@@ -206,7 +206,7 @@
   "wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor.text": "點擊此處了解有關使用Yoroi和Trezor的更多情報",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1": "僅支援 ",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link": "https://github.com/trezor/trezor-core/blob/master/ChangeLog",
-  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link.text": "Trezor Model T with version 2.1.0",
+  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link.text": "Trezor Model T 2.1.0版本",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part3": " 或更高版本。",
   "wallet.connect.trezor.dialog.step.about.prerequisite.2": "Trezor 設備必須預先初始化。",
   "wallet.connect.trezor.dialog.step.about.prerequisite.3": "Trezor設備螢幕必須解鎖。",
