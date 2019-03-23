@@ -26,7 +26,7 @@ export const adaStoreClasses = {
   trezorSend: TrezorSendStore,
   ledgerConnect: LedgerConnectStore,
   ledgerSend: LedgerSendStore,
-  hwVerifyAddress: HWVerifyAddressStore, 
+  hwVerifyAddress: HWVerifyAddressStore,
 };
 
 export type AdaStoresMap = {

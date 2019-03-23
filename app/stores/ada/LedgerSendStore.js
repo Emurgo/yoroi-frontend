@@ -1,6 +1,5 @@
 // @flow
 import { action, observable } from 'mobx';
-import { defineMessages } from 'react-intl';
 
 import {
   LedgerBridge,
@@ -14,9 +13,6 @@ import type { LedgerSignTxPayload } from '../../domain/HWSignTx';
 import Store from '../base/Store';
 import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
-
-import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
-import globalMessages from '../../i18n/global-messages';
 
 import type {
   CreateLedgerSignTxDataRequest,

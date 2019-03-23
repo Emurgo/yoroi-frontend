@@ -79,6 +79,7 @@ export default class AddressesStore extends Store {
   }
 
   trezorVerifyAddress = async (
+    // eslint-disable-next-line no-unused-vars
     path: BIP32Path
   ): Promise<void> => {
     /**
