@@ -8,6 +8,7 @@ import HWConnectActions from './hw-connect-actions';
 import TrezorSendActions from './trezor-send-actions';
 import AdaRedemptionActions from './ada-redemption-actions';
 import LedgerSendActions from './ledger-send-actions';
+import HWVerifyAddressActions from './hw-verify-address-actions';
 
 export type AdaActionsMap = {
   adaRedemption: AdaRedemptionActions,
@@ -20,6 +21,7 @@ export type AdaActionsMap = {
   trezorSend: TrezorSendActions,
   ledgerConnect: HWConnectActions,
   ledgerSend: LedgerSendActions,
+  hwVerifyAddress: HWVerifyAddressActions,
 };
 
 const adaActionsMap: AdaActionsMap = {
@@ -33,6 +35,7 @@ const adaActionsMap: AdaActionsMap = {
   trezorSend: new TrezorSendActions(),
   ledgerConnect: new HWConnectActions(),
   ledgerSend: new LedgerSendActions(),
+  hwVerifyAddress: new HWVerifyAddressActions(),
 };
 
 export default adaActionsMap;

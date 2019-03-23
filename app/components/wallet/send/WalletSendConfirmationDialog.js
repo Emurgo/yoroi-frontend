@@ -189,5 +189,4 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       </Dialog>
     );
   }
-
 }
