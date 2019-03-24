@@ -109,6 +109,9 @@ export default class AddressesStore extends Store {
 
         await prepareLedgerBridger(ledgerBridge);
         Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
+        // the next line is used to get an error when
+        // Ledger is not connected or has issues.
+        await ledgerBridge.getVersion();
         await ledgerBridge.showAddress(path);
       } else {
         throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
