@@ -44,3 +44,22 @@
 .isSubmitting {
   @include loading-spinner("../../../../assets/images/spinner-light.svg");
 }
+
+$opacityCommon: 0.7;
+
+.headerBlock {
+  width: 725px;
+  height: 3em;
+  margin-top: 5rem;
+  span {
+    font-family: var(--font-light);
+    line-height: 1.38;
+    font-size: 14px;
+    opacity: $opacityCommon;
+  }
+}
+
+.button {
+  align-self: center;
+  margin-top: 20px;
+}

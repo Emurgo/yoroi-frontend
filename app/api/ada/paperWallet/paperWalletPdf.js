@@ -18,7 +18,7 @@ export type PaperRequest = {
   isCustomPass: boolean,
 }
 
-export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function): Blob => {
+export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function): Promise<Blob> => {
   // Prepare params
   const logback = callback || (() => {});
   logback('Reading parameters');
@@ -62,13 +62,8 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
     throw error;
   }
 
-  logback('Downloading');
-  // Write file to disk
-  console.log(doc);
   const blob = doc.output('blob');
-
   logback('All done');
-
   return blob;
 };
 

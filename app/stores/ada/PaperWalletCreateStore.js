@@ -6,6 +6,7 @@ import type { UpdateWalletPasswordResponse, UpdateWalletResponse } from '../../a
 import Store from "../base/Store";
 import LocalizableError from "../../i18n/LocalizableError";
 import type { AdaPaper } from "../../api/ada";
+import fileSaver from 'file-saver';
 
 export type ProgressStepEnum = 0 | 1 | 2 | 3 | 4;
 export const ProgressStep = {
@@ -19,6 +20,8 @@ export const ProgressStep = {
 export default class PaperWalletCreateStore extends Store {
 
   @observable progressInfo: ProgressStepEnum;
+  @observable pdfRenderStatus: string;
+  @observable pdf: Blob;
   error: ?LocalizableError;
   isCustomPassword: boolean;
   numAddresses: number;
@@ -31,6 +34,9 @@ export default class PaperWalletCreateStore extends Store {
     a.submitInit.listen(this._submitInit);
     a.submitUserPassword.listen(this._submitUserPassword);
     a.createPaperWallet.listen(this._createPaperWallet);
+    a.createPdfDocument.listen(this._createPdfDocument);
+    a.setPdfRenderStatus.listen(this._setPdfRenderStatus);
+    a.setPdf.listen(this._setPdf);
     a.downloadPaperWallet.listen(this._downloadPaperWallet);
     a.cancel.listen(this._cancel);
   }
@@ -42,6 +48,7 @@ export default class PaperWalletCreateStore extends Store {
       this.progressInfo = ProgressStep.USER_PASSWORD;
     } else {
       this.actions.ada.paperWallets.createPaperWallet.trigger();
+      this.actions.ada.paperWallets.createPdfDocument.trigger();
       this.progressInfo = ProgressStep.CREATE;
     }
   };
@@ -49,6 +56,7 @@ export default class PaperWalletCreateStore extends Store {
   @action _submitUserPassword = async ({ userPassword }: { userPassword: string }) => {
     this.userPassword = userPassword;
     this.actions.ada.paperWallets.createPaperWallet.trigger();
+    this.actions.ada.paperWallets.createPdfDocument.trigger();
     this.progressInfo = ProgressStep.CREATE;
   };
 
@@ -59,8 +67,27 @@ export default class PaperWalletCreateStore extends Store {
     });
   };
 
-  @action _downloadPaperWallet = async () => {
+  @action _createPdfDocument = async (): Promise<AdaPaper> => {
+    const pdf = await this.api.ada.createAdaPaperPdf({
+      paper: this.paper,
+      isMainnet: true, // TODO make dynamic for testnet support,
+      logback: (status: string) => {
+        this.actions.ada.paperWallets.setPdfRenderStatus.trigger({ status })
+      }
+    });
+    this.actions.ada.paperWallets.setPdf.trigger({ pdf });
+  };
 
+  @action _setPdfRenderStatus = async ({ status }: { status: string }) => {
+    this.pdfRenderStatus = status;
+  };
+
+  @action _setPdf = async ({ pdf }: { pdf: Blob }) => {
+    this.pdf = pdf;
+  };
+
+  @action _downloadPaperWallet = async () => {
+    fileSaver.saveAs(this.pdf, 'Yoroi-Paper-Wallet.pdf');
   };
 
   @action _cancel = async () => {
@@ -79,5 +106,7 @@ export default class PaperWalletCreateStore extends Store {
     this.numAddresses = undefined;
     this.userPassword = undefined;
     this.paper = undefined;
+    this.pdf = undefined;
+    this.pdfRenderStatus = undefined;
   };
 }

@@ -31,9 +31,18 @@ const messages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.download.label',
     defaultMessage: '!!!Download Paper Wallet Certificate',
   },
+  downloadPaperIntroLine1: {
+    id: 'settings.paperWallet.dialog.createPaper.download.intro.line1',
+    defaultMessage: '!!!Your paper wallet PDF is ready',
+  },
+  downloadPaperIntroLine2: {
+    id: 'settings.paperWallet.dialog.createPaper.download.intro.line2',
+    defaultMessage: '!!!Download size (Mb)',
+  },
 });
 
 type Props = {
+  renderStatus: string,
   paperFile: Blob,
   onNext: Function,
   onCancel: Function,
@@ -43,6 +52,12 @@ type Props = {
 
 @observer
 export default class CreatePaperDialog extends Component<Props> {
+
+  static formatBytes = (bytes: number): string => {
+    const mb = (bytes / 1024) / 1024;
+    return mb.toFixed(2);
+  };
+
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -58,6 +73,7 @@ export default class CreatePaperDialog extends Component<Props> {
       onCancel,
       paperFile,
       onDownload,
+      renderStatus,
     } = this.props;
 
     const dialogClasses = classnames(['createPaperDialog', styles.dialog]);
@@ -74,7 +90,7 @@ export default class CreatePaperDialog extends Component<Props> {
       },
     ];
 
-    return (
+    return paperFile ? (
       <Dialog
         title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
         actions={actions}
@@ -83,23 +99,30 @@ export default class CreatePaperDialog extends Component<Props> {
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
-
-        {
-          paperFile ? (
-            <Button
-              className={buttonClassNames}
-              label={this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
-              skin={ButtonSkin}
-              onClick={onDownload}
-            />
-          ) : (
-            <AnnotatedLoader
-              title={this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
-              details={"..."}
-            />
-          )
-        }
-
+        <div className={styles.headerBlock}>
+          <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span><br />
+          <span>{intl.formatMessage(messages.downloadPaperIntroLine2)}: {CreatePaperDialog.formatBytes(paperFile.size)}</span><br />
+        </div>
+        <Button
+          className={buttonClassNames}
+          label={this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
+          skin={ButtonSkin}
+          onClick={onDownload}
+        />
+      </Dialog>
+    ) : (
+      <Dialog
+        title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
+        actions={actions}
+        closeOnOverlayClick
+        onClose={onCancel}
+        className={dialogClasses}
+        closeButton={<DialogCloseButton onClose={onCancel} />}
+      >
+        <AnnotatedLoader
+          title={this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
+          details={renderStatus || '...'}
+        />
       </Dialog>
     );
   }

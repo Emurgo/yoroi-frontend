@@ -234,11 +234,19 @@ export default class AdaApi {
     return { addresses, scrambledWords, pass };
   }
 
-  async createAdaPaperPdf(paper: AdaPaper, isMainnet = true): Promise<Blob> {
+  async createAdaPaperPdf({ paper, isMainnet, logback }: { paper: AdaPaper, isMainnet?: boolean, logback?: Function }): Promise<Blob> {
     const { addresses, scrambledWords, pass } = paper;
-    await generateAdaPaperPdf({
-      words: scrambledWords, addresses, isMainnet, isCustomPass: !!pass.password
-    }, s => Logger.info('[PaperWalletRender] ' + s));
+    return generateAdaPaperPdf({
+      words: scrambledWords,
+      addresses,
+      isMainnet: isMainnet || true,
+      isCustomPass: !!pass.password
+    }, s => {
+      Logger.info('[PaperWalletRender] ' + s);
+      if (logback) {
+        logback(s);
+      }
+    });
   }
 
   async getWallets(): Promise<GetWalletsResponse> {

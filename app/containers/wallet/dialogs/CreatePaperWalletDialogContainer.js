@@ -12,8 +12,6 @@ import CreatePaperDialog from "../../../components/wallet/settings/paper-wallets
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
 
-
-
   render() {
     const { actions } = this.props;
     const { uiDialogs } = this.props.stores;
@@ -51,7 +49,8 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
       case ProgressStep.CREATE:
         return (
           <CreatePaperDialog
-            paperFile={dialogData.paperFile}
+            renderStatus={paperStore.pdfRenderStatus}
+            paperFile={paperStore.pdf}
             onNext={paperActions.submitCreate.trigger}
             onCancel={onCancel}
             onDownload={paperActions.downloadPaperWallet.trigger}
