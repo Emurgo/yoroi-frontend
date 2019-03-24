@@ -70,15 +70,6 @@ export default class WalletReceivePage extends Component<Props, State> {
     const walletAddress = addresses.active ? addresses.active.id : '';
     const isWalletAddressUsed = addresses.active ? addresses.active.isUsed : false;
 
-    /**
-     * TODO: change this condition to simple
-     * wallet.cwType === HARDWARE_WALLET
-     * once we add support for this in Trezor also
-     */
-    const isHardware = wallet.hardwareInfo
-      ? wallet.hardwareInfo.model === 'NanoS'
-      : false;
-
     const walletAddresses = addresses.all.reverse();
 
     const notification = {
@@ -129,7 +120,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
-            isHardware={isHardware}
+            isHardware={wallet.isHardwareWallet}
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger({ wallet })}
             cancel={() => actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger()}
           />

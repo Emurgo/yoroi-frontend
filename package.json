@@ -156,7 +156,7 @@
     "route-parser": "0.0.5",
     "rust-cardano-crypto": "file:js-cardano-wasm",
     "semver": "^5.6.0",
-    "trezor-connect": "7.0.1",
+    "trezor-connect": "7.0.2",
     "validator": "6.3.0",
     "unorm": "1.4.1",
     "yoroi-extension-ledger-bridge": "git+https://github.com/Emurgo/yoroi-extension-ledger-bridge.git"
