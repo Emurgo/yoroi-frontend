@@ -20,12 +20,23 @@ export type PaperRequest = {
 
 export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function): Promise<Blob> => {
   // Prepare params
-  const logback = callback || (() => {});
-  logback('Reading parameters');
+  callback = callback || (() => true);
+  const logback = (s) => {
+    if (!callback(s)) {
+      callback('Cancelled');
+      return false;
+    }
+    return true;
+  };
+  if (!logback('Reading parameters')) {
+    return null;
+  }
   const { isMainnet, addresses, words, isCustomPass } = request;
-  console.log(words);
 
-  logback('Initializing the document');
+  if (!logback('Initializing the document')) {
+    return null;
+  }
+
   const width = 595.28;
   const height = 841.98;
   const doc = new Pdf({
@@ -35,26 +46,40 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
     [doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight()];
   const pageSize = { w: pageWidthPx, h: pageHeightPx };
   try {
-    logback('Drawing pretty background');
+
+    if (!logback('Drawing pretty background')) {
+      return null;
+    }
+
     // background images
     const bgUrl = isMainnet ? paperWalletCertificateBgPath : paperWalletCertificateBgPathTestnet;
     await addImage(doc, bgUrl, pageSize);
 
-    logback('Preparing the face page');
+    if (!logback('Preparing the face page')) {
+      return null;
+    }
+
     // first page
     const page1Uri = isMainnet ? paperWalletPage1Path : paperWalletPage1PathTestnet;
     await addImage(doc, page1Uri, pageSize);
-    printAddresses(doc, addresses, logback);
+    if (!printAddresses(doc, addresses, logback)) {
+      return null;
+    }
 
     // second page
     doc.addPage();
 
-    logback('Preparing the back page');
+    if (!logback('Preparing the back page')) {
+      return null;
+    }
+
     const page2Uri = isMainnet ?
       (isCustomPass ? paperWalletPage2PassPath : paperWalletPage2Path)
       : (isCustomPass ? paperWalletPage2PassPathTestnet : paperWalletPage2PathTestnet);
     await addImage(doc, page2Uri, pageSize);
-    logback('Printing mnemonics');
+    if (!logback('Printing mnemonics')) {
+      return null;
+    }
     printMnemonics(doc, words)
 
   } catch (error) {
@@ -63,18 +88,22 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
   }
 
   const blob = doc.output('blob');
-  logback('All done');
+  if (!logback('All done')) {
+    return null;
+  }
   return blob;
 };
 
-function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function) {
+function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function): boolean {
   const pageWidthPx = doc.internal.pageSize.getWidth();
   const [pA, pB] = [{ x:40, y:187 }, { x:170, y:249 }];
 
   doc.setTextColor(0, 0, 0);
   if (addresses.length === 1) {
 
-    logback('Drawing the address');
+    if (!logback('Drawing the address')) {
+      return false;
+    }
 
     doc.setFontSize(9);
     const [address] = addresses;
@@ -110,7 +139,9 @@ function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function) {
 
     const rowHeight = (pB.y - pA.y) / addresses.length;
     for (let r = 0; r < addresses.length; r++) {
-      logback(`Drawing address #${r + 1}`);
+      if (!logback(`Drawing address #${r + 1}`)) {
+        return false;
+      }
       const y = (pB.y - (rowHeight / 2)) - (rowHeight * r);
       doc.text(pB.x - addrPad, y, addresses[r], null, 180);
       const qrCodeImage = Buffer.from(qr.imageSync(addresses[r], {
@@ -127,6 +158,7 @@ function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function) {
       });
     }
   }
+  return true;
 }
 
 function printMnemonics(doc: Pdf, words: Array<string>) {

@@ -90,41 +90,50 @@ export default class CreatePaperDialog extends Component<Props> {
       },
     ];
 
-    return paperFile ? (
-      <Dialog
-        title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
-        actions={actions}
-        closeOnOverlayClick
-        onClose={onCancel}
-        className={dialogClasses}
-        closeButton={<DialogCloseButton onClose={onCancel} />}
-      >
-        <div className={styles.headerBlock}>
-          <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span><br />
-          <span>{intl.formatMessage(messages.downloadPaperIntroLine2)}: {CreatePaperDialog.formatBytes(paperFile.size)}</span><br />
-        </div>
-        <Button
-          className={buttonClassNames}
-          label={this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
-          skin={ButtonSkin}
-          onClick={onDownload}
-        />
-      </Dialog>
-    ) : (
-      <Dialog
-        title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
-        actions={actions}
-        closeOnOverlayClick
-        onClose={onCancel}
-        className={dialogClasses}
-        closeButton={<DialogCloseButton onClose={onCancel} />}
-      >
-        <AnnotatedLoader
-          title={this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
-          details={renderStatus || '...'}
-        />
-      </Dialog>
-    );
-  }
+    if (paperFile) {
 
+      let pdfSizeMb = CreatePaperDialog.formatBytes(paperFile.size);
+      
+      return (
+        <Dialog
+          title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
+          actions={actions}
+          closeOnOverlayClick
+          onClose={onCancel}
+          className={dialogClasses}
+          closeButton={<DialogCloseButton onClose={onCancel} />}
+        >
+          <div className={styles.headerBlock}>
+            <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span><br />
+            <span>{intl.formatMessage(messages.downloadPaperIntroLine2)}: {pdfSizeMb}</span><br />
+          </div>
+          <Button
+            className={buttonClassNames}
+            label={this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
+            skin={ButtonSkin}
+            onClick={onDownload}
+          />
+        </Dialog>
+      );
+
+    } else {
+
+      return (
+        <Dialog
+          title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
+          actions={actions}
+          closeOnOverlayClick
+          onClose={onCancel}
+          className={dialogClasses}
+          closeButton={<DialogCloseButton onClose={onCancel} />}
+        >
+          <AnnotatedLoader
+            title={this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
+            details={renderStatus || '...'}
+          />
+        </Dialog>
+      );
+
+    }
+  }
 }

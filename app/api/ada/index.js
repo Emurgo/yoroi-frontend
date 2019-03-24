@@ -243,9 +243,7 @@ export default class AdaApi {
       isCustomPass: !!pass.password
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
-      if (logback) {
-        logback(s);
-      }
+      return !logback || logback(s);
     });
   }
 

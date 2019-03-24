@@ -72,10 +72,13 @@ export default class PaperWalletCreateStore extends Store {
       paper: this.paper,
       isMainnet: true, // TODO make dynamic for testnet support,
       logback: (status: string) => {
-        this.actions.ada.paperWallets.setPdfRenderStatus.trigger({ status })
+        this.actions.ada.paperWallets.setPdfRenderStatus.trigger({ status });
+        return !!this.paper;
       }
     });
-    this.actions.ada.paperWallets.setPdf.trigger({ pdf });
+    if (this.paper && pdf) {
+      this.actions.ada.paperWallets.setPdf.trigger({pdf});
+    }
   };
 
   @action _setPdfRenderStatus = async ({ status }: { status: string }) => {
