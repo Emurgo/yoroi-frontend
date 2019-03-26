@@ -24,10 +24,12 @@ export default class TopBarCategory extends Component<Props> {
       className
     ]);
 
+    const isWithHW = (className === 'with-trezor-t' || className === 'with-ledger-nano-s');
     const iconStyles = classNames([
       className === 'wallets' ? styles.walletsIcon : null,
-      className === 'with-trezor-t' ? styles.withTrezorTIcon : null,
+      isWithHW ? styles.withHardwareWalletIcon : null,
       classicTheme ? styles.iconClassic : styles.icon
+      // styles.icon
     ]);
 
     return (

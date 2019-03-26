@@ -63,6 +63,11 @@ declare module 'rust-cardano-crypto' {
         failed: boolean,
         msg: ?string
       },
+      fromDaedalusMasterKey(masterKey: Uint8Array): {
+        result: CryptoWallet,
+        failed: boolean,
+        msg: ?string
+      },
       fromSeed(seed: Array<mixed>): {
         result: CryptoWallet,
         failed: boolean,

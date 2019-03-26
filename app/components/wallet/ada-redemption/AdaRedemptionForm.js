@@ -32,7 +32,6 @@ const messages = defineMessages({
   headline: {
     id: 'wallet.redeem.dialog.headline',
     defaultMessage: '!!!Ada Redemption',
-    description: 'Headline "Ada redemption" dialog.'
   },
   instructionsRegular: {
     id: 'wallet.redeem.dialog.instructions.regular',
@@ -42,7 +41,6 @@ Below is an example of a redemption key. Your key will look similar:</p>
 <p>If you upload a PDF file with your certificate, a redemption code will be automatically extracted.</p>
 <p>If you upload an <strong>encrypted certificate</strong>, you will need to provide a <strong>{adaRedemptionPassphraseLength} word mnemonic
 passphrase</strong> to decrypt your certificate and your redemption code will be automatically extracted.</p>`,
-    description: 'Detailed instructions for redeeming Ada from the regular vending',
   },
   instructionsForceVended: {
     id: 'wallet.redeem.dialog.instructions.forceVended',
@@ -51,136 +49,110 @@ Below is an example of a redemption key. Your key will look similar:</p><p><stro
 <p>If you upload a PDF file with your certificate, the redemption code will be automatically extracted.</p>
 <p>If you upload an <strong>encrypted certificate</strong>, you will need to provide <strong>your email address, Ada passcode and Ada amount</strong>
 to decrypt your certificate and your redemption code will be automatically extracted.</p>`,
-    description: 'Detailed instructions for redeeming Ada from the force vending',
   },
   instructionsRecoveryRegular: {
     id: 'wallet.redeem.dialog.instructions.recoveryRegular',
     defaultMessage: `!!!<p>To redeem your Ada using the regularly vended certificate from the recovery service, please upload your encrypted certificate and enter a {adaRedemptionPassphraseLength}-word mnemonic passphrase.</p>
   >After you upload your <strong>encrypted certificate</strong> and enter your <strong>{adaRedemptionPassphraseLength}-word mnemonic passphrase</strong>, your redemption key will be automatically extracted and you will be able to redeem your Ada to the selected wallet.</p>`,
-    description: 'Detailed instructions for redeeming Ada from the regular vending via Recovery service',
   },
   instructionsRecoveryForceVended: {
     id: 'wallet.redeem.dialog.instructions.recoveryForceVended',
     defaultMessage: `!!!<p>To redeem your Ada using the force vended certificate from the recovery service, please upload your encrypted certificate and enter the decryption key. Your decryption key should look like this:</p>
   ><strong>qXQWDxI3JrlFRtC4SeQjeGzLbVXWBomYPbNO1Vfm1T4=</strong></p>
   >After you upload your <strong>encrypted certificate</strong> and enter your <strong>decryption key</strong>, your redemption key will be automatically extracted and you will be able to redeem your Ada to the selected wallet.</p>`,
-    description: 'Detailed instructions for redeeming Ada from the force vending via Recovery service',
   },
   instructionsPaperVended: {
     id: 'wallet.redeem.dialog.instructions.paperVended',
     defaultMessage: `!!!<p>To redeem your Ada, enter your shielded vending key from the certificate, choose a wallet
 where Ada should be redeemed and enter {adaRedemptionPassphraseLength} word mnemonic passphrase.</p>`,
-    description: 'Detailed instructions for redeeming Ada from the paper vending',
   },
   certificateLabel: {
     id: 'wallet.redeem.dialog.certificateLabel',
     defaultMessage: '!!!Certificate',
-    description: 'Label for the certificate file upload'
   },
   certificateHint: {
     id: 'wallet.redeem.dialog.certificateHint',
     defaultMessage: '!!!Drop the file with your certificate here or click to find on your computer',
-    description: 'Hint for the certificate file upload'
   },
   walletSelectLabel: {
     id: 'wallet.redeem.dialog.walletSelectLabel',
     defaultMessage: '!!!Choose Wallet',
-    description: 'Label for the wallet select field on Ada redemption form'
   },
   passphraseLabel: {
     id: 'wallet.redeem.dialog.passphraseLabel',
     defaultMessage: '!!!Passphrase to Decrypt the Ada Voucher Certificate',
-    description: 'Label for the passphrase to decrypt Ada voucher certificate input'
   },
   passphraseHint: {
     id: 'wallet.redeem.dialog.passphraseHint',
     defaultMessage: '!!!Enter your {length} word mnemonic here',
-    description: 'Hint for the mnemonic passphrase input'
   },
   passphraseNoResults: {
     id: 'wallet.redeem.dialog.passphrase.input.noResults',
     defaultMessage: '!!!No results',
-    description: '"No results" message for the passphrase input search results.'
   },
   redemptionKeyLabel: {
     id: 'wallet.redeem.dialog.redemptionKeyLabel',
     defaultMessage: '!!!Redemption key',
-    description: 'Label for ada redemption key input',
   },
   shieldedRedemptionKeyLabel: {
     id: 'wallet.redeem.dialog.shieldedRedemptionKeyLabel',
     defaultMessage: '!!!Shielded redemption key',
-    description: 'Label for shielded redemption key input',
   },
   decryptionKeyLabel: {
     id: 'wallet.redeem.dialog.decryptionKeyLabel',
     defaultMessage: '!!!Decryption key',
-    description: 'Label for decryption key input',
   },
   redemptionKeyError: {
     id: 'wallet.redeem.dialog.redemptionCodeError',
     defaultMessage: '!!!Invalid redemption key',
-    description: 'Error "Invalid redemption key" for ada redemption code input',
   },
   shieldedRedemptionKeyError: {
     id: 'wallet.redeem.dialog.shieldedRedemptionCodeError',
     defaultMessage: '!!!Invalid shielded vending key',
-    description: 'Error "Invalid shielded vending key" for ada redemption code input',
   },
   redemptionKeyHint: {
     id: 'wallet.redeem.dialog.redemptionCodeHint',
     defaultMessage: '!!!Enter your redemption key or upload a certificate',
-    description: 'Hint for ada redemption key input',
   },
   recoveryRedemptionKeyHint: {
     id: 'wallet.redeem.dialog.recoveryRedemptionKeyHint',
     defaultMessage: '!!!Upload your certificate',
-    description: 'Hint for ada redemption key input shown on Recovery tabs',
   },
   shieldedRedemptionKeyHint: {
     id: 'wallet.redeem.dialog.shieldedRedemptionKeyHint',
     defaultMessage: '!!!Enter your shielded vending key',
-    description: 'Hint for shielded vending key input',
   },
   decryptionKeyHint: {
     id: 'wallet.redeem.dialog.decryptionKeyHint',
     defaultMessage: '!!!Enter your decryption key',
-    description: 'Hint for decryption key input',
   },
   submitLabel: {
     id: 'wallet.redeem.dialog.submitLabel',
     defaultMessage: '!!!Redeem your money',
-    description: 'Label for the "Ada redemption" dialog submit button.'
   },
   emailLabel: {
     id: 'wallet.redeem.dialog.emailLabel',
     defaultMessage: '!!!Email',
-    description: 'Label for the email input field.'
   },
   emailHint: {
     id: 'wallet.redeem.dialog.emailHint',
     defaultMessage: '!!!Enter your email address',
-    description: 'Hint for the email input field.'
   },
   adaPasscodeLabel: {
     id: 'wallet.redeem.dialog.adaPasscodeLabel',
     defaultMessage: '!!!Ada passcode',
-    description: 'Label for the ada passcode input field.'
   },
   adaPasscodeHint: {
     id: 'wallet.redeem.dialog.adaPasscodeHint',
     defaultMessage: '!!!Enter your Ada passcode',
-    description: 'Hint for the Ada passcode input field.'
   },
   adaAmountLabel: {
     id: 'wallet.redeem.dialog.adaAmountLabel',
     defaultMessage: '!!!Ada amount',
-    description: 'Label for the ada amount input field.'
   },
   adaAmountHint: {
     id: 'wallet.redeem.dialog.adaAmountHint',
     defaultMessage: '!!!Enter your Ada amount',
-    description: 'Hint for the Ada amount input field.'
   }
 });
 

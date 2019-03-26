@@ -18,82 +18,66 @@ const messages = defineMessages({
   type: {
     id: 'wallet.transaction.type',
     defaultMessage: '!!!{currency} transaction',
-    description: 'Transaction type shown for {currency} transactions.',
   },
   exchange: {
     id: 'wallet.transaction.type.exchange',
     defaultMessage: '!!!Exchange',
-    description: 'Transaction type shown for money exchanges between currencies.',
   },
   assuranceLevel: {
     id: 'wallet.transaction.assuranceLevel',
     defaultMessage: '!!!Transaction assurance level',
-    description: 'Transaction assurance level.',
   },
   confirmations: {
     id: 'wallet.transaction.confirmations',
     defaultMessage: '!!!confirmations',
-    description: 'Transaction confirmations.',
   },
   transactionId: {
     id: 'wallet.transaction.transactionId',
     defaultMessage: '!!!Transaction ID',
-    description: 'Transaction ID.',
   },
   conversionRate: {
     id: 'wallet.transaction.conversion.rate',
     defaultMessage: '!!!Conversion rate',
-    description: 'Conversion rate.',
   },
   sent: {
     id: 'wallet.transaction.sent',
     defaultMessage: '!!!{currency} sent',
-    description: 'Label "{currency} sent" for the transaction.',
   },
   received: {
     id: 'wallet.transaction.received',
     defaultMessage: '!!!{currency} received',
-    description: 'Label "{currency} received" for the transaction.',
   },
   intrawallet: {
     id: 'wallet.transaction.type.intrawallet',
     defaultMessage: '!!!{currency} intrawallet transaction',
-    description: 'both sender & receiver are yourself',
   },
   multiparty: {
     id: 'wallet.transaction.type.multiparty',
     defaultMessage: '!!!{currency} multiparty transaction',
-    description: 'only some inputs of tx belong to you',
   },
   fromAddress: {
     id: 'wallet.transaction.address.from',
     defaultMessage: '!!!From address',
-    description: 'From address',
   },
   fee: {
     id: 'wallet.transaction.fee',
     defaultMessage: '!!!Fee',
-    description: 'label for fee for tx',
   },
   fromAddresses: {
     id: 'wallet.transaction.addresses.from',
     defaultMessage: '!!!From addresses',
-    description: 'From addresses',
   },
   toAddress: {
     id: 'wallet.transaction.address.to',
     defaultMessage: '!!!To address',
-    description: 'To address',
   },
   toAddresses: {
     id: 'wallet.transaction.addresses.to',
     defaultMessage: '!!!To addresses',
-    description: 'To addresses',
   },
   transactionAmount: {
     id: 'wallet.transaction.transactionAmount',
     defaultMessage: '!!!Transaction amount',
-    description: 'Transaction amount.',
   },
 });
 
@@ -101,17 +85,14 @@ const assuranceLevelTranslations = defineMessages({
   [assuranceLevels.LOW]: {
     id: 'wallet.transaction.assuranceLevel.low',
     defaultMessage: '!!!low',
-    description: 'Transaction assurance level "low".',
   },
   [assuranceLevels.MEDIUM]: {
     id: 'wallet.transaction.assuranceLevel.medium',
     defaultMessage: '!!!medium',
-    description: 'Transaction assurance level "medium".',
   },
   [assuranceLevels.HIGH]: {
     id: 'wallet.transaction.assuranceLevel.high',
     defaultMessage: '!!!high',
-    description: 'Transaction assurance level "high".',
   },
 });
 
@@ -119,12 +100,10 @@ const stateTranslations = defineMessages({
   [transactionStates.PENDING]: {
     id: 'wallet.transaction.state.pending',
     defaultMessage: '!!!Transaction pending',
-    description: 'Transaction state "pending"',
   },
   [transactionStates.FAILED]: {
     id: 'wallet.transaction.state.failed',
     defaultMessage: '!!!Transaction failed',
-    description: 'Transaction state "pending"',
   },
 });
 

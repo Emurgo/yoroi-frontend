@@ -36,6 +36,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       acceptWalletBackupTermRecovery,
       restartWalletBackup,
       finishWalletBackup,
+      removeOneMnemonicWord,
       acceptPrivacyNoticeForWalletBackup,
       continueToRecoveryPhraseForWalletBackup
     } = actions.walletBackup;
@@ -58,7 +59,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         // Props for WalletRecoveryPhraseEntryDialog
         isTermDeviceAccepted={isTermDeviceAccepted}
         enteredPhrase={enteredPhrase}
-        canFinishBackup={isRecoveryPhraseValid && isTermDeviceAccepted && isTermRecoveryAccepted}
+        hasWord={() => recoveryPhraseWords.length > 0}
         isTermRecoveryAccepted={isTermRecoveryAccepted}
         isValid={isRecoveryPhraseValid}
         isSubmitting={createWalletRequest.isExecuting}
@@ -68,6 +69,9 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         onClear={clearEnteredRecoveryPhrase.trigger}
         onFinishBackup={() => {
           finishWalletBackup.trigger();
+        }}
+        removeWord={() => {
+          removeOneMnemonicWord.trigger();
         }}
         onRestartBackup={restartWalletBackup.trigger}
         recoveryPhraseSorted={recoveryPhraseSorted}

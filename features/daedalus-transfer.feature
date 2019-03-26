@@ -43,7 +43,7 @@ Feature: Transfer Daedalus Wallet funds
     | gadget |
 
   @withWebSocketConnection @it-45
-  Scenario: User can transfer Daedalus funds to Icarus using 12-word mnemonic phrase (IT-45)
+  Scenario: User can transfer Daedalus funds to Yoroi using 12-word mnemonic phrase (IT-45)
     Given I am testing "Daedalus transfer funds Screen"
     When There is a wallet stored named Test
     And My Daedalus wallet has funds
@@ -99,3 +99,23 @@ Feature: Transfer Daedalus Wallet funds
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
     |instructionMessage                              | attentionMessage| 
     |transfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
+
+  @withWebSocketConnection @it-19
+  Scenario: User can transfer Daedalus funds to Yoroi using master key (IT-19)
+    Given I am testing "Daedalus transfer funds Screen"
+    When There is a wallet stored named Test
+    And My Daedalus wallet has funds
+    And I am on the Daedalus Transfer instructions screen
+    When I click on the transfer funds from Daedalus master key button
+    # enter private key for following mnemonic
+    # leaf immune metal phrase river cool domain snow year below result three
+    And I enter the master key:
+    | masterKey |
+    | 50d1b52581adefa3e99025ade8f7189318e1e9ac2f0a1d66d9a1c86f3908ca5fe1a5e08866b500a9a0e11d48c41dbb4957c550b418e7b5c6c9a531ab37037c35d0e9ecaab457c8dea556bb2ef43ec59cc943b12adb39c9d38d4d90563b9014a7 |
+    And I proceed with the recovery
+    Then I should wait until funds are recovered:
+    | daedalusAddress                                                                                          | amount |   
+    | DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb | 500000 |
+    | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm | 500000 |
+    When I confirm Daedalus transfer funds
+    Then I should see the summary screen

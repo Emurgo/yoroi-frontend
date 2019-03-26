@@ -1,0 +1,21 @@
+@import './DialogCommonStyle.scss';
+
+.headerSaveBlockClassic {
+  padding-top: 0;
+}
+
+.middleSaveLoadBlock {
+  padding: 0px;
+  text-align: center;
+}
+
+.middleSaveStartProcessBlock {
+  padding: 0px;
+  text-align: center;
+}
+
+.middleSaveErrorBlockClassic {
+  padding: 0px;
+  background-color: var(--theme-hw-connect-dialog-middle-block-common-error-background-color);
+  text-align: center;
+}

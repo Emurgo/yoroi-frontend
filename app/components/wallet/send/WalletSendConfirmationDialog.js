@@ -21,17 +21,14 @@ const messages = defineMessages({
   walletPasswordLabel: {
     id: 'wallet.send.confirmationDialog.walletPasswordLabel',
     defaultMessage: '!!!Spending password',
-    description: 'Label for the "Spending password" input in the wallet send confirmation dialog.',
   },
   walletPasswordFieldPlaceholder: {
     id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
     defaultMessage: '!!!Type your spending password',
-    description: 'Placeholder for the "Spending password" inputs in the wallet send confirmation dialog.',
   },
   sendButtonLabel: {
     id: 'wallet.send.confirmationDialog.submit',
     defaultMessage: '!!!Send',
-    description: 'Label for the send button in the wallet send confirmation dialog.'
   },
 });
 
@@ -119,7 +116,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
 
     const actions = [
       {
-        label: intl.formatMessage(globalMessages.walletSendConfirmationBackButtonLabel),
+        label: intl.formatMessage(globalMessages.backButtonLabel),
         onClick: isSubmitting
           ? () => {} // noop
           : onCancel
@@ -196,5 +193,4 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       </Dialog>
     );
   }
-
 }

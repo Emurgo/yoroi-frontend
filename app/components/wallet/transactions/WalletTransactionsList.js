@@ -17,17 +17,14 @@ const messages = defineMessages({
   today: {
     id: 'wallet.summary.page.todayLabel',
     defaultMessage: '!!!Today',
-    description: 'Label for the "Today" label on the wallet summary page.',
   },
   yesterday: {
     id: 'wallet.summary.page.yesterdayLabel',
     defaultMessage: '!!!Yesterday',
-    description: 'Label for the "Yesterday" label on the wallet summary page.',
   },
   showMoreTransactionsButtonLabel: {
     id: 'wallet.summary.page.showMoreTransactionsButtonLabel',
     defaultMessage: '!!!Show more transactions',
-    description: 'Label for the "Show more transactions" button on the wallet summary page.',
   },
 });
 

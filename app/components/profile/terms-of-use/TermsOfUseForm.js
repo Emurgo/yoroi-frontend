@@ -15,12 +15,10 @@ const messages = defineMessages({
   checkboxLabel: {
     id: 'profile.termsOfUse.checkboxLabel',
     defaultMessage: '!!!I agree with terms of use',
-    description: 'Label for the "I agree with terms of use" checkbox.'
   },
   submitLabel: {
     id: 'profile.termsOfUse.submitLabel',
     defaultMessage: '!!!Continue',
-    description: 'Label for the "Terms of use" form submit button.'
   },
 });
 

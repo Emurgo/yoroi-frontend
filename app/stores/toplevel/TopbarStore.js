@@ -3,7 +3,10 @@ import { observable, action } from 'mobx';
 import Store from '../base/Store';
 import resolver from '../../utils/imports';
 import environment from '../../environment';
-import { WITH_TREZOR_T_CATEGORIE } from '../../config/topbarConfig';
+import {
+  WITH_LEDGER_NANO_S_CATEGORIE as WITH_LEDGER_NANO_S,
+  WITH_TREZOR_T_CATEGORIE as WITH_TREZOR_T,
+} from '../../config/topbarConfig';
 
 const topbarConfig = resolver('config/topbarConfig');
 
@@ -25,13 +28,17 @@ export default class TopbarStore extends Store {
   @action initCategories() {
     this.CATEGORIES = topbarConfig.CATEGORIES;
 
-    // If active wallet is TrezorTWallet then show with Trezor Icon
     const { wallets } = this.stores.substores[environment.API];
-    if (wallets
-      && wallets.first
-      && wallets.first.isTrezorTWallet
-      && !this.CATEGORIES.find(category => category.name === WITH_TREZOR_T_CATEGORIE.name)) {
-      this.CATEGORIES.push(WITH_TREZOR_T_CATEGORIE);
+    // If active wallet is TrezorTWallet then show with Trezor T Icon
+    if (wallets && wallets.first && wallets.first.isTrezorTWallet
+      && !this.CATEGORIES.find(category => category.name === WITH_TREZOR_T.name)) {
+      this.CATEGORIES.push(WITH_TREZOR_T);
+    }
+
+    // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
+    if (wallets && wallets.first && wallets.first.isLedgerNanoSWallet
+      && !this.CATEGORIES.find(category => category.name === WITH_LEDGER_NANO_S.name)) {
+      this.CATEGORIES.push(WITH_LEDGER_NANO_S);
     }
 
     this.activeTopbarCategory = this.CATEGORIES[0].route;

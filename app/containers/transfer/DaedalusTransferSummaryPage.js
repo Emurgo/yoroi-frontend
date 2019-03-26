@@ -10,7 +10,6 @@ const messages = defineMessages({
   addressFromSubLabel: {
     id: 'daedalusTransfer.summary.addressFrom.subLabel',
     defaultMessage: '!!!Daedalus wallet Addresses',
-    description: 'SubLabel showing addresses where the tx will be from',
   }
 });
 

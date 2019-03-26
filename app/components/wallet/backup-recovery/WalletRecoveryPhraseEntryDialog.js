@@ -18,28 +18,27 @@ const messages = defineMessages({
   verificationInstructions: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.verification.instructions',
     defaultMessage: '!!!Tap each word in the correct order to verify your recovery phrase',
-    description: 'Instructions for verifying wallet recovery phrase on dialog for entering wallet recovery phrase.'
+  },
+  buttonLabelRemoveLast: {
+    id: 'wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast',
+    defaultMessage: '!!!Remove last',
   },
   buttonLabelConfirm: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelConfirm',
     defaultMessage: '!!!Confirm',
-    description: 'Label for button "Confirm" on wallet backup dialog'
   },
   buttonLabelClear: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelClear',
     defaultMessage: '!!!Clear',
-    description: 'Label for button "Clear" on wallet backup dialog'
   },
   termDevice: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device',
     defaultMessage: '!!!I understand that my money are held securely on this device only, not on the company servers',
-    description: 'Term and condition on wallet backup dialog describing that wallet is on a users device, not on company servers'
   },
   termRecovery: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery',
     defaultMessage: `!!!I understand that if this application is moved to another device or deleted, my money can
     be only recovered with the backup phrase which were written down in a secure place`,
-    description: 'Term and condition on wallet backup dialog describing that wallet can only be recovered with a security phrase'
   }
 });
 
@@ -51,14 +50,15 @@ type Props = {
   isTermRecoveryAccepted: boolean,
   isSubmitting: boolean,
   onAddWord: Function,
-  canFinishBackup: boolean,
   onClear: Function,
   onAcceptTermDevice: Function,
   onAcceptTermRecovery: Function,
   onRestartBackup: Function,
   onCancelBackup: Function,
   onFinishBackup: Function,
-  classicTheme: boolean
+  removeWord: Function,
+  hasWord: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -81,11 +81,12 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       onClear,
       onAcceptTermDevice,
       onAcceptTermRecovery,
-      canFinishBackup,
+      removeWord,
       onRestartBackup,
       onCancelBackup,
       onFinishBackup,
-      classicTheme
+      hasWord,
+      classicTheme,
     } = this.props;
     const dialogClasses = classnames([
       classicTheme ? styles.componentClassic : styles.component,
@@ -97,19 +98,25 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
 
     const actions = [];
 
-    actions.push({
-      className: isSubmitting ? styles.isSubmitting : null,
-      label: intl.formatMessage(messages.buttonLabelConfirm),
-      onClick: onFinishBackup,
-      disabled: !canFinishBackup,
-      primary: true
-    });
-
     // Only show "Clear" button when user is not yet done with entering mnemonic
     if (!isValid) {
       actions.unshift({
+        label: intl.formatMessage(messages.buttonLabelRemoveLast),
+        onClick: removeWord,
+        disabled: !hasWord,
+        primary: true
+      });
+      actions.unshift({
         label: intl.formatMessage(messages.buttonLabelClear),
         onClick: onClear,
+        primary: true
+      });
+    } else {
+      actions.push({
+        className: isSubmitting ? styles.isSubmitting : null,
+        label: intl.formatMessage(messages.buttonLabelConfirm),
+        onClick: onFinishBackup,
+        primary: true
       });
     }
 

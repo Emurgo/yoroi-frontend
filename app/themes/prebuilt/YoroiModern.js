@@ -34,6 +34,9 @@ const rpButton = {
   '--rp-button-bg-color-disabled': 'rgba(23, 209, 170, 0.3)', // #17d1aa
   '--rp-button-bg-color-hover': '#17e2b8',
   '--rp-button-font-family': rpFonts['--rp-theme-font-medium'],
+  '--rp-button-font-size': '14px',
+  '--rp-button-line-height': '20px',
+  '--rp-button-padding': '12px 20px',
   '--rp-button-text-color': '#fff',
   '--rp-button-text-transform': 'none',
 };

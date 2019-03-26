@@ -12,17 +12,14 @@ const messages = defineMessages({
   headLine: {
     id: 'wallet.redeem.noWallets.headLine',
     defaultMessage: '!!!Ada redemption is not available because you don\'t have any wallets.',
-    description: '"No wallets" headLine on the Ada Redemption Page.'
   },
   instructions: {
     id: 'wallet.redeem.noWallets.instructions',
     defaultMessage: '!!!Create a new wallet (or restore an existing one), come back here and choose it for Ada redemption.',
-    description: '"No wallets" instructions on the Ada Redemption Page.'
   },
   createWalletLink: {
     id: 'wallet.redeem.noWallets.createWalletLink',
     defaultMessage: '!!!Create your first wallet',
-    description: 'URL for the "FAQ on Daedalus website" link in the FAQ section on the support settings page',
   },
 });
 

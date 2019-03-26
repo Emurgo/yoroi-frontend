@@ -2,7 +2,7 @@
 
 git submodule update --init --recursive && \
 cd js-cardano-wasm && \
-git checkout 2833341059426b0aefc60e60b7d281f7ff6bde26 && \
+git checkout bd40ab0f8d6ae27998c7ef5125c8c5cbd109a285 && \
 git submodule update
 cd rust && \
 git checkout 9bef10d1bbd1321d98aa6b30ba030631806ad153 && \

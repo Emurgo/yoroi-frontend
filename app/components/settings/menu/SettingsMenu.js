@@ -11,37 +11,30 @@ const messages = defineMessages({
   general: {
     id: 'settings.menu.general.link.label',
     defaultMessage: '!!!General',
-    description: 'Label for the "General" link in the settings menu.',
   },
   wallet: {
     id: 'settings.menu.wallet.link.label',
     defaultMessage: '!!!Wallet',
-    description: 'Label for the "Wallet" link in the settings menu.',
   },
   support: {
     id: 'settings.menu.support.link.label',
     defaultMessage: '!!!Support',
-    description: 'Label for the "Support" link in the settings menu.',
   },
   termsOfUse: {
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
-    description: 'Label for the "Terms of use" link in the settings menu.',
   },
   display: {
     id: 'settings.menu.display.link.label',
     defaultMessage: '!!!Themes',
-    description: 'Label for the "Themes" link in the settings menu.',
   },
   AboutYoroi: {
     id: 'settings.menu.aboutYroi.link.label',
     defaultMessage: '!!!About Yoroi',
-    description: 'Label for the "About Yoroi" link in the settings menu.',
   },
   adaRedemption: {
     id: 'settings.menu.adaRedemption.link.label',
     defaultMessage: '!!!Ada Redemption',
-    description: 'Label for the "Ada Redemption" link in the settings menu.',
   }
 });
 

@@ -15,22 +15,18 @@ const messages = defineMessages({
   name: {
     id: 'wallet.settings.name.label',
     defaultMessage: '!!!Name',
-    description: 'Label for the "Name" text input on the wallet settings page.',
   },
   passwordLabel: {
     id: 'wallet.settings.password',
     defaultMessage: '!!!Password',
-    description: 'Label for the "Password" field.',
   },
   passwordLastUpdated: {
     id: 'wallet.settings.passwordLastUpdated',
     defaultMessage: '!!!Last updated',
-    description: 'Last updated X time ago message.',
   },
   exportButtonLabel: {
     id: 'wallet.settings.exportWalletButtonLabel',
     defaultMessage: '!!!Export wallet',
-    description: 'Label for the export button on wallet settings.',
   },
 });
 

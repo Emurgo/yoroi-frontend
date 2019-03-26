@@ -22,57 +22,46 @@ const messages = defineMessages({
   title: {
     id: 'wallet.restore.dialog.title.label',
     defaultMessage: '!!!Restore wallet',
-    description: 'Label "Restore wallet" on the wallet restore dialog.'
   },
   walletNameInputLabel: {
     id: 'wallet.restore.dialog.wallet.name.input.label',
     defaultMessage: '!!!Wallet name',
-    description: 'Label for the wallet name input on the wallet restore dialog.'
   },
   walletNameInputHint: {
     id: 'wallet.restore.dialog.wallet.name.input.hint',
     defaultMessage: '!!!Enter wallet name',
-    description: 'Hint "Enter wallet name" for the wallet name input on the wallet restore dialog.'
   },
   recoveryPhraseInputLabel: {
     id: 'wallet.restore.dialog.recovery.phrase.input.label',
     defaultMessage: '!!!Recovery phrase',
-    description: 'Label for the recovery phrase input on the wallet restore dialog.'
   },
   recoveryPhraseInputHint: {
     id: 'wallet.restore.dialog.recovery.phrase.input.hint',
     defaultMessage: '!!!Enter recovery phrase',
-    description: 'Hint "Enter recovery phrase" for the recovery phrase input on the wallet restore dialog.'
   },
   recoveryPhraseNoResults: {
     id: 'wallet.restore.dialog.recovery.phrase.input.noResults',
     defaultMessage: '!!!No results',
-    description: '"No results" message for the recovery phrase input search results.'
   },
   importButtonLabel: {
     id: 'wallet.restore.dialog.restore.wallet.button.label',
     defaultMessage: '!!!Restore wallet',
-    description: 'Label for the "Restore wallet" button on the wallet restore dialog.'
   },
   invalidRecoveryPhrase: {
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
-    description: 'Error message shown when invalid recovery phrase was entered.'
   },
   walletPasswordLabel: {
     id: 'wallet.restore.dialog.walletPasswordLabel',
     defaultMessage: '!!!Wallet password',
-    description: 'Label for the "Wallet password" input in the wallet restore dialog.',
   },
   repeatPasswordLabel: {
     id: 'wallet.restore.dialog.repeatPasswordLabel',
     defaultMessage: '!!!Repeat password',
-    description: 'Label for the "Repeat password" input in the wallet restore dialog.',
   },
   passwordFieldPlaceholder: {
     id: 'wallet.restore.dialog.passwordFieldPlaceholder',
     defaultMessage: '!!!Password',
-    description: 'Placeholder for the "Password" inputs in the wallet restore dialog.',
   },
 });
 

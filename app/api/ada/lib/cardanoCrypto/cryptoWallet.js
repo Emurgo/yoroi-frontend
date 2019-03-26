@@ -110,3 +110,16 @@ export function getCryptoDaedalusWalletFromMnemonics(
   wallet.config.protocol_magic = protocolMagic;
   return wallet;
 }
+
+/** Generate a Daedalus /wallet/ to create transactions. Do not save this. Regenerate every time.
+ * Note: key encoded as hex-string
+ */
+export function getCryptoDaedalusWalletFromMasterKey(
+  masterKey: string,
+): CryptoDaedalusWallet {
+  const encodedKey = Buffer.from(masterKey, 'hex');
+
+  const wallet: CryptoDaedalusWallet = getResultOrFail(Wallet.fromDaedalusMasterKey(encodedKey));
+  wallet.config.protocol_magic = protocolMagic;
+  return wallet;
+}

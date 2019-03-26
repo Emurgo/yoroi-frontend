@@ -24,13 +24,13 @@ const messages = defineMessages({
   noTransactions: {
     id: 'wallet.summary.no.transactions',
     defaultMessage: '!!!No recent transactions',
-    description: 'Message shown when wallet has no transactions on wallet summary page.'
   }
 });
 
 const targetNotificationIds = [
   globalMessages.walletCreatedNotificationMessage.id,
   globalMessages.walletRestoredNotificationMessage.id,
+  globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
   globalMessages.trezorTWalletIntegratedNotificationMessage.id,
 ];
 

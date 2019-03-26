@@ -14,22 +14,18 @@ const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
     id: 'wallet.summary.page.pendingOutgoingConfirmationLabel',
     defaultMessage: '!!!Outgoing pending confirmation',
-    description: '"Outgoing pending confirmation" label on Wallet summary page'
   },
   pendingIncomingConfirmationLabel: {
     id: 'wallet.summary.page.pendingIncomingConfirmationLabel',
     defaultMessage: '!!!Incoming pending confirmation',
-    description: '"Incoming pending confirmation" label on Wallet summary page'
   },
   numOfTxsLabel: {
     id: 'wallet.summary.page.transactionsLabel',
     defaultMessage: '!!!Number of transactions',
-    description: '"Number of transactions" label on Wallet summary page'
   },
   exportIconTooltip: {
     id: 'wallet.transaction.export.exportIcon.tooltip',
     defaultMessage: '!!!Export to file',
-    description: '"Export" icon tooltip'
   }
 });
 

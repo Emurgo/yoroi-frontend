@@ -14,22 +14,18 @@ const messages = defineMessages({
   disclaimerTitle: {
     id: 'wallet.redeem.disclaimerOverlay.title',
     defaultMessage: '!!!Daedalus Redemption Disclamer',
-    description: 'Title of "Redemption disclaimer" on Ada redemption page.'
   },
   disclaimerText: {
     id: 'wallet.redeem.disclaimerOverlay.disclaimerText',
     defaultMessage: '!!!ATTENTION: Redeeming on the Cardano testnet will validate that your certificate or redemption key is correct and will allow you to redeem TEST-ADA for testing purposes only. KEEP your certificate or redemption key safe and secure. You will need to redeem on the mainnet. TEST-ADA holds no value.',
-    description: 'Disclaimer text for "Redemption disclaimer" on Ada redemption page.'
   },
   checkboxLabel: {
     id: 'wallet.redeem.disclaimerOverlay.checkboxLabel',
     defaultMessage: '!!!I’ve understood the information above',
-    description: 'Label for "I’ve understood the information above" checkbox on Ada redemption page "Redemption disclaimer".'
   },
   submitLabel: {
     id: 'wallet.redeem.disclaimerOverlay.submitLabel',
     defaultMessage: '!!!Continue',
-    description: 'Label for "Continue" button on Ada redemption page "Redemption disclaimer".'
   },
 });
 

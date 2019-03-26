@@ -35,7 +35,6 @@ const rpButton = {
   '--rp-button-bg-color-hover': '#edb3a8',
   '--rp-button-font-family': rpFonts['--rp-theme-font-medium'],
   '--rp-button-font-size': '14px',
-  '--rp-button-height': '40px',
   '--rp-button-line-height': '20px',
   '--rp-button-padding': '12px 20px',
   '--rp-button-text-color': '#fafbfc',
@@ -228,7 +227,7 @@ export default {
   '--theme-receive-qr-code-foreground-color': '#121327',
 
   '--theme-send-confirmation-dialog-send-values-color': '#ea4c5b',
-  '--theme-trezor-send-confirmation-info-block-background-color': '#f3f3f5',
+  '--theme-hw-send-confirmation-info-block-background-color': '#f3f3f5',
 
   '--theme-settings-body-background-color': '#ffffff',
   '--theme-settings-pane-background-color': '#f3f3f5',
@@ -335,8 +334,8 @@ export default {
   '--theme-wallet-password-switch-label-color': '#121327',
 
   '--theme-banner-warning-background-color': '#b54b4b',
-  '--theme-trezor-connect-dialog-middle-block-common-background-color': '#f3f3f5',
-  '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
+  '--theme-hw-connect-dialog-middle-block-common-background-color': '#f3f3f5',
+  '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
 
