@@ -1,26 +1,19 @@
 // Css module overrides go here …
 
-// .options {
-//   :global {
-//     .SimpleBubble_bubble {
-//       margin-top: -11px !important;
-//     }
-//   }
+.options {
+  :global {
+    .SimpleBubble_bubble {
+      margin-top: -11px !important;
+    }
+  }
 
-//   span[data-bubble-arrow] {
-//     display: none;
-//   }
-// }
-
-// .ul {
-//   font-size: 16px;
-// }
-
-// .option {
-//   padding: 15px;
-// }
+  span[data-bubble-arrow] {
+    display: none;
+  }
+}
 
 .ul {
+  font-size: 16px;
   overflow-x: hidden;
   overflow-y: overlay;
   max-height: 300px;
@@ -28,4 +21,8 @@
     height: 7px;
     display: block;
   }
+}
+
+.option {
+  padding: 15px;
 }

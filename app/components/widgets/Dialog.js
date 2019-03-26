@@ -36,6 +36,17 @@ export default class Dialog extends Component<Props> {
     modalOverlay: undefined,
   };
 
+  setSkin = (props) => {
+    const { modalOverlay } = this.props;
+    // hack to override modal styles
+    const newProps = _.set(
+      { ...props },
+      `theme.${props.themeId}.modal`,
+      `${props.theme[props.themeId].modal} ${modalOverlay}`
+    );
+    return ModalSkin(modalOverlay ? newProps : props);
+  }
+
   render() {
     const {
       title,
@@ -46,7 +57,6 @@ export default class Dialog extends Component<Props> {
       className,
       closeButton,
       backButton,
-      modalOverlay,
       classicTheme
     } = this.props;
     const titleClasses = classicTheme ? styles.titleClassic : styles.title;
@@ -57,15 +67,7 @@ export default class Dialog extends Component<Props> {
         isOpen
         triggerCloseOnOverlayClick={closeOnOverlayClick}
         onClose={onClose}
-        skin={(props) => {
-          // hack to override modal styles
-          const newProps = _.set(
-            { ...props },
-            `theme.${props.themeId}.modal`,
-            `${props.theme[props.themeId].modal} ${modalOverlay}`
-          );
-          return ModalSkin(modalOverlay ? newProps : props);
-        }}
+        skin={this.setSkin}
       >
 
         <div className={classnames([styles.dialogWrapper, className])}>
