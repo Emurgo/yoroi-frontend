@@ -1,7 +1,7 @@
 // @flow
 import { ROUTES } from '../routes-config';
 import walletsIcon from '../assets/images/yoroi-logo-shape-white.inline.svg';
-import withLedgerNanoSIcon from '../assets/images/top-bar/with-ledger-nano-s-logo-white.inline.svg';
+import withLedgerNanoSIcon from '../assets/images/top-bar/with-ledger-nano-s-logo.inline.svg';
 import withTrezorTIcon from '../assets/images/top-bar/with-trezor-t-logo-white.inline.svg';
 import settingsIcon from '../assets/images/top-bar/setting-active.inline.svg';
 import daedalusTransferIcon from '../assets/images/top-bar/daedalus-migration-active.inline.svg';
