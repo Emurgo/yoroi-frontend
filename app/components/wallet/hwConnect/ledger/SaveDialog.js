@@ -15,7 +15,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
-// import HelpLinkBlock from './HelpLinkBlock';
+import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import saveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-ledger-modern.inline.svg';
@@ -161,7 +161,7 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {walletNameBlock}
         {middleBlock}
-        {/* <HelpLinkBlock progressInfo={progressInfo} /> */}
+        <HelpLinkBlock progressInfo={progressInfo} />
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
       </Dialog>);
   }
