@@ -11,7 +11,7 @@ const rpFonts = {
 
 // AUTOCOMPLETE
 const rpAutocomplete = {
-  '--rp-autocomplete-bg-color': '#fff',
+  '--rp-autocomplete-bg-color': 'transparent',
   '--rp-autocomplete-border': '1px solid #9b9b9b',
   '--rp-autocomplete-border-color-opened': '#353535',
   '--rp-autocomplete-input-text-color': '#353535',
@@ -258,12 +258,6 @@ export default {
   '--theme-topbar-background-color': 'linear-gradient(to right, #1e46bd, #4760ff)',
   '--theme-topbar-wallet-name-color': '#ffffff',
   '--theme-topbar-wallet-info-color': '#ffffff',
-
-  // '--theme-topbar-category-background-color-hover': '#373f52',
-  // '--theme-topbar-category-text-color': '#fafbfc',
-  // '--theme-topbar-background-color': '#dc1144',
-  // '--theme-topbar-wallet-name-color': '#fafbfc',
-  // '--theme-topbar-wallet-info-color': '#fafbfc',
   '--theme-topbar-layout-body-background-color': '#ffffff',
 
   '--theme-transactions-list-background-color': '#f0f3f5',
@@ -289,31 +283,16 @@ export default {
   '--theme-transactions-received-address-color': '#9b9b9b',
   '--theme-transactions-text-color': '#adaeb6',
 
-  // '--theme-icon-nav-color': 'rgba(18, 19, 39, 0.6)',
-  // '--theme-icon-nav-color-active': '#ffffff',
-  // '--theme-icon-topbar-color': '#fafbfc',
-  // '--theme-icon-toggle-menu-color': '#fafbfc',
-  // '--theme-icon-ada-summary-wallet-amount-symbol-color': '#121327',
-  // '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#121327',
-  // '--theme-icon-copy-address-color': '#121327',
-  // '--theme-icon-back-button-color': '#121327',
-  // '--theme-icon-close-button-color': '#121327',
-  // '--theme-icon-transactions-ada-symbol-color': '#2b2c32',
-  // '--theme-icon-transaction-type-color': '#fafbfc',
-
-  '--theme-icon-nav-color': 'rgba(18, 19, 39, 0.6)', // #121327
+  '--theme-icon-nav-color': '#adaeb6',
   '--theme-icon-nav-color-active': '#ffffff',
   '--theme-icon-topbar-color': '#ffffff',
   '--theme-icon-toggle-menu-color': '#ffffff',
   '--theme-icon-ada-summary-wallet-amount-symbol-color': '#2b2c32',
   '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#2b2c32',
-  // '--theme-icon-topbar-color': '#fafbfc',
-  // '--theme-icon-toggle-menu-color': '#fafbfc',
-  // '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#121327',
-  '--theme-icon-copy-address-color': '#121327',
-  '--theme-icon-back-button-color': '#121327',
-  '--theme-icon-close-button-color': '#121327',
-  '--theme-icon-transactions-ada-symbol-color': '#121327',
+  '--theme-icon-copy-address-color': '#353535',
+  '--theme-icon-back-button-color': '#353535',
+  '--theme-icon-close-button-color': '#353535',
+  '--theme-icon-transactions-ada-symbol-color': '#353535',
   '--theme-icon-transaction-type-color': '#fafbfc',
 
   '--theme-wallet-add-color': '#ffffff',

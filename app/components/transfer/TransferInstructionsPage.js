@@ -73,6 +73,7 @@ export default class TransferInstructionsPage extends Component<Props> {
       'primary',
       styles.button,
     ]);
+    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
 
     return (
       <div className="transferInstructionsPageComponent">
@@ -84,7 +85,7 @@ export default class TransferInstructionsPage extends Component<Props> {
             <div className={styles.body}>
 
               <div>
-                <div className={styles.title}>
+                <div className={titleClasses}>
                   {intl.formatMessage(messages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
@@ -113,7 +114,7 @@ export default class TransferInstructionsPage extends Component<Props> {
             <div className={styles.body}>
 
               <div>
-                <div className={styles.title}>
+                <div className={titleClasses}>
                   {intl.formatMessage(messages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
@@ -121,9 +122,14 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
               </div>
 
+              <div className={classicTheme ? styles.buttonTitleClassic : styles.buttonTitle}>
+                Transfer all funds from:
+              </div>
+
               <Button
                 className={confirmButtonClasses}
-                label={confirmationText}
+                // label={confirmationText}
+                label="Daedalus Wallet"
                 onClick={onConfirm}
                 disabled={disableTransferFunds}
                 skin={ButtonSkin}
@@ -131,7 +137,8 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <Button
                 className={confirmButtonClasses}
-                label={confirmationPaperText}
+                // label={confirmationPaperText}
+                label="Daedalus Paper Wallet"
                 onClick={onPaperConfirm}
                 disabled={disableTransferFunds}
                 skin={ButtonSkin}
@@ -139,7 +146,8 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <Button
                 className={`masterKey ${confirmButtonClasses}`} // append class for testing
-                label={confirmationMasterKeyText}
+                // label={confirmationMasterKeyText}
+                label="Daedalus Master Key"
                 onClick={onMasterKeyConfirm}
                 disabled={disableTransferFunds}
                 skin={ButtonSkin}

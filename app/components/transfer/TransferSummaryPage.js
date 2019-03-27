@@ -71,6 +71,13 @@ export default class TransferSummaryPage extends Component<Props> {
       transferTx.recoveredBalance.minus(transferTx.fee)
     );
 
+    const addressLabelClasses = classicTheme ? styles.addressLabelClassic : styles.addressLabel;
+    const amountLabelClasses = classicTheme ? styles.amountLabelClassic : styles.amountLabel;
+    const feesLabelClasses = classicTheme ? styles.feesLabelClassic : styles.feesLabel;
+    const totalAmountLabelClasses = classicTheme
+      ? styles.totalAmountLabelClassic
+      : styles.totalAmountLabel;
+
     const nextButtonClasses = classnames([
       'transferButton',
       isSubmitting ? styles.isSubmitting : 'primary',
@@ -79,7 +86,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
     const cancelButtonClasses = classnames([
       'cancelTransferButton',
-      'flat',
+      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -90,7 +97,7 @@ export default class TransferSummaryPage extends Component<Props> {
           <div className={styles.body}>
 
             <div className={styles.addressLabelWrapper}>
-              <div className={styles.addressLabel}>
+              <div className={addressLabelClasses}>
                 {intl.formatMessage(messages.addressFromLabel)}
               </div>
               <div className={styles.addressSubLabel}>
@@ -112,7 +119,7 @@ export default class TransferSummaryPage extends Component<Props> {
             </div>
 
             <div className={styles.addressLabelWrapper}>
-              <div className={styles.addressLabel}>
+              <div className={addressLabelClasses}>
                 {intl.formatMessage(messages.addressToLabel)}
               </div>
               <div className={styles.address}>{receiver}</div>
@@ -120,7 +127,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
             <div className={styles.amountFeesWrapper}>
               <div className={styles.amountWrapper}>
-                <div className={styles.amountLabel}>
+                <div className={amountLabelClasses}>
                   {intl.formatMessage(messages.recoveredBalanceLabel)}
                 </div>
                 <div className={styles.amount}>{recoveredBalance}
@@ -129,7 +136,7 @@ export default class TransferSummaryPage extends Component<Props> {
               </div>
 
               <div className={styles.feesWrapper}>
-                <div className={styles.feesLabel}>
+                <div className={feesLabelClasses}>
                   {intl.formatMessage(messages.transactionFeeLabel)}
                 </div>
                 <div className={styles.fees}>+{transactionFee}
@@ -139,7 +146,7 @@ export default class TransferSummaryPage extends Component<Props> {
             </div>
 
             <div className={styles.totalAmountWrapper}>
-              <div className={styles.totalAmountLabel}>
+              <div className={totalAmountLabelClasses}>
                 {intl.formatMessage(messages.finalBalanceLabel)}
               </div>
               <div className={styles.totalAmount}>{finalBalance}

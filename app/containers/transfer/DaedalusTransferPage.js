@@ -115,10 +115,11 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     );
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
+
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
-          <MainLayout topbar={topBar} classicTheme={theme.classic} withFooter={!theme.classic}>
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
             <DaedalusTransferInstructionsPage
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               onAnswerYes={this.goToReceiveScreen}
@@ -148,7 +149,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case 'gettingPaperMnemonics':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
@@ -161,7 +162,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case 'gettingMasterKey':
         return (
-          <MainLayout topbar={topBar}>
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
             <DaedalusTransferMasterKeyFormPage
               onSubmit={this.setupTransferFundsWithMasterKey}
               onBack={this.backToUninitialized}
@@ -200,6 +201,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferErrorPage
               error={daedalusTransfer.error}
               onCancel={this.cancelTransferFunds}
+              classicTheme={theme.classic}
             />
           </MainLayout>
         );

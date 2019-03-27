@@ -29,7 +29,6 @@ export default class TopBarCategory extends Component<Props> {
       className === 'wallets' ? styles.walletsIcon : null,
       isWithHW ? styles.withHardwareWalletIcon : null,
       classicTheme ? styles.iconClassic : styles.icon
-      // styles.icon
     ]);
 
     return (

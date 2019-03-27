@@ -104,7 +104,7 @@ export default class TransferMnemonicPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      'flat',
+      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -118,7 +118,7 @@ export default class TransferMnemonicPage extends Component<Props> {
 
             { /* Instructions for how to transfer */ }
             <div>
-              <div className={styles.title}>
+              <div className={classicTheme ? styles.titleClassic : styles.title}>
                 {intl.formatMessage(messages.instructionTitle)}
               </div>
 
