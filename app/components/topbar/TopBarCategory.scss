@@ -15,32 +15,47 @@
 }
 
 .active {
-  .icon:not(.withHardwareWalletIcon) path {
+  .icon:not(.withLedgerNanoSIcon):not(.withTrezorTIcon) path {
     stroke: var(--theme-button-primary-background-color);
     fill: var(--theme-button-primary-background-color);
   }
 
-  .icon:not(.walletsIcon):not(.withHardwareWalletIcon) path {
+  .icon:not(.walletsIcon):not(.withLedgerNanoSIcon):not(.withTrezorTIcon) path {
     fill: var(--theme-button-primary-background-color);
   }
 
-  .icon:not(.walletsIcon):not(.withHardwareWalletIcon) polygon {
+  .icon:not(.walletsIcon):not(.withLedgerNanoSIcon):not(.withTrezorTIcon) polygon {
     fill: var(--theme-button-primary-background-color);
   }
 
-  .withHardwareWalletIcon {
+  .withLedgerNanoSIcon {
     & > svg {
       // plus-logo
       & > g > g:nth-child(1) {
         stroke: none;
         fill: var(--theme-button-primary-background-color);
       }
-      // hardware wallet (trezor/ledger)
+      // Ledger Nano S icon
+      & > g > g:nth-child(2) path {
+        stroke: var(--theme-button-primary-background-color);
+        fill: var(--theme-button-primary-background-color);
+      }
+    }
+  }  
+
+  .withTrezorTIcon {
+    & > svg {
+      // plus-logo
+      & > g > g:nth-child(1) {
+        stroke: none;
+        fill: var(--theme-button-primary-background-color);
+      }
+      // Trezor Model T icon
       & > g > g:nth-child(2) {
         stroke: var(--theme-button-primary-background-color);
       }
     }
-  }  
+  }
 
   &:hover {
     cursor: default;
@@ -68,7 +83,7 @@
   }
 }
 
-.withHardwareWalletIcon {
+.withLedgerNanoSIcon {
   flex-shrink: 0;
   & > svg {
     width: 64px;
@@ -78,7 +93,24 @@
       stroke: none;
       fill: var(--theme-icon-topbar-color);
     }
-    // hardware wallet (trezor/ledger)
+    // Ledger Nano S icon
+    & > g > g:nth-child(2) {
+      stroke: var(--theme-icon-topbar-color);
+    }    
+  }
+}
+
+.withTrezorTIcon {
+  flex-shrink: 0;
+  & > svg {
+    width: 64px;
+    height: 42.5px;
+    // plus-logo
+    & > g > g:nth-child(1) {
+      stroke: none;
+      fill: var(--theme-icon-topbar-color);
+    }
+    // Ledger Nano S icon
     & > g > g:nth-child(2) {
       stroke: var(--theme-icon-topbar-color);
     }    
