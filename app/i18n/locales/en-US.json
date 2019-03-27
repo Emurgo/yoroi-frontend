@@ -188,7 +188,7 @@
   "wallet.connect.hw.dialog.step.save.label": "SAVE",
   "wallet.connect.hw.dialog.step.save.walletName.hint": "Enter wallet name",
   "wallet.connect.hw.dialog.step.save.walletName.label": "WALLET NAME",
-  "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://youtu.be/Dp0wXwtToX0",
+  "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text": "Click here to learn more about using Yoroi with Ledger",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1": "Only Supports ",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link": "https://www.ledger.com/products/ledger-nano-s",

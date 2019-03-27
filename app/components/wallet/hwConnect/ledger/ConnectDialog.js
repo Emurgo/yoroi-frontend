@@ -13,7 +13,7 @@ import DialogBackButton from '../../../widgets/DialogBackButton';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
-// import HelpLinkBlock from './HelpLinkBlock';
+import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/ledger/connect-load.gif';
@@ -116,7 +116,7 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        {/* <HelpLinkBlock progressInfo={progressInfo} /> */}
+        <HelpLinkBlock progressInfo={progressInfo} />
         <HWErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }

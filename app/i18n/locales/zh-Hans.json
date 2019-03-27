@@ -188,7 +188,7 @@
   "wallet.connect.hw.dialog.step.save.label": "保存",
   "wallet.connect.hw.dialog.step.save.walletName.hint": "输入钱包名称",
   "wallet.connect.hw.dialog.step.save.walletName.label": "钱包名称",
-  "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://youtu.be/Dp0wXwtToX0",
+  "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text": "点击这里了解更多关于使用 Yoroi 与 Ledger",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1": "仅支援 ",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link": "https://www.ledger.com/products/ledger-nano-s",

@@ -11,7 +11,7 @@ import styles from '../common/HelpLinkBlock.scss';
 const messages = defineMessages({
   helpLinkYoroiWithLedger: {
     id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger',
-    defaultMessage: '!!!https://yoroi-wallet.com/',
+    defaultMessage: '!!!https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano',
   },
   helpLinkYoroiWithLedgerText: {
     id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text',
@@ -35,8 +35,8 @@ export default class HelpLinkBlock extends Component<Props> {
 
     return (
       <div className={styles.linkBlock}>
-        <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-          {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+        <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.helpLinkYoroiWithLedger)}>
+          {intl.formatMessage(messages.helpLinkYoroiWithLedgerText)}
           <SvgInline svg={externalLinkSVG} />
         </a>
       </div>);

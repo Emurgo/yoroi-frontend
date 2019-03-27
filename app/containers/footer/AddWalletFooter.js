@@ -3,9 +3,7 @@ import FooterItem from '../../components/footer/FooterItem';
 import HorizontalFlexContainer from '../../components/layout/HorizontalFlexContainer';
 
 import buyTrezorSvg from '../../assets/images/footer/buy-trezor.inline.svg';
-import whatIsHardwareWalletSvg from '../../assets/images/footer/what-is-hardware-wallet.inline.svg';
 import howCreateWalletSvg from '../../assets/images/footer/how-to-create-wallet.inline.svg';
-import howConnetTrezorSvg from '../../assets/images/footer/how-to-connect-trezor.inline.svg';
 import howRestoreWalletSvg from '../../assets/images/footer/how-to-restore-wallet.inline.svg';
 
 import { defineMessages } from 'react-intl';
@@ -15,17 +13,9 @@ const messages = defineMessages({
     id: 'wallet.footer.buyTrezorHardwareWallet.text',
     defaultMessage: '!!!Buy a Trezor hardware wallet.',
   },
-  whatIsHardwareWallet: {
-    id: 'wallet.footer.whatIsHardwareWallet.text',
-    defaultMessage: '!!!What is a hardware wallet',
-  },
   buyLedgerHardwareWallet: {
     id: 'wallet.footer.buyLedgerHardwareWallet.text',
     defaultMessage: '!!!Buy a Ledger hardware wallet.',
-  },
-  howToConnectTrezor: {
-    id: 'wallet.footer.howToConnectTrezor.text',
-    defaultMessage: '!!!How to connect a Trezor.',
   },
   howToCreateWallet: {
     id: 'wallet.footer.howToCreateWallet.text',
@@ -35,6 +25,18 @@ const messages = defineMessages({
     id: 'wallet.footer.howToRestoreWallet.text',
     defaultMessage: '!!!How to restore a wallet.',
   },
+  /* Temporarily disable
+   * re-enable when new design is ready and if it's still needed
+   * if it's not needed in new design,
+   * then delete this as well as it's assets and translations */
+  // whatIsHardwareWallet: {
+  //   id: 'wallet.footer.whatIsHardwareWallet.text',
+  //   defaultMessage: '!!!What is a hardware wallet',
+  // },
+  // howToConnectTrezor: {
+  //   id: 'wallet.footer.howToConnectTrezor.text',
+  //   defaultMessage: '!!!How to connect a Trezor.',
+  // },
 });
 
 export default class AddWalletFooter extends Component {
@@ -48,22 +50,10 @@ export default class AddWalletFooter extends Component {
           message={messages.buyTrezorHardwareWallet}
         />
         <FooterItem
-          url="https://medium.com/@emurgo_io/whats-a-hardware-wallet-b3605a026008"
-          svg={whatIsHardwareWalletSvg}
-          message={messages.whatIsHardwareWallet}
-        />
-        {/* Temporarily disable, re-enable when Ledger is ready to enable */}
-        {/* <FooterItem
           url="https://yoroi-wallet.com/get-ledger"
           svg={buyTrezorSvg}
           message={messages.buyLedgerHardwareWallet}
-        /> */}
-        {/* It should be enable in the future with a video on how to connect Ledger */}
-        {/* <FooterItem
-          url="https://youtu.be/Dp0wXwtToX0"
-          svg={howConnetTrezorSvg}
-          message={messages.howToConnectTrezor}
-        /> */}
+        />
         <FooterItem
           url="https://youtu.be/9jg8lsreIQ8?t=56"
           svg={howCreateWalletSvg}
@@ -74,6 +64,22 @@ export default class AddWalletFooter extends Component {
           svg={howRestoreWalletSvg}
           message={messages.howToRestoreWallet}
         />
+        {
+          /* Temporarily disable
+           * re-enable when new design is ready and if it's still needed
+           * if it's not needed in new design,
+           * then delete this as well as it's assets and translations */
+        }
+        {/* <FooterItem
+          url="https://medium.com/@emurgo_io/whats-a-hardware-wallet-b3605a026008"
+          svg={whatIsHardwareWalletSvg}
+          message={messages.whatIsHardwareWallet}
+        /> */}
+        {/* <FooterItem
+          url="https://youtu.be/Dp0wXwtToX0"
+          svg={howConnetTrezorSvg}
+          message={messages.howToConnectTrezor}
+        /> */}
       </HorizontalFlexContainer>
     );
   }
