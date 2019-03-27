@@ -163,7 +163,7 @@
   "wallet.add.dialog.restoreNotificationMessage": "В настоящее время осуществляется восстановление кошелька. До его полного завершения, невозможно восстановить или импортировать новые кошельки.",
   "wallet.add.dialog.title.label": "Добавить кошелек",
   "wallet.add.dialog.trezor.description": "Подключиться к аппаратному кошельку Trezor",
-  "wallet.add.page.title": "Добавить кошелек",
+  "wallet.add.page.title": "Добавить Кошелек",
   "wallet.amountInput.feesLabel": "+ комиссия {amount}",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "Продолжить",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Убедитесь, что никто не смотрит на экран Вашего устройства, если только Вы не собираетесь предоставить им доступ к Вашим средствам.",
