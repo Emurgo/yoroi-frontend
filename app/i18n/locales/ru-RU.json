@@ -237,7 +237,7 @@
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Контактные данные",
   "wallet.receive.confirmationDialog.addressLabel": "Адрес",
   "wallet.receive.confirmationDialog.derivationPathLabel": "Путь деривации (от англ. Derivation Path)",
-  "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Проверить на аппаратный кошелек",
+  "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Проверить на аппаратном кошельке",
   "wallet.receive.page.addressCopyNotificationMessage": "Вы успешно скопировали адрес своего кошелька",
   "wallet.receive.page.copyAddressLabel": "Скопировать адрес",
   "wallet.receive.page.generateNewAddressButtonLabel": "Сгенерировать новый адрес",
