@@ -10,6 +10,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
+import magnifyingGlass from '../../assets/images/search-ic-dark.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -20,37 +21,30 @@ const messages = defineMessages({
   walletAddressLabel: {
     id: 'wallet.receive.page.walletAddressLabel',
     defaultMessage: '!!!Your wallet address',
-    description: 'Label for wallet address on the wallet "Receive page"',
   },
   walletReceiveInstructions: {
     id: 'wallet.receive.page.walletReceiveInstructions',
     defaultMessage: '!!!Share this wallet address to receive payments. To protect your privacy, new addresses are generated automatically once you use them.',
-    description: 'Wallet receive payments instructions on the wallet "Receive page"',
   },
   generateNewAddressButtonLabel: {
     id: 'wallet.receive.page.generateNewAddressButtonLabel',
     defaultMessage: '!!!Generate new address',
-    description: 'Label for "Generate new address" button on the wallet "Receive page"',
   },
   generatedAddressesSectionTitle: {
     id: 'wallet.receive.page.generatedAddressesSectionTitle',
     defaultMessage: '!!!Generated addresses',
-    description: '"Generated addresses" section title on the wallet "Receive page"',
   },
   hideUsedLabel: {
     id: 'wallet.receive.page.hideUsedLabel',
     defaultMessage: '!!!hide used',
-    description: 'Label for "hide used" wallet addresses link on the wallet "Receive page"',
   },
   showUsedLabel: {
     id: 'wallet.receive.page.showUsedLabel',
     defaultMessage: '!!!show used',
-    description: 'Label for "show used" wallet addresses link on the wallet "Receive page"',
   },
   copyAddressLabel: {
     id: 'wallet.receive.page.copyAddressLabel',
     defaultMessage: '!!!Copy address',
-    description: 'Label for "Copy address" link on the wallet "Receive page"',
   },
 });
 
@@ -62,6 +56,7 @@ type Props = {
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
   onCopyAddress: Function,
+  onAddressDetail: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
 };
@@ -97,7 +92,7 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress,
+      onCopyAddress, onAddressDetail,
       isSubmitting, error, isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
@@ -181,11 +176,21 @@ export default class WalletReceive extends Component<Props, State> {
               <div key={`gen-${address.id}`} className={addressClasses}>
                 <div className={styles.addressId}>{address.id}</div>
                 <div className={styles.addressActions}>
+                  <span className={styles.addressIcon}>
+                    <SvgInline
+                      svg={magnifyingGlass}
+                      className={styles.copyIcon}
+                      onClick={
+                        onAddressDetail.bind(this, { address: address.id, path: address.path })
+                      }
+                    />
+                  </span>
+                  &nbsp;
                   <CopyToClipboard
                     text={address.id}
                     onCopy={onCopyAddress.bind(this, address.id)}
                   >
-                    <span className={styles.copyAddress}>
+                    <span className={styles.addressIcon}>
                       <SvgInline svg={iconCopy} className={styles.copyIcon} />
                       <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
                     </span>
@@ -207,5 +212,4 @@ export default class WalletReceive extends Component<Props, State> {
       </div>
     );
   }
-
 }

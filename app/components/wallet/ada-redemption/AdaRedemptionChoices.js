@@ -10,27 +10,22 @@ const messages = defineMessages({
   regularTabTitle: {
     id: 'wallet.redeem.choices.tab.title.regularVended',
     defaultMessage: '!!!Regular',
-    description: 'Tab title "Regular" on Ada redemption page.'
   },
   forceVendedTabTitle: {
     id: 'wallet.redeem.choices.tab.title.forceVended',
     defaultMessage: '!!!Force vended',
-    description: 'Tab title "Force vended" on Ada redemption page.'
   },
   paperVendedTabTitle: {
     id: 'wallet.redeem.choices.tab.title.paperVended',
     defaultMessage: '!!!Paper vended',
-    description: 'Tab title "Paper vended" on Ada redemption page.'
   },
   recoveryRegularTabTitle: {
     id: 'wallet.redeem.choices.tab.title.recoveryRegular',
     defaultMessage: '!!!Recovery - regular',
-    description: 'Tab title "Recovery - regular" on Ada redemption page.'
   },
   recoveryForceVendedTabTitle: {
     id: 'wallet.redeem.choices.tab.title.recoveryForceVended',
     defaultMessage: '!!!Recovery - force vended',
-    description: 'Tab title "Recovery - force vended" on Ada redemption page.'
   },
 });
 

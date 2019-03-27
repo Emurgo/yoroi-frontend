@@ -26,17 +26,14 @@ const messagesLedger: MessageDescriptorMap = defineMessages({
   infoLine1: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
-    description: 'Informative message line 1 in the ledger wallet send confirmation dialog.'
   },
   infoLine2: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.2',
     defaultMessage: '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
-    description: 'Informative message line 2 in the ledger wallet send confirmation dialog.'
   },
   sendUsingHWButtonLabel: {
     id: 'wallet.send.ledger.confirmationDialog.submit',
     defaultMessage: '!!!Send using Ledger',
-    description: 'Label for the send button in the ledger walle send confirmation dialog.'
   },
 });
 
@@ -44,17 +41,14 @@ const messagesTrezor: MessageDescriptorMap = defineMessages({
   infoLine1: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
-    description: 'Informative message line 1 in the trezor wallet send confirmation dialog.'
   },
   infoLine2: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.2',
     defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
-    description: 'Informative message line 2 in the trezor wallet send confirmation dialog.'
   },
   sendUsingHWButtonLabel: {
     id: 'wallet.send.trezor.confirmationDialog.submit',
     defaultMessage: '!!!Send using Trezor',
-    description: 'Label for the send button in the trezor wallet send confirmation dialog.'
   },
 });
 

@@ -12,7 +12,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
-// import HelpLinkBlock from './HelpLinkBlock';
+import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
@@ -27,37 +27,30 @@ const messages = defineMessages({
   aboutPrerequisite1Part1: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1',
     defaultMessage: '!!!Only Supports ',
-    description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2Link: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link',
     defaultMessage: '!!!https://www.ledger.com/products/ledger-nano-s',
-    description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part2LinkText: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link.text',
     defaultMessage: '!!!Ledger Nano S',
-    description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite1Part3: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3',
     defaultMessage: '!!! model.',
-    description: 'First Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite2: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part2',
     defaultMessage: '!!!Cardano ADA app must be installed on the Ledger device.',
-    description: 'Second Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite3: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.3',
     defaultMessage: '!!!Cardano ADA app must remain open on the Ledger device.',
-    description: 'Third Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
   aboutPrerequisite5: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.5',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
-    description: 'Fifth Prerequisite on the Connect to Ledger Hardware Wallet dialog.'
   },
 });
 
@@ -142,7 +135,7 @@ export default class AboutDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        {/* <HelpLinkBlock progressInfo={progressInfo} /> */}
+        <HelpLinkBlock progressInfo={progressInfo} />
         <HWErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }

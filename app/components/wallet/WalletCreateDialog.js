@@ -17,37 +17,30 @@ const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.create.dialog.title',
     defaultMessage: '!!!Create a new wallet',
-    description: 'Title "Create a new wallet" in the wallet create form.'
   },
   walletName: {
     id: 'wallet.create.dialog.name.label',
     defaultMessage: '!!!Wallet Name',
-    description: 'Label for the "Wallet Name" text input in the wallet create form.'
   },
   walletNameHint: {
     id: 'wallet.create.dialog.walletNameHint',
     defaultMessage: '!!!e.g: Shopping Wallet',
-    description: 'Hint for the "Wallet Name" text input in the wallet create form.'
   },
   createPersonalWallet: {
     id: 'wallet.create.dialog.create.personal.wallet.button.label',
     defaultMessage: '!!!Create personal wallet',
-    description: 'Label for the "Create personal wallet" button on create wallet dialog.'
   },
   walletPasswordLabel: {
     id: 'wallet.create.dialog.walletPasswordLabel',
     defaultMessage: '!!!Wallet password',
-    description: 'Label for the "Wallet password" input in the create wallet dialog.',
   },
   repeatPasswordLabel: {
     id: 'wallet.create.dialog.repeatPasswordLabel',
     defaultMessage: '!!!Repeat password',
-    description: 'Label for the "Repeat password" input in the create wallet dialog.',
   },
   passwordFieldPlaceholder: {
     id: 'wallet.create.dialog.passwordFieldPlaceholder',
     defaultMessage: '!!!Password',
-    description: 'Placeholder for the "Password" inputs in the create wallet dialog.',
   },
 });
 

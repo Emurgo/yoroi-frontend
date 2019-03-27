@@ -35,7 +35,6 @@ const rpButton = {
   '--rp-button-bg-color-hover': '#edb3a8',
   '--rp-button-font-family': rpFonts['--rp-theme-font-medium'],
   '--rp-button-font-size': '14px',
-  '--rp-button-height': '40px',
   '--rp-button-line-height': '20px',
   '--rp-button-padding': '12px 20px',
   '--rp-button-text-color': '#fafbfc',

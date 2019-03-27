@@ -18,33 +18,27 @@ const messages = defineMessages({
   verificationInstructions: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.verification.instructions',
     defaultMessage: '!!!Tap each word in the correct order to verify your recovery phrase',
-    description: 'Instructions for verifying wallet recovery phrase on dialog for entering wallet recovery phrase.'
   },
   buttonLabelRemoveLast: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast',
     defaultMessage: '!!!Remove last',
-    description: 'Label for button "Remove Last" on wallet backup dialog'
   },
   buttonLabelConfirm: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelConfirm',
     defaultMessage: '!!!Confirm',
-    description: 'Label for button "Confirm" on wallet backup dialog'
   },
   buttonLabelClear: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelClear',
     defaultMessage: '!!!Clear',
-    description: 'Label for button "Clear" on wallet backup dialog'
   },
   termDevice: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device',
     defaultMessage: '!!!I understand that my money are held securely on this device only, not on the company servers',
-    description: 'Term and condition on wallet backup dialog describing that wallet is on a users device, not on company servers'
   },
   termRecovery: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery',
     defaultMessage: `!!!I understand that if this application is moved to another device or deleted, my money can
     be only recovered with the backup phrase which were written down in a secure place`,
-    description: 'Term and condition on wallet backup dialog describing that wallet can only be recovered with a security phrase'
   }
 });
 

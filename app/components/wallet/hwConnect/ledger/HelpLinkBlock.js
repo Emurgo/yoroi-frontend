@@ -9,15 +9,13 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import styles from '../common/HelpLinkBlock.scss';
 
 const messages = defineMessages({
-  helpLinkYoroiWithTrezor: {
-    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithTrezor',
-    defaultMessage: '!!!https://yoroi-wallet.com/',
-    description: 'Tutorial link about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
+  helpLinkYoroiWithLedger: {
+    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger',
+    defaultMessage: '!!!https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano',
   },
-  helpLinkYoroiWithTrezorText: {
-    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithTrezor.text',
-    defaultMessage: '!!!Click here to know more about how to use Yoroi with Trezor.',
-    description: 'Tutorial link text about how to use Yoroi with Trezor on the Connect to Trezor Hardware Wallet dialog.'
+  helpLinkYoroiWithLedgerText: {
+    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text',
+    defaultMessage: '!!!Click here to know more about how to use Yoroi with Ledger.',
   },
 });
 
@@ -37,8 +35,8 @@ export default class HelpLinkBlock extends Component<Props> {
 
     return (
       <div className={styles.linkBlock}>
-        <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}>
-          {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
+        <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.helpLinkYoroiWithLedger)}>
+          {intl.formatMessage(messages.helpLinkYoroiWithLedgerText)}
           <SvgInline svg={externalLinkSVG} />
         </a>
       </div>);

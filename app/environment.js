@@ -7,9 +7,10 @@ declare var CONFIG: ConfigType;
 
 declare type Currency = 'ada';
 
-const environment = (Object.assign({
+export const environment = (Object.assign({
   /** Network used to connect */
   NETWORK: CONFIG.network.name,
+  version: require('../chrome/manifest.' + CONFIG.network.name + '.json').version,
   /** Environment used during webpack build */
   current: process.env.NODE_ENV,
 
@@ -24,6 +25,7 @@ const environment = (Object.assign({
   walletRefreshInterval: CONFIG.app.walletRefreshInterval,
 }, process.env): {
   NETWORK: Network,
+  version: string,
   current: ?string,
   API: Currency,
   MOBX_DEV_TOOLS: ?string,

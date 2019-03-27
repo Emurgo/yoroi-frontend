@@ -20,9 +20,8 @@ import {
 import { toAdaWallet, toAdaHardwareWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
   getAdaAddressesList,
-  newAdaAddress
 } from './adaAddress';
-import { newCryptoAccount } from './adaAccount';
+import { createCryptoAccount } from './adaAccount';
 import type {
   AdaWallet,
   AdaWalletParams,
@@ -40,8 +39,14 @@ import type {
   UtxoSumForAddressesResponse
 } from './lib/yoroi-backend-api';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
-import { saveAdaWallet, getAdaWallet, getWalletMasterKey } from './adaLocalStorage';
+import {
+  getAdaWallet,
+  getWalletMasterKey,
+  saveAdaWallet,
+  saveWalletMasterKey
+} from './adaLocalStorage';
 import type { ConfigType } from '../../../config/config-types';
+import { restoreTransactionsAndSave } from './restoreAdaWallet';
 
 declare var CONFIG : ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
@@ -51,9 +56,10 @@ export async function newAdaWallet(
   { walletPassword, walletInitData }: AdaWalletParams
 ): Promise<AdaWallet> {
   const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
-  const cryptoAccount = newCryptoAccount(masterKey, walletPassword);
-  await newAdaAddress(cryptoAccount, 'External');
-  saveAdaWallet(adaWallet, masterKey);
+  const cryptoAccount = createCryptoAccount(masterKey, walletPassword);
+
+  // creating an account same as restoring an account plus some initial setup
+  await restoreTransactionsAndSave(cryptoAccount, adaWallet, masterKey);
   return Promise.resolve(adaWallet);
 }
 
@@ -70,7 +76,7 @@ export const updateAdaWalletMetaParams = async (
     const updatedWallet = Object.assign({}, persistentWallet, { cwMeta: walletMeta });
 
     // Update the meta params cached in localstorage
-    _saveAdaWalletKeepingMasterKey(updatedWallet);
+    saveAdaWallet(updatedWallet);
     return updatedWallet;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWalletMetaParams error: ' + stringifyError(error));
@@ -97,7 +103,7 @@ export const updateAdaWalletBalance = async (): Promise<?BigNumber> => {
     });
 
     // Update the balance cached in localstorage
-    _saveAdaWalletKeepingMasterKey(updatedWallet);
+    saveAdaWallet(updatedWallet);
     return updatedWallet.cwAmount.getCCoin;
   } catch (error) {
     Logger.error('adaWallet::updateAdaWalletBalance error: ' + stringifyError(error));
@@ -188,9 +194,15 @@ export const changeAdaWalletSpendingPassword = (
   { oldPassword, newPassword }: ChangeAdaWalletSpendingPasswordParams
 ): Promise<AdaWallet> => {
   // update spending password
-  const walletMasterKey = getWalletMasterKey();
-  const updatedWalletMasterKey =
-    updateWalletMasterKeyPassword(walletMasterKey, oldPassword, newPassword);
+  {
+    const walletMasterKey = getWalletMasterKey();
+    const updatedWalletMasterKey = updateWalletMasterKeyPassword(
+      walletMasterKey,
+      oldPassword,
+      newPassword
+    );
+    saveWalletMasterKey(updatedWalletMasterKey);
+  }
 
   // update password last update time
   const wallet = getAdaWallet();
@@ -201,14 +213,7 @@ export const changeAdaWalletSpendingPassword = (
   );
 
   // save result in cache
-  saveAdaWallet(updatedWallet, updatedWalletMasterKey);
+  saveAdaWallet(updatedWallet);
+
   return Promise.resolve(updatedWallet);
 };
-
-/** Swap the cached wallet information in localstorage but keep the wallet itself the same */
-function _saveAdaWalletKeepingMasterKey(
-  adaWallet: AdaWallet
-): void {
-  const masterKey = getWalletMasterKey();
-  saveAdaWallet(adaWallet, masterKey);
-}

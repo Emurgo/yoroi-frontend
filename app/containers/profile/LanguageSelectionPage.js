@@ -12,7 +12,6 @@ const messages = defineMessages({
   title: {
     id: 'profile.languageSelect.title',
     defaultMessage: '!!!Language Select',
-    description: 'Language Select Title.'
   },
 });
 

@@ -14,7 +14,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
-// import HelpLinkBlock from './HelpLinkBlock';
+import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import saveLoadSVG from '../../../../assets/images/hardware-wallet/ledger/save-load.inline.svg';
@@ -36,7 +36,6 @@ const messages = defineMessages({
   saveWalletNameInputBottomInfo: {
     id: 'wallet.connect.ledger.dialog.step.save.walletName.info',
     defaultMessage: '!!!We have fetched Ledger device’s name for you; you can use as it is or assign a different name.',
-    description: 'Hint for the wallet name input on the wallet restore dialog.'
   },
 });
 
@@ -151,7 +150,7 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} />
         {walletNameBlock}
         {middleBlock}
-        {/* <HelpLinkBlock progressInfo={progressInfo} /> */}
+        <HelpLinkBlock progressInfo={progressInfo} />
         <HWErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }

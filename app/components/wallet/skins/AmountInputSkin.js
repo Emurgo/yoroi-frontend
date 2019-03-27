@@ -8,7 +8,6 @@ const messages = defineMessages({
   feesLabel: {
     id: 'wallet.amountInput.feesLabel',
     defaultMessage: '!!!+ {amount} of fees',
-    description: 'Label for the "+ 12.042481 of fees" message above amount input field.'
   },
 });
 

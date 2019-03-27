@@ -18,47 +18,38 @@ const messages = defineMessages({
   dialogTitleSetPassword: {
     id: 'wallet.settings.changePassword.dialog.title.setPassword',
     defaultMessage: '!!!Password',
-    description: 'Title for the "Change wallet password" dialog when there is no password set.',
   },
   dialogTitleChangePassword: {
     id: 'wallet.settings.changePassword.dialog.title.changePassword',
     defaultMessage: '!!!Change password',
-    description: 'Title for the "Change wallet password" dialog when there is already password set.',
   },
   walletPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.walletPasswordLabel',
     defaultMessage: '!!!Wallet password',
-    description: 'Label for the "Wallet password" input in the change wallet password dialog.',
   },
   currentPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordLabel',
     defaultMessage: '!!!Current password',
-    description: 'Label for the "Current password" input in the change wallet password dialog.',
   },
   repeatPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
     defaultMessage: '!!!Repeat password',
-    description: 'Label for the "Repeat password" input in the change wallet password dialog.',
   },
   currentPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder',
     defaultMessage: '!!!Type current password',
-    description: 'Placeholder for the "Current password" inputs in the change wallet password dialog.',
   },
   newPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
     defaultMessage: '!!!Type new password',
-    description: 'Placeholder for the "New password" inputs in the change wallet password dialog.',
   },
   newPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
     defaultMessage: '!!!New password',
-    description: 'Label for the "New password" input in the change wallet password dialog.',
   },
   repeatPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
     defaultMessage: '!!!Repeat new password',
-    description: 'Placeholder for the "Repeat password" inputs in the change wallet password dialog.',
   },
 });
 

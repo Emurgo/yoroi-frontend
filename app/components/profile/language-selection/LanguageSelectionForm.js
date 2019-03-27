@@ -16,12 +16,10 @@ const messages = defineMessages({
   languageSelectLabel: {
     id: 'profile.languageSelect.form.languageSelectLabel',
     defaultMessage: '!!!Select your language',
-    description: 'Label for the language select.'
   },
   submitLabel: {
     id: 'profile.languageSelect.form.submitLabel',
     defaultMessage: '!!!Continue',
-    description: 'Label for the "Language select" form submit button.'
   },
 });
 
