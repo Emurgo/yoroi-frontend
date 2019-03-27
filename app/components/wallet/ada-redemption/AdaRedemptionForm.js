@@ -9,6 +9,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
@@ -473,7 +474,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     }}
                     disabled={isRecovery || isCertificateSelected}
                     error={redemptionKeyField.error}
-                    skin={InputSkin}
+                    skin={classicTheme ? InputSkin : InputOwnSkin}
                   />
                 ) : (
                   <Input
@@ -482,7 +483,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     {...shieldedRedemptionKeyField.bind()}
                     disabled={isCertificateSelected}
                     error={shieldedRedemptionKeyField.error}
-                    skin={InputSkin}
+                    skin={classicTheme ? InputSkin : InputOwnSkin}
                   />
                 )}
 
