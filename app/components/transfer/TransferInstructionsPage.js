@@ -34,6 +34,7 @@ type Props = {
   onMasterKeyConfirm: Function,
   disableTransferFunds: boolean,
   attentionText: string,
+  confirmationTitleText: string,
   confirmationText: string,
   confirmationPaperText: string,
   confirmationMasterKeyText: string,
@@ -56,6 +57,7 @@ export default class TransferInstructionsPage extends Component<Props> {
       onMasterKeyConfirm,
       disableTransferFunds,
       attentionText,
+      confirmationTitleText,
       confirmationText,
       confirmationPaperText,
       confirmationMasterKeyText,
@@ -123,13 +125,12 @@ export default class TransferInstructionsPage extends Component<Props> {
               </div>
 
               <div className={classicTheme ? styles.buttonTitleClassic : styles.buttonTitle}>
-                Transfer all funds from:
+                {confirmationTitleText}
               </div>
 
               <Button
                 className={confirmButtonClasses}
-                // label={confirmationText}
-                label="Daedalus Wallet"
+                label={confirmationText}
                 onClick={onConfirm}
                 disabled={disableTransferFunds}
                 skin={ButtonSkin}
@@ -137,8 +138,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <Button
                 className={confirmButtonClasses}
-                // label={confirmationPaperText}
-                label="Daedalus Paper Wallet"
+                label={confirmationPaperText}
                 onClick={onPaperConfirm}
                 disabled={disableTransferFunds}
                 skin={ButtonSkin}
@@ -146,8 +146,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <Button
                 className={`masterKey ${confirmButtonClasses}`} // append class for testing
-                // label={confirmationMasterKeyText}
-                label="Daedalus Master Key"
+                label={confirmationMasterKeyText}
                 onClick={onMasterKeyConfirm}
                 disabled={disableTransferFunds}
                 skin={ButtonSkin}

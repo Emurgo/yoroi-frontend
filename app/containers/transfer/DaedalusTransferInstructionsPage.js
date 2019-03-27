@@ -77,9 +77,10 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
         onMasterKeyConfirm={onMasterKeyConfirm}
         disableTransferFunds={disableTransferFunds}
         attentionText={intl.formatMessage(messages.attentionText)}
-        confirmationText={intl.formatMessage(messages.confirmationText)}
-        confirmationPaperText={intl.formatMessage(messages.confirmationPaperText)}
-        confirmationMasterKeyText={intl.formatMessage(messages.confirmationMasterKeyText)}
+        confirmationTitleText={intl.formatMessage(messages.transferTitleText)}
+        confirmationText={intl.formatMessage(messages.transferText)}
+        confirmationPaperText={intl.formatMessage(messages.transferPaperText)}
+        confirmationMasterKeyText={intl.formatMessage(messages.transferMasterKeyText)}
         classicTheme={classicTheme}
       />
     );
