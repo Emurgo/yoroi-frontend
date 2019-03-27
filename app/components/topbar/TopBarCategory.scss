@@ -37,7 +37,7 @@
       }
       // Ledger Nano S icon
       & > g > g:nth-child(2) path {
-        stroke: var(--theme-button-primary-background-color);
+        stroke: none;
         fill: var(--theme-button-primary-background-color);
       }
     }
@@ -95,7 +95,8 @@
     }
     // Ledger Nano S icon
     & > g > g:nth-child(2) {
-      stroke: var(--theme-icon-topbar-color);
+      stroke: none;
+      fill: var(--theme-icon-topbar-color);
     }    
   }
 }
