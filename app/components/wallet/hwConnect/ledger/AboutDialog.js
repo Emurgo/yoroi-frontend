@@ -12,7 +12,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
-// import HelpLinkBlock from './HelpLinkBlock';
+import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
@@ -135,7 +135,7 @@ export default class AboutDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        {/* <HelpLinkBlock progressInfo={progressInfo} /> */}
+        <HelpLinkBlock progressInfo={progressInfo} />
         <HWErrorBlock progressInfo={progressInfo} error={error} />
       </Dialog>);
   }
