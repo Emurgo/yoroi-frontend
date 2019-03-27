@@ -22,6 +22,22 @@ const messages = defineMessages({
     id: 'daedalusTransfer.instructions.attention.confirmationMasterKey',
     defaultMessage: '!!!Transfer all funds from Daedalus master key',
   },
+  transferTitleText: {
+    id: 'daedalusTransfer.instructions.attention.title',
+    defaultMessage: '!!!Transfer all funds from:'
+  },
+  transferText: {
+    id: 'daedalusTransfer.instructions.attention.button.label',
+    defaultMessage: '!!!Daedalus Wallet',
+  },
+  transferPaperText: {
+    id: 'daedalusTransfer.instructions.attention.paper.button.label',
+    defaultMessage: '!!!Daedalus Paper Wallet',
+  },
+  transferMasterKeyText: {
+    id: 'daedalusTransfer.instructions.attention.masterKey.button.label',
+    defaultMessage: '!!!Daedalus Master Key',
+  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
