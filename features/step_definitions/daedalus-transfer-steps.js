@@ -135,7 +135,7 @@ Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/,
   await this.waitForElement(`//div[@class='TransferInstructionsPage_text' and contains(text(), '${instructionMessage}')]`, By.xpath);
   await this.waitForElement(`//div[contains(text(), 'Attention')]//following::div[@class='TransferInstructionsPage_text' and contains(text(), '${attentionMessage}')]`, By.xpath);
   await this.waitForElement(`//button[contains(@class, 'disabled') and contains(text(), 'Create Yoroi wallet')]`, By.xpath); // Disabled "Create yoroi" button
-  await this.waitForElement(`//button[contains(@class, 'confirmButton') and contains(text(), 'Transfer all funds from Daedalus wallet')]`, By.xpath);
+  await this.waitForElement(`//button[contains(@class, 'confirmButton') and contains(text(), '!!!Daedalus Wallet')]`, By.xpath); // as no translation is available now
 });
 
 async function _checkDaedalusAddressesRecoveredAreCorrect(rows, world) {

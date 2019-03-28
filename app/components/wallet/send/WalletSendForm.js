@@ -231,6 +231,8 @@ export default class WalletSendForm extends Component<Props, State> {
         <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
       </div>
     );
+    console.log('transactionFeeError', transactionFeeError);
+    console.log('amountField.error', amountField.error);
 
     return (
       <div className={componentClasses}>
