@@ -1,0 +1,19 @@
+#!/bin/bash
+
+function yoroi-depends-install() {
+
+  set -e
+  sudo chown -R $(id -u):$(id -g) /src /usr/local/lib/node_modules
+  npm run build-js-cardano-wasm
+  npm install
+  
+}
+
+function yoroi-build() {
+
+  set -e
+  npm run build-dll
+  npm run build -- --env testnet
+  npm run build -- --env mainnet
+
+}

@@ -1,0 +1,64 @@
+#!/bin/bash
+
+function create-developer-user() {
+
+  ARGS=$@
+  DEVELOPER_USER=$1
+  DEVELOPER_HOME="/home/$DEVELOPER_USER"
+  # set an unprivileged user using the host UID to avoid messing with perms
+  test -z $HOST_UID && HOST_UID=1000
+  test -z $HOST_GID && HOST_GID=1000
+  export uid=$HOST_UID gid=$HOST_GID
+  if [ -z $(grep ^$DEVELOPER_USER /etc/passwd) ]
+  then
+    sudo cp -a /etc/passwd /etc/passwd-mod
+    sudo sed -i "/.*:${uid}:${gid}.*/d" /etc/passwd-mod
+    sudo mv /etc/passwd-mod /etc/passwd
+    echo "$DEVELOPER_USER:!:${uid}:${gid}:$DEVELOPER_USER,,,:$DEVELOPER_HOME:/bin/bash" | sudo tee -a /etc/passwd &> /dev/null
+    echo "$DEVELOPER_USER:!:${uid}:" | sudo tee -a /etc/group &> /dev/null
+    echo "$DEVELOPER_USER:*:99999:0:99999:7:::" | sudo tee -a /etc/shadow &> /dev/null
+    sudo bash -c "echo '$DEVELOPER_USER ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/$DEVELOPER_USER"
+    sudo chmod 0440 /etc/sudoers.d/$DEVELOPER_USER
+    if [ ! -d "$DEVELOPER_HOME" ]
+    then
+      sudo cp -a /etc/skel $DEVELOPER_HOME
+    else
+      sudo rsync -Pav /etc/skel/ ${DEVELOPER_HOME}/
+    fi
+    sudo chown ${uid}:${gid} -R $DEVELOPER_HOME
+  fi
+
+}
+
+function setup-sudoers() {
+
+  # allow circleci/noode to pivot to a diff user w/o passwd
+  SUDO_USERS="circleci node"
+  for user in $SUDO_USERS
+  do
+    sudo bash -c "echo '${user} ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/50-${user}"
+  done
+
+}
+
+function run-shell() {
+
+  # sync node_modules and dll from image to serve as cache to avoid downloads
+  test -e /host-src/dll || cp -a /src/dll /host-src
+  test -e /host-src/node_modules || cp -a /src/node_modules /host-src/node_modules
+  test -e /host-src/js-cardano-wasm/node_modules || cp -a /src/js-cardano-wasm/node_modules /host-src/js-cardano-wasm/node_modules
+  sudo mv /src /src-from-docker-image
+  sudo ln -s /host-src /src
+  sudo chown -R ${DEVELOPER_USER}: /host-src /usr/local/lib/node_modules
+  
+  sudo -HEu ${DEVELOPER_USER} bash --login
+
+}
+
+function run-chrome() {
+
+  sudo useradd -r -g ${DEVELOPER_USER} -G audio,video chrome
+  sudo chown -R ${DEVELOPER_USER}: /data
+  sudo -EHu ${DEVELOPER_USER} google-chrome --load-extension=/yoroi --user-data-dir=/data
+
+}

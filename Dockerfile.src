@@ -1,0 +1,20 @@
+FROM alpine AS src
+RUN apk add --no-cache git
+
+ADD ./ /src
+WORKDIR /src
+
+ARG JS_CARDANO_WASM_HASH=bd40ab0f8d6ae27998c7ef5125c8c5cbd109a285
+ENV JS_CARDANO_WASM_HASH ${JS_CARDANO_WASM_HASH}
+
+ARG RUST_HASH=9bef10d1bbd1321d98aa6b30ba030631806ad153
+ENV RUSH_HASH ${RUST_HASH}
+
+RUN rm -rf /src/node_modules /src/dll && \
+    git checkout . && git reset --hard && \
+    git submodule update --init --recursive && \
+    cd js-cardano-wasm && \
+    git checkout ${JS_CARDANO_WASM_HASH} && \
+    git submodule update && \
+    cd rust && \
+    git checkout ${RUSH_HASH}

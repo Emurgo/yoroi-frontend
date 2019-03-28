@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source /src/docker-assets/bin/entrypoint.functions
+
+test -z "$DEVELOPER_USER" && export DEVELOPER_USER="developer"
+create-developer-user $DEVELOPER_USER
+
+ARGS=$@
+
+case "$ARGS" in
+  run-chrome) run-chrome;;
+  *) if [ ! -z "$ARGS" ]; then $ARGS; else run-shell; fi;;
+esac

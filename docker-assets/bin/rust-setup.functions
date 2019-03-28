@@ -1,0 +1,15 @@
+#!/bin/bash
+
+function rust-setup() {
+
+  # install rustup
+  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  sudo ln -s $HOME/.cargo/bin/* /usr/local/bin/
+
+  # use 1.32.0 version. 
+  # // TODO: This is hardcoded but taken from js-cardano-wasm repo
+  # which is checked out later
+  rustup install 1.32.0 && \
+  rustup target add wasm32-unknown-unknown --toolchain 1.32.0
+
+}
