@@ -2,17 +2,23 @@
 
 ## Build source container
 
+Execute from git repo root:
+
 ```
 docker build -t emurgo/yoroi-frontend-src:latest -f Dockerfile.src .
 ```
 
 ## Build development environment
 
+Execute from git repo root:
+
 ```
 docker build --target yoroi -t emurgo/yoroi-frontend .
 ```
 
 # Build standalone-chrome container
+
+Execute from git repo root:
 
 ```
 docker build \
@@ -30,6 +36,7 @@ Replace *DATA_DIR* with your secure location and don't use this browser to navig
 ```
 DATA_DIR=/mnt/supersecure-encrypted-usbdrive
 docker run -it --rm \
+  --cap-add=ALL \
   --net host --cpuset-cpus 0 \
   -e DEVELOPER_USER=$(basename $HOME) \
   -e DISPLAY=unix$DISPLAY \
@@ -66,6 +73,3 @@ npm run dev
 ```
 
 Then you can edit the source from outside the container with your IDE of choice.
-
-
-
