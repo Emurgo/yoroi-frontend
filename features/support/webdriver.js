@@ -39,8 +39,7 @@ function getBraveBuilder() {
     .setChromeOptions(new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
       .addArguments('--start-maximized', '--disable-setuid-sandbox', '--no-sandbox')
-      .addExtensions(path.resolve(__dirname, '../../yoroi-test.crx'))
-    );
+      .addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
 }
 
 function getChromeBuilder() {
@@ -90,19 +89,22 @@ type WorldInput = {
 
 // TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {
-  switch(cmdInput.parameters.browser) {
-    case 'brave':
-      const brave_builder = getBraveBuilder();
-      this.driver = brave_builder.build();
+  switch (cmdInput.parameters.browser) {
+    case 'brave': {
+      const braveBuilder = getBraveBuilder();
+      this.driver = braveBuilder.build();
       break;
-    case 'chrome':
-      const chrome_builder = getChromeBuilder();
-      this.driver = chrome_builder.build();
+    }
+    case 'firefox': {
+      const firefoxBuilder = getFirefoxBuilder();
+      this.driver = firefoxBuilder.build();
       break;
-    case 'firefox':
-      const firefox_builder = getFirefoxBuilder();
-      this.driver = firefox_builder.build();
+    }
+    default: {
+      const chromeBuilder = getChromeBuilder();
+      this.driver = chromeBuilder.build();
       break;
+    }
   }
 
   this.getExtensionUrl = (): string => {
