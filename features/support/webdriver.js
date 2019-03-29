@@ -90,21 +90,20 @@ type WorldInput = {
 
 // TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {
-  const builder = (function() {
-    switch(cmdInput.parameters.browser) {
+  switch(cmdInput.parameters.browser) {
     case 'brave':
-      return getBraveBuilder();
+      const brave_builder = getBraveBuilder();
+      this.driver = brave_builder.build();
       break;
     case 'chrome':
-      return getChromeBuilder();
+      const chrome_builder = getChromeBuilder();
+      this.driver = chrome_builder.build();
       break;
     case 'firefox':
-      return getFirefoxBuilder();
+      const firefox_builder = getFirefoxBuilder();
+      this.driver = firefox_builder.build();
       break;
-    }
-  })();
-
-  this.driver = builder.build();
+  }
 
   this.getExtensionUrl = (): string => {
     if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
