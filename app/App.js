@@ -43,17 +43,6 @@ class App extends Component<{
     }
   }
 
-  // temporary method
-  handleChange = (e: { target: { checked: boolean } }) => {
-    const { stores } = this.props;
-    const currentTheme = stores.profile.currentTheme;
-    const theme = currentTheme === THEMES.YOROI_CLASSIC
-      ? THEMES.YOROI_MODERN
-      : THEMES.YOROI_CLASSIC;
-    this.props.actions.theme.changeTheme.trigger({ theme: e.target.checked });
-    this.props.actions.profile.updateTheme.trigger({ theme });
-  }
-
   updateMarkup = () => {
     const { stores } = this.props;
     const currentTheme = stores.profile.currentTheme;
@@ -75,13 +64,7 @@ class App extends Component<{
 
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager
-          variables={themeVars}
-          updateMarkup={this.updateMarkup}
-          // temporary variables
-          handleChange={this.handleChange}
-          classic={stores.theme.classic}
-        />
+        <ThemeManager variables={themeVars} updateMarkup={this.updateMarkup} />
 
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
         <ThemeProvider

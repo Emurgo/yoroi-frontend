@@ -23,15 +23,6 @@ export default class ThemeManager extends Component {
   render() {
     return (
       <div>
-        {/* <input
-          type="checkbox"
-          onChange={(e) => {
-            this.updateCSSVariables(this.props.variables);
-            this.props.handleChange(e);
-          }}
-          checked={this.props.classic}
-        />
-        <span> - classic design </span> */}
         {this.props.children}
       </div>
     );
