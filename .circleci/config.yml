@@ -47,6 +47,16 @@ jobs:
           root: ~/repo
           paths: .
 
+  test-brave:
+    working_directory: ~/repo
+    docker:
+      - image: emurgo/circleci-node-8-browsers:latest
+
+    steps:
+      - checkout
+      - *attach_workspace
+      - run: npm run test-e2e-brave
+
   test-chrome:
     working_directory: ~/repo
     docker:
@@ -95,6 +105,13 @@ workflows:
   build-deploy:
     jobs:
       - build-setup
+      - test-brave:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build-setup
       - test-chrome:
           requires:
             - build-setup
