@@ -48,6 +48,9 @@ jobs:
           paths: .
 
   test-brave:
+    branches:
+      only:
+        - master
     working_directory: ~/repo
     docker:
       - image: emurgo/circleci-node-8-browsers:latest
