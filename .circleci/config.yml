@@ -50,7 +50,7 @@ jobs:
   test-brave:
     working_directory: ~/repo
     docker:
-      - image: rcmorano/circleci-node-8-browsers:latest
+      - image: emurgo/circleci-node-8-browsers:latest
 
     steps:
       - checkout
