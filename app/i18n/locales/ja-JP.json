@@ -182,7 +182,7 @@
   "wallet.connect.hw.dialog.step.about.label": "概要",
   "wallet.connect.hw.dialog.step.about.prerequisite.4": "プロセスの実行中はPCをインターネットに接続したままにしてください。",
   "wallet.connect.hw.dialog.step.about.prerequisite.header": "前提条件",
-  "wallet.connect.hw.dialog.step.connect.introText.line.3": "このプロセスにより、Cardanoの秘密鍵がヨロイに共有されます。",
+  "wallet.connect.hw.dialog.step.connect.introText.line.3": "このプロセスにより、Cardanoの公開鍵がヨロイに共有されます。",
   "wallet.connect.hw.dialog.step.connect.label": "接続",
   "wallet.connect.hw.dialog.step.save.error.101": "保存に失敗しました。インターネット接続を確認して再試行してください。",
   "wallet.connect.hw.dialog.step.save.label": "保存",
