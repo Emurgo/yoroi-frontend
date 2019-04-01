@@ -106,9 +106,10 @@ workflows:
     jobs:
       - build-setup
       - test-brave:
-          branches:
-            only:
-              - master
+          filters:
+            branches:
+              only:
+                - master
           requires:
             - build-setup
       - test-chrome:
