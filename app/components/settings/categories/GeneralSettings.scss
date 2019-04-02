@@ -21,11 +21,7 @@ $flagSize: 30px;
 }
 
 .flag {
-  background-size: cover;
-  display: inline-block;
-  height: $flagSize;
   margin-right: $flagSize / 4;
-  width: $flagSize;
 }
 
 .language {
