@@ -1,5 +1,7 @@
 @import '../../../themes/mixins/error-message';
 
+$flagSize: 30px;
+
 .component {
   margin-bottom: 20px;
 
@@ -18,4 +20,16 @@
   text-align: center;
 }
 
+.flag {
+  background-size: cover;
+  display: inline-block;
+  height: $flagSize;
+  margin-right: $flagSize / 4;
+  width: $flagSize;
+}
+
+.language {
+  line-height: $flagSize;
+  vertical-align: top;
+}
 
