@@ -20,7 +20,7 @@ const messages = defineMessages({
 });
 
 type Props = {
-  languages: Array<{ value: string, label: ReactIntlMessage }>,
+  languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
   currentLocale: string,
   onSelectLanguage: Function,
   isSubmitting: boolean,
