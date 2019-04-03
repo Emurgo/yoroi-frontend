@@ -80,7 +80,7 @@ export default class GeneralSettings extends Component<Props> {
           skin={SelectSkin}
           optionRenderer={option => (
             <div>
-              <SvgInline svg={option.svg} className={styles.flag} width="30" height="27" />
+              <SvgInline svg={option.svg} className={styles.flag} width="18" height="18" />
               <span className={styles.language}>{option.label}</span>
             </div>
           )}
