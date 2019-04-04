@@ -9,7 +9,7 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
-import SvgInline from 'react-svg-inline';
+import FlagLabel from '../../widgets/FlagLabel';
 
 const messages = defineMessages({
   languageSelectLabel: {
@@ -79,10 +79,7 @@ export default class GeneralSettings extends Component<Props> {
           onChange={this.selectLanguage}
           skin={SelectSkin}
           optionRenderer={option => (
-            <div>
-              <SvgInline svg={option.svg} className={styles.flag} width="18" height="18" />
-              <span className={styles.language}>{option.label}</span>
-            </div>
+            <FlagLabel svg={option.svg} label={option.label} />
           )}
         />
         {error && <p className={styles.error}>{error}</p>}
