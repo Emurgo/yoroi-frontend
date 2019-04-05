@@ -27,6 +27,15 @@ module.exports = {
     filename: '[name].bundle.js'
   },
   plugins: [
+    /**
+     * We need CardanoWallet for flow to get the WASM binding types.
+     * However, the flow definitions aren't available to webpack at runtime
+     * so we have to mock them out with a noop
+     */
+    new webpack.NormalModuleReplacementPlugin(
+      /CardanoWallet/,
+      'lodash/noop.js'
+    ),
     new ConfigWebpackPlugin(),
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
@@ -34,12 +43,6 @@ module.exports = {
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
-    new webpack.optimize.UglifyJsPlugin({
-      comments: false,
-      compressor: {
-        warnings: false
-      }
-    }),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('testnet'),
@@ -48,7 +51,7 @@ module.exports = {
     })
   ],
   resolve: {
-    extensions: ['*', '.js']
+    extensions: ['*', '.js', '.wasm']
   },
   module: {
     rules: [
@@ -119,6 +122,10 @@ module.exports = {
           'html-loader',
           'markdown-loader',
         ]
+      },
+      {
+        test: /\.wasm$/,
+        type: 'webassembly/experimental'
       },
     ]
   }
