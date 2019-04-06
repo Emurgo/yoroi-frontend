@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ConfigWebpackPlugin = require('config-webpack');
 const shell = require('shelljs');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
@@ -11,6 +12,13 @@ module.exports = {
   optimization: {
     // https://github.com/webpack/webpack/issues/7470
     nodeEnv: false,
+    splitChunks: {
+      // the default delimiter ~ doesn't work with Terser
+      automaticNameDelimiter: '_',
+      chunks: 'all',
+      // Firefox require all files to be <4MBs
+      maxSize: 4000000,
+    }
   },
   entry: {
     yoroi: [
@@ -24,9 +32,12 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, '../build/js'),
-    filename: '[name].bundle.js'
+    filename: '[name].bundle.js',
+    publicPath: '/js/',
   },
   plugins: [
+    /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
+    new webpack.IgnorePlugin(/^\.\/(?!english)/, /bip39\/src\/wordlists$/),
     /**
      * We need CardanoWallet for flow to get the WASM binding types.
      * However, the flow definitions aren't available to webpack at runtime
@@ -36,6 +47,19 @@ module.exports = {
       /CardanoWallet/,
       'lodash/noop.js'
     ),
+    /**
+     * We use the HtmlWebpackPlugin to group back together the chunks inside the HTML
+     */
+    new HtmlWebpackPlugin({
+      filename: path.join(__dirname, '../build/main_window.html'),
+      template: path.join(__dirname, '../chrome/views/main_window.html'),
+      chunks: ['yoroi']
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join(__dirname, '../build/background.html'),
+      template: path.join(__dirname, '../chrome/views/background.html'),
+      chunks: ['background']
+    }),
     new ConfigWebpackPlugin(),
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
@@ -114,7 +138,11 @@ module.exports = {
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
-        loader: 'file-loader'
+        loader: 'file-loader',
+        options: {
+          // Need to specify public path so assets can be loaded from static resources like CSS
+          publicPath: '/js/'
+        },
       },
       {
         test: /\.md$/,

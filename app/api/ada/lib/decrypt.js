@@ -1,8 +1,8 @@
 import aesjs from 'aes-js';
-import bip39 from 'bip39';
+import { mnemonicToEntropy, validateMnemonic } from 'bip39';
 import blakejs from 'blakejs';
 import crypto from 'crypto';
-import validWords from 'bip39/wordlists/english.json';
+import validWords from 'bip39/src/wordlists/english.json';
 
 const isBase64 = (string) => {
   const criteria = '(?:^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$)';
@@ -37,10 +37,10 @@ const hexToBytes = (s) => {
 
 const blake2b = (data) => blakejs.blake2b(data, null, 32);
 
-const fromMnemonic = (words) => hexToBytes(bip39.mnemonicToEntropy(words, validWords));
+const fromMnemonic = (words) => hexToBytes(mnemonicToEntropy(words, validWords));
 
 export const isValidMnemonic = (phrase, numberOfWords = 9) => (
-  (phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase, validWords))
+  (phrase.split(' ').length === numberOfWords && validateMnemonic(phrase, validWords))
 );
 
 const hashData = (data) => {

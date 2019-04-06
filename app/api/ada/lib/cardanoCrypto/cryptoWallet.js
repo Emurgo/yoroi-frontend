@@ -2,7 +2,7 @@
 
 // Utility functions for handling the private master key
 
-import bip39 from 'bip39';
+import { validateMnemonic, generateMnemonic } from 'bip39';
 
 import { Logger, stringifyError } from '../../../../utils/logging';
 
@@ -17,7 +17,7 @@ import { RustModule } from './rustLoader';
 declare var CONFIG : ConfigType;
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
-export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
+export const generateAdaMnemonic = () => generateMnemonic(160).split(' ');
 
 /** Check validty of mnemonic (including checksum) */
 export const isValidEnglishAdaMnemonic = (
@@ -26,7 +26,7 @@ export const isValidEnglishAdaMnemonic = (
 ) => (
   // Note: splitting on spaces will not work for Japanese-encoded mnemonics who use \u3000 instead
   // We only use English mnemonics in Yoroi so this is okay.
-  phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase)
+  phrase.split(' ').length === numberOfWords && validateMnemonic(phrase)
 );
 
 /** Check validty of paper mnemonic (including checksum) */
