@@ -73,13 +73,13 @@ const baseDevConfig = () => ({
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, '../dev/main_window.html'),
       template: path.join(__dirname, '../chrome/views/main_window.html'),
-      chunks: ['yoroi', 'vendor'],
+      chunks: ['yoroi'],
       alwaysWriteToDisk: true
     }),
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, '../dev/background.html'),
       template: path.join(__dirname, '../chrome/views/background.html'),
-      chunks: ['background', 'vendor'],
+      chunks: ['background'],
       alwaysWriteToDisk: true
     }),
     /**
