@@ -3,6 +3,7 @@ import { mnemonicToEntropy, validateMnemonic } from 'bip39';
 import blakejs from 'blakejs';
 import crypto from 'crypto';
 import validWords from 'bip39/src/wordlists/english.json';
+import { RustModule } from './cardanoCrypto/rustLoader';
 
 const isBase64 = (string) => {
   const criteria = '(?:^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$)';
@@ -37,7 +38,10 @@ const hexToBytes = (s) => {
 
 const blake2b = (data) => blakejs.blake2b(data, null, 32);
 
-const fromMnemonic = (words) => hexToBytes(mnemonicToEntropy(words, validWords));
+const fromMnemonic = (words) => {
+  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(words);
+  return new Uint8Array(entropy.to_array());
+};
 
 export const isValidMnemonic = (phrase, numberOfWords = 9) => (
   (phrase.split(' ').length === numberOfWords && validateMnemonic(phrase, validWords))

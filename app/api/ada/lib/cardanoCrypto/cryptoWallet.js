@@ -23,11 +23,24 @@ export const generateAdaMnemonic = () => generateMnemonic(160).split(' ');
 export const isValidEnglishAdaMnemonic = (
   phrase: string,
   numberOfWords: ?number = 15
-) => (
+) => {
   // Note: splitting on spaces will not work for Japanese-encoded mnemonics who use \u3000 instead
   // We only use English mnemonics in Yoroi so this is okay.
-  phrase.split(' ').length === numberOfWords && validateMnemonic(phrase)
-);
+  const split = phrase.split(' ');
+  if (split.length !== numberOfWords) {
+    return false;
+  }
+  /**
+   * Redemption mnemonics use 0-word menmonics.
+   * However, 9-word mnemonics were disallowed in a later version of BIP39
+   * Since our bip39 library now considers all 9-word mnemonics invalid
+   * we just return true for backwards compatibility
+   */
+  if (split.length === 9) {
+    return true;
+  }
+  return validateMnemonic(phrase);
+};
 
 /** Check validty of paper mnemonic (including checksum) */
 export const isValidEnglishAdaPaperMnemonic = (
