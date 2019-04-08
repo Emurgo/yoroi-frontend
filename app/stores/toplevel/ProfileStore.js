@@ -120,7 +120,7 @@ export default class SettingsStore extends Store {
     // TODO: This is temporary, when release ready
     // 1. New Theme should be loaded by default
     // 2. This comment should be deleted
-    return (environment.isDev()) ? THEMES.YOROI_MODERN : THEMES.YOROI_CLASSIC;
+    return (environment.isMainnet()) ? THEMES.YOROI_CLASSIC : THEMES.YOROI_MODERN;
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
