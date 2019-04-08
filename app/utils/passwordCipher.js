@@ -2,6 +2,7 @@
 
 import cryptoRandomString from 'crypto-random-string';
 import { RustModule } from '../api/ada/lib/cardanoCrypto/rustLoader';
+import { WrongPassphraseError } from '../api/ada/lib/cardanoCrypto/cryptoErrors';
 
 export function encryptWithPassword(
   password: string,
@@ -19,7 +20,11 @@ export function decryptWithPassword(
   encryptedHex: string
 ): Uint8Array {
   const encryptedBytes = Buffer.from(encryptedHex, 'hex');
-  const decryptedBytes: Uint8Array =
-    RustModule.Wallet.password_decrypt(password, encryptedBytes);
+  let decryptedBytes;
+  try {
+    decryptedBytes = RustModule.Wallet.password_decrypt(password, encryptedBytes);
+  } catch (err) {
+    throw new WrongPassphraseError();
+  }
   return decryptedBytes;
 }

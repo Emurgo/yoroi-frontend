@@ -94,7 +94,7 @@ export function generateWalletMasterKey(mnemonic : string, password : string): s
     EMPTY_PASSWORD
   );
   const masterKey = rootKey.key().to_hex();
-  const encodedMasterKey = new TextEncoder().encode(masterKey);
+  const encodedMasterKey = Buffer.from(masterKey, 'hex');
   return encryptWithPassword(password, encodedMasterKey);
 }
 
@@ -112,9 +112,9 @@ export function getCryptoWalletFromMasterKey(
   encryptedMasterKey: string,
   password: string
 ): RustModule.Wallet.Bip44RootPrivateKey {
-  const masterKeyHex = decryptWithPassword(password, encryptedMasterKey);
-  const decodedKey = new TextDecoder().decode(Buffer.from(masterKeyHex));
-  const masterKey = RustModule.Wallet.PrivateKey.from_hex(decodedKey);
+  const masterKeyBytes = decryptWithPassword(password, encryptedMasterKey);
+  const masterKeyHex = Buffer.from(masterKeyBytes).toString('hex');
+  const masterKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
   const asRoot = RustModule.Wallet.Bip44RootPrivateKey.new(
     masterKey,
     RustModule.Wallet.DerivationScheme.v2()

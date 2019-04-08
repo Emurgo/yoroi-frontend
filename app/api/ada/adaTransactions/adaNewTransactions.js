@@ -64,7 +64,12 @@ export async function newAdaUnsignedTx(
   const senders = await getAdaAddressesList();
   const allUtxos = await getAllUTXOsForAddresses(senders.map(addr => addr.cadId));
   const txInputs = utxoToTxInput(allUtxos);
-  const selectionResult = getInputSelection(txInputs, outputPolicy, feeAlgorithm, receiver, amount);
+  let selectionResult;
+  try {
+    selectionResult = getInputSelection(txInputs, outputPolicy, feeAlgorithm, receiver, amount);
+  } catch (err) {
+    throw new NotEnoughMoneyToSendError();
+  }
   const senderInputs = txInputs.filter(input => (
     selectionResult.is_input(
       RustModule.Wallet.TxoPointer.from_json(input.to_json().ptr)
