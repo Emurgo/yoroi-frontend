@@ -42,20 +42,16 @@ export function getAddressesWithFunds(payload: {
 }): AddressKeyMap {
   try {
     const { checker, fullUtxo } = payload;
-    const addressesWithFunds =
-      fullUtxo
-        .map(addr => RustModule.Wallet.Address.from_base58(addr))
-        .map(addr => [addr, checker.check_address(addr)])
-        .filter(([, checkedAddr]) => checkedAddr.is_checked())
-        .map(([addr, checkedAddr]) => [addr.to_base58(), checkedAddr.private_key()])
-        .reduce(
-          (map, pair) => {
-            map[pair[0]] = pair[1];
-            return map;
-          },
-          {}
-        );
-    return addressesWithFunds;
+
+    const addrKeyMap = {};
+    for (const addr of fullUtxo) {
+      const rustAddr = RustModule.Wallet.Address.from_base58(addr);
+      const checkedAddr = checker.check_address(rustAddr);
+      if (!checkedAddr.is_checked()) {
+        addrKeyMap[addr] = checkedAddr.private_key();
+      }
+    }
+    return addrKeyMap;
   } catch (error) {
     Logger.error(`daedalusTransfer::getAddressesWithFunds ${stringifyError(error)}`);
     throw new GetAddressesWithFundsError();
