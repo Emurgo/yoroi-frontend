@@ -117,12 +117,11 @@ export default class SettingsStore extends Store {
   @computed get currentTheme(): string {
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet) return result;
-    return THEMES.YOROI_CLASSIC; // default
+    // TODO: This is temporary, when release ready
+    // 1. New Theme should be loaded by default
+    // 2. This comment should be deleted
+    return (environment.isDev()) ? THEMES.YOROI_MODERN : THEMES.YOROI_CLASSIC;
   }
-
-  // getMarkup = (result: string) => {
-  //   if (result === THEMES.YOROI_MODERN) this.actions.theme.changeTheme.trigger({ theme: false });
-  // };
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
   @computed get currentThemeVars(): string {
