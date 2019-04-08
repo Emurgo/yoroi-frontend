@@ -36,7 +36,7 @@ export async function migrateToLatest(localStorageApi: LocalStorageApi) {
     */
 
   const migrationMap: { [ver: string]: (() => Promise<void>) } = {
-    '=0.0.0': async () => await testMigration(localStorageApi),
+    '=0.0.1': async () => await testMigration(localStorageApi),
     '<1.4.0': bip44Migration
   };
 
