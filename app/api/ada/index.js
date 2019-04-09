@@ -126,6 +126,9 @@ import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
 import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
 import config from '../../config';
 import { migrateToLatest } from './adaMigration';
+import {
+  makeCardanoBIP44Path,
+} from 'yoroi-extension-ledger-bridge';
 import type { PaperWalletPass } from './adaWallet';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 
@@ -911,6 +914,8 @@ const _createAddressFromServerData = action(
   (data: AdaAddress) => (
     new WalletAddress({
       id: data.cadId,
+      // note: assume single account
+      path: makeCardanoBIP44Path(0, data.change, data.index),
       amount: new BigNumber(data.cadAmount.getCCoin).dividedBy(
         LOVELACES_PER_ADA
       ),

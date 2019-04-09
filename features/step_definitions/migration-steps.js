@@ -13,7 +13,7 @@ Then(/^Last launch version is updated$/, async function () {
 
 Then(/^I decreast last launch version$/, async function () {
   this.driver.wait(async () => {
-    await setLastLaunchVersion(this.driver, '0.0.0');
+    await setLastLaunchVersion(this.driver, '0.0.1');
     return true;
   });
 });

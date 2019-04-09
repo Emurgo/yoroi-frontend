@@ -12,14 +12,14 @@ import globalMessages from '../../i18n/global-messages';
 export default class SettingsStore extends Store {
 
   LANGUAGE_OPTIONS = [
-    { value: 'en-US', label: globalMessages.languageEnglish },
-    { value: 'ja-JP', label: globalMessages.languageJapanese },
-    { value: 'ko-KR', label: globalMessages.languageKorean },
-    { value: 'zh-Hans', label: globalMessages.languageChineseSimplified },
-    { value: 'zh-Hant', label: globalMessages.languageChineseTraditional },
-    { value: 'ru-RU', label: globalMessages.languageRussian },
-    { value: 'de-DE', label: globalMessages.languageGerman },
-    { value: 'fr-FR', label: globalMessages.languageFrench },
+    { value: 'en-US', label: globalMessages.languageEnglish, svg: require('../../assets/images/flags/english.inline.svg') },
+    { value: 'ja-JP', label: globalMessages.languageJapanese, svg: require('../../assets/images/flags/japanese.inline.svg') },
+    { value: 'ko-KR', label: globalMessages.languageKorean, svg: require('../../assets/images/flags/korean.inline.svg') },
+    { value: 'zh-Hans', label: globalMessages.languageChineseSimplified, svg: require('../../assets/images/flags/chinese.inline.svg') },
+    { value: 'zh-Hant', label: globalMessages.languageChineseTraditional, svg: require('../../assets/images/flags/chinese.inline.svg') },
+    { value: 'ru-RU', label: globalMessages.languageRussian, svg: require('../../assets/images/flags/russian.inline.svg') },
+    { value: 'de-DE', label: globalMessages.languageGerman, svg: require('../../assets/images/flags/german.inline.svg') },
+    { value: 'fr-FR', label: globalMessages.languageFrench, svg: require('../../assets/images/flags/french.inline.svg') }
   ];
 
   @observable bigNumberDecimalFormat = {

@@ -143,7 +143,11 @@ Feature: Send transaction
 
   @it-89
   Scenario: Try to make a transactions from the empty wallet (IT-89)
+    # note: this test must be the last test in the file
+    # since we switch the wallet test code that is being run in order to get an empty wallet
+    And I am testing ""
     Given There is a wallet stored named empty-wallet
+    # should not be necessary since we're using an empty wallet but just to be sure
     Given I cleared my local balance
     # need this for cleared wallet to take into affect properly
     When I refresh the page
