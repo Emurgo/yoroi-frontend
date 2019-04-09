@@ -47,7 +47,7 @@ export function getAddressesWithFunds(payload: {
     for (const addr of fullUtxo) {
       const rustAddr = RustModule.Wallet.Address.from_base58(addr);
       const checkedAddr = checker.check_address(rustAddr);
-      if (!checkedAddr.is_checked()) {
+      if (checkedAddr.is_checked()) {
         addrKeyMap[addr] = checkedAddr.private_key();
       }
     }
