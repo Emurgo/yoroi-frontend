@@ -100,7 +100,7 @@ export const scramblePaperAdaMnemonic = (
   password: string,
 ): string => {
   const iv = new Uint8Array(8);
-  window.crypto.getRandomValues(iv);
+  crypto.getRandomValues(iv);
   return PaperWallet.scrambleStrings(iv, password, phrase);
 };
 
