@@ -8,7 +8,6 @@ import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 import AdaRedemptionSuccessOverlay from '../../components/wallet/ada-redemption/AdaRedemptionSuccessOverlay';
-import AddWalletFooter from '../footer/AddWalletFooter';
 
 type Props = InjectedContainerProps;
 
@@ -45,14 +44,10 @@ export default class Wallet extends Component<Props> {
       );
     }
 
-    const footer = theme.classic ? undefined : <AddWalletFooter />;
-
     return (
       <MainLayout
         actions={actions}
         stores={stores}
-
-        footer={footer}
         classicTheme={theme.classic}
       >
         <WalletWithNavigation

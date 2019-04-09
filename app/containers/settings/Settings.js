@@ -8,7 +8,6 @@ import TopBar from '../../components/topbar/TopBar';
 import resolver from '../../utils/imports';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
-import AddWalletFooter from '../footer/AddWalletFooter';
 
 const Layout = resolver('containers/MainLayout');
 
@@ -64,7 +63,6 @@ export default class Settings extends Component<InjectedContainerProps> {
           />
         )}
         classicTheme={theme.classic}
-        footer={theme.classic ? undefined : <AddWalletFooter />}
       >
         <SettingsLayout menu={menu} classicTheme={theme.classic}>
           {children}

@@ -15,7 +15,9 @@ export default class WalletRecoveryInstructions extends Component<Props> {
   render() {
     const { instructionsText, classicTheme } = this.props;
     return (
-      <div className={classicTheme ? styles.componentClassic : styles.component}>{instructionsText}</div>
+      <div className={classicTheme ? styles.componentClassic : styles.component}>
+        {instructionsText}
+      </div>
     );
   }
 
