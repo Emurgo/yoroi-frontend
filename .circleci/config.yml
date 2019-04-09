@@ -70,20 +70,14 @@ jobs:
   test-firefox:
     working_directory: ~/repo
     docker:
-      - image: circleci/node:8-browsers
+      # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
+      # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr,
+      # so we use a custom image derivated from circleci's one:
+      - image: rcmorano/circleci-node-8-browsers:firefox-nightly
 
     steps:
       - checkout
       - *attach_workspace
-
-      # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
-      # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr
-      # Firefox-esr is easier to install of Debian so we pick it
-      # https://www.mozilla.org/en-US/firefox/organizations/
-      - run: sudo rm -f /opt/firefox/firefox
-      - run: sudo rm -f /usr/local/bin/firefox
-      - run: sudo apt install firefox-esr
-      - run: sudo ln -s /usr/bin/firefox-esr /usr/local/bin/firefox
 
       - run: npm run test-e2e-firefox
 
