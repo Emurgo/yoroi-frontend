@@ -1,11 +1,13 @@
 // @flow
+import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
   AdaAddress,
   AdaTransactionInputOutput,
   Transaction,
   AdaTransaction,
-  AdaTransactionCondition
+  AdaTransactionCondition,
+  UTXO,
 } from '../adaTypes';
 import type { TransactionExportRow } from '../../export';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
@@ -167,4 +169,22 @@ export function getLatestUsedIndex(addresses: Array<AdaAddress>): number {
     ...usedAddresses
       .map(address => address.index)
   );
+}
+
+export type UtxoLookupMap = { [string]: { [number]: UTXO }};
+export function utxosToLookupMap(
+  utxos: Array<UTXO>
+): UtxoLookupMap {
+  // first create 1-level map of tx_hash -> UTXO
+  const txHashMap = _.groupBy(utxos, utxo => utxo.tx_hash);
+
+  // now create 2-level map of tx_hash -> index -> UTXO
+  const lookupMap = _.mapValues(
+    txHashMap,
+    utxoList => _.keyBy(
+      utxoList,
+      utxo => utxo.tx_index
+    )
+  );
+  return lookupMap;
 }

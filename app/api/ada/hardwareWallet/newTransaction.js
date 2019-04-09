@@ -10,6 +10,8 @@ import type {
   AdaAddress,
   UTXO
 } from '../adaTypes';
+import type { UtxoLookupMap }  from '../lib/utils';
+import { utxosToLookupMap }  from '../lib/utils';
 import type {
   AdaAddressMap,
 } from '../adaAddress';
@@ -60,13 +62,7 @@ export async function createTrezorSignTxPayload(
 ): Promise<TrezorSignTxPayload> {
   const txJson: TransactionType = unsignedTx.to_json();
 
-  const utxoMap: {[TxoPointerType]: UTXO} = _.keyBy(
-    senderUtxos,
-    utxo => ({
-      id: utxo.tx_hash,
-      index: utxo.tx_index
-    })
-  );
+  const utxoMap = utxosToLookupMap(senderUtxos);
 
   // Inputs
   const trezorInputs = _transformToTrezorInputs(
@@ -158,10 +154,10 @@ function _derivePathAsString(chain: number, addressIndex: number): string {
 function _transformToTrezorInputs(
   inputs: Array<TxoPointerType>,
   addressMap: AdaAddressMap,
-  utxoMap: {[TxoPointerType]: UTXO},
+  utxoMap: UtxoLookupMap,
 ): Array<TrezorInput> {
   return inputs.map((input: TxoPointerType) => {
-    const utxo = utxoMap[input];
+    const utxo = utxoMap[input.id][input.index];
     const addressInfo = addressMap[utxo.receiver];
     return {
       path: _derivePathAsString(addressInfo.change, addressInfo.index),
@@ -204,13 +200,7 @@ export async function createLedgerSignTxPayload(
   const txJson: TransactionType = unsignedTx.to_json();
   const txDataHexMap = await txsBodiesForInputs(txJson.inputs);
 
-  const utxoMap: {[TxoPointerType]: UTXO} = _.keyBy(
-    senderUtxos,
-    utxo => ({
-      id: utxo.tx_hash,
-      index: utxo.tx_index
-    })
-  );
+  const utxoMap = utxosToLookupMap(senderUtxos);
 
   // Inputs
   const ledgerInputs: Array<InputTypeUTxO> =
@@ -245,11 +235,11 @@ function _derivePathAsBIP32Path(
 function _transformToLedgerInputs(
   inputs: Array<TxoPointerType>,
   addressMap: AdaAddressMap,
-  utxoMap: {[TxoPointerType]: UTXO},
+  utxoMap: UtxoLookupMap,
   txDataHexMap: {[key: string]:string}
 ): Array<InputTypeUTxO> {
   return inputs.map(input => {
-    const utxo = utxoMap[input];
+    const utxo = utxoMap[input.id][input.index];
     const addressInfo = addressMap[utxo.receiver];
     return {
       txDataHex: txDataHexMap[input.id],

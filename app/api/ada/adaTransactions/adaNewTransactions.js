@@ -35,6 +35,7 @@ import { getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import { HARD_DERIVATION_START } from '../../../config/numbersConfig';
 import type { AdaAddressMap } from '../adaAddress';
+import { utxosToLookupMap } from '../lib/utils';
 import type { SignedResponse } from '../lib/yoroi-backend-api';
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
@@ -61,8 +62,8 @@ export async function newAdaUnsignedTx(
   const outputPolicy = RustModule.Wallet.OutputPolicy.change_to_one_address(changeAddr);
   const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
 
-  const senders = await getAdaAddressesList();
-  const allUtxos = await getAllUTXOsForAddresses(senders.map(addr => addr.cadId));
+  const allAdaAddresses = await getAdaAddressesList();
+  const allUtxos = await getAllUTXOsForAddresses(allAdaAddresses.map(addr => addr.cadId));
   const txInputs = utxoToTxInput(allUtxos);
   let selectionResult;
   try {
@@ -75,12 +76,16 @@ export async function newAdaUnsignedTx(
       RustModule.Wallet.TxoPointer.from_json(input.to_json().ptr)
     )
   ));
-  const addressesMap: AdaAddressMap = addressesToAddressMap(senders);
+
+  const usedAddressSet = new Set(senderInputs.map(input => input.to_json().value.address));
+  const usedAdaAddresses = allAdaAddresses.filter(
+    adaAddress => usedAddressSet.has(adaAddress.cadId)
+  );
 
   const txBuilder = new RustModule.Wallet.TransactionBuilder();
   await addTxIO(txBuilder, senderInputs, outputPolicy, feeAlgorithm, receiver, amount);
   return {
-    addressesMap,
+    addressesMap: addressesToAddressMap(usedAdaAddresses),
     changeAddr: changeAdaAddr,
     senderUtxos: filterUtxo(senderInputs, allUtxos),
     txBuilder,
@@ -164,16 +169,11 @@ export function filterUtxo(
   inputs: Array<RustModule.Wallet.TxInput>,
   utxos: Array<UTXO>,
 ): Array<UTXO> {
-  const utxoMap: {[TxoPointerType]: UTXO} = _.keyBy(
-    utxos,
-    utxo => ({
-      id: utxo.tx_hash,
-      index: utxo.tx_index
-    })
-  );
+  const lookupMap = utxosToLookupMap(utxos);
+
   return inputs.map(input => {
     const txoPointer = input.to_json().ptr;
-    return utxoMap[txoPointer];
+    return lookupMap[txoPointer.id][txoPointer.index];
   });
 }
 
@@ -201,10 +201,14 @@ export async function addTxIO(
   addTxInputs(txBuilder, senderInputs);
   addOutput(txBuilder, receiver, amount);
 
-  txBuilder.apply_output_policy(
-    feeAlgorithm,
-    outputPolicy
-  );
+  try {
+    txBuilder.apply_output_policy(
+      feeAlgorithm,
+      outputPolicy
+    );
+  } catch (err) {
+    throw new NotEnoughMoneyToSendError();
+  }
 
   const balance = txBuilder.get_balance(feeAlgorithm);
   if (balance.is_negative()) {
