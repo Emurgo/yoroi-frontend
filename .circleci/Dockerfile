@@ -1,4 +1,6 @@
-FROM circleci/node:8-browsers
+FROM circleci/node:8-browsers AS circleci-node-8-browsers
+
+FROM circleci-node-8-browsers AS brave
 
 # hardcode ubuntu version for circleci's debian-9 based image
 ENV UBUNTU_CODENAME=cosmic
@@ -20,3 +22,14 @@ RUN /bin/bash -c 'set -e; \
     sudo mv chromedriver /usr/local/bin/chromedriver; \
     sudo chmod +x /usr/local/bin/chromedriver; \
     chromedriver --version'
+
+FROM circleci-node-8-browsers AS firefox-nightly
+
+ENV FIREFOX_NIGHTLY=67.0b8
+
+RUN /bin/bash -c 'set -e; \
+    curl -o /tmp/firefox-nightly.bz2 -sL https://download-installer.cdn.mozilla.net/pub/devedition/releases/${FIREFOX_NIGHTLY}/linux-x86_64/es-ES/firefox-${FIREFOX_NIGHTLY}.tar.bz2; \
+    sudo tar -C /opt -jxf /tmp/firefox-nightly.bz2; \
+    sudo rm -f /opt/firefox/firefox; \
+    sudo rm -f /usr/local/bin/firefox; \
+    sudo ln -s /opt/firefox/firefox-bin /usr/local/bin/firefox'
