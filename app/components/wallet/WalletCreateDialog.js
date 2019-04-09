@@ -188,7 +188,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         className={dialogClasses}
         title={intl.formatMessage(messages.dialogTitle)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}

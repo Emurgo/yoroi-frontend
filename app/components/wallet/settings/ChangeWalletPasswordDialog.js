@@ -196,7 +196,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       <Dialog
         title={intl.formatMessage(messages.dialogTitleChangePassword)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}

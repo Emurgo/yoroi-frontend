@@ -134,7 +134,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         className={classicTheme ? styles.dialogClassic : styles.dialog}
         closeButton={<DialogCloseButton />}
