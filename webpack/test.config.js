@@ -87,6 +87,7 @@ module.exports = {
           presets: []
         }
       },
+      // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
       {
         test: /pdf\.worker(\.min)?\.js$/,
         use: 'raw-loader',

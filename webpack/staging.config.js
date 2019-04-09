@@ -63,7 +63,7 @@ module.exports = {
     new ConfigWebpackPlugin(),
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
-      manifest: require('../dll/vendor-manifest.json') // eslint-disable-line
+      manifest: require('../dll/vendor-manifest.json')
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
