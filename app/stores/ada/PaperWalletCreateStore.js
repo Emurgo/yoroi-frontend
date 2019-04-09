@@ -8,13 +8,12 @@ import LocalizableError from "../../i18n/LocalizableError";
 import type { AdaPaper } from "../../api/ada";
 import fileSaver from 'file-saver';
 
-export type ProgressStepEnum = 0 | 1 | 2 | 3 | 4;
+export type ProgressStepEnum = 0 | 1 | 2 | 3;
 export const ProgressStep = {
   INIT: 0,
   USER_PASSWORD: 1,
   CREATE: 2,
-  MNEMONIC_PASSWORD: 3,
-  VERIFY: 4,
+  VERIFY: 3,
 };
 
 export default class PaperWalletCreateStore extends Store {
@@ -23,7 +22,6 @@ export default class PaperWalletCreateStore extends Store {
   @observable pdfRenderStatus: string;
   @observable pdf: Blob;
   error: ?LocalizableError;
-  isCustomPassword: boolean;
   numAddresses: number;
   userPassword: string;
   paper: AdaPaper;
@@ -41,16 +39,9 @@ export default class PaperWalletCreateStore extends Store {
     a.cancel.listen(this._cancel);
   }
 
-  @action _submitInit = async ({ isCustomPassword, numAddresses }: { isCustomPassword: boolean, numAddresses: number }): Promise<void> => {
-    this.isCustomPassword = isCustomPassword;
+  @action _submitInit = async ({ numAddresses }: { numAddresses: number }): Promise<void> => {
     this.numAddresses = numAddresses;
-    if (isCustomPassword) {
-      this.progressInfo = ProgressStep.USER_PASSWORD;
-    } else {
-      this.actions.ada.paperWallets.createPaperWallet.trigger();
-      this.actions.ada.paperWallets.createPdfDocument.trigger();
-      this.progressInfo = ProgressStep.CREATE;
-    }
+    this.progressInfo = ProgressStep.USER_PASSWORD;
   };
 
   @action _submitUserPassword = async ({ userPassword }: { userPassword: string }) => {
@@ -105,7 +96,6 @@ export default class PaperWalletCreateStore extends Store {
   _reset = () => {
     this.progressInfo = ProgressStep.INIT;
     this.error = undefined;
-    this.isCustomPassword = undefined;
     this.numAddresses = undefined;
     this.userPassword = undefined;
     this.paper = undefined;

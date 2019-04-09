@@ -115,7 +115,6 @@ export default class WalletAddPage extends Component<Props> {
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: "paper" } })}
-          onPaperPasswordRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: "paper-password" } })}
           isRestoreActive={isRestoreActive}
         />
       );

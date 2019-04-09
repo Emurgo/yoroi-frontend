@@ -22,14 +22,6 @@ const protocolMagic = CONFIG.network.protocolMagic;
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
 
-/** Generate a random mnemonic based on 96-bits of entropy (9 words), and also return hexed seed */
-export const generatePasswordAndMnemonic = () => {
-  const mnemonic = bip39.generateMnemonic(96);
-  const words = mnemonic.split(' ');
-  const seed = mnemonicToSeedHex(mnemonic);
-  return { words, seed };
-};
-
 /** Check validty of mnemonic (including checksum) */
 export const isValidEnglishAdaMnemonic = (
   phrase: string,

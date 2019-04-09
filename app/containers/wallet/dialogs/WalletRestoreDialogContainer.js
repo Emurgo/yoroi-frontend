@@ -10,7 +10,7 @@ import {
 } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 
 type Props = InjectedDialogContainerProps & {
-  mode: "regular" | "paper" | "paper-password"
+  mode: "regular" | "paper"
 };
 
 @observer
@@ -18,7 +18,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   onSubmit = (values: { recoveryPhrase: string, walletName: string, walletPassword: string, paperPassword: string }) => {
     if (isPaperMode(this.props.mode)) {
-      console.log('>', values.paperPassword);
       const [newPhrase] = unscramblePaperAdaMnemonic(values.recoveryPhrase, getWordsCount(this.props.mode), values.paperPassword);
       values.recoveryPhrase = newPhrase;
     }
@@ -59,7 +58,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         onCancel={this.onCancel}
         error={restoreRequest.error}
         isPaper={isPaper}
-        showPaperPassword={isPaperPasswordMode(this.props.mode)}
+        showPaperPassword={true}
       />
     );
   }
@@ -70,19 +69,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 }
 
 function isPaperMode(mode: string): boolean {
-  return mode === 'paper' || mode === 'paper-password';
-}
-
-function isPaperPasswordMode(mode: string): boolean {
-  return mode === 'paper-password';
+  return mode === 'paper';
 }
 
 function getWordsCount(mode: string): boolean {
-  if (mode === 'paper') {
-    return 30;
-  }
-  if (mode === 'paper-password') {
-    return 21;
-  }
-  return 15;
+  return mode === 'paper' ? 21 : 15;
 }

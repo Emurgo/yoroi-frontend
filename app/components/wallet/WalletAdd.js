@@ -33,10 +33,6 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.restore.paper.description',
     defaultMessage: '!!!Restore Yoroi Paper Wallet',
   },
-  restorePaperPasswordDescription: {
-    id: 'wallet.add.dialog.restore.paper.password.description',
-    defaultMessage: '!!!Restore Yoroi Paper Wallet with Password',
-  },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
@@ -59,7 +55,6 @@ type Props = {
   onCreate: Function,
   onRestore: Function,
   onPaperRestore: Function,
-  onPaperPasswordRestore: Function,
   isRestoreActive: boolean,
 };
 
@@ -80,7 +75,6 @@ export default class WalletAdd extends Component<Props> {
       onCreate,
       onRestore,
       onPaperRestore,
-      onPaperPasswordRestore,
       isRestoreActive,
     } = this.props;
 
@@ -126,12 +120,6 @@ export default class WalletAdd extends Component<Props> {
             className="primary restorePaperWalletButton"
             label={intl.formatMessage(messages.restorePaperDescription)}
             onMouseUp={onPaperRestore}
-            skin={ButtonSkin}
-          />
-          <Button
-            className="primary restorePaperPasswordWalletButton"
-            label={intl.formatMessage(messages.restorePaperPasswordDescription)}
-            onMouseUp={onPaperPasswordRestore}
             skin={ButtonSkin}
           />
           {activeNotification ? (

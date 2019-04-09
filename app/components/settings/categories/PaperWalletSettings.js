@@ -13,18 +13,6 @@ import styles from './PaperWalletSettings.scss';
 import ReactMarkdown from 'react-markdown';
 
 const messages = defineMessages({
-  paperTypeSelectLabel: {
-    id: 'settings.paperWallet.paperTypeSelect.label',
-    defaultMessage: '!!!Type of paper wallet',
-  },
-  paperTypeRegular: {
-    id: 'settings.paperWallet.paperTypeSelect.regular.label',
-    defaultMessage: '!!!30 words',
-  },
-  paperTypePassword: {
-    id: 'settings.paperWallet.paperTypeSelect.password.label',
-    defaultMessage: '!!!21 word and a custom password',
-  },
   numAddressesSelectLabel: {
     id: 'settings.paperWallet.numAddressesSelect.label',
     defaultMessage: '!!!Number of addresses',
@@ -54,9 +42,8 @@ export default class PaperWalletSettings extends Component<Props> {
   };
 
   createPaper = () => {
-    const { paperType, numAddresses } = this.form.values();
-    const isCustomPassword = paperType === 'password';
-    this.props.onCreatePaper({ isCustomPassword, numAddresses: parseInt(numAddresses) });
+    const { numAddresses } = this.form.values();
+    this.props.onCreatePaper({ numAddresses: parseInt(numAddresses) });
   };
 
   form = new ReactToolboxMobxForm({
@@ -64,10 +51,6 @@ export default class PaperWalletSettings extends Component<Props> {
       numAddresses: {
         label: this.context.intl.formatMessage(messages.numAddressesSelectLabel),
         value: '1',
-      },
-      paperType: {
-        label: this.context.intl.formatMessage(messages.paperTypeSelectLabel),
-        value: 'regular',
       },
     }
   }, {
@@ -78,15 +61,9 @@ export default class PaperWalletSettings extends Component<Props> {
 
   render() {
     const { error, isDialogOpen, dialog, paperWalletsIntroText } = this.props;
-    const paperType = this.form.$('paperType');
     const numAddresses = this.form.$('numAddresses');
-    const paperTypeOptions = [
-      { value: 'regular', label: this.context.intl.formatMessage(messages.paperTypeRegular) },
-      { value: 'password', label: this.context.intl.formatMessage(messages.paperTypePassword) },
-    ];
     const numAddressOptions = [...Array(5).keys()].map(x => ({ value: `${x + 1}`, label: `${x + 1}` }));
     const componentClassNames = classNames([styles.component, 'general']);
-    const paperTypeSelectClassNames = classNames([styles.paperTypeSelect]);
     const numAddressesSelectClassNames = classNames([styles.numAddressesSelect]);
     const buttonClassNames = classNames([
       "primary",
@@ -99,13 +76,6 @@ export default class PaperWalletSettings extends Component<Props> {
           <ReactMarkdown
             source={paperWalletsIntroText} />
         </div>
-
-        <Select
-          className={paperTypeSelectClassNames}
-          options={paperTypeOptions}
-          {...paperType.bind()}
-          skin={SelectSkin}
-        />
 
         <Select
           className={numAddressesSelectClassNames}

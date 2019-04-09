@@ -11,12 +11,11 @@ You can use a paper wallet to receive coins and store them for any period of tim
 to restore a regular digital wallet in Yoroi, and this wallet will give you access
 yo all the funds you have sent to printed addresses.
 
-Yoroi allows creating two types of paper wallets:
-- Regular paper wallet with 30 secret words. 21 word is printed out and 9 words are written manually.
-If someone gets access to this paper-wallet - they have full access to any funds you have sent there.
-- Password-protected paper wallet with 21 secret word. You are setting your own custom password
-for this type and you need to remember it very carefully. If someone gets access to this paper-wallet -
-they will also need to find your password to gain access to the funds. 
+Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret word.
+You are setting your own custom password and you need to remember it very carefully.
+If someone gets access to this paper-wallet - they will also need to find your password
+to gain access to the funds. **But if you lost or forget your password - your funds will be
+lost forever and no one will be able to restore them!** 
 
 When you restore a paper wallet back into Yoroi and get access to your funds -
 you supposed to throw away or destroy the document itself, because it is now

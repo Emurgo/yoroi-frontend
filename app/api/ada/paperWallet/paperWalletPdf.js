@@ -3,8 +3,6 @@ import Pdf from 'jspdf';
 import qr from 'qr-image';
 import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1.png';
 import paperWalletPage1PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1_testnet.png';
-import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2.png';
-import paperWalletPage2PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_testnet.png';
 import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_pass.png';
 import paperWalletPage2PassPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_pass_testnet.png';
 import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
@@ -15,7 +13,6 @@ export type PaperRequest = {
   words: Array<string>,
   addresses: Array<string>,
   isMainnet: boolean,
-  isCustomPass: boolean,
 }
 
 export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function): Promise<Blob> => {
@@ -31,7 +28,7 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
   if (!logback('Reading parameters')) {
     return null;
   }
-  const { isMainnet, addresses, words, isCustomPass } = request;
+  const { isMainnet, addresses, words } = request;
 
   if (!logback('Initializing the document')) {
     return null;
@@ -73,9 +70,7 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
       return null;
     }
 
-    const page2Uri = isMainnet ?
-      (isCustomPass ? paperWalletPage2PassPath : paperWalletPage2Path)
-      : (isCustomPass ? paperWalletPage2PassPathTestnet : paperWalletPage2PathTestnet);
+    const page2Uri = isMainnet ? paperWalletPage2PassPath : paperWalletPage2PassPathTestnet;
     await addImage(doc, page2Uri, pageSize);
     if (!logback('Printing mnemonics')) {
       return null;

@@ -16,7 +16,6 @@ import {
   isValidEnglishAdaPaperMnemonic,
   unscramblePaperAdaMnemonic,
   updateWalletMasterKeyPassword,
-  generatePasswordAndMnemonic,
   scramblePaperAdaMnemonic,
   mnemonicsToAddresses
 } from './lib/cardanoCrypto/cryptoWallet';
@@ -163,32 +162,20 @@ export const generateAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseRespo
   generateAdaMnemonic()
 );
 
-export type PaperWalletPass = {
-  passphrase: Array<string>
-} | {
-  password: string
-}
-
+/**
+ * This type represents the very secret part of a paper wallet.
+ * Should be handled with care and never exposed.
+ */
 export type PaperWalletSecret = {
   words: Array<string>,
   scrambledWords: Array<string>,
-  pass: PaperWalletPass,
 };
 
-export const generatePaperWalletSecret = (password?: string): PaperWalletSecret => {
+export const generatePaperWalletSecret = (password: string): PaperWalletSecret => {
   const words = generateAdaMnemonic();
-  const [pass, passString] = _paperPass(password);
-  const scrambledWords = scramblePaperAdaMnemonic(words.join(' '), passString).split(' ');
-  return { words, scrambledWords, pass };
+  const scrambledWords = scramblePaperAdaMnemonic(words.join(' '), password).split(' ');
+  return { words, scrambledWords };
 };
-
-function _paperPass(password?: string): [PaperWalletPass, string] {
-  if (password) {
-    return [{ password }, password];
-  }
-  const { words, seed } = generatePasswordAndMnemonic();
-  return [{ passphrase: words }, seed];
-}
 
 export const mnemonicsToExternalAddresses =
   (mnemonics: string, count?: number): string => mnemonicsToAddresses(mnemonics, count);
