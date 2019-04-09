@@ -28,7 +28,7 @@ FROM circleci-node-8-browsers AS firefox-nightly
 ENV FIREFOX_NIGHTLY=67.0b8
 
 RUN /bin/bash -c 'set -e; \
-    curl -o /tmp/firefox-nightly.bz2 -sL https://download-installer.cdn.mozilla.net/pub/devedition/releases/${FIREFOX_NIGHTLY}/linux-x86_64/es-ES/firefox-${FIREFOX_NIGHTLY}.tar.bz2; \
+    curl -o /tmp/firefox-nightly.bz2 -sL https://download-installer.cdn.mozilla.net/pub/devedition/releases/${FIREFOX_NIGHTLY}/linux-x86_64/en-US/firefox-${FIREFOX_NIGHTLY}.tar.bz2; \
     sudo tar -C /opt -jxf /tmp/firefox-nightly.bz2; \
     sudo rm -f /opt/firefox/firefox; \
     sudo rm -f /usr/local/bin/firefox; \
