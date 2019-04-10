@@ -15,7 +15,6 @@ import {
   isValidWalletName,
   isValidWalletPassword,
   isValidRepeatPassword,
-  isValidPaperPassword,
 } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';

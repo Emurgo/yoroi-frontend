@@ -39,7 +39,8 @@ export const isValidEnglishAdaPaperMnemonic = (
   numberOfWords: ?number = 27
 ) => {
   const fakePassword = numberOfWords === 21 ? 'xxx' : undefined;
-  const [unscrambled, unscrambledLen] = unscramblePaperAdaMnemonic(phrase, numberOfWords, fakePassword);
+  const [unscrambled, unscrambledLen] =
+    unscramblePaperAdaMnemonic(phrase, numberOfWords, fakePassword);
   if (unscrambled && unscrambledLen) {
     return isValidEnglishAdaMnemonic(unscrambled, unscrambledLen);
   }

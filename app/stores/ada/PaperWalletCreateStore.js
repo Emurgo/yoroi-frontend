@@ -1,11 +1,8 @@
 // @flow
 import { observable, action } from 'mobx';
-import _ from 'lodash';
-import Request from '../lib/LocalizedRequest';
-import type { UpdateWalletPasswordResponse, UpdateWalletResponse } from '../../api/common';
-import Store from "../base/Store";
-import LocalizableError from "../../i18n/LocalizableError";
-import type { AdaPaper } from "../../api/ada";
+import Store from '../base/Store';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { AdaPaper } from '../../api/ada';
 import fileSaver from 'file-saver';
 
 export type ProgressStepEnum = 0 | 1 | 2 | 3;
@@ -67,13 +64,13 @@ export default class PaperWalletCreateStore extends Store {
         paper: this.paper,
         isMainnet: true, // TODO make dynamic for testnet support,
         logback: (status: string) => {
-          this.actions.ada.paperWallets.setPdfRenderStatus.trigger({status});
+          this.actions.ada.paperWallets.setPdfRenderStatus.trigger({ status });
           return !!this.paper;
         }
       });
     }
     if (this.paper && pdf) {
-      this.actions.ada.paperWallets.setPdf.trigger({pdf});
+      this.actions.ada.paperWallets.setPdf.trigger({ pdf });
     }
   };
 

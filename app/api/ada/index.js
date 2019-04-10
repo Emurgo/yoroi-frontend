@@ -229,13 +229,31 @@ export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 export default class AdaApi {
 
   // noinspection JSMethodCanBeStatic
-  createAdaPaper({ password, numAddresses }: { password: string, numAddresses?: number } = {}): AdaPaper {
+  createAdaPaper(
+    {
+      password,
+      numAddresses
+    }: {
+      password: string,
+      numAddresses?: number
+    } = {}
+  ): AdaPaper {
     const { words, scrambledWords } = generatePaperWalletSecret(password);
     const addresses = mnemonicsToExternalAddresses(words.join(' '), numAddresses || DEFAULT_ADDRESSES_PER_PAPER);
     return { addresses, scrambledWords };
   }
 
-  async createAdaPaperPdf({ paper, isMainnet, logback }: { paper: AdaPaper, isMainnet?: boolean, logback?: Function }): Promise<?Blob> {
+  async createAdaPaperPdf(
+    {
+      paper,
+      isMainnet,
+      logback
+    }: {
+      paper: AdaPaper,
+      isMainnet?: boolean,
+      logback?: Function
+    }
+  ): Promise<?Blob> {
     const { addresses, scrambledWords } = paper;
     // noinspection UnnecessaryLocalVariableJS
     const res : Promise<?Blob> = generateAdaPaperPdf({
@@ -563,7 +581,11 @@ export default class AdaApi {
     return isValidPaperMnemonic(mnemonic, numberOfWords);
   }
 
-  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number, password?: string): [?string, number] {
+  unscramblePaperMnemonic(
+    mnemonic: string,
+    numberOfWords: ?number,
+    password?: string
+  ): [?string, number] {
     return unscramblePaperMnemonic(mnemonic, numberOfWords, password);
   }
 

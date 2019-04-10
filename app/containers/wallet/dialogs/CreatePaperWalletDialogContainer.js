@@ -4,10 +4,10 @@ import { observer } from 'mobx-react';
 import UserPasswordDialog from '../../../components/wallet/settings/paper-wallets/UserPasswordDialog';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
-import PaperWalletsActions from "../../../actions/ada/paper-wallets-actions";
-import PaperWalletCreateStore, { ProgressStep } from "../../../stores/ada/PaperWalletCreateStore";
-import { Logger } from "../../../utils/logging";
-import CreatePaperDialog from "../../../components/wallet/settings/paper-wallets/CreatePaperDialog";
+import PaperWalletsActions from '../../../actions/ada/paper-wallets-actions';
+import PaperWalletCreateStore, { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
+import { Logger } from '../../../utils/logging';
+import CreatePaperDialog from '../../../components/wallet/settings/paper-wallets/CreatePaperDialog';
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
@@ -65,6 +65,11 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
     }
   }
 
-  _getActions = (): PaperWalletsActions => this.props.actions[environment.API].paperWallets;
-  _getStore = (): PaperWalletCreateStore => this.props.stores.substores[environment.API].paperWallets;
+  _getActions = (): PaperWalletsActions => (
+    this.props.actions[environment.API].paperWallets
+  );
+
+  _getStore = (): PaperWalletCreateStore => (
+    this.props.stores.substores[environment.API].paperWallets
+  );
 }

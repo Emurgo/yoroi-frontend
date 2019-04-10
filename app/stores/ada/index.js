@@ -14,7 +14,7 @@ import AdaRedemptionStore from './AdaRedemptionStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
 import HWVerifyAddressStore from './HWVerifyAddressStore';
-import PaperWalletCreateStore from "./PaperWalletCreateStore";
+import PaperWalletCreateStore from './PaperWalletCreateStore';
 
 export const adaStoreClasses = {
   adaRedemption: AdaRedemptionStore,

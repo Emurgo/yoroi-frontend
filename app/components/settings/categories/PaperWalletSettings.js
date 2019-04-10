@@ -44,7 +44,7 @@ export default class PaperWalletSettings extends Component<Props> {
 
   createPaper = () => {
     const { numAddresses } = this.form.values();
-    this.props.onCreatePaper({ numAddresses: parseInt(numAddresses) });
+    this.props.onCreatePaper({ numAddresses: parseInt(numAddresses, 10) });
   };
 
   form = new ReactToolboxMobxForm({
@@ -67,15 +67,14 @@ export default class PaperWalletSettings extends Component<Props> {
     const componentClassNames = classNames([styles.component, 'general']);
     const numAddressesSelectClassNames = classNames([styles.numAddressesSelect]);
     const buttonClassNames = classNames([
-      "primary",
+      'primary',
       styles.button
     ]);
     return (
       <div className={componentClassNames}>
 
         <div className={styles.intro}>
-          <ReactMarkdown
-            source={paperWalletsIntroText} />
+          <ReactMarkdown source={paperWalletsIntroText} />
         </div>
 
         <Select

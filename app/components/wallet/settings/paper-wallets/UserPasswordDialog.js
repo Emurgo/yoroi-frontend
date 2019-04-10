@@ -8,9 +8,8 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
-import {isValidWalletPassword, isValidRepeatPassword, isValidPaperPassword} from '../../../../utils/validations';
+import { isValidRepeatPassword, isValidPaperPassword } from '../../../../utils/validations';
 import globalMessages from '../../../../i18n/global-messages';
-import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UserPasswordDialog.scss';
 import config from '../../../../config';
 

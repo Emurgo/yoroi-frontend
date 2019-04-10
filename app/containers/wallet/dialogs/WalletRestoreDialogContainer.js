@@ -5,9 +5,7 @@ import validWords from 'bip39/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
-import {
-  unscramblePaperAdaMnemonic
-} from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { unscramblePaperAdaMnemonic } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper"
@@ -16,9 +14,18 @@ type Props = InjectedDialogContainerProps & {
 @observer
 export default class WalletRestoreDialogContainer extends Component<Props> {
 
-  onSubmit = (values: { recoveryPhrase: string, walletName: string, walletPassword: string, paperPassword: string }) => {
+  onSubmit = (values: {
+    recoveryPhrase: string,
+    walletName: string,
+    walletPassword: string,
+    paperPassword: string
+  }) => {
     if (isPaperMode(this.props.mode)) {
-      const [newPhrase] = unscramblePaperAdaMnemonic(values.recoveryPhrase, getWordsCount(this.props.mode), values.paperPassword);
+      const [newPhrase] = unscramblePaperAdaMnemonic(
+        values.recoveryPhrase,
+        getWordsCount(this.props.mode),
+        values.paperPassword
+      );
       if (newPhrase) {
         values.recoveryPhrase = newPhrase;
       }
@@ -40,8 +47,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
     const isPaper = isPaperMode(this.props.mode);
     const wordsCount = getWordsCount(this.props.mode);
-    if (!isPaper && this.props.mode !== "regular") {
-      throw new Error("Unexpected restore mode: " + this.props.mode);
+    if (!isPaper && this.props.mode !== 'regular') {
+      throw new Error('Unexpected restore mode: ' + this.props.mode);
     }
 
     return (
@@ -49,9 +56,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         mnemonicValidator={mnemonic => {
           if (isPaper) {
             return wallets.isValidPaperMnemonic(mnemonic, wordsCount);
-          } else {
-            return wallets.isValidMnemonic(mnemonic);
           }
+          return wallets.isValidMnemonic(mnemonic);
         }}
         validWords={validWords}
         numberOfMnemonics={wordsCount}
@@ -60,7 +66,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         onCancel={this.onCancel}
         error={restoreRequest.error}
         isPaper={isPaper}
-        showPaperPassword={true}
+        showPaperPassword
       />
     );
   }

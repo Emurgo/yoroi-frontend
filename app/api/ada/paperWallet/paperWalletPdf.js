@@ -15,8 +15,12 @@ export type PaperRequest = {
   isMainnet: boolean,
 }
 
-export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function): Promise<?Blob> => {
+export const generateAdaPaperPdf = async (
+  request: PaperRequest,
+  callback?: Function
+): Promise<?Blob> => {
   // Prepare params
+  // eslint-disable-next-line no-unused-vars
   const safeCallback = callback || ((s) => true);
   const logback = (s) => {
     if (!safeCallback(s)) {
@@ -75,7 +79,7 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
     if (!logback('Printing mnemonics')) {
       return null;
     }
-    printMnemonics(doc, words)
+    printMnemonics(doc, words);
 
   } catch (error) {
     Logger.error('Failed to render paper wallet! ' + stringifyError(error));
@@ -91,7 +95,7 @@ export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Func
 
 function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function): boolean {
   const pageWidthPx = doc.internal.pageSize.getWidth();
-  const [pA, pB] = [{ x:40, y:187 }, { x:170, y:249 }];
+  const [pA, pB] = [{ x: 40, y: 187 }, { x: 170, y: 249 }];
 
   doc.setTextColor(0, 0, 0);
   if (addresses.length === 1) {
@@ -125,12 +129,7 @@ function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function): 
 
     doc.setFontSize(8);
     const addrPad = 22;
-    const qrSize = {
-      '2': 14,
-      '3': 14,
-      '4': 12,
-      '5': 10,
-    }[`${addresses.length}`];
+    const qrSize = [14, 14, 12, 10][addresses.length - 2];
 
     const rowHeight = (pB.y - pA.y) / addresses.length;
     for (let r = 0; r < addresses.length; r++) {
@@ -159,7 +158,7 @@ function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function): 
 function printMnemonics(doc: Pdf, words: Array<string>) {
   doc.setFont('courier');
   doc.setFontSize(7);
-  const [pA, pB] = [{ x:56, y:82 }, { x:153, y:105 }];
+  const [pA, pB] = [{ x: 56, y: 82 }, { x: 153, y: 105 }];
   const lineHeight = (pB.y - pA.y) / 3;
   for (let r = 0; r < 3; r++) {
     const rowIndex = r * 7;
