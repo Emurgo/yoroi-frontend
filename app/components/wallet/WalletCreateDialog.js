@@ -21,7 +21,7 @@ const messages = defineMessages({
   },
   walletName: {
     id: 'wallet.create.dialog.name.label',
-    defaultMessage: '!!!Wallet Name',
+    defaultMessage: '!!!Wallet name',
   },
   walletNameHint: {
     id: 'wallet.create.dialog.walletNameHint',
@@ -33,15 +33,19 @@ const messages = defineMessages({
   },
   walletPasswordLabel: {
     id: 'wallet.create.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Wallet password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.create.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat password',
+    defaultMessage: '!!!Spending password',
   },
   passwordFieldPlaceholder: {
     id: 'wallet.create.dialog.passwordFieldPlaceholder',
-    defaultMessage: '!!!Password',
+    defaultMessage: '!!!Spending password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.create.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat spending password',
+  },
+  repeatPasswordFieldPlaceholder: {
+    id: 'wallet.create.dialog.repeatPasswordFieldPlaceholder',
+    defaultMessage: '!!!Repeat spending password',
   },
 });
 
@@ -103,7 +107,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;

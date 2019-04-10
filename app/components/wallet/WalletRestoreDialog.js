@@ -53,15 +53,19 @@ const messages = defineMessages({
   },
   walletPasswordLabel: {
     id: 'wallet.restore.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Wallet password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.restore.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat password',
+    defaultMessage: '!!!Spending password',
   },
   passwordFieldPlaceholder: {
     id: 'wallet.restore.dialog.passwordFieldPlaceholder',
-    defaultMessage: '!!!Password',
+    defaultMessage: '!!!Spending Password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.restore.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat spending password',
+  },
+  repeatPasswordFieldPlaceholder: {
+    id: 'wallet.restore.dialog.repeatPasswordFieldPlaceholder',
+    defaultMessage: '!!!Repeat spending password',
   },
 });
 
@@ -132,7 +136,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
