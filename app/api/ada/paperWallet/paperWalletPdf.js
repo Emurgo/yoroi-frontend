@@ -2,11 +2,8 @@
 import Pdf from 'jspdf';
 import qr from 'qr-image';
 import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1.png';
-import paperWalletPage1PathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1_testnet.png';
 import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_pass.png';
-import paperWalletPage2PassPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_pass_testnet.png';
 import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
-import paperWalletCertificateBgPathTestnet from '../../../assets/images/paper-wallet/paper-wallet-certificate-background_testnet.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 
 export type PaperRequest = {
@@ -53,16 +50,23 @@ export const generateAdaPaperPdf = async (
     }
 
     // background images
-    const bgUrl = isMainnet ? paperWalletCertificateBgPath : paperWalletCertificateBgPathTestnet;
+    const bgUrl = paperWalletCertificateBgPath;
     await addImage(doc, bgUrl, pageSize);
+    if (!isMainnet) {
+      printTestnetLabel(doc, 178, 20, 15);
+    }
 
     if (!logback('Preparing the face page')) {
       return null;
     }
 
     // first page
-    const page1Uri = isMainnet ? paperWalletPage1Path : paperWalletPage1PathTestnet;
+    if (!isMainnet) {
+      printTestnetLabel(doc, 85);
+    }
+    const page1Uri = paperWalletPage1Path;
     await addImage(doc, page1Uri, pageSize);
+
     if (!printAddresses(doc, addresses, logback)) {
       return null;
     }
@@ -74,7 +78,10 @@ export const generateAdaPaperPdf = async (
       return null;
     }
 
-    const page2Uri = isMainnet ? paperWalletPage2PassPath : paperWalletPage2PassPathTestnet;
+    if (!isMainnet) {
+      printTestnetLabel(doc, 75, 180);
+    }
+    const page2Uri = paperWalletPage2PassPath;
     await addImage(doc, page2Uri, pageSize);
     if (!logback('Printing mnemonics')) {
       return null;
@@ -92,6 +99,15 @@ export const generateAdaPaperPdf = async (
   }
   return blob;
 };
+
+function printTestnetLabel(doc: Pdf, y: number, r?: number, xShift?: number) {
+  doc.setFontSize(60);
+  doc.setFontType('bold');
+  doc.setTextColor(255,180,164);
+  textCenter(doc, y, 'TESTNET', null, r, (r || 0) > 90, xShift);
+  doc.setFontType('normal');
+  doc.setTextColor(0,0,0);
+}
 
 function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function): boolean {
   const pageWidthPx = doc.internal.pageSize.getWidth();
@@ -177,13 +193,13 @@ type AddImageParams = {
   h?: number,
 }
 
-function textCenter(doc: Pdf, y: number, text: string, m, r, isReverseCentering?: boolean) {
+function textCenter(doc: Pdf, y: number, text: string, m, r, isReverseCentering?: boolean, xShift?: number) {
   const unit = doc.getStringUnitWidth(text);
   const fontSize = doc.internal.getFontSize();
   const scaleFactor = doc.internal.scaleFactor;
   const textWidth = unit * fontSize / scaleFactor;
   const pageWidth = doc.internal.pageSize.width;
-  const textOffset = (pageWidth / 2) - ((textWidth / 2) * (isReverseCentering ? -1 : +1));
+  const textOffset = ((pageWidth / 2) - ((textWidth / 2) * (isReverseCentering ? -1 : +1))) + (xShift || 0);
   doc.text(textOffset, y, text, m, r);
 }
 
