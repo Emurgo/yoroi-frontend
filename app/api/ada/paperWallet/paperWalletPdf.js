@@ -2,7 +2,7 @@
 import Pdf from 'jspdf';
 import qr from 'qr-image';
 import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1.png';
-import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2_pass.png';
+import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2.png';
 import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 
