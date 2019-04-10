@@ -114,12 +114,12 @@ export function getCryptoWalletFromMasterKey(
 ): RustModule.Wallet.Bip44RootPrivateKey {
   const masterKeyBytes = decryptWithPassword(password, encryptedMasterKey);
   const masterKeyHex = Buffer.from(masterKeyBytes).toString('hex');
-  const masterKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
-  const asRoot = RustModule.Wallet.Bip44RootPrivateKey.new(
-    masterKey,
+  const privateKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
+  const cryptoWallet = RustModule.Wallet.Bip44RootPrivateKey.new(
+    privateKey,
     RustModule.Wallet.DerivationScheme.v2()
   );
-  return asRoot;
+  return cryptoWallet;
 }
 
 /** Generate a Daedalus /wallet/ to create transactions. Do not save this. Regenerate every time. */
@@ -137,7 +137,7 @@ export function getCryptoDaedalusWalletFromMnemonics(
 export function getCryptoDaedalusWalletFromMasterKey(
   masterKeyHex: string,
 ): RustModule.Wallet.DaedalusWallet {
-  const masterKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
-  const wallet = RustModule.Wallet.DaedalusWallet.new(masterKey);
+  const privateKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
+  const wallet = RustModule.Wallet.DaedalusWallet.new(privateKey);
   return wallet;
 }

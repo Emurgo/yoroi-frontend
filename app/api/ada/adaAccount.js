@@ -15,9 +15,9 @@ export function createCryptoAccount(
   walletPassword: string,
   accountIndex: number = ACCOUNT_INDEX
 ): CryptoAccount {
-  const masterKey = getCryptoWalletFromMasterKey(encryptedMasterKey, walletPassword);
+  const cryptoWallet = getCryptoWalletFromMasterKey(encryptedMasterKey, walletPassword);
   // create a hardened account
-  const account = masterKey.bip44_account(
+  const account = cryptoWallet.bip44_account(
     RustModule.Wallet.AccountIndex.new(accountIndex | HARD_DERIVATION_START)
   );
   const accountPublic = account.public();

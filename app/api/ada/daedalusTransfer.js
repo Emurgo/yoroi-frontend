@@ -2,8 +2,8 @@
 
 // Handle data created by wallets using the v1 address scheme
 
-import BigNumber from 'bignumber.js';
 import _ from 'lodash';
+import BigNumber from 'bignumber.js';
 import {
   Logger,
   stringifyError,
@@ -80,13 +80,9 @@ export async function generateTransferTx(payload: {
     // firts build a transaction to see what the cost would be
     const fakeTxBuilder = new RustModule.Wallet.TransactionBuilder();
     addTxInputs(fakeTxBuilder, inputs);
-    const inputAmount = new BigNumber(
-      fakeTxBuilder.get_input_total().to_str()
-    ).times(LOVELACES_PER_ADA);
+    const inputAmount = coinToBigNumber(fakeTxBuilder.get_input_total());
     addOutput(fakeTxBuilder, outputAddr, inputAmount.toString());
-    const fee = new BigNumber(
-      fakeTxBuilder.estimate_fee(feeAlgorithm).to_str()
-    ).times(LOVELACES_PER_ADA);
+    const fee = coinToBigNumber(fakeTxBuilder.estimate_fee(feeAlgorithm));
 
     // now build the real transaction with the fees taken into account
     const realTxBuilder = new RustModule.Wallet.TransactionBuilder();
@@ -133,4 +129,10 @@ export async function generateTransferTx(payload: {
     }
     throw new GenerateTransferTxError();
   }
+}
+
+export function coinToBigNumber(coin: RustModule.Wallet.Coin): BigNumber {
+  const ada = new BigNumber(coin.ada());
+  const lovelace = ada.times(LOVELACES_PER_ADA).add(coin.lovelace());
+  return lovelace;
 }
