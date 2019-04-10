@@ -173,7 +173,7 @@ function _generateTrezorOutputs(
   changeAddr: AdaAddress,
 ): Array<TrezorOutput> {
   return txOutputs.map(txOutput => ({
-    amount: txOutput.value,
+    amount: txOutput.value.toString(),
     ..._outputAddressOrPath(txOutput, changeAddr)
   }));
 }
@@ -254,7 +254,7 @@ function _transformToLedgerOutputs(
   changeAddr: AdaAddress,
 ): Array<OutputTypeAddress | OutputTypeChange> {
   return txOutputs.map(txOutput => ({
-    amountStr: txOutput.value,
+    amountStr: txOutput.value.toString(),
     ..._ledgerOutputAddress58OrPath(txOutput, changeAddr)
   }));
 }

@@ -447,5 +447,5 @@ declare type TxoPointerType = {
 
 declare type TxOutType = {
   address: string,
-  value: string,
+  value: number,
 };
