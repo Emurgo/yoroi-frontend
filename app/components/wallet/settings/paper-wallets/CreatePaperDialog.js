@@ -42,8 +42,8 @@ const messages = defineMessages({
 });
 
 type Props = {
-  renderStatus: string,
-  paperFile: Blob,
+  renderStatus: ?string,
+  paperFile: ?Blob,
   onNext: Function,
   onCancel: Function,
   onDownload: Function,

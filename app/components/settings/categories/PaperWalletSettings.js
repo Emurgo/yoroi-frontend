@@ -11,6 +11,7 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './PaperWalletSettings.scss';
 import ReactMarkdown from 'react-markdown';
+import type { Node } from 'react';
 
 const messages = defineMessages({
   numAddressesSelectLabel: {

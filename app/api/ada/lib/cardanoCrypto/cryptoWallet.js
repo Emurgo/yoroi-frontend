@@ -3,6 +3,7 @@
 // Utility functions for handling the private master key
 
 import bip39 from 'bip39';
+import cryptoRandomString from 'crypto-random-string';
 
 import { Logger, stringifyError } from '../../../../utils/logging';
 
@@ -99,9 +100,8 @@ export const scramblePaperAdaMnemonic = (
   phrase: string,
   password: string,
 ): string => {
-  const iv = new Uint8Array(8);
-  crypto.getRandomValues(iv);
-  return PaperWallet.scrambleStrings(iv, password, phrase);
+  const salt = Buffer.from(cryptoRandomString(2 * 8), 'hex');
+  return PaperWallet.scrambleStrings(salt, password, phrase);
 };
 
 const mnemonicToSeedHex = (mnemonic: string, password: ?string) => {

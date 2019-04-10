@@ -15,12 +15,12 @@ export type PaperRequest = {
   isMainnet: boolean,
 }
 
-export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function): Promise<Blob> => {
+export const generateAdaPaperPdf = async (request: PaperRequest, callback?: Function): Promise<?Blob> => {
   // Prepare params
-  callback = callback || (() => true);
+  const safeCallback = callback || ((s) => true);
   const logback = (s) => {
-    if (!callback(s)) {
-      callback('Cancelled');
+    if (!safeCallback(s)) {
+      safeCallback('Cancelled');
       return false;
     }
     return true;
@@ -126,11 +126,11 @@ function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function): 
     doc.setFontSize(8);
     const addrPad = 22;
     const qrSize = {
-      2: 14,
-      3: 14,
-      4: 12,
-      5: 10,
-    }[addresses.length];
+      '2': 14,
+      '3': 14,
+      '4': 12,
+      '5': 10,
+    }[`${addresses.length}`];
 
     const rowHeight = (pB.y - pA.y) / addresses.length;
     for (let r = 0; r < addresses.length; r++) {
@@ -192,14 +192,13 @@ async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise
   return addImageBase64(doc, await loadImage(url), params);
 }
 
-function addImageBase64(doc: Pdf, img: string, params?: AddImageParams): Promise<void> {
+function addImageBase64(doc: Pdf, img: string, params?: AddImageParams) {
   const { x, y, w, h } = params || {};
   doc.addImage(img, 'png', x || 0, y || 0, w, h);
-  return null;
 }
 
 async function loadImage(url: string): Promise<string> {
-  return new Promise<Image>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     try {
       const img = new Image();
       img.crossOrigin = 'Anonymous';

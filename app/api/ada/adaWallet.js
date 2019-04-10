@@ -178,7 +178,7 @@ export const generatePaperWalletSecret = (password: string): PaperWalletSecret =
 };
 
 export const mnemonicsToExternalAddresses =
-  (mnemonics: string, count?: number): string => mnemonicsToAddresses(mnemonics, count);
+  (mnemonics: string, count?: number): Array<string> => mnemonicsToAddresses(mnemonics, count);
 
 /** Call backend-service to get the balances of addresses and then sum them */
 export async function getBalance(

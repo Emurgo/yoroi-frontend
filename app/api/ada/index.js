@@ -129,7 +129,6 @@ import { migrateToLatest } from './adaMigration';
 import {
   makeCardanoBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
-import type { PaperWalletPass } from './adaWallet';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 
 // ADA specific Request / Response params
@@ -236,9 +235,10 @@ export default class AdaApi {
     return { addresses, scrambledWords };
   }
 
-  async createAdaPaperPdf({ paper, isMainnet, logback }: { paper: AdaPaper, isMainnet?: boolean, logback?: Function }): Promise<Blob> {
+  async createAdaPaperPdf({ paper, isMainnet, logback }: { paper: AdaPaper, isMainnet?: boolean, logback?: Function }): Promise<?Blob> {
     const { addresses, scrambledWords } = paper;
-    return generateAdaPaperPdf({
+    // noinspection UnnecessaryLocalVariableJS
+    const res : Promise<?Blob> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
       isMainnet: isMainnet || true,
@@ -246,6 +246,7 @@ export default class AdaApi {
       Logger.info('[PaperWalletRender] ' + s);
       return !logback || logback(s);
     });
+    return res;
   }
 
   async getWallets(): Promise<GetWalletsResponse> {

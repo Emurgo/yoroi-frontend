@@ -18,13 +18,13 @@ export const ProgressStep = {
 
 export default class PaperWalletCreateStore extends Store {
 
-  @observable progressInfo: ProgressStepEnum;
-  @observable pdfRenderStatus: string;
-  @observable pdf: Blob;
+  @observable progressInfo: ?ProgressStepEnum;
+  @observable pdfRenderStatus: ?string;
+  @observable pdf: ?Blob;
   error: ?LocalizableError;
-  numAddresses: number;
-  userPassword: string;
-  paper: AdaPaper;
+  numAddresses: ?number;
+  userPassword: ?string;
+  paper: ?AdaPaper;
 
   setup() {
     this._reset();
@@ -46,27 +46,32 @@ export default class PaperWalletCreateStore extends Store {
 
   @action _submitUserPassword = async ({ userPassword }: { userPassword: string }) => {
     this.userPassword = userPassword;
-    this.actions.ada.paperWallets.createPaperWallet.trigger();
-    this.actions.ada.paperWallets.createPdfDocument.trigger();
+    this.actions.ada.paperWallets.createPaperWallet.trigger({});
+    this.actions.ada.paperWallets.createPdfDocument.trigger({});
     this.progressInfo = ProgressStep.CREATE;
   };
 
-  @action _createPaperWallet = async (): Promise<AdaPaper> => {
-    this.paper = this.api.ada.createAdaPaper({
-      numAddresses: this.numAddresses,
-      password: this.userPassword
-    });
+  @action _createPaperWallet = async () => {
+    if (this.numAddresses && this.userPassword) {
+      this.paper = this.api.ada.createAdaPaper({
+        numAddresses: this.numAddresses,
+        password: this.userPassword
+      });
+    }
   };
 
-  @action _createPdfDocument = async (): Promise<AdaPaper> => {
-    const pdf = await this.api.ada.createAdaPaperPdf({
-      paper: this.paper,
-      isMainnet: true, // TODO make dynamic for testnet support,
-      logback: (status: string) => {
-        this.actions.ada.paperWallets.setPdfRenderStatus.trigger({ status });
-        return !!this.paper;
-      }
-    });
+  @action _createPdfDocument = async () => {
+    let pdf;
+    if (this.paper) {
+      pdf = await this.api.ada.createAdaPaperPdf({
+        paper: this.paper,
+        isMainnet: true, // TODO make dynamic for testnet support,
+        logback: (status: string) => {
+          this.actions.ada.paperWallets.setPdfRenderStatus.trigger({status});
+          return !!this.paper;
+        }
+      });
+    }
     if (this.paper && pdf) {
       this.actions.ada.paperWallets.setPdf.trigger({pdf});
     }

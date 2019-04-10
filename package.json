@@ -163,7 +163,6 @@
     "trezor-connect": "7.0.2",
     "validator": "6.3.0",
     "unorm": "1.4.1",
-    "pbkdf2": "3.0.17",
     "yoroi-extension-ledger-bridge": "git+https://github.com/Emurgo/yoroi-extension-ledger-bridge.git",
     "qr-image": "3.2.0"
   },

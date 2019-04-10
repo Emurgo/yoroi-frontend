@@ -19,7 +19,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   onSubmit = (values: { recoveryPhrase: string, walletName: string, walletPassword: string, paperPassword: string }) => {
     if (isPaperMode(this.props.mode)) {
       const [newPhrase] = unscramblePaperAdaMnemonic(values.recoveryPhrase, getWordsCount(this.props.mode), values.paperPassword);
-      values.recoveryPhrase = newPhrase;
+      if (newPhrase) {
+        values.recoveryPhrase = newPhrase;
+      }
     }
     this.props.actions[environment.API].wallets.restoreWallet.trigger(values);
   };
@@ -72,6 +74,6 @@ function isPaperMode(mode: string): boolean {
   return mode === 'paper';
 }
 
-function getWordsCount(mode: string): boolean {
+function getWordsCount(mode: string): number {
   return mode === 'paper' ? 21 : 15;
 }
