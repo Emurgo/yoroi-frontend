@@ -65,6 +65,7 @@
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
   "global.errors.fieldIsRequired": "Isian ini wajib diisi.",
+  "global.errors.invalidEmail": "Invalid email entered, please check.",
   "global.errors.invalidMasterKey": "Master key yang Anda masukkan salah, harap periksa kembali.",
   "global.errors.invalidRepeatPassword": "Tidak cocok.",
   "global.errors.invalidWalletName": "Nama wallet membutuhkan setidaknya 1 dan paling banyak 40 huruf.",
