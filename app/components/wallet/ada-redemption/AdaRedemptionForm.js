@@ -449,6 +449,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                 if (isRedemptionTypeChanged) resetForm();
                 onChooseRedemptionType(choice);
               }}
+              classicTheme={classicTheme}
             />
 
             <div className={styles.instructions}>
@@ -542,7 +543,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="decryption-key"
                   {...decryptionKeyField.bind()}
                   error={decryptionKeyField.error}
-                  skin={InputSkin}
+                  skin={classicTheme ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -554,7 +555,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="email"
                   {...emailField.bind()}
                   error={emailField.error}
-                  skin={InputSkin}
+                  skin={classicTheme ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -566,7 +567,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-passcode"
                   {...adaPasscodeField.bind()}
                   error={adaPasscodeField.error}
-                  skin={InputSkin}
+                  skin={classicTheme ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -578,7 +579,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-amount"
                   {...adaAmountField.bind()}
                   error={adaAmountField.error}
-                  skin={InputSkin}
+                  skin={classicTheme ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -598,6 +599,7 @@ export default class AdaRedemptionForm extends Component<Props> {
         {!isRedemptionDisclaimerAccepted ? (
           <AdaRedemptionDisclaimer
             onSubmit={onAcceptRedemptionDisclaimer}
+            classicTheme={classicTheme}
           />
         ) : null}
       </div>

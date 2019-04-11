@@ -55,6 +55,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
         <div>
           <AdaRedemptionNoWallets
             onGoToCreateWalletClick={this.handleGoToCreateWalletClick}
+            classicTheme={theme.classic}
           />
         </div>
       );
