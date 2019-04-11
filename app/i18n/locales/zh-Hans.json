@@ -65,6 +65,7 @@
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
   "global.errors.fieldIsRequired": "该字段为必填字段。",
+  "global.errors.invalidEmail": "Invalid email entered, please check.",
   "global.errors.invalidMasterKey": "输入的主密钥无效, 请再检查。",
   "global.errors.invalidRepeatPassword": "不匹配。",
   "global.errors.invalidWalletName": "钱包名称需要最少 1 个，最多 40 个字母。",
