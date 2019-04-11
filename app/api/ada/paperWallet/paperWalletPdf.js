@@ -38,7 +38,8 @@ export const generateAdaPaperPdf = async (
   const width = 595.28;
   const height = 841.98;
   const doc = new Pdf({
-    format: [width, height]
+    format: [width, height],
+    compressPdf: true,
   });
   const [pageWidthPx, pageHeightPx] =
     [doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight()];
@@ -209,7 +210,7 @@ async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise
 
 function addImageBase64(doc: Pdf, img: string, params?: AddImageParams) {
   const { x, y, w, h } = params || {};
-  doc.addImage(img, 'png', x || 0, y || 0, w, h);
+  doc.addImage(img, 'png', x || 0, y || 0, w, h, '', 'FAST');
 }
 
 async function loadImage(url: string): Promise<string> {
