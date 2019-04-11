@@ -3,7 +3,7 @@ import LocalizableError from './LocalizableError';
 export class InvalidMnemonicError extends LocalizableError {
   constructor() {
     super({
-      id: 'global.errors.invalidMnemonic',
+      id: 'api.errors.invalidMnemonicError',
       defaultMessage: '!!!Invalid phrase entered, please check.',
     });
   }
