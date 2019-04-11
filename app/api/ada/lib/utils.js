@@ -175,10 +175,10 @@ export type UtxoLookupMap = { [string]: { [number]: UTXO }};
 export function utxosToLookupMap(
   utxos: Array<UTXO>
 ): UtxoLookupMap {
-  // first create 1-level map of tx_hash -> UTXO
+  // first create 1-level map of (tx_hash -> [UTXO])
   const txHashMap = _.groupBy(utxos, utxo => utxo.tx_hash);
 
-  // now create 2-level map of tx_hash -> index -> UTXO
+  // now create 2-level map of (tx_hash -> index -> UTXO)
   const lookupMap = _.mapValues(
     txHashMap,
     utxoList => _.keyBy(
