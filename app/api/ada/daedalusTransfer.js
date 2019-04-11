@@ -92,9 +92,10 @@ export async function generateTransferTx(payload: {
 
     // sanity check
     const balance = realTxBuilder.get_balance(feeAlgorithm);
-    if (!balance.is_zero()) {
+    if (balance.is_negative()) {
       throw new GenerateTransferTxError();
     }
+    const realFee = coinToBigNumber(realTxBuilder.get_balance_without_fees().value());
 
     // sign inputs
     const txFinalizer = new RustModule.Wallet.TransactionFinalized(
@@ -117,7 +118,7 @@ export async function generateTransferTx(payload: {
     // return summary of transaction
     return {
       recoveredBalance: inputAmount.dividedBy(LOVELACES_PER_ADA),
-      fee: fee.dividedBy(LOVELACES_PER_ADA),
+      fee: realFee.dividedBy(LOVELACES_PER_ADA),
       signedTx,
       senders,
       receiver: outputAddr,
