@@ -65,6 +65,7 @@
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
   "global.errors.fieldIsRequired": "Это поле обязательно к заполнению.",
+  "global.errors.invalidEmail": "Invalid email entered, please check.",
   "global.errors.invalidMasterKey": "Введен неверный мастер-ключ, пожалуйста, проверьте.",
   "global.errors.invalidRepeatPassword": "Не совпадает.",
   "global.errors.invalidWalletName": "Длина имени кошелька должна быть не менее 1 и не более 40 букв.",
