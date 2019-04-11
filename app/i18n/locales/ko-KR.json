@@ -65,6 +65,7 @@
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
   "global.errors.fieldIsRequired": "이 필드는 필수입니다.",
+  "global.errors.invalidEmail": "Invalid email entered, please check.",
   "global.errors.invalidMasterKey": "유효하지 않은 복구 구절 (master key) 입니다. 다시 확인해 주십시오.",
   "global.errors.invalidRepeatPassword": "일치하지 않습니다.",
   "global.errors.invalidWalletName": "지갑의 이름은 1~40자 사이여야 합니다.",
