@@ -3,6 +3,8 @@ const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ConfigWebpackPlugin = require('config-webpack');
 const shell = require('shelljs');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 
 const host = 'localhost';
 const port = 3000;
@@ -15,6 +17,13 @@ const baseDevConfig = () => ({
   optimization: {
     // https://github.com/webpack/webpack/issues/7470
     nodeEnv: false,
+    splitChunks: {
+      // the default delimiter ~ doesn't work with Terser
+      automaticNameDelimiter: '_',
+      chunks: 'all',
+      // Firefox require all files to be <4MBs
+      maxSize: 4000000,
+    }
   },
   devtool: 'eval-source-map',
   entry: {
@@ -43,9 +52,12 @@ const baseDevConfig = () => ({
   output: {
     path: path.join(__dirname, '../dev/js'),
     filename: '[name].bundle.js',
-    webassemblyModuleFilename: '[modulehash].wasm',
+    // Need to so `HtmlWebpackPlugin` knows where to find the js bundles
+    publicPath: 'http://localhost:3000/js/'
   },
   plugins: [
+    /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
+    new webpack.IgnorePlugin(/^\.\/(?!english)/, /bip39\/src\/wordlists$/),
     /**
      * We need CardanoWallet for flow to get the WASM binding types.
      * However, the flow definitions aren't available to webpack at runtime
@@ -55,6 +67,27 @@ const baseDevConfig = () => ({
       /CardanoWallet/,
       'lodash/noop.js'
     ),
+    /**
+     * We use the HtmlWebpackPlugin to group back together the chunks inside the HTML
+     */
+    new HtmlWebpackPlugin({
+      filename: path.join(__dirname, '../dev/main_window.html'),
+      template: path.join(__dirname, '../chrome/views/main_window.html'),
+      chunks: ['yoroi'],
+      alwaysWriteToDisk: true
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join(__dirname, '../dev/background.html'),
+      template: path.join(__dirname, '../chrome/views/background.html'),
+      chunks: ['background'],
+      alwaysWriteToDisk: true
+    }),
+    /**
+     * This plugin adds `alwaysWriteToDisk` to `HtmlWebpackPlugin`.
+     * We need this otherwise the HTML files are managed by in-memory only by our hot reloader
+     * But we need this written to disk so the extension can be loaded by Chrome
+     */
+    new HtmlWebpackHarddiskPlugin(),
     new ConfigWebpackPlugin(),
     new webpack.DllReferencePlugin({
       context: path.join(__dirname, '..', 'dll'),
@@ -82,7 +115,7 @@ const baseDevConfig = () => ({
     rules: [
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        loader: 'babel-loader?cacheDirectory',
         exclude: /node_modules/
       },
       // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
@@ -93,7 +126,7 @@ const baseDevConfig = () => ({
       {
         test: /\.(js|jsx)$/,
         exclude: [/node_modules/, /pdf\.worker(\.min)?\.js$/],
-        use: 'babel-loader',
+        use: 'babel-loader?cacheDirectory',
       },
       {
         test: /\.css$/,
@@ -136,7 +169,7 @@ const baseDevConfig = () => ({
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
-        loader: 'file-loader'
+        loader: 'file-loader',
       },
       {
         test: /\.md$/,

@@ -2,7 +2,7 @@
 
 // Utility functions for handling the private master key
 
-import bip39 from 'bip39';
+import { validateMnemonic, generateMnemonic } from 'bip39';
 
 import { Logger, stringifyError } from '../../../../utils/logging';
 
@@ -17,17 +17,30 @@ import { RustModule } from './rustLoader';
 declare var CONFIG : ConfigType;
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
-export const generateAdaMnemonic = () => bip39.generateMnemonic(160).split(' ');
+export const generateAdaMnemonic = () => generateMnemonic(160).split(' ');
 
 /** Check validty of mnemonic (including checksum) */
 export const isValidEnglishAdaMnemonic = (
   phrase: string,
   numberOfWords: ?number = 15
-) => (
+) => {
   // Note: splitting on spaces will not work for Japanese-encoded mnemonics who use \u3000 instead
   // We only use English mnemonics in Yoroi so this is okay.
-  phrase.split(' ').length === numberOfWords && bip39.validateMnemonic(phrase)
-);
+  const split = phrase.split(' ');
+  if (split.length !== numberOfWords) {
+    return false;
+  }
+  /**
+   * Redemption mnemonics use 0-word menmonics.
+   * However, 9-word mnemonics were disallowed in a later version of BIP39
+   * Since our bip39 library now considers all 9-word mnemonics invalid
+   * we just return true for backwards compatibility
+   */
+  if (split.length === 9) {
+    return true;
+  }
+  return validateMnemonic(phrase);
+};
 
 /** Check validty of paper mnemonic (including checksum) */
 export const isValidEnglishAdaPaperMnemonic = (
