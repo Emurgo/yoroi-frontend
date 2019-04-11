@@ -65,6 +65,7 @@
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
   "global.errors.fieldIsRequired": "Veuillez remplir ce champ.",
+  "global.errors.invalidEmail": "Invalid email entered, please check.",
   "global.errors.invalidMasterKey": "Invalid master key entered, please check.",
   "global.errors.invalidRepeatPassword": "Incorrect.",
   "global.errors.invalidWalletName": "La longueur du nom du wallet doit être comprise entre 1 et 40 caractères.",
