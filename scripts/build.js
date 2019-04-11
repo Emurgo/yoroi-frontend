@@ -11,4 +11,4 @@ tasks.copyAssets('build', argv.env);
 console.log('[Webpack Build]');
 console.log('-'.repeat(80));
 
-exec(`./node_modules/.bin/webpack --config webpack/${argv.env}.config.js --progress --profile --colors`);
+exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --colors --env=${argv.env}`);
