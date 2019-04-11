@@ -39,4 +39,5 @@ const initializeYoroi = async () => {
   );
 };
 
+
 window.addEventListener('load', initializeYoroi);

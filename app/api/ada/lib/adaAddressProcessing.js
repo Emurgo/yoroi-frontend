@@ -4,13 +4,18 @@
 // TODO: this file is not a library so it shouldn't be in the "lib" folder
 
 import _ from 'lodash';
-import { Wallet } from 'rust-cardano-crypto';
-import {
-  getResultOrFail
-} from './cardanoCrypto/cryptoUtils';
 import {
   checkAddressesInUse,
 } from './yoroi-backend-api';
+import type {
+  AddressType
+} from '../adaTypes';
+
+import { RustModule } from './cardanoCrypto/rustLoader';
+import type { ConfigType } from '../../../../config/config-types';
+
+declare var CONFIG: ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
 
 type AddressInfo = { address: string, isUsed: boolean, index: number };
 
@@ -18,7 +23,7 @@ type AddressInfo = { address: string, isUsed: boolean, index: number };
  * @returns all scanned addresses
  */
 export async function discoverAllAddressesFrom(
-  cryptoAccount: CryptoAccount,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
   addressType: AddressType,
   initialHighestUsedIndex: number,
   scanSize: number,
@@ -93,7 +98,7 @@ function _findNewHighestIndex(
  */
 async function _scanNextBatch(
   fetchedAddressesInfo: Array<AddressInfo>,
-  cryptoAccount: CryptoAccount,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
   addressType: AddressType,
   offset: number,
   fromIndex: number,
@@ -121,8 +126,10 @@ async function _scanNextBatch(
   );
 
   // batch to cryptography backend
-  const newAddresses = getResultOrFail(
-    Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex)
+  const newAddresses = generateAddressBatch(
+    addressesIndex,
+    cryptoAccount,
+    addressType
   );
 
   // batch to backend API
@@ -157,4 +164,22 @@ function _addFetchedAddressesInfo(
   }));
 
   return fetchedAddressesInfo.concat(newAddressesInfo);
+}
+
+export function generateAddressBatch(
+  indices: Array<number>,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
+  type: AddressType,
+): Array<string> {
+  const setting = RustModule.Wallet.BlockchainSettings.from_json({
+    protocol_magic: protocolMagic
+  });
+  return indices.map(i => {
+    const pubKey = cryptoAccount.address_key(
+      type === 'Internal',
+      RustModule.Wallet.AddressKeyIndex.new(i)
+    );
+    const addr = pubKey.bootstrap_era_address(setting);
+    return addr.to_base58();
+  });
 }

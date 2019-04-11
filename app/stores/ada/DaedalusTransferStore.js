@@ -28,12 +28,7 @@ import {
   getCryptoDaedalusWalletFromMnemonics,
   getCryptoDaedalusWalletFromMasterKey
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import {
-  getResultOrFail
-} from '../../api/ada/lib/cardanoCrypto/cryptoUtils';
-import {
-  RandomAddressChecker,
-} from 'rust-cardano-crypto';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -106,8 +101,7 @@ export default class DaedalusTransferStore extends Store {
    * Finally, generate the tx to transfer the wallet to Yoroi
    */
   _setupTransferWebSocket = (
-    checker: CryptoAddressChecker,
-    wallet: CryptoDaedalusWallet,
+    wallet: RustModule.Wallet.DaedalusWallet,
   ): void => {
     this._updateStatus('restoringAddresses');
     this.ws = new WebSocket(websocketUrl);
@@ -130,9 +124,10 @@ export default class DaedalusTransferStore extends Store {
         Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
           this._updateStatus('checkingAddresses');
+          const checker = RustModule.Wallet.DaedalusAddressChecker.new(wallet);
           const addressesWithFunds = getAddressesWithFunds({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
-          const transferTx = await generateTransferTx({ wallet, addressesWithFunds });
+          const transferTx = await generateTransferTx({ addressesWithFunds });
           runInAction(() => {
             this.transferTx = transferTx;
           });
@@ -178,9 +173,6 @@ export default class DaedalusTransferStore extends Store {
     }
 
     this._setupTransferWebSocket(
-      getResultOrFail(
-        RandomAddressChecker.newCheckerFromMnemonics(secretWords)
-      ),
       getCryptoDaedalusWalletFromMnemonics(secretWords)
     );
   }
@@ -189,9 +181,6 @@ export default class DaedalusTransferStore extends Store {
     const { masterKey: key } = payload;
 
     this._setupTransferWebSocket(
-      getResultOrFail(
-        RandomAddressChecker.newChecker(key)
-      ),
       getCryptoDaedalusWalletFromMasterKey(key)
     );
   }
@@ -208,12 +197,10 @@ export default class DaedalusTransferStore extends Store {
 
   /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (payload: {
-    cborEncodedTx: Array<number>
-  }): Promise<SignedResponse> => {
-    const { cborEncodedTx } = payload;
-    const signedTx = Buffer.from(cborEncodedTx).toString('base64');
-    return sendTx({ signedTx });
-  }
+    signedTx: RustModule.Wallet.SignedTransaction
+  }): Promise<SignedResponse> => (
+    sendTx({ signedTx: payload.signedTx })
+  )
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
@@ -225,7 +212,7 @@ export default class DaedalusTransferStore extends Store {
         throw new NoTransferTxError();
       }
       await this.transferFundsRequest.execute({
-        cborEncodedTx: this.transferTx.cborEncodedTx
+        signedTx: this.transferTx.signedTx
       });
       // TBD: why do we need a continuation instead of just pustting the code here directly?
       next();

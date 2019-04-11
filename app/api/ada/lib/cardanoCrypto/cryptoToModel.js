@@ -2,6 +2,7 @@
 import moment from 'moment';
 
 import type {
+  AddressType,
   AdaWallet,
   AdaAddress,
   AdaWalletInitData,

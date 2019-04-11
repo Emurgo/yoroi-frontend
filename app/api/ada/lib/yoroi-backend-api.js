@@ -22,7 +22,8 @@ import type {
   UTXO,
   Transaction
 } from '../adaTypes';
-import { rustRawTxToId } from './utils';
+
+import { RustModule } from './cardanoCrypto/rustLoader';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
@@ -117,7 +118,7 @@ export const getTransactionsHistoryForAddresses = (
 );
 
 export type SignedRequest = {
-  signedTx: string
+  signedTx: RustModule.Wallet.SignedTransaction
 };
 export type SignedResponse = {
   txId: string
@@ -125,17 +126,22 @@ export type SignedResponse = {
 
 export const sendTx = (
   body: SignedRequest
-): Promise<SignedResponse> => (
-  axios(
+): Promise<SignedResponse> => {
+  const signedTxHex = Buffer.from(
+    body.signedTx.to_hex(),
+    'hex'
+  );
+  const signedTx64 = Buffer.from(signedTxHex).toString('base64');
+  return axios(
     `${backendUrl}/api/txs/signed`,
     {
       method: 'post',
       data: {
-        signedTx: body.signedTx
+        signedTx: signedTx64
       }
     }
   ).then(() => ({
-    txId: rustRawTxToId(Buffer.from(body.signedTx, 'base64'))
+    txId: body.signedTx.id()
   }))
     .catch((error) => {
       Logger.error('yoroi-backend-api::sendTx error: ' + stringifyError(error));
@@ -143,8 +149,8 @@ export const sendTx = (
         throw new InvalidWitnessError();
       }
       throw new SendTransactionApiError();
-    })
-);
+    });
+};
 
 export type FilterUsedRequest = {
   addresses: Array<string>
