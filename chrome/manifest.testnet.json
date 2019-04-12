@@ -1,6 +1,6 @@
 {
-  "version": "1.4.1",
-  "version_name": "tn-1.4.1",
+  "version": "1.5.0",
+  "version_name": "tn-1.5.0",
   "name": "yoroi",
   "manifest_version": 2,
   "description": "[testnet] Cardano ADA wallet",
