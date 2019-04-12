@@ -1,11 +1,9 @@
 {
   "name": "yoroi",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Cardano ADA wallet",
   "scripts": {
-    "start": "node scripts/start",
-    "dev": "npm run start -- --env 'development'",
-    "dev:mainnet": "npm run start -- --env 'mainnet'",
+    "dev": "node scripts/start --env 'development'",
     "build": "node scripts/build",
     "compress": "node scripts/compress",
     "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
