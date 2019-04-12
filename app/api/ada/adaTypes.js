@@ -134,7 +134,6 @@ export type UnsignedTxResponse = {
 };
 
 export type AdaWallet = {
-  cwAccountsNumber: number,
   cwAmount: AdaAmount,
   cwId: string,
   cwMeta: AdaWalletMetaParams,

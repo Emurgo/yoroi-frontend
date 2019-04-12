@@ -11,7 +11,7 @@ import type {
   UTXO
 } from '../adaTypes';
 import type { UtxoLookupMap }  from '../lib/utils';
-import { utxosToLookupMap }  from '../lib/utils';
+import { utxosToLookupMap, derivePathAsString }  from '../lib/utils';
 import type {
   AdaAddressMap,
 } from '../adaAddress';
@@ -45,8 +45,7 @@ import type {
 import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
 
 import type { ConfigType } from '../../../../config/config-types';
-import Config from '../../../config';
-import { getSingleCryptoAccount } from '../adaLocalStorage';
+import { getCurrentCryptoAccount, getCurrentAccountIndex } from '../adaLocalStorage';
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
@@ -146,11 +145,6 @@ export async function broadcastTrezorSignedTx(
   }
 }
 
-function _derivePathAsString(chain: number, addressIndex: number): string {
-  // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return `${Config.wallets.BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH}/${chain}/${addressIndex}`;
-}
-
 function _transformToTrezorInputs(
   inputs: Array<TxoPointerType>,
   addressMap: AdaAddressMap,
@@ -160,7 +154,7 @@ function _transformToTrezorInputs(
     const utxo = utxoMap[input.id][input.index];
     const addressInfo = addressMap[utxo.receiver];
     return {
-      path: _derivePathAsString(addressInfo.change, addressInfo.index),
+      path: derivePathAsString(addressInfo.change, addressInfo.index),
       prev_hash: input.id,
       prev_index: input.index,
       type: 0
@@ -183,7 +177,7 @@ function _outputAddressOrPath(
   changeAddr: AdaAddress,
 ): { path: string } | { address: string } {
   if (txOutput.address === changeAddr.cadId) {
-    return { path: _derivePathAsString(changeAddr.change, changeAddr.index) };
+    return { path: derivePathAsString(changeAddr.change, changeAddr.index) };
   }
 
   return { address: txOutput.address };
@@ -228,8 +222,8 @@ function _derivePathAsBIP32Path(
   chain: number,
   addressIndex: number
 ): BIP32Path {
-  // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return makeCardanoBIP44Path(0, chain, addressIndex);
+  const accountIndex = getCurrentAccountIndex();
+  return makeCardanoBIP44Path(accountIndex, chain, addressIndex);
 }
 
 function _transformToLedgerInputs(
@@ -302,7 +296,7 @@ function prepareWitness(
   finalizer: RustModule.Wallet.TransactionFinalized,
   ledgerWitness: Witness,
 ): void {
-  const cryptoAccount = getSingleCryptoAccount();
+  const cryptoAccount = getCurrentCryptoAccount();
   const pubKey = cryptoAccount.root_cached_key.address_key(
     ledgerWitness.path[3] === 1,
     RustModule.Wallet.AddressKeyIndex.new(ledgerWitness.path[4])

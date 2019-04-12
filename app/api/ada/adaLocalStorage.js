@@ -45,7 +45,7 @@ export function saveCryptoAccount(
   _saveInStorage(storageKeys.ACCOUNT_KEY, localAccount);
 }
 
-export function getSingleCryptoAccount(): CryptoAccount {
+export function getCurrentCryptoAccount(): CryptoAccount {
   const localAccount = _getFromStorage(storageKeys.ACCOUNT_KEY);
   if (localAccount.derivation_scheme !== 'V2') {
     throw Error('Sanity check');
@@ -60,6 +60,11 @@ export function getSingleCryptoAccount(): CryptoAccount {
     root_cached_key: account,
     derivation_scheme: localAccount.derivation_scheme
   };
+}
+
+export function getCurrentAccountIndex(): number {
+  const localAccount = _getFromStorage(storageKeys.ACCOUNT_KEY);
+  return localAccount.account;
 }
 
 /* Wallet storage */

@@ -32,7 +32,8 @@ export async function createWallet({
 
     // create crypto account object for hardware wallet
     const cryptoAccount = createHardwareWalletAccount(
-      walletInitData.cwHardwareInfo.publicMasterKey
+      walletInitData.cwHardwareInfo.publicMasterKey,
+      0 // always create the 0th account
     );
 
     // Restore transactions and Save wallet + cryptoAccount to localstorage
