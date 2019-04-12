@@ -8,8 +8,6 @@ import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
-import type { LedgerSignTxPayload } from '../../domain/HWSignTx';
-
 import Store from '../base/Store';
 import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
@@ -19,7 +17,6 @@ import LocalizableError from '../../i18n/LocalizableError';
 import type {
   CreateLedgerSignTxDataRequest,
   CreateLedgerSignTxDataResponse,
-  PrepareAndBroadcastLedgerSignedTxRequest,
 } from '../../api/ada';
 import type { PrepareAndBroadcastLedgerSignedTxResponse } from '../../api/common';
 
@@ -37,6 +34,8 @@ import {
   prepareLedgerBridger,
   disposeLedgerBridgeIFrame
 } from '../../utils/iframeHandler';
+
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -121,18 +120,15 @@ export default class LedgerSendStore extends Store {
 
         await prepareLedgerBridger(ledgerBridge);
 
-        const unsignedTx: LedgerSignTxPayload = {
-          inputs: ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
-          outputs: ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
-        };
-
         const ledgerSignTxResp: LedgerSignTxResponse =
-          await ledgerBridge.signTransaction(unsignedTx.inputs, unsignedTx.outputs);
+          await ledgerBridge.signTransaction(
+            ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
+            ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
+          );
 
         await this._prepareAndBroadcastSignedTx(
           ledgerSignTxResp,
-          ledgerSignTxDataResp,
-          unsignedTx
+          ledgerSignTxDataResp.unsignedTx,
         );
 
       } else {
@@ -150,18 +146,13 @@ export default class LedgerSendStore extends Store {
 
   _prepareAndBroadcastSignedTx = async (
     ledgerSignTxResp: LedgerSignTxResponse,
-    createLedgerSignTxDataResp: CreateLedgerSignTxDataResponse,
-    unsignedTx: LedgerSignTxPayload,
+    unsignedTx: RustModule.Wallet.Transaction,
   ): Promise<void> => {
-
-    const reqParams: PrepareAndBroadcastLedgerSignedTxRequest = {
-      ledgerSignTxResp,
-      unsignedTx,
-      txExt: createLedgerSignTxDataResp.txExt
-    };
-
     try {
-      await this.broadcastLedgerSignedTxRequest.execute(reqParams).promise;
+      await this.broadcastLedgerSignedTxRequest.execute({
+        ledgerSignTxResp,
+        unsignedTx
+      }).promise;
     } catch (error) {
       Logger.error('LedgerSendStore::_prepareAndBroadcastSignedTx error: ' + stringifyError(error));
     }

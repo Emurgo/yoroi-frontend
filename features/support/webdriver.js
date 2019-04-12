@@ -26,6 +26,22 @@ const fs = require('fs');
 const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
 
+function getBraveBuilder() {
+  return new seleniumWebdriver.Builder()
+    .withCapabilities({
+      chromeOptions: {
+        args: [
+          'start-maximized'
+        ]
+      }
+    })
+    .forBrowser('chrome')
+    .setChromeOptions(new chrome.Options()
+      .setChromeBinaryPath('/usr/bin/brave-browser')
+      .addArguments('--start-maximized', '--disable-setuid-sandbox', '--no-sandbox')
+      .addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
+}
+
 function getChromeBuilder() {
   return new seleniumWebdriver.Builder()
     .withCapabilities({
@@ -67,19 +83,32 @@ function getFirefoxBuilder() {
 
 type WorldInput = {
   parameters: {
-    browser: 'chrome' | 'firefox'
+    browser: 'brave' | 'chrome' | 'firefox'
   }
 };
 
 // TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {
-  const builder = cmdInput.parameters.browser === 'chrome'
-    ? getChromeBuilder()
-    : getFirefoxBuilder();
-  this.driver = builder.build();
+  switch (cmdInput.parameters.browser) {
+    case 'brave': {
+      const braveBuilder = getBraveBuilder();
+      this.driver = braveBuilder.build();
+      break;
+    }
+    case 'firefox': {
+      const firefoxBuilder = getFirefoxBuilder();
+      this.driver = firefoxBuilder.build();
+      break;
+    }
+    default: {
+      const chromeBuilder = getChromeBuilder();
+      this.driver = chromeBuilder.build();
+      break;
+    }
+  }
 
   this.getExtensionUrl = (): string => {
-    if (cmdInput.parameters.browser === 'chrome') {
+    if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
       /**
        * Extension id is determinisitically calculated based on pubKey used to generate the crx file
        * so we can just hardcode this value if we keep e2etest-key.pem file

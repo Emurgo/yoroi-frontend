@@ -236,10 +236,14 @@ export default class Transaction extends Component<Props, State> {
               </div>
             )}
             <div>
-              <h2>
-                {intl.formatMessage(messages.fee)}
-              </h2>
-              <span>{formattedWalletAmount(data.fee.abs(), false)}</span>
+              {data.type !== transactionTypes.INCOME && (
+                <div>
+                  <h2>
+                    {intl.formatMessage(messages.fee)}
+                  </h2>
+                  <span>{formattedWalletAmount(data.fee.abs(), false)}</span>
+                </div>
+              )}
               <h2>
                 {intl.formatMessage(messages.fromAddresses)}
               </h2>

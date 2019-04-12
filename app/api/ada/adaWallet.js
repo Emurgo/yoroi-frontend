@@ -119,6 +119,7 @@ export function createAdaWallet(
 
   const mnemonic = walletInitData.cwBackupPhrase.bpToList;
   const masterKey = generateWalletMasterKey(mnemonic, walletPassword);
+
   return [adaWallet, masterKey];
 }
 

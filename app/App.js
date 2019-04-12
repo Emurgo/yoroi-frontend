@@ -11,6 +11,7 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import de from 'react-intl/locale-data/de';
 import fr from 'react-intl/locale-data/fr';
+import id from 'react-intl/locale-data/id';
 import { Routes } from './Routes';
 import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
 import { themeOverrides } from './themes/overrides/index';
@@ -22,7 +23,7 @@ import environment from './environment';
 import { hot } from 'react-hot-loader';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id]);
 
 @observer
 class App extends Component<{

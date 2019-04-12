@@ -109,8 +109,23 @@ Then(
       await clickeableElement.click();
       const txData = await actualTxsList[i].getText();
       const txDataFields = txData.split('\n');
-      const [txType, txTime, txStatus, txAmount, , txFee, , txFrom, , txTo, , ...pendingTxFields]
-        = txDataFields;
+      const [txType, txTime, txStatus, txAmount] = txDataFields;
+
+      let txFee;
+      let txFrom;
+      let txTo;
+      let pendingTxFields;
+
+      if (txType === 'ADA received') {
+        // Exclude fee
+        [, , , , , txFrom, , txTo, , ...pendingTxFields]
+          = txDataFields;
+
+      } else {
+        [, , , , , txFee, , txFrom, , txTo, , ...pendingTxFields]
+          = txDataFields;
+      }
+
       const [txId, txConfirmations] = mapPendingTxFields(txExpectedStatus, pendingTxFields);
       verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, [txFrom],
         [txTo], txId, expectedTxsList[i], txConfirmations);

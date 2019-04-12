@@ -3,17 +3,15 @@
 // Handle restoring wallets that follow the v2 addressing scheme (bip44)
 
 import _ from 'lodash';
-import { Wallet } from 'rust-cardano-crypto';
 import {
-  getResultOrFail
-} from './lib/cardanoCrypto/cryptoUtils';
-import {
-  discoverAllAddressesFrom
+  discoverAllAddressesFrom,
+  generateAddressBatch
 } from './lib/adaAddressProcessing';
 import {
   saveAsAdaAddresses,
 } from './adaAddress';
 import type {
+  AddressType,
   AdaWallet,
   AdaWalletParams
 } from './adaTypes';
@@ -26,6 +24,9 @@ import {
   createStoredWallet,
   getLastReceiveAddressIndex,
   saveLastReceiveAddressIndex
+} from './adaLocalStorage';
+import type {
+  CryptoAccount
 } from './adaLocalStorage';
 import { createAdaWallet } from './adaWallet';
 import { createCryptoAccount } from './adaAccount';
@@ -92,9 +93,10 @@ async function saveInitialAddresses(
     addressScanSize
   );
 
-  // batch to cryptography backend
-  const initialAddresses = getResultOrFail(
-    Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex)
+  const initialAddresses = generateAddressBatch(
+    addressesIndex,
+    cryptoAccount.root_cached_key,
+    addressType
   );
 
   await saveAsAdaAddresses(
@@ -111,7 +113,7 @@ export async function scanAndSaveAddresses(
   startIndex: number
 ): Promise<void> {
   const addressesToSave = await discoverAllAddressesFrom(
-    cryptoAccount,
+    cryptoAccount.root_cached_key,
     addressType,
     startIndex,
     addressScanSize,
