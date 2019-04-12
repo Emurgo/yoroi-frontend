@@ -29,7 +29,6 @@ jobs:
 
       # Because npm link will write in this path
       - run: sudo chown -R "$(whoami):$(whoami)" /usr/local/lib/node_modules
-      - run: npm run build-js-cardano-wasm
       - run: npm install
       
       # code quality checks

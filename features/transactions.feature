@@ -90,7 +90,7 @@ Feature: Send transaction
     Then I should see a not enough ada error
     And I should not be able to submit
 
-  @invalidWitnessTest
+  @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error
     Given There is a wallet stored named Test
     And I have a wallet with funds

@@ -30,7 +30,7 @@ export class FieldRequiredError extends LocalizableError {
 export class AdaRedemptionCertificateParseError extends LocalizableError {
   constructor() {
     super({
-      id: 'global.errors.AdaRedemptionCertificateParseError',
+      id: 'api.errors.AdaRedemptionCertificateParseError',
       defaultMessage: '!!!The ADA redemption code could not be parsed from the given document.',
     });
   }
