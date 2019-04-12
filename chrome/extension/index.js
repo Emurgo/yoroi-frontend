@@ -10,6 +10,7 @@ import actions from '../../app/actions/index';
 import Action from '../../app/actions/lib/Action';
 import App from '../../app/App';
 import '../../app/themes/index.global.scss';
+import { addCloseListener } from '../../app/utils/tabManager';
 
 // run MobX in strict mode
 useStrict(true);
@@ -39,5 +40,6 @@ const initializeYoroi = async () => {
   );
 };
 
+addCloseListener(window);
 
 window.addEventListener('load', initializeYoroi);

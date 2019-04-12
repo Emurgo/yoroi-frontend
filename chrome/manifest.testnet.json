@@ -26,7 +26,6 @@
     "page": "background.html"
   },
   "permissions": [
-    "tabs",
     "storage",
     "*://connect.trezor.io/*"
   ],
