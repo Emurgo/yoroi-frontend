@@ -85,6 +85,7 @@
   "global.language.japanese": "日本語",
   "global.language.korean": "한국어",
   "global.language.russian": "Pусский",
+  "global.language.indonesian": "Bahasa Indonesia",
   "global.passwordInstructions": "Примечание: Пароль должен содержать не менее 12 символов.",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "отменить",
