@@ -47,7 +47,8 @@ import {
 } from './adaTransactions/adaTransactionsHistory';
 import {
   getAdaTransactionFee,
-  newAdaTransaction
+  newAdaUnsignedTx,
+  newAdaSignedTx,
 } from './adaTransactions/adaNewTransactions';
 import type {
   TrezorSignTxPayload,
@@ -69,8 +70,8 @@ import type {
   AdaAddress,
   AdaAddresses,
   AdaTransaction,
+  AddressType,
   AdaTransactionCondition,
-  AdaTransactionFee,
   AdaTransactionInputOutput,
   AdaTransactions,
   AdaWallet,
@@ -131,6 +132,8 @@ import {
 } from 'yoroi-extension-ledger-bridge';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 
+import { RustModule } from './lib/cardanoCrypto/rustLoader';
+
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
 export type CreateTransactionRequest = {
@@ -143,8 +146,9 @@ export type CreateTrezorSignTxDataRequest = {
   amount: string
 };
 export type CreateTrezorSignTxDataResponse = {
-  trezorSignTxPayload: TrezorSignTxPayload, // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
-  changeAddress: AdaAddress
+  // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
+  trezorSignTxPayload: TrezorSignTxPayload,
+  changeAddress: AdaAddress,
 };
 export type BroadcastTrezorSignedTxRequest = {
   signedTxHex: string,
@@ -156,12 +160,11 @@ export type CreateLedgerSignTxDataRequest = {
 export type CreateLedgerSignTxDataResponse = {
   ledgerSignTxPayload: LedgerSignTxPayload,
   changeAddress: AdaAddress,
-  txExt: UnsignedTransactionExt
+  unsignedTx: RustModule.Wallet.Transaction
 };
 export type PrepareAndBroadcastLedgerSignedTxRequest = {
   ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: any,
-  txExt: UnsignedTransactionExt,
+  unsignedTx: RustModule.Wallet.Transaction,
 };
 export type UpdateWalletRequest = {
   walletId: string,
@@ -388,7 +391,7 @@ export default class AdaApi {
     Logger.debug('AdaApi::createTransaction called');
     const { receiver, amount, password } = request;
     try {
-      const response = await newAdaTransaction(
+      const response = await newAdaSignedTx(
         receiver,
         amount,
         password
@@ -416,15 +419,21 @@ export default class AdaApi {
       Logger.debug('AdaApi::createTrezorSignTxData called');
       const { receiver, amount } = request;
 
-      const { changeAdaAddress, txExt }: AdaFeeEstimateResponse =
-          await getAdaTransactionFee(receiver, amount);
+      const unsignedTxResponse = await newAdaUnsignedTx(receiver, amount);
 
-      const trezorSignTxPayload: TrezorSignTxPayload = await createTrezorSignTxPayload(txExt);
+      const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
+
+      const trezorSignTxPayload = await createTrezorSignTxPayload(
+        unsignedTxResponse.addressesMap,
+        unsignedTxResponse.changeAddr,
+        unsignedTxResponse.senderUtxos,
+        unsignedTx
+      );
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
 
       return {
         trezorSignTxPayload,
-        changeAddress: changeAdaAddress
+        changeAddress: unsignedTxResponse.changeAddr,
       };
     } catch (error) {
       Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
@@ -463,16 +472,22 @@ export default class AdaApi {
       Logger.debug('AdaApi::createLedgerSignTxData called');
       const { receiver, amount } = request;
 
-      const { changeAdaAddress, txExt }: AdaFeeEstimateResponse
-        = await getAdaTransactionFee(receiver, amount);
+      const unsignedTxResponse = await newAdaUnsignedTx(receiver, amount);
 
-      const ledgerSignTxPayload: LedgerSignTxPayload = await createLedgerSignTxPayload(txExt);
+      const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
+
+      const ledgerSignTxPayload = await createLedgerSignTxPayload(
+        unsignedTxResponse.addressesMap,
+        unsignedTxResponse.changeAddr,
+        unsignedTxResponse.senderUtxos,
+        unsignedTx
+      );
 
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
       return {
         ledgerSignTxPayload,
-        changeAddress: changeAdaAddress,
-        txExt
+        changeAddress: unsignedTxResponse.changeAddr,
+        unsignedTx,
       };
     } catch (error) {
       Logger.error('AdaApi::createLedgerSignTxData error: ' + stringifyError(error));
@@ -493,11 +508,10 @@ export default class AdaApi {
     try {
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
 
-      const { ledgerSignTxResp, unsignedTx, txExt } = request;
+      const { ledgerSignTxResp, unsignedTx } = request;
       const response = await prepareAndBroadcastLedgerSignedTx(
         ledgerSignTxResp,
-        unsignedTx,
-        txExt
+        unsignedTx
       );
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx success: ' + stringifyData(response));
 
@@ -521,7 +535,7 @@ export default class AdaApi {
     Logger.debug('AdaApi::calculateTransactionFee called');
     const { receiver, amount } = request;
     try {
-      const { fee }: AdaFeeEstimateResponse =
+      const fee: AdaFeeEstimateResponse =
         await getAdaTransactionFee(receiver, amount);
       Logger.debug(
         'AdaApi::calculateTransactionFee success: ' + stringifyData(fee)
@@ -980,8 +994,7 @@ const _createTransactionFromServerData = action(
 
 const _createTransactionFeeFromServerData = action(
   'AdaApi::_createTransactionFeeFromServerData',
-  (data: AdaTransactionFee) => {
-    const coins = data.getCCoin;
-    return new BigNumber(coins).dividedBy(LOVELACES_PER_ADA);
-  }
+  ({ fee }: AdaFeeEstimateResponse) => (
+    new BigNumber(fee)
+  )
 );

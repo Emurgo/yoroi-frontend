@@ -99,6 +99,10 @@ export default defineMessages({
     id: 'global.language.french',
     defaultMessage: '!!!French',
   },
+  languageIndonesian: {
+    id: 'global.language.indonesian',
+    defaultMessage: '!!!Indonesian',
+  },
   unitAda: {
     id: 'global.unit.ada',
     defaultMessage: '!!!Ada',

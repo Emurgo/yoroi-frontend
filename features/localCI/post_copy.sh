@@ -17,6 +17,4 @@ rustup target add wasm32-unknown-unknown --toolchain 1.32.0
 
 chown -R "$user:$user" /usr/local/lib/node_modules
 
-npm run build-js-cardano-wasm
-
 npm install

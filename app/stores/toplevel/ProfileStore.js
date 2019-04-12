@@ -19,7 +19,9 @@ export default class SettingsStore extends Store {
     { value: 'zh-Hant', label: globalMessages.languageChineseTraditional, svg: require('../../assets/images/flags/chinese.inline.svg') },
     { value: 'ru-RU', label: globalMessages.languageRussian, svg: require('../../assets/images/flags/russian.inline.svg') },
     { value: 'de-DE', label: globalMessages.languageGerman, svg: require('../../assets/images/flags/german.inline.svg') },
-    { value: 'fr-FR', label: globalMessages.languageFrench, svg: require('../../assets/images/flags/french.inline.svg') }
+    { value: 'fr-FR', label: globalMessages.languageFrench, svg: require('../../assets/images/flags/french.inline.svg') },
+    // { value: 'id-ID', label: globalMessages.languageIndonesian,
+    //     svg: require('../../assets/images/flags/indonesian.inline.svg') }
   ];
 
   @observable bigNumberDecimalFormat = {

@@ -21,5 +21,4 @@ exports.copyAssets = (type, env) => {
   cp('-R', 'dll/*', `${type}/js/`);
   cp('chrome/3rd-party/trezor/*.js', `${type}/js/`);
   cp('chrome/3rd-party/trezor/trezor-usb-permissions.html', `${type}/`);
-  exec(`./node_modules/.bin/pug -O "{ env: '${env}' }" -o ${type} chrome/views/`);
 };

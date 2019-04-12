@@ -1,44 +1,58 @@
 // @flow
-
-import { Redemption } from 'rust-cardano-crypto';
-import { SeedWithInvalidLengthError, CreateRedeemTransactionError } from './cryptoErrors';
+import { SeedWithInvalidLengthError } from './cryptoErrors';
 import type { ConfigType } from '../../../../../config/config-types';
 import type { UTXO } from '../../adaTypes';
-import { Logger } from '../../../../utils/logging';
+import {
+  addTxInputs,
+  addOutput,
+  utxoToTxInput
+} from '../../adaTransactions/adaNewTransactions';
+
+import { RustModule } from './rustLoader';
 
 declare var CONFIG : ConfigType;
 
 const protocolMagic = CONFIG.network.protocolMagic;
 
 export function getAddressFromRedemptionKey(
-  redemptionKey: Buffer,
-): Uint8Array {
-  const address = Redemption.redemptionKeyToAddress(redemptionKey, protocolMagic);
-  if (!address) {
+  redemptionKey: RustModule.Wallet.PrivateRedeemKey,
+): RustModule.Wallet.Address {
+  const setting = RustModule.Wallet.BlockchainSettings.from_json({
+    protocol_magic: protocolMagic
+  });
+  try {
+    return redemptionKey.public().address(setting);
+  } catch (err) {
     throw new SeedWithInvalidLengthError();
   }
-  return address;
 }
 
 export function getRedemptionSignedTransaction(
-  redemptionKey: Buffer,
-  address: string,
+  redemptionKey: RustModule.Wallet.PrivateRedeemKey,
+  receiverAddress: string,
   utxo: UTXO
-): RedeemResponse {
-  const utxoIdBuffer = Buffer.from(utxo.tx_hash, 'hex');
-  const input = { id: utxoIdBuffer, index: utxo.tx_index };
-  const output = { address, value: JSON.stringify(parseInt(utxo.amount, 10)) };
-  const redeemResponse = Redemption.createRedemptionTransaction(
+): RustModule.Wallet.SignedTransaction {
+  const txBuilder = new RustModule.Wallet.TransactionBuilder();
+
+  const inputs = utxoToTxInput([utxo]);
+  addTxInputs(txBuilder, inputs);
+  addOutput(txBuilder, receiverAddress, utxo.amount);
+
+  const unsignedTx = txBuilder.make_transaction();
+  const txId = unsignedTx.id();
+  const txFinalizer = new RustModule.Wallet.TransactionFinalized(unsignedTx);
+
+  // sign the transactions
+  const setting = RustModule.Wallet.BlockchainSettings.from_json({
+    protocol_magic: protocolMagic
+  });
+  const witness = RustModule.Wallet.Witness.new_redeem_key(
+    setting,
     redemptionKey,
-    input,
-    output,
-    protocolMagic
+    txId
   );
-  if (!redeemResponse) {
-    throw new SeedWithInvalidLengthError();
-  } else if (redeemResponse.failed) {
-    Logger.error('cryptoRedemption::getRedemptionSignedTransaction error: ' + redeemResponse.msg);
-    throw new CreateRedeemTransactionError();
-  }
-  return redeemResponse;
+  txFinalizer.add_witness(witness);
+
+  const signedTx = txFinalizer.finalize();
+  return signedTx;
 }
