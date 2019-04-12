@@ -137,6 +137,6 @@ module.exports = {
   rules,
   optimization,
   node,
-  resolve, 
+  resolve,
   definePlugin,
 };
