@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable camelcase */
 
 // Utility functions for handling the private master key
 
@@ -16,6 +17,7 @@ import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 import { RustModule } from './rustLoader';
 import { generateAddressBatch } from '../adaAddressProcessing';
 import type { AddressType } from '../../adaTypes';
+import { createCryptoAccount } from '../../adaAccount';
 
 declare var CONFIG : ConfigType;
 
@@ -194,7 +196,6 @@ export const mnemonicsToAddresses = (
   type?: AddressType = 'External'
 ): Array<string> => {
   const masterKey = generateWalletMasterKey(mnemonic, '');
-  const wallet = getCryptoWalletFromMasterKey(masterKey, '');
-  const account = wallet.bip44_account(RustModule.Wallet.AccountIndex.new(0));
-  return generateAddressBatch([...Array(count).keys()], account.public(), type);
+  const { root_cached_key } = createCryptoAccount(masterKey, '', 0);
+  return generateAddressBatch([...Array(count).keys()], root_cached_key, type);
 };
