@@ -15,7 +15,7 @@ import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 
 import { RustModule } from './rustLoader';
 import { generateAddressBatch } from '../adaAddressProcessing';
-import type { AddressType } from "../../adaTypes";
+import type { AddressType } from '../../adaTypes';
 
 declare var CONFIG : ConfigType;
 

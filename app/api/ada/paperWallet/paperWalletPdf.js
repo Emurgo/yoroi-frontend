@@ -104,10 +104,10 @@ export const generateAdaPaperPdf = async (
 function printTestnetLabel(doc: Pdf, y: number, r?: number, xShift?: number) {
   doc.setFontSize(60);
   doc.setFontType('bold');
-  doc.setTextColor(255,180,164);
+  doc.setTextColor(255, 180, 164);
   textCenter(doc, y, 'TESTNET', null, r, (r || 0) > 90, xShift);
   doc.setFontType('normal');
-  doc.setTextColor(0,0,0);
+  doc.setTextColor(0, 0, 0);
 }
 
 function printAddresses(doc: Pdf, addresses: Array<string>, logback: Function): boolean {
@@ -194,14 +194,22 @@ type AddImageParams = {
   h?: number,
 }
 
-function textCenter(doc: Pdf, y: number, text: string, m, r, isReverseCentering?: boolean, xShift?: number) {
+function textCenter(
+  doc: Pdf,
+  y: number,
+  text: string,
+  m,
+  r,
+  isReverseCentering?: boolean,
+  xShift?: number
+) {
   const unit = doc.getStringUnitWidth(text);
   const fontSize = doc.internal.getFontSize();
   const scaleFactor = doc.internal.scaleFactor;
   const textWidth = unit * fontSize / scaleFactor;
   const pageWidth = doc.internal.pageSize.width;
-  const textOffset = ((pageWidth / 2) - ((textWidth / 2) * (isReverseCentering ? -1 : +1))) + (xShift || 0);
-  doc.text(textOffset, y, text, m, r);
+  const textOffset = ((pageWidth / 2) - ((textWidth / 2) * (isReverseCentering ? -1 : +1)));
+  doc.text(textOffset + (xShift || 0), y, text, m, r);
 }
 
 async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise<void> {
