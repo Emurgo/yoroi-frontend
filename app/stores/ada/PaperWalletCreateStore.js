@@ -5,12 +5,28 @@ import LocalizableError from '../../i18n/LocalizableError';
 import type { AdaPaper } from '../../api/ada';
 import fileSaver from 'file-saver';
 
-export type ProgressStepEnum = 0 | 1 | 2 | 3;
+export type ProgressStepEnum = 0 | 1 | 2 | 3 | 4;
 export const ProgressStep = {
+  /**
+   * Initiate the paper-wallet generation process.
+   */
   INIT: 0,
+  /**
+   * Take paper password from user.
+   */
   USER_PASSWORD: 1,
+  /**
+   * Generate/Download the paper and PDF certificate.
+   */
   CREATE: 2,
+  /**
+   * Ask user to verify paper secrets
+   */
   VERIFY: 3,
+  /**
+   * Confirm verification and give use the addresses on-screen
+   */
+  FINALIZE: 4,
 };
 
 export default class PaperWalletCreateStore extends Store {
