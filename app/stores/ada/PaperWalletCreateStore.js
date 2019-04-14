@@ -45,6 +45,7 @@ export default class PaperWalletCreateStore extends Store {
     a.submitInit.listen(this._submitInit);
     a.submitUserPassword.listen(this._submitUserPassword);
     a.submitCreate.listen(this._submitCreatePaper);
+    a.submitVerify.listen(this._submitVerifyPaper);
     a.createPaperWallet.listen(this._createPaperWallet);
     a.createPdfDocument.listen(this._createPdfDocument);
     a.setPdfRenderStatus.listen(this._setPdfRenderStatus);
@@ -67,6 +68,10 @@ export default class PaperWalletCreateStore extends Store {
 
   @action _submitCreatePaper = async () => {
     this.progressInfo = ProgressStep.VERIFY;
+  };
+
+  @action _submitVerifyPaper = async () => {
+    this.progressInfo = ProgressStep.FINALIZE;
   };
 
   @action _createPaperWallet = async () => {

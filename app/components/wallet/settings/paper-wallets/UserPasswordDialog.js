@@ -36,7 +36,7 @@ const messages = defineMessages({
   },
   paperPasswordIntroLine1: {
     id: 'settings.paperWallet.dialog.password.intro.line1',
-    defaultMessage: '!!!You have selected a password-protected type of paper wallet.',
+    defaultMessage: '!!!Yoroi Paper Wallets are always protected with an additional password.',
   },
   paperPasswordIntroLine2: {
     id: 'settings.paperWallet.dialog.password.intro.line2',

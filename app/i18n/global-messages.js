@@ -47,6 +47,10 @@ export default defineMessages({
     id: 'transfer.instructions.instructions.title.label',
     defaultMessage: '!!!Instructions',
   },
+  finish: {
+    id: 'global.labels.finish',
+    defaultMessage: '!!!Finish',
+  },
   cancel: {
     id: 'global.labels.cancel',
     defaultMessage: '!!!Cancel',

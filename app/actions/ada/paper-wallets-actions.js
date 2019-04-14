@@ -12,7 +12,6 @@ export default class PaperWalletsActions {
   setPdf: Action<{ pdf: Blob }> = new Action();
   downloadPaperWallet: Action<{}> = new Action();
   submitCreate: Action<{}> = new Action();
-  submitMnemonicPassword: Action<{}> = new Action();
   submitVerify: Action<{}> = new Action();
   cancel: Action<{}> = new Action();
 }

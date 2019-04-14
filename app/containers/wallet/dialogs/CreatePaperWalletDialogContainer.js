@@ -10,6 +10,7 @@ import { Logger } from '../../../utils/logging';
 import CreatePaperDialog from '../../../components/wallet/settings/paper-wallets/CreatePaperDialog';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import validWords from 'bip39/src/wordlists/english.json';
+import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/FinalizeDialog';
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
@@ -74,6 +75,14 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             isPaper
             showPaperPassword
             isVerificationMode
+          />
+        );
+      case ProgressStep.FINALIZE:
+        return (
+          <FinalizeDialog
+            addresses={paperStore.paper.addresses}
+            onNext={onCancel}
+            onCancel={onCancel}
           />
         );
       default:

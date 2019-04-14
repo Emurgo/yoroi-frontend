@@ -1,0 +1,76 @@
+@import '../../../../themes/mixins/loading-spinner';
+@import '../../../../themes/mixins/error-message';
+
+.dialog {
+  font-family: var(--font-light);
+  height: 26rem;
+  .walletPassword {
+    .walletPasswordSwitch {
+      & .passwordLabel {
+        color: var(--theme-wallet-password-switch-label-color);
+        font-family: var(--font-semibold);
+        font-size: 16px;
+        line-height: 1.38;
+        margin-bottom: 10px;
+      }
+    }
+    & + .walletPasswordFields {
+      .newPassword {
+        margin-top: 20px;
+      }
+    }
+  }
+
+
+  :global .SimpleSwitch_root > .SimpleSwitch_checked {
+    background: var(--theme-input-remove-color-light) !important;
+    .SimpleSwitch_thumb {
+      box-shadow: inset -1.5px -1.5px 0 var(--theme-input-remove-color-light) !important;
+      box-shadow:
+        inset -1.5px -1.5px 0 var(--theme-input-remove-color-light),
+        inset 1.5px 1.5px 0 var(--theme-input-remove-color-light),
+        inset 1.5px -1.5px 0 var(--theme-input-remove-color-light),
+        inset -1.5px 1.5px 0 var(--theme-input-remove-color-light) !important;
+    }
+  }
+
+  .error {
+    @include error-message;
+    text-align: center;
+    margin-top: 27px;
+  }
+}
+
+.isSubmitting {
+  @include loading-spinner("../../../../assets/images/spinner-light.svg");
+}
+
+$opacityCommon: 0.7;
+
+.headerBlock {
+  width: 725px;
+  height: 5em;
+  padding-top: 10px;
+  span {
+    font-family: var(--font-light);
+    line-height: 1.38;
+    font-size: 14px;
+    opacity: $opacityCommon;
+  }
+}
+
+.largeTopMargin {
+  margin-top: 20px;
+}
+
+.repeatedPassword {
+  margin-top: 20px;
+}
+
+.passwordInstructions {
+  color: var(--theme-instructions-text-color);
+  font-family: var(--font-light);
+  line-height: 1.38;
+  margin-top: 20px;
+  opacity: 0.5;
+}
