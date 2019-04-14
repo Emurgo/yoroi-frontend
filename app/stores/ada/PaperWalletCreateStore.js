@@ -28,6 +28,7 @@ export default class PaperWalletCreateStore extends Store {
     const a = this.actions.ada.paperWallets;
     a.submitInit.listen(this._submitInit);
     a.submitUserPassword.listen(this._submitUserPassword);
+    a.submitCreate.listen(this._submitCreatePaper);
     a.createPaperWallet.listen(this._createPaperWallet);
     a.createPdfDocument.listen(this._createPdfDocument);
     a.setPdfRenderStatus.listen(this._setPdfRenderStatus);
@@ -46,6 +47,10 @@ export default class PaperWalletCreateStore extends Store {
     this.actions.ada.paperWallets.createPaperWallet.trigger({});
     this.actions.ada.paperWallets.createPdfDocument.trigger({});
     this.progressInfo = ProgressStep.CREATE;
+  };
+
+  @action _submitCreatePaper = async () => {
+    this.progressInfo = ProgressStep.VERIFY;
   };
 
   @action _createPaperWallet = async () => {

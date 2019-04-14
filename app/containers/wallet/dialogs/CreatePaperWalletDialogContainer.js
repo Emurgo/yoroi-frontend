@@ -8,6 +8,8 @@ import PaperWalletsActions from '../../../actions/ada/paper-wallets-actions';
 import PaperWalletCreateStore, { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
 import { Logger } from '../../../utils/logging';
 import CreatePaperDialog from '../../../components/wallet/settings/paper-wallets/CreatePaperDialog';
+import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
+import validWords from 'bip39/src/wordlists/english.json';
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
@@ -57,6 +59,21 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
+          />
+        );
+      case ProgressStep.VERIFY:
+        return (
+          <WalletRestoreDialog
+            onSubmit={paperActions.submitVerify.trigger}
+            onCancel={onCancel}
+            numberOfMnemonics={21}
+            mnemonicValidator={words => words === paperStore.paper.scrambledWords.join(' ')}
+            passwordValidator={pass => pass === paperStore.userPassword}
+            isSubmitting={false}
+            validWords={validWords}
+            isPaper
+            showPaperPassword
+            isVerificationMode
           />
         );
       default:

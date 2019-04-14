@@ -28,7 +28,15 @@ const messages = defineMessages({
   },
   titlePaper: {
     id: 'wallet.restore.dialog.title.paper.label',
-    defaultMessage: '!!!Restore Yoroi paper wallet',
+    defaultMessage: '!!!Restore Yoroi Paper wallet',
+  },
+  titleVerify: {
+    id: 'wallet.restore.dialog.title.verify.label',
+    defaultMessage: '!!!Verify Yoroi wallet',
+  },
+  titleVerifyPaper: {
+    id: 'wallet.restore.dialog.title.verify.paper.label',
+    defaultMessage: '!!!Verify Yoroi Paper wallet',
   },
   walletNameInputLabel: {
     id: 'wallet.restore.dialog.wallet.name.input.label',
@@ -53,6 +61,10 @@ const messages = defineMessages({
   importButtonLabel: {
     id: 'wallet.restore.dialog.restore.wallet.button.label',
     defaultMessage: '!!!Restore wallet',
+  },
+  verifyButtonLabel: {
+    id: 'wallet.restore.dialog.verify.wallet.button.label',
+    defaultMessage: '!!!Verify wallet',
   },
   invalidRecoveryPhrase: {
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
@@ -83,11 +95,13 @@ type Props = {
   onCancel: Function,
   isSubmitting: boolean,
   mnemonicValidator: Function,
+  passwordValidator?: Function,
   numberOfMnemonics: number,
   error?: ?LocalizableError,
   validWords: Array<string>,
-  isPaper: boolean,
-  showPaperPassword: boolean,
+  isPaper?: boolean,
+  isVerificationMode?: boolean,
+  showPaperPassword?: boolean,
 };
 
 @observer
@@ -132,12 +146,8 @@ export default class WalletRestoreDialog extends Component<Props> {
         placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
-          const repeatPasswordField = form.$('repeatPassword');
-          if (repeatPasswordField.value.length > 0) {
-            repeatPasswordField.validate({ showErrors: true });
-          }
           return [
-            field.value.length > 0,
+            field.value.length > 0 && (!this.props.passwordValidator || this.props.passwordValidator(field.value)),
             this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
           ];
         }],
@@ -199,7 +209,15 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error, onCancel, isPaper, showPaperPassword } = this.props;
+    const {
+      validWords,
+      isSubmitting,
+      error,
+      onCancel,
+      isPaper,
+      isVerificationMode,
+      showPaperPassword,
+    } = this.props;
 
     const dialogClasses = classnames([
       styles.component,
@@ -230,7 +248,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: intl.formatMessage(messages.importButtonLabel),
+        label: intl.formatMessage(isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel),
         primary: true,
         disabled: isSubmitting,
         onClick: this.submit,
@@ -240,19 +258,24 @@ export default class WalletRestoreDialog extends Component<Props> {
     return (
       <Dialog
         className={dialogClasses}
-        title={intl.formatMessage(isPaper ? messages.titlePaper : messages.title)}
+        title={intl.formatMessage(isPaper ?
+          (isVerificationMode ? messages.titleVerifyPaper : messages.titlePaper) :
+          (isVerificationMode ? messages.titleVerify : messages.title)
+        )}
         actions={actions}
         closeOnOverlayClick
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
       >
 
-        <Input
-          className={walletNameFieldClasses}
-          {...walletNameField.bind()}
-          error={walletNameField.error}
-          skin={InputSkin}
-        />
+        {isVerificationMode ? '' : (
+          <Input
+            className={walletNameFieldClasses}
+            {...walletNameField.bind()}
+            error={walletNameField.error}
+            skin={InputSkin}
+          />
+        )}
 
         <Autocomplete
           options={validWords}
@@ -277,25 +300,27 @@ export default class WalletRestoreDialog extends Component<Props> {
           </div>
         ) : ''}
 
-        <div className={styles.walletPassword}>
-          <div className={walletPasswordFieldsClasses}>
-            <Input
-              className="walletPassword"
-              {...walletPasswordField.bind()}
-              error={walletPasswordField.error}
-              skin={InputSkin}
-            />
-            <Input
-              className="repeatedPassword"
-              {...repeatedPasswordField.bind()}
-              error={repeatedPasswordField.error}
-              skin={InputSkin}
-            />
-            <p className={styles.passwordInstructions}>
-              {intl.formatMessage(globalMessages.passwordInstructions)}
-            </p>
+        {isVerificationMode ? '' : (
+          <div className={styles.walletPassword}>
+            <div className={walletPasswordFieldsClasses}>
+              <Input
+                className="walletPassword"
+                {...walletPasswordField.bind()}
+                error={walletPasswordField.error}
+                skin={InputSkin}
+              />
+              <Input
+                className="repeatedPassword"
+                {...repeatedPasswordField.bind()}
+                error={repeatedPasswordField.error}
+                skin={InputSkin}
+              />
+              <p className={styles.passwordInstructions}>
+                {intl.formatMessage(globalMessages.passwordInstructions)}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
