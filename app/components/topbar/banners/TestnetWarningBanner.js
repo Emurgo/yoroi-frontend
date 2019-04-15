@@ -10,7 +10,7 @@ import environment from '../../../environment';
 const messages = defineMessages({
   testnetLabel: {
     id: 'testnet.label.message',
-    defaultMessage: '!!!WARNING: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
+    defaultMessage: '!!!WARNING: This is a {network} network. ADA has no monetary value here. For more information, check out the FAQ at {faqLink}',
   },
 });
 
@@ -38,7 +38,7 @@ export default class TestnetWarningBanner extends Component<{}> {
         {
           environment.isMainnet() ? null : (
             <div className={styles.testnetWarning}>
-              <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
+              <FormattedMessage {...messages.testnetLabel} values={{ faqLink, network: environment.NETWORK }} />
             </div>
           )
         }
