@@ -7,6 +7,7 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
 import styles from './FinalizeDialog.scss';
+import DialogBackButton from '../../../widgets/DialogBackButton';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -39,6 +40,7 @@ type Props = {
   addresses: Array<string>,
   onNext: Function,
   onCancel: Function,
+  onBack?: Function,
 };
 
 @observer
@@ -53,6 +55,7 @@ export default class FinalizeDialog extends Component<Props> {
       addresses,
       onCancel,
       onNext,
+      onBack,
     } = this.props;
 
     console.log(addresses);
@@ -77,6 +80,7 @@ export default class FinalizeDialog extends Component<Props> {
         closeOnOverlayClick
         onClose={onCancel}
         className={dialogClasses}
+        backButton={onBack && <DialogBackButton onBack={onBack} />}
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
 
@@ -87,10 +91,12 @@ export default class FinalizeDialog extends Component<Props> {
           <span>{intl.formatMessage(messages.paperFinalizeIntroLine4)}</span><br />
         </div>
 
-        <h2 className={largeTopMarginClasses}>{intl.formatMessage(messages.paperAddressesLabel)}</h2>
+        <h2 className={largeTopMarginClasses}>
+          {intl.formatMessage(messages.paperAddressesLabel)}
+        </h2>
         <div className={styles.headerBlock}>
-          {addresses.map((a, i) => (
-            <span>{a}<br/></span>
+          {addresses.map(a => (
+            <span>{a}<br /></span>
           ))}
         </div>
 

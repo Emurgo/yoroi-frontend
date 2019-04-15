@@ -67,8 +67,9 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
           <WalletRestoreDialog
             onSubmit={paperActions.submitVerify.trigger}
             onCancel={onCancel}
+            onBack={paperActions.backToCreate.trigger}
             numberOfMnemonics={21}
-            mnemonicValidator={words => words === paperStore.paper.scrambledWords.join(' ')}
+            mnemonicValidator={words => paperStore.paper && words === paperStore.paper.scrambledWords.join(' ')}
             passwordValidator={pass => pass === paperStore.userPassword}
             isSubmitting={false}
             validWords={validWords}
@@ -80,9 +81,10 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
       case ProgressStep.FINALIZE:
         return (
           <FinalizeDialog
-            addresses={paperStore.paper.addresses}
+            addresses={paperStore.paper ? paperStore.paper.addresses : []}
             onNext={onCancel}
             onCancel={onCancel}
+            onBack={paperActions.backToCreate.trigger}
           />
         );
       default:

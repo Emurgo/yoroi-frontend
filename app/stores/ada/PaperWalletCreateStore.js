@@ -45,6 +45,7 @@ export default class PaperWalletCreateStore extends Store {
     a.submitInit.listen(this._submitInit);
     a.submitUserPassword.listen(this._submitUserPassword);
     a.submitCreate.listen(this._submitCreatePaper);
+    a.backToCreate.listen(this._backToCreatePaper);
     a.submitVerify.listen(this._submitVerifyPaper);
     a.createPaperWallet.listen(this._createPaperWallet);
     a.createPdfDocument.listen(this._createPdfDocument);
@@ -60,9 +61,16 @@ export default class PaperWalletCreateStore extends Store {
   };
 
   @action _submitUserPassword = async ({ userPassword }: { userPassword: string }) => {
+    if (this.userPassword) {
+      throw new Error('User password is already initialized');
+    }
     this.userPassword = userPassword;
     this.actions.ada.paperWallets.createPaperWallet.trigger({});
     this.actions.ada.paperWallets.createPdfDocument.trigger({});
+    this.progressInfo = ProgressStep.CREATE;
+  };
+
+  @action _backToCreatePaper = async () => {
     this.progressInfo = ProgressStep.CREATE;
   };
 

@@ -20,6 +20,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import config from '../../config';
+import DialogBackButton from '../widgets/DialogBackButton';
 
 const messages = defineMessages({
   title: {
@@ -93,6 +94,7 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 type Props = {
   onSubmit: Function,
   onCancel: Function,
+  onBack?: Function,
   isSubmitting: boolean,
   mnemonicValidator: Function,
   passwordValidator?: Function,
@@ -145,9 +147,12 @@ export default class WalletRestoreDialog extends Component<Props> {
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
         placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
         value: '',
-        validators: [({ field, form }) => {
+        validators: [({ field }) => {
+          const validatePassword = p => (
+            !this.props.passwordValidator || this.props.passwordValidator(p)
+          );
           return [
-            field.value.length > 0 && (!this.props.passwordValidator || this.props.passwordValidator(field.value)),
+            field.value.length > 0 && validatePassword(field.value),
             this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
           ];
         }],
@@ -214,6 +219,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       isSubmitting,
       error,
       onCancel,
+      onBack,
       isPaper,
       isVerificationMode,
       showPaperPassword,
@@ -255,17 +261,22 @@ export default class WalletRestoreDialog extends Component<Props> {
       },
     ];
 
+    const dialogTitle = () => {
+      if (isPaper) {
+        return isVerificationMode ? messages.titleVerifyPaper : messages.titlePaper;
+      }
+      return isVerificationMode ? messages.titleVerify : messages.title;
+    };
+
     return (
       <Dialog
         className={dialogClasses}
-        title={intl.formatMessage(isPaper ?
-          (isVerificationMode ? messages.titleVerifyPaper : messages.titlePaper) :
-          (isVerificationMode ? messages.titleVerify : messages.title)
-        )}
+        title={intl.formatMessage(dialogTitle())}
         actions={actions}
         closeOnOverlayClick
         onClose={onCancel}
-        closeButton={<DialogCloseButton />}
+        backButton={onBack && <DialogBackButton onBack={onBack} />}
+        closeButton={<DialogCloseButton onClose={onCancel} />}
       >
 
         {isVerificationMode ? '' : (
