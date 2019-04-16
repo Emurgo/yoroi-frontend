@@ -5,7 +5,7 @@ import { observable, action } from 'mobx';
 
 import {
   LedgerBridge,
-  BIP44_HARDENED_CARDANO_FIRST_ACCOUNT_SUB_PATH as CARDANO_FIRST_ACCOUNT_SUB_PATH
+  makeCardanoAccountBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
 import type {
   GetVersionResponse,
@@ -159,13 +159,16 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
         const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
 
         Logger.debug(stringifyData(versionResp));
+
+        // TODO: assume single account in Yoroi
+        const accountPath = makeCardanoAccountBIP44Path(0);
         // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
-        Logger.debug(stringifyData(CARDANO_FIRST_ACCOUNT_SUB_PATH));
+        Logger.debug(stringifyData(accountPath));
 
         // get Cardano's first account's
         // i.e hdPath = [2147483692, 2147485463, 2147483648]
         const extendedPublicKeyResp: GetExtendedPublicKeyResponse
-          = await ledgerBridge.getExtendedPublicKey(CARDANO_FIRST_ACCOUNT_SUB_PATH);
+          = await ledgerBridge.getExtendedPublicKey(accountPath);
 
         this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
 
