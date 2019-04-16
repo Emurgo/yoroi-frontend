@@ -40,10 +40,6 @@ const plugins = (folder) => ([
    */
   new HtmlWebpackHarddiskPlugin(),
   new ConfigWebpackPlugin(),
-  new webpack.DllReferencePlugin({
-    context: path.join(__dirname, '..', 'dll'),
-    manifest: require('../dll/vendor-manifest.json')
-  }),
 ]);
 
 const rules = [
