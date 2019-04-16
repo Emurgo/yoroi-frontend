@@ -117,10 +117,9 @@ export default class SettingsStore extends Store {
   @computed get currentTheme(): string {
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet) return result;
-    // TODO: This is temporary, when release ready
-    // 1. New Theme should be loaded by default
-    // 2. This comment should be deleted
-    return (environment.isMainnet()) ? THEMES.YOROI_CLASSIC : THEMES.YOROI_MODERN;
+    // TODO: This is temporary, fix before release
+    // return (environment.isMainnet()) ? THEMES.YOROI_CLASSIC : THEMES.YOROI_MODERN;
+    return THEMES.YOROI_CLASSIC;
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
