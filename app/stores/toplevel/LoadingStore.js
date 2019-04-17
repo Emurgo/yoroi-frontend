@@ -11,6 +11,7 @@ import Request from '../lib/LocalizedRequest';
 import type { MigrationRequest } from '../../api';
 import { migrate } from '../../api';
 import { Logger, stringifyError } from '../../utils/logging';
+import { closeOtherInstances } from '../../utils/tabManager';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -34,6 +35,7 @@ export default class LoadingStore extends Store {
     Promise
       .all([this.loadRustRequest.execute().promise, this.loadDbRequest.execute().promise])
       .then(async () => {
+        closeOtherInstances();
         await this.migrationRequest.execute({
           api: this.api,
           currVersion: environment.version

@@ -38,11 +38,6 @@ To install other Yoroi-frontend related dependencies use:
 $ npm install
 ```
 
-Rebuild dll
-```bash
-$ npm run build-dll
-```
-
 ### Firefox
 
 Adding unsigned extensions is not supported for the regular version of Firefox.

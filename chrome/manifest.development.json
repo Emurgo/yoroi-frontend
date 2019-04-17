@@ -1,5 +1,5 @@
 {
-  "version": "1.4.1",
+  "version": "1.5.0",
   "name": "yoroi",
   "manifest_version": 2,
   "description": "[dev] Cardano ADA wallet",
@@ -25,7 +25,6 @@
     "page": "background.html"
   },
   "permissions": [
-    "tabs",
     "storage",
     "*://connect.trezor.io/*"
   ],

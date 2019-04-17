@@ -12,7 +12,7 @@ import warningSvg from '../../../assets/images/warning.inline.svg';
 const messages = defineMessages({
   testnetLabel: {
     id: 'testnet.label.message',
-    defaultMessage: '!!!WARNING: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
+    defaultMessage: '!!!WARNING: This is a {network} network. ADA has no monetary value here. For more information, check out the FAQ at {faqLink}',
   },
   testnetLabelWarning: {
     id: 'testnet.labelWarning.message',
@@ -70,17 +70,12 @@ export default class TestnetWarningBanner extends Component<Props> {
           environment.isMainnet() ? null : (
             <div className={testnetClasses}>
               {classicTheme ? (
-                <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
+                <FormattedMessage {...messages.testnetLabel} values={{ faqLink, network: environment.NETWORK }} />
               ) : ([
                 <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
-                <span key="1">
-                  {intl.formatMessage(messages.testnetLabelWarning)}
-                  &nbsp;
-                </span>,
-                <FormattedMessage {...messages.testnetLabelMain} values={{ faqLink }} key="2" />
+                <FormattedMessage {...messages.testnetLabel} values={{ faqLink, network: environment.NETWORK }} />
               ])}
-            </div>
-          )
+            </div>)
         }
       </div>
     );

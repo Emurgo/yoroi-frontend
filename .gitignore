@@ -6,7 +6,6 @@ production-key.pem
 
 build/
 dev/
-dll/
 screenshots/
 
 *.zip
