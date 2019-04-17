@@ -63,7 +63,8 @@ export default class TestnetWarningBanner extends Component<Props> {
                 <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
                 <FormattedMessage
                   {...messages.testnetLabel}
-                  values={{ faqLink, network: environment.NETWORK }} />
+                  values={{ faqLink, network: environment.NETWORK }}
+                />
               ])}
             </div>)
         }
