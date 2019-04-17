@@ -142,7 +142,6 @@
   "settings.support.reportProblem.link": "Contacter le support",
   "settings.support.reportProblem.title": "Partager un problème",
   "testnet.label.message": "ATTENTION: Ceci est un testnet. L'ADA présent sur le testnet n'a aucune vraie valeur financière. Pour plus d'information, veuillez consulter notre Foire aux Questions ici {faqLink}",
-  "testnet.labelLink.message": "!!!Check out the FAQ",
   "testnet.labelMain.message": "!!!This is a testnet. ADA on the testnet has no monetary value. For more information, {faqLink}",
   "testnet.labelWarning.message": "!!!Warning:",
   "transfer.form.errors.invalidRecoveryPhrase": "Phrase de secours incorrecte",

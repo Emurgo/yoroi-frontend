@@ -14,21 +14,6 @@ const messages = defineMessages({
     id: 'testnet.label.message',
     defaultMessage: '!!!WARNING: This is a {network} network. ADA has no monetary value here. For more information, check out the FAQ at {faqLink}',
   },
-  testnetLabelWarning: {
-    id: 'testnet.labelWarning.message',
-    defaultMessage: '!!!Warning:',
-    description: 'Message alerting users the wallet is not running in mainnet.'
-  },
-  testnetLabelMain: {
-    id: 'testnet.labelMain.message',
-    defaultMessage: '!!!This is a testnet. ADA on the testnet has no monetary value. For more information, {faqLink}',
-    description: 'Message alerting users the wallet is not running in mainnet.'
-  },
-  testnetLabelLink: {
-    id: 'testnet.labelLink.message',
-    defaultMessage: '!!!Check out the FAQ',
-    description: 'Message alerting users the wallet is not running in mainnet.'
-  },
 });
 
 type Props = {
@@ -70,10 +55,15 @@ export default class TestnetWarningBanner extends Component<Props> {
           environment.isMainnet() ? null : (
             <div className={testnetClasses}>
               {classicTheme ? (
-                <FormattedMessage {...messages.testnetLabel} values={{ faqLink, network: environment.NETWORK }} />
+                <FormattedMessage
+                  {...messages.testnetLabel}
+                  values={{ faqLink, network: environment.NETWORK }}
+                />
               ) : ([
                 <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
-                <FormattedMessage {...messages.testnetLabel} values={{ faqLink, network: environment.NETWORK }} />
+                <FormattedMessage
+                  {...messages.testnetLabel}
+                  values={{ faqLink, network: environment.NETWORK }} />
               ])}
             </div>)
         }
