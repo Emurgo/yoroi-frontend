@@ -43,13 +43,16 @@
       }
     ],
     "@babel/plugin-proposal-export-default-from",
-    "@babel/plugin-proposal-export-namespace-from"
+    "@babel/plugin-proposal-export-namespace-from",
   ],
   "env": {
     "development": {
       "plugins": [
         "@babel/plugin-transform-runtime"
       ]
+    },
+    "test": {
+      "plugins": ["dynamic-import-node"]
     }
   }
 }

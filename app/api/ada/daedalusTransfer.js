@@ -25,6 +25,9 @@ import type {
 } from '../../types/TransferTypes';
 import { getReceiverAddress } from './adaAddress';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import type {
+  UTXO
+} from './adaTypes';
 
 import type { ConfigType } from '../../../config/config-types';
 
@@ -62,19 +65,36 @@ export function getAddressesWithFunds(payload: {
 export async function generateTransferTx(payload: {
   addressesWithFunds: AddressKeyMap
 }): Promise<TransferTx> {
-  try {
-    const { addressesWithFunds } = payload;
+  const { addressesWithFunds } = payload;
 
-    // fetch data to make transaction
-    const senders = Object.keys(addressesWithFunds);
-    const senderUtxos = await getAllUTXOsForAddresses(senders);
-    if (_.isEmpty(senderUtxos)) {
-      throw new NoInputsError();
-    }
+  // fetch data to make transaction
+  const senders = Object.keys(addressesWithFunds);
+  const senderUtxos = await getAllUTXOsForAddresses(senders);
+  if (_.isEmpty(senderUtxos)) {
+    const error = new NoInputsError();
+    Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
+    throw error;
+  }
+
+  const outputAddr = await getReceiverAddress();
+
+  return buildTransferTx({
+    addressesWithFunds,
+    senderUtxos,
+    outputAddr,
+  });
+}
+
+/** Generate transaction including all addresses with no change */
+export async function buildTransferTx(payload: {
+  addressesWithFunds: AddressKeyMap,
+  senderUtxos: Array<UTXO>,
+  outputAddr: string,
+}): Promise<TransferTx> {
+  try {
+    const { addressesWithFunds, senderUtxos, outputAddr } = payload;
     const inputs = utxoToTxInput(senderUtxos);
 
-    // pick which address to send transfer to
-    const outputAddr = await getReceiverAddress();
     const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
 
     // firts build a transaction to see what the cost would be
@@ -120,14 +140,11 @@ export async function generateTransferTx(payload: {
       recoveredBalance: inputAmount.dividedBy(LOVELACES_PER_ADA),
       fee: realFee.dividedBy(LOVELACES_PER_ADA),
       signedTx,
-      senders,
+      senders: Object.keys(addressesWithFunds),
       receiver: outputAddr,
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
-    if (error instanceof NoInputsError) {
-      throw error;
-    }
     throw new GenerateTransferTxError();
   }
 }
