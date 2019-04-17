@@ -45,5 +45,5 @@ Then(/^The Japanese language should be selected$/, async function () {
 });
 
 Then(/^I should see second theme as selected$/, async function () {
-  await this.waitForElement('.DisplaySettings_themesWrapper button:nth-child(2).DisplaySettings_active');
+  await this.waitForElement('.DisplaySettings_themesWrapper button:nth-child(4).DisplaySettings_active');
 });
