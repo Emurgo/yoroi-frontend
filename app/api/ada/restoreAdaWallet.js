@@ -45,7 +45,8 @@ export async function restoreAdaWallet(
   try {
     // recover master key
     const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
-    const cryptoAccount = createCryptoAccount(masterKey, walletPassword);
+    // always create the 0th account
+    const cryptoAccount = createCryptoAccount(masterKey, walletPassword, 0);
 
     await restoreTransactionsAndSave(cryptoAccount, adaWallet, masterKey);
     return adaWallet;

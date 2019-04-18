@@ -6,8 +6,6 @@ export default {
     MAX_ALLOWED_UNUSED_ADDRESSES: 20,
     TRANSACTION_REQUEST_SIZE: 20,
     WALLET_RECOVERY_PHRASE_WORD_COUNT: 12,
-    // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
-    BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH: 'm/44\'/1815\'/0\'',
     hardwareWallet: {
       trezorT: {
         VENDOR: 'trezor.io',

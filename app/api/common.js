@@ -89,7 +89,7 @@ export type GetAddressesRequest = {
   walletId: string
 };
 export type GetAddressesResponse = {
-  accountId: ?string,
+  accountId: string,
   addresses: Array<WalletAddress>
 };
 

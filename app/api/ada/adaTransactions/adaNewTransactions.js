@@ -31,7 +31,7 @@ import {
   GetAllUTXOsForAddressesError,
   InvalidWitnessError
 } from '../errors';
-import { getWalletMasterKey } from '../adaLocalStorage';
+import { getWalletMasterKey, getCurrentAccountIndex } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import { HARD_DERIVATION_START } from '../../../config/numbersConfig';
 import type { AdaAddressMap } from '../adaAddress';
@@ -222,15 +222,15 @@ export function signTransaction(
   addressesMap: AdaAddressMap,
   cryptoWallet: RustModule.Wallet.Bip44RootPrivateKey,
 ): void {
-  const account = cryptoWallet.bip44_account(
-    // assume single account in Yoroi
-    RustModule.Wallet.AccountIndex.new(0 | HARD_DERIVATION_START)
+  const currAccount = getCurrentAccountIndex();
+  const accountPrivateKey = cryptoWallet.bip44_account(
+    RustModule.Wallet.AccountIndex.new(currAccount | HARD_DERIVATION_START)
   );
 
   // get private keys
   const privateKeys = senderUtxos.map(utxo => {
     const addressInfo = addressesMap[utxo.receiver];
-    return account.address_key(
+    return accountPrivateKey.address_key(
       addressInfo.change === 1, // is internal
       RustModule.Wallet.AddressKeyIndex.new(addressInfo.index)
     );

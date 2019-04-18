@@ -159,6 +159,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
         const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
 
         Logger.debug(stringifyData(versionResp));
+
         // TODO: assume single account in Yoroi
         const accountPath = makeCardanoAccountBIP44Path(0);
         // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples

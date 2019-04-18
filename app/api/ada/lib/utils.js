@@ -11,6 +11,7 @@ import type {
 } from '../adaTypes';
 import type { TransactionExportRow } from '../../export';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+import { getCurrentAccountIndex } from '../adaLocalStorage';
 
 export const toAdaTx = function (
   amount: BigNumber,
@@ -187,4 +188,16 @@ export function utxosToLookupMap(
     )
   );
   return lookupMap;
+}
+
+export function derivePathAsString(chain: number, addressIndex: number): string {
+  const account = getCurrentAccountIndex();
+  // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
+  return `m/44'/1815'/${account}'/${chain}/${addressIndex}`;
+}
+
+export function derivePathPrefix(): string {
+  const account = getCurrentAccountIndex();
+  // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
+  return `m/44'/1815'/${account}'`;
 }

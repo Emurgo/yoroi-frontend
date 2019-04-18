@@ -26,7 +26,6 @@
     "masterKey": "f5daab925d1b7ab110ed6e69568307e3708f4795a9a93b40a4db1500574ef9cdaece6aa8a4c18f7325992f40193ea39bd7f808f2bbed3f5f66e53d32f9f097cc9aa64bb6848b7ce5da13ab1175122abe3dabb144a258c23fccf643a7fe190347cccf4a0aeaf2c51162d196323d192da857544a5bc0d5cadd421f733992455fabc842547b284648ec50983145ace133711c40fcbedf972c5023ade7de",
     "password": "aaSecret_123",
     "wallet": {
-      "cwAccountsNumber": 1,
       "cwAmount": {
         "getCCoin": "0"
       },

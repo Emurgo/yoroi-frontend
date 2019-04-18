@@ -81,7 +81,6 @@ LAST_BLOCK_NUMBER = "last_block_number"
 ```
 WALLET = {
   "adaWallet": {
-    "cwAccountsNumber": 1,
     "cwAmount": {
       "getCCoin": "1000000"
     },
@@ -111,7 +110,6 @@ LAST_BLOCK_NUMBER = "last_block_number"
 ```
 WALLET = {
   "adaWallet": {
-    "cwAccountsNumber": 1,
     "cwAmount": {
       "getCCoin": "1000000"
     },
