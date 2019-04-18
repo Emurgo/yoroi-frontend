@@ -68,7 +68,6 @@ export const unscramblePaperAdaMnemonic = (
         const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(
           scrambledMnemonics.join(' ')
         );
-        // TODO fix unscramble
         const newEntropy = RustModule.Wallet.paper_wallet_unscramble(
           entropy.to_array(),
           password

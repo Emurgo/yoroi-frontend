@@ -14,7 +14,6 @@ import { AdaWalletTypeOption } from '../../config/AdaTypesConfig';
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
-    cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
     },
@@ -33,7 +32,6 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
 export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
-    cwAccountsNumber: 1,
     cwAmount: {
       getCCoin: 0
     },

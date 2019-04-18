@@ -93,6 +93,7 @@ export default class AddressesStore extends Store {
   };
 
   _getAccountIdByWalletId = (walletId: string): (?string) => {
+    // Note: assume single account in Yoroi
     const result = this._getAddressesAllRequest(walletId).result;
     return result ? result.accountId : null;
   };

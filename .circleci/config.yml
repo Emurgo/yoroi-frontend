@@ -29,7 +29,7 @@ jobs:
 
       # Because npm link will write in this path
       - run: sudo chown -R "$(whoami):$(whoami)" /usr/local/lib/node_modules
-      - run: npm install
+      - run: npm ci
       
       # code quality checks
       - run: npm run flow
