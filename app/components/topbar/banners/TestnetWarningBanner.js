@@ -33,19 +33,12 @@ export default class TestnetWarningBanner extends Component<Props> {
 
     const testnetClasses = classicTheme ? styles.testnetWarningClassic : styles.testnetWarning;
 
-    const faqLink = classicTheme ? (
+    const faqLink = (
       <a
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => handleExternalLinkClick(event)}
       >
         {intl.formatMessage(globalMessages.faqLinkUrl)}
-      </a>
-    ) : (
-      <a
-        href={intl.formatMessage(globalMessages.faqLinkUrl)}
-        onClick={event => handleExternalLinkClick(event)}
-      >
-        {intl.formatMessage(messages.testnetLabelLink)}
       </a>
     );
 
@@ -54,18 +47,20 @@ export default class TestnetWarningBanner extends Component<Props> {
         {
           environment.isMainnet() ? null : (
             <div className={testnetClasses}>
-              {classicTheme ? (
-                <FormattedMessage
-                  {...messages.testnetLabel}
-                  values={{ faqLink, network: environment.NETWORK }}
-                />
-              ) : ([
-                <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
-                <FormattedMessage
-                  {...messages.testnetLabel}
-                  values={{ faqLink, network: environment.NETWORK }}
-                />
-              ])}
+              {classicTheme ?
+                (
+                  <FormattedMessage
+                    {...messages.testnetLabel}
+                    values={{ faqLink, network: environment.NETWORK }}
+                  />
+                ) :
+                ([
+                  <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
+                  <FormattedMessage
+                    {...messages.testnetLabel}
+                    values={{ faqLink, network: environment.NETWORK }}
+                  />
+                ])}
             </div>)
         }
       </div>
