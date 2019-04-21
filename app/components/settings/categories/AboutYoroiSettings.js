@@ -4,7 +4,6 @@ import styles from './AboutYoroiSettings.scss';
 import { observer } from 'mobx-react';
 
 import GridFlexContainer from '../../layout/GridFlexContainer';
-import FooterItem from '../../footer/FooterItem';
 import githubSvg from '../../../assets/images/social/github.inline.svg';
 import youtubeSvg from '../../../assets/images/social/youtube.inline.svg';
 import telegramSvg from '../../../assets/images/social/telegram.inline.svg';
@@ -14,6 +13,7 @@ import facebookSvg from '../../../assets/images/social/facebook.inline.svg';
 import mediumSvg from '../../../assets/images/social/medium.inline.svg';
 
 import environment from '../../../environment';
+import LinkButton from '../../widgets/LinkButton';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -62,6 +62,37 @@ const messages = defineMessages({
   },
 });
 
+const socialMediaLinks = [{
+  url: 'https://twitter.com/YoroiWallet',
+  svg: twitterSvg,
+  message: messages.aboutYoroiTwitter
+}, {
+  svgClassName: styles.yoroiLogo,
+  url: 'https://yoroi-wallet.com',
+  svg: yoroiSvg,
+  message: messages.aboutYoroiWebsite
+}, {
+  url: 'https://www.facebook.com/Yoroi-wallet-399386000586822/',
+  svg: facebookSvg,
+  message: messages.aboutYoroiFacebook
+}, {
+  url: 'https://www.youtube.com/channel/UCgFQ0hHuPO1QDcyP6t9KZTQ',
+  svg: youtubeSvg,
+  message: messages.aboutYoroiYoutube
+}, {
+  url: 'https://t.me/emurgo',
+  svg: telegramSvg,
+  message: messages.aboutEmurgoTelegram
+}, {
+  url: 'https://medium.com/@emurgo_io',
+  svg: mediumSvg,
+  message: messages.aboutYoroiMedium
+}, {
+  url: 'https://github.com/Emurgo/yoroi-frontend',
+  svg: githubSvg,
+  message: messages.aboutYoroiGithub
+}];
+
 @observer
 export default class AboutYoroiSettings extends Component {
   static contextTypes = {
@@ -89,42 +120,7 @@ export default class AboutYoroiSettings extends Component {
         </p>
         <br />
         <GridFlexContainer rowSize={3}>
-          <FooterItem
-            url="https://twitter.com/YoroiWallet"
-            svg={twitterSvg}
-            message={messages.aboutYoroiTwitter}
-          />
-          <FooterItem
-            className={styles.yoroiLogo}
-            url="https://yoroi-wallet.com"
-            svg={yoroiSvg}
-            message={messages.aboutYoroiWebsite}
-          />
-          <FooterItem
-            url="https://www.facebook.com/Yoroi-wallet-399386000586822/"
-            svg={facebookSvg}
-            message={messages.aboutYoroiFacebook}
-          />
-          <FooterItem
-            url="https://www.youtube.com/channel/UCgFQ0hHuPO1QDcyP6t9KZTQ"
-            svg={youtubeSvg}
-            message={messages.aboutYoroiYoutube}
-          />
-          <FooterItem
-            url="https://t.me/emurgo"
-            svg={telegramSvg}
-            message={messages.aboutEmurgoTelegram}
-          />
-          <FooterItem
-            url="https://medium.com/@emurgo_io"
-            svg={mediumSvg}
-            message={messages.aboutYoroiMedium}
-          />
-          <FooterItem
-            url="https://github.com/Emurgo/yoroi-frontend"
-            svg={githubSvg}
-            message={messages.aboutYoroiGithub}
-          />
+          {socialMediaLinks.map(link => <LinkButton key={link.url} {...link} />)}
         </GridFlexContainer>
       </div>
     );
