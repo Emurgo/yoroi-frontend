@@ -27,15 +27,8 @@ $blockHeight: 55px;
     vertical-align: middle;
   }
 };
+
 .block:hover {
   background-color: var(--theme-footer-block-background-color-hover);
   cursor: pointer;
 };
-
-@media screen and (max-width: 1450px) {
-  .block {
-    .text {
-      display: none;
-    }
-  }
-}

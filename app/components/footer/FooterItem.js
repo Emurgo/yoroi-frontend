@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import SvgInline from 'react-svg-inline';
-import { intlShape } from 'react-intl';
-import styles from './FooterItem.scss';
+import './FooterItem.scss';
+
+import LinkButton from '../widgets/LinkButton';
 
 type Props = {
   url: string,
@@ -11,33 +11,15 @@ type Props = {
 
 export default class FooterItem extends Component<Props> {
 
-  static contextTypes = {
-    intl: intlShape.isRequired,
-  };
-
   render() {
-    const { intl } = this.context;
-    const { url, svg, message, className } = this.props;
+    const { url, svg, message } = this.props;
 
     return (
-      <div className={styles.component}>
-        {
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.block}
-            title={intl.formatMessage(message)}
-          >
-            <div className={styles.icon}>
-              <SvgInline svg={svg} className={className} width="20" height="52" />
-            </div>
-            <div className={styles.text}>
-              {intl.formatMessage(message)}
-            </div>
-          </a>
-        }
-      </div>
+      <LinkButton
+        url={url}
+        svg={svg}
+        message={message}
+      />
     );
   }
 }
