@@ -59,6 +59,7 @@ export default class TestnetWarningBanner extends Component<Props> {
                   <FormattedMessage
                     {...messages.testnetLabel}
                     values={{ faqLink, network: environment.NETWORK }}
+                    key="1"
                   />
                 ])}
             </div>)
