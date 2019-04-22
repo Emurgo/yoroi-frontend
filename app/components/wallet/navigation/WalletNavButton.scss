@@ -19,12 +19,22 @@
   height: 40px;
 }
 
-.label {
+.labelClassic {
   font-size: 12px;
   font-family: var(--font-regular);
   font-weight: 600;
   display: block;
   letter-spacing: 0.4px;
+  overflow: visible;
+  text-transform: uppercase;
+}
+
+.label {
+  font-size: 16px;
+  font-family: var(--font-medium);
+  font-weight: 500;
+  display: block;
+  letter-spacing: 0;
   overflow: visible;
   text-transform: uppercase;
 }

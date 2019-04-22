@@ -4,6 +4,24 @@
   padding: 20px;
 }
 
+.buttonTitleClassic {
+  margin-top: 30px;
+  font-size: 11px;
+  font-family: var(--font-medium);
+  font-weight: 600;
+  line-height: 1.38;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.buttonTitle {
+  margin-top: 30px;
+  font-size: 18px;
+  font-family: var(--font-semibold);
+  line-height: 1.38;
+  text-align: center;
+}
+
 .button {
   display: block !important;
   margin: 30px auto 0;
@@ -15,7 +33,7 @@
   font-size: 14px;
   line-height: 19px;
 
-  .title {
+  .titleClassic {
     font-size: 11px;
     font-family: var(--font-medium);
     font-weight: 600;
@@ -23,6 +41,13 @@
     margin-bottom: 4px;
     padding-left: 10px;
     text-transform: uppercase;
+  }
+
+  .title {
+    font-size: 18px;
+    font-family: var(--font-semibold);
+    line-height: 1.38;
+    margin-bottom: 4px;
   }
 
   .text {

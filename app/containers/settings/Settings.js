@@ -35,7 +35,7 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { profile, topbar } = stores;
+    const { profile, topbar, theme } = stores;
 
     const menu = (
       <SettingsMenu
@@ -43,6 +43,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         isActiveItem={this.isActivePage}
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
         currentLocale={profile.currentLocale}
+        classicTheme={theme.classic}
       />
     );
     const topbarTitle = (
@@ -58,10 +59,12 @@ export default class Settings extends Component<InjectedContainerProps> {
             }}
             categories={topbar.CATEGORIES}
             activeTopbarCategory={topbar.activeTopbarCategory}
+            classicTheme={theme.classic}
           />
         )}
+        classicTheme={theme.classic}
       >
-        <SettingsLayout menu={menu}>
+        <SettingsLayout menu={menu} classicTheme={theme.classic}>
           {children}
         </SettingsLayout>
       </Layout>

@@ -6,6 +6,7 @@ import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
+import TransferLayout from '../../components/transfer/TransferLayout';
 import DaedalusTransferInstructionsPage from './DaedalusTransferInstructionsPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
@@ -98,7 +99,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   render() {
     const { stores, actions } = this.props;
-    const { topbar } = stores;
+    const { topbar, theme } = stores;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -110,66 +111,82 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        classicTheme={theme.classic}
       />
     );
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
+
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
-          <MainLayout topbar={topBar}>
-            <DaedalusTransferInstructionsPage
-              onFollowInstructionsPrerequisites={this.goToCreateWallet}
-              onAnswerYes={this.goToReceiveScreen}
-              onConfirm={this.startTransferFunds}
-              onPaperConfirm={this.startTransferPaperFunds}
-              onMasterKeyConfirm={this.startTransferMasterKey}
-              disableTransferFunds={daedalusTransfer.disableTransferFunds}
-            />
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+            <TransferLayout>
+              <DaedalusTransferInstructionsPage
+                onFollowInstructionsPrerequisites={this.goToCreateWallet}
+                onAnswerYes={this.goToReceiveScreen}
+                onConfirm={this.startTransferFunds}
+                onPaperConfirm={this.startTransferPaperFunds}
+                onMasterKeyConfirm={this.startTransferMasterKey}
+                disableTransferFunds={daedalusTransfer.disableTransferFunds}
+                classicTheme={theme.classic}
+              />
+            </TransferLayout>
           </MainLayout>
         );
       case 'gettingMnemonics':
         return (
-          <MainLayout topbar={topBar}>
-            <DaedalusTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
-              onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidMnemonic(
-                mnemonic,
-                config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
-              )}
-              validWords={validWords}
-              mnemonicLength={12}
-            />
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+            <TransferLayout>
+              <DaedalusTransferFormPage
+                onSubmit={this.setupTransferFundsWithMnemonic}
+                onBack={this.backToUninitialized}
+                mnemonicValidator={mnemonic => wallets.isValidMnemonic(
+                  mnemonic,
+                  config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
+                )}
+                validWords={validWords}
+                mnemonicLength={12}
+                classicTheme={theme.classic}
+              />
+            </TransferLayout>
           </MainLayout>
         );
       case 'gettingPaperMnemonics':
         return (
-          <MainLayout topbar={topBar}>
-            <DaedalusTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
-              onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
-              validWords={validWords}
-              mnemonicLength={27}
-            />
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+            <TransferLayout>
+              <DaedalusTransferFormPage
+                onSubmit={this.setupTransferFundsWithMnemonic}
+                onBack={this.backToUninitialized}
+                mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
+                validWords={validWords}
+                mnemonicLength={27}
+                classicTheme={theme.classic}
+              />
+            </TransferLayout>
           </MainLayout>
         );
       case 'gettingMasterKey':
         return (
-          <MainLayout topbar={topBar}>
-            <DaedalusTransferMasterKeyFormPage
-              onSubmit={this.setupTransferFundsWithMasterKey}
-              onBack={this.backToUninitialized}
-            />
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+            <TransferLayout>
+              <DaedalusTransferMasterKeyFormPage
+                onSubmit={this.setupTransferFundsWithMasterKey}
+                onBack={this.backToUninitialized}
+                classicTheme={theme.classic}
+              />
+            </TransferLayout>
           </MainLayout>
         );
       case 'restoringAddresses':
       case 'checkingAddresses':
       case 'generatingTx':
         return (
-          <MainLayout topbar={topBar}>
-            <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+            <TransferLayout>
+              <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
+            </TransferLayout>
           </MainLayout>
         );
       case 'readyToTransfer':
@@ -177,24 +194,30 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           return null; // TODO: throw error? Shoudln't happen
         }
         return (
-          <MainLayout topbar={topBar}>
-            <DaedalusTransferSummaryPage
-              formattedWalletAmount={formattedWalletAmount}
-              transferTx={daedalusTransfer.transferTx}
-              onSubmit={this.tranferFunds}
-              isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
-              onCancel={this.cancelTransferFunds}
-              error={daedalusTransfer.error}
-            />
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+            <TransferLayout>
+              <DaedalusTransferSummaryPage
+                formattedWalletAmount={formattedWalletAmount}
+                transferTx={daedalusTransfer.transferTx}
+                onSubmit={this.tranferFunds}
+                isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
+                onCancel={this.cancelTransferFunds}
+                error={daedalusTransfer.error}
+                classicTheme={theme.classic}
+              />
+            </TransferLayout>
           </MainLayout>
         );
       case 'error':
         return (
-          <MainLayout topbar={topBar}>
-            <DaedalusTransferErrorPage
-              error={daedalusTransfer.error}
-              onCancel={this.cancelTransferFunds}
-            />
+          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+            <TransferLayout>
+              <DaedalusTransferErrorPage
+                error={daedalusTransfer.error}
+                onCancel={this.cancelTransferFunds}
+                classicTheme={theme.classic}
+              />
+            </TransferLayout>
           </MainLayout>
         );
       default:

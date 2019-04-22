@@ -25,6 +25,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
   )
 
   render() {
+    const { theme } = this.props.stores;
     const { currentTheme } = this.props.stores.profile;
     return (
       <DisplaySettings
@@ -34,6 +35,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
         exportTheme={this.exportTheme}
         hasCustomTheme={this.hasCustomTheme}
         onExternalLinkClick={handleExternalLinkClick}
+        classicTheme={theme.classic}
       />
     );
   }

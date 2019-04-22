@@ -16,6 +16,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import config from '../../config';
+import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   title: {
@@ -52,15 +53,19 @@ const messages = defineMessages({
   },
   walletPasswordLabel: {
     id: 'wallet.restore.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Wallet password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.restore.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat password',
+    defaultMessage: '!!!Spending password',
   },
   passwordFieldPlaceholder: {
     id: 'wallet.restore.dialog.passwordFieldPlaceholder',
-    defaultMessage: '!!!Password',
+    defaultMessage: '!!!Spending Password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.restore.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat spending password',
+  },
+  repeatPasswordFieldPlaceholder: {
+    id: 'wallet.restore.dialog.repeatPasswordFieldPlaceholder',
+    defaultMessage: '!!!Repeat spending password',
   },
 });
 
@@ -73,6 +78,7 @@ type Props = {
   mnemonicValidator: Function,
   error?: ?LocalizableError,
   validWords: Array<string>,
+  classicTheme: boolean
 };
 
 @observer
@@ -130,7 +136,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -167,7 +173,9 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error, onCancel } = this.props;
+    const { validWords, isSubmitting, error,
+      onCancel, classicTheme, mnemonicValidator } = this.props;
+    const { walletName, walletPassword, repeatPassword, recoveryPhrase } = form.values();
 
     const dialogClasses = classnames([
       styles.component,
@@ -176,13 +184,26 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const walletNameFieldClasses = classnames([
       'walletName',
-      styles.walletName,
+      classicTheme ? styles.walletNameClassic : styles.walletName,
     ]);
-
     const walletPasswordFieldsClasses = classnames([
       styles.walletPasswordFields,
       styles.show,
     ]);
+    const walletPasswordClasses = classicTheme
+      ? styles.walletPasswordClassic
+      : styles.walletPassword;
+
+    const passwordInstructionsClasses = classicTheme
+      ? styles.passwordInstructionsClassic
+      : styles.passwordInstructions;
+
+    const disabledCondition = !(
+      isValidWalletName(walletName)
+      && mnemonicValidator(join(recoveryPhrase, ' '))
+      && isValidWalletPassword(walletPassword)
+      && isValidRepeatPassword(walletPassword, repeatPassword)
+    );
 
     const walletNameField = form.$('walletName');
     const recoveryPhraseField = form.$('recoveryPhrase');
@@ -194,7 +215,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(messages.importButtonLabel),
         primary: true,
-        disabled: isSubmitting,
+        disabled: isSubmitting || (!classicTheme && disabledCondition),
         onClick: this.submit,
       },
     ];
@@ -204,16 +225,18 @@ export default class WalletRestoreDialog extends Component<Props> {
         className={dialogClasses}
         title={intl.formatMessage(messages.title)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
+        classicTheme={classicTheme}
       >
 
         <Input
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
+          done={isValidWalletName(walletName)}
           error={walletNameField.error}
-          skin={InputSkin}
+          skin={classicTheme ? InputSkin : InputOwnSkin}
         />
 
         <Autocomplete
@@ -226,21 +249,24 @@ export default class WalletRestoreDialog extends Component<Props> {
           skin={AutocompleteSkin}
         />
 
-        <div className={styles.walletPassword}>
+        <div className={walletPasswordClasses}>
           <div className={walletPasswordFieldsClasses}>
             <Input
               className="walletPassword"
               {...walletPasswordField.bind()}
+              done={isValidWalletPassword(walletPassword)}
               error={walletPasswordField.error}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
+              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               error={repeatedPasswordField.error}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
-            <p className={styles.passwordInstructions}>
+
+            <p className={passwordInstructionsClasses}>
               {intl.formatMessage(globalMessages.passwordInstructions)}
             </p>
           </div>

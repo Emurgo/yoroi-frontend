@@ -24,7 +24,8 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onGoToCreateWalletClick: Function
+  onGoToCreateWalletClick: Function,
+  classicTheme: boolean,
 };
 
 export default class AdaRedemptionNoWallets extends Component<Props> {

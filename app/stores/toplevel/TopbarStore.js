@@ -11,7 +11,6 @@ import {
 const topbarConfig = resolver('config/topbarConfig');
 
 export default class TopbarStore extends Store {
-
   CATEGORIES = topbarConfig.CATEGORIES;
 
   @observable activeTopbarCategory: string = this.CATEGORIES[0].route;

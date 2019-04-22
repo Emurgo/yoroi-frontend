@@ -1,7 +1,7 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.dialog {
+.dialogClassic {
   font-family: var(--font-medium);
 
   :global {
@@ -87,6 +87,108 @@
     line-height: 1.38;
     margin-top: 6px;
     word-break: break-word;
+  }
+
+  .walletPassword {
+    margin-top: 20px;
+  }
+
+  .error {
+    @include error-message;
+    text-align: center;
+    margin-top: 17px;
+  }
+}
+
+
+.dialog {
+  font-family: var(--font-regular);
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 55px;
+    }
+  }
+
+  .currencySymbol {
+    font-family: var(--font-regular);
+    text-transform: uppercase;
+  }
+
+  .addressToLabelWrapper,
+  .amountFeesWrapper {
+    margin-bottom: 23px;
+  }
+
+  .addressToLabel {
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 0;
+    line-height: 1.38;
+    margin-left: 0;
+    text-transform: none;
+  }
+
+  .addressTo {
+    font-size: 14px;
+    line-height: 1.57;
+    margin-top: 2px;
+    opacity: 0.4;
+    word-wrap: break-word;
+  }
+
+  .amountFeesWrapper {
+    display: flex;
+    flex-direction: row;
+    .amountWrapper,
+    .feesWrapper {
+      width: 50%;
+    }
+    .amountWrapper {
+      margin-right: 10px;
+    }
+    .feesWrapper {
+      margin-left: 10px;
+    }
+    .amountLabel,
+    .feesLabel {
+      font-size: 16px;
+      font-weight: normal;
+      letter-spacing: 0;
+      line-height: 1.38;
+      margin-left: 0;
+      text-transform: none;
+    }
+    .amount,
+    .fees {
+      color: var(--theme-send-confirmation-dialog-send-values-color);
+      font-size: 14px;
+      line-height: 1.57;
+      margin-top: 2px;
+      word-break: break-word;
+      opacity: 0.4;
+    }
+  }
+
+  .totalAmountLabel {
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 0;
+    line-height: 1.38;
+    margin-left: 0;
+    text-transform: none;
+  }
+
+  .totalAmount {
+    color: var(--theme-send-confirmation-dialog-send-values-color);
+    line-height: 1.57;
+    margin-top: 2px;
+    word-break: break-word;
+    font-family: var(--font-medium);
+
+    .currencySymbol {
+      font-family: var(--font-medium);
+    }
   }
 
   .walletPassword {

@@ -5,7 +5,7 @@ import moment from 'moment/moment';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { THEMES } from '../../themes/index';
+import { THEMES } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 
@@ -20,7 +20,11 @@ export default class SettingsStore extends Store {
     { value: 'ru-RU', label: globalMessages.languageRussian, svg: require('../../assets/images/flags/russian.inline.svg') },
     { value: 'de-DE', label: globalMessages.languageGerman, svg: require('../../assets/images/flags/german.inline.svg') },
     { value: 'fr-FR', label: globalMessages.languageFrench, svg: require('../../assets/images/flags/french.inline.svg') },
-    // { value: 'id-ID', label: globalMessages.languageIndonesian, svg: require('../../assets/images/flags/indonesian.inline.svg') }
+    // {
+    //   value: 'id-ID',
+    //   label: globalMessages.languageIndonesian,
+    //   svg: require('../../assets/images/flags/indonesian.inline.svg')
+    // }
   ];
 
   @observable bigNumberDecimalFormat = {
@@ -118,7 +122,11 @@ export default class SettingsStore extends Store {
   @computed get currentTheme(): string {
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet) return result;
-    return THEMES.YOROI_CLASSIC; // default
+    // TODO: We temporarily disable the new theme on mainnet until it's ready
+    // TODO: Tests were written for the old theme so we need to use it for testing
+    return (environment.isMainnet() || environment.isTest()) ?
+      THEMES.YOROI_CLASSIC :
+      THEMES.YOROI_MODERN;
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */

@@ -262,10 +262,6 @@ export default {
   '--theme-transactions-list-border-color': '#f3f3f5',
   '--theme-transactions-list-group-date-color': '#121327',
   '--theme-transactions-list-item-details-color': '#121327',
-  '--theme-transactions-card-background-color': '#e6ebf2',
-  '--theme-transactions-card-income-background-color': '#e6ebf2',
-  '--theme-transactions-card-expend-background-color': '#f2e6e6',
-  '--theme-transactions-card-exchange-background-color': '#f2e6e6',
   '--theme-transactions-state-failed-background-color': '#bdc5ce',
   '--theme-transactions-state-failed-text-color': '#bdc5ce',
   '--theme-transactions-state-pending-background-color': '#bdc5ce',
@@ -274,7 +270,6 @@ export default {
   '--theme-transactions-priority-low-background-color': '#e8abbb',
   '--theme-transactions-priority-medium-background-color': '#e7d5a3',
   '--theme-transactions-priority-heigh-background-color': '#afdac2',
-  '--theme-transactions-search-background-color': '#fafbfc',
   '--theme-transactions-icon-type-expend-background-color': '#54ca87',
   '--theme-transactions-icon-type-income-background-color': '#9ab2d9',
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
@@ -320,9 +315,6 @@ export default {
 
   '--theme-backup-mnemonic-background-color': '#f3f3f5',
 
-  '--theme-color-error': '#ea4c5b',
-  '--theme-error-text-color': '#daa49a',
-
   '--theme-instructions-text-color': '#121327',
 
   '--theme-label-button-color': '#121327',
@@ -335,6 +327,7 @@ export default {
   '--theme-separation-border-color': '#dfe4e8',
 
   '--theme-support-settings-text-color': '#121327',
+  '--theme-support-settings-link-color': '#121327',
 
   '--theme-terms-of-use-text-color': '#121327',
 

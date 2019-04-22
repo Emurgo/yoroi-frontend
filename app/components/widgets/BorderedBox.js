@@ -6,6 +6,7 @@ import styles from './BorderedBox.scss';
 
 type Props = {
   children?: Node,
+  classicTheme: boolean
 };
 
 @observer
@@ -15,9 +16,9 @@ export default class BorderedBox extends Component<Props> {
   };
 
   render() {
-    const { children } = this.props;
+    const { children, classicTheme } = this.props;
     return (
-      <div className={styles.component}>
+      <div className={classicTheme ? styles.componentClassic : styles.component}>
         {children}
       </div>
     );

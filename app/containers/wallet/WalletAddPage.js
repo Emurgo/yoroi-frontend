@@ -46,7 +46,7 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { topbar } = this.props.stores;
+    const { topbar, theme } = this.props.stores;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -58,6 +58,8 @@ export default class WalletAddPage extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        classicTheme={theme.classic}
+        areCategoriesHidden={!theme.classic}
       />);
 
     const wallets = this._getWalletsStore();
@@ -76,17 +78,33 @@ export default class WalletAddPage extends Component<Props> {
     };
 
     let content = null;
+    let isWalletAdd = false;
     if (uiDialogs.isOpen(WalletCreateDialog)) {
       content = (
-        <WalletCreateDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+        <WalletCreateDialogContainer
+          actions={actions}
+          stores={stores}
+          onClose={this.onClose}
+          classicTheme={theme.classic}
+        />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
       content = (
-        <WalletRestoreDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+        <WalletRestoreDialogContainer
+          actions={actions}
+          stores={stores}
+          onClose={this.onClose}
+          classicTheme={theme.classic}
+        />
       );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       content = (
-        <WalletBackupDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+        <WalletBackupDialogContainer
+          actions={actions}
+          stores={stores}
+          onClose={this.onClose}
+          classicTheme={theme.classic}
+        />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
       content = (
@@ -94,6 +112,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
+          classicTheme={theme.classic}
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
@@ -102,9 +121,11 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
+          classicTheme={theme.classic}
         />
       );
     } else {
+      isWalletAdd = true;
       content = (
         <WalletAdd
           onTrezor={openTrezorConnectDialog}
@@ -114,6 +135,8 @@ export default class WalletAddPage extends Component<Props> {
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           isRestoreActive={isRestoreActive}
+          classicTheme={theme.classic}
+          title={this.context.intl.formatMessage(messages.title)}
         />
       );
     }
@@ -122,6 +145,8 @@ export default class WalletAddPage extends Component<Props> {
       <MainLayout
         topbar={topBar}
         footer={<AddWalletFooter />}
+        noTopbarNoBanner={!theme.classic && isWalletAdd}
+        classicTheme={theme.classic}
       >
         {content}
       </MainLayout>

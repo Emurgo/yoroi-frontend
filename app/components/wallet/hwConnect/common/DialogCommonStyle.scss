@@ -29,7 +29,7 @@ $opacityCommon: 0.7;
   }
 }
 
-.headerBlock {
+.headerBlockClassic {
   width: 725px;
   height: 5em;
   padding-top: 1em;
@@ -41,7 +41,24 @@ $opacityCommon: 0.7;
   }
 }
 
-.middleBlock {
+.headerBlock {
+  padding-top: 16px;
+  letter-spacing: 0;
+  
+  span {
+    font-family: var(--font-regular);
+    line-height: 1.57;
+    font-size: 14px;
+  }  
+}
+
+:global {
+  .AboutDialog_headerBlock.small span {
+    font-size: 12px;
+  }
+}
+
+.middleBlockClassic {
   overflow: hidden;  
   background-color: var(--theme-hw-connect-dialog-middle-block-common-background-color);
   object-fit: contain;
@@ -52,4 +69,12 @@ $opacityCommon: 0.7;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 10px;
+}
+
+.middleBlock {
+  overflow: hidden;  
+  background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
+  object-fit: contain;
+  margin-top: 12px;
+  border-radius: 8px;
 }

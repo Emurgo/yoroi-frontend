@@ -24,6 +24,7 @@ import {
 } from '../../../utils/formatters';
 import dangerIcon from '../../../assets/images/danger.inline.svg';
 import config from '../../../config';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   titleLabel: {
@@ -100,6 +101,7 @@ type Props = {
   isDialogOpen: Function,
   webWalletConfirmationDialogRenderCallback: Function,
   hardwareWalletConfirmationDialogRenderCallback: Function,
+  classicTheme: boolean,
 };
 
 type State = {
@@ -207,6 +209,7 @@ export default class WalletSendForm extends Component<Props, State> {
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
       hasAnyPending,
+      classicTheme,
     } = this.props;
     const {
       transactionFee,
@@ -218,6 +221,10 @@ export default class WalletSendForm extends Component<Props, State> {
     const amountFieldProps = amountField.bind();
     const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
 
+    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
+    const receiverInputClasses = classicTheme ? styles.receiverInputClassic : styles.receiverInput;
+    const amountInputClasses = classicTheme ? styles.amountInputClassic : styles.amountInput;
+
     const hasPendingTxWarning = (
       <div className={styles.contentWarning}>
         <SvgInline svg={dangerIcon} className={styles.icon} />
@@ -226,22 +233,22 @@ export default class WalletSendForm extends Component<Props, State> {
     );
 
     return (
-      <div className={styles.component}>
+      <div className={componentClasses}>
 
         {hasAnyPending && hasPendingTxWarning}
 
-        <BorderedBox>
+        <BorderedBox classicTheme={classicTheme}>
 
-          <div className={styles.receiverInput}>
+          <div className={receiverInputClasses}>
             <Input
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
           </div>
 
-          <div className={styles.amountInput}>
+          <div className={amountInputClasses}>
             <NumericInput
               {...amountFieldProps}
               className="amount"
@@ -254,6 +261,7 @@ export default class WalletSendForm extends Component<Props, State> {
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
               skin={AmountInputSkin}
+              classicTheme={classicTheme}
             />
           </div>
 
@@ -273,10 +281,11 @@ export default class WalletSendForm extends Component<Props, State> {
     * CASE 2: Hardware Wallet (Trezor or Ledger) */
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
+    const { classicTheme } = this.props;
 
     const buttonClasses = classnames([
       'primary',
-      styles.nextButton,
+      classicTheme ? styles.nextButtonClassic : styles.nextButton,
     ]);
 
     const {

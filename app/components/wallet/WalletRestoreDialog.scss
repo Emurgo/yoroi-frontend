@@ -2,11 +2,15 @@
 @import '../../themes/mixins/error-message';
 @import '../../themes/mixins/place-form-field-error-below-input';
 
-.walletName {
+.walletNameClassic {
   margin-bottom: 20px;
 }
 
-.walletPassword {
+.walletName {
+  margin-bottom: 0;
+}
+
+.walletPasswordClassic {
   .walletPasswordSwitch {
     border-top: 1px solid var(--theme-separation-border-color);
     margin-top: 30px;
@@ -55,6 +59,63 @@
       line-height: 1.38;
       margin-top: 16px;
       opacity: 0.5;
+    }
+  }
+}
+
+.walletPassword {
+  .walletPasswordFields {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 400ms ease;
+
+    &.show {
+      max-height: 600px;
+      opacity: 1;
+    }
+
+    & > div {
+      margin-top: 0;
+      width: 100%;
+    }
+
+    .passwordInstructions {
+      color: var(--theme-instructions-text-color);
+      font-family: var(--font-regular);
+      line-height: 1.71;
+      margin-top: 14px;
+      font-size: 14px;
+      letter-spacing: 0;
+
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      li {
+        list-style-type: disc;
+        margin-left: 18px;
+        width: calc(50% - 18px);
+      }
+
+      .successCondition {
+        position: relative;
+        color: var(--theme-password-condition-text-color);
+        list-style-type: none;
+
+        span:first-child {
+          position: absolute;
+          left: -18px;
+        }
+
+        svg {
+          width: 11px;
+        }
+      }
     }
   }
 }

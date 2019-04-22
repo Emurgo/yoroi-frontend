@@ -1,1 +1,13 @@
 // Css module overrides go here …
+
+.input {
+  border: none;
+
+  &:not([disabled]):hover {
+    border-color: var(--rp-input-border-color-focus);
+  }
+
+  &.errored:hover {
+    border-color: var(--rp-input-border-color-errored);
+  }
+}

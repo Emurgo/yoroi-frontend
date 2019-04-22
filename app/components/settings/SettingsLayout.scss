@@ -1,13 +1,13 @@
 @import "./settingsConfig";
 
-.component {
+.componentClassic {
   background-color: var(--theme-settings-body-background-color);
   display: flex;
   height: 100%;
   padding: 0 20px;
 }
 
-.settingsPaneWrapper {
+.settingsPaneWrapperClassic {
   flex: 1;
   overflow-x: hidden;
   overflow-y: overlay;
@@ -18,9 +18,37 @@
   }
 }
 
-.settingsPane {
+.settingsPaneClassic {
   background-color: var(--theme-settings-pane-background-color);
   border: var(--theme-settings-pane-border);
   padding: 20px 20px 10px 20px;
+  overflow: visible;
+}
+
+.component {
+  background-color: var(--theme-settings-body-background-color);
+  display: flex;
+  height: 100%;
+  padding: 0 30px;
+}
+
+.settingsPaneWrapper {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: overlay;
+  padding: 30px 20px 30px 0;
+
+  &::-webkit-scrollbar-button {
+    height: 7px;
+    display: block;
+  }
+}
+
+.settingsPane {
+  min-height: 100%;
+  background-color: var(--theme-settings-pane-background-color);
+  border: var(--theme-settings-pane-border);
+  padding: 30px 30px 20px 30px;
+  border-radius: 8px;
   overflow: visible;
 }
