@@ -23,7 +23,8 @@ import OptionsOverridesClassic from './OptionsOverridesClassic.scss';
 import SelectOverridesClassic from './SelectOverridesClassic.scss';
 import SwitchOverridesClassic from './SwitchOverridesClassic.scss';
 
-import { THEMES } from '../index';
+import type { Themes } from '..';
+import { THEMES } from '..';
 
 const {
   AUTOCOMPLETE,
@@ -39,28 +40,37 @@ const {
   SWITCH
 } = IDENTIFIERS;
 
-export const themeOverrides = (theme) => (theme === THEMES.YOROI_MODERN ? ({
-  [AUTOCOMPLETE]: AutocompleteOverrides,
-  [BUBBLE]: BubbleOverrides,
-  [BUTTON]: ButtonOverrides,
-  [CHECKBOX]: CheckboxOverrides,
-  [FORM_FIELD]: FormFieldOverrides,
-  [INPUT]: InputOverrides,
-  [TEXT_AREA]: TextAreaOverrides,
-  [MODAL]: ModalOverrides,
-  [OPTIONS]: OptionsOverrides,
-  [SELECT]: SelectOverrides,
-  [SWITCH]: SwitchOverrides,
-}) : ({
-  [AUTOCOMPLETE]: AutocompleteOverridesClassic,
-  [BUBBLE]: BubbleOverridesClassic,
-  [BUTTON]: ButtonOverridesClassic,
-  [CHECKBOX]: CheckboxOverridesClassic,
-  [FORM_FIELD]: FormFieldOverridesClassic,
-  [INPUT]: InputOverridesClassic,
-  [TEXT_AREA]: TextAreaOverridesClassic,
-  [MODAL]: ModalOverridesClassic,
-  [OPTIONS]: OptionsOverridesClassic,
-  [SELECT]: SelectOverridesClassic,
-  [SWITCH]: SwitchOverridesClassic,
-}));
+export const themeOverrides = (theme: Themes): Object => {
+  switch (theme) {
+    case THEMES.YOROI_CLASSIC:
+      return ({
+        [AUTOCOMPLETE]: AutocompleteOverridesClassic,
+        [BUBBLE]: BubbleOverridesClassic,
+        [BUTTON]: ButtonOverridesClassic,
+        [CHECKBOX]: CheckboxOverridesClassic,
+        [FORM_FIELD]: FormFieldOverridesClassic,
+        [INPUT]: InputOverridesClassic,
+        [TEXT_AREA]: TextAreaOverridesClassic,
+        [MODAL]: ModalOverridesClassic,
+        [OPTIONS]: OptionsOverridesClassic,
+        [SELECT]: SelectOverridesClassic,
+        [SWITCH]: SwitchOverridesClassic,
+      });
+    case THEMES.YOROI_MODERN:
+      return ({
+        [AUTOCOMPLETE]: AutocompleteOverrides,
+        [BUBBLE]: BubbleOverrides,
+        [BUTTON]: ButtonOverrides,
+        [CHECKBOX]: CheckboxOverrides,
+        [FORM_FIELD]: FormFieldOverrides,
+        [INPUT]: InputOverrides,
+        [TEXT_AREA]: TextAreaOverrides,
+        [MODAL]: ModalOverrides,
+        [OPTIONS]: OptionsOverrides,
+        [SELECT]: SelectOverrides,
+        [SWITCH]: SwitchOverrides,
+      });
+    default:
+      throw new Error(`Unsupported Theme: ${theme}`);
+  }
+};

@@ -14,15 +14,15 @@ import fr from 'react-intl/locale-data/fr';
 import id from 'react-intl/locale-data/id';
 import { Routes } from './Routes';
 import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
-import { themeOverrides } from './themes/overrides/index';
+import { themeOverrides } from './themes/overrides';
 import translations from './i18n/translations';
-import type { StoresMap } from './stores/index';
-import type { ActionsMap } from './actions/index';
+import type { StoresMap } from './stores';
+import type { ActionsMap } from './actions';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import { hot } from 'react-hot-loader';
 
-import { THEMES } from './themes/index';
+import { THEMES } from './themes';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id]);
