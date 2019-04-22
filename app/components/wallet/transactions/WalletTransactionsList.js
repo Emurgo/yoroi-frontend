@@ -38,6 +38,7 @@ type Props = {
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
+  classicTheme: boolean
 };
 
 @observer
@@ -107,13 +108,18 @@ export default class WalletTransactionsList extends Component<Props> {
       assuranceMode,
       walletId,
       formattedWalletAmount,
-      onLoadMore
+      onLoadMore,
+      classicTheme
     } = this.props;
 
     const buttonClasses = classnames([
       'primary',
       styles.showMoreTransactionsButton,
     ]);
+    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
+    const groupClasses = classicTheme ? styles.groupClassic : styles.group;
+    const groupDateClasses = classicTheme ? styles.groupDateClassic : styles.groupDate;
+    const listClasses = classicTheme ? styles.listClassic : styles.list;
 
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
@@ -122,21 +128,21 @@ export default class WalletTransactionsList extends Component<Props> {
     ) : null;
 
     return (
-      <div className={styles.component}>
+      <div className={componentClasses}>
         {transactionsGroups.map(group => (
-          <div className={styles.group} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
-            <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
-            <div className={styles.list}>
+          <div className={groupClasses} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
+            <div className={groupDateClasses}>{this.localizedDate(group.date)}</div>
+            <div className={listClasses}>
               {group.transactions.map((transaction, transactionIndex) => (
-                <div key={`${walletId}-${transaction.id}-${transaction.type}`}>
-                  <Transaction
-                    data={transaction}
-                    isLastInList={transactionIndex === group.transactions.length - 1}
-                    state={transaction.state}
-                    assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
-                    formattedWalletAmount={formattedWalletAmount}
-                  />
-                </div>
+                <Transaction
+                  key={`${walletId}-${transaction.id}-${transaction.type}`}
+                  data={transaction}
+                  isLastInList={transactionIndex === group.transactions.length - 1}
+                  state={transaction.state}
+                  assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
+                  formattedWalletAmount={formattedWalletAmount}
+                  classicTheme={classicTheme}
+                />
               ))}
             </div>
           </div>

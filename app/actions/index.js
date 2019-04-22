@@ -1,4 +1,5 @@
 // @flow
+import ThemeActions from './theme-actions';
 import RouterActions from './router-actions';
 import TopbarActions from './topbar-actions';
 import WalletBackupActions from './wallet-backup-actions';
@@ -9,6 +10,7 @@ import adaActionsMap from './ada/index';
 import type { AdaActionsMap } from './ada/index';
 
 export type ActionsMap = {
+  theme: ThemeActions,
   router: RouterActions,
   topbar: TopbarActions,
   walletBackup: WalletBackupActions,
@@ -19,6 +21,7 @@ export type ActionsMap = {
 };
 
 const actionsMap: ActionsMap = {
+  theme: new ThemeActions(),
   router: new RouterActions(),
   topbar: new TopbarActions(),
   walletBackup: new WalletBackupActions(),

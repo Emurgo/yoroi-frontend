@@ -34,6 +34,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         onSubmit={this.onSubmit}
         onCancel={this.onCancel}
         error={restoreRequest.error}
+        classicTheme={this.props.classicTheme}
       />
     );
   }

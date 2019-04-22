@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
+import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import styles from './AmountInputSkin.scss';
 
 const messages = defineMessages({
@@ -16,6 +18,7 @@ type Props = {
   fees: BigNumber,
   total: BigNumber,
   error: boolean,
+  classicTheme: boolean
 };
 
 export default class AmountInputSkin extends Component<Props> {
@@ -25,20 +28,29 @@ export default class AmountInputSkin extends Component<Props> {
   };
 
   render() {
-    const { error, fees, total, currency } = this.props;
+    const { error, fees, total, currency, classicTheme } = this.props;
     const { intl } = this.context;
+
+    const feesClasses = classicTheme ? styles.feesClassic : styles.fees;
 
     return (
       <div className={styles.root}>
-        <InputSkin {...this.props} />
+        {classicTheme ? <InputSkin {...this.props} /> : <InputOwnSkin {...this.props} />}
         {!error && (
-          <span className={styles.fees}>
+          <span className={feesClasses}>
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
           </span>
         )}
-        <span className={styles.total}>
-          {!error && `= ${total} `}{currency}
-        </span>
+
+        {classicTheme ? (
+          <span className={styles.totalClassic}>
+            {!error && `= ${total} `}{currency}
+          </span>
+        ) : (
+          <span className={classnames([styles.total, error ? styles.error : ''])}>
+            {!error && `= ${total} `}{currency}
+          </span>
+        )}
       </div>
     );
   }

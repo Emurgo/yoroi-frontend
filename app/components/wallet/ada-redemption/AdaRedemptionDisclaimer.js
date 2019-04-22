@@ -31,6 +31,7 @@ const messages = defineMessages({
 
 type Props = {
   onSubmit: Function,
+  classicTheme: boolean,
 };
 
 type State = {

@@ -17,6 +17,7 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 type Props = {
   onSubmit: Function,
   onBack: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -28,13 +29,14 @@ export default class DaedalusTransferMasterKeyFormPage extends Component<Props> 
 
   render() {
     const { intl } = this.context;
-    const { onBack, onSubmit } = this.props;
+    const { onBack, onSubmit, classicTheme } = this.props;
 
     return (
       <TransferMasterKeyPage
         onSubmit={onSubmit}
         onBack={onBack}
         step0={intl.formatMessage(messages.step0)}
+        classicTheme={classicTheme}
       />
     );
   }

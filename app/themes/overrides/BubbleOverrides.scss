@@ -1,0 +1,8 @@
+// Css module overrides go here …
+
+.root:not(.transparent) > div.bubble {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border: 0px solid black;
+  box-shadow: 0 1.5px 5px 1px rgba(0, 0, 0, 0.1);
+}

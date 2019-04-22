@@ -1,4 +1,4 @@
-.component {
+.componentClassic {
 
   .main {
     align-items: center;
@@ -26,6 +26,41 @@
   a {
     color: var(--theme-support-settings-link-color);
     text-decoration: underline;
+  }
+
+  p {
+    margin-bottom: 20px;
+  }
+}
+
+.component {
+  .main {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  & > .label {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-semibold);
+    font-size: 18px;
+    line-height: 1.38;
+    margin-bottom: 11px;
+  }
+
+  a,
+  p {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 19px;
+  }
+
+  a {
+    color: var(--theme-support-settings-link-color);
+    text-decoration: none;
+    font-family: var(--font-semibold);
   }
 
   p {
