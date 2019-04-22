@@ -88,6 +88,10 @@ export default class AddressDetailsDialog extends Component<Props> {
     const qrCodeForegroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
+    const labelStyle = classicTheme ?
+      'SimpleFormField_label FormFieldOverridesClassic_label AddressDetailsDialog_header' :
+      'SimpleFormField_label FormFieldOverrides_label AddressDetailsDialog_header';
+
     return (
       <Dialog
         className={classnames([styles.component, 'AddressDetailsDialog'])}
@@ -111,14 +115,14 @@ export default class AddressDetailsDialog extends Component<Props> {
             </div>
             <br />
             <br />
-            <span className="SimpleFormField_label FormFieldOverrides_label AddressDetailsDialog_header">
+            <span className={labelStyle}>
               {intl.formatMessage(messages.addressLabel)}
             </span>
             <div className={styles.infoBlock}>
               <p>{walletAddress}</p>
             </div>
             <br />
-            <span className="SimpleFormField_label FormFieldOverrides_label AddressDetailsDialog_header">
+            <span className={labelStyle}>
               {intl.formatMessage(messages.derivationPathLabel)}
             </span>
             <div className={styles.infoBlock}>
