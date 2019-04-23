@@ -23,3 +23,11 @@
     background-color: var(--theme-settings-pane-background-color);
   }
 }
+
+:global {
+  .GeneralSettings_language
+  .SimpleOptions_ul
+  .SimpleOptions_option {
+    padding-right: 30px;
+  }
+}

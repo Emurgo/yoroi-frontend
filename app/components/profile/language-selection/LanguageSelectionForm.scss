@@ -58,6 +58,12 @@
       border-color: var(--theme-select-language-color);
     }
   }
+
+  .LanguageSelectionForm_languageSelect
+  .SimpleOptions_ul
+  .SimpleOptions_option {
+    padding-right: 30px;
+  }
 }
 
 .submitButton,
