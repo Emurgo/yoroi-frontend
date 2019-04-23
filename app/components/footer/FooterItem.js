@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import './FooterItem.scss';
 
 import LinkButton from '../widgets/LinkButton';
+import styles from './FooterItem.scss';
+
 
 type Props = {
   url: string,
@@ -19,6 +20,7 @@ export default class FooterItem extends Component<Props> {
         url={url}
         svg={svg}
         message={message}
+        textClassName={styles.text}
       />
     );
   }
