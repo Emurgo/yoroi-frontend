@@ -6,7 +6,9 @@ Tested on Ubuntu 18.04
 
 ### NodeJS
 
-- node [v8.9.4](https://nodejs.org/download/release/v8.9.4/) (if you are using nvm, just execute: `nvm use`)
+If you have `nvm`, just run `nvm use`
+
+Otherwise, you can download `node` manually from [here](https://nodejs.org) but you need to be careful the version matches the one specified in our `package.lock` file.
 
 ### Rust
 
