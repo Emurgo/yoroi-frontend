@@ -21,12 +21,11 @@ $blockHeight: 56px;
     display: inline-block;
     vertical-align: middle;
   }
+  .text {
+    display: inline-block;
+    vertical-align: middle;
+  }
 };
-
-span {
-  display: inline-block;
-  vertical-align: middle;
-}
 
 .block:hover {
   background-color: var(--theme-footer-block-background-color-hover);
