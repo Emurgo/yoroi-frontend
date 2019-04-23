@@ -15,7 +15,7 @@ $rightBlockWidth: $leftBlockWidth;
   }
 }
 
-.component {
+.componentClassic {
   margin-top: 20px;
   margin-left: 20px;
   margin-right: 20px;
@@ -76,4 +76,36 @@ $rightBlockWidth: $leftBlockWidth;
 
 .numberOfTransactions {
   @extend %smallText;
+}
+
+.component {
+  margin-top: 20px;
+  margin-left: 30px;
+  margin-right: 30px;
+  :global {
+    .BorderedBox_component {
+      background: none;
+      border: none;
+
+      > div {
+        height: auto;
+        font-family: var(--font-regular);
+        font-size: 30px;
+        letter-spacing: 0;
+      }
+
+      svg {
+        height: 21px;
+        width: 21px;
+      }
+    }
+  }
+
+  .leftBlock, .rightBlock {
+    padding-top: 33px;
+  }
+
+  .middleBlock {
+    border: none;
+  }
 }

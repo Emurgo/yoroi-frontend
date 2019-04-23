@@ -14,13 +14,15 @@ import fr from 'react-intl/locale-data/fr';
 import id from 'react-intl/locale-data/id';
 import { Routes } from './Routes';
 import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
-import { themeOverrides } from './themes/overrides/index';
+import { themeOverrides } from './themes/overrides';
 import translations from './i18n/translations';
-import type { StoresMap } from './stores/index';
-import type { ActionsMap } from './actions/index';
+import type { StoresMap } from './stores';
+import type { ActionsMap } from './actions';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import { hot } from 'react-hot-loader';
+
+import { THEMES } from './themes';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id]);
@@ -42,6 +44,12 @@ class App extends Component<{
     }
   }
 
+  updateMarkup = () => {
+    const { stores } = this.props;
+    const currentTheme = stores.profile.currentTheme;
+    this.props.actions.theme.changeTheme.trigger({ theme: currentTheme === THEMES.YOROI_CLASSIC });
+  }
+
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -52,13 +60,19 @@ class App extends Component<{
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
     const themeVars = stores.profile.currentThemeVars;
+    const currentTheme = stores.profile.currentTheme;
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager variables={themeVars} />
+        <ThemeManager variables={themeVars} updateMarkup={this.updateMarkup} />
+
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
-        <ThemeProvider theme={yoroiPolymorphTheme} themeOverrides={themeOverrides}>
+        <ThemeProvider
+          key={currentTheme}
+          theme={yoroiPolymorphTheme}
+          themeOverrides={themeOverrides(currentTheme)}
+        >
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             <Router history={history}>
               {Routes(stores, actions)}

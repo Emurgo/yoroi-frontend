@@ -57,7 +57,8 @@ type Props = {
   onCancelBackup: Function,
   onFinishBackup: Function,
   removeWord: Function,
-  hasWord: Function
+  hasWord: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -84,12 +85,14 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       onRestartBackup,
       onCancelBackup,
       onFinishBackup,
-      hasWord
+      hasWord,
+      classicTheme,
     } = this.props;
     const dialogClasses = classnames([
-      styles.component,
+      classicTheme ? styles.componentClassic : styles.component,
       'WalletRecoveryPhraseEntryDialog',
     ]);
+    const wordsClasses = classicTheme ? styles.wordsClassic : styles.words;
 
     const enteredPhraseString = enteredPhrase.reduce((phrase, { word }) => `${phrase} ${word}`, '');
 
@@ -117,39 +120,55 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       });
     }
 
+    const phraseOld = enteredPhraseString;
+    const phrase = enteredPhrase.length ? (
+      <div className={styles.phraseWrapper}>
+        {enteredPhrase.map((item) => (
+          <div key={item.word} className={styles.phraseWord}>{item.word}</div>
+        ))}
+      </div>
+    ) : (
+      <p className={styles.phrasePlaceholder}>
+        {intl.formatMessage(messages.verificationInstructions)}
+      </p>
+    );
+
     return (
       <Dialog
         className={dialogClasses}
         title={intl.formatMessage(globalMessages.recoveryPhraseDialogTitle)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={!isValid ? <DialogBackButton onBack={onRestartBackup} /> : null}
+        classicTheme={classicTheme}
       >
-        {!isValid && (
+        {!isValid && classicTheme ? (
           <WalletRecoveryInstructions
             instructionsText={intl.formatMessage(messages.verificationInstructions)}
+            classicTheme={classicTheme}
           />
-        )}
+        ) : null}
 
-        <WalletRecoveryPhraseMnemonic phrase={enteredPhraseString} />
+        <WalletRecoveryPhraseMnemonic
+          filled={!classicTheme && Boolean(enteredPhrase.length)}
+          phrase={classicTheme ? phraseOld : phrase}
+          classicTheme={classicTheme}
+        />
 
         {!isValid && (
-          <div className={styles.words}>
-            {recoveryPhraseSorted.map(({ word, isActive }, index) => {
-              const handleClick = value => isActive && onAddWord(value);
-
-              return (
-                <MnemonicWord
-                  key={index} // eslint-disable-line react/no-array-index-key
-                  word={word}
-                  index={index}
-                  isActive={isActive}
-                  onClick={handleClick}
-                />
-              );
-            })}
+          <div className={wordsClasses}>
+            {recoveryPhraseSorted.map(({ word, isActive }, index) => (
+              <MnemonicWord
+                key={index} // eslint-disable-line react/no-array-index-key
+                word={word}
+                index={index}
+                isActive={isActive}
+                onClick={(value) => isActive && onAddWord(value)}
+                classicTheme={classicTheme}
+              />
+            ))}
           </div>
         )}
 

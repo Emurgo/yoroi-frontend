@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node } from 'react';
 import { Modal } from 'react-polymorph/lib/components/Modal';
@@ -17,8 +18,11 @@ type Props = {
   className?: string,
   onClose?: Function,
   closeOnOverlayClick?: boolean,
+  modalOverlay?: Object,
+  classicTheme: boolean
 };
 
+@observer
 export default class Dialog extends Component<Props> {
   static defaultProps = {
     title: undefined,
@@ -29,7 +33,19 @@ export default class Dialog extends Component<Props> {
     className: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
+    modalOverlay: undefined,
   };
+
+  setSkin = (props) => {
+    const { modalOverlay } = this.props;
+    // hack to override modal styles
+    const newProps = _.set(
+      { ...props },
+      `theme.${props.themeId}.modal`,
+      `${props.theme[props.themeId].modal} ${modalOverlay}`
+    );
+    return ModalSkin(modalOverlay ? newProps : props);
+  }
 
   render() {
     const {
@@ -41,19 +57,22 @@ export default class Dialog extends Component<Props> {
       className,
       closeButton,
       backButton,
+      classicTheme
     } = this.props;
+    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
+    const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
     return (
       <Modal
         isOpen
         triggerCloseOnOverlayClick={closeOnOverlayClick}
         onClose={onClose}
-        skin={ModalSkin}
+        skin={this.setSkin}
       >
 
         <div className={classnames([styles.dialogWrapper, className])}>
           {title && (
-            <div className={styles.title}>
+            <div className={titleClasses}>
               <h1>{title}</h1>
             </div>)
           }
@@ -69,7 +88,7 @@ export default class Dialog extends Component<Props> {
               {_.map(actions, (action, key) => {
                 const buttonClasses = classnames([
                   action.className ? action.className : null,
-                  action.primary ? 'primary' : 'flat',
+                  action.primary ? 'primary' : secondaryButton,
                 ]);
                 return (
                   <Button

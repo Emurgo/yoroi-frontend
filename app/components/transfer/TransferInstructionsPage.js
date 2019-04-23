@@ -34,9 +34,11 @@ type Props = {
   onMasterKeyConfirm: Function,
   disableTransferFunds: boolean,
   attentionText: string,
+  confirmationTitleText: string,
   confirmationText: string,
   confirmationPaperText: string,
   confirmationMasterKeyText: string,
+  classicTheme: boolean,
 };
 
 @observer
@@ -55,9 +57,11 @@ export default class TransferInstructionsPage extends Component<Props> {
       onMasterKeyConfirm,
       disableTransferFunds,
       attentionText,
+      confirmationTitleText,
       confirmationText,
       confirmationPaperText,
       confirmationMasterKeyText,
+      classicTheme,
     } = this.props;
 
     const instructionsButtonClasses = classnames([
@@ -71,18 +75,19 @@ export default class TransferInstructionsPage extends Component<Props> {
       'primary',
       styles.button,
     ]);
+    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
 
     return (
       <div className="transferInstructionsPageComponent">
 
         { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
         <div className={styles.component}>
-          <BorderedBox>
+          <BorderedBox classicTheme={classicTheme}>
 
             <div className={styles.body}>
 
               <div>
-                <div className={styles.title}>
+                <div className={titleClasses}>
                   {intl.formatMessage(messages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
@@ -106,17 +111,21 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         { /* Confirm transferring funds */ }
         <div className={styles.component}>
-          <BorderedBox>
+          <BorderedBox classicTheme={classicTheme}>
 
             <div className={styles.body}>
 
               <div>
-                <div className={styles.title}>
+                <div className={titleClasses}>
                   {intl.formatMessage(messages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
                   {attentionText}
                 </div>
+              </div>
+
+              <div className={classicTheme ? styles.buttonTitleClassic : styles.buttonTitle}>
+                {confirmationTitleText}
               </div>
 
               <Button

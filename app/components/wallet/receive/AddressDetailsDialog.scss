@@ -34,3 +34,7 @@
     border: var(--theme-bordered-box-border);
   }
 }
+
+.modalOverlay {
+  max-width: unset!important;
+}

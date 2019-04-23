@@ -2,9 +2,28 @@
   position: relative;
 }
 
+.feesClassic {
+  position: absolute;
+  bottom: 56px;
+  right: 10px;
+  color: var(--theme-input-right-floating-text-color);
+  font-family: var(--font-regular);
+  font-size: 11px;
+}
+
+.totalClassic {
+  position: absolute;
+  bottom: 22px;
+  right: 10px;
+  color: var(--theme-input-right-floating-text-color);
+  font-family: var(--font-light);
+  font-size: 15px;
+  text-transform: uppercase;
+}
+
 .fees {
   position: absolute;
-  bottom: 46px;
+  bottom: 80px;
   right: 10px;
   color: var(--theme-input-right-floating-text-color);
   font-family: var(--font-regular);
@@ -13,10 +32,14 @@
 
 .total {
   position: absolute;
-  bottom: 12px;
+  bottom: 40px;
   right: 10px;
   color: var(--theme-input-right-floating-text-color);
   font-family: var(--font-light);
   font-size: 15px;
   text-transform: uppercase;
+
+  &.error {
+    right: 47px;
+  }
 }

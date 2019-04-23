@@ -41,6 +41,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       continueToRecoveryPhraseForWalletBackup
     } = actions.walletBackup;
     const { createWalletRequest } = stores.substores[environment.API].wallets;
+    const { classicTheme } = this.props;
     return (
       <WalletBackupDialog
         // Global props for all dialogs
@@ -74,6 +75,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         }}
         onRestartBackup={restartWalletBackup.trigger}
         recoveryPhraseSorted={recoveryPhraseSorted}
+        classicTheme={classicTheme}
       />
     );
   }

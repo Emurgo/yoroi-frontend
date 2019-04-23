@@ -32,6 +32,7 @@ const messages = defineMessages({
 type Props = {
   activeChoice: RedemptionTypeChoices,
   onSelectChoice: Function,
+  classicTheme: boolean,
 };
 
 @observer

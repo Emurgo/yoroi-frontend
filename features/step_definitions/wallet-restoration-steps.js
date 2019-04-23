@@ -18,7 +18,7 @@ When(/^I enter the recovery phrase:$/, async function (table) {
   const recoveryPhrase = fields.recoveryPhrase.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.input('.AutocompleteOverrides_autocompleteWrapper input', word);
+    await this.input('.AutocompleteOverridesClassic_autocompleteWrapper input', word);
     await this.click(`//li[contains(text(), '${word}')]`, By.xpath);
   }
 });
@@ -30,13 +30,13 @@ When(/^I enter the master key:$/, async function (table) {
 
 When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
   const words = table.hashes()[0];
-  await this.input('.AutocompleteOverrides_autocompleteWrapper input', words.word);
+  await this.input('.AutocompleteOverridesClassic_autocompleteWrapper input', words.word);
   const lastWord = await this.driver.findElements(By.xpath(`//span[contains(text(), '${words.word}')]`));
   expect(lastWord.length).to.be.equal(0);
 });
 
 When(/^I clear the recovery phrase$/, async function () {
-  await this.clearInputUpdatingForm('.AutocompleteOverrides_autocompleteWrapper input', 15);
+  await this.clearInputUpdatingForm('.AutocompleteOverridesClassic_autocompleteWrapper input', 15);
 });
 
 When(/^I enter the restored wallet password:$/, async function (table) {
@@ -59,7 +59,7 @@ Then(/^I should see an "Invalid recovery phrase" error message$/, async function
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.title.label' });
-  await this.waitUntilText('.Dialog_title', restoreMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.Dialog_titleClassic', restoreMessage.toUpperCase(), 2000);
 });
 
 Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
@@ -73,7 +73,7 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.AutocompleteOverrides_autocompleteWrapper .SimpleFormField_error';
+  const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 

@@ -1,14 +1,14 @@
-$blockHeight: 55px;
+$blockHeight: 56px;
 
 .component {
   display: block;
   width: 100%;
   font-size: 14px;
-  font-family: var(--font-regular);
+  font-family: var(--rp-theme-font-regular);
   a {
     display: block;
     opacity: 0.7;
-    color: var(--font-black);
+    color: var(--rp-theme-font-black);
   }
 }
 
