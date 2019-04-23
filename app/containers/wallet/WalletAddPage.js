@@ -78,7 +78,6 @@ export default class WalletAddPage extends Component<Props> {
     };
 
     let content = null;
-    let isWalletAdd = false;
     if (uiDialogs.isOpen(WalletCreateDialog)) {
       content = (
         <WalletCreateDialogContainer
@@ -125,7 +124,6 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else {
-      isWalletAdd = true;
       content = (
         <WalletAdd
           onTrezor={openTrezorConnectDialog}
@@ -145,7 +143,6 @@ export default class WalletAddPage extends Component<Props> {
       <MainLayout
         topbar={topBar}
         footer={<AddWalletFooter />}
-        noTopbarNoBanner={!theme.classic && isWalletAdd}
         classicTheme={theme.classic}
       >
         {content}
