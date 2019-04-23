@@ -37,7 +37,7 @@ type Props = {
   isValid: Function,
   validationErrorMessage: string,
   successfullyUpdated: boolean,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 type State = {
@@ -135,13 +135,13 @@ export default class InlineEditingInput extends Component<Props, State> {
       isActive,
       inputFieldValue,
       successfullyUpdated,
-      classicTheme,
+      isClassicThemeActive,
     } = this.props;
     const { intl } = this.context;
     const inputField = validator.$('inputField');
     const componentStyles = classnames([
       className,
-      classicTheme ? styles.componentClassic : styles.component,
+      isClassicThemeActive ? styles.componentClassic : styles.component,
       isActive ? null : styles.inactive,
     ]);
     const inputStyles = classnames([
@@ -171,7 +171,7 @@ export default class InlineEditingInput extends Component<Props, State> {
           error={isActive ? inputField.error : null}
           disabled={!isActive}
           ref={(input) => { this.inputField = input; }}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
         />
 
         {isActive && (

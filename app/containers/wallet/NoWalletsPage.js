@@ -12,7 +12,7 @@ export default class NoWalletsPage extends Component<any> {
     const { stores } = this.props;
     const { theme } = stores;
     return (
-      <Layout classicTheme={theme.classic}>
+      <Layout isClassicThemeActive={theme.isClassicThemeActive}>
         <div />
       </Layout>
     );

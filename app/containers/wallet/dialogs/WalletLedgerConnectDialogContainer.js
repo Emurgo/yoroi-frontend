@@ -41,7 +41,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             error={ledgerConnectStore.error}
             submit={hwConnectActions.submitAbout.trigger}
             cancel={this.cancel}
-            classicTheme={theme.classic}
+            isClassicThemeActive={theme.isClassicThemeActive}
           />);
         break;
       case ProgressStep.CONNECT:
@@ -53,7 +53,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             goBack={hwConnectActions.goBackToAbout.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
-            classicTheme={theme.classic}
+            isClassicThemeActive={theme.isClassicThemeActive}
           />);
         break;
       case ProgressStep.SAVE:
@@ -65,7 +65,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             defaultWalletName={ledgerConnectStore.defaultWalletName}
             submit={hwConnectActions.submitSave.trigger}
             cancel={this.cancel}
-            classicTheme={theme.classic}
+            isClassicThemeActive={theme.isClassicThemeActive}
           />);
         break;
       default:

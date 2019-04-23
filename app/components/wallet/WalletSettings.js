@@ -47,7 +47,7 @@ type Props = {
   isInvalid: boolean,
   lastUpdatedField: ?string,
   showPasswordBlock: boolean,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -75,7 +75,7 @@ export default class WalletSettings extends Component<Props> {
       nameValidator, activeField,
       isSubmitting, isInvalid,
       lastUpdatedField, dialog,
-      showPasswordBlock, classicTheme,
+      showPasswordBlock, isClassicThemeActive,
     } = this.props;
     const passwordMessage = (
       intl.formatMessage(messages.passwordLastUpdated, {
@@ -97,7 +97,7 @@ export default class WalletSettings extends Component<Props> {
           isValid={nameValidator}
           validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
           successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
-          classicTheme={classicTheme}
+          isClassicThemeActive={isClassicThemeActive}
         />
 
         {showPasswordBlock &&
@@ -108,7 +108,7 @@ export default class WalletSettings extends Component<Props> {
             onClick={() => openDialogAction({
               dialog: ChangeWalletPasswordDialog,
             })}
-            classicTheme={classicTheme}
+            isClassicThemeActive={isClassicThemeActive}
           />}
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}

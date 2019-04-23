@@ -51,7 +51,7 @@ const messages = defineMessages({
 type Props = {
   onExternalLinkClick: Function,
   onDownloadLogs: Function,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -62,7 +62,7 @@ export default class SupportSettings extends Component<Props> {
   };
 
   render() {
-    const { onExternalLinkClick, onDownloadLogs, classicTheme } = this.props;
+    const { onExternalLinkClick, onDownloadLogs, isClassicThemeActive } = this.props;
     const { intl } = this.context;
 
     const faqLink = (
@@ -90,7 +90,7 @@ export default class SupportSettings extends Component<Props> {
     );
 
     return (
-      <div className={classicTheme ? styles.componentClassic : styles.component}>
+      <div className={isClassicThemeActive ? styles.componentClassic : styles.component}>
 
         <h1>{intl.formatMessage(messages.faqTitle)}</h1>
 

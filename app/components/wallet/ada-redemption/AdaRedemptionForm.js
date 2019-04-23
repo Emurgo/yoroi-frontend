@@ -188,7 +188,7 @@ type Props = {
   redemptionCode: ?string,
   error: ?LocalizableError,
   suggestedMnemonics: Array<string>,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -364,7 +364,7 @@ export default class AdaRedemptionForm extends Component<Props> {
       onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting, onCertificateSelected,
       isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate, showPassPhraseWidget,
       suggestedMnemonics, showInputForDecryptionKey, showInputsForDecryptingForceVendedCertificate,
-      isRedemptionDisclaimerAccepted, onAcceptRedemptionDisclaimer, classicTheme
+      isRedemptionDisclaimerAccepted, onAcceptRedemptionDisclaimer, isClassicThemeActive
     } = this.props;
 
     const certificateField = form.$('certificate');
@@ -439,7 +439,7 @@ export default class AdaRedemptionForm extends Component<Props> {
     return (
       <div>
         <div className={styles.scrollableContent}>
-          <BorderedBox classicTheme={classicTheme}>
+          <BorderedBox isClassicThemeActive={isClassicThemeActive}>
             <h1 className={styles.headline}>{intl.formatMessage(messages.headline)}</h1>
 
             <AdaRedemptionChoices
@@ -449,7 +449,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                 if (isRedemptionTypeChanged) resetForm();
                 onChooseRedemptionType(choice);
               }}
-              classicTheme={classicTheme}
+              isClassicThemeActive={isClassicThemeActive}
             />
 
             <div className={styles.instructions}>
@@ -475,7 +475,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     }}
                     disabled={isRecovery || isCertificateSelected}
                     error={redemptionKeyField.error}
-                    skin={classicTheme ? InputSkin : InputOwnSkin}
+                    skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
                   />
                 ) : (
                   <Input
@@ -484,7 +484,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     {...shieldedRedemptionKeyField.bind()}
                     disabled={isCertificateSelected}
                     error={shieldedRedemptionKeyField.error}
-                    skin={classicTheme ? InputSkin : InputOwnSkin}
+                    skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
                   />
                 )}
 
@@ -543,7 +543,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="decryption-key"
                   {...decryptionKeyField.bind()}
                   error={decryptionKeyField.error}
-                  skin={classicTheme ? InputSkin : InputOwnSkin}
+                  skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -555,7 +555,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="email"
                   {...emailField.bind()}
                   error={emailField.error}
-                  skin={classicTheme ? InputSkin : InputOwnSkin}
+                  skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -567,7 +567,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-passcode"
                   {...adaPasscodeField.bind()}
                   error={adaPasscodeField.error}
-                  skin={classicTheme ? InputSkin : InputOwnSkin}
+                  skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -579,7 +579,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-amount"
                   {...adaAmountField.bind()}
                   error={adaAmountField.error}
-                  skin={classicTheme ? InputSkin : InputOwnSkin}
+                  skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -599,7 +599,7 @@ export default class AdaRedemptionForm extends Component<Props> {
         {!isRedemptionDisclaimerAccepted ? (
           <AdaRedemptionDisclaimer
             onSubmit={onAcceptRedemptionDisclaimer}
-            classicTheme={classicTheme}
+            isClassicThemeActive={isClassicThemeActive}
           />
         ) : null}
       </div>

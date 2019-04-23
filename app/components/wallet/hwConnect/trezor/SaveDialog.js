@@ -50,7 +50,7 @@ type Props = {
   defaultWalletName: string,
   submit: Function,
   cancel: Function,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 @observer
@@ -89,18 +89,22 @@ export default class SaveDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
+    const { progressInfo, isActionProcessing, error, cancel, isClassicThemeActive } = this.props;
 
     const walletNameFieldClasses = classnames([
       'walletName',
       styles.walletName,
     ]);
     const walletNameField = this.form.$('walletName');
-    const headerBlockClasses = classicTheme
+    const headerBlockClasses = isClassicThemeActive
       ? classnames([styles.headerBlockClassic, styles.headerSaveBlockClassic])
       : styles.headerBlock;
-    const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
-    const middleBlockErrorClasses = classicTheme ? styles.middleSaveErrorBlockClassic : null;
+    const middleBlockClasses = isClassicThemeActive ?
+      styles.middleBlockClassic :
+      styles.middleBlock;
+    const middleBlockErrorClasses = isClassicThemeActive ?
+      styles.middleSaveErrorBlockClassic :
+      null;
 
     const walletNameBlock = (
       <div className={headerBlockClasses}>
@@ -108,7 +112,7 @@ export default class SaveDialog extends Component<Props> {
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
         />
         <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);
@@ -120,19 +124,19 @@ export default class SaveDialog extends Component<Props> {
       case StepState.LOAD:
         middleBlock = (
           <div className={classnames([middleBlockClasses, styles.middleSaveLoadBlock])}>
-            <SvgInline svg={classicTheme ? saveLoadSVG : saveLoadImage} />
+            <SvgInline svg={isClassicThemeActive ? saveLoadSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
           <div className={classnames([middleBlockClasses, styles.middleSaveStartProcessBlock])}>
-            <SvgInline svg={classicTheme ? saveStartSVG : saveLoadImage} />
+            <SvgInline svg={isClassicThemeActive ? saveStartSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
           <div className={classnames([middleBlockClasses, middleBlockErrorClasses])}>
-            <SvgInline svg={classicTheme ? saveErrorSVG : saveErrorImage} />
+            <SvgInline svg={isClassicThemeActive ? saveErrorSVG : saveErrorImage} />
           </div>);
         break;
       default:
@@ -156,20 +160,31 @@ export default class SaveDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={cancel}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock
+          progressInfo={progressInfo}
+          isClassicThemeActive={isClassicThemeActive}
+        />
         {walletNameBlock}
         {middleBlock}
 
-        {!classicTheme && (
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        {!isClassicThemeActive && (
+          <HWErrorBlock
+            progressInfo={progressInfo}
+            error={error}
+            isClassicThemeActive={isClassicThemeActive}
+          />
         )}
 
-        <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <HelpLinkBlock progressInfo={progressInfo} isClassicThemeActive={isClassicThemeActive} />
 
-        {classicTheme && (
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        {isClassicThemeActive && (
+          <HWErrorBlock
+            progressInfo={progressInfo}
+            error={error}
+            isClassicThemeActive={isClassicThemeActive}
+          />
         )}
       </Dialog>);
   }

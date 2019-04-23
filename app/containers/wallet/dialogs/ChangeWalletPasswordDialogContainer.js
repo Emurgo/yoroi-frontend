@@ -43,7 +43,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
         }}
         isSubmitting={updateWalletPasswordRequest.isExecuting}
         error={updateWalletPasswordRequest.error}
-        classicTheme={theme.classic}
+        isClassicThemeActive={theme.isClassicThemeActive}
       />
     );
   }

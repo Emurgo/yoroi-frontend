@@ -48,7 +48,7 @@ type Props = {
   isHardware: boolean,
   walletAddress: string,
   walletPath: BIP32Path,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -68,7 +68,7 @@ export default class AddressDetailsDialog extends Component<Props> {
       walletPath,
       cancel,
       isHardware,
-      classicTheme,
+      isClassicThemeActive,
     } = this.props;
 
     const dialogActions = !isHardware
@@ -88,7 +88,7 @@ export default class AddressDetailsDialog extends Component<Props> {
     const qrCodeForegroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
-    const labelStyle = classicTheme ?
+    const labelStyle = isClassicThemeActive ?
       'SimpleFormField_label FormFieldOverridesClassic_label AddressDetailsDialog_header' :
       'SimpleFormField_label FormFieldOverrides_label AddressDetailsDialog_header';
 
@@ -101,7 +101,7 @@ export default class AddressDetailsDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
         modalOverlay={styles.modalOverlay}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       >
         {walletAddress ? (
           <div>

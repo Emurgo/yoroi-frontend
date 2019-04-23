@@ -38,7 +38,7 @@ type Props = {
   confirmationText: string,
   confirmationPaperText: string,
   confirmationMasterKeyText: string,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -61,7 +61,7 @@ export default class TransferInstructionsPage extends Component<Props> {
       confirmationText,
       confirmationPaperText,
       confirmationMasterKeyText,
-      classicTheme,
+      isClassicThemeActive,
     } = this.props;
 
     const instructionsButtonClasses = classnames([
@@ -75,14 +75,14 @@ export default class TransferInstructionsPage extends Component<Props> {
       'primary',
       styles.button,
     ]);
-    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
+    const titleClasses = isClassicThemeActive ? styles.titleClassic : styles.title;
 
     return (
       <div className="transferInstructionsPageComponent">
 
         { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
         <div className={styles.component}>
-          <BorderedBox classicTheme={classicTheme}>
+          <BorderedBox isClassicThemeActive={isClassicThemeActive}>
 
             <div className={styles.body}>
 
@@ -111,7 +111,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         { /* Confirm transferring funds */ }
         <div className={styles.component}>
-          <BorderedBox classicTheme={classicTheme}>
+          <BorderedBox isClassicThemeActive={isClassicThemeActive}>
 
             <div className={styles.body}>
 
@@ -124,7 +124,11 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
               </div>
 
-              <div className={classicTheme ? styles.buttonTitleClassic : styles.buttonTitle}>
+              <div
+                className={isClassicThemeActive ?
+                  styles.buttonTitleClassic :
+                  styles.buttonTitle}
+              >
                 {confirmationTitleText}
               </div>
 

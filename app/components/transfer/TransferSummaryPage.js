@@ -49,7 +49,7 @@ type Props = {
   onCancel: Function,
   error: ?LocalizableError,
   addressFromSubLabel: string,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 /** Show user what the transfer would do to get final confirmation */
@@ -62,7 +62,13 @@ export default class TransferSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, addressFromSubLabel, classicTheme } = this.props;
+    const {
+      transferTx,
+      isSubmitting,
+      error,
+      addressFromSubLabel,
+      isClassicThemeActive
+    } = this.props;
 
     const receiver = transferTx.receiver;
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
@@ -71,10 +77,14 @@ export default class TransferSummaryPage extends Component<Props> {
       transferTx.recoveredBalance.minus(transferTx.fee)
     );
 
-    const addressLabelClasses = classicTheme ? styles.addressLabelClassic : styles.addressLabel;
-    const amountLabelClasses = classicTheme ? styles.amountLabelClassic : styles.amountLabel;
-    const feesLabelClasses = classicTheme ? styles.feesLabelClassic : styles.feesLabel;
-    const totalAmountLabelClasses = classicTheme
+    const addressLabelClasses = isClassicThemeActive ?
+      styles.addressLabelClassic :
+      styles.addressLabel;
+    const amountLabelClasses = isClassicThemeActive ?
+      styles.amountLabelClassic :
+      styles.amountLabel;
+    const feesLabelClasses = isClassicThemeActive ? styles.feesLabelClassic : styles.feesLabel;
+    const totalAmountLabelClasses = isClassicThemeActive
       ? styles.totalAmountLabelClassic
       : styles.totalAmountLabel;
 
@@ -86,13 +96,13 @@ export default class TransferSummaryPage extends Component<Props> {
 
     const cancelButtonClasses = classnames([
       'cancelTransferButton',
-      classicTheme ? 'flat' : 'outlined',
+      isClassicThemeActive ? 'flat' : 'outlined',
       styles.button,
     ]);
 
     return (
       <div className={styles.component}>
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox isClassicThemeActive={isClassicThemeActive}>
 
           <div className={styles.body}>
 

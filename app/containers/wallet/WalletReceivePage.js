@@ -112,11 +112,11 @@ export default class WalletReceivePage extends Component<Props, State> {
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
-          classicTheme={theme.classic}
+          isClassicThemeActive={theme.isClassicThemeActive}
           notification={notificationComponent}
         />
 
-        {theme.classic && notificationComponent}
+        {theme.isClassicThemeActive && notificationComponent}
 
         {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
           <AddressDetailsDialog
@@ -127,7 +127,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             isHardware={wallet.isHardwareWallet}
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger({ wallet })}
             cancel={() => actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger()}
-            classicTheme={theme.classic}
+            isClassicThemeActive={theme.isClassicThemeActive}
           />
         ) : null}
 

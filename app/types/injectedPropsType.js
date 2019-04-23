@@ -14,5 +14,5 @@ export type InjectedContainerProps = InjectedProps & {
 
 export type InjectedDialogContainerProps = InjectedContainerProps & {
   onClose: Function,
-  classicTheme: false
+  isClassicThemeActive: false
 };

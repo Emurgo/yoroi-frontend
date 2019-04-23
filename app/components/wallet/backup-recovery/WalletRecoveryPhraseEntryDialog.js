@@ -58,7 +58,7 @@ type Props = {
   onFinishBackup: Function,
   removeWord: Function,
   hasWord: Function,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -86,13 +86,13 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       onCancelBackup,
       onFinishBackup,
       hasWord,
-      classicTheme,
+      isClassicThemeActive,
     } = this.props;
     const dialogClasses = classnames([
-      classicTheme ? styles.componentClassic : styles.component,
+      isClassicThemeActive ? styles.componentClassic : styles.component,
       'WalletRecoveryPhraseEntryDialog',
     ]);
-    const wordsClasses = classicTheme ? styles.wordsClassic : styles.words;
+    const wordsClasses = isClassicThemeActive ? styles.wordsClassic : styles.words;
 
     const enteredPhraseString = enteredPhrase.reduce((phrase, { word }) => `${phrase} ${word}`, '');
 
@@ -142,19 +142,19 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={!isValid ? <DialogBackButton onBack={onRestartBackup} /> : null}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       >
-        {!isValid && classicTheme ? (
+        {!isValid && isClassicThemeActive ? (
           <WalletRecoveryInstructions
             instructionsText={intl.formatMessage(messages.verificationInstructions)}
-            classicTheme={classicTheme}
+            isClassicThemeActive={isClassicThemeActive}
           />
         ) : null}
 
         <WalletRecoveryPhraseMnemonic
-          filled={!classicTheme && Boolean(enteredPhrase.length)}
-          phrase={classicTheme ? phraseOld : phrase}
-          classicTheme={classicTheme}
+          filled={!isClassicThemeActive && Boolean(enteredPhrase.length)}
+          phrase={isClassicThemeActive ? phraseOld : phrase}
+          isClassicThemeActive={isClassicThemeActive}
         />
 
         {!isValid && (
@@ -166,7 +166,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
                 index={index}
                 isActive={isActive}
                 onClick={(value) => isActive && onAddWord(value)}
-                classicTheme={classicTheme}
+                isClassicThemeActive={isClassicThemeActive}
               />
             ))}
           </div>

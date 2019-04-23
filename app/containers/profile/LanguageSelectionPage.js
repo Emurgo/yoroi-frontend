@@ -37,17 +37,17 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={theme.classic}
+        isClassicThemeActive={theme.isClassicThemeActive}
       />);
     return (
       <TopBarLayout
         topbar={topBar}
-        classicTheme={theme.classic}
-        noTopbarNoBanner={!theme.classic}
+        isClassicThemeActive={theme.isClassicThemeActive}
+        noTopbarNoBanner={!theme.isClassicThemeActive}
         languageSelectionBackground
       >
         <LanguageSelectionForm
-          classicTheme={theme.classic}
+          isClassicThemeActive={theme.isClassicThemeActive}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
           languages={LANGUAGE_OPTIONS}

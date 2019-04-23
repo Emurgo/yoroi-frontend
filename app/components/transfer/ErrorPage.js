@@ -13,7 +13,7 @@ type Props = {
   onCancel: Function,
   title: string,
   backButtonLabel: string,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -28,9 +28,9 @@ export default class ErrorPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { error, onCancel, title, backButtonLabel, classicTheme } = this.props;
+    const { error, onCancel, title, backButtonLabel, isClassicThemeActive } = this.props;
     const backButtonClasses = classnames([
-      classicTheme ? 'flat' : 'outlined',
+      isClassicThemeActive ? 'flat' : 'outlined',
       styles.button,
     ]);
 

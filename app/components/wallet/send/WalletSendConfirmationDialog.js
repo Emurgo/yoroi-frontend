@@ -45,7 +45,7 @@ type Props = {
   isSubmitting: boolean,
   error: ?LocalizableError,
   currencyUnit: string,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 @observer
@@ -106,7 +106,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       isSubmitting,
       error,
       currencyUnit,
-      classicTheme
+      isClassicThemeActive
     } = this.props;
 
     const confirmButtonClasses = classnames([
@@ -136,9 +136,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         actions={actions}
         closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
-        className={classicTheme ? styles.dialogClassic : styles.dialog}
+        className={isClassicThemeActive ? styles.dialogClassic : styles.dialog}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       >
         <div className={styles.walletPasswordFields}>
           <div className={styles.addressToLabelWrapper}>
@@ -183,7 +183,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
             />
           }
         </div>

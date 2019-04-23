@@ -46,7 +46,7 @@ type Props = {
   validWords: Array<string>,
   step0: string,
   mnemonicLength: number,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 @observer
@@ -95,7 +95,7 @@ export default class TransferMnemonicPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, onBack, step0, mnemonicLength, classicTheme } = this.props;
+    const { validWords, onBack, step0, mnemonicLength, isClassicThemeActive } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -104,7 +104,7 @@ export default class TransferMnemonicPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      classicTheme ? 'flat' : 'outlined',
+      isClassicThemeActive ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -112,13 +112,13 @@ export default class TransferMnemonicPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox isClassicThemeActive={isClassicThemeActive}>
 
           <div className={styles.body}>
 
             { /* Instructions for how to transfer */ }
             <div>
-              <div className={classicTheme ? styles.titleClassic : styles.title}>
+              <div className={isClassicThemeActive ? styles.titleClassic : styles.title}>
                 {intl.formatMessage(messages.instructionTitle)}
               </div>
 

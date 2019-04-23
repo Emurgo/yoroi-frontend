@@ -61,7 +61,7 @@ type Props = {
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -79,10 +79,10 @@ export default class AboutDialog extends Component<Props> {
       error,
       submit,
       cancel,
-      classicTheme,
+      isClassicThemeActive,
     } = this.props;
-    const headerBlockClasses = classicTheme ? styles.headerBlockClassic : classnames([styles.headerBlock, 'small']);
-    const middleBlockClasses = classicTheme
+    const headerBlockClasses = isClassicThemeActive ? styles.headerBlockClassic : classnames([styles.headerBlock, 'small']);
+    const middleBlockClasses = isClassicThemeActive
       ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])
       : classnames([styles.middleBlock, styles.middleAboutBlock]);
 
@@ -95,7 +95,7 @@ export default class AboutDialog extends Component<Props> {
 
     const middleBlock = (
       <div className={middleBlockClasses}>
-        {!classicTheme && <SvgInline svg={aboutLedgerSVG} />}
+        {!isClassicThemeActive && <SvgInline svg={aboutLedgerSVG} />}
 
         <div className={styles.prerequisiteBlock}>
           <div>
@@ -119,7 +119,7 @@ export default class AboutDialog extends Component<Props> {
             <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
           </ul>
         </div>
-        {classicTheme && (
+        {isClassicThemeActive && (
           <div className={styles.hwImageBlock}>
             <SvgInline svg={aboutPrerequisiteTrezorSVG} />
           </div>
@@ -142,13 +142,20 @@ export default class AboutDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock
+          progressInfo={progressInfo}
+          isClassicThemeActive={isClassicThemeActive}
+        />
         {introBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} />
-        <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        <HWErrorBlock
+          progressInfo={progressInfo}
+          error={error}
+          isClassicThemeActive={isClassicThemeActive}
+        />
       </Dialog>);
   }
 }

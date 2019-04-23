@@ -101,7 +101,7 @@ type Props = {
   isDialogOpen: Function,
   webWalletConfirmationDialogRenderCallback: Function,
   hardwareWalletConfirmationDialogRenderCallback: Function,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 type State = {
@@ -209,7 +209,7 @@ export default class WalletSendForm extends Component<Props, State> {
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
       hasAnyPending,
-      classicTheme,
+      isClassicThemeActive,
     } = this.props;
     const {
       transactionFee,
@@ -221,9 +221,13 @@ export default class WalletSendForm extends Component<Props, State> {
     const amountFieldProps = amountField.bind();
     const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
 
-    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
-    const receiverInputClasses = classicTheme ? styles.receiverInputClassic : styles.receiverInput;
-    const amountInputClasses = classicTheme ? styles.amountInputClassic : styles.amountInput;
+    const componentClasses = isClassicThemeActive ? styles.componentClassic : styles.component;
+    const receiverInputClasses = isClassicThemeActive ?
+      styles.receiverInputClassic :
+      styles.receiverInput;
+    const amountInputClasses = isClassicThemeActive ?
+      styles.amountInputClassic :
+      styles.amountInput;
 
     const hasPendingTxWarning = (
       <div className={styles.contentWarning}>
@@ -237,14 +241,14 @@ export default class WalletSendForm extends Component<Props, State> {
 
         {hasAnyPending && hasPendingTxWarning}
 
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox isClassicThemeActive={isClassicThemeActive}>
 
           <div className={receiverInputClasses}>
             <Input
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
             />
           </div>
 
@@ -261,7 +265,7 @@ export default class WalletSendForm extends Component<Props, State> {
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
               skin={AmountInputSkin}
-              classicTheme={classicTheme}
+              isClassicThemeActive={isClassicThemeActive}
             />
           </div>
 
@@ -281,11 +285,11 @@ export default class WalletSendForm extends Component<Props, State> {
     * CASE 2: Hardware Wallet (Trezor or Ledger) */
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
-    const { classicTheme } = this.props;
+    const { isClassicThemeActive } = this.props;
 
     const buttonClasses = classnames([
       'primary',
-      classicTheme ? styles.nextButtonClassic : styles.nextButton,
+      isClassicThemeActive ? styles.nextButtonClassic : styles.nextButton,
     ]);
 
     const {

@@ -17,7 +17,7 @@ const messages = defineMessages({
 });
 
 type Props = {
-  classicTheme: ?boolean,
+  isClassicThemeActive: ?boolean,
 };
 
 @observer
@@ -29,9 +29,11 @@ export default class TestnetWarningBanner extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { classicTheme } = this.props;
+    const { isClassicThemeActive } = this.props;
 
-    const testnetClasses = classicTheme ? styles.testnetWarningClassic : styles.testnetWarning;
+    const testnetClasses = isClassicThemeActive ?
+      styles.testnetWarningClassic :
+      styles.testnetWarning;
 
     const faqLink = (
       <a
@@ -47,7 +49,7 @@ export default class TestnetWarningBanner extends Component<Props> {
         {
           environment.isMainnet() ? null : (
             <div className={testnetClasses}>
-              {classicTheme ?
+              {isClassicThemeActive ?
                 (
                   <FormattedMessage
                     {...messages.testnetLabel}

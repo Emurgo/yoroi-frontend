@@ -28,7 +28,7 @@ type Props = {
   recoveryPhrase: string,
   onStartWalletBackup: Function,
   onCancelBackup: Function,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 @observer
@@ -44,7 +44,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
       recoveryPhrase,
       onStartWalletBackup,
       onCancelBackup,
-      classicTheme
+      isClassicThemeActive
     } = this.props;
     const dialogClasses = classnames([
       styles.component,
@@ -67,15 +67,19 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
         onClose={onCancelBackup}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       >
-        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryPhraseSvg} />}
+        {!isClassicThemeActive &&
+          <SvgInline className={styles.recoveryImage} svg={recoveryPhraseSvg} />}
 
         <WalletRecoveryInstructions
           instructionsText={<FormattedHTMLMessage {...messages.backupInstructions} />}
-          classicTheme={classicTheme}
+          isClassicThemeActive={isClassicThemeActive}
         />
-        <WalletRecoveryPhraseMnemonic phrase={recoveryPhrase} classicTheme={classicTheme} />
+        <WalletRecoveryPhraseMnemonic
+          phrase={recoveryPhrase}
+          isClassicThemeActive={isClassicThemeActive}
+        />
       </Dialog>
     );
   }

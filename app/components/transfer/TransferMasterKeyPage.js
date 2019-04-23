@@ -40,7 +40,7 @@ type Props = {
   onSubmit: Function,
   onBack: Function,
   step0: string,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -94,7 +94,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { onBack, step0, classicTheme } = this.props;
+    const { onBack, step0, isClassicThemeActive } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -103,7 +103,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      classicTheme ? 'flat' : 'outlined',
+      isClassicThemeActive ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -111,13 +111,13 @@ export default class TransferMasterKeyPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox isClassicThemeActive={isClassicThemeActive}>
 
           <div className={styles.body}>
 
             { /* Instructions for how to transfer */ }
             <div>
-              <div className={classicTheme ? styles.titleClassic : styles.title}>
+              <div className={isClassicThemeActive ? styles.titleClassic : styles.title}>
                 {intl.formatMessage(messages.instructionTitle)}
               </div>
 
@@ -138,7 +138,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
               autoComplete="off"
               {...masterKeyField.bind()}
               error={masterKeyField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>

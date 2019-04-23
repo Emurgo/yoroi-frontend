@@ -7,19 +7,21 @@ import styles from './SettingsLayout.scss';
 type Props = {
   children: Node,
   menu: Node,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
 export default class SettingsLayout extends Component<Props> {
   render() {
-    const { menu, children, classicTheme } = this.props;
+    const { menu, children, isClassicThemeActive } = this.props;
     return (
-      <div className={classicTheme ? styles.componentClassic : styles.component}>
+      <div className={isClassicThemeActive ? styles.componentClassic : styles.component}>
         <div
-          className={classicTheme ? styles.settingsPaneWrapperClassic : styles.settingsPaneWrapper}
+          className={isClassicThemeActive ?
+            styles.settingsPaneWrapperClassic :
+            styles.settingsPaneWrapper}
         >
-          <div className={classicTheme ? styles.settingsPaneClassic : styles.settingsPane}>
+          <div className={isClassicThemeActive ? styles.settingsPaneClassic : styles.settingsPane}>
             {children}
           </div>
         </div>

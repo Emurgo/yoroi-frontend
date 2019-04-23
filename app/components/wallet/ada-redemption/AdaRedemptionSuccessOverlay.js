@@ -24,7 +24,7 @@ const messages = defineMessages({
 type Props = {
   amount: number,
   onClose: Function,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer

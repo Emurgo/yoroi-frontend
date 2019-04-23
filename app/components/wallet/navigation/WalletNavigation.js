@@ -26,7 +26,7 @@ const messages = defineMessages({
 type Props = {
   isActiveNavItem: Function,
   onNavItemClick: Function,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 @observer
@@ -37,7 +37,7 @@ export default class WalletNavigation extends Component<Props> {
   };
 
   render() {
-    const { isActiveNavItem, onNavItemClick, classicTheme } = this.props;
+    const { isActiveNavItem, onNavItemClick, isClassicThemeActive } = this.props;
     const { intl } = this.context;
     return (
       <div className={styles.component}>
@@ -49,7 +49,7 @@ export default class WalletNavigation extends Component<Props> {
             icon={summaryIcon}
             isActive={isActiveNavItem('transactions')}
             onClick={() => onNavItemClick('transactions')}
-            classicTheme={classicTheme}
+            isClassicThemeActive={isClassicThemeActive}
           />
         </div>
 
@@ -60,7 +60,7 @@ export default class WalletNavigation extends Component<Props> {
             icon={sendIcon}
             isActive={isActiveNavItem('send')}
             onClick={() => onNavItemClick('send')}
-            classicTheme={classicTheme}
+            isClassicThemeActive={isClassicThemeActive}
           />
         </div>
 
@@ -71,7 +71,7 @@ export default class WalletNavigation extends Component<Props> {
             icon={receiveIcon}
             isActive={isActiveNavItem('receive')}
             onClick={() => onNavItemClick('receive')}
-            classicTheme={classicTheme}
+            isClassicThemeActive={isClassicThemeActive}
           />
         </div>
 

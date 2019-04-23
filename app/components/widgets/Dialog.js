@@ -19,7 +19,7 @@ type Props = {
   onClose?: Function,
   closeOnOverlayClick?: boolean,
   modalOverlay?: Object,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 @observer
@@ -57,10 +57,10 @@ export default class Dialog extends Component<Props> {
       className,
       closeButton,
       backButton,
-      classicTheme
+      isClassicThemeActive
     } = this.props;
-    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
-    const secondaryButton = classicTheme ? 'flat' : 'outlined';
+    const titleClasses = isClassicThemeActive ? styles.titleClassic : styles.title;
+    const secondaryButton = isClassicThemeActive ? 'flat' : 'outlined';
 
     return (
       <Modal

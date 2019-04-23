@@ -64,7 +64,7 @@ type Props = {
   onPasswordSwitchToggle: Function,
   isSubmitting: boolean,
   error: ?LocalizableError,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -147,7 +147,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       repeatedPasswordValue,
       isSubmitting,
       error,
-      classicTheme,
+      isClassicThemeActive,
     } = this.props;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
@@ -163,10 +163,10 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
 
     const newPasswordClasses = classnames([
       'newPassword',
-      classicTheme ? styles.newPasswordClassic : '',
+      isClassicThemeActive ? styles.newPasswordClassic : '',
     ]);
 
-    const passwordInstructionsClasses = classicTheme
+    const passwordInstructionsClasses = isClassicThemeActive
       ? styles.passwordInstructionsClassic
       : styles.passwordInstructions;
 
@@ -188,7 +188,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         onClick: this.submit,
         primary: true,
         className: confirmButtonClasses,
-        disabled: (!classicTheme && disabledCondition)
+        disabled: (!isClassicThemeActive && disabledCondition)
       },
     ];
 
@@ -200,7 +200,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       >
 
         <div className={styles.walletPassword}>
@@ -211,7 +211,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
           />
         </div>
 
@@ -224,7 +224,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...newPasswordField.bind()}
             done={isValidWalletPassword(newPassword)}
             error={newPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
           />
 
           <Input
@@ -235,7 +235,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...repeatedPasswordField.bind()}
             done={repeatedPassword && isValidRepeatPassword(newPassword, repeatedPassword)}
             error={repeatedPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
           />
 
           <p className={passwordInstructionsClasses}>

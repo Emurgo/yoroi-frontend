@@ -55,7 +55,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
         <div>
           <AdaRedemptionNoWallets
             onGoToCreateWalletClick={this.handleGoToCreateWalletClick}
-            classicTheme={theme.classic}
+            isClassicThemeActive={theme.isClassicThemeActive}
           />
         </div>
       );
@@ -122,7 +122,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           )}
           isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
           onAcceptRedemptionDisclaimer={() => acceptRedemptionDisclaimer.trigger()}
-          classicTheme={theme.classic}
+          isClassicThemeActive={theme.isClassicThemeActive}
         />
       </div>
     );

@@ -35,7 +35,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
         exportTheme={this.exportTheme}
         hasCustomTheme={this.hasCustomTheme}
         onExternalLinkClick={handleExternalLinkClick}
-        classicTheme={theme.classic}
+        isClassicThemeActive={theme.isClassicThemeActive}
       />
     );
   }

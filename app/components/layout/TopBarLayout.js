@@ -12,7 +12,7 @@ type Props = {
   banner?: Node,
   noTopbarNoBanner?: boolean,
   languageSelectionBackground?: boolean,
-  classicTheme?: boolean,
+  isClassicThemeActive?: boolean,
   footer?: Node,
 };
 
@@ -26,7 +26,7 @@ export default class TopBarLayout extends Component<Props> {
     noTopbarNoBanner: undefined,
     languageSelectionBackground: false,
     withFooter: false,
-    classicTheme: false,
+    isClassicThemeActive: false,
     footer: undefined,
   };
 
@@ -39,14 +39,14 @@ export default class TopBarLayout extends Component<Props> {
       noTopbarNoBanner,
       languageSelectionBackground,
       footer,
-      classicTheme
+      isClassicThemeActive
     } = this.props;
     const componentClasses = classnames([
       styles.component,
-      languageSelectionBackground && !classicTheme ? styles.languageSelectionBackground : '',
+      languageSelectionBackground && !isClassicThemeActive ? styles.languageSelectionBackground : '',
     ]);
     const topbarClasses = classnames([
-      classicTheme ? styles.topbarClassic : styles.topbar,
+      isClassicThemeActive ? styles.topbarClassic : styles.topbar,
     ]);
     const contentClasses = classnames([
       styles.content,

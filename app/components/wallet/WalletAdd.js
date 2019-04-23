@@ -51,7 +51,7 @@ type Props = {
   onCreate: Function,
   onRestore: Function,
   isRestoreActive: boolean,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
   title: string
 };
 
@@ -71,21 +71,21 @@ export default class WalletAdd extends Component<Props> {
       onCreate,
       onRestore,
       isRestoreActive,
-      classicTheme,
+      isClassicThemeActive,
       title
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
     const createWalletButtonClasses = classnames([
-      classicTheme ? 'primary' : 'outlined',
+      isClassicThemeActive ? 'primary' : 'outlined',
       'createWalletButton'
     ]);
     const restoreWalletButtonClasses = classnames([
-      classicTheme ? 'primary' : 'outlined',
+      isClassicThemeActive ? 'primary' : 'outlined',
       'restoreWalletButton'
     ]);
     const buttonsContainerClasses = classnames([
-      classicTheme ? styles.buttonsContainerClassic : styles.buttonsContainer
+      isClassicThemeActive ? styles.buttonsContainerClassic : styles.buttonsContainer
     ]);
 
     let activeNotification = null;
@@ -100,7 +100,7 @@ export default class WalletAdd extends Component<Props> {
     return (
       <div className={componentClasses}>
         <div className={buttonsContainerClasses}>
-          {!classicTheme && (
+          {!isClassicThemeActive && (
             <div className={styles.title}>{title}</div>
           )}
 
@@ -139,9 +139,9 @@ export default class WalletAdd extends Component<Props> {
 
         </div>
 
-        {!classicTheme && <div className={styles.background} />}
+        {!isClassicThemeActive && <div className={styles.background} />}
 
-        {!classicTheme && <div className={styles.walletImage} />}
+        {!isClassicThemeActive && <div className={styles.walletImage} />}
       </div>
     );
   }

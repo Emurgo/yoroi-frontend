@@ -16,7 +16,7 @@ type Props = {
   value: string,
   isSet: boolean,
   onClick: Function,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -32,13 +32,13 @@ export default class ReadOnlyInput extends Component<Props> {
       value,
       isSet,
       onClick,
-      classicTheme,
+      isClassicThemeActive,
     } = this.props;
     const { intl } = this.context;
     const buttonLabel = intl.formatMessage(globalMessages[isSet ? 'change' : 'create']);
 
     const mainClasses = classnames([
-      classicTheme ? styles.componentClassic : styles.component,
+      isClassicThemeActive ? styles.componentClassic : styles.component,
       isSet ? 'changeLabel' : 'createLabel',
     ]);
 
@@ -51,7 +51,7 @@ export default class ReadOnlyInput extends Component<Props> {
           label={label}
           value={value}
           disabled
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
         />
 
         <button
@@ -59,7 +59,7 @@ export default class ReadOnlyInput extends Component<Props> {
           className={styles.button}
           onClick={onClick}
         >
-          {classicTheme ? buttonLabel : <SvgInline svg={editSvg} className={styles.icon} />}
+          {isClassicThemeActive ? buttonLabel : <SvgInline svg={editSvg} className={styles.icon} />}
         </button>
 
       </div>

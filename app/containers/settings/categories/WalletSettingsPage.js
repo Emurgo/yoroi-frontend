@@ -55,7 +55,7 @@ export default class WalletSettingsPage extends Component<Props> {
         activeField={walletFieldBeingEdited}
         nameValidator={name => isValidWalletName(name)}
         showPasswordBlock={activeWallet.isWebWallet}
-        classicTheme={theme.classic}
+        isClassicThemeActive={theme.isClassicThemeActive}
       />
     );
   }

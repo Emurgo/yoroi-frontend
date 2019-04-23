@@ -24,7 +24,7 @@ type Props = {
   mnemonicValidator: Function,
   validWords: Array<string>,
   mnemonicLength: number,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
 };
 
 @observer
@@ -42,7 +42,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
       onSubmit,
       mnemonicValidator,
       mnemonicLength,
-      classicTheme
+      isClassicThemeActive
     } = this.props;
     const message = mnemonicLength === 27 ? messages.step0Paper : messages.step0;
 
@@ -54,7 +54,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
         validWords={validWords}
         step0={intl.formatMessage(message)}
         mnemonicLength={mnemonicLength}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       />
     );
   }

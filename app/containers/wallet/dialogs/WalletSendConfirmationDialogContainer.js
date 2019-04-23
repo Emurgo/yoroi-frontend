@@ -52,7 +52,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         }}
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
-        classicTheme={theme.classic}
+        isClassicThemeActive={theme.isClassicThemeActive}
       />
     );
   }

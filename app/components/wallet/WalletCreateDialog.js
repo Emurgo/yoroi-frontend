@@ -52,7 +52,7 @@ const messages = defineMessages({
 type Props = {
   onSubmit: Function,
   onCancel: Function,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 type State = {
@@ -153,7 +153,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
-    const { onCancel, classicTheme } = this.props;
+    const { onCancel, isClassicThemeActive } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([
       styles.component,
@@ -163,7 +163,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
       styles.walletPasswordFields,
       styles.show,
     ]);
-    const passwordInstructionsClasses = classicTheme
+    const passwordInstructionsClasses = isClassicThemeActive
       ? styles.passwordInstructionsClassic
       : styles.passwordInstructions;
 
@@ -179,7 +179,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         label: this.context.intl.formatMessage(messages.createPersonalWallet),
         primary: true,
         onClick: this.submit,
-        disabled: isSubmitting || (!classicTheme && disabledCondition)
+        disabled: isSubmitting || (!isClassicThemeActive && disabledCondition)
       },
     ];
 
@@ -195,7 +195,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
+        isClassicThemeActive={isClassicThemeActive}
       >
         <Input
           className="walletName"
@@ -204,7 +204,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
           {...walletNameField.bind()}
           done={isValidWalletName(walletName)}
           error={walletNameField.error}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
         />
 
         <div className={styles.walletPassword}>
@@ -214,14 +214,14 @@ export default class WalletCreateDialog extends Component<Props, State> {
               {...walletPasswordField.bind()}
               done={isValidWalletPassword(walletPassword)}
               error={walletPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
               done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               error={repeatedPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={isClassicThemeActive ? InputSkin : InputOwnSkin}
             />
 
             <p className={passwordInstructionsClasses}>

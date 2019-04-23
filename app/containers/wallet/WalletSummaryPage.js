@@ -83,16 +83,22 @@ export default class WalletSummaryPage extends Component<Props> {
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
-            classicTheme={theme.classic}
+            isClassicThemeActive={theme.isClassicThemeActive}
           />
         );
       } else if (!hasAny) {
         walletTransactions = (
-          <WalletNoTransactions label={noTransactionsFoundLabel} classicTheme={theme.classic} />
+          <WalletNoTransactions
+            label={noTransactionsFoundLabel}
+            isClassicThemeActive={theme.isClassicThemeActive}
+          />
         );
       } else if (!hasAny) {
         walletTransactions = (
-          <WalletNoTransactions label={noTransactionsLabel} classicTheme={theme.classic} />
+          <WalletNoTransactions
+            label={noTransactionsLabel}
+            isClassicThemeActive={theme.isClassicThemeActive}
+          />
         );
       }
     }
@@ -113,7 +119,7 @@ export default class WalletSummaryPage extends Component<Props> {
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
-          classicTheme={theme.classic}
+          isClassicThemeActive={theme.isClassicThemeActive}
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 

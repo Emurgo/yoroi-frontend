@@ -88,7 +88,7 @@ export default class WalletSendPage extends Component<Props> {
         hardwareWalletConfirmationDialogRenderCallback={this.hardwareWalletDoConfirmation}
         hasAnyPending={hasAnyPending}
         isHardwareWallet={activeWallet.isHardwareWallet}
-        classicTheme={theme.classic}
+        isClassicThemeActive={theme.isClassicThemeActive}
       />
     );
   }

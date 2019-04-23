@@ -7,7 +7,7 @@ import styles from './WalletRecoveryPhraseMnemonic.scss';
 
 type Props = {
   phrase: string | Element<any>,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
   filled?: boolean
 };
 
@@ -18,9 +18,9 @@ export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
   }
 
   render() {
-    const { phrase, classicTheme, filled } = this.props;
+    const { phrase, isClassicThemeActive, filled } = this.props;
     const componentClasses = classnames([
-      classicTheme ? styles.componentClassic : styles.component,
+      isClassicThemeActive ? styles.componentClassic : styles.component,
       filled ? styles.filled : ''
     ]);
     return (

@@ -60,7 +60,7 @@ type Props = {
   onAddressDetail: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-  classicTheme: boolean,
+  isClassicThemeActive: boolean,
   notification: Node
 };
 
@@ -97,7 +97,7 @@ export default class WalletReceive extends Component<Props, State> {
       walletAddress, walletAddresses,
       onCopyAddress, onAddressDetail,
       isSubmitting, error, isWalletAddressUsed,
-      classicTheme,
+      isClassicThemeActive,
       notification
     } = this.props;
     const { intl } = this.context;
@@ -115,11 +115,11 @@ export default class WalletReceive extends Component<Props, State> {
       isSubmitting ? styles.spinning : null,
     ]);
 
-    const qrCodeAndInstructionsClasses = classicTheme
+    const qrCodeAndInstructionsClasses = isClassicThemeActive
       ? styles.qrCodeAndInstructionsClassic
       : styles.qrCodeAndInstructions;
 
-    const generatedAddressesClasses = classicTheme
+    const generatedAddressesClasses = isClassicThemeActive
       ? styles.generatedAddressesClassic
       : styles.generatedAddresses;
 
@@ -139,7 +139,7 @@ export default class WalletReceive extends Component<Props, State> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const walletReceiveContent = (
-      <BorderedBox classicTheme={classicTheme}>
+      <BorderedBox isClassicThemeActive={isClassicThemeActive}>
         <div className={qrCodeAndInstructionsClasses}>
           <div className={styles.instructions}>
             <div className={styles.hashLabel}>
@@ -154,7 +154,7 @@ export default class WalletReceive extends Component<Props, State> {
                 <SvgInline svg={iconCopy} className={styles.copyIconBig} />
               </CopyToClipboard>
 
-              {!classicTheme && notification}
+              {!isClassicThemeActive && notification}
             </div>
             <div className={styles.instructionsText}>
               {intl.formatMessage(messages.walletReceiveInstructions)}
@@ -224,7 +224,7 @@ export default class WalletReceive extends Component<Props, State> {
       <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />;
 
     return (
-      <div className={classicTheme ? styles.componentClassic : styles.component}>
+      <div className={isClassicThemeActive ? styles.componentClassic : styles.component}>
         {walletAddress ? walletReceiveContent : loadingSpinner}
       </div>
     );

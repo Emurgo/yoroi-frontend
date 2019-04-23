@@ -19,7 +19,7 @@ export default class SupportSettingsPage extends Component<InjectedProps> {
       <SupportSettings
         onExternalLinkClick={handleExternalLinkClick}
         onDownloadLogs={this.handleDownloadLogs}
-        classicTheme={theme.classic}
+        isClassicThemeActive={theme.isClassicThemeActive}
       />
     );
   }

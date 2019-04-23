@@ -113,7 +113,7 @@ type Props = {
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
-  classicTheme: boolean
+  isClassicThemeActive: boolean
 };
 
 type State = {
@@ -155,9 +155,9 @@ export default class Transaction extends Component<Props, State> {
     }
   }
 
-  getAmountStyle(amt: BigNumber, classicTheme: boolean) {
+  getAmountStyle(amt: BigNumber, isClassicThemeActive: boolean) {
     return classNames([
-      classicTheme ? styles.amountClassic : styles.amount,
+      isClassicThemeActive ? styles.amountClassic : styles.amount,
       amt.lt(0)
         ? styles.amountSent
         : styles.amountReceived
@@ -166,40 +166,46 @@ export default class Transaction extends Component<Props, State> {
 
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, formattedWalletAmount, classicTheme } = this.props;
+    const {
+      isLastInList,
+      state,
+      assuranceLevel,
+      formattedWalletAmount,
+      isClassicThemeActive
+    } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state === transactionStates.FAILED;
     const isPendingTransaction = state === transactionStates.PENDING;
 
     const componentStyles = classNames([
-      classicTheme ? styles.componentClassic : styles.component,
+      isClassicThemeActive ? styles.componentClassic : styles.component,
       isFailedTransaction ? styles.failed : null,
       isPendingTransaction ? styles.pending : null,
     ]);
 
     const contentStyles = classNames([
-      classicTheme ? styles.contentClassic : styles.content,
+      isClassicThemeActive ? styles.contentClassic : styles.content,
       isLastInList ? styles.last : null
     ]);
 
     const detailsStyles = classNames([
-      classicTheme ? styles.detailsClassic : styles.details,
+      isClassicThemeActive ? styles.detailsClassic : styles.details,
       isExpanded ? styles.expanded : styles.closed
     ]);
 
-    const togglerClasses = classicTheme ? styles.togglerClassic : styles.toggler;
-    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
-    const typeClasses = classicTheme ? styles.typeClassic : styles.type;
+    const togglerClasses = isClassicThemeActive ? styles.togglerClassic : styles.toggler;
+    const titleClasses = isClassicThemeActive ? styles.titleClassic : styles.title;
+    const typeClasses = isClassicThemeActive ? styles.typeClassic : styles.type;
     const labelOkClasses = classNames([
-      classicTheme ? styles.labelClassic : styles.label,
+      isClassicThemeActive ? styles.labelClassic : styles.label,
       styles[assuranceLevel]
     ]);
     const labelClasses = classNames([
-      classicTheme ? styles.labelClassic : styles.label,
-      classicTheme ? styles[`${state}LabelClassic`] : styles[`${state}Label`]
+      isClassicThemeActive ? styles.labelClassic : styles.label,
+      isClassicThemeActive ? styles[`${state}LabelClassic`] : styles[`${state}Label`]
     ]);
-    const currencySymbolClasses = classicTheme
+    const currencySymbolClasses = isClassicThemeActive
       ? styles.currencySymbolClassic
       : styles.currencySymbol;
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
@@ -229,7 +235,7 @@ export default class Transaction extends Component<Props, State> {
                 </div>
               )}
 
-              <div className={this.getAmountStyle(data.amount, classicTheme)}>
+              <div className={this.getAmountStyle(data.amount, isClassicThemeActive)}>
                 {
                   // hide currency (we are showing symbol instead)
                   formattedWalletAmount(data.amount, false)
@@ -237,7 +243,7 @@ export default class Transaction extends Component<Props, State> {
                 <SvgInline svg={symbol} className={currencySymbolClasses} />
               </div>
 
-              {!classicTheme && (
+              {!isClassicThemeActive && (
                 <div className={styles.expandArrowBox}>
                   <SvgInline className={arrowClasses} svg={expandArrow} />
                 </div>
