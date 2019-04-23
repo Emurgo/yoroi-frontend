@@ -120,7 +120,9 @@ export default class AboutYoroiSettings extends Component {
         </p>
         <br />
         <GridFlexContainer rowSize={3}>
-          {socialMediaLinks.map(link => <LinkButton key={link.url} {...link} />)}
+          {socialMediaLinks.map(link => (
+            <LinkButton key={link.url} {...link} textClassName={styles.socialMediaLinkText} />
+          ))}
         </GridFlexContainer>
       </div>
     );
