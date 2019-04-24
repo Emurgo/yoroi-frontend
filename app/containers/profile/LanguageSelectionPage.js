@@ -7,6 +7,7 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
+import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 
 const messages = defineMessages({
   title: {
@@ -43,8 +44,9 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBarLayout
         topbar={topBar}
         isClassicThemeActive={theme.isClassicThemeActive}
-        noTopbarNoBanner={!theme.isClassicThemeActive}
+        noTopbar={!theme.isClassicThemeActive}
         languageSelectionBackground
+        banner={<TestnetWarningBanner isClassicThemeActive={theme.isClassicThemeActive} />}
       >
         <LanguageSelectionForm
           isClassicThemeActive={theme.isClassicThemeActive}

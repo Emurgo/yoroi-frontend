@@ -38,7 +38,9 @@ class App extends Component<{
     if (!environment.isDev()) return undefined;
     try {
       const mobxDevToolsPackage = require('mobx-react-devtools').default;
-      return React.createElement(mobxDevToolsPackage);
+      return React.createElement(mobxDevToolsPackage, {
+        position: 'topRight'
+      });
     } catch (err) {
       return undefined;
     }

@@ -6,6 +6,10 @@ import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
 import resolver from '../utils/imports';
+import {
+  Logger,
+  stringifyError
+} from '../utils/logging';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 
@@ -15,24 +19,29 @@ type Props = InjectedProps;
 export default class TopBarContainer extends Component<Props> {
 
   render() {
-    const { actions, stores } = this.props;
-    const { app, topbar, theme } = stores;
+    try {
+      const { actions, stores } = this.props;
+      const { app, topbar, theme } = stores;
 
-    const title = (<WalletTopbarTitle
-      wallet={stores.substores[environment.API].wallets.active}
-      currentRoute={app.currentRoute}
-      formattedWalletAmount={formattedWalletAmount}
-    />);
-    return (
-      <TopBar
-        title={title}
-        onCategoryClicked={category => {
-          actions.topbar.activateTopbarCategory.trigger({ category });
-        }}
-        categories={topbar.CATEGORIES}
-        activeTopbarCategory={topbar.activeTopbarCategory}
-        isClassicThemeActive={theme.isClassicThemeActive}
-      />
-    );
+      const title = (<WalletTopbarTitle
+        wallet={stores.substores[environment.API].wallets.active}
+        currentRoute={app.currentRoute}
+        formattedWalletAmount={formattedWalletAmount}
+      />);
+      return (
+        <TopBar
+          title={title}
+          onCategoryClicked={category => {
+            actions.topbar.activateTopbarCategory.trigger({ category });
+          }}
+          categories={topbar.CATEGORIES}
+          activeTopbarCategory={topbar.activeTopbarCategory}
+          isClassicThemeActive={theme.isClassicThemeActive}
+        />
+      );
+    } catch (error) {
+      Logger.error(`TopBarContainer::render::${stringifyError(error)}`);
+      return null;
+    }
   }
 }

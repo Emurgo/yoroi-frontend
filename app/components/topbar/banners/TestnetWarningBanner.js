@@ -49,21 +49,14 @@ export default class TestnetWarningBanner extends Component<Props> {
         {
           environment.isMainnet() ? null : (
             <div className={testnetClasses}>
-              {isClassicThemeActive ?
-                (
-                  <FormattedMessage
-                    {...messages.testnetLabel}
-                    values={{ faqLink, network: environment.NETWORK }}
-                  />
-                ) :
-                ([
-                  <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
-                  <FormattedMessage
-                    {...messages.testnetLabel}
-                    values={{ faqLink, network: environment.NETWORK }}
-                    key="1"
-                  />
-                ])}
+              {[
+                <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
+                <FormattedMessage
+                  {...messages.testnetLabel}
+                  values={{ faqLink, network: environment.NETWORK }}
+                  key="1"
+                />
+              ]}
             </div>)
         }
       </div>
