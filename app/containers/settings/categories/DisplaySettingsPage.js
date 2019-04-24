@@ -4,11 +4,12 @@ import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import DisplaySettings from '../../../components/settings/categories/DisplaySettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { Themes } from '../../../types/ThemeType';
 
 @observer
 export default class DisplaySettingsPage extends Component<InjectedProps> {
 
-  selectTheme = (values: { theme: string }) => {
+  selectTheme = (values: { theme: Themes }) => {
     this.props.actions.profile.updateTheme.trigger(values);
   };
 
@@ -16,7 +17,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
     this.props.actions.profile.exportTheme.trigger();
   };
 
-  getThemeVars = (theme: { theme: string}) => (
+  getThemeVars = (theme: { theme: Themes}) => (
     this.props.stores.profile.getThemeVars(theme)
   )
 
@@ -25,8 +26,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
   )
 
   render() {
-    const { theme } = this.props.stores;
-    const { currentTheme } = this.props.stores.profile;
+    const { currentTheme, isClassicThemeActive } = this.props.stores.profile;
     return (
       <DisplaySettings
         theme={currentTheme}
@@ -35,7 +35,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
         exportTheme={this.exportTheme}
         hasCustomTheme={this.hasCustomTheme}
         onExternalLinkClick={handleExternalLinkClick}
-        isClassicThemeActive={theme.isClassicThemeActive}
+        isClassicThemeActive={isClassicThemeActive}
       />
     );
   }

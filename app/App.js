@@ -22,8 +22,6 @@ import ThemeManager from './ThemeManager';
 import environment from './environment';
 import { hot } from 'react-hot-loader';
 
-import { THEMES } from './themes';
-
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id]);
 
@@ -46,12 +44,6 @@ class App extends Component<{
     }
   }
 
-  updateMarkup = () => {
-    const { stores } = this.props;
-    const currentTheme = stores.profile.currentTheme;
-    this.props.actions.theme.changeTheme.trigger({ theme: currentTheme === THEMES.YOROI_CLASSIC });
-  }
-
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -67,7 +59,7 @@ class App extends Component<{
 
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager variables={themeVars} updateMarkup={this.updateMarkup} />
+        <ThemeManager variables={themeVars} updateMarkup={actions.profile.updateMarkup.trigger} />
 
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
         <ThemeProvider

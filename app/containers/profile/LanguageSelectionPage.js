@@ -30,7 +30,8 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   render() {
     const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const { topbar, theme } = this.props.stores;
+    const { topbar } = this.props.stores;
+    const { isClassicThemeActive } = this.props.stores.profile;
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -38,18 +39,18 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        isClassicThemeActive={theme.isClassicThemeActive}
+        isClassicThemeActive={isClassicThemeActive}
       />);
     return (
       <TopBarLayout
         topbar={topBar}
-        isClassicThemeActive={theme.isClassicThemeActive}
-        noTopbar={!theme.isClassicThemeActive}
+        isClassicThemeActive={isClassicThemeActive}
+        noTopbar={!isClassicThemeActive}
         languageSelectionBackground
-        banner={<TestnetWarningBanner isClassicThemeActive={theme.isClassicThemeActive} />}
+        banner={<TestnetWarningBanner isClassicThemeActive={isClassicThemeActive} />}
       >
         <LanguageSelectionForm
-          isClassicThemeActive={theme.isClassicThemeActive}
+          isClassicThemeActive={isClassicThemeActive}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
           languages={LANGUAGE_OPTIONS}

@@ -10,7 +10,8 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
 
   render() {
     const { actions } = this.props;
-    const { uiDialogs, theme } = this.props.stores;
+    const { uiDialogs } = this.props.stores;
+    const { isClassicThemeActive } = this.props.stores.profile;
     const { wallets, walletSettings } = this.props.stores.substores[environment.API];
     const dialogData = uiDialogs.dataForActiveDialog;
     const { updateDataForActiveDialog } = actions.dialogs;
@@ -43,7 +44,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
         }}
         isSubmitting={updateWalletPasswordRequest.isExecuting}
         error={updateWalletPasswordRequest.error}
-        isClassicThemeActive={theme.isClassicThemeActive}
+        isClassicThemeActive={isClassicThemeActive}
       />
     );
   }

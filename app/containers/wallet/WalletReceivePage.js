@@ -59,7 +59,8 @@ export default class WalletReceivePage extends Component<Props, State> {
   render() {
     const { copiedAddress } = this.state;
     const actions = this.props.actions;
-    const { uiNotifications, uiDialogs, theme } = this.props.stores;
+    const { isClassicThemeActive } = this.props.stores.profile;
+    const { uiNotifications, uiDialogs } = this.props.stores;
     const { wallets, addresses, hwVerifyAddress } = this.props.stores.substores.ada;
     const wallet = wallets.active;
 
@@ -112,11 +113,11 @@ export default class WalletReceivePage extends Component<Props, State> {
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
-          isClassicThemeActive={theme.isClassicThemeActive}
+          isClassicThemeActive={isClassicThemeActive}
           notification={notificationComponent}
         />
 
-        {theme.isClassicThemeActive && notificationComponent}
+        {isClassicThemeActive && notificationComponent}
 
         {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
           <AddressDetailsDialog
@@ -127,7 +128,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             isHardware={wallet.isHardwareWallet}
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger({ wallet })}
             cancel={() => actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger()}
-            isClassicThemeActive={theme.isClassicThemeActive}
+            isClassicThemeActive={isClassicThemeActive}
           />
         ) : null}
 

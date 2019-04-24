@@ -47,7 +47,7 @@ export default class WalletAddPage extends Component<Props> {
 
   render() {
     const { topbar } = this.props.stores;
-    const { isClassicThemeActive } = this.props.stores.theme;
+    const { isClassicThemeActive } = this.props.stores.profile;
 
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />

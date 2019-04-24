@@ -42,7 +42,7 @@ export default class WalletSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { theme } = this.props.stores;
+    const { isClassicThemeActive } = this.props.stores.profile;
     const actions = this.props.actions;
     const { wallets, transactions } = this.props.stores.substores.ada;
     const {
@@ -83,21 +83,21 @@ export default class WalletSummaryPage extends Component<Props> {
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
-            isClassicThemeActive={theme.isClassicThemeActive}
+            isClassicThemeActive={isClassicThemeActive}
           />
         );
       } else if (!hasAny) {
         walletTransactions = (
           <WalletNoTransactions
             label={noTransactionsFoundLabel}
-            isClassicThemeActive={theme.isClassicThemeActive}
+            isClassicThemeActive={isClassicThemeActive}
           />
         );
       } else if (!hasAny) {
         walletTransactions = (
           <WalletNoTransactions
             label={noTransactionsLabel}
-            isClassicThemeActive={theme.isClassicThemeActive}
+            isClassicThemeActive={isClassicThemeActive}
           />
         );
       }
@@ -119,7 +119,7 @@ export default class WalletSummaryPage extends Component<Props> {
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
-          isClassicThemeActive={theme.isClassicThemeActive}
+          isClassicThemeActive={isClassicThemeActive}
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 

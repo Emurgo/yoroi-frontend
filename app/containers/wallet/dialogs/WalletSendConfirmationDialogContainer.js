@@ -26,14 +26,18 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
 
   render() {
     const {
-      actions, amount, receiver, totalAmount,
-      transactionFee, amountToNaturalUnits, currencyUnit,
-      stores
+      actions,
+      amount,
+      receiver,
+      totalAmount,
+      transactionFee,
+      amountToNaturalUnits,
+      currencyUnit,
     } = this.props;
     const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
     const activeWallet = wallets.active;
-    const { theme } = stores;
+    const { isClassicThemeActive } = this.props.stores.profile;
 
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
@@ -52,7 +56,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         }}
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
-        isClassicThemeActive={theme.isClassicThemeActive}
+        isClassicThemeActive={isClassicThemeActive}
       />
     );
   }

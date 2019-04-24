@@ -14,12 +14,12 @@ export default class SupportSettingsPage extends Component<InjectedProps> {
   };
 
   render() {
-    const { theme } = this.props.stores;
+    const { isClassicThemeActive } = this.props.stores.profile;
     return (
       <SupportSettings
         onExternalLinkClick={handleExternalLinkClick}
         onDownloadLogs={this.handleDownloadLogs}
-        isClassicThemeActive={theme.isClassicThemeActive}
+        isClassicThemeActive={isClassicThemeActive}
       />
     );
   }

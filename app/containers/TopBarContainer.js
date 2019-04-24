@@ -21,7 +21,8 @@ export default class TopBarContainer extends Component<Props> {
   render() {
     try {
       const { actions, stores } = this.props;
-      const { app, topbar, theme } = stores;
+      const { app, topbar } = stores;
+      const { isClassicThemeActive } = this.props.stores.profile;
 
       const title = (<WalletTopbarTitle
         wallet={stores.substores[environment.API].wallets.active}
@@ -36,7 +37,7 @@ export default class TopBarContainer extends Component<Props> {
           }}
           categories={topbar.CATEGORIES}
           activeTopbarCategory={topbar.activeTopbarCategory}
-          isClassicThemeActive={theme.isClassicThemeActive}
+          isClassicThemeActive={isClassicThemeActive}
         />
       );
     } catch (error) {

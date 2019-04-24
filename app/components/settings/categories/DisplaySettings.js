@@ -6,7 +6,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import styles from './DisplaySettings.scss';
-import { THEMES } from '../../../themes';
+import { THEMES } from '../../../types/ThemeType';
 import ThemeThumbnail from './display/ThemeThumbnail';
 import environment from '../../../environment';
 

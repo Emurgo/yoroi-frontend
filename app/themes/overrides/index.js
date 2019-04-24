@@ -23,8 +23,8 @@ import OptionsOverridesClassic from './OptionsOverridesClassic.scss';
 import SelectOverridesClassic from './SelectOverridesClassic.scss';
 import SwitchOverridesClassic from './SwitchOverridesClassic.scss';
 
-import type { Themes } from '..';
-import { THEMES } from '..';
+import type { Themes } from '../../types/ThemeType';
+import { THEMES } from '../../types/ThemeType';
 
 const {
   AUTOCOMPLETE,

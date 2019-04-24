@@ -12,10 +12,11 @@ type Props = InjectedProps
 export default class WalletSettingsPage extends Component<Props> {
 
   render() {
-    const { uiDialogs, theme } = this.props.stores;
+    const { uiDialogs } = this.props.stores;
     const { wallets, walletSettings } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
     const activeWallet = wallets.active;
+    const { isClassicThemeActive } = this.props.stores.profile;
     const {
       updateWalletMetaRequest,
       lastUpdatedWalletField,
@@ -55,7 +56,7 @@ export default class WalletSettingsPage extends Component<Props> {
         activeField={walletFieldBeingEdited}
         nameValidator={name => isValidWalletName(name)}
         showPasswordBlock={activeWallet.isWebWallet}
-        isClassicThemeActive={theme.isClassicThemeActive}
+        isClassicThemeActive={isClassicThemeActive}
       />
     );
   }

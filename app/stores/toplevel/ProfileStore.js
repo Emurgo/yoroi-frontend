@@ -1,11 +1,12 @@
 // @flow
-import { observable, computed } from 'mobx';
+import { observable, computed, action } from 'mobx';
 import BigNumber from 'bignumber.js';
 import moment from 'moment/moment';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../types/ThemeType';
+import type { Themes } from '../../types/ThemeType';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 
@@ -55,6 +56,7 @@ export default class SettingsStore extends Store {
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
+    this.actions.profile.updateMarkup.listen(this._updateMarkup);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -119,7 +121,9 @@ export default class SettingsStore extends Store {
 
   // ========== Current/Custom Theme ========== //
 
-  @computed get currentTheme(): string {
+  @observable isClassicThemeActive = true;
+
+  @computed get currentTheme(): Themes {
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet) return result;
     // TODO: We temporarily disable the new theme on mainnet until it's ready
@@ -154,11 +158,11 @@ export default class SettingsStore extends Store {
     );
   }
 
-  _updateTheme = async ({ theme }: { theme: string }) => {
+  _updateTheme = async (param: { theme: Themes }) => {
     // Unset / Clear the Customized Theme from LocalStorage
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
-    await this.setThemeRequest.execute(theme);
+    await this.setThemeRequest.execute(param.theme);
     await this.getThemeRequest.execute(); // eagerly cache
   };
 
@@ -174,6 +178,10 @@ export default class SettingsStore extends Store {
       await this.getCustomThemeRequest.execute(); // eagerly cache
     }
   };
+
+  @action _updateMarkup = async () => {
+    this.isClassicThemeActive = (this.currentTheme === THEMES.YOROI_CLASSIC);
+  }
 
   getThemeVars = ({ theme }: { theme: string }) => {
     if (theme) return require(`../../themes/prebuilt/${theme}.js`);
