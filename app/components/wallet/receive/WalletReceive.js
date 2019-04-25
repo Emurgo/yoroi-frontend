@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
@@ -9,13 +8,13 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import QRCode from 'qrcode.react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import BorderedBox from '../widgets/BorderedBox';
-import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
-import magnifyingGlass from '../../assets/images/search-ic-dark.inline.svg';
-import WalletAddress from '../../domain/WalletAddress';
-import globalMessages from '../../i18n/global-messages';
-import LocalizableError from '../../i18n/LocalizableError';
-import LoadingSpinner from '../widgets/LoadingSpinner';
+import BorderedBox from '../../widgets/BorderedBox';
+import iconCopy from '../../../assets/images/clipboard-ic.inline.svg';
+import magnifyingGlass from '../../../assets/images/search-ic-dark.inline.svg';
+import WalletAddress from '../../../domain/WalletAddress';
+import globalMessages from '../../../i18n/global-messages';
+import LocalizableError from '../../../i18n/LocalizableError';
+import LoadingSpinner from '../../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 
 const messages = defineMessages({
@@ -60,8 +59,7 @@ type Props = {
   onAddressDetail: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-  isClassicThemeActive: boolean,
-  notification: Node
+  isClassicThemeActive: boolean
 };
 
 type State = {
@@ -98,7 +96,6 @@ export default class WalletReceive extends Component<Props, State> {
       onCopyAddress, onAddressDetail,
       isSubmitting, error, isWalletAddressUsed,
       isClassicThemeActive,
-      notification
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -151,10 +148,13 @@ export default class WalletReceive extends Component<Props, State> {
                 text={walletAddress}
                 onCopy={onCopyAddress.bind(this, walletAddress)}
               >
-                <SvgInline svg={iconCopy} className={styles.copyIconBig} />
+                <div>
+                  <SvgInline svg={iconCopy} className={styles.copyIconBig} />
+                  <span className={styles.copyAddressText}>
+                    {intl.formatMessage(messages.copyAddressLabel)}
+                  </span>
+                </div>
               </CopyToClipboard>
-
-              {!isClassicThemeActive && notification}
             </div>
             <div className={styles.instructionsText}>
               {intl.formatMessage(messages.walletReceiveInstructions)}

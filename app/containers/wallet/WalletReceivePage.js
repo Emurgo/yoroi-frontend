@@ -4,7 +4,7 @@ import { defineMessages, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ellipsis } from '../../utils/strings';
 import config from '../../config';
-import WalletReceive from '../../components/wallet/WalletReceive';
+import WalletReceive from '../../components/wallet/receive/WalletReceive';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
 import AddressDetailsDialog from '../../components/wallet/receive/AddressDetailsDialog';
@@ -114,10 +114,9 @@ export default class WalletReceivePage extends Component<Props, State> {
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
           isClassicThemeActive={isClassicThemeActive}
-          notification={notificationComponent}
         />
 
-        {isClassicThemeActive && notificationComponent}
+        {notificationComponent}
 
         {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
           <AddressDetailsDialog

@@ -1,5 +1,5 @@
-@import '../../themes/mixins/loading-spinner';
-@import '../../themes/mixins/error-message';
+@import '../../../themes/mixins/loading-spinner';
+@import '../../../themes/mixins/error-message';
 
 .componentClassic {
   flex: 1;
@@ -33,7 +33,8 @@
 }
 
 .copyIconBig,
-.copyIcon {
+.copyIcon,
+.copyAddressText {
   cursor: pointer;
   object-fit: contain;
 }
@@ -58,6 +59,13 @@
       fill: var(--theme-icon-copy-address-color);
     }
   }
+}
+
+.copyAddressText {
+  text-transform: uppercase;
+  padding-left: 3px;
+  vertical-align: text-bottom;
+  opacity: 0.6;
 }
 
 .qrCodeAndInstructionsClassic {
@@ -120,7 +128,7 @@
       max-width: 310px;
       width: calc(50% - 10px);
       &.spinning {
-        @include loading-spinner("../../assets/images/spinner-light.svg");
+        @include loading-spinner("../../../assets/images/spinner-light.svg");
       }
     }
 
@@ -224,7 +232,7 @@
       max-width: 310px;
       width: calc(50% - 10px);
       &.spinning {
-        @include loading-spinner("../../assets/images/spinner-light.svg");
+        @include loading-spinner("../../../assets/images/spinner-light.svg");
       }
     }
 
