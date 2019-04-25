@@ -88,22 +88,6 @@ export default class SettingsMenu extends Component<Props> {
           />
 
           <SettingsMenuItem
-            label={intl.formatMessage(messages.termsOfUse)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.TERMS_OF_USE)}
-            active={isActiveItem(ROUTES.SETTINGS.TERMS_OF_USE)}
-            className="termsOfUse"
-            isClassicThemeActive={isClassicThemeActive}
-          />
-
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.support)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
-            active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
-            className="support"
-            isClassicThemeActive={isClassicThemeActive}
-          />
-
-          <SettingsMenuItem
             label={intl.formatMessage(messages.display)}
             onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
             active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
@@ -122,6 +106,22 @@ export default class SettingsMenu extends Component<Props> {
               isClassicThemeActive={isClassicThemeActive}
             />
           }
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.termsOfUse)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.TERMS_OF_USE)}
+            active={isActiveItem(ROUTES.SETTINGS.TERMS_OF_USE)}
+            className="termsOfUse"
+            isClassicThemeActive={isClassicThemeActive}
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.support)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
+            active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
+            className="support"
+            isClassicThemeActive={isClassicThemeActive}
+          />
 
           <SettingsMenuItem
             label={intl.formatMessage(messages.AboutYoroi)}
