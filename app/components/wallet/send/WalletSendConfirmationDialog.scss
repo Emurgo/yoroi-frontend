@@ -205,9 +205,3 @@
 .submitButtonSpinning {
   @include loading-spinner("../../../assets/images/spinner-light.svg");
 }
-
-:global {
-  .ModalOverrides_modal {
-    max-width: 624px;
-  }
-}
