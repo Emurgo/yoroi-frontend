@@ -170,6 +170,12 @@ export default class WalletRestoreDialog extends Component<Props> {
     });
   };
 
+  componentDidMount() {
+    setTimeout(() => { this.walletNameInput.focus(); });
+  }
+
+  walletNameInput: Input;
+
   render() {
     const { intl } = this.context;
     const { form } = this;
@@ -233,6 +239,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         <Input
           className={walletNameFieldClasses}
+          ref={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
           done={isValidWalletName(walletName)}
           error={walletNameField.error}
