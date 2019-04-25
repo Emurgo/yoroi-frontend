@@ -16,7 +16,6 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
-import { derivePathPrefix } from '../../api/ada/lib/utils';
 
 // This is actually just an interface
 import {
@@ -179,7 +178,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
       // TODO: [TREZOR] fix type if possible
       const trezorResp = await TrezorConnect.cardanoGetPublicKey({
-        path: derivePathPrefix()
+        path: Config.wallets.BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH
       });
 
       const trezorEventDevice: DeviceMessage = { ...this.trezorEventDevice };
