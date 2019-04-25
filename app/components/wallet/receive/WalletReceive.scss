@@ -33,8 +33,7 @@
 }
 
 .copyIconBig,
-.copyIcon,
-.copyAddressText {
+.copyIcon {
   cursor: pointer;
   object-fit: contain;
 }
@@ -59,13 +58,6 @@
       fill: var(--theme-icon-copy-address-color);
     }
   }
-}
-
-.copyAddressText {
-  text-transform: uppercase;
-  padding-left: 3px;
-  vertical-align: text-bottom;
-  opacity: 0.6;
 }
 
 .qrCodeAndInstructionsClassic {
