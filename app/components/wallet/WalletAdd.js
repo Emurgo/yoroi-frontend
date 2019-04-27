@@ -56,11 +56,12 @@ type Props = {
   onRestore: Function,
   onPaperRestore: Function,
   isRestoreActive: boolean,
+  classicTheme: boolean,
+  title: string
 };
 
 @observer
 export default class WalletAdd extends Component<Props> {
-
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -76,9 +77,22 @@ export default class WalletAdd extends Component<Props> {
       onRestore,
       onPaperRestore,
       isRestoreActive,
+      classicTheme,
+      title
     } = this.props;
 
     const componentClasses = classnames([styles.component, 'WalletAdd']);
+    const createWalletButtonClasses = classnames([
+      classicTheme ? 'primary' : 'outlined',
+      'createWalletButton'
+    ]);
+    const restoreWalletButtonClasses = classnames([
+      classicTheme ? 'primary' : 'outlined',
+      'restoreWalletButton'
+    ]);
+    const buttonsContainerClasses = classnames([
+      classicTheme ? styles.buttonsContainerClassic : styles.buttonsContainer
+    ]);
 
     let activeNotification = null;
     if (isCreateTrezorWalletActive) {
@@ -91,7 +105,11 @@ export default class WalletAdd extends Component<Props> {
 
     return (
       <div className={componentClasses}>
-        <div className={styles.buttonsContainer}>
+        <div className={buttonsContainerClasses}>
+          {!classicTheme && (
+            <div className={styles.title}>{title}</div>
+          )}
+
           <Button
             className="primary"
             label={intl.formatMessage(messages.useLedgerDescription)}
@@ -105,13 +123,13 @@ export default class WalletAdd extends Component<Props> {
             skin={ButtonSkin}
           />
           <Button
-            className="primary createWalletButton"
+            className={createWalletButtonClasses}
             label={intl.formatMessage(messages.createDescription)}
             onMouseUp={onCreate}
             skin={ButtonSkin}
           />
           <Button
-            className="primary restoreWalletButton"
+            className={restoreWalletButtonClasses}
             label={intl.formatMessage(messages.restoreDescription)}
             onMouseUp={onRestore}
             skin={ButtonSkin}
@@ -130,7 +148,12 @@ export default class WalletAdd extends Component<Props> {
               />
             </div>
           ) : null}
+
         </div>
+
+        {!classicTheme && <div className={styles.background} />}
+
+        {!classicTheme && <div className={styles.walletImage} />}
       </div>
     );
   }

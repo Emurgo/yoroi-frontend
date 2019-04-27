@@ -1,4 +1,4 @@
-.component {
+.componentClassic {
   color: var(--theme-settings-menu-item-text-color);
   display: block;
   font-family: var(--font-regular);
@@ -8,15 +8,16 @@
   padding: 10px 20px;
   text-align: left;
   width: 100%;
+
+  &.active {
+    color: var(--theme-settings-menu-item-text-color-active);
+    background-color: var(--theme-settings-menu-item-background-color-active);
+    border-left: 4px solid var(--theme-settings-menu-item-left-border-color-active);
+    font-family: var(--font-bold);
+    padding-left: 16px;
+  }
 }
 
-.active {
-  color: var(--theme-settings-menu-item-text-color-active);
-  background-color: var(--theme-settings-menu-item-background-color-active);
-  border-left: 4px solid var(--theme-settings-menu-item-left-border-color-active);
-  font-family: var(--font-bold);
-  padding-left: 16px;
-}
 
 .enabled {
   &:hover {
@@ -27,4 +28,25 @@
 
 .disabled {
   color: var(--theme-settings-menu-item-text-color-disabled);
+}
+
+.component {
+  color: var(--theme-settings-menu-item-text-color);
+  display: block;
+  font-family: var(--font-medium);
+  font-size: 16px;
+  height: 60px;
+  line-height: 1.38;
+  padding: 10px 30px;
+  text-align: left;
+  width: 100%;
+  text-transform: uppercase;
+
+  &.active {
+    color: var(--theme-settings-menu-item-text-color-active);
+    background-color: var(--theme-settings-menu-item-background-color-active);
+    border-left: 7px solid var(--theme-settings-menu-item-left-border-color-active);
+    font-family: var(--font-medium);
+    padding-left: 23px;
+  }
 }

@@ -1,8 +1,15 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.component {
+.componentClassic {
   align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.component {
+  padding-top: 222px;
   display: flex;
   height: 100%;
   justify-content: center;
@@ -13,8 +20,44 @@
   width: 400px;
 }
 
-.languageSelect {
+.languageSelectClassic {
   margin-bottom: 20px;
+}
+
+.languageSelect {
+  margin-bottom: 10px;
+
+  label {
+    width: 100%;
+    left: 0;
+    top: -72px;
+    text-align: center;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-family: var(--rp-theme-font-medium);
+  }
+}
+
+:global {
+  .LanguageSelectionForm_languageSelect.SelectOverrides_isOpen .SelectOverrides_selectInput {
+    input, input:hover {
+      border-color: var(--theme-select-language-color);
+      color: var(--theme-select-language-color);
+    }
+
+    &::after {
+      background-color: var(--theme-select-language-color)!important;
+    }
+  }
+
+  .LanguageSelectionForm_languageSelect {
+    .InputOverrides_input:not([disabled]):focus,
+    .InputOverrides_input:not([disabled]):active,
+    .InputOverrides_input:not([disabled]):focus:hover,
+    .InputOverrides_input:not([disabled]):active:hover {
+      border-color: var(--theme-select-language-color);
+    }
+  }
 }
 
 .submitButton,

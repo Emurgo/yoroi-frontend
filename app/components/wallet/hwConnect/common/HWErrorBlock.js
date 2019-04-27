@@ -10,13 +10,13 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 type Props = {
   progressInfo: ProgressInfo,
   error: ?LocalizableError,
+  classicTheme: boolean
 };
 
 @observer
 export default @observer
-class HWErrorBlock
-  extends Component<Props> {
+class HWErrorBlock extends Component<Props> {
   render() {
-    return <ErrorBlock error={this.props.error} />;
+    return <ErrorBlock error={this.props.error} classicTheme={this.props.classicTheme} />;
   }
 }

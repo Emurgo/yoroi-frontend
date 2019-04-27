@@ -23,6 +23,7 @@ const baseProdConfig = (networkName) => ({
   output: {
     path: path.join(__dirname, '../build/js'),
     filename: '[name].bundle.js',
+    chunkFilename: '[name].chunk.js',
     publicPath: '/js/',
   },
   plugins: [

@@ -34,6 +34,7 @@ type Props = {
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
   openExportTxToFileDialog: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -48,14 +49,16 @@ export default class WalletSummary extends Component<Props> {
       pendingAmount,
       numberOfTransactions,
       isLoadingTransactions,
-      openExportTxToFileDialog
+      openExportTxToFileDialog,
+      classicTheme,
     } = this.props;
     const { intl } = this.context;
+    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
     return (
-      <div className={styles.component}>
+      <div className={componentClasses}>
         <div className={styles.leftBlock} />
         <div className={styles.middleBlock}>
-          <BorderedBox>
+          <BorderedBox classicTheme={classicTheme}>
             {pendingAmount.incoming.greaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
@@ -91,5 +94,4 @@ export default class WalletSummary extends Component<Props> {
       </div>
     );
   }
-
 }

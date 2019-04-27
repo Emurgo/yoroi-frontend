@@ -17,3 +17,9 @@
   @include error-message;
   text-align: center;
 }
+
+.language {
+  label {
+    background-color: var(--theme-settings-pane-background-color);
+  }
+}

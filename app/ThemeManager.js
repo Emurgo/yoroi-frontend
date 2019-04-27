@@ -5,11 +5,13 @@ import _ from 'lodash';
 export default class ThemeManager extends Component {
   componentDidMount() {
     this.updateCSSVariables(this.props.variables);
+    this.props.updateMarkup();
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.variables !== prevProps.variables) {
       this.updateCSSVariables(this.props.variables);
+      this.props.updateMarkup();
     }
   }
 
@@ -19,6 +21,10 @@ export default class ThemeManager extends Component {
     });
   }
   render() {
-    return <div>{this.props.children}</div>;
+    return (
+      <div>
+        {this.props.children}
+      </div>
+    );
   }
 }

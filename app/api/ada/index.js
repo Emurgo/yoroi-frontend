@@ -108,7 +108,8 @@ import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import {
   getAdaWallet,
   getLastBlockNumber,
-  getLastReceiveAddressIndex
+  getLastReceiveAddressIndex,
+  getCurrentCryptoAccount,
 } from './adaLocalStorage';
 import LocalStorageApi from '../localStorage/index';
 import {
@@ -297,6 +298,7 @@ export default class AdaApi {
     try {
       const cuttoffIndex = getLastReceiveAddressIndex() + 1;
 
+      const accountIndex = getCurrentCryptoAccount();
       const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
       Logger.debug('AdaApi::getExternalAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses
@@ -305,7 +307,7 @@ export default class AdaApi {
       return new Promise(resolve => (
         resolve(
           {
-            accountId: '0', /* We are using a SINGLE account */
+            accountId: accountIndex.toString(),
             addresses
           }
         )
@@ -949,8 +951,7 @@ const _createAddressFromServerData = action(
   (data: AdaAddress) => (
     new WalletAddress({
       id: data.cadId,
-      // note: assume single account
-      path: makeCardanoBIP44Path(0, data.change, data.index),
+      path: makeCardanoBIP44Path(data.account, data.change, data.index),
       amount: new BigNumber(data.cadAmount.getCCoin).dividedBy(
         LOVELACES_PER_ADA
       ),

@@ -8,12 +8,10 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import type { CryptoAccount } from './adaLocalStorage';
 
-const ACCOUNT_INDEX = 0; /* Currently we only provide a SINGLE account */
-
 export function createCryptoAccount(
   encryptedMasterKey: string,
   walletPassword: string,
-  accountIndex: number = ACCOUNT_INDEX
+  accountIndex: number
 ): CryptoAccount {
   const cryptoWallet = getCryptoWalletFromMasterKey(encryptedMasterKey, walletPassword);
   // create a hardened account
@@ -30,7 +28,7 @@ export function createCryptoAccount(
 
 export function createHardwareWalletAccount(
   publicMasterKey: string,
-  accountIndex: number = ACCOUNT_INDEX
+  accountIndex: number
 ): CryptoAccount {
   const pubKey = RustModule.Wallet.PublicKey.from_hex(publicMasterKey);
   const account = RustModule.Wallet.Bip44AccountPublic.new(

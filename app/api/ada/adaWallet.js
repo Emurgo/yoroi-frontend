@@ -58,7 +58,8 @@ export async function newAdaWallet(
   { walletPassword, walletInitData }: AdaWalletParams
 ): Promise<AdaWallet> {
   const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
-  const cryptoAccount = createCryptoAccount(masterKey, walletPassword);
+  // always restore the 0th account
+  const cryptoAccount = createCryptoAccount(masterKey, walletPassword, 0);
 
   // creating an account same as restoring an account plus some initial setup
   await restoreTransactionsAndSave(cryptoAccount, adaWallet, masterKey);

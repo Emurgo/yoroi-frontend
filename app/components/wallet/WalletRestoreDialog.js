@@ -21,6 +21,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
+import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   title: {
@@ -77,15 +78,19 @@ const messages = defineMessages({
   },
   walletPasswordLabel: {
     id: 'wallet.restore.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Wallet password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.restore.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat password',
+    defaultMessage: '!!!Spending password',
   },
   passwordFieldPlaceholder: {
     id: 'wallet.restore.dialog.passwordFieldPlaceholder',
-    defaultMessage: '!!!Password',
+    defaultMessage: '!!!Spending Password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.restore.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat spending password',
+  },
+  repeatPasswordFieldPlaceholder: {
+    id: 'wallet.restore.dialog.repeatPasswordFieldPlaceholder',
+    defaultMessage: '!!!Repeat spending password',
   },
 });
 
@@ -104,6 +109,7 @@ type Props = {
   isPaper?: boolean,
   isVerificationMode?: boolean,
   showPaperPassword?: boolean,
+  classicTheme: boolean
 };
 
 @observer
@@ -176,7 +182,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       repeatPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -223,7 +229,10 @@ export default class WalletRestoreDialog extends Component<Props> {
       isPaper,
       isVerificationMode,
       showPaperPassword,
+      classicTheme,
+      mnemonicValidator
     } = this.props;
+    const { walletName, walletPassword, repeatPassword, recoveryPhrase } = form.values();
 
     const dialogClasses = classnames([
       styles.component,
@@ -232,7 +241,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const walletNameFieldClasses = classnames([
       'walletName',
-      styles.walletName,
+      classicTheme ? styles.walletNameClassic : styles.walletName,
     ]);
 
     const paperPasswordFieldClasses = classnames([
@@ -245,6 +254,21 @@ export default class WalletRestoreDialog extends Component<Props> {
       styles.show,
     ]);
 
+    const walletPasswordClasses = classicTheme
+      ? styles.walletPasswordClassic
+      : styles.walletPassword;
+
+    const passwordInstructionsClasses = classicTheme
+      ? styles.passwordInstructionsClassic
+      : styles.passwordInstructions;
+
+    const disabledCondition = !(
+      isValidWalletName(walletName)
+      && mnemonicValidator(join(recoveryPhrase, ' '))
+      && isValidWalletPassword(walletPassword)
+      && isValidRepeatPassword(walletPassword, repeatPassword)
+    );
+
     const walletNameField = form.$('walletName');
     const recoveryPhraseField = form.$('recoveryPhrase');
     const paperPasswordField = form.$('paperPassword');
@@ -256,7 +280,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel),
         primary: true,
-        disabled: isSubmitting,
+        disabled: isSubmitting || (!classicTheme && disabledCondition),
         onClick: this.submit,
       },
     ];
@@ -273,18 +297,20 @@ export default class WalletRestoreDialog extends Component<Props> {
         className={dialogClasses}
         title={intl.formatMessage(dialogTitle())}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={onCancel}
         backButton={onBack && <DialogBackButton onBack={onBack} />}
         closeButton={<DialogCloseButton onClose={onCancel} />}
+        classicTheme={classicTheme}
       >
 
         {isVerificationMode ? '' : (
           <Input
             className={walletNameFieldClasses}
             {...walletNameField.bind()}
+            done={isValidWalletName(walletName)}
             error={walletNameField.error}
-            skin={InputSkin}
+            skin={classicTheme ? InputSkin : InputOwnSkin}
           />
         )}
 
@@ -299,34 +325,37 @@ export default class WalletRestoreDialog extends Component<Props> {
         />
 
         {showPaperPassword ? (
-          <div className={styles.walletPassword}>
+          <div className={walletPasswordClasses}>
             <div className={paperPasswordFieldClasses}>
               <Input
                 className="paperPassword"
                 {...paperPasswordField.bind()}
+                done={isValidWalletPassword(walletPassword)}
                 error={paperPasswordField.error}
-                skin={InputSkin}
+                skin={classicTheme ? InputSkin : InputOwnSkin}
               />
             </div>
           </div>
         ) : ''}
 
         {isVerificationMode ? '' : (
-          <div className={styles.walletPassword}>
+          <div className={walletPasswordClasses}>
             <div className={walletPasswordFieldsClasses}>
               <Input
                 className="walletPassword"
                 {...walletPasswordField.bind()}
+                done={isValidWalletPassword(walletPassword)}
                 error={walletPasswordField.error}
-                skin={InputSkin}
+                skin={classicTheme ? InputSkin : InputOwnSkin}
               />
               <Input
                 className="repeatedPassword"
                 {...repeatedPasswordField.bind()}
+                done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
                 error={repeatedPasswordField.error}
-                skin={InputSkin}
+                skin={classicTheme ? InputSkin : InputOwnSkin}
               />
-              <p className={styles.passwordInstructions}>
+              <p className={passwordInstructionsClasses}>
                 {intl.formatMessage(globalMessages.passwordInstructions)}
               </p>
             </div>

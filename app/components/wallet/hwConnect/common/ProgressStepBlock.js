@@ -23,6 +23,7 @@ const messages = defineMessages({
 
 type Props = {
   progressInfo: ProgressInfo,
+  classicTheme: boolean
 };
 
 @observer
@@ -34,7 +35,7 @@ export default class ProgressStepBlock extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { progressInfo } = this.props;
+    const { progressInfo, classicTheme } = this.props;
 
     return (
       <ProgressSteps
@@ -44,6 +45,7 @@ export default class ProgressStepBlock extends Component<Props> {
           intl.formatMessage(messages.stepSaveLabel)
         ]}
         progressInfo={progressInfo}
+        classicTheme={classicTheme}
       />);
   }
 }

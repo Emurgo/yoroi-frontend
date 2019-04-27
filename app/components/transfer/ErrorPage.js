@@ -12,7 +12,8 @@ type Props = {
   error?: ?LocalizableError,
   onCancel: Function,
   title: string,
-  backButtonLabel: string
+  backButtonLabel: string,
+  classicTheme: boolean,
 };
 
 @observer
@@ -27,9 +28,9 @@ export default class ErrorPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { error, onCancel, title, backButtonLabel } = this.props;
+    const { error, onCancel, title, backButtonLabel, classicTheme } = this.props;
     const backButtonClasses = classnames([
-      'flat',
+      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 

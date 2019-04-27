@@ -47,6 +47,7 @@ type Props = {
   onItemClick: Function,
   hasActiveWallet: boolean,
   currentLocale: string,
+  classicTheme: boolean,
 };
 
 @observer
@@ -58,16 +59,17 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale, classicTheme } = this.props;
 
     return (
-      <div>
-        <div className={styles.component}>
+      <div className={classicTheme ? '' : styles.componentWrapper}>
+        <div className={classicTheme ? styles.componentClassic : styles.component}>
           <SettingsMenuItem
             label={intl.formatMessage(messages.general)}
             onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}
             active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
             className="general"
+            classicTheme={classicTheme}
           />
 
           <SettingsMenuItem
@@ -87,6 +89,7 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.WALLET)}
             className="wallet"
             disabled={!hasActiveWallet}
+            classicTheme={classicTheme}
           />
 
           <SettingsMenuItem
@@ -94,6 +97,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.TERMS_OF_USE)}
             active={isActiveItem(ROUTES.SETTINGS.TERMS_OF_USE)}
             className="termsOfUse"
+            classicTheme={classicTheme}
           />
 
           <SettingsMenuItem
@@ -101,6 +105,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
+            classicTheme={classicTheme}
           />
 
           <SettingsMenuItem
@@ -108,6 +113,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
             active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
             className="display"
+            classicTheme={classicTheme}
           />
 
           {(!environment.isMainnet() || currentLocale === 'ko-KR' || currentLocale === 'ja-JP') &&
@@ -118,6 +124,7 @@ export default class SettingsMenu extends Component<Props> {
               onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
               active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
               className="adaRedemption"
+              classicTheme={classicTheme}
             />
           }
 
@@ -126,6 +133,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
             active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
             className="AboutYoroi"
+            classicTheme={classicTheme}
           />
         </div>
       </div>

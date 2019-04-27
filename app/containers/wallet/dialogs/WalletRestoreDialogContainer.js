@@ -67,6 +67,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         error={restoreRequest.error}
         isPaper={isPaper}
         showPaperPassword={isPaper}
+        classicTheme={this.props.classicTheme}
       />
     );
   }

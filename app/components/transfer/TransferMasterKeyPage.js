@@ -6,6 +6,7 @@ import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
@@ -39,6 +40,7 @@ type Props = {
   onSubmit: Function,
   onBack: Function,
   step0: string,
+  classicTheme: boolean,
 };
 
 @observer
@@ -92,7 +94,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { onBack, step0 } = this.props;
+    const { onBack, step0, classicTheme } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -101,7 +103,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      'flat',
+      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -109,13 +111,13 @@ export default class TransferMasterKeyPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox>
+        <BorderedBox classicTheme={classicTheme}>
 
           <div className={styles.body}>
 
             { /* Instructions for how to transfer */ }
             <div>
-              <div className={styles.title}>
+              <div className={classicTheme ? styles.titleClassic : styles.title}>
                 {intl.formatMessage(messages.instructionTitle)}
               </div>
 
@@ -136,7 +138,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
               autoComplete="off"
               {...masterKeyField.bind()}
               error={masterKeyField.error}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>
