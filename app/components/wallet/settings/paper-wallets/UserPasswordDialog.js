@@ -156,6 +156,7 @@ export default class UserPasswordDialog extends Component<Props> {
         onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
+        classicTheme={classicTheme}
       >
 
         <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>

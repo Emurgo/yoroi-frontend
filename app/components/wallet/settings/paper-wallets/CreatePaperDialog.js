@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import SVGInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -11,6 +12,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './CreatePaperDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
+import download from '../../../../assets/images/import-ic.inline.svg';
 
 const messages = defineMessages({
   dialogTitleCreatePaperWallet: {
@@ -96,18 +98,21 @@ export default class CreatePaperDialog extends Component<Props> {
           onClose={onCancel}
           className={dialogClasses}
           closeButton={<DialogCloseButton onClose={onCancel} />}
+          classicTheme={classicTheme}
         >
           <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
-            <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span><br />
-            <span>{intl.formatMessage(messages.downloadPaperIntroLine2)}: {pdfSizeMb}</span><br />
+            <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span>
           </div>
           <center>
-            <Button
+            <button
+              type="button"
               className={buttonClassNames}
-              label={this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
-              skin={ButtonSkin}
               onClick={onDownload}
-            />
+            >
+              <SVGInline svg={download} className={styles.icon} /><br />
+              <span className={styles.label}>{this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}</span><br />
+              <span className={styles.label}>{intl.formatMessage(messages.downloadPaperIntroLine2)}: {pdfSizeMb}</span>
+            </button>
           </center>
         </Dialog>
       );
@@ -122,6 +127,7 @@ export default class CreatePaperDialog extends Component<Props> {
         onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
+        classicTheme={classicTheme}
       >
         <AnnotatedLoader
           title={this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}

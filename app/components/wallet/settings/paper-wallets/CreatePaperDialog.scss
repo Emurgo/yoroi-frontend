@@ -3,7 +3,6 @@
 
 .dialog {
   font-family: var(--font-light);
-  height: 26rem;
   .walletPassword {
     & + .walletPasswordFields {
       .newPassword {
@@ -21,5 +20,19 @@
 
 .button {
   align-self: center;
-  margin-top: 20px;
+  background: transparent !important;;
+  color: transparent !important;;
+}
+
+.icon {
+  & > svg {
+    max-height: 75px;
+    max-width: 75px;
+    width: 100%;
+  }
+}
+
+.label {
+  font-family: var(--font-light);
+  color: black;
 }

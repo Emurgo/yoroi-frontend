@@ -87,6 +87,7 @@ export default class FinalizeDialog extends Component<Props> {
         className={dialogClasses}
         backButton={onBack && <DialogBackButton onBack={onBack} />}
         closeButton={<DialogCloseButton onClose={onCancel} />}
+        classicTheme={classicTheme}
       >
 
         <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
