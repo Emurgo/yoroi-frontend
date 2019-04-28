@@ -9,7 +9,7 @@ import { THEMES } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 
-export default class SettingsStore extends Store {
+export default class ProfileStore extends Store {
 
   LANGUAGE_OPTIONS = [
     { value: 'en-US', label: globalMessages.languageEnglish, svg: require('../../assets/images/flags/english.inline.svg') },
@@ -73,12 +73,17 @@ export default class SettingsStore extends Store {
     BigNumber.config({ FORMAT: this.bigNumberDecimalFormat });
   };
 
+
+  static getDefaultLocale() {
+    return 'en-US';
+  }
+
   // ========== Locale ========== //
 
   @computed get currentLocale(): string {
     const { result } = this.getProfileLocaleRequest.execute();
     if (this.isCurrentLocaleSet) return result;
-    return 'en-US'; // default
+    return ProfileStore.getDefaultLocale();
   }
 
   @computed get hasLoadedCurrentLocale(): boolean {
@@ -188,7 +193,11 @@ export default class SettingsStore extends Store {
   // ========== Paper Wallets ========== //
 
   @computed get paperWalletsIntro(): string {
-    return require(`../../i18n/locales/paper-wallets/intro/${this.currentLocale}.md`);
+    try {
+      return require(`../../i18n/locales/paper-wallets/intro/${this.currentLocale}.md`);
+    } catch {
+      return require(`../../i18n/locales/paper-wallets/intro/${ProfileStore.getDefaultLocale()}.md`);
+    }
   }
 
   // ========== Terms of Use ========== //

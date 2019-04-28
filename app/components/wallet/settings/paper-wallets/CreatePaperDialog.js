@@ -3,8 +3,6 @@ import React, { Component } from 'react';
 import SVGInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
@@ -110,8 +108,12 @@ export default class CreatePaperDialog extends Component<Props> {
               onClick={onDownload}
             >
               <SVGInline svg={download} className={styles.icon} /><br />
-              <span className={styles.label}>{this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}</span><br />
-              <span className={styles.label}>{intl.formatMessage(messages.downloadPaperIntroLine2)}: {pdfSizeMb}</span>
+              <span className={styles.label}>
+                {this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
+              </span><br />
+              <span className={styles.label}>
+                {intl.formatMessage(messages.downloadPaperIntroLine2)}: {pdfSizeMb}
+              </span>
             </button>
           </center>
         </Dialog>
