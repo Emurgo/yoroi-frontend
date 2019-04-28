@@ -462,9 +462,11 @@ export default class AdaApi {
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
 
       const { ledgerSignTxResp, unsignedTx } = request;
+      const cryptoAccount = getCurrentCryptoAccount().root_cached_key;
       const response = await prepareAndBroadcastLedgerSignedTx(
         ledgerSignTxResp,
-        unsignedTx
+        unsignedTx,
+        cryptoAccount
       );
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx success: ' + stringifyData(response));
 
