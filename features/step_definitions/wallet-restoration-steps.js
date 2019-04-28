@@ -41,12 +41,12 @@ When(/^I clear the recovery phrase$/, async function () {
 
 When(/^I enter the restored wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input('#walletPassword--4', fields.password);
-  await this.input('#repeatPassword--5', fields.repeatedPassword);
+  await this.input('#walletPassword--5', fields.password);
+  await this.input('#repeatPassword--6', fields.repeatedPassword);
 });
 
 When(/^I clear the restored wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm('#walletPassword--4', password.length);
+  await this.clearInputUpdatingForm('#walletPassword--5', password.length);
 });
 
 When(/^I click the "Restore Wallet" button$/, async function () {
