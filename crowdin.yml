@@ -1,7 +1,9 @@
+preserve_hierarchy: true
+
 files:
-  - source: /app/i18n/locales/en-US.json
-    translation: /app/i18n/locales/%language%.json
-    languages_mapping:
+  - source: /app/i18n/locales/**/en-US.json
+    translation: /app/i18n/locales/**/%locale%.json
+    languages_mapping: &anchor
       language:
         zh-CN: zh-Hans
         zh-TW: zh-Hant
@@ -11,3 +13,6 @@ files:
         de: de-DE
         fr: fr-FR
         id: id-ID
+  - source : /app/i18n/locales/**/en-US.md
+    translation : /app/i18n/locales/**/%locale%.md
+    languages_mapping: *anchor
