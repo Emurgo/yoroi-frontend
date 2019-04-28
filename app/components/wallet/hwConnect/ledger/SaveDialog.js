@@ -32,6 +32,7 @@ import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
 import { Logger } from '../../../../utils/logging';
 
 import styles from '../common/SaveDialog.scss';
+import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
 
 const saveStartSVG = saveLoadSVG;
@@ -93,8 +94,8 @@ export default class SaveDialog extends Component<Props> {
     const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
 
     const headerBlockClasses = classicTheme
-      ? classnames([styles.headerBlockClassic, styles.headerSaveBlockClassic])
-      : styles.headerBlock;
+      ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
+      : headerMixin.headerBlock;
     const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
     const middleBlockErrorClasses = classicTheme ? styles.middleSaveErrorBlockClassic : null;
     const walletNameFieldClasses = classnames([

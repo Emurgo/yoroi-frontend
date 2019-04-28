@@ -1,22 +1,14 @@
 # Paper Wallets
 
-A **"Paper Wallet"** is a special document, containing secret mnemonics words
-and one or few addresses. When a paper wallet is created - **it is NOT linked
-to your computer, and full wallet key is NOT stored in computer memory**.
-When you print out a paper wallet and delete the PDF document - the print-outs
-are the only copies of this wallet in the whole world.
+A **"Paper Wallet"** is a special document, containing secret mnemonics words and a small set of addresses.
+When a paper wallet is created **it is NOT stored by Yoroi**.
+The generated PDF document is the only copy of this wallet in existance.
 
-You can use a paper wallet to receive coins and store them for any period of time
-(using the addresses on the document). At any moment - you can use a paper wallet
-to restore a regular digital wallet in Yoroi, and this wallet will give you access
-yo all the funds you have sent to printed addresses.
+You can use a paper wallet to receive coins using the pre-generated addresses.
+You can restore your paper wallet at any time into Yoroi to access the funds.
+However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
 
-Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret word.
-You are setting your own custom password and you need to remember it very carefully.
-If someone gets access to this paper-wallet - they will also need to find your password
-to gain access to the funds. **But if you lost or forget your password - your funds will be
-lost forever and no one will be able to restore them!** 
-
-When you restore a paper wallet back into Yoroi and get access to your funds -
-you supposed to throw away or destroy the document itself, because it is now
-meaningless after already being exposed into a computer.
+Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret words.
+Even if someone gets access to this paper-wallet, they will also need to know your password
+to gain access to the funds. **But if you lose or forget your password, your funds will be
+lost forever and no one will be able to restore them!**

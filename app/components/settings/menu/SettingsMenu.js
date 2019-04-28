@@ -77,6 +77,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
             active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
             className="paperWallet"
+            classicTheme={classicTheme}
           />
 
           <SettingsMenuItem

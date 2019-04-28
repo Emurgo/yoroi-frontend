@@ -31,10 +31,6 @@ export default defineMessages({
     id: 'global.errors.invalidRepeatPassword',
     defaultMessage: '!!!Doesn\'t match.',
   },
-  passwordInstructions: {
-    id: 'global.passwordInstructions',
-    defaultMessage: '!!!Note: Password needs to be at least 12 characters long.',
-  },
   nextButtonLabel: {
     id: 'global.labels.next',
     defaultMessage: '!!!Next',

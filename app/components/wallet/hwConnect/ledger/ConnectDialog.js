@@ -27,6 +27,7 @@ import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
 import { Logger } from '../../../../utils/logging';
 
 import styles from '../common/ConnectDialog.scss';
+import headerMixin from '../../../mixins/HeaderBlock.scss';
 
 const connectStartGIF = connectLoadGIF;
 
@@ -64,7 +65,9 @@ export default class ConnectDialog extends Component<Props> {
       progressInfo, isActionProcessing, error,
       goBack, submit, cancel, classicTheme,
     } = this.props;
-    const headerBlockClasses = classicTheme ? styles.headerBlockClassic : styles.headerBlock;
+    const headerBlockClasses = classicTheme
+      ? headerMixin.headerBlockClassic
+      : headerMixin.headerBlock;
     const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
     const middleConnectErrorBlockClasses = classicTheme
       ? styles.middleConnectErrorBlockClassic
@@ -72,9 +75,12 @@ export default class ConnectDialog extends Component<Props> {
 
     const introBlock = (
       <div className={headerBlockClasses}>
-        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
-        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br />
-        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span><br />
+        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span>
+        <br />
+        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span>
+        <br />
+        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span>
+        <br />
       </div>);
 
     let middleBlock = null;

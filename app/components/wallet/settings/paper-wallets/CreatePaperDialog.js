@@ -9,6 +9,7 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
 import styles from './CreatePaperDialog.scss';
+import headerMixin from '../../../mixins/HeaderBlock.scss';
 import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
 
 const messages = defineMessages({
@@ -41,6 +42,7 @@ type Props = {
   onCancel: Function,
   onDownload: Function,
   onDataChange: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -67,6 +69,7 @@ export default class CreatePaperDialog extends Component<Props> {
       paperFile,
       onDownload,
       renderStatus,
+      classicTheme,
     } = this.props;
 
     const dialogClasses = classnames(['createPaperDialog', styles.dialog]);
@@ -94,16 +97,18 @@ export default class CreatePaperDialog extends Component<Props> {
           className={dialogClasses}
           closeButton={<DialogCloseButton onClose={onCancel} />}
         >
-          <div className={styles.headerBlock}>
+          <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
             <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span><br />
             <span>{intl.formatMessage(messages.downloadPaperIntroLine2)}: {pdfSizeMb}</span><br />
           </div>
-          <Button
-            className={buttonClassNames}
-            label={this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
-            skin={ButtonSkin}
-            onClick={onDownload}
-          />
+          <center>
+            <Button
+              className={buttonClassNames}
+              label={this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
+              skin={ButtonSkin}
+              onClick={onDownload}
+            />
+          </center>
         </Dialog>
       );
 

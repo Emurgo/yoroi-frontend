@@ -22,6 +22,7 @@ import styles from './WalletRestoreDialog.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
+import PasswordInstructions from '../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   title: {
@@ -115,7 +116,12 @@ type Props = {
 @observer
 export default class WalletRestoreDialog extends Component<Props> {
   static defaultProps = {
-    error: undefined
+    error: undefined,
+    onBack: undefined,
+    passwordValidator: undefined,
+    isPaper: undefined,
+    isVerificationMode: undefined,
+    showPaperPassword: undefined
   };
 
   static contextTypes = {
@@ -258,16 +264,18 @@ export default class WalletRestoreDialog extends Component<Props> {
       ? styles.walletPasswordClassic
       : styles.walletPassword;
 
-    const passwordInstructionsClasses = classicTheme
-      ? styles.passwordInstructionsClassic
-      : styles.passwordInstructions;
+    const disabledCondition = () => {
+      let condition =
+        isValidWalletName(walletName)
+        && mnemonicValidator(join(recoveryPhrase, ' '))
+        && isValidWalletPassword(walletPassword);
 
-    const disabledCondition = !(
-      isValidWalletName(walletName)
-      && mnemonicValidator(join(recoveryPhrase, ' '))
-      && isValidWalletPassword(walletPassword)
-      && isValidRepeatPassword(walletPassword, repeatPassword)
-    );
+      if (showPaperPassword) {
+        condition &= isValidRepeatPassword(walletPassword, repeatPassword);
+      }
+
+      return !condition;
+    };
 
     const walletNameField = form.$('walletName');
     const recoveryPhraseField = form.$('recoveryPhrase');
@@ -278,9 +286,11 @@ export default class WalletRestoreDialog extends Component<Props> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: intl.formatMessage(isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel),
+        label: intl.formatMessage(
+          isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel
+        ),
         primary: true,
-        disabled: isSubmitting || (!classicTheme && disabledCondition),
+        disabled: isSubmitting || (!classicTheme && disabledCondition()),
         onClick: this.submit,
       },
     ];
@@ -355,9 +365,7 @@ export default class WalletRestoreDialog extends Component<Props> {
                 error={repeatedPasswordField.error}
                 skin={classicTheme ? InputSkin : InputOwnSkin}
               />
-              <p className={passwordInstructionsClasses}>
-                {intl.formatMessage(globalMessages.passwordInstructions)}
-              </p>
+              <PasswordInstructions isClassicThemeActive={classicTheme} />
             </div>
           </div>
         )}

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
@@ -11,7 +12,9 @@ import Dialog from '../../../widgets/Dialog';
 import { isValidRepeatPassword, isValidPaperPassword } from '../../../../utils/validations';
 import globalMessages from '../../../../i18n/global-messages';
 import styles from './UserPasswordDialog.scss';
+import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
+import PasswordInstructions from '../../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitleUserPaperPassword: {
@@ -36,19 +39,15 @@ const messages = defineMessages({
   },
   paperPasswordIntroLine1: {
     id: 'settings.paperWallet.dialog.password.intro.line1',
-    defaultMessage: '!!!Yoroi Paper Wallets are always protected with an additional password.',
+    defaultMessage: '!!!Yoroi Paper Wallets are encrypted with an additional password.',
   },
   paperPasswordIntroLine2: {
     id: 'settings.paperWallet.dialog.password.intro.line2',
-    defaultMessage: '!!!Your own custom password will be used to encrypt the printed secret words.',
+    defaultMessage: '!!!You CANNOT restore your funds without the password!',
   },
   paperPasswordIntroLine3: {
     id: 'settings.paperWallet.dialog.password.intro.line3',
-    defaultMessage: '!!!Secret words without the password WILL NOT give access to funds!',
-  },
-  paperPasswordIntroLine4: {
-    id: 'settings.paperWallet.dialog.password.intro.line4',
-    defaultMessage: '!!!It is YOUR OWN responsibility to make sure you securely remember the password.',
+    defaultMessage: '!!!It is YOUR OWN responsibility to make sure you remember the password.',
   },
 });
 
@@ -58,6 +57,7 @@ type Props = {
   onNext: Function,
   onCancel: Function,
   onDataChange: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -122,14 +122,16 @@ export default class UserPasswordDialog extends Component<Props> {
 
   render() {
     const { form } = this;
+    const { paperPassword, repeatPassword } = form.values();
     const { intl } = this.context;
     const {
       onCancel,
       passwordValue,
       repeatedPasswordValue,
+      classicTheme,
     } = this.props;
 
-    const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
+    const dialogClasses = classnames(['userPasswordDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
     const paperPasswordClasses = classnames([styles.paperPassword]);
     const repeatedPasswordClasses = classnames([styles.repeatedPassword]);
@@ -156,11 +158,10 @@ export default class UserPasswordDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
 
-        <div className={styles.headerBlock}>
+        <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
           <span>{intl.formatMessage(messages.paperPasswordIntroLine1)}</span><br />
           <span>{intl.formatMessage(messages.paperPasswordIntroLine2)}</span><br />
           <span>{intl.formatMessage(messages.paperPasswordIntroLine3)}</span><br />
-          <span>{intl.formatMessage(messages.paperPasswordIntroLine4)}</span><br />
         </div>
 
         <div className={paperPasswordClasses}>
@@ -170,8 +171,9 @@ export default class UserPasswordDialog extends Component<Props> {
             value={passwordValue}
             onChange={(value) => this.handleDataChange('passwordValue', value)}
             {...paperPasswordField.bind()}
+            done={isValidPaperPassword(paperPassword)}
             error={paperPasswordField.error}
-            skin={InputSkin}
+            skin={classicTheme ? InputSkin : InputOwnSkin}
           />
         </div>
         <div className={repeatedPasswordClasses}>
@@ -180,16 +182,13 @@ export default class UserPasswordDialog extends Component<Props> {
             className={repeatedPasswordClasses}
             value={repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
+            done={repeatPassword && isValidRepeatPassword(paperPassword, repeatPassword)}
             {...repeatedPasswordField.bind()}
             error={repeatedPasswordField.error}
-            skin={InputSkin}
+            skin={classicTheme ? InputSkin : InputOwnSkin}
           />
         </div>
-        <div className={styles.passwordInstructions}>
-          <p className={styles.passwordInstructions}>
-            {intl.formatMessage(globalMessages.passwordInstructions)}
-          </p>
-        </div>
+        <PasswordInstructions isClassicThemeActive={classicTheme} />
 
       </Dialog>
     );

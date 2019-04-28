@@ -7,6 +7,7 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
 import styles from './FinalizeDialog.scss';
+import headerMixin from '../../../mixins/HeaderBlock.scss';
 import DialogBackButton from '../../../widgets/DialogBackButton';
 
 const messages = defineMessages({
@@ -41,10 +42,15 @@ type Props = {
   onNext: Function,
   onCancel: Function,
   onBack?: Function,
+  classicTheme: boolean,
 };
 
 @observer
 export default class FinalizeDialog extends Component<Props> {
+  static defaultProps = {
+    onBack: undefined
+  }
+
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -56,11 +62,10 @@ export default class FinalizeDialog extends Component<Props> {
       onCancel,
       onNext,
       onBack,
+      classicTheme,
     } = this.props;
 
-    console.log(addresses);
-
-    const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
+    const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
     const largeTopMarginClasses = classnames([styles.largeTopMargin]);
 
@@ -84,7 +89,7 @@ export default class FinalizeDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
 
-        <div className={styles.headerBlock}>
+        <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
           <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />
           <span>{intl.formatMessage(messages.paperFinalizeIntroLine2)}</span><br />
           <span>{intl.formatMessage(messages.paperFinalizeIntroLine3)}</span><br />
@@ -94,7 +99,7 @@ export default class FinalizeDialog extends Component<Props> {
         <h2 className={largeTopMarginClasses}>
           {intl.formatMessage(messages.paperAddressesLabel)}
         </h2>
-        <div className={styles.headerBlock}>
+        <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
           {addresses.map(a => (
             <span>{a}<br /></span>
           ))}

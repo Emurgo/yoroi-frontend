@@ -17,7 +17,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
 
   render() {
     const { actions } = this.props;
-    const { uiDialogs } = this.props.stores;
+    const { uiDialogs, theme } = this.props.stores;
     const { updateDataForActiveDialog } = actions.dialogs;
     const dialogData = uiDialogs.dataForActiveDialog;
 
@@ -47,6 +47,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
+            classicTheme={theme.classic}
           />
         );
       case ProgressStep.CREATE:
@@ -60,6 +61,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
+            classicTheme={theme.classic}
           />
         );
       case ProgressStep.VERIFY:
@@ -76,6 +78,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             isPaper
             showPaperPassword
             isVerificationMode
+            classicTheme={theme.classic}
           />
         );
       case ProgressStep.FINALIZE:
@@ -85,6 +88,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
+            classicTheme={theme.classic}
           />
         );
       default:
