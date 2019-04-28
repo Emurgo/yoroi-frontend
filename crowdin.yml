@@ -14,5 +14,5 @@ files:
         fr: fr-FR
         id: id-ID
   - source : /app/i18n/**/en-US.md
-    translation : /app/i18n/**/%two_letters_code%.md
+    translation : /app/i18n/**/%locale%.md
     languages_mapping: *anchor
