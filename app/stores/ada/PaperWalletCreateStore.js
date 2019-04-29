@@ -5,6 +5,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import type { AdaPaper } from '../../api/ada';
 import fileSaver from 'file-saver';
 import type { PdfGenStepType } from '../../api/ada/paperWallet/paperWalletPdf';
+import environment from '../../environment';
 
 export type ProgressStepEnum = 0 | 1 | 2 | 3 | 4;
 export const ProgressStep = {
@@ -97,7 +98,7 @@ export default class PaperWalletCreateStore extends Store {
     if (this.paper) {
       pdf = await this.api.ada.createAdaPaperPdf({
         paper: this.paper,
-        isMainnet: true, // TODO make dynamic for testnet support,
+        network: environment.NETWORK,
         updateStatus: status => {
           this.actions.ada.paperWallets.setPdfRenderStatus.trigger({ status });
           return !!this.paper;

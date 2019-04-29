@@ -5,11 +5,13 @@ import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wall
 import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2.png';
 import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
 import { Logger, stringifyError } from '../../../utils/logging';
+import type { Network } from '../../../../config/config-types';
+import { NetworkType } from '../../../../config/config-types';
 
 export type PaperRequest = {
   words: Array<string>,
   addresses: Array<string>,
-  isMainnet: boolean,
+  network: Network,
 }
 
 export const PdfGenSteps = {
@@ -29,7 +31,7 @@ export const generateAdaPaperPdf = async (
 ): Promise<?Blob> => {
   // Prepare params
   // eslint-disable-next-line no-unused-vars
-  const { isMainnet, addresses, words } = request;
+  const { network, addresses, words } = request;
 
   updateStatus(PdfGenSteps.initializing);
 
@@ -49,15 +51,15 @@ export const generateAdaPaperPdf = async (
     // background images
     const bgUrl = paperWalletCertificateBgPath;
     await addImage(doc, bgUrl, pageSize);
-    if (!isMainnet) {
-      printTestnetLabel(doc, 178, 20, 15);
+    if (network !== NetworkType.MAINNET) {
+      printTestnetLabel(doc, network, 178, 20, 15);
     }
 
     updateStatus(PdfGenSteps.frontpage);
 
     // first page
-    if (!isMainnet) {
-      printTestnetLabel(doc, 85);
+    if (network !== NetworkType.MAINNET) {
+      printTestnetLabel(doc, network, 85);
     }
     const page1Uri = paperWalletPage1Path;
     await addImage(doc, page1Uri, pageSize);
@@ -72,8 +74,8 @@ export const generateAdaPaperPdf = async (
 
     updateStatus(PdfGenSteps.backpage);
 
-    if (!isMainnet) {
-      printTestnetLabel(doc, 75, 180);
+    if (network !== NetworkType.MAINNET) {
+      printTestnetLabel(doc, network, 75, 180);
     }
     const page2Uri = paperWalletPage2PassPath;
     await addImage(doc, page2Uri, pageSize);
@@ -90,11 +92,17 @@ export const generateAdaPaperPdf = async (
   return blob;
 };
 
-function printTestnetLabel(doc: Pdf, y: number, r?: number, xShift?: number) {
+function printTestnetLabel(
+  doc: Pdf,
+  network: string,
+  y: number,
+  r?: number,
+  xShift?: number
+) {
   doc.setFontSize(60);
   doc.setFontType('bold');
   doc.setTextColor(255, 180, 164);
-  textCenter(doc, y, 'TESTNET', null, r, (r || 0) > 90, xShift);
+  textCenter(doc, y, network.toUpperCase(), null, r, (r || 0) > 90, xShift);
   doc.setFontType('normal');
   doc.setTextColor(0, 0, 0);
 }

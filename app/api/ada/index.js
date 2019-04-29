@@ -15,6 +15,7 @@ import type {
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
+import type { Network } from '../../../config/config-types';
 import {
   isValidMnemonic,
   isValidPaperMnemonic,
@@ -251,11 +252,11 @@ export default class AdaApi {
   async createAdaPaperPdf(
     {
       paper,
-      isMainnet,
+      network,
       updateStatus
     }: {
       paper: AdaPaper,
-      isMainnet?: boolean,
+      network: Network,
       updateStatus?: (PdfGenStepType => ?any)
     }
   ): Promise<?Blob> {
@@ -264,7 +265,7 @@ export default class AdaApi {
     const res : Promise<?Blob> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
-      isMainnet: isMainnet || true,
+      network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
       return !updateStatus || updateStatus(s);
