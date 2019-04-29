@@ -15,4 +15,5 @@ files:
   - &ref_languages_mapping
     source: /app/i18n/locales/**/en-US.md
     translation: /app/i18n/locales/**/%locale%.md
+    content_segmentation: 0
     languages_mapping: []
