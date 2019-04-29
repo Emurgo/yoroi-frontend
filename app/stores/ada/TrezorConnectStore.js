@@ -179,7 +179,8 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
       // TODO: [TREZOR] fix type if possible
       const trezorResp = await TrezorConnect.cardanoGetPublicKey({
-        path: derivePathPrefix()
+        // TODO: only support Trezor wallest on account 0
+        path: derivePathPrefix(0)
       });
 
       const trezorEventDevice: DeviceMessage = { ...this.trezorEventDevice };

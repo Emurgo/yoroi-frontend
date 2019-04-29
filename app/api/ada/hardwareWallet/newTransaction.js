@@ -45,7 +45,6 @@ import type {
 import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
 
 import type { ConfigType } from '../../../../config/config-types';
-import { getCurrentCryptoAccount, getCurrentAccountIndex } from '../adaLocalStorage';
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
@@ -154,7 +153,7 @@ function _transformToTrezorInputs(
     const utxo = utxoMap[input.id][input.index];
     const addressInfo = addressMap[utxo.receiver];
     return {
-      path: derivePathAsString(addressInfo.change, addressInfo.index),
+      path: derivePathAsString(addressInfo.account, addressInfo.change, addressInfo.index),
       prev_hash: input.id,
       prev_index: input.index,
       type: 0
@@ -177,7 +176,7 @@ function _outputAddressOrPath(
   changeAddr: AdaAddress,
 ): { path: string } | { address: string } {
   if (txOutput.address === changeAddr.cadId) {
-    return { path: derivePathAsString(changeAddr.change, changeAddr.index) };
+    return { path: derivePathAsString(changeAddr.account, changeAddr.change, changeAddr.index) };
   }
 
   return { address: txOutput.address };
@@ -218,14 +217,6 @@ export async function createLedgerSignTxPayload(
   };
 }
 
-function _derivePathAsBIP32Path(
-  chain: number,
-  addressIndex: number
-): BIP32Path {
-  const accountIndex = getCurrentAccountIndex();
-  return makeCardanoBIP44Path(accountIndex, chain, addressIndex);
-}
-
 function _transformToLedgerInputs(
   inputs: Array<TxoPointerType>,
   addressMap: AdaAddressMap,
@@ -238,7 +229,7 @@ function _transformToLedgerInputs(
     return {
       txDataHex: txDataHexMap[input.id],
       outputIndex: input.index,
-      path: _derivePathAsBIP32Path(addressInfo.change, addressInfo.index),
+      path: makeCardanoBIP44Path(addressInfo.account, addressInfo.change, addressInfo.index),
     };
   });
 }
@@ -258,7 +249,7 @@ function _ledgerOutputAddress58OrPath(
   changeAddr: AdaAddress,
 ): { address58: string } | { path: BIP32Path }  {
   if (txOutput.address === changeAddr.cadId) {
-    return { path: _derivePathAsBIP32Path(changeAddr.change, changeAddr.index) };
+    return { path: makeCardanoBIP44Path(changeAddr.account, changeAddr.change, changeAddr.index) };
   }
 
   return { address58: txOutput.address };
@@ -267,6 +258,7 @@ function _ledgerOutputAddress58OrPath(
 export async function prepareAndBroadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
   unsignedTx: RustModule.Wallet.Transaction,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
 ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
   try {
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');
@@ -276,7 +268,7 @@ export async function prepareAndBroadcastLedgerSignedTx(
       unsignedTxJson
     )}`);
     const finalizer = new RustModule.Wallet.TransactionFinalized(unsignedTx);
-    ledgerSignTxResp.witnesses.map((witness) => prepareWitness(finalizer, witness));
+    ledgerSignTxResp.witnesses.map((witness) => prepareWitness(finalizer, witness, cryptoAccount));
 
     const backendResponse = await sendTx({ signedTx: finalizer.finalize() });
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: success');
@@ -295,9 +287,9 @@ export async function prepareAndBroadcastLedgerSignedTx(
 function prepareWitness(
   finalizer: RustModule.Wallet.TransactionFinalized,
   ledgerWitness: Witness,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
 ): void {
-  const cryptoAccount = getCurrentCryptoAccount();
-  const pubKey = cryptoAccount.root_cached_key.address_key(
+  const pubKey = cryptoAccount.address_key(
     ledgerWitness.path[3] === 1,
     RustModule.Wallet.AddressKeyIndex.new(ledgerWitness.path[4])
   );
