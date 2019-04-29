@@ -1,5 +1,6 @@
 // @flow
 import Action from '../lib/Action';
+import type { PdfGenStepType } from '../../api/ada/paperWallet/paperWalletPdf';
 
 // ======= PAPER WALLET ACTIONS =======
 
@@ -11,7 +12,7 @@ export default class PaperWalletsActions {
   submitVerify: Action<{}> = new Action();
   createPaperWallet: Action<{}> = new Action();
   createPdfDocument: Action<{}> = new Action();
-  setPdfRenderStatus: Action<{ status: string }> = new Action();
+  setPdfRenderStatus: Action<{ status: PdfGenStepType }> = new Action();
   setPdf: Action<{ pdf: Blob }> = new Action();
   downloadPaperWallet: Action<{}> = new Action();
   cancel: Action<{}> = new Action();

@@ -11,6 +11,8 @@ import styles from './CreatePaperDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
 import download from '../../../../assets/images/import-ic.inline.svg';
+import { PdfGenSteps } from '../../../../api/ada/paperWallet/paperWalletPdf';
+import type { PdfGenStepType } from '../../../../api/ada/paperWallet/paperWalletPdf';
 
 const messages = defineMessages({
   dialogTitleCreatePaperWallet: {
@@ -33,10 +35,38 @@ const messages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.download.intro.line2',
     defaultMessage: '!!!Download size (Mb)',
   },
+  pdfGenInitializing: {
+    id: 'settings.paperWallet.dialog.createPaper.initializing',
+    defaultMessage: '!!!Initializing the document',
+  },
+  pdfGenBackground: {
+    id: 'settings.paperWallet.dialog.createPaper.background',
+    defaultMessage: '!!!Drawing pretty background',
+  },
+  pdfGenFrontpage: {
+    id: 'settings.paperWallet.dialog.createPaper.frontpage',
+    defaultMessage: '!!!Preparing the front page',
+  },
+  pdfGenBackpage: {
+    id: 'settings.paperWallet.dialog.createPaper.backpage',
+    defaultMessage: '!!!Preparing the back page',
+  },
+  pdfGenMnemonic: {
+    id: 'settings.paperWallet.dialog.createPaper.mnemonic',
+    defaultMessage: '!!!Printing mnemonics',
+  },
+  pdfGenAddresses: {
+    id: 'settings.paperWallet.dialog.createPaper.addresses',
+    defaultMessage: '!!!Drawing the address',
+  },
+  pdfGenDone: {
+    id: 'settings.paperWallet.dialog.createPaper.done',
+    defaultMessage: '!!!All done!',
+  },
 });
 
 type Props = {
-  renderStatus: ?string,
+  renderStatus: ?PdfGenStepType,
   paperFile: ?Blob,
   onNext: Function,
   onCancel: Function,
@@ -60,6 +90,28 @@ export default class CreatePaperDialog extends Component<Props> {
   handleDataChange = (key: string, value: string) => {
     this.props.onDataChange({ [key]: value });
   };
+
+  statusToMessage(status: ?PdfGenStepType): string {
+    const defaultMessage = '...';
+    switch (status) {
+      case PdfGenSteps.initializing:
+        return this.context.intl.formatMessage(messages.pdfGenInitializing);
+      case PdfGenSteps.background:
+        return this.context.intl.formatMessage(messages.pdfGenBackground);
+      case PdfGenSteps.frontpage:
+        return this.context.intl.formatMessage(messages.pdfGenFrontpage);
+      case PdfGenSteps.backpage:
+        return this.context.intl.formatMessage(messages.pdfGenBackpage);
+      case PdfGenSteps.mnemonic:
+        return this.context.intl.formatMessage(messages.pdfGenMnemonic);
+      case PdfGenSteps.addresses:
+        return this.context.intl.formatMessage(messages.pdfGenAddresses);
+      case PdfGenSteps.done:
+        return this.context.intl.formatMessage(messages.pdfGenDone);
+      default:
+        return defaultMessage;
+    }
+  }
 
   render() {
     const { intl } = this.context;
@@ -133,7 +185,7 @@ export default class CreatePaperDialog extends Component<Props> {
       >
         <AnnotatedLoader
           title={this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
-          details={renderStatus || '...'}
+          details={this.statusToMessage(renderStatus)}
         />
       </Dialog>
     );

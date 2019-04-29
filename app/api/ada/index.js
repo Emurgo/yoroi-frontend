@@ -132,6 +132,7 @@ import {
   makeCardanoBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
+import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
@@ -251,11 +252,11 @@ export default class AdaApi {
     {
       paper,
       isMainnet,
-      logback
+      updateStatus
     }: {
       paper: AdaPaper,
       isMainnet?: boolean,
-      logback?: Function
+      updateStatus?: (PdfGenStepType => ?any)
     }
   ): Promise<?Blob> {
     const { addresses, scrambledWords } = paper;
@@ -266,7 +267,7 @@ export default class AdaApi {
       isMainnet: isMainnet || true,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
-      return !logback || logback(s);
+      return !updateStatus || updateStatus(s);
     });
     return res;
   }
