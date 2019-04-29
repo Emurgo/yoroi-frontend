@@ -82,7 +82,7 @@ export default class FinalizeDialog extends Component<Props> {
       <Dialog
         title={intl.formatMessage(messages.dialogTitleFinalizePaper)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={onCancel}
         className={dialogClasses}
         backButton={onBack && <DialogBackButton onBack={onBack} />}

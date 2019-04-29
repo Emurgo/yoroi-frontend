@@ -152,7 +152,7 @@ export default class UserPasswordDialog extends Component<Props> {
       <Dialog
         title={intl.formatMessage(messages.dialogTitleUserPaperPassword)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
