@@ -1,59 +1,58 @@
 # Abstract
 
-Allows user to lock their wallet with a pin like someone can do in iOS / Android.
+Add a layer for security and privacy with a lock feature, similarly to how it is done in yoroi-mobile. 
+
+When the feature is enabled, the user will be required to enter a chosen password to open the app. The password will be used to encrypt all locally stored data (transactions, addresses, wallets, etc).
 
 # Motivation
 
-Yoroi is completely secure (impossible to do tx without the password), but we want to add a lock screen similar to what phones have so we can protect the user privacy (balance and transactions) in case that someone else has access to the computer. This has a been a constant request from multiple people.
+Although user's funds are secured with a spending password, the balance, addresses, and transactions are immediately visible when the app is opened. Additionally, the same sensitive data is stored locally (in localStorage and IndexedDB) unencrypted.
+
+We want to allow users to protect their privacy with the lock feature.
 
 # Proposal
 
-## How it should work
+Terminology:
+We will use the word 'passcode' to refer to the password used for this feature.
 
-The user should have like a possibility to click an icon in the topbar (a lock) and then the app will be locked; in the locked state, the user can’t see any information except for a dialog where a PIN is asked (we will name this pin/ pincode to avoid confusion with the spending password)
+Stanford JavaScript Crypto Library will be used for data encryption/decryption and hashing (SHA256).
 
-## Requirements
+Lock feature implementation plan:
 
-- add a dummy icon in the top right part of the topbar -> activate a locking screen
-- add a new item in the settings list with the option to enable / disable a locking screen (if it’s disable probably we should hide the icon on the top right bar) also besides a checkbox for this screen we should have: current password input / new password input / repeat new password input
-- when the user selects the checkbox to enable a password, we should show a dialog asking for a password and repeat password
-minimum 6 characters (max depending on the design). PIN will be stored as a hash + salt. Probably we should use SHA2, SHA3 or Blake2b.
+## 1. Lovefield Schema updates
+Update Lovefield DB Schema of existing tables: add auto-incremented primary key columns to all tables, update foreign keys, make sure that proper action is set on foreign keys (CASCADE).
 
-### Advantages
+Because the data currently stored in IDB is not critical, and because of the significant change in the schema, it is okay to drop the existing database, and recreate a new version with the new schema. The only data we need to migrate are accounts and wallets information currently stored in localStorage. After migration this information has to be purged from localStorage.
 
-- Even if this feature doesn’t add real security, it would help with privacy.
-- Feature pairing with the upcoming mobile version.
+## 2. Refactor the database API to allow passcode protection and encryption.
 
-### Disadvantages
+Here is what will be happening when the user enables passcode lock:
 
-- Users can get confused between PIN and password.
-- Users can get confused if their PIN is not ”automatically” sync with other instances of Chrome App.
+- Create an object containing validation hash (hash(hash(passcode))), and the current date.
+- Encrypt this object with a newly generated salt and initialization vector (this will give us encrypted cipher)
+- Using single transaction, encrypt all data stored in IDB using same salt and IV, and save the encrypted cipher in IDB (Security table)
 
-### Current flow
-- User can go to the settings page and enable lock screen feature (it's disabled by default)
-- After that user will be asked to set his PIN code. The pin code will be encrypted by the https://www.npmjs.com/package/bcryptjs - the JS implementation of the well-known bcrypt. Bcryptjs uses Blowfish algorithm under the hood and the great advantage is we don't have to store salt somewhere, the salt is generated on the fly by Bcryptjs itself. The encrypted pin code will be saved in localStorage.
-- If the user have the lock screen feature enabled and pin code set, he will be able to see the icon in the topbar. 
-- User can lock his app by clicking on this icon.
-- If the app is locked, it will render only the lock screen, no matter on what page user is.
-- User should enter his pin code to unlock the app
-- The entered pin code will be processed by bcryptjs and if it's correct the app will be unlocked.
-- note: since all the settings are stored locally, the user will be able to open Application tab in browser and remove all related items from the localStorage, thus the app will be unlocked after a page refresh.
-- User is able to change his PIN code from settings page, but he have to remember his current PIN code for changing.
+During database initialization we will check the contents of Security table. If we find an encrypted cipher stored there, we will try to decrypt it with a passcode provided by the user. Database initialization won't succeed unless a correct passcode is provided.
 
-# Improvement proposal
+Here is a sandboxed reference implementation of database encryption:
+https://github.com/ebeloded/indexed-db-encryption
 
-### Flow 1: keep lock screen optional
+### Note regarding timestamps
 
-If we want to keep lock screen optional as it is, we could just encrypt saved data as it was proposed. We also might display some kind of notification to user when there are no wallet data in localStorage, something like "Enable lock screen to improve the security". I think we need user to understand clearly that if he\she don't avoid the lock screen, his\her data won't be protected with encryption.
+The proposed implementation of Database encryption leaves one type of values unencrypted - dates stored as UNIX timestamps. We cannot encrypt these values because date fields are indexed DateTime types, and we cannot replace them with arbitrary ciphertext.
 
-### Flow 2: make lock screen enabled by default for all users
+Dates of transactions, however, are sensitive values. A committed investigator with the right tools could potentially infer information about transactions by analyzing the timestamps.
 
-In this case, we will have 3 states of the app
-- state 1: there are no wallet data and no hashed pincode in the localStorage
-This is like a state after you just have installed the app. State 1 asks user to set a pin code to proceed. 
-- state 2: there is a hashed pincode in the localStorage
-At this stage user is asked to confirm his pincode every time when the user opens the app. Now user can work with wallets. When user tries to add or restore the wallet, wallet data should be encrypted and then saved. 
-- state 3: there is wallet data in localStorage, but no hashed pin code
-In this case walled data should be cleared and the app goes to state 1.
+I propose to add random noise to all dates during encryption in order to hide real timestamps.
 
-Flow 2 has better security because if someone clears the lock screen-related fields in the localStorage, he\she won't be able to work with wallets.
+In practical terms, I suggest to generate a random number when the user initiates DB encryption and add it to every date field in the database. We will store this number, encrypted, in the cipher data object, and use it during decryption to get the real date value.
+
+This will allow us to retain the order of dates and DB index, while making sure that locally stored data doesn’t expose any sensitive information directly.
+
+## 3. Add Lock feature in settings, implement the following functionality:
+  - Set a new passcode, which will encrypt the IDB contents
+  - Show age of the passcode
+  - Disable lock (requires passcode), which will decrypt contents of IDB
+  - Change passcode (requires current and new passcode), which will decrypt-encrypt IDB contents
+
+## 4. Show lock screen if the database cannot be opened without a passcode
