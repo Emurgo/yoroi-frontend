@@ -68,6 +68,10 @@ export default class FinalizeDialog extends Component<Props> {
     const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
     const largeTopMarginClasses = classnames([styles.largeTopMargin]);
+    const addressClasses = classnames([
+      classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock,
+      styles.addressWrap
+    ]);
 
     const actions = [
       {
@@ -100,9 +104,9 @@ export default class FinalizeDialog extends Component<Props> {
         <h2 className={largeTopMarginClasses}>
           {intl.formatMessage(messages.paperAddressesLabel)}
         </h2>
-        <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
+        <div className={addressClasses}>
           {addresses.map(a => (
-            <span>{a}<br /></span>
+            <span key={a}>{a}<br /></span>
           ))}
         </div>
 

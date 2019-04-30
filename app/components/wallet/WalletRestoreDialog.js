@@ -165,7 +165,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           );
           return [
             field.value.length > 0 && validatePassword(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
+            this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
           ];
         }],
       } : undefined,
@@ -236,9 +236,16 @@ export default class WalletRestoreDialog extends Component<Props> {
       isVerificationMode,
       showPaperPassword,
       classicTheme,
-      mnemonicValidator
+      mnemonicValidator,
+      passwordValidator,
     } = this.props;
-    const { walletName, walletPassword, repeatPassword, recoveryPhrase } = form.values();
+    const {
+      walletName,
+      paperPassword,
+      walletPassword,
+      repeatPassword,
+      recoveryPhrase
+    } = form.values();
 
     const dialogClasses = classnames([
       styles.component,
@@ -264,14 +271,24 @@ export default class WalletRestoreDialog extends Component<Props> {
       ? styles.walletPasswordClassic
       : styles.walletPassword;
 
-    const disabledCondition = () => {
-      let condition =
-        isValidWalletName(walletName)
-        && mnemonicValidator(join(recoveryPhrase, ' '))
-        && isValidWalletPassword(walletPassword);
+    const validatePaperPassword = () => {
+      let condition = isValidWalletPassword(paperPassword);
+      if (passwordValidator) {
+        condition = condition && passwordValidator(paperPassword);
+      }
+      return condition;
+    };
 
+    const disabledCondition = () => {
+      let condition = mnemonicValidator(join(recoveryPhrase, ' '));
+      if (!isVerificationMode) {
+        condition = condition &&
+          isValidWalletName(walletName) &&
+          isValidWalletPassword(walletPassword) &&
+          isValidRepeatPassword(walletPassword, repeatPassword);
+      }
       if (showPaperPassword) {
-        condition &= isValidRepeatPassword(walletPassword, repeatPassword);
+        condition = condition && validatePaperPassword();
       }
 
       return !condition;
@@ -340,7 +357,7 @@ export default class WalletRestoreDialog extends Component<Props> {
               <Input
                 className="paperPassword"
                 {...paperPasswordField.bind()}
-                done={isValidWalletPassword(walletPassword)}
+                done={validatePaperPassword()}
                 error={paperPasswordField.error}
                 skin={classicTheme ? InputSkin : InputOwnSkin}
               />

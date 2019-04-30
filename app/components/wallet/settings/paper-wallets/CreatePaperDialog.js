@@ -177,7 +177,7 @@ export default class CreatePaperDialog extends Component<Props> {
       <Dialog
         title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
