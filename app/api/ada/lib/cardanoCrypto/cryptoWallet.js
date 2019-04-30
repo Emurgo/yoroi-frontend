@@ -52,6 +52,8 @@ export const isValidEnglishAdaPaperMnemonic = (
   phrase: string,
   numberOfWords: ?number = 27
 ) => {
+  // Any password will return some valid unscrambled mnemonic
+  // so we just pass a fake password to pass downstream validation
   const fakePassword = numberOfWords === 21 ? 'xxx' : undefined;
   const [unscrambled, unscrambledLen] =
     unscramblePaperAdaMnemonic(phrase, numberOfWords, fakePassword);
