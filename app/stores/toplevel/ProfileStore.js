@@ -24,7 +24,12 @@ export default class SettingsStore extends Store {
     //   value: 'id-ID',
     //   label: globalMessages.languageIndonesian,
     //   svg: require('../../assets/images/flags/indonesian.inline.svg')
-    // }
+    // },
+    // {
+    //   value: 'es-ES',
+    //   label: globalMessages.languageSpanish,
+    //   svg: require('../../assets/images/flags/spanish.inline.svg')
+    // },
   ];
 
   @observable bigNumberDecimalFormat = {
