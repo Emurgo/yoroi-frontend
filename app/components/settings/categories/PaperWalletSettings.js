@@ -82,6 +82,7 @@ export default class PaperWalletSettings extends Component<Props> {
           options={numAddressOptions}
           {...numAddresses.bind()}
           skin={SelectSkin}
+          isOpeningUpward // need this to make sure all options still show on small screens
         />
 
         <Button
