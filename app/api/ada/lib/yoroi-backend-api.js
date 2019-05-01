@@ -4,19 +4,22 @@
 // https://github.com/Emurgo/yoroi-backend-service/
 
 import axios from 'axios';
+import _ from 'lodash';
 import type { ConfigType } from '../../../../config/config-types';
 import {
   Logger,
   stringifyError
 } from '../../../utils/logging';
 import {
+  GetAllUTXOsForAddressesError,
   GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
   SendTransactionApiError,
+  SendTransactionError,
   CheckAdressesInUseApiError,
-  InvalidWitnessError
+  InvalidWitnessError,
 } from '../errors';
 import type {
   UTXO,
@@ -92,6 +95,32 @@ export const getUTXOsSumsForAddresses = (
     })
 );
 
+/** Sum up the UTXO for a list of addresses by batching backend requests */
+export async function getAllUTXOsForAddresses(
+  addresses: Array<string>
+): Promise<Array<UTXO>> {
+  try {
+    // split up all addresses into chunks of equal size
+    const groupsOfAddresses = _.chunk(addresses, CONFIG.app.addressRequestSize);
+
+    // convert chunks into list of Promises that call the backend-service
+    const promises = groupsOfAddresses
+      .map(groupOfAddresses => getUTXOsForAddresses(
+        { addresses: groupOfAddresses }
+      ));
+
+    // Sum up all the utxo
+    return Promise.all(promises)
+      .then(groupsOfUTXOs => (
+        groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), [])
+      ));
+  } catch (getUtxosError) {
+    Logger.error('yoroi-backend-api:::getAllUTXOsForAddresses error: ' +
+      stringifyError(getUtxosError));
+    throw new GetAllUTXOsForAddressesError();
+  }
+}
+
 export type HistoryRequest = {
   addresses: Array<string>,
   dateFrom: Date
@@ -151,6 +180,21 @@ export const sendTx = (
       throw new SendTransactionApiError();
     });
 };
+
+export async function sendFinalizedTx(
+  signedTx: RustModule.Wallet.SignedTransaction
+): Promise<SignedResponse> {
+  try {
+    return await sendTx({ signedTx });
+  } catch (sendTxError) {
+    Logger.error('adaNewTransactions::newAdaTransaction error: ' +
+      stringifyError(sendTxError));
+    if (sendTxError instanceof InvalidWitnessError) {
+      throw new InvalidWitnessError();
+    }
+    throw new SendTransactionError();
+  }
+}
 
 export type FilterUsedRequest = {
   addresses: Array<string>
