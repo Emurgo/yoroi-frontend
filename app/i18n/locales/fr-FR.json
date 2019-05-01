@@ -186,7 +186,7 @@
   "wallet.connect.hw.dialog.step.about.introText.line.1": "Un hardware wallet est un petit appareil USB qui ajoute un niveau de sécurité supplémentaire à votre wallet.",
   "wallet.connect.hw.dialog.step.about.introText.line.2": "C'est plus sécurisé car la clé privée ne quitte jamais le hardware wallet.",
   "wallet.connect.hw.dialog.step.about.introText.line.3": "Cela protège vos fonds, même si votre ordinateur est compromis en raison des tentatives de hameçonage, de logiciels malveillants, etc.",
-  "wallet.connect.hw.dialog.step.about.label": "A propos",
+  "wallet.connect.hw.dialog.step.about.label": "À propos",
   "wallet.connect.hw.dialog.step.about.prerequisite.4": "Votre ordinateur doit rester connecté à Internet durant tout le processus.",
   "wallet.connect.hw.dialog.step.about.prerequisite.header": "Prérequis",
   "wallet.connect.hw.dialog.step.connect.introText.line.3": "Ce processus partage la clé publique de Cardano avec Yoroi.",
