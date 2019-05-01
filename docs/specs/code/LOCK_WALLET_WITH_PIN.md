@@ -49,7 +49,11 @@ In practical terms, I suggest to generate a random number when the user initiate
 
 This will allow us to retain the order of dates and DB index, while making sure that locally stored data doesn’t expose any sensitive information directly.
 
-## 3. Add Lock feature in settings, implement the following functionality:
+## 3. Add Lock feature in settings:
+
+Lock feature will be a part of a new "Security and Privacy" section in settings (apart from lock feature, we will later add an option to show/hide balance, and likely other options).
+
+Implement the following functionality
   - Set a new passcode, which will encrypt the IDB contents
   - Show age of the passcode
   - Disable lock (requires passcode), which will decrypt contents of IDB
