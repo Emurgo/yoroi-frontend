@@ -21,9 +21,9 @@ ABCD-1234
 
 First 4 characters are always letters, for this we can take "Shifted HEX" alphabet:
 
-`A B C D E H K L N O P S T W X Z`
+`A B C D E H K L N O P S T V X Z`
 
-16 letter symbols, selected to contain character from all over the alphabet, but not contain characters that look too much like each other.
+16 letter symbols, selected to contain character from all over the alphabet, but not contain characters that look too much like each other (and also carefully selected to minimize possible collision with [this list](https://www.noswearing.com/fourletterwords.php)).
 
 So proposition is just to take first 2 bytes of the checksum and format them with this set of symbols, as with HEX, e.g. byte 0 would be represented as `AA`, and byte 255 - as `ZZ`; byte 132 is `NE`, etc.
 
