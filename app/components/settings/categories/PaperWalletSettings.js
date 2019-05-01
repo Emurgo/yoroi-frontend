@@ -68,7 +68,8 @@ export default class PaperWalletSettings extends Component<Props> {
     const numAddressesSelectClassNames = classNames([styles.numAddressesSelect]);
     const buttonClassNames = classNames([
       'primary',
-      styles.button
+      styles.button,
+      'createPaperWallet' // classname for UI tests
     ]);
     return (
       <div className={componentClassNames}>

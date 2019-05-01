@@ -64,6 +64,10 @@ When(/^I submit the wallet password dialog$/, async function () {
   await this.click('.confirmButton');
 });
 
+When(/^I press the next button$/, async function () {
+  await this.click('.confirmButton');
+});
+
 Then(/^I should not see the change password dialog anymore$/, async function () {
   await this.waitForElementNotPresent('.changePasswordDialog');
 });

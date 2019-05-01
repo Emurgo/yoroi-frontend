@@ -49,6 +49,10 @@ When(/^I enter the restored wallet password:$/, async function (table) {
   await this.input("input[name='repeatPassword']", fields.repeatedPassword);
 });
 
+Then(/^I repeat the wallet password "([^"]*)"$/, async function (password) {
+  await this.input("input[name='repeatPassword']", password);
+});
+
 When(/^I enter the paper wallet password "([^"]*)"$/, async function (password) {
   await this.input("input[name='paperPassword']", password);
 });
