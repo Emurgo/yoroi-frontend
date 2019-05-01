@@ -19,6 +19,7 @@ import {
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
+import headerMixin from '../mixins/HeaderBlock.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
@@ -93,6 +94,10 @@ const messages = defineMessages({
   repeatPasswordFieldPlaceholder: {
     id: 'wallet.restore.dialog.repeatPasswordFieldPlaceholder',
     defaultMessage: '!!!Repeat spending password',
+  },
+  passwordDisclaimer: {
+    id: 'wallet.restore.dialog.passwordDisclaimer',
+    defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
   },
 });
 
@@ -273,10 +278,11 @@ export default class WalletRestoreDialog extends Component<Props> {
       : styles.walletPassword;
 
     const validatePaperPassword = () => {
-      // Although we require 12 words for creation
-      // We allow any password to be used for restoration
-      // This is to ensure compatiblity with any other apps that use our paper wallet construction
-      return true;
+      let condition = isValidWalletPassword(paperPassword);
+      if (passwordValidator) {
+        condition = condition && passwordValidator(paperPassword);
+      }
+      return condition;
     };
 
     const disabledCondition = () => {
@@ -287,12 +293,17 @@ export default class WalletRestoreDialog extends Component<Props> {
           isValidWalletPassword(walletPassword) &&
           isValidRepeatPassword(walletPassword, repeatPassword);
       }
-      if (showPaperPassword) {
-        condition = condition && validatePaperPassword();
-      }
+
+      // Although we require 12 words for creation
+      // We allow any password to be used for restoration
+      // This is to ensure compatiblity with any other apps that use our paper wallet construction
 
       return !condition;
     };
+
+    const headerBlockClasses = classicTheme
+      ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
+      : headerMixin.headerBlock;
 
     const walletNameField = form.$('walletName');
     const recoveryPhraseField = form.$('recoveryPhrase');
@@ -355,6 +366,9 @@ export default class WalletRestoreDialog extends Component<Props> {
         {showPaperPassword ? (
           <div className={walletPasswordClasses}>
             <div className={paperPasswordFieldClasses}>
+              <div className={headerBlockClasses}>
+                {intl.formatMessage(messages.passwordDisclaimer)}
+              </div>
               <Input
                 className="paperPassword"
                 {...paperPasswordField.bind()}
