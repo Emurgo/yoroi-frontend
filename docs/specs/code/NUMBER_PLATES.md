@@ -6,6 +6,8 @@ There's no technical option for us to completely eliminate this from happening, 
 
 As the first step we need to implement a unique account identifier that can be shown in UI in a very easily perceivable way, so users can see it, remember it, print-screen it, and store it somewhere else for later. Unique ID must be generated from *account public key* (NOT private) and of course should be completely irreversible.
 
+**⚠️ Note:** that plate numbers are generated **per account**, and not for the whole wallet. Because right now we store account public keys, and using root wallet public key would allow to ask all users to restore their wallets again. Additionally, when working with hardware wallets we might not have an access to the root key at all, as Trezor, for example, only exports us the public key for a specific account.
+
 To ensure proper irreversibility on all steps we propose to first take value `H` as `Blake2b_512` (with 64 byte output) of the public account key, and then futher work strictly with this value.
 
 ## "Number Plate"
