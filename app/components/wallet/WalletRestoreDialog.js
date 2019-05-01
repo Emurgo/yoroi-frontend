@@ -273,11 +273,10 @@ export default class WalletRestoreDialog extends Component<Props> {
       : styles.walletPassword;
 
     const validatePaperPassword = () => {
-      let condition = isValidWalletPassword(paperPassword);
-      if (passwordValidator) {
-        condition = condition && passwordValidator(paperPassword);
-      }
-      return condition;
+      // Although we require 12 words for creation
+      // We allow any password to be used for restoration
+      // This is to ensure compatiblity with any other apps that use our paper wallet construction
+      return true;
     };
 
     const disabledCondition = () => {
