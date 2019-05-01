@@ -54,12 +54,12 @@ When(/^I enter a valid "Regular" redemption key$/, async function () {
 
 When(/^I enter an invalid "Regular" redemption key$/, async function () {
   const redemptionKey = 'invalidKey';
-  await this.input("input[name='walletPassword']", redemptionKey);
+  await this.input("input[name='redemptionKey']", redemptionKey);
 });
 
 When(/^I enter an already used "Regular" redemption key$/, async function () {
   const redemptionKey = 'Dhpd0rMtOTcRoHO62BFAb47il3zjtsICfsjUuFLiTS0=';
-  await this.input("input[name='walletPassword']", redemptionKey);
+  await this.input("input[name='redemptionKey']", redemptionKey);
 });
 
 When(/^I select a valid "Regular" PDF certificate$/, async function () {
@@ -72,7 +72,7 @@ When(/^I select a valid "Regular" encrypted PDF certificate$/, async function ()
 
 When(/^I enter a valid "Force vended" redemption key$/, async function () {
   const redemptionKey = 'LtOD4vxIqfEUYheTiHprRmvmAXHvMJbulllqHhjAGHc=';
-  await this.input("input[name='walletPassword']", redemptionKey);
+  await this.input("input[name='redemptionKey']", redemptionKey);
 });
 
 When(/^I select a valid "Force vended" PDF certificate$/, async function () {
