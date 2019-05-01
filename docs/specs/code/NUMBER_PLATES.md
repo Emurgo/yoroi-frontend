@@ -78,4 +78,6 @@ For UI, imo, it would make sense to have this ID in the top left corner always p
 
 Note that this UI implies that plate and icon are always some padding to the right of the main logo, even when main logo **includes a hardware wallet icon**.
 
-Optionally we might also design the alphanumeric ID to look like some stylistic car plate number, so it gets more interesting and exciting for people.
+Optionally we might also design the alphanumeric ID to look like some stylistic car plate number, so it gets more interesting and exciting for people. E.g.
+
+<img src="https://user-images.githubusercontent.com/5585355/57031913-a8b38980-6c51-11e9-9c26-fafec659b97f.png" width="400"/>
