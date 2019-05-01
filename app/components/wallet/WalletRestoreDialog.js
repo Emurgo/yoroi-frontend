@@ -23,6 +23,7 @@ import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import PasswordInstructions from '../widgets/forms/PasswordInstructions';
+import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
   title: {
@@ -345,10 +346,11 @@ export default class WalletRestoreDialog extends Component<Props> {
           options={validWords}
           maxSelections={this.props.numberOfMnemonics}
           {...recoveryPhraseField.bind()}
+          done={mnemonicValidator(join(recoveryPhrase, ' '))}
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-          skin={AutocompleteSkin}
+          skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
         />
 
         {showPaperPassword ? (
