@@ -32,8 +32,8 @@ Example code for the whole process:
 function bytesToId(a,b,c,d) {
   const alpha = `ABCDEHKLNOPSTWXZ`;
   const letters = b => `${alpha[Math.floor(b/16)]}${alpha[b%16]}`;
-  const numbers = (a,b) => `${((a<<8)+b)%10000}`.padStart(4,'0');
-  return `${letters(a)}${letters(b)}-${numbers(c,d)}`;
+  const numbers = `${((c<<8)+d)%10000}`.padStart(4,'0');
+  return `${letters(a)}${letters(b)}-${numbers}`;
 }
 ```
 
