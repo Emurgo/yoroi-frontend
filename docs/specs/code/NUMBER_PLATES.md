@@ -21,7 +21,7 @@ ABCD-1234
 
 First 4 characters are always letters, for this we can take "Shifted HEX" alphabet:
 
-`A B C D E H K L N O P S T V X Z`
+`A B C D E H K L N O P Q S T X Z`
 
 16 letter symbols, selected to contain character from all over the alphabet, but not contain characters that look too much like each other (and also carefully selected to minimize possible collision with [this list](https://www.noswearing.com/fourletterwords.php)).
 
