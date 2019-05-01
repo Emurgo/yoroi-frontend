@@ -49,17 +49,17 @@ When(/^I click on ada redemption choices "([^"]*)" tab$/, async function (tabTex
 
 When(/^I enter a valid "Regular" redemption key$/, async function () {
   const redemptionKey = 'llVRYvW7LAyqmDMnUOvrs5ih4OHfLiLZrz5NT+iRuTw=';
-  await this.input('#redemptionKey--5', redemptionKey);
+  await this.input("input[name='redemptionKey']", redemptionKey);
 });
 
 When(/^I enter an invalid "Regular" redemption key$/, async function () {
   const redemptionKey = 'invalidKey';
-  await this.input('#redemptionKey--5', redemptionKey);
+  await this.input("input[name='walletPassword']", redemptionKey);
 });
 
 When(/^I enter an already used "Regular" redemption key$/, async function () {
   const redemptionKey = 'Dhpd0rMtOTcRoHO62BFAb47il3zjtsICfsjUuFLiTS0=';
-  await this.input('#redemptionKey--5', redemptionKey);
+  await this.input("input[name='walletPassword']", redemptionKey);
 });
 
 When(/^I select a valid "Regular" PDF certificate$/, async function () {
@@ -72,7 +72,7 @@ When(/^I select a valid "Regular" encrypted PDF certificate$/, async function ()
 
 When(/^I enter a valid "Force vended" redemption key$/, async function () {
   const redemptionKey = 'LtOD4vxIqfEUYheTiHprRmvmAXHvMJbulllqHhjAGHc=';
-  await this.input('#redemptionKey--5', redemptionKey);
+  await this.input("input[name='walletPassword']", redemptionKey);
 });
 
 When(/^I select a valid "Force vended" PDF certificate$/, async function () {
@@ -87,17 +87,17 @@ When(/^I enter a valid "Force vended" encrypted PDF certificate email, passcode 
   const email = 'nnmbsds@example.org';
   const passcode = 'uilfeet';
   const amount = '12345';
-  await this.input('#email--8', email);
-  await this.input('#adaPasscode--9', passcode);
-  await this.input('#adaAmount--10', amount);
+  await this.input("input[name='email']", email);
+  await this.input("input[name='adaPasscode']", passcode);
+  await this.input("input[name='adaAmount']", amount);
 });
 
 When(/^I enter a valid "Force vended" encrypted PDF certificate decryption key "([^"]*)"$/, async function (decryptionKey) {
-  await this.input('#decryptionKey--11', decryptionKey);
+  await this.input("input[name='decryptionKey']", decryptionKey);
 });
 
 When(/^I enter a valid "Paper vended" shielded vending key$/, async function () {
-  await this.input('#shieldedRedemptionKey--6', '6ANn43jbzR7zZGnV3BYnna1myW5HajPgjiCPg4vpcayf');
+  await this.input("input[name='shieldedRedemptionKey']", '6ANn43jbzR7zZGnV3BYnna1myW5HajPgjiCPg4vpcayf');
 });
 
 When(/^I enter a valid "Paper vended" shielded vending key passphrase$/, async function () {

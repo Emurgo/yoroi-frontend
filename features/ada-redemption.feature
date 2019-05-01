@@ -14,6 +14,7 @@ Feature: Ada Redemption
     Then I should not see the "Daedalus Redemption Disclaimer" overlay anymore
     And I should still be on the ada redemption screen
 
+  @it-73
   Scenario: User redeems manually entered "Regular" redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I enter a valid "Regular" redemption key
@@ -69,6 +70,7 @@ Feature: Ada Redemption
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue
     And I should see the summary screen
 
+  @it-75
   Scenario: User redeems "Force vended" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I click on ada redemption choices "Force vended" tab
@@ -79,6 +81,7 @@ Feature: Ada Redemption
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue
     And I should see the summary screen
 
+  @it-74
   Scenario: User redeems manually entered "Paper vended" shielded vending key and passphrase
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I click on ada redemption choices "Paper vended" tab
@@ -99,6 +102,7 @@ Feature: Ada Redemption
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue
     And I should see the summary screen
 
+  @it-76
   Scenario Outline: User redeems "Recovery - force vended" encrypted PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I click on ada redemption choices "Recovery - force vended" tab
