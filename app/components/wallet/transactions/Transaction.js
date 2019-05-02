@@ -298,7 +298,7 @@ export default class Transaction extends Component<Props, State> {
               ) : null}
 
               <h2>{intl.formatMessage(messages.transactionId)}</h2>
-              <span>{data.id}</span>
+              <span className={styles.address}>{data.id}</span>
             </div>
           </div>
         </div>
