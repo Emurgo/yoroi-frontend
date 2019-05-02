@@ -174,7 +174,7 @@
   "wallet.amountInput.feesLabel": "+ {amount} of fees",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "Continuar",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Asegúrese de que nadie vea su pantalla a menos que desee que tengan acceso a sus fondos.",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "En la siguiente pantalla, verás un conjunto de 15 palabras aleatorias. Esto es\n su frase de respaldo de su billetera. Se puede ingresar en cualquier versión de Yoroi \n para respaldar o restaurar los fondos de su billetera y la llave privada.",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "En la siguiente pantalla, verás un conjunto de 15 palabras aleatorias. Esta es\nla frase de respaldo de tu billetera. Se puede ingresar en cualquier versión de Yoroi \npara respaldar o restaurar los fondos de tu billetera y la llave privada.",
   "wallet.backup.recovery.phrase.dialog.title": "Frase de recuperación",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "Please, make sure you have carefully written down your recovery phrase somewhere safe.\n    You will need this phrase to use and restore your wallet. Phrase is case sensitive.",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "Sí, lo he escrito.",
