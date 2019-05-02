@@ -87,9 +87,10 @@
     font-size: 14px;
     justify-content: space-between;
     line-height: 19px;
+    letter-spacing: 0;
 
     .hash {
-      font-size: 17px;
+      font-size: 14px;
       font-family: var(--font-mono-medium);
       line-height: 23px;
       margin-bottom: 6px;
@@ -278,6 +279,7 @@
       font-family: var(--font-mono-regular);
       flex-grow: 1;
       margin-right: 32.5px;
+      letter-spacing: 0;
     }
 
     .addressActions {
@@ -356,9 +358,10 @@
     }
 
     .addressId {
+      font-family: var(--font-mono-regular);
       flex-grow: 1;
       margin-right: 32.5px;
-      font-family: var(--font-mono-regular);
+      letter-spacing: 0;
       color: var(--theme-transactions-received-address-color);
     }
 
