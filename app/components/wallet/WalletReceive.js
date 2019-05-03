@@ -17,6 +17,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
+import CopyableAddress from '../widgets/CopyableAddress';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -103,11 +104,6 @@ export default class WalletReceive extends Component<Props, State> {
     const { intl } = this.context;
     const { showUsed } = this.state;
 
-    const walletAddressClasses = classnames([
-      styles.hash,
-      isWalletAddressUsed ? styles.usedHash : null,
-    ]);
-
     const generateAddressButtonClasses = classnames([
       'primary',
       'generateAddressButton',
@@ -145,17 +141,13 @@ export default class WalletReceive extends Component<Props, State> {
             <div className={styles.hashLabel}>
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
-            <div className={walletAddressClasses}>
-              <span>{walletAddress}</span>
-              <CopyToClipboard
-                text={walletAddress}
-                onCopy={onCopyAddress.bind(this, walletAddress)}
-              >
-                <SvgInline svg={iconCopy} className={styles.copyIconBig} />
-              </CopyToClipboard>
-
-              {!classicTheme && notification}
-            </div>
+            <CopyableAddress
+              address={walletAddress}
+              isClassicThemeActive={classicTheme}
+              onCopyAddress={onCopyAddress}
+              isUsed={isWalletAddressUsed}
+            />
+            {!classicTheme && notification}
             <div className={styles.instructionsText}>
               {intl.formatMessage(messages.walletReceiveInstructions)}
             </div>

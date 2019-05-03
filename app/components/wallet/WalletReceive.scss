@@ -32,21 +32,9 @@
   }
 }
 
-.copyIconBig,
 .copyIcon {
   cursor: pointer;
   object-fit: contain;
-}
-
-.copyIconBig {
-  margin-left: 6px;
-  & > svg {
-    height: 14.5px;
-    width: 11.5px;
-    path {
-      fill: var(--theme-icon-copy-address-color);
-    }
-  }
 }
 
 .copyIcon {

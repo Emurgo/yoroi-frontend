@@ -1,0 +1,40 @@
+@mixin hashBase {
+  // TODO: monospace
+  font-family: var(--font-medium);
+  margin-bottom: 6px;
+  word-break: break-all;
+}
+.hash {
+  @include hashBase;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1.57;
+} 
+.hashClassic {
+  @include hashBase;
+  font-size: 17px;
+  line-height: 23px;
+}
+
+
+.usedHash > span {
+  opacity: 0.4;
+}
+
+.copyIconBig,
+.copyIcon {
+  cursor: pointer;
+  object-fit: contain;
+}
+
+.copyIconBig {
+  margin-left: 6px;
+  & > svg {
+    height: 14.5px;
+    width: 11.5px;
+    path {
+      fill: var(--theme-icon-copy-address-color);
+    }
+  }
+}

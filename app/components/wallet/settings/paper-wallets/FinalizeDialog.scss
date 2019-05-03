@@ -18,7 +18,27 @@
   }
 }
 
+li::before {
+  content: "●";
+  font-size:0.8em;
+  color: var(--theme-bullet-point-color);
+}
+li {
+  display: list-item;
+
+  span {
+    font-size: 13px;
+    margin-left:0.2em;
+  }
+}
+
+.smallTopMargin {
+  margin-top: 7px;
+}
+
 .largeTopMargin {
+  font-family: var(--font-regular);
+  margin-left: 5px;
   margin-top: 20px;
 }
 

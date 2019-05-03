@@ -178,6 +178,8 @@ export default {
   '--theme-bordered-box-border': '1px solid #f3f3f5',
   '--theme-bordered-box-text-color': '#121327',
 
+  '--theme-bullet-point-color': '#adaeb5',
+
   '--theme-button-primary-background-color': '#daa49a',
   '--theme-button-primary-background-color-hover': '#edb3a8',
   '--theme-button-primary-background-color-active': '#c4948b',

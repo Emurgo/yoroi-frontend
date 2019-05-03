@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
@@ -17,23 +17,19 @@ const messages = defineMessages({
   },
   paperAddressesLabel: {
     id: 'settings.paperWallet.dialog.paperAddressesLabel',
-    defaultMessage: '!!!Your Paper Wallet address[es]',
+    defaultMessage: '!!!Your Paper Wallet address[es]:',
   },
   paperFinalizeIntroLine1: {
     id: 'settings.paperWallet.dialog.finalize.intro.line1',
-    defaultMessage: '!!!You have successfully created and verified a Yoroi Paper Wallet!',
+    defaultMessage: '!!!Make sure:',
   },
   paperFinalizeIntroLine2: {
     id: 'settings.paperWallet.dialog.finalize.intro.line2',
-    defaultMessage: '!!!Make sure to keep the paper document and secret words safe.',
+    defaultMessage: '!!!to <strong>keep the paper document</strong> and secret words safe.',
   },
   paperFinalizeIntroLine3: {
     id: 'settings.paperWallet.dialog.finalize.intro.line3',
-    defaultMessage: '!!!Make sure to REMEMBER THE PASSWORD, or write it down and keep it safe!',
-  },
-  paperFinalizeIntroLine4: {
-    id: 'settings.paperWallet.dialog.finalize.intro.line4',
-    defaultMessage: '!!!You can copy-paste the address[es] to have easy quick access to them without typing.',
+    defaultMessage: '!!!to <strong>remember the password</strong>, or write it down and keep it safe!',
   },
 });
 
@@ -67,9 +63,7 @@ export default class FinalizeDialog extends Component<Props> {
 
     const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
-    const largeTopMarginClasses = classnames([styles.largeTopMargin]);
     const addressClasses = classnames([
-      classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock,
       styles.addressWrap
     ]);
 
@@ -94,14 +88,13 @@ export default class FinalizeDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
 
-        <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
-          <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />
-          <span>{intl.formatMessage(messages.paperFinalizeIntroLine2)}</span><br />
-          <span>{intl.formatMessage(messages.paperFinalizeIntroLine3)}</span><br />
-          <span>{intl.formatMessage(messages.paperFinalizeIntroLine4)}</span><br />
-        </div>
+        <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />
+        <ul>
+          <li className={styles.smallTopMargin}><span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine2} /></span></li>
+          <li className={styles.smallTopMargin}><span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine3} /></span></li>
+        </ul>
 
-        <h2 className={largeTopMarginClasses}>
+        <h2 className={styles.largeTopMargin}>
           {intl.formatMessage(messages.paperAddressesLabel)}
         </h2>
         <div className={addressClasses}>

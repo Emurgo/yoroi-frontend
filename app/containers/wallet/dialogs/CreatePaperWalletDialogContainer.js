@@ -37,7 +37,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
     }
 
     switch (paperStore.progressInfo) {
-      case ProgressStep.USER_PASSWORD:
+      case ProgressStep.FINALIZE:
         return (
           <UserPasswordDialog
             passwordValue={dialogData.passwordValue}
@@ -81,10 +81,10 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             classicTheme={theme.classic}
           />
         );
-      case ProgressStep.FINALIZE:
+      case ProgressStep.USER_PASSWORD:
         return (
           <FinalizeDialog
-            addresses={paperStore.paper ? paperStore.paper.addresses : []}
+            addresses={['Ae2tdPwUPEZLs4HtbuNey7tK4hTKrwNwYtGqp7bDfCy2WdR3P6735W5Yfpe', 'Ae2tdPwUPEZ6sMd6oatRzNe96ytQEvExMNtxfHQksHdza8RpEon7p69FL6V']}
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
