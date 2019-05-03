@@ -10,7 +10,7 @@ type Props = {
 const messages = defineMessages({
   passwordInstructions: {
     id: 'global.passwordInstructions',
-    defaultMessage: '!!!Note: Password needs to be at least 12 characters long.',
+    defaultMessage: '!!!Note: Spending password needs to be at least 12 characters long.',
   },
 });
 

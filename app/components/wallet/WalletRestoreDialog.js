@@ -163,7 +163,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       paperPassword: this.props.showPaperPassword ? {
         type: 'password',
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        placeholder: this.context.intl.formatMessage(messages.paperPasswordLabel),
         value: '',
         validators: [({ field }) => {
           const validatePassword = p => (

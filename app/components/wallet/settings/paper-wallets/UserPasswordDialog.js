@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
@@ -43,11 +43,11 @@ const messages = defineMessages({
   },
   paperPasswordIntroLine2: {
     id: 'settings.paperWallet.dialog.password.intro.line2',
-    defaultMessage: '!!!You MUST have it to restore your funds!',
+    defaultMessage: '!!!You <strong>must</strong> have it to restore your funds!',
   },
   paperPasswordIntroLine3: {
     id: 'settings.paperWallet.dialog.password.intro.line3',
-    defaultMessage: '!!!It is YOUR OWN responsibility to make sure you remember it.',
+    defaultMessage: '!!!It is <strong>your own</strong> responsibility to make sure you remember it.',
   },
 });
 
@@ -161,8 +161,8 @@ export default class UserPasswordDialog extends Component<Props> {
 
         <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
           <span>{intl.formatMessage(messages.paperPasswordIntroLine1)}</span><br />
-          <span>{intl.formatMessage(messages.paperPasswordIntroLine2)}</span><br />
-          <span>{intl.formatMessage(messages.paperPasswordIntroLine3)}</span><br />
+          <span><FormattedHTMLMessage {...messages.paperPasswordIntroLine2} /></span><br />
+          <span><FormattedHTMLMessage {...messages.paperPasswordIntroLine3} /></span><br />
         </div>
 
         <div className={paperPasswordClasses}>
