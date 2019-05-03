@@ -136,7 +136,7 @@
   "settings.paperWallet.dialog.createPaper.background": "Drawing pretty background",
   "settings.paperWallet.dialog.createPaper.backpage": "Preparing the back page",
   "settings.paperWallet.dialog.createPaper.done": "All done!",
-  "settings.paperWallet.dialog.createPaper.download.intro.line1": "Your paper wallet PDF is ready",
+  "settings.paperWallet.dialog.createPaper.download.intro.line1": "Dein Papier-Wallet PDF steht bereit",
   "settings.paperWallet.dialog.createPaper.download.intro.line2": "Download size (Mb)",
   "settings.paperWallet.dialog.createPaper.download.label": "Download Paper Wallet Certificate",
   "settings.paperWallet.dialog.createPaper.frontpage": "Preparing the front page",
