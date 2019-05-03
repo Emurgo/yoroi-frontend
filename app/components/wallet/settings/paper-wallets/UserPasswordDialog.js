@@ -39,15 +39,15 @@ const messages = defineMessages({
   },
   paperPasswordIntroLine1: {
     id: 'settings.paperWallet.dialog.password.intro.line1',
-    defaultMessage: '!!!Yoroi Paper Wallets are encrypted with an additional password.',
+    defaultMessage: '!!!Yoroi Paper Wallets are encrypted with a password.',
   },
   paperPasswordIntroLine2: {
     id: 'settings.paperWallet.dialog.password.intro.line2',
-    defaultMessage: '!!!You CANNOT restore your funds without the password!',
+    defaultMessage: '!!!You MUST have it to restore your funds!',
   },
   paperPasswordIntroLine3: {
     id: 'settings.paperWallet.dialog.password.intro.line3',
-    defaultMessage: '!!!It is YOUR OWN responsibility to make sure you remember the password.',
+    defaultMessage: '!!!It is YOUR OWN responsibility to make sure you remember it.',
   },
 });
 

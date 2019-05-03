@@ -16,19 +16,19 @@
     text-align: center;
     margin-top: 27px;
   }
-}
-
-li::before {
-  content: "●";
-  font-size:0.8em;
-  color: var(--theme-bullet-point-color);
-}
-li {
-  display: list-item;
-
-  span {
-    font-size: 13px;
-    margin-left:0.2em;
+  
+  li::before {
+    content: "●";
+    font-size:0.8em;
+    color: var(--theme-bullet-point-color);
+  }
+  li {
+    display: list-item;
+  
+    span {
+      font-size: 13px;
+      margin-left:0.2em;
+    }
   }
 }
 
