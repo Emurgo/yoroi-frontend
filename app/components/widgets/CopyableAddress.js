@@ -17,11 +17,14 @@ type Props = {
 export default class CopyableAddress extends Component<Props> {
 
   render() {
-    const { address, onCopyAddress, isUsed } = this.props;
+    const { address, onCopyAddress, isUsed, isClassicThemeActive } = this.props;
 
+    const usedStyle = isClassicThemeActive
+      ? styles.usedWalletAddressClassic
+      : styles.usedWalletAddress;
     const walletAddressClasses = classnames([
-      styles.hash,
-      isUsed ? styles.usedHash : null,
+      isClassicThemeActive ? styles.hashClassic : styles.hash,
+      isUsed ? usedStyle : null,
     ]);
 
     return (

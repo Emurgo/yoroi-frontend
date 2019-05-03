@@ -107,7 +107,7 @@ export default class FinalizeDialog extends Component<Props> {
             address={a}
             isClassicThemeActive={classicTheme}
             onCopyAddress={onCopyAddress}
-            isUsed={false}
+            isUsed={classicTheme /* pretend isUsed on classic theme for stylistic purposes */ }
             key={a}
           />
         ))}

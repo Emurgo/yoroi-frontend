@@ -1,14 +1,14 @@
 @mixin hashBase {
-  font-family: var(--font-mono-medium);
   letter-spacing: 0px;
   margin-bottom: 6px;
+  font-family: var(--font-mono-regular);
   word-break: break-all;
 }
 .hash {
   @include hashBase;
+  color: var(--theme-transactions-received-address-color);
   display: flex;
   align-items: center;
-  color: var(--theme-transactions-received-address-color);
   font-size: 14px;
   line-height: 1.57;
 } 
@@ -18,13 +18,7 @@
   line-height: 23px;
 }
 
-
-.usedHash > span {
-  opacity: 0.4;
-}
-
-.copyIconBig,
-.copyIcon {
+.copyIconBig {
   cursor: pointer;
   object-fit: contain;
 }
@@ -37,5 +31,19 @@
     path {
       fill: var(--theme-icon-copy-address-color);
     }
+  }
+}
+
+.usedWalletAddressClassic {
+  span,
+  img {
+    opacity: 0.4;
+  }
+}
+
+.usedWalletAddress {
+  span,
+  img {
+    opacity: 0.4;
   }
 }

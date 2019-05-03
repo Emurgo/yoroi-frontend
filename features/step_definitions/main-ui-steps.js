@@ -26,7 +26,7 @@ Then(/^I should see the transactions screen$/, async function () {
 });
 
 Then(/^I click on "copy to clipboard" button$/, async function () {
-  await this.click("//div[@class = 'WalletReceive_hash']//following-sibling::span", By.xpath);
+  await this.click("//div[@class = 'CopyableAddress_hash']//following-sibling::span", By.xpath);
 });
 
 Then(/^I should see "You have successfully copied wallet address" pop up:$/, async function (data) {

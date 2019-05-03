@@ -16,7 +16,7 @@
     text-align: center;
     margin-top: 27px;
   }
-  
+
   li::before {
     content: "●";
     font-size:0.8em;
@@ -41,10 +41,6 @@
   margin-left: 5px;
   margin-top: 20px;
   margin-bottom: 10px;
-}
-
-.addressWrap {
-  word-wrap: break-word;
 }
 
 .recoveryImage {
