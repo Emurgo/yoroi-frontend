@@ -7,8 +7,10 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
 import styles from './FinalizeDialog.scss';
-import headerMixin from '../../../mixins/HeaderBlock.scss';
 import DialogBackButton from '../../../widgets/DialogBackButton';
+import CopyableAddress from '../../../widgets/CopyableAddress';
+import SvgInline from 'react-svg-inline';
+import recoveryWatchingSvg from '../../../../assets/images/recovery-watching.inline.svg';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -34,6 +36,7 @@ const messages = defineMessages({
 });
 
 type Props = {
+  onCopyAddress: Function,
   addresses: Array<string>,
   onNext: Function,
   onCancel: Function,
@@ -59,6 +62,7 @@ export default class FinalizeDialog extends Component<Props> {
       onNext,
       onBack,
       classicTheme,
+      onCopyAddress,
     } = this.props;
 
     const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
@@ -87,6 +91,7 @@ export default class FinalizeDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancel} />}
         classicTheme={classicTheme}
       >
+        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} />}
 
         <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />
         <ul>
@@ -94,14 +99,18 @@ export default class FinalizeDialog extends Component<Props> {
           <li className={styles.smallTopMargin}><span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine3} /></span></li>
         </ul>
 
-        <h2 className={styles.largeTopMargin}>
+        <h2 className={styles.addressLabel}>
           {intl.formatMessage(messages.paperAddressesLabel)}
         </h2>
-        <div className={addressClasses}>
-          {addresses.map(a => (
-            <span key={a}>{a}<br /></span>
-          ))}
-        </div>
+        {addresses.map(a => (
+          <CopyableAddress
+            address={a}
+            isClassicThemeActive={classicTheme}
+            onCopyAddress={onCopyAddress}
+            isUsed={false}
+            key={a}
+          />
+        ))}
 
       </Dialog>
     );

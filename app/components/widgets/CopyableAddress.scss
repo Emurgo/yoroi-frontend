@@ -1,6 +1,7 @@
 @mixin hashBase {
-  // TODO: monospace
-  font-family: var(--font-medium);
+  font-family: var(--font-mono-medium);
+  letter-spacing: 0px;
+  color: var(--theme-transactions-received-address-color);
   margin-bottom: 6px;
   word-break: break-all;
 }
