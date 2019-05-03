@@ -1,7 +1,6 @@
 @mixin hashBase {
   font-family: var(--font-mono-medium);
   letter-spacing: 0px;
-  color: var(--theme-transactions-received-address-color);
   margin-bottom: 6px;
   word-break: break-all;
 }
@@ -9,6 +8,7 @@
   @include hashBase;
   display: flex;
   align-items: center;
+  color: var(--theme-transactions-received-address-color);
   font-size: 14px;
   line-height: 1.57;
 } 
