@@ -366,9 +366,11 @@ export default class WalletRestoreDialog extends Component<Props> {
         {showPaperPassword ? (
           <div className={walletPasswordClasses}>
             <div className={paperPasswordFieldClasses}>
-              <div className={headerBlockClasses}>
-                {intl.formatMessage(messages.passwordDisclaimer)}
-              </div>
+              {isVerificationMode ? '' : (
+                <div className={headerBlockClasses}>
+                  {intl.formatMessage(messages.passwordDisclaimer)}
+                </div>
+              )}
               <Input
                 className="paperPassword"
                 {...paperPasswordField.bind()}
