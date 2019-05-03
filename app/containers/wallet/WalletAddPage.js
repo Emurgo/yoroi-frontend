@@ -89,12 +89,14 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
+      const restoreType = uiDialogs.getParam('restoreType');
       content = (
         <WalletRestoreDialogContainer
           actions={actions}
           stores={stores}
           onClose={this.onClose}
           classicTheme={theme.classic}
+          mode={restoreType || 'regular'}
         />
       );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
@@ -134,6 +136,7 @@ export default class WalletAddPage extends Component<Props> {
           isCreateLedgerWalletActive={isCreateLedgerWalletActive}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
           isRestoreActive={isRestoreActive}
           classicTheme={theme.classic}
           title={this.context.intl.formatMessage(messages.title)}

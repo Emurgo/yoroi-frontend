@@ -15,6 +15,7 @@ import type {
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
+import type { Network } from '../../../config/config-types';
 import {
   isValidMnemonic,
   isValidPaperMnemonic,
@@ -22,7 +23,9 @@ import {
   generateAdaAccountRecoveryPhrase,
   updateAdaWalletMetaParams,
   updateAdaWalletBalance,
-  changeAdaWalletSpendingPassword
+  changeAdaWalletSpendingPassword,
+  generatePaperWalletSecret,
+  mnemonicsToExternalAddresses,
 } from './adaWallet';
 import {
   isValidAdaAddress,
@@ -129,6 +132,8 @@ import { migrateToLatest } from './adaMigration';
 import {
   makeCardanoBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
+import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
+import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
@@ -220,7 +225,53 @@ export type UpdateWalletPasswordResponse = boolean;
 
 export type AdaWalletRecoveryPhraseResponse = Array<string>;
 
+export type AdaPaper = {
+  addresses: Array<string>,
+  scrambledWords: Array<string>,
+}
+
+export const DEFAULT_ADDRESSES_PER_PAPER = 1;
+
 export default class AdaApi {
+
+  // noinspection JSMethodCanBeStatic
+  createAdaPaper(
+    {
+      password,
+      numAddresses
+    }: {
+      password: string,
+      numAddresses?: number
+    } = {}
+  ): AdaPaper {
+    const { words, scrambledWords } = generatePaperWalletSecret(password);
+    const addresses = mnemonicsToExternalAddresses(words.join(' '), numAddresses || DEFAULT_ADDRESSES_PER_PAPER);
+    return { addresses, scrambledWords };
+  }
+
+  async createAdaPaperPdf(
+    {
+      paper,
+      network,
+      updateStatus
+    }: {
+      paper: AdaPaper,
+      network: Network,
+      updateStatus?: (PdfGenStepType => ?any)
+    }
+  ): Promise<?Blob> {
+    const { addresses, scrambledWords } = paper;
+    // noinspection UnnecessaryLocalVariableJS
+    const res : Promise<?Blob> = generateAdaPaperPdf({
+      words: scrambledWords,
+      addresses,
+      network,
+    }, s => {
+      Logger.info('[PaperWalletRender] ' + s);
+      return !updateStatus || updateStatus(s);
+    });
+    return res;
+  }
 
   async getWallets(): Promise<GetWalletsResponse> {
     Logger.debug('AdaApi::getWallets called');
@@ -550,8 +601,12 @@ export default class AdaApi {
     return isValidPaperMnemonic(mnemonic, numberOfWords);
   }
 
-  unscramblePaperMnemonic(mnemonic: string, numberOfWords: ?number): [?string, number] {
-    return unscramblePaperMnemonic(mnemonic, numberOfWords);
+  unscramblePaperMnemonic(
+    mnemonic: string,
+    numberOfWords: ?number,
+    password?: string
+  ): [?string, number] {
+    return unscramblePaperMnemonic(mnemonic, numberOfWords, password);
   }
 
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {

@@ -69,7 +69,7 @@ const baseDevConfig = (networkName) => ({
         use: 'babel-loader?cacheDirectory',
       },
       {
-        test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
+        test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
         loader: 'file-loader',
       },
     ]
