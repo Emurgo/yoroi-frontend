@@ -170,6 +170,12 @@ export default {
   '--font-heavy': 'SFUIDisplay-Heavy',
   '--font-black': 'SFUIDisplay-Black',
 
+  '--font-mono-thin': 'RobotoMono-Thin',
+  '--font-mono-light': 'RobotoMono-Light',
+  '--font-mono-regular': 'RobotoMono-Regular',
+  '--font-mono-medium': 'RobotoMono-Medium',
+  '--font-mono-bold': 'RobotoMono-Bold',
+
   '--theme-input-hint-font': 'SFUIDisplay-Regular',
 
   '--theme-scrollbar-thumb-background': '#c8ccce',

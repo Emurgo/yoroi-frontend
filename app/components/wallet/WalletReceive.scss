@@ -75,10 +75,11 @@
     font-size: 14px;
     justify-content: space-between;
     line-height: 19px;
+    letter-spacing: 0;
 
     .hash {
-      font-size: 17px;
-      font-family: var(--font-medium);
+      font-size: 14px;
+      font-family: var(--font-mono-medium);
       line-height: 23px;
       margin-bottom: 6px;
       word-break: break-all;
@@ -151,7 +152,7 @@
       display: flex;
       align-items: center;
       font-size: 14px;
-      font-family: var(--font-medium);
+      font-family: var(--font-mono-medium);
       line-height: 1.57;
       margin-bottom: 6px;
       word-break: break-all;
@@ -263,8 +264,10 @@
     }
 
     .addressId {
+      font-family: var(--font-mono-regular);
       flex-grow: 1;
       margin-right: 32.5px;
+      letter-spacing: 0;
     }
 
     .addressActions {
@@ -343,8 +346,10 @@
     }
 
     .addressId {
+      font-family: var(--font-mono-regular);
       flex-grow: 1;
       margin-right: 32.5px;
+      letter-spacing: 0;
       color: var(--theme-transactions-received-address-color);
     }
 

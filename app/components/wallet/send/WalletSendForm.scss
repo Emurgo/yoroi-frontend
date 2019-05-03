@@ -12,15 +12,34 @@
   padding: 30px;
 }
 
-.amountInputClassic,
-.receiverInputClassic {
+.amountInputClassic {
   position: relative;
   margin-bottom: 10px;
 }
-
-.amountInput,
-.receiverInput {
+.receiverInputClassic {
   position: relative;
+  margin-bottom: 10px;
+  :global {
+    .SimpleInput_input {
+      font-family: var(--font-mono-light);
+      letter-spacing: 0;
+    }
+  }
+}
+
+.amountInput {
+  position: relative;
+  margin-bottom: 10px;
+}
+.receiverInput {
+  letter-spacing: 0;
+  position: relative;
+  :global {
+    .SimpleInput_input {
+      font-family: var(--font-mono-regular);
+      letter-spacing: 0;
+    }
+  }
 }
 
 .adaLabel {

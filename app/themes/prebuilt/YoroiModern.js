@@ -167,6 +167,12 @@ export default {
   '--font-heavy': 'Rubik-Bold',
   '--font-black': 'Rubik-Black',
 
+  '--font-mono-thin': 'RobotoMono-Thin',
+  '--font-mono-light': 'RobotoMono-Light',
+  '--font-mono-regular': 'RobotoMono-Regular',
+  '--font-mono-medium': 'RobotoMono-Medium',
+  '--font-mono-bold': 'RobotoMono-Bold',
+
   '--theme-input-hint-font': 'Rubik-Regular',
   '--theme-footer-text-font': 'Helvetica-Regular',
 
