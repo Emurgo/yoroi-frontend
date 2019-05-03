@@ -30,7 +30,8 @@
   }
 
   .addressTo {
-    font-family: var(--font-light);
+    font-family: var(--font-mono-light);
+    letter-spacing: 0;
     font-size: 15px;
     line-height: 1.38;
     margin-top: 6px;
@@ -130,6 +131,8 @@
   }
 
   .addressTo {
+    font-family: var(--font-mono-regular);
+    letter-spacing: 0;
     font-size: 14px;
     line-height: 1.57;
     margin-top: 2px;
