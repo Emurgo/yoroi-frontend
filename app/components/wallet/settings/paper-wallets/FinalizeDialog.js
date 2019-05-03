@@ -67,9 +67,6 @@ export default class FinalizeDialog extends Component<Props> {
 
     const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
-    const addressClasses = classnames([
-      styles.addressWrap
-    ]);
 
     const actions = [
       {
@@ -95,8 +92,12 @@ export default class FinalizeDialog extends Component<Props> {
 
         <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />
         <ul>
-          <li className={styles.smallTopMargin}><span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine2} /></span></li>
-          <li className={styles.smallTopMargin}><span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine3} /></span></li>
+          <li className={styles.smallTopMargin}>
+            <span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine2} /></span>
+          </li>
+          <li className={styles.smallTopMargin}>
+            <span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine3} /></span>
+          </li>
         </ul>
 
         <h2 className={styles.addressLabel}>
@@ -107,7 +108,7 @@ export default class FinalizeDialog extends Component<Props> {
             address={a}
             isClassicThemeActive={classicTheme}
             onCopyAddress={onCopyAddress}
-            isUsed={classicTheme /* pretend isUsed on classic theme for stylistic purposes */ }
+            isUsed={classicTheme /* pretend isUsed on classic theme for stylistic purposes */}
             key={a}
           />
         ))}
