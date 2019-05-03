@@ -9,8 +9,6 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './FinalizeDialog.scss';
 import DialogBackButton from '../../../widgets/DialogBackButton';
 import CopyableAddress from '../../../widgets/CopyableAddress';
-import SvgInline from 'react-svg-inline';
-import recoveryWatchingSvg from '../../../../assets/images/recovery-watching.inline.svg';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -88,7 +86,6 @@ export default class FinalizeDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancel} />}
         classicTheme={classicTheme}
       >
-        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} />}
 
         <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />
         <ul>
