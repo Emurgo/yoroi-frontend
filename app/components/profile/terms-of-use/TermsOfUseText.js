@@ -6,15 +6,11 @@ import styles from './TermsOfUseText.scss';
 
 type Props = {
   localizedTermsOfUse: string,
-  classicTheme?: boolean
+  classicTheme: boolean
 };
 
 @observer
 export default class TermsOfUseText extends Component<Props> {
-  static defaultProps = {
-    classicTheme: false
-  }
-
   render() {
     const { classicTheme } = this.props;
     return (
