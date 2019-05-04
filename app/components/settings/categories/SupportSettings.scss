@@ -38,8 +38,8 @@
   }
 }
 
-.component.YoroiClassic {
 
+:global(.YoroiClassic) .component {
   h1 {
     font-size: 16px;
   }
@@ -50,7 +50,7 @@
   }
 }
 
-.component.YoroiModern {
+:global(.YoroiModern) .component {
   h1 {
     font-size: 18px;
   }
@@ -61,5 +61,3 @@
     font-family: var(--font-semibold);
   }
 }
-
-

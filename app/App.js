@@ -57,7 +57,7 @@ class App extends Component<{
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
     return (
-      <div style={{ height: '100%' }}>
+      <div className={currentTheme} style={{ height: '100%' }}>
         <ThemeManager variables={themeVars} />
 
         {/* Automatically pass a theme prop to all componenets in this subtree. */}

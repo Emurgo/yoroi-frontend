@@ -4,8 +4,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './SupportSettings.scss';
-import type { Themes } from '../../../themes';
-import classnames from 'classnames';
 
 const messages = defineMessages({
   faqTitle: {
@@ -53,7 +51,6 @@ const messages = defineMessages({
 type Props = {
   onExternalLinkClick: Function,
   onDownloadLogs: Function,
-  theme: Themes,
 };
 
 @observer
@@ -64,7 +61,7 @@ export default class SupportSettings extends Component<Props> {
   };
 
   render() {
-    const { onExternalLinkClick, onDownloadLogs, theme } = this.props;
+    const { onExternalLinkClick, onDownloadLogs } = this.props;
     const { intl } = this.context;
 
     const faqLink = (
@@ -91,14 +88,8 @@ export default class SupportSettings extends Component<Props> {
       </button>
     );
 
-    const componentClass = classnames([
-      styles.component,
-      styles[theme]
-    ]);
-
     return (
-      <div className={componentClass}>
-
+      <div className={styles.component}>
         <h1>{intl.formatMessage(messages.faqTitle)}</h1>
 
         <p><FormattedMessage {...messages.faqContent} values={{ faqLink }} /></p>
