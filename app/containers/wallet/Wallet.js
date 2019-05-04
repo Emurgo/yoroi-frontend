@@ -39,7 +39,11 @@ export default class Wallet extends Component<Props> {
     const { showAdaRedemptionSuccessMessage, amountRedeemed } = adaRedemption;
     if (!wallets.active) {
       return (
-        <MainLayout actions={actions} stores={stores} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+        <MainLayout
+          actions={actions}
+          stores={stores}
+          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        >
           <LoadingSpinner />
         </MainLayout>
       );

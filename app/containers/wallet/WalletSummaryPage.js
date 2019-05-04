@@ -89,11 +89,17 @@ export default class WalletSummaryPage extends Component<Props> {
         );
       } else if (!hasAny) {
         walletTransactions = (
-          <WalletNoTransactions label={noTransactionsFoundLabel} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC} />
+          <WalletNoTransactions
+            label={noTransactionsFoundLabel}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          />
         );
       } else if (!hasAny) {
         walletTransactions = (
-          <WalletNoTransactions label={noTransactionsLabel} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC} />
+          <WalletNoTransactions
+            label={noTransactionsLabel}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          />
         );
       }
     }

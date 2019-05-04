@@ -5,7 +5,6 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import SupportSettings from '../../../components/settings/categories/SupportSettings';
 import { downloadLogs } from '../../../utils/logging';
 import type { InjectedProps } from '../../../types/injectedPropsType';
-import { THEMES } from '../../../themes';
 
 @observer
 export default class SupportSettingsPage extends Component<InjectedProps> {

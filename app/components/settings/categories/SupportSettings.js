@@ -97,7 +97,6 @@ export default class SupportSettings extends Component<Props> {
     ]);
 
     return (
-      
       <div className={componentClass}>
 
         <h1>{intl.formatMessage(messages.faqTitle)}</h1>

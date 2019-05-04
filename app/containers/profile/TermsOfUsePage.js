@@ -45,7 +45,11 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
       <TopBarLayout
         topbar={topbarElement}
         isBannerVisible={profile.currentTheme === THEMES.YOROI_MODERN}
-        banner={<TestnetWarningBanner classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC} />}
+        banner={
+          <TestnetWarningBanner
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          />
+        }
       >
         <TermsOfUseForm
           classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}

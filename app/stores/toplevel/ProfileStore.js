@@ -6,6 +6,7 @@ import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { THEMES } from '../../themes';
+import type { Themes } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 
@@ -125,7 +126,7 @@ export default class ProfileStore extends Store {
 
   // ========== Current/Custom Theme ========== //
 
-  @computed get currentTheme(): string {
+  @computed get currentTheme(): Themes {
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet) return result;
     // TODO: We temporarily disable the new theme on mainnet until it's ready
