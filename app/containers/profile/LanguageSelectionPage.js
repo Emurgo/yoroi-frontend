@@ -7,6 +7,7 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
+import { THEMES } from '../../themes';
 
 const messages = defineMessages({
   title: {
@@ -29,7 +30,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   render() {
     const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const { topbar, theme } = this.props.stores;
+    const { topbar, profile } = this.props.stores;
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -37,17 +38,17 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       />);
     return (
       <TopBarLayout
         topbar={topBar}
-        classicTheme={theme.classic}
-        noTopbarNoBanner={!theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        noTopbarNoBanner={profile.currentTheme === THEMES.YOROI_MODERN}
         languageSelectionBackground
       >
         <LanguageSelectionForm
-          classicTheme={theme.classic}
+          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
           languages={LANGUAGE_OPTIONS}

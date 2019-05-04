@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import resolver from '../../../utils/imports';
 import type { InjectedProps } from '../../../types/injectedPropsType';
+import { THEMES } from '../../../themes';
 
 const WalletSendConfirmationDialog = resolver('components/wallet/send/WalletSendConfirmationDialog');
 
@@ -33,7 +34,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
     const activeWallet = wallets.active;
-    const { theme } = stores;
+    const { profile } = stores;
 
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
@@ -52,7 +53,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         }}
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       />
     );
   }

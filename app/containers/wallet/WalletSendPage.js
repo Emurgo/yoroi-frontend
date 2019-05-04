@@ -8,6 +8,7 @@ import type { MessageDescriptorMap } from 'react-intl';
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
+import { THEMES } from '../../themes';
 
 import {
   DECIMAL_PLACES_IN_ADA,
@@ -67,7 +68,7 @@ export default class WalletSendPage extends Component<Props> {
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
     const { intl } = this.context;
-    const { uiDialogs, theme } = this.props.stores;
+    const { uiDialogs, profile } = this.props.stores;
     const { actions } = this.props;
     const { isValidAddress } = wallets;
     const { calculateTransactionFee, validateAmount, hasAnyPending } = transactions;
@@ -88,7 +89,7 @@ export default class WalletSendPage extends Component<Props> {
         hardwareWalletConfirmationDialogRenderCallback={this.hardwareWalletDoConfirmation}
         hasAnyPending={hasAnyPending}
         isHardwareWallet={activeWallet.isHardwareWallet}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       />
     );
   }

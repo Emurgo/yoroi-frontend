@@ -8,6 +8,7 @@ import TopBar from '../../components/topbar/TopBar';
 import resolver from '../../utils/imports';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
+import { THEMES } from '../../themes';
 
 const Layout = resolver('containers/MainLayout');
 
@@ -35,7 +36,7 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { profile, topbar, theme } = stores;
+    const { profile, topbar } = stores;
 
     const menu = (
       <SettingsMenu
@@ -43,7 +44,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         isActiveItem={this.isActivePage}
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
         currentLocale={profile.currentLocale}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       />
     );
     const topbarTitle = (
@@ -59,12 +60,12 @@ export default class Settings extends Component<InjectedContainerProps> {
             }}
             categories={topbar.CATEGORIES}
             activeTopbarCategory={topbar.activeTopbarCategory}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />
         )}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       >
-        <SettingsLayout menu={menu} classicTheme={theme.classic}>
+        <SettingsLayout menu={menu} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
           {children}
         </SettingsLayout>
       </Layout>

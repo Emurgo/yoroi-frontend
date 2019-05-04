@@ -8,6 +8,7 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
+import { THEMES } from '../../themes';
 
 const messages = defineMessages({
   title: {
@@ -30,7 +31,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
   render() {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
-    const { topbar, theme } = this.props.stores;
+    const { topbar, profile } = this.props.stores;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -38,16 +39,16 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
       <TopBar
         title={topbarTitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       />);
     return (
       <TopBarLayout
         topbar={topbarElement}
-        isBannerVisible={!theme.classic}
-        banner={<TestnetWarningBanner classicTheme={theme.classic} />}
+        isBannerVisible={profile.currentTheme === THEMES.YOROI_MODERN}
+        banner={<TestnetWarningBanner classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC} />}
       >
         <TermsOfUseForm
-          classicTheme={theme.classic}
+          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           localizedTermsOfUse={termsOfUse}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}

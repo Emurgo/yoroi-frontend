@@ -15,6 +15,7 @@ import LedgerConnectStore from '../../../stores/ada/LedgerConnectStore';
 import HWConnectActions from '../../../actions/ada/hw-connect-actions';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
+import { THEMES } from '../../../themes';
 
 type Props = InjectedDialogContainerProps;
 @observer
@@ -26,7 +27,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
   };
 
   render() {
-    const { theme } = this.props.stores;
+    const { profile } = this.props.stores;
     const ledgerConnectStore = this._getLedgerConnectStore();
     const hwConnectActions = this._getHWConnectActions();
 
@@ -41,7 +42,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             error={ledgerConnectStore.error}
             submit={hwConnectActions.submitAbout.trigger}
             cancel={this.cancel}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />);
         break;
       case ProgressStep.CONNECT:
@@ -53,7 +54,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             goBack={hwConnectActions.goBackToAbout.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />);
         break;
       case ProgressStep.SAVE:
@@ -65,7 +66,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             defaultWalletName={ledgerConnectStore.defaultWalletName}
             submit={hwConnectActions.submitSave.trigger}
             cancel={this.cancel}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />);
         break;
       default:

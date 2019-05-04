@@ -17,6 +17,7 @@ import environment from '../../environment';
 import resolver from '../../utils/imports';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
+import { THEMES } from '../../themes';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 const MainLayout = resolver('containers/MainLayout');
@@ -99,7 +100,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   render() {
     const { stores, actions } = this.props;
-    const { topbar, theme } = stores;
+    const { topbar, profile } = stores;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -111,7 +112,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       />
     );
     const wallets = this._getWalletsStore();
@@ -120,7 +121,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
-          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
             <TransferLayout>
               <DaedalusTransferInstructionsPage
                 onFollowInstructionsPrerequisites={this.goToCreateWallet}
@@ -129,14 +130,14 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 onPaperConfirm={this.startTransferPaperFunds}
                 onMasterKeyConfirm={this.startTransferMasterKey}
                 disableTransferFunds={daedalusTransfer.disableTransferFunds}
-                classicTheme={theme.classic}
+                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
               />
             </TransferLayout>
           </MainLayout>
         );
       case 'gettingMnemonics':
         return (
-          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
             <TransferLayout>
               <DaedalusTransferFormPage
                 onSubmit={this.setupTransferFundsWithMnemonic}
@@ -147,14 +148,14 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 )}
                 validWords={validWords}
                 mnemonicLength={12}
-                classicTheme={theme.classic}
+                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
               />
             </TransferLayout>
           </MainLayout>
         );
       case 'gettingPaperMnemonics':
         return (
-          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
             <TransferLayout>
               <DaedalusTransferFormPage
                 onSubmit={this.setupTransferFundsWithMnemonic}
@@ -162,19 +163,19 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
                 validWords={validWords}
                 mnemonicLength={27}
-                classicTheme={theme.classic}
+                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
               />
             </TransferLayout>
           </MainLayout>
         );
       case 'gettingMasterKey':
         return (
-          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
             <TransferLayout>
               <DaedalusTransferMasterKeyFormPage
                 onSubmit={this.setupTransferFundsWithMasterKey}
                 onBack={this.backToUninitialized}
-                classicTheme={theme.classic}
+                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
               />
             </TransferLayout>
           </MainLayout>
@@ -183,7 +184,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
       case 'checkingAddresses':
       case 'generatingTx':
         return (
-          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
             <TransferLayout>
               <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
             </TransferLayout>
@@ -194,7 +195,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           return null; // TODO: throw error? Shoudln't happen
         }
         return (
-          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
             <TransferLayout>
               <DaedalusTransferSummaryPage
                 formattedWalletAmount={formattedWalletAmount}
@@ -203,19 +204,19 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
                 onCancel={this.cancelTransferFunds}
                 error={daedalusTransfer.error}
-                classicTheme={theme.classic}
+                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
               />
             </TransferLayout>
           </MainLayout>
         );
       case 'error':
         return (
-          <MainLayout topbar={topBar} classicTheme={theme.classic}>
+          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
             <TransferLayout>
               <DaedalusTransferErrorPage
                 error={daedalusTransfer.error}
                 onCancel={this.cancelTransferFunds}
-                classicTheme={theme.classic}
+                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
               />
             </TransferLayout>
           </MainLayout>

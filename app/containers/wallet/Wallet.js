@@ -8,6 +8,7 @@ import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 import AdaRedemptionSuccessOverlay from '../../components/wallet/ada-redemption/AdaRedemptionSuccessOverlay';
+import { THEMES } from '../../themes';
 
 type Props = InjectedContainerProps;
 
@@ -34,11 +35,11 @@ export default class Wallet extends Component<Props> {
   render() {
     const { wallets, adaRedemption } = this.props.stores.substores.ada;
     const { actions, stores, } = this.props;
-    const { theme } = stores;
+    const { profile } = stores;
     const { showAdaRedemptionSuccessMessage, amountRedeemed } = adaRedemption;
     if (!wallets.active) {
       return (
-        <MainLayout actions={actions} stores={stores} classicTheme={theme.classic}>
+        <MainLayout actions={actions} stores={stores} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
           <LoadingSpinner />
         </MainLayout>
       );
@@ -48,12 +49,12 @@ export default class Wallet extends Component<Props> {
       <MainLayout
         actions={actions}
         stores={stores}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
-          classicTheme={theme.classic}
+          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
         >
           {this.props.children}
         </WalletWithNavigation>
@@ -62,7 +63,7 @@ export default class Wallet extends Component<Props> {
           <AdaRedemptionSuccessOverlay
             amount={amountRedeemed}
             onClose={actions.ada.adaRedemption.closeAdaRedemptionSuccessOverlay.trigger}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />
         ) : null}
       </MainLayout>

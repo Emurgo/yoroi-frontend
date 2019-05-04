@@ -5,6 +5,7 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import SupportSettings from '../../../components/settings/categories/SupportSettings';
 import { downloadLogs } from '../../../utils/logging';
 import type { InjectedProps } from '../../../types/injectedPropsType';
+import { THEMES } from '../../../themes';
 
 @observer
 export default class SupportSettingsPage extends Component<InjectedProps> {
@@ -14,12 +15,12 @@ export default class SupportSettingsPage extends Component<InjectedProps> {
   };
 
   render() {
-    const { theme } = this.props.stores;
+    const { profile } = this.props.stores;
     return (
       <SupportSettings
         onExternalLinkClick={handleExternalLinkClick}
         onDownloadLogs={this.handleDownloadLogs}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       />
     );
   }

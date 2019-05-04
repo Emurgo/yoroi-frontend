@@ -45,12 +45,6 @@ class App extends Component<{
     }
   }
 
-  updateMarkup = () => {
-    const { stores } = this.props;
-    const currentTheme = stores.profile.currentTheme;
-    this.props.actions.theme.changeTheme.trigger({ theme: currentTheme === THEMES.YOROI_CLASSIC });
-  }
-
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -66,7 +60,7 @@ class App extends Component<{
 
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager variables={themeVars} updateMarkup={this.updateMarkup} />
+        <ThemeManager variables={themeVars} />
 
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
         <ThemeProvider

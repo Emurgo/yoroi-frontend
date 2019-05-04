@@ -10,6 +10,7 @@ import { AdaRedemptionCertificateParseError } from '../../i18n/errors';
 import validWords from 'bip39/src/wordlists/english.json';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
+import { THEMES } from '../../themes';
 
 @observer
 export default class AdaRedemptionPage extends Component<InjectedProps> {
@@ -31,7 +32,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
   };
 
   render() {
-    const { substores, theme } = this.props.stores;
+    const { substores, profile } = this.props.stores;
     const { ada } = substores;
     const { wallets, adaRedemption } = ada;
     const isMainnet = environment.isMainnet();
@@ -55,7 +56,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
         <div>
           <AdaRedemptionNoWallets
             onGoToCreateWalletClick={this.handleGoToCreateWalletClick}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />
         </div>
       );
@@ -122,7 +123,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           )}
           isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
           onAcceptRedemptionDisclaimer={() => acceptRedemptionDisclaimer.trigger()}
-          classicTheme={theme.classic}
+          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
         />
       </div>
     );

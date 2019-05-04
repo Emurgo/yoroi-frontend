@@ -11,13 +11,14 @@ import CreatePaperDialog from '../../../components/wallet/settings/paper-wallets
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import validWords from 'bip39/src/wordlists/english.json';
 import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/FinalizeDialog';
+import { THEMES } from '../../../themes';
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
 
   render() {
     const { actions } = this.props;
-    const { uiDialogs, theme } = this.props.stores;
+    const { uiDialogs, profile } = this.props.stores;
     const { updateDataForActiveDialog } = actions.dialogs;
     const dialogData = uiDialogs.dataForActiveDialog;
 
@@ -47,7 +48,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />
         );
       case ProgressStep.CREATE:
@@ -61,7 +62,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />
         );
       case ProgressStep.VERIFY:
@@ -78,7 +79,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             isPaper
             showPaperPassword
             isVerificationMode
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
           />
         );
       case ProgressStep.FINALIZE:
@@ -88,7 +89,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
-            classicTheme={theme.classic}
+            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
             onCopyAddress={
               () => {} // no notification but maybe we want one
             }

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import DisplaySettings from '../../../components/settings/categories/DisplaySettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
+import { THEMES } from '../../../themes';
 
 @observer
 export default class DisplaySettingsPage extends Component<InjectedProps> {
@@ -25,7 +26,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
   )
 
   render() {
-    const { theme } = this.props.stores;
+    const { profile } = this.props.stores;
     const { currentTheme } = this.props.stores.profile;
     return (
       <DisplaySettings
@@ -35,7 +36,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
         exportTheme={this.exportTheme}
         hasCustomTheme={this.hasCustomTheme}
         onExternalLinkClick={handleExternalLinkClick}
-        classicTheme={theme.classic}
+        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
       />
     );
   }
