@@ -148,7 +148,7 @@
   "settings.paperWallet.dialog.finalize.intro.line2": "das <strong>Papier-Dokument</strong> und die geheimen Wörter sicher aufbewahrt werden.",
   "settings.paperWallet.dialog.finalize.intro.line3": "Du dir das <strong>Passwort merkst</strong>, oder aufschreibst und sicher aufbewahrst!",
   "settings.paperWallet.dialog.finalize.title": "Das Yoroi Papier-Wallet ist erstellt",
-  "settings.paperWallet.dialog.paperAddressesLabel": "Your Paper Wallet address[es]:",
+  "settings.paperWallet.dialog.paperAddressesLabel": "Deine Papier-Wallet Adresse[n]:",
   "settings.paperWallet.dialog.paperPasswordLabel": "Papier-Wallet Passwort",
   "settings.paperWallet.dialog.paperPasswordPlaceholder": "Gib ein Passwort für diese Papier-Wallet ein",
   "settings.paperWallet.dialog.password.intro.line1": "Yoroi Papier-Wallets sind mit einem Kennwort verschlüsselt.",
