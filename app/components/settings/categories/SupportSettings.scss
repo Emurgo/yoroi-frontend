@@ -1,12 +1,9 @@
 @import '../../../themes/mixins/error-message';
 
-.componentClassic {
-  padding-bottom: 10px;
-
+.component {
   h1 {
     color: var(--theme-support-settings-text-color);
     font-family: var(--font-semibold);
-    font-size: 16px;
     line-height: 1.38;
     margin-bottom: 10px;
   }
@@ -27,7 +24,6 @@
   a,
   button {
     color: var(--theme-support-settings-link-color);
-    text-decoration: underline;
   }
 
   button {
@@ -40,44 +36,30 @@
   }
 }
 
-.component {
+.component.YoroiClassic {
   padding-bottom: 10px;
 
   h1 {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-semibold);
-    font-size: 18px;
-    line-height: 1.38;
-    margin-bottom: 10px;
-  }
-
-  h1:not(:first-child) {
-    padding-top: 10px;
-  }
-
-  a,
-  button,
-  p {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-regular);
-    font-size: 14px;
-    line-height: 19px;
+    font-size: 16px;
   }
 
   a,
   button {
-    color: var(--theme-support-settings-link-color);
+    text-decoration: underline;
+  }
+}
+
+.component.YoroiModern {
+  padding-bottom: 10px;
+
+  h1 {
+    font-size: 18px;
+  }
+
+  a,
+  button {
     text-decoration: none;
     font-family: var(--font-semibold);
-  }
-
-  button {
-    cursor: pointer;
-    letter-spacing: 1px;
-  }
-
-  p {
-    margin-bottom: 10px;
   }
 }
 

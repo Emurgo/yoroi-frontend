@@ -20,7 +20,7 @@ export default class SupportSettingsPage extends Component<InjectedProps> {
       <SupportSettings
         onExternalLinkClick={handleExternalLinkClick}
         onDownloadLogs={this.handleDownloadLogs}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        theme={profile.currentTheme}
       />
     );
   }
