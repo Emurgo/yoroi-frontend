@@ -31,7 +31,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
   };
 
   render() {
-    const { substores, theme } = this.props.stores;
+    const { substores, profile } = this.props.stores;
     const { ada } = substores;
     const { wallets, adaRedemption } = ada;
     const isMainnet = environment.isMainnet();
@@ -55,7 +55,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
         <div>
           <AdaRedemptionNoWallets
             onGoToCreateWalletClick={this.handleGoToCreateWalletClick}
-            classicTheme={theme.classic}
+            classicTheme={profile.isClassicTheme}
           />
         </div>
       );
@@ -122,7 +122,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           )}
           isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
           onAcceptRedemptionDisclaimer={() => acceptRedemptionDisclaimer.trigger()}
-          classicTheme={theme.classic}
+          classicTheme={profile.isClassicTheme}
         />
       </div>
     );

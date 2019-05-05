@@ -6,6 +6,7 @@ import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { THEMES } from '../../themes';
+import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 
@@ -125,7 +126,7 @@ export default class ProfileStore extends Store {
 
   // ========== Current/Custom Theme ========== //
 
-  @computed get currentTheme(): string {
+  @computed get currentTheme(): Theme {
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet) return result;
     // TODO: We temporarily disable the new theme on mainnet until it's ready
@@ -133,6 +134,14 @@ export default class ProfileStore extends Store {
     return (environment.isMainnet() || environment.isTest()) ?
       THEMES.YOROI_CLASSIC :
       THEMES.YOROI_MODERN;
+  }
+
+  @computed get isModernTheme(): boolean {
+    return this.currentTheme === THEMES.YOROI_MODERN;
+  }
+
+  @computed get isClassicTheme(): boolean {
+    return this.currentTheme === THEMES.YOROI_CLASSIC;
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
@@ -144,7 +153,6 @@ export default class ProfileStore extends Store {
     // Merge Custom Theme and Current Theme
     return { ...currentThemeVars, ...customThemeVars };
   }
-
 
   @computed get isCurrentThemeSet(): boolean {
     return (
