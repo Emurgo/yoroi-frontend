@@ -40,6 +40,15 @@ export async function getAdaTransactionFee(
     possibleInputAddresses,
     addressesToUtxos
   );
+  /**
+   * Note: get_balance_without_fees() != estimated fee
+   *
+   * Imagine you send a transaction with 1000 ADA input, 1 ADA output (no change)
+   * Your fee is very small, but the difference between the input & output is high
+   *
+   * Therefore we instead display input - output as the fee in Yoroi
+   * This is safer and gives a more consistent UI
+   */
   const fee = txBuilder.get_balance_without_fees().value();
   return { fee };
 }
@@ -56,13 +65,16 @@ export async function sendAllUnsignedTxFromUtxo(
     );
 
   const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
-  // firts build a transaction to see what the cost would be
-  const fakeTxBuilder = new RustModule.Wallet.TransactionBuilder();
-  const inputs = utxoToTxInput(allUtxos);
-  addTxInputs(fakeTxBuilder, inputs);
-  const inputAmount = coinToBigNumber(fakeTxBuilder.get_input_total());
-  addOutput(fakeTxBuilder, receiver, inputAmount.toString());
-  const fee = coinToBigNumber(fakeTxBuilder.estimate_fee(feeAlgorithm));
+  let fee;
+  {
+    // firts build a transaction to see what the cost would be
+    const fakeTxBuilder = new RustModule.Wallet.TransactionBuilder();
+    const inputs = utxoToTxInput(allUtxos);
+    addTxInputs(fakeTxBuilder, inputs);
+    const inputAmount = coinToBigNumber(fakeTxBuilder.get_input_total());
+    addOutput(fakeTxBuilder, receiver, inputAmount.toString());
+    fee = coinToBigNumber(fakeTxBuilder.estimate_fee(feeAlgorithm));
+  }
 
   // create a new transaction subtracing the fee from your total UTXO
   const newAmount = totalBalance.minus(fee);
@@ -70,11 +82,13 @@ export async function sendAllUnsignedTxFromUtxo(
 
   // sanity check
   const balance = unsignedTxResponse.txBuilder.get_balance(feeAlgorithm);
+  /**
+   * The balance may be slightly positive. This is because lowering the "amount" to send
+   * May reduce the amount of bytes required for the "amount", causing the fee to also drop
+   *
+   * Therefore we throw an error when the balance is negative, not when strictly equal to 0
+   */
   if (balance.is_negative()) {
-    /**
-     * The balance may be slightly positive. This is because lowering the "amount" to send
-     * May reduce the amount of bytes required for the "amount", causing the fee to also drop
-     */
     throw new NotEnoughMoneyToSendError();
   }
 
@@ -84,6 +98,7 @@ export async function sendAllUnsignedTxFromUtxo(
 /**
  * @param {*} possibleInputAddresses we send all UTXO associated with an address.
  * This maximizes privacy.
+ * The address will not be part of the input if it has no UTXO in it
  */
 export async function newAdaUnsignedTx(
   receiver: string,
