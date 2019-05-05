@@ -6,7 +6,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import styles from './DisplaySettings.scss';
-import { THEMES } from '../../../themes/index';
+import { THEMES } from '../../../themes';
 import ThemeThumbnail from './display/ThemeThumbnail';
 import environment from '../../../environment';
 
@@ -52,6 +52,7 @@ type Props = {
   getThemeVars: Function,
   hasCustomTheme: Function,
   onExternalLinkClick: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -68,7 +69,8 @@ export default class DisplaySettings extends Component<Props> {
       getThemeVars,
       exportTheme,
       hasCustomTheme,
-      onExternalLinkClick
+      onExternalLinkClick,
+      classicTheme,
     } = this.props;
     const { intl } = this.context;
 
@@ -97,7 +99,7 @@ export default class DisplaySettings extends Component<Props> {
     );
 
     return (
-      <div className={styles.component}>
+      <div className={classicTheme ? styles.componentClassic : styles.component}>
 
         <div className={styles.label}>
           {intl.formatMessage(messages.themeLabel)}

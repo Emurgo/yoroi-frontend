@@ -120,7 +120,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}

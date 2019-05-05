@@ -12,7 +12,7 @@ type Props = InjectedProps
 export default class WalletSettingsPage extends Component<Props> {
 
   render() {
-    const { uiDialogs } = this.props.stores;
+    const { uiDialogs, profile } = this.props.stores;
     const { wallets, walletSettings } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
     const activeWallet = wallets.active;
@@ -32,7 +32,10 @@ export default class WalletSettingsPage extends Component<Props> {
     if (!activeWallet) throw new Error('Active wallet required for WalletSettingsPage.');
 
     const changeDialog = (
-      <ChangeWalletPasswordDialogContainer actions={actions} stores={stores} />
+      <ChangeWalletPasswordDialogContainer
+        actions={actions}
+        stores={stores}
+      />
     );
     return (
       <WalletSettings
@@ -52,6 +55,7 @@ export default class WalletSettingsPage extends Component<Props> {
         activeField={walletFieldBeingEdited}
         nameValidator={name => isValidWalletName(name)}
         showPasswordBlock={activeWallet.isWebWallet}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }

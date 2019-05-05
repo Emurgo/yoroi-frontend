@@ -6,13 +6,15 @@ import styles from './TermsOfUseText.scss';
 
 type Props = {
   localizedTermsOfUse: string,
+  classicTheme: boolean
 };
 
 @observer
 export default class TermsOfUseText extends Component<Props> {
   render() {
+    const { classicTheme } = this.props;
     return (
-      <div className={styles.terms}>
+      <div className={classicTheme ? styles.termsClassic : styles.terms}>
         <ReactMarkdown source={this.props.localizedTermsOfUse} />
       </div>
     );

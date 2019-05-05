@@ -30,6 +30,7 @@ import {
 } from '../errors';
 import type
 {
+  AddressType,
   AdaTransaction,
   AdaTransactions,
   Transaction
@@ -40,7 +41,10 @@ import {
 import {
   saveLastBlockNumber,
   getLastBlockNumber,
-  getSingleCryptoAccount
+  getCurrentCryptoAccount
+} from '../adaLocalStorage';
+import type {
+  CryptoAccount,
 } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
 import config from '../../../config';
@@ -62,8 +66,7 @@ export const getAdaTxLastUpdatedDate = async (): Promise<Date> => getTxsLastUpda
  * Additionally add new addresses to DB to remain BIP-44 complaint
  */
 export async function refreshTxs(): Promise<void> {
-  // TODO: This should be an argument to this function once we support multiple accounts
-  const account = getSingleCryptoAccount();
+  const account = getCurrentCryptoAccount();
 
   /**
   * We have to make backend calls to check which of our addresses are used

@@ -1,6 +1,6 @@
 @import './DialogCommonStyle.scss';
 
-.headerSaveBlock {
+.headerSaveBlockClassic {
   padding-top: 0;
 }
 
@@ -14,7 +14,7 @@
   text-align: center;
 }
 
-.middleSaveErrorBlock {
+.middleSaveErrorBlockClassic {
   padding: 0px;
   background-color: var(--theme-hw-connect-dialog-middle-block-common-error-background-color);
   text-align: center;

@@ -6,15 +6,18 @@ import styles from './WalletRecoveryInstructions.scss';
 
 type Props = {
   instructionsText: string | Element<any>,
+  classicTheme: boolean
 };
 
 @observer
 export default class WalletRecoveryInstructions extends Component<Props> {
 
   render() {
-    const { instructionsText } = this.props;
+    const { instructionsText, classicTheme } = this.props;
     return (
-      <div className={styles.component}>{instructionsText}</div>
+      <div className={classicTheme ? styles.componentClassic : styles.component}>
+        {instructionsText}
+      </div>
     );
   }
 

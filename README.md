@@ -81,29 +81,6 @@ We use Jest for unittests.
 $ npm run jest
 ```
 
-## Update Cardano crypto library
-
-In order to update it run the following commands:
-
-```bash
-# Update js-cardano-wasm
-cd js-cardano-wasm;
-git checkout master;
-git pull origin master;
-cd ..;
-
-# Commit the update
-git add .
-git commit -S -m "${youCommitMessage}"
-git push ...
-
-# Re-install the module
-$ npm run build-js-cardano-wasm 
-$ npm install
-
-# At this point you can go back to Development steps. 
-```
-
 ## LICENSE
 
 [MIT](LICENSE)

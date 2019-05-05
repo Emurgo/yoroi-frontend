@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { action, useStrict } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
-import createHashHistory from 'history/createHashHistory';
+import { createHashHistory } from 'history';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
 import translations from '../../app/i18n/translations';
@@ -10,6 +10,7 @@ import actions from '../../app/actions/index';
 import Action from '../../app/actions/lib/Action';
 import App from '../../app/App';
 import '../../app/themes/index.global.scss';
+import { addCloseListener } from '../../app/utils/tabManager';
 
 // run MobX in strict mode
 useStrict(true);
@@ -38,5 +39,7 @@ const initializeYoroi = async () => {
     document.querySelector('#root')
   );
 };
+
+addCloseListener(window);
 
 window.addEventListener('load', initializeYoroi);

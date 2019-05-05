@@ -11,6 +11,7 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './LanguageSelectionForm.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import FlagLabel from '../../widgets/FlagLabel';
 
 const messages = defineMessages({
   languageSelectLabel: {
@@ -24,10 +25,11 @@ const messages = defineMessages({
 });
 
 type Props = {
-  languages: Array<{ value: string, label: ReactIntlMessage }>,
+  languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
+  classicTheme: boolean
 };
 
 @observer
@@ -66,11 +68,12 @@ export default class LanguageSelectionForm extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { languages, isSubmitting, error } = this.props;
+    const { languages, isSubmitting, error, classicTheme } = this.props;
     const languageId = form.$('languageId');
     const languageOptions = languages.map(language => ({
       value: language.value,
-      label: intl.formatMessage(language.label)
+      label: intl.formatMessage(language.label),
+      svg: language.svg
     }));
     const buttonClasses = classnames([
       'primary',
@@ -82,10 +85,13 @@ export default class LanguageSelectionForm extends Component<Props> {
         <div className={styles.centeredBox}>
 
           <Select
-            className={styles.languageSelect}
+            className={classicTheme ? styles.languageSelectClassic : styles.languageSelect}
             options={languageOptions}
             {...languageId.bind()}
             skin={SelectSkin}
+            optionRenderer={option => (
+              <FlagLabel svg={option.svg} label={option.label} />
+            )}
           />
 
           {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}

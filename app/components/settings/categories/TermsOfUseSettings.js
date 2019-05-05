@@ -6,15 +6,16 @@ import styles from './TermsOfUseSettings.scss';
 
 type Props = {
   localizedTermsOfUse: string,
+  classicTheme: boolean,
 };
 
 @observer
 export default class TermsOfUseSettings extends Component<Props> {
   render() {
-    const { localizedTermsOfUse } = this.props;
+    const { localizedTermsOfUse, classicTheme } = this.props;
     return (
       <div className={styles.component}>
-        <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} />
+        <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} classicTheme={classicTheme} />
       </div>
     );
   }

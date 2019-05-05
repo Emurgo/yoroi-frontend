@@ -1,17 +1,45 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.component {
+.componentClassic {
   padding-top: 40px;
   padding-right: 20px;
   padding-bottom: 20px;
   padding-left: 20px;
 }
 
-.amountInput,
-.receiverInput {
+.component {
+  padding: 30px;
+}
+
+.amountInputClassic {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+.receiverInputClassic {
+  position: relative;
+  margin-bottom: 10px;
+  :global {
+    .SimpleInput_input {
+      font-family: var(--font-mono-light);
+      letter-spacing: 0;
+    }
+  }
+}
+
+.amountInput {
+  position: relative;
+  margin-bottom: 10px;
+}
+.receiverInput {
+  letter-spacing: 0;
+  position: relative;
+  :global {
+    .SimpleInput_input {
+      font-family: var(--font-mono-regular);
+      letter-spacing: 0;
+    }
+  }
 }
 
 .adaLabel {
@@ -23,9 +51,14 @@
   text-transform: uppercase;
 }
 
-.nextButton {
+.nextButtonClassic {
   display: block !important;
   margin: 30px auto 0;
+}
+
+.nextButton {
+  display: block !important;
+  margin: 20px auto 0;
 }
 
 .contentWarning{
@@ -50,5 +83,5 @@
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 0.5em;
-  color: var(--theme-error-text-color);
+  color: var(--rp-theme-color-error);
 }

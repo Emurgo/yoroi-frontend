@@ -7,7 +7,7 @@ import AdaRedemptionNoWallets from '../../components/wallet/ada-redemption/AdaRe
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ADA_REDEMPTION_TYPES } from '../../types/redemptionTypes';
 import { AdaRedemptionCertificateParseError } from '../../i18n/errors';
-import validWords from 'bip39/wordlists/english.json';
+import validWords from 'bip39/src/wordlists/english.json';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 
@@ -31,7 +31,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
   };
 
   render() {
-    const { substores } = this.props.stores;
+    const { substores, profile } = this.props.stores;
     const { ada } = substores;
     const { wallets, adaRedemption } = ada;
     const isMainnet = environment.isMainnet();
@@ -55,6 +55,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
         <div>
           <AdaRedemptionNoWallets
             onGoToCreateWalletClick={this.handleGoToCreateWalletClick}
+            classicTheme={profile.isClassicTheme}
           />
         </div>
       );
@@ -121,6 +122,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           )}
           isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
           onAcceptRedemptionDisclaimer={() => acceptRedemptionDisclaimer.trigger()}
+          classicTheme={profile.isClassicTheme}
         />
       </div>
     );

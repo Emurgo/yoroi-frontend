@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
@@ -16,6 +17,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
+import CopyableAddress from '../widgets/CopyableAddress';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -59,6 +61,8 @@ type Props = {
   onAddressDetail: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
+  classicTheme: boolean,
+  notification: Node
 };
 
 type State = {
@@ -94,14 +98,11 @@ export default class WalletReceive extends Component<Props, State> {
       walletAddress, walletAddresses,
       onCopyAddress, onAddressDetail,
       isSubmitting, error, isWalletAddressUsed,
+      classicTheme,
+      notification
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
-
-    const walletAddressClasses = classnames([
-      styles.hash,
-      isWalletAddressUsed ? styles.usedHash : null,
-    ]);
 
     const generateAddressButtonClasses = classnames([
       'primary',
@@ -109,6 +110,14 @@ export default class WalletReceive extends Component<Props, State> {
       styles.submitButton,
       isSubmitting ? styles.spinning : null,
     ]);
+
+    const qrCodeAndInstructionsClasses = classicTheme
+      ? styles.qrCodeAndInstructionsClassic
+      : styles.qrCodeAndInstructions;
+
+    const generatedAddressesClasses = classicTheme
+      ? styles.generatedAddressesClassic
+      : styles.generatedAddresses;
 
     const generateAddressForm = (
       <Button
@@ -126,25 +135,25 @@ export default class WalletReceive extends Component<Props, State> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const walletReceiveContent = (
-      <BorderedBox>
-        <div className={styles.qrCodeAndInstructions}>
+      <BorderedBox classicTheme={classicTheme}>
+        <div className={qrCodeAndInstructionsClasses}>
           <div className={styles.instructions}>
             <div className={styles.hashLabel}>
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
-            <div className={walletAddressClasses}>
-              {walletAddress}
-              <CopyToClipboard
-                text={walletAddress}
-                onCopy={onCopyAddress.bind(this, walletAddress)}
-              >
-                <SvgInline svg={iconCopy} className={styles.copyIconBig} />
-              </CopyToClipboard>
-            </div>
+            <CopyableAddress
+              address={walletAddress}
+              isClassicThemeActive={classicTheme}
+              onCopyAddress={onCopyAddress}
+              isUsed={isWalletAddressUsed}
+            />
+            {!classicTheme && notification}
             <div className={styles.instructionsText}>
               {intl.formatMessage(messages.walletReceiveInstructions)}
             </div>
-            {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
+            {error
+              ? <p className={styles.error}>{intl.formatMessage(error)}</p>
+              : <p className={styles.error} />}
             {generateAddressForm}
           </div>
           <div className={styles.qrCode}>
@@ -157,7 +166,7 @@ export default class WalletReceive extends Component<Props, State> {
           </div>
         </div>
 
-        <div className={styles.generatedAddresses}>
+        <div className={generatedAddressesClasses}>
           <h2>
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
             <button type="button" onClick={this.toggleUsedAddresses}>
@@ -207,7 +216,7 @@ export default class WalletReceive extends Component<Props, State> {
       <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />;
 
     return (
-      <div className={styles.component}>
+      <div className={classicTheme ? styles.componentClassic : styles.component}>
         {walletAddress ? walletReceiveContent : loadingSpinner}
       </div>
     );

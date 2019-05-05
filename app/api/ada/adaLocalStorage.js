@@ -3,6 +3,20 @@
 // Wrapper API to Save&Load localstorage using JSON
 
 import type { AdaWallet } from './adaTypes';
+import { RustModule } from './lib/cardanoCrypto/rustLoader';
+
+export type CryptoAccount = {
+  account: number,
+  // master public key
+  root_cached_key: RustModule.Wallet.Bip44AccountPublic,
+  derivation_scheme: string
+}
+
+type LocalStorageCryptoAccount = {
+  account: number,
+  root_cached_key: string, // MasterPublicKey
+  derivation_scheme: string
+}
 
 export type LocalStorageWallet = {
   adaWallet: AdaWallet,
@@ -23,11 +37,34 @@ const storageKeys = {
 export function saveCryptoAccount(
   ca: CryptoAccount
 ): void {
-  _saveInStorage(storageKeys.ACCOUNT_KEY, ca);
+  const localAccount: LocalStorageCryptoAccount = {
+    account: ca.account,
+    root_cached_key: ca.root_cached_key.key().to_hex(),
+    derivation_scheme: ca.derivation_scheme
+  };
+  _saveInStorage(storageKeys.ACCOUNT_KEY, localAccount);
 }
 
-export function getSingleCryptoAccount(): CryptoAccount {
-  return _getFromStorage(storageKeys.ACCOUNT_KEY);
+export function getCurrentCryptoAccount(): CryptoAccount {
+  const localAccount = _getFromStorage(storageKeys.ACCOUNT_KEY);
+  if (localAccount.derivation_scheme !== 'V2') {
+    throw Error('Sanity check');
+  }
+  const pubKey = RustModule.Wallet.PublicKey.from_hex(localAccount.root_cached_key);
+  const account = RustModule.Wallet.Bip44AccountPublic.new(
+    pubKey,
+    RustModule.Wallet.DerivationScheme.v2()
+  );
+  return {
+    account: localAccount.account,
+    root_cached_key: account,
+    derivation_scheme: localAccount.derivation_scheme
+  };
+}
+
+export function getCurrentAccountIndex(): number {
+  const localAccount = _getFromStorage(storageKeys.ACCOUNT_KEY);
+  return localAccount.account;
 }
 
 /* Wallet storage */

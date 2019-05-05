@@ -2,20 +2,26 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 import globalMessages from '../../../i18n/global-messages';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import styles from './TestnetWarningBanner.scss';
 import environment from '../../../environment';
+import warningSvg from '../../../assets/images/warning.inline.svg';
 
 const messages = defineMessages({
   testnetLabel: {
     id: 'testnet.label.message',
-    defaultMessage: '!!!WARNING: This is a testnet. ADA on the testnet has no monetary value. For more information, check out the FAQ at {faqLink}',
+    defaultMessage: '!!!WARNING: This is a {network} network. ADA has no monetary value here. For more information, check out the FAQ at {faqLink}',
   },
 });
 
+type Props = {
+  classicTheme: ?boolean,
+};
+
 @observer
-export default class TestnetWarningBanner extends Component<{}> {
+export default class TestnetWarningBanner extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -23,6 +29,9 @@ export default class TestnetWarningBanner extends Component<{}> {
 
   render() {
     const { intl } = this.context;
+    const { classicTheme } = this.props;
+
+    const testnetClasses = classicTheme ? styles.testnetWarningClassic : styles.testnetWarning;
 
     const faqLink = (
       <a
@@ -37,10 +46,23 @@ export default class TestnetWarningBanner extends Component<{}> {
       <div>
         {
           environment.isMainnet() ? null : (
-            <div className={styles.testnetWarning}>
-              <FormattedMessage {...messages.testnetLabel} values={{ faqLink }} />
-            </div>
-          )
+            <div className={testnetClasses}>
+              {classicTheme ?
+                (
+                  <FormattedMessage
+                    {...messages.testnetLabel}
+                    values={{ faqLink, network: environment.NETWORK }}
+                  />
+                ) :
+                ([
+                  <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
+                  <FormattedMessage
+                    {...messages.testnetLabel}
+                    values={{ faqLink, network: environment.NETWORK }}
+                    key="1"
+                  />
+                ])}
+            </div>)
         }
       </div>
     );

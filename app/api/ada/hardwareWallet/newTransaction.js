@@ -8,7 +8,13 @@ import {
 } from '../../../utils/logging';
 import type {
   AdaAddress,
+  UTXO
 } from '../adaTypes';
+import type { UtxoLookupMap }  from '../lib/utils';
+import { utxosToLookupMap, derivePathAsString }  from '../lib/utils';
+import type {
+  AdaAddressMap,
+} from '../adaAddress';
 import {
   sendTx,
   getTxsBodiesForUTXOs
@@ -27,8 +33,6 @@ import type {
   TrezorOutput,
   TrezorSignTxPayload,
   LedgerSignTxPayload,
-  LedgerUnsignedOutput,
-  LedgerUnsignedUtxo,
 } from '../../../domain/HWSignTx';
 import type {
   BIP32Path,
@@ -36,39 +40,44 @@ import type {
   OutputTypeAddress,
   OutputTypeChange,
   SignTransactionResponse as LedgerSignTxResponse,
+  Witness
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
-import bs58 from 'bs58';
 
 import type { ConfigType } from '../../../../config/config-types';
-import Config from '../../../config';
 
-// Probably this needs to be moved somewhere else
-import { getSingleCryptoAccount } from '../adaLocalStorage';
-import cbor from 'cbor';
-import { HdWallet } from 'rust-cardano-crypto';
-import { CborIndefiniteLengthArray } from '../lib/utils';
-import { blake2b } from 'cardano-crypto.js';
+import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
 declare var CONFIG: ConfigType;
-
-export type UnsignedLedgerTx = {inputs: Array<any>, outputs: Array<any>, attributes: {}};
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
-  txExt: UnsignedTransactionExt
+  addressesMap: AdaAddressMap,
+  changeAddr: AdaAddress,
+  senderUtxos: Array<UTXO>,
+  unsignedTx: RustModule.Wallet.Transaction,
 ): Promise<TrezorSignTxPayload> {
+  const txJson: TransactionType = unsignedTx.to_json();
+
+  const utxoMap = utxosToLookupMap(senderUtxos);
 
   // Inputs
-  const trezorInputs = _transformToTrezorInputs(txExt.inputs);
+  const trezorInputs = _transformToTrezorInputs(
+    txJson.inputs,
+    addressesMap,
+    utxoMap
+  );
 
-  // Outputs
-  const trezorOutputs = _generateTrezorOutputs(txExt.outputs);
+  // Output
+  const trezorOutputs = _generateTrezorOutputs(
+    txJson.outputs,
+    changeAddr
+  );
 
   // Transactions
-  const txsBodiesMap = await txsBodiesForInputs(txExt.inputs);
-  const txsBodies = txExt.inputs.map((x: TxInput) => txsBodiesMap[x.ptr.id]);
+  const txsBodiesMap = await txsBodiesForInputs(txJson.inputs);
+  const txsBodies = txJson.inputs.map((x) => txsBodiesMap[x.id]);
 
   return {
     inputs: trezorInputs,
@@ -80,15 +89,15 @@ export async function createTrezorSignTxPayload(
 
 /** List of Body hashes for a list of utxos by batching backend requests */
 export async function txsBodiesForInputs(
-  inputs: Array<TxInput>
+  inputs: Array<TxoPointerType>
 ): Promise<{[key: string]:string}> {
   if (!inputs) return {};
   try {
 
     // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
-    const txsHashes = [...new Set(inputs.map(x => x.ptr.id))];
+    const txsHashes = [...new Set(inputs.map(x => x.id))];
 
-    // split up all addresses into chunks of equal size
+    // split up all txs into chunks of equal size
     const groupsOfTxsHashes = _.chunk(txsHashes, CONFIG.app.txsBodiesRequestSize);
 
     // convert chunks into list of Promises that call the backend-service
@@ -117,7 +126,8 @@ export async function broadcastTrezorSignedTx(
   signedTxHex: string,
 ): Promise<BroadcastTrezorSignedTxResponse> {
   Logger.debug('newTransaction::broadcastTrezorSignedTx: called');
-  const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
+  const signedTxBytes = Buffer.from(signedTxHex, 'hex');
+  const signedTx = RustModule.Wallet.SignedTransaction.from_bytes(signedTxBytes);
 
   try {
     const body = { signedTx };
@@ -134,36 +144,39 @@ export async function broadcastTrezorSignedTx(
   }
 }
 
-function _derivePathAsString(chain: number, addressIndex: number): string {
-  // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return `${Config.wallets.BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH}/${chain}/${addressIndex}`;
+function _transformToTrezorInputs(
+  inputs: Array<TxoPointerType>,
+  addressMap: AdaAddressMap,
+  utxoMap: UtxoLookupMap,
+): Array<TrezorInput> {
+  return inputs.map((input: TxoPointerType) => {
+    const utxo = utxoMap[input.id][input.index];
+    const addressInfo = addressMap[utxo.receiver];
+    return {
+      path: derivePathAsString(addressInfo.account, addressInfo.change, addressInfo.index),
+      prev_hash: input.id,
+      prev_index: input.index,
+      type: 0
+    };
+  });
 }
 
-function _transformToTrezorInputs(inputs: Array<TxInput>): Array<TrezorInput> {
-  return inputs.map((input: TxInput) => ({
-    path: _derivePathAsString(input.addressing.change, input.addressing.index),
-    prev_hash: input.ptr.id,
-    prev_index: input.ptr.index,
-    type: 0
-  }));
-}
-
-function _generateTrezorOutputs(outputs: Array<TxOutput>): Array<TrezorOutput> {
-  return outputs.map(x => ({
-    amount: x.value.toString(),
-    ..._outputAddressOrPath(x)
+function _generateTrezorOutputs(
+  txOutputs: Array<TxOutType>,
+  changeAddr: AdaAddress,
+): Array<TrezorOutput> {
+  return txOutputs.map(txOutput => ({
+    amount: txOutput.value.toString(),
+    ..._outputAddressOrPath(txOutput, changeAddr)
   }));
 }
 
 function _outputAddressOrPath(
-  txOutput: TxOutput
+  txOutput: TxOutType,
+  changeAddr: AdaAddress,
 ): { path: string } | { address: string } {
-  if (txOutput.isChange) {
-    const fullAddress: ?AdaAddress = txOutput.fullAddress;
-    if (fullAddress) {
-      return { path: _derivePathAsString(fullAddress.change, fullAddress.index) };
-    }
-    Logger.debug(`newTransaction::_outputAddressOrPath:[WEIRD] Trezor got a change output without a full 'Ada Address': ${stringifyData(txOutput)}`);
+  if (txOutput.address === changeAddr.cadId) {
+    return { path: derivePathAsString(changeAddr.account, changeAddr.change, changeAddr.index) };
   }
 
   return { address: txOutput.address };
@@ -172,19 +185,31 @@ function _outputAddressOrPath(
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
 export async function createLedgerSignTxPayload(
-  txExt: UnsignedTransactionExt
+  addressesMap: AdaAddressMap,
+  changeAddr: AdaAddress,
+  senderUtxos: Array<UTXO>,
+  unsignedTx: RustModule.Wallet.Transaction,
 ): Promise<LedgerSignTxPayload> {
+  const txJson: TransactionType = unsignedTx.to_json();
+  const txDataHexMap = await txsBodiesForInputs(txJson.inputs);
 
-  // Transactions Hash
-  const txDataHexMap = await txsBodiesForInputs(txExt.inputs);
+  const utxoMap = utxosToLookupMap(senderUtxos);
 
   // Inputs
   const ledgerInputs: Array<InputTypeUTxO> =
-    _transformToLedgerInputs(txExt.inputs, txDataHexMap);
+    _transformToLedgerInputs(
+      txJson.inputs,
+      addressesMap,
+      utxoMap,
+      txDataHexMap,
+    );
 
   // Outputs
   const ledgerOutputs: Array<OutputTypeAddress | OutputTypeChange> =
-    _transformToLedgerOutputs(txExt.outputs);
+    _transformToLedgerOutputs(
+      txJson.outputs,
+      changeAddr,
+    );
 
   return {
     inputs: ledgerInputs,
@@ -192,71 +217,60 @@ export async function createLedgerSignTxPayload(
   };
 }
 
-function _derivePathAsBIP32Path(
-  chain: number,
-  addressIndex: number
-): BIP32Path {
-  // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return makeCardanoBIP44Path(0, chain, addressIndex);
-}
-
 function _transformToLedgerInputs(
-  inputs: Array<TxInput>,
+  inputs: Array<TxoPointerType>,
+  addressMap: AdaAddressMap,
+  utxoMap: UtxoLookupMap,
   txDataHexMap: {[key: string]:string}
 ): Array<InputTypeUTxO> {
-  return inputs.map((input: TxInput) => ({
-    txDataHex: txDataHexMap[input.ptr.id],
-    outputIndex: input.ptr.index,
-    path: _derivePathAsBIP32Path(input.addressing.change, input.addressing.index),
-  }));
+  return inputs.map(input => {
+    const utxo = utxoMap[input.id][input.index];
+    const addressInfo = addressMap[utxo.receiver];
+    return {
+      txDataHex: txDataHexMap[input.id],
+      outputIndex: input.index,
+      path: makeCardanoBIP44Path(addressInfo.account, addressInfo.change, addressInfo.index),
+    };
+  });
 }
 
 function _transformToLedgerOutputs(
-  txOutputs: Array<TxOutput>
+  txOutputs: Array<TxOutType>,
+  changeAddr: AdaAddress,
 ): Array<OutputTypeAddress | OutputTypeChange> {
   return txOutputs.map(txOutput => ({
     amountStr: txOutput.value.toString(),
-    ..._ledgerOutputAddress58OrPath(txOutput)
+    ..._ledgerOutputAddress58OrPath(txOutput, changeAddr)
   }));
 }
 
 function _ledgerOutputAddress58OrPath(
-  txOutput: TxOutput
+  txOutput: TxOutType,
+  changeAddr: AdaAddress,
 ): { address58: string } | { path: BIP32Path }  {
-  if (txOutput.isChange) {
-    const fullAddress: ?AdaAddress = txOutput.fullAddress;
-    if (fullAddress) {
-      return { path: _derivePathAsBIP32Path(fullAddress.change, fullAddress.index) };
-    }
-    Logger.debug(`newTransaction::_ledgerOutputAddressOrPath:[WEIRD] Ledger got a change output without a full 'Ada Address': ${stringifyData(txOutput)}`);
+  if (txOutput.address === changeAddr.cadId) {
+    return { path: makeCardanoBIP44Path(changeAddr.account, changeAddr.change, changeAddr.index) };
   }
 
   return { address58: txOutput.address };
 }
 
-/** Send a transaction and save the new change address */
 export async function prepareAndBroadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: any,
-  txExt: UnsignedTransactionExt
+  unsignedTx: RustModule.Wallet.Transaction,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
 ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
   try {
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');
 
-    // Since Ledger only provide witness signature
-    // need to make full broadcastable signed Tx
-    Logger.debug(`newTransaction::prepareAndBroadcastLedgerSignedTx unsignedTx: ${stringifyData(unsignedTx)}`);
-    const signedTxHex: string = await prepareLedgerSignedTxBody(
-      ledgerSignTxResp,
-      unsignedTx,
-      txExt
-    );
+    const unsignedTxJson: TransactionType = unsignedTx.to_json();
+    Logger.debug(`newTransaction::prepareAndBroadcastLedgerSignedTx unsignedTx: ${stringifyData(
+      unsignedTxJson
+    )}`);
+    const finalizer = new RustModule.Wallet.TransactionFinalized(unsignedTx);
+    ledgerSignTxResp.witnesses.map((witness) => prepareWitness(finalizer, witness, cryptoAccount));
 
-    Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');
-    const signedTx: string = Buffer.from(signedTxHex, 'hex').toString('base64');
-
-    const body = { signedTx };
-    const backendResponse = await sendTx(body);
+    const backendResponse = await sendTx({ signedTx: finalizer.finalize() });
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: success');
 
     return backendResponse;
@@ -270,176 +284,20 @@ export async function prepareAndBroadcastLedgerSignedTx(
   }
 }
 
-function prepareLedgerSignedTxBody(
-  ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: any,
-  txExt: UnsignedTransactionExt
-): string {
-  // TODO: add type to unsignedTx
-
-  const txAux = TxAux(
-    txExt.inputs
-      .map(input => {
-        const transformedInput = InputToLedgerUnsignedFormat(input);
-        Logger.debug(`newTransaction::transformedInput: ${stringifyData(transformedInput)}`);
-        return TxInputFromUtxo(transformedInput);
-      }),
-    txExt.outputs
-      .map(output => {
-        const transformedOutput = OutputToLedgerUnsignedFormat(output);
-        Logger.debug(`newTransaction::transformedOutput: ${stringifyData(transformedOutput)}`);
-        return LedgerTxOutput(transformedOutput);
-      }),
-    {} // attributes
+function prepareWitness(
+  finalizer: RustModule.Wallet.TransactionFinalized,
+  ledgerWitness: Witness,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
+): void {
+  const pubKey = cryptoAccount.address_key(
+    ledgerWitness.path[3] === 1,
+    RustModule.Wallet.AddressKeyIndex.new(ledgerWitness.path[4])
   );
 
-  const txWitnesses = ledgerSignTxResp.witnesses.map((witness) => prepareWitness(witness));
-  Logger.debug(`newTransaction::prepareLedgerSignedTxBody txWitnesses: ${stringifyData(txWitnesses)}`);
+  const txSignature = RustModule.Wallet.TransactionSignature.from_hex(
+    ledgerWitness.witnessSignatureHex
+  );
 
-  const txBody = prepareBody(txAux, txWitnesses);
-  Logger.debug(`newTransaction::prepareLedgerSignedTxBody txBody: ${stringifyData(txBody)}`);
-
-  return txBody;
-}
-
-function InputToLedgerUnsignedFormat(txInput: TxInput): LedgerUnsignedUtxo {
-  return {
-    txHash: txInput.ptr.id,
-    address: txInput.value.address,
-    coins: Number(txInput.value.value),
-    outputIndex: txInput.ptr.index
-  };
-}
-
-function OutputToLedgerUnsignedFormat(output: TxOutput): LedgerUnsignedOutput {
-  // TODO: when does this actually happen
-  const isChange = !!output.isChange;
-  return {
-    address: output.address,
-    coins: Number(output.value),
-    isChange
-  };
-}
-/* Stuff from VacuumLabs */
-
-function TxInputFromUtxo(utxo: LedgerUnsignedUtxo) {
-  // default input type
-  const type = 0;
-  const coins = utxo.coins;
-  const txHash = utxo.txHash;
-  const outputIndex = utxo.outputIndex;
-
-  function encodeCBOR(encoder) {
-    return encoder.pushAny([
-      type,
-      new cbor.Tagged(24, cbor.encode([Buffer.from(txHash, 'hex'), outputIndex])),
-    ]);
-  }
-
-  return {
-    coins,
-    txHash,
-    outputIndex,
-    utxo,
-    encodeCBOR,
-  };
-}
-
-function AddressCborWrapper(address: string) {
-  function encodeCBOR(encoder) {
-    return encoder.push(bs58.decode(address));
-  }
-
-  return {
-    address,
-    encodeCBOR,
-  };
-}
-function LedgerTxOutput(output: LedgerUnsignedOutput) {
-  function encodeCBOR(encoder) {
-    return encoder.pushAny([AddressCborWrapper(output.address), output.coins]);
-  }
-
-  return {
-    address: output.address,
-    coins: output.coins,
-    isChange: output.isChange,
-    encodeCBOR,
-  };
-}
-
-function prepareWitness(witness) {
-  const cryptoAccount = getSingleCryptoAccount();
-  const masterXPubAccount0 = cryptoAccount.root_cached_key;
-
-  const deriveXpub = function XPubFactory(absDerivationPath: Array<number>) {
-    const masterXPubAccount0Buffer = Buffer.from(masterXPubAccount0, 'hex');
-    const changeXpub = HdWallet.derivePublic(masterXPubAccount0Buffer, [absDerivationPath[3]]);
-    const addressXpub = HdWallet.derivePublic(changeXpub, [absDerivationPath[4]]);
-    return addressXpub;
-  };
-
-  const extendedPublicKey = deriveXpub(witness.path);
-  Logger.debug(`newTransaction::prepareWitness extendedPublicKey: ${stringifyData(extendedPublicKey)}`);
-  return TxWitness(extendedPublicKey, Buffer.from(witness.witnessSignatureHex, 'hex'));
-}
-
-function TxWitness(extendedPublicKey, signature) {
-  // default - PkWitness
-  const type = 0;
-
-  function encodeCBOR(encoder) {
-    return encoder.pushAny(
-      [type, new cbor.Tagged(24, cbor.encode([extendedPublicKey, signature]))]
-    );
-  }
-
-  return {
-    extendedPublicKey,
-    signature,
-    encodeCBOR,
-  };
-}
-
-function prepareBody(txAux, txWitnesses) {
-  return cbor.encode(SignedTransactionStructured(txAux, txWitnesses)).toString('hex');
-}
-
-function TxAux(inputs: Array<any>, outputs: Array<any>, attributes: any) {
-  function getId() {
-    return blake2b(cbor.encode(TxAux(inputs, outputs, attributes)), 32).toString('hex');
-  }
-
-  function encodeCBOR(encoder) {
-    return encoder.pushAny([
-      new CborIndefiniteLengthArray(inputs),
-      new CborIndefiniteLengthArray(outputs),
-      attributes,
-    ]);
-  }
-
-  return {
-    getId,
-    inputs,
-    outputs,
-    attributes,
-    encodeCBOR,
-  };
-}
-
-function SignedTransactionStructured(txAux, witnesses) {
-  function getId() {
-    return txAux.getId();
-  }
-
-  function encodeCBOR(encoder) {
-    return encoder.pushAny([txAux, witnesses]);
-  }
-
-  return {
-    getId,
-    witnesses,
-    txAux,
-    encodeCBOR,
-  };
+  const witness = RustModule.Wallet.Witness.from_external(pubKey, txSignature);
+  finalizer.add_witness(witness);
 }

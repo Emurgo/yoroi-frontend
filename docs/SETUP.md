@@ -6,7 +6,9 @@ Tested on Ubuntu 18.04
 
 ### NodeJS
 
-- node [v8.9.4](https://nodejs.org/download/release/v8.9.4/) (if you are using nvm, just execute: `nvm use`)
+If you have `nvm`, just run `nvm use`
+
+Otherwise, you can download `node` manually from [here](https://nodejs.org) but you need to be careful the version matches the one specified in our `package.lock` file.
 
 ### Rust
 
@@ -32,28 +34,10 @@ $ rustup update
 $ rustup target add wasm32-unknown-unknown --toolchain nightly
 ```
 
-### Submodules
-
-```bash
-# clone the repository with the submodule js-cardano-wasm
-$ git clone --recursive git@github.com:Emurgo/yoroi-frontend.git
-$ git submodule update --init --recursive
-```
-
-To automate downloading and installation of `js-cardano-wasm` dependency run `setup_cardano_crypto.sh` to download latest `js-cardano-wasm` repository into `js-cardano-wasm` folder.
-```bash
-$ sh setup_cardano_crypto.sh
-```
-
 ### Packages
 To install other Yoroi-frontend related dependencies use:
 ```bash
 $ npm install
-```
-
-Rebuild dll
-```bash
-$ npm run build-dll
 ```
 
 ### Firefox

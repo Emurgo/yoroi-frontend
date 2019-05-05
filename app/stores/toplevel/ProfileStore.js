@@ -5,21 +5,28 @@ import moment from 'moment/moment';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { THEMES } from '../../themes/index';
+import { THEMES } from '../../themes';
+import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 
-export default class SettingsStore extends Store {
+export default class ProfileStore extends Store {
 
   LANGUAGE_OPTIONS = [
-    { value: 'en-US', label: globalMessages.languageEnglish },
-    { value: 'ja-JP', label: globalMessages.languageJapanese },
-    { value: 'ko-KR', label: globalMessages.languageKorean },
-    { value: 'zh-Hans', label: globalMessages.languageChineseSimplified },
-    { value: 'zh-Hant', label: globalMessages.languageChineseTraditional },
-    { value: 'ru-RU', label: globalMessages.languageRussian },
-    { value: 'de-DE', label: globalMessages.languageGerman },
-    { value: 'fr-FR', label: globalMessages.languageFrench },
+    { value: 'en-US', label: globalMessages.languageEnglish, svg: require('../../assets/images/flags/english.inline.svg') },
+    { value: 'ja-JP', label: globalMessages.languageJapanese, svg: require('../../assets/images/flags/japanese.inline.svg') },
+    { value: 'ko-KR', label: globalMessages.languageKorean, svg: require('../../assets/images/flags/korean.inline.svg') },
+    { value: 'zh-Hans', label: globalMessages.languageChineseSimplified, svg: require('../../assets/images/flags/chinese.inline.svg') },
+    { value: 'zh-Hant', label: globalMessages.languageChineseTraditional, svg: require('../../assets/images/flags/chinese.inline.svg') },
+    { value: 'ru-RU', label: globalMessages.languageRussian, svg: require('../../assets/images/flags/russian.inline.svg') },
+    { value: 'de-DE', label: globalMessages.languageGerman, svg: require('../../assets/images/flags/german.inline.svg') },
+    { value: 'fr-FR', label: globalMessages.languageFrench, svg: require('../../assets/images/flags/french.inline.svg') },
+    ...(!environment.isMainnet()
+      ? [
+        { value: 'id-ID', label: globalMessages.languageIndonesian, svg: require('../../assets/images/flags/indonesian.inline.svg') },
+        { value: 'es-ES', label: globalMessages.languageSpanish, svg: require('../../assets/images/flags/spanish.inline.svg') },
+      ]
+      : [])
   ];
 
   @observable bigNumberDecimalFormat = {
@@ -68,12 +75,17 @@ export default class SettingsStore extends Store {
     BigNumber.config({ FORMAT: this.bigNumberDecimalFormat });
   };
 
+
+  static getDefaultLocale() {
+    return 'en-US';
+  }
+
   // ========== Locale ========== //
 
   @computed get currentLocale(): string {
     const { result } = this.getProfileLocaleRequest.execute();
     if (this.isCurrentLocaleSet) return result;
-    return 'en-US'; // default
+    return ProfileStore.getDefaultLocale();
   }
 
   @computed get hasLoadedCurrentLocale(): boolean {
@@ -114,10 +126,22 @@ export default class SettingsStore extends Store {
 
   // ========== Current/Custom Theme ========== //
 
-  @computed get currentTheme(): string {
+  @computed get currentTheme(): Theme {
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet) return result;
-    return THEMES.YOROI_CLASSIC; // default
+    // TODO: We temporarily disable the new theme on mainnet until it's ready
+    // TODO: Tests were written for the old theme so we need to use it for testing
+    return (environment.isMainnet() || environment.isTest()) ?
+      THEMES.YOROI_CLASSIC :
+      THEMES.YOROI_MODERN;
+  }
+
+  @computed get isModernTheme(): boolean {
+    return this.currentTheme === THEMES.YOROI_MODERN;
+  }
+
+  @computed get isClassicTheme(): boolean {
+    return this.currentTheme === THEMES.YOROI_CLASSIC;
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
@@ -129,7 +153,6 @@ export default class SettingsStore extends Store {
     // Merge Custom Theme and Current Theme
     return { ...currentThemeVars, ...customThemeVars };
   }
-
 
   @computed get isCurrentThemeSet(): boolean {
     return (
@@ -175,6 +198,16 @@ export default class SettingsStore extends Store {
     const { result } = this.getCustomThemeRequest.execute();
     return result !== '';
   };
+
+  // ========== Paper Wallets ========== //
+
+  @computed get paperWalletsIntro(): string {
+    try {
+      return require(`../../i18n/locales/paper-wallets/intro/${this.currentLocale}.md`);
+    } catch {
+      return require(`../../i18n/locales/paper-wallets/intro/${ProfileStore.getDefaultLocale()}.md`);
+    }
+  }
 
   // ========== Terms of Use ========== //
 

@@ -1,3 +1,0 @@
-[submodule "js-cardano-wasm"]
-	path = js-cardano-wasm
-	url = https://github.com/input-output-hk/js-cardano-wasm.git

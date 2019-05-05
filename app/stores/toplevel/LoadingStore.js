@@ -1,6 +1,5 @@
 // @flow
 import { observable, computed, when, runInAction } from 'mobx';
-import { loadRustModule } from 'rust-cardano-crypto';
 import Store from '../base/Store';
 import Wallet from '../../domain/Wallet';
 import environment from '../../environment';
@@ -12,6 +11,9 @@ import Request from '../lib/LocalizedRequest';
 import type { MigrationRequest } from '../../api';
 import { migrate } from '../../api';
 import { Logger, stringifyError } from '../../utils/logging';
+import { closeOtherInstances } from '../../utils/tabManager';
+
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /** Load dependencies before launching the app */
 export default class LoadingStore extends Store {
@@ -19,7 +21,7 @@ export default class LoadingStore extends Store {
   @observable error: ?LocalizableError = null;
   @observable _loading: boolean = true;
 
-  @observable loadRustRequest: Request<void> = new Request(loadRustModule);
+  @observable loadRustRequest: Request<void> = new Request(RustModule.load.bind(RustModule));
   @observable migrationRequest: Request<MigrationRequest> = new Request(migrate);
 
   // TODO: Should not make currency-specific requests in a toplevel store
@@ -33,6 +35,7 @@ export default class LoadingStore extends Store {
     Promise
       .all([this.loadRustRequest.execute().promise, this.loadDbRequest.execute().promise])
       .then(async () => {
+        closeOtherInstances();
         await this.migrationRequest.execute({
           api: this.api,
           currVersion: environment.version

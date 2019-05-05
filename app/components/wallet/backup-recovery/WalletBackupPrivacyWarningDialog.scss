@@ -1,5 +1,13 @@
+.checkboxClassic {
+  margin-top: 20px;
+}
+
 .checkbox {
   margin-top: 20px;
+
+  label {
+    font-size: 14px;
+  }
 }
 
 .component{
@@ -7,5 +15,16 @@
     .WalletRecoveryInstructions_component {
       text-align: left;
     }
+  }
+}
+
+.recoveryImage {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin: 23px 0 36px;
+
+  svg {
+    width: 212px;
   }
 }
