@@ -57,7 +57,7 @@
   "daedalusTransfer.instructions.attention.confirmationPaper": "转出 Daedalus 钱包中的所有资金",
   "daedalusTransfer.instructions.attention.masterKey.button.label": "代达罗斯主密钥",
   "daedalusTransfer.instructions.attention.paper.button.label": "代达罗斯纸钱包",
-  "daedalusTransfer.instructions.attention.text": "Yoroi钱包与Daedalus钱包使用不同的金钥衍生配置，并且两者均采用单独的地址格式。因此，您无法继续使用Daedalus钱包，您必须创建一个Yoroi钱包并转移您的资金（这可在将来更改） Daedalus与Yoroi钱包与资金转移完全相容。如果您没有Daedalus的副本，您可以使用12字恢复短语（或纸钱包之27个单词）将余额从Daedalus转移到Yoroi。",
+  "daedalusTransfer.instructions.attention.text": "Yoroi and Daedalus wallets use different key derivation schemes, and the address format is different on each. Due to this, at present the funds from a Daedalus wallet cannot be simply imported directly into Yoroi. Instead, you must create a Yoroi wallet and transfer your funds over from Daedalus. (Daedalus and Yoroi wallets are fully compatible for transferring funds.) If you do not currently have Daedalus installed, or if you cannot access it, you can enter your 12-word recovery phrase from Daedalus (or 27 words for a paper wallet) and transfer your entire wallet balance over from Daedalus into Yoroi.",
   "daedalusTransfer.instructions.attention.title": "Transfer all funds from:",
   "daedalusTransfer.summary.addressFrom.subLabel": "Daedalus 钱包地址",
   "daedalusTransfer.title": "从 Daedalus 转出资金",
