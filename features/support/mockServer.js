@@ -5,12 +5,12 @@ import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { getFeatureData, getTxsMapList } from './mockDataBuilder';
 import type {
-  UtxoForAddressesRequest, UtxoForAddressesResponse,
-  UtxoSumForAddressessRequest, UtxoSumForAddressesResponse,
+  AddressUtxoRequest, AddressUtxoResponse,
+  UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse
-} from '../../app/api/ada/lib/yoroi-backend-api';
+} from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
 
 const middlewares = [...defaults(), bodyParser];
@@ -71,9 +71,9 @@ export function getMockServer(
 
     server.post('/api/txs/utxoForAddresses', (
       req: {
-        body: UtxoForAddressesRequest
+        body: AddressUtxoRequest
       },
-      res: { send(arg: UtxoForAddressesResponse): any }
+      res: { send(arg: AddressUtxoResponse): any }
     ): void => {
       const featureData = getFeatureData();
       const utxos = featureData
@@ -87,9 +87,9 @@ export function getMockServer(
 
     server.post('/api/txs/utxoSumForAddresses', (
       req: {
-        body: UtxoSumForAddressessRequest
+        body: UtxoSumRequest
       },
-      res: { send(arg: UtxoSumForAddressesResponse): any }
+      res: { send(arg: UtxoSumResponse): any }
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
       const featureData = getFeatureData();

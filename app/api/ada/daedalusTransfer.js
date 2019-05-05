@@ -18,9 +18,9 @@ import {
 import {
   sendAllUnsignedTxFromUtxo,
 } from './adaTransactions/adaNewTransactions';
-import {
-  getAllUTXOsForAddresses
-} from './lib/yoroi-backend-api';
+import type {
+  AddressUtxoFunc
+} from './lib/state-fetch/types';
 import type {
   TransferTx
 } from '../../types/TransferTypes';
@@ -64,13 +64,14 @@ export function getAddressesWithFunds(payload: {
 
 /** Generate transaction including all addresses with no change */
 export async function generateTransferTx(payload: {
-  addressesWithFunds: AddressKeyMap
+  addressesWithFunds: AddressKeyMap,
+  getUTXOsForAddresses: AddressUtxoFunc,
 }): Promise<TransferTx> {
-  const { addressesWithFunds } = payload;
+  const { addressesWithFunds, getUTXOsForAddresses } = payload;
 
   // fetch data to make transaction
   const senders = Object.keys(addressesWithFunds);
-  const senderUtxos = await getAllUTXOsForAddresses(senders);
+  const senderUtxos = await getUTXOsForAddresses({ addresses: senders });
   if (_.isEmpty(senderUtxos)) {
     const error = new NoInputsError();
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);

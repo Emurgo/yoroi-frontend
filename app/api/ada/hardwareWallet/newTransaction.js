@@ -15,10 +15,10 @@ import { utxosToLookupMap, derivePathAsString }  from '../lib/utils';
 import type {
   AdaAddressMap,
 } from '../adaAddress';
-import {
-  sendTx,
-  getTxsBodiesForUTXOs
-} from '../lib/yoroi-backend-api';
+import type {
+  SendFunc,
+  TxBodiesFunc
+} from '../lib/state-fetch/types';
 import {
   SendTransactionError,
   InvalidWitnessError,
@@ -57,6 +57,7 @@ export async function createTrezorSignTxPayload(
   changeAddr: ?AdaAddress,
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<TrezorSignTxPayload> {
   const txJson: TransactionType = unsignedTx.to_json();
 
@@ -76,7 +77,7 @@ export async function createTrezorSignTxPayload(
   );
 
   // Transactions
-  const txsBodiesMap = await txsBodiesForInputs(txJson.inputs);
+  const txsBodiesMap = await txsBodiesForInputs(txJson.inputs, getTxsBodiesForUTXOs);
   const txsBodies = txJson.inputs.map((x) => txsBodiesMap[x.id]);
 
   return {
@@ -89,8 +90,11 @@ export async function createTrezorSignTxPayload(
 
 /** List of Body hashes for a list of utxos by batching backend requests */
 export async function txsBodiesForInputs(
-  inputs: Array<TxoPointerType>
+  inputs: Array<TxoPointerType>,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<{[key: string]:string}> {
+  // TODO: move this to state-fetcher/helpers
+
   if (!inputs) return {};
   try {
 
@@ -102,7 +106,7 @@ export async function txsBodiesForInputs(
 
     // convert chunks into list of Promises that call the backend-service
     const promises = groupsOfTxsHashes
-      .map(groupOfTxsHashes => getTxsBodiesForUTXOs(groupOfTxsHashes));
+      .map(groupOfTxsHashes => getTxsBodiesForUTXOs({ txsHashes: groupOfTxsHashes }));
 
     // Sum up all the utxo
     return Promise.all(promises)
@@ -124,6 +128,7 @@ export async function txsBodiesForInputs(
 /** Send a transaction and save the new change address */
 export async function broadcastTrezorSignedTx(
   signedTxHex: string,
+  sendTx: SendFunc
 ): Promise<BroadcastTrezorSignedTxResponse> {
   Logger.debug('newTransaction::broadcastTrezorSignedTx: called');
   const signedTxBytes = Buffer.from(signedTxHex, 'hex');
@@ -189,9 +194,10 @@ export async function createLedgerSignTxPayload(
   changeAddr: ?AdaAddress,
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<LedgerSignTxPayload> {
   const txJson: TransactionType = unsignedTx.to_json();
-  const txDataHexMap = await txsBodiesForInputs(txJson.inputs);
+  const txDataHexMap = await txsBodiesForInputs(txJson.inputs, getTxsBodiesForUTXOs);
 
   const utxoMap = utxosToLookupMap(senderUtxos);
 
@@ -259,6 +265,7 @@ export async function prepareAndBroadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
   unsignedTx: RustModule.Wallet.Transaction,
   cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
+  sendTx: SendFunc,
 ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
   try {
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');

@@ -8,9 +8,6 @@ import {
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
-import {
-  sendTx
-} from '../../api/ada/lib/yoroi-backend-api';
 import LocalizableError, {
   localizedError
 } from '../../i18n/LocalizableError';
@@ -23,7 +20,8 @@ import {
   generateTransferTx
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
-import type { SignedResponse } from '../../api/ada/lib/yoroi-backend-api';
+import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
+import { batchUTXOsForAddresses } from '../../api/ada/lib/state-fetch/helpers';
 import {
   getCryptoDaedalusWalletFromMnemonics,
   getCryptoDaedalusWalletFromMasterKey
@@ -135,7 +133,12 @@ export default class DaedalusTransferStore extends Store {
           const checker = RustModule.Wallet.DaedalusAddressChecker.new(wallet);
           const addressesWithFunds = getAddressesWithFunds({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
-          const transferTx = await generateTransferTx({ addressesWithFunds });
+          const transferTx = await generateTransferTx({
+            addressesWithFunds,
+            getUTXOsForAddresses: batchUTXOsForAddresses(
+              this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses
+            ),
+          });
           runInAction(() => {
             this.transferTx = transferTx;
           });
@@ -208,9 +211,9 @@ export default class DaedalusTransferStore extends Store {
 
   /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (request: {
-    signedTx: RustModule.Wallet.SignedTransaction
+    signedTx: RustModule.Wallet.SignedTransaction,
   }): Promise<SignedResponse> => (
-    sendTx({ signedTx: request.signedTx })
+    this.stores.substores.ada.stateFetchStore.fetcher.sendTx({ signedTx: request.signedTx })
   )
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */

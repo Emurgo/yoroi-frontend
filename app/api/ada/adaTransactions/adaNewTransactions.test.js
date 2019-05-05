@@ -15,11 +15,13 @@ import {
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
+import type { AddressUtxoFunc } from '../lib/state-fetch/types';
+
 // function to mock our network call
-function makeNetworkMock(utxos) {
-  return async (addresses) => {
+function makeNetworkMock(utxos): AddressUtxoFunc {
+  return async (body) => {
     const senderUtxos = [];
-    for (const addr of addresses) {
+    for (const addr of body.addresses) {
       for (const utxo of utxos) {
         if (utxo.receiver === addr) {
           senderUtxos.push(utxo);

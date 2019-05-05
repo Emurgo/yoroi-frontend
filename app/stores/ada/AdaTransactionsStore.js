@@ -27,6 +27,8 @@ import type {
   ExportTransactionsFunc,
 } from '../../api/common';
 
+import type { TransactionRowsToExportRequest } from '../../actions/ada/transactions-actions';
+
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
 export default class AdaTransactionsStore extends TransactionsStore {
@@ -107,7 +109,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
   );
 
   @action _exportTransactionsToFile = async (
-    params: GetTransactionRowsToExportRequest
+    params: TransactionRowsToExportRequest
   ): Promise<void> => {
     try {
       this._setExporting(true);
