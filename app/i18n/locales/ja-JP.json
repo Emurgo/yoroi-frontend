@@ -57,7 +57,7 @@
   "daedalusTransfer.instructions.attention.confirmationPaper": "ダイダロスペーパーウォレットから復元する",
   "daedalusTransfer.instructions.attention.masterKey.button.label": "ダイダロス マスター鍵",
   "daedalusTransfer.instructions.attention.paper.button.label": "ダイダロス ペーパーウォレット",
-  "daedalusTransfer.instructions.attention.text": "ヨロイウォレットとダイダロスウォレットは、それぞれ異なる鍵導出スキームおよび異なるアドレス形式を使用しています。そのため、ダイダロスウォレットを引き続き使用することはできず、ヨロイウォレットを作成し、送金する必要があります。（今後は１つのアドレスで両方のウォレットが使用できる予定です。）現時点では、ダイダロスウォレットの資金を使用するためにはヨロイウォレットに送金する必要があります。ダイダロスウォレットとヨロイウォレットは、送金において互換性があります。ダイダロスを立ち上げることができない場合、12単語（またはペーパーウォレットの27単語）から成るリカバリフレーズを使用してダイダロスからヨロイウォレットに残高を送金する事ができます。",
+  "daedalusTransfer.instructions.attention.text": "Yoroi and Daedalus wallets use different key derivation schemes, and the address format is different on each. Due to this, at present the funds from a Daedalus wallet cannot be simply imported directly into Yoroi. Instead, you must create a Yoroi wallet and transfer your funds over from Daedalus. (Daedalus and Yoroi wallets are fully compatible for transferring funds.) If you do not currently have Daedalus installed, or if you cannot access it, you can enter your 12-word recovery phrase from Daedalus (or 27 words for a paper wallet) and transfer your entire wallet balance over from Daedalus into Yoroi.",
   "daedalusTransfer.instructions.attention.title": "資金を全て送金します：",
   "daedalusTransfer.summary.addressFrom.subLabel": "ダイダロスウォレットのアドレス",
   "daedalusTransfer.title": "ダイダロスから送金",
