@@ -22,7 +22,7 @@ import { createCryptoAccount } from '../../adaAccount';
 declare var CONFIG : ConfigType;
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
-export const generateAdaMnemonic = () => generateMnemonic(160).split(' ');
+export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic(160).split(' ');
 
 /** Check validty of mnemonic (including checksum) */
 export const isValidEnglishAdaMnemonic = (

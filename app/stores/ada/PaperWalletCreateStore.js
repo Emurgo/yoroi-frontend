@@ -86,6 +86,7 @@ export default class PaperWalletCreateStore extends Store {
 
   @action _createPaperWallet = async () => {
     if (this.numAddresses && this.userPassword) {
+      // TODO: use Request
       this.paper = this.api.ada.createAdaPaper({
         numAddresses: this.numAddresses,
         password: this.userPassword
@@ -96,6 +97,7 @@ export default class PaperWalletCreateStore extends Store {
   @action _createPdfDocument = async () => {
     let pdf;
     if (this.paper) {
+      // TODO: use Request
       pdf = await this.api.ada.createAdaPaperPdf({
         paper: this.paper,
         network: environment.NETWORK,

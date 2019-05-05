@@ -39,17 +39,39 @@ export default class ProfileStore extends Store {
   };
 
   /* eslint-disable max-len */
-  @observable getProfileLocaleRequest: Request<string> = new Request(this.api.localStorage.getUserLocale);
-  @observable setProfileLocaleRequest: Request<void> = new Request(this.api.localStorage.setUserLocale);
-  @observable getThemeRequest: Request<string> = new Request(this.api.localStorage.getUserTheme);
-  @observable setThemeRequest: Request<void> = new Request(this.api.localStorage.setUserTheme);
-  @observable getCustomThemeRequest: Request<string> = new Request(this.api.localStorage.getCustomUserTheme);
-  @observable setCustomThemeRequest: Request<void> = new Request(this.api.localStorage.setCustomUserTheme);
-  @observable unsetCustomThemeRequest: Request<void> = new Request(this.api.localStorage.unsetCustomUserTheme);
-  @observable getTermsOfUseAcceptanceRequest: Request<string> = new Request(this.api.localStorage.getTermsOfUseAcceptance);
-  @observable setTermsOfUseAcceptanceRequest: Request<void> = new Request(this.api.localStorage.setTermsOfUseAcceptance);
-  @observable getLastLaunchVersionRequest: Request<string> = new Request(this.api.localStorage.getLastLaunchVersion);
-  @observable setLastLaunchVersionRequest: Request<void> = new Request(this.api.localStorage.setLastLaunchVersion);
+  @observable getProfileLocaleRequest: Request<void => Promise<string>>
+    = new Request<void => Promise<string>>(this.api.localStorage.getUserLocale);
+
+  @observable setProfileLocaleRequest: Request<string => Promise<void>>
+    = new Request<string => Promise<void>>(this.api.localStorage.setUserLocale);
+
+  @observable getThemeRequest: Request<void => Promise<string>>
+    = new Request<void => Promise<string>>(this.api.localStorage.getUserTheme);
+
+  @observable setThemeRequest: Request<string => Promise<void>>
+    = new Request<string => Promise<void>>(this.api.localStorage.setUserTheme);
+
+  @observable getCustomThemeRequest: Request<void => Promise<string>>
+    = new Request<void => Promise<string>>(this.api.localStorage.getCustomUserTheme);
+
+  @observable setCustomThemeRequest: Request<(string, Object) => Promise<void>>
+    = new Request<(string, Object) => Promise<void>>(this.api.localStorage.setCustomUserTheme);
+
+  @observable unsetCustomThemeRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.localStorage.unsetCustomUserTheme);
+
+  @observable getTermsOfUseAcceptanceRequest: Request<void => Promise<boolean>>
+  = new Request<void => Promise<boolean>>(this.api.localStorage.getTermsOfUseAcceptance);
+
+  @observable setTermsOfUseAcceptanceRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.localStorage.setTermsOfUseAcceptance);
+
+  @observable getLastLaunchVersionRequest: Request<void => Promise<string>>
+    = new Request<void => Promise<string>>(this.api.localStorage.getLastLaunchVersion);
+
+  @observable setLastLaunchVersionRequest: Request<string => Promise<void>>
+    = new Request<string => Promise<void>>(this.api.localStorage.setLastLaunchVersion);
+
   /* eslint-enable max-len */
 
   setup() {
@@ -84,7 +106,7 @@ export default class ProfileStore extends Store {
 
   @computed get currentLocale(): string {
     const { result } = this.getProfileLocaleRequest.execute();
-    if (this.isCurrentLocaleSet) return result;
+    if (this.isCurrentLocaleSet && result) return result;
     return ProfileStore.getDefaultLocale();
   }
 
@@ -128,7 +150,7 @@ export default class ProfileStore extends Store {
 
   @computed get currentTheme(): Theme {
     const { result } = this.getThemeRequest.execute();
-    if (this.isCurrentThemeSet) return result;
+    if (this.isCurrentThemeSet && result) return result;
     // TODO: We temporarily disable the new theme on mainnet until it's ready
     // TODO: Tests were written for the old theme so we need to use it for testing
     return (environment.isMainnet() || environment.isTest()) ?
@@ -145,11 +167,11 @@ export default class ProfileStore extends Store {
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
-  @computed get currentThemeVars(): string {
+  @computed get currentThemeVars() {
     const { result } = this.getCustomThemeRequest.execute();
     const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
     let customThemeVars = {};
-    if (result !== '') customThemeVars = JSON.parse(result);
+    if (result && result !== '') customThemeVars = JSON.parse(result);
     // Merge Custom Theme and Current Theme
     return { ...currentThemeVars, ...customThemeVars };
   }
@@ -239,7 +261,7 @@ export default class ProfileStore extends Store {
 
   @computed get lastLaunchVersion(): string {
     const { result } = this.getLastLaunchVersionRequest.execute();
-    return result;
+    return result || '0.0.0';
   }
 
   setLastLaunchVersion = async (version: string) => {
