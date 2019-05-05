@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import resolver from '../../../utils/imports';
 import type { InjectedProps } from '../../../types/injectedPropsType';
-import { THEMES } from '../../../themes';
 
 const WalletSendConfirmationDialog = resolver('components/wallet/send/WalletSendConfirmationDialog');
 
@@ -53,7 +52,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         }}
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }

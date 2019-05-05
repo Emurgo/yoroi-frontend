@@ -11,7 +11,6 @@ import CreatePaperDialog from '../../../components/wallet/settings/paper-wallets
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import validWords from 'bip39/src/wordlists/english.json';
 import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/FinalizeDialog';
-import { THEMES } from '../../../themes';
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
@@ -48,7 +47,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         );
       case ProgressStep.CREATE:
@@ -62,7 +61,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         );
       case ProgressStep.VERIFY:
@@ -79,7 +78,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             isPaper
             showPaperPassword
             isVerificationMode
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         );
       case ProgressStep.FINALIZE:
@@ -89,7 +88,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
             onCopyAddress={
               () => {} // no notification but maybe we want one
             }

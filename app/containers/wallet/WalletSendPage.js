@@ -8,7 +8,6 @@ import type { MessageDescriptorMap } from 'react-intl';
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
-import { THEMES } from '../../themes';
 
 import {
   DECIMAL_PLACES_IN_ADA,
@@ -89,7 +88,7 @@ export default class WalletSendPage extends Component<Props> {
         hardwareWalletConfirmationDialogRenderCallback={this.hardwareWalletDoConfirmation}
         hasAnyPending={hasAnyPending}
         isHardwareWallet={activeWallet.isHardwareWallet}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }

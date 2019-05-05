@@ -5,7 +5,6 @@ import WalletSettings from '../../../components/wallet/WalletSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
-import { THEMES } from '../../../themes';
 
 type Props = InjectedProps
 
@@ -56,7 +55,7 @@ export default class WalletSettingsPage extends Component<Props> {
         activeField={walletFieldBeingEdited}
         nameValidator={name => isValidWalletName(name)}
         showPasswordBlock={activeWallet.isWebWallet}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }

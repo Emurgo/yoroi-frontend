@@ -15,7 +15,6 @@ import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import resolver from '../../utils/imports';
 import { Logger } from '../../utils/logging';
-import { THEMES } from '../../themes';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 
@@ -84,21 +83,21 @@ export default class WalletSummaryPage extends Component<Props> {
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         );
       } else if (!hasAny) {
         walletTransactions = (
           <WalletNoTransactions
             label={noTransactionsFoundLabel}
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         );
       } else if (!hasAny) {
         walletTransactions = (
           <WalletNoTransactions
             label={noTransactionsLabel}
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         );
       }
@@ -120,7 +119,7 @@ export default class WalletSummaryPage extends Component<Props> {
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 

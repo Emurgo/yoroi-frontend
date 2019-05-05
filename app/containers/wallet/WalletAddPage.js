@@ -21,7 +21,6 @@ import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
 import TrezorConnectStore from '../../stores/ada/TrezorConnectStore';
 import LedgerConnectStore from '../../stores/ada/LedgerConnectStore';
 import AddWalletFooter from '../footer/AddWalletFooter';
-import { THEMES } from '../../themes';
 
 type Props = InjectedProps;
 const MainLayout = resolver('containers/MainLayout');
@@ -59,8 +58,8 @@ export default class WalletAddPage extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
-        areCategoriesHidden={profile.currentTheme === THEMES.YOROI_MODERN}
+        classicTheme={profile.isClassicTheme}
+        areCategoriesHidden={profile.isModernTheme}
       />);
 
     const wallets = this._getWalletsStore();
@@ -86,7 +85,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
@@ -96,7 +95,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
           mode={restoreType || 'regular'}
         />
       );
@@ -106,7 +105,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
         />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
@@ -115,7 +114,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
@@ -124,7 +123,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
         />
       );
     } else {
@@ -139,7 +138,7 @@ export default class WalletAddPage extends Component<Props> {
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
           isRestoreActive={isRestoreActive}
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
           title={this.context.intl.formatMessage(messages.title)}
         />
       );
@@ -149,8 +148,8 @@ export default class WalletAddPage extends Component<Props> {
       <MainLayout
         topbar={topBar}
         footer={<AddWalletFooter />}
-        noTopbarNoBanner={profile.currentTheme === THEMES.YOROI_MODERN && isWalletAdd}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        noTopbarNoBanner={profile.isModernTheme && isWalletAdd}
+        classicTheme={profile.isClassicTheme}
       >
         {content}
       </MainLayout>

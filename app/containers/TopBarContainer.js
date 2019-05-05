@@ -6,7 +6,6 @@ import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
 import resolver from '../utils/imports';
-import { THEMES } from '../themes';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 
@@ -32,7 +31,7 @@ export default class TopBarContainer extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }

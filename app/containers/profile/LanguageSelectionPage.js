@@ -7,7 +7,6 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import { THEMES } from '../../themes';
 
 const messages = defineMessages({
   title: {
@@ -38,17 +37,17 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />);
     return (
       <TopBarLayout
         topbar={topBar}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
-        noTopbarNoBanner={profile.currentTheme === THEMES.YOROI_MODERN}
+        classicTheme={profile.isClassicTheme}
+        noTopbarNoBanner={profile.isModernTheme}
         languageSelectionBackground
       >
         <LanguageSelectionForm
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
           languages={LANGUAGE_OPTIONS}

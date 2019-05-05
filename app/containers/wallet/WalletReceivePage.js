@@ -10,7 +10,6 @@ import NotificationMessage from '../../components/widgets/NotificationMessage';
 import AddressDetailsDialog from '../../components/wallet/receive/AddressDetailsDialog';
 import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import { THEMES } from '../../themes';
 
 const messages = defineMessages({
   message: {
@@ -113,11 +112,11 @@ export default class WalletReceivePage extends Component<Props, State> {
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
           notification={notificationComponent}
         />
 
-        {profile.currentTheme === THEMES.YOROI_CLASSIC && notificationComponent}
+        {profile.isClassicTheme && notificationComponent}
 
         {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
           <AddressDetailsDialog
@@ -128,7 +127,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             isHardware={wallet.isHardwareWallet}
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger({ wallet })}
             cancel={() => actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger()}
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         ) : null}
 

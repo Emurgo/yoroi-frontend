@@ -8,7 +8,6 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
-import { THEMES } from '../../themes';
 
 const messages = defineMessages({
   title: {
@@ -39,20 +38,20 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
       <TopBar
         title={topbarTitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />);
     return (
       <TopBarLayout
         topbar={topbarElement}
-        isBannerVisible={profile.currentTheme === THEMES.YOROI_MODERN}
+        isBannerVisible={profile.isModernTheme}
         banner={
           <TestnetWarningBanner
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         }
       >
         <TermsOfUseForm
-          classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={profile.isClassicTheme}
           localizedTermsOfUse={termsOfUse}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}

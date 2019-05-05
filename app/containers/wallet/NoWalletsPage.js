@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import resolver from '../../utils/imports';
-import { THEMES } from '../../themes';
 
 const Layout = resolver('containers/MainLayout');
 
@@ -13,7 +12,7 @@ export default class NoWalletsPage extends Component<any> {
     const { stores } = this.props;
     const { profile } = stores;
     return (
-      <Layout classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+      <Layout classicTheme={profile.isClassicTheme}>
         <div />
       </Layout>
     );

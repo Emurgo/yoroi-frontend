@@ -17,7 +17,6 @@ import environment from '../../environment';
 import resolver from '../../utils/imports';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
-import { THEMES } from '../../themes';
 
 const { formattedWalletAmount } = resolver('utils/formatters');
 const MainLayout = resolver('containers/MainLayout');
@@ -112,7 +111,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />
     );
     const wallets = this._getWalletsStore();
@@ -121,7 +120,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
-          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+          <MainLayout topbar={topBar} classicTheme={profile.isClassicTheme}>
             <TransferLayout>
               <DaedalusTransferInstructionsPage
                 onFollowInstructionsPrerequisites={this.goToCreateWallet}
@@ -130,14 +129,14 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 onPaperConfirm={this.startTransferPaperFunds}
                 onMasterKeyConfirm={this.startTransferMasterKey}
                 disableTransferFunds={daedalusTransfer.disableTransferFunds}
-                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>
         );
       case 'gettingMnemonics':
         return (
-          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+          <MainLayout topbar={topBar} classicTheme={profile.isClassicTheme}>
             <TransferLayout>
               <DaedalusTransferFormPage
                 onSubmit={this.setupTransferFundsWithMnemonic}
@@ -148,14 +147,14 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 )}
                 validWords={validWords}
                 mnemonicLength={12}
-                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>
         );
       case 'gettingPaperMnemonics':
         return (
-          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+          <MainLayout topbar={topBar} classicTheme={profile.isClassicTheme}>
             <TransferLayout>
               <DaedalusTransferFormPage
                 onSubmit={this.setupTransferFundsWithMnemonic}
@@ -163,19 +162,19 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
                 validWords={validWords}
                 mnemonicLength={27}
-                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>
         );
       case 'gettingMasterKey':
         return (
-          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+          <MainLayout topbar={topBar} classicTheme={profile.isClassicTheme}>
             <TransferLayout>
               <DaedalusTransferMasterKeyFormPage
                 onSubmit={this.setupTransferFundsWithMasterKey}
                 onBack={this.backToUninitialized}
-                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>
@@ -184,7 +183,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
       case 'checkingAddresses':
       case 'generatingTx':
         return (
-          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+          <MainLayout topbar={topBar} classicTheme={profile.isClassicTheme}>
             <TransferLayout>
               <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
             </TransferLayout>
@@ -195,7 +194,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           return null; // TODO: throw error? Shoudln't happen
         }
         return (
-          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+          <MainLayout topbar={topBar} classicTheme={profile.isClassicTheme}>
             <TransferLayout>
               <DaedalusTransferSummaryPage
                 formattedWalletAmount={formattedWalletAmount}
@@ -204,19 +203,19 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
                 onCancel={this.cancelTransferFunds}
                 error={daedalusTransfer.error}
-                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>
         );
       case 'error':
         return (
-          <MainLayout topbar={topBar} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+          <MainLayout topbar={topBar} classicTheme={profile.isClassicTheme}>
             <TransferLayout>
               <DaedalusTransferErrorPage
                 error={daedalusTransfer.error}
                 onCancel={this.cancelTransferFunds}
-                classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>

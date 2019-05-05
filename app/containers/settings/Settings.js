@@ -8,7 +8,6 @@ import TopBar from '../../components/topbar/TopBar';
 import resolver from '../../utils/imports';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
-import { THEMES } from '../../themes';
 
 const Layout = resolver('containers/MainLayout');
 
@@ -44,7 +43,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         isActiveItem={this.isActivePage}
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
         currentLocale={profile.currentLocale}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />
     );
     const topbarTitle = (
@@ -60,12 +59,12 @@ export default class Settings extends Component<InjectedContainerProps> {
             }}
             categories={topbar.CATEGORIES}
             activeTopbarCategory={topbar.activeTopbarCategory}
-            classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+            classicTheme={profile.isClassicTheme}
           />
         )}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       >
-        <SettingsLayout menu={menu} classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}>
+        <SettingsLayout menu={menu} classicTheme={profile.isClassicTheme}>
           {children}
         </SettingsLayout>
       </Layout>

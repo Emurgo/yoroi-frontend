@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
-import { THEMES } from '../../../themes';
 
 @observer
 export default class ChangeWalletPasswordDialogContainer extends Component<InjectedProps> {
@@ -44,7 +43,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
         }}
         isSubmitting={updateWalletPasswordRequest.isExecuting}
         error={updateWalletPasswordRequest.error}
-        classicTheme={profile.currentTheme === THEMES.YOROI_CLASSIC}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }
