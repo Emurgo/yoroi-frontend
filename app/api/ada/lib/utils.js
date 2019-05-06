@@ -11,6 +11,7 @@ import type {
 } from '../adaTypes';
 import type { TransactionExportRow } from '../../export';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+import { RustModule } from './cardanoCrypto/rustLoader';
 
 export const toAdaTx = function (
   amount: BigNumber,
@@ -201,4 +202,10 @@ export function derivePathAsString(
 export function derivePathPrefix(accountIndex: number): string {
   // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
   return `m/44'/1815'/${accountIndex}'`;
+}
+
+export function coinToBigNumber(coin: RustModule.Wallet.Coin): BigNumber {
+  const ada = new BigNumber(coin.ada());
+  const lovelace = ada.times(LOVELACES_PER_ADA).add(coin.lovelace());
+  return lovelace;
 }

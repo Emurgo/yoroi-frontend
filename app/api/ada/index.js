@@ -14,8 +14,9 @@ import type {
   TransactionType
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
-import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
+import { LOVELACES_PER_ADA, HARD_DERIVATION_START } from '../../config/numbersConfig';
 import type { Network } from '../../../config/config-types';
+
 import {
   isValidMnemonic,
   isValidPaperMnemonic,
@@ -49,8 +50,11 @@ import {
 import {
   getAdaTransactionFee,
   newAdaUnsignedTx,
-  newAdaSignedTx,
+  signTransaction,
 } from './adaTransactions/adaNewTransactions';
+import {
+  getCryptoWalletFromMasterKey,
+} from './lib/cardanoCrypto/cryptoWallet';
 import type {
   TrezorSignTxPayload,
   LedgerSignTxPayload,
@@ -78,7 +82,6 @@ import type {
   AdaWallet,
   AdaWallets,
   AdaAssurance,
-  AdaFeeEstimateResponse,
 } from './adaTypes';
 import type {
   CreateWalletRequest,
@@ -110,7 +113,9 @@ import {
   getAdaWallet,
   getLastBlockNumber,
   getLastReceiveAddressIndex,
+  getCurrentAccountIndex,
   getCurrentCryptoAccount,
+  getWalletMasterKey,
 } from './adaLocalStorage';
 import LocalStorageApi from '../localStorage/index';
 import {
@@ -119,6 +124,7 @@ import {
   reset,
 } from './lib/lovefieldDatabase';
 import type { SignedResponse } from './lib/yoroi-backend-api';
+import { getAllUTXOsForAddresses, sendFinalizedTx } from './lib/yoroi-backend-api';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
 import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
 import {
@@ -151,7 +157,7 @@ export type CreateTrezorSignTxDataRequest = {
 export type CreateTrezorSignTxDataResponse = {
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   trezorSignTxPayload: TrezorSignTxPayload,
-  changeAddress: AdaAddress,
+  changeAddress: ?AdaAddress,
 };
 export type BroadcastTrezorSignedTxRequest = {
   signedTxHex: string,
@@ -162,7 +168,7 @@ export type CreateLedgerSignTxDataRequest = {
 };
 export type CreateLedgerSignTxDataResponse = {
   ledgerSignTxPayload: LedgerSignTxPayload,
-  changeAddress: AdaAddress,
+  changeAddress: ?AdaAddress,
   unsignedTx: RustModule.Wallet.Transaction
 };
 export type PrepareAndBroadcastLedgerSignedTxRequest = {
@@ -395,11 +401,26 @@ export default class AdaApi {
     Logger.debug('AdaApi::createTransaction called');
     const { receiver, amount, password } = request;
     try {
-      const response = await newAdaSignedTx(
+      const allAdaAddresses = await getAdaAddressesList();
+      const changeAdaAddr = await popBip44Address('Internal');
+      const unsignedTx = await newAdaUnsignedTx(
         receiver,
         amount,
-        password
+        changeAdaAddr,
+        allAdaAddresses,
+        getAllUTXOsForAddresses,
       );
+      const masterKey = getWalletMasterKey();
+      const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
+      const currAccount = getCurrentAccountIndex();
+      const accountPrivateKey = cryptoWallet.bip44_account(
+        RustModule.Wallet.AccountIndex.new(currAccount | HARD_DERIVATION_START)
+      );
+      const signedTx = await signTransaction(
+        unsignedTx,
+        accountPrivateKey
+      );
+      const response = sendFinalizedTx(signedTx);
       Logger.debug(
         'AdaApi::createTransaction success: ' + stringifyData(response)
       );
@@ -423,21 +444,29 @@ export default class AdaApi {
       Logger.debug('AdaApi::createTrezorSignTxData called');
       const { receiver, amount } = request;
 
-      const unsignedTxResponse = await newAdaUnsignedTx(receiver, amount);
+      const allAdaAddresses = await getAdaAddressesList();
+      const changeAdaAddr = await popBip44Address('Internal');
+      const unsignedTxResponse = await newAdaUnsignedTx(
+        receiver,
+        amount,
+        changeAdaAddr,
+        allAdaAddresses,
+        getAllUTXOsForAddresses
+      );
 
       const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
 
       const trezorSignTxPayload = await createTrezorSignTxPayload(
         unsignedTxResponse.addressesMap,
-        unsignedTxResponse.changeAddr,
+        changeAdaAddr,
         unsignedTxResponse.senderUtxos,
-        unsignedTx
+        unsignedTx,
       );
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
 
       return {
         trezorSignTxPayload,
-        changeAddress: unsignedTxResponse.changeAddr,
+        changeAddress: changeAdaAddr,
       };
     } catch (error) {
       Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
@@ -476,13 +505,21 @@ export default class AdaApi {
       Logger.debug('AdaApi::createLedgerSignTxData called');
       const { receiver, amount } = request;
 
-      const unsignedTxResponse = await newAdaUnsignedTx(receiver, amount);
+      const allAdaAddresses = await getAdaAddressesList();
+      const changeAdaAddr = await popBip44Address('Internal');
+      const unsignedTxResponse = await newAdaUnsignedTx(
+        receiver,
+        amount,
+        changeAdaAddr,
+        allAdaAddresses,
+        getAllUTXOsForAddresses
+      );
 
       const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
 
       const ledgerSignTxPayload = await createLedgerSignTxPayload(
         unsignedTxResponse.addressesMap,
-        unsignedTxResponse.changeAddr,
+        changeAdaAddr,
         unsignedTxResponse.senderUtxos,
         unsignedTx
       );
@@ -490,7 +527,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
       return {
         ledgerSignTxPayload,
-        changeAddress: unsignedTxResponse.changeAddr,
+        changeAddress: changeAdaAddr,
         unsignedTx,
       };
     } catch (error) {
@@ -540,9 +577,17 @@ export default class AdaApi {
   ): Promise<TransactionFeeResponse> {
     Logger.debug('AdaApi::calculateTransactionFee called');
     const { receiver, amount } = request;
+    const allAdaAddresses = await getAdaAddressesList();
     try {
-      const fee: AdaFeeEstimateResponse =
-        await getAdaTransactionFee(receiver, amount);
+      const changeAdaAddr = await popBip44Address('Internal');
+      const feeResponse = await getAdaTransactionFee(
+        receiver,
+        amount,
+        changeAdaAddr,
+        allAdaAddresses,
+        getAllUTXOsForAddresses
+      );
+      const fee = feeResponse.fee.to_str();
       Logger.debug(
         'AdaApi::calculateTransactionFee success: ' + stringifyData(fee)
       );
@@ -999,7 +1044,7 @@ const _createTransactionFromServerData = action(
 
 const _createTransactionFeeFromServerData = action(
   'AdaApi::_createTransactionFeeFromServerData',
-  ({ fee }: AdaFeeEstimateResponse) => (
+  (fee: string) => (
     new BigNumber(fee)
   )
 );
