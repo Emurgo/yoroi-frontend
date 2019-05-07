@@ -15,21 +15,22 @@
   font-size: 14px;
   line-height: 19px;
 
-  .titleClassic {
+  .title {
+    line-height: 1.38;
+    margin-bottom: 4px;
+  }
+
+  .title.YoroiClassic {
     font-size: 11px;
     font-family: var(--font-medium);
     font-weight: 600;
-    line-height: 1.38;
-    margin-bottom: 4px;
     padding-left: 10px;
     text-transform: uppercase;
   }
 
-  .title {
+  .title.YoroiModern {
     font-size: 18px;
     font-family: var(--font-semibold);
-    line-height: 1.38;
-    margin-bottom: 4px;
   }
 
   .text {

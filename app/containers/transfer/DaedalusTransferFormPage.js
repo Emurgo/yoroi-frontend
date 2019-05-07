@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import TransferMnemonicPage from '../../components/transfer/TransferMnemonicPage';
+import type { Theme } from '../../themes';
 
 const messages = defineMessages({
   step0: {
@@ -24,7 +25,7 @@ type Props = {
   mnemonicValidator: Function,
   validWords: Array<string>,
   mnemonicLength: number,
-  classicTheme: boolean,
+  currentTheme: Theme,
 };
 
 @observer
@@ -42,7 +43,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
       onSubmit,
       mnemonicValidator,
       mnemonicLength,
-      classicTheme
+      currentTheme
     } = this.props;
     const message = mnemonicLength === 27 ? messages.step0Paper : messages.step0;
 
@@ -54,7 +55,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
         validWords={validWords}
         step0={intl.formatMessage(message)}
         mnemonicLength={mnemonicLength}
-        classicTheme={classicTheme}
+        currentTheme={currentTheme}
       />
     );
   }
