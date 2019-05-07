@@ -156,7 +156,7 @@
   "settings.paperWallet.dialog.password.intro.line3": "Это <strong>Ваша личная</strong> ответственность удостовериться, что Вы помните пароль.",
   "settings.paperWallet.dialog.repeatPasswordLabel": "Повторите пароль бумажного кошелька",
   "settings.paperWallet.dialog.repeatPasswordPlaceholder": "Введите пароль бумажного кошелька еще раз",
-  "settings.paperWallet.dialog.userPassword.title": "Установить пользовательский пароль бумажного кошелька",
+  "settings.paperWallet.dialog.userPassword.title": "Установить пароль бумажного кошелька",
   "settings.paperWallet.numAddressesSelect.label": "Количество адресов",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "блогом",
