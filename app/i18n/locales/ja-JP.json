@@ -135,7 +135,7 @@
   "settings.paperWallet.dialog.createPaper.addresses": "Drawing the address",
   "settings.paperWallet.dialog.createPaper.background": "Drawing pretty background",
   "settings.paperWallet.dialog.createPaper.backpage": "Preparing the back page",
-  "settings.paperWallet.dialog.createPaper.done": "All done!",
+  "settings.paperWallet.dialog.createPaper.done": "完了しました!",
   "settings.paperWallet.dialog.createPaper.download.intro.line1": "ペーパーウォレットPDFの用意ができました",
   "settings.paperWallet.dialog.createPaper.download.intro.line2": "ダウンロードサイズ (MB)",
   "settings.paperWallet.dialog.createPaper.download.label": "ペーパーウォレット証明書をダウンロードする",
