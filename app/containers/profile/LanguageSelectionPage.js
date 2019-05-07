@@ -47,7 +47,6 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         languageSelectionBackground
       >
         <LanguageSelectionForm
-          classicTheme={profile.isClassicTheme}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
           languages={LANGUAGE_OPTIONS}
