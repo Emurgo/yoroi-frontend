@@ -122,7 +122,7 @@ export default class TransferMnemonicPage extends Component<Props> {
 
             { /* Instructions for how to transfer */ }
             <div>
-              <div className={styles.title.$currentTheme}>
+              <div className={currentTheme === THEMES.YOROI_CLASSIC ? styles.titleClassic : styles.title}>
                 {intl.formatMessage(messages.instructionTitle)}
               </div>
 
