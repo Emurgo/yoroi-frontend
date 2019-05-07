@@ -6,6 +6,7 @@ import styles from './WalletTopbarTitle.scss';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import Wallet from '../../domain/Wallet';
+import Blockies from 'react-blockies';
 
 type Props = {
   wallet: ?Wallet,
@@ -30,9 +31,26 @@ export default class WalletTopbarTitle extends Component<Props> {
     const showWalletInfo = walletRoutesMatch && wallet;
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
-        <div className={styles.walletName}>{wallet && wallet.name}</div>
-        <div className={styles.walletAmount}>
-          { wallet && formattedWalletAmount(wallet.amount) + ' ADA' }
+        <div className={styles.divIcon}>
+          <Blockies
+            seed={`${Math.random()}`}
+            size={7}
+            scale={7}
+            bgColor='#55ff00'
+            color='#dd01fa'
+            spotColor='#000'
+            className={styles.walletIcon}
+          />
+        </div>
+        <div className={styles.divPlate}>
+          <div className={styles.walletPlate}>ABCD</div>
+          <div className={styles.walletPlate}>1234</div>
+        </div>
+        <div className={styles.divWalletInfo}>
+          <div className={styles.walletName}>{wallet && wallet.name}</div>
+          <div className={styles.walletAmount}>
+            { wallet && formattedWalletAmount(wallet.amount) + ' ADA' }
+          </div>
         </div>
       </div>
     ) : null;

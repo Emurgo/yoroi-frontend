@@ -6,18 +6,54 @@
     font-family: var(--font-regular);
     letter-spacing: 0.5px;
     line-height: 20px;
-    text-align: center;
+    text-align: left;
     text-transform: uppercase;
+    padding-top: 4px;
+
+    .divIcon {
+        float: left;
+        margin-left: 100px;
+    }
+
+    .divPlate {
+        float: left;
+        margin-top: 2px;
+        margin-left: 8px;
+        padding: 6px 3px;
+        text-align: center;
+        border-top: 1px solid lightgrey;
+        border-bottom: 1px solid lightgrey;
+        border-radius: 3px;
+    }
+
+    .divWalletInfo {
+        float: left;
+        margin-left: 15px;
+    }
+
+    .walletIcon {
+        border: 1px solid grey;
+    }
+
+    .walletPlate {
+        padding-top: 2px;
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 14px;
+        color: var(--theme-topbar-wallet-name-color);
+    }
 
     .walletName {
+        padding-top: 4px;
         font-size: 17px;
         font-weight: 600;
         color: var(--theme-topbar-wallet-name-color);
     }
 
     .walletAmount {
-        font-size: 14px;
-        font-weight: 300;
+        padding-top: 4px;
+        font-size: 16px;
+        font-weight: 600;
         opacity: 0.7;
         word-break: break-all;
     }

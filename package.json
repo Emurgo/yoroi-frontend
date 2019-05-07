@@ -145,6 +145,7 @@
     "qr-image": "3.2.0",
     "qrcode.react": "0.8.0",
     "react": "16.8.6",
+    "react-blockies": "1.4.1",
     "react-copy-to-clipboard": "5.0.0",
     "react-css-themr": "2.1.2",
     "react-dom": "16.8.6",
