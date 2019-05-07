@@ -23,6 +23,7 @@ import aboutTrezorSvg from '../../../../assets/images/hardware-wallet/trezor/abo
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
 import styles from '../common/AboutDialog.scss';
+import headerMixin from '../../../mixins/HeaderBlock.scss';
 
 const messages = defineMessages({
   aboutPrerequisite1Part1: {
@@ -83,7 +84,9 @@ export default class AboutDialog extends Component<Props> {
       cancel,
       classicTheme,
     } = this.props;
-    const headerBlockClasses = classicTheme ? styles.headerBlockClassic : classnames([styles.headerBlock, 'small']);
+    const headerBlockClasses = classicTheme
+      ? headerMixin.headerBlockClassic
+      : classnames([headerMixin.headerBlock, 'small']);
     const middleBlockClasses = classicTheme
       ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])
       : classnames([styles.middleBlock, styles.middleAboutBlock]);

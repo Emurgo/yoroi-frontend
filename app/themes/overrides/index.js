@@ -23,7 +23,7 @@ import OptionsOverridesClassic from './OptionsOverridesClassic.scss';
 import SelectOverridesClassic from './SelectOverridesClassic.scss';
 import SwitchOverridesClassic from './SwitchOverridesClassic.scss';
 
-import type { Themes } from '..';
+import type { Theme } from '..';
 import { THEMES } from '..';
 
 const {
@@ -40,7 +40,7 @@ const {
   SWITCH
 } = IDENTIFIERS;
 
-export const themeOverrides = (theme: Themes): Object => {
+export const themeOverrides = (theme: Theme): Object => {
   switch (theme) {
     case THEMES.YOROI_CLASSIC:
       return ({

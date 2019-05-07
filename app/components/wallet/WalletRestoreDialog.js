@@ -11,17 +11,37 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
-import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../utils/validations';
+import {
+  isValidWalletName,
+  isValidWalletPassword,
+  isValidRepeatPassword,
+} from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
+import headerMixin from '../mixins/HeaderBlock.scss';
 import config from '../../config';
+import DialogBackButton from '../widgets/DialogBackButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
+import PasswordInstructions from '../widgets/forms/PasswordInstructions';
+import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
   title: {
     id: 'wallet.restore.dialog.title.label',
     defaultMessage: '!!!Restore wallet',
+  },
+  titlePaper: {
+    id: 'wallet.restore.dialog.title.paper.label',
+    defaultMessage: '!!!Restore Yoroi Paper wallet',
+  },
+  titleVerify: {
+    id: 'wallet.restore.dialog.title.verify.label',
+    defaultMessage: '!!!Verify Yoroi wallet',
+  },
+  titleVerifyPaper: {
+    id: 'wallet.restore.dialog.title.verify.paper.label',
+    defaultMessage: '!!!Verify Yoroi Paper wallet',
   },
   walletNameInputLabel: {
     id: 'wallet.restore.dialog.wallet.name.input.label',
@@ -47,9 +67,17 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.restore.wallet.button.label',
     defaultMessage: '!!!Restore wallet',
   },
+  verifyButtonLabel: {
+    id: 'wallet.restore.dialog.verify.wallet.button.label',
+    defaultMessage: '!!!Verify wallet',
+  },
   invalidRecoveryPhrase: {
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
+  },
+  paperPasswordLabel: {
+    id: 'wallet.restore.dialog.paperPasswordLabel',
+    defaultMessage: '!!!Paper wallet password',
   },
   walletPasswordLabel: {
     id: 'wallet.restore.dialog.walletPasswordLabel',
@@ -67,6 +95,10 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.repeatPasswordFieldPlaceholder',
     defaultMessage: '!!!Repeat spending password',
   },
+  passwordDisclaimer: {
+    id: 'wallet.restore.dialog.passwordDisclaimer',
+    defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
+  },
 });
 
 messages.fieldIsRequired = globalMessages.fieldIsRequired;
@@ -74,17 +106,28 @@ messages.fieldIsRequired = globalMessages.fieldIsRequired;
 type Props = {
   onSubmit: Function,
   onCancel: Function,
+  onBack?: Function,
   isSubmitting: boolean,
   mnemonicValidator: Function,
+  passwordValidator?: Function,
+  numberOfMnemonics: number,
   error?: ?LocalizableError,
   validWords: Array<string>,
+  isPaper?: boolean,
+  isVerificationMode?: boolean,
+  showPaperPassword?: boolean,
   classicTheme: boolean
 };
 
 @observer
 export default class WalletRestoreDialog extends Component<Props> {
   static defaultProps = {
-    error: undefined
+    error: undefined,
+    onBack: undefined,
+    passwordValidator: undefined,
+    isPaper: undefined,
+    isVerificationMode: undefined,
+    showPaperPassword: undefined
   };
 
   static contextTypes = {
@@ -93,7 +136,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
   form = new ReactToolboxMobxForm({
     fields: {
-      walletName: {
+      walletName: this.props.isVerificationMode ? undefined : {
         label: this.context.intl.formatMessage(messages.walletNameInputLabel),
         placeholder: this.context.intl.formatMessage(messages.walletNameInputHint),
         value: '',
@@ -117,7 +160,22 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
-      walletPassword: {
+      paperPassword: this.props.showPaperPassword ? {
+        type: 'password',
+        label: this.context.intl.formatMessage(messages.paperPasswordLabel),
+        placeholder: this.context.intl.formatMessage(messages.paperPasswordLabel),
+        value: '',
+        validators: [({ field }) => {
+          const validatePassword = p => (
+            !this.props.passwordValidator || this.props.passwordValidator(p)
+          );
+          return [
+            field.value.length > 0 && validatePassword(field.value),
+            this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
+          ];
+        }],
+      } : undefined,
+      walletPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(messages.walletPasswordLabel),
         placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
@@ -133,7 +191,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
-      repeatPassword: {
+      repeatPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
         placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
@@ -158,11 +216,12 @@ export default class WalletRestoreDialog extends Component<Props> {
   submit = () => {
     this.form.submit({
       onSuccess: (form) => {
-        const { recoveryPhrase, walletName, walletPassword } = form.values();
+        const { recoveryPhrase, walletName, walletPassword, paperPassword } = form.values();
         const walletData = {
           recoveryPhrase: join(recoveryPhrase, ' '),
           walletName,
           walletPassword,
+          paperPassword,
         };
         this.props.onSubmit(walletData);
       },
@@ -173,9 +232,26 @@ export default class WalletRestoreDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, isSubmitting, error,
-      onCancel, classicTheme, mnemonicValidator } = this.props;
-    const { walletName, walletPassword, repeatPassword, recoveryPhrase } = form.values();
+    const {
+      validWords,
+      isSubmitting,
+      error,
+      onCancel,
+      onBack,
+      isPaper,
+      isVerificationMode,
+      showPaperPassword,
+      classicTheme,
+      mnemonicValidator,
+      passwordValidator,
+    } = this.props;
+    const {
+      walletName,
+      paperPassword,
+      walletPassword,
+      repeatPassword,
+      recoveryPhrase
+    } = form.values();
 
     const dialogClasses = classnames([
       styles.component,
@@ -186,91 +262,147 @@ export default class WalletRestoreDialog extends Component<Props> {
       'walletName',
       classicTheme ? styles.walletNameClassic : styles.walletName,
     ]);
+
+    const paperPasswordFieldClasses = classnames([
+      'paperPassword',
+      styles.paperPassword,
+    ]);
+
     const walletPasswordFieldsClasses = classnames([
       styles.walletPasswordFields,
       styles.show,
     ]);
+
     const walletPasswordClasses = classicTheme
       ? styles.walletPasswordClassic
       : styles.walletPassword;
 
-    const passwordInstructionsClasses = classicTheme
-      ? styles.passwordInstructionsClassic
-      : styles.passwordInstructions;
+    const validatePaperPassword = () => {
+      let condition = isValidWalletPassword(paperPassword);
+      if (passwordValidator) {
+        condition = condition && passwordValidator(paperPassword);
+      }
+      return condition;
+    };
 
-    const disabledCondition = !(
-      isValidWalletName(walletName)
-      && mnemonicValidator(join(recoveryPhrase, ' '))
-      && isValidWalletPassword(walletPassword)
-      && isValidRepeatPassword(walletPassword, repeatPassword)
-    );
+    const disabledCondition = () => {
+      let condition = mnemonicValidator(join(recoveryPhrase, ' '));
+      if (!isVerificationMode) {
+        condition = condition &&
+          isValidWalletName(walletName) &&
+          isValidWalletPassword(walletPassword) &&
+          isValidRepeatPassword(walletPassword, repeatPassword);
+      }
+
+      // Although we require 12 words for creation
+      // We allow any password to be used for restoration
+      // This is to ensure compatiblity with any other apps that use our paper wallet construction
+
+      return !condition;
+    };
+
+    const headerBlockClasses = classicTheme
+      ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
+      : headerMixin.headerBlock;
 
     const walletNameField = form.$('walletName');
     const recoveryPhraseField = form.$('recoveryPhrase');
+    const paperPasswordField = form.$('paperPassword');
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
 
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: intl.formatMessage(messages.importButtonLabel),
+        label: intl.formatMessage(
+          isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel
+        ),
         primary: true,
-        disabled: isSubmitting || (!classicTheme && disabledCondition),
+        disabled: isSubmitting || (!classicTheme && disabledCondition()),
         onClick: this.submit,
       },
     ];
 
+    const dialogTitle = () => {
+      if (isPaper) {
+        return isVerificationMode ? messages.titleVerifyPaper : messages.titlePaper;
+      }
+      return isVerificationMode ? messages.titleVerify : messages.title;
+    };
+
     return (
       <Dialog
         className={dialogClasses}
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(dialogTitle())}
         actions={actions}
         closeOnOverlayClick={false}
         onClose={onCancel}
-        closeButton={<DialogCloseButton />}
+        backButton={onBack && <DialogBackButton onBack={onBack} />}
+        closeButton={<DialogCloseButton onClose={onCancel} />}
         classicTheme={classicTheme}
       >
 
-        <Input
-          className={walletNameFieldClasses}
-          {...walletNameField.bind()}
-          done={isValidWalletName(walletName)}
-          error={walletNameField.error}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
-        />
+        {isVerificationMode ? '' : (
+          <Input
+            className={walletNameFieldClasses}
+            {...walletNameField.bind()}
+            done={isValidWalletName(walletName)}
+            error={walletNameField.error}
+            skin={classicTheme ? InputSkin : InputOwnSkin}
+          />
+        )}
 
         <Autocomplete
           options={validWords}
-          maxSelections={15}
+          maxSelections={this.props.numberOfMnemonics}
           {...recoveryPhraseField.bind()}
+          done={mnemonicValidator(join(recoveryPhrase, ' '))}
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-          skin={AutocompleteSkin}
+          skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
         />
 
-        <div className={walletPasswordClasses}>
-          <div className={walletPasswordFieldsClasses}>
-            <Input
-              className="walletPassword"
-              {...walletPasswordField.bind()}
-              done={isValidWalletPassword(walletPassword)}
-              error={walletPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
-            />
-            <Input
-              className="repeatedPassword"
-              {...repeatedPasswordField.bind()}
-              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
-              error={repeatedPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
-            />
-
-            <p className={passwordInstructionsClasses}>
-              {intl.formatMessage(globalMessages.passwordInstructions)}
-            </p>
+        {showPaperPassword ? (
+          <div className={walletPasswordClasses}>
+            <div className={paperPasswordFieldClasses}>
+              {isVerificationMode ? '' : (
+                <div className={headerBlockClasses}>
+                  {intl.formatMessage(messages.passwordDisclaimer)}
+                </div>
+              )}
+              <Input
+                className="paperPassword"
+                {...paperPasswordField.bind()}
+                done={validatePaperPassword()}
+                error={paperPasswordField.error}
+                skin={classicTheme ? InputSkin : InputOwnSkin}
+              />
+            </div>
           </div>
-        </div>
+        ) : ''}
+
+        {isVerificationMode ? '' : (
+          <div className={walletPasswordClasses}>
+            <div className={walletPasswordFieldsClasses}>
+              <Input
+                className="walletPassword"
+                {...walletPasswordField.bind()}
+                done={isValidWalletPassword(walletPassword)}
+                error={walletPasswordField.error}
+                skin={classicTheme ? InputSkin : InputOwnSkin}
+              />
+              <Input
+                className="repeatedPassword"
+                {...repeatedPasswordField.bind()}
+                done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
+                error={repeatedPasswordField.error}
+                skin={classicTheme ? InputSkin : InputOwnSkin}
+              />
+              <PasswordInstructions isClassicThemeActive={classicTheme} />
+            </div>
+          </div>
+        )}
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 

@@ -33,7 +33,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
     const activeWallet = wallets.active;
-    const { theme } = stores;
+    const { profile } = stores;
 
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
@@ -52,7 +52,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         }}
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
-        classicTheme={theme.classic}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }

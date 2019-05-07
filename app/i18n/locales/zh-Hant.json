@@ -92,7 +92,7 @@
   "global.language.korean": "한국어",
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
-  "global.passwordInstructions": "Note: Spending password needs to be at least 12 characters long.",
+  "global.passwordInstructions": "注意: 密碼長度必須至少為12個字元。",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "取消",
   "inline.editing.input.change.label": "變更",

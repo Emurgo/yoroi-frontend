@@ -16,6 +16,8 @@ import {
   isValidEnglishAdaPaperMnemonic,
   unscramblePaperAdaMnemonic,
   updateWalletMasterKeyPassword,
+  scramblePaperAdaMnemonic,
+  mnemonicsToAddresses
 } from './lib/cardanoCrypto/cryptoWallet';
 import { toAdaWallet, toAdaHardwareWallet } from './lib/cardanoCrypto/cryptoToModel';
 import {
@@ -143,9 +145,10 @@ export const isValidPaperMnemonic = (
 /** Wrapper function to check paper mnemonic validity according to bip39 */
 export const unscramblePaperMnemonic = (
   phrase: string,
-  numberOfWords: ?number
+  numberOfWords: ?number,
+  password?: string,
 ): [?string, number] => (
-  unscramblePaperAdaMnemonic(phrase, numberOfWords)
+  unscramblePaperAdaMnemonic(phrase, numberOfWords, password)
 );
 
 /** Wrapper function to create new Trezor ADA hardware wallet object */
@@ -160,6 +163,24 @@ export function createAdaHardwareWallet({
 export const generateAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse => (
   generateAdaMnemonic()
 );
+
+/**
+ * This type represents the very secret part of a paper wallet.
+ * Should be handled with care and never exposed.
+ */
+export type PaperWalletSecret = {
+  words: Array<string>,
+  scrambledWords: Array<string>,
+};
+
+export const generatePaperWalletSecret = (password: string): PaperWalletSecret => {
+  const words = generateAdaMnemonic();
+  const scrambledWords = scramblePaperAdaMnemonic(words.join(' '), password).split(' ');
+  return { words, scrambledWords };
+};
+
+export const mnemonicsToExternalAddresses =
+  (mnemonics: string, count?: number): Array<string> => mnemonicsToAddresses(mnemonics, count);
 
 /** Call backend-service to get the balances of addresses and then sum them */
 export async function getBalance(

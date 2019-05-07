@@ -426,5 +426,5 @@
   "wallet.transaction.type": "transaction en {currency}",
   "wallet.transaction.type.exchange": "Échange",
   "wallet.transaction.type.intrawallet": "Transaction entre wallets {currency}",
-  "wallet.transaction.type.multiparty": "Transaction multiparties {currency}"
+  "wallet.transaction.type.multiparty": "Transaction multipartis {currency}"
 }

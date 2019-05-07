@@ -18,6 +18,7 @@ export const ROUTES = {
     ROOT: '/settings',
     WALLET: '/settings/wallet',
     GENERAL: '/settings/general',
+    PAPER_WALLET: '/settings/paper-wallet',
     DISPLAY: '/settings/display',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',

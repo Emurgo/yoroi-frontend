@@ -23,13 +23,13 @@ export default defineMessages({
     id: 'global.errors.invalidWalletPassword',
     defaultMessage: '!!!Invalid password',
   },
+  invalidPaperPassword: {
+    id: 'global.errors.invalidPaperPassword',
+    defaultMessage: '!!!Invalid Paper Wallet password',
+  },
   invalidRepeatPassword: {
     id: 'global.errors.invalidRepeatPassword',
     defaultMessage: '!!!Doesn\'t match.',
-  },
-  passwordInstructions: {
-    id: 'global.passwordInstructions',
-    defaultMessage: '!!!Note: Password needs to be at least 12 characters long.',
   },
   nextButtonLabel: {
     id: 'global.labels.next',
@@ -42,6 +42,10 @@ export default defineMessages({
   instructionTitle: {
     id: 'transfer.instructions.instructions.title.label',
     defaultMessage: '!!!Instructions',
+  },
+  finish: {
+    id: 'global.labels.finish',
+    defaultMessage: '!!!Finish',
   },
   cancel: {
     id: 'global.labels.cancel',
@@ -98,6 +102,10 @@ export default defineMessages({
   languageIndonesian: {
     id: 'global.language.indonesian',
     defaultMessage: '!!!Indonesian',
+  },
+  languageSpanish: {
+    id: 'global.language.spanish',
+    defaultMessage: '!!!Spanish',
   },
   unitAda: {
     id: 'global.unit.ada',

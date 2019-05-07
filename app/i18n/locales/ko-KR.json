@@ -92,7 +92,7 @@
   "global.language.korean": "한국어",
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
-  "global.passwordInstructions": "Note: Spending password needs to be at least 12 characters long.",
+  "global.passwordInstructions": "참고: 비밀번호는 최소 12자 이상이여야 합니다.",
   "global.unit.ada": "ADA",
   "inline.editing.input.cancel.label": "취소",
   "inline.editing.input.change.label": "변경",

@@ -18,6 +18,8 @@ if (!argv.codebase || (isCrx && !existsKey)) {
 const crx = new ChromeExtension({
   appId: argv['app-id'],
   codebase: argv.codebase,
+  // https://github.com/oncletom/crx/issues/108
+  version: 2,
   privateKey: existsKey
     ? fs.readFileSync(keyPath)
     : null
