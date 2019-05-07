@@ -68,15 +68,15 @@ export default class AdaRedemptionStore extends Store {
     ]);
   }
 
-  isValidRedemptionKey = (redemptionKey: string) => (
+  isValidRedemptionKey = (redemptionKey: string): Promise<boolean> => (
     this.api.ada.isValidRedemptionKey({ mnemonic: redemptionKey })
   );
 
-  isValidRedemptionMnemonic = (mnemonic: string) => (
+  isValidRedemptionMnemonic = (mnemonic: string): Promise<boolean> => (
     this.api.ada.isValidRedemptionMnemonic({ mnemonic })
   );
 
-  isValidPaperVendRedemptionKey = (mnemonic: string) => (
+  isValidPaperVendRedemptionKey = (mnemonic: string): Promise<boolean> => (
     this.api.ada.isValidPaperVendRedemptionKey({ mnemonic })
   );
 

@@ -230,13 +230,16 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.saveAddressesToDB = (addresses, type) => (
     this.driver.executeScript((addrs, addrType) => {
-      addrs.forEach(addr => window.yoroi.api.ada.saveAddress(addr, addrType));
+      addrs.forEach(addr => window.yoroi.api.ada.saveAddress({
+        address: addr,
+        addressType: addrType
+      }));
     }, addresses, type)
   );
 
   this.saveTxsToDB = transactions => {
     this.driver.executeScript(txs => {
-      window.yoroi.api.ada.saveTxs(txs);
+      window.yoroi.api.ada.saveTxs({ txs });
     }, transactions);
   };
 

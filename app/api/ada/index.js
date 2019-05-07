@@ -353,7 +353,7 @@ export type IsValidMnemonicRequest = {
 export type IsValidMnemonicResponse = boolean;
 export type IsValidMnemonicFunc = (
   request: IsValidMnemonicRequest
-) => Promise<IsValidMnemonicResponse>;
+) => IsValidMnemonicResponse;
 
 // isValidPaperMnemonic
 
@@ -364,7 +364,7 @@ export type IsValidPaperMnemonicRequest = {
 export type IsValidPaperMnemonicResponse = boolean;
 export type IsValidPaperMnemonicFunc = (
   request: IsValidPaperMnemonicRequest
-) => Promise<IsValidPaperMnemonicResponse>;
+) => IsValidPaperMnemonicResponse;
 
 // unscramblePaperMnemonic
 
@@ -376,7 +376,7 @@ export type UnscramblePaperMnemonicRequest = {
 export type UnscramblePaperMnemonicResponse = [?string, number];
 export type UnscramblePaperMnemonicFunc = (
   request: UnscramblePaperMnemonicRequest
-) => Promise<UnscramblePaperMnemonicResponse>;
+) => UnscramblePaperMnemonicResponse;
 
 // generateWalletRecoveryPhrase
 
@@ -903,26 +903,20 @@ export default class AdaApi {
 
   isValidMnemonic(
     request: IsValidMnemonicRequest,
-  ): Promise<IsValidMnemonicResponse> {
-    return Promise.resolve(
-      isValidMnemonic(request.mnemonic, request.numberOfWords)
-    );
+  ): IsValidMnemonicResponse {
+    return isValidMnemonic(request.mnemonic, request.numberOfWords);
   }
 
   isValidPaperMnemonic(
     request: IsValidPaperMnemonicRequest
-  ): Promise<IsValidPaperMnemonicResponse> {
-    return Promise.resolve(
-      isValidPaperMnemonic(request.mnemonic, request.numberOfWords)
-    );
+  ): IsValidPaperMnemonicResponse {
+    return isValidPaperMnemonic(request.mnemonic, request.numberOfWords);
   }
 
   unscramblePaperMnemonic(
     request: UnscramblePaperMnemonicRequest
-  ): Promise<UnscramblePaperMnemonicResponse> {
-    return Promise.resolve(
-      unscramblePaperMnemonic(request.mnemonic, request.numberOfWords, request.password)
-    );
+  ): UnscramblePaperMnemonicResponse {
+    return unscramblePaperMnemonic(request.mnemonic, request.numberOfWords, request.password);
   }
 
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {

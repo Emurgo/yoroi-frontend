@@ -29,7 +29,7 @@ export default class AddressesStore extends Store {
 
   _createAddress = async () => {
     try {
-      const address: ?WalletAddress = await await this.createAddressRequest.execute({}).promise;
+      const address: ?WalletAddress = await this.createAddressRequest.execute({}).promise;
       if (address != null) {
         this._refreshAddresses();
         runInAction('reset error', () => { this.error = null; });

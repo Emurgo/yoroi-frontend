@@ -99,14 +99,14 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
     return !this.wasExecuted && this.isExecuting;
   }
 
-  then<Cont: Function>(continuation: Cont): Promise<PromisslessReturnType<Cont>> {
+  // Turn Requests into promise-like objects by adding "then" and "catch"
+  then(...args: Array<any>): Promise<PromisslessReturnType<Func>> {
     if (!this.promise) throw new NotExecutedYetError();
-    return this.promise.then(continuation);
+    return this.promise.then(...args);
   }
-
-  catch<Cont: Function>(continuation: Cont): Promise<PromisslessReturnType<Cont>>  {
+  catch(...args: Array<any>): Promise<any> {
     if (!this.promise) throw new NotExecutedYetError();
-    return this.promise.catch(continuation);
+    return this.promise.catch(...args);
   }
 
   /**
