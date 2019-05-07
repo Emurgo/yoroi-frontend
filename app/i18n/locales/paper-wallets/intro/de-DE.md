@@ -1,0 +1,7 @@
+# Paper Wallets
+
+Eine **"Paper Wallet"** ist ein spezielles Dokument, welches geheime einprägsame Wörter (Mnemonics) sowie eine kleine Anzahl von Adressen enthält. Wenn eine Paper Wallet erstellt wird, **wird sie NICHT von Yoroi gespeichert**. Das erzeugte PDF-Dokument ist die einzige Kopie dieser Wallet, die es gibt.
+
+Sie können eine Paper Wallet verwenden, um Geld mit den vorgefertigten Adressen zu empfangen. Sie können Ihre Paper Wallet jederzeit in Yoroi wiederherstellen, um auf das Geld zuzugreifen. Allerdings sollten Sie aufhören, eine Paper Wallet zu verwenden, nachdem Sie ihre Guthaben wiederhergestellt haben, da es sich nicht mehr um eine "kalte" (sichere) Wallet handelt.
+
+Yoroi Paper Wallets sind mit einem **kundenspezifischen Benutzerpasswort** geschützt und enthalten 21 geheime einprägsame Wörter (Mnemonics). Selbst wenn jemand Zugang zu dieser Paper Wallet erhält, muss er auch Dein Passwort kennen, um Zugang zu den Guthaben zu erhalten. **Aber wenn Sie Ihr Passwort verlieren oder vergessen, geht Ihr Geld für immer verloren und niemand kann es wiederherstellen!**. Wenn Sie das falsche Wallet-Passwort eingeben, erhalten Sie eine andere Wallet. Dies ermöglicht das glaubhafte Abstreiten des Besitzes von Geldern (Plausible deniability).
