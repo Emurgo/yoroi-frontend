@@ -32,7 +32,8 @@
     "localci-newbuild": "sudo /bin/bash ./features/localCI/new_build.sh",
     "localci-test": "sudo /bin/bash ./features/localCI/wrap_command.sh",
     "manage-translations": "node ./translations/translation-runner.js",
-    "purge-translations": "rimraf ./translations/messages"
+    "purge-translations": "rimraf ./translations/messages",
+    "zip": "node scripts/zip"
   },
   "repository": {
     "type": "git",
