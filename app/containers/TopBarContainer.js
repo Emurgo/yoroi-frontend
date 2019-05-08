@@ -22,6 +22,9 @@ export default class TopBarContainer extends Component<Props> {
       wallet={stores.substores[environment.API].wallets.active}
       currentRoute={app.currentRoute}
       formattedWalletAmount={formattedWalletAmount}
+      theme={{
+        identiconSaturationFactor: profile.isClassicTheme ? 5 : 10
+      }}
     />);
     return (
       <TopBar

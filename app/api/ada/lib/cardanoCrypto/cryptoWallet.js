@@ -18,6 +18,8 @@ import { RustModule } from './rustLoader';
 import { generateAddressBatch } from '../adaAddressProcessing';
 import type { AddressType } from '../../adaTypes';
 import { createCryptoAccount } from '../../adaAccount';
+import blakejs from 'blakejs';
+import crc32 from 'buffer-crc32';
 
 declare var CONFIG : ConfigType;
 
@@ -169,6 +171,16 @@ export function getCryptoWalletFromMasterKey(
     RustModule.Wallet.DerivationScheme.v2()
   );
   return cryptoWallet;
+}
+
+export function createAccountPlate(accountPubHash: string) {
+  const hash = blakejs.blake2bHex(accountPubHash);
+  const [a,b,c,d] = crc32(hash);
+  const alpha = `ABCDEJHKLNOPSTXZ`;
+  const letters = b => `${alpha[Math.floor(b/16)]}${alpha[b%16]}`;
+  const numbers = `${((c<<8)+d)%10000}`.padStart(4,'0');
+  const id = `${letters(a)}${letters(b)}-${numbers}`;
+  return { hash, id };
 }
 
 /** Generate a Daedalus /wallet/ to create transactions. Do not save this. Regenerate every time. */

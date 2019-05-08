@@ -54,6 +54,7 @@ import {
 } from './adaTransactions/adaNewTransactions';
 import {
   getCryptoWalletFromMasterKey,
+  createAccountPlate,
 } from './lib/cardanoCrypto/cryptoWallet';
 import type {
   TrezorSignTxPayload,
@@ -142,6 +143,7 @@ import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import type { CryptoAccount } from "./adaLocalStorage";
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -283,12 +285,13 @@ export default class AdaApi {
     Logger.debug('AdaApi::getWallets called');
     try {
       const wallet = await getAdaWallet();
+      const account = getCurrentCryptoAccount();
       const wallets: AdaWallets = wallet
-        ? [wallet]
+        ? [[wallet, account]]
         : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets.map(data => _createWalletFromServerData(data));
+      return wallets.map(([wallet, account]) => _createWalletFromServerData(wallet, [account]));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -978,7 +981,7 @@ async function _getTxFinancialInfo(
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
-  (adaWallet: AdaWallet) => {
+  (adaWallet: AdaWallet, accounts?: Array<CryptoAccount>) => {
     const walletObj = {
       id: adaWallet.cwId,
       amount: new BigNumber(adaWallet.cwAmount.getCCoin).dividedBy(
@@ -990,7 +993,12 @@ const _createWalletFromServerData = action(
       type: adaWallet.cwType,
       hardwareInfo: adaWallet.cwHardwareInfo,
     };
-
+    if (accounts) {
+      walletObj.accounts = accounts.map(a => ({
+        account: a.account,
+        plate: createAccountPlate(a.root_cached_key.key().to_hex()),
+      }))
+    }
     return new Wallet(walletObj);
   }
 );
