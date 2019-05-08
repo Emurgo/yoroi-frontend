@@ -65,7 +65,9 @@ export default class SettingsMenu extends Component<Props> {
 
     return (
       <div className={currentTheme === THEMES.YOROI_CLASSIC ? '' : styles.componentWrapper}>
-        <div className={currentTheme === THEMES.YOROI_CLASSIC ? styles.componentClassic : styles.component}>
+        <div className={currentTheme === THEMES.YOROI_CLASSIC
+          ? styles.componentClassic : styles.component}
+        >
           <SettingsMenuItem
             label={intl.formatMessage(messages.general)}
             onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}

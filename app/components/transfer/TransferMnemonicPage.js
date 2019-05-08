@@ -49,7 +49,7 @@ type Props = {
   validWords: Array<string>,
   step0: string,
   mnemonicLength: number,
-  classicTheme: boolean
+  currentTheme: Theme
 };
 
 @observer
@@ -98,7 +98,14 @@ export default class TransferMnemonicPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, onBack, step0, mnemonicValidator, mnemonicLength, classicTheme } = this.props;
+    const {
+      validWords,
+      onBack,
+      step0,
+      mnemonicValidator,
+      mnemonicLength,
+      currentTheme
+    } = this.props;
     const { recoveryPhrase } = form.values();
 
     const nextButtonClasses = classnames([
@@ -108,7 +115,7 @@ export default class TransferMnemonicPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      classicTheme ? 'flat' : 'outlined',
+      currentTheme === THEMES.YOROI_CLASSIC ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -144,7 +151,7 @@ export default class TransferMnemonicPage extends Component<Props> {
               error={recoveryPhraseField.error}
               maxVisibleOptions={5}
               noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
+              skin={currentTheme === THEMES.YOROI_CLASSIC ? AutocompleteSkin : AutocompleteOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>

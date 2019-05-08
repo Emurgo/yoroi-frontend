@@ -17,11 +17,16 @@ export default class SettingsLayout extends Component<Props> {
   render() {
     const { menu, children, currentTheme } = this.props;
     return (
-      <div className={currentTheme === THEMES.YOROI_CLASSIC ? styles.componentClassic : styles.component}>
+      <div className={currentTheme === THEMES.YOROI_CLASSIC
+        ? styles.componentClassic : styles.component}
+      >
         <div
-          className={currentTheme === THEMES.YOROI_CLASSIC ? styles.settingsPaneWrapperClassic : styles.settingsPaneWrapper}
+          className={currentTheme === THEMES.YOROI_CLASSIC
+            ? styles.settingsPaneWrapperClassic : styles.settingsPaneWrapper}
         >
-          <div className={currentTheme === THEMES.YOROI_CLASSIC ? styles.settingsPaneClassic : styles.settingsPane}>
+          <div className={currentTheme === THEMES.YOROI_CLASSIC
+            ? styles.settingsPaneClassic : styles.settingsPane}
+          >
             {children}
           </div>
         </div>
