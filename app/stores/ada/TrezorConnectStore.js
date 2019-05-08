@@ -372,10 +372,12 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       throw new Error('Trezor device hardware info not valid');
     }
 
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     return {
       walletName,
       publicMasterKey: this.hwDeviceInfo.publicMasterKey,
-      hwFeatures: this.hwDeviceInfo.hwFeatures
+      hwFeatures: this.hwDeviceInfo.hwFeatures,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   }
 

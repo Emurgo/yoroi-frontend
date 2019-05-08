@@ -50,8 +50,8 @@ export default class WalletSettingsPage extends Component<Props> {
         lastUpdatedField={lastUpdatedWalletField}
         onFieldValueChange={(field, value) => updateWalletField.trigger({ field, value })}
         onStartEditing={field => startEditingWalletField.trigger({ field })}
-        onStopEditing={stopEditingWalletField.trigger}
-        onCancelEditing={cancelEditingWalletField.trigger}
+        onStopEditing={() => stopEditingWalletField.trigger()}
+        onCancelEditing={() => cancelEditingWalletField.trigger()}
         activeField={walletFieldBeingEdited}
         nameValidator={name => isValidWalletName(name)}
         showPasswordBlock={activeWallet.isWebWallet}

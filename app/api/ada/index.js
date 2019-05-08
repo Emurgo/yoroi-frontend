@@ -208,10 +208,10 @@ export type GetTransactionsRequestOptions = {
   limit: number,
 };
 export type GetTransactionsRequest = {
+  ...$Shape<GetTransactionsRequestOptions>,
   walletId: string,
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
-  ...$Shape<GetTransactionsRequestOptions>
 };
 export type GetTransactionsResponse = {
   transactions: Array<WalletTransaction>,

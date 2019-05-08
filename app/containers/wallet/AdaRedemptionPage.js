@@ -108,7 +108,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           }
           suggestedMnemonics={validWords}
           isCertificateInvalid={error instanceof AdaRedemptionCertificateParseError}
-          onRemoveCertificate={removeCertificate.trigger}
+          onRemoveCertificate={() => removeCertificate.trigger()}
           redemptionType={redemptionType}
           redemptionCode={adaRedemption.redemptionCode}
           getSelectedWallet={walletId => wallets.getWalletById(walletId)}

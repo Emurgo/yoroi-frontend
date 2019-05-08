@@ -97,4 +97,3 @@ export type DeleteWalletResponse = boolean;
 export type DeleteWalletFunc = (
   request: DeleteWalletRequest
 ) => Promise<DeleteWalletResponse>;
-
