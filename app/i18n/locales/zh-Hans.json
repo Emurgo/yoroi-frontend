@@ -299,6 +299,7 @@
   "wallet.redeem.success.overlay.confirmButton": "很好",
   "wallet.redeem.success.overlay.headline": "您已成功兑换",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "助记词无效",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
   "wallet.restore.dialog.passwordFieldPlaceholder": "Spending Password",
   "wallet.restore.dialog.recovery.phrase.input.hint": "输入助记词",
   "wallet.restore.dialog.recovery.phrase.input.label": "助记词",

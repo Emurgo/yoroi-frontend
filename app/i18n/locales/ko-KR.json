@@ -299,6 +299,7 @@
   "wallet.redeem.success.overlay.confirmButton": " ",
   "wallet.redeem.success.overlay.headline": "성공적으로 상환되었습니다.",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "잘못된 복구 구절",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
   "wallet.restore.dialog.passwordFieldPlaceholder": "스펜딩 패스워드",
   "wallet.restore.dialog.recovery.phrase.input.hint": "복구 구절 입력",
   "wallet.restore.dialog.recovery.phrase.input.label": "복구 구절",

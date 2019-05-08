@@ -300,6 +300,7 @@
   "wallet.redeem.success.overlay.confirmButton": "Great",
   "wallet.redeem.success.overlay.headline": "You have successfully redeemed",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "Invalid recovery phrase",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
   "wallet.restore.dialog.passwordFieldPlaceholder": "Spending Password",
   "wallet.restore.dialog.recovery.phrase.input.hint": "Enter recovery phrase",
   "wallet.restore.dialog.recovery.phrase.input.label": "Recovery phrase",

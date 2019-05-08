@@ -299,6 +299,7 @@
   "wallet.redeem.success.overlay.confirmButton": "おめでとうございます！",
   "wallet.redeem.success.overlay.headline": "以下の還元に成功しました",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "復元フレーズが無効です",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
   "wallet.restore.dialog.passwordFieldPlaceholder": "送金パスワード",
   "wallet.restore.dialog.recovery.phrase.input.hint": "復元フレーズを入力してください",
   "wallet.restore.dialog.recovery.phrase.input.label": "復元フレーズ",

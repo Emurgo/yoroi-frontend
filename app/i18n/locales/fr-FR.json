@@ -299,6 +299,7 @@
   "wallet.redeem.success.overlay.confirmButton": "do not translate",
   "wallet.redeem.success.overlay.headline": "do not translate",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "Phrase de secours incorrecte",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
   "wallet.restore.dialog.passwordFieldPlaceholder": "Spending Password",
   "wallet.restore.dialog.recovery.phrase.input.hint": "Entrez votre phrase de secours",
   "wallet.restore.dialog.recovery.phrase.input.label": "Phrase de secours",

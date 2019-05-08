@@ -52,6 +52,10 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
   },
+  shortRecoveryPhrase: {
+    id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase',
+    defaultMessage: '!!!Short recovery phrase',
+  },
   walletPasswordLabel: {
     id: 'wallet.restore.dialog.walletPasswordLabel',
     defaultMessage: '!!!Spending password',
@@ -111,7 +115,9 @@ export default class WalletRestoreDialog extends Component<Props> {
         value: '',
         validators: [({ field }) => {
           const value = join(field.value, ' ');
+          const words_left = 15 - field.value.length;
           if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          if (words_left > 0) return [ false, this.context.intl.formatMessage(messages.shortRecoveryPhrase, {number: words_left})];
           return [
             this.props.mnemonicValidator(value),
             this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
