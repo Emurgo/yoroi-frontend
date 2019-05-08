@@ -439,7 +439,7 @@ export default class AdaRedemptionForm extends Component<Props> {
     return (
       <div>
         <div className={styles.scrollableContent}>
-          <BorderedBox classicTheme={classicTheme}>
+          <BorderedBox>
             <h1 className={styles.headline}>{intl.formatMessage(messages.headline)}</h1>
 
             <AdaRedemptionChoices

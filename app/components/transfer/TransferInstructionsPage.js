@@ -82,7 +82,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
         <div className={styles.component}>
-          <BorderedBox classicTheme={classicTheme}>
+          <BorderedBox>
 
             <div className={styles.body}>
 
@@ -111,7 +111,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         { /* Confirm transferring funds */ }
         <div className={styles.component}>
-          <BorderedBox classicTheme={classicTheme}>
+          <BorderedBox>
 
             <div className={styles.body}>
 

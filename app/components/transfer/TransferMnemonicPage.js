@@ -116,7 +116,7 @@ export default class TransferMnemonicPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox classicTheme={currentTheme === THEMES.YOROI_CLASSIC}>
+        <BorderedBox>
 
           <div className={styles.body}>
 

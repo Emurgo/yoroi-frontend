@@ -92,7 +92,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox>
 
           <div className={styles.body}>
 

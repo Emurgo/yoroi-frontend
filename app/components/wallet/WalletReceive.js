@@ -135,7 +135,7 @@ export default class WalletReceive extends Component<Props, State> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const walletReceiveContent = (
-      <BorderedBox classicTheme={classicTheme}>
+      <BorderedBox>
         <div className={qrCodeAndInstructionsClasses}>
           <div className={styles.instructions}>
             <div className={styles.hashLabel}>

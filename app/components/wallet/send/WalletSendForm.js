@@ -237,7 +237,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
         {hasAnyPending && hasPendingTxWarning}
 
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox>
 
           <div className={receiverInputClasses}>
             <Input
