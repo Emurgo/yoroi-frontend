@@ -117,7 +117,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
 
             { /* Instructions for how to transfer */ }
             <div>
-              <div className={classicTheme ? styles.titleClassic : styles.title}>
+              <div className={styles.title}>
                 {intl.formatMessage(messages.instructionTitle)}
               </div>
 

@@ -38,7 +38,6 @@ type Props = {
   confirmationText: string,
   confirmationPaperText: string,
   confirmationMasterKeyText: string,
-  classicTheme: boolean,
 };
 
 @observer
@@ -61,7 +60,6 @@ export default class TransferInstructionsPage extends Component<Props> {
       confirmationText,
       confirmationPaperText,
       confirmationMasterKeyText,
-      classicTheme,
     } = this.props;
 
     const instructionsButtonClasses = classnames([
@@ -75,7 +73,6 @@ export default class TransferInstructionsPage extends Component<Props> {
       'primary',
       styles.button,
     ]);
-    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
 
     return (
       <div className="transferInstructionsPageComponent">
@@ -87,7 +84,7 @@ export default class TransferInstructionsPage extends Component<Props> {
             <div className={styles.body}>
 
               <div>
-                <div className={titleClasses}>
+                <div className={styles.title}>
                   {intl.formatMessage(messages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
@@ -116,7 +113,7 @@ export default class TransferInstructionsPage extends Component<Props> {
             <div className={styles.body}>
 
               <div>
-                <div className={titleClasses}>
+                <div className={styles.title}>
                   {intl.formatMessage(messages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
@@ -124,7 +121,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
               </div>
 
-              <div className={classicTheme ? styles.buttonTitleClassic : styles.buttonTitle}>
+              <div className={styles.buttonTitle}>
                 {confirmationTitleText}
               </div>
 
