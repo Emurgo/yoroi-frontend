@@ -17,9 +17,8 @@
 
     .divPlate {
         float: left;
-        margin-top: 2px;
         margin-left: 8px;
-        padding: 6px 3px;
+        padding: 4px 3px;
         text-align: center;
         border-top: 1px solid lightgrey;
         border-bottom: 1px solid lightgrey;
@@ -27,12 +26,20 @@
     }
 
     .divWalletInfo {
+        margin-top: -2px;
         float: left;
         margin-left: 15px;
     }
 
+    .divAmount {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+    }
+
     .walletIcon {
-        border: 1px solid grey;
+        border: 1px solid lightgrey;
+        border-radius: 6px;
     }
 
     .walletPlate {
@@ -44,17 +51,24 @@
     }
 
     .walletName {
-        padding-top: 4px;
+        text-overflow: ellipsis;
         font-size: 17px;
         font-weight: 600;
         color: var(--theme-topbar-wallet-name-color);
     }
 
     .walletAmount {
-        padding-top: 4px;
-        font-size: 16px;
+        font-size: 21px;
         font-weight: 600;
         opacity: 0.7;
         word-break: break-all;
+    }
+
+    .walletAmountLabel {
+        text-transform: none;
+        padding-top: 2px;
+        font-size: 14px;
+        font-weight: 300;
+        opacity: 0.7;
     }
 }}
