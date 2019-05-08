@@ -1,87 +1,88 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.componentClassic {
+.component {
   padding-top: 40px;
   padding-right: 20px;
   padding-bottom: 20px;
   padding-left: 20px;
+
+  .receiverInput {
+    position: relative;
+
+    :global {
+      .SimpleInput_input {
+        font-family: var(--font-mono-light);
+        letter-spacing: 0;
+      }
+    }
+  }
+  
+  .amountInput {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  
+  .adaLabel {
+    bottom: 16px;
+    color: var(--theme-input-right-floating-text-color);
+    font-family: var(--font-light);
+    position: absolute;
+    right: 20px;
+    text-transform: uppercase;
+  }
+  
+  .nextButton {
+    display: block !important;
+    margin: 30px auto 0;
+  }
+
+  .contentWarning {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    margin-bottom: 1em;
+  }
+
+  .icon {
+    flex-shrink: 0;
+    & > svg {
+      width: 26px;
+      height: 26px;
+    }
+    margin: 1em 0;
+  }
+  
+  .warning {
+    font-family: var(--font-light);
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+    color: var(--rp-theme-color-error);
+  }  
 }
 
-.component {
+:global(.YoroiClassic) .component {
+  .receiverInput {
+    margin-bottom: 10px;
+  }
+}
+
+:global(.YoroiModern) .component {
   padding: 30px;
-}
 
-.amountInputClassic {
-  position: relative;
-  margin-bottom: 10px;
-}
-.receiverInputClassic {
-  position: relative;
-  margin-bottom: 10px;
-  :global {
-    .SimpleInput_input {
-      font-family: var(--font-mono-light);
-      letter-spacing: 0;
+  .receiverInput {
+    letter-spacing: 0;
+
+    :global {
+      .SimpleInput_input {
+        font-family: var(--font-mono-regular);
+      }
     }
   }
-}
 
-.amountInput {
-  position: relative;
-  margin-bottom: 10px;
-}
-.receiverInput {
-  letter-spacing: 0;
-  position: relative;
-  :global {
-    .SimpleInput_input {
-      font-family: var(--font-mono-regular);
-      letter-spacing: 0;
-    }
-  }
-}
-
-.adaLabel {
-  bottom: 16px;
-  color: var(--theme-input-right-floating-text-color);
-  font-family: var(--font-light);
-  position: absolute;
-  right: 20px;
-  text-transform: uppercase;
-}
-
-.nextButtonClassic {
-  display: block !important;
-  margin: 30px auto 0;
-}
-
-.nextButton {
-  display: block !important;
-  margin: 20px auto 0;
-}
-
-.contentWarning{
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  margin-bottom: 1em;
-}
-
-.icon {
-  flex-shrink: 0;
-  & > svg {
-    width: 26px;
-    height: 26px;
-  }
-  margin: 1em 0;
-}
-
-.warning {
-  font-family: var(--font-light);
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 0.5em;
-  color: var(--rp-theme-color-error);
+  .nextButton {
+    margin: 20px auto 0;
+  }  
 }
