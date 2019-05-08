@@ -156,7 +156,7 @@ export function createAdaHardwareWallet({
 }
 
 /** Wrapper function to create new mnemonic according to bip39 */
-export const generateAdaAccountRecoveryPhrase = () => (
+export const generateAdaAccountRecoveryPhrase: void => Array<string> = () => (
   generateAdaMnemonic()
 );
 
