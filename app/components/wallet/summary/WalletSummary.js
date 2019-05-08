@@ -58,7 +58,7 @@ export default class WalletSummary extends Component<Props> {
       <div className={componentClasses}>
         <div className={styles.leftBlock} />
         <div className={styles.middleBlock}>
-          <BorderedBox classicTheme={classicTheme}>
+          <BorderedBox>
             {pendingAmount.incoming.greaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}

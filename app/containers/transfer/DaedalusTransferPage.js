@@ -129,7 +129,6 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 onPaperConfirm={this.startTransferPaperFunds}
                 onMasterKeyConfirm={this.startTransferMasterKey}
                 disableTransferFunds={daedalusTransfer.disableTransferFunds}
-                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>
@@ -147,7 +146,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 )}
                 validWords={validWords}
                 mnemonicLength={12}
-                currentTheme={profile.currentTheme}
+                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>
@@ -162,7 +161,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
                 validWords={validWords}
                 mnemonicLength={27}
-                currentTheme={profile.currentTheme}
+                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>

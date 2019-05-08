@@ -48,7 +48,6 @@ type Props = {
   onPaperConfirm: Function,
   onMasterKeyConfirm: Function,
   disableTransferFunds: boolean,
-  classicTheme: boolean
 };
 
 @observer
@@ -66,7 +65,6 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
       onPaperConfirm,
       onMasterKeyConfirm,
       disableTransferFunds,
-      classicTheme
     } = this.props;
 
     return (
@@ -81,7 +79,6 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
         confirmationText={intl.formatMessage(messages.transferText)}
         confirmationPaperText={intl.formatMessage(messages.transferPaperText)}
         confirmationMasterKeyText={intl.formatMessage(messages.transferMasterKeyText)}
-        classicTheme={classicTheme}
       />
     );
   }
