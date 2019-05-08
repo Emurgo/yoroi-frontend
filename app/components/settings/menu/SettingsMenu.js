@@ -6,6 +6,8 @@ import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
 import environment from '../../../environment';
+import { THEMES } from '../../../themes';
+import type { Theme } from '../../../themes';
 
 const messages = defineMessages({
   general: {
@@ -47,7 +49,7 @@ type Props = {
   onItemClick: Function,
   hasActiveWallet: boolean,
   currentLocale: string,
-  classicTheme: boolean,
+  currentTheme: Theme,
 };
 
 @observer
@@ -59,17 +61,17 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale, classicTheme } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale, currentTheme } = this.props;
 
     return (
-      <div className={classicTheme ? '' : styles.componentWrapper}>
-        <div className={classicTheme ? styles.componentClassic : styles.component}>
+      <div className={currentTheme === THEMES.YOROI_CLASSIC ? '' : styles.componentWrapper}>
+        <div className={currentTheme === THEMES.YOROI_CLASSIC ? styles.componentClassic : styles.component}>
           <SettingsMenuItem
             label={intl.formatMessage(messages.general)}
             onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}
             active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
             className="general"
-            classicTheme={classicTheme}
+            currentTheme={currentTheme}
           />
 
           <SettingsMenuItem
@@ -77,7 +79,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
             active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
             className="paperWallet"
-            classicTheme={classicTheme}
+            currentTheme={currentTheme}
           />
 
           <SettingsMenuItem
@@ -90,7 +92,7 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.WALLET)}
             className="wallet"
             disabled={!hasActiveWallet}
-            classicTheme={classicTheme}
+            currentTheme={currentTheme}
           />
 
           <SettingsMenuItem
@@ -98,7 +100,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.TERMS_OF_USE)}
             active={isActiveItem(ROUTES.SETTINGS.TERMS_OF_USE)}
             className="termsOfUse"
-            classicTheme={classicTheme}
+            currentTheme={currentTheme}
           />
 
           <SettingsMenuItem
@@ -106,7 +108,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
-            classicTheme={classicTheme}
+            currentTheme={currentTheme}
           />
 
           <SettingsMenuItem
@@ -114,7 +116,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
             active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
             className="display"
-            classicTheme={classicTheme}
+            currentTheme={currentTheme}
           />
 
           {(!environment.isMainnet() || currentLocale === 'ko-KR' || currentLocale === 'ja-JP') &&
@@ -125,7 +127,7 @@ export default class SettingsMenu extends Component<Props> {
               onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
               active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
               className="adaRedemption"
-              classicTheme={classicTheme}
+              currentTheme={currentTheme}
             />
           }
 
@@ -134,7 +136,7 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
             active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
             className="AboutYoroi"
-            classicTheme={classicTheme}
+            currentTheme={currentTheme}
           />
         </div>
       </div>

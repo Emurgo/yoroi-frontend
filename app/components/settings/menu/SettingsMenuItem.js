@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SettingsMenuItem.scss';
+import { THEMES } from '../../../themes';
+import type { Theme } from '../../../themes';
 
 type Props = {
   label: string,
@@ -10,7 +12,7 @@ type Props = {
   onClick: Function,
   className: string,
   disabled?: boolean,
-  classicTheme: boolean,
+  currentTheme: Theme,
 };
 
 @observer
@@ -20,7 +22,7 @@ export default class SettingsMenuItem extends Component<Props> {
   };
 
   render() {
-    const { label, active, disabled, onClick, className, classicTheme } = this.props;
+    const { label, active, disabled, onClick, className, currentTheme } = this.props;
     let state = styles.enabled;
     if (disabled) {
       state = styles.disabled;
@@ -28,7 +30,7 @@ export default class SettingsMenuItem extends Component<Props> {
       state = styles.active;
     }
     const componentClasses = classNames([
-      classicTheme ? styles.componentClassic : styles.component,
+      currentTheme === THEMES.YOROI_CLASSIC ? styles.componentClassic : styles.component,
       state,
       className
     ]);

@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import TermsOfUseSettings from '../../../components/settings/categories/TermsOfUseSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
-import { THEMES } from '../../../themes';
 
 @observer
 export default class TermsOfUseSettingsPage extends Component<InjectedProps> {
@@ -13,7 +12,7 @@ export default class TermsOfUseSettingsPage extends Component<InjectedProps> {
     return (
       <TermsOfUseSettings
         localizedTermsOfUse={termsOfUse}
-        classicTheme={currentTheme === THEMES.YOROI_CLASSIC}
+        currentTheme={currentTheme}
       />
     );
   }

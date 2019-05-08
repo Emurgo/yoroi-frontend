@@ -3,23 +3,25 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './SettingsLayout.scss';
+import { THEMES } from '../../themes';
+import type { Theme } from '../../themes';
 
 type Props = {
   children: Node,
   menu: Node,
-  classicTheme: boolean,
+  currentTheme: Theme,
 };
 
 @observer
 export default class SettingsLayout extends Component<Props> {
   render() {
-    const { menu, children, classicTheme } = this.props;
+    const { menu, children, currentTheme } = this.props;
     return (
-      <div className={classicTheme ? styles.componentClassic : styles.component}>
+      <div className={currentTheme === THEMES.YOROI_CLASSIC ? styles.componentClassic : styles.component}>
         <div
-          className={classicTheme ? styles.settingsPaneWrapperClassic : styles.settingsPaneWrapper}
+          className={currentTheme === THEMES.YOROI_CLASSIC ? styles.settingsPaneWrapperClassic : styles.settingsPaneWrapper}
         >
-          <div className={classicTheme ? styles.settingsPaneClassic : styles.settingsPane}>
+          <div className={currentTheme === THEMES.YOROI_CLASSIC ? styles.settingsPaneClassic : styles.settingsPane}>
             {children}
           </div>
         </div>
