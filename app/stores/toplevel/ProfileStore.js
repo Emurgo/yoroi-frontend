@@ -101,6 +101,9 @@ export default class ProfileStore extends Store {
   static getDefaultLocale() {
     return 'en-US';
   }
+  static getDefaultTheme(): Theme {
+    return THEMES.YOROI_CLASSIC;
+  }
 
   // ========== Locale ========== //
 
@@ -150,7 +153,13 @@ export default class ProfileStore extends Store {
 
   @computed get currentTheme(): Theme {
     const { result } = this.getThemeRequest.execute();
-    if (this.isCurrentThemeSet && result) return result;
+    if (this.isCurrentThemeSet && result) {
+      // verify content is an actual theme
+      if (Object.values(THEMES).find(theme => theme === result)) {
+        // $FlowFixMe: can safely cast
+        return result;
+      }
+    }
     // TODO: We temporarily disable the new theme on mainnet until it's ready
     // TODO: Tests were written for the old theme so we need to use it for testing
     return (environment.isMainnet() || environment.isTest()) ?
@@ -213,7 +222,7 @@ export default class ProfileStore extends Store {
 
   getThemeVars = ({ theme }: { theme: string }) => {
     if (theme) return require(`../../themes/prebuilt/${theme}.js`);
-    return require(`../../themes/prebuilt/${THEMES.YOROI_CLASSIC}.js`); // default
+    return require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`); // default
   };
 
   hasCustomTheme = (): boolean => {
