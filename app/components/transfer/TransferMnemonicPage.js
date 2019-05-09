@@ -13,8 +13,6 @@ import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMnemonicPage.scss';
 import config from '../../config';
-import { THEMES } from '../../themes';
-import type { Theme } from '../../themes';
 import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
@@ -49,7 +47,7 @@ type Props = {
   validWords: Array<string>,
   step0: string,
   mnemonicLength: number,
-  currentTheme: Theme
+  classicTheme: boolean
 };
 
 @observer
@@ -104,7 +102,7 @@ export default class TransferMnemonicPage extends Component<Props> {
       step0,
       mnemonicValidator,
       mnemonicLength,
-      currentTheme
+      classicTheme
     } = this.props;
     const { recoveryPhrase } = form.values();
 
@@ -115,7 +113,7 @@ export default class TransferMnemonicPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      currentTheme === THEMES.YOROI_CLASSIC ? 'flat' : 'outlined',
+      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -151,7 +149,7 @@ export default class TransferMnemonicPage extends Component<Props> {
               error={recoveryPhraseField.error}
               maxVisibleOptions={5}
               noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={currentTheme === THEMES.YOROI_CLASSIC ? AutocompleteSkin : AutocompleteOwnSkin}
+              skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>
