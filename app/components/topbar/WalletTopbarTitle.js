@@ -39,6 +39,23 @@ const saturation = (color, factor: number = 10) => {
   return tcol.toHexString();
 };
 
+function constructPlate(account, saturationFactor): [string, Component] {
+  const { plate: { hash: accountPlateHash, id: accountPlateId } } = account;
+  const colorIdx = Buffer.from(accountPlateHash, 'hex')[0] % COLORS.length;
+  const color = COLORS[colorIdx];
+  return [accountPlateId, (<div className={styles.divIcon}>
+    <Blockies
+      seed={accountPlateHash}
+      size={7}
+      scale={6}
+      bgColor={saturation(color.primary, saturationFactor)}
+      color={saturation(color.secondary, saturationFactor)}
+      spotColor={saturation(color.spots, saturationFactor)}
+      className={styles.walletIcon}
+    />
+  </div>)]
+}
+
 /** Dynamically generated title for the topbar when a wallet is selected */
 @observer
 export default class WalletTopbarTitle extends Component<Props> {
@@ -55,26 +72,16 @@ export default class WalletTopbarTitle extends Component<Props> {
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
     const showWalletInfo = walletRoutesMatch && wallet;
 
-    const [{ plate: { hash: accountPlateHash, id: accountPlateId } }] = wallet.accounts;
-    const colorIdx = Buffer.from(accountPlateHash, 'hex')[0] % COLORS.length;
-    const color = COLORS[colorIdx];
+    const [accountPlateId, iconComponent] = wallet.accounts ?
+      constructPlate(wallet.accounts[0], theme.identiconSaturationFactor)
+      : [];
 
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
-        <div className={styles.divIcon}>
-          <Blockies
-            seed={accountPlateHash}
-            size={7}
-            scale={6}
-            bgColor={saturation(color.primary, theme.identiconSaturationFactor)}
-            color={saturation(color.secondary, theme.identiconSaturationFactor)}
-            spotColor={saturation(color.spots, theme.identiconSaturationFactor)}
-            className={styles.walletIcon}
-          />
-        </div>
+        {iconComponent}
         <div className={styles.divWalletInfo}>
           <div className={styles.walletName}>{wallet && wallet.name}</div>
-          <div className={styles.walletPlate}>[{accountPlateId}]</div>
+          <div className={styles.walletPlate}>{accountPlateId ? `[${accountPlateId}]` : ''}</div>
         </div>
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>

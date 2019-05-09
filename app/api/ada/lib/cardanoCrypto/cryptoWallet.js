@@ -20,6 +20,7 @@ import type { AddressType } from '../../adaTypes';
 import { createCryptoAccount } from '../../adaAccount';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
+import type { WalletAccountNumberPlate } from "../../../../domain/Wallet";
 
 declare var CONFIG : ConfigType;
 
@@ -173,7 +174,7 @@ export function getCryptoWalletFromMasterKey(
   return cryptoWallet;
 }
 
-export function createAccountPlate(accountPubHash: string) {
+export function createAccountPlate(accountPubHash: string): WalletAccountNumberPlate {
   const hash = blakejs.blake2bHex(accountPubHash);
   const [a,b,c,d] = crc32(hash);
   const alpha = `ABCDEJHKLNOPSTXZ`;
@@ -207,8 +208,10 @@ export const mnemonicsToAddresses = (
   mnemonic: string,
   count?: number = 1,
   type?: AddressType = 'External'
-): Array<string> => {
+): { addresses: Array<string>, accountPlate: WalletAccountNumberPlate } => {
   const masterKey = generateWalletMasterKey(mnemonic, '');
   const { root_cached_key } = createCryptoAccount(masterKey, '', 0);
-  return generateAddressBatch([...Array(count).keys()], root_cached_key, type);
+  const accountPlate = createAccountPlate(root_cached_key.key().to_hex());
+  const addresses = generateAddressBatch([...Array(count).keys()], root_cached_key, type);
+  return { addresses, accountPlate };
 };

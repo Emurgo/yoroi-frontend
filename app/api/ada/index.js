@@ -144,6 +144,7 @@ import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import type { CryptoAccount } from "./adaLocalStorage";
+import type { WalletAccountNumberPlate } from "../../domain/Wallet";
 
 // ADA specific Request / Response params
 export type CreateAddressResponse = WalletAddress;
@@ -236,6 +237,7 @@ export type AdaWalletRecoveryPhraseResponse = Array<string>;
 export type AdaPaper = {
   addresses: Array<string>,
   scrambledWords: Array<string>,
+  accountPlate: WalletAccountNumberPlate,
 }
 
 export const DEFAULT_ADDRESSES_PER_PAPER = 1;
@@ -253,8 +255,11 @@ export default class AdaApi {
     } = {}
   ): AdaPaper {
     const { words, scrambledWords } = generatePaperWalletSecret(password);
-    const addresses = mnemonicsToExternalAddresses(words.join(' '), numAddresses || DEFAULT_ADDRESSES_PER_PAPER);
-    return { addresses, scrambledWords };
+    const { addresses, accountPlate } = mnemonicsToExternalAddresses(
+      words.join(' '),
+      numAddresses || DEFAULT_ADDRESSES_PER_PAPER,
+    );
+    return { addresses, scrambledWords, accountPlate };
   }
 
   async createAdaPaperPdf(
@@ -268,11 +273,12 @@ export default class AdaApi {
       updateStatus?: (PdfGenStepType => ?any)
     }
   ): Promise<?Blob> {
-    const { addresses, scrambledWords } = paper;
+    const { addresses, scrambledWords, accountPlate } = paper;
     // noinspection UnnecessaryLocalVariableJS
     const res : Promise<?Blob> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
+      accountPlate,
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
@@ -291,7 +297,7 @@ export default class AdaApi {
         : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets.map(([wallet, account]) => _createWalletFromServerData(wallet, [account]));
+      return wallets.map(([wallet, account]) => _createWalletFromServerData(wallet, account ? [account] : undefined));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();

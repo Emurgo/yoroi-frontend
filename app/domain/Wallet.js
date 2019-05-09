@@ -7,12 +7,14 @@ import type { WalletType, WalletHardwareInfo } from '../types/WalletType';
 import { WalletTypeOption } from '../types/WalletType';
 import Config from '../config';
 
+export type WalletAccountNumberPlate = {
+  hash: string,
+  id: string,
+}
+
 export type WalletAccount = {
   account: number,
-  plate: {
-    hash: string,
-    id: string,
-  },
+  plate: WalletAccountNumberPlate,
 }
 
 /** External representation of the internal Wallet in the API layer  */

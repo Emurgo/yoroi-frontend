@@ -7,10 +7,13 @@ import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/pa
 import { Logger, stringifyError } from '../../../utils/logging';
 import type { Network } from '../../../../config/config-types';
 import { NetworkType } from '../../../../config/config-types';
+import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
+import { createIcon } from '@download/blockies';
 
 export type PaperRequest = {
   words: Array<string>,
   addresses: Array<string>,
+  accountPlate: WalletAccountNumberPlate,
   network: Network,
 }
 
@@ -31,7 +34,7 @@ export const generateAdaPaperPdf = async (
 ): Promise<?Blob> => {
   // Prepare params
   // eslint-disable-next-line no-unused-vars
-  const { network, addresses, words } = request;
+  const { network, addresses, words, accountPlate } = request;
 
   updateStatus(PdfGenSteps.initializing);
 
@@ -54,6 +57,8 @@ export const generateAdaPaperPdf = async (
     if (network !== NetworkType.MAINNET) {
       printTestnetLabel(doc, network, 178, 20, 15);
     }
+    doc.setFontSize(12);
+    doc.text(40, 175, `[${accountPlate.id}]`);
 
     updateStatus(PdfGenSteps.frontpage);
 
@@ -77,6 +82,26 @@ export const generateAdaPaperPdf = async (
     if (network !== NetworkType.MAINNET) {
       printTestnetLabel(doc, network, 75, 180);
     }
+
+    const icon = createIcon({
+      seed: accountPlate.hash,
+      size: 7,
+      scale: 5,
+      bgcolor: '#fff',
+      color: '#aaa',
+      spotcolor: '#000'
+    });
+    addImageBase64(doc, icon.toDataURL('image/png'), {
+      x: (pageWidthPx + 24) / 2,
+      y: 115,
+      w: 24,
+      h: 24,
+      r: 180,
+    });
+
+    doc.setFontSize(12);
+    textCenter(doc, 130, `[${accountPlate.id}]`, null, 180, true);
+
     const page2Uri = paperWalletPage2PassPath;
     await addImage(doc, page2Uri, pageSize);
     updateStatus(PdfGenSteps.mnemonic);
@@ -209,8 +234,8 @@ async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise
 }
 
 function addImageBase64(doc: Pdf, img: string, params?: AddImageParams) {
-  const { x, y, w, h } = params || {};
-  doc.addImage(img, 'png', x || 0, y || 0, w, h, '', 'FAST');
+  const { x, y, w, h, r } = params || {};
+  doc.addImage(img, 'png', x || 0, y || 0, w, h, '', 'FAST', r);
 }
 
 async function loadImage(url: string): Promise<string> {
