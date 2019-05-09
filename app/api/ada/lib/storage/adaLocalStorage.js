@@ -2,8 +2,8 @@
 
 // Wrapper API to Save&Load localstorage using JSON
 
-import type { AdaWallet } from './adaTypes';
-import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import type { AdaWallet } from '../../adaTypes';
+import { RustModule } from '../cardanoCrypto/rustLoader';
 
 export type CryptoAccount = {
   account: number,

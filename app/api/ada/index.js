@@ -16,36 +16,29 @@ import type {
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA, HARD_DERIVATION_START } from '../../config/numbersConfig';
 import type { Network } from '../../../config/config-types';
-
+import { createCryptoAccount, createHardwareWalletAccount } from './lib/storage/adaAccount';
+import { toAdaWallet, toAdaHardwareWallet } from './lib/storage/cryptoToModel';
 import {
   isValidMnemonic,
   isValidPaperMnemonic,
   unscramblePaperMnemonic,
   generateAdaAccountRecoveryPhrase,
-  updateAdaWalletMetaParams,
-  updateAdaWalletBalance,
-  changeAdaWalletSpendingPassword,
   generatePaperWalletSecret,
+  getBalance,
   mnemonicsToExternalAddresses,
 } from './adaWallet';
 import {
-  isValidAdaAddress,
   getAdaAddressesByType,
   getAdaAddressesList,
   popBip44Address,
-  saveAdaAddress
-} from './adaAddress';
+  saveAdaAddress,
+  saveAsAdaAddresses,
+} from './lib/storage/adaAddress';
 import {
-  restoreAdaWallet
+  restoreBip44Wallet
 } from './restoreAdaWallet';
 import {
-  createWallet,
-} from './hardwareWallet/createWallet';
-import {
-  getAdaTxsHistoryByWallet,
-  getAdaTxLastUpdatedDate,
   refreshTxs,
-  getPendingAdaTxs
 } from './adaTransactions/adaTransactionsHistory';
 import {
   getAdaTransactionFee,
@@ -56,6 +49,7 @@ import {
 import {
   getCryptoWalletFromMasterKey,
   createAccountPlate,
+  generateWalletMasterKey,
 } from './lib/cardanoCrypto/cryptoWallet';
 import type {
   TrezorSignTxPayload,
@@ -80,7 +74,6 @@ import type {
   AddressType,
   AdaTransactionCondition,
   AdaTransactionInputOutput,
-  AdaTransactions,
   AdaWallet,
   AdaAssurance,
 } from './adaTypes';
@@ -96,13 +89,23 @@ import {
   getCurrentAccountIndex,
   getCurrentCryptoAccount,
   getWalletMasterKey,
-} from './adaLocalStorage';
+  saveCryptoAccount,
+  saveLastReceiveAddressIndex,
+  createStoredWallet,
+} from './lib/storage/adaLocalStorage';
+import type {
+  CryptoAccount
+} from './lib/storage/adaLocalStorage';
 import LocalStorageApi from '../localStorage/index';
 import {
+  getPendingTxs,
+  getTxsLastUpdatedDate,
+  getTxsOrderedByDateDesc,
+  getTxsOrderedByLastUpdateDesc,
   saveTxs,
   loadLovefieldDB,
   reset,
-} from './lib/lovefieldDatabase';
+} from './lib/storage/lovefieldDatabase';
 import type {
   FilterFunc,
   HistoryFunc,
@@ -113,6 +116,16 @@ import type {
   UtxoSumFunc,
 } from './lib/state-fetch/types';
 import { batchUTXOsForAddresses, batchTxsBodiesForInputs } from './lib/state-fetch/helpers';
+import {
+  changeAdaWalletSpendingPassword,
+  getAddressList,
+  getLatestUsedIndex,
+  updateAdaWalletBalance,
+  updateAdaWalletMetaParams,
+  updateBestBlockNumber,
+  updateLastReceiveAddressIndex,
+  updateTransactionList,
+} from './lib/storage/helpers';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
 import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
 import {
@@ -122,7 +135,7 @@ import {
 import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
 import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
 import config from '../../config';
-import { migrateToLatest } from './adaMigration';
+import { migrateToLatest } from './lib/storage/adaMigration';
 import {
   makeCardanoBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
@@ -133,7 +146,6 @@ import type { TransactionExportRow } from '../export';
 import { HWFeatures } from '../../types/HWConnectStoreTypes';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
-import type { CryptoAccount } from './adaLocalStorage';
 import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 
 // ADA specific Request / Response params
@@ -353,6 +365,16 @@ export type SaveAddressFunc = (
   request: SaveAddressRequest
 ) => Promise<SaveAddressResponse>;
 
+// saveLastReceiveAddressIndex
+
+export type SaveLastReceiveAddressIndexRequest = {
+  index: number,
+};
+export type SaveLastReceiveAddressIndexResponse = void;
+export type SaveLastReceiveAddressIndexFunc = (
+  request: SaveLastReceiveAddressIndexRequest
+) => Promise<SaveLastReceiveAddressIndexResponse>;
+
 // saveTxs
 
 export type SaveTxRequest = {
@@ -549,6 +571,7 @@ export default class AdaApi {
     const { words, scrambledWords } = generatePaperWalletSecret(password);
     const { addresses, accountPlate } = mnemonicsToExternalAddresses(
       words.join(' '),
+      0, // paper wallets always use account 0
       numAddresses || DEFAULT_ADDRESSES_PER_PAPER,
     );
     return { addresses, scrambledWords, accountPlate };
@@ -629,7 +652,12 @@ export default class AdaApi {
 
   async getBalance(request: GetBalanceRequest): Promise<GetBalanceResponse> {
     try {
-      return updateAdaWalletBalance(request.getUTXOsSumsForAddresses);
+      // get all wallet's addresses
+      const adaAddresses = await getAdaAddressesList();
+      const addresses = adaAddresses.map(address => address.cadId);
+      const balance = await getBalance(addresses, request.getUTXOsSumsForAddresses);
+      await updateAdaWalletBalance(balance);
+      return balance;
     } catch (error) {
       Logger.error('AdaApi::getBalance error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -638,7 +666,7 @@ export default class AdaApi {
 
   async getTxLastUpdatedDate(): Promise<GetTxLastUpdateDateResponse> {
     try {
-      return getAdaTxLastUpdatedDate();
+      return await getTxsLastUpdatedDate();
     } catch (error) {
       Logger.error('AdaApi::getTxLastUpdatedDate error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -649,15 +677,28 @@ export default class AdaApi {
     Logger.debug('AdaApi::refreshTransactions called: ' + stringifyData(request));
     const { skip = 0, limit } = request;
     try {
-      await refreshTxs(
-        request.getTransactionsHistoryForAddresses,
-        request.checkAddressesInUse,
-      );
-      const history: AdaTransactions = await getAdaTxsHistoryByWallet();
+      const account = getCurrentCryptoAccount();
+      if (account) {
+        const existingTxs = await getTxsOrderedByLastUpdateDesc();
+        const newTxs = await refreshTxs(
+          account.root_cached_key,
+          account.account,
+          existingTxs,
+          request.getTransactionsHistoryForAddresses,
+          request.checkAddressesInUse,
+          updateBestBlockNumber,
+          getAddressList,
+          saveAsAdaAddresses,
+          await getLatestUsedIndex('Internal'),
+          await getLatestUsedIndex('External'),
+        );
+        await updateTransactionList(newTxs);
+      }
+      const txHistory = await getTxsOrderedByDateDesc();
       Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(history));
       const transactions = limit
-        ? history[0].slice(skip, skip + limit)
-        : history[0];
+        ? txHistory.slice(skip, skip + limit)
+        : txHistory;
 
       const mappedTransactions = transactions.map(async data => {
         const { type, amount, fee } = await _getTxFinancialInfo(data);
@@ -665,7 +706,7 @@ export default class AdaApi {
       });
       return Promise.all(mappedTransactions).then(mappedTxs => Promise.resolve({
         transactions: mappedTxs,
-        total: history[1]
+        total: txHistory.length
       }));
     } catch (error) {
       Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
@@ -676,7 +717,7 @@ export default class AdaApi {
   async refreshPendingTransactions(): Promise<RefreshPendingTransactionsResponse> {
     Logger.debug('AdaApi::refreshPendingTransactions called');
     try {
-      const pendingTxs = await getPendingAdaTxs();
+      const pendingTxs = await getPendingTxs();
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
       return Promise.all(pendingTxs.map(async data => {
         const { type, amount, fee } = await _getTxFinancialInfo(data);
@@ -952,11 +993,26 @@ export default class AdaApi {
   }
 
   /** TODO: This method is exposed to allow injecting data when testing */
+  async saveLastReceiveAddressIndex(
+    request: SaveLastReceiveAddressIndexRequest
+  ): Promise<SaveLastReceiveAddressIndexResponse> {
+    Logger.debug('AdaApi::saveLastReceiveAddressIndex called');
+    try {
+      // also needed as some tests inject fake used transactiosn without coresponding txs
+      saveLastReceiveAddressIndex(request.index);
+    } catch (error) {
+      Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  /** TODO: This method is exposed to allow injecting data when testing */
   async saveTxs(
     request: SaveTxRequest
   ): Promise<void> {
     try {
       await saveTxs(request.txs);
+      await updateLastReceiveAddressIndex();
     } catch (error) {
       Logger.error('AdaApi::saveTxs error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -966,7 +1022,16 @@ export default class AdaApi {
   isValidAddress(
     request: IsValidAddressRequest
   ): Promise<IsValidAddressResponse> {
-    return isValidAdaAddress(request.address);
+    try {
+      RustModule.Wallet.Address.from_base58(request.address);
+      return Promise.resolve(true);
+    } catch (validateAddressError) {
+      Logger.error('AdaApi::isValidAdaAddress error: ' +
+        stringifyError(validateAddressError));
+
+      // This error means the address is not valid
+      return Promise.resolve(false);
+    }
   }
 
   isValidMnemonic(
@@ -1003,6 +1068,10 @@ export default class AdaApi {
     }
   }
 
+  /**
+   * Restore all addresses and caches the results locally
+   * Note: addresses may not be detected if generated by a wallet that doesn't follow bip44
+  */
   async restoreWallet(
     request: RestoreWalletRequest
   ): Promise<RestoreWalletResponse> {
@@ -1023,12 +1092,29 @@ export default class AdaApi {
     };
 
     try {
-      const wallet: AdaWallet = await restoreAdaWallet(
-        { walletPassword, walletInitData },
-        checkAddressesInUse,
+      // recover master key
+      const adaWallet = toAdaWallet(walletInitData);
+      const masterKey = generateWalletMasterKey(
+        walletInitData.cwBackupPhrase.bpToList,
+        walletPassword
       );
+      // always create the 0th account
+      const cryptoAccount = createCryptoAccount(masterKey, walletPassword, 0);
+
+      // save wallet info in localstorage
+      saveCryptoAccount(cryptoAccount);
+      createStoredWallet(adaWallet, masterKey);
+      await restoreBip44Wallet(
+        cryptoAccount.root_cached_key,
+        cryptoAccount.account,
+        adaWallet,
+        masterKey,
+        checkAddressesInUse,
+        saveAsAdaAddresses
+      );
+
       Logger.debug('AdaApi::restoreWallet success');
-      return _createWalletFromServerData(wallet);
+      return _createWalletFromServerData(adaWallet);
     } catch (error) {
       Logger.error('AdaApi::restoreWallet error: ' + stringifyError(error));
       // TODO: backend will return something different here, if multiple wallets
@@ -1118,13 +1204,29 @@ export default class AdaApi {
           language: hwFeatures.language,
         },
       };
-      const wallet: AdaWallet = await createWallet(
-        { walletInitData },
+      // create ada wallet object for hardware wallet
+      const hardwareWallet = toAdaHardwareWallet(walletInitData);
+
+      // create crypto account object for hardware wallet
+      const cryptoAccount = createHardwareWalletAccount(
+        walletInitData.cwHardwareInfo.publicMasterKey,
+        0 // always create the 0th account
+      );
+
+      // save wallet info in localstorage
+      saveCryptoAccount(cryptoAccount);
+      createStoredWallet(hardwareWallet, undefined);
+      await restoreBip44Wallet(
+        cryptoAccount.root_cached_key,
+        cryptoAccount.account,
+        hardwareWallet,
+        undefined,
         checkAddressesInUse,
+        saveAsAdaAddresses
       );
 
       Logger.debug('AdaApi::createHardwareWallet success');
-      return _createWalletFromServerData(wallet);
+      return _createWalletFromServerData(hardwareWallet);
     } catch (error) {
       Logger.error('AdaApi::createHardwareWallet error: ' + stringifyError(error));
 
@@ -1145,14 +1247,27 @@ export default class AdaApi {
   ): Promise<GetTransactionRowsToExportResponse> {
     try {
       Logger.debug('AdaApi::getTransactionRowsToExport: called');
-      await refreshTxs(
-        request.getTransactionsHistoryForAddresses,
-        request.checkAddressesInUse,
-      );
-      const history: AdaTransactions = await getAdaTxsHistoryByWallet();
+      const account = getCurrentCryptoAccount();
+      if (account) {
+        const existingTxs = await getTxsOrderedByLastUpdateDesc();
+        const newTxs = await refreshTxs(
+          account.root_cached_key,
+          account.account,
+          existingTxs,
+          request.getTransactionsHistoryForAddresses,
+          request.checkAddressesInUse,
+          updateBestBlockNumber,
+          getAddressList,
+          saveAsAdaAddresses,
+          await getLatestUsedIndex('Internal'),
+          await getLatestUsedIndex('External'),
+        );
+        await updateTransactionList(newTxs);
+      }
+      const transactions = await getTxsOrderedByDateDesc();
 
       Logger.debug('AdaApi::getTransactionRowsToExport: success');
-      return convertAdaTransactionsToExportRows(history[0]);
+      return convertAdaTransactionsToExportRows(transactions);
     } catch (error) {
       Logger.error('AdaApi::getTransactionRowsToExport: ' + stringifyError(error));
 

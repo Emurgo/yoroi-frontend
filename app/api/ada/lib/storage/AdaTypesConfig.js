@@ -1,5 +1,5 @@
 // @flow
-import type { AdaWalletType } from '../adaTypes';
+import type { AdaWalletType } from '../../adaTypes';
 
 export const AdaWalletTypeOption : {
   WEB_WALLET: AdaWalletType,

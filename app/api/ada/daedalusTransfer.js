@@ -24,7 +24,6 @@ import type {
 import type {
   TransferTx
 } from '../../types/TransferTypes';
-import { getReceiverAddress } from './adaAddress';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import type {
   UTXO
@@ -64,10 +63,11 @@ export function getAddressesWithFunds(payload: {
 
 /** Generate transaction including all addresses with no change */
 export async function generateTransferTx(payload: {
+  outputAddr: string,
   addressesWithFunds: AddressKeyMap,
   getUTXOsForAddresses: AddressUtxoFunc,
 }): Promise<TransferTx> {
-  const { addressesWithFunds, getUTXOsForAddresses } = payload;
+  const { outputAddr, addressesWithFunds, getUTXOsForAddresses } = payload;
 
   // fetch data to make transaction
   const senders = Object.keys(addressesWithFunds);
@@ -77,8 +77,6 @@ export async function generateTransferTx(payload: {
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
     throw error;
   }
-
-  const outputAddr = await getReceiverAddress();
 
   return buildTransferTx({
     addressesWithFunds,

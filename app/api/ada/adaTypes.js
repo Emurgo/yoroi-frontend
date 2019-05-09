@@ -13,7 +13,7 @@
 */
 
 import BigNumber from 'bignumber.js';
-import type { AdaAddressMap } from './adaAddress';
+import type { AdaAddressMap } from './lib/storage/adaAddress';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 /*
@@ -111,11 +111,6 @@ export type AdaTransaction = {
   ctOutputs: Array<AdaTransactionInputOutput>,
   ctCondition: AdaTransactionCondition,
 };
-
-export type AdaTransactions = [
-  Array<AdaTransaction>,
-  number, // length
-];
 
 export type AdaTransactionInputOutput = [
   string, // output address

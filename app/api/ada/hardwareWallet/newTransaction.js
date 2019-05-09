@@ -12,7 +12,7 @@ import type { UtxoLookupMap }  from '../lib/utils';
 import { utxosToLookupMap, derivePathAsString }  from '../lib/utils';
 import type {
   AdaAddressMap,
-} from '../adaAddress';
+} from '../lib/storage/adaAddress';
 import type {
   SendFunc,
   TxBodiesFunc
@@ -24,7 +24,7 @@ import {
 import type {
   BroadcastTrezorSignedTxResponse,
   PrepareAndBroadcastLedgerSignedTxResponse
-} from '..';
+} from '../index';
 import type {
   TrezorInput,
   TrezorOutput,

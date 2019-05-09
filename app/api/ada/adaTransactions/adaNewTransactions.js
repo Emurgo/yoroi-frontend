@@ -5,7 +5,7 @@
 import BigNumber from 'bignumber.js';
 import {
   addressesToAddressMap,
-} from '../adaAddress';
+} from '../lib/storage/adaAddress';
 import type {
   AdaAddress,
   AdaFeeEstimateResponse,
@@ -17,7 +17,7 @@ import {
   NotEnoughMoneyToSendError,
 } from '../errors';
 import type { ConfigType } from '../../../../config/config-types';
-import type { AdaAddressMap } from '../adaAddress';
+import type { AdaAddressMap } from '../lib/storage/adaAddress';
 import { utxosToLookupMap, coinToBigNumber } from '../lib/utils';
 
 import type { AddressUtxoFunc } from '../lib/state-fetch/types';

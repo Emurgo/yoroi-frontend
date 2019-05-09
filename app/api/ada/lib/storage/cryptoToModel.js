@@ -8,7 +8,7 @@ import type {
   AdaWalletInitData,
   AdaHardwareWalletInitData
 } from '../../adaTypes';
-import { AdaWalletTypeOption } from '../../config/AdaTypesConfig';
+import { AdaWalletTypeOption } from './AdaTypesConfig';
 
 /** Convert uesr-inputted data during wallet creation to internal web wallet representation */
 export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {

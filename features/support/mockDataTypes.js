@@ -1,7 +1,7 @@
 // @flow
 
 import type { AdaAddress, AdaTransaction, AdaWallet, Transaction, UTXO } from '../../app/api/ada/adaTypes';
-import type { CryptoAccount } from '../../app/api/ada/adaLocalStorage';
+import type { CryptoAccount } from '../../app/api/ada/lib/storage/adaLocalStorage';
 
 export type InitialData = {
     addressesStartingWith: string,

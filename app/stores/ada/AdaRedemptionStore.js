@@ -9,6 +9,7 @@ import {
   AdaRedemptionCertificateParseError,
   NoCertificateError
 } from '../../api/ada/errors';
+import { getReceiverAddress } from '../../api/ada/lib/storage/adaAddress';
 import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
 import { matchRoute } from '../../utils/routing';
@@ -220,7 +221,9 @@ export default class AdaRedemptionStore extends Store {
 
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
+      const receiverAddress = await getReceiverAddress();
       const transactionAmountInLovelace: BigNumber = await this.redeemAdaRequest.execute({
+        receiverAddress,
         redemptionCode: this.redemptionCode,
         getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
         sendTx: stateFetcher.sendTx,
@@ -244,9 +247,11 @@ export default class AdaRedemptionStore extends Store {
 
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
+      const receiverAddress = await getReceiverAddress();
       if (!this.passPhrase) throw new Error('should never happen');
       const transactionAmountInLovelace =
         await this.redeemPaperVendedAdaRequest.execute({
+          receiverAddress,
           redemptionCode: shieldedRedemptionKey,
           mnemonics: this.passPhrase.split(' '),
           getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,

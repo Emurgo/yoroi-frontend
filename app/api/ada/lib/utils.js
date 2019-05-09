@@ -2,7 +2,6 @@
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
-  AdaAddress,
   AdaTransactionInputOutput,
   Transaction,
   AdaTransaction,
@@ -155,21 +154,6 @@ export function sumInputsOutputs(ios: Array<AdaTransactionInputOutput>): BigNumb
  */
 export function formatBigNumberToFloatString(x: BigNumber): string {
   return x.isInteger() ? x.toFixed(1) : x.toString();
-}
-
-/**
- * Note: returns -1 if no used addresses exist
- */
-export function getLatestUsedIndex(addresses: Array<AdaAddress>): number {
-  const usedAddresses = addresses.filter(address => address.cadIsUsed);
-  if (usedAddresses.length === 0) {
-    return -1;
-  }
-
-  return Math.max(
-    ...usedAddresses
-      .map(address => address.index)
-  );
 }
 
 export type UtxoLookupMap = { [string]: { [number]: UTXO }};

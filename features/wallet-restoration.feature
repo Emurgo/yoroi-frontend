@@ -48,6 +48,7 @@ Feature: Restore Wallet
     Then I should see a plate SETH-7545
     Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
+    Given There are 2 generated addresses
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
@@ -68,6 +69,7 @@ Feature: Restore Wallet
     Then I should see a plate DADJ-4614
     Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
+    Given There are 6 generated addresses
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
