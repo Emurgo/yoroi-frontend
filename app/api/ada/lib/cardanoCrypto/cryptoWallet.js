@@ -1,8 +1,10 @@
 // @flow
+/* eslint-disable camelcase */
 
 // Utility functions for handling the private master key
 
-import { validateMnemonic, generateMnemonic } from 'bip39';
+import cryptoRandomString from 'crypto-random-string';
+import { validateMnemonic, generateMnemonic, entropyToMnemonic, wordlists } from 'bip39';
 
 import { Logger, stringifyError } from '../../../../utils/logging';
 
@@ -13,11 +15,14 @@ import * as unorm from 'unorm';
 import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 
 import { RustModule } from './rustLoader';
+import { generateAddressBatch } from '../adaAddressProcessing';
+import type { AddressType } from '../../adaTypes';
+import { createCryptoAccount } from '../../adaAccount';
 
 declare var CONFIG : ConfigType;
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
-export const generateAdaMnemonic = () => generateMnemonic(160).split(' ');
+export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic(160).split(' ');
 
 /** Check validty of mnemonic (including checksum) */
 export const isValidEnglishAdaMnemonic = (
@@ -47,7 +52,11 @@ export const isValidEnglishAdaPaperMnemonic = (
   phrase: string,
   numberOfWords: ?number = 27
 ) => {
-  const [unscrambled, unscrambledLen] = unscramblePaperAdaMnemonic(phrase, numberOfWords);
+  // Any password will return some valid unscrambled mnemonic
+  // so we just pass a fake password to pass downstream validation
+  const fakePassword = numberOfWords === 21 ? 'xxx' : undefined;
+  const [unscrambled, unscrambledLen] =
+    unscramblePaperAdaMnemonic(phrase, numberOfWords, fakePassword);
   if (unscrambled && unscrambledLen) {
     return isValidEnglishAdaMnemonic(unscrambled, unscrambledLen);
   }
@@ -57,14 +66,18 @@ export const isValidEnglishAdaPaperMnemonic = (
 /** Check validty of paper mnemonic (including checksum) */
 export const unscramblePaperAdaMnemonic = (
   phrase: string,
-  numberOfWords: ?number = 27
+  numberOfWords: ?number = 27,
+  password?: string,
 ): [?string, number] => {
   const words = phrase.split(' ');
   if (words.length === numberOfWords) {
     if (numberOfWords === 27) {
+      if (password) {
+        throw new Error('Password is not expected for a 27-word paper!');
+      }
       const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 18), words.slice(18)];
       try {
-        const password = mnemonicToSeedHex(passwordMnemonics.join(' '));
+        password = mnemonicToSeedHex(passwordMnemonics.join(' '));
         const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(
           scrambledMnemonics.join(' ')
         );
@@ -79,8 +92,32 @@ export const unscramblePaperAdaMnemonic = (
         return [undefined, 0];
       }
     }
+    if (numberOfWords === 21) {
+      if (!password) {
+        throw new Error('Password is expected for a 21-word paper!');
+      }
+      try {
+        const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(phrase);
+        const newEntropy = RustModule.Wallet.paper_wallet_unscramble(entropy.to_array(), password);
+        return [newEntropy.to_english_mnemonics(), 15];
+      } catch (e) {
+        Logger.error('Failed to unscramble paper mnemonic! ' + stringifyError(e));
+        return [undefined, 0];
+      }
+    }
   }
   return [undefined, 0];
+};
+
+/** Scramble provided mnemonic with the provided password */
+export const scramblePaperAdaMnemonic = (
+  phrase: string,
+  password: string,
+): string => {
+  const salt = new Uint8Array(Buffer.from(cryptoRandomString(2 * 8), 'hex'));
+  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(phrase);
+  const bytes = RustModule.Wallet.paper_wallet_scramble(entropy, salt, password);
+  return entropyToMnemonic(Buffer.from(bytes), wordlists.ENGLISH);
 };
 
 const mnemonicToSeedHex = (mnemonic: string, password: ?string) => {
@@ -153,3 +190,13 @@ export function getCryptoDaedalusWalletFromMasterKey(
   const wallet = RustModule.Wallet.DaedalusWallet.new(privateKey);
   return wallet;
 }
+
+export const mnemonicsToAddresses = (
+  mnemonic: string,
+  count?: number = 1,
+  type?: AddressType = 'External'
+): Array<string> => {
+  const masterKey = generateWalletMasterKey(mnemonic, '');
+  const { root_cached_key } = createCryptoAccount(masterKey, '', 0);
+  return generateAddressBatch([...Array(count).keys()], root_cached_key, type);
+};

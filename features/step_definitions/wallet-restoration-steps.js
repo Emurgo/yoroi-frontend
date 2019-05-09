@@ -13,6 +13,10 @@ When(/^I click the restore button$/, async function () {
   await this.click('.restoreWalletButton');
 });
 
+When(/^I click the restore paper wallet button$/, async function () {
+  await this.click('.restorePaperWalletButton');
+});
+
 When(/^I enter the recovery phrase:$/, async function (table) {
   const fields = table.hashes()[0];
   const recoveryPhrase = fields.recoveryPhrase.split(' ');
@@ -41,12 +45,20 @@ When(/^I clear the recovery phrase$/, async function () {
 
 When(/^I enter the restored wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input('#walletPassword--4', fields.password);
-  await this.input('#repeatPassword--5', fields.repeatedPassword);
+  await this.input("input[name='walletPassword']", fields.password);
+  await this.input("input[name='repeatPassword']", fields.repeatedPassword);
+});
+
+Then(/^I repeat the wallet password "([^"]*)"$/, async function (password) {
+  await this.input("input[name='repeatPassword']", password);
+});
+
+When(/^I enter the paper wallet password "([^"]*)"$/, async function (password) {
+  await this.input("input[name='paperPassword']", password);
 });
 
 When(/^I clear the restored wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm('#walletPassword--4', password.length);
+  await this.clearInputUpdatingForm("input[name='walletPassword']", password.length);
 });
 
 When(/^I click the "Restore Wallet" button$/, async function () {

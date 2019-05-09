@@ -123,14 +123,15 @@ export type AdaTransactionInputOutput = [
 ];
 
 export type AdaFeeEstimateResponse = {
-  fee: string,
+  fee: RustModule.Wallet.Coin,
 };
 
-export type UnsignedTxResponse = {
-  addressesMap: AdaAddressMap,
-  changeAddr: AdaAddress,
+export type UnsignedTxFromUtxoResponse = {
   senderUtxos: Array<UTXO>,
   txBuilder: RustModule.Wallet.TransactionBuilder,
+};
+export type UnsignedTxResponse = UnsignedTxFromUtxoResponse & {
+  addressesMap: AdaAddressMap,
 };
 
 export type AdaWallet = {

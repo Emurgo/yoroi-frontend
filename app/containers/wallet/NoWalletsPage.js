@@ -10,9 +10,9 @@ export default class NoWalletsPage extends Component<any> {
 
   render() {
     const { stores } = this.props;
-    const { theme } = stores;
+    const { profile } = stores;
     return (
-      <Layout classicTheme={theme.classic}>
+      <Layout classicTheme={profile.isClassicTheme}>
         <div />
       </Layout>
     );

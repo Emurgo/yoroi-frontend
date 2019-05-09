@@ -13,6 +13,9 @@ import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMnemonicPage.scss';
 import config from '../../config';
+import { THEMES } from '../../themes';
+import type { Theme } from '../../themes';
+import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
   recoveryPhraseInputLabel: {
@@ -95,7 +98,8 @@ export default class TransferMnemonicPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, onBack, step0, mnemonicLength, classicTheme } = this.props;
+    const { validWords, onBack, step0, mnemonicValidator, mnemonicLength, classicTheme } = this.props;
+    const { recoveryPhrase } = form.values();
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -112,13 +116,13 @@ export default class TransferMnemonicPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox>
 
           <div className={styles.body}>
 
             { /* Instructions for how to transfer */ }
             <div>
-              <div className={classicTheme ? styles.titleClassic : styles.title}>
+              <div className={styles.title}>
                 {intl.formatMessage(messages.instructionTitle)}
               </div>
 
@@ -136,10 +140,11 @@ export default class TransferMnemonicPage extends Component<Props> {
               options={validWords}
               maxSelections={mnemonicLength}
               {...recoveryPhraseField.bind()}
+              done={mnemonicValidator(join(recoveryPhrase, ' '))}
               error={recoveryPhraseField.error}
               maxVisibleOptions={5}
               noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={AutocompleteSkin}
+              skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>

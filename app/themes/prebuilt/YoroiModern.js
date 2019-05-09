@@ -167,6 +167,12 @@ export default {
   '--font-heavy': 'Rubik-Bold',
   '--font-black': 'Rubik-Black',
 
+  '--font-mono-thin': 'RobotoMono-Thin',
+  '--font-mono-light': 'RobotoMono-Light',
+  '--font-mono-regular': 'RobotoMono-Regular',
+  '--font-mono-medium': 'RobotoMono-Medium',
+  '--font-mono-bold': 'RobotoMono-Bold',
+
   '--theme-input-hint-font': 'Rubik-Regular',
   '--theme-footer-text-font': 'Helvetica-Regular',
 
@@ -177,6 +183,8 @@ export default {
   '--theme-bordered-box-background-color': '#f0f3f5',
   '--theme-bordered-box-border': '1px solid #f0f3f5',
   '--theme-bordered-box-text-color': '#2b2c32',
+
+  '--theme-bullet-point-color': '#adaeb5',
 
   '--theme-button-primary-background-color': '#17d1aa',
   '--theme-button-primary-background-color-hover': '#17e2b8',

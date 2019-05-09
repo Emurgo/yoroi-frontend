@@ -67,7 +67,7 @@ export default class WalletSendPage extends Component<Props> {
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
     const { intl } = this.context;
-    const { uiDialogs, theme } = this.props.stores;
+    const { uiDialogs, profile } = this.props.stores;
     const { actions } = this.props;
     const { isValidAddress } = wallets;
     const { calculateTransactionFee, validateAmount, hasAnyPending } = transactions;
@@ -88,7 +88,7 @@ export default class WalletSendPage extends Component<Props> {
         hardwareWalletConfirmationDialogRenderCallback={this.hardwareWalletDoConfirmation}
         hasAnyPending={hasAnyPending}
         isHardwareWallet={activeWallet.isHardwareWallet}
-        classicTheme={theme.classic}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }

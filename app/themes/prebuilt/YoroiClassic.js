@@ -170,6 +170,12 @@ export default {
   '--font-heavy': 'SFUIDisplay-Heavy',
   '--font-black': 'SFUIDisplay-Black',
 
+  '--font-mono-thin': 'RobotoMono-Thin',
+  '--font-mono-light': 'RobotoMono-Light',
+  '--font-mono-regular': 'RobotoMono-Regular',
+  '--font-mono-medium': 'RobotoMono-Medium',
+  '--font-mono-bold': 'RobotoMono-Bold',
+
   '--theme-input-hint-font': 'SFUIDisplay-Regular',
 
   '--theme-scrollbar-thumb-background': '#c8ccce',
@@ -177,6 +183,8 @@ export default {
   '--theme-bordered-box-background-color': '#f3f3f5',
   '--theme-bordered-box-border': '1px solid #f3f3f5',
   '--theme-bordered-box-text-color': '#121327',
+
+  '--theme-bullet-point-color': '#adaeb5',
 
   '--theme-button-primary-background-color': '#daa49a',
   '--theme-button-primary-background-color-hover': '#edb3a8',

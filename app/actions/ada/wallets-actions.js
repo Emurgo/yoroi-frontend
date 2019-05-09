@@ -16,6 +16,6 @@ export default class WalletsActions {
   restoreWallet: Action<{recoveryPhrase: string, walletName: string, walletPassword: string }> = new Action();
   importWalletFromFile: Action<WalletImportFromFileParams> = new Action();
   deleteWallet: Action<{ walletId: string }> = new Action();
-  sendMoney: Action<{ receiver: string, amount: string, password: ?string }> = new Action();
+  sendMoney: Action<{ receiver: string, amount: string, password: string }> = new Action();
   updateBalance: Action <{ amount: BigNumber }> = new Action();
 }

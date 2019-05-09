@@ -4,6 +4,7 @@
 
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
+import { coinToBigNumber } from './lib/utils';
 import {
   Logger,
   stringifyError,
@@ -15,11 +16,11 @@ import {
   GenerateTransferTxError
 } from './errors';
 import {
-  addTxInputs,
-  addOutput,
-  getAllUTXOsForAddresses,
-  utxoToTxInput
+  sendAllUnsignedTxFromUtxo,
 } from './adaTransactions/adaNewTransactions';
+import {
+  getAllUTXOsForAddresses
+} from './lib/yoroi-backend-api';
 import type {
   TransferTx
 } from '../../types/TransferTypes';
@@ -93,33 +94,24 @@ export async function buildTransferTx(payload: {
 }): Promise<TransferTx> {
   try {
     const { addressesWithFunds, senderUtxos, outputAddr } = payload;
-    const inputs = utxoToTxInput(senderUtxos);
 
-    const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
+    const totalBalance = senderUtxos
+      .map(utxo => new BigNumber(utxo.amount))
+      .reduce(
+        (acc, amount) => acc.plus(amount),
+        new BigNumber(0)
+      );
 
-    // firts build a transaction to see what the cost would be
-    const fakeTxBuilder = new RustModule.Wallet.TransactionBuilder();
-    addTxInputs(fakeTxBuilder, inputs);
-    const inputAmount = coinToBigNumber(fakeTxBuilder.get_input_total());
-    addOutput(fakeTxBuilder, outputAddr, inputAmount.toString());
-    const fee = coinToBigNumber(fakeTxBuilder.estimate_fee(feeAlgorithm));
-
-    // now build the real transaction with the fees taken into account
-    const realTxBuilder = new RustModule.Wallet.TransactionBuilder();
-    addTxInputs(realTxBuilder, inputs);
-    const sendAmount = inputAmount.minus(fee.toString());
-    addOutput(realTxBuilder, outputAddr, sendAmount.toString());
-
-    // sanity check
-    const balance = realTxBuilder.get_balance(feeAlgorithm);
-    if (balance.is_negative()) {
-      throw new GenerateTransferTxError();
-    }
-    const realFee = coinToBigNumber(realTxBuilder.get_balance_without_fees().value());
+    // first build a transaction to see what the fee will be
+    const txBuilder = await sendAllUnsignedTxFromUtxo(
+      outputAddr,
+      senderUtxos
+    ).then(resp => resp.txBuilder);
+    const fee = coinToBigNumber(txBuilder.get_balance_without_fees().value());
 
     // sign inputs
     const txFinalizer = new RustModule.Wallet.TransactionFinalized(
-      realTxBuilder.make_transaction()
+      txBuilder.make_transaction()
     );
     const setting = RustModule.Wallet.BlockchainSettings.from_json({
       protocol_magic: protocolMagic
@@ -137,8 +129,8 @@ export async function buildTransferTx(payload: {
 
     // return summary of transaction
     return {
-      recoveredBalance: inputAmount.dividedBy(LOVELACES_PER_ADA),
-      fee: realFee.dividedBy(LOVELACES_PER_ADA),
+      recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
+      fee: fee.dividedBy(LOVELACES_PER_ADA),
       signedTx,
       senders: Object.keys(addressesWithFunds),
       receiver: outputAddr,
@@ -147,10 +139,4 @@ export async function buildTransferTx(payload: {
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
     throw new GenerateTransferTxError();
   }
-}
-
-export function coinToBigNumber(coin: RustModule.Wallet.Coin): BigNumber {
-  const ada = new BigNumber(coin.ada());
-  const lovelace = ada.times(LOVELACES_PER_ADA).add(coin.lovelace());
-  return lovelace;
 }

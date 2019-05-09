@@ -30,7 +30,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
   render() {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
-    const { topbar, theme } = this.props.stores;
+    const { topbar, profile } = this.props.stores;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -38,16 +38,19 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
       <TopBar
         title={topbarTitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={theme.classic}
+        classicTheme={profile.isClassicTheme}
       />);
     return (
       <TopBarLayout
         topbar={topbarElement}
-        isBannerVisible={!theme.classic}
-        banner={<TestnetWarningBanner classicTheme={theme.classic} />}
+        isBannerVisible={profile.isModernTheme}
+        banner={
+          <TestnetWarningBanner
+            classicTheme={profile.isClassicTheme}
+          />
+        }
       >
         <TermsOfUseForm
-          classicTheme={theme.classic}
           localizedTermsOfUse={termsOfUse}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
