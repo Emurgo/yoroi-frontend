@@ -83,7 +83,7 @@ Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async functi
   await this.waitForElementNotPresent(`//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`, By.xpath);
 });
 
-Then(/^I should see an "X words left" error message:$/, async function (data) {
+Then(/^I should see an "X words left" error message:$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase', values: { number: 1 } });
   const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .SimpleFormField_error';
   console.log(errorMessage);
