@@ -23,11 +23,13 @@ Feature: Ada Redemption
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue
     And I should see the summary screen
 
+  @it-78
   Scenario: User tries to redeem manually entered "Regular" invalid redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I enter an invalid "Regular" redemption key
     Then I should see invalid redemption key message
 
+  @it-79
   Scenario: User tries to redeem manually entered "Regular" already used redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I enter an already used "Regular" redemption key

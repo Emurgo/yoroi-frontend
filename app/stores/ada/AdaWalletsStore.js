@@ -10,38 +10,36 @@ import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
-import type { ImportWalletFromFileResponse } from '../../api/ada/index';
 import type {
-  CreateTransactionResponse, CreateWalletResponse, DeleteWalletResponse,
-  GetWalletsResponse, RestoreWalletResponse,
-  GenerateWalletRecoveryPhraseResponse
-} from '../../api/common';
+  CreateTransactionFunc, CreateWalletFunc,
+  GetWalletsFunc, RestoreWalletFunc,
+  GenerateWalletRecoveryPhraseFunc
+} from '../../api/ada/index';
+import type { DeleteWalletFunc } from '../../api/common';
 
 export default class AdaWalletsStore extends WalletStore {
 
   // REQUESTS
-  @observable walletsRequest:
-    Request<GetWalletsResponse> = new Request(this.api.ada.getWallets);
+  @observable walletsRequest: Request<GetWalletsFunc>
+    = new Request<GetWalletsFunc>(this.api.ada.getWallets);
 
-  @observable importFromFileRequest:
-    Request<ImportWalletFromFileResponse> = new Request(() => {});
+  @observable importFromFileRequest: Request<{} => Promise<{}>>
+    = new Request<{} => Promise<{}>>(() => Promise.resolve({}));
 
-  @observable createWalletRequest:
-    Request<CreateWalletResponse> = new Request(this.api.ada.createWallet.bind(this.api.ada));
+  @observable createWalletRequest: Request<CreateWalletFunc>
+    = new Request<CreateWalletFunc>(this.api.ada.createWallet.bind(this.api.ada));
 
-  @observable deleteWalletRequest:
-    Request<DeleteWalletResponse> = new Request(() => {});
+  @observable deleteWalletRequestt: Request<DeleteWalletFunc>
+    = new Request<DeleteWalletFunc>(() => Promise.resolve(true));
 
-  @observable sendMoneyRequest:
-    Request<CreateTransactionResponse> = new Request(this.api.ada.createTransaction);
+  @observable sendMoneyRequest: Request<CreateTransactionFunc>
+    = new Request<CreateTransactionFunc>(this.api.ada.createTransaction);
 
-  @observable generateWalletRecoveryPhraseRequest:
-    Request<GenerateWalletRecoveryPhraseResponse> = new Request(
-      this.api.ada.generateWalletRecoveryPhrase
-    );
+  @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
+    = new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
 
-  @observable restoreRequest:
-    Request<RestoreWalletResponse> = new Request(this.api.ada.restoreWallet);
+  @observable restoreRequest: Request<RestoreWalletFunc>
+    = new Request<RestoreWalletFunc>(this.api.ada.restoreWallet);
 
   setup() {
     super.setup();
@@ -63,7 +61,7 @@ export default class AdaWalletsStore extends WalletStore {
   _sendMoney = async (transactionDetails: {
     receiver: string,
     amount: string,
-    password: ?string,
+    password: string,
   }) => {
     const wallet = this.active;
     if (!wallet) throw new Error('Active wallet required before sending.');
@@ -92,17 +90,17 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== VALIDITY CHECK ==================== //
 
-  isValidAddress = (address: string): Promise<boolean> => this.api.ada.isValidAddress(address);
+  isValidAddress = (address: string): Promise<boolean> => this.api.ada.isValidAddress({ address });
 
   isValidMnemonic = (
     mnemonic: string,
     numberOfWords: ?number
-  ): boolean => this.api.ada.isValidMnemonic(mnemonic, numberOfWords);
+  ): boolean => this.api.ada.isValidMnemonic({ mnemonic, numberOfWords });
 
   isValidPaperMnemonic = (
     mnemonic: string,
     numberOfWords: ?number
-  ): boolean => this.api.ada.isValidPaperMnemonic(mnemonic, numberOfWords);
+  ): boolean => this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords });
 
   // =================== WALLET RESTORATION ==================== //
 
@@ -158,9 +156,11 @@ export default class AdaWalletsStore extends WalletStore {
     }, this.WAIT_FOR_SERVER_ERROR_TIME);
 
     const { filePath, walletName, walletPassword } = params;
-    const importedWallet = await this.importFromFileRequest.execute({
+    this.importFromFileRequest.execute({
       filePath, walletName, walletPassword,
-    }).promise;
+    });
+    // $FlowFixMe fix if we ever implement this
+    const importedWallet = await this.importFromFileRequest.promise;
     setTimeout(() => {
       this._setIsImportActive(false);
       this.actions.dialogs.closeActiveDialog.trigger();

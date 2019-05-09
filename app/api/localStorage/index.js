@@ -1,3 +1,5 @@
+// @flow
+
 import environment from '../../environment';
 
 const networkForLocalStorage = String(environment.NETWORK);
@@ -58,7 +60,7 @@ export default class LocalStorageApi {
 
   setTermsOfUseAcceptance = (): Promise<void> => new Promise((resolve, reject) => {
     try {
-      localStorage.setItem(storageKeys.TERMS_OF_USE_ACCEPTANCE, true);
+      localStorage.setItem(storageKeys.TERMS_OF_USE_ACCEPTANCE, JSON.stringify(true));
       resolve();
     } catch (error) {
       return reject(error);
@@ -112,8 +114,10 @@ export default class LocalStorageApi {
     }
   });
 
-  setCustomUserTheme = (customThemeVars: string, currentThemeVars: Object)
-  : Promise<void> => new Promise((resolve, reject) => {
+  setCustomUserTheme = (
+    customThemeVars: string,
+    currentThemeVars: Object
+  ): Promise<void> => new Promise((resolve, reject) => {
     try {
       // Convert CSS String into Javascript Object
       const vars = customThemeVars.split(';');
@@ -185,9 +189,9 @@ export default class LocalStorageApi {
   });
 
   async reset() {
-    await this.unsetUserLocale(); // TODO: remove after saving locale to API is restored
+    await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
-    await this.unsetVerionNumber();
+    await this.unsetLastLaunchVersion();
   }
 }

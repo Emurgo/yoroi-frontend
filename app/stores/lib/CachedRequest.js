@@ -4,12 +4,14 @@ import { isEqual, remove } from 'lodash';
 import Request from './Request';
 import type { ApiCallType } from './Request';
 
-export default class CachedRequest<Result, Error> extends Request<Result, Error> {
+export default class CachedRequest<
+  Func: (...args: any) => Promise<any>, Error
+> extends Request<Func, Error> {
 
-  _apiCalls: Array<ApiCallType> = [];
+  _apiCalls: Array<ApiCallType<Func>> = [];
   _isInvalidated: boolean = true;
 
-  execute(...callArgs: Array<any>): CachedRequest<Result, Error> {
+  execute(...callArgs: Arguments<Func>): CachedRequest<Func, Error> {
     // Do not continue if this request is already loading
     if (this._isWaitingForResponse) return this;
 
@@ -75,7 +77,7 @@ export default class CachedRequest<Result, Error> extends Request<Result, Error>
    */
   invalidate(
     options: { immediately: boolean } = { immediately: false }
-  ): CachedRequest<Result, Error> {
+  ): CachedRequest<Func, Error> {
     this._isInvalidated = true;
     if (options.immediately && this._currentApiCall) {
       return this.execute(...this._currentApiCall.args);
@@ -83,22 +85,22 @@ export default class CachedRequest<Result, Error> extends Request<Result, Error>
     return this;
   }
 
-  removeCacheForCallWith(...args: Array<any>): Array<ApiCallType> {
+  removeCacheForCallWith(...args: Arguments<Func>): Array<ApiCallType<Func>> {
     return remove(this._apiCalls, c => isEqual(c.args, args));
   }
 
-  _addApiCall(args: Array<any>): ApiCallType {
+  _addApiCall(args: Arguments<Func>): ApiCallType<Func> {
     const newCall = { args, result: null };
     this._apiCalls.push(newCall);
     return newCall;
   }
 
-  _findApiCall(args: Array<any>): ?ApiCallType {
+  _findApiCall(args: Arguments<Func>): ?ApiCallType<Func> {
     return this._apiCalls.find(c => isEqual(c.args, args));
   }
 
   /** Reset request properties including cache */
-  reset(): CachedRequest<Result, Error> {
+  reset(): CachedRequest<Func, Error> {
     super.reset();
     this._isInvalidated = true;
     return this;

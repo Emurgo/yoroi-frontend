@@ -16,13 +16,15 @@ import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
 import { transactionTypes } from '../../domain/WalletTransaction';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
-import type { TransactionFeeResponse } from '../../api/ada/index';
+import type {
+  TransactionFeeResponse,
+  GetTransactionRowsToExportFunc,
+  GetTransactionRowsToExportRequest,
+} from '../../api/ada';
 
 import type {
-  GetTransactionRowsToExportRequest,
-  GetTransactionRowsToExportResponse,
   ExportTransactionsRequest,
-  ExportTransactionsResponse,
+  ExportTransactionsFunc,
 } from '../../api/common';
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
@@ -36,11 +38,11 @@ export default class AdaTransactionsStore extends TransactionsStore {
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
   }
 
-  getTransactionRowsToExportRequest: LocalizedRequest<GetTransactionRowsToExportResponse>
-    = new LocalizedRequest(this.api.ada.getTransactionRowsToExport);
+  getTransactionRowsToExportRequest: LocalizedRequest<GetTransactionRowsToExportFunc>
+    = new LocalizedRequest<GetTransactionRowsToExportFunc>(this.api.ada.getTransactionRowsToExport);
 
-  exportTransactions: LocalizedRequest<ExportTransactionsResponse>
-    = new LocalizedRequest(this.api.export.exportTransactions);
+  exportTransactions: LocalizedRequest<ExportTransactionsFunc>
+    = new LocalizedRequest<ExportTransactionsFunc>(this.api.export.exportTransactions);
 
   @observable isExporting: boolean = false;
 
@@ -113,8 +115,10 @@ export default class AdaTransactionsStore extends TransactionsStore {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const respTxRows: GetTransactionRowsToExportResponse =
-        await this.getTransactionRowsToExportRequest.execute(params).promise;
+      this.getTransactionRowsToExportRequest.execute(params);
+      if (!this.getTransactionRowsToExportRequest.promise) throw new Error('should never happen');
+
+      const respTxRows = await this.getTransactionRowsToExportRequest.promise;
 
       if (respTxRows == null || respTxRows.length < 1) {
         throw new LocalizableError(globalMessages.noTransactionsFound);

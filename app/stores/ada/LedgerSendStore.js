@@ -16,9 +16,9 @@ import LocalizableError from '../../i18n/LocalizableError';
 
 import type {
   CreateLedgerSignTxDataRequest,
-  CreateLedgerSignTxDataResponse,
+  CreateLedgerSignTxDataFunc,
+  PrepareAndBroadcastLedgerSignedTxFunc,
 } from '../../api/ada';
-import type { PrepareAndBroadcastLedgerSignedTxResponse } from '../../api/common';
 
 import {
   convertToLocalizableError
@@ -46,11 +46,13 @@ export default class LedgerSendStore extends Store {
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  createLedgerSignTxDataRequest: LocalizedRequest<CreateLedgerSignTxDataResponse> =
-    new LocalizedRequest(this.api.ada.createLedgerSignTxData);
+  createLedgerSignTxDataRequest: LocalizedRequest<CreateLedgerSignTxDataFunc>
+    = new LocalizedRequest<CreateLedgerSignTxDataFunc>(this.api.ada.createLedgerSignTxData);
 
-  broadcastLedgerSignedTxRequest: LocalizedRequest<PrepareAndBroadcastLedgerSignedTxResponse> =
-    new LocalizedRequest(this.api.ada.prepareAndBroadcastLedgerSignedTx);
+  broadcastLedgerSignedTxRequest: LocalizedRequest<PrepareAndBroadcastLedgerSignedTxFunc>
+    = new LocalizedRequest<PrepareAndBroadcastLedgerSignedTxFunc>(
+      this.api.ada.prepareAndBroadcastLedgerSignedTx
+    );
   // =================== API RELATED =================== //
 
   setup() {
@@ -115,8 +117,9 @@ export default class LedgerSendStore extends Store {
         // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
         const ledgerBridge: LedgerBridge = this.ledgerBridge;
 
-        const ledgerSignTxDataResp: CreateLedgerSignTxDataResponse =
-          await this.createLedgerSignTxDataRequest.execute(params).promise;
+        this.createLedgerSignTxDataRequest.execute(params);
+        if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
+        const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
 
         await prepareLedgerBridger(ledgerBridge);
 

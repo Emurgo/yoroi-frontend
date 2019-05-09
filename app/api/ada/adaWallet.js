@@ -30,10 +30,6 @@ import type {
   AdaWalletMetaParams,
   AdaHardwareWalletParams,
 } from './adaTypes';
-import type {
-  ChangeAdaWalletSpendingPasswordParams,
-  AdaWalletRecoveryPhraseResponse,
-} from './index';
 import {
   getUTXOsSumsForAddresses
 } from './lib/yoroi-backend-api';
@@ -160,7 +156,7 @@ export function createAdaHardwareWallet({
 }
 
 /** Wrapper function to create new mnemonic according to bip39 */
-export const generateAdaAccountRecoveryPhrase = (): AdaWalletRecoveryPhraseResponse => (
+export const generateAdaAccountRecoveryPhrase: void => Array<string> = () => (
   generateAdaMnemonic()
 );
 
@@ -214,7 +210,10 @@ export async function getBalance(
 
 /** Update spending password and password last update time */
 export const changeAdaWalletSpendingPassword = (
-  { oldPassword, newPassword }: ChangeAdaWalletSpendingPasswordParams
+  { oldPassword, newPassword }: {
+    oldPassword: string,
+    newPassword: string,
+  }
 ): Promise<AdaWallet> => {
   // update spending password
   {
