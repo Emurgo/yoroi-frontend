@@ -111,7 +111,7 @@ import type {
   TxBodiesFunc,
   UtxoSumFunc,
 } from './lib/state-fetch/types';
-import { batchUTXOsForAddresses } from './lib/state-fetch/helpers';
+import { batchUTXOsForAddresses, batchTxsBodiesForInputs } from './lib/state-fetch/helpers';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
 import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
 import {
@@ -750,7 +750,7 @@ export default class AdaApi {
         changeAdaAddr,
         unsignedTxResponse.senderUtxos,
         unsignedTx,
-        request.getTxsBodiesForUTXOs
+        batchTxsBodiesForInputs(request.getTxsBodiesForUTXOs)
       );
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
 
@@ -815,7 +815,7 @@ export default class AdaApi {
         changeAdaAddr,
         unsignedTxResponse.senderUtxos,
         unsignedTx,
-        request.getTxsBodiesForUTXOs,
+        batchTxsBodiesForInputs(request.getTxsBodiesForUTXOs),
       );
 
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
