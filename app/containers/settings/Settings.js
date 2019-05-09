@@ -64,7 +64,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         )}
         classicTheme={profile.isClassicTheme}
       >
-        <SettingsLayout menu={menu} currentTheme={profile.currentTheme}>
+        <SettingsLayout menu={menu}>
           {children}
         </SettingsLayout>
       </Layout>
