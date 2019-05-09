@@ -120,7 +120,6 @@ Feature: Restore Wallet
     | wallet.restore.dialog.form.errors.invalidRecoveryPhrase |
     Examples:
     | recoveryPhrase                                                                                           |                    |
-    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow         | 14-words phrase    |
     | atom remind style monster lunch result upgrade fashion eight limit glance frequent eternal borrow accuse | invalid word order |
 
     @it-71
@@ -134,3 +133,18 @@ Feature: Restore Wallet
     Examples:
     | recoveryPhrase                                                                                                  |                    |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster galaxy | 16-words phrase    |
+
+
+    @it-72
+    Scenario Outline: Wallet restoration Recovery Phrase with less than 15 words (IT-71)
+    And I click the restore button
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase   |
+    | <recoveryPhrase> |
+    Then I should see an "X words left" error message:
+    | message                                                 |
+    | wallet.restore.dialog.form.errors.shortRecoveryPhrase |
+    Examples:
+    | recoveryPhrase                                                                                           |                    |
+    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow         | 14-words phrase    |
