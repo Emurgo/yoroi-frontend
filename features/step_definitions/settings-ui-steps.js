@@ -4,7 +4,7 @@ import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
 import { By, Key } from 'selenium-webdriver';
 
-const walletNameInputSelector = '.SettingsLayout_settingsPaneClassic .walletName input';
+const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
 Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dialogType) {
   const selector = '.' + dialogType + 'PasswordDialog';
@@ -12,7 +12,7 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dia
 });
 
 When(/^I click on "name" input field$/, async function () {
-  await this.click('.SettingsLayout_settingsPaneClassic .InlineEditingInput_componentClassic');
+  await this.click('.SettingsLayout_settingsPane .InlineEditingInput_componentClassic');
 });
 
 When(/^I enter new wallet name:$/, async function (table) {
@@ -37,7 +37,7 @@ Then(/^I should see the "Terms of use" screen$/, async function () {
 });
 
 When(/^I click outside "name" input field$/, async function () {
-  await this.click('.SettingsLayout_settingsPaneClassic');
+  await this.click('.SettingsLayout_settingsPane');
 });
 
 When(/^I click on the "([^"]*)" password label$/, async function (label) {

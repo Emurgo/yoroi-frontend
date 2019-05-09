@@ -8,11 +8,10 @@ import type { InjectedProps } from '../../../types/injectedPropsType';
 export default class TermsOfUseSettingsPage extends Component<InjectedProps> {
 
   render() {
-    const { termsOfUse, currentTheme } = this.props.stores.profile;
+    const { termsOfUse } = this.props.stores.profile;
     return (
       <TermsOfUseSettings
         localizedTermsOfUse={termsOfUse}
-        currentTheme={currentTheme}
       />
     );
   }

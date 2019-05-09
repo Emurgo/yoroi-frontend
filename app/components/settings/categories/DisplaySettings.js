@@ -98,9 +98,7 @@ export default class DisplaySettings extends Component<Props> {
     );
 
     return (
-      <div className={currentTheme === THEMES.YOROI_CLASSIC
-        ? styles.componentClassic : styles.component}
-      >
+      <div className={styles.component}>
 
         <div className={styles.label}>
           {intl.formatMessage(messages.themeLabel)}
