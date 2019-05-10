@@ -10,9 +10,12 @@ import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import type {
-  CreateWalletResponse, DeleteWalletResponse,
-  GetWalletsResponse, RestoreWalletResponse,
-  GenerateWalletRecoveryPhraseResponse,
+  CreateWalletFunc,
+  GetWalletsFunc, RestoreWalletFunc,
+  GenerateWalletRecoveryPhraseFunc,
+} from '../../api/ada';
+import type {
+  DeleteWalletFunc
 } from '../../api/common';
 
 /**
@@ -27,21 +30,21 @@ export default class WalletsStore extends Store {
   MIN_NOTIFICATION_TIME = 500;
 
   @observable active: ?Wallet = null;
-  @observable walletsRequest: Request<GetWalletsResponse>;
-  @observable createWalletRequest: Request<CreateWalletResponse>;
-  @observable deleteWalletRequest: Request<DeleteWalletResponse>;
-  @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseResponse>;
-  @observable restoreRequest: Request<RestoreWalletResponse>;
+  @observable walletsRequest: Request<GetWalletsFunc>;
+  @observable createWalletRequest: Request<CreateWalletFunc>;
+  @observable deleteWalletRequest: Request<DeleteWalletFunc>;
+  @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>;
+  @observable restoreRequest: Request<RestoreWalletFunc>;
   @observable isImportActive: boolean = false;
 
   /** While restoration is taking place, we need to block users from starting a restoration
    *  on a seperate wallet and explain to them why the action is blocked */
   @observable isRestoreActive: boolean = false;
 
-  _newWalletDetails: { name: string, mnemonic: string, password: ?string } = {
+  _newWalletDetails: { name: string, mnemonic: string, password: string } = {
     name: '',
     mnemonic: '',
-    password: null,
+    password: '',
   };
 
   setup() {
@@ -60,8 +63,8 @@ export default class WalletsStore extends Store {
   }) => {
     Object.assign(this._newWalletDetails, params);
     try {
-      const recoveryPhrase: ?GenerateWalletRecoveryPhraseResponse = await (
-        this.generateWalletRecoveryPhraseRequest.execute().promise
+      const recoveryPhrase = await (
+        this.generateWalletRecoveryPhraseRequest.execute({}).promise
       );
       if (recoveryPhrase != null) {
         this.actions.walletBackup.initiateWalletBackup.trigger({ recoveryPhrase });
@@ -76,7 +79,8 @@ export default class WalletsStore extends Store {
     this._newWalletDetails.mnemonic = this.stores.walletBackup.recoveryPhrase.join(' ');
     const wallet = await this.createWalletRequest.execute(this._newWalletDetails).promise;
     if (wallet) {
-      await this.walletsRequest.patch(result => { result.push(wallet); });
+      // TODO: add this back once we support multiple wallets
+      // await this.walletsRequest.patch(result => { result.push(wallet); });
       this.actions.dialogs.closeActiveDialog.trigger();
       this.goToWalletRoute(wallet.id);
     } else {
@@ -90,9 +94,10 @@ export default class WalletsStore extends Store {
     if (!walletToDelete) return;
     const indexOfWalletToDelete = this.all.indexOf(walletToDelete);
     await this.deleteWalletRequest.execute({ walletId: params.walletId });
-    await this.walletsRequest.patch(result => {
-      result.splice(indexOfWalletToDelete, 1);
-    });
+    // TODO: add back once we support multiple wallets
+    // await this.walletsRequest.patch(result => {
+    //   result.splice(indexOfWalletToDelete, 1);
+    // });
     runInAction('WalletsStore::_delete', () => {
       if (this.hasAnyWallets) {
         const nextIndexInList = Math.max(indexOfWalletToDelete - 1, 0);
@@ -187,7 +192,7 @@ export default class WalletsStore extends Store {
 
   /** Make all API calls required to setup/update wallet */
   @action refreshWalletsData = async () => {
-    const result = await this.walletsRequest.execute().promise;
+    const result = await this.walletsRequest.execute({}).promise;
     if (!result) return;
     runInAction('refresh active wallet', () => {
       if (this.active) {

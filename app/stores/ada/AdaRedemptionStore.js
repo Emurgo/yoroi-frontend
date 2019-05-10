@@ -12,11 +12,15 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
 import { matchRoute } from '../../utils/routing';
-import type { RedeemAdaParams, RedeemPaperVendedAdaParams } from '../../api/ada/adaRedemption';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import environment from '../../environment';
 import BigNumber from 'bignumber.js';
 import Request from '../lib/LocalizedRequest';
+
+import type {
+  RedeemAdaFunc,
+  RedeemPaperVendedAdaFunc,
+} from '../../api/ada';
 
 export default class AdaRedemptionStore extends Store {
 
@@ -33,9 +37,13 @@ export default class AdaRedemptionStore extends Store {
   @observable isRedemptionDisclaimerAccepted = false;
   @observable walletId: ?string = null;
   @observable shieldedRedemptionKey: ?string = null;
-  @observable redeemAdaRequest: Request<RedeemAdaParams> = new Request(this.api.ada.redeemAda);
+  @observable redeemAdaRequest: Request<RedeemAdaFunc>
+    = new Request<RedeemAdaFunc>(this.api.ada.redeemAda);
+
   // eslint-disable-next-line
-  @observable redeemPaperVendedAdaRequest: Request<RedeemPaperVendedAdaParams> = new Request(this.api.ada.redeemPaperVendedAda);
+  @observable redeemPaperVendedAdaRequest: Request<RedeemPaperVendedAdaFunc>
+    = new Request<RedeemPaperVendedAdaFunc>(this.api.ada.redeemPaperVendedAda);
+
   @observable amountRedeemed: number = 0;
   @observable showAdaRedemptionSuccessMessage: boolean = false;
 
@@ -60,16 +68,16 @@ export default class AdaRedemptionStore extends Store {
     ]);
   }
 
-  isValidRedemptionKey = (redemptionKey: string) => (
-    this.api.ada.isValidRedemptionKey(redemptionKey)
+  isValidRedemptionKey = (redemptionKey: string): Promise<boolean> => (
+    this.api.ada.isValidRedemptionKey({ mnemonic: redemptionKey })
   );
 
-  isValidRedemptionMnemonic = (mnemonic: string) => (
-    this.api.ada.isValidRedemptionMnemonic(mnemonic)
+  isValidRedemptionMnemonic = (mnemonic: string): Promise<boolean> => (
+    this.api.ada.isValidRedemptionMnemonic({ mnemonic })
   );
 
-  isValidPaperVendRedemptionKey = (mnemonic: string) => (
-    this.api.ada.isValidPaperVendRedemptionKey(mnemonic)
+  isValidPaperVendRedemptionKey = (mnemonic: string): Promise<boolean> => (
+    this.api.ada.isValidPaperVendRedemptionKey({ mnemonic })
   );
 
   @computed get isAdaRedemptionPage(): boolean {
@@ -165,7 +173,11 @@ export default class AdaRedemptionStore extends Store {
     ) {
       decryptionKey = this.decryptionKey;
     }
-    this.api.ada.getPDFSecretKey(this.certificate, decryptionKey, this.redemptionType)
+    this.api.ada.getPDFSecretKey({
+      file: this.certificate,
+      decryptionKey,
+      redemptionType: this.redemptionType
+    })
       .then(code => this._onCodeParsed(code))
       .catch(error => this._onParseError(error));
   }
@@ -215,10 +227,11 @@ export default class AdaRedemptionStore extends Store {
     runInAction(() => { this.walletId = walletId; });
 
     try {
-      const transactionAmountInLovelace: BigNumber =
+      if (!this.passPhrase) throw new Error('should never happen');
+      const transactionAmountInLovelace =
         await this.redeemPaperVendedAdaRequest.execute({
           redemptionCode: shieldedRedemptionKey,
-          mnemonics: this.passPhrase && this.passPhrase.split(' ')
+          mnemonics: this.passPhrase.split(' ')
         });
       this._reset();
       const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);

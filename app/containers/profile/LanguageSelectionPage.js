@@ -29,7 +29,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   render() {
     const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const { topbar, theme } = this.props.stores;
+    const { topbar, profile } = this.props.stores;
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -37,17 +37,16 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={theme.classic}
+        classicTheme={profile.isClassicTheme}
       />);
     return (
       <TopBarLayout
         topbar={topBar}
-        classicTheme={theme.classic}
-        noTopbarNoBanner={!theme.classic}
+        classicTheme={profile.isClassicTheme}
+        noTopbarNoBanner={profile.isModernTheme}
         languageSelectionBackground
       >
         <LanguageSelectionForm
-          classicTheme={theme.classic}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
           languages={LANGUAGE_OPTIONS}

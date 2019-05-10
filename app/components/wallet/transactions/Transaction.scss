@@ -94,7 +94,7 @@
   width: 146px;
   font-size: 18px;
   font-family: var(--font-medium);
-  text-align: left;
+  text-align: center;
   margin-right: 25px;
 }
 
@@ -298,6 +298,8 @@
     &.address {
       display: block;
       line-height: 19px;
+      font-family: var(--font-mono-light);
+      letter-spacing: 0;
     }
   }
 }
@@ -324,6 +326,8 @@
     &.address {
       display: block;
       line-height: 19px;
+      font-family: var(--font-mono-regular);
+      letter-spacing: 0;
     }
   }
 }

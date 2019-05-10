@@ -27,7 +27,7 @@ import {
 import type {
   BroadcastTrezorSignedTxResponse,
   PrepareAndBroadcastLedgerSignedTxResponse
-} from '../../common';
+} from '..';
 import type {
   TrezorInput,
   TrezorOutput,
@@ -54,7 +54,7 @@ declare var CONFIG: ConfigType;
 /** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
   addressesMap: AdaAddressMap,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
 ): Promise<TrezorSignTxPayload> {
@@ -163,7 +163,7 @@ function _transformToTrezorInputs(
 
 function _generateTrezorOutputs(
   txOutputs: Array<TxOutType>,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
 ): Array<TrezorOutput> {
   return txOutputs.map(txOutput => ({
     amount: txOutput.value.toString(),
@@ -173,9 +173,9 @@ function _generateTrezorOutputs(
 
 function _outputAddressOrPath(
   txOutput: TxOutType,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
 ): { path: string } | { address: string } {
-  if (txOutput.address === changeAddr.cadId) {
+  if (changeAddr && txOutput.address === changeAddr.cadId) {
     return { path: derivePathAsString(changeAddr.account, changeAddr.change, changeAddr.index) };
   }
 
@@ -186,7 +186,7 @@ function _outputAddressOrPath(
 /** Generate a payload for Ledger SignTx */
 export async function createLedgerSignTxPayload(
   addressesMap: AdaAddressMap,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
 ): Promise<LedgerSignTxPayload> {
@@ -236,7 +236,7 @@ function _transformToLedgerInputs(
 
 function _transformToLedgerOutputs(
   txOutputs: Array<TxOutType>,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
 ): Array<OutputTypeAddress | OutputTypeChange> {
   return txOutputs.map(txOutput => ({
     amountStr: txOutput.value.toString(),
@@ -246,9 +246,9 @@ function _transformToLedgerOutputs(
 
 function _ledgerOutputAddress58OrPath(
   txOutput: TxOutType,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
 ): { address58: string } | { path: BIP32Path }  {
-  if (txOutput.address === changeAddr.cadId) {
+  if (changeAddr && txOutput.address === changeAddr.cadId) {
     return { path: makeCardanoBIP44Path(changeAddr.account, changeAddr.change, changeAddr.index) };
   }
 

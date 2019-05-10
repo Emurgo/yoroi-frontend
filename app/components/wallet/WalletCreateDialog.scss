@@ -2,26 +2,6 @@
 @import '../../themes/mixins/place-form-field-error-below-input';
 
 .walletPasswordClassic {
-  .walletPasswordSwitch {
-    border-top: 1px solid var(--theme-separation-border-color);
-    margin-top: 30px;
-    padding-top: 20px;
-
-    & > .passwordLabel {
-      color: var(--theme-wallet-password-switch-label-color);
-      font-family: var(--font-semibold);
-      font-size: 16px;
-      line-height: 1.38;
-      margin-bottom: 10px;
-    }
-
-    :global {
-      .SimpleSwitch_root {
-        margin-bottom: 0;
-      }
-    }
-  }
-
   .walletPasswordFields {
     display: flex;
     flex-wrap: wrap;
@@ -43,14 +23,6 @@
     }
 
     @include place-form-field-error-below-input;
-
-    .passwordInstructions {
-      color: var(--theme-instructions-text-color);
-      font-family: var(--font-light);
-      line-height: 1.38;
-      margin-top: 16px;
-      opacity: 0.5;
-    }
   }
 }
 
@@ -71,41 +43,6 @@
 
     & > div {
       width: 100%;
-    }
-
-    .passwordInstructions {
-      color: var(--theme-instructions-text-color);
-      font-family: var(--font-regular);
-      line-height: 1.71;
-      margin-top: 14px;
-      font-size: 14px;
-      letter-spacing: 0;
-
-      ul {
-        display: flex;
-        flex-wrap: wrap;
-      }
-
-      li {
-        list-style-type: disc;
-        margin-left: 18px;
-        width: calc(50% - 18px);
-      }
-
-      .successCondition {
-        position: relative;
-        color: var(--theme-password-condition-text-color);
-        list-style-type: none;
-
-        span:first-child {
-          position: absolute;
-          left: -18px;
-        }
-
-        svg {
-          width: 11px;
-        }
-      }
     }
   }
 }

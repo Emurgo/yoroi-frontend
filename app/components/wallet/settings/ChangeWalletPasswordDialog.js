@@ -14,6 +14,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import PasswordInstructions from '../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitleSetPassword: {
@@ -166,10 +167,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       classicTheme ? styles.newPasswordClassic : '',
     ]);
 
-    const passwordInstructionsClasses = classicTheme
-      ? styles.passwordInstructionsClassic
-      : styles.passwordInstructions;
-
     const currentPasswordField = form.$('currentPassword');
     const newPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
@@ -238,9 +235,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             skin={classicTheme ? InputSkin : InputOwnSkin}
           />
 
-          <p className={passwordInstructionsClasses}>
-            {intl.formatMessage(globalMessages.passwordInstructions)}
-          </p>
+          <PasswordInstructions isClassicThemeActive={classicTheme} />
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

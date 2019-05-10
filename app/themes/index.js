@@ -5,4 +5,4 @@ export const THEMES = Object.freeze({
   YOROI_MODERN: 'YoroiModern'
 });
 
-export type Themes = $Values<typeof THEMES>;
+export type Theme = $Values<typeof THEMES>;

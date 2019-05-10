@@ -13,6 +13,7 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import config from '../../config';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
+import PasswordInstructions from '../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -163,9 +164,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
       styles.walletPasswordFields,
       styles.show,
     ]);
-    const passwordInstructionsClasses = classicTheme
-      ? styles.passwordInstructionsClassic
-      : styles.passwordInstructions;
 
     const disabledCondition = !(
       isValidWalletName(walletName)
@@ -224,9 +222,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
               skin={classicTheme ? InputSkin : InputOwnSkin}
             />
 
-            <p className={passwordInstructionsClasses}>
-              {intl.formatMessage(globalMessages.passwordInstructions)}
-            </p>
+            <PasswordInstructions isClassicThemeActive={classicTheme} />
           </div>
         </div>
 

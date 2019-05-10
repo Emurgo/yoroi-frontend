@@ -34,8 +34,8 @@ import {
 
 import type {
   CreateHardwareWalletRequest,
-  CreateHardwareWalletResponse,
-} from '../../api/common';
+  CreateHardwareWalletFunc,
+} from '../../api/ada';
 
 /** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
   * try to make a common base class */
@@ -72,8 +72,8 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  createHWRequest: LocalizedRequest<CreateHardwareWalletResponse> =
-    new LocalizedRequest(this.api.ada.createHardwareWallet);
+  createHWRequest: LocalizedRequest<CreateHardwareWalletFunc>
+    = new LocalizedRequest<CreateHardwareWalletFunc>(this.api.ada.createHardwareWallet);
 
   /** While trezor wallet creation is taking place, we need to block users from starting a
     * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
@@ -339,8 +339,10 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
       this.createHWRequest.reset();
 
       const reqParams = this._prepareCreateHWReqParams(walletName);
-      const trezorWallet: Wallet =
-        await this.createHWRequest.execute(reqParams).promise;
+      this.createHWRequest.execute(reqParams);
+      if (!this.createHWRequest.promise) throw new Error('should never happen');
+
+      const trezorWallet = await this.createHWRequest.promise;
 
       await this._onSaveSucess(trezorWallet);
     } catch (error) {

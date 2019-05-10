@@ -14,7 +14,7 @@ When(/^I click on "I agree with terms of use" checkbox$/, async function () {
 });
 
 When(/^I submit the "Terms of use" form$/, async function () {
-  await this.click('.TermsOfUseForm_submitButtonClassic');
+  await this.click('.TermsOfUseForm_submitButton');
 });
 
 Then(/^I should not see the "Terms of use" screen anymore$/, async function () {

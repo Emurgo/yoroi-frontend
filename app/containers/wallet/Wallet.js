@@ -34,11 +34,15 @@ export default class Wallet extends Component<Props> {
   render() {
     const { wallets, adaRedemption } = this.props.stores.substores.ada;
     const { actions, stores, } = this.props;
-    const { theme } = stores;
+    const { profile } = stores;
     const { showAdaRedemptionSuccessMessage, amountRedeemed } = adaRedemption;
     if (!wallets.active) {
       return (
-        <MainLayout actions={actions} stores={stores} classicTheme={theme.classic}>
+        <MainLayout
+          actions={actions}
+          stores={stores}
+          classicTheme={profile.isClassicTheme}
+        >
           <LoadingSpinner />
         </MainLayout>
       );
@@ -48,12 +52,12 @@ export default class Wallet extends Component<Props> {
       <MainLayout
         actions={actions}
         stores={stores}
-        classicTheme={theme.classic}
+        classicTheme={profile.isClassicTheme}
       >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
-          classicTheme={theme.classic}
+          classicTheme={profile.isClassicTheme}
         >
           {this.props.children}
         </WalletWithNavigation>
@@ -62,7 +66,7 @@ export default class Wallet extends Component<Props> {
           <AdaRedemptionSuccessOverlay
             amount={amountRedeemed}
             onClose={actions.ada.adaRedemption.closeAdaRedemptionSuccessOverlay.trigger}
-            classicTheme={theme.classic}
+            classicTheme={profile.isClassicTheme}
           />
         ) : null}
       </MainLayout>

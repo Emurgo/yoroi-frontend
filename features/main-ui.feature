@@ -4,6 +4,7 @@ Feature: Main UI
     Given I have opened the extension
     And I have completed the basic setup
 
+  @it-81
   Scenario: Get balance with 45 addresses
     Given I am testing "Main UI"
     And There is a wallet stored named complex-wallet
