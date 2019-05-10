@@ -84,7 +84,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
       case ProgressStep.FINALIZE:
         return (
           <FinalizeDialog
-            addresses={paperStore.paper ? paperStore.paper.addresses : []}
+            paper={paperStore.paper}
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
