@@ -31,8 +31,8 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
 
     if (paperStore.progressInfo === ProgressStep.INIT) {
       paperActions.submitInit.trigger({
-        isCustomPassword: dialogData.isCustomPassword,
         numAddresses: dialogData.numAddresses,
+        printAccountPlate: dialogData.printAccountPlate,
       });
     }
 

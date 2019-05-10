@@ -251,7 +251,7 @@ export default class AdaApi {
       numAddresses
     }: {
       password: string,
-      numAddresses?: number
+      numAddresses?: number,
     } = {}
   ): AdaPaper {
     const { words, scrambledWords } = generatePaperWalletSecret(password);
@@ -266,11 +266,13 @@ export default class AdaApi {
     {
       paper,
       network,
-      updateStatus
+      printAccountPlate,
+      updateStatus,
     }: {
       paper: AdaPaper,
       network: Network,
-      updateStatus?: (PdfGenStepType => ?any)
+      printAccountPlate: ?boolean,
+      updateStatus?: (PdfGenStepType => ?any),
     }
   ): Promise<?Blob> {
     const { addresses, scrambledWords, accountPlate } = paper;
@@ -278,7 +280,7 @@ export default class AdaApi {
     const res : Promise<?Blob> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
-      accountPlate,
+      accountPlate: printAccountPlate ? accountPlate : undefined,
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);

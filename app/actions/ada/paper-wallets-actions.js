@@ -5,7 +5,11 @@ import type { PdfGenStepType } from '../../api/ada/paperWallet/paperWalletPdf';
 // ======= PAPER WALLET ACTIONS =======
 
 export default class PaperWalletsActions {
-  submitInit: Action<{ isCustomPassword: boolean, numAddresses: number }> = new Action();
+  submitInit: Action<{
+    isCustomPassword: boolean,
+    numAddresses: number,
+    printAccountPlate: boolean,
+  }> = new Action();
   submitUserPassword: Action<{ userPassword: string }> = new Action();
   submitCreate: Action<{}> = new Action();
   backToCreate: Action<{}> = new Action();

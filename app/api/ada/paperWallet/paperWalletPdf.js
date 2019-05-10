@@ -13,7 +13,7 @@ import { createIcon as blockiesIcon } from '@download/blockies';
 export type PaperRequest = {
   words: Array<string>,
   addresses: Array<string>,
-  accountPlate: WalletAccountNumberPlate,
+  accountPlate: ?WalletAccountNumberPlate,
   network: Network,
 }
 
@@ -58,9 +58,11 @@ export const generateAdaPaperPdf = async (
       printTestnetLabel(doc, network, 178, 20, 15);
     }
 
-    // print account plate ID bottom-left corner of main front section
-    doc.setFontSize(12);
-    doc.text(40, 175, accountPlate.id);
+    if (accountPlate) {
+      // print account plate ID bottom-left corner of main front section
+      doc.setFontSize(12);
+      doc.text(40, 175, accountPlate.id);
+    }
 
     updateStatus(PdfGenSteps.frontpage);
 
@@ -85,28 +87,31 @@ export const generateAdaPaperPdf = async (
       printTestnetLabel(doc, network, 75, 180);
     }
 
-    // Generate account plate icon
-    const icon = blockiesIcon({
-      seed: accountPlate.hash,
-      size: 7,
-      scale: 5,
-      bgcolor: '#fff',
-      color: '#aaa',
-      spotcolor: '#000'
-    });
+    if (accountPlate) {
 
-    // Draw account plate icon upside-down middle of the backside
-    addImageBase64(doc, icon.toDataURL('image/png'), {
-      x: (pageWidthPx + 24) / 2,
-      y: 115,
-      w: 24,
-      h: 24,
-      r: 180,
-    });
+      // Generate account plate icon
+      const icon = blockiesIcon({
+        seed: accountPlate.hash,
+        size: 7,
+        scale: 5,
+        bgcolor: '#fff',
+        color: '#aaa',
+        spotcolor: '#000'
+      });
 
-    // Print account plate ID under the plate icon on backside
-    doc.setFontSize(12);
-    textCenter(doc, 130, accountPlate.id, null, 180, true);
+      // Draw account plate icon upside-down middle of the backside
+      addImageBase64(doc, icon.toDataURL('image/png'), {
+        x: (pageWidthPx + 24) / 2,
+        y: 115,
+        w: 24,
+        h: 24,
+        r: 180,
+      });
+
+      // Print account plate ID under the plate icon on backside
+      doc.setFontSize(12);
+      textCenter(doc, 130, accountPlate.id, null, 180, true);
+    }
 
     const page2Uri = paperWalletPage2PassPath;
     await addImage(doc, page2Uri, pageSize);

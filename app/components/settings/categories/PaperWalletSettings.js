@@ -2,8 +2,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
+import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { Button } from 'react-polymorph/lib/components/Button';
+import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
@@ -17,6 +19,10 @@ const messages = defineMessages({
   numAddressesSelectLabel: {
     id: 'settings.paperWallet.numAddressesSelect.label',
     defaultMessage: '!!!Number of addresses',
+  },
+  printIdentificationSelectLabel: {
+    id: 'settings.paperWallet.printIdentificationCheckbox.label',
+    defaultMessage: '!!!Print Paper Wallet account identification',
   },
   createPaperLabel: {
     id: 'settings.paperWallet.createPaper.label',
@@ -43,8 +49,11 @@ export default class PaperWalletSettings extends Component<Props> {
   };
 
   createPaper = () => {
-    const { numAddresses } = this.form.values();
-    this.props.onCreatePaper({ numAddresses: parseInt(numAddresses, 10) });
+    const { numAddresses, printPaperWalletIdentification } = this.form.values();
+    this.props.onCreatePaper({
+      numAddresses: parseInt(numAddresses, 10),
+      printAccountPlate: printPaperWalletIdentification,
+    });
   };
 
   form = new ReactToolboxMobxForm({
@@ -53,6 +62,10 @@ export default class PaperWalletSettings extends Component<Props> {
         label: this.context.intl.formatMessage(messages.numAddressesSelectLabel),
         value: '1',
       },
+      printPaperWalletIdentification: {
+        label: this.context.intl.formatMessage(messages.printIdentificationSelectLabel),
+        value: true,
+      },
     }
   }, {
     options: {
@@ -60,9 +73,14 @@ export default class PaperWalletSettings extends Component<Props> {
     },
   });
 
+  setPrintPaperIdentification = (printPaperWalletIdentification) => {
+    this.form.$('printPaperWalletIdentification').value = printPaperWalletIdentification;
+  };
+
   render() {
     const { error, isDialogOpen, dialog, paperWalletsIntroText } = this.props;
     const numAddresses = this.form.$('numAddresses');
+    const printPaperWalletIdentification = this.form.$('printPaperWalletIdentification');
     const numAddressOptions = [...Array(5).keys()].map(x => ({ value: `${x + 1}`, label: `${x + 1}` }));
     const componentClassNames = classNames([styles.component, 'general']);
     const numAddressesSelectClassNames = classNames([styles.numAddressesSelect]);
@@ -84,6 +102,13 @@ export default class PaperWalletSettings extends Component<Props> {
           {...numAddresses.bind()}
           skin={SelectSkin}
           isOpeningUpward // need this to make sure all options still show on small screens
+        />
+
+        <Checkbox
+          skin={CheckboxSkin}
+          {...printPaperWalletIdentification.bind()}
+          checked={printPaperWalletIdentification.value}
+          onChange={this.setPrintPaperIdentification}
         />
 
         <Button
