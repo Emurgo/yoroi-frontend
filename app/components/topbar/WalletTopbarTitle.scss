@@ -33,24 +33,24 @@
     }
 
     .walletName {
-        text-overflow: ellipsis;
         font-size: 17px;
         font-weight: 600;
+        word-break: break-all;
         color: var(--theme-topbar-wallet-name-color);
     }
 
     .walletPlate {
         padding-top: 2px;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         opacity: 0.8;
         color: var(--theme-topbar-wallet-name-color);
     }
 
     .walletAmount {
-        font-size: 21px;
+        font-size: 17px;
         font-weight: 600;
-        opacity: 0.7;
+        color: var(--theme-topbar-wallet-name-color);
         word-break: break-all;
     }
 

@@ -8,7 +8,7 @@ import { Logger, stringifyError } from '../../../utils/logging';
 import type { Network } from '../../../../config/config-types';
 import { NetworkType } from '../../../../config/config-types';
 import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
-import { createIcon } from '@download/blockies';
+import { createIcon as blockiesIcon } from '@download/blockies';
 
 export type PaperRequest = {
   words: Array<string>,
@@ -57,8 +57,10 @@ export const generateAdaPaperPdf = async (
     if (network !== NetworkType.MAINNET) {
       printTestnetLabel(doc, network, 178, 20, 15);
     }
+
+    // print account plate ID bottom-left corner of main front section
     doc.setFontSize(12);
-    doc.text(40, 175, `[${accountPlate.id}]`);
+    doc.text(40, 175, accountPlate.id);
 
     updateStatus(PdfGenSteps.frontpage);
 
@@ -83,7 +85,8 @@ export const generateAdaPaperPdf = async (
       printTestnetLabel(doc, network, 75, 180);
     }
 
-    const icon = createIcon({
+    // Generate account plate icon
+    const icon = blockiesIcon({
       seed: accountPlate.hash,
       size: 7,
       scale: 5,
@@ -91,6 +94,8 @@ export const generateAdaPaperPdf = async (
       color: '#aaa',
       spotcolor: '#000'
     });
+
+    // Draw account plate icon upside-down middle of the backside
     addImageBase64(doc, icon.toDataURL('image/png'), {
       x: (pageWidthPx + 24) / 2,
       y: 115,
@@ -99,8 +104,9 @@ export const generateAdaPaperPdf = async (
       r: 180,
     });
 
+    // Print account plate ID under the plate icon on backside
     doc.setFontSize(12);
-    textCenter(doc, 130, `[${accountPlate.id}]`, null, 180, true);
+    textCenter(doc, 130, accountPlate.id, null, 180, true);
 
     const page2Uri = paperWalletPage2PassPath;
     await addImage(doc, page2Uri, pageSize);

@@ -50,7 +50,7 @@ export default class WalletTopbarTitle extends Component<Props> {
         {iconComponent}
         <div className={styles.divWalletInfo}>
           <div className={styles.walletName}>{wallet && wallet.name}</div>
-          <div className={styles.walletPlate}>{accountPlateId ? `[${accountPlateId}]` : ''}</div>
+          <div className={styles.walletPlate}>{accountPlateId || ''}</div>
         </div>
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
