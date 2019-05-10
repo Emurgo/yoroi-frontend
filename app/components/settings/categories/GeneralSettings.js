@@ -9,6 +9,7 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import ReactMarkdown from 'react-markdown';
 import FlagLabel from '../../widgets/FlagLabel';
 
 const messages = defineMessages({
@@ -16,8 +17,13 @@ const messages = defineMessages({
     id: 'settings.general.languageSelect.label',
     defaultMessage: '!!!Language',
   },
-
+  languageSelectInfo: {
+    id: 'settings.general.languageSelect.info',
+    defaultMessage: '!!!LanguageInfo',
+  }
 });
+
+const tier1Languages = ['en-US', 'ja-JP', 'ru-RU', 'es-ES'];
 
 type Props = {
   languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
@@ -55,7 +61,7 @@ export default class GeneralSettings extends Component<Props> {
   });
 
   render() {
-    const { languages, isSubmitting, error } = this.props;
+    const { languages, isSubmitting, error, currentLocale } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const languageId = form.$('languageId');
@@ -83,6 +89,13 @@ export default class GeneralSettings extends Component<Props> {
           )}
         />
         {error && <p className={styles.error}>{error}</p>}
+
+        {!tier1Languages.includes(currentLocale) &&
+          <div className={styles.info}>
+            <h1>The selected language translation is fully provided by the community</h1>
+            <p>{intl.formatMessage(messages.languageSelectInfo)}</p>
+          </div>
+        }
 
       </div>
     );

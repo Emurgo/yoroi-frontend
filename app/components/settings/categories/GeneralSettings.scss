@@ -23,3 +23,33 @@
     background-color: var(--theme-settings-pane-background-color);
   }
 }
+
+.info {
+  color: var(--theme-terms-of-use-text-color);
+  text-align: justify;
+  margin-top: 10px;
+
+  h1 {
+    color: var(--rp-formfield-label-text-color);
+    font-family: var(--font-medium);
+    font-size: 14px;
+    margin-bottom: 11px;
+  }
+
+  ul {
+    list-style: disc;
+    margin-left: 20px;
+  }
+
+  p, li {
+    font-family: var(--font-regular);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+    margin-bottom: 11px;
+
+    strong {
+      font-weight: 500;
+    }
+  }
+}

@@ -22,14 +22,19 @@ const messages = defineMessages({
     id: 'profile.languageSelect.form.submitLabel',
     defaultMessage: '!!!Continue',
   },
+  languageSelectInfo: {
+    id: 'settings.general.languageSelect.info',
+    defaultMessage: '!!!LanguageInfo',
+  },
 });
+
+const tier1Languages = ['en-US', 'ja-JP', 'ru-RU', 'es-ES'];
 
 type Props = {
   languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-  classicTheme: boolean
 };
 
 @observer
@@ -68,7 +73,7 @@ export default class LanguageSelectionForm extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { languages, isSubmitting, error, classicTheme } = this.props;
+    const { languages, isSubmitting, error } = this.props;
     const languageId = form.$('languageId');
     const languageOptions = languages.map(language => ({
       value: language.value,
@@ -85,7 +90,7 @@ export default class LanguageSelectionForm extends Component<Props> {
         <div className={styles.centeredBox}>
 
           <Select
-            className={classicTheme ? styles.languageSelectClassic : styles.languageSelect}
+            className={styles.languageSelect}
             options={languageOptions}
             {...languageId.bind()}
             skin={SelectSkin}
@@ -102,6 +107,13 @@ export default class LanguageSelectionForm extends Component<Props> {
             onMouseUp={this.submit}
             skin={ButtonSkin}
           />
+
+          {!tier1Languages.includes(languageId.value) &&
+          <div className={styles.info}>
+            <h1>The selected language translation is fully provided by the community</h1>
+            <p>{intl.formatMessage(messages.languageSelectInfo)}</p>
+          </div>
+        }
 
         </div>
       </div>

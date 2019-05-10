@@ -1,40 +1,31 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.componentClassic {
-  align-items: center;
-  display: flex;
-  height: 100%;
-  justify-content: center;
-}
-
 .component {
-  padding-top: 222px;
   display: flex;
   height: 100%;
   justify-content: center;
-}
 
-.centeredBox {
-  overflow: visible;
-  width: 400px;
-}
+  .centeredBox {
+    overflow: visible;
+    width: 400px;
+  }
 
-.languageSelectClassic {
-  margin-bottom: 20px;
-}
-
-.languageSelect {
-  margin-bottom: 10px;
-
-  label {
-    width: 100%;
-    left: 0;
-    top: -72px;
+  .submitButton,
+  .submitButtonSpinning {
+    display: block !important;
+    margin: 0 auto;
+    width: 100% !important;
+  }
+  
+  .submitButtonSpinning {
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
+  }
+  
+  .error {
+    @include error-message;
     text-align: center;
-    font-size: 16px;
-    text-transform: uppercase;
-    font-family: var(--rp-theme-font-medium);
+    margin-bottom: 1rem;
   }
 }
 
@@ -60,19 +51,58 @@
   }
 }
 
-.submitButton,
-.submitButtonSpinning {
-  display: block !important;
-  margin: 0 auto;
-  width: 100% !important;
+:global(.YoroiClassic) .component {
+  align-items: center;
+  
+  .languageSelect {
+    margin-bottom: 20px;
+  }  
 }
 
-.submitButtonSpinning {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
+:global(.YoroiModern) .component {
+  padding-top: 222px;
+
+  .languageSelect {
+    margin-bottom: 10px;
+  
+    label {
+      width: 100%;
+      left: 0;
+      top: -72px;
+      text-align: center;
+      font-size: 16px;
+      text-transform: uppercase;
+      font-family: var(--rp-theme-font-medium);
+    }
+  }  
 }
 
-.error {
-  @include error-message;
-  text-align: center;
-  margin-bottom: 1rem;
+.info {
+  color: var(--theme-terms-of-use-text-color);
+  text-align: justify;
+  margin-top: 30px;
+
+  h1 {
+    color: var(--rp-formfield-label-text-color);
+    font-family: var(--font-medium);
+    font-size: 14px;
+    margin-bottom: 11px;
+  }
+
+  ul {
+    list-style: disc;
+    margin-left: 20px;
+  }
+
+  p, li {
+    font-family: var(--font-regular);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+    margin-bottom: 11px;
+
+    strong {
+      font-weight: 500;
+    }
+  }
 }
