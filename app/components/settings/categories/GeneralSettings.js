@@ -9,7 +9,6 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
-import ReactMarkdown from 'react-markdown';
 import FlagLabel from '../../widgets/FlagLabel';
 import { tier1Languages } from '../../../config/languagesConfig';
 
