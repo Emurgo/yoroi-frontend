@@ -13,7 +13,7 @@
     "build-compress-crx:staging": "npm run build -- --env 'staging' && npm run compress -- --env 'staging' --app-id 'yoroi-stag' --codebase 'https://yoroiwallet.com/dw/yoroi-staging-extension.crx' --key ./staging-key.pem",
     "compress-keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx",
-    "flow": "flow .",
+    "flow": "flow --show-all-errors .",
     "eslint": "eslint app features chrome scripts webpack/*.js",
     "test-unit": "jest",
     "test-prepare": "npm run clean && npm run build -- --env 'test' && npm run compress-e2e-tests",

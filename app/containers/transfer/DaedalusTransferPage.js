@@ -129,7 +129,6 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
                 onPaperConfirm={this.startTransferPaperFunds}
                 onMasterKeyConfirm={this.startTransferMasterKey}
                 disableTransferFunds={daedalusTransfer.disableTransferFunds}
-                classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
           </MainLayout>

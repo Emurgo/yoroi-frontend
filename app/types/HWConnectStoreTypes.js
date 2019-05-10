@@ -6,7 +6,7 @@ import LocalizedRequest from '../stores/lib/LocalizedRequest';
 
 import LocalizableError from '../i18n/LocalizableError';
 
-import type { CreateHardwareWalletRequest } from '../api/common';
+import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../api/ada';
 
 export type ProgressStepEnum = 0 | 1 | 2;
 export const ProgressStep = {
@@ -65,7 +65,7 @@ export interface HWConnectStoreTypes {
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  createHWRequest: LocalizedRequest<CreateHardwareWalletRequest>;
+  createHWRequest: LocalizedRequest<CreateHardwareWalletFunc>;
 
   /** While hardware wallet creation is taking place, we need to block users from starting a
     * hardware wallet creation on a seperate wallet and explain to them why the action is blocked */

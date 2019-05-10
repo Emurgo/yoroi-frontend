@@ -217,10 +217,10 @@ export default class AdaRedemptionForm extends Component<Props> {
           // Otherwise check mnemonic
           const passPhrase = join(field.value, ' ');
           if (!isEmpty(passPhrase)) this.props.onPassPhraseChanged(passPhrase);
-          return [
-            this.props.mnemonicValidator(passPhrase),
-            this.context.intl.formatMessage(new InvalidMnemonicError())
-          ];
+          return this.props.mnemonicValidator(passPhrase)
+            .then(isValid => (
+              [isValid, this.context.intl.formatMessage(new InvalidMnemonicError())]
+            ));
         }]
       },
       redemptionKey: {
@@ -230,10 +230,10 @@ export default class AdaRedemptionForm extends Component<Props> {
           if (this.props.redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED) return [true];
           const value = this.props.redemptionCode || field.value;
           if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
-          return [
-            this.props.redemptionCodeValidator(value),
-            this.context.intl.formatMessage(messages.redemptionKeyError)
-          ];
+          return this.props.redemptionCodeValidator(value)
+            .then(isValid => (
+              [isValid, this.context.intl.formatMessage(messages.redemptionKeyError)]
+            ));
         },
       },
       shieldedRedemptionKey: {
@@ -244,10 +244,10 @@ export default class AdaRedemptionForm extends Component<Props> {
           if (this.props.redemptionType !== ADA_REDEMPTION_TYPES.PAPER_VENDED) return [true];
           const value = field.value;
           if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
-          return [
-            this.props.postVendRedemptionCodeValidator(value),
-            this.context.intl.formatMessage(messages.shieldedRedemptionKeyError)
-          ];
+          return this.props.postVendRedemptionCodeValidator(value)
+            .then(isValid => (
+              [isValid, this.context.intl.formatMessage(messages.shieldedRedemptionKeyError)]
+            ));
         },
       },
       walletId: {
@@ -439,7 +439,7 @@ export default class AdaRedemptionForm extends Component<Props> {
     return (
       <div>
         <div className={styles.scrollableContent}>
-          <BorderedBox classicTheme={classicTheme}>
+          <BorderedBox>
             <h1 className={styles.headline}>{intl.formatMessage(messages.headline)}</h1>
 
             <AdaRedemptionChoices

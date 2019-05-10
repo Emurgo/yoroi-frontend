@@ -27,7 +27,7 @@ import {
 import type {
   BroadcastTrezorSignedTxResponse,
   PrepareAndBroadcastLedgerSignedTxResponse
-} from '../../common';
+} from '..';
 import type {
   TrezorInput,
   TrezorOutput,

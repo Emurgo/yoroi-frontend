@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import TransferMnemonicPage from '../../components/transfer/TransferMnemonicPage';
+import type { Theme } from '../../themes';
 
 const messages = defineMessages({
   step0: {

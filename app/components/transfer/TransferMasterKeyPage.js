@@ -111,13 +111,13 @@ export default class TransferMasterKeyPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox>
 
           <div className={styles.body}>
 
             { /* Instructions for how to transfer */ }
             <div>
-              <div className={classicTheme ? styles.titleClassic : styles.title}>
+              <div className={styles.title}>
                 {intl.formatMessage(messages.instructionTitle)}
               </div>
 

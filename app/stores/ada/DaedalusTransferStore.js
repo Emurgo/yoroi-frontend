@@ -35,15 +35,23 @@ const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
 const WS_CODE_NORMAL_CLOSURE = 1000;
 
+type TransferFundsRequest = {
+  signedTx: RustModule.Wallet.SignedTransaction,
+};
+type TransferFundsResponse = SignedResponse;
+type TransferFundsFunc = (
+  request: TransferFundsRequest
+) => Promise<TransferFundsResponse>;
+
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatus = 'uninitialized';
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<SignedResponse>= new Request(
-    this._transferFundsRequest
-  );
+  @observable transferFundsRequest: Request<TransferFundsFunc>
+    = new Request<TransferFundsFunc>(this._transferFundsRequest);
+
   @observable ws: any = null;
 
   setup(): void {
@@ -161,11 +169,14 @@ export default class DaedalusTransferStore extends Store {
     });
   };
 
-  _setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }): void => {
+  _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
       const [newSecretWords, unscrambledLen] =
-        this.api.ada.unscramblePaperMnemonic(secretWords, 27);
+        await this.api.ada.unscramblePaperMnemonic({
+          mnemonic: secretWords,
+          numberOfWords: 27
+        });
       if (!newSecretWords || !unscrambledLen) {
         throw new Error('Failed to unscramble paper mnemonics!');
       }
@@ -196,10 +207,10 @@ export default class DaedalusTransferStore extends Store {
   }
 
   /** Send a transaction to the backend-service to be broadcast into the network */
-  _transferFundsRequest = async (payload: {
+  _transferFundsRequest = async (request: {
     signedTx: RustModule.Wallet.SignedTransaction
   }): Promise<SignedResponse> => (
-    sendTx({ signedTx: payload.signedTx })
+    sendTx({ signedTx: request.signedTx })
   )
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
