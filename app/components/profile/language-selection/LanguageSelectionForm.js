@@ -12,6 +12,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './LanguageSelectionForm.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
 import FlagLabel from '../../widgets/FlagLabel';
+import { tier1Languages } from '../../../config/languagesConfig';
 
 const messages = defineMessages({
   languageSelectLabel: {
@@ -27,8 +28,6 @@ const messages = defineMessages({
     defaultMessage: '!!!LanguageInfo',
   },
 });
-
-const tier1Languages = ['en-US', 'ja-JP', 'ru-RU', 'es-ES'];
 
 type Props = {
   languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,

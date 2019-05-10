@@ -11,6 +11,7 @@ import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
 import ReactMarkdown from 'react-markdown';
 import FlagLabel from '../../widgets/FlagLabel';
+import { tier1Languages } from '../../../config/languagesConfig';
 
 const messages = defineMessages({
   languageSelectLabel: {
@@ -22,8 +23,6 @@ const messages = defineMessages({
     defaultMessage: '!!!LanguageInfo',
   }
 });
-
-const tier1Languages = ['en-US', 'ja-JP', 'ru-RU', 'es-ES'];
 
 type Props = {
   languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
