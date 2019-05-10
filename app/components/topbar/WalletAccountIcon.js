@@ -20,14 +20,13 @@ const COLORS = [
   mkcolor('#E1F2FF', '#F59F9A', '#085F48'),
 ];
 
-const saturation = (color, factor: number = 10) => {
-  if (factor < 0 || factor > 20) {
-    throw Error("Expected factor between 0 and 20 (default 10)")
+const saturation = (color, factor: number = 0) => {
+  if (factor < -100 || factor > 100) {
+    throw Error("Expected factor between -100 and 100 (default 0)")
   }
-  const diff = factor - 10;
   let tcol = tinycolor(color);
-  for (let i = 0; i < Math.abs(diff); i++) {
-    tcol = diff < 0 ?
+  for (let i = 0; i < Math.abs(factor); i++) {
+    tcol = factor < 0 ?
       tcol.desaturate()
       : tcol.saturate();
   }

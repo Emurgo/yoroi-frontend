@@ -23,7 +23,7 @@ export default class TopBarContainer extends Component<Props> {
       currentRoute={app.currentRoute}
       formattedWalletAmount={formattedWalletAmount}
       theme={{
-        identiconSaturationFactor: profile.isClassicTheme ? 5 : 10
+        identiconSaturationFactor: profile.isClassicTheme ? -5 : 0
       }}
     />);
     return (
