@@ -134,11 +134,12 @@ import type { WalletAccountNumberPlate } from "../../domain/Wallet";
 
 export type CreateAdaPaperRequest = {
   password: string,
-  numAddresses?: number
+  numAddresses?: number,
 };
 export type AdaPaper = {
   addresses: Array<string>,
   scrambledWords: Array<string>,
+  accountPlate: WalletAccountNumberPlate,
 };
 export type CreateAdaPaperFunc = (
   request: CreateAdaPaperRequest
@@ -149,6 +150,7 @@ export type CreateAdaPaperFunc = (
 export type CreateAdaPaperPdfRequest = {
   paper: AdaPaper,
   network: Network,
+  printAccountPlate?: boolean,
   updateStatus?: PdfGenStepType => ?any,
 };
 
@@ -526,10 +528,11 @@ export default class AdaApi {
     {
       paper,
       network,
+      printAccountPlate,
       updateStatus
     }: CreateAdaPaperPdfRequest
   ): Promise<CreateAdaPaperPdfResponse> {
-    const { addresses, scrambledWords } = paper;
+    const { addresses, scrambledWords, accountPlate } = paper;
     // noinspection UnnecessaryLocalVariableJS
     const res : Promise<CreateAdaPaperPdfResponse> = generateAdaPaperPdf({
       words: scrambledWords,
