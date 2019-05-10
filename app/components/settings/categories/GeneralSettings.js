@@ -10,13 +10,21 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
 import FlagLabel from '../../widgets/FlagLabel';
+import { tier1Languages } from '../../../config/languagesConfig';
 
 const messages = defineMessages({
   languageSelectLabel: {
     id: 'settings.general.languageSelect.label',
     defaultMessage: '!!!Language',
   },
-
+  languageSelectLabelInfo: {
+    id: 'settings.general.languageSelect.labelInfo',
+    defaultMessage: '!!!LanguageLabelInfo',
+  },
+  languageSelectInfo: {
+    id: 'settings.general.languageSelect.info',
+    defaultMessage: '!!!LanguageInfo',
+  },
 });
 
 type Props = {
@@ -83,6 +91,13 @@ export default class GeneralSettings extends Component<Props> {
           )}
         />
         {error && <p className={styles.error}>{error}</p>}
+
+        {!tier1Languages.includes(languageId.value) &&
+          <div className={styles.info}>
+            <h1>{intl.formatMessage(messages.languageSelectLabelInfo)}</h1>
+            <p>{intl.formatMessage(messages.languageSelectInfo)}</p>
+          </div>
+        }
 
       </div>
     );
