@@ -3,16 +3,36 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
+import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
-import { unscramblePaperAdaMnemonic } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import {
+  unscramblePaperAdaMnemonic,
+  mnemonicsToAddresses,
+} from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper"
 };
 
+const NUMBER_OF_VERIFIED_ADDRESSES = 1;
+const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
+
 @observer
 export default class WalletRestoreDialogContainer extends Component<Props> {
+
+  state = {
+    verifyRestore: undefined,
+    submitValues: undefined,
+  };
+
+  onVerifiedSubmit = () => {
+    const { submitValues } = this.state;
+    if (!submitValues) {
+      throw new Error("Cannot submit wallet restoration! No values are available in context!");
+    }
+    this.props.actions[environment.API].wallets.restoreWallet.trigger(submitValues);
+  };
 
   onSubmit = (values: {
     recoveryPhrase: string,
@@ -20,7 +40,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     walletPassword: string,
     paperPassword: string
   }) => {
-    if (isPaperMode(this.props.mode)) {
+    let isPaper = isPaperMode(this.props.mode);
+    if (isPaper) {
       const [newPhrase] = unscramblePaperAdaMnemonic(
         values.recoveryPhrase,
         getWordsCount(this.props.mode),
@@ -30,7 +51,19 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         values.recoveryPhrase = newPhrase;
       }
     }
-    this.props.actions[environment.API].wallets.restoreWallet.trigger(values);
+    const { addresses, accountPlate } =  mnemonicsToAddresses(values.recoveryPhrase,
+      isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES);
+    this.setState(s => ({...s,
+      verifyRestore: { addresses, accountPlate },
+      submitValues: values,
+    }));
+  };
+
+  cancelVerification = () => {
+    this.setState(s => ({...s,
+      verifyRestore: undefined,
+      submitValues: undefined,
+    }));
   };
 
   onCancel = () => {
@@ -49,6 +82,21 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     const wordsCount = getWordsCount(this.props.mode);
     if (!isPaper && this.props.mode !== 'regular') {
       throw new Error('Unexpected restore mode: ' + this.props.mode);
+    }
+
+    const { verifyRestore } = this.state;
+    if (verifyRestore) {
+      const { addresses, accountPlate } = verifyRestore;
+      return (
+        <WalletRestoreVerifyDialog
+          addresses={addresses}
+          accountPlate={accountPlate}
+          onCopyAddress={() => {}}
+          onNext={this.onVerifiedSubmit}
+          onCancel={this.cancelVerification}
+          classicTheme={this.props.classicTheme}
+        />
+      )
     }
 
     return (
