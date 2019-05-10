@@ -48,11 +48,11 @@ When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
-  await this.click('.WalletSendForm_nextButtonClassic');
+  await this.click('.WalletSendForm_nextButton');
 });
 
 When(/^I see send money confirmation dialog$/, async function () {
-  await this.waitForElement('.WalletSendConfirmationDialog_dialogClassic');
+  await this.waitForElement('.WalletSendConfirmationDialog_dialog');
 });
 
 When(/^I enter the wallet password:$/, async function (table) {
