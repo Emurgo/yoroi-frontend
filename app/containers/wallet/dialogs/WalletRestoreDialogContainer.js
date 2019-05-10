@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
+import type { WalletRestoreDialogValues } from '../../../components/wallet/WalletRestoreDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 import {
@@ -24,45 +25,47 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   state = {
     verifyRestore: undefined,
     submitValues: undefined,
+    resolvedRecoveryPhrase: undefined,
   };
 
   onVerifiedSubmit = () => {
-    const { submitValues } = this.state;
+    const { submitValues, resolvedRecoveryPhrase } = this.state;
     if (!submitValues) {
       throw new Error("Cannot submit wallet restoration! No values are available in context!");
+    }
+    if (resolvedRecoveryPhrase) {
+      submitValues.recoveryPhrase = resolvedRecoveryPhrase;
     }
     this.props.actions[environment.API].wallets.restoreWallet.trigger(submitValues);
   };
 
-  onSubmit = (values: {
-    recoveryPhrase: string,
-    walletName: string,
-    walletPassword: string,
-    paperPassword: string
-  }) => {
+  onSubmit = (values: WalletRestoreDialogValues) => {
     let isPaper = isPaperMode(this.props.mode);
+    let resolvedRecoveryPhrase = values.recoveryPhrase;
     if (isPaper) {
       const [newPhrase] = unscramblePaperAdaMnemonic(
         values.recoveryPhrase,
         getWordsCount(this.props.mode),
         values.paperPassword
       );
-      if (newPhrase) {
-        values.recoveryPhrase = newPhrase;
+      if (!newPhrase) {
+        throw new Error("Failed to restore a paper wallet! Invalid recovery phrase!");
       }
+      resolvedRecoveryPhrase = newPhrase;
     }
-    const { addresses, accountPlate } =  mnemonicsToAddresses(values.recoveryPhrase,
+    const { addresses, accountPlate } =  mnemonicsToAddresses(resolvedRecoveryPhrase,
       isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES);
     this.setState(s => ({...s,
       verifyRestore: { addresses, accountPlate },
       submitValues: values,
+      resolvedRecoveryPhrase,
     }));
   };
 
   cancelVerification = () => {
     this.setState(s => ({...s,
       verifyRestore: undefined,
-      submitValues: undefined,
+      resolvedRecoveryPhrase: undefined,
     }));
   };
 
@@ -84,7 +87,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       throw new Error('Unexpected restore mode: ' + this.props.mode);
     }
 
-    const { verifyRestore } = this.state;
+    const { verifyRestore, submitValues } = this.state;
     if (verifyRestore) {
       const { addresses, accountPlate } = verifyRestore;
       return (
@@ -116,6 +119,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         isPaper={isPaper}
         showPaperPassword={isPaper}
         classicTheme={this.props.classicTheme}
+        initValues={submitValues}
       />
     );
   }
