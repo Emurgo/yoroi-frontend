@@ -7,6 +7,7 @@ import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import Wallet from '../../domain/Wallet';
 import WalletAccountIcon from "./WalletAccountIcon";
+import { WalletTypeOption } from "../../types/WalletType";
 
 type Props = {
   wallet: ?Wallet,
@@ -15,9 +16,9 @@ type Props = {
   theme: { identiconSaturationFactor: number },
 };
 
-function constructPlate(account, saturationFactor): [string, Component] {
+function constructPlate(account, saturationFactor, divClass): [string, Component] {
   const { plate: { hash, id } } = account;
-  return [id, (<div className={styles.divIcon}>
+  return [id, (<div className={divClass}>
     <WalletAccountIcon
       iconSeed={hash}
       saturationFactor={saturationFactor}
@@ -41,8 +42,10 @@ export default class WalletTopbarTitle extends Component<Props> {
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
     const showWalletInfo = walletRoutesMatch && wallet;
 
+    const isHardwareWallet = wallet.type === WalletTypeOption.HARDWARE_WALLET;
+    const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
     const [accountPlateId, iconComponent] = wallet.accounts ?
-      constructPlate(wallet.accounts[0], theme.identiconSaturationFactor)
+      constructPlate(wallet.accounts[0], theme.identiconSaturationFactor, iconDivClass)
       : [];
 
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
