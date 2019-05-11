@@ -22,7 +22,7 @@ const COLORS = [
 
 const saturation = (color, factor: number = 0) => {
   if (factor < -100 || factor > 100) {
-    throw Error("Expected factor between -100 and 100 (default 0)")
+    throw Error('Expected factor between -100 and 100 (default 0)');
   }
   let tcol = tinycolor(color);
   for (let i = 0; i < Math.abs(factor); i++) {
@@ -37,7 +37,8 @@ const saturation = (color, factor: number = 0) => {
 @observer
 export default class WalletAccountIcon extends Component<Props> {
   static defaultProps = {
-    formattedWalletAmount: undefined
+    scalePx: 5,
+    saturationFactor: 0,
   };
 
   render() {

@@ -11,7 +11,7 @@ import {
   unscramblePaperAdaMnemonic,
   mnemonicsToAddresses,
 } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import type { WalletAccountNumberPlate } from "../../../domain/Wallet";
+import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper"
@@ -30,7 +30,8 @@ type WalletRestoreDialogContainerState = {
 }
 
 @observer
-export default class WalletRestoreDialogContainer extends Component<Props, WalletRestoreDialogContainerState> {
+export default class WalletRestoreDialogContainer
+  extends Component<Props, WalletRestoreDialogContainerState> {
 
   state = {
     verifyRestore: undefined,
@@ -41,7 +42,7 @@ export default class WalletRestoreDialogContainer extends Component<Props, Walle
   onVerifiedSubmit = () => {
     const { submitValues, resolvedRecoveryPhrase } = this.state;
     if (!submitValues) {
-      throw new Error("Cannot submit wallet restoration! No values are available in context!");
+      throw new Error('Cannot submit wallet restoration! No values are available in context!');
     }
     if (resolvedRecoveryPhrase) {
       submitValues.recoveryPhrase = resolvedRecoveryPhrase;
@@ -50,7 +51,7 @@ export default class WalletRestoreDialogContainer extends Component<Props, Walle
   };
 
   onSubmit = (values: WalletRestoreDialogValues) => {
-    let isPaper = isPaperMode(this.props.mode);
+    const isPaper = isPaperMode(this.props.mode);
     let resolvedRecoveryPhrase = values.recoveryPhrase;
     if (isPaper) {
       const [newPhrase] = unscramblePaperAdaMnemonic(
@@ -59,7 +60,7 @@ export default class WalletRestoreDialogContainer extends Component<Props, Walle
         values.paperPassword
       );
       if (!newPhrase) {
-        throw new Error("Failed to restore a paper wallet! Invalid recovery phrase!");
+        throw new Error('Failed to restore a paper wallet! Invalid recovery phrase!');
       }
       resolvedRecoveryPhrase = newPhrase;
     }
@@ -109,7 +110,7 @@ export default class WalletRestoreDialogContainer extends Component<Props, Walle
           onCancel={this.cancelVerification}
           classicTheme={this.props.classicTheme}
         />
-      )
+      );
     }
 
     return (

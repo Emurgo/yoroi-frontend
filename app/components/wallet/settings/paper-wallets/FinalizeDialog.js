@@ -9,8 +9,8 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './FinalizeDialog.scss';
 import DialogBackButton from '../../../widgets/DialogBackButton';
 import CopyableAddress from '../../../widgets/CopyableAddress';
-import type { AdaPaper } from "../../../../api/ada";
-import WalletAccountIcon from "../../../topbar/WalletAccountIcon";
+import type { AdaPaper } from '../../../../api/ada';
+import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {

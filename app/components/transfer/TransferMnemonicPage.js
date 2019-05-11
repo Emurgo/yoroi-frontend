@@ -13,8 +13,6 @@ import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMnemonicPage.scss';
 import config from '../../config';
-import { THEMES } from '../../themes';
-import type { Theme } from '../../themes';
 import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
@@ -98,7 +96,14 @@ export default class TransferMnemonicPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, onBack, step0, mnemonicValidator, mnemonicLength, classicTheme } = this.props;
+    const {
+      validWords,
+      onBack,
+      step0,
+      mnemonicValidator,
+      mnemonicLength,
+      classicTheme
+    } = this.props;
     const { recoveryPhrase } = form.values();
 
     const nextButtonClasses = classnames([

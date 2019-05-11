@@ -20,7 +20,7 @@ import type { AddressType } from '../../adaTypes';
 import { createCryptoAccount } from '../../adaAccount';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
-import type { WalletAccountNumberPlate } from "../../../../domain/Wallet";
+import type { WalletAccountNumberPlate } from '../../../../domain/Wallet';
 
 declare var CONFIG : ConfigType;
 
@@ -176,10 +176,10 @@ export function getCryptoWalletFromMasterKey(
 
 export function createAccountPlate(accountPubHash: string): WalletAccountNumberPlate {
   const hash = blakejs.blake2bHex(accountPubHash);
-  const [a,b,c,d] = crc32(hash);
+  const [a, b, c, d] = crc32(hash);
   const alpha = `ABCDEJHKLNOPSTXZ`;
-  const letters = b => `${alpha[Math.floor(b/16)]}${alpha[b%16]}`;
-  const numbers = `${((c<<8)+d)%10000}`.padStart(4,'0');
+  const letters = x => `${alpha[Math.floor(x / 16)]}${alpha[x % 16]}`;
+  const numbers = `${((c << 8) + d) % 10000}`.padStart(4, '0');
   const id = `${letters(a)}${letters(b)}-${numbers}`;
   return { hash, id };
 }

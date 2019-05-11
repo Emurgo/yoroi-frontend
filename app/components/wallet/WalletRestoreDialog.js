@@ -135,7 +135,8 @@ export default class WalletRestoreDialog extends Component<Props> {
     passwordValidator: undefined,
     isPaper: undefined,
     isVerificationMode: undefined,
-    showPaperPassword: undefined
+    showPaperPassword: undefined,
+    initValues: undefined,
   };
 
   static contextTypes = {

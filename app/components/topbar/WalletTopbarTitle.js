@@ -6,8 +6,8 @@ import styles from './WalletTopbarTitle.scss';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import Wallet from '../../domain/Wallet';
-import WalletAccountIcon from "./WalletAccountIcon";
-import { WalletTypeOption } from "../../types/WalletType";
+import WalletAccountIcon from './WalletAccountIcon';
+import { WalletTypeOption } from '../../types/WalletType';
 
 type Props = {
   wallet: ?Wallet,
@@ -18,12 +18,14 @@ type Props = {
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<any>] {
   const { plate: { hash, id } } = account;
-  return [id, (<div className={divClass}>
-    <WalletAccountIcon
-      iconSeed={hash}
-      saturationFactor={saturationFactor}
-    />
-  </div>)]
+  return [id, (
+    <div className={divClass}>
+      <WalletAccountIcon
+        iconSeed={hash}
+        saturationFactor={saturationFactor}
+      />
+    </div>
+  )];
 }
 
 /** Dynamically generated title for the topbar when a wallet is selected */

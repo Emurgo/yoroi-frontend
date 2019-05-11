@@ -9,7 +9,7 @@ import DialogBackButton from '../widgets/DialogBackButton';
 import CopyableAddress from '../widgets/CopyableAddress';
 import WalletAccountIcon from '../topbar/WalletAccountIcon';
 import Dialog from '../widgets/Dialog';
-import type { WalletAccountNumberPlate } from "../../domain/Wallet";
+import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {

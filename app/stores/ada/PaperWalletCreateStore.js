@@ -58,7 +58,15 @@ export default class PaperWalletCreateStore extends Store {
     a.cancel.listen(this._cancel);
   }
 
-  @action _submitInit = async ({ numAddresses, printAccountPlate }: { numAddresses: number, printAccountPlate: boolean }): Promise<void> => {
+  @action _submitInit = async (
+    {
+      numAddresses,
+      printAccountPlate
+    }: {
+      numAddresses: number,
+      printAccountPlate: boolean
+    }
+  ): Promise<void> => {
     this.numAddresses = numAddresses;
     this.printAccountPlate = printAccountPlate;
     this.progressInfo = ProgressStep.USER_PASSWORD;

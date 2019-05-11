@@ -45,7 +45,7 @@ import {
 } from './adaLocalStorage';
 import type { ConfigType } from '../../../config/config-types';
 import { restoreTransactionsAndSave } from './restoreAdaWallet';
-import type { WalletAccountNumberPlate } from "../../domain/Wallet";
+import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 
 declare var CONFIG : ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
@@ -176,10 +176,15 @@ export const generatePaperWalletSecret = (password: string): PaperWalletSecret =
   return { words, scrambledWords };
 };
 
-export const mnemonicsToExternalAddresses =
-  (mnemonics: string, count?: number): { addresses: Array<string>, accountPlate: WalletAccountNumberPlate } => (
-    mnemonicsToAddresses(mnemonics, count)
-  );
+export const mnemonicsToExternalAddresses = (
+  mnemonics: string,
+  count?: number
+): {
+  addresses: Array<string>,
+  accountPlate: WalletAccountNumberPlate
+} => (
+  mnemonicsToAddresses(mnemonics, count)
+);
 
 /** Call backend-service to get the balances of addresses and then sum them */
 export async function getBalance(

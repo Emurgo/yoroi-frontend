@@ -81,7 +81,6 @@ import type {
   AdaTransactionInputOutput,
   AdaTransactions,
   AdaWallet,
-  AdaWallets,
   AdaAssurance,
 } from './adaTypes';
 import type {
@@ -125,8 +124,8 @@ import type { TransactionExportRow } from '../export';
 import { HWFeatures } from '../../types/HWConnectStoreTypes';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
-import type { CryptoAccount } from "./adaLocalStorage";
-import type { WalletAccountNumberPlate } from "../../domain/Wallet";
+import type { CryptoAccount } from './adaLocalStorage';
+import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 
 // ADA specific Request / Response params
 
@@ -556,7 +555,7 @@ export default class AdaApi {
         : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets.map(([wallet, account]) => _createWalletFromServerData(wallet, account ? [account] : undefined));
+      return wallets.map(([w, a]) => _createWalletFromServerData(w, a ? [a] : undefined));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -576,7 +575,7 @@ export default class AdaApi {
 
       const accountIndex = getCurrentCryptoAccount();
       if (!accountIndex) {
-        throw new Error("Internal Error! Cannot get addresses without current account.")
+        throw new Error('Internal Error! Cannot get addresses without current account.');
       }
       const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
       Logger.debug('AdaApi::getExternalAddresses success: ' + stringifyData(adaAddresses));
@@ -821,9 +820,9 @@ export default class AdaApi {
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
 
       const { ledgerSignTxResp, unsignedTx } = request;
-      let currentCryptoAccount = getCurrentCryptoAccount();
+      const currentCryptoAccount = getCurrentCryptoAccount();
       if (!currentCryptoAccount) {
-        throw new Error("Internal Error! Cannot broadcast tx without current account.");
+        throw new Error('Internal Error! Cannot broadcast tx without current account.');
       }
       const cryptoAccount = currentCryptoAccount.root_cached_key;
       const response = await prepareAndBroadcastLedgerSignedTx(
@@ -1297,7 +1296,7 @@ const _createWalletFromServerData = action(
       walletObj.accounts = accounts.map(a => ({
         account: a.account,
         plate: createAccountPlate(a.root_cached_key.key().to_hex()),
-      }))
+      }));
     }
     return new Wallet(walletObj);
   }
