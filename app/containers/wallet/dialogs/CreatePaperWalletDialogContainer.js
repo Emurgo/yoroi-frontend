@@ -82,9 +82,13 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
           />
         );
       case ProgressStep.FINALIZE:
+        const paper = paperStore.paper;
+        if (!paper) {
+          throw new Error("Internal error! Paper instance is not available when should be.");
+        }
         return (
           <FinalizeDialog
-            paper={paperStore.paper}
+            paper={paper}
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}

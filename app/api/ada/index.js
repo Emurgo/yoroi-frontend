@@ -551,7 +551,7 @@ export default class AdaApi {
     try {
       const wallet = await getAdaWallet();
       const account = getCurrentCryptoAccount();
-      const wallets: AdaWallets = wallet
+      const wallets: Array<[AdaWallet, ?CryptoAccount]> = wallet
         ? [[wallet, account]]
         : [];
       // Refresh wallet data
@@ -575,6 +575,9 @@ export default class AdaApi {
       const cuttoffIndex = getLastReceiveAddressIndex() + 1;
 
       const accountIndex = getCurrentCryptoAccount();
+      if (!accountIndex) {
+        throw new Error("Internal Error! Cannot get addresses without current account.")
+      }
       const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
       Logger.debug('AdaApi::getExternalAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses
@@ -818,7 +821,11 @@ export default class AdaApi {
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
 
       const { ledgerSignTxResp, unsignedTx } = request;
-      const cryptoAccount = getCurrentCryptoAccount().root_cached_key;
+      let currentCryptoAccount = getCurrentCryptoAccount();
+      if (!currentCryptoAccount) {
+        throw new Error("Internal Error! Cannot broadcast tx without current account.");
+      }
+      const cryptoAccount = currentCryptoAccount.root_cached_key;
       const response = await prepareAndBroadcastLedgerSignedTx(
         ledgerSignTxResp,
         unsignedTx,
@@ -1284,6 +1291,7 @@ const _createWalletFromServerData = action(
       passwordUpdateDate: adaWallet.cwPassphraseLU,
       type: adaWallet.cwType,
       hardwareInfo: adaWallet.cwHardwareInfo,
+      accounts: undefined,
     };
     if (accounts) {
       walletObj.accounts = accounts.map(a => ({

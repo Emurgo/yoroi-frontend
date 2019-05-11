@@ -220,6 +220,7 @@ type AddImageParams = {
   y?: number,
   w?: number,
   h?: number,
+  r?: number,
 }
 
 function textCenter(

@@ -11,6 +11,7 @@ import {
   unscramblePaperAdaMnemonic,
   mnemonicsToAddresses,
 } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import type { WalletAccountNumberPlate } from "../../../domain/Wallet";
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper"
@@ -19,8 +20,17 @@ type Props = InjectedDialogContainerProps & {
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
+type WalletRestoreDialogContainerState = {
+  verifyRestore?: {
+    addresses: Array<string>,
+    accountPlate: WalletAccountNumberPlate,
+  },
+  submitValues?: WalletRestoreDialogValues,
+  resolvedRecoveryPhrase?: string,
+}
+
 @observer
-export default class WalletRestoreDialogContainer extends Component<Props> {
+export default class WalletRestoreDialogContainer extends Component<Props, WalletRestoreDialogContainerState> {
 
   state = {
     verifyRestore: undefined,
@@ -55,18 +65,18 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     }
     const { addresses, accountPlate } =  mnemonicsToAddresses(resolvedRecoveryPhrase,
       isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES);
-    this.setState(s => ({...s,
+    this.setState({
       verifyRestore: { addresses, accountPlate },
       submitValues: values,
       resolvedRecoveryPhrase,
-    }));
+    });
   };
 
   cancelVerification = () => {
-    this.setState(s => ({...s,
+    this.setState({
       verifyRestore: undefined,
       resolvedRecoveryPhrase: undefined,
-    }));
+    });
   };
 
   onCancel = () => {
@@ -119,7 +129,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         isPaper={isPaper}
         showPaperPassword={isPaper}
         classicTheme={this.props.classicTheme}
-        initValues={submitValues}
+        initValues={submitValues || undefined}
       />
     );
   }

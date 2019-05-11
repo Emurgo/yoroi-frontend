@@ -38,7 +38,7 @@ export default class PaperWalletCreateStore extends Store {
   @observable pdf: ?Blob;
   error: ?LocalizableError;
   numAddresses: ?number;
-  printAccountPlate: ?boolean;
+  printAccountPlate: boolean = true;
   userPassword: ?string;
   paper: ?AdaPaper;
 

@@ -16,7 +16,7 @@ type Props = {
   theme: { identiconSaturationFactor: number },
 };
 
-function constructPlate(account, saturationFactor, divClass): [string, Component] {
+function constructPlate(account, saturationFactor, divClass): [string, React$Element<any>] {
   const { plate: { hash, id } } = account;
   return [id, (<div className={divClass}>
     <WalletAccountIcon
@@ -42,9 +42,9 @@ export default class WalletTopbarTitle extends Component<Props> {
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
     const showWalletInfo = walletRoutesMatch && wallet;
 
-    const isHardwareWallet = wallet.type === WalletTypeOption.HARDWARE_WALLET;
+    const isHardwareWallet = (wallet && wallet.type) === WalletTypeOption.HARDWARE_WALLET;
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
-    const [accountPlateId, iconComponent] = wallet.accounts ?
+    const [accountPlateId, iconComponent] = (wallet && wallet.accounts) ?
       constructPlate(wallet.accounts[0], theme.identiconSaturationFactor, iconDivClass)
       : [];
 

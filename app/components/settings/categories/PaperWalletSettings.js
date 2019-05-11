@@ -73,7 +73,7 @@ export default class PaperWalletSettings extends Component<Props> {
     },
   });
 
-  setPrintPaperIdentification = (printPaperWalletIdentification) => {
+  setPrintPaperIdentification = (printPaperWalletIdentification: boolean) => {
     this.form.$('printPaperWalletIdentification').value = printPaperWalletIdentification;
   };
 
