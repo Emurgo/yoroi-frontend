@@ -116,6 +116,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(messages.buttonLabelConfirm),
         onClick: onFinishBackup,
+        disabled: !isTermDeviceAccepted || !isTermRecoveryAccepted,
         primary: true
       });
     }
