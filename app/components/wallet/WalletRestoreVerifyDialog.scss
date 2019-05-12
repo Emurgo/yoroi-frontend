@@ -1,21 +1,5 @@
-@import '../../themes/mixins/loading-spinner';
-@import '../../themes/mixins/error-message';
-
 .dialog {
   font-family: var(--font-light);
-  .walletPassword {
-    & + .walletPasswordFields {
-      .newPassword {
-        margin-top: 20px;
-      }
-    }
-  }
-
-  .error {
-    @include error-message;
-    text-align: center;
-    margin-top: 27px;
-  }
 
   li::before {
     content: "●";
