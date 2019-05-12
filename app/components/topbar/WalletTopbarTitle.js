@@ -8,9 +8,11 @@ import { ROUTES } from '../../routes-config';
 import Wallet from '../../domain/Wallet';
 import WalletAccountIcon from './WalletAccountIcon';
 import { WalletTypeOption } from '../../types/WalletType';
+import type { WalletAccount } from "../../domain/Wallet";
 
 type Props = {
   wallet: ?Wallet,
+  account: ?WalletAccount,
   currentRoute: string,
   formattedWalletAmount?: Function,
   theme: { identiconSaturationFactor: number },
@@ -37,7 +39,7 @@ export default class WalletTopbarTitle extends Component<Props> {
 
   render() {
     const {
-      wallet, currentRoute, formattedWalletAmount, theme
+      wallet, account, currentRoute, formattedWalletAmount, theme
     } = this.props;
 
     // If we are looking at a wallet, show its name and balance
@@ -46,8 +48,8 @@ export default class WalletTopbarTitle extends Component<Props> {
 
     const isHardwareWallet = (wallet && wallet.type) === WalletTypeOption.HARDWARE_WALLET;
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
-    const [accountPlateId, iconComponent] = (wallet && wallet.accounts) ?
-      constructPlate(wallet.accounts[0], theme.identiconSaturationFactor, iconDivClass)
+    const [accountPlateId, iconComponent] = account ?
+      constructPlate(account, theme.identiconSaturationFactor, iconDivClass)
       : [];
 
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
