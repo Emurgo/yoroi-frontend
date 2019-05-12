@@ -30,7 +30,6 @@ const messages = defineMessages({
     id: 'wallet.send.confirmationDialog.submit',
     defaultMessage: '!!!Send',
   },
-  fieldIsRequired: globalMessages.fieldIsRequired,
 });
 
 type Props = {
@@ -63,7 +62,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         value: '',
         validators: [({ field }) => {
           if (field.value === '') {
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           return [true];
         }],

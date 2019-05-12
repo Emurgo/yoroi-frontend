@@ -27,12 +27,6 @@ const messages = defineMessages({
     id: 'transfer.form.masterkey.requirement',
     defaultMessage: '!!!Note: master keys are 192 characters and hexadecimal-encoded',
   },
-  fieldIsRequired: globalMessages.fieldIsRequired,
-  invalidMasterKey: globalMessages.invalidMasterKey,
-  nextButtonLabel: globalMessages.nextButtonLabel,
-  backButtonLabel: globalMessages.backButtonLabel,
-  step1: globalMessages.step1,
-  instructionTitle: globalMessages.instructionTitle,
 });
 
 type Props = {
@@ -58,13 +52,13 @@ export default class TransferMasterKeyPage extends Component<Props> {
         validators: [({ field }) => {
           const value = field.value;
           if (value === '') {
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           if (value.length !== 192) {
-            return [false, this.context.intl.formatMessage(messages.invalidMasterKey)];
+            return [false, this.context.intl.formatMessage(globalMessages.invalidMasterKey)];
           }
           if (!value.match('^[0-9a-fA-F]+$')) {
-            return [false, this.context.intl.formatMessage(messages.invalidMasterKey)];
+            return [false, this.context.intl.formatMessage(globalMessages.invalidMasterKey)];
           }
           return true;
         }],
@@ -117,14 +111,14 @@ export default class TransferMasterKeyPage extends Component<Props> {
             { /* Instructions for how to transfer */ }
             <div>
               <div className={styles.title}>
-                {intl.formatMessage(messages.instructionTitle)}
+                {intl.formatMessage(globalMessages.instructionTitle)}
               </div>
 
               <ul className={styles.instructionsList}>
                 {
                   <div className={styles.text}>
                     {step0}
-                    {intl.formatMessage(messages.step1)}
+                    {intl.formatMessage(globalMessages.step1)}
                     <br /><br />
                     {intl.formatMessage(messages.masterKeyRequirements)}
                   </div>
@@ -143,14 +137,14 @@ export default class TransferMasterKeyPage extends Component<Props> {
             <div className={styles.buttonsWrapper}>
               <Button
                 className={nextButtonClasses}
-                label={intl.formatMessage(messages.nextButtonLabel)}
+                label={intl.formatMessage(globalMessages.nextButtonLabel)}
                 onClick={this.submit}
                 skin={ButtonSkin}
               />
 
               <Button
                 className={backButtonClasses}
-                label={intl.formatMessage(messages.backButtonLabel)}
+                label={intl.formatMessage(globalMessages.backButtonLabel)}
                 onClick={onBack}
                 skin={ButtonSkin}
               />

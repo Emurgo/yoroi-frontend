@@ -54,7 +54,6 @@ const messages = defineMessages({
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.5',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
   },
-  nextButtonLabel: globalMessages.nextButtonLabel,
 });
 
 type Props = {
@@ -133,7 +132,7 @@ export default class AboutDialog extends Component<Props> {
 
     const dailogActions = [{
       className: isActionProcessing ? styles.processing : null,
-      label: intl.formatMessage(globalMessages.nextButtonLabel),
+      label: intl.formatMessage(globalglobalMessages.nextButtonLabel),
       primary: true,
       disabled: false,
       onClick: submit,

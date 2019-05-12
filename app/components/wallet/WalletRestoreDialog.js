@@ -99,7 +99,6 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.passwordDisclaimer',
     defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
   },
-  fieldIsRequired: globalMessages.fieldIsRequired,
 });
 
 type Props = {
@@ -152,7 +151,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         value: '',
         validators: [({ field }) => {
           const value = join(field.value, ' ');
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           return [
             this.props.mnemonicValidator(value),
             this.context.intl.formatMessage(messages.invalidRecoveryPhrase)

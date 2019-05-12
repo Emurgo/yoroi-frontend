@@ -22,7 +22,6 @@ const messages = defineMessages({
     id: 'transfer.instructions.attention.title.label',
     defaultMessage: '!!!Attention',
   },
-  instructionTitle: globalMessages.instructionTitle,
 });
 
 type Props = {
@@ -83,7 +82,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <div>
                 <div className={styles.title}>
-                  {intl.formatMessage(messages.instructionTitle)}
+                  {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
                   {intl.formatMessage(messages.instructionsText)}

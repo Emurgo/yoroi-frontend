@@ -155,7 +155,6 @@ where Ada should be redeemed and enter {adaRedemptionPassphraseLength} word mnem
     id: 'wallet.redeem.dialog.adaAmountHint',
     defaultMessage: '!!!Enter your Ada amount',
   },
-  fieldIsRequired: globalMessages.fieldIsRequired,
 });
 
 type Props = {
@@ -228,7 +227,7 @@ export default class AdaRedemptionForm extends Component<Props> {
         validators: ({ field }) => {
           if (this.props.redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED) return [true];
           const value = this.props.redemptionCode || field.value;
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           return this.props.redemptionCodeValidator(value)
             .then(isValid => (
               [isValid, this.context.intl.formatMessage(messages.redemptionKeyError)]
@@ -242,7 +241,7 @@ export default class AdaRedemptionForm extends Component<Props> {
         validators: ({ field }) => {
           if (this.props.redemptionType !== ADA_REDEMPTION_TYPES.PAPER_VENDED) return [true];
           const value = field.value;
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           return this.props.postVendRedemptionCodeValidator(value)
             .then(isValid => (
               [isValid, this.context.intl.formatMessage(messages.shieldedRedemptionKeyError)]
