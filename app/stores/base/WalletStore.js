@@ -17,7 +17,7 @@ import type {
 import type {
   DeleteWalletFunc
 } from '../../api/common';
-import type { WalletAccount } from "../../domain/Wallet";
+import type { WalletAccount } from '../../domain/Wallet';
 
 /**
  * The base wallet store that contains the shared logic
@@ -220,10 +220,12 @@ export default class WalletsStore extends Store {
     { walletId }: { walletId: string }
   ): void => {
     if (this.hasAnyWallets) {
-      let newActiveWallet: ?Wallet = this.all.find(wallet => wallet.id === walletId);
+      const newActiveWallet: ?Wallet = this.all.find(wallet => wallet.id === walletId);
       this.active = newActiveWallet;
       // Set first account as default current when wallet is changed
-      this.activeAccount = newActiveWallet && newActiveWallet.accounts && newActiveWallet.accounts[0];
+      this.activeAccount = newActiveWallet &&
+        newActiveWallet.accounts &&
+        newActiveWallet.accounts[0];
     }
   };
 

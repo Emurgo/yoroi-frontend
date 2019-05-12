@@ -8,14 +8,14 @@ import { ROUTES } from '../../routes-config';
 import Wallet from '../../domain/Wallet';
 import WalletAccountIcon from './WalletAccountIcon';
 import { WalletTypeOption } from '../../types/WalletType';
-import type { WalletAccount } from "../../domain/Wallet";
+import type { WalletAccount } from '../../domain/Wallet';
 
 type Props = {
   wallet: ?Wallet,
   account: ?WalletAccount,
   currentRoute: string,
   formattedWalletAmount?: Function,
-  themeProperties: {
+  themeProperties?: {
     identiconSaturationFactor: number,
   },
 };

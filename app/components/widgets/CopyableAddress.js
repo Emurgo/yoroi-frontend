@@ -16,6 +16,10 @@ type Props = {
 @observer
 export default class CopyableAddress extends Component<Props> {
 
+  static defaultProps = {
+    onCopyAddress: undefined,
+  };
+
   render() {
     const { address, onCopyAddress, isUsed, isClassicThemeActive } = this.props;
 
