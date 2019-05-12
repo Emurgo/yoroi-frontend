@@ -15,7 +15,9 @@ type Props = {
   account: ?WalletAccount,
   currentRoute: string,
   formattedWalletAmount?: Function,
-  theme: { identiconSaturationFactor: number },
+  themeProperties: {
+    identiconSaturationFactor: number,
+  },
 };
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<any>] {
@@ -34,13 +36,17 @@ function constructPlate(account, saturationFactor, divClass): [string, React$Ele
 @observer
 export default class WalletTopbarTitle extends Component<Props> {
   static defaultProps = {
-    formattedWalletAmount: undefined
+    formattedWalletAmount: undefined,
+    themeProperties: {
+      identiconSaturationFactor: 0,
+    },
   };
 
   render() {
     const {
-      wallet, account, currentRoute, formattedWalletAmount, theme
+      wallet, account, currentRoute, formattedWalletAmount, themeProperties
     } = this.props;
+    const { identiconSaturationFactor } = themeProperties;
 
     // If we are looking at a wallet, show its name and balance
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
@@ -49,7 +55,7 @@ export default class WalletTopbarTitle extends Component<Props> {
     const isHardwareWallet = (wallet && wallet.type) === WalletTypeOption.HARDWARE_WALLET;
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
     const [accountPlateId, iconComponent] = account ?
-      constructPlate(account, theme.identiconSaturationFactor, iconDivClass)
+      constructPlate(account, identiconSaturationFactor, iconDivClass)
       : [];
 
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (

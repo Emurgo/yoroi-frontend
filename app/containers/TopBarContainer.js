@@ -24,7 +24,7 @@ export default class TopBarContainer extends Component<Props> {
       account={walletsStore.activeAccount}
       currentRoute={app.currentRoute}
       formattedWalletAmount={formattedWalletAmount}
-      theme={{
+      themeProperties={{
         identiconSaturationFactor: profile.isClassicTheme ? -5 : 0
       }}
     />);
