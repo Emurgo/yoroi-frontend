@@ -105,7 +105,6 @@ export default class WalletRestoreDialogContainer
         <WalletRestoreVerifyDialog
           addresses={addresses}
           accountPlate={accountPlate}
-          onCopyAddress={() => {}}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
           classicTheme={this.props.classicTheme}

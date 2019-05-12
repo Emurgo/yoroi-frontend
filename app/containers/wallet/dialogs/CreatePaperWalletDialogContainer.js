@@ -98,9 +98,6 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
             classicTheme={profile.isClassicTheme}
-            onCopyAddress={
-              () => {} // no notification but maybe we want one
-            }
           />
         );
       default:

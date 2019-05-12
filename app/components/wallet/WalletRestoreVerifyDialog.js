@@ -46,7 +46,7 @@ const messages = defineMessages({
 type Props = {
   addresses: Array<string>,
   accountPlate: WalletAccountNumberPlate,
-  onCopyAddress: Function,
+  onCopyAddress?: Function,
   onNext: Function,
   onCancel: Function,
   classicTheme: boolean,
@@ -55,7 +55,8 @@ type Props = {
 @observer
 export default class WalletRestoreVerifyDialog extends Component<Props> {
   static defaultProps = {
-    onBack: undefined
+    onBack: undefined,
+    onCopyAddress: undefined,
   };
 
   static contextTypes = {

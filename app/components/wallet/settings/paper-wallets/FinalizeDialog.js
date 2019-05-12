@@ -40,7 +40,7 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onCopyAddress: Function,
+  onCopyAddress?: Function,
   paper: AdaPaper,
   onNext: Function,
   onCancel: Function,
@@ -51,7 +51,8 @@ type Props = {
 @observer
 export default class FinalizeDialog extends Component<Props> {
   static defaultProps = {
-    onBack: undefined
+    onBack: undefined,
+    onCopyAddress: undefined,
   };
 
   static contextTypes = {
