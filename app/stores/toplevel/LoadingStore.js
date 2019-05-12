@@ -21,11 +21,15 @@ export default class LoadingStore extends Store {
   @observable error: ?LocalizableError = null;
   @observable _loading: boolean = true;
 
-  @observable loadRustRequest: Request<void> = new Request(RustModule.load.bind(RustModule));
-  @observable migrationRequest: Request<MigrationRequest> = new Request(migrate);
+  @observable loadRustRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(RustModule.load.bind(RustModule));
+
+  @observable migrationRequest: Request<MigrationRequest => Promise<void>>
+    = new Request<MigrationRequest => Promise<void>>(migrate);
 
   // TODO: Should not make currency-specific requests in a toplevel store
-  @observable loadDbRequest: Request<void> = new Request(this.api.ada.loadDB);
+  @observable loadDbRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.ada.loadDB);
 
   setup() {
   }

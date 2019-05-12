@@ -51,7 +51,6 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
         }
       >
         <TermsOfUseForm
-          classicTheme={profile.isClassicTheme}
           localizedTermsOfUse={termsOfUse}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}

@@ -12,17 +12,21 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
 import { matchRoute } from '../../utils/routing';
-import type { RedeemAdaParams, RedeemPaperVendedAdaParams } from '../../api/ada/adaRedemption';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import environment from '../../environment';
 import BigNumber from 'bignumber.js';
 import Request from '../lib/LocalizedRequest';
 
+import type {
+  RedeemAdaFunc,
+  RedeemPaperVendedAdaFunc,
+} from '../../api/ada';
+
 export default class AdaRedemptionStore extends Store {
 
   @observable redemptionType: RedemptionTypeChoices = ADA_REDEMPTION_TYPES.REGULAR;
   @observable redemptionCode: string = '';
-  @observable certificate: ?Blob = null;
+  @observable certificate: ?Blob= null;
   @observable decryptionKey: ?string = null;
   @observable error: ?LocalizableError = null;
   @observable isCertificateEncrypted = false;
@@ -33,9 +37,13 @@ export default class AdaRedemptionStore extends Store {
   @observable isRedemptionDisclaimerAccepted = false;
   @observable walletId: ?string = null;
   @observable shieldedRedemptionKey: ?string = null;
-  @observable redeemAdaRequest: Request<RedeemAdaParams> = new Request(this.api.ada.redeemAda);
+  @observable redeemAdaRequest: Request<RedeemAdaFunc>
+    = new Request<RedeemAdaFunc>(this.api.ada.redeemAda);
+
   // eslint-disable-next-line
-  @observable redeemPaperVendedAdaRequest: Request<RedeemPaperVendedAdaParams> = new Request(this.api.ada.redeemPaperVendedAda);
+  @observable redeemPaperVendedAdaRequest: Request<RedeemPaperVendedAdaFunc>
+    = new Request<RedeemPaperVendedAdaFunc>(this.api.ada.redeemPaperVendedAda);
+
   @observable amountRedeemed: number = 0;
   @observable showAdaRedemptionSuccessMessage: boolean = false;
 
@@ -60,16 +68,16 @@ export default class AdaRedemptionStore extends Store {
     ]);
   }
 
-  isValidRedemptionKey = (redemptionKey: string) => (
-    this.api.ada.isValidRedemptionKey(redemptionKey)
+  isValidRedemptionKey = (redemptionKey: string): Promise<boolean> => (
+    this.api.ada.isValidRedemptionKey({ mnemonic: redemptionKey })
   );
 
-  isValidRedemptionMnemonic = (mnemonic: string) => (
-    this.api.ada.isValidRedemptionMnemonic(mnemonic)
+  isValidRedemptionMnemonic = (mnemonic: string): Promise<boolean> => (
+    this.api.ada.isValidRedemptionMnemonic({ mnemonic })
   );
 
-  isValidPaperVendRedemptionKey = (mnemonic: string) => (
-    this.api.ada.isValidPaperVendRedemptionKey(mnemonic)
+  isValidPaperVendRedemptionKey = (mnemonic: string): Promise<boolean> => (
+    this.api.ada.isValidPaperVendRedemptionKey({ mnemonic })
   );
 
   @computed get isAdaRedemptionPage(): boolean {
@@ -85,11 +93,16 @@ export default class AdaRedemptionStore extends Store {
     }
   };
 
-  _onAcceptRedemptionDisclaimer = action(() => {
+  @action
+  _onAcceptRedemptionDisclaimer = () => {
     this.isRedemptionDisclaimerAccepted = true;
-  });
+  };
 
-  _setCertificate = action(({ certificate }) => {
+  @action
+  _setCertificate = ({ certificate }: { certificate: Blob | File }) => {
+    // File inherits Blob but Flow forces us to cast this way to get things working
+    certificate = ((certificate: any): Blob);
+
     this.certificate = certificate;
     this.isCertificateEncrypted = certificate.type !== 'application/pdf';
     if (this.isCertificateEncrypted && (!this.passPhrase || !this.decryptionKey)) {
@@ -97,36 +110,42 @@ export default class AdaRedemptionStore extends Store {
       return; // We cannot decrypt it yet!
     }
     this._parseCodeFromCertificate();
-  });
+  };
 
-  _setPassPhrase = action(({ passPhrase } : { passPhrase: string }) => {
+  @action
+  _setPassPhrase = ({ passPhrase } : { passPhrase: string }) => {
     this.passPhrase = passPhrase;
     if (this.isValidRedemptionMnemonic(passPhrase)) this._parseCodeFromCertificate();
-  });
+  };
 
-  _setRedemptionCode = action(({ redemptionCode } : { redemptionCode: string }) => {
+  @action
+  _setRedemptionCode = ({ redemptionCode } : { redemptionCode: string }) => {
     this.redemptionCode = redemptionCode;
-  });
+  };
 
-  _setEmail = action(({ email } : { email: string }) => {
+  @action
+  _setEmail = ({ email } : { email: string }) => {
     this.email = email;
     this._parseCodeFromCertificate();
-  });
+  };
 
-  _setAdaPasscode = action(({ adaPasscode } : { adaPasscode: string }) => {
+  @action
+  _setAdaPasscode = ({ adaPasscode } : { adaPasscode: string }) => {
     this.adaPasscode = adaPasscode;
     this._parseCodeFromCertificate();
-  });
+  };
 
-  _setAdaAmount = action(({ adaAmount } : { adaAmount: string }) => {
+  @action
+  _setAdaAmount = ({ adaAmount } : { adaAmount: string }) => {
     this.adaAmount = adaAmount;
     this._parseCodeFromCertificate();
-  });
+  };
 
-  _setDecryptionKey = action(({ decryptionKey } : { decryptionKey: string }) => {
+  @action
+  _setDecryptionKey = ({ decryptionKey } : { decryptionKey: string }) => {
     this.decryptionKey = decryptionKey;
     this._parseCodeFromCertificate();
-  });
+  };
 
   _parseCodeFromCertificate() {
     if (
@@ -165,17 +184,23 @@ export default class AdaRedemptionStore extends Store {
     ) {
       decryptionKey = this.decryptionKey;
     }
-    this.api.ada.getPDFSecretKey(this.certificate, decryptionKey, this.redemptionType)
+    this.api.ada.getPDFSecretKey({
+      file: this.certificate,
+      decryptionKey,
+      redemptionType: this.redemptionType
+    })
       .then(code => this._onCodeParsed(code))
       .catch(error => this._onParseError(error));
   }
 
-  _onCodeParsed = action(code => {
+  @action
+  _onCodeParsed = code => {
     Logger.debug('Redemption code parsed from certificate: ' + code);
     this.redemptionCode = code;
-  });
+  };
 
-  _onParseError = action((error) => {
+  @action
+  _onParseError = (error) => {
     Logger.error('Error received from certificate parsing: ' + stringifyError(error));
     if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
       if (this.isCertificateEncrypted) {
@@ -185,7 +210,7 @@ export default class AdaRedemptionStore extends Store {
       }
     }
     this._resetDecryptionFields();
-  });
+  };
 
   _redeemAda = async ({ walletId } : {
     walletId: string
@@ -193,9 +218,12 @@ export default class AdaRedemptionStore extends Store {
 
     runInAction(() => { this.walletId = walletId; });
 
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
       const transactionAmountInLovelace: BigNumber = await this.redeemAdaRequest.execute({
-        redemptionCode: this.redemptionCode
+        redemptionCode: this.redemptionCode,
+        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        sendTx: stateFetcher.sendTx,
       });
       this._reset();
       const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);
@@ -214,11 +242,15 @@ export default class AdaRedemptionStore extends Store {
   }) => {
     runInAction(() => { this.walletId = walletId; });
 
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
-      const transactionAmountInLovelace: BigNumber =
+      if (!this.passPhrase) throw new Error('should never happen');
+      const transactionAmountInLovelace =
         await this.redeemPaperVendedAdaRequest.execute({
           redemptionCode: shieldedRedemptionKey,
-          mnemonics: this.passPhrase && this.passPhrase.split(' ')
+          mnemonics: this.passPhrase.split(' '),
+          getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+          sendTx: stateFetcher.sendTx,
         });
       this._reset();
       const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);
@@ -231,7 +263,8 @@ export default class AdaRedemptionStore extends Store {
     }
   };
 
-  _onAdaSuccessfullyRedeemed = action(({ walletId, amount } : {
+  @action
+  _onAdaSuccessfullyRedeemed = ({ walletId, amount } : {
     walletId: string,
     amount: number,
   }) => {
@@ -242,30 +275,33 @@ export default class AdaRedemptionStore extends Store {
     this.amountRedeemed = amount;
     this.showAdaRedemptionSuccessMessage = true;
     this._resetDecryptionFields();
-  });
+  };
 
-  _onCloseAdaRedemptionSuccessOverlay = action(() => {
+  @action
+  _onCloseAdaRedemptionSuccessOverlay = () => {
     this.showAdaRedemptionSuccessMessage = false;
-  });
+  };
 
   _resetRedemptionFormValuesOnAdaRedemptionPageLoad = () => {
     if (this.isAdaRedemptionPage) this._reset();
   };
 
-  _onRemoveCertificate = action(() => {
+  @action
+  _onRemoveCertificate = () => {
     this.error = null;
     this.certificate = null;
     this.email = null;
     this.adaPasscode = null;
     this.adaAmount = null;
     this._resetDecryptionFields();
-  });
+  };
 
-  _resetDecryptionFields = action(() => {
+  @action
+  _resetDecryptionFields = () => {
     this.redemptionCode = '';
     this.passPhrase = null;
     this.decryptionKey = null;
-  });
+  };
 
   @action _reset = () => {
     this.error = null;

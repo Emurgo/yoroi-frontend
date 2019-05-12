@@ -7,12 +7,12 @@ import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
-  CreateTrezorSignTxDataRequest,
-  CreateTrezorSignTxDataResponse,
-  BroadcastTrezorSignedTxRequest,
+  CreateTrezorSignTxDataFunc,
+  BroadcastTrezorSignedTxFunc
 } from '../../api/ada';
-import type { BroadcastTrezorSignedTxResponse } from '../../api/common';
-
+import type {
+  SendUsingTrezorParams
+} from '../../actions/ada/trezor-send-actions';
 import {
   Logger,
   stringifyError,
@@ -30,11 +30,11 @@ export default class TrezorSendStore extends Store {
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  createTrezorSignTxDataRequest: LocalizedRequest<CreateTrezorSignTxDataResponse> =
-    new LocalizedRequest(this.api.ada.createTrezorSignTxData);
+  createTrezorSignTxDataRequest: LocalizedRequest<CreateTrezorSignTxDataFunc>
+    = new LocalizedRequest<CreateTrezorSignTxDataFunc>(this.api.ada.createTrezorSignTxData);
 
-  broadcastTrezorSignedTxRequest: LocalizedRequest<BroadcastTrezorSignedTxResponse> =
-    new LocalizedRequest(this.api.ada.broadcastTrezorSignedTx);
+  broadcastTrezorSignedTxRequest: LocalizedRequest<BroadcastTrezorSignedTxFunc>
+    = new LocalizedRequest<BroadcastTrezorSignedTxFunc>(this.api.ada.broadcastTrezorSignedTx);
   // =================== API RELATED =================== //
 
   setup() {
@@ -49,7 +49,7 @@ export default class TrezorSendStore extends Store {
   }
 
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
-  _sendUsingTrezor = async (params: CreateTrezorSignTxDataRequest): Promise<void> => {
+  _sendUsingTrezor = async (params: SendUsingTrezorParams): Promise<void> => {
     try {
       this.createTrezorSignTxDataRequest.reset();
       this.broadcastTrezorSignedTxRequest.reset();
@@ -75,13 +75,21 @@ export default class TrezorSendStore extends Store {
         throw new Error('Active account required before sending.');
       }
 
-      const trezorSignTxDataResp =
-        await this.createTrezorSignTxDataRequest.execute(params).promise;
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      this.createTrezorSignTxDataRequest.execute({
+        ...params,
+        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
+      });
+      if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
+
+      const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
 
       // TODO: [TREZOR] fix type if possible
-      const trezorSignTxResp = await TrezorConnect.cardanoSignTransaction({
-        ...trezorSignTxDataResp.trezorSignTxPayload
-      });
+      const trezorSignTxResp = await await TrezorConnect.cardanoSignTransaction(
+        // $FlowFixMe Trezor types in Yoroi are all wrong for no good reason. TODO: fix this
+        { ...trezorSignTxDataResp.trezorSignTxPayload }
+      );
 
       if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error) {
         // this Error will be converted to LocalizableError()
@@ -101,15 +109,12 @@ export default class TrezorSendStore extends Store {
   };
 
   _brodcastSignedTx = async (
-    trezorSignTxResp: any,
+    trezorSignTxResp,
   ): Promise<void> => {
-    // TODO: [TREZOR] fix type if possible
-    const payload: any = trezorSignTxResp.payload;
-    const reqParams: BroadcastTrezorSignedTxRequest = {
-      signedTxHex: payload.body,
-    };
-
-    await this.broadcastTrezorSignedTxRequest.execute(reqParams).promise;
+    await this.broadcastTrezorSignedTxRequest.execute({
+      signedTxHex: trezorSignTxResp.payload.body,
+      sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+    }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];

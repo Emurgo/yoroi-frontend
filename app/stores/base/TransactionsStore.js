@@ -5,8 +5,9 @@ import BigNumber from 'bignumber.js';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
-import type { GetTransactionsResponse, GetBalanceResponse,
-  GetTransactionsRequest, GetTransactionsRequesOptions } from '../../api/common';
+import type { GetTransactionsFunc, GetBalanceFunc,
+  GetTransactionsRequest, GetTransactionsRequestOptions,
+  RefreshPendingTransactionsFunc } from '../../api/ada';
 import environment from '../../environment';
 
 export default class TransactionsStore extends Store {
@@ -23,10 +24,10 @@ export default class TransactionsStore extends Store {
   /** Track transactions for a set of wallets */
   @observable transactionsRequests: Array<{
     walletId: string,
-    pendingRequest: CachedRequest<GetTransactionsResponse>,
-    recentRequest: CachedRequest<GetTransactionsResponse>,
-    allRequest: CachedRequest<GetTransactionsResponse>,
-    getBalanceRequest: CachedRequest<GetBalanceResponse>
+    pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
+    recentRequest: CachedRequest<GetTransactionsFunc>,
+    allRequest: CachedRequest<GetTransactionsFunc>,
+    getBalanceRequest: CachedRequest<GetBalanceFunc>
   }> = [];
 
   @observable _searchOptionsForWallets = {};
@@ -45,15 +46,19 @@ export default class TransactionsStore extends Store {
     }
   };
 
-  @computed get recentTransactionsRequest(): CachedRequest<GetTransactionsResponse> {
+  @computed get recentTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
     const wallet = this.stores.substores[environment.API].wallets.active;
     // TODO: Do not return new request here
-    if (!wallet) return new CachedRequest(this.api[environment.API].refreshTransactions);
+    if (!wallet) {
+      return new CachedRequest<GetTransactionsFunc>(
+        this.api[environment.API].refreshTransactions
+      );
+    }
     return this._getTransactionsRecentRequest(wallet.id);
   }
 
   /** Get (or create) the search options for the active wallet (if any)  */
-  @computed get searchOptions(): ?GetTransactionsRequesOptions {
+  @computed get searchOptions(): ?GetTransactionsRequestOptions {
     const wallet = this.stores.substores[environment.API].wallets.active;
     if (!wallet) return null;
     let options = this._searchOptionsForWallets[wallet.id];
@@ -114,10 +119,15 @@ export default class TransactionsStore extends Store {
       const skip = this.searchOptions
         ? this.searchOptions.skip
         : this.SEARCH_SKIP;
+
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+
       const requestParams: GetTransactionsRequest = {
         walletId: wallet.id,
         limit,
         skip,
+        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
       };
       const recentRequest = this._getTransactionsRecentRequest(wallet.id);
       recentRequest.invalidate({ immediately: false });
@@ -125,18 +135,29 @@ export default class TransactionsStore extends Store {
 
       const allRequest = this._getTransactionsAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
-      allRequest.execute({ walletId: wallet.id });
+      allRequest.execute({
+        walletId: wallet.id,
+        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      });
+
+      if (!allRequest.promise) throw new Error('should never happen');
 
       allRequest.promise
         .then(async () => {
           // calculate pending tranactions just to cache the result
           const pendingRequest = this._getTransactionsPendingRequest(wallet.id);
           pendingRequest.invalidate({ immediately: false });
-          pendingRequest.execute({ walletId: wallet.id });
+          pendingRequest.execute(
+            { walletId: wallet.id } // add walletId just for cache
+          );
 
           const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate();
           // Note: cache based on lastUpdateDate even though it's not used in balanceRequest
-          return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
+          return this._getBalanceRequest(wallet.id).execute({
+            date: lastUpdateDate,
+            getUTXOsSumsForAddresses: stateFetcher.getUTXOsSumsForAddresses,
+          });
         })
         .then((updatedBalance: BigNumber) => {
           if (walletsStore.active && walletsStore.active.id === wallet.id) {
@@ -162,32 +183,36 @@ export default class TransactionsStore extends Store {
     this._refreshTransactionData();
   }
 
-  _getTransactionsPendingRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
+  _getTransactionsPendingRequest = (
+    walletId: string
+  ): CachedRequest<RefreshPendingTransactionsFunc> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.pendingRequest) return foundRequest.pendingRequest;
-    return new CachedRequest(this.api[environment.API].refreshPendingTransactions);
+    return new CachedRequest<RefreshPendingTransactionsFunc>(
+      this.api[environment.API].refreshPendingTransactions
+    );
   };
 
   /** Get request for fetching transaction data.
    * Should ONLY be executed to cache query WITH search options */
-  _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
+  _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsFunc> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.recentRequest) return foundRequest.recentRequest;
-    return new CachedRequest(this.api[environment.API].refreshTransactions);
+    return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
   };
 
   /** Get request for fetching transaction data.
    * Should ONLY be executed to cache query WITHOUT search options */
-  _getTransactionsAllRequest = (walletId: string): CachedRequest<GetTransactionsResponse> => {
+  _getTransactionsAllRequest = (walletId: string): CachedRequest<GetTransactionsFunc> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
-    return new CachedRequest(this.api[environment.API].refreshTransactions);
+    return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
   };
 
-  _getBalanceRequest = (walletId: string): CachedRequest<GetBalanceResponse> => {
+  _getBalanceRequest = (walletId: string): CachedRequest<GetBalanceFunc> => {
     const foundRequest = _.find(this.transactionsRequests, { walletId });
     if (foundRequest && foundRequest.getBalanceRequest) return foundRequest.getBalanceRequest;
-    return new CachedRequest(this.api[environment.API].getBalance);
+    return new CachedRequest<GetBalanceFunc>(this.api[environment.API].getBalance);
   };
 
 }

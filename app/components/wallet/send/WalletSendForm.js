@@ -221,11 +221,7 @@ export default class WalletSendForm extends Component<Props, State> {
     const amountFieldProps = amountField.bind();
     const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
 
-    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
-    const receiverInputClasses = classicTheme ? styles.receiverInputClassic : styles.receiverInput;
-    const amountInputClasses = classicTheme ? styles.amountInputClassic : styles.amountInput;
-
-    const hasPendingTxWarning = (
+    const pendingTxWarningComponent = (
       <div className={styles.contentWarning}>
         <SvgInline svg={dangerIcon} className={styles.icon} />
         <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
@@ -233,13 +229,13 @@ export default class WalletSendForm extends Component<Props, State> {
     );
 
     return (
-      <div className={componentClasses}>
+      <div className={styles.component}>
 
-        {hasAnyPending && hasPendingTxWarning}
+        {hasAnyPending && pendingTxWarningComponent}
 
-        <BorderedBox classicTheme={classicTheme}>
+        <BorderedBox>
 
-          <div className={receiverInputClasses}>
+          <div className={styles.receiverInput}>
             <Input
               className="receiver"
               {...receiverField.bind()}
@@ -248,7 +244,7 @@ export default class WalletSendForm extends Component<Props, State> {
             />
           </div>
 
-          <div className={amountInputClasses}>
+          <div className={styles.amountInput}>
             <NumericInput
               {...amountFieldProps}
               className="amount"
@@ -281,11 +277,10 @@ export default class WalletSendForm extends Component<Props, State> {
     * CASE 2: Hardware Wallet (Trezor or Ledger) */
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
-    const { classicTheme } = this.props;
 
     const buttonClasses = classnames([
       'primary',
-      classicTheme ? styles.nextButtonClassic : styles.nextButton,
+      styles.nextButton,
     ]);
 
     const {

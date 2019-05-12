@@ -6,8 +6,8 @@ import type { RedemptionTypeChoices } from '../../types/redemptionTypes';
 
 export default class AdaRedemptionActions {
   chooseRedemptionType: Action<{ redemptionType: RedemptionTypeChoices }> = new Action();
-  setCertificate: Action<{ certificate: File }> = new Action();
-  removeCertificate: Action<any> = new Action();
+  setCertificate: Action<{ certificate: File | Blob }> = new Action();
+  removeCertificate: Action<void> = new Action();
   setPassPhrase: Action<{ passPhrase: string }> = new Action();
   setRedemptionCode: Action<{ redemptionCode: string }> = new Action();
   setEmail: Action<{ email: string }> = new Action();
@@ -18,6 +18,6 @@ export default class AdaRedemptionActions {
   // eslint-disable-next-line max-len
   redeemPaperVendedAda: Action<{ walletId: string, shieldedRedemptionKey: string }> = new Action();
   adaSuccessfullyRedeemed: Action<{ walletId: string, amount: number }> = new Action();
-  acceptRedemptionDisclaimer: Action<any> = new Action();
-  closeAdaRedemptionSuccessOverlay: Action<any> = new Action();
+  acceptRedemptionDisclaimer: Action<void> = new Action();
+  closeAdaRedemptionSuccessOverlay: Action<void> = new Action();
 }

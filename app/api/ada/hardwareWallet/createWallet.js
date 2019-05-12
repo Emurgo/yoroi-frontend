@@ -15,15 +15,17 @@ import {
 } from '../../../utils/logging';
 import { createAdaHardwareWallet } from '../adaWallet';
 import { createHardwareWalletAccount } from '../adaAccount';
+import type { FilterFunc } from '../lib/state-fetch/types';
 
 /** Creates and stores(into local storage) a new/empty AdaWallet and CryptoAccount
  * Fetches all related addresses
  * Caches the fetched address results locally (into lovefieldDatabase)
  * @returns a new AdaWallet
  */
-export async function createWallet({
-  walletInitData
-}: AdaHardwareWalletParams): Promise<AdaWallet> {
+export async function createWallet(
+  { walletInitData }: AdaHardwareWalletParams,
+  checkAddressesInUse: FilterFunc,
+): Promise<AdaWallet> {
   try {
     Logger.debug('hardwareWallet::createWallet called');
 
@@ -37,7 +39,7 @@ export async function createWallet({
     );
 
     // Restore transactions and Save wallet + cryptoAccount to localstorage
-    await restoreTransactionsAndSave(cryptoAccount, hardwareWallet);
+    await restoreTransactionsAndSave(cryptoAccount, hardwareWallet, undefined, checkAddressesInUse);
 
     Logger.debug('hardwareWallet::createWallet success');
     return hardwareWallet;
