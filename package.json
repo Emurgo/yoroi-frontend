@@ -14,6 +14,7 @@
     "compress-keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx",
     "flow": "flow --show-all-errors .",
+    "flow-install": "flow-typed install",
     "eslint": "eslint app features chrome scripts webpack/*.js",
     "test-unit": "jest",
     "test-prepare": "npm run clean && npm run build -- --env 'test' && npm run compress-e2e-tests",

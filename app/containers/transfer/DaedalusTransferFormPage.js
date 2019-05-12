@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
 import TransferMnemonicPage from '../../components/transfer/TransferMnemonicPage';
 
 const messages = defineMessages({
@@ -15,8 +14,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Enter the 27-word recovery phrase used to back up your Daedalus Paper wallet to restore the balance and transfer all the funds from Daedalus to Yoroi.',
   },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   onSubmit: Function,

@@ -7,11 +7,12 @@ import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
-  CreateTrezorSignTxDataRequest,
   CreateTrezorSignTxDataFunc,
   BroadcastTrezorSignedTxFunc
 } from '../../api/ada';
-
+import type {
+  SendUsingTrezorParams
+} from '../../actions/ada/trezor-send-actions';
 import {
   Logger,
   stringifyError,
@@ -48,7 +49,7 @@ export default class TrezorSendStore extends Store {
   }
 
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
-  _sendUsingTrezor = async (params: CreateTrezorSignTxDataRequest): Promise<void> => {
+  _sendUsingTrezor = async (params: SendUsingTrezorParams): Promise<void> => {
     try {
       this.createTrezorSignTxDataRequest.reset();
       this.broadcastTrezorSignedTxRequest.reset();
@@ -74,7 +75,12 @@ export default class TrezorSendStore extends Store {
         throw new Error('Active account required before sending.');
       }
 
-      this.createTrezorSignTxDataRequest.execute(params);
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      this.createTrezorSignTxDataRequest.execute({
+        ...params,
+        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
+      });
       if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
 
       const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
@@ -107,6 +113,7 @@ export default class TrezorSendStore extends Store {
   ): Promise<void> => {
     await this.broadcastTrezorSignedTxRequest.execute({
       signedTxHex: trezorSignTxResp.payload.body,
+      sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();

@@ -30,12 +30,11 @@ import type {
   AdaWalletMetaParams,
   AdaHardwareWalletParams,
 } from './adaTypes';
-import {
-  getUTXOsSumsForAddresses
-} from './lib/yoroi-backend-api';
 import type {
-  UtxoSumForAddressesResponse
-} from './lib/yoroi-backend-api';
+  FilterFunc,
+  UtxoSumFunc,
+  UtxoSumResponse
+} from './lib/state-fetch/types';
 import { UpdateAdaWalletError, GetBalanceError } from './errors';
 import {
   getAdaWallet,
@@ -52,14 +51,15 @@ const addressesLimit = CONFIG.app.addressRequestSize;
 
 /* Create and save a wallet with your master key, and a SINGLE account with one address */
 export async function newAdaWallet(
-  { walletPassword, walletInitData }: AdaWalletParams
+  { walletPassword, walletInitData }: AdaWalletParams,
+  checkAddressesInUse: FilterFunc,
 ): Promise<AdaWallet> {
   const [adaWallet, masterKey] = createAdaWallet({ walletPassword, walletInitData });
   // always restore the 0th account
   const cryptoAccount = createCryptoAccount(masterKey, walletPassword, 0);
 
   // creating an account same as restoring an account plus some initial setup
-  await restoreTransactionsAndSave(cryptoAccount, adaWallet, masterKey);
+  await restoreTransactionsAndSave(cryptoAccount, adaWallet, masterKey, checkAddressesInUse);
   return Promise.resolve(adaWallet);
 }
 
@@ -85,7 +85,9 @@ export const updateAdaWalletMetaParams = async (
 };
 
 /** Calculate balance and update wallet balance cached in localstorage */
-export const updateAdaWalletBalance = async (): Promise<?BigNumber> => {
+export const updateAdaWalletBalance = async (
+  getUTXOsSumsForAddresses: UtxoSumFunc,
+): Promise<?BigNumber> => {
   // Get existing wallet or return if non exists
   const persistentWallet = getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
@@ -98,7 +100,7 @@ export const updateAdaWalletBalance = async (): Promise<?BigNumber> => {
     // Calculate and set new user balance
     const updatedWallet = Object.assign({}, persistentWallet, {
       cwAmount: {
-        getCCoin: await getBalance(addresses)
+        getCCoin: await getBalance(addresses, getUTXOsSumsForAddresses)
       }
     });
 
@@ -188,7 +190,8 @@ export const mnemonicsToExternalAddresses = (
 
 /** Call backend-service to get the balances of addresses and then sum them */
 export async function getBalance(
-  addresses: Array<string>
+  addresses: Array<string>,
+  getUTXOsSumsForAddresses: UtxoSumFunc,
 ): Promise<BigNumber> {
   try {
     // batch all addresses into chunks for API
@@ -197,7 +200,7 @@ export async function getBalance(
       groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(
         { addresses: groupOfAddresses }
       ));
-    const partialAmounts: Array<UtxoSumForAddressesResponse> = await Promise.all(promises);
+    const partialAmounts: Array<UtxoSumResponse> = await Promise.all(promises);
 
     // sum all chunks together
     return partialAmounts.reduce(

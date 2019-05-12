@@ -7,9 +7,7 @@ import {
   Logger,
   stringifyError
 } from '../../../utils/logging';
-import {
-  getTransactionsHistoryForAddresses
-} from '../lib/yoroi-backend-api';
+import type { FilterFunc, HistoryFunc } from '../lib/state-fetch/types';
 import {
   saveTxs,
   getTxsOrderedByDateDesc,
@@ -65,10 +63,12 @@ export const getAdaTxLastUpdatedDate = async (): Promise<Date> => getTxsLastUpda
 /** Make backend-service calls to update any missing transactions in lovefieldDB
  * Additionally add new addresses to DB to remain BIP-44 complaint
  */
-export async function refreshTxs(): Promise<void> {
+export async function refreshTxs(
+  getTransactionsHistoryForAddresses: HistoryFunc,
+  checkAddressesInUse: FilterFunc,
+): Promise<void> {
   const account = getCurrentCryptoAccount();
   if (account) {
-
     /**
      * We have to make backend calls to check which of our addresses are used
      * This is because if many txs were made since the last time we synced,
@@ -82,14 +82,16 @@ export async function refreshTxs(): Promise<void> {
      * Therefore we need to make sure necessary addresses are generated in both chains
      * to ensure they are correctly detected as ours
      */
-    await syncAddresses(account, 'Internal');
-    await syncAddresses(account, 'External');
+    await syncAddresses(account, 'Internal', checkAddressesInUse);
+    await syncAddresses(account, 'External', checkAddressesInUse);
   }
 
-  await refreshChains();
+  await refreshChains(getTransactionsHistoryForAddresses);
 }
 
-async function refreshChains(): Promise<void> {
+async function refreshChains(
+  getTransactionsHistoryForAddresses: HistoryFunc
+): Promise<void> {
   try {
     /**
      * Note: we refresh both chains at the same time because of how we optimize requests
@@ -103,7 +105,7 @@ async function refreshChains(): Promise<void> {
     const rawAddresses: Array<string> = adaAddresses.map(addr => addr.cadId);
 
     const newTxs = await _updateAdaTxsHistory(
-      await getTxsOrderedByLastUpdateDesc(), rawAddresses
+      await getTxsOrderedByLastUpdateDesc(), rawAddresses, getTransactionsHistoryForAddresses,
     );
 
     // save transactions in lovefieldDB
@@ -120,6 +122,7 @@ async function refreshChains(): Promise<void> {
 async function syncAddresses(
   cryptoAccount: CryptoAccount,
   type: AddressType,
+  checkAddressesInUse: FilterFunc,
 ) {
   // optimize backend call by only checking the isUsed status of addresses we know aren't used
   const adaAddresses = await getAdaAddressesByType(type);
@@ -128,7 +131,8 @@ async function syncAddresses(
   await scanAndSaveAddresses(
     cryptoAccount,
     type,
-    prevLatest
+    prevLatest,
+    checkAddressesInUse,
   );
 }
 
@@ -143,7 +147,8 @@ export function getPendingAdaTxs(): Promise<Array<AdaTransaction>> {
  */
 async function _updateAdaTxsHistory(
   existingTransactions: Array<AdaTransaction>,
-  addresses: Array<string>
+  addresses: Array<string>,
+  getTransactionsHistoryForAddresses: HistoryFunc,
 ): Promise<Array<Transaction>> {
   try {
     // optimization: look for new transactions AFTER the timestamp of the last transaction received
@@ -153,7 +158,12 @@ async function _updateAdaTxsHistory(
 
     // send batched requests to get transaction history for addresses
     const mappedTxs = await _getTxsForChunksOfAddresses(addresses, groupOfAddresses => (
-      _updateAdaTxsHistoryForGroupOfAddresses([], groupOfAddresses, dateFrom)
+      _updateAdaTxsHistoryForGroupOfAddresses(
+        [],
+        groupOfAddresses,
+        dateFrom,
+        getTransactionsHistoryForAddresses
+      )
     ));
 
     return mappedTxs;
@@ -181,6 +191,7 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
   previousTxs: Array<Transaction>,
   groupOfAddresses: Array<string>,
   dateFrom: Date,
+  getTransactionsHistoryForAddresses: HistoryFunc,
 ): Promise<Array<Transaction>> {
   /* We want to get the transaction history of a list of addresses
    * Howevever, the backend API has a limited size in its response
@@ -220,7 +231,8 @@ async function _updateAdaTxsHistoryForGroupOfAddresses(
     return await _updateAdaTxsHistoryForGroupOfAddresses(
       transactions,
       groupOfAddresses,
-      dateFrom
+      dateFrom,
+      getTransactionsHistoryForAddresses
     );
   }
 

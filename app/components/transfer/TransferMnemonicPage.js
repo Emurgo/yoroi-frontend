@@ -34,12 +34,6 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
-messages.backButtonLabel = globalMessages.backButtonLabel;
-messages.step1 = globalMessages.step1;
-messages.instructionTitle = globalMessages.instructionTitle;
-
 type Props = {
   onSubmit: Function,
   onBack: Function,
@@ -65,7 +59,7 @@ export default class TransferMnemonicPage extends Component<Props> {
         value: '',
         validators: [({ field }) => {
           const value = join(field.value, ' ');
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           return [
             this.props.mnemonicValidator(value),
             this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
@@ -128,14 +122,14 @@ export default class TransferMnemonicPage extends Component<Props> {
             { /* Instructions for how to transfer */ }
             <div>
               <div className={styles.title}>
-                {intl.formatMessage(messages.instructionTitle)}
+                {intl.formatMessage(globalMessages.instructionTitle)}
               </div>
 
               <ul className={styles.instructionsList}>
                 {
                   <div className={styles.text}>
                     {step0}
-                    {intl.formatMessage(messages.step1)}
+                    {intl.formatMessage(globalMessages.step1)}
                   </div>
                 }
               </ul>
@@ -155,14 +149,14 @@ export default class TransferMnemonicPage extends Component<Props> {
             <div className={styles.buttonsWrapper}>
               <Button
                 className={nextButtonClasses}
-                label={intl.formatMessage(messages.nextButtonLabel)}
+                label={intl.formatMessage(globalMessages.nextButtonLabel)}
                 onClick={this.submit}
                 skin={ButtonSkin}
               />
 
               <Button
                 className={backButtonClasses}
-                label={intl.formatMessage(messages.backButtonLabel)}
+                label={intl.formatMessage(globalMessages.backButtonLabel)}
                 onClick={onBack}
                 skin={ButtonSkin}
               />

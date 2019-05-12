@@ -101,8 +101,6 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
 export type WalletRestoreDialogValues = {
   recoveryPhrase: string,
   walletName: string,
@@ -172,7 +170,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         value: this.getInitRecoveryPhrase(),
         validators: [({ field }) => {
           const value = join(field.value, ' ');
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           return [
             this.props.mnemonicValidator(value),
             this.context.intl.formatMessage(messages.invalidRecoveryPhrase)

@@ -1,6 +1,4 @@
 // @flow
-import _ from 'lodash';
-
 import {
   Logger,
   stringifyError,
@@ -15,14 +13,13 @@ import { utxosToLookupMap, derivePathAsString }  from '../lib/utils';
 import type {
   AdaAddressMap,
 } from '../adaAddress';
-import {
-  sendTx,
-  getTxsBodiesForUTXOs
-} from '../lib/yoroi-backend-api';
+import type {
+  SendFunc,
+  TxBodiesFunc
+} from '../lib/state-fetch/types';
 import {
   SendTransactionError,
   InvalidWitnessError,
-  GetTxsBodiesForUTXOsError
 } from '../errors';
 import type {
   BroadcastTrezorSignedTxResponse,
@@ -57,6 +54,7 @@ export async function createTrezorSignTxPayload(
   changeAddr: ?AdaAddress,
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<TrezorSignTxPayload> {
   const txJson: TransactionType = unsignedTx.to_json();
 
@@ -76,7 +74,9 @@ export async function createTrezorSignTxPayload(
   );
 
   // Transactions
-  const txsBodiesMap = await txsBodiesForInputs(txJson.inputs);
+  // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
+  const txsHashes = [...new Set(txJson.inputs.map(x => x.id))];
+  const txsBodiesMap = await getTxsBodiesForUTXOs({ txsHashes });
   const txsBodies = txJson.inputs.map((x) => txsBodiesMap[x.id]);
 
   return {
@@ -87,43 +87,10 @@ export async function createTrezorSignTxPayload(
   };
 }
 
-/** List of Body hashes for a list of utxos by batching backend requests */
-export async function txsBodiesForInputs(
-  inputs: Array<TxoPointerType>
-): Promise<{[key: string]:string}> {
-  if (!inputs) return {};
-  try {
-
-    // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
-    const txsHashes = [...new Set(inputs.map(x => x.id))];
-
-    // split up all txs into chunks of equal size
-    const groupsOfTxsHashes = _.chunk(txsHashes, CONFIG.app.txsBodiesRequestSize);
-
-    // convert chunks into list of Promises that call the backend-service
-    const promises = groupsOfTxsHashes
-      .map(groupOfTxsHashes => getTxsBodiesForUTXOs(groupOfTxsHashes));
-
-    // Sum up all the utxo
-    return Promise.all(promises)
-      .then(groupsOfTxBodies => {
-        const bodies = groupsOfTxBodies
-          .reduce((acc, groupOfTxBodies) => Object.assign(acc, groupOfTxBodies), {});
-        if (txsHashes.length !== Object.keys(bodies).length) {
-          throw new GetTxsBodiesForUTXOsError();
-        }
-        return bodies;
-      });
-  } catch (getTxBodiesError) {
-    Logger.error('newTransaction::txsBodiesForInputs error: ' +
-      stringifyError(getTxBodiesError));
-    throw new GetTxsBodiesForUTXOsError();
-  }
-}
-
 /** Send a transaction and save the new change address */
 export async function broadcastTrezorSignedTx(
   signedTxHex: string,
+  sendTx: SendFunc
 ): Promise<BroadcastTrezorSignedTxResponse> {
   Logger.debug('newTransaction::broadcastTrezorSignedTx: called');
   const signedTxBytes = Buffer.from(signedTxHex, 'hex');
@@ -189,9 +156,12 @@ export async function createLedgerSignTxPayload(
   changeAddr: ?AdaAddress,
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<LedgerSignTxPayload> {
   const txJson: TransactionType = unsignedTx.to_json();
-  const txDataHexMap = await txsBodiesForInputs(txJson.inputs);
+  // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
+  const txsHashes = [...new Set(txJson.inputs.map(x => x.id))];
+  const txsBodiesMap = await getTxsBodiesForUTXOs({ txsHashes });
 
   const utxoMap = utxosToLookupMap(senderUtxos);
 
@@ -201,7 +171,7 @@ export async function createLedgerSignTxPayload(
       txJson.inputs,
       addressesMap,
       utxoMap,
-      txDataHexMap,
+      txsBodiesMap,
     );
 
   // Outputs
@@ -259,6 +229,7 @@ export async function prepareAndBroadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
   unsignedTx: RustModule.Wallet.Transaction,
   cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
+  sendTx: SendFunc,
 ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
   try {
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');

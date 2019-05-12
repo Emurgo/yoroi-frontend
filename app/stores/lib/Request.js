@@ -149,7 +149,7 @@ export class ApiMethodNotYetImplementedError extends LocalizableError {
   constructor() {
     super({
       id: messages.apiMethodNotYetImplementedError.id,
-      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage,
+      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage || '',
     });
   }
 }
@@ -158,7 +158,7 @@ export class NotExecutedYetError extends LocalizableError {
   constructor() {
     super({
       id: messages.apiMethodNotYetImplementedError.id,
-      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage,
+      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage || '',
     });
   }
 }

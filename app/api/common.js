@@ -5,7 +5,6 @@
 import { defineMessages } from 'react-intl';
 
 import LocalizableError from '../i18n/LocalizableError';
-import type { SignedResponse } from './ada/lib/yoroi-backend-api';
 import type {
   TransactionExportRow,
   TransactionExportDataFormat,
@@ -39,7 +38,7 @@ export class GenericApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.genericApiError.id,
-      defaultMessage: messages.genericApiError.defaultMessage,
+      defaultMessage: messages.genericApiError.defaultMessage || '',
     });
   }
 }
@@ -48,7 +47,7 @@ export class IncorrectWalletPasswordError extends LocalizableError {
   constructor() {
     super({
       id: messages.incorrectWalletPasswordError.id,
-      defaultMessage: messages.incorrectWalletPasswordError.defaultMessage,
+      defaultMessage: messages.incorrectWalletPasswordError.defaultMessage || '',
     });
   }
 }
@@ -57,7 +56,7 @@ export class WalletAlreadyRestoredError extends LocalizableError {
   constructor() {
     super({
       id: messages.walletAlreadyRestoredError.id,
-      defaultMessage: messages.walletAlreadyRestoredError.defaultMessage,
+      defaultMessage: messages.walletAlreadyRestoredError.defaultMessage || '',
     });
   }
 }
@@ -66,7 +65,7 @@ export class ReportRequestError extends LocalizableError {
   constructor() {
     super({
       id: messages.reportRequestError.id,
-      defaultMessage: messages.reportRequestError.defaultMessage,
+      defaultMessage: messages.reportRequestError.defaultMessage || '',
     });
   }
 }
@@ -75,7 +74,7 @@ export class UnusedAddressesError extends LocalizableError {
   constructor() {
     super({
       id: messages.unusedAddressesError.id,
-      defaultMessage: messages.unusedAddressesError.defaultMessage,
+      defaultMessage: messages.unusedAddressesError.defaultMessage || '',
     });
   }
 }
@@ -98,5 +97,3 @@ export type DeleteWalletResponse = boolean;
 export type DeleteWalletFunc = (
   request: DeleteWalletRequest
 ) => Promise<DeleteWalletResponse>;
-
-export type CreateTransactionResponse = SignedResponse;

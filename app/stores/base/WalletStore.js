@@ -77,10 +77,13 @@ export default class WalletsStore extends Store {
   /** Create the wallet and go to wallet summary screen */
   _finishCreation = async () => {
     this._newWalletDetails.mnemonic = this.stores.walletBackup.recoveryPhrase.join(' ');
-    const wallet = await this.createWalletRequest.execute(this._newWalletDetails).promise;
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const wallet = await this.createWalletRequest.execute({
+      ...this._newWalletDetails,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
+    }).promise;
     if (wallet) {
-      // TODO: add this back once we support multiple wallets
-      // await this.walletsRequest.patch(result => { result.push(wallet); });
+      await this.walletsRequest.patch(result => { result.push(wallet); });
       this.actions.dialogs.closeActiveDialog.trigger();
       this.goToWalletRoute(wallet.id);
     } else {
@@ -119,7 +122,11 @@ export default class WalletsStore extends Store {
     walletName: string,
     walletPassword: string,
   }) => {
-    const restoredWallet = await this.restoreRequest.execute(params).promise;
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const restoredWallet = await this.restoreRequest.execute({
+      ...params,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
+    }).promise;
     if (!restoredWallet) throw new Error('Restored wallet was not received correctly');
     await this._patchWalletRequestWithNewWallet(restoredWallet);
     this.actions.dialogs.closeActiveDialog.trigger();
