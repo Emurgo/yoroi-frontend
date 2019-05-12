@@ -7,8 +7,10 @@ import type {
 
 // ======= TRANSACTIONS ACTIONS =======
 
+export type TransactionRowsToExportRequest = {};
+
 export default class TransactionsActions {
-  loadMoreTransactions: Action<any> = new Action();
+  loadMoreTransactions: Action<void> = new Action();
   exportTransactionsToFile: Action<GetTransactionRowsToExportRequest> = new Action();
   closeExportTransactionDialog: Action<void> = new Action();
 }

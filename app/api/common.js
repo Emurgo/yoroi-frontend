@@ -5,7 +5,6 @@
 import { defineMessages } from 'react-intl';
 
 import LocalizableError from '../i18n/LocalizableError';
-import type { SignedResponse } from './ada/lib/yoroi-backend-api';
 import type {
   TransactionExportRow,
   TransactionExportDataFormat,
@@ -98,5 +97,3 @@ export type DeleteWalletResponse = boolean;
 export type DeleteWalletFunc = (
   request: DeleteWalletRequest
 ) => Promise<DeleteWalletResponse>;
-
-export type CreateTransactionResponse = SignedResponse;

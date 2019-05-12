@@ -288,10 +288,12 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
       throw new Error('Ledger device hardware info not valid');
     }
 
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     return {
       walletName,
       publicMasterKey: this.hwDeviceInfo.publicMasterKey,
-      hwFeatures: this.hwDeviceInfo.hwFeatures
+      hwFeatures: this.hwDeviceInfo.hwFeatures,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   };
 

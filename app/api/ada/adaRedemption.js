@@ -3,25 +3,31 @@
 import { getAddressFromRedemptionKey, getRedemptionSignedTransaction } from './lib/cardanoCrypto/cryptoRedemption';
 import { SeedWithInvalidLengthError } from './lib/cardanoCrypto/cryptoErrors';
 import bs58 from 'bs58';
-import { getUTXOsForAddresses, sendTx } from './lib/yoroi-backend-api';
 import { decryptRegularVend } from './lib/decrypt';
 import { getReceiverAddress } from './adaAddress';
 import { RedemptionKeyAlreadyUsedError } from './errors';
 import BigNumber from 'bignumber.js';
+import type { AddressUtxoFunc, SendFunc } from './lib/state-fetch/types';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 export type RedeemAdaParams = {
-  redemptionCode: string
+  redemptionCode: string,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  sendTx: SendFunc,
 };
 
 export type RedeemPaperVendedAdaParams = {
   redemptionCode: string,
   mnemonics: Array<string>,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  sendTx: SendFunc,
 };
 
 async function createAndSendTx(
-  keyBytes: Buffer
+  keyBytes: Buffer,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  sendTx: SendFunc,
 ) : Promise<BigNumber> {
   let redeemKey;
   try {
@@ -50,7 +56,11 @@ export async function redeemAda(
 ) : Promise<BigNumber> {
   const redemptionKey = Buffer.from(redemptionParams.redemptionCode, 'base64');
 
-  return createAndSendTx(redemptionKey);
+  return createAndSendTx(
+    redemptionKey,
+    redemptionParams.getUTXOsForAddresses,
+    redemptionParams.sendTx,
+  );
 }
 
 export async function redeemPaperVendedAda(
@@ -61,5 +71,9 @@ export async function redeemPaperVendedAda(
   const seed = decryptRegularVend(mnemonicAsString, redemptionCodeBuffer);
   const redemptionKey = Buffer.from(seed, 'base64');
 
-  return createAndSendTx(redemptionKey);
+  return createAndSendTx(
+    redemptionKey,
+    redemptionParams.getUTXOsForAddresses,
+    redemptionParams.sendTx,
+  );
 }
