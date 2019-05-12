@@ -61,6 +61,7 @@ export default class PaperWalletSettings extends Component<Props> {
   });
 
   render() {
+    const { intl } = this.context;
     const { error, isDialogOpen, dialog, paperWalletsIntroText } = this.props;
     const numAddresses = this.form.$('numAddresses');
     const numAddressOptions = [...Array(5).keys()].map(x => ({ value: `${x + 1}`, label: `${x + 1}` }));
@@ -97,7 +98,7 @@ export default class PaperWalletSettings extends Component<Props> {
           <div>{dialog}</div>
         ) : null}
 
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
       </div>
     );

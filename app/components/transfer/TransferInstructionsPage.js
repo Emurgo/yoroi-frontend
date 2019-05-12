@@ -24,9 +24,6 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.instructionTitle = globalMessages.instructionTitle;
-
 type Props = {
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
@@ -85,7 +82,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <div>
                 <div className={styles.title}>
-                  {intl.formatMessage(messages.instructionTitle)}
+                  {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
                   {intl.formatMessage(messages.instructionsText)}

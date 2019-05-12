@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import type { MessageDescriptorMap } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -14,6 +14,12 @@ import LocalizableError from '../../../i18n/LocalizableError';
 
 import styles from './HWSendConfirmationDialog.scss';
 
+type ExpectedMessages = {
+  infoLine1: MessageDescriptor,
+  infoLine2: MessageDescriptor,
+  sendUsingHWButtonLabel: MessageDescriptor,
+};
+
 type Props = {
   amount: string,
   receiver: string,
@@ -21,7 +27,7 @@ type Props = {
   transactionFee: string,
   currencyUnit: string,
   amountToNaturalUnits: Function,
-  messages: MessageDescriptorMap,
+  messages: ExpectedMessages,
   isSubmitting: boolean,
   error: ?LocalizableError,
   onSubmit: Function,

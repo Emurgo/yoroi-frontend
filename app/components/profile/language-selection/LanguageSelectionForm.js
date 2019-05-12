@@ -10,7 +10,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './LanguageSelectionForm.scss';
-import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import type { MessageDescriptor } from 'react-intl';
 import FlagLabel from '../../widgets/FlagLabel';
 
 const messages = defineMessages({
@@ -25,7 +25,7 @@ const messages = defineMessages({
 });
 
 type Props = {
-  languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
+  languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
