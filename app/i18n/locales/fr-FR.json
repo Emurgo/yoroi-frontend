@@ -330,7 +330,7 @@
   "wallet.redeem.success.overlay.confirmButton": "do not translate",
   "wallet.redeem.success.overlay.headline": "do not translate",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "Phrase de secours incorrecte",
-  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} mots manquants",
   "wallet.restore.dialog.paperPasswordLabel": "Mot de passe du wallet papier",
   "wallet.restore.dialog.passwordDisclaimer": "Taper un mauvais mot de passe vous donnera accès à un wallet différent. Cela vous permettra de faire une dénégation plausible.",
   "wallet.restore.dialog.passwordFieldPlaceholder": "Mot de passe de paiement",
