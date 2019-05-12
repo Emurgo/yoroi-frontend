@@ -30,9 +30,8 @@ const messages = defineMessages({
     id: 'wallet.send.confirmationDialog.submit',
     defaultMessage: '!!!Send',
   },
+  fieldIsRequired: globalMessages.fieldIsRequired,
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   amount: string,

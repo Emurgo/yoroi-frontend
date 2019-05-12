@@ -22,10 +22,8 @@ const messages = defineMessages({
     id: 'transfer.instructions.attention.title.label',
     defaultMessage: '!!!Attention',
   },
+  instructionTitle: globalMessages.instructionTitle,
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.instructionTitle = globalMessages.instructionTitle;
 
 type Props = {
   onFollowInstructionsPrerequisites: Function,

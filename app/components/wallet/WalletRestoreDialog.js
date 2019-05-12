@@ -99,9 +99,8 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.passwordDisclaimer',
     defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
   },
+  fieldIsRequired: globalMessages.fieldIsRequired,
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   onSubmit: Function,

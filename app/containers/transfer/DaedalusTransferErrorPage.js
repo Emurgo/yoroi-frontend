@@ -11,9 +11,8 @@ const messages = defineMessages({
     id: 'daedalusTransfer.errorPage.title.label',
     defaultMessage: '!!!Unable to restore Daedalus wallet',
   },
+  backButtonLabel: globalMessages.backButtonLabel,
 });
-
-messages.backButtonLabel = globalMessages.backButtonLabel;
 
 type Props = {
   error?: ?LocalizableError,

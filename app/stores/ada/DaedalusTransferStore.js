@@ -271,7 +271,7 @@ export class TransferFundsError extends LocalizableError {
   constructor() {
     super({
       id: messages.transferFundsError.id,
-      defaultMessage: messages.transferFundsError.defaultMessage,
+      defaultMessage: messages.transferFundsError.defaultMessage || '',
       description: messages.transferFundsError.description,
     });
   }
@@ -281,7 +281,7 @@ export class NoTransferTxError extends LocalizableError {
   constructor() {
     super({
       id: messages.noTransferTxError.id,
-      defaultMessage: messages.noTransferTxError.defaultMessage,
+      defaultMessage: messages.noTransferTxError.defaultMessage || '',
       description: messages.noTransferTxError.description,
     });
   }
@@ -291,7 +291,7 @@ export class WebSocketRestoreError extends LocalizableError {
   constructor() {
     super({
       id: messages.webSocketRestoreError.id,
-      defaultMessage: messages.webSocketRestoreError.defaultMessage,
+      defaultMessage: messages.webSocketRestoreError.defaultMessage || '',
       description: messages.webSocketRestoreError.description,
     });
   }

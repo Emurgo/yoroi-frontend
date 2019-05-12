@@ -154,10 +154,9 @@ where Ada should be redeemed and enter {adaRedemptionPassphraseLength} word mnem
   adaAmountHint: {
     id: 'wallet.redeem.dialog.adaAmountHint',
     defaultMessage: '!!!Enter your Ada amount',
-  }
+  },
+  fieldIsRequired: globalMessages.fieldIsRequired,
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   wallets: Array<{ value: string, label: string }>,

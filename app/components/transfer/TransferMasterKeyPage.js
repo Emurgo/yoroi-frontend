@@ -27,14 +27,13 @@ const messages = defineMessages({
     id: 'transfer.form.masterkey.requirement',
     defaultMessage: '!!!Note: master keys are 192 characters and hexadecimal-encoded',
   },
+  fieldIsRequired: globalMessages.fieldIsRequired,
+  invalidMasterKey: globalMessages.invalidMasterKey,
+  nextButtonLabel: globalMessages.nextButtonLabel,
+  backButtonLabel: globalMessages.backButtonLabel,
+  step1: globalMessages.step1,
+  instructionTitle: globalMessages.instructionTitle,
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.invalidMasterKey = globalMessages.invalidMasterKey;
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
-messages.backButtonLabel = globalMessages.backButtonLabel;
-messages.step1 = globalMessages.step1;
-messages.instructionTitle = globalMessages.instructionTitle;
 
 type Props = {
   onSubmit: Function,

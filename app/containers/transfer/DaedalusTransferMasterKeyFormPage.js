@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
 import TransferMasterKeyPage from '../../components/transfer/TransferMasterKeyPage';
 
 const messages = defineMessages({
@@ -11,8 +10,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Enter the unencrypted master key for your Daedalus wallet to restore the balance and transfer all the funds from Daedalus to Yoroi.',
   },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   onSubmit: Function,

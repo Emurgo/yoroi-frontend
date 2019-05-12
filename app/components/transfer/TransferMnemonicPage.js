@@ -34,13 +34,12 @@ const messages = defineMessages({
     id: 'transfer.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
   },
+  fieldIsRequired: globalMessages.fieldIsRequired,
+  nextButtonLabel: globalMessages.nextButtonLabel,
+  backButtonLabel: globalMessages.backButtonLabel,
+  step1: globalMessages.step1,
+  instructionTitle: globalMessages.instructionTitle,
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
-messages.backButtonLabel = globalMessages.backButtonLabel;
-messages.step1 = globalMessages.step1;
-messages.instructionTitle = globalMessages.instructionTitle;
 
 type Props = {
   onSubmit: Function,

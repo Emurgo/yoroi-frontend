@@ -8,7 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
-import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import type { MessageDescriptor } from 'react-intl';
 import FlagLabel from '../../widgets/FlagLabel';
 
 const messages = defineMessages({
@@ -20,7 +20,7 @@ const messages = defineMessages({
 });
 
 type Props = {
-  languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
+  languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
   currentLocale: string,
   onSelectLanguage: Function,
   isSubmitting: boolean,
@@ -82,7 +82,7 @@ export default class GeneralSettings extends Component<Props> {
             <FlagLabel svg={option.svg} label={option.label} />
           )}
         />
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
       </div>
     );

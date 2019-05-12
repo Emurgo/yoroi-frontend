@@ -54,9 +54,8 @@ const messages = defineMessages({
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.5',
     defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
   },
+  nextButtonLabel: globalMessages.nextButtonLabel,
 });
-
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
 
 type Props = {
   progressInfo: ProgressInfo,

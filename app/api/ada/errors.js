@@ -1,3 +1,5 @@
+// @flow
+
 import { defineMessages } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 
@@ -144,7 +146,7 @@ export class WalletAlreadyImportedError extends LocalizableError {
   constructor() {
     super({
       id: messages.walletAlreadyImportedError.id,
-      defaultMessage: messages.walletAlreadyImportedError.defaultMessage,
+      defaultMessage: messages.walletAlreadyImportedError.defaultMessage || '',
     });
   }
 }
@@ -153,7 +155,7 @@ export class RedeemAdaError extends LocalizableError {
   constructor() {
     super({
       id: messages.redeemAdaError.id,
-      defaultMessage: messages.redeemAdaError.defaultMessage,
+      defaultMessage: messages.redeemAdaError.defaultMessage || '',
     });
   }
 }
@@ -162,7 +164,7 @@ export class WalletFileImportError extends LocalizableError {
   constructor() {
     super({
       id: messages.walletFileImportError.id,
-      defaultMessage: messages.walletFileImportError.defaultMessage,
+      defaultMessage: messages.walletFileImportError.defaultMessage || '',
     });
   }
 }
@@ -171,7 +173,7 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
   constructor() {
     super({
       id: messages.notEnoughMoneyToSendError.id,
-      defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage,
+      defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage || '',
     });
   }
 }
@@ -180,7 +182,7 @@ export class UpdateAdaWalletError extends LocalizableError {
   constructor() {
     super({
       id: messages.updateAdaWalletError.id,
-      defaultMessage: messages.updateAdaWalletError.defaultMessage,
+      defaultMessage: messages.updateAdaWalletError.defaultMessage || '',
     });
   }
 }
@@ -189,7 +191,7 @@ export class GetBalanceError extends LocalizableError {
   constructor() {
     super({
       id: messages.getBalanceError.id,
-      defaultMessage: messages.getBalanceError.defaultMessage,
+      defaultMessage: messages.getBalanceError.defaultMessage || '',
     });
   }
 }
@@ -198,7 +200,7 @@ export class UpdateAdaTxsHistoryError extends LocalizableError {
   constructor() {
     super({
       id: messages.updateAdaTxsHistoryError.id,
-      defaultMessage: messages.updateAdaTxsHistoryError.defaultMessage,
+      defaultMessage: messages.updateAdaTxsHistoryError.defaultMessage || '',
     });
   }
 }
@@ -207,7 +209,7 @@ export class TransactionError extends LocalizableError {
   constructor() {
     super({
       id: messages.transactionError.id,
-      defaultMessage: messages.transactionError.defaultMessage,
+      defaultMessage: messages.transactionError.defaultMessage || '',
     });
   }
 }
@@ -216,7 +218,7 @@ export class PendingTransactionError extends LocalizableError {
   constructor() {
     super({
       id: messages.pendingTransactionError.id,
-      defaultMessage: messages.pendingTransactionError.defaultMessage,
+      defaultMessage: messages.pendingTransactionError.defaultMessage || '',
     });
   }
 }
@@ -225,7 +227,7 @@ export class GetAddressesWithFundsError extends LocalizableError {
   constructor() {
     super({
       id: messages.getAddressesWithFundsError.id,
-      defaultMessage: messages.getAddressesWithFundsError.defaultMessage
+      defaultMessage: messages.getAddressesWithFundsError.defaultMessage || '',
     });
   }
 }
@@ -234,7 +236,7 @@ export class NoInputsError extends LocalizableError {
   constructor() {
     super({
       id: messages.noInputsError.id,
-      defaultMessage: messages.noInputsError.defaultMessage
+      defaultMessage: messages.noInputsError.defaultMessage || '',
     });
   }
 }
@@ -243,7 +245,7 @@ export class GenerateTransferTxError extends LocalizableError {
   constructor() {
     super({
       id: messages.generateTransferTxError.id,
-      defaultMessage: messages.generateTransferTxError.defaultMessage
+      defaultMessage: messages.generateTransferTxError.defaultMessage || '',
     });
   }
 }
@@ -252,7 +254,7 @@ export class SendTransactionError extends LocalizableError {
   constructor() {
     super({
       id: messages.sendTransactionError.id,
-      defaultMessage: messages.sendTransactionError.defaultMessage
+      defaultMessage: messages.sendTransactionError.defaultMessage || '',
     });
   }
 }
@@ -261,7 +263,7 @@ export class GetAllUTXOsForAddressesError extends LocalizableError {
   constructor() {
     super({
       id: messages.getAllUTXOsForAddressesError.id,
-      defaultMessage: messages.getAllUTXOsForAddressesError.defaultMessage
+      defaultMessage: messages.getAllUTXOsForAddressesError.defaultMessage || '',
     });
   }
 }
@@ -270,7 +272,7 @@ export class DiscoverAddressesError extends LocalizableError {
   constructor() {
     super({
       id: messages.discoverAddressesError.id,
-      defaultMessage: messages.discoverAddressesError.defaultMessage
+      defaultMessage: messages.discoverAddressesError.defaultMessage || '',
     });
   }
 }
@@ -279,7 +281,7 @@ export class GetUtxosForAddressesApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.getUtxosForAddressesApiError.id,
-      defaultMessage: messages.getUtxosForAddressesApiError.defaultMessage
+      defaultMessage: messages.getUtxosForAddressesApiError.defaultMessage || '',
     });
   }
 }
@@ -288,7 +290,7 @@ export class GetTxsBodiesForUTXOsError extends LocalizableError {
   constructor() {
     super({
       id: messages.getTxsBodiesForUTXOsError.id,
-      defaultMessage: messages.getTxsBodiesForUTXOsError.defaultMessage
+      defaultMessage: messages.getTxsBodiesForUTXOsError.defaultMessage || '',
     });
   }
 }
@@ -297,7 +299,7 @@ export class GetTxsBodiesForUTXOsApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.getTxsBodiesForUTXOsApiError.id,
-      defaultMessage: messages.getTxsBodiesForUTXOsApiError.defaultMessage
+      defaultMessage: messages.getTxsBodiesForUTXOsApiError.defaultMessage || '',
     });
   }
 }
@@ -306,7 +308,7 @@ export class GetUtxosSumsForAddressesApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.getUtxosSumsForAddressesApiError.id,
-      defaultMessage: messages.getUtxosSumsForAddressesApiError.defaultMessage
+      defaultMessage: messages.getUtxosSumsForAddressesApiError.defaultMessage || '',
     });
   }
 }
@@ -315,7 +317,7 @@ export class GetTxHistoryForAddressesApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.getTxHistoryForAddressesApiError.id,
-      defaultMessage: messages.getTxHistoryForAddressesApiError.defaultMessage
+      defaultMessage: messages.getTxHistoryForAddressesApiError.defaultMessage || '',
     });
   }
 }
@@ -324,7 +326,7 @@ export class SendTransactionApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.sendTransactionApiError.id,
-      defaultMessage: messages.sendTransactionApiError.defaultMessage
+      defaultMessage: messages.sendTransactionApiError.defaultMessage || '',
     });
   }
 }
@@ -333,7 +335,7 @@ export class CheckAdressesInUseApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.checkAdressesInUseApiError.id,
-      defaultMessage: messages.checkAdressesInUseApiError.defaultMessage
+      defaultMessage: messages.checkAdressesInUseApiError.defaultMessage || '',
     });
   }
 }
@@ -342,7 +344,7 @@ export class InvalidWitnessError extends LocalizableError {
   constructor() {
     super({
       id: messages.invalidWitnessError.id,
-      defaultMessage: messages.invalidWitnessError.defaultMessage
+      defaultMessage: messages.invalidWitnessError.defaultMessage || '',
     });
   }
 }
@@ -351,7 +353,7 @@ export class InvalidCertificateError extends LocalizableError {
   constructor() {
     super({
       id: messages.invalidCertificateError.id,
-      defaultMessage: messages.invalidCertificateError.defaultMessage
+      defaultMessage: messages.invalidCertificateError.defaultMessage || '',
     });
   }
 }
@@ -360,7 +362,7 @@ export class ReadFileError extends LocalizableError {
   constructor() {
     super({
       id: messages.readFileError.id,
-      defaultMessage: messages.readFileError.defaultMessage
+      defaultMessage: messages.readFileError.defaultMessage || '',
     });
   }
 }
@@ -369,7 +371,7 @@ export class DecryptionError extends LocalizableError {
   constructor() {
     super({
       id: messages.decryptionError.id,
-      defaultMessage: messages.decryptionError.defaultMessage
+      defaultMessage: messages.decryptionError.defaultMessage || '',
     });
   }
 }
@@ -378,7 +380,7 @@ export class ParsePDFFileError extends LocalizableError {
   constructor() {
     super({
       id: messages.parsePDFFileError.id,
-      defaultMessage: messages.parsePDFFileError.defaultMessage
+      defaultMessage: messages.parsePDFFileError.defaultMessage || '',
     });
   }
 }
@@ -387,7 +389,7 @@ export class ParsePDFPageError extends LocalizableError {
   constructor() {
     super({
       id: messages.parsePDFPageError.id,
-      defaultMessage: messages.parsePDFPageError.defaultMessage
+      defaultMessage: messages.parsePDFPageError.defaultMessage || '',
     });
   }
 }
@@ -396,7 +398,7 @@ export class ParsePDFKeyError extends LocalizableError {
   constructor() {
     super({
       id: messages.parsePDFKeyError.id,
-      defaultMessage: messages.parsePDFKeyError.defaultMessage
+      defaultMessage: messages.parsePDFKeyError.defaultMessage || '',
     });
   }
 }
@@ -405,7 +407,7 @@ export class InvalidMnemonicError extends LocalizableError {
   constructor() {
     super({
       id: messages.invalidMnemonicError.id,
-      defaultMessage: messages.invalidMnemonicError.defaultMessage
+      defaultMessage: messages.invalidMnemonicError.defaultMessage || '',
     });
   }
 }
@@ -414,7 +416,7 @@ export class AdaRedemptionEncryptedCertificateParseError extends LocalizableErro
   constructor() {
     super({
       id: messages.adaRedemptionEncryptedCertificateParseError.id,
-      defaultMessage: messages.adaRedemptionEncryptedCertificateParseError.defaultMessage
+      defaultMessage: messages.adaRedemptionEncryptedCertificateParseError.defaultMessage || '',
     });
   }
 }
@@ -423,7 +425,7 @@ export class AdaRedemptionCertificateParseError extends LocalizableError {
   constructor() {
     super({
       id: messages.adaRedemptionCertificateParseError.id,
-      defaultMessage: messages.adaRedemptionCertificateParseError.defaultMessage
+      defaultMessage: messages.adaRedemptionCertificateParseError.defaultMessage || '',
     });
   }
 }
@@ -432,7 +434,7 @@ export class NoCertificateError extends LocalizableError {
   constructor() {
     super({
       id: messages.noCertificateError.id,
-      defaultMessage: messages.noCertificateError.defaultMessage
+      defaultMessage: messages.noCertificateError.defaultMessage || '',
     });
   }
 }
@@ -441,7 +443,7 @@ export class RedemptionKeyAlreadyUsedError extends LocalizableError {
   constructor() {
     super({
       id: messages.redemptionKeyAlreadyUsedError.id,
-      defaultMessage: messages.redemptionKeyAlreadyUsedError.defaultMessage,
+      defaultMessage: messages.redemptionKeyAlreadyUsedError.defaultMessage || '',
     });
   }
 }

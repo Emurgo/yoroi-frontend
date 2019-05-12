@@ -82,11 +82,10 @@ const messages = defineMessages({
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Cannot send a transaction while there is a pending one',
-  }
+  },
+  fieldIsRequired: globalMessages.fieldIsRequired,
+  nextButtonLabel: globalMessages.nextButtonLabel,
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
 
 type Props = {
   currencyUnit: string,
