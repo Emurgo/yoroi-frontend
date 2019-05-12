@@ -46,7 +46,7 @@ export default class WalletTopbarTitle extends Component<Props> {
     const {
       wallet, account, currentRoute, formattedWalletAmount, themeProperties
     } = this.props;
-    const { identiconSaturationFactor } = themeProperties;
+    const { identiconSaturationFactor } = themeProperties || {};
 
     // If we are looking at a wallet, show its name and balance
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
