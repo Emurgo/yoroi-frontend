@@ -330,6 +330,7 @@
   "wallet.redeem.success.overlay.confirmButton": "Отлично",
   "wallet.redeem.success.overlay.headline": "Вы успешно обналичили Ada",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "Неверная фраза восстановления",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
   "wallet.restore.dialog.paperPasswordLabel": "Пароль бумажного кошелька",
   "wallet.restore.dialog.passwordDisclaimer": "Ввод неправильного пароля кошелька даст Вам другой кошелек. Это учитывает правдоподобное отрицание.",
   "wallet.restore.dialog.passwordFieldPlaceholder": "Пароль",

@@ -330,6 +330,7 @@
   "wallet.redeem.success.overlay.confirmButton": "很好",
   "wallet.redeem.success.overlay.headline": "您已成功兌換",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "無效復原片語",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
   "wallet.restore.dialog.paperPasswordLabel": "Paper wallet password",
   "wallet.restore.dialog.passwordDisclaimer": "Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.",
   "wallet.restore.dialog.passwordFieldPlaceholder": "Spending Password",

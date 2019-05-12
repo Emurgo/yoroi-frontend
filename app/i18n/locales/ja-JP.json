@@ -330,6 +330,7 @@
   "wallet.redeem.success.overlay.confirmButton": "おめでとうございます！",
   "wallet.redeem.success.overlay.headline": "以下の還元に成功しました",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "復元フレーズが無効です",
+  "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} words left",
   "wallet.restore.dialog.paperPasswordLabel": "ペーパーウォレットのパスワード",
   "wallet.restore.dialog.passwordDisclaimer": "ウォレットパスワードを誤って入力した場合、異なるウォレットが作成されます。これは妥当な否認権を認めるものです。",
   "wallet.restore.dialog.passwordFieldPlaceholder": "送金パスワード",
