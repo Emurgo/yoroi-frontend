@@ -20,6 +20,8 @@ import type { ConfigType } from '../../../../config/config-types';
 import type { AdaAddressMap } from '../adaAddress';
 import { utxosToLookupMap, coinToBigNumber } from '../lib/utils';
 
+import type { AddressUtxoFunc } from '../lib/state-fetch/types';
+
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
 declare var CONFIG: ConfigType;
@@ -31,14 +33,14 @@ export async function getAdaTransactionFee(
   amount: string,
   changeAdaAddr: ?AdaAddress,
   possibleInputAddresses: Array<AdaAddress>,
-  addressesToUtxos: Array<string> => Promise<Array<UTXO>>
+  getUTXOsForAddresses: AddressUtxoFunc
 ): Promise<AdaFeeEstimateResponse> {
   const { txBuilder } = await newAdaUnsignedTx(
     receiver,
     amount,
     changeAdaAddr,
     possibleInputAddresses,
-    addressesToUtxos
+    getUTXOsForAddresses
   );
   /**
    * Note: get_balance_without_fees() != estimated fee
@@ -105,9 +107,11 @@ export async function newAdaUnsignedTx(
   amount: string,
   changeAdaAddr: ?AdaAddress,
   possibleInputAddresses: Array<AdaAddress>,
-  addressesToUtxos: Array<string> => Promise<Array<UTXO>>
+  getUTXOsForAddresses: AddressUtxoFunc
 ): Promise<UnsignedTxResponse> {
-  const allUtxos = await addressesToUtxos(possibleInputAddresses.map(addr => addr.cadId));
+  const allUtxos = await getUTXOsForAddresses({
+    addresses: possibleInputAddresses.map(addr => addr.cadId)
+  });
   const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
     receiver,
     amount,

@@ -105,8 +105,6 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
 type Props = {
   onSubmit: Function,
   onCancel: Function,
@@ -158,7 +156,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         validators: [({ field }) => {
           const value = join(field.value, ' ');
           const wordsLeft = 15 - field.value.length;
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           if (wordsLeft > 0) {
             return [
               false,

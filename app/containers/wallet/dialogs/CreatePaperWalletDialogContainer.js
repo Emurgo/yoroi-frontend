@@ -25,7 +25,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
     const paperActions = this._getActions();
 
     const onCancel = () => {
-      actions.dialogs.closeActiveDialog.trigger({});
+      actions.dialogs.closeActiveDialog.trigger();
       paperActions.cancel.trigger({});
     };
 

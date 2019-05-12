@@ -26,7 +26,7 @@ export default class AdaRedemptionStore extends Store {
 
   @observable redemptionType: RedemptionTypeChoices = ADA_REDEMPTION_TYPES.REGULAR;
   @observable redemptionCode: string = '';
-  @observable certificate: ?Blob = null;
+  @observable certificate: ?Blob= null;
   @observable decryptionKey: ?string = null;
   @observable error: ?LocalizableError = null;
   @observable isCertificateEncrypted = false;
@@ -93,11 +93,16 @@ export default class AdaRedemptionStore extends Store {
     }
   };
 
-  _onAcceptRedemptionDisclaimer = action(() => {
+  @action
+  _onAcceptRedemptionDisclaimer = () => {
     this.isRedemptionDisclaimerAccepted = true;
-  });
+  };
 
-  _setCertificate = action(({ certificate }) => {
+  @action
+  _setCertificate = ({ certificate }: { certificate: Blob | File }) => {
+    // File inherits Blob but Flow forces us to cast this way to get things working
+    certificate = ((certificate: any): Blob);
+
     this.certificate = certificate;
     this.isCertificateEncrypted = certificate.type !== 'application/pdf';
     if (this.isCertificateEncrypted && (!this.passPhrase || !this.decryptionKey)) {
@@ -105,36 +110,42 @@ export default class AdaRedemptionStore extends Store {
       return; // We cannot decrypt it yet!
     }
     this._parseCodeFromCertificate();
-  });
+  };
 
-  _setPassPhrase = action(({ passPhrase } : { passPhrase: string }) => {
+  @action
+  _setPassPhrase = ({ passPhrase } : { passPhrase: string }) => {
     this.passPhrase = passPhrase;
     if (this.isValidRedemptionMnemonic(passPhrase)) this._parseCodeFromCertificate();
-  });
+  };
 
-  _setRedemptionCode = action(({ redemptionCode } : { redemptionCode: string }) => {
+  @action
+  _setRedemptionCode = ({ redemptionCode } : { redemptionCode: string }) => {
     this.redemptionCode = redemptionCode;
-  });
+  };
 
-  _setEmail = action(({ email } : { email: string }) => {
+  @action
+  _setEmail = ({ email } : { email: string }) => {
     this.email = email;
     this._parseCodeFromCertificate();
-  });
+  };
 
-  _setAdaPasscode = action(({ adaPasscode } : { adaPasscode: string }) => {
+  @action
+  _setAdaPasscode = ({ adaPasscode } : { adaPasscode: string }) => {
     this.adaPasscode = adaPasscode;
     this._parseCodeFromCertificate();
-  });
+  };
 
-  _setAdaAmount = action(({ adaAmount } : { adaAmount: string }) => {
+  @action
+  _setAdaAmount = ({ adaAmount } : { adaAmount: string }) => {
     this.adaAmount = adaAmount;
     this._parseCodeFromCertificate();
-  });
+  };
 
-  _setDecryptionKey = action(({ decryptionKey } : { decryptionKey: string }) => {
+  @action
+  _setDecryptionKey = ({ decryptionKey } : { decryptionKey: string }) => {
     this.decryptionKey = decryptionKey;
     this._parseCodeFromCertificate();
-  });
+  };
 
   _parseCodeFromCertificate() {
     if (
@@ -182,12 +193,14 @@ export default class AdaRedemptionStore extends Store {
       .catch(error => this._onParseError(error));
   }
 
-  _onCodeParsed = action(code => {
+  @action
+  _onCodeParsed = code => {
     Logger.debug('Redemption code parsed from certificate: ' + code);
     this.redemptionCode = code;
-  });
+  };
 
-  _onParseError = action((error) => {
+  @action
+  _onParseError = (error) => {
     Logger.error('Error received from certificate parsing: ' + stringifyError(error));
     if (this.redemptionType === ADA_REDEMPTION_TYPES.REGULAR) {
       if (this.isCertificateEncrypted) {
@@ -197,7 +210,7 @@ export default class AdaRedemptionStore extends Store {
       }
     }
     this._resetDecryptionFields();
-  });
+  };
 
   _redeemAda = async ({ walletId } : {
     walletId: string
@@ -205,9 +218,12 @@ export default class AdaRedemptionStore extends Store {
 
     runInAction(() => { this.walletId = walletId; });
 
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
       const transactionAmountInLovelace: BigNumber = await this.redeemAdaRequest.execute({
-        redemptionCode: this.redemptionCode
+        redemptionCode: this.redemptionCode,
+        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        sendTx: stateFetcher.sendTx,
       });
       this._reset();
       const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);
@@ -226,12 +242,15 @@ export default class AdaRedemptionStore extends Store {
   }) => {
     runInAction(() => { this.walletId = walletId; });
 
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
       if (!this.passPhrase) throw new Error('should never happen');
       const transactionAmountInLovelace =
         await this.redeemPaperVendedAdaRequest.execute({
           redemptionCode: shieldedRedemptionKey,
-          mnemonics: this.passPhrase.split(' ')
+          mnemonics: this.passPhrase.split(' '),
+          getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+          sendTx: stateFetcher.sendTx,
         });
       this._reset();
       const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);
@@ -244,7 +263,8 @@ export default class AdaRedemptionStore extends Store {
     }
   };
 
-  _onAdaSuccessfullyRedeemed = action(({ walletId, amount } : {
+  @action
+  _onAdaSuccessfullyRedeemed = ({ walletId, amount } : {
     walletId: string,
     amount: number,
   }) => {
@@ -255,30 +275,33 @@ export default class AdaRedemptionStore extends Store {
     this.amountRedeemed = amount;
     this.showAdaRedemptionSuccessMessage = true;
     this._resetDecryptionFields();
-  });
+  };
 
-  _onCloseAdaRedemptionSuccessOverlay = action(() => {
+  @action
+  _onCloseAdaRedemptionSuccessOverlay = () => {
     this.showAdaRedemptionSuccessMessage = false;
-  });
+  };
 
   _resetRedemptionFormValuesOnAdaRedemptionPageLoad = () => {
     if (this.isAdaRedemptionPage) this._reset();
   };
 
-  _onRemoveCertificate = action(() => {
+  @action
+  _onRemoveCertificate = () => {
     this.error = null;
     this.certificate = null;
     this.email = null;
     this.adaPasscode = null;
     this.adaAmount = null;
     this._resetDecryptionFields();
-  });
+  };
 
-  _resetDecryptionFields = action(() => {
+  @action
+  _resetDecryptionFields = () => {
     this.redemptionCode = '';
     this.passPhrase = null;
     this.decryptionKey = null;
-  });
+  };
 
   @action _reset = () => {
     this.error = null;

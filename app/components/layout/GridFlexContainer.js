@@ -8,7 +8,7 @@ import HorizontalFlexContainer from './HorizontalFlexContainer';
 
 type Props = {
   children: ?Node,
-  rowSize: Number
+  rowSize: number
 };
 
 @observer

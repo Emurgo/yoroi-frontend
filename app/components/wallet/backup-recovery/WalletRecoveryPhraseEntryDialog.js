@@ -116,6 +116,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(messages.buttonLabelConfirm),
         onClick: onFinishBackup,
+        disabled: !isTermDeviceAccepted || !isTermRecoveryAccepted,
         primary: true
       });
     }
@@ -123,8 +124,9 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
     const phraseOld = enteredPhraseString;
     const phrase = enteredPhrase.length ? (
       <div className={styles.phraseWrapper}>
-        {enteredPhrase.map((item) => (
-          <div key={item.word} className={styles.phraseWord}>{item.word}</div>
+        {enteredPhrase.map((item, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={item.word + i} className={styles.phraseWord}>{item.word}</div>
         ))}
       </div>
     ) : (
@@ -161,7 +163,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
           <div className={wordsClasses}>
             {recoveryPhraseSorted.map(({ word, isActive }, index) => (
               <MnemonicWord
-                key={index} // eslint-disable-line react/no-array-index-key
+                key={word + index} // eslint-disable-line react/no-array-index-key
                 word={word}
                 index={index}
                 isActive={isActive}

@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
-import type { MessageDescriptorMap } from 'react-intl';
 
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -22,7 +21,7 @@ import type { DialogProps } from './dialogs/WalletSendConfirmationDialogContaine
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 
-const messagesLedger: MessageDescriptorMap = defineMessages({
+const messagesLedger = defineMessages({
   infoLine1: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
@@ -37,7 +36,7 @@ const messagesLedger: MessageDescriptorMap = defineMessages({
   },
 });
 
-const messagesTrezor: MessageDescriptorMap = defineMessages({
+const messagesTrezor = defineMessages({
   infoLine1: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',

@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import yoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
-import type { ReactIntlMessage } from '../../types/i18nTypes';
+import type { MessageDescriptor } from 'react-intl';
 import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
 
@@ -15,7 +15,7 @@ type Props = {
   currencyIcon: string,
   apiIcon: string,
   isLoadingDataForNextScreen: boolean,
-  loadingDataForNextScreenMessage: ReactIntlMessage,
+  loadingDataForNextScreenMessage: MessageDescriptor,
   hasLoadedCurrentLocale: boolean,
   hasLoadedCurrentTheme: boolean,
   error: ?LocalizableError

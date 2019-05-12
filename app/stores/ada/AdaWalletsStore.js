@@ -71,6 +71,8 @@ export default class AdaWalletsStore extends WalletStore {
     await this.sendMoneyRequest.execute({
       ...transactionDetails,
       sender: accountId,
+      getUTXOsForAddresses: this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
+      sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
     });
 
     this.refreshWalletsData();
@@ -122,7 +124,10 @@ export default class AdaWalletsStore extends WalletStore {
       if (!this.restoreRequest.isError) this._toggleAddWalletDialogOnActiveRestoreOrImport();
     }, this.WAIT_FOR_SERVER_ERROR_TIME);
 
-    const restoredWallet = await this.restoreRequest.execute(params).promise;
+    const restoredWallet = await this.restoreRequest.execute({
+      ...params,
+      checkAddressesInUse: this.stores.substores.ada.stateFetchStore.fetcher.checkAddressesInUse,
+    }).promise;
 
     // if the restore wallet call ended with no error, we close the dialog.
     setTimeout(() => {

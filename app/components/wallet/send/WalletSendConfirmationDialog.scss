@@ -1,7 +1,7 @@
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
-.dialogClassic {
+.dialog {
   font-family: var(--font-medium);
 
   :global {
@@ -9,6 +9,10 @@
       margin-bottom: 20px;
     }
   }
+
+  .submitButtonSpinning {
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
+  }  
 
   .currencySymbol {
     font-family: var(--font-light);
@@ -42,16 +46,20 @@
   .amountFeesWrapper {
     display: flex;
     flex-direction: row;
+
     .amountWrapper,
     .feesWrapper {
       width: 50%;
     }
+
     .amountWrapper {
       margin-right: 10px;
     }
+
     .feesWrapper {
       margin-left: 10px;
     }
+
     .amountLabel,
     .feesLabel {
       font-size: 11px;
@@ -61,6 +69,7 @@
       margin-left: 10px;
       text-transform: uppercase;
     }
+
     .amount,
     .fees {
       color: var(--theme-send-confirmation-dialog-send-values-color);
@@ -69,6 +78,7 @@
       margin-top: 6px;
       word-break: break-word;
     }
+
     .fees {
       opacity: 0.5;
     }
@@ -101,8 +111,15 @@
   }
 }
 
+:global(.YoroiClassic) .dialog {
+  .amountFeesWrapper {
+    .fees {
+      opacity: 0.5;
+    }
+  }
+}
 
-.dialog {
+:global(.YoroiModern) .dialog {
   font-family: var(--font-regular);
 
   :global {
@@ -113,7 +130,6 @@
 
   .currencySymbol {
     font-family: var(--font-regular);
-    text-transform: uppercase;
   }
 
   .addressToLabelWrapper,
@@ -125,50 +141,34 @@
     font-size: 16px;
     font-weight: normal;
     letter-spacing: 0;
-    line-height: 1.38;
     margin-left: 0;
     text-transform: none;
   }
 
   .addressTo {
     font-family: var(--font-mono-regular);
-    letter-spacing: 0;
     font-size: 14px;
     line-height: 1.57;
     margin-top: 2px;
     opacity: 0.4;
-    word-wrap: break-word;
   }
 
   .amountFeesWrapper {
-    display: flex;
-    flex-direction: row;
-    .amountWrapper,
-    .feesWrapper {
-      width: 50%;
-    }
-    .amountWrapper {
-      margin-right: 10px;
-    }
-    .feesWrapper {
-      margin-left: 10px;
-    }
     .amountLabel,
     .feesLabel {
       font-size: 16px;
       font-weight: normal;
       letter-spacing: 0;
-      line-height: 1.38;
       margin-left: 0;
       text-transform: none;
     }
+
     .amount,
     .fees {
       color: var(--theme-send-confirmation-dialog-send-values-color);
       font-size: 14px;
       line-height: 1.57;
       margin-top: 2px;
-      word-break: break-word;
       opacity: 0.4;
     }
   }
@@ -177,34 +177,17 @@
     font-size: 16px;
     font-weight: normal;
     letter-spacing: 0;
-    line-height: 1.38;
     margin-left: 0;
     text-transform: none;
   }
 
   .totalAmount {
-    color: var(--theme-send-confirmation-dialog-send-values-color);
+    font-family: var(--font-medium);
     line-height: 1.57;
     margin-top: 2px;
-    word-break: break-word;
-    font-family: var(--font-medium);
 
     .currencySymbol {
       font-family: var(--font-medium);
     }
   }
-
-  .walletPassword {
-    margin-top: 20px;
-  }
-
-  .error {
-    @include error-message;
-    text-align: center;
-    margin-top: 17px;
-  }
-}
-
-.submitButtonSpinning {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
 }

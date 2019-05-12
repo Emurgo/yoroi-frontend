@@ -4,9 +4,9 @@
 // TODO: this file is not a library so it shouldn't be in the "lib" folder
 
 import _ from 'lodash';
-import {
-  checkAddressesInUse,
-} from './yoroi-backend-api';
+import type {
+  FilterFunc,
+} from './state-fetch/types';
 import type {
   AddressType
 } from '../adaTypes';
@@ -28,6 +28,7 @@ export async function discoverAllAddressesFrom(
   initialHighestUsedIndex: number,
   scanSize: number,
   requestSize: number,
+  checkAddressesInUse: FilterFunc,
 ): Promise<Array<string>> {
   let fetchedAddressesInfo = [];
   let highestUsedIndex = initialHighestUsedIndex;
@@ -44,7 +45,8 @@ export async function discoverAllAddressesFrom(
         initialHighestUsedIndex + 1,
         highestUsedIndex + 1,
         scanSize,
-        requestSize
+        requestSize,
+        checkAddressesInUse,
       );
 
     const newHighestUsedIndex = _findNewHighestIndex(
@@ -104,6 +106,7 @@ async function _scanNextBatch(
   fromIndex: number,
   scanSize: number,
   requestSize: number,
+  checkAddressesInUse: FilterFunc,
 ): Promise<Array<AddressInfo>> {
   let newFetchedAddressesInfo = fetchedAddressesInfo;
 

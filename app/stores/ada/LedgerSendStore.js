@@ -15,10 +15,12 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 
 import type {
-  CreateLedgerSignTxDataRequest,
   CreateLedgerSignTxDataFunc,
   PrepareAndBroadcastLedgerSignedTxFunc,
 } from '../../api/ada';
+import type {
+  SendUsingLedgerParams
+} from '../../actions/ada/ledger-send-actions';
 
 import {
   convertToLocalizableError
@@ -101,7 +103,7 @@ export default class LedgerSendStore extends Store {
   }
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
-  _send = async (params: CreateLedgerSignTxDataRequest): Promise<void> => {
+  _send = async (params: SendUsingLedgerParams): Promise<void> => {
     try {
       Logger.debug('LedgerSendStore::_send::called: ' + stringifyData(params));
 
@@ -117,7 +119,12 @@ export default class LedgerSendStore extends Store {
         // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
         const ledgerBridge: LedgerBridge = this.ledgerBridge;
 
-        this.createLedgerSignTxDataRequest.execute(params);
+        const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+        this.createLedgerSignTxDataRequest.execute({
+          ...params,
+          getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+          getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
+        });
         if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
         const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
 
@@ -154,7 +161,8 @@ export default class LedgerSendStore extends Store {
     try {
       await this.broadcastLedgerSignedTxRequest.execute({
         ledgerSignTxResp,
-        unsignedTx
+        unsignedTx,
+        sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
       }).promise;
     } catch (error) {
       Logger.error('LedgerSendStore::_prepareAndBroadcastSignedTx error: ' + stringifyError(error));

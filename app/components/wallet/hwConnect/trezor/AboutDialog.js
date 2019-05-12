@@ -56,8 +56,6 @@ const messages = defineMessages({
   },
 });
 
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
-
 type Props = {
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
