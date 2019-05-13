@@ -235,6 +235,10 @@ export default defineMessages({
     id: 'transfer.form.instructions.step1.text',
     defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
   },
+  passwordInstructionsPaperWallet: {
+    id: 'global.passwordInstructionsPaperWallet',
+    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 12 characters long.',
+  },
 });
 
 export const environmentSpecificMessages = {
