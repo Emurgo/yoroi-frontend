@@ -3,6 +3,7 @@
 .component {
   background-color: var(--theme-settings-body-background-color);
   display: flex;
+  overflow: overlay;
   height: 100%;
 
   .settingsPaneWrapper {
