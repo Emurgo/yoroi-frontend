@@ -94,7 +94,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.passwordInstructions": "Remarque : Le mot de passe de paiement doit avoir au moins 12 caractères.",
-  "global.passwordInstructionsPaperWallet": "Note: Paper Wallet password needs to be at least 12 characters long.",
+  "global.passwordInstructionsPaperWallet": "Remarque : le mot de passe du Wallet Papier doit avoir au moins 12 caractères.",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "annuler",
   "inline.editing.input.change.label": "modifier",
