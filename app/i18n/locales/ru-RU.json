@@ -94,7 +94,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.passwordInstructions": "Примечание: Пароль должен содержать не менее 12 символов.",
-  "global.passwordInstructionsPaperWallet": "Note: Paper Wallet password needs to be at least 12 characters long.",
+  "global.passwordInstructionsPaperWallet": "Примечание: Пароль бумажного кошелька должен содержать не менее 12 символов.",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "отменить",
   "inline.editing.input.change.label": "изменить",
