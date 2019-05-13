@@ -81,6 +81,9 @@
   color: var(--theme-terms-of-use-text-color);
   text-align: justify;
   margin-top: 30px;
+  background-color: var(--theme-bordered-box-background-color);
+  border-radius: 8px;
+  padding: 16px;
 
   h1 {
     color: var(--rp-formfield-label-text-color);
@@ -94,6 +97,5 @@
     font-size: 12px;
     letter-spacing: 0.5px;
     line-height: 1.38;
-    margin-bottom: 11px;
   }
 }
