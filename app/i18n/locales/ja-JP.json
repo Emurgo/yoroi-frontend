@@ -352,7 +352,7 @@
   "wallet.restore.dialog.verify.addressesLabel": "ウォレットのアドレス：",
   "wallet.restore.dialog.verify.intro.line1": "ウォレットの復元は慎重に行ってください。",
   "wallet.restore.dialog.verify.intro.line2": "アカウントIDとアイコンがお持ちのウォレットと一致していることをご確認ください。",
-  "wallet.restore.dialog.verify.intro.line3": "Make sure addresses match what you remember.",
+  "wallet.restore.dialog.verify.intro.line3": "アドレスがお持ちのウォレットと一致することをご確認ください。",
   "wallet.restore.dialog.verify.intro.line4": "誤った英語単語やペーパーウォレットパスワードを入力した場合、復元したいウォレットとは全く別の空のウォレットを復元してしまいます。その場合はアカウントIDもアドレスも復元したかったウォレットと異なります。",
   "wallet.restore.dialog.verify.title": "復元したウォレットを検証する",
   "wallet.restore.dialog.verify.wallet.button.label": "ウォレットを検証する",
