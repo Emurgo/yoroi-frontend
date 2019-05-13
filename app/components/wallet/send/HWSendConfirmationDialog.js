@@ -32,6 +32,7 @@ type Props = {
   error: ?LocalizableError,
   onSubmit: Function,
   onCancel: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -53,6 +54,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       messages,
       error,
       onCancel,
+      classicTheme,
     } = this.props;
 
     const infoBlock = (
@@ -130,6 +132,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
+        classicTheme={classicTheme}
       >
         {infoBlock}
         {addressBlock}
