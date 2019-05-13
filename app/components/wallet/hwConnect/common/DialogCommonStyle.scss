@@ -35,6 +35,17 @@ $opacityCommon: 0.7;
   }
 }
 
+.headerBlockClassic {
+  width: 725px;
+  padding-top: 1em;
+  span {
+    font-family: var(--font-light);
+    line-height: 1.38;
+    font-size: 14px;
+    opacity: $opacityCommon;
+  }
+}
+
 .middleBlockClassic {
   overflow: hidden;  
   background-color: var(--theme-hw-connect-dialog-middle-block-common-background-color);
