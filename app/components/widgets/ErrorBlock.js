@@ -35,7 +35,7 @@ export default class ErrorBlock extends Component<Props> {
     }
 
     return (
-      <div className={classicTheme ? styles.errorBlock : styles.errorBlock}>
+      <div className={classicTheme ? styles.errorBlockClassic : styles.errorBlock}>
         <span>{errorText}</span>
       </div>);
   }
