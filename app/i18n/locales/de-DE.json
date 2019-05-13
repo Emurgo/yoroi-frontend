@@ -349,7 +349,7 @@
   "wallet.restore.dialog.title.verify.paper.label": "Überprüfe eine Yoroi Paper Wallet",
   "wallet.restore.dialog.verify.accountId.label": "Your Wallet Account identification:",
   "wallet.restore.dialog.verify.addressesLabel": "Deine Wallet Adresse[n]:",
-  "wallet.restore.dialog.verify.intro.line1": "Be careful about wallet restoration:",
+  "wallet.restore.dialog.verify.intro.line1": "Sei vorsichtig bei der Wiederherstellung deiner Wallet:",
   "wallet.restore.dialog.verify.intro.line2": "Make sure account ID and icon match what you remember.",
   "wallet.restore.dialog.verify.intro.line3": "Make sure addresses match what you remember",
   "wallet.restore.dialog.verify.intro.line4": "If you've entered wrong mnemonics or a wrong paper certificate password - you will just open another empty wallet with wrong account ID and wrong addresses!",
