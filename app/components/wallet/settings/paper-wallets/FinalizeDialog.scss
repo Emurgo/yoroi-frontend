@@ -41,3 +41,16 @@
   margin-top: 20px;
   margin-bottom: 10px;
 }
+
+.plateRowDiv {
+  display: table;
+}
+
+.plateIdSpan {
+  display: table-cell;
+  vertical-align: middle;
+  padding-left: 10px;
+  font-size: 35px;
+  font-weight: 600;
+  opacity: 0.7;
+}

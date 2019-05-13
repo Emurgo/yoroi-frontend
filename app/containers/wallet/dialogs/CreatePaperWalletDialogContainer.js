@@ -11,6 +11,7 @@ import CreatePaperDialog from '../../../components/wallet/settings/paper-wallets
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import validWords from 'bip39/src/wordlists/english.json';
 import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/FinalizeDialog';
+import type { AdaPaper } from '../../../api/ada';
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
@@ -24,6 +25,14 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
     const paperStore = this._getStore();
     const paperActions = this._getActions();
 
+    const getPaperFromStore = (): AdaPaper => {
+      const paper = paperStore.paper;
+      if (!paper) {
+        throw new Error('Internal error! Paper instance is not available when should be.');
+      }
+      return paper;
+    };
+
     const onCancel = () => {
       actions.dialogs.closeActiveDialog.trigger();
       paperActions.cancel.trigger({});
@@ -31,8 +40,8 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
 
     if (paperStore.progressInfo === ProgressStep.INIT) {
       paperActions.submitInit.trigger({
-        isCustomPassword: dialogData.isCustomPassword,
         numAddresses: dialogData.numAddresses,
+        printAccountPlate: dialogData.printAccountPlate,
       });
     }
 
@@ -84,14 +93,11 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
       case ProgressStep.FINALIZE:
         return (
           <FinalizeDialog
-            addresses={paperStore.paper ? paperStore.paper.addresses : []}
+            paper={getPaperFromStore()}
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
             classicTheme={profile.isClassicTheme}
-            onCopyAddress={
-              () => {} // no notification but maybe we want one
-            }
           />
         );
       default:

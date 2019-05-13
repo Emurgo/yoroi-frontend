@@ -54,6 +54,7 @@ import {
 } from './adaTransactions/adaNewTransactions';
 import {
   getCryptoWalletFromMasterKey,
+  createAccountPlate,
 } from './lib/cardanoCrypto/cryptoWallet';
 import type {
   TrezorSignTxPayload,
@@ -80,7 +81,6 @@ import type {
   AdaTransactionInputOutput,
   AdaTransactions,
   AdaWallet,
-  AdaWallets,
   AdaAssurance,
 } from './adaTypes';
 import type {
@@ -132,6 +132,8 @@ import type { TransactionExportRow } from '../export';
 import { HWFeatures } from '../../types/HWConnectStoreTypes';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import type { CryptoAccount } from './adaLocalStorage';
+import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 
 // ADA specific Request / Response params
 
@@ -139,11 +141,12 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 export type CreateAdaPaperRequest = {
   password: string,
-  numAddresses?: number
+  numAddresses?: number,
 };
 export type AdaPaper = {
   addresses: Array<string>,
   scrambledWords: Array<string>,
+  accountPlate: WalletAccountNumberPlate,
 };
 export type CreateAdaPaperFunc = (
   request: CreateAdaPaperRequest
@@ -154,6 +157,7 @@ export type CreateAdaPaperFunc = (
 export type CreateAdaPaperPdfRequest = {
   paper: AdaPaper,
   network: Network,
+  printAccountPlate?: boolean,
   updateStatus?: PdfGenStepType => ?any,
 };
 
@@ -540,22 +544,27 @@ export default class AdaApi {
     }: CreateAdaPaperRequest = {}
   ): AdaPaper {
     const { words, scrambledWords } = generatePaperWalletSecret(password);
-    const addresses = mnemonicsToExternalAddresses(words.join(' '), numAddresses || DEFAULT_ADDRESSES_PER_PAPER);
-    return { addresses, scrambledWords };
+    const { addresses, accountPlate } = mnemonicsToExternalAddresses(
+      words.join(' '),
+      numAddresses || DEFAULT_ADDRESSES_PER_PAPER,
+    );
+    return { addresses, scrambledWords, accountPlate };
   }
 
   async createAdaPaperPdf(
     {
       paper,
       network,
+      printAccountPlate,
       updateStatus
     }: CreateAdaPaperPdfRequest
   ): Promise<CreateAdaPaperPdfResponse> {
-    const { addresses, scrambledWords } = paper;
+    const { addresses, scrambledWords, accountPlate } = paper;
     // noinspection UnnecessaryLocalVariableJS
     const res : Promise<CreateAdaPaperPdfResponse> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
+      accountPlate: printAccountPlate ? accountPlate : undefined,
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
@@ -568,12 +577,13 @@ export default class AdaApi {
     Logger.debug('AdaApi::getWallets called');
     try {
       const wallet = await getAdaWallet();
-      const wallets: AdaWallets = wallet
-        ? [wallet]
+      const account = getCurrentCryptoAccount();
+      const wallets: Array<[AdaWallet, ?CryptoAccount]> = wallet
+        ? [[wallet, account]]
         : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets.map(data => _createWalletFromServerData(data));
+      return wallets.map(([w, a]) => _createWalletFromServerData(w, a ? [a] : undefined));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -592,6 +602,9 @@ export default class AdaApi {
       const cuttoffIndex = getLastReceiveAddressIndex() + 1;
 
       const accountIndex = getCurrentCryptoAccount();
+      if (!accountIndex) {
+        throw new Error('Internal Error! Cannot get addresses without current account.');
+      }
       const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
       Logger.debug('AdaApi::getExternalAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses
@@ -844,7 +857,11 @@ export default class AdaApi {
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
 
       const { ledgerSignTxResp, unsignedTx, sendTx } = request;
-      const cryptoAccount = getCurrentCryptoAccount().root_cached_key;
+      const currentCryptoAccount = getCurrentCryptoAccount();
+      if (!currentCryptoAccount) {
+        throw new Error('Internal Error! Cannot broadcast tx without current account.');
+      }
+      const cryptoAccount = currentCryptoAccount.root_cached_key;
       const response = await prepareAndBroadcastLedgerSignedTx(
         ledgerSignTxResp,
         unsignedTx,
@@ -1306,7 +1323,7 @@ async function _getTxFinancialInfo(
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
-  (adaWallet: AdaWallet) => {
+  (adaWallet: AdaWallet, accounts?: Array<CryptoAccount>) => {
     const walletObj = {
       id: adaWallet.cwId,
       amount: new BigNumber(adaWallet.cwAmount.getCCoin).dividedBy(
@@ -1317,8 +1334,14 @@ const _createWalletFromServerData = action(
       passwordUpdateDate: adaWallet.cwPassphraseLU,
       type: adaWallet.cwType,
       hardwareInfo: adaWallet.cwHardwareInfo,
+      accounts: undefined,
     };
-
+    if (accounts) {
+      walletObj.accounts = accounts.map(a => ({
+        account: a.account,
+        plate: createAccountPlate(a.root_cached_key.key().to_hex()),
+      }));
+    }
     return new Wallet(walletObj);
   }
 );

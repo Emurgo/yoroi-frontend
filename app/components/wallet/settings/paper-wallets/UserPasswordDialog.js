@@ -189,7 +189,10 @@ export default class UserPasswordDialog extends Component<Props> {
             skin={classicTheme ? InputSkin : InputOwnSkin}
           />
         </div>
-        <PasswordInstructions isClassicThemeActive={classicTheme} />
+        <PasswordInstructions
+          isClassicThemeActive={classicTheme}
+          instructionDescriptor={globalMessages.passwordInstructionsPaperWallet}
+        />
 
       </Dialog>
     );

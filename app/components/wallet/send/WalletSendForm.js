@@ -82,11 +82,8 @@ const messages = defineMessages({
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Cannot send a transaction while there is a pending one',
-  }
+  },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
 
 type Props = {
   currencyUnit: string,
@@ -151,7 +148,7 @@ export default class WalletSendForm extends Component<Props, State> {
           const value = field.value;
           if (value === '') {
             this._resetTransactionFee();
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           return this.props.addressValidator(value)
             .then(isValid => {
@@ -175,7 +172,7 @@ export default class WalletSendForm extends Component<Props, State> {
           const amountValue = field.value;
           if (amountValue === '') {
             this._resetTransactionFee();
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           const isValid = await this.props.validateAmount(
             formattedAmountToNaturalUnits(amountValue)
@@ -304,7 +301,7 @@ export default class WalletSendForm extends Component<Props, State> {
     return (
       <Button
         className={buttonClasses}
-        label={intl.formatMessage(messages.nextButtonLabel)}
+        label={intl.formatMessage(globalMessages.nextButtonLabel)}
         onMouseUp={onMouseUp}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */

@@ -13,7 +13,6 @@ import BorderedBox from '../widgets/BorderedBox';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
 import magnifyingGlass from '../../assets/images/search-ic-dark.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
-import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
@@ -49,8 +48,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Copy address',
   },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   walletAddress: string,

@@ -13,8 +13,6 @@ const messages = defineMessages({
   },
 });
 
-messages.backButtonLabel = globalMessages.backButtonLabel;
-
 type Props = {
   error?: ?LocalizableError,
   onCancel: Function,
@@ -37,7 +35,7 @@ export default class DaedalusTransferErrorPage extends Component<Props> {
 
     return (<ErrorPage
       title={intl.formatMessage(messages.title)}
-      backButtonLabel={intl.formatMessage(messages.backButtonLabel)}
+      backButtonLabel={intl.formatMessage(globalMessages.backButtonLabel)}
       onCancel={onCancel}
       error={error}
       classicTheme={classicTheme}

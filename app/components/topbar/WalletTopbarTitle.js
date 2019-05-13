@@ -6,33 +6,70 @@ import styles from './WalletTopbarTitle.scss';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import Wallet from '../../domain/Wallet';
+import WalletAccountIcon from './WalletAccountIcon';
+import { WalletTypeOption } from '../../types/WalletType';
+import type { WalletAccount } from '../../domain/Wallet';
 
 type Props = {
   wallet: ?Wallet,
+  account: ?WalletAccount,
   currentRoute: string,
-  formattedWalletAmount?: Function
+  formattedWalletAmount?: Function,
+  themeProperties?: {
+    identiconSaturationFactor: number,
+  },
 };
+
+function constructPlate(account, saturationFactor, divClass): [string, React$Element<any>] {
+  const { plate: { hash, id } } = account;
+  return [id, (
+    <div className={divClass}>
+      <WalletAccountIcon
+        iconSeed={hash}
+        saturationFactor={saturationFactor}
+      />
+    </div>
+  )];
+}
 
 /** Dynamically generated title for the topbar when a wallet is selected */
 @observer
 export default class WalletTopbarTitle extends Component<Props> {
   static defaultProps = {
-    formattedWalletAmount: undefined
+    formattedWalletAmount: undefined,
+    themeProperties: {
+      identiconSaturationFactor: 0,
+    },
   };
 
   render() {
     const {
-      wallet, currentRoute, formattedWalletAmount
+      wallet, account, currentRoute, formattedWalletAmount, themeProperties
     } = this.props;
+    const { identiconSaturationFactor } = themeProperties || {};
 
     // If we are looking at a wallet, show its name and balance
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
     const showWalletInfo = walletRoutesMatch && wallet;
+
+    const isHardwareWallet = (wallet && wallet.type) === WalletTypeOption.HARDWARE_WALLET;
+    const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
+    const [accountPlateId, iconComponent] = account ?
+      constructPlate(account, identiconSaturationFactor, iconDivClass)
+      : [];
+
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
-        <div className={styles.walletName}>{wallet && wallet.name}</div>
-        <div className={styles.walletAmount}>
-          { wallet && formattedWalletAmount(wallet.amount) + ' ADA' }
+        {iconComponent}
+        <div className={styles.divWalletInfo}>
+          <div className={styles.walletName}>{wallet && wallet.name}</div>
+          <div className={styles.walletPlate}>{accountPlateId || ''}</div>
+        </div>
+        <div className={styles.divAmount}>
+          <div className={styles.walletAmount}>
+            { wallet && formattedWalletAmount(wallet.amount) + ' ADA' }
+          </div>
+          <div className={styles.walletAmountLabel}>Total balance</div>
         </div>
       </div>
     ) : null;

@@ -43,6 +43,10 @@ export default defineMessages({
     id: 'transfer.instructions.instructions.title.label',
     defaultMessage: '!!!Instructions',
   },
+  confirm: {
+    id: 'global.labels.confirm',
+    defaultMessage: '!!!Confirm',
+  },
   finish: {
     id: 'global.labels.finish',
     defaultMessage: '!!!Finish',
@@ -230,6 +234,14 @@ export default defineMessages({
   step1: {
     id: 'transfer.form.instructions.step1.text',
     defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
+  },
+  passwordInstructionsPaperWallet: {
+    id: 'global.passwordInstructionsPaperWallet',
+    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 12 characters long.',
+  },
+  shortRecoveryPhrase: {
+    id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase',
+    defaultMessage: '!!!Short recovery phrase',
   },
 });
 

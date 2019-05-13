@@ -68,22 +68,23 @@ export async function refreshTxs(
   checkAddressesInUse: FilterFunc,
 ): Promise<void> {
   const account = getCurrentCryptoAccount();
-
-  /**
-  * We have to make backend calls to check which of our addresses are used
-  * This is because if many txs were made since the last time we synced,
-  * there may be txs that contain addresses we own far beyond the bipp4 gap size
-  * Therefore we need to check for this and possibly create new local addresses
-  * that way they are recognized as belonging to us when we save the transactions
-  *
-  * We need to refresh the txs for each chain AFTER refreshing the addresses for each chain
-  * This is because transactions in these chains are not mutually exclusive
-  * in the case of interwallet transaction
-  * Therefore we need to make sure necessary addresses are generated in both chains
-  * to ensure they are correctly detected as ours
-  */
-  await syncAddresses(account, 'Internal', checkAddressesInUse);
-  await syncAddresses(account, 'External', checkAddressesInUse);
+  if (account) {
+    /**
+     * We have to make backend calls to check which of our addresses are used
+     * This is because if many txs were made since the last time we synced,
+     * there may be txs that contain addresses we own far beyond the bipp4 gap size
+     * Therefore we need to check for this and possibly create new local addresses
+     * that way they are recognized as belonging to us when we save the transactions
+     *
+     * We need to refresh the txs for each chain AFTER refreshing the addresses for each chain
+     * This is because transactions in these chains are not mutually exclusive
+     * in the case of interwallet transaction
+     * Therefore we need to make sure necessary addresses are generated in both chains
+     * to ensure they are correctly detected as ours
+     */
+    await syncAddresses(account, 'Internal', checkAddressesInUse);
+    await syncAddresses(account, 'External', checkAddressesInUse);
+  }
 
   await refreshChains(getTransactionsHistoryForAddresses);
 }

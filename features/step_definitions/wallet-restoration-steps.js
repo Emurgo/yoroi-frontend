@@ -69,6 +69,12 @@ Then(/^I should see an "Invalid recovery phrase" error message$/, async function
   await this.waitForElement('.SimpleAutocomplete_errored');
 });
 
+Then(/^I should see a plate ([^"]*)$/, async function (plate) {
+  const plateElement = await this.driver.findElements(By.css('.WalletRestoreVerifyDialog_plateIdSpan'));
+  const plateText = await plateElement[0].getText();
+  expect(plateText).to.be.equal(plate);
+});
+
 Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.title.label' });
   await this.waitUntilText('.Dialog_titleClassic', restoreMessage.toUpperCase(), 2000);
@@ -80,6 +86,7 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
     await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);
   }
   const expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
+
   expect(expectedElements.length).to.be.equal(0);
 });
 
@@ -93,4 +100,10 @@ Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async functi
   const words = table.split(' ');
   const lastWord = words[words.length - 1];
   await this.waitForElementNotPresent(`//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`, By.xpath);
+});
+
+Then(/^I should see an "X words left" error message:$/, async function (data) {
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase', values: { number: 1 } });
+  const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .SimpleFormField_error';
+  await this.waitUntilText(errorSelector, errorMessage);
 });
