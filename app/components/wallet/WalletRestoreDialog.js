@@ -198,10 +198,17 @@ export default class WalletRestoreDialog extends Component<Props> {
             !this.props.passwordValidator || this.props.passwordValidator(p)
           );
           return [
-            field.value.length > 0 && validatePassword(field.value),
+            validatePassword(field.value),
             this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
           ];
-        }],
+        },
+        ({ field }) => ([
+          // TODO: Should we allow 0-length paper wallet passwords?
+          // Disable for now to avoid user accidentally forgetting to enter his password and pressing restore
+          field.value.length > 0,
+          this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
+        ]),
+        ],
       } : undefined,
       walletPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
