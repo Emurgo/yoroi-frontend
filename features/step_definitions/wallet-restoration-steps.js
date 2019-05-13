@@ -86,7 +86,7 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
     await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);
   }
   const expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
-  
+
   expect(expectedElements.length).to.be.equal(0);
 });
 
