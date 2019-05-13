@@ -1,23 +1,24 @@
 @import "../settingsConfig";
 
-.componentClassic {
+.component {
   background-color: var(--theme-settings-menu-box-background-color);
   border: var(--theme-settings-menu-box-border);
+}
+
+:global(.YoroiClassic) .component {
   margin: 20px 0;
   padding: 16px 0;
   width: 200px;
 }
 
-.componentWrapper {
-  padding: 30px 0;
-}
-
-.component {
+:global(.YoroiModern) .component {
   width: 250px;
   height: 100%;
-  background-color: var(--theme-settings-menu-box-background-color);
-  border: var(--theme-settings-menu-box-border);
   padding: 20px 0;
   border: none;
   border-radius: 8px;
+}
+
+.componentWrapper {
+  padding: 30px 0;
 }

@@ -10,7 +10,6 @@ type Props = {
   onClick: Function,
   className: string,
   disabled?: boolean,
-  classicTheme: boolean,
 };
 
 @observer
@@ -20,7 +19,7 @@ export default class SettingsMenuItem extends Component<Props> {
   };
 
   render() {
-    const { label, active, disabled, onClick, className, classicTheme } = this.props;
+    const { label, active, disabled, onClick, className } = this.props;
     let state = styles.enabled;
     if (disabled) {
       state = styles.disabled;
@@ -28,7 +27,7 @@ export default class SettingsMenuItem extends Component<Props> {
       state = styles.active;
     }
     const componentClasses = classNames([
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       state,
       className
     ]);
