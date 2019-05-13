@@ -7,6 +7,16 @@ import type { WalletType, WalletHardwareInfo } from '../types/WalletType';
 import { WalletTypeOption } from '../types/WalletType';
 import Config from '../config';
 
+export type WalletAccountNumberPlate = {
+  hash: string,
+  id: string,
+}
+
+export type WalletAccount = {
+  account: number,
+  plate: WalletAccountNumberPlate,
+}
+
 /** External representation of the internal Wallet in the API layer  */
 export default class Wallet {
 
@@ -14,6 +24,7 @@ export default class Wallet {
   address: string = 'current address';
   type: WalletType = WalletTypeOption.WEB_WALLET;
   hardwareInfo: ?WalletHardwareInfo;
+  accounts: ?Array<WalletAccount>;
   @observable name: string = '';
   @observable amount: BigNumber;
   @observable assurance: AssuranceModeOption;
@@ -33,6 +44,7 @@ export default class Wallet {
     amount: BigNumber,
     assurance: AssuranceModeOption,
     passwordUpdateDate: ?Date,
+    accounts?: Array<WalletAccount>,
   }) {
     Object.assign(this, data);
     this.type = this.type || WalletTypeOption.WEB_WALLET;

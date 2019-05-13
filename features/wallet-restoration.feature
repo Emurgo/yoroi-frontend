@@ -17,6 +17,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
+    Then I should see a plate EAJD-7036
+    Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -43,6 +45,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
+    Then I should see a plate SETH-7545
+    Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -61,6 +65,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
+    Then I should see a plate DADJ-4614
+    Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -83,6 +89,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
+    Then I should see a plate HNHT-5379
+    Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -146,6 +154,8 @@ Feature: Restore Wallet
       | password   | repeatedPassword |
       | aaSecret_123 | aaSecret_123       |
       And I click the "Restore Wallet" button
+      Then I should see a plate KOTZ-1730
+      Then I press the next button
       Then I should see the opened wallet with name "Restored Wallet"
       And I go to the receive screen
       And I should see the addresses exactly list them

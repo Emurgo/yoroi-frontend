@@ -45,8 +45,11 @@ export function saveCryptoAccount(
   _saveInStorage(storageKeys.ACCOUNT_KEY, localAccount);
 }
 
-export function getCurrentCryptoAccount(): CryptoAccount {
+export function getCurrentCryptoAccount(): ?CryptoAccount {
   const localAccount = _getFromStorage(storageKeys.ACCOUNT_KEY);
+  if (!localAccount) {
+    return null;
+  }
   if (localAccount.derivation_scheme !== 'V2') {
     throw Error('Sanity check');
   }

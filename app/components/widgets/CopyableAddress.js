@@ -10,11 +10,15 @@ type Props = {
   address: string,
   isUsed: Boolean,
   isClassicThemeActive: boolean,
-  onCopyAddress: Function,
+  onCopyAddress?: Function,
 };
 
 @observer
 export default class CopyableAddress extends Component<Props> {
+
+  static defaultProps = {
+    onCopyAddress: undefined,
+  };
 
   render() {
     const { address, onCopyAddress, isUsed, isClassicThemeActive } = this.props;
@@ -32,7 +36,7 @@ export default class CopyableAddress extends Component<Props> {
         <span>{address}</span>
         <CopyToClipboard
           text={address}
-          onCopy={onCopyAddress.bind(this, address)}
+          onCopy={onCopyAddress && onCopyAddress.bind(this, address)}
         >
           <SvgInline svg={iconCopy} className={styles.copyIconBig} />
         </CopyToClipboard>

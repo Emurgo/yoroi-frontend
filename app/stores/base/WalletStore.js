@@ -17,6 +17,7 @@ import type {
 import type {
   DeleteWalletFunc
 } from '../../api/common';
+import type { WalletAccount } from '../../domain/Wallet';
 
 /**
  * The base wallet store that contains the shared logic
@@ -30,6 +31,7 @@ export default class WalletsStore extends Store {
   MIN_NOTIFICATION_TIME = 500;
 
   @observable active: ?Wallet = null;
+  @observable activeAccount: ?WalletAccount = null;
   @observable walletsRequest: Request<GetWalletsFunc>;
   @observable createWalletRequest: Request<CreateWalletFunc>;
   @observable deleteWalletRequest: Request<DeleteWalletFunc>;
@@ -109,6 +111,7 @@ export default class WalletsStore extends Store {
         this.goToWalletRoute(nextWalletInList.id);
       } else {
         this.active = null;
+        this.activeAccount = null;
         this.actions.router.goToRoute.trigger({ route: ROUTES.NO_WALLETS });
       }
     });
@@ -217,12 +220,18 @@ export default class WalletsStore extends Store {
     { walletId }: { walletId: string }
   ): void => {
     if (this.hasAnyWallets) {
-      this.active = this.all.find(wallet => wallet.id === walletId);
+      const newActiveWallet: ?Wallet = this.all.find(wallet => wallet.id === walletId);
+      this.active = newActiveWallet;
+      // Set first account as default current when wallet is changed
+      this.activeAccount = newActiveWallet &&
+        newActiveWallet.accounts &&
+        newActiveWallet.accounts[0];
     }
   };
 
   @action _unsetActiveWallet = (): void => {
     this.active = null;
+    this.activeAccount = null;
   };
 
   // =================== PRIVATE API ==================== //
