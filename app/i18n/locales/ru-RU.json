@@ -349,7 +349,7 @@
   "wallet.restore.dialog.title.verify.paper.label": "Проверьте бумажный кошелек Yoroi",
   "wallet.restore.dialog.verify.accountId.label": "Идентификационный номер Вашего кошелька:",
   "wallet.restore.dialog.verify.addressesLabel": "Адрес[а] Вашего кошелька:",
-  "wallet.restore.dialog.verify.intro.line1": "Be careful about wallet restoration:",
+  "wallet.restore.dialog.verify.intro.line1": "Будьте осторожны при восстановлении кошелька:",
   "wallet.restore.dialog.verify.intro.line2": "Make sure account ID and icon match what you remember.",
   "wallet.restore.dialog.verify.intro.line3": "Make sure addresses match what you remember",
   "wallet.restore.dialog.verify.intro.line4": "If you've entered wrong mnemonics or a wrong paper certificate password - you will just open another empty wallet with wrong account ID and wrong addresses!",
