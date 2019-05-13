@@ -94,6 +94,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.passwordInstructions": "Note: Spending password needs to be at least 12 characters long.",
+  "global.passwordInstructionsPaperWallet": "Note: Paper Wallet password needs to be at least 12 characters long.",
   "global.unit.ada": "ADA",
   "inline.editing.input.cancel.label": "취소",
   "inline.editing.input.change.label": "변경",
