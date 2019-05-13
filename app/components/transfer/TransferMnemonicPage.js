@@ -59,7 +59,15 @@ export default class TransferMnemonicPage extends Component<Props> {
         value: '',
         validators: [({ field }) => {
           const value = join(field.value, ' ');
+          const wordsLeft = this.props.mnemonicLength - field.value.length;
           if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+          if (wordsLeft > 0) {
+            return [
+              false,
+              this.context.intl.formatMessage(globalMessages.shortRecoveryPhrase,
+                { number: wordsLeft })
+            ];
+          }
           return [
             this.props.mnemonicValidator(value),
             this.context.intl.formatMessage(messages.invalidRecoveryPhrase)

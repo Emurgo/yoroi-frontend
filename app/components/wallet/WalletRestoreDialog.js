@@ -75,10 +75,6 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
   },
-  shortRecoveryPhrase: {
-    id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase',
-    defaultMessage: '!!!Short recovery phrase',
-  },
   paperPasswordLabel: {
     id: 'wallet.restore.dialog.paperPasswordLabel',
     defaultMessage: '!!!Paper wallet password',
@@ -179,7 +175,8 @@ export default class WalletRestoreDialog extends Component<Props> {
           if (wordsLeft > 0) {
             return [
               false,
-              this.context.intl.formatMessage(messages.shortRecoveryPhrase, { number: wordsLeft })
+              this.context.intl.formatMessage(globalMessages.shortRecoveryPhrase,
+                { number: wordsLeft })
             ];
           }
           return [

@@ -239,6 +239,10 @@ export default defineMessages({
     id: 'global.passwordInstructionsPaperWallet',
     defaultMessage: '!!!Note: Paper Wallet password needs to be at least 12 characters long.',
   },
+  shortRecoveryPhrase: {
+    id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase',
+    defaultMessage: '!!!Short recovery phrase',
+  },
 });
 
 export const environmentSpecificMessages = {
