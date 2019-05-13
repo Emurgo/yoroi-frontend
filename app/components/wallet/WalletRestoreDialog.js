@@ -174,7 +174,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         value: this.getInitRecoveryPhrase(),
         validators: [({ field }) => {
           const value = join(field.value, ' ');
-          const wordsLeft = 15 - field.value.length;
+          const wordsLeft = this.props.numberOfMnemonics - field.value.length;
           if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           if (wordsLeft > 0) {
             return [
