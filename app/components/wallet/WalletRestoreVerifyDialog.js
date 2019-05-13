@@ -30,7 +30,7 @@ const messages = defineMessages({
   },
   walletRestoreVerifyIntroLine4: {
     id: 'wallet.restore.dialog.verify.intro.line4',
-    defaultMessage: '!!!If you\'ve entered wrong mnemonics or a wrong paper certificate password -' +
+    defaultMessage: '!!!If you\'ve entered wrong mnemonics or a wrong paper wallet password -' +
       ' you will just open another empty wallet with wrong account ID and wrong addresses!',
   },
   walletRestoreVerifyAccountIdLabel: {
