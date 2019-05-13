@@ -353,7 +353,7 @@
   "wallet.restore.dialog.verify.intro.line1": "Будьте осторожны при восстановлении кошелька:",
   "wallet.restore.dialog.verify.intro.line2": "Убедитесь, что ID аккаунта и изображение соответствуют тому, что Вы помните.",
   "wallet.restore.dialog.verify.intro.line3": "Убедитесь, что адреса соответствуют",
-  "wallet.restore.dialog.verify.intro.line4": "Если Вы ввели неверную мнемоническую фразу или неверный пароль бумажного сертификата - Вы просто откроете другой, пустой кошелек с неверным ID аккаунта и неправильными адресами!",
+  "wallet.restore.dialog.verify.intro.line4": "If you've entered wrong mnemonics or a wrong paper wallet password - you will just open another empty wallet with wrong account ID and wrong addresses!",
   "wallet.restore.dialog.verify.title": "Проверить восстановленный кошелек",
   "wallet.restore.dialog.verify.wallet.button.label": "Проверить кошелек",
   "wallet.restore.dialog.wallet.name.input.hint": "например: Кошелек для покупок",
