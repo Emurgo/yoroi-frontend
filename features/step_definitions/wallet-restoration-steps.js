@@ -86,7 +86,7 @@ Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
     await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);
   }
   const expectedElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
-  
+
   expect(expectedElements.length).to.be.equal(0);
 });
 
@@ -102,7 +102,7 @@ Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async functi
   await this.waitForElementNotPresent(`//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`, By.xpath);
 });
 
-Then(/^I should see an "X words left" error message:$/, async function (data) {
+Then(/^I should see an "X words left" error message:$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase', values: { number: 1 } });
   const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .SimpleFormField_error';
   await this.waitUntilText(errorSelector, errorMessage);
