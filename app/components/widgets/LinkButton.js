@@ -32,7 +32,7 @@ export default class LinkButton extends Component<Props> {
             title={intl.formatMessage(message)}
           >
             <div className={styles.icon}>
-              <SvgInline svg={svg} className={svgClassName} width="20" height="52" />
+              <SvgInline svg={svg} className={svgClassName} />
             </div>
             <div className={styles.text}>
               <span className={textClassName}>
