@@ -34,7 +34,7 @@ export default class HelpLinkBlock extends Component<Props> {
     const { intl } = this.context;
 
     return (
-      <div className={styles.linkBlock}>
+      <div className={styles.component}>
         <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.helpLinkYoroiWithLedger)}>
           {intl.formatMessage(messages.helpLinkYoroiWithLedgerText)}
           <SvgInline svg={externalLinkSVG} />
