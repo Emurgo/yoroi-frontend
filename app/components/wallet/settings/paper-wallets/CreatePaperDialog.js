@@ -127,6 +127,10 @@ export default class CreatePaperDialog extends Component<Props> {
     const dialogClasses = classnames(['createPaperDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
     const buttonClassNames = classnames(['primary', styles.button]);
+    const downloadPaperIntroLine1ClassNames = classnames([
+      classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock,
+      styles.downloadPaperIntroLine1,
+    ]);
 
     const actions = [
       {
@@ -150,7 +154,7 @@ export default class CreatePaperDialog extends Component<Props> {
           closeButton={<DialogCloseButton onClose={onCancel} />}
           classicTheme={classicTheme}
         >
-          <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
+          <div className={downloadPaperIntroLine1ClassNames}>
             <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span>
           </div>
           <center>
