@@ -94,7 +94,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.passwordInstructions": "Achtung: Das Ausgaben-Passwort muss mindestens 12 Zeichen lang sein.",
-  "global.passwordInstructionsPaperWallet": "Note: Paper Wallet password needs to be at least 12 characters long.",
+  "global.passwordInstructionsPaperWallet": "Achtung: Das Paper Wallet Passwort muss mindestens 12 Zeichen lang sein.",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "abbrechen",
   "inline.editing.input.change.label": "ändern",
