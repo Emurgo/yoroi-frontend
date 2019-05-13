@@ -134,6 +134,7 @@ export default class WalletSendPage extends Component<Props> {
           error={ledgerSendStore.error}
           onSubmit={ledgerSendAction.sendUsingLedger.trigger}
           onCancel={ledgerSendAction.cancel.trigger}
+          classicTheme={this.props.stores.profile.isClassicTheme}
         />);
     } else if (active.isTrezorTWallet) {
       const trezorSendAction = this.props.actions[environment.API].trezorSend;
@@ -151,6 +152,7 @@ export default class WalletSendPage extends Component<Props> {
           error={trezorSendStore.error}
           onSubmit={trezorSendAction.sendUsingTrezor.trigger}
           onCancel={trezorSendAction.cancel.trigger}
+          classicTheme={this.props.stores.profile.isClassicTheme}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');
