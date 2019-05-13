@@ -94,6 +94,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.passwordInstructions": "Nota: La contraseña de gastos debe tener al menos 12 caracteres de longitud.",
+  "global.passwordInstructionsPaperWallet": "Note: Paper Wallet password needs to be at least 12 characters long.",
   "global.unit.ada": "Ada",
   "inline.editing.input.cancel.label": "cancelar",
   "inline.editing.input.change.label": "vuelto",
