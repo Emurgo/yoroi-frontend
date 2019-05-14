@@ -33,15 +33,25 @@ export async function getAdaTransactionFee(
   amount: string,
   changeAdaAddr: ?AdaAddress,
   possibleInputAddresses: Array<AdaAddress>,
-  getUTXOsForAddresses: AddressUtxoFunc
+  getUTXOsForAddresses: AddressUtxoFunc,
+  shouldSendAll: boolean
 ): Promise<AdaFeeEstimateResponse> {
-  const { txBuilder } = await newAdaUnsignedTx(
-    receiver,
-    amount,
-    changeAdaAddr,
-    possibleInputAddresses,
-    getUTXOsForAddresses
-  );
+  let unsignedTxResponse;
+  if (shouldSendAll) {
+    unsignedTxResponse = await sendAllUnsignedTx(
+      receiver,
+      possibleInputAddresses,
+      getUTXOsForAddresses
+    );
+  } else {
+    unsignedTxResponse = await newAdaUnsignedTx(
+      receiver,
+      amount,
+      changeAdaAddr,
+      possibleInputAddresses,
+      getUTXOsForAddresses
+    );
+  }
   /**
    * Note: get_balance_without_fees() != estimated fee
    *
@@ -51,8 +61,29 @@ export async function getAdaTransactionFee(
    * Therefore we instead display input - output as the fee in Yoroi
    * This is safer and gives a more consistent UI
    */
-  const fee = txBuilder.get_balance_without_fees().value();
+  const fee = unsignedTxResponse.txBuilder.get_balance_without_fees().value();
   return { fee };
+}
+
+export async function sendAllUnsignedTx(
+  receiver: string,
+  allInputAddresses: Array<AdaAddress>,
+  getUTXOsForAddresses: AddressUtxoFunc
+): Promise<UnsignedTxResponse> {
+  const allUtxos = await getUTXOsForAddresses({
+    addresses: allInputAddresses.map(addr => addr.cadId)
+  });
+  const unsignedTxResponse = await sendAllUnsignedTxFromUtxo(
+    receiver,
+    allUtxos
+  );
+
+  const addressesMap = addressesToAddressMap(allInputAddresses);
+
+  return {
+    ...unsignedTxResponse,
+    addressesMap
+  };
 }
 
 export async function sendAllUnsignedTxFromUtxo(
