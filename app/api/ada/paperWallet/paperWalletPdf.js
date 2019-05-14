@@ -112,6 +112,7 @@ export const generateAdaPaperPdf = async (
     await addImage(doc, paperWalletPage2Path, pageSize);
     updateStatus(PdfGenSteps.mnemonic);
     printMnemonics(doc, words);
+    printPasswordMessage(doc);
 
   } catch (error) {
     Logger.error('Failed to render paper wallet! ' + stringifyError(error));
@@ -122,6 +123,15 @@ export const generateAdaPaperPdf = async (
   updateStatus(PdfGenSteps.done);
   return blob;
 };
+
+function printPasswordMessage(
+  doc: Pdf,
+) {
+  doc.setFontSize(11);
+  const text = 'password or a hint';
+  textCenter(doc, 56, text, null, 180, true);
+  doc.setFontType('normal');
+}
 
 function printTestnetLabel(
   doc: Pdf,
