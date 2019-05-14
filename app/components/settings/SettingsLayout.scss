@@ -3,18 +3,12 @@
 .component {
   background-color: var(--theme-settings-body-background-color);
   display: flex;
-  overflow: overlay;
   height: 100%;
 
   .settingsPaneWrapper {
     flex: 1;
     overflow-x: hidden;
     overflow-y: overlay;
-    
-    &::-webkit-scrollbar-button {
-      height: 7px;
-      display: block;
-    }
   }
 
   .settingsPane {
