@@ -31,6 +31,14 @@ const messages = defineMessages({
     id: 'settings.general.languageSelect.info',
     defaultMessage: '!!!LanguageInfo',
   },
+  languageSelectThanking: {
+    id: 'settings.general.languageSelect.thanking',
+    defaultMessage: '!!!Thanks to the following',
+  },
+  languageSelectContributors: {
+    id: 'settings.general.languageSelect.contributors',
+    defaultMessage: '!!!contributors',
+  },
 });
 
 type Props = {
@@ -87,6 +95,12 @@ export default class LanguageSelectionForm extends Component<Props> {
       'primary',
       isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
     ]);
+    const contributors = intl.formatMessage(messages.languageSelectContributors);
+    let contributorsMessage = ' ';
+    if(contributors !== messages.languageSelectContributors.defaultMessage) {
+      contributorsMessage = contributorsMessage + intl.formatMessage(messages.languageSelectThanking);
+      contributorsMessage = contributorsMessage + contributors;
+    }
 
     return (
       <div className={styles.component}>
@@ -114,7 +128,10 @@ export default class LanguageSelectionForm extends Component<Props> {
           {!tier1Languages.includes(languageId.value) &&
             <div className={styles.info}>
               <h1>{intl.formatMessage(messages.languageSelectLabelInfo)}</h1>
-              <p>{intl.formatMessage(messages.languageSelectInfo)}</p>
+              <p>
+                {intl.formatMessage(messages.languageSelectInfo)}
+                {contributorsMessage}
+              </p>
             </div>
           }
 
