@@ -150,7 +150,7 @@
   "settings.paperWallet.dialog.finalize.intro.line2": "<strong>紙の文書</strong>と秘密鍵を安全に保管する",
   "settings.paperWallet.dialog.finalize.intro.line3": "<strong>パスワードを記憶する</strong>、または書き留めて安全に保管する",
   "settings.paperWallet.dialog.finalize.title": "ヨロイペーパーウォレットが作成されました",
-  "settings.paperWallet.dialog.paperAccountIdLabel": "Your Paper Wallet Account checksum:",
+  "settings.paperWallet.dialog.paperAccountIdLabel": "ペーパーウォレットのアカウントチェックサム：",
   "settings.paperWallet.dialog.paperAddressesLabel": "あなたのペーパーウォレットのアドレス:",
   "settings.paperWallet.dialog.paperPasswordLabel": "ペーパーウォレットのパスワード",
   "settings.paperWallet.dialog.paperPasswordPlaceholder": "ペーパーウォレットのパスワードを入力する",
