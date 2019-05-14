@@ -22,7 +22,7 @@ const messages = defineMessages({
   },
   walletRestoreVerifyIntroLine2: {
     id: 'wallet.restore.dialog.verify.intro.line2',
-    defaultMessage: '!!!Make sure account ID and icon match what you remember.',
+    defaultMessage: '!!!Make sure account checksum and icon match what you remember.',
   },
   walletRestoreVerifyIntroLine3: {
     id: 'wallet.restore.dialog.verify.intro.line3',
@@ -31,11 +31,11 @@ const messages = defineMessages({
   walletRestoreVerifyIntroLine4: {
     id: 'wallet.restore.dialog.verify.intro.line4',
     defaultMessage: '!!!If you\'ve entered wrong mnemonics or a wrong paper wallet password -' +
-      ' you will just open another empty wallet with wrong account ID and wrong addresses!',
+      ' you will just open another empty wallet with wrong account checksum and wrong addresses!',
   },
   walletRestoreVerifyAccountIdLabel: {
     id: 'wallet.restore.dialog.verify.accountId.label',
-    defaultMessage: '!!!Your Wallet Account identification:',
+    defaultMessage: '!!!Your Wallet Account checksum:',
   },
   walletRestoreVerifyAddressesLabel: {
     id: 'wallet.restore.dialog.verify.addressesLabel',

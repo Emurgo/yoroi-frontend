@@ -22,7 +22,7 @@ const messages = defineMessages({
   },
   printIdentificationSelectLabel: {
     id: 'settings.paperWallet.printIdentificationCheckbox.label',
-    defaultMessage: '!!!Print Paper Wallet account identification',
+    defaultMessage: '!!!Print Paper Wallet account checksum',
   },
   createPaperLabel: {
     id: 'settings.paperWallet.createPaper.label',

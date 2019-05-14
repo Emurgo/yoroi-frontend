@@ -19,7 +19,7 @@ const messages = defineMessages({
   },
   paperAccountIdLabel: {
     id: 'settings.paperWallet.dialog.paperAccountIdLabel',
-    defaultMessage: '!!!Your Paper Wallet Account identification:',
+    defaultMessage: '!!!Your Paper Wallet Account checksum:',
   },
   paperAddressesLabel: {
     id: 'settings.paperWallet.dialog.paperAddressesLabel',
