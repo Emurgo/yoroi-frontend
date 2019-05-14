@@ -327,7 +327,7 @@
   "wallet.redeem.disclaimerOverlay.checkboxLabel": "我已经理解了以上的信息",
   "wallet.redeem.disclaimerOverlay.disclaimerText": "注意：于Cardano测试网兑换将验证您的证书或兑换密钥是否正确，并且允许您兑换TEST-ADA作为测试目的。请保证您的证书或兑换钥匙安全无虞。您需要在主网上兑换。TEST-ADA没有任何价值。",
   "wallet.redeem.disclaimerOverlay.submitLabel": "继续",
-  "wallet.redeem.disclaimerOverlay.title": "Daedalus Redemption Disclaimer",
+  "wallet.redeem.disclaimerOverlay.title": "do not translate",
   "wallet.redeem.noWallets.createWalletLink": "创建你的第一个钱包",
   "wallet.redeem.noWallets.headLine": "不可兑换ADA，因为您没有任何钱包。",
   "wallet.redeem.noWallets.instructions": "创建一个新钱包（或恢复现有钱包），然后回到这里并选择它进行ADA兑换。",
