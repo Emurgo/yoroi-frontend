@@ -30,7 +30,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
   render() {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
-    const { topbar, profile } = this.props.stores;
+    const { topbar } = this.props.stores;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -42,7 +42,6 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     return (
       <TopBarLayout
         topbar={topbarElement}
-        isBannerVisible={profile.isModernTheme}
         banner={<TestnetWarningBanner />}
       >
         <TermsOfUseForm
