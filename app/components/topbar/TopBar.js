@@ -13,7 +13,6 @@ type Props = {
   categories?: Array<Category>,
   activeTopbarCategory: string,
   onCategoryClicked?: Function,
-  classicTheme: boolean,
   areCategoriesHidden?: boolean
 };
 
@@ -32,7 +31,6 @@ export default class TopBar extends Component<Props> {
       categories,
       activeTopbarCategory,
       onCategoryClicked,
-      classicTheme,
       areCategoriesHidden
     } = this.props;
 
@@ -53,7 +51,6 @@ export default class TopBar extends Component<Props> {
                   onCategoryClicked(category.route);
                 }
               }}
-              classicTheme={classicTheme}
             />
           );
         }) : null}

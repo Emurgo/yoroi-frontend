@@ -1,25 +1,14 @@
 @import '../../themes/mixins/buttons';
 
-.componentClassic {
-  @include button;
-  align-items: center;
-  color: var(--theme-topbar-category-text-color);
-  display: flex;
-  height: 64px;
-  justify-content: center;
-  width: 87px;
-
-  &:hover {
-    background-color: var(--theme-topbar-category-background-color-hover);
-  }
-}
+$topBarClassicHeight: 64px;
+$topBarHeight: 58px;
 
 .component {
   @include button;
   align-items: center;
   color: var(--theme-topbar-category-text-color);
   display: flex;
-  height: 58px;
+  height: $topBarClassicHeight;
   justify-content: center;
   width: 87px;
 
@@ -131,7 +120,7 @@
 }
 
 :global {
-  .TopBarCategory_component, .TopBarCategory_componentClassic {
+  .TopBarCategory_component {
     position: absolute;
     top: 0;
 
@@ -160,4 +149,8 @@
 .label {
   font-family: var(--font-regular);
   font-size: 18px;
+}
+
+:global(.YoroiModern) .component {
+  height: $topBarHeight;
 }

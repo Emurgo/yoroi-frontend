@@ -58,7 +58,6 @@ export default class WalletAddPage extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.isClassicTheme}
         areCategoriesHidden={profile.isModernTheme}
       />);
 
