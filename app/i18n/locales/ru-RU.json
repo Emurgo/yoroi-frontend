@@ -150,7 +150,7 @@
   "settings.paperWallet.dialog.finalize.intro.line2": "Вы <strong>сохранили бумажный документ</strong> и секретные слова в безопасном месте.",
   "settings.paperWallet.dialog.finalize.intro.line3": "Вы <strong>запомнили пароль</strong>, или записали его и храните в безопасном месте!",
   "settings.paperWallet.dialog.finalize.title": "Бумажный кошелек Yoroi успешно создан",
-  "settings.paperWallet.dialog.paperAccountIdLabel": "Your Paper Wallet Account checksum:",
+  "settings.paperWallet.dialog.paperAccountIdLabel": "Контрольная сумма Вашего бумажного кошелька:",
   "settings.paperWallet.dialog.paperAddressesLabel": "Адрес(а) Вашего Бумажного кошелька:",
   "settings.paperWallet.dialog.paperPasswordLabel": "Пароль бумажного кошелька",
   "settings.paperWallet.dialog.paperPasswordPlaceholder": "Введите пароль бумажного кошелька",
