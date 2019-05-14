@@ -348,7 +348,7 @@
   "wallet.restore.dialog.title.paper.label": "恢复Yoroi纸钱包",
   "wallet.restore.dialog.title.verify.label": "验证Yoroi钱包",
   "wallet.restore.dialog.title.verify.paper.label": "验证Yoroi钱包",
-  "wallet.restore.dialog.verify.accountId.label": "Your Wallet Account identification:",
+  "wallet.restore.dialog.verify.accountId.label": "Konto-Kennzeichnung für deine Wallet:",
   "wallet.restore.dialog.verify.addressesLabel": "您的钱包地址:",
   "wallet.restore.dialog.verify.intro.line1": "Be careful about wallet restoration:",
   "wallet.restore.dialog.verify.intro.line2": "Make sure account ID and icon match what you remember.",
