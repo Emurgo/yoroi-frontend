@@ -1,8 +1,8 @@
 // @flow
 import Pdf from 'jspdf';
 import qr from 'qr-image';
-import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.front.png';
-import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.back.png';
+import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.front-min.png';
+import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.back-min.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 import type { Network } from '../../../../config/config-types';
 import { NetworkType } from '../../../../config/config-types';
