@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
@@ -59,7 +58,6 @@ type Props = {
   isSubmitting: boolean,
   error?: ?LocalizableError,
   classicTheme: boolean,
-  notification: Node
 };
 
 type State = {
@@ -96,7 +94,6 @@ export default class WalletReceive extends Component<Props, State> {
       onCopyAddress, onAddressDetail,
       isSubmitting, error, isWalletAddressUsed,
       classicTheme,
-      notification
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -144,7 +141,6 @@ export default class WalletReceive extends Component<Props, State> {
               onCopyAddress={onCopyAddress}
               isUsed={isWalletAddressUsed}
             />
-            {!classicTheme && notification}
             <div className={styles.instructionsText}>
               {intl.formatMessage(messages.walletReceiveInstructions)}
             </div>
