@@ -31,6 +31,14 @@
     border-radius: 8px;
 
     margin-top: -17px;
+    background-color: transparent;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+      -webkit-transition-delay: 99999s;
   }
 
   &:hover {
