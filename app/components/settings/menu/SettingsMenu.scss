@@ -3,6 +3,8 @@
 .component {
   background-color: var(--theme-settings-menu-box-background-color);
   border: var(--theme-settings-menu-box-border);
+  height: 100%;
+  overflow: overlay;
 }
 
 :global(.YoroiClassic) .component {
@@ -13,7 +15,6 @@
 
 :global(.YoroiModern) .component {
   width: 250px;
-  height: 100%;
   padding: 20px 0;
   border: none;
   border-radius: 8px;
