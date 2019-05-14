@@ -22,6 +22,10 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
+  onSelectLanguage = (values: { locale: string }) => {
+    this.props.actions.profile.updateLocale.trigger(values);
+  };
+
   onSubmit = (values: { locale: string }) => {
     this.props.actions.profile.updateLocale.trigger(values);
   };
@@ -47,6 +51,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         languageSelectionBackground
       >
         <LanguageSelectionForm
+          onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
           languages={LANGUAGE_OPTIONS}

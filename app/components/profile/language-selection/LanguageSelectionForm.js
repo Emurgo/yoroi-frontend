@@ -43,6 +43,7 @@ const messages = defineMessages({
 
 type Props = {
   languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
+  onSelectLanguage: Function,
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
@@ -56,6 +57,10 @@ export default class LanguageSelectionForm extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
+  };
+
+  selectLanguage = (values: { locale: string }) => {
+    this.props.onSelectLanguage({ locale: values });
   };
 
   submit = () => {
@@ -111,6 +116,7 @@ export default class LanguageSelectionForm extends Component<Props> {
             options={languageOptions}
             {...languageId.bind()}
             skin={SelectSkin}
+            onChange={this.selectLanguage}
             optionRenderer={option => (
               <FlagLabel svg={option.svg} label={option.label} />
             )}
