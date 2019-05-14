@@ -3,7 +3,6 @@ import Pdf from 'jspdf';
 import qr from 'qr-image';
 import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.front.png';
 import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.back.png';
-// import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 import type { Network } from '../../../../config/config-types';
 import { NetworkType } from '../../../../config/config-types';
@@ -69,9 +68,6 @@ export const generateAdaPaperPdf = async (
     if (network !== NetworkType.MAINNET) {
       printTestnetLabel(doc, network, 105);
     }
-
-    // const page1Uri = paperWalletPage1Path;
-    // await addImage(doc, page1Uri, pageSize);
 
     updateStatus(PdfGenSteps.addresses);
     if (!printAddresses(doc, addresses)) {
