@@ -201,7 +201,8 @@ export default class WalletRestoreDialog extends Component<Props> {
         },
         ({ field }) => ([
           // TODO: Should we allow 0-length paper wallet passwords?
-          // Disable for now to avoid user accidentally forgetting to enter his password and pressing restore
+          // Disable for now to avoid user accidentally forgetting
+          // to enter his password and pressing restore
           field.value.length > 0,
           this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
         ]),
