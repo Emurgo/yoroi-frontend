@@ -59,7 +59,7 @@
 
 :global(.YoroiModern) .component {
   .inputWrapper span[class*='selectedWordBox'] {
-    background-color: #D9DDE0 !important;
+    background-color: var(--rp-autocomplete-selected-word-box-bg-color-secondary);
   }
 
   .body {
