@@ -103,40 +103,60 @@ means the protocol is simply pre-registered "from factory" and should be effecti
       the first time.
 
 2. Since the extension ID is uniquely determined by the private key we use to upload our app to the Chrome store, we can safely assume it will not change and therefore we should just hard-code it. Alternatively, we may just use a relative
-URL (eg. `main_window.html#/path/to/page`). The advantage of the latter approach
+URL (eg. `main_window.html#/path/to/page`).
+The advantage of the latter approach
 is that it is
 
 3. The URI (which replaces the placeholder `%s`) should be passed as an argument to a special page in the Yoroi app and not the send page (see Future Proof section for more detail)
 
 ### Note
 
-1. Since the user can choose “block” or remove the handler at any time from his browser settings, we cannot enforce this feature
-2. Here is the list of browsers that support this feature: [registerProtocolHandler](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/registerProtocolHandler#Browser_compatibility)
+Since the user can choose “block” or remove the handler at any time from his browser settings, we cannot enforce this feature.
+
+## Registering the Protocol in Mobile Apps
+
+Once again, handling custom protocols works differently for Android and iOS,
+though the idea is basically the same.
+
+### Android
+
+- Include the URI definition inside the `AndroidManifest.xml` file as an `intent-filter` (see [(3)](3)). Here's a minimum working example (assuming we keep `web+cardano` as the protocol handle):
+```HTML
+        <intent-filter>
+          <action android:name="android.intent.action.VIEW" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <category android:name="android.intent.category.BROWSABLE" />
+          <data android:scheme="web+cardano"/>
+        </intent-filter>
+```
+The example above simply opens the app when a `web+cardano:` URI is clicked.
+
+- The payload can then be retrieved through the `Linking.getInitialURL()` method.
+
+### iOS
+
+TODO
 
 # Security Considerations
 
 1. We cannot prompt the user to send the funds right away as they may not be fully aware of the URI they clicked or were redirected to. Instead, it may be better to simply pre-populate fields in a transaction.
 2. We should be wary of people who disguise “donate” links as actually opening up a phishing website that LOOKS like Yoroi with the fields pre-filled.
 
-## Registering the Protocol in Mobile Apps
-
-TODO
-
 # Future Proof Considerations
 
 ## Considerations
 
 1. Once we pick a page in Yoroi to send users to, we cannot easily change it (since it will be baked into the protocol)
-2. Before sending a transaction, the user may have to make extra choices (such as which wallet to send from if Yoroi eventually supports multiple wallets).These options should not all be listed on the “send” page
+2. Before sending a transaction, the user may have to make extra choices (such as which wallet to send from if Yoroi eventually supports multiple wallets). These options should not all be listed on the “send” page
 
 ## Suggested Implementation
 We should create a new page in Yoroi to handle these URI links that way we can prompt the user for additional decisions in the future before redirecting them to the appropriate page.
 
 ## Note
-Users may have downloaded Yoroi and registered the protocol but have not created a wallet yet
+Users may have downloaded Yoroi and registered the protocol but have not created a wallet yet.
 
 [1]: https://developer.mozilla.org/en-US/docs/Web/API/Navigator/registerProtocolHandler
 
-[1:browser-compatibility]: https://developer.mozilla.org/en-US/docs/Web/API/Navigator/registerProtocolHandler#Browser_compatibility
-
 [2]: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/protocol_handlers
+
+[3]: https://developer.android.com/training/app-links/deep-linking#adding-filters
