@@ -121,8 +121,6 @@ export default class TransferMnemonicPage extends Component<Props> {
 
     const recoveryPhraseField = form.$('recoveryPhrase');
 
-    console.log('theme: ' + classicTheme);
-
     return (
       <div className={styles.component}>
         <BorderedBox>
