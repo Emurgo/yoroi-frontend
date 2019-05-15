@@ -1,4 +1,4 @@
-.component {
+.componentClassic {
   color: var(--theme-transactions-list-item-details-color);
 
   &.failed {
@@ -13,12 +13,45 @@
   }
 }
 
+.component {
+  color: var(--theme-transactions-list-item-details-color);
+  background-color: var(--theme-transactions-list-background-color);
+  border-radius: 8px;
+  margin-bottom: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &.failed {
+    background-color: var(--theme-transactions-list-failed-background-color);
+  }
+
+  &.pending {
+    .title, .type, .amount, .details {
+      color: var(--theme-transactions-state-pending-text-color);
+    }
+    .currencySymbol {
+      & > svg > g > g {
+        stroke: var(--theme-transactions-state-pending-text-color);
+      }
+    }
+  }
+}
+
 // ========= TOGGLER =========
+
+.togglerClassic {
+  cursor: pointer;
+  display: flex;
+  padding: 20px;
+  -webkit-user-select: none;
+}
 
 .toggler {
   cursor: pointer;
   display: flex;
-  padding: 20px;
+  padding: 25px 30px;
   -webkit-user-select: none;
 }
 
@@ -34,7 +67,7 @@
   width: 100%;
 }
 
-.title, .amount {
+.titleClassic, .amountClassic {
   color: var(--theme-transactions-list-item-details-color);
   font-size: 16px;
   font-family: var(--font-semibold);
@@ -43,11 +76,32 @@
   text-align: left;
 }
 
-.amount {
+.amountClassic {
   margin-left: auto;
   font-family: var(--font-medium);
   font-size: 16px;
   letter-spacing: 1px;
+}
+
+.title, .amount {
+  color: var(--theme-transactions-list-item-details-color);
+  height: 25px;
+  line-height: 25px;
+  letter-spacing: 0;
+}
+
+.title {
+  width: 146px;
+  font-size: 18px;
+  font-family: var(--font-medium);
+  text-align: center;
+  margin-right: 25px;
+}
+
+.amount {
+  margin-left: auto;
+  font-family: var(--font-regular);
+  font-size: 25px;
 }
 
 .amountSent {
@@ -70,7 +124,22 @@
   }
 }
 
-.pendingLabel, .failedLabel, .low, .medium, .high {
+.expandArrowBox {
+  margin-left: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.expandArrow svg {
+  height: 8px;
+}
+
+.collapseArrow svg {
+  height: 8px;
+  transform: rotate(180deg);
+}
+
+.labelClassic {
   color: var(--theme-transactions-priority-color);
   display: inline-block;
   font-family: var(--font-bold);
@@ -83,9 +152,23 @@
   text-transform: uppercase;
 }
 
-.pendingLabel {
+.label {
+  height: 25px;
+  min-width: 90px;
+  padding: 0 15px;
+  display: inline-block;
+  line-height: 25px;
+  text-align: center;
+  color: var(--theme-transactions-priority-color);
+  font-family: var(--font-regular);
+  font-size: 15px;
+  text-transform: uppercase;
+  border-radius: 15px;
+}
+
+.pendingLabelClassic {
   :global {
-    @keyframes pending-label-animation {
+    @keyframes pending-label-animation-classic {
       0% {
         background-position: 0 0;
       }
@@ -108,11 +191,40 @@
         transparent
     );
   background-size:50px 50px;
-  animation: pending-label-animation 2s linear infinite;
+  animation: pending-label-animation-classic 2s linear infinite;
   overflow: hidden;
 }
 
-.failedLabel {
+.pendingLabel {
+  :global {
+    @keyframes pending-label-animation {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 70px 50px;
+      }
+    }
+  }
+
+  background-color: var(--theme-transactions-state-pending-background-color);
+  background-image:
+    linear-gradient(
+        55deg,
+        transparent  33.4%,
+        var(--theme-transactions-state-pending-stripes-color) 33.4%,
+        var(--theme-transactions-state-pending-stripes-color) 50%,
+        transparent 50%,
+        transparent 83.4%,
+        var(--theme-transactions-state-pending-stripes-color) 83.4%,
+        var(--theme-transactions-state-pending-stripes-color)
+    );
+  background-size: 35px 50px;
+  animation: pending-label-animation 1s linear infinite;
+  overflow: hidden;
+}
+
+.failedLabelClassic, .failedLabel {
   background-color: var(--theme-transactions-state-failed-background-color);
 }
 
@@ -132,26 +244,40 @@
   text-transform: capitalize;
 }
 
-.type {
+.typeClassic {
   font-family: var(--font-light);
   font-size: 14px;
   margin-left: 12px;
   margin-top: 3px;
 }
 
+.type {
+  width: 100px;
+  font-family: var(--font-regular);
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 25px;
+  margin-right: 40px;
+}
+
 // ========= DETAILS =========
 
-.content {
+.contentClassic {
   border-bottom: 1px solid var(--theme-separation-border-color);
   margin-left: 20px;
   margin-right: 20px;
+}
+
+.content {
+  margin-left: 30px;
+  margin-right: 30px;
 }
 
 .last {
   border: none;
 }
 
-.details {
+.detailsClassic {
   height: auto;
   * + h2,
   * + .row {
@@ -172,6 +298,36 @@
     &.address {
       display: block;
       line-height: 19px;
+      font-family: var(--font-mono-light);
+      letter-spacing: 0;
+    }
+  }
+}
+
+.details {
+  height: auto;
+  * + h2,
+  * + .row {
+    margin-top: 20px;
+  }
+  h2 {
+    font-family: var(--font-regular);
+    font-size: 16px;
+    line-height: 1.38;
+    margin-bottom: 2px;
+  }
+  span {
+    color: var(--theme-transactions-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    word-break: break-all;
+    line-height: 1.57;
+
+    &.address {
+      display: block;
+      line-height: 19px;
+      font-family: var(--font-mono-regular);
+      letter-spacing: 0;
     }
   }
 }
@@ -195,13 +351,26 @@
   margin-left: 76px;
 }
 
-.currencySymbol {
+.currencySymbolClassic {
   display: inline-block;
   margin-bottom: -1px;
   margin-left: 4px;
   & > svg {
     width: 12px;
     height: 12px;
+    & > g > g {
+      stroke: var(--theme-icon-transactions-ada-symbol-color);
+    }
+  }
+}
+
+.currencySymbol {
+  display: inline-block;
+  margin-left: 12px;
+  vertical-align: middle;
+  & > svg {
+    width: 21px;
+    height: 21px;
     & > g > g {
       stroke: var(--theme-icon-transactions-ada-symbol-color);
     }

@@ -1,12 +1,31 @@
-.linkBlock {
+.component {
   margin-top: 16px;
-  width: 725px;
-  height: 18px;
   text-align: center;
   font-family: var(--font-regular);
   font-size: 15px;
   a {
     opacity: 0.7;
     color: var(--font-black);
-  }
+  }  
+}
+
+:global(.YoroiClassic) .component {
+  width: 725px;
+  height: 18px;
+}
+
+:global(.YoroiModern) .component {
+  margin-top: 24px;
+  font-size: 14px;
+  letter-spacing: 0;
+
+  a {
+    display: inline-flex;
+    color: var(--font-black);
+    text-decoration: none;
+
+    span {
+      margin-left: 4px;
+    }
+  }  
 }

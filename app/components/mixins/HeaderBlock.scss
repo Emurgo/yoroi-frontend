@@ -1,0 +1,15 @@
+@mixin headerBlockBase {
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--theme-instructions-recovery-text-color);
+  margin-bottom: 10px;
+  letter-spacing: 0;
+}
+.headerBlock {
+  @include headerBlockBase;
+  font-family: var(--font-regular);
+} 
+.headerBlockClassic {
+  @include headerBlockBase;
+  font-family: var(--font-light);
+}

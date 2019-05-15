@@ -8,6 +8,7 @@ import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   change: {
@@ -36,6 +37,7 @@ type Props = {
   isValid: Function,
   validationErrorMessage: string,
   successfullyUpdated: boolean,
+  classicTheme: boolean,
 };
 
 type State = {
@@ -119,7 +121,7 @@ export default class InlineEditingInput extends Component<Props, State> {
 
   componentDidUpdate() {
     if (this.props.isActive && this.inputField) {
-      this.inputField.getRef().focus();
+      this.inputField.focus();
     }
   }
 
@@ -132,13 +134,14 @@ export default class InlineEditingInput extends Component<Props, State> {
       inputFieldLabel,
       isActive,
       inputFieldValue,
-      successfullyUpdated
+      successfullyUpdated,
+      classicTheme,
     } = this.props;
     const { intl } = this.context;
     const inputField = validator.$('inputField');
     const componentStyles = classnames([
       className,
-      styles.component,
+      classicTheme ? styles.componentClassic : styles.component,
       isActive ? null : styles.inactive,
     ]);
     const inputStyles = classnames([
@@ -168,13 +171,13 @@ export default class InlineEditingInput extends Component<Props, State> {
           error={isActive ? inputField.error : null}
           disabled={!isActive}
           ref={(input) => { this.inputField = input; }}
-          skin={InputSkin}
+          skin={classicTheme ? InputSkin : InputOwnSkin}
         />
 
         {isActive && (
           <button
             type="button"
-            className={styles.button}
+            className={classnames([styles.button, inputField.error ? styles.error : ''])}
             onMouseDown={this.onCancel}
           >
             {intl.formatMessage(messages.cancel)}

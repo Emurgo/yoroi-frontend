@@ -24,5 +24,4 @@ export default class SettingsLayout extends Component<Props> {
       </div>
     );
   }
-
 }

@@ -31,7 +31,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
   };
 
   render() {
-    const { substores } = this.props.stores;
+    const { substores, profile } = this.props.stores;
     const { ada } = substores;
     const { wallets, adaRedemption } = ada;
     const isMainnet = environment.isMainnet();
@@ -55,6 +55,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
         <div>
           <AdaRedemptionNoWallets
             onGoToCreateWalletClick={this.handleGoToCreateWalletClick}
+            classicTheme={profile.isClassicTheme}
           />
         </div>
       );
@@ -107,7 +108,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           }
           suggestedMnemonics={validWords}
           isCertificateInvalid={error instanceof AdaRedemptionCertificateParseError}
-          onRemoveCertificate={removeCertificate.trigger}
+          onRemoveCertificate={() => removeCertificate.trigger()}
           redemptionType={redemptionType}
           redemptionCode={adaRedemption.redemptionCode}
           getSelectedWallet={walletId => wallets.getWalletById(walletId)}
@@ -121,6 +122,7 @@ export default class AdaRedemptionPage extends Component<InjectedProps> {
           )}
           isRedemptionDisclaimerAccepted={isMainnet || isRedemptionDisclaimerAccepted}
           onAcceptRedemptionDisclaimer={() => acceptRedemptionDisclaimer.trigger()}
+          classicTheme={profile.isClassicTheme}
         />
       </div>
     );

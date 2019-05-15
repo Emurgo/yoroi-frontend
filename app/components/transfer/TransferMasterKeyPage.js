@@ -6,6 +6,7 @@ import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import BorderedBox from '../widgets/BorderedBox';
@@ -28,17 +29,11 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.invalidMasterKey = globalMessages.invalidMasterKey;
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
-messages.backButtonLabel = globalMessages.backButtonLabel;
-messages.step1 = globalMessages.step1;
-messages.instructionTitle = globalMessages.instructionTitle;
-
 type Props = {
   onSubmit: Function,
   onBack: Function,
   step0: string,
+  classicTheme: boolean,
 };
 
 @observer
@@ -57,13 +52,13 @@ export default class TransferMasterKeyPage extends Component<Props> {
         validators: [({ field }) => {
           const value = field.value;
           if (value === '') {
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           if (value.length !== 192) {
-            return [false, this.context.intl.formatMessage(messages.invalidMasterKey)];
+            return [false, this.context.intl.formatMessage(globalMessages.invalidMasterKey)];
           }
           if (!value.match('^[0-9a-fA-F]+$')) {
-            return [false, this.context.intl.formatMessage(messages.invalidMasterKey)];
+            return [false, this.context.intl.formatMessage(globalMessages.invalidMasterKey)];
           }
           return true;
         }],
@@ -92,7 +87,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { onBack, step0 } = this.props;
+    const { onBack, step0, classicTheme } = this.props;
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -101,7 +96,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      'flat',
+      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -116,14 +111,14 @@ export default class TransferMasterKeyPage extends Component<Props> {
             { /* Instructions for how to transfer */ }
             <div>
               <div className={styles.title}>
-                {intl.formatMessage(messages.instructionTitle)}
+                {intl.formatMessage(globalMessages.instructionTitle)}
               </div>
 
               <ul className={styles.instructionsList}>
                 {
                   <div className={styles.text}>
                     {step0}
-                    {intl.formatMessage(messages.step1)}
+                    {intl.formatMessage(globalMessages.step1)}
                     <br /><br />
                     {intl.formatMessage(messages.masterKeyRequirements)}
                   </div>
@@ -136,20 +131,20 @@ export default class TransferMasterKeyPage extends Component<Props> {
               autoComplete="off"
               {...masterKeyField.bind()}
               error={masterKeyField.error}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>
               <Button
                 className={nextButtonClasses}
-                label={intl.formatMessage(messages.nextButtonLabel)}
+                label={intl.formatMessage(globalMessages.nextButtonLabel)}
                 onClick={this.submit}
                 skin={ButtonSkin}
               />
 
               <Button
                 className={backButtonClasses}
-                label={intl.formatMessage(messages.backButtonLabel)}
+                label={intl.formatMessage(globalMessages.backButtonLabel)}
                 onClick={onBack}
                 skin={ButtonSkin}
               />

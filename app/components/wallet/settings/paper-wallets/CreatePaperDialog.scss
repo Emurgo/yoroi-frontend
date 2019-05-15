@@ -1,0 +1,43 @@
+@import '../../../../themes/mixins/loading-spinner';
+@import '../../../../themes/mixins/error-message';
+
+.dialog {
+  font-family: var(--font-light);
+  .walletPassword {
+    & + .walletPasswordFields {
+      .newPassword {
+        margin-top: 20px;
+      }
+    }
+  }
+
+  .error {
+    @include error-message;
+    text-align: center;
+    margin-top: 27px;
+  }
+}
+
+.button {
+  cursor: pointer;
+  align-self: center;
+  background: transparent !important;;
+  color: transparent !important;;
+}
+
+.icon {
+  & > svg {
+    max-height: 75px;
+    max-width: 75px;
+    width: 100%;
+  }
+}
+
+.label {
+  font-family: var(--font-light);
+  color: black;
+}
+
+.downloadPaperIntroLine1 {
+  text-align: center;
+}

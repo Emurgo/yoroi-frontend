@@ -18,10 +18,12 @@ import HWErrorBlock from '../common/HWErrorBlock';
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
 import aboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/about-prerequisite-header-icon.inline.svg';
 import aboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-wallet/trezor/about.inline.svg';
+import aboutTrezorSvg from '../../../../assets/images/hardware-wallet/trezor/about-trezor-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
 import styles from '../common/AboutDialog.scss';
+import headerMixin from '../../../mixins/HeaderBlock.scss';
 
 const messages = defineMessages({
   aboutPrerequisite1Part1: {
@@ -54,14 +56,13 @@ const messages = defineMessages({
   },
 });
 
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
-
 type Props = {
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
+  classicTheme: boolean,
 };
 
 @observer
@@ -78,18 +79,27 @@ export default class AboutDialog extends Component<Props> {
       isActionProcessing,
       error,
       submit,
-      cancel
+      cancel,
+      classicTheme,
     } = this.props;
+    const headerBlockClasses = classicTheme
+      ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
+      : classnames([headerMixin.headerBlock, 'small']);
+    const middleBlockClasses = classicTheme
+      ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])
+      : classnames([styles.middleBlock, styles.middleAboutBlock]);
 
     const introBlock = (
-      <div className={styles.headerBlock}>
+      <div className={headerBlockClasses}>
         <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine1)}</span><br />
         <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine2)}</span><br />
         <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine3)}</span><br />
       </div>);
 
     const middleBlock = (
-      <div className={classnames([styles.middleBlock, styles.middleAboutBlock])}>
+      <div className={middleBlockClasses}>
+        {!classicTheme && <SvgInline svg={aboutTrezorSvg} />}
+
         <div className={styles.prerequisiteBlock}>
           <div>
             <SvgInline svg={aboutPrerequisiteIconSVG} />
@@ -112,9 +122,12 @@ export default class AboutDialog extends Component<Props> {
             <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
           </ul>
         </div>
-        <div className={styles.hwImageBlock}>
-          <SvgInline svg={aboutPrerequisiteTrezorSVG} />
-        </div>
+
+        {classicTheme && (
+          <div className={styles.hwImageBlock}>
+            <SvgInline svg={aboutPrerequisiteTrezorSVG} />
+          </div>
+        )}
       </div>);
 
     const dailogActions = [{
@@ -133,12 +146,13 @@ export default class AboutDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
+        classicTheme={classicTheme}
       >
-        <ProgressStepBlock progressInfo={progressInfo} />
+        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}
         {middleBlock}
         <HelpLinkBlock progressInfo={progressInfo} />
-        <HWErrorBlock progressInfo={progressInfo} error={error} />
+        <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
       </Dialog>);
   }
 }

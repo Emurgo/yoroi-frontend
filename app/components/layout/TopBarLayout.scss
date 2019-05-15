@@ -1,6 +1,6 @@
-$topBarHeight: 64px;
-$footerHeight: 55px;
-
+$topBarClassicHeight: 64px;
+$topBarHeight: 58px;
+$footerHeight: 56px;
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
   box-shadow: 0 0 70px 0 rgba(0,0,0,0.75);
@@ -9,6 +9,19 @@ $footerHeight: 55px;
   height: 100%;
   overflow: hidden;
   width: 100%;
+}
+
+.languageSelectionBackground {
+  background-image: url(../../assets/images/select-language.svg);
+  background-size: cover;
+  background-position-y: bottom;
+}
+
+.topbarClassic {
+  height: $topBarClassicHeight;
+  flex-shrink: 0;
+  // Show elements that overflow the topbar above the content area
+  z-index: 1;
 }
 
 .topbar {
@@ -38,9 +51,11 @@ $footerHeight: 55px;
 }
 
 .footer {
-  z-index: 1;
-  margin-top: (-$footerHeight);
   height: $footerHeight;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  z-index: 1;
 }
 
 .main {

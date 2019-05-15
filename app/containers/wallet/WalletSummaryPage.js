@@ -42,6 +42,7 @@ export default class WalletSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const { profile } = this.props.stores;
     const actions = this.props.actions;
     const { wallets, transactions } = this.props.stores.substores.ada;
     const {
@@ -78,16 +79,27 @@ export default class WalletSummaryPage extends Component<Props> {
             transactions={recent}
             isLoadingTransactions={recentTransactionsRequest.isExecuting}
             hasMoreToLoad={totalAvailable > limit}
-            onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
+            onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
+            classicTheme={profile.isClassicTheme}
           />
         );
       } else if (!hasAny) {
-        walletTransactions = <WalletNoTransactions label={noTransactionsFoundLabel} />;
+        walletTransactions = (
+          <WalletNoTransactions
+            label={noTransactionsFoundLabel}
+            classicTheme={profile.isClassicTheme}
+          />
+        );
       } else if (!hasAny) {
-        walletTransactions = <WalletNoTransactions label={noTransactionsLabel} />;
+        walletTransactions = (
+          <WalletNoTransactions
+            label={noTransactionsLabel}
+            classicTheme={profile.isClassicTheme}
+          />
+        );
       }
     }
 
@@ -107,6 +119,7 @@ export default class WalletSummaryPage extends Component<Props> {
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
+          classicTheme={profile.isClassicTheme}
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 

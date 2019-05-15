@@ -24,9 +24,6 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.instructionTitle = globalMessages.instructionTitle;
-
 type Props = {
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
@@ -34,6 +31,7 @@ type Props = {
   onMasterKeyConfirm: Function,
   disableTransferFunds: boolean,
   attentionText: string,
+  confirmationTitleText: string,
   confirmationText: string,
   confirmationPaperText: string,
   confirmationMasterKeyText: string,
@@ -55,6 +53,7 @@ export default class TransferInstructionsPage extends Component<Props> {
       onMasterKeyConfirm,
       disableTransferFunds,
       attentionText,
+      confirmationTitleText,
       confirmationText,
       confirmationPaperText,
       confirmationMasterKeyText,
@@ -83,7 +82,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <div>
                 <div className={styles.title}>
-                  {intl.formatMessage(messages.instructionTitle)}
+                  {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
                   {intl.formatMessage(messages.instructionsText)}
@@ -117,6 +116,10 @@ export default class TransferInstructionsPage extends Component<Props> {
                 <div className={styles.text}>
                   {attentionText}
                 </div>
+              </div>
+
+              <div className={styles.buttonTitle}>
+                {confirmationTitleText}
               </div>
 
               <Button

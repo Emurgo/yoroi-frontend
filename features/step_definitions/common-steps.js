@@ -1,9 +1,10 @@
 // @flow
 
-import { Before, BeforeAll, Given, After, AfterAll, setDefinitionFunctionWrapper } from 'cucumber';
+import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper } from 'cucumber';
 import { getMockServer, closeMockServer } from '../support/mockServer';
 import { buildFeatureData, getFeatureData, getFakeAddresses } from '../support/mockDataBuilder';
 import i18nHelper from '../support/helpers/i18n-helpers';
+import { By } from 'selenium-webdriver';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -71,21 +72,25 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
 
     if (cleanString.includes('I should see')) {
-      // path logic
-      const dir = `${screenshotsDir}/${testProgress.scenarioName}`;
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-      }
-      const path = `${dir}/${testProgress.step}_${testProgress.lineNum}-${cleanString}.png`;
-
-      const screenshot = await this.driver.takeScreenshot();
-      await writeFile(path, screenshot, 'base64');
+      await takeScreenshot(this.driver, cleanString);
     }
 
     testProgress.step += 1;
     return ret;
   };
 });
+
+async function takeScreenshot(driver, name) {
+  // path logic
+  const dir = `${screenshotsDir}/${testProgress.scenarioName}`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+  const path = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}.png`;
+
+  const screenshot = await driver.takeScreenshot();
+  await writeFile(path, screenshot, 'base64');
+}
 
 Given(/^I am testing "([^"]*)"$/, feature => {
   buildFeatureData(feature);
@@ -125,6 +130,11 @@ Given(/^There is a wallet stored named (.*)$/, async function (walletName) {
   await storeWallet(this, walletName);
   await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
 });
+
+Then(/^I click then button labeled (.*)$/, async function (buttonName) {
+  await this.click(`//button[contains(text(), ${buttonName})]`, By.xpath);
+});
+
 
 function refreshWallet(client) {
   return client.driver.executeAsyncScript((done) => {

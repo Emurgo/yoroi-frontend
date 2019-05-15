@@ -90,7 +90,6 @@ export default class SupportSettings extends Component<Props> {
 
     return (
       <div className={styles.component}>
-
         <h1>{intl.formatMessage(messages.faqTitle)}</h1>
 
         <p><FormattedMessage {...messages.faqContent} values={{ faqLink }} /></p>

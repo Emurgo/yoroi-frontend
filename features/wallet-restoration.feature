@@ -17,6 +17,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
+    Then I should see a plate EAJD-7036
+    Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -43,6 +45,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
+    Then I should see a plate SETH-7545
+    Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -61,6 +65,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
+    Then I should see a plate DADJ-4614
+    Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -83,6 +89,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | aaSecret_123 | aaSecret_123       |
     And I click the "Restore Wallet" button
+    Then I should see a plate HNHT-5379
+    Then I press the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -120,7 +128,6 @@ Feature: Restore Wallet
     | wallet.restore.dialog.form.errors.invalidRecoveryPhrase |
     Examples:
     | recoveryPhrase                                                                                           |                    |
-    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow         | 14-words phrase    |
     | atom remind style monster lunch result upgrade fashion eight limit glance frequent eternal borrow accuse | invalid word order |
 
     @it-71
@@ -134,3 +141,37 @@ Feature: Restore Wallet
     Examples:
     | recoveryPhrase                                                                                                  |                    |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster galaxy | 16-words phrase    |
+
+    @it-72
+    Scenario: Restoring a paper wallet (IT-72)
+      When I click the restore paper wallet button
+      And I enter the name "Restored Wallet"
+      And I enter the recovery phrase:
+      | recoveryPhrase                                                                                        |
+      | mushroom expose slogan wagon uphold train absurd fix snake unable rescue curious escape member resource garbage enemy champion airport matrix year |
+      And I enter the paper wallet password "cool password"
+      And I enter the restored wallet password:
+      | password   | repeatedPassword |
+      | aaSecret_123 | aaSecret_123       |
+      And I click the "Restore Wallet" button
+      Then I should see a plate KOTZ-1730
+      Then I press the next button
+      Then I should see the opened wallet with name "Restored Wallet"
+      And I go to the receive screen
+      And I should see the addresses exactly list them
+      | address                                                     |
+      | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr |
+
+    @it-73
+    Scenario Outline: Wallet restoration Recovery Phrase with less than 15 words (IT-73)
+    And I click the restore button
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase   |
+    | <recoveryPhrase> |
+    Then I should see an "X words left" error message:
+    | message                                                 |
+    | wallet.restore.dialog.form.errors.shortRecoveryPhrase |
+    Examples:
+    | recoveryPhrase                                                                                           |                    |
+    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow         | 14-words phrase    |

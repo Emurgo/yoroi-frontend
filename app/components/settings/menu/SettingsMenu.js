@@ -6,11 +6,17 @@ import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
 import environment from '../../../environment';
+import { THEMES } from '../../../themes';
+import type { Theme } from '../../../themes';
 
 const messages = defineMessages({
   general: {
     id: 'settings.menu.general.link.label',
     defaultMessage: '!!!General',
+  },
+  paperWallet: {
+    id: 'settings.menu.paperWallet.link.label',
+    defaultMessage: '!!!Paper Wallet',
   },
   wallet: {
     id: 'settings.menu.wallet.link.label',
@@ -43,6 +49,7 @@ type Props = {
   onItemClick: Function,
   hasActiveWallet: boolean,
   currentLocale: string,
+  currentTheme: Theme,
 };
 
 @observer
@@ -54,16 +61,23 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale, currentTheme } = this.props;
 
     return (
-      <div>
+      <div className={currentTheme === THEMES.YOROI_CLASSIC ? '' : styles.componentWrapper}>
         <div className={styles.component}>
           <SettingsMenuItem
             label={intl.formatMessage(messages.general)}
             onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}
             active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
             className="general"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.paperWallet)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
+            active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
+            className="paperWallet"
           />
 
           <SettingsMenuItem

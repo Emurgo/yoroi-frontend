@@ -9,6 +9,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
@@ -153,10 +154,8 @@ where Ada should be redeemed and enter {adaRedemptionPassphraseLength} word mnem
   adaAmountHint: {
     id: 'wallet.redeem.dialog.adaAmountHint',
     defaultMessage: '!!!Enter your Ada amount',
-  }
+  },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   wallets: Array<{ value: string, label: string }>,
@@ -187,6 +186,7 @@ type Props = {
   redemptionCode: ?string,
   error: ?LocalizableError,
   suggestedMnemonics: Array<string>,
+  classicTheme: boolean,
 };
 
 @observer
@@ -215,10 +215,10 @@ export default class AdaRedemptionForm extends Component<Props> {
           // Otherwise check mnemonic
           const passPhrase = join(field.value, ' ');
           if (!isEmpty(passPhrase)) this.props.onPassPhraseChanged(passPhrase);
-          return [
-            this.props.mnemonicValidator(passPhrase),
-            this.context.intl.formatMessage(new InvalidMnemonicError())
-          ];
+          return this.props.mnemonicValidator(passPhrase)
+            .then(isValid => (
+              [isValid, this.context.intl.formatMessage(new InvalidMnemonicError())]
+            ));
         }]
       },
       redemptionKey: {
@@ -227,11 +227,11 @@ export default class AdaRedemptionForm extends Component<Props> {
         validators: ({ field }) => {
           if (this.props.redemptionType === ADA_REDEMPTION_TYPES.PAPER_VENDED) return [true];
           const value = this.props.redemptionCode || field.value;
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
-          return [
-            this.props.redemptionCodeValidator(value),
-            this.context.intl.formatMessage(messages.redemptionKeyError)
-          ];
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+          return this.props.redemptionCodeValidator(value)
+            .then(isValid => (
+              [isValid, this.context.intl.formatMessage(messages.redemptionKeyError)]
+            ));
         },
       },
       shieldedRedemptionKey: {
@@ -241,11 +241,11 @@ export default class AdaRedemptionForm extends Component<Props> {
         validators: ({ field }) => {
           if (this.props.redemptionType !== ADA_REDEMPTION_TYPES.PAPER_VENDED) return [true];
           const value = field.value;
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
-          return [
-            this.props.postVendRedemptionCodeValidator(value),
-            this.context.intl.formatMessage(messages.shieldedRedemptionKeyError)
-          ];
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+          return this.props.postVendRedemptionCodeValidator(value)
+            .then(isValid => (
+              [isValid, this.context.intl.formatMessage(messages.shieldedRedemptionKeyError)]
+            ));
         },
       },
       walletId: {
@@ -362,7 +362,7 @@ export default class AdaRedemptionForm extends Component<Props> {
       onRedemptionCodeChanged, isCertificateSelected, error, isSubmitting, onCertificateSelected,
       isCertificateEncrypted, isCertificateInvalid, onRemoveCertificate, showPassPhraseWidget,
       suggestedMnemonics, showInputForDecryptionKey, showInputsForDecryptingForceVendedCertificate,
-      isRedemptionDisclaimerAccepted, onAcceptRedemptionDisclaimer
+      isRedemptionDisclaimerAccepted, onAcceptRedemptionDisclaimer, classicTheme
     } = this.props;
 
     const certificateField = form.$('certificate');
@@ -447,6 +447,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                 if (isRedemptionTypeChanged) resetForm();
                 onChooseRedemptionType(choice);
               }}
+              classicTheme={classicTheme}
             />
 
             <div className={styles.instructions}>
@@ -472,7 +473,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     }}
                     disabled={isRecovery || isCertificateSelected}
                     error={redemptionKeyField.error}
-                    skin={InputSkin}
+                    skin={classicTheme ? InputSkin : InputOwnSkin}
                   />
                 ) : (
                   <Input
@@ -481,7 +482,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     {...shieldedRedemptionKeyField.bind()}
                     disabled={isCertificateSelected}
                     error={shieldedRedemptionKeyField.error}
-                    skin={InputSkin}
+                    skin={classicTheme ? InputSkin : InputOwnSkin}
                   />
                 )}
 
@@ -540,7 +541,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="decryption-key"
                   {...decryptionKeyField.bind()}
                   error={decryptionKeyField.error}
-                  skin={InputSkin}
+                  skin={classicTheme ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -552,7 +553,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="email"
                   {...emailField.bind()}
                   error={emailField.error}
-                  skin={InputSkin}
+                  skin={classicTheme ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -564,7 +565,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-passcode"
                   {...adaPasscodeField.bind()}
                   error={adaPasscodeField.error}
-                  skin={InputSkin}
+                  skin={classicTheme ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -576,7 +577,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-amount"
                   {...adaAmountField.bind()}
                   error={adaAmountField.error}
-                  skin={InputSkin}
+                  skin={classicTheme ? InputSkin : InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -596,6 +597,7 @@ export default class AdaRedemptionForm extends Component<Props> {
         {!isRedemptionDisclaimerAccepted ? (
           <AdaRedemptionDisclaimer
             onSubmit={onAcceptRedemptionDisclaimer}
+            classicTheme={classicTheme}
           />
         ) : null}
       </div>

@@ -10,6 +10,10 @@
     }
   }
 
+  .submitButtonSpinning {
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
+  }  
+
   .currencySymbol {
     font-family: var(--font-light);
     text-transform: uppercase;
@@ -30,7 +34,8 @@
   }
 
   .addressTo {
-    font-family: var(--font-light);
+    font-family: var(--font-mono-light);
+    letter-spacing: 0;
     font-size: 15px;
     line-height: 1.38;
     margin-top: 6px;
@@ -41,16 +46,20 @@
   .amountFeesWrapper {
     display: flex;
     flex-direction: row;
+
     .amountWrapper,
     .feesWrapper {
       width: 50%;
     }
+
     .amountWrapper {
       margin-right: 10px;
     }
+
     .feesWrapper {
       margin-left: 10px;
     }
+
     .amountLabel,
     .feesLabel {
       font-size: 11px;
@@ -60,6 +69,7 @@
       margin-left: 10px;
       text-transform: uppercase;
     }
+
     .amount,
     .fees {
       color: var(--theme-send-confirmation-dialog-send-values-color);
@@ -68,6 +78,7 @@
       margin-top: 6px;
       word-break: break-word;
     }
+
     .fees {
       opacity: 0.5;
     }
@@ -100,6 +111,83 @@
   }
 }
 
-.submitButtonSpinning {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
+:global(.YoroiClassic) .dialog {
+  .amountFeesWrapper {
+    .fees {
+      opacity: 0.5;
+    }
+  }
+}
+
+:global(.YoroiModern) .dialog {
+  font-family: var(--font-regular);
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 55px;
+    }
+  }
+
+  .currencySymbol {
+    font-family: var(--font-regular);
+  }
+
+  .addressToLabelWrapper,
+  .amountFeesWrapper {
+    margin-bottom: 23px;
+  }
+
+  .addressToLabel {
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 0;
+    margin-left: 0;
+    text-transform: none;
+  }
+
+  .addressTo {
+    font-family: var(--font-mono-regular);
+    font-size: 14px;
+    line-height: 1.57;
+    margin-top: 2px;
+    opacity: 0.4;
+  }
+
+  .amountFeesWrapper {
+    .amountLabel,
+    .feesLabel {
+      font-size: 16px;
+      font-weight: normal;
+      letter-spacing: 0;
+      margin-left: 0;
+      text-transform: none;
+    }
+
+    .amount,
+    .fees {
+      color: var(--theme-send-confirmation-dialog-send-values-color);
+      font-size: 14px;
+      line-height: 1.57;
+      margin-top: 2px;
+      opacity: 0.4;
+    }
+  }
+
+  .totalAmountLabel {
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 0;
+    margin-left: 0;
+    text-transform: none;
+  }
+
+  .totalAmount {
+    font-family: var(--font-medium);
+    line-height: 1.57;
+    margin-top: 2px;
+
+    .currencySymbol {
+      font-family: var(--font-medium);
+    }
+  }
 }

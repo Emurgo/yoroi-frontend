@@ -1,5 +1,6 @@
 // @flow
 import WalletsActions from './wallets-actions';
+import PaperWalletsActions from './paper-wallets-actions';
 import TransactionsActions from './transactions-actions';
 import WalletSettingsActions from './wallet-settings-actions';
 import AddressesActions from './addresses-actions';
@@ -13,6 +14,7 @@ import HWVerifyAddressActions from './hw-verify-address-actions';
 export type AdaActionsMap = {
   adaRedemption: AdaRedemptionActions,
   wallets: WalletsActions,
+  paperWallets: PaperWalletsActions,
   transactions: TransactionsActions,
   walletSettings: WalletSettingsActions,
   addresses: AddressesActions,
@@ -27,6 +29,7 @@ export type AdaActionsMap = {
 const adaActionsMap: AdaActionsMap = {
   adaRedemption: new AdaRedemptionActions(),
   wallets: new WalletsActions(),
+  paperWallets: new PaperWalletsActions(),
   transactions: new TransactionsActions(),
   walletSettings: new WalletSettingsActions(),
   addresses: new AddressesActions(),

@@ -13,6 +13,8 @@ import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
 import config from '../../../config';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import PasswordInstructions from '../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitleSetPassword: {
@@ -63,6 +65,7 @@ type Props = {
   onPasswordSwitchToggle: Function,
   isSubmitting: boolean,
   error: ?LocalizableError,
+  classicTheme: boolean,
 };
 
 @observer
@@ -145,6 +148,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       repeatedPasswordValue,
       isSubmitting,
       error,
+      classicTheme,
     } = this.props;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
@@ -160,8 +164,20 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
 
     const newPasswordClasses = classnames([
       'newPassword',
-      styles.newPassword,
+      classicTheme ? styles.newPasswordClassic : '',
     ]);
+
+    const currentPasswordField = form.$('currentPassword');
+    const newPasswordField = form.$('walletPassword');
+    const repeatedPasswordField = form.$('repeatPassword');
+
+    const newPassword = newPasswordField.value;
+    const repeatedPassword = repeatedPasswordField.value;
+
+    const disabledCondition = !(
+      isValidWalletPassword(newPassword)
+      && isValidRepeatPassword(newPassword, repeatedPassword)
+    );
 
     const actions = [
       {
@@ -169,21 +185,19 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         onClick: this.submit,
         primary: true,
         className: confirmButtonClasses,
+        disabled: (!classicTheme && disabledCondition)
       },
     ];
-
-    const currentPasswordField = form.$('currentPassword');
-    const newPasswordField = form.$('walletPassword');
-    const repeatedPasswordField = form.$('repeatPassword');
 
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitleChangePassword)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
+        classicTheme={classicTheme}
       >
 
         <div className={styles.walletPassword}>
@@ -194,7 +208,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
-            skin={InputSkin}
+            skin={classicTheme ? InputSkin : InputOwnSkin}
           />
         </div>
 
@@ -205,8 +219,9 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             value={newPasswordValue}
             onChange={(value) => this.handleDataChange('newPasswordValue', value)}
             {...newPasswordField.bind()}
+            done={isValidWalletPassword(newPassword)}
             error={newPasswordField.error}
-            skin={InputSkin}
+            skin={classicTheme ? InputSkin : InputOwnSkin}
           />
 
           <Input
@@ -215,13 +230,12 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             value={repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
             {...repeatedPasswordField.bind()}
+            done={repeatedPassword && isValidRepeatPassword(newPassword, repeatedPassword)}
             error={repeatedPasswordField.error}
-            skin={InputSkin}
+            skin={classicTheme ? InputSkin : InputOwnSkin}
           />
 
-          <p className={styles.passwordInstructions}>
-            {intl.formatMessage(globalMessages.passwordInstructions)}
-          </p>
+          <PasswordInstructions isClassicThemeActive={classicTheme} />
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

@@ -48,7 +48,8 @@ type Props = {
   isSubmitting: boolean,
   onCancel: Function,
   error: ?LocalizableError,
-  addressFromSubLabel: string
+  addressFromSubLabel: string,
+  classicTheme: boolean
 };
 
 /** Show user what the transfer would do to get final confirmation */
@@ -61,7 +62,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, addressFromSubLabel } = this.props;
+    const { transferTx, isSubmitting, error, addressFromSubLabel, classicTheme } = this.props;
 
     const receiver = transferTx.receiver;
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
@@ -78,7 +79,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
     const cancelButtonClasses = classnames([
       'cancelTransferButton',
-      'flat',
+      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 

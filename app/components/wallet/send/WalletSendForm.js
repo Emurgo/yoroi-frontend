@@ -24,6 +24,7 @@ import {
 } from '../../../utils/formatters';
 import dangerIcon from '../../../assets/images/danger.inline.svg';
 import config from '../../../config';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   titleLabel: {
@@ -81,11 +82,8 @@ const messages = defineMessages({
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Cannot send a transaction while there is a pending one',
-  }
+  },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
 
 type Props = {
   currencyUnit: string,
@@ -100,6 +98,7 @@ type Props = {
   isDialogOpen: Function,
   webWalletConfirmationDialogRenderCallback: Function,
   hardwareWalletConfirmationDialogRenderCallback: Function,
+  classicTheme: boolean,
 };
 
 type State = {
@@ -149,7 +148,7 @@ export default class WalletSendForm extends Component<Props, State> {
           const value = field.value;
           if (value === '') {
             this._resetTransactionFee();
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           return this.props.addressValidator(value)
             .then(isValid => {
@@ -173,7 +172,7 @@ export default class WalletSendForm extends Component<Props, State> {
           const amountValue = field.value;
           if (amountValue === '') {
             this._resetTransactionFee();
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           const isValid = await this.props.validateAmount(
             formattedAmountToNaturalUnits(amountValue)
@@ -207,6 +206,7 @@ export default class WalletSendForm extends Component<Props, State> {
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
       hasAnyPending,
+      classicTheme,
     } = this.props;
     const {
       transactionFee,
@@ -218,7 +218,7 @@ export default class WalletSendForm extends Component<Props, State> {
     const amountFieldProps = amountField.bind();
     const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
 
-    const hasPendingTxWarning = (
+    const pendingTxWarningComponent = (
       <div className={styles.contentWarning}>
         <SvgInline svg={dangerIcon} className={styles.icon} />
         <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
@@ -228,7 +228,7 @@ export default class WalletSendForm extends Component<Props, State> {
     return (
       <div className={styles.component}>
 
-        {hasAnyPending && hasPendingTxWarning}
+        {hasAnyPending && pendingTxWarningComponent}
 
         <BorderedBox>
 
@@ -237,7 +237,7 @@ export default class WalletSendForm extends Component<Props, State> {
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              skin={InputSkin}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
             />
           </div>
 
@@ -254,6 +254,7 @@ export default class WalletSendForm extends Component<Props, State> {
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
               skin={AmountInputSkin}
+              classicTheme={classicTheme}
             />
           </div>
 
@@ -300,7 +301,7 @@ export default class WalletSendForm extends Component<Props, State> {
     return (
       <Button
         className={buttonClasses}
-        label={intl.formatMessage(messages.nextButtonLabel)}
+        label={intl.formatMessage(globalMessages.nextButtonLabel)}
         onMouseUp={onMouseUp}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */

@@ -29,9 +29,14 @@ $opacityCommon: 0.7;
   }
 }
 
-.headerBlock {
+:global {
+  .AboutDialog_headerBlock.small span {
+    font-size: 12px;
+  }
+}
+
+.headerBlockClassic {
   width: 725px;
-  height: 5em;
   padding-top: 1em;
   span {
     font-family: var(--font-light);
@@ -41,7 +46,7 @@ $opacityCommon: 0.7;
   }
 }
 
-.middleBlock {
+.middleBlockClassic {
   overflow: hidden;  
   background-color: var(--theme-hw-connect-dialog-middle-block-common-background-color);
   object-fit: contain;
@@ -52,4 +57,12 @@ $opacityCommon: 0.7;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 10px;
+}
+
+.middleBlock {
+  overflow: hidden;  
+  background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
+  object-fit: contain;
+  margin-top: 12px;
+  border-radius: 8px;
 }

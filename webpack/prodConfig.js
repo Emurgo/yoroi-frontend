@@ -23,6 +23,7 @@ const baseProdConfig = (networkName) => ({
   output: {
     path: path.join(__dirname, '../build/js'),
     filename: '[name].bundle.js',
+    chunkFilename: '[name].chunk.js',
     publicPath: '/js/',
   },
   plugins: [
@@ -48,7 +49,7 @@ const baseProdConfig = (networkName) => ({
         use: 'babel-loader',
       },
       {
-        test: /\.(eot|otf|ttf|woff|woff2|gif)$/,
+        test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
         loader: 'file-loader',
         options: {
           // Need to specify public path so assets can be loaded from static resources like CSS

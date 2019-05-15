@@ -14,10 +14,13 @@ import AdaRedemptionStore from './AdaRedemptionStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
 import HWVerifyAddressStore from './HWVerifyAddressStore';
+import PaperWalletCreateStore from './PaperWalletCreateStore';
+import StateFetchStore from './StateFetchStore';
 
 export const adaStoreClasses = {
   adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
+  paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
@@ -27,11 +30,13 @@ export const adaStoreClasses = {
   ledgerConnect: LedgerConnectStore,
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
+  stateFetchStore: StateFetchStore,
 };
 
 export type AdaStoresMap = {
   adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
+  paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
@@ -41,11 +46,13 @@ export type AdaStoresMap = {
   ledgerConnect: LedgerConnectStore,
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
+  stateFetchStore: StateFetchStore,
 };
 
 const adaStores = observable({
   adaRedemption: null,
   wallets: null,
+  paperWallets: null,
   transactions: null,
   walletSettings: null,
   addresses: null,
@@ -55,6 +62,7 @@ const adaStores = observable({
   ledgerConnect: null,
   ledgerSend: null,
   hwVerifyAddress: null,
+  stateFetchStore: null,
 });
 
 /** See `stores` index for description of this weird behavior

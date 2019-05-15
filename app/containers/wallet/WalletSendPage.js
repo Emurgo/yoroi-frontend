@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
-import type { MessageDescriptorMap } from 'react-intl';
 
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -22,7 +21,7 @@ import type { DialogProps } from './dialogs/WalletSendConfirmationDialogContaine
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 
-const messagesLedger: MessageDescriptorMap = defineMessages({
+const messagesLedger = defineMessages({
   infoLine1: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
@@ -37,7 +36,7 @@ const messagesLedger: MessageDescriptorMap = defineMessages({
   },
 });
 
-const messagesTrezor: MessageDescriptorMap = defineMessages({
+const messagesTrezor = defineMessages({
   infoLine1: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
@@ -67,7 +66,7 @@ export default class WalletSendPage extends Component<Props> {
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
     const { intl } = this.context;
-    const { uiDialogs } = this.props.stores;
+    const { uiDialogs, profile } = this.props.stores;
     const { actions } = this.props;
     const { isValidAddress } = wallets;
     const { calculateTransactionFee, validateAmount, hasAnyPending } = transactions;
@@ -88,6 +87,7 @@ export default class WalletSendPage extends Component<Props> {
         hardwareWalletConfirmationDialogRenderCallback={this.hardwareWalletDoConfirmation}
         hasAnyPending={hasAnyPending}
         isHardwareWallet={activeWallet.isHardwareWallet}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }
@@ -134,6 +134,7 @@ export default class WalletSendPage extends Component<Props> {
           error={ledgerSendStore.error}
           onSubmit={ledgerSendAction.sendUsingLedger.trigger}
           onCancel={ledgerSendAction.cancel.trigger}
+          classicTheme={this.props.stores.profile.isClassicTheme}
         />);
     } else if (active.isTrezorTWallet) {
       const trezorSendAction = this.props.actions[environment.API].trezorSend;
@@ -151,6 +152,7 @@ export default class WalletSendPage extends Component<Props> {
           error={trezorSendStore.error}
           onSubmit={trezorSendAction.sendUsingTrezor.trigger}
           onCancel={trezorSendAction.cancel.trigger}
+          classicTheme={this.props.stores.profile.isClassicTheme}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');

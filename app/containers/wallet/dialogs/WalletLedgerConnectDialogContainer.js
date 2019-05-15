@@ -26,6 +26,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
   };
 
   render() {
+    const { profile } = this.props.stores;
     const ledgerConnectStore = this._getLedgerConnectStore();
     const hwConnectActions = this._getHWConnectActions();
 
@@ -40,6 +41,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             error={ledgerConnectStore.error}
             submit={hwConnectActions.submitAbout.trigger}
             cancel={this.cancel}
+            classicTheme={profile.isClassicTheme}
           />);
         break;
       case ProgressStep.CONNECT:
@@ -51,6 +53,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             goBack={hwConnectActions.goBackToAbout.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
+            classicTheme={profile.isClassicTheme}
           />);
         break;
       case ProgressStep.SAVE:
@@ -62,6 +65,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             defaultWalletName={ledgerConnectStore.defaultWalletName}
             submit={hwConnectActions.submitSave.trigger}
             cancel={this.cancel}
+            classicTheme={profile.isClassicTheme}
           />);
         break;
       default:

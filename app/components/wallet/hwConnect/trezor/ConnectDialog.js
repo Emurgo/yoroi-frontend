@@ -16,6 +16,9 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
+import connectLoadImage from '../../../../assets/images/hardware-wallet/trezor/connect-load-modern.inline.gif';
+import connectErrorImage from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
+
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
 import connectErrorSVG from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
 
@@ -24,6 +27,7 @@ import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
 import { Logger } from '../../../../utils/logging';
 
 import styles from '../common/ConnectDialog.scss';
+import headerMixin from '../../../mixins/HeaderBlock.scss';
 
 const connectStartGIF = connectLoadGIF;
 
@@ -45,21 +49,36 @@ type Props = {
   goBack: Function,
   submit: Function,
   cancel: Function,
+  classicTheme: boolean
 };
 
 @observer
 export default class ConnectDialog extends Component<Props> {
-
   static contextTypes = {
     intl: intlShape.isRequired
   };
 
   render() {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, goBack, submit, cancel } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      goBack,
+      submit,
+      cancel,
+      classicTheme
+    } = this.props;
+    const headerBlockClasses = classicTheme
+      ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
+      : headerMixin.headerBlock;
+    const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
+    const middleConnectErrorBlockClasses = classicTheme
+      ? styles.middleConnectErrorBlockClassic
+      : null;
 
     const introBlock = (
-      <div className={styles.headerBlock}>
+      <div className={headerBlockClasses}>
         <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
         <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br />
         <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span><br />
@@ -72,22 +91,22 @@ export default class ConnectDialog extends Component<Props> {
       case StepState.LOAD:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
-            <img src={connectLoadGIF} alt="" />
+          <div className={classnames([middleBlockClasses, styles.middleConnectLoadBlock])}>
+            <img src={classicTheme ? connectLoadGIF : connectLoadImage} alt="" />
           </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
-          <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
-            <img src={connectStartGIF} alt="" />
+          <div className={classnames([middleBlockClasses, styles.middleConnectProcessBlock])}>
+            <img src={classicTheme ? connectStartGIF : connectLoadImage} alt="" />
           </div>);
         break;
       case StepState.ERROR:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            <SvgInline svg={connectErrorSVG} />
+          <div className={classnames([middleBlockClasses, middleConnectErrorBlockClasses])}>
+            <SvgInline svg={classicTheme ? connectErrorSVG : connectErrorImage} />
           </div>);
         break;
       default:
@@ -112,12 +131,21 @@ export default class ConnectDialog extends Component<Props> {
         onClose={cancel}
         backButton={backButton}
         closeButton={<DialogCloseButton />}
+        classicTheme={classicTheme}
       >
-        <ProgressStepBlock progressInfo={progressInfo} />
+        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
-        <HWErrorBlock progressInfo={progressInfo} error={error} />
+
+        {!classicTheme && (
+          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        )}
+
+        <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+
+        {classicTheme && (
+          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        )}
       </Dialog>);
   }
 }

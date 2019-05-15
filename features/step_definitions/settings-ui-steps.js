@@ -12,7 +12,7 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dia
 });
 
 When(/^I click on "name" input field$/, async function () {
-  await this.click('.SettingsLayout_settingsPane .InlineEditingInput_component');
+  await this.click('.SettingsLayout_settingsPane .InlineEditingInput_componentClassic');
 });
 
 When(/^I enter new wallet name:$/, async function (table) {
@@ -64,6 +64,10 @@ When(/^I submit the wallet password dialog$/, async function () {
   await this.click('.confirmButton');
 });
 
+When(/^I press the next button$/, async function () {
+  await this.click('.confirmButton');
+});
+
 Then(/^I should not see the change password dialog anymore$/, async function () {
   await this.waitForElementNotPresent('.changePasswordDialog');
 });
@@ -74,7 +78,7 @@ Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
 
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.ChangeWalletPasswordDialog_newPassword .SimpleFormField_error';
+  const errorSelector = '.ChangeWalletPasswordDialog_newPasswordClassic .SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
@@ -97,7 +101,7 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 Then(/^I should stay in the change password dialog$/, async function () {
   const changePasswordMessage = await i18n.formatMessage(this.driver,
     { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
-  await this.waitUntilText('.Dialog_title', changePasswordMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.Dialog_titleClassic', changePasswordMessage.toUpperCase(), 2000);
 });
 
 Then(/^I should see support screen$/, async function () {

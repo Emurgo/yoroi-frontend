@@ -8,9 +8,6 @@ import {
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
-import {
-  sendTx
-} from '../../api/ada/lib/yoroi-backend-api';
 import LocalizableError, {
   localizedError
 } from '../../i18n/LocalizableError';
@@ -23,7 +20,8 @@ import {
   generateTransferTx
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
-import type { SignedResponse } from '../../api/ada/lib/yoroi-backend-api';
+import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
+import { batchUTXOsForAddresses } from '../../api/ada/lib/state-fetch/helpers';
 import {
   getCryptoDaedalusWalletFromMnemonics,
   getCryptoDaedalusWalletFromMasterKey
@@ -35,15 +33,23 @@ const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
 const WS_CODE_NORMAL_CLOSURE = 1000;
 
+type TransferFundsRequest = {
+  signedTx: RustModule.Wallet.SignedTransaction,
+};
+type TransferFundsResponse = SignedResponse;
+type TransferFundsFunc = (
+  request: TransferFundsRequest
+) => Promise<TransferFundsResponse>;
+
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatus = 'uninitialized';
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<SignedResponse>= new Request(
-    this._transferFundsRequest
-  );
+  @observable transferFundsRequest: Request<TransferFundsFunc>
+    = new Request<TransferFundsFunc>(this._transferFundsRequest);
+
   @observable ws: any = null;
 
   setup(): void {
@@ -127,7 +133,12 @@ export default class DaedalusTransferStore extends Store {
           const checker = RustModule.Wallet.DaedalusAddressChecker.new(wallet);
           const addressesWithFunds = getAddressesWithFunds({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
-          const transferTx = await generateTransferTx({ addressesWithFunds });
+          const transferTx = await generateTransferTx({
+            addressesWithFunds,
+            getUTXOsForAddresses: batchUTXOsForAddresses(
+              this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses
+            ),
+          });
           runInAction(() => {
             this.transferTx = transferTx;
           });
@@ -161,11 +172,14 @@ export default class DaedalusTransferStore extends Store {
     });
   };
 
-  _setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }): void => {
+  _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
       const [newSecretWords, unscrambledLen] =
-        this.api.ada.unscramblePaperMnemonic(secretWords, 27);
+        await this.api.ada.unscramblePaperMnemonic({
+          mnemonic: secretWords,
+          numberOfWords: 27
+        });
       if (!newSecretWords || !unscrambledLen) {
         throw new Error('Failed to unscramble paper mnemonics!');
       }
@@ -196,10 +210,10 @@ export default class DaedalusTransferStore extends Store {
   }
 
   /** Send a transaction to the backend-service to be broadcast into the network */
-  _transferFundsRequest = async (payload: {
-    signedTx: RustModule.Wallet.SignedTransaction
+  _transferFundsRequest = async (request: {
+    signedTx: RustModule.Wallet.SignedTransaction,
   }): Promise<SignedResponse> => (
-    sendTx({ signedTx: payload.signedTx })
+    this.stores.substores.ada.stateFetchStore.fetcher.sendTx({ signedTx: request.signedTx })
   )
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
@@ -257,7 +271,7 @@ export class TransferFundsError extends LocalizableError {
   constructor() {
     super({
       id: messages.transferFundsError.id,
-      defaultMessage: messages.transferFundsError.defaultMessage,
+      defaultMessage: messages.transferFundsError.defaultMessage || '',
       description: messages.transferFundsError.description,
     });
   }
@@ -267,7 +281,7 @@ export class NoTransferTxError extends LocalizableError {
   constructor() {
     super({
       id: messages.noTransferTxError.id,
-      defaultMessage: messages.noTransferTxError.defaultMessage,
+      defaultMessage: messages.noTransferTxError.defaultMessage || '',
       description: messages.noTransferTxError.description,
     });
   }
@@ -277,7 +291,7 @@ export class WebSocketRestoreError extends LocalizableError {
   constructor() {
     super({
       id: messages.webSocketRestoreError.id,
-      defaultMessage: messages.webSocketRestoreError.defaultMessage,
+      defaultMessage: messages.webSocketRestoreError.defaultMessage || '',
       description: messages.webSocketRestoreError.description,
     });
   }

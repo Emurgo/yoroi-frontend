@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import styles from './TopBarLayout.scss';
 
 type Props = {
@@ -10,6 +10,9 @@ type Props = {
   children?: ?Node,
   notification?: ?Node,
   banner?: Node,
+  noTopbarNoBanner?: boolean,
+  languageSelectionBackground?: boolean,
+  classicTheme?: boolean,
   footer?: Node,
 };
 
@@ -20,6 +23,10 @@ export default class TopBarLayout extends Component<Props> {
     children: undefined,
     notification: undefined,
     banner: undefined,
+    noTopbarNoBanner: undefined,
+    languageSelectionBackground: false,
+    withFooter: false,
+    classicTheme: false,
     footer: undefined,
   };
 
@@ -29,35 +36,47 @@ export default class TopBarLayout extends Component<Props> {
       children,
       topbar,
       notification,
-      footer
+      noTopbarNoBanner,
+      languageSelectionBackground,
+      footer,
+      classicTheme
     } = this.props;
-
-    const contentStyle = classNames([
+    const componentClasses = classnames([
+      styles.component,
+      languageSelectionBackground && !classicTheme ? styles.languageSelectionBackground : '',
+    ]);
+    const topbarClasses = classnames([
+      classicTheme ? styles.topbarClassic : styles.topbar,
+    ]);
+    const contentClasses = classnames([
       styles.content,
-      (footer) ? styles.contentWithFooter : null,
+      footer ? styles.contentWithFooter : null,
     ]);
 
     return (
-      <div className={styles.component}>
+      <div className={componentClasses}>
         <div className={styles.main}>
-          <div className={styles.topbar}>
-            {topbar}
-          </div>
+          {noTopbarNoBanner ? null : (
+            <div className={topbarClasses}>
+              {topbar}
+            </div>
+          )}
 
-          {banner}
+          {noTopbarNoBanner ? null : banner}
 
           {notification}
 
           <div className={styles.contentWrapper}>
-            <div className={contentStyle}>
+            <div className={contentClasses}>
               {children}
             </div>
           </div>
 
-          {footer &&
+          {footer ? (
             <div className={styles.footer}>
               {footer}
-            </div>}
+            </div>
+          ) : null}
         </div>
       </div>
     );

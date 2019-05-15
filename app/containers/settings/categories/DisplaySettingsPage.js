@@ -28,7 +28,7 @@ export default class DisplaySettingsPage extends Component<InjectedProps> {
     const { currentTheme } = this.props.stores.profile;
     return (
       <DisplaySettings
-        theme={currentTheme}
+        currentTheme={currentTheme}
         selectTheme={this.selectTheme}
         getThemeVars={this.getThemeVars}
         exportTheme={this.exportTheme}

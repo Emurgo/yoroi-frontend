@@ -16,12 +16,17 @@ export default class TopBarContainer extends Component<Props> {
 
   render() {
     const { actions, stores } = this.props;
-    const { app, topbar } = stores;
+    const { app, topbar, profile } = stores;
 
+    const walletsStore = stores.substores[environment.API].wallets;
     const title = (<WalletTopbarTitle
-      wallet={stores.substores[environment.API].wallets.active}
+      wallet={walletsStore.active}
+      account={walletsStore.activeAccount}
       currentRoute={app.currentRoute}
       formattedWalletAmount={formattedWalletAmount}
+      themeProperties={{
+        identiconSaturationFactor: profile.isClassicTheme ? -5 : 0
+      }}
     />);
     return (
       <TopBar
@@ -31,6 +36,7 @@ export default class TopBarContainer extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
+        classicTheme={profile.isClassicTheme}
       />
     );
   }

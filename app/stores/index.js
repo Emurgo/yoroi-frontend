@@ -41,6 +41,7 @@ export type StoresMap = {
 /** Constant that represents the stores across the lifetime of the application */
 const stores = observable({
   profile: null,
+  theme: null,
   app: null,
   topbar: null,
   walletBackup: null,

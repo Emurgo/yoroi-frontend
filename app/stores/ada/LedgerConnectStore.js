@@ -21,8 +21,8 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
   CreateHardwareWalletRequest,
-  CreateHardwareWalletResponse,
-} from '../../api/common';
+  CreateHardwareWalletFunc,
+} from '../../api/ada';
 
 import {
   convertToLocalizableError
@@ -73,8 +73,8 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
-  createHWRequest: LocalizedRequest<CreateHardwareWalletResponse> =
-    new LocalizedRequest(this.api.ada.createHardwareWallet);
+  createHWRequest: LocalizedRequest<CreateHardwareWalletFunc>
+    = new LocalizedRequest<CreateHardwareWalletFunc>(this.api.ada.createHardwareWallet);
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
     * ledger wallet creation on a seperate wallet and explain to them why the action is blocked */
@@ -159,6 +159,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
         const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
 
         Logger.debug(stringifyData(versionResp));
+
         // TODO: assume single account in Yoroi
         const accountPath = makeCardanoAccountBIP44Path(0);
         // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
@@ -255,8 +256,9 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
       this.createHWRequest.reset();
 
       const reqParams = this._prepareCreateHWReqParams(walletName);
-      const ledgerWallet: CreateHardwareWalletResponse =
-        await this.createHWRequest.execute(reqParams).promise;
+      this.createHWRequest.execute(reqParams);
+      if (!this.createHWRequest.promise) throw new Error('should never happen');
+      const ledgerWallet = await this.createHWRequest.promise;
 
       await this._onSaveSucess(ledgerWallet);
     } catch (error) {
@@ -286,10 +288,12 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
       throw new Error('Ledger device hardware info not valid');
     }
 
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     return {
       walletName,
       publicMasterKey: this.hwDeviceInfo.publicMasterKey,
-      hwFeatures: this.hwDeviceInfo.hwFeatures
+      hwFeatures: this.hwDeviceInfo.hwFeatures,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   };
 

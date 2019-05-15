@@ -1,6 +1,4 @@
 // @flow
-import _ from 'lodash';
-
 import {
   Logger,
   stringifyError,
@@ -11,23 +9,22 @@ import type {
   UTXO
 } from '../adaTypes';
 import type { UtxoLookupMap }  from '../lib/utils';
-import { utxosToLookupMap }  from '../lib/utils';
+import { utxosToLookupMap, derivePathAsString }  from '../lib/utils';
 import type {
   AdaAddressMap,
 } from '../adaAddress';
-import {
-  sendTx,
-  getTxsBodiesForUTXOs
-} from '../lib/yoroi-backend-api';
+import type {
+  SendFunc,
+  TxBodiesFunc
+} from '../lib/state-fetch/types';
 import {
   SendTransactionError,
   InvalidWitnessError,
-  GetTxsBodiesForUTXOsError
 } from '../errors';
 import type {
   BroadcastTrezorSignedTxResponse,
   PrepareAndBroadcastLedgerSignedTxResponse
-} from '../../common';
+} from '..';
 import type {
   TrezorInput,
   TrezorOutput,
@@ -45,8 +42,6 @@ import type {
 import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
 
 import type { ConfigType } from '../../../../config/config-types';
-import Config from '../../../config';
-import { getSingleCryptoAccount } from '../adaLocalStorage';
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
@@ -56,9 +51,10 @@ declare var CONFIG: ConfigType;
 /** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
   addressesMap: AdaAddressMap,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<TrezorSignTxPayload> {
   const txJson: TransactionType = unsignedTx.to_json();
 
@@ -78,7 +74,9 @@ export async function createTrezorSignTxPayload(
   );
 
   // Transactions
-  const txsBodiesMap = await txsBodiesForInputs(txJson.inputs);
+  // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
+  const txsHashes = [...new Set(txJson.inputs.map(x => x.id))];
+  const txsBodiesMap = await getTxsBodiesForUTXOs({ txsHashes });
   const txsBodies = txJson.inputs.map((x) => txsBodiesMap[x.id]);
 
   return {
@@ -89,43 +87,10 @@ export async function createTrezorSignTxPayload(
   };
 }
 
-/** List of Body hashes for a list of utxos by batching backend requests */
-export async function txsBodiesForInputs(
-  inputs: Array<TxoPointerType>
-): Promise<{[key: string]:string}> {
-  if (!inputs) return {};
-  try {
-
-    // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
-    const txsHashes = [...new Set(inputs.map(x => x.id))];
-
-    // split up all txs into chunks of equal size
-    const groupsOfTxsHashes = _.chunk(txsHashes, CONFIG.app.txsBodiesRequestSize);
-
-    // convert chunks into list of Promises that call the backend-service
-    const promises = groupsOfTxsHashes
-      .map(groupOfTxsHashes => getTxsBodiesForUTXOs(groupOfTxsHashes));
-
-    // Sum up all the utxo
-    return Promise.all(promises)
-      .then(groupsOfTxBodies => {
-        const bodies = groupsOfTxBodies
-          .reduce((acc, groupOfTxBodies) => Object.assign(acc, groupOfTxBodies), {});
-        if (txsHashes.length !== Object.keys(bodies).length) {
-          throw new GetTxsBodiesForUTXOsError();
-        }
-        return bodies;
-      });
-  } catch (getTxBodiesError) {
-    Logger.error('newTransaction::txsBodiesForInputs error: ' +
-      stringifyError(getTxBodiesError));
-    throw new GetTxsBodiesForUTXOsError();
-  }
-}
-
 /** Send a transaction and save the new change address */
 export async function broadcastTrezorSignedTx(
   signedTxHex: string,
+  sendTx: SendFunc
 ): Promise<BroadcastTrezorSignedTxResponse> {
   Logger.debug('newTransaction::broadcastTrezorSignedTx: called');
   const signedTxBytes = Buffer.from(signedTxHex, 'hex');
@@ -146,11 +111,6 @@ export async function broadcastTrezorSignedTx(
   }
 }
 
-function _derivePathAsString(chain: number, addressIndex: number): string {
-  // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return `${Config.wallets.BIP44_CARDANO_FIRST_ACCOUNT_SUB_PATH}/${chain}/${addressIndex}`;
-}
-
 function _transformToTrezorInputs(
   inputs: Array<TxoPointerType>,
   addressMap: AdaAddressMap,
@@ -160,7 +120,7 @@ function _transformToTrezorInputs(
     const utxo = utxoMap[input.id][input.index];
     const addressInfo = addressMap[utxo.receiver];
     return {
-      path: _derivePathAsString(addressInfo.change, addressInfo.index),
+      path: derivePathAsString(addressInfo.account, addressInfo.change, addressInfo.index),
       prev_hash: input.id,
       prev_index: input.index,
       type: 0
@@ -170,7 +130,7 @@ function _transformToTrezorInputs(
 
 function _generateTrezorOutputs(
   txOutputs: Array<TxOutType>,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
 ): Array<TrezorOutput> {
   return txOutputs.map(txOutput => ({
     amount: txOutput.value.toString(),
@@ -180,10 +140,10 @@ function _generateTrezorOutputs(
 
 function _outputAddressOrPath(
   txOutput: TxOutType,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
 ): { path: string } | { address: string } {
-  if (txOutput.address === changeAddr.cadId) {
-    return { path: _derivePathAsString(changeAddr.change, changeAddr.index) };
+  if (changeAddr && txOutput.address === changeAddr.cadId) {
+    return { path: derivePathAsString(changeAddr.account, changeAddr.change, changeAddr.index) };
   }
 
   return { address: txOutput.address };
@@ -193,12 +153,15 @@ function _outputAddressOrPath(
 /** Generate a payload for Ledger SignTx */
 export async function createLedgerSignTxPayload(
   addressesMap: AdaAddressMap,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<LedgerSignTxPayload> {
   const txJson: TransactionType = unsignedTx.to_json();
-  const txDataHexMap = await txsBodiesForInputs(txJson.inputs);
+  // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
+  const txsHashes = [...new Set(txJson.inputs.map(x => x.id))];
+  const txsBodiesMap = await getTxsBodiesForUTXOs({ txsHashes });
 
   const utxoMap = utxosToLookupMap(senderUtxos);
 
@@ -208,7 +171,7 @@ export async function createLedgerSignTxPayload(
       txJson.inputs,
       addressesMap,
       utxoMap,
-      txDataHexMap,
+      txsBodiesMap,
     );
 
   // Outputs
@@ -224,14 +187,6 @@ export async function createLedgerSignTxPayload(
   };
 }
 
-function _derivePathAsBIP32Path(
-  chain: number,
-  addressIndex: number
-): BIP32Path {
-  // Assumes this is only for Cardano and Web Yoroi (only one account).
-  return makeCardanoBIP44Path(0, chain, addressIndex);
-}
-
 function _transformToLedgerInputs(
   inputs: Array<TxoPointerType>,
   addressMap: AdaAddressMap,
@@ -244,14 +199,14 @@ function _transformToLedgerInputs(
     return {
       txDataHex: txDataHexMap[input.id],
       outputIndex: input.index,
-      path: _derivePathAsBIP32Path(addressInfo.change, addressInfo.index),
+      path: makeCardanoBIP44Path(addressInfo.account, addressInfo.change, addressInfo.index),
     };
   });
 }
 
 function _transformToLedgerOutputs(
   txOutputs: Array<TxOutType>,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
 ): Array<OutputTypeAddress | OutputTypeChange> {
   return txOutputs.map(txOutput => ({
     amountStr: txOutput.value.toString(),
@@ -261,10 +216,10 @@ function _transformToLedgerOutputs(
 
 function _ledgerOutputAddress58OrPath(
   txOutput: TxOutType,
-  changeAddr: AdaAddress,
+  changeAddr: ?AdaAddress,
 ): { address58: string } | { path: BIP32Path }  {
-  if (txOutput.address === changeAddr.cadId) {
-    return { path: _derivePathAsBIP32Path(changeAddr.change, changeAddr.index) };
+  if (changeAddr && txOutput.address === changeAddr.cadId) {
+    return { path: makeCardanoBIP44Path(changeAddr.account, changeAddr.change, changeAddr.index) };
   }
 
   return { address58: txOutput.address };
@@ -273,6 +228,8 @@ function _ledgerOutputAddress58OrPath(
 export async function prepareAndBroadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
   unsignedTx: RustModule.Wallet.Transaction,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
+  sendTx: SendFunc,
 ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
   try {
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: called');
@@ -282,7 +239,7 @@ export async function prepareAndBroadcastLedgerSignedTx(
       unsignedTxJson
     )}`);
     const finalizer = new RustModule.Wallet.TransactionFinalized(unsignedTx);
-    ledgerSignTxResp.witnesses.map((witness) => prepareWitness(finalizer, witness));
+    ledgerSignTxResp.witnesses.map((witness) => prepareWitness(finalizer, witness, cryptoAccount));
 
     const backendResponse = await sendTx({ signedTx: finalizer.finalize() });
     Logger.debug('newTransaction::prepareAndBroadcastLedgerSignedTx: success');
@@ -301,9 +258,9 @@ export async function prepareAndBroadcastLedgerSignedTx(
 function prepareWitness(
   finalizer: RustModule.Wallet.TransactionFinalized,
   ledgerWitness: Witness,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
 ): void {
-  const cryptoAccount = getSingleCryptoAccount();
-  const pubKey = cryptoAccount.root_cached_key.address_key(
+  const pubKey = cryptoAccount.address_key(
     ledgerWitness.path[3] === 1,
     RustModule.Wallet.AddressKeyIndex.new(ledgerWitness.path[4])
   );

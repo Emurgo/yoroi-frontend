@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
 import TransferInstructionsPage from '../../components/transfer/TransferInstructionsPage';
 
 const messages = defineMessages({
@@ -22,9 +21,23 @@ const messages = defineMessages({
     id: 'daedalusTransfer.instructions.attention.confirmationMasterKey',
     defaultMessage: '!!!Transfer all funds from Daedalus master key',
   },
+  transferTitleText: {
+    id: 'daedalusTransfer.instructions.attention.title',
+    defaultMessage: '!!!Transfer all funds from:'
+  },
+  transferText: {
+    id: 'daedalusTransfer.instructions.attention.button.label',
+    defaultMessage: '!!!Daedalus Wallet',
+  },
+  transferPaperText: {
+    id: 'daedalusTransfer.instructions.attention.paper.button.label',
+    defaultMessage: '!!!Daedalus Paper Wallet',
+  },
+  transferMasterKeyText: {
+    id: 'daedalusTransfer.instructions.attention.masterKey.button.label',
+    defaultMessage: '!!!Daedalus Master Key',
+  },
 });
-
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
 
 type Props = {
   onFollowInstructionsPrerequisites: Function,
@@ -59,9 +72,10 @@ export default class DaedalusTransferInstructionsPage extends Component<Props> {
         onMasterKeyConfirm={onMasterKeyConfirm}
         disableTransferFunds={disableTransferFunds}
         attentionText={intl.formatMessage(messages.attentionText)}
-        confirmationText={intl.formatMessage(messages.confirmationText)}
-        confirmationPaperText={intl.formatMessage(messages.confirmationPaperText)}
-        confirmationMasterKeyText={intl.formatMessage(messages.confirmationMasterKeyText)}
+        confirmationTitleText={intl.formatMessage(messages.transferTitleText)}
+        confirmationText={intl.formatMessage(messages.transferText)}
+        confirmationPaperText={intl.formatMessage(messages.transferPaperText)}
+        confirmationMasterKeyText={intl.formatMessage(messages.transferMasterKeyText)}
       />
     );
   }

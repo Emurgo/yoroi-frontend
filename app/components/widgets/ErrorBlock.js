@@ -10,10 +10,14 @@ import styles from './ErrorBlock.scss';
 
 type Props = {
   error: ?LocalizableError,
+  classicTheme?: boolean
 };
 
 @observer
 export default class ErrorBlock extends Component<Props> {
+  static defaultProps = {
+    classicTheme: false
+  }
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -21,7 +25,7 @@ export default class ErrorBlock extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { error } = this.props;
+    const { error, classicTheme } = this.props;
 
     let errorText = '';
     try {
@@ -31,7 +35,7 @@ export default class ErrorBlock extends Component<Props> {
     }
 
     return (
-      <div className={styles.errorBlock}>
+      <div className={classicTheme ? styles.errorBlockClassic : styles.errorBlock}>
         <span>{errorText}</span>
       </div>);
   }
