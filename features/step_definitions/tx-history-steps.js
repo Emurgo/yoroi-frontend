@@ -101,7 +101,7 @@ Then(
       By.xpath
     );
 
-    const actualTxsList = await this.getElementsBy('.Transaction_componentClassic');
+    const actualTxsList = await this.getElementsBy('.Transaction_component');
     const firstIndex = txExpectedStatus === 'pending' ? 0 : (actualTxsList.length - txsAmount);
     const lastIndex = txExpectedStatus === 'pending' ? txsAmount : actualTxsList.length;
     for (let i = firstIndex; i < lastIndex; i++) {
