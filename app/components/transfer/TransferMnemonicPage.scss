@@ -58,8 +58,8 @@
 }
 
 :global(.YoroiModern) .component {
-  .inputWrapper fieldset {
-    background-color: #ffffff !important;
+  .inputWrapper span[class*='selectedWordBox'] {
+    background-color: #D9DDE0 !important;
   }
 
   .body {
