@@ -58,6 +58,10 @@
 }
 
 :global(.YoroiModern) .component {
+  .inputWrapper fieldset {
+    background-color: #ffffff!important;
+  }
+
   .body {
     .title {
       font-size: 18px;

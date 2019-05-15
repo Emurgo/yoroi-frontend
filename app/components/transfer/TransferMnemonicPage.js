@@ -121,6 +121,8 @@ export default class TransferMnemonicPage extends Component<Props> {
 
     const recoveryPhraseField = form.$('recoveryPhrase');
 
+    console.log('theme: ' + classicTheme);
+
     return (
       <div className={styles.component}>
         <BorderedBox>
@@ -144,6 +146,7 @@ export default class TransferMnemonicPage extends Component<Props> {
             </div>
 
             <Autocomplete
+              className={styles.inputWrapper}
               options={validWords}
               maxSelections={mnemonicLength}
               {...recoveryPhraseField.bind()}
