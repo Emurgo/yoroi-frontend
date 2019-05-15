@@ -42,7 +42,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     return (
       <TopBarLayout
         topbar={topbarElement}
-        isBannerVisible={profile.isModernTheme}
+        classicTheme={profile.isClassicTheme}
         banner={<TestnetWarningBanner />}
       >
         <TermsOfUseForm

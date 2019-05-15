@@ -113,10 +113,9 @@ export default class WalletReceivePage extends Component<Props, State> {
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
           classicTheme={profile.isClassicTheme}
-          notification={notificationComponent}
         />
 
-        {profile.isClassicTheme && notificationComponent}
+        {notificationComponent}
 
         {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
           <AddressDetailsDialog
