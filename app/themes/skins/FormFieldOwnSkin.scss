@@ -46,6 +46,12 @@
       right: 12px;
     }
   }
+
+  &.focused .legend {
+    transform: translateY(-125%);
+    font-size: .85em;
+    background: #fff;
+  }
 }
 
 .legend {
@@ -55,6 +61,13 @@
   font-weight: normal;
   padding: 0 6px;
   z-index: 1;
+  position: absolute;
+  left: 0;
+  top: 10px;
+  cursor: text;
+  z-index: 10;
+  font-size: 1em;
+  transition: transform 150ms ease-out, font-size 100ms ease-out;
 
   line-height: 1.38;
   margin-bottom: 10px;
