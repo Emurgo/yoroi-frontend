@@ -116,10 +116,6 @@ export default class WalletTransactionsList extends Component<Props> {
       'primary',
       styles.showMoreTransactionsButton,
     ]);
-    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
-    const groupClasses = classicTheme ? styles.groupClassic : styles.group;
-    const groupDateClasses = classicTheme ? styles.groupDateClassic : styles.groupDate;
-    const listClasses = classicTheme ? styles.listClassic : styles.list;
 
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
@@ -128,11 +124,11 @@ export default class WalletTransactionsList extends Component<Props> {
     ) : null;
 
     return (
-      <div className={componentClasses}>
+      <div className={styles.component}>
         {transactionsGroups.map(group => (
-          <div className={groupClasses} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
-            <div className={groupDateClasses}>{this.localizedDate(group.date)}</div>
-            <div className={listClasses}>
+          <div className={styles.group} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
+            <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
+            <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
                 <Transaction
                   key={`${walletId}-${transaction.id}-${transaction.type}`}
