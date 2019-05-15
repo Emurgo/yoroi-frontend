@@ -45,9 +45,6 @@ export default class TopBarLayout extends Component<Props> {
       styles.component,
       languageSelectionBackground && !classicTheme ? styles.languageSelectionBackground : '',
     ]);
-    const topbarClasses = classnames([
-      classicTheme ? styles.topbarClassic : styles.topbar,
-    ]);
     const contentClasses = classnames([
       styles.content,
       footer ? styles.contentWithFooter : null,
@@ -57,7 +54,7 @@ export default class TopBarLayout extends Component<Props> {
       <div className={componentClasses}>
         <div className={styles.main}>
           {noTopbarNoBanner ? null : (
-            <div className={topbarClasses}>
+            <div className={styles.topbar}>
               {topbar}
             </div>
           )}

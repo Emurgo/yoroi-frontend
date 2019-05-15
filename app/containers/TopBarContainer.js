@@ -36,7 +36,6 @@ export default class TopBarContainer extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.isClassicTheme}
       />
     );
   }

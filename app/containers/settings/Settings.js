@@ -59,7 +59,6 @@ export default class Settings extends Component<InjectedContainerProps> {
             }}
             categories={topbar.CATEGORIES}
             activeTopbarCategory={topbar.activeTopbarCategory}
-            classicTheme={profile.isClassicTheme}
           />
         )}
         classicTheme={profile.isClassicTheme}
