@@ -45,7 +45,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         classicTheme={profile.isClassicTheme}
         hideTopbar={profile.isModernTheme}
         languageSelectionBackground
-        banner={<TestnetWarningBanner classicTheme={profile.isClassicTheme} />}
+        banner={<TestnetWarningBanner />}
       >
         <LanguageSelectionForm
           onSubmit={this.onSubmit}

@@ -10,12 +10,6 @@ $footerHeight: 56px;
   height: 100%;
   overflow: hidden;
   width: 100%;
-
-  .languageSelectionBackground {
-    background-image: url(../../assets/images/select-language.svg);
-    background-size: cover;
-    background-position-y: bottom;
-  }
   
   .topbar {
     height: $topBarClassicHeight;    
@@ -59,6 +53,12 @@ $footerHeight: 56px;
     flex-direction: column;
     position: relative;
   }
+}
+
+.languageSelectionBackground {
+  background-image: url(../../assets/images/select-language.svg);
+  background-size: cover;
+  background-position-y: bottom;
 }
 
 :global(.YoroiModern) .component {
