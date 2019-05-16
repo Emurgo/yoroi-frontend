@@ -72,6 +72,7 @@ in Firefox**.
 Using the `protocol_handlers` method:
 
 1. The protocol is registered inside the `manifest.json` file, eg.:
+
         "protocol_handlers": [
           {
             "protocol": "ext+cardano",
@@ -79,6 +80,7 @@ Using the `protocol_handlers` method:
             "uriTemplate": "main_window.html#/wallets/1/transactions?a=%s"
           }
         ]
+
   Note: the prefix `ext+` is recommended for extensions, but not mandatory.
 
 2. This method only seem to work using a relative `uriTemplate` as shown above. Using an absolute URL throws a security error (requires HTTPS).
