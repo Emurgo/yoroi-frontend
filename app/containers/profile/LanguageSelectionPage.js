@@ -7,6 +7,7 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
+import { ROUTES } from '../../routes-config';
 
 const messages = defineMessages({
   title: {
@@ -27,7 +28,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   };
 
   onSubmit = (values: { locale: string }) => {
-    this.props.actions.profile.updateLocale.trigger(values);
+    this.props.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
   };
 
   render() {

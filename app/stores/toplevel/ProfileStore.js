@@ -289,7 +289,7 @@ export default class ProfileStore extends Store {
 
   _redirectToLanguageSelectionIfNoLocaleSet = () => {
     const { isLoading } = this.stores.loading;
-    if (!isLoading && this.hasLoadedCurrentLocale && !this.isCurrentLocaleSet) {
+    if (!isLoading) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
     }
   };
