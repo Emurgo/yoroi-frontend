@@ -137,7 +137,6 @@ export default class WalletReceive extends Component<Props, State> {
             </div>
             <CopyableAddress
               address={walletAddress}
-              isClassicThemeActive={classicTheme}
               onCopyAddress={onCopyAddress}
               isUsed={isWalletAddressUsed}
             />
