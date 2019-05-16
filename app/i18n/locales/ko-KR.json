@@ -28,7 +28,7 @@
   "api.errors.invalidCertificateError": "유효하지 않은 인증서.",
   "api.errors.invalidMnemonicError": "유효하지 않은 구절입니다. 다시 확인해 주십시오.",
   "api.errors.invalidWitnessError": "서명이 잘못되었습니다.",
-  "api.errors.noCertificateError": "인증서 파일에 대한 분석이 필요합니다.",
+  "api.errors.noCertificateError": "문서 분석을 위한 인증서 파일이 필요합니다.",
   "api.errors.noInputsError": "복구 구절에서 복구시킨 지갑이 비어 있습니다. 복구 구절을 확인하시고 복구를 다시 시도해주세요.",
   "api.errors.parsePDFFileError": "PDF파일을 분석하는 동안 오류가 발생했습니다.",
   "api.errors.parsePDFKeyError": "비밀키를 분석하는 동안 오류가 발생했습니다.",
