@@ -39,15 +39,18 @@ Example:
 
 # Multiplatform Implementation
 
+An ideal, multiplatform implementation would allow users to launch Yoroi (or
+possibly other Cardano wallets if they implement the protocol as well) to make
+payments by  simply clicking on any link starting with `web+cardano:` - in a similar
+way as `mailto:` links launch the default email client. To achieve this, the protocol must be registered by browsers and by the mobile apps.
+
 ## Registering the Protocol in Web Browsers
 
 There are two common approaches to register a custom protocol in modern web
 browsers: `Navigator​.register​Protocol​Handler()` [(1)][1] and `protocol_handlers` [(2)][2]. The former currently works in Chrome and the latter
-in Firefox. Some details on both methods are given next.
+in Firefox.
 
-### Considerations
-
-Using the `Navigator​.register​Protocol​Handler()` method:
+### Using the `Navigator​.register​Protocol​Handler()` method (Chrome)
 
 1. A new protocol is registered by executing:
 
@@ -69,7 +72,7 @@ As a consequence, registering a protocol from within an extension doesn't work
 in some browsers, (see row "Secure context required" in [(1, section Browser compatibility)][1]). Currently **works in Chrome but not
 in Firefox**.
 
-Using the `protocol_handlers` method:
+### Using the `protocol_handlers` method (Firefox)
 
 1. The protocol is registered inside the `manifest.json` file, eg.:
 
@@ -83,46 +86,48 @@ Using the `protocol_handlers` method:
 
   Note: the prefix `ext+` is recommended for extensions, but not mandatory.
 
-2. This method only seem to work using a relative `uriTemplate` as shown above. Using an absolute URL throws a security error (requires HTTPS).
+2. This method only seems to work using a relative `uriTemplate` as shown above. Using an absolute URL throws a security error (requires HTTPS).
 
 3. It does not impose the same-domain security policy. This
 means the protocol is simply pre-registered "from factory" and should be effectively activated after the first time the user clicks on a URI and gives the corresponding permissions.
 
 4. This option is currently **only supported by Firefox** (see [(2, section Browser compatibility)][2])
 
-### Suggested Implementation
+## Suggested Implementation
 
 1. As explained above, we will need to implement two different methods to register
   the protocol. The following approaches can be considered:
-  - A) Chrome
-    * Register protocol during first-boot.
-    * We add an explanation of this feature and what the prompt will look
-      like. Once the user presses a “understood button”, we register the
-      protocol causing the browser prompt to appear.
-  - B) Firefox
-    * The protocol is pre-registered in the `manifest.json`.
-      Users should simply grant (or deny) permission once clicking on a URI for
-      the first time.
+
+    - A) Chrome
+      * Register protocol during first-boot.
+      * We add an explanation of this feature and what the prompt will look
+        like. Once the user presses a “understood button”, we register the
+        protocol causing the browser prompt to appear.
+    - B) Firefox
+      * The protocol is pre-registered in the `manifest.json`.
+        Users should simply grant (or deny) permission once clicking on a URI for
+        the first time.
 
 2. Since the extension ID is uniquely determined by the private key we use to upload our app to the Chrome store, we can safely assume it will not change and therefore we should just hard-code it. Alternatively, we may just use a relative
 URL (eg. `main_window.html#/path/to/page`).
-The advantage of the latter approach
-is that it is
 
 3. The URI (which replaces the placeholder `%s`) should be passed as an argument to a special page in the Yoroi app and not the send page (see Future Proof section for more detail)
 
-### Note
+## Note
 
 Since the user can choose “block” or remove the handler at any time from his browser settings, we cannot enforce this feature.
 
 ## Registering the Protocol in Mobile Apps
 
 Once again, handling custom protocols works differently for Android and iOS,
-though the idea is basically the same.
+though the idea is basically the same and is based in Mobile Deep Linking.
+
+In mobile, custom protocols are registered "from factory" in the app's code. An advantage with respect to browsers is that there is no requirement for a `web+` prefix.
 
 ### Android
 
-- Include the URI definition inside the `AndroidManifest.xml` file as an `intent-filter` (see [(3)](3)). Here's a minimum working example (assuming we keep `web+cardano` as the protocol handle):
+The URI definition must be included inside the `AndroidManifest.xml` file as
+an `intent-filter` (see [(3)](3)). Here's a minimum working example (assuming we keep `web+cardano` as the protocol handle):
 ```HTML
         <intent-filter>
           <action android:name="android.intent.action.VIEW" />
@@ -133,11 +138,32 @@ though the idea is basically the same.
 ```
 The example above simply opens the app when a `web+cardano:` URI is clicked.
 
-- The payload can then be retrieved through the `Linking.getInitialURL()` method.
-
 ### iOS
 
-TODO
+The URI definition can be included in the `info.plist` file through Xcode
+[(5)](5). Some additional configuration is required (`RTCLinking` must be linked
+to the project. See [(4)](4) for more details.)
+
+#### Note:
+
+- As of iOS 9, Apple encourages the use of [Universal Links](https://developer.apple.com/documentation/uikit/core_app/allowing_apps_and_websites_to_link_to_your_content) over custom URI schemes
+for handling deep linking. This questions support for custom URIs in the future.
+
+### Handling the Deep Links in react-native
+
+This is done using the `Linking` [(4)](4) interface.
+When the app intercepts an external URI call, the payload can then be retrieved through the `Linking.getInitialURL()` method.
+
+## Non-protocol-based Solution
+
+An alternative solution to the original problem described above is to use
+standard URL links in combination with a routing
+backend system. The routing system is used to redirect to the app's URI.
+The advantage of this scheme is that it allows to provide a fallback mechanism
+to handle the case when no application implementing the protocol is installed
+(for instance, by redirecting to the App Store or Google Play).
+This is the approach behind iOS Universal Links and Android App Links.
+In general, it provides a better user experience.
 
 # Security Considerations
 
@@ -150,6 +176,8 @@ TODO
 
 1. Once we pick a page in Yoroi to send users to, we cannot easily change it (since it will be baked into the protocol)
 2. Before sending a transaction, the user may have to make extra choices (such as which wallet to send from if Yoroi eventually supports multiple wallets). These options should not all be listed on the “send” page
+3. For mobile, there is a clear trend toward the use of HTTP/HTTPS Deep Links.
+It is likely that custom URIs will not be supported for much longer.
 
 ## Suggested Implementation
 We should create a new page in Yoroi to handle these URI links that way we can prompt the user for additional decisions in the future before redirecting them to the appropriate page.
@@ -162,3 +190,7 @@ Users may have downloaded Yoroi and registered the protocol but have not created
 [2]: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/protocol_handlers
 
 [3]: https://developer.android.com/training/app-links/deep-linking#adding-filters
+
+[4]: https://facebook.github.io/react-native/docs/linking.html
+
+[5]: https://developer.apple.com/documentation/uikit/core_app/allowing_apps_and_websites_to_link_to_your_content/defining_a_custom_url_scheme_for_your_app
