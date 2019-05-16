@@ -101,7 +101,7 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 Then(/^I should stay in the change password dialog$/, async function () {
   const changePasswordMessage = await i18n.formatMessage(this.driver,
     { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
-  await this.waitUntilText('.Dialog_titleClassic', changePasswordMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.Dialog_title', changePasswordMessage.toUpperCase(), 2000);
 });
 
 Then(/^I should see support screen$/, async function () {

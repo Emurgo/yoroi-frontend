@@ -77,7 +77,7 @@ Then(/^I should see a plate ([^"]*)$/, async function (plate) {
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.title.label' });
-  await this.waitUntilText('.Dialog_titleClassic', restoreMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.Dialog_title', restoreMessage.toUpperCase(), 2000);
 });
 
 Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
