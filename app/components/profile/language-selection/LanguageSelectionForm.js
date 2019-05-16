@@ -46,6 +46,7 @@ type Props = {
   onSelectLanguage: Function,
   onSubmit: Function,
   isSubmitting: boolean,
+  currentLocale: string,
   error?: ?LocalizableError,
 };
 
@@ -77,7 +78,7 @@ export default class LanguageSelectionForm extends Component<Props> {
     fields: {
       languageId: {
         label: this.context.intl.formatMessage(messages.languageSelectLabel),
-        value: this.props.languages[0].value,
+        value: this.props.currentLocale,
       }
     }
   }, {
@@ -89,7 +90,7 @@ export default class LanguageSelectionForm extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { languages, isSubmitting, error } = this.props;
+    const { languages, isSubmitting, currentLocale, error } = this.props;
     const languageId = form.$('languageId');
     const languageOptions = languages.map(language => ({
       value: language.value,
@@ -107,6 +108,9 @@ export default class LanguageSelectionForm extends Component<Props> {
       contributorsMessage = contributorsMessage + contributors;
     }
 
+    console.log(currentLocale);
+    console.log(languageId.value);
+
     return (
       <div className={styles.component}>
         <div className={styles.centeredBox}>
@@ -114,6 +118,7 @@ export default class LanguageSelectionForm extends Component<Props> {
           <Select
             className={styles.languageSelect}
             options={languageOptions}
+            value={currentLocale}
             {...languageId.bind()}
             skin={SelectSkin}
             onChange={this.selectLanguage}
@@ -131,7 +136,7 @@ export default class LanguageSelectionForm extends Component<Props> {
             skin={ButtonSkin}
           />
 
-          {!tier1Languages.includes(languageId.value) &&
+          {!tier1Languages.includes(currentLocale) &&
             <div className={styles.info}>
               <h1>{intl.formatMessage(messages.languageSelectLabelInfo)}</h1>
               <p>

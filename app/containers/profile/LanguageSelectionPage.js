@@ -32,7 +32,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   };
 
   render() {
-    const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
+    const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
     const { topbar, profile } = this.props.stores;
     const topBartitle = (
@@ -55,6 +55,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
           onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
+          currentLocale={currentLocale}
           languages={LANGUAGE_OPTIONS}
           error={setProfileLocaleRequest.error}
         />
