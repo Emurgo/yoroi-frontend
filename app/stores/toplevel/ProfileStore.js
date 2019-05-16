@@ -289,7 +289,7 @@ export default class ProfileStore extends Store {
 
   _redirectToLanguageSelectionIfNoLocaleSet = () => {
     const { isLoading } = this.stores.loading;
-    if (!isLoading) {
+    if (!isLoading && !this.areTermsOfUseAccepted) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
     }
   };
@@ -302,7 +302,7 @@ export default class ProfileStore extends Store {
   };
 
   _redirectToRoot = () => {
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
   };
 
   _isOnTermsOfUsePage = () => this.stores.app.currentRoute === ROUTES.PROFILE.TERMS_OF_USE;
