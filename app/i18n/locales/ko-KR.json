@@ -336,7 +336,7 @@
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "잘못된 복구 구절",
   "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} 단어 남음",
   "wallet.restore.dialog.paperPasswordLabel": "종이 지갑 암호",
-  "wallet.restore.dialog.passwordDisclaimer": "잘못된 지갑 암호를 입력하면 다른 지갑이 생성됩니다. 이것은 타당한 거부권을 허용합니다.",
+  "wallet.restore.dialog.passwordDisclaimer": "잘못된 지갑 암호를 입력하면 다른 지갑이 생성됩니다. 이것은 사용자의 진술 거부권을 감안한 것입니다.",
   "wallet.restore.dialog.passwordFieldPlaceholder": "지불 암호",
   "wallet.restore.dialog.recovery.phrase.input.hint": "복구 구절 입력",
   "wallet.restore.dialog.recovery.phrase.input.label": "복구 구절",
