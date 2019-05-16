@@ -103,13 +103,10 @@ export default class LanguageSelectionForm extends Component<Props> {
     ]);
     const contributors = intl.formatMessage(messages.languageSelectContributors);
     let contributorsMessage = ' ';
-    if(contributors !== messages.languageSelectContributors.defaultMessage) {
-      contributorsMessage = contributorsMessage + intl.formatMessage(messages.languageSelectThanking);
-      contributorsMessage = contributorsMessage + contributors;
+    if (contributors !== messages.languageSelectContributors.defaultMessage) {
+      contributorsMessage += intl.formatMessage(messages.languageSelectThanking);
+      contributorsMessage += contributors;
     }
-
-    console.log(currentLocale);
-    console.log(languageId.value);
 
     return (
       <div className={styles.component}>
