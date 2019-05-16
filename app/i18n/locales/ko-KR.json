@@ -313,7 +313,7 @@
   "wallet.redeem.dialog.instructions.recoveryRegular": "<p>복구 서비스로부터 보통 벤드 인증서를 사용하여 ADA를 상환하기 위해 암호화된 인증서와 ADA 상환  {adaRedemptionPassphraseLength}단어의 연상 구절을 입력해 주십시오. </p>\n<p>암호화된 인증서를 업로드 하고  {adaRedemptionPassphraseLength}단어의 연상구절을 입력하면 사용자의 상환키가 자동으로 추출됩니다. 사용자는 선택된 지갑으로 ADA를 상환할 수 있습니다.</p>",
   "wallet.redeem.dialog.instructions.regular": "<p> ADA를 상환하기 위해서는 인증서 복사본의 업로드나 인증서의 상환 코드를 입력이 필요합니다.\n아래는 상환키의 예시입니다. 예시를 참고하여 주십시오.:</p><p>\n<p><strong>B_GQOAffMBeRIn6vh1hJmeOT3ViS_TmaT4XAHAfDVH0=</strong></p>\n<p>인증서의 PDF파일을 업로드 할 경우 상환코드는 자동으로 추출됩니다.</p>\n<p>암호화된 인증서를 업로드 할 경우에는 인증서를 해독하기 위해 {adaRedemptionPassphraseLength}단어의 연상구절 입력이 필요하며 상환코드는 자동으로 추출됩니다.</p>",
   "wallet.redeem.dialog.passphrase.input.noResults": "결과 없음",
-  "wallet.redeem.dialog.passphraseHint": "연상기호 {length} 를 입력해 주십시오",
+  "wallet.redeem.dialog.passphraseHint": "{length} 개의 미모닉 복구 구절을 입력하세요",
   "wallet.redeem.dialog.passphraseLabel": "ADA 상품권 인증서 해제 패스프레이즈",
   "wallet.redeem.dialog.recoveryRedemptionKeyHint": "인증서 업로드",
   "wallet.redeem.dialog.redemptionCodeError": "유효하지 않은 상환키",
