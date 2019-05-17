@@ -41,7 +41,7 @@ Ex: A Derived Account wallet is one with accounts all being derived from a known
 
 **Define**: Read-only Wallet - one with only public keys
 
-**Define:** When I mentioned “public key” and “private key”, recall that in the bip44 case these are actually extended public keys (xpub) and extended private keys (xprv)
+**Warning:** `public key` and `private key` may actually mean extended public keys (xpub) and extended private keys (xprv) in the bip44 case
 
 ### Requirements
 
@@ -93,21 +93,31 @@ This spec doesn’t explicitly state what should be stored to maintain app state
 
 Cardano addresses (and the keys themselves) are actually versioned. Instead of repeating the version number in every table, we infer that all derivation levels below a key have the same version.
 
-Note: I represent “Version” (v1, v2, v3 addresses) with an integer.
+Note: `Version` (v1, v2, v3 addresses) is represented with an integer.
+
+#### Names & Uniqueness
+
+Names are limited to 40 characters to match the existing limit in Yoroi and Daedalus (too large causes problems in the UI)
+
+Name uniqueness is not enforced by the storage layer. In fact, the storage layer allows you to add the exact same wallet multiple times.
+
+#### Amounts
+
+We use an amount size of `32` even though Cardano only requires `17` as other blockchains or sidechains may have different settings.
 
 ### Key Table
 
 We use Key to represent any key in our application (public or private). This table doesn’t enforce a format on purpose because Shelley and Plutus will add more key types so this makes sure they can all go into this table and we can extend our storage spec for more key types when needed.
 
-Note: Multiple keys derived from the same parent key don’t need to be encrypted with the same password. This allows, for example, that every account can have its own password.
+Note: multiple keys derived from the same parent key don’t need to be encrypted with the same password. This allows, for example, that every account can have its own password.
 
-#### EncryptionInfo Table
+Note: you can't infer if a password is present just by the presence of `PasswordLastUpdate` as it is possible (ex: Daedalus) that a user removes a password. The key is no longer encrypted but you still want to show the user the time since the password was removed.
 
-We indicated whether or not a key is encrypted by whether or not it has an entry in this table.
-
-Note: Although encrypting public keys kind of defeats the point (since you can no longer fetch new transactions from the network without typing in a password), our storage spec allow for it since disallowing it actually complicates the design and because plain-text public keys can lead to privacy loss or cause your Bip44 wallet to be compromised.
+Note: although encrypting public keys kind of defeats the point (since you can no longer fetch new transactions from the network without typing in a password), our storage spec allow for it since disallowing it actually complicates the design and because plain-text public keys can lead to privacy loss or cause your Bip44 wallet to be compromised.
 
 Note: this means our storage layer also does not enforce a password for the private key. Yoroi UI enforces this but Daedalus allows a no-password option. Encrypting the private with a password is strongly recommended.
+
+Note: we don't enfroce a checksum in the storage layer. Deciding whether or not to use a checksum is up to the specific encryption method used.
 
 ### Bip44Derivation Table
 
@@ -125,8 +135,6 @@ This allows us to decouple the concept of wallets from Bip44 in the storage laye
 
 Note: we need to add “CoinType” to conceptual wallet in order to make the storage layer be able to support multiple currencies. You could infer this information IF a conceptual wallet contained a Bip44Purpose and then checking which index is used for the CoinType derivation, but this is not guaranteed to be the case (especially in the case of adhoc wallets). Additionally, we have no guarantee a conceptual wallet will be tied to something that uses Bip44 at all so we can’t resolve this by just enforcing the presence of a Bip44Purpose
 
-Note: Name has limit `40` to match the existing limit in Yoroi and Daedalus (too large causes problems in the UI. 40 may be too long to be honest)
-
 Note: NetworkId is in the conceptual wallet even though you actually only need to know the protocol magic for when you derive an address. The tradeoff is between the two following behaviors:
 
 1. Associate ProtocolMagic with address only: when user switches to testnet, all their wallets, accounts, etc. stay exactly the same but all their addresses & transactions change
@@ -143,7 +151,7 @@ Note: The Bip44DerivationId should NOT point to Bip44Purpose. Instead, it should
 
 Note: LastBlockSynced is required for light wallets because we don’t want to constantly be syncing every ConceptualWallet the user has (too much bandwidth). Instead, we only sync the AdHocDerivation that the user has selected at the moment.
 
-# Bip44Chain Table
+### Bip44Chain Table
 
 Note: Rust codebase and Bip44 talk of “chain” as a boolean: \
 0: External \
@@ -151,19 +159,27 @@ Note: Rust codebase and Bip44 talk of “chain” as a boolean: \
 
 However, here we represent this implicitly through the index with respect to the parent (as an integer). This allows us to follow the convention when using a derived wallet with an Account table while allowing for multiple chains in the adhoc chain case (If you were to add a specific “IsInternal” field to the table instead, this wouldn’t make sense in the adhoc case)
 
-# Address Table
+LastReceiveIndex allows us to keep track of how many addresses to show on the receive page inside the application (instead of showing the full 20 addresses mandated by bip44). Is is nullable as bip44 only mandates this behavior on external chains.
+
+#### Change address selection
+
+The storage spec doesn't enforce anything for the change address. Note that in the adhoc chain and adhoc address case, we can't even tell what should be the change address and must rely on external input.
+
+### Address Table
 
 Address in table may not belong to the user at all. Notably, all addresses in the transaction history for the wallet are part of the Address table (even if the input came from a different wallet). Similar, Shelley introduces some addresses for keys that are not linked to bIp44 wallets.
 
 Having the Address table generically usable also makes our spec more robust to change. For example, Cardano v3 addresses contain more information such as “address kinds”. These can be added in the future by creating a new table and associating kinds to address table entries.
 
-# EpochLength Table
+### EpochLength and CardanoNetworkStart tables
 
 Represents starting at which block number the epoch length changes and the new length. This is needed as the number of slots per epoch isn’t fixed so converting between the two representations requires a lookup.
 
 Note: Number of slots per epoch can also change depending on which network you connect to or which which side chain you connect to
 
-# Transaction Table
+Additionally, we store the start time of the network. Each slot in Cardano is a specific amount of time so knowing this allows us to get a concrete time for each slot.
+
+### Transaction Table
 
 There are two ways to store blocks number
 
@@ -178,33 +194,27 @@ Note: We use block number instead of date because “date” can change dependin
 
 Note: Transactions are linked to wallets indirectly through addresses.
 
-# UtxoTransactionInput / UtxoTransactionOutput tables
+Note: You can infer the fee by (input - output)
 
-Note: I add “Amount”  explicitly in the input even though when the input belongs to yourself, you can know the value by just looking up the value of the UTXO from the TransactionOutput table. The reason I do this is because in the light client case, you can’t know the input amount when the input belongs to somebody else.
+Note: We don't store raw transaction body. This must be provided externally if required.
 
-# Status tables
+Note: although UTXO can be derived from the Inputs + Outputs and maintained in memory, this can lead to longer app start times for large wallets so it’s better to store this.
 
-We want to avoid representing the storage as a string because we often want queries such as "give me all pending transactions" which would not be fast on string keys. Using ints as a key instead of more flexible but is error-prone and hard to debug.
+#### Error status
 
-Instead, we have explicit tables for each status. This spec proposes two:
+We optionally store `ErrorMessage` but this should only be used if the API layer does not recognize the error code received by the server.
 
-1. PendingTransaction
-2. FailedTransaction
+### UtxoTransactionInput / UtxoTransactionOutput tables
 
-Note: Included in the blockchain is implicit by being absent from these two tables.
+Note: `Amount` is explicit in the input even though when the input belongs to yourself, you can know the value by just looking up the value of the UTXO from the TransactionOutput table. This is because in the light client case, you can’t know the input amount when the input belongs to somebody else.
 
-# PrivateKey Table
+### PrivateKey Table
 
 These aren’t available for
 1. Hardware wallets
 2. Address checkers
 
-# UTXO Table
-
-Although UTXO can be derived from the Inputs + Outputs and maintained in memory, this can lead to longer app start times for large wallets so it’s better to store this.
-TODO: I think this will also be useful come Plutus to be able to associate data with UTXO. We may have to change the UTXO table to get this to be future-proof though
-
-# Bip44Wrapper Table
+### Bip44Wrapper Table
 
 This table allows us to decouple settings for a Bip44 wallet from the ConceptualWallet. Necessary to support non-UTXO wallets.
 
@@ -257,41 +267,3 @@ Note: for cases like accounts, we explicitly don’t want these to be considered
 Note: in the IsBundled case, all private keys required have to be either unencrypted OR encrypted with the same password
 
 Note: in the IsBundled case, every new adhoc derivation you add, you have to completely refresh the transaction history UI because any address previously deemed not to be yours may suddenly be considered yours.
-
-# TODO
-
-TODO: Should name be unique?
-
-TODO: Do we need to save the start time of each blockchain or is that okay simply on the server side?
-  I think we need this if we want to be able to give the user a warning if they haven’t sync’d their wallet for a while
-
-TODO: Assume “Amount” is 20-letter string (45 billion ADA in Lovelaces is 17-letters but I use 20 in case another currency has a larger number).
-
-TODO: Timestamp without timezone. Maybe instead use a 64bit timestamp instead?
-
-TODO: Where I didn’t know what the length should be, I should put 1024. Should maybe double check with the Rust team?
-
-TODO: In adhoc chain or adhoc addresses, how do you pick the change address?
-
-TODO: Should we allow the user to have 2 copies of the same wallet running in Yoroi? Currently the storage layer supports this.
-
-TODO: We store no checksum for the password
-
-TODO: What should we do about “transaction assurance”?
-90% of users don’t know what this means (and often ask us about what “high” means next to their transaction)
-9.9% of users know this refers to rollback chance in the blockchain
-0.1% of users know you can’t reliably calculate the chance of the rollback in the blockchain because It’s a function of many things like network topology and % of stake owned by the adversary all of which are unknown to your node.
-If we do include it, what is the default value? A formula for getting the transaction assurance as a function of adversarial hash is given in “COMPARISON OF BLOCK EXPECTATION TIME FOR VARIOUS CONSENSUS ALGORITHMS” but this is for Ouroboros Classic and not Genesis. There may be an update in the future extending this formula for Ouroboros Genesis.
-
-TODO: LastReceive is actually a user-specific setting and not part of the cryptography so maybe it should be isolated (also doesn’t apply to internal chains so it’s kind of strange to have it in the Bip44Chain table)
-
-TODO: I didn’t add Witnesses in the Transactions table. Do we need them?
-
-TODO: Should we store raw transaction body? (Useful for hardware wallets)
-
-TODO: I don’t store fees in the Transactions table. You can infer the fee by (input - output) but this is usually higher than the minimum fee required to send the transaction. Do we want to store the minimum fee also?
-
-TODO: do we really want the amount explicitly in the TransactionInput?
-
-TODO: How do we store the reason a transaction fails (ex: INVALID_UTXO, TTL_EXPIRE, UNKNOWN)? The node doesn’t tell us this information. Just that it failed.
-TODO: Should we split up Failed and time-to-live (TTL) expiration?
