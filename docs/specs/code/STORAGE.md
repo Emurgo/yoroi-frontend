@@ -59,7 +59,7 @@ We will also need in the future to support wallet types unrelated to bip44:
 
 We will need to support multiple models:
 - Standard UTXO
-- [Extneded UTXO](https://github.com/input-output-hk/plutus/tree/master/docs/extended-utxo)
+- [Extended UTXO](https://github.com/input-output-hk/plutus/tree/master/docs/extended-utxo)
 - Account-based transactions (required for Shelley)
 
 ### General notes
