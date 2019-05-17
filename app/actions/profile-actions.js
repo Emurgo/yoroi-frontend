@@ -8,4 +8,5 @@ export default class ProfileActions {
   updateLocale: Action<{ locale: string }> = new Action();
   updateTheme: Action<{ theme: string }> = new Action();
   exportTheme: Action<any> = new Action();
+  redirectToTermsOfUse: Action<{ locale: string }> = new Action();
 }

@@ -28,7 +28,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   };
 
   onSubmit = (values: { locale: string }) => {
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
+    this.props.actions.profile.redirectToTermsOfUse.trigger(values);
   };
 
   render() {

@@ -79,11 +79,11 @@ export default class ProfileStore extends Store {
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
+    this.actions.profile.redirectToTermsOfUse.listen(this._redirectToTermsOfUseScreenIfTermsNotAccepted);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
       this._redirectToLanguageSelectionIfNoLocaleSet,
-      this._redirectToTermsOfUseScreenIfTermsNotAccepted,
       this._redirectToMainUiAfterTermsAreAccepted,
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
@@ -289,20 +289,24 @@ export default class ProfileStore extends Store {
 
   _redirectToLanguageSelectionIfNoLocaleSet = () => {
     const { isLoading } = this.stores.loading;
-    if (!isLoading && !this.areTermsOfUseAccepted) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
+    if (!isLoading && !this.areTermsOfUseAccepted && !this.isCurrentLocaleSet) {
+        this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
     }
   };
 
-  _redirectToTermsOfUseScreenIfTermsNotAccepted = () => {
+  _redirectToTermsOfUseScreenIfTermsNotAccepted = async (values) => {
+    // note: this await call is needed when submitting the form without changing
+    // the selected option (so the locale never gets to update)
+    // note 2: now this method is called only when submiting
+    await this._updateLocale(values);
     if (this.isCurrentLocaleSet &&
-      this.hasLoadedTermsOfUseAcceptance && !this.areTermsOfUseAccepted) {
+        this.hasLoadedTermsOfUseAcceptance && !this.areTermsOfUseAccepted) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
     }
   };
 
   _redirectToRoot = () => {
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
   };
 
   _isOnTermsOfUsePage = () => this.stores.app.currentRoute === ROUTES.PROFILE.TERMS_OF_USE;
