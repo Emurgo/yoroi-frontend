@@ -26,6 +26,10 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.hardware.description',
     defaultMessage: '!!!Connect to hardware wallet',
   },
+  useTrezorDescription: {
+    id: 'wallet.add.dialog.trezor.description',
+    defaultMessage: '!!!Connect to Trezor',
+  },
   useLedgerDescription: {
     id: 'wallet.add.dialog.ledger.description',
     defaultMessage: '!!!Connect to Ledger',
