@@ -7,7 +7,6 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import { ROUTES } from '../../routes-config';
 
 const messages = defineMessages({
   title: {

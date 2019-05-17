@@ -290,14 +290,13 @@ export default class ProfileStore extends Store {
   _redirectToLanguageSelectionIfNoLocaleSet = () => {
     const { isLoading } = this.stores.loading;
     if (!isLoading && !this.areTermsOfUseAccepted && !this.isCurrentLocaleSet) {
-        this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
+      this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
     }
   };
 
   _redirectToTermsOfUseScreenIfTermsNotAccepted = async (values) => {
-    // note: this await call is needed when submitting the form without changing
-    // the selected option (so the locale never gets to update)
-    // note 2: now this method is called only when submiting
+    // this await call is needed when submitting the form without having
+    // called onChange before (updateLocale is never triggered)
     await this._updateLocale(values);
     if (this.isCurrentLocaleSet &&
         this.hasLoadedTermsOfUseAcceptance && !this.areTermsOfUseAccepted) {
