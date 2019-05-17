@@ -1,25 +1,30 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './WalletAdd.scss';
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
+
+import SvgInline from 'react-svg-inline';
+import logo from '../../assets/images/yoroi-logo-white.inline.svg';
+import HorizontalFlexContainer from '../layout/HorizontalFlexContainer';
 
 const messages = defineMessages({
   title: {
     id: 'wallet.add.dialog.title.label',
     defaultMessage: '!!!Add wallet',
   },
+  subTitle: {
+    id: 'wallet.add.dialog.subtitle.label',
+    defaultMessage: '!!!Yoroi light wallet for Cardano',
+  },
   createDescription: {
     id: 'wallet.add.dialog.create.description',
-    defaultMessage: '!!!Create a new wallet',
+    defaultMessage: '!!!Create wallet',
   },
-  useTrezorDescription: {
-    id: 'wallet.add.dialog.trezor.description',
-    defaultMessage: '!!!Connect to Trezor',
+  connectToHardwareDescription: {
+    id: 'wallet.add.dialog.hardware.description',
+    defaultMessage: '!!!Connect to hardware wallet',
   },
   useLedgerDescription: {
     id: 'wallet.add.dialog.ledger.description',
@@ -27,7 +32,7 @@ const messages = defineMessages({
   },
   restoreDescription: {
     id: 'wallet.add.dialog.restore.description',
-    defaultMessage: '!!!Restore wallet from backup',
+    defaultMessage: '!!!Restore wallet',
   },
   restorePaperDescription: {
     id: 'wallet.add.dialog.restore.paper.description',
@@ -57,7 +62,8 @@ type Props = {
   onPaperRestore: Function,
   isRestoreActive: boolean,
   classicTheme: boolean,
-  title: string
+  title: string,
+  subTitle: string,
 };
 
 @observer
@@ -69,30 +75,15 @@ export default class WalletAdd extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
-      onTrezor,
       isCreateTrezorWalletActive,
       onLedger,
       isCreateLedgerWalletActive,
       onCreate,
       onRestore,
-      onPaperRestore,
       isRestoreActive,
       classicTheme,
-      title
+      title,
     } = this.props;
-
-    const componentClasses = classnames([styles.component, 'WalletAdd']);
-    const createWalletButtonClasses = classnames([
-      classicTheme ? 'primary' : 'outlined',
-      'createWalletButton'
-    ]);
-    const restoreWalletButtonClasses = classnames([
-      classicTheme ? 'primary' : 'outlined',
-      'restoreWalletButton'
-    ]);
-    const buttonsContainerClasses = classnames([
-      classicTheme ? styles.buttonsContainerClassic : styles.buttonsContainer
-    ]);
 
     let activeNotification = null;
     if (isCreateTrezorWalletActive) {
@@ -104,56 +95,40 @@ export default class WalletAdd extends Component<Props> {
     }
 
     return (
-      <div className={componentClasses}>
-        <div className={buttonsContainerClasses}>
-          {!classicTheme && (
-            <div className={styles.title}>{title}</div>
-          )}
-
-          <Button
-            className="primary"
-            label={intl.formatMessage(messages.useLedgerDescription)}
-            onMouseUp={onLedger}
-            skin={ButtonSkin}
-          />
-          <Button
-            className="primary"
-            label={intl.formatMessage(messages.useTrezorDescription)}
-            onMouseUp={onTrezor}
-            skin={ButtonSkin}
-          />
-          <Button
-            className={createWalletButtonClasses}
-            label={intl.formatMessage(messages.createDescription)}
-            onMouseUp={onCreate}
-            skin={ButtonSkin}
-          />
-          <Button
-            className={restoreWalletButtonClasses}
-            label={intl.formatMessage(messages.restoreDescription)}
-            onMouseUp={onRestore}
-            skin={ButtonSkin}
-          />
-          <Button
-            className="primary restorePaperWalletButton"
-            label={intl.formatMessage(messages.restorePaperDescription)}
-            onMouseUp={onPaperRestore}
-            skin={ButtonSkin}
-          />
-          {activeNotification ? (
-            <div className={styles.notification}>
-              <FormattedHTMLMessage
-                {...messages[activeNotification]}
-                values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
-              />
+      <div className={styles.hero}>
+        <div className={styles.heroInner}>
+          <div className={styles.heroLeft}>
+            <SvgInline svg={logo} className={styles.heroLogo} />
+            <h2 className={styles.title}>{title}</h2>
+            <h3 className={styles.subTitle}>{intl.formatMessage(messages.subTitle)}</h3>
+          </div>
+          <HorizontalFlexContainer>
+            {/* eslint-disable */}
+            <div className={styles.itemCard} tabIndex="0" role="button" onClick={onCreate}>
+              <div className={`${styles.itemCardBg} ${styles.create}`} />
+              <h3 className={styles.itemCardTitle}>{intl.formatMessage(messages.createDescription)}</h3>
             </div>
-          ) : null}
-
+            <div className={styles.itemCard} tabIndex="0" role="button" onClick={onRestore}>
+              <div className={`${styles.itemCardBg} ${styles.restore}`} />
+              <h3 className={styles.itemCardTitle}>{intl.formatMessage(messages.restoreDescription)}</h3>
+            </div>
+            <div className={styles.itemCard} tabIndex="0" role="button" onClick={onLedger}>
+              <div className={`${styles.itemCardBg} ${styles.connect}`} />
+              <h3 className={styles.itemCardTitle}>{intl.formatMessage(messages.connectToHardwareDescription)}</h3>
+            </div>
+            {/* eslint-enable */}
+            {activeNotification ? (
+              <div className={styles.notification}>
+                <FormattedHTMLMessage
+                  {...messages[activeNotification]}
+                  values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
+                />
+              </div>
+            ) : null}
+          </HorizontalFlexContainer>
         </div>
 
-        {!classicTheme && <div className={styles.background} />}
-
-        {!classicTheme && <div className={styles.walletImage} />}
+        {!classicTheme && <div className={styles.heroBg} />}
       </div>
     );
   }
