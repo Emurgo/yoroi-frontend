@@ -140,13 +140,13 @@ const rpTextArea = {
 };
 
 // OPTION CARD
-const rpItemCard = {
-  '--rp-card-bg-color': '#fff',
-  '--rp-card-border-radius': '8px',
-  '--rp-card-text-color': '#DAA49A',
-  '--rp-card-text-size': '16px',
-  '--rp-card-width': '250px',
-  '--rp-card-height': '380px',
+const itemCard = {
+  '--card-bg-color': '#fff',
+  '--card-border-radius': '8px',
+  '--card-text-color': '#DAA49A',
+  '--card-text-size': '16px',
+  '--card-width': '250px',
+  '--card-height': '380px',
 };
 
 const rpYoroiTheme = {
@@ -163,7 +163,7 @@ const rpYoroiTheme = {
   ...rpSelect,
   ...rpSwitch,
   ...rpTextArea,
-  ...rpItemCard,
+  ...itemCard,
 };
 
 
