@@ -50,3 +50,42 @@
 .isSubmitting {
   @include loading-spinner("../../assets/images/spinner-light.svg");
 }
+
+
+.tabs {
+  font-family: var(--font-regular);
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 40px;
+}
+
+.tabsLink {
+  padding: 10px 0;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+  }
+}
+
+:global(.YoroiModern) {
+  .tabsLink {
+    color: var(--tab-link-text-color);
+    font-size: var(--tab-link-text-size);
+    line-height: var(--tab-link-line-height);
+
+    &::after {
+      background-color: var(--tab-link-border-color);
+    }
+  }
+
+  .tabsLink::after {
+    background-color: red;
+  }
+}

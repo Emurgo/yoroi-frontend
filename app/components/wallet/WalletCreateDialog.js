@@ -195,6 +195,26 @@ export default class WalletCreateDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
+        <div className={styles.tabs}>
+          <div className={styles.tabsLink}>Recommended</div>
+          <div className={styles.tabsLink}>Advanced</div>
+        </div>
+        <div className={styles.tabsContent}>
+          <div className={styles.tabsItem}>
+            <div className={styles.walletType}>
+              <div className={styles.walletTypeImg} />
+              <h3 className={styles.walletTypeTytle}>
+                Wallet from 15 mnemonic words
+              </h3>
+              <p className={styles.walletTypeDesc}>
+                Lorem ipsum dolor sit amet, 
+                consectetur adipiscing elit,
+                sed do eiusmod tempor
+              </p>
+            </div>
+          </div>
+          <div className={styles.tabsItem}>Advanced</div>
+        </div>
         <Input
           className="walletName"
           onKeyPress={this.checkForEnterKey.bind(this)}

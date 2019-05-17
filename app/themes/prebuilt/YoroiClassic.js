@@ -139,6 +139,14 @@ const rpTextArea = {
   '--rp-textarea-text-color': '#121327',
 };
 
+// TABS
+const tabs = {
+  '--tab-link-text-color': '#17D1AA',
+  '--tab-link-text-size': '16px',
+  '--tab-link-line-height': '19px',
+  '--tab-link-border-color': '#17D1AA',
+};
+
 const rpYoroiTheme = {
   ...rpAutocomplete,
   ...rpBubble,
@@ -153,6 +161,7 @@ const rpYoroiTheme = {
   ...rpSelect,
   ...rpSwitch,
   ...rpTextArea,
+  ...tabs,
 };
 
 
