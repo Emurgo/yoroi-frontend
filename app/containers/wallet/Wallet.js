@@ -57,7 +57,6 @@ export default class Wallet extends Component<Props> {
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
-          classicTheme={profile.isClassicTheme}
         >
           {this.props.children}
         </WalletWithNavigation>
