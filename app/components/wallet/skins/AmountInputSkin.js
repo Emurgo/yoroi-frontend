@@ -31,19 +31,17 @@ export default class AmountInputSkin extends Component<Props> {
     const { error, fees, total, currency, classicTheme } = this.props;
     const { intl } = this.context;
 
-    const feesClasses = classicTheme ? styles.feesClassic : styles.fees;
-
     return (
-      <div className={styles.root}>
+      <div className={styles.component}>
         {classicTheme ? <InputSkin {...this.props} /> : <InputOwnSkin {...this.props} />}
         {!error && (
-          <span className={feesClasses}>
+          <span className={styles.fees}>
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
           </span>
         )}
 
         {classicTheme ? (
-          <span className={styles.totalClassic}>
+          <span className={styles.total}>
             {!error && `= ${total} `}{currency}
           </span>
         ) : (

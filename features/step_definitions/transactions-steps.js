@@ -44,7 +44,7 @@ When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  await this.waitUntilText('.AmountInputSkin_feesClassic', `+ ${fee} of fees`);
+  await this.waitUntilText('.AmountInputSkin_fees', `+ ${fee} of fees`);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
