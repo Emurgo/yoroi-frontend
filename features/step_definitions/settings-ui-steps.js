@@ -12,7 +12,7 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dia
 });
 
 When(/^I click on "name" input field$/, async function () {
-  await this.click('.SettingsLayout_settingsPane .InlineEditingInput_componentClassic');
+  await this.click('.SettingsLayout_settingsPane .InlineEditingInput_component');
 });
 
 When(/^I enter new wallet name:$/, async function (table) {
@@ -101,7 +101,7 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 Then(/^I should stay in the change password dialog$/, async function () {
   const changePasswordMessage = await i18n.formatMessage(this.driver,
     { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
-  await this.waitUntilText('.Dialog_titleClassic', changePasswordMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.Dialog_title', changePasswordMessage.toUpperCase(), 2000);
 });
 
 Then(/^I should see support screen$/, async function () {
