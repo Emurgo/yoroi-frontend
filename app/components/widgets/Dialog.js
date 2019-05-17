@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node } from 'react';
+import { THEMES } from '../../themes';
 import { Modal } from 'react-polymorph/lib/components/Modal';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -61,6 +62,16 @@ export default class Dialog extends Component<Props> {
     } = this.props;
     const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
+    /* Dialog is spacial case as it's not a child of React #root.
+     * For Theme change management, setting current theme is nessesary like below
+     * classicTheme ? THEMES.YOROI_CLASSIC : THEMES.YOROI_MODERN
+     * This should be updated on addition/deletion of theme */
+    const componentStyle = classnames([
+      classicTheme ? THEMES.YOROI_CLASSIC : THEMES.YOROI_MODERN,
+      styles.component,
+      className,
+    ]);
+
     return (
       <Modal
         isOpen
@@ -69,7 +80,7 @@ export default class Dialog extends Component<Props> {
         skin={this.setSkin}
       >
 
-        <div className={classnames([styles.component, className])}>
+        <div className={componentStyle}>
           {title && (
             <div className={styles.title}>
               <h1>{title}</h1>
