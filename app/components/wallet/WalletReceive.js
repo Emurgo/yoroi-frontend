@@ -57,7 +57,6 @@ type Props = {
   onAddressDetail: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-  classicTheme: boolean,
 };
 
 type State = {
@@ -93,7 +92,6 @@ export default class WalletReceive extends Component<Props, State> {
       walletAddress, walletAddresses,
       onCopyAddress, onAddressDetail,
       isSubmitting, error, isWalletAddressUsed,
-      classicTheme,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -104,14 +102,6 @@ export default class WalletReceive extends Component<Props, State> {
       styles.submitButton,
       isSubmitting ? styles.spinning : null,
     ]);
-
-    const qrCodeAndInstructionsClasses = classicTheme
-      ? styles.qrCodeAndInstructionsClassic
-      : styles.qrCodeAndInstructions;
-
-    const generatedAddressesClasses = classicTheme
-      ? styles.generatedAddressesClassic
-      : styles.generatedAddresses;
 
     const generateAddressForm = (
       <Button
@@ -130,14 +120,13 @@ export default class WalletReceive extends Component<Props, State> {
 
     const walletReceiveContent = (
       <BorderedBox>
-        <div className={qrCodeAndInstructionsClasses}>
+        <div className={styles.qrCodeAndInstructions}>
           <div className={styles.instructions}>
             <div className={styles.hashLabel}>
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
             <CopyableAddress
               address={walletAddress}
-              isClassicThemeActive={classicTheme}
               onCopyAddress={onCopyAddress}
               isUsed={isWalletAddressUsed}
             />
@@ -159,7 +148,7 @@ export default class WalletReceive extends Component<Props, State> {
           </div>
         </div>
 
-        <div className={generatedAddressesClasses}>
+        <div className={styles.generatedAddresses}>
           <h2>
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
             <button type="button" onClick={this.toggleUsedAddresses}>
@@ -209,7 +198,7 @@ export default class WalletReceive extends Component<Props, State> {
       <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />;
 
     return (
-      <div className={classicTheme ? styles.componentClassic : styles.component}>
+      <div className={styles.component}>
         {walletAddress ? walletReceiveContent : loadingSpinner}
       </div>
     );
