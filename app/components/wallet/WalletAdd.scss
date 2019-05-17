@@ -71,13 +71,13 @@
 
 :global(.YoroiModern) {
   .itemCard {
-    width: var(--rp-card-width);
-    flex: 1 0 var(--rp-card-width);
-    height: var(--rp-card-height);
-    border-radius: var(--rp-card-border-radius);
-    background-color: var(--rp-card-bg-color);
-    color: var(--rp-card-text-color);
-    font-size: var(--rp-card-text-size);
+    width: var(--card-width);
+    flex: 1 0 var(--card-width);
+    height: var(--card-height);
+    border-radius: var(--card-border-radius);
+    background-color: var(--card-bg-color);
+    color: var(--card-text-color);
+    font-size: var(--card-text-size);
   }
 
   .itemCardBg {
@@ -107,12 +107,12 @@
 
 :global(.YoroiClassic) {
   .itemCard {
-    width: var(--rp-card-width);
-    flex: 1 0 var(--rp-card-width);
-    height: var(--rp-card-height);
-    border-radius: var(--rp-card-border-radius);
-    background-color: var(--rp-card-bg-color);
-    color: var(--rp-card-text-color);
-    font-size: var(--rp-card-text-size);
+    width: var(--card-width);
+    flex: 1 0 var(--card-width);
+    height: var(--card-height);
+    border-radius: var(--card-border-radius);
+    background-color: var(--card-bg-color);
+    color: var(--card-text-color);
+    font-size: var(--card-text-size);
   }
 }
