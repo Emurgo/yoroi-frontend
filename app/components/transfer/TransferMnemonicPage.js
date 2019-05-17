@@ -144,6 +144,7 @@ export default class TransferMnemonicPage extends Component<Props> {
             </div>
 
             <Autocomplete
+              className={styles.inputWrapper}
               options={validWords}
               maxSelections={mnemonicLength}
               {...recoveryPhraseField.bind()}
