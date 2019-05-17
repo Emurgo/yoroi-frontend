@@ -10,7 +10,6 @@ type Props = {
   isActive: boolean,
   onClick: Function,
   className?: string,
-  classicTheme: boolean
 };
 
 @observer
@@ -20,17 +19,16 @@ export default class WalletNavButton extends Component<Props> {
   };
 
   render() {
-    const { isActive, onClick, className, classicTheme } = this.props;
+    const { isActive, onClick, className } = this.props;
     const componentClasses = classnames([
       className,
       styles.component,
       isActive ? styles.active : styles.normal
     ]);
-    const labelClasses = classicTheme ? styles.labelClassic : styles.label;
     return (
       <button type="button" className={componentClasses} onClick={onClick}>
         <div className={styles.container}>
-          <span className={labelClasses}>{this.props.label}</span>
+          <span className={styles.label}>{this.props.label}</span>
         </div>
       </button>
     );
