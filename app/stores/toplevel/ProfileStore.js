@@ -79,11 +79,12 @@ export default class ProfileStore extends Store {
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
-    this.actions.profile.redirectToTermsOfUse.listen(this._redirectToTermsOfUseScreenIfTermsNotAccepted);
+    this.actions.profile.redirectToTermsOfUse.listen(this._redirectToTermsOfUse);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
       this._redirectToLanguageSelectionIfNoLocaleSet,
+      this._redirectToTermsOfUseScreenIfTermsNotAccepted,
       this._redirectToMainUiAfterTermsAreAccepted,
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
@@ -294,12 +295,20 @@ export default class ProfileStore extends Store {
     }
   };
 
-  _redirectToTermsOfUseScreenIfTermsNotAccepted = async (values) => {
-    // this await call is needed when submitting the form without having
-    // called onChange before (updateLocale is never triggered)
+  _redirectToTermsOfUseScreenIfTermsNotAccepted = () => {
+    if (this.isCurrentLocaleSet && !this.areTermsOfUseAccepted &&
+      this.stores.app.currentRoute !== ROUTES.PROFILE.TERMS_OF_USE &&
+      this.stores.app.currentRoute !== ROUTES.PROFILE.LANGUAGE_SELECTION) {
+      this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
+    }
+  }
+
+  _redirectToTermsOfUse = async (values) => {
+    // this await call is needed because when the language select from
+    // is submitted without changing the default option, then the onChange
+    // event never gets called and updateLocale is never triggered.
     await this._updateLocale(values);
-    if (this.isCurrentLocaleSet &&
-        this.hasLoadedTermsOfUseAcceptance && !this.areTermsOfUseAccepted) {
+    if (!this.areTermsOfUseAccepted && this.isCurrentLocaleSet) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
     }
   };
