@@ -150,8 +150,8 @@ export default class WalletSendForm extends Component<Props, State> {
     this._isMounted = false;
   }
 
-  async toggleShouldSendAll() {
-    this.setState(prevState => ({ shouldSendAll: !prevState.shouldSendAll }));
+  setShouldSendAll(newState: boolean) {
+    this.setState({ shouldSendAll: newState });
   }
 
   // FORM VALIDATION
@@ -169,7 +169,7 @@ export default class WalletSendForm extends Component<Props, State> {
           }
           return this.props.addressValidator(receiverValue)
             .then(isValidReceiver => {
-              this._updateTxValues();
+              this._updateTxValues(this.state.shouldSendAll);
               return [isValidReceiver, this.context.intl.formatMessage(messages.invalidAddress)];
             });
         }],
@@ -189,7 +189,7 @@ export default class WalletSendForm extends Component<Props, State> {
           );
           const { shouldSendAll } = this.state;
           if (!shouldSendAll) {
-            this._updateTxValues();
+            this._updateTxValues(this.state.shouldSendAll);
           }
           return [isValidAmount, this.context.intl.formatMessage(messages.invalidAmount)];
         }],
@@ -268,9 +268,9 @@ export default class WalletSendForm extends Component<Props, State> {
           <div className={styles.checkbox}>
             <Checkbox
               label={intl.formatMessage(messages.checkboxLabel)}
-              onChange={() => {
-                this.toggleShouldSendAll();
-                this._updateTxValues();
+              onChange={(newState) => {
+                this.setShouldSendAll(newState);
+                this._updateTxValues(newState);
               }}
               checked={shouldSendAll}
               skin={CheckboxSkin}
@@ -304,6 +304,7 @@ export default class WalletSendForm extends Component<Props, State> {
       hasAnyPending,
     } = this.props;
     const { isTransactionFeeCalculated } = this.state;
+
     /** TODO: [REFACTOR]
       * too bad, opening dialog directly without its container dialog
       * WalletSendForm.js is a component and we already have Send Confirmation dialog's containers
@@ -323,10 +324,7 @@ export default class WalletSendForm extends Component<Props, State> {
         onMouseUp={onMouseUp}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
-        disabled={
-          !isTransactionFeeCalculated
-          || hasAnyPending
-        }
+        disabled={!isTransactionFeeCalculated || hasAnyPending}
         skin={ButtonSkin}
       />);
   }
@@ -422,12 +420,11 @@ export default class WalletSendForm extends Component<Props, State> {
     }
   }
 
-  async _updateTxValues() {
+  async _updateTxValues(shouldSendAll: boolean) {
     const isValidReceiver = this.form.$('receiver').isValid;
     const isValidAmount = this.form.$('amount').isValid;
     const receiverValue = this.form.$('receiver').value;
     const amountValue = this.form.$('amount').value;
-    const { shouldSendAll } = this.state;
     if (isValidReceiver && shouldSendAll) {
       await this._calculateTransactionFee(receiverValue, amountValue, shouldSendAll);
       const { totalBalance } = this.props;
