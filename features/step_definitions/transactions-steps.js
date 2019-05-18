@@ -51,6 +51,10 @@ When(/^I click on the next button in the wallet send form$/, async function () {
   await this.click('.WalletSendForm_nextButton');
 });
 
+When(/^I click on the checkbox to use all in the wallet send form$/, async function () {
+  await this.click('.WalletSendForm_shouldSendAllCheckBox');
+});
+
 When(/^I see send money confirmation dialog$/, async function () {
   await this.waitForElement('.WalletSendConfirmationDialog_dialog');
 });

@@ -150,8 +150,9 @@ export default class WalletSendForm extends Component<Props, State> {
     this._isMounted = false;
   }
 
-  toggleShouldSendAll() {
+  async toggleShouldSendAll() {
     this.setState(prevState => ({ shouldSendAll: !prevState.shouldSendAll }));
+    await this._updateTxValues();
   }
 
   // FORM VALIDATION
@@ -248,7 +249,7 @@ export default class WalletSendForm extends Component<Props, State> {
             />
           </div>
 
-          <div className={styles.amountInput}>
+          <div className="shouldSendAllCheckbox">
             <NumericInput
               {...amountFieldProps}
               className="amount"
@@ -265,8 +266,9 @@ export default class WalletSendForm extends Component<Props, State> {
               classicTheme={classicTheme}
             />
           </div>
-          <div className={styles.checkbox}>
+          <div className={styles.shouldSendAllCheckBox}>
             <Checkbox
+              className="shouldSendAllCheckBox"
               label={intl.formatMessage(messages.checkboxLabel)}
               onChange={
                 this.toggleShouldSendAll.bind(this)
