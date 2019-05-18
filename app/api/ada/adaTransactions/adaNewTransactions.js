@@ -96,6 +96,9 @@ export async function sendAllUnsignedTxFromUtxo(
       (acc, amount) => acc.plus(amount),
       new BigNumber(0)
     );
+  if (totalBalance.isZero()) {
+    throw new NotEnoughMoneyToSendError();
+  }
 
   const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
   let fee;
@@ -110,6 +113,9 @@ export async function sendAllUnsignedTxFromUtxo(
   }
 
   // create a new transaction subtracing the fee from your total UTXO
+  if (totalBalance.isLessThan(fee)) {
+    throw new NotEnoughMoneyToSendError();
+  }
   const newAmount = totalBalance.minus(fee);
   const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(receiver, newAmount, null, allUtxos);
 
