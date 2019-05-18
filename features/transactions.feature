@@ -25,8 +25,8 @@ Feature: Send transaction
     Examples:
       | amount              | fee       | |
       | 0.001000            | 0.168082  | # Sent tx to a valid adress|
-      | 9007199254.552484  | 0.168038  | # Sent all funds|
-      | 9007199253.720698  | 0.168170  | # Sent a big amount|
+      | 2007199254.552484  | 0.168038  | # Sent all funds|
+      | 2007199253.720698  | 0.168170  | # Sent a big amount|
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
@@ -110,7 +110,7 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       | |
-      | 9007199254.552484  | 0.168038  | # Sent all funds|
+      | 2007199254.554682  | 0.166016  | # Sent all funds|
 
   @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error

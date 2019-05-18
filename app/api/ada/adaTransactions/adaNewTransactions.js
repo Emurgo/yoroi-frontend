@@ -113,7 +113,7 @@ export async function sendAllUnsignedTxFromUtxo(
   }
 
   // create a new transaction subtracing the fee from your total UTXO
-  if (totalBalance.isLessThan(fee)) {
+  if (totalBalance.lessThan(fee)) {
     throw new NotEnoughMoneyToSendError();
   }
   const newAmount = totalBalance.minus(fee);
