@@ -11,29 +11,7 @@ import styles from './GeneralSettings.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
 import FlagLabel from '../../widgets/FlagLabel';
 import { tier1Languages } from '../../../config/languagesConfig';
-
-const messages = defineMessages({
-  languageSelectLabel: {
-    id: 'settings.general.languageSelect.label',
-    defaultMessage: '!!!Language',
-  },
-  languageSelectLabelInfo: {
-    id: 'settings.general.languageSelect.labelInfo',
-    defaultMessage: '!!!LanguageLabelInfo',
-  },
-  languageSelectInfo: {
-    id: 'settings.general.languageSelect.info',
-    defaultMessage: '!!!LanguageInfo',
-  },
-  languageSelectThanking: {
-    id: 'settings.general.languageSelect.thanking',
-    defaultMessage: '!!!Thanks to the following',
-  },
-  languageSelectContributors: {
-    id: 'settings.general.languageSelect.contributors',
-    defaultMessage: '!!!contributors',
-  },
-});
+import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
 
 type Props = {
   languages: Array<{ value: string, label: ReactIntlMessage, svg: string }>,
@@ -60,7 +38,7 @@ export default class GeneralSettings extends Component<Props> {
   form = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(messages.languageSelectLabel),
+        label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
         value: this.props.currentLocale,
       }
     }
@@ -85,12 +63,7 @@ export default class GeneralSettings extends Component<Props> {
       styles.language,
       isSubmitting ? styles.submitLanguageSpinner : null,
     ]);
-    const contributors = intl.formatMessage(messages.languageSelectContributors);
-    let contributorsMessage = ' ';
-    if (contributors !== messages.languageSelectContributors.defaultMessage) {
-      contributorsMessage += intl.formatMessage(messages.languageSelectThanking);
-      contributorsMessage += contributors;
-    }
+
     return (
       <div className={componentClassNames}>
 
@@ -108,10 +81,13 @@ export default class GeneralSettings extends Component<Props> {
 
         {!tier1Languages.includes(languageId.value) &&
           <div className={styles.info}>
-            <h1>{intl.formatMessage(messages.languageSelectLabelInfo)}</h1>
+            <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
             <p>
-              {intl.formatMessage(messages.languageSelectInfo)}
-              {contributorsMessage}
+              {intl.formatMessage(globalMessages.languageSelectInfo)}
+              {
+                listOfTranslators(intl.formatMessage(globalMessages.translationContributors),
+                intl.formatMessage(globalMessages.translationAcknowledgment))
+              }
             </p>
           </div>
         }

@@ -13,31 +13,12 @@ import styles from './LanguageSelectionForm.scss';
 import type { ReactIntlMessage } from '../../../types/i18nTypes';
 import FlagLabel from '../../widgets/FlagLabel';
 import { tier1Languages } from '../../../config/languagesConfig';
+import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
 
 const messages = defineMessages({
-  languageSelectLabel: {
-    id: 'profile.languageSelect.form.languageSelectLabel',
-    defaultMessage: '!!!Select your language',
-  },
   submitLabel: {
     id: 'profile.languageSelect.form.submitLabel',
     defaultMessage: '!!!Continue',
-  },
-  languageSelectLabelInfo: {
-    id: 'settings.general.languageSelect.labelInfo',
-    defaultMessage: '!!!LanguageLabelInfo',
-  },
-  languageSelectInfo: {
-    id: 'settings.general.languageSelect.info',
-    defaultMessage: '!!!LanguageInfo',
-  },
-  languageSelectThanking: {
-    id: 'settings.general.languageSelect.thanking',
-    defaultMessage: '!!!Thanks to the following',
-  },
-  languageSelectContributors: {
-    id: 'settings.general.languageSelect.contributors',
-    defaultMessage: '!!!contributors',
   },
 });
 
@@ -77,7 +58,7 @@ export default class LanguageSelectionForm extends Component<Props> {
   form = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(messages.languageSelectLabel),
+        label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
         value: this.props.currentLocale,
       }
     }
@@ -101,12 +82,6 @@ export default class LanguageSelectionForm extends Component<Props> {
       'primary',
       isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
     ]);
-    const contributors = intl.formatMessage(messages.languageSelectContributors);
-    let contributorsMessage = ' ';
-    if (contributors !== messages.languageSelectContributors.defaultMessage) {
-      contributorsMessage += intl.formatMessage(messages.languageSelectThanking);
-      contributorsMessage += contributors;
-    }
 
     return (
       <div className={styles.component}>
@@ -135,10 +110,13 @@ export default class LanguageSelectionForm extends Component<Props> {
 
           {!tier1Languages.includes(currentLocale) &&
             <div className={styles.info}>
-              <h1>{intl.formatMessage(messages.languageSelectLabelInfo)}</h1>
+              <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
               <p>
-                {intl.formatMessage(messages.languageSelectInfo)}
-                {contributorsMessage}
+                {intl.formatMessage(globalMessages.languageSelectInfo)}
+                {
+                  listOfTranslators(intl.formatMessage(globalMessages.translationContributors),
+                  intl.formatMessage(globalMessages.translationAcknowledgment))
+                }
               </p>
             </div>
           }
