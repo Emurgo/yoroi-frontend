@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
@@ -84,10 +84,8 @@ export default class GeneralSettings extends Component<Props> {
             <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
             <p>
               {intl.formatMessage(globalMessages.languageSelectInfo)}
-              {
-                listOfTranslators(intl.formatMessage(globalMessages.translationContributors),
-                intl.formatMessage(globalMessages.translationAcknowledgment))
-              }
+              {listOfTranslators(intl.formatMessage(globalMessages.translationContributors),
+                intl.formatMessage(globalMessages.translationAcknowledgment))}
             </p>
           </div>
         }
