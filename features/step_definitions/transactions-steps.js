@@ -26,6 +26,11 @@ When(/^I fill the form:$/, async function (table) {
   await this.input("input[name='amount']", fields.amount);
 });
 
+When(/^I fill the address of the form:$/, async function (table) {
+  const fields = table.hashes()[0];
+  await this.input("input[name='receiver']", fields.address);
+});
+
 When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const fields = table.hashes()[0];
   const total = parseFloat(fields.amount) + parseFloat(fields.fee);
@@ -51,8 +56,8 @@ When(/^I click on the next button in the wallet send form$/, async function () {
   await this.click('.WalletSendForm_nextButton');
 });
 
-When(/^I click on the checkbox to use all in the wallet send form$/, async function () {
-  await this.click('.WalletSendForm_shouldSendAllCheckBox');
+When(/^I click on "Use all my ADA" checkbox$/, async function () {
+  await this.click('.WalletSendForm_checkbox');
 });
 
 When(/^I see send money confirmation dialog$/, async function () {
