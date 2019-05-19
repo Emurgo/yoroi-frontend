@@ -77,14 +77,15 @@ export default class WalletSendPage extends Component<Props> {
         currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
         currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
         validateAmount={validateAmount}
-        calculateTransactionFee={(receiver, amount) => (
-          calculateTransactionFee(activeWallet.id, receiver, amount)
+        calculateTransactionFee={(receiver, amount, shouldSendAll) => (
+          calculateTransactionFee(activeWallet.id, receiver, amount, shouldSendAll)
         )}
         addressValidator={isValidAddress}
         isDialogOpen={uiDialogs.isOpen}
         openDialogAction={actions.dialogs.open.trigger}
         webWalletConfirmationDialogRenderCallback={this.webWalletDoConfirmation}
         hardwareWalletConfirmationDialogRenderCallback={this.hardwareWalletDoConfirmation}
+        totalBalance={activeWallet.amount}
         hasAnyPending={hasAnyPending}
         isHardwareWallet={activeWallet.isHardwareWallet}
         classicTheme={profile.isClassicTheme}
@@ -105,6 +106,7 @@ export default class WalletSendPage extends Component<Props> {
       transactionFee={dialogProps.transactionFee}
       amountToNaturalUnits={dialogProps.amountToNaturalUnits}
       currencyUnit={dialogProps.currencyUnit}
+      shouldSendAll={dialogProps.shouldSendAll}
     />);
   };
 
@@ -135,6 +137,7 @@ export default class WalletSendPage extends Component<Props> {
           onSubmit={ledgerSendAction.sendUsingLedger.trigger}
           onCancel={ledgerSendAction.cancel.trigger}
           classicTheme={this.props.stores.profile.isClassicTheme}
+          shouldSendAll={dialogProps.shouldSendAll}
         />);
     } else if (active.isTrezorTWallet) {
       const trezorSendAction = this.props.actions[environment.API].trezorSend;
@@ -153,6 +156,7 @@ export default class WalletSendPage extends Component<Props> {
           onSubmit={trezorSendAction.sendUsingTrezor.trigger}
           onCancel={trezorSendAction.cancel.trigger}
           classicTheme={this.props.stores.profile.isClassicTheme}
+          shouldSendAll={dialogProps.shouldSendAll}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');

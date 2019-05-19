@@ -61,6 +61,10 @@
     margin-bottom: 0.5em;
     color: var(--rp-theme-color-error);
   }  
+
+  .checkbox {
+    font-family: var(--font-mono-light);
+  }
 }
 
 :global(.YoroiClassic) .component {

@@ -50,6 +50,7 @@ import {
 import {
   getAdaTransactionFee,
   newAdaUnsignedTx,
+  sendAllUnsignedTx,
   signTransaction,
 } from './adaTransactions/adaNewTransactions';
 import {
@@ -254,6 +255,7 @@ export type CreateTransactionRequest = {
   password: string,
   getUTXOsForAddresses: AddressUtxoFunc,
   sendTx: SendFunc,
+  shouldSendAll: boolean,
 };
 export type CreateTransactionResponse = SignedResponse;
 export type CreateTransactionFunc = (
@@ -324,6 +326,7 @@ export type TransactionFeeRequest = {
   receiver: string,
   amount: string,
   getUTXOsForAddresses: AddressUtxoFunc,
+  shouldSendAll: boolean,
 };
 export type TransactionFeeResponse = BigNumber;
 
@@ -701,17 +704,26 @@ export default class AdaApi {
     request: CreateTransactionRequest
   ): Promise<CreateTransactionResponse> {
     Logger.debug('AdaApi::createTransaction called');
-    const { receiver, amount, password } = request;
+    const { receiver, amount, password, shouldSendAll } = request;
     try {
       const allAdaAddresses = await getAdaAddressesList();
       const changeAdaAddr = await popBip44Address('Internal');
-      const unsignedTx = await newAdaUnsignedTx(
-        receiver,
-        amount,
-        changeAdaAddr,
-        allAdaAddresses,
-        batchUTXOsForAddresses(request.getUTXOsForAddresses),
-      );
+      let unsignedTx;
+      if (shouldSendAll) {
+        unsignedTx = await sendAllUnsignedTx(
+          receiver,
+          allAdaAddresses,
+          batchUTXOsForAddresses(request.getUTXOsForAddresses),
+        );
+      } else {
+        unsignedTx = await newAdaUnsignedTx(
+          receiver,
+          amount,
+          changeAdaAddr,
+          allAdaAddresses,
+          batchUTXOsForAddresses(request.getUTXOsForAddresses),
+        );
+      }
       const masterKey = getWalletMasterKey();
       const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
       const currAccount = getCurrentAccountIndex();
@@ -888,7 +900,7 @@ export default class AdaApi {
     request: TransactionFeeRequest
   ): Promise<TransactionFeeResponse> {
     Logger.debug('AdaApi::calculateTransactionFee called');
-    const { receiver, amount } = request;
+    const { receiver, amount, shouldSendAll } = request;
     const allAdaAddresses = await getAdaAddressesList();
     try {
       const changeAdaAddr = await popBip44Address('Internal');
@@ -897,7 +909,8 @@ export default class AdaApi {
         amount,
         changeAdaAddr,
         allAdaAddresses,
-        batchUTXOsForAddresses(request.getUTXOsForAddresses)
+        batchUTXOsForAddresses(request.getUTXOsForAddresses),
+        shouldSendAll
       );
       const fee = feeResponse.fee.to_str();
       Logger.debug(

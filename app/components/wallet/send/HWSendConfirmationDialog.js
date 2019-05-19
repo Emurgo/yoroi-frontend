@@ -33,6 +33,7 @@ type Props = {
   onSubmit: Function,
   onCancel: Function,
   classicTheme: boolean,
+  shouldSendAll: boolean,
 };
 
 @observer
@@ -143,10 +144,11 @@ export default class HWSendConfirmationDialog extends Component<Props> {
   }
 
   submit = () => {
-    const { receiver, amount, amountToNaturalUnits } = this.props;
+    const { receiver, amount, amountToNaturalUnits, shouldSendAll } = this.props;
     const transactionData = {
       receiver,
       amount: amountToNaturalUnits(amount),
+      shouldSendAll
     };
     this.props.onSubmit(transactionData);
   }
