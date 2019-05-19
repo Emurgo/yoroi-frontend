@@ -168,8 +168,8 @@ export default class WalletSendForm extends Component<Props, State> {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           return this.props.addressValidator(receiverValue)
-            .then(isValidReceiver => {
-              this._updateTxValues(this.state.shouldSendAll);
+            .then(async isValidReceiver => {
+              await this._updateTxValues({ isValidReceiver });
               return [isValidReceiver, this.context.intl.formatMessage(messages.invalidAddress)];
             });
         }],
@@ -179,6 +179,11 @@ export default class WalletSendForm extends Component<Props, State> {
         placeholder: `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}`,
         value: '',
         validators: [async ({ field }) => {
+          const { shouldSendAll } = this.state;
+          if (shouldSendAll) {
+            // sendall doesn't depend on the amount so always succeed
+            return true;
+          }
           const amountValue = field.value;
           if (amountValue === '') {
             this._resetTransactionFee();
@@ -187,10 +192,7 @@ export default class WalletSendForm extends Component<Props, State> {
           const isValidAmount = await this.props.validateAmount(
             formattedAmountToNaturalUnits(amountValue)
           );
-          const { shouldSendAll } = this.state;
-          if (!shouldSendAll) {
-            this._updateTxValues(this.state.shouldSendAll);
-          }
+          await this._updateTxValues({ isValidAmount });
           return [isValidAmount, this.context.intl.formatMessage(messages.invalidAmount)];
         }],
       },
@@ -270,7 +272,9 @@ export default class WalletSendForm extends Component<Props, State> {
               label={intl.formatMessage(messages.checkboxLabel)}
               onChange={(newState) => {
                 this.setShouldSendAll(newState);
-                this._updateTxValues(newState);
+                this._updateTxValues({
+                  shouldSendAll: newState,
+                });
               }}
               checked={shouldSendAll}
               skin={CheckboxSkin}
@@ -420,21 +424,45 @@ export default class WalletSendForm extends Component<Props, State> {
     }
   }
 
-  async _updateTxValues(shouldSendAll: boolean) {
-    const isValidReceiver = this.form.$('receiver').isValid;
-    const isValidAmount = this.form.$('amount').isValid;
+  /**
+   * Precondition: both amount and redeiver are valid
+   */
+  async _updateTxValues(checkers: {
+    isValidAmount?: boolean,
+    isValidReceiver?: boolean,
+    shouldSendAll?: boolean,
+  }) {
+    let { isValidAmount, isValidReceiver, shouldSendAll } = checkers;
+    if (shouldSendAll === undefined) {
+      shouldSendAll = this.state.shouldSendAll;
+    }
+
+    let amountValue;
+    if (shouldSendAll) {
+      amountValue = '1'; // arbitrary value as it isn't used in sendAll case
+      isValidAmount = true;
+    } else {
+      amountValue = this.form.$('amount').value;
+
+      if (isValidAmount === undefined) {
+        isValidAmount = this.form.$('amount').isValid;
+      }
+    }
+
+    if (isValidReceiver === undefined) {
+      isValidReceiver = this.form.$('receiver').isValid;
+    }
+    if (!isValidAmount || !isValidReceiver) {
+      this._resetTransactionFee();
+      return;
+    }
     const receiverValue = this.form.$('receiver').value;
-    const amountValue = this.form.$('amount').value;
-    if (isValidReceiver && shouldSendAll) {
-      await this._calculateTransactionFee(receiverValue, amountValue, shouldSendAll);
+    await this._calculateTransactionFee(receiverValue, amountValue, shouldSendAll);
+    if (shouldSendAll) {
       const { totalBalance } = this.props;
       const { transactionFee } = this.state;
       const sendAllAmount = totalBalance.minus(transactionFee);
       this.form.$('amount').value = sendAllAmount.toString();
-    } else if (isValidReceiver && isValidAmount) {
-      this._calculateTransactionFee(receiverValue, amountValue, shouldSendAll);
-    } else {
-      this._resetTransactionFee();
     }
   }
 }
