@@ -71,7 +71,7 @@ export const AutocompleteOwnSkin = (props: Props) => {
     if (props.selectedOptions && !props.renderSelections) {
       // render default skin
       return props.selectedOptions.map((selectedOption, index) => (
-        <span className={theme.selectedWordBox} key={index.toString()}>
+        <span className={theme.selectedWordBox} key={`${selectedOption}-${index.toString()}`}>
           <span className={theme.selectedWordValue}>
             {selectedOption}
             <span
