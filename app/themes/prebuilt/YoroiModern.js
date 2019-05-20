@@ -85,6 +85,8 @@ const rpModal = {
   '--rp-modal-bg-color': '#fff',
   '--rp-modal-max-height': '97%',
   '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
+  '--rp-modal-max-width': `600px`,
+  '--rp-modal-min-width': `600px`,
 };
 
 // OPTIONS
