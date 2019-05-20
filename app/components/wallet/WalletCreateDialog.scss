@@ -51,17 +51,21 @@
   @include loading-spinner("../../assets/images/spinner-light.svg");
 }
 
+// new styles 
 
+// TABS
 .tabs {
   font-family: var(--font-regular);
   display: flex;
-  justify-content: space-around;
-  margin-bottom: 40px;
+  justify-content: center;
+  margin-bottom: 35px;
 }
 
 .tabsLink {
-  padding: 10px 0;
+  padding: 5px 0;
   position: relative;
+  cursor: pointer;
+  margin: 0 50px;
 
   &::after {
     content: '';
@@ -80,12 +84,59 @@
     font-size: var(--tab-link-text-size);
     line-height: var(--tab-link-line-height);
 
-    &::after {
+    &.active::after {
       background-color: var(--tab-link-border-color);
     }
   }
+}
 
-  .tabsLink::after {
-    background-color: red;
+// WALLETS
+
+.walletType {
+  font-family: var(--font-regular);
+  display: flex;
+  align-items: center;
+  padding: 0 15px 0 10px;
+  border-bottom: 1px solid #C2C9D3;
+  
+  .walletTypeImg {
+    width: 60px;
+    height: 100px;
+    margin-right: 25px;
+    background-size: contain;
+    background-position: center 10px;
+    background-repeat: no-repeat;
+
+    &.mnemonic {
+      background-image: url(../../assets/images/wallets/mnemonic_wallet.svg);
+    }
+  
+    &.master {
+      background-image: url(../../assets/images/wallets/master_key.svg);
+    }
+  
+    &.paper {
+      background-image: url(../../assets/images/wallets/paper_wallet.svg);
+    }
+  
+    &.business {
+      background-image: url(../../assets/images/wallets/business_wallet.svg);
+    }
+  }
+
+  .walletTypeTitle {
+    font-size: 16px;
+    line-height: 22px;
+    color: #2B2C32;
+    max-width: 182px;
+    margin-right: 52px;
+  }
+
+  .walletTypeDesc {
+    color: #ADAEB6;
+    font-size: 12px;
+    line-height: 14px;
+    margin-left: auto;
+    max-width: 158px;
   }
 }
