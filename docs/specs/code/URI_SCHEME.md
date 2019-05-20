@@ -5,7 +5,8 @@ as possible approaches for a multiplatform implementation.
 
 # Motivation
 
-Users who create community content often want donations as a financial incentive. However, no consumer wants to
+Users who create community content often want donations as a financial incentive.
+However, no consumer wants to
 - A) Open Daedalus as it takes too long to sync
 - B) Copy paste the user address and decide how much to send
 
@@ -35,14 +36,37 @@ Example:
 
 1. BIP-21 is limited to only features Bitcoin supports. A similar feature for Ethereum would, for example, also support gas as an extra parameter. BIP-21 is easily extensible but we have to take precaution to avoid different wallets having different implementations of these features as they become available on Cardano. To get an idea of some extra features that could be added, consider this (still under discussion) proposal for Ethereum: [EIP-681](https://eips.ethereum.org/EIPS/eip-681)
 
-2. Depending on the protocol registration method (see next section), browsers generally enforce a `web+` or `ext+` (for extensions) prefix for non-whitelisted protocols (note: `bitcoin:` was whitelisted).
+2. Depending on the protocol registration method (see next section), browsers
+generally enforce a `web+` or `ext+` prefix for non-whitelisted
+protocols (note: `bitcoin:` was whitelisted). The prefix `ext+` is recommended
+for extensions, but not mandatory.
+
+## ABNF Grammar (Proposal)
+
+This is an initial, simplified protocol definition for fast implementation; it
+only requires an address and an optional amount parameter.
+As discussed above, these rules are likely to evolve in time in order to support
+additional features, including unique capabilities of the Cardano blockchain.
+
+```
+cardanourn     = "web+cardano:" cardanoaddress [ "?" amountparam ]
+cardanoaddress = *base58
+amountparam    = "amount=" *digit [ "." *digit ]
+
+```
+
+The amount parameter must follow the [same rules](https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki#transfer-amountsize) described in BIP-21, namely,
+it must be specified in decimal ADA, without commas and using the period (.)
+decimal separator.
 
 # Multiplatform Implementation
 
 An ideal, multiplatform implementation would allow users to launch Yoroi (or
 possibly other Cardano wallets if they implement the protocol as well) to make
-payments by  simply clicking on any link starting with `web+cardano:` - in a similar
-way as `mailto:` links launch the default email client. To achieve this, the protocol must be registered by browsers and by the mobile apps.
+payments by simply clicking on any URL starting with `web+cardano:` - in a similar
+way as a `mailto:` URL launches the default email client. To achieve this, the
+protocol must be registered by browsers and by the mobile apps.
+For integration with desktop clients, the protocol must be registered in the OS.
 
 ## Registering the Protocol in Web Browsers
 
@@ -78,13 +102,11 @@ in Firefox**.
 
         "protocol_handlers": [
           {
-            "protocol": "ext+cardano",
+            "protocol": "web+cardano",
             "name": "Yoroi",
             "uriTemplate": "main_window.html#/wallets/1/transactions?a=%s"
           }
         ]
-
-  Note: the prefix `ext+` is recommended for extensions, but not mandatory.
 
 2. This method only seems to work using a relative `uriTemplate` as shown above. Using an absolute URL throws a security error (requires HTTPS).
 
