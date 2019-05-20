@@ -32,8 +32,6 @@ const messages = defineMessages({
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
 type Props = {
   amount: string,
   receiver: string,
@@ -45,7 +43,8 @@ type Props = {
   isSubmitting: boolean,
   error: ?LocalizableError,
   currencyUnit: string,
-  classicTheme: boolean
+  classicTheme: boolean,
+  shouldSendAll: boolean
 };
 
 @observer
@@ -64,7 +63,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         value: '',
         validators: [({ field }) => {
           if (field.value === '') {
-            return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           return [true];
         }],
@@ -80,12 +79,13 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
   submit() {
     this.form.submit({
       onSuccess: (form) => {
-        const { receiver, amount, amountToNaturalUnits } = this.props;
+        const { receiver, amount, amountToNaturalUnits, shouldSendAll } = this.props;
         const { walletPassword } = form.values();
         const transactionData = {
           receiver,
           amount: amountToNaturalUnits(amount),
           password: walletPassword,
+          shouldSendAll
         };
         this.props.onSubmit(transactionData);
       },
@@ -136,7 +136,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         actions={actions}
         closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
-        className={classicTheme ? styles.dialogClassic : styles.dialog}
+        className={styles.dialog}
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >

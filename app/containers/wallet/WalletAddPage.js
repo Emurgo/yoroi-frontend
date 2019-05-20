@@ -58,7 +58,6 @@ export default class WalletAddPage extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.isClassicTheme}
         areCategoriesHidden={profile.isModernTheme}
       />);
 
@@ -148,7 +147,7 @@ export default class WalletAddPage extends Component<Props> {
       <MainLayout
         topbar={topBar}
         footer={<AddWalletFooter />}
-        noTopbarNoBanner={profile.isModernTheme && isWalletAdd}
+        hideTopbar={profile.isModernTheme && isWalletAdd}
         classicTheme={profile.isClassicTheme}
       >
         {content}

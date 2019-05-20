@@ -57,7 +57,6 @@ export default class Wallet extends Component<Props> {
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
-          classicTheme={profile.isClassicTheme}
         >
           {this.props.children}
         </WalletWithNavigation>
@@ -65,7 +64,7 @@ export default class Wallet extends Component<Props> {
         {showAdaRedemptionSuccessMessage ? (
           <AdaRedemptionSuccessOverlay
             amount={amountRedeemed}
-            onClose={actions.ada.adaRedemption.closeAdaRedemptionSuccessOverlay.trigger}
+            onClose={() => actions.ada.adaRedemption.closeAdaRedemptionSuccessOverlay.trigger()}
             classicTheme={profile.isClassicTheme}
           />
         ) : null}

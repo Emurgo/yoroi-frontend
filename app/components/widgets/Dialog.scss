@@ -1,25 +1,15 @@
-.dialogWrapper {
+.component {
   color: var(--theme-dialog-title-color);
   display: flex;
   flex: 1;
   flex-direction: column;
   position: relative;
 
-  & > .titleClassic {
+  & > .title {
     font-family: var(--font-medium);
     font-size: 15px;
     line-height: 1.39;
     letter-spacing: 2px;
-    margin-bottom: 20px;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  & > .title {
-    font-family: var(--font-medium);
-    font-size: 16px;
-    line-height: 1.39;
-    letter-spacing: 0px;
     margin-bottom: 20px;
     text-align: center;
     text-transform: uppercase;
@@ -51,4 +41,11 @@
       }
     }
   }
+}
+
+:global(.YoroiModern) .component {
+  & > .title {
+    font-size: 16px;
+    letter-spacing: 0px;
+  }  
 }

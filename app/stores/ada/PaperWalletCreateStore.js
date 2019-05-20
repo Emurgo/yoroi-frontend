@@ -38,6 +38,7 @@ export default class PaperWalletCreateStore extends Store {
   @observable pdf: ?Blob;
   error: ?LocalizableError;
   numAddresses: ?number;
+  printAccountPlate: boolean = true;
   userPassword: ?string;
   paper: ?AdaPaper;
 
@@ -57,8 +58,17 @@ export default class PaperWalletCreateStore extends Store {
     a.cancel.listen(this._cancel);
   }
 
-  @action _submitInit = async ({ numAddresses }: { numAddresses: number }): Promise<void> => {
+  @action _submitInit = async (
+    {
+      numAddresses,
+      printAccountPlate
+    }: {
+      numAddresses: number,
+      printAccountPlate: boolean
+    }
+  ): Promise<void> => {
     this.numAddresses = numAddresses;
+    this.printAccountPlate = printAccountPlate;
     this.progressInfo = ProgressStep.USER_PASSWORD;
   };
 
@@ -88,7 +98,7 @@ export default class PaperWalletCreateStore extends Store {
     if (this.numAddresses && this.userPassword) {
       this.paper = this.api.ada.createAdaPaper({
         numAddresses: this.numAddresses,
-        password: this.userPassword
+        password: this.userPassword,
       });
     }
   };
@@ -99,6 +109,7 @@ export default class PaperWalletCreateStore extends Store {
       pdf = await this.api.ada.createAdaPaperPdf({
         paper: this.paper,
         network: environment.NETWORK,
+        printAccountPlate: this.printAccountPlate,
         updateStatus: status => {
           this.actions.ada.paperWallets.setPdfRenderStatus.trigger({ status });
           return !!this.paper;

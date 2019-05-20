@@ -21,6 +21,10 @@
     height: 7px;
     display: block;
   }
+  li {
+    // need this to give room to the scrollbar
+    margin-right: 10px;
+  }
 }
 
 .option {

@@ -119,10 +119,15 @@ export default class TransactionsStore extends Store {
       const skip = this.searchOptions
         ? this.searchOptions.skip
         : this.SEARCH_SKIP;
+
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+
       const requestParams: GetTransactionsRequest = {
         walletId: wallet.id,
         limit,
         skip,
+        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
       };
       const recentRequest = this._getTransactionsRecentRequest(wallet.id);
       recentRequest.invalidate({ immediately: false });
@@ -130,7 +135,11 @@ export default class TransactionsStore extends Store {
 
       const allRequest = this._getTransactionsAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
-      allRequest.execute({ walletId: wallet.id });
+      allRequest.execute({
+        walletId: wallet.id,
+        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      });
 
       if (!allRequest.promise) throw new Error('should never happen');
 
@@ -145,7 +154,10 @@ export default class TransactionsStore extends Store {
 
           const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate();
           // Note: cache based on lastUpdateDate even though it's not used in balanceRequest
-          return this._getBalanceRequest(wallet.id).execute(lastUpdateDate);
+          return this._getBalanceRequest(wallet.id).execute({
+            date: lastUpdateDate,
+            getUTXOsSumsForAddresses: stateFetcher.getUTXOsSumsForAddresses,
+          });
         })
         .then((updatedBalance: BigNumber) => {
           if (walletsStore.active && walletsStore.active.id === wallet.id) {

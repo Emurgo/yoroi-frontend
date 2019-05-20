@@ -50,10 +50,12 @@ import {
 import {
   getAdaTransactionFee,
   newAdaUnsignedTx,
+  sendAllUnsignedTx,
   signTransaction,
 } from './adaTransactions/adaNewTransactions';
 import {
   getCryptoWalletFromMasterKey,
+  createAccountPlate,
 } from './lib/cardanoCrypto/cryptoWallet';
 import type {
   TrezorSignTxPayload,
@@ -80,7 +82,6 @@ import type {
   AdaTransactionInputOutput,
   AdaTransactions,
   AdaWallet,
-  AdaWallets,
   AdaAssurance,
 } from './adaTypes';
 import type {
@@ -102,8 +103,16 @@ import {
   loadLovefieldDB,
   reset,
 } from './lib/lovefieldDatabase';
-import type { SignedResponse } from './lib/yoroi-backend-api';
-import { getAllUTXOsForAddresses, sendFinalizedTx } from './lib/yoroi-backend-api';
+import type {
+  FilterFunc,
+  HistoryFunc,
+  AddressUtxoFunc,
+  SendFunc,
+  SignedResponse,
+  TxBodiesFunc,
+  UtxoSumFunc,
+} from './lib/state-fetch/types';
+import { batchUTXOsForAddresses, batchTxsBodiesForInputs } from './lib/state-fetch/helpers';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
 import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
 import {
@@ -124,6 +133,8 @@ import type { TransactionExportRow } from '../export';
 import { HWFeatures } from '../../types/HWConnectStoreTypes';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import type { CryptoAccount } from './adaLocalStorage';
+import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 
 // ADA specific Request / Response params
 
@@ -131,11 +142,12 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 export type CreateAdaPaperRequest = {
   password: string,
-  numAddresses?: number
+  numAddresses?: number,
 };
 export type AdaPaper = {
   addresses: Array<string>,
   scrambledWords: Array<string>,
+  accountPlate: WalletAccountNumberPlate,
 };
 export type CreateAdaPaperFunc = (
   request: CreateAdaPaperRequest
@@ -146,6 +158,7 @@ export type CreateAdaPaperFunc = (
 export type CreateAdaPaperPdfRequest = {
   paper: AdaPaper,
   network: Network,
+  printAccountPlate?: boolean,
   updateStatus?: PdfGenStepType => ?any,
 };
 
@@ -177,7 +190,9 @@ export type GetAddressesFunc = (
 
 // getBalance
 
-export type GetBalanceRequest = {};
+export type GetBalanceRequest = {
+  getUTXOsSumsForAddresses: UtxoSumFunc,
+};
 export type GetBalanceResponse = BigNumber;
 export type GetBalanceFunc = (
   request: GetBalanceRequest
@@ -198,8 +213,10 @@ export type GetTransactionsRequestOptions = {
   limit: number,
 };
 export type GetTransactionsRequest = {
+  ...$Shape<GetTransactionsRequestOptions>,
   walletId: string,
-  ...$Shape<GetTransactionsRequestOptions>
+  getTransactionsHistoryForAddresses: HistoryFunc,
+  checkAddressesInUse: FilterFunc,
 };
 export type GetTransactionsResponse = {
   transactions: Array<WalletTransaction>,
@@ -223,6 +240,7 @@ export type CreateWalletRequest = {
   name: string,
   mnemonic: string,
   password: string,
+  checkAddressesInUse: FilterFunc,
 };
 export type CreateWalletResponse = Wallet;
 export type CreateWalletFunc = (
@@ -234,7 +252,10 @@ export type CreateWalletFunc = (
 export type CreateTransactionRequest = {
   receiver: string,
   amount: string,
-  password: string
+  password: string,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  sendTx: SendFunc,
+  shouldSendAll: boolean,
 };
 export type CreateTransactionResponse = SignedResponse;
 export type CreateTransactionFunc = (
@@ -245,7 +266,9 @@ export type CreateTransactionFunc = (
 
 export type CreateTrezorSignTxDataRequest = {
   receiver: string,
-  amount: string
+  amount: string,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 };
 export type CreateTrezorSignTxDataResponse = {
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
@@ -260,6 +283,7 @@ export type CreateTrezorSignTxDataFunc = (
 
 export type BroadcastTrezorSignedTxRequest = {
   signedTxHex: string,
+  sendTx: SendFunc,
 };
 export type BroadcastTrezorSignedTxResponse = SignedResponse;
 export type BroadcastTrezorSignedTxFunc = (
@@ -270,7 +294,9 @@ export type BroadcastTrezorSignedTxFunc = (
 
 export type CreateLedgerSignTxDataRequest = {
   receiver: string,
-  amount: string
+  amount: string,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  getTxsBodiesForUTXOs: TxBodiesFunc,
 };
 export type CreateLedgerSignTxDataResponse = {
   ledgerSignTxPayload: LedgerSignTxPayload,
@@ -286,6 +312,7 @@ export type CreateLedgerSignTxDataFunc = (
 export type PrepareAndBroadcastLedgerSignedTxRequest = {
   ledgerSignTxResp: LedgerSignTxResponse,
   unsignedTx: RustModule.Wallet.Transaction,
+  sendTx: SendFunc,
 };
 export type PrepareAndBroadcastLedgerSignedTxResponse = SignedResponse;
 export type PrepareAndBroadcastLedgerSignedTxFunc = (
@@ -297,7 +324,9 @@ export type PrepareAndBroadcastLedgerSignedTxFunc = (
 export type TransactionFeeRequest = {
   sender: string,
   receiver: string,
-  amount: string
+  amount: string,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  shouldSendAll: boolean,
 };
 export type TransactionFeeResponse = BigNumber;
 
@@ -392,6 +421,7 @@ export type RestoreWalletRequest = {
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
+  checkAddressesInUse: FilterFunc,
 };
 export type RestoreWalletResponse = Wallet;
 export type RestoreWalletFunc = (
@@ -428,6 +458,7 @@ export type CreateHardwareWalletRequest = {
   walletName: string,
   publicMasterKey: string,
   hwFeatures: HWFeatures,
+  checkAddressesInUse: FilterFunc,
 };
 export type CreateHardwareWalletResponse = Wallet;
 export type CreateHardwareWalletFunc = (
@@ -436,7 +467,11 @@ export type CreateHardwareWalletFunc = (
 
 // getTransactionRowsToExport
 
-export type GetTransactionRowsToExportRequest = {}; // TODO: Implement in the Next iteration
+export type GetTransactionRowsToExportRequest = {
+  getTransactionsHistoryForAddresses: HistoryFunc,
+  checkAddressesInUse: FilterFunc,
+  // TODO: Implement date range
+};
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
   request: GetTransactionRowsToExportRequest
@@ -512,22 +547,27 @@ export default class AdaApi {
     }: CreateAdaPaperRequest = {}
   ): AdaPaper {
     const { words, scrambledWords } = generatePaperWalletSecret(password);
-    const addresses = mnemonicsToExternalAddresses(words.join(' '), numAddresses || DEFAULT_ADDRESSES_PER_PAPER);
-    return { addresses, scrambledWords };
+    const { addresses, accountPlate } = mnemonicsToExternalAddresses(
+      words.join(' '),
+      numAddresses || DEFAULT_ADDRESSES_PER_PAPER,
+    );
+    return { addresses, scrambledWords, accountPlate };
   }
 
   async createAdaPaperPdf(
     {
       paper,
       network,
+      printAccountPlate,
       updateStatus
     }: CreateAdaPaperPdfRequest
   ): Promise<CreateAdaPaperPdfResponse> {
-    const { addresses, scrambledWords } = paper;
+    const { addresses, scrambledWords, accountPlate } = paper;
     // noinspection UnnecessaryLocalVariableJS
     const res : Promise<CreateAdaPaperPdfResponse> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
+      accountPlate: printAccountPlate ? accountPlate : undefined,
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
@@ -540,12 +580,13 @@ export default class AdaApi {
     Logger.debug('AdaApi::getWallets called');
     try {
       const wallet = await getAdaWallet();
-      const wallets: AdaWallets = wallet
-        ? [wallet]
+      const account = getCurrentCryptoAccount();
+      const wallets: Array<[AdaWallet, ?CryptoAccount]> = wallet
+        ? [[wallet, account]]
         : [];
       // Refresh wallet data
       Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets.map(data => _createWalletFromServerData(data));
+      return wallets.map(([w, a]) => _createWalletFromServerData(w, a ? [a] : undefined));
     } catch (error) {
       Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -564,6 +605,9 @@ export default class AdaApi {
       const cuttoffIndex = getLastReceiveAddressIndex() + 1;
 
       const accountIndex = getCurrentCryptoAccount();
+      if (!accountIndex) {
+        throw new Error('Internal Error! Cannot get addresses without current account.');
+      }
       const adaAddresses: AdaAddresses = await getAdaAddressesByType('External');
       Logger.debug('AdaApi::getExternalAddresses success: ' + stringifyData(adaAddresses));
       const addresses = adaAddresses
@@ -583,9 +627,9 @@ export default class AdaApi {
     }
   }
 
-  async getBalance(): Promise<GetBalanceResponse> {
+  async getBalance(request: GetBalanceRequest): Promise<GetBalanceResponse> {
     try {
-      return updateAdaWalletBalance();
+      return updateAdaWalletBalance(request.getUTXOsSumsForAddresses);
     } catch (error) {
       Logger.error('AdaApi::getBalance error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -605,7 +649,10 @@ export default class AdaApi {
     Logger.debug('AdaApi::refreshTransactions called: ' + stringifyData(request));
     const { skip = 0, limit } = request;
     try {
-      await refreshTxs();
+      await refreshTxs(
+        request.getTransactionsHistoryForAddresses,
+        request.checkAddressesInUse,
+      );
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
       Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(history));
       const transactions = limit
@@ -648,7 +695,8 @@ export default class AdaApi {
     return await this.restoreWallet({
       recoveryPhrase: request.mnemonic,
       walletName: request.name,
-      walletPassword: request.password
+      walletPassword: request.password,
+      checkAddressesInUse: request.checkAddressesInUse,
     });
   }
 
@@ -656,17 +704,26 @@ export default class AdaApi {
     request: CreateTransactionRequest
   ): Promise<CreateTransactionResponse> {
     Logger.debug('AdaApi::createTransaction called');
-    const { receiver, amount, password } = request;
+    const { receiver, amount, password, shouldSendAll } = request;
     try {
       const allAdaAddresses = await getAdaAddressesList();
       const changeAdaAddr = await popBip44Address('Internal');
-      const unsignedTx = await newAdaUnsignedTx(
-        receiver,
-        amount,
-        changeAdaAddr,
-        allAdaAddresses,
-        getAllUTXOsForAddresses,
-      );
+      let unsignedTx;
+      if (shouldSendAll) {
+        unsignedTx = await sendAllUnsignedTx(
+          receiver,
+          allAdaAddresses,
+          batchUTXOsForAddresses(request.getUTXOsForAddresses),
+        );
+      } else {
+        unsignedTx = await newAdaUnsignedTx(
+          receiver,
+          amount,
+          changeAdaAddr,
+          allAdaAddresses,
+          batchUTXOsForAddresses(request.getUTXOsForAddresses),
+        );
+      }
       const masterKey = getWalletMasterKey();
       const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
       const currAccount = getCurrentAccountIndex();
@@ -677,7 +734,7 @@ export default class AdaApi {
         unsignedTx,
         accountPrivateKey
       );
-      const response = sendFinalizedTx(signedTx);
+      const response = request.sendTx({ signedTx });
       Logger.debug(
         'AdaApi::createTransaction success: ' + stringifyData(response)
       );
@@ -708,7 +765,7 @@ export default class AdaApi {
         amount,
         changeAdaAddr,
         allAdaAddresses,
-        getAllUTXOsForAddresses
+        batchUTXOsForAddresses(request.getUTXOsForAddresses)
       );
 
       const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
@@ -718,6 +775,7 @@ export default class AdaApi {
         changeAdaAddr,
         unsignedTxResponse.senderUtxos,
         unsignedTx,
+        batchTxsBodiesForInputs(request.getTxsBodiesForUTXOs)
       );
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
 
@@ -737,9 +795,12 @@ export default class AdaApi {
     request: BroadcastTrezorSignedTxRequest
   ): Promise<BroadcastTrezorSignedTxResponse> {
     Logger.debug('AdaApi::broadcastTrezorSignedTx called');
-    const { signedTxHex } = request;
+    const { signedTxHex, sendTx } = request;
     try {
-      const response = await broadcastTrezorSignedTx(signedTxHex);
+      const response = await broadcastTrezorSignedTx(
+        signedTxHex,
+        sendTx
+      );
       Logger.debug('AdaApi::broadcastTrezorSignedTx success: ' + stringifyData(response));
 
       return response;
@@ -769,7 +830,7 @@ export default class AdaApi {
         amount,
         changeAdaAddr,
         allAdaAddresses,
-        getAllUTXOsForAddresses
+        batchUTXOsForAddresses(request.getUTXOsForAddresses)
       );
 
       const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
@@ -778,7 +839,8 @@ export default class AdaApi {
         unsignedTxResponse.addressesMap,
         changeAdaAddr,
         unsignedTxResponse.senderUtxos,
-        unsignedTx
+        unsignedTx,
+        batchTxsBodiesForInputs(request.getTxsBodiesForUTXOs),
       );
 
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
@@ -806,12 +868,17 @@ export default class AdaApi {
     try {
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
 
-      const { ledgerSignTxResp, unsignedTx } = request;
-      const cryptoAccount = getCurrentCryptoAccount().root_cached_key;
+      const { ledgerSignTxResp, unsignedTx, sendTx } = request;
+      const currentCryptoAccount = getCurrentCryptoAccount();
+      if (!currentCryptoAccount) {
+        throw new Error('Internal Error! Cannot broadcast tx without current account.');
+      }
+      const cryptoAccount = currentCryptoAccount.root_cached_key;
       const response = await prepareAndBroadcastLedgerSignedTx(
         ledgerSignTxResp,
         unsignedTx,
-        cryptoAccount
+        cryptoAccount,
+        sendTx,
       );
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx success: ' + stringifyData(response));
 
@@ -833,7 +900,7 @@ export default class AdaApi {
     request: TransactionFeeRequest
   ): Promise<TransactionFeeResponse> {
     Logger.debug('AdaApi::calculateTransactionFee called');
-    const { receiver, amount } = request;
+    const { receiver, amount, shouldSendAll } = request;
     const allAdaAddresses = await getAdaAddressesList();
     try {
       const changeAdaAddr = await popBip44Address('Internal');
@@ -842,7 +909,8 @@ export default class AdaApi {
         amount,
         changeAdaAddr,
         allAdaAddresses,
-        getAllUTXOsForAddresses
+        batchUTXOsForAddresses(request.getUTXOsForAddresses),
+        shouldSendAll
       );
       const fee = feeResponse.fee.to_str();
       Logger.debug(
@@ -939,7 +1007,7 @@ export default class AdaApi {
     request: RestoreWalletRequest
   ): Promise<RestoreWalletResponse> {
     Logger.debug('AdaApi::restoreWallet called');
-    const { recoveryPhrase, walletName, walletPassword } = request;
+    const { recoveryPhrase, walletName, walletPassword, checkAddressesInUse, } = request;
     const assurance = 'CWANormal';
     const unit = 0;
 
@@ -955,10 +1023,10 @@ export default class AdaApi {
     };
 
     try {
-      const wallet: AdaWallet = await restoreAdaWallet({
-        walletPassword,
-        walletInitData
-      });
+      const wallet: AdaWallet = await restoreAdaWallet(
+        { walletPassword, walletInitData },
+        checkAddressesInUse,
+      );
       Logger.debug('AdaApi::restoreWallet success');
       return _createWalletFromServerData(wallet);
     } catch (error) {
@@ -1028,7 +1096,7 @@ export default class AdaApi {
   ): Promise<CreateHardwareWalletResponse> {
     try {
       Logger.debug('AdaApi::createHardwareWallet called');
-      const { walletName, publicMasterKey, hwFeatures } = request;
+      const { walletName, publicMasterKey, hwFeatures, checkAddressesInUse, } = request;
       const assurance = 'CWANormal';
       const unit = 0;
 
@@ -1050,7 +1118,10 @@ export default class AdaApi {
           language: hwFeatures.language,
         },
       };
-      const wallet: AdaWallet = await createWallet({ walletInitData });
+      const wallet: AdaWallet = await createWallet(
+        { walletInitData },
+        checkAddressesInUse,
+      );
 
       Logger.debug('AdaApi::createHardwareWallet success');
       return _createWalletFromServerData(wallet);
@@ -1074,7 +1145,10 @@ export default class AdaApi {
   ): Promise<GetTransactionRowsToExportResponse> {
     try {
       Logger.debug('AdaApi::getTransactionRowsToExport: called');
-      await refreshTxs();
+      await refreshTxs(
+        request.getTransactionsHistoryForAddresses,
+        request.checkAddressesInUse,
+      );
       const history: AdaTransactions = await getAdaTxsHistoryByWallet();
 
       Logger.debug('AdaApi::getTransactionRowsToExport: success');
@@ -1262,7 +1336,7 @@ async function _getTxFinancialInfo(
 
 const _createWalletFromServerData = action(
   'AdaApi::_createWalletFromServerData',
-  (adaWallet: AdaWallet) => {
+  (adaWallet: AdaWallet, accounts?: Array<CryptoAccount>) => {
     const walletObj = {
       id: adaWallet.cwId,
       amount: new BigNumber(adaWallet.cwAmount.getCCoin).dividedBy(
@@ -1273,8 +1347,14 @@ const _createWalletFromServerData = action(
       passwordUpdateDate: adaWallet.cwPassphraseLU,
       type: adaWallet.cwType,
       hardwareInfo: adaWallet.cwHardwareInfo,
+      accounts: undefined,
     };
-
+    if (accounts) {
+      walletObj.accounts = accounts.map(a => ({
+        account: a.account,
+        plate: createAccountPlate(a.root_cached_key.key().to_hex()),
+      }));
+    }
     return new Wallet(walletObj);
   }
 );

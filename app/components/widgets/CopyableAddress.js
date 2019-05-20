@@ -8,34 +8,37 @@ import styles from './CopyableAddress.scss';
 
 type Props = {
   address: string,
-  isUsed: Boolean,
-  isClassicThemeActive: boolean,
-  onCopyAddress: Function,
+  isUsed?: boolean,
+  onCopyAddress?: Function,
 };
 
 @observer
 export default class CopyableAddress extends Component<Props> {
 
-  render() {
-    const { address, onCopyAddress, isUsed, isClassicThemeActive } = this.props;
+  static defaultProps = {
+    onCopyAddress: undefined,
+    isUsed: false,
+  };
 
-    const usedStyle = isClassicThemeActive
-      ? styles.usedWalletAddressClassic
-      : styles.usedWalletAddress;
+  render() {
+    const { address, onCopyAddress, isUsed } = this.props;
+
     const walletAddressClasses = classnames([
-      isClassicThemeActive ? styles.hashClassic : styles.hash,
-      isUsed ? usedStyle : null,
+      styles.hash,
+      isUsed ? styles.usedWalletAddress : null,
     ]);
 
     return (
-      <div className={walletAddressClasses}>
-        <span>{address}</span>
-        <CopyToClipboard
-          text={address}
-          onCopy={onCopyAddress.bind(this, address)}
-        >
-          <SvgInline svg={iconCopy} className={styles.copyIconBig} />
-        </CopyToClipboard>
+      <div className={styles.component}>
+        <div className={walletAddressClasses}>
+          <span>{address}</span>
+          <CopyToClipboard
+            text={address}
+            onCopy={onCopyAddress && onCopyAddress.bind(this, address)}
+          >
+            <SvgInline svg={iconCopy} className={styles.copyIconBig} />
+          </CopyToClipboard>
+        </div>
       </div>
     );
   }

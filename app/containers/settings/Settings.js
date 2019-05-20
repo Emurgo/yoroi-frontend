@@ -43,7 +43,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         isActiveItem={this.isActivePage}
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
         currentLocale={profile.currentLocale}
-        classicTheme={profile.isClassicTheme}
+        currentTheme={profile.currentTheme}
       />
     );
     const topbarTitle = (
@@ -59,12 +59,11 @@ export default class Settings extends Component<InjectedContainerProps> {
             }}
             categories={topbar.CATEGORIES}
             activeTopbarCategory={topbar.activeTopbarCategory}
-            classicTheme={profile.isClassicTheme}
           />
         )}
         classicTheme={profile.isClassicTheme}
       >
-        <SettingsLayout menu={menu} classicTheme={profile.isClassicTheme}>
+        <SettingsLayout menu={menu}>
           {children}
         </SettingsLayout>
       </Layout>

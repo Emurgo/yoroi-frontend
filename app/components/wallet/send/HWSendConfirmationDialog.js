@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import type { MessageDescriptorMap } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -14,6 +14,12 @@ import LocalizableError from '../../../i18n/LocalizableError';
 
 import styles from './HWSendConfirmationDialog.scss';
 
+type ExpectedMessages = {
+  infoLine1: MessageDescriptor,
+  infoLine2: MessageDescriptor,
+  sendUsingHWButtonLabel: MessageDescriptor,
+};
+
 type Props = {
   amount: string,
   receiver: string,
@@ -21,11 +27,13 @@ type Props = {
   transactionFee: string,
   currencyUnit: string,
   amountToNaturalUnits: Function,
-  messages: MessageDescriptorMap,
+  messages: ExpectedMessages,
   isSubmitting: boolean,
   error: ?LocalizableError,
   onSubmit: Function,
   onCancel: Function,
+  classicTheme: boolean,
+  shouldSendAll: boolean,
 };
 
 @observer
@@ -47,6 +55,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       messages,
       error,
       onCancel,
+      classicTheme,
     } = this.props;
 
     const infoBlock = (
@@ -124,6 +133,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
+        classicTheme={classicTheme}
       >
         {infoBlock}
         {addressBlock}
@@ -134,10 +144,11 @@ export default class HWSendConfirmationDialog extends Component<Props> {
   }
 
   submit = () => {
-    const { receiver, amount, amountToNaturalUnits } = this.props;
+    const { receiver, amount, amountToNaturalUnits, shouldSendAll } = this.props;
     const transactionData = {
       receiver,
       amount: amountToNaturalUnits(amount),
+      shouldSendAll
     };
     this.props.onSubmit(transactionData);
   }

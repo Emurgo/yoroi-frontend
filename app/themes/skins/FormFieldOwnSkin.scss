@@ -33,6 +33,17 @@
     margin-top: -17px;
   }
 
+  /* By default, Chrome's styling for autofill inputs overlaps with floating labels.
+   * The following fix delays webkit-autofill transition to avoid Chrome setting its
+   * own style and thus floating fields are not overlapped.
+   */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-transition-delay: 99999s;
+  }
+
   &:hover {
     border-color: var(--rp-input-border-color-hover);
   }

@@ -1,16 +1,14 @@
-.componentClassic {
-
+.component {
   .main {
     align-items: center;
     display: flex;
     justify-content: center;
-    flex-direction: column;
+    flex-direction: column;    
   }
 
   & > .label {
     color: var(--theme-support-settings-text-color);
     font-family: var(--font-semibold);
-    font-size: 16px;
     line-height: 1.38;
     margin-bottom: 11px;
   }
@@ -25,7 +23,6 @@
 
   a {
     color: var(--theme-support-settings-link-color);
-    text-decoration: underline;
   }
 
   p {
@@ -33,38 +30,22 @@
   }
 }
 
-.component {
-  .main {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-  }
-
+:global(.YoroiClassic) .component {
   & > .label {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-semibold);
-    font-size: 18px;
-    line-height: 1.38;
-    margin-bottom: 11px;
+    font-size: 16px;
   }
-
-  a,
-  p {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-regular);
-    font-size: 14px;
-    line-height: 19px;
-  }
-
   a {
-    color: var(--theme-support-settings-link-color);
+    text-decoration: underline;
+  }
+}
+
+:global(.YoroiModern) .component {
+  & > .label {
+    font-size: 18px;
+  }
+  a {
     text-decoration: none;
     font-family: var(--font-semibold);
-  }
-
-  p {
-    margin-bottom: 20px;
   }
 }
 

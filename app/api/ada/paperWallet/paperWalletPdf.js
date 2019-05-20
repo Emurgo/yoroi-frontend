@@ -1,16 +1,18 @@
 // @flow
 import Pdf from 'jspdf';
 import qr from 'qr-image';
-import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-1.png';
-import paperWalletPage2PassPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-page-2.png';
-import paperWalletCertificateBgPath from '../../../assets/images/paper-wallet/paper-wallet-certificate-background.png';
+import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.front-min.png';
+import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.back-min.png';
 import { Logger, stringifyError } from '../../../utils/logging';
 import type { Network } from '../../../../config/config-types';
 import { NetworkType } from '../../../../config/config-types';
+import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
+import { createIcon as blockiesIcon } from '@download/blockies';
 
 export type PaperRequest = {
   words: Array<string>,
   addresses: Array<string>,
+  accountPlate: ?WalletAccountNumberPlate,
   network: Network,
 }
 
@@ -31,7 +33,7 @@ export const generateAdaPaperPdf = async (
 ): Promise<?Blob> => {
   // Prepare params
   // eslint-disable-next-line no-unused-vars
-  const { network, addresses, words } = request;
+  const { network, addresses, words, accountPlate } = request;
 
   updateStatus(PdfGenSteps.initializing);
 
@@ -49,20 +51,23 @@ export const generateAdaPaperPdf = async (
     updateStatus(PdfGenSteps.background);
 
     // background images
-    const bgUrl = paperWalletCertificateBgPath;
-    await addImage(doc, bgUrl, pageSize);
+    await addImage(doc, paperWalletPage1Path, pageSize);
     if (network !== NetworkType.MAINNET) {
-      printTestnetLabel(doc, network, 178, 20, 15);
+      printTestnetLabel(doc, network, 172);
+    }
+
+    if (accountPlate) {
+      // print account plate ID bottom-left corner of main front section
+      doc.setFontSize(12);
+      doc.text(145, 180, accountPlate.id);
     }
 
     updateStatus(PdfGenSteps.frontpage);
 
     // first page
     if (network !== NetworkType.MAINNET) {
-      printTestnetLabel(doc, network, 85);
+      printTestnetLabel(doc, network, 105);
     }
-    const page1Uri = paperWalletPage1Path;
-    await addImage(doc, page1Uri, pageSize);
 
     updateStatus(PdfGenSteps.addresses);
     if (!printAddresses(doc, addresses)) {
@@ -77,10 +82,37 @@ export const generateAdaPaperPdf = async (
     if (network !== NetworkType.MAINNET) {
       printTestnetLabel(doc, network, 75, 180);
     }
-    const page2Uri = paperWalletPage2PassPath;
-    await addImage(doc, page2Uri, pageSize);
+
+    if (accountPlate) {
+
+      // Generate account plate icon
+      const icon = blockiesIcon({
+        seed: accountPlate.hash,
+        size: 7,
+        scale: 5,
+        bgcolor: '#fff',
+        color: '#aaa',
+        spotcolor: '#000'
+      });
+
+      // Draw account plate icon upside-down middle of the backside
+      addImageBase64(doc, icon.toDataURL('image/png'), {
+        x: (pageWidthPx + 24) / 2,
+        y: 115,
+        w: 24,
+        h: 24,
+        r: 180,
+      });
+
+      // Print account plate ID under the plate icon on backside
+      doc.setFontSize(12);
+      textCenter(doc, 130, accountPlate.id, null, 180, true);
+    }
+
+    await addImage(doc, paperWalletPage2Path, pageSize);
     updateStatus(PdfGenSteps.mnemonic);
     printMnemonics(doc, words);
+    printPasswordMessage(doc);
 
   } catch (error) {
     Logger.error('Failed to render paper wallet! ' + stringifyError(error));
@@ -92,6 +124,15 @@ export const generateAdaPaperPdf = async (
   return blob;
 };
 
+function printPasswordMessage(
+  doc: Pdf,
+) {
+  doc.setFontSize(11);
+  const text = 'password or a hint';
+  textCenter(doc, 56, text, null, 180, true);
+  doc.setFontType('normal');
+}
+
 function printTestnetLabel(
   doc: Pdf,
   network: string,
@@ -99,7 +140,7 @@ function printTestnetLabel(
   r?: number,
   xShift?: number
 ) {
-  doc.setFontSize(60);
+  doc.setFontSize(50);
   doc.setFontType('bold');
   doc.setTextColor(255, 180, 164);
   textCenter(doc, y, network.toUpperCase(), null, r, (r || 0) > 90, xShift);
@@ -184,6 +225,7 @@ type AddImageParams = {
   y?: number,
   w?: number,
   h?: number,
+  r?: number,
 }
 
 function textCenter(
@@ -209,8 +251,8 @@ async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise
 }
 
 function addImageBase64(doc: Pdf, img: string, params?: AddImageParams) {
-  const { x, y, w, h } = params || {};
-  doc.addImage(img, 'png', x || 0, y || 0, w, h, '', 'FAST');
+  const { x, y, w, h, r } = params || {};
+  doc.addImage(img, 'png', x || 0, y || 0, w, h, '', 'FAST', r);
 }
 
 async function loadImage(url: string): Promise<string> {

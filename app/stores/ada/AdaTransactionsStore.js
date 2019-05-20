@@ -19,13 +19,14 @@ import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import type {
   TransactionFeeResponse,
   GetTransactionRowsToExportFunc,
-  GetTransactionRowsToExportRequest,
 } from '../../api/ada';
 
 import type {
   ExportTransactionsRequest,
   ExportTransactionsFunc,
 } from '../../api/common';
+
+import type { TransactionRowsToExportRequest } from '../../actions/ada/transactions-actions';
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
@@ -91,14 +92,22 @@ export default class AdaTransactionsStore extends TransactionsStore {
   calculateTransactionFee = (
     walletId: string,
     receiver: string,
-    amount: string
+    amount: string,
+    shouldSendAll: boolean
   ): Promise<TransactionFeeResponse> => {
     // get HdWallet account
     const accountId = this.stores.substores.ada.addresses._getAccountIdByWalletId(walletId);
     if (!accountId) throw new Error('Active account required before calculating transaction fees.');
 
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     // calculate fee
-    return this.api.ada.calculateTransactionFee({ sender: accountId, receiver, amount });
+    return this.api.ada.calculateTransactionFee({
+      sender: accountId,
+      receiver,
+      amount,
+      getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+      shouldSendAll
+    });
   };
 
   /** Wrap utility function to expose to components/containers */
@@ -107,7 +116,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
   );
 
   @action _exportTransactionsToFile = async (
-    params: GetTransactionRowsToExportRequest
+    params: TransactionRowsToExportRequest
   ): Promise<void> => {
     try {
       this._setExporting(true);
@@ -115,7 +124,12 @@ export default class AdaTransactionsStore extends TransactionsStore {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      this.getTransactionRowsToExportRequest.execute(params);
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      this.getTransactionRowsToExportRequest.execute({
+        ...params,
+        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      });
       if (!this.getTransactionRowsToExportRequest.promise) throw new Error('should never happen');
 
       const respTxRows = await this.getTransactionRowsToExportRequest.promise;

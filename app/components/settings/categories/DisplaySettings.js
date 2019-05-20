@@ -7,6 +7,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import styles from './DisplaySettings.scss';
 import { THEMES } from '../../../themes';
+import type { Theme } from '../../../themes';
 import ThemeThumbnail from './display/ThemeThumbnail';
 import environment from '../../../environment';
 
@@ -46,13 +47,12 @@ const messages = defineMessages({
 });
 
 type Props = {
-  theme: string,
+  currentTheme: Theme,
   selectTheme: Function,
   exportTheme: Function,
   getThemeVars: Function,
   hasCustomTheme: Function,
   onExternalLinkClick: Function,
-  classicTheme: boolean,
 };
 
 @observer
@@ -64,23 +64,22 @@ export default class DisplaySettings extends Component<Props> {
 
   render() {
     const {
-      theme,
+      currentTheme,
       selectTheme,
       getThemeVars,
       exportTheme,
       hasCustomTheme,
       onExternalLinkClick,
-      classicTheme,
     } = this.props;
     const { intl } = this.context;
 
     const themeYoroiClassicClasses = classnames([
-      theme === THEMES.YOROI_CLASSIC ? styles.active : styles.inactive,
+      currentTheme === THEMES.YOROI_CLASSIC ? styles.active : styles.inactive,
       styles.themeImageWrapper,
     ]);
 
     const themeYoroiModernClasses = classnames([
-      theme === THEMES.YOROI_MODERN ? styles.active : styles.inactive,
+      currentTheme === THEMES.YOROI_MODERN ? styles.active : styles.inactive,
       styles.themeImageWrapper,
     ]);
 
@@ -99,7 +98,7 @@ export default class DisplaySettings extends Component<Props> {
     );
 
     return (
-      <div className={classicTheme ? styles.componentClassic : styles.component}>
+      <div className={styles.component}>
 
         <div className={styles.label}>
           {intl.formatMessage(messages.themeLabel)}
@@ -115,7 +114,7 @@ export default class DisplaySettings extends Component<Props> {
               className={themeYoroiClassicClasses}
               onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
             >
-              {(theme === THEMES.YOROI_CLASSIC
+              {(currentTheme === THEMES.YOROI_CLASSIC
                 && hasCustomTheme() &&
                   <div className={styles.themeWarning}>
                     {intl.formatMessage(messages.themeWarning)}
@@ -132,7 +131,7 @@ export default class DisplaySettings extends Component<Props> {
                   className={themeYoroiModernClasses}
                   onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
                 >
-                  {(theme === THEMES.YOROI_MODERN
+                  {(currentTheme === THEMES.YOROI_MODERN
                     && hasCustomTheme() &&
                       <div className={styles.themeWarning}>
                         {intl.formatMessage(messages.themeWarning)}

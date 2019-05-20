@@ -25,8 +25,8 @@ Feature: Send transaction
     Examples:
       | amount              | fee       | |
       | 0.001000            | 0.168082  | # Sent tx to a valid adress|
-      | 9007199254.552484  | 0.168038  | # Sent all funds|
-      | 9007199253.720698  | 0.168170  | # Sent a big amount|
+      | 2007199254.552484  | 0.168038  | # Sent all funds|
+      | 2007199253.720698  | 0.168170  | # Sent a big amount|
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
@@ -89,6 +89,28 @@ Feature: Send transaction
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 9007199255 |
     Then I should see a not enough ada error
     And I should not be able to submit
+
+  @it-55
+  Scenario Outline: User can send all funds from one Yoroi wallet to another
+    Given There is a wallet stored named Test
+    And I have a wallet with funds
+    When I go to the send transaction screen
+	And I click on "Use all my ADA" checkbox
+    And I fill the address of the form:
+      | address                                                     |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | aaSecret_123 |
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+    Examples:
+      | amount              | fee       | |
+      | 2007199254.554682  | 0.166016  | # Sent all funds|
 
   @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error

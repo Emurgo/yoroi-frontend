@@ -1,24 +1,70 @@
-.withoutWallet {}
+.withoutWallet {} // TODO: TBD
 
 .withWallet {
-.walletInfo {
+  .walletInfo {
     color: var(--theme-topbar-wallet-info-color);
     font-family: var(--font-regular);
     letter-spacing: 0.5px;
     line-height: 20px;
-    text-align: center;
+    text-align: left;
     text-transform: uppercase;
+    padding-top: 4px;
+
+    .divIcon {
+      float: left;
+      margin-left: 100px;
+    }
+
+    .divIconHardware {
+      float: left;
+      margin-left: 160px;
+    }
+
+    .divWalletInfo {
+      margin-top: -2px;
+      float: left;
+      margin-left: 15px;
+    }
+
+    .divAmount {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+    }
+
+    .walletIcon {
+      border: 1px solid lightgrey;
+      border-radius: 6px;
+    }
 
     .walletName {
-        font-size: 17px;
-        font-weight: 600;
-        color: var(--theme-topbar-wallet-name-color);
+      font-size: 17px;
+      font-weight: 600;
+      word-break: break-all;
+      color: var(--theme-topbar-wallet-name-color);
+    }
+
+    .walletPlate {
+      padding-top: 2px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0.8;
+      color: var(--theme-topbar-wallet-name-color);
     }
 
     .walletAmount {
-        font-size: 14px;
-        font-weight: 300;
-        opacity: 0.7;
-        word-break: break-all;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--theme-topbar-wallet-name-color);
+      word-break: break-all;
     }
-}}
+
+    .walletAmountLabel {
+      text-transform: none;
+      padding-top: 2px;
+      font-size: 14px;
+      font-weight: 300;
+      opacity: 0.7;
+    }
+  }
+}

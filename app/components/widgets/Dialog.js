@@ -59,7 +59,6 @@ export default class Dialog extends Component<Props> {
       backButton,
       classicTheme
     } = this.props;
-    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
     const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
     return (
@@ -70,9 +69,9 @@ export default class Dialog extends Component<Props> {
         skin={this.setSkin}
       >
 
-        <div className={classnames([styles.dialogWrapper, className])}>
+        <div className={classnames([styles.component, className])}>
           {title && (
-            <div className={titleClasses}>
+            <div className={styles.title}>
               <h1>{title}</h1>
             </div>)
           }

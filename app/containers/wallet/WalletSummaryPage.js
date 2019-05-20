@@ -79,7 +79,7 @@ export default class WalletSummaryPage extends Component<Props> {
             transactions={recent}
             isLoadingTransactions={recentTransactionsRequest.isExecuting}
             hasMoreToLoad={totalAvailable > limit}
-            onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
+            onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
@@ -119,7 +119,6 @@ export default class WalletSummaryPage extends Component<Props> {
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
-          classicTheme={profile.isClassicTheme}
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 

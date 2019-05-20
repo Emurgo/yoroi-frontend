@@ -10,7 +10,7 @@ import type { InjectedContainerProps } from '../types/injectedPropsType';
 export type MainLayoutProps = InjectedContainerProps & {
   topbar: ?Node,
   classicTheme: boolean,
-  noTopbarNoBanner?: boolean,
+  hideTopbar?: boolean,
   footer: ?Node,
 };
 
@@ -18,7 +18,7 @@ export type MainLayoutProps = InjectedContainerProps & {
 export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     topbar: null,
-    noTopbarNoBanner: undefined,
+    hideTopbar: undefined,
     footer: null,
   };
 
@@ -28,17 +28,17 @@ export default class MainLayout extends Component<MainLayoutProps> {
       stores,
       topbar,
       classicTheme,
-      noTopbarNoBanner,
+      hideTopbar,
       footer
     } = this.props;
     const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
     return (
       <TopBarLayout
-        banner={<TestnetWarningBanner classicTheme={classicTheme} />}
+        banner={<TestnetWarningBanner />}
         topbar={topbarComponent}
         notification={<div />}
         classicTheme={classicTheme}
-        noTopbarNoBanner={noTopbarNoBanner}
+        hideTopbar={hideTopbar}
         footer={footer}
       >
         {this.props.children}

@@ -9,11 +9,17 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './FinalizeDialog.scss';
 import DialogBackButton from '../../../widgets/DialogBackButton';
 import CopyableAddress from '../../../widgets/CopyableAddress';
+import type { AdaPaper } from '../../../../api/ada';
+import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
     id: 'settings.paperWallet.dialog.finalize.title',
     defaultMessage: '!!!Yoroi Paper Wallet is created',
+  },
+  paperAccountIdLabel: {
+    id: 'settings.paperWallet.dialog.paperAccountIdLabel',
+    defaultMessage: '!!!Your Paper Wallet Account checksum:',
   },
   paperAddressesLabel: {
     id: 'settings.paperWallet.dialog.paperAddressesLabel',
@@ -34,8 +40,8 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onCopyAddress: Function,
-  addresses: Array<string>,
+  onCopyAddress?: Function,
+  paper: AdaPaper,
   onNext: Function,
   onCancel: Function,
   onBack?: Function,
@@ -45,8 +51,9 @@ type Props = {
 @observer
 export default class FinalizeDialog extends Component<Props> {
   static defaultProps = {
-    onBack: undefined
-  }
+    onBack: undefined,
+    onCopyAddress: undefined,
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -55,7 +62,7 @@ export default class FinalizeDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
-      addresses,
+      paper,
       onCancel,
       onNext,
       onBack,
@@ -97,18 +104,33 @@ export default class FinalizeDialog extends Component<Props> {
           </li>
         </ul>
 
-        <h2 className={styles.addressLabel}>
-          {intl.formatMessage(messages.paperAddressesLabel)}
-        </h2>
-        {addresses.map(a => (
-          <CopyableAddress
-            address={a}
-            isClassicThemeActive={classicTheme}
-            onCopyAddress={onCopyAddress}
-            isUsed={classicTheme /* pretend isUsed on classic theme for stylistic purposes */}
-            key={a}
-          />
-        ))}
+        {paper.accountPlate ? (
+          <div>
+            <h2 className={styles.addressLabel}>
+              {intl.formatMessage(messages.paperAccountIdLabel)}
+            </h2>
+            <div className={styles.plateRowDiv}>
+              <WalletAccountIcon
+                iconSeed={paper.accountPlate.hash}
+              />
+              <span className={styles.plateIdSpan}>{paper.accountPlate.id}</span>
+            </div>
+          </div>
+        ) : ''}
+
+        <div>
+          <h2 className={styles.addressLabel}>
+            {intl.formatMessage(messages.paperAddressesLabel)}
+          </h2>
+          {paper.addresses.map(a => (
+            <CopyableAddress
+              address={a}
+              onCopyAddress={onCopyAddress}
+              isUsed={classicTheme /* pretend isUsed on classic theme for stylistic purposes */}
+              key={a}
+            />
+          ))}
+        </div>
 
       </Dialog>
     );

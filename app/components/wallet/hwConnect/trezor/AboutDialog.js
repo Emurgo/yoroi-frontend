@@ -56,8 +56,6 @@ const messages = defineMessages({
   },
 });
 
-messages.nextButtonLabel = globalMessages.nextButtonLabel;
-
 type Props = {
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
@@ -85,7 +83,7 @@ export default class AboutDialog extends Component<Props> {
       classicTheme,
     } = this.props;
     const headerBlockClasses = classicTheme
-      ? headerMixin.headerBlockClassic
+      ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
       : classnames([headerMixin.headerBlock, 'small']);
     const middleBlockClasses = classicTheme
       ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])

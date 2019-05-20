@@ -23,8 +23,9 @@ export const Logger = {
   },
 
   error: (data : string) => {
-    logger.error(data);
-    logs.enq(`[${moment().format()}] ${data}\n`);
+    const fixedString = data.replace(/\\n/g, '\n');
+    logger.error(fixedString);
+    logs.enq(`[${moment().format()}] ${fixedString}\n`);
   },
 
   warn: (data : string) => {
