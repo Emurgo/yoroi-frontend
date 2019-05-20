@@ -136,16 +136,8 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}
         {middleBlock}
-
-        {!classicTheme && (
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        )}
-
         <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
-
-        {classicTheme && (
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        )}
+        <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
       </Dialog>);
   }
 }
