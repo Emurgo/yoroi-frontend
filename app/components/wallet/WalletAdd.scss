@@ -183,7 +183,7 @@
   color: var(--theme-wallet-add-color);
   margin-bottom: 15px;
   margin-right: 42px;
-  width: 429px;
+  width: 432px;
 }
 
 .subTitle {
@@ -271,4 +271,13 @@
     color: var(--card-text-color);
     font-size: var(--card-text-size);
   }
+}
+
+.settingsLink {
+  position: absolute;
+  right: 22px;
+  top: 21px;
+  z-index: 99;
+  width: 32px;
+  height: 30px;
 }

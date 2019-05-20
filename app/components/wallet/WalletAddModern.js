@@ -6,7 +6,8 @@ import styles from './WalletAdd.scss';
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 
 import SvgInline from 'react-svg-inline';
-import logo from '../../assets/images/yoroi-logo-white.inline.svg';
+import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
+import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import HorizontalFlexContainer from '../layout/HorizontalFlexContainer';
 
 const messages = defineMessages({
@@ -72,7 +73,7 @@ export default class WalletAddModern extends Component<Props> {
       <div className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroLeft}>
-            <SvgInline svg={logo} className={styles.heroLogo} />
+            <SvgInline svg={logoIcon} className={styles.heroLogo} />
             <h2 className={styles.title}>{title}</h2>
             <h3 className={styles.subTitle}>{intl.formatMessage(messages.subTitle)}</h3>
           </div>
@@ -105,6 +106,10 @@ export default class WalletAddModern extends Component<Props> {
             ) : null}
           </HorizontalFlexContainer>
         </div>
+
+        <a href="main_window.html#/settings" className={styles.settingsLink}>
+          <SvgInline svg={settingsIcon} />
+        </a>
 
         {!classicTheme && <div className={styles.heroBg} />}
       </div>
