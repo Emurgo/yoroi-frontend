@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import WalletAdd from '../../components/wallet/WalletAdd';
+import WalletAddModern from '../../components/wallet/WalletAddModern';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
@@ -29,6 +30,10 @@ const messages = defineMessages({
   title: {
     id: 'wallet.add.page.title',
     defaultMessage: '!!!Add Wallet',
+  },
+  subTitle: {
+    id: 'wallet.add.subpage.title',
+    defaultMessage: '!!!Yoroi light wallet for Cardano',
   },
 });
 
@@ -127,20 +132,39 @@ export default class WalletAddPage extends Component<Props> {
       );
     } else {
       isWalletAdd = true;
-      content = (
-        <WalletAdd
-          onTrezor={openTrezorConnectDialog}
-          isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-          onLedger={openLedgerConnectDialog}
-          isCreateLedgerWalletActive={isCreateLedgerWalletActive}
-          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
-          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-          isRestoreActive={isRestoreActive}
-          classicTheme={profile.isClassicTheme}
-          title={this.context.intl.formatMessage(messages.title)}
-        />
-      );
+      if (profile.isClassicTheme) {
+        content = (
+          <WalletAdd
+            onTrezor={openTrezorConnectDialog}
+            isCreateTrezorWalletActive={isCreateTrezorWalletActive}
+            onLedger={openLedgerConnectDialog}
+            isCreateLedgerWalletActive={isCreateLedgerWalletActive}
+            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+            onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
+            isRestoreActive={isRestoreActive}
+            classicTheme={profile.isClassicTheme}
+            title={this.context.intl.formatMessage(messages.title)}
+          />
+        );
+      } else {
+        content = (
+          <WalletAddModern
+            onTrezor={openTrezorConnectDialog}
+            isCreateTrezorWalletActive={isCreateTrezorWalletActive}
+            onLedger={openLedgerConnectDialog}
+            isCreateLedgerWalletActive={isCreateLedgerWalletActive}
+            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+            onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
+            isRestoreActive={isRestoreActive}
+            classicTheme={profile.isClassicTheme}
+            title={this.context.intl.formatMessage(messages.title)}
+            subTitle={this.context.intl.formatMessage(messages.subTitle)}
+          />
+        );
+      }
+
     }
 
     return (

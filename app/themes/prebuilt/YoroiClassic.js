@@ -139,6 +139,16 @@ const rpTextArea = {
   '--rp-textarea-text-color': '#121327',
 };
 
+// OPTION CARD
+const itemCard = {
+  '--card-bg-color': '#fff',
+  '--card-border-radius': '8px',
+  '--card-text-color': '#DAA49A',
+  '--card-text-size': '16px',
+  '--card-width': '250px',
+  '--card-height': '380px',
+};
+
 const rpYoroiTheme = {
   ...rpAutocomplete,
   ...rpBubble,
@@ -153,6 +163,7 @@ const rpYoroiTheme = {
   ...rpSelect,
   ...rpSwitch,
   ...rpTextArea,
+  ...itemCard,
 };
 
 
