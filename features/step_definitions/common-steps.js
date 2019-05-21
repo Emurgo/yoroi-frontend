@@ -102,6 +102,7 @@ Given(/^I have completed the basic setup$/, async function () {
 
   await i18nHelper.setActiveLanguage(this.driver);
 
+  await this.click('.LanguageSelectionForm_submitButton');
   await this.waitForElement('.TermsOfUseForm_component');
   await this.driver.executeScript(() => {
     window.yoroi.actions.profile.acceptTermsOfUse.trigger();

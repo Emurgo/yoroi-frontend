@@ -7,6 +7,7 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { InjectedProps } from '../../types/injectedPropsType';
+import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 
 const messages = defineMessages({
   title: {
@@ -22,12 +23,16 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
-  onSubmit = (values: { locale: string }) => {
+  onSelectLanguage = (values: { locale: string }) => {
     this.props.actions.profile.updateLocale.trigger(values);
   };
 
+  onSubmit = (values: { locale: string }) => {
+    this.props.actions.profile.redirectToTermsOfUse.trigger(values);
+  };
+
   render() {
-    const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
+    const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
     const { topbar, profile } = this.props.stores;
     const topBartitle = (
@@ -37,18 +42,20 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.isClassicTheme}
       />);
     return (
       <TopBarLayout
         topbar={topBar}
         classicTheme={profile.isClassicTheme}
-        noTopbarNoBanner={profile.isModernTheme}
+        hideTopbar={profile.isModernTheme}
         languageSelectionBackground
+        banner={<TestnetWarningBanner />}
       >
         <LanguageSelectionForm
+          onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
+          currentLocale={currentLocale}
           languages={LANGUAGE_OPTIONS}
           error={setProfileLocaleRequest.error}
         />

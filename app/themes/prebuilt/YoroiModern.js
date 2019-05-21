@@ -17,6 +17,7 @@ const rpAutocomplete = {
   '--rp-autocomplete-input-text-color': '#353535',
   '--rp-autocomplete-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
   '--rp-autocomplete-selected-word-box-bg-color': '#f0f3f5',
+  '--rp-autocomplete-selected-word-box-bg-color-secondary': '#D9DDE0',
   '--rp-autocomplete-selected-word-text-color': '#353535',
 };
 

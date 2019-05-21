@@ -58,6 +58,10 @@
 }
 
 :global(.YoroiModern) .component {
+  .inputWrapper span[class*='selectedWordBox'] {
+    background-color: var(--rp-autocomplete-selected-word-box-bg-color-secondary);
+  }
+
   .body {
     .title {
       font-size: 18px;

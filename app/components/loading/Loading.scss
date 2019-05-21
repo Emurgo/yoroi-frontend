@@ -63,6 +63,7 @@ $adaLogoWidth: 43px;
 }
 
 .component, .headline, .logo, .error {
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 

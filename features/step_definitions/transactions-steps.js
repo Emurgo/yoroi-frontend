@@ -26,6 +26,11 @@ When(/^I fill the form:$/, async function (table) {
   await this.input("input[name='amount']", fields.amount);
 });
 
+When(/^I fill the address of the form:$/, async function (table) {
+  const fields = table.hashes()[0];
+  await this.input("input[name='receiver']", fields.address);
+});
+
 When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const fields = table.hashes()[0];
   const total = parseFloat(fields.amount) + parseFloat(fields.fee);
@@ -44,11 +49,15 @@ When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  await this.waitUntilText('.AmountInputSkin_feesClassic', `+ ${fee} of fees`);
+  await this.waitUntilText('.AmountInputSkin_fees', `+ ${fee} of fees`);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
   await this.click('.WalletSendForm_nextButton');
+});
+
+When(/^I click on "Use all my ADA" checkbox$/, async function () {
+  await this.click('.WalletSendForm_checkbox');
 });
 
 When(/^I see send money confirmation dialog$/, async function () {
@@ -65,7 +74,7 @@ When(/^I submit the wallet send form$/, async function () {
 });
 
 Then(/^I should see the summary screen$/, async function () {
-  await this.waitForElement('.WalletSummary_componentClassic');
+  await this.waitForElement('.WalletSummary_component');
 });
 
 Then(/^I should see an invalid address error$/, async function () {

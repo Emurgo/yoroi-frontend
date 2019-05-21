@@ -119,7 +119,6 @@ export default class WalletSummaryPage extends Component<Props> {
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
-          classicTheme={profile.isClassicTheme}
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 

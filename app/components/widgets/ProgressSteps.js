@@ -30,22 +30,19 @@ export default class ProgressSteps extends Component<Props> {
     for (let idx = 0; idx < stepsList.length; idx++) {
       const stepText = stepsList[idx];
 
-      const textClass = classicTheme ? styles.stepTextClassic : styles.stepText;
-      const topBarClass = classicTheme ? styles.stepTopBarClassic : styles.stepTopBar;
-
-      let stepTopBarStyle = classNames([topBarClass]);
-      let stepTextStyle = classNames([textClass]);
+      let stepTopBarStyle = styles.stepTopBar;
+      let stepTextStyle = styles.stepText;
       let displayIcon = 'none';
 
       if (idx < currentStep) {
         // step already done
         displayIcon = 'done';
         stepTopBarStyle = classNames([
-          topBarClass,
+          styles.stepTopBar,
           styles.stepTopBarDone
         ]);
         stepTextStyle = classNames([
-          textClass,
+          styles.stepText,
           styles.stepTextDone
         ]);
       } else if (idx === currentStep) {
@@ -53,11 +50,11 @@ export default class ProgressSteps extends Component<Props> {
         // 0 = LOAD and 1 = PROCESS has same icon but for 9 = ERROR there is a error icon
         displayIcon = (progressInfo.stepState === 9) ? 'error' : 'none';
         stepTopBarStyle = classNames([
-          topBarClass,
+          styles.stepTopBar,
           styles.stepTopBarActive
         ]);
         stepTextStyle = classNames([
-          textClass,
+          styles.stepText,
           styles.stepTextActive
         ]);
       }
@@ -84,7 +81,7 @@ export default class ProgressSteps extends Component<Props> {
   render() {
     const { stepsList, progressInfo } = this.props;
     return (
-      <div className={classNames([styles.outer])}>
+      <div className={styles.component}>
         {this.createSetps(stepsList, progressInfo)}
       </div>
     );

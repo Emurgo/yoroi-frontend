@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev": "node scripts/start --env 'development'",
@@ -127,7 +127,6 @@
     "bignumber.js": "4.0.0",
     "bip39": "3.0.0",
     "blakejs": "1.1.0",
-    "bluebird": "3.3.4",
     "bs58": "4.0.1",
     "buffer-crc32": "0.2.13",
     "cardano-wallet-browser": "0.3.0",

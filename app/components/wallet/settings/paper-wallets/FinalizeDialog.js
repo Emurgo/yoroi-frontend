@@ -125,7 +125,6 @@ export default class FinalizeDialog extends Component<Props> {
           {paper.addresses.map(a => (
             <CopyableAddress
               address={a}
-              isClassicThemeActive={classicTheme}
               onCopyAddress={onCopyAddress}
               isUsed={classicTheme /* pretend isUsed on classic theme for stylistic purposes */}
               key={a}

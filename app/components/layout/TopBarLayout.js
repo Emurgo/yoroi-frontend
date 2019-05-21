@@ -10,7 +10,7 @@ type Props = {
   children?: ?Node,
   notification?: ?Node,
   banner?: Node,
-  noTopbarNoBanner?: boolean,
+  hideTopbar?: boolean,
   languageSelectionBackground?: boolean,
   classicTheme?: boolean,
   footer?: Node,
@@ -23,7 +23,7 @@ export default class TopBarLayout extends Component<Props> {
     children: undefined,
     notification: undefined,
     banner: undefined,
-    noTopbarNoBanner: undefined,
+    hideTopbar: undefined,
     languageSelectionBackground: false,
     withFooter: false,
     classicTheme: false,
@@ -36,7 +36,7 @@ export default class TopBarLayout extends Component<Props> {
       children,
       topbar,
       notification,
-      noTopbarNoBanner,
+      hideTopbar,
       languageSelectionBackground,
       footer,
       classicTheme
@@ -44,9 +44,6 @@ export default class TopBarLayout extends Component<Props> {
     const componentClasses = classnames([
       styles.component,
       languageSelectionBackground && !classicTheme ? styles.languageSelectionBackground : '',
-    ]);
-    const topbarClasses = classnames([
-      classicTheme ? styles.topbarClassic : styles.topbar,
     ]);
     const contentClasses = classnames([
       styles.content,
@@ -56,13 +53,14 @@ export default class TopBarLayout extends Component<Props> {
     return (
       <div className={componentClasses}>
         <div className={styles.main}>
-          {noTopbarNoBanner ? null : (
-            <div className={topbarClasses}>
+
+          {banner}
+
+          {hideTopbar ? null : (
+            <div className={styles.topbar}>
               {topbar}
             </div>
           )}
-
-          {noTopbarNoBanner ? null : banner}
 
           {notification}
 

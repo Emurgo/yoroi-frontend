@@ -6,7 +6,7 @@ import { defineMessages } from 'react-intl';
  * We instead store the shared messages in this file
 */
 
-export default defineMessages({
+const globalMessages = defineMessages({
   invalidMasterKey: {
     id: 'global.errors.invalidMasterKey',
     defaultMessage: '!!!Invalid master key entered, please check.',
@@ -235,6 +235,26 @@ export default defineMessages({
     id: 'transfer.form.instructions.step1.text',
     defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
   },
+  languageSelectLabel: {
+    id: 'profile.languageSelect.form.languageSelectLabel',
+    defaultMessage: '!!!Select your language',
+  },
+  languageSelectLabelInfo: {
+    id: 'settings.general.languageSelect.labelInfo',
+    defaultMessage: '!!!Language Label Info',
+  },
+  languageSelectInfo: {
+    id: 'settings.general.languageSelect.info',
+    defaultMessage: '!!!Language Info',
+  },
+  translationAcknowledgment: {
+    id: 'settings.general.translation.acknowledgment',
+    defaultMessage: '!!!Thanks to the following',
+  },
+  translationContributors: {
+    id: 'settings.general.translation.contributors',
+    defaultMessage: '!!!List of contributors',
+  },
   passwordInstructionsPaperWallet: {
     id: 'global.passwordInstructionsPaperWallet',
     defaultMessage: '!!!Note: Paper Wallet password needs to be at least 12 characters long.',
@@ -244,6 +264,7 @@ export default defineMessages({
     defaultMessage: '!!!Short recovery phrase',
   },
 });
+export default globalMessages;
 
 export const environmentSpecificMessages = {
   ada: defineMessages({
@@ -261,3 +282,12 @@ export const environmentSpecificMessages = {
     },
   }),
 };
+
+export function listOfTranslators(contributorsList, contributorsAck): string {
+  let output = '';
+  // append name of contributors only if the message is not empty
+  if (contributorsList !== globalMessages.translationContributors.defaultMessage) {
+    output = contributorsAck + contributorsList;
+  }
+  return output;
+}

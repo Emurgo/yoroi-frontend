@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { kebabCase } from 'lodash';
-import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import TopBarCategory from './TopBarCategory';
 import styles from './TopBar.scss';
@@ -14,7 +13,6 @@ type Props = {
   categories?: Array<Category>,
   activeTopbarCategory: string,
   onCategoryClicked?: Function,
-  classicTheme: boolean,
   areCategoriesHidden?: boolean
 };
 
@@ -33,16 +31,11 @@ export default class TopBar extends Component<Props> {
       categories,
       activeTopbarCategory,
       onCategoryClicked,
-      classicTheme,
       areCategoriesHidden
     } = this.props;
 
-    const topBarStyles = classNames([
-      classicTheme ? styles.topBarClassic : styles.topBar
-    ]);
-
     return (
-      <header className={topBarStyles}>
+      <header className={styles.topBar}>
         <div className={styles.topBarTitle}>{title}</div>
         {this.props.children}
         {categories && !areCategoriesHidden ? categories.map(category => {
@@ -58,7 +51,6 @@ export default class TopBar extends Component<Props> {
                   onCategoryClicked(category.route);
                 }
               }}
-              classicTheme={classicTheme}
             />
           );
         }) : null}

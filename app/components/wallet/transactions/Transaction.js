@@ -155,9 +155,9 @@ export default class Transaction extends Component<Props, State> {
     }
   }
 
-  getAmountStyle(amt: BigNumber, classicTheme: boolean) {
+  getAmountStyle(amt: BigNumber) {
     return classNames([
-      classicTheme ? styles.amountClassic : styles.amount,
+      styles.amount,
       amt.lt(0)
         ? styles.amountSent
         : styles.amountReceived
@@ -173,35 +173,31 @@ export default class Transaction extends Component<Props, State> {
     const isPendingTransaction = state === transactionStates.PENDING;
 
     const componentStyles = classNames([
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       isFailedTransaction ? styles.failed : null,
       isPendingTransaction ? styles.pending : null,
     ]);
 
     const contentStyles = classNames([
-      classicTheme ? styles.contentClassic : styles.content,
+      styles.content,
       isLastInList ? styles.last : null
     ]);
 
     const detailsStyles = classNames([
-      classicTheme ? styles.detailsClassic : styles.details,
+      styles.details,
       isExpanded ? styles.expanded : styles.closed
     ]);
 
-    const togglerClasses = classicTheme ? styles.togglerClassic : styles.toggler;
-    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
-    const typeClasses = classicTheme ? styles.typeClassic : styles.type;
     const labelOkClasses = classNames([
-      classicTheme ? styles.labelClassic : styles.label,
+      styles.label,
       styles[assuranceLevel]
     ]);
+
     const labelClasses = classNames([
-      classicTheme ? styles.labelClassic : styles.label,
-      classicTheme ? styles[`${state}LabelClassic`] : styles[`${state}Label`]
+      styles.label,
+      styles[`${state}Label`]
     ]);
-    const currencySymbolClasses = classicTheme
-      ? styles.currencySymbolClassic
-      : styles.currencySymbol;
+
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
     const status = intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
@@ -212,13 +208,13 @@ export default class Transaction extends Component<Props, State> {
       <div className={componentStyles}>
 
         {/* ==== Clickable Header -> toggles details ==== */}
-        <div className={togglerClasses} onClick={this.toggleDetails.bind(this)} role="presentation" aria-hidden>
+        <div className={styles.toggler} onClick={this.toggleDetails.bind(this)} role="presentation" aria-hidden>
           <div className={styles.togglerContent}>
             <div className={styles.header}>
-              <div className={titleClasses}>
+              <div className={styles.title}>
                 { this.getTransactionHeaderMsg(intl, currency, data.type) }
               </div>
-              <div className={typeClasses}>
+              <div className={styles.type}>
                 {moment(data.date).format('hh:mm:ss A')}
               </div>
               {state === transactionStates.OK ? (
@@ -229,12 +225,12 @@ export default class Transaction extends Component<Props, State> {
                 </div>
               )}
 
-              <div className={this.getAmountStyle(data.amount, classicTheme)}>
+              <div className={this.getAmountStyle(data.amount)}>
                 {
                   // hide currency (we are showing symbol instead)
                   formattedWalletAmount(data.amount, false)
                 }
-                <SvgInline svg={symbol} className={currencySymbolClasses} />
+                <SvgInline svg={symbol} className={styles.currencySymbol} />
               </div>
 
               {!classicTheme && (
