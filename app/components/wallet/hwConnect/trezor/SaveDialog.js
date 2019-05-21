@@ -162,16 +162,8 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {walletNameBlock}
         {middleBlock}
-
-        {!classicTheme && (
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        )}
-
         <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
-
-        {classicTheme && (
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        )}
+        <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
       </Dialog>);
   }
 
