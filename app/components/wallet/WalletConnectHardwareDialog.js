@@ -43,7 +43,7 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
   };
 
   componentDidMount() {
-    setTimeout(() => { this.walletNameInput.focus(); });
+    // setTimeout(() => { this.walletNameInput.focus(); });
   }
 
   render() {
