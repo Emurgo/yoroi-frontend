@@ -38,6 +38,10 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
     intl: intlShape.isRequired,
   };
 
+  state = {
+    isSubmitting: false,
+  };
+
   componentDidMount() {
     setTimeout(() => { this.walletNameInput.focus(); });
   }
@@ -60,16 +64,12 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
-        <div className={styles.tabs}>
-          <div className={`${styles.tabsLink} ${styles.active}`}>Recommended</div>
-          <div className={styles.tabsLink}>Advanced</div>
-        </div>
-        <div className={styles.tabsContent}>
+        <div className={styles.walletTypeList}>
           <div className={styles.walletTypeWrapper}>
             <div className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.trezor}`} />
               <h3 className={styles.walletTypeTitle}>
-                Trezor Wallet
+                {intl.formatMessage(messages.walletTrezorTitle)}
               </h3>
               <p className={styles.walletTypeDesc}>
                 Lorem ipsum dolor sit amet, 
@@ -80,7 +80,7 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
             <div className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.ledger}`} />
               <h3 className={styles.walletTypeTitle}>
-                Ledger Wallet
+                {intl.formatMessage(messages.walletLedgerTitle)}
               </h3>
               <p className={styles.walletTypeDesc}>
                 Lorem ipsum dolor sit amet, 
@@ -89,7 +89,6 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
               </p>
             </div>
           </div>
-          <div className={styles.tabsItem} hidden>Advanced</div>
         </div>
       </Dialog>
     );

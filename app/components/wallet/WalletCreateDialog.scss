@@ -92,6 +92,10 @@
 }
 
 // WALLETS
+.walletTypeList {
+  padding: 10px 0 25px;
+}
+
 .walletType {
   font-family: var(--font-regular);
   display: flex;
@@ -127,6 +131,14 @@
   
     &.business {
       background-image: url(../../assets/images/wallets/business_wallet.svg);
+    }
+
+    &.trezor {
+      background-image: url(../../assets/images/wallets/trezor_wallet.svg);
+    }
+
+    &.ledger {
+      background-image: url(../../assets/images/wallets/ledger_wallet.svg);
     }
   }
 

@@ -91,7 +91,7 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
           <div className={`${styles.tabsLink} ${styles.active}`}>{intl.formatMessage(messages.walletTabsRecommended)}</div>
           <div className={styles.tabsLink}>{intl.formatMessage(messages.walletTabsAdvanced)}</div>
         </div>
-        <div className={styles.tabsContent}>
+        <div className={styles.walletTypeList}>
           <div className={styles.walletTypeWrapper}>
             <div className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.mnemonic}`} />
