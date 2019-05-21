@@ -2,7 +2,6 @@
 
 // Wrapper to generate/edit wallet information in localstorage
 
-import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import {
   Logger,
@@ -18,14 +17,9 @@ import {
 } from './lib/cardanoCrypto/cryptoWallet';
 import type {
   UtxoSumFunc,
-  UtxoSumResponse
 } from './lib/state-fetch/types';
 import { GetBalanceError } from './errors';
-import type { ConfigType } from '../../../config/config-types';
 import type { WalletAccountNumberPlate } from '../../domain/Wallet';
-
-declare var CONFIG : ConfigType;
-const addressesLimit = CONFIG.app.addressRequestSize;
 
 /** Wrapper function to check mnemonic validity according to bip39 */
 export const isValidMnemonic = (
@@ -83,31 +77,16 @@ export const mnemonicsToExternalAddresses = (
   mnemonicsToAddresses(mnemonics, accountIndex, count, 'External')
 );
 
-/** Call backend-service to get the balances of addresses and then sum them */
 export async function getBalance(
   addresses: Array<string>,
   getUTXOsSumsForAddresses: UtxoSumFunc,
 ): Promise<BigNumber> {
   try {
-    // batch all addresses into chunks for API
-    const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-    const promises =
-      groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(
-        { addresses: groupOfAddresses }
-      ));
-    const partialAmounts: Array<UtxoSumResponse> = await Promise.all(promises);
-
-    // sum all chunks together
-    return partialAmounts.reduce(
-      (acc: BigNumber, partialAmount) => (
-        acc.plus(
-          partialAmount.sum // undefined if no addresses in the batch has any balance in them
-            ? new BigNumber(partialAmount.sum)
-            : new BigNumber(0)
-        )
-      ),
-      new BigNumber(0)
-    );
+    const { sum } = await getUTXOsSumsForAddresses({ addresses });
+    if (sum) {
+      return new BigNumber(sum);
+    }
+    return new BigNumber(0);
   } catch (error) {
     Logger.error('adaWallet::getBalance error: ' + stringifyError(error));
     throw new GetBalanceError();

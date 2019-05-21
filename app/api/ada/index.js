@@ -115,7 +115,6 @@ import type {
   TxBodiesFunc,
   UtxoSumFunc,
 } from './lib/state-fetch/types';
-import { batchUTXOsForAddresses, batchTxsBodiesForInputs } from './lib/state-fetch/helpers';
 import {
   changeAdaWalletSpendingPassword,
   getAddressList,
@@ -754,7 +753,7 @@ export default class AdaApi {
         unsignedTx = await sendAllUnsignedTx(
           receiver,
           allAdaAddresses,
-          batchUTXOsForAddresses(request.getUTXOsForAddresses),
+          request.getUTXOsForAddresses,
         );
       } else {
         unsignedTx = await newAdaUnsignedTx(
@@ -762,7 +761,7 @@ export default class AdaApi {
           amount,
           changeAdaAddr,
           allAdaAddresses,
-          batchUTXOsForAddresses(request.getUTXOsForAddresses),
+          request.getUTXOsForAddresses,
         );
       }
       const masterKey = getWalletMasterKey();
@@ -806,7 +805,7 @@ export default class AdaApi {
         amount,
         changeAdaAddr,
         allAdaAddresses,
-        batchUTXOsForAddresses(request.getUTXOsForAddresses)
+        request.getUTXOsForAddresses,
       );
 
       const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
@@ -816,7 +815,7 @@ export default class AdaApi {
         changeAdaAddr,
         unsignedTxResponse.senderUtxos,
         unsignedTx,
-        batchTxsBodiesForInputs(request.getTxsBodiesForUTXOs)
+        request.getTxsBodiesForUTXOs,
       );
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
 
@@ -871,7 +870,7 @@ export default class AdaApi {
         amount,
         changeAdaAddr,
         allAdaAddresses,
-        batchUTXOsForAddresses(request.getUTXOsForAddresses)
+        request.getUTXOsForAddresses,
       );
 
       const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
@@ -881,7 +880,7 @@ export default class AdaApi {
         changeAdaAddr,
         unsignedTxResponse.senderUtxos,
         unsignedTx,
-        batchTxsBodiesForInputs(request.getTxsBodiesForUTXOs),
+        request.getTxsBodiesForUTXOs,
       );
 
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
@@ -950,8 +949,8 @@ export default class AdaApi {
         amount,
         changeAdaAddr,
         allAdaAddresses,
-        batchUTXOsForAddresses(request.getUTXOsForAddresses),
-        shouldSendAll
+        request.getUTXOsForAddresses,
+        shouldSendAll,
       );
       const fee = feeResponse.fee.to_str();
       Logger.debug(

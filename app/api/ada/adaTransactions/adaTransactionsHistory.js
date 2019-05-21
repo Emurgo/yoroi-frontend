@@ -2,7 +2,6 @@
 
 // Handles interfacing with & updating the LovefieldDB for things related to historic transactions
 
-import _ from 'lodash';
 import {
   Logger,
   stringifyError
@@ -24,13 +23,10 @@ import {
   scanAndSaveAddresses
 } from '../restoreAdaWallet';
 import type { ConfigType } from '../../../../config/config-types';
-import config from '../../../config';
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
 declare var CONFIG : ConfigType;
-const addressesLimit = CONFIG.app.addressRequestSize;
-const transactionsLimit = config.wallets.TRANSACTION_REQUEST_SIZE;
 
 /** Make backend-service calls to update any missing transactions in lovefieldDB
  * Additionally add new addresses to DB to remain BIP-44 complaint
@@ -105,7 +101,6 @@ export async function refreshTxs(
 }
 
 /**
- * Make backend-service calls on set of addresses to update any missing transactions in lovefieldDB
  * @requires existingTransactions should be ordered descendingly by ctmUpdate
  */
 async function _updateAdaTxsHistory(
@@ -120,85 +115,13 @@ async function _updateAdaTxsHistory(
       ? existingTransactions[0].ctMeta.ctmUpdate
       : new Date(0);
 
-    // send batched requests to get transaction history for addresses
-    const mappedTxs = await _getTxsForChunksOfAddresses(addresses, groupOfAddresses => (
-      _updateAdaTxsHistoryForGroupOfAddresses(
-        [],
-        groupOfAddresses,
-        dateFrom,
-        getTransactionsHistoryForAddresses,
-        updateBestBlockNumber
-      )
-    ));
+    const mappedTxs = await getTransactionsHistoryForAddresses({ addresses, dateFrom });
+    const bestBlockNum = Math.max(...mappedTxs.map(tx => Number(tx.best_block_num)));
+    await updateBestBlockNumber({ bestBlockNum });
 
     return mappedTxs;
   } catch (error) {
     Logger.error('adaTransactionsHistory::updateAdaTxsHistory error: ' + stringifyError(error));
     throw new UpdateAdaTxsHistoryError();
   }
-}
-
-/** Split API call on list of addresses into batched requests */
-async function _getTxsForChunksOfAddresses(
-  addresses: Array<string>,
-  apiCall: (Array<string>) => Promise<Array<Transaction>>
-): Promise<Array<Transaction>> {
-  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
-  const groupedTxsPromises = groupsOfAddresses.map(apiCall);
-  const groupedTxs = await Promise.all(groupedTxsPromises);
-  return groupedTxs.reduce((accum, chunkTxs) => accum.concat(chunkTxs), []);
-}
-
-/** Recursively fetch transaction history for a set of addresses from backend API
-  * At the same time, update best block saved in local storage
-*/
-async function _updateAdaTxsHistoryForGroupOfAddresses(
-  previousTxs: Array<Transaction>,
-  groupOfAddresses: Array<string>,
-  dateFrom: Date,
-  getTransactionsHistoryForAddresses: HistoryFunc,
-  updateBestBlockNumber: UpdateBestBlockNumberFunc,
-): Promise<Array<Transaction>> {
-  /* We want to get the transaction history of a list of addresses
-   * Howevever, the backend API has a limited size in its response
-   * Therefore we keep calling it repeatedly until we get the full history.
-  */
-
-  // Move cutoff date forward to make progress on recursive calls
-  const updatedDateFrom = previousTxs.length > 0
-    ? new Date(previousTxs[previousTxs.length - 1].last_update)
-    : dateFrom;
-
-  // Get historic transactions from backend API
-  const history = await getTransactionsHistoryForAddresses({
-    addresses: groupOfAddresses,
-    dateFrom: updatedDateFrom
-  });
-
-  // No more history left to fetch
-  if (history.length === 0) {
-    return previousTxs;
-  }
-
-  /* Update last block to best block in wallet history.
-   * Note: Done for one tx as the best_block_num is the same for all txs in request
-  */
-  const bestBlockNum = Number(history[0].best_block_num);
-  await updateBestBlockNumber({ bestBlockNum });
-
-  // map database format for historic transactions to actual AdaTransaction format
-  const transactions = previousTxs.concat(history);
-
-  // If we reached the API limit, call API again to get more results
-  if (history.length === transactionsLimit) {
-    return await _updateAdaTxsHistoryForGroupOfAddresses(
-      transactions,
-      groupOfAddresses,
-      dateFrom,
-      getTransactionsHistoryForAddresses,
-      updateBestBlockNumber
-    );
-  }
-
-  return transactions;
 }
