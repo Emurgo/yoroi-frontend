@@ -195,59 +195,37 @@ export default class WalletCreateDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
-        <div className={styles.tabs}>
-          <div className={`${styles.tabsLink} ${styles.active}`}>Recommended</div>
-          <div className={styles.tabsLink}>Advanced</div>
-        </div>
-        <div className={styles.tabsContent}>
-          <div className={styles.tabsItem}>
-            <div className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.mnemonic}`} />
-              <h3 className={styles.walletTypeTitle}>
-                Wallet from 15 mnemonic words
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
-            </div>
-            <div className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.master}`} />
-              <h3 className={styles.walletTypeTitle}>
-                Master Key
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
-            </div>
-            <div className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.paper}`} />
-              <h3 className={styles.walletTypeTitle}>
-                Paper Wallet
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
-            </div>
-            <div className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.business}`} />
-              <h3 className={styles.walletTypeTitle}>
-                Business Wallet
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
-            </div>
+        <Input
+          className="walletName"
+          onKeyPress={this.checkForEnterKey.bind(this)}
+          ref={(input) => { this.walletNameInput = input; }}
+          {...walletNameField.bind()}
+          done={isValidWalletName(walletName)}
+          error={walletNameField.error}
+          skin={classicTheme ? InputSkin : InputOwnSkin}
+        />
+
+        <div className={styles.walletPassword}>
+          <div className={walletPasswordFieldsClasses}>
+            <Input
+              className="walletPassword"
+              {...walletPasswordField.bind()}
+              done={isValidWalletPassword(walletPassword)}
+              error={walletPasswordField.error}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
+            />
+            <Input
+              className="repeatedPassword"
+              {...repeatedPasswordField.bind()}
+              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
+              error={repeatedPasswordField.error}
+              skin={classicTheme ? InputSkin : InputOwnSkin}
+            />
+
+            <PasswordInstructions isClassicThemeActive={classicTheme} />
           </div>
-          <div className={styles.tabsItem} hidden>Advanced</div>
         </div>
+
       </Dialog>
     );
   }

@@ -49,3 +49,15 @@
     letter-spacing: 0px;
   }  
 }
+
+:global(.YoroiModern) {
+  .content {
+    padding: 0 30px;
+    margin: 0 -30px;
+    max-height: 60vh;
+  }
+
+  .title {
+    letter-spacing: 0;
+  }
+}

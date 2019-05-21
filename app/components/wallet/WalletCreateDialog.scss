@@ -59,6 +59,7 @@
   display: flex;
   justify-content: center;
   margin-bottom: 35px;
+  margin-top: 10px;
 }
 
 .tabsLink {
@@ -91,13 +92,18 @@
 }
 
 // WALLETS
-
 .walletType {
   font-family: var(--font-regular);
   display: flex;
   align-items: center;
   padding: 0 15px 0 10px;
-  border-bottom: 1px solid #C2C9D3;
+  position: relative;
+  cursor: pointer;
+  z-index: 2;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #C2C9D3;
+  }
   
   .walletTypeImg {
     width: 60px;
@@ -138,5 +144,21 @@
     line-height: 14px;
     margin-left: auto;
     max-width: 158px;
+  }
+
+  &:hover {
+    &::after {
+      content: '';
+      position: absolute;
+      left: -30px;
+      top: -1px;
+      bottom: -1px;
+      right: -30px;
+      border-top: 1px solid #C2C9D3;
+      border-bottom: 1px solid #C2C9D3;
+      box-shadow: 0 15px 15px 0 rgba(0,0,0, .1);
+      background-color: white;
+      z-index: -1;
+    }
   }
 }

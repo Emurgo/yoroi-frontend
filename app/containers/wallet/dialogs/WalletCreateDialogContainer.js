@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletCreateDialog from '../../../components/wallet/WalletCreateDialog';
+import WalletCreateDialogModern from '../../../components/wallet/WalletCreateDialogModern';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 
@@ -15,8 +16,17 @@ export default class WalletCreateDialogContainer extends Component<Props> {
   };
 
   render() {
+    if (this.props.classicTheme) {
+      return (
+        <WalletCreateDialog
+          classicTheme={this.props.classicTheme}
+          onSubmit={this.onSubmit}
+          onCancel={this.props.onClose}
+        />
+      );
+    }
     return (
-      <WalletCreateDialog
+      <WalletCreateDialogModern
         classicTheme={this.props.classicTheme}
         onSubmit={this.onSubmit}
         onCancel={this.props.onClose}
