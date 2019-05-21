@@ -76,7 +76,7 @@ Then(/^I see All selected words are cleared$/, async function () {
 });
 
 Then(/^I should stay in the create wallet dialog$/, async function () {
-  const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.add.dialog.create.description' });
+  const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.create.dialog.title' });
   await this.waitUntilText('.Dialog_titleClassic', createMessage.toUpperCase(), 2000);
 });
 
