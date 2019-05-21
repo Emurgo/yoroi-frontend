@@ -64,8 +64,8 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
-        <div className={styles.walletTypeList}>
-          <ul className={styles.walletTypeWrapper}>
+        <div className={styles.tabsContent}>
+          <ul className={styles.walletTypeList}>
             <li className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.trezor}`} />
               <h3 className={styles.walletTypeTitle}>
