@@ -8,6 +8,7 @@ import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 import SvgInline from 'react-svg-inline';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
+import daedalusIcon from '../../assets/images/top-bar/daedalus-migration-active.inline.svg';
 import HorizontalFlexContainer from '../layout/HorizontalFlexContainer';
 
 const messages = defineMessages({
@@ -71,6 +72,16 @@ export default class WalletAddModern extends Component<Props> {
 
     return (
       <div className={styles.hero}>
+        {/* start page settings bar start */}
+        <div className={styles.settingsBar}>
+          <a href="main_window.html#/daedalus-transfer" className={styles.settingsBarLink}>
+            <SvgInline svg={daedalusIcon} width={45} height={40} />
+          </a>
+          <a href="main_window.html#/settings" className={styles.settingsBarLink}>
+            <SvgInline svg={settingsIcon} width={30} height={30} />
+          </a>
+        </div>
+        {/* start page settings bar end */}
         <div className={styles.heroInner}>
           <div className={styles.heroLeft}>
             <SvgInline svg={logoIcon} className={styles.heroLogo} />
@@ -106,11 +117,6 @@ export default class WalletAddModern extends Component<Props> {
             ) : null}
           </HorizontalFlexContainer>
         </div>
-
-        <a href="main_window.html#/settings" className={styles.settingsLink}>
-          <SvgInline svg={settingsIcon} />
-        </a>
-
         {!classicTheme && <div className={styles.heroBg} />}
       </div>
     );

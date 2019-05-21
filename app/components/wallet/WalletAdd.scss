@@ -273,12 +273,19 @@
     font-size: var(--card-text-size);
   }
 }
-
-.settingsLink {
+.settingsBar {
   position: absolute;
   right: 22px;
   top: 21px;
   z-index: 99;
-  width: 32px;
-  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.settingsBarLink {
+  display: block;
+
+  + .settingsBarLink {
+    margin-left: 50px;
+  }
 }
