@@ -27,7 +27,7 @@
     font-size: 16px;
     box-sizing: border-box;
     line-height: 56px;
-    padding: 0 15px;
+    padding: 10px 15px;
     border-radius: 8px;
 
     margin-top: -17px;
@@ -49,25 +49,31 @@
 
   &.focused .legend {
     transform: translateY(-125%);
-    font-size: .85em;
+    font-size: .80em;
     background: #fff;
+    color: var(--rp-formfield-label-text-color) !important;
   }
 }
 
 .legend {
   margin-left: 9px;
-  font-family: var(--rp-theme-font-regular);
+  font-family: var(--rp-input-font-family, var(--rp-theme-font-regular, "NotoSans-Regular, NotoSansCJKjp-Regular"), sans-serif);
+  color: var(--rp-input-placeholder-color) !important;
   font-size: 12px;
-  font-weight: normal;
+  font-weight: thin;
   padding: 0 6px;
   z-index: 1;
   position: absolute;
-  left: 0;
-  top: 10px;
+  pointer-events:none;
+  left: 0px;
+  top: 8px;
   cursor: text;
   z-index: 10;
-  font-size: 1em;
-  transition: transform 150ms ease-out, font-size 100ms ease-out;
+  font-size: 16px;
+  transition:0.2s ease all; 
+  -moz-transition:0.2s ease all; 
+  -webkit-transition:0.2s ease all;
+  pointer-events:none;
 
   line-height: 1.38;
   margin-bottom: 10px;
