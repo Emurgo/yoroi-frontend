@@ -92,19 +92,25 @@ export default class WalletAddModern extends Component<Props> {
             <button type="button" onClick={onCreate}>
               <div className={styles.itemCard}>
                 <div className={`${styles.itemCardBg} ${styles.create}`} />
-                <h3 className={styles.itemCardTitle}>{intl.formatMessage(messages.createDescription)}</h3>
+                <h3 className={styles.itemCardTitle}>
+                  {intl.formatMessage(messages.createDescription)}
+                </h3>
               </div>
             </button>
             <button type="button" onClick={onRestore}>
               <div className={styles.itemCard}>
                 <div className={`${styles.itemCardBg} ${styles.restore}`} />
-                <h3 className={styles.itemCardTitle}>{intl.formatMessage(messages.restoreDescription)}</h3>
+                <h3 className={styles.itemCardTitle}>
+                  {intl.formatMessage(messages.restoreDescription)}
+                </h3>
               </div>
             </button>
             <button type="button" onClick={onLedger}>
               <div className={styles.itemCard}>
                 <div className={`${styles.itemCardBg} ${styles.connect}`} />
-                <h3 className={styles.itemCardTitle}>{intl.formatMessage(messages.connectToHardwareDescription)}</h3>
+                <h3 className={styles.itemCardTitle}>
+                  {intl.formatMessage(messages.connectToHardwareDescription)}
+                </h3>
               </div>
             </button>
             {activeNotification ? (
