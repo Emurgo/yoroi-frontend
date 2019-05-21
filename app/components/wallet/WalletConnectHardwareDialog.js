@@ -65,8 +65,8 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
         classicTheme={classicTheme}
       >
         <div className={styles.walletTypeList}>
-          <div className={styles.walletTypeWrapper}>
-            <div className={styles.walletType}>
+          <ul className={styles.walletTypeWrapper}>
+            <li className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.trezor}`} />
               <h3 className={styles.walletTypeTitle}>
                 {intl.formatMessage(messages.walletTrezorTitle)}
@@ -76,8 +76,8 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
                 consectetur adipiscing elit,
                 sed do eiusmod tempor
               </p>
-            </div>
-            <div className={styles.walletType}>
+            </li>
+            <li className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.ledger}`} />
               <h3 className={styles.walletTypeTitle}>
                 {intl.formatMessage(messages.walletLedgerTitle)}
@@ -87,8 +87,8 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
                 consectetur adipiscing elit,
                 sed do eiusmod tempor
               </p>
-            </div>
-          </div>
+            </li>
+          </ul>
         </div>
       </Dialog>
     );

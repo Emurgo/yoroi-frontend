@@ -92,8 +92,8 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
           <div className={styles.tabsLink}>{intl.formatMessage(messages.walletTabsAdvanced)}</div>
         </div>
         <div className={styles.walletTypeList}>
-          <div className={styles.walletTypeWrapper}>
-            <div className={styles.walletType}>
+          <ul className={styles.walletTypeWrapper}>
+            <li className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.mnemonic}`} />
               <h3 className={styles.walletTypeTitle}>
                 {intl.formatMessage(messages.walletMnemonicTitle)}
@@ -103,8 +103,8 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
                 consectetur adipiscing elit,
                 sed do eiusmod tempor
               </p>
-            </div>
-            <div className={styles.walletType}>
+            </li>
+            <li className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.master}`} />
               <h3 className={styles.walletTypeTitle}>
                 {intl.formatMessage(messages.walletMasterTitle)}
@@ -114,8 +114,8 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
                 consectetur adipiscing elit,
                 sed do eiusmod tempor
               </p>
-            </div>
-            <div className={styles.walletType}>
+            </li>
+            <li className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.paper}`} />
               <h3 className={styles.walletTypeTitle}>
                 {intl.formatMessage(messages.walletPaperTitle)}
@@ -125,8 +125,8 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
                 consectetur adipiscing elit,
                 sed do eiusmod tempor
               </p>
-            </div>
-            <div className={styles.walletType}>
+            </li>
+            <li className={styles.walletType}>
               <div className={`${styles.walletTypeImg} ${styles.business}`} />
               <h3 className={styles.walletTypeTitle}>
                 {intl.formatMessage(messages.walletBusinessTitle)}
@@ -136,8 +136,8 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
                 consectetur adipiscing elit,
                 sed do eiusmod tempor
               </p>
-            </div>
-          </div>
+            </li>
+          </ul>
           <div className={styles.tabsItem} hidden>Advanced</div>
         </div>
       </Dialog>
