@@ -164,6 +164,7 @@
   "settings.paperWallet.dialog.repeatPasswordLabel": "Répétez le mot de passe du wallet papier",
   "settings.paperWallet.dialog.repeatPasswordPlaceholder": "Taper à nouveau le mot de passe du wallet papier",
   "settings.paperWallet.dialog.userPassword.title": "Choisir le mot de passe du wallet papier",
+  "settings.paperWallet.dialog.verify.message": "This is the final step. Please verify the mnemonic phrase (printed on the PDF certificate) and the password to make sure you have all the valid information to *access your funds later*. On the next screen you will also be able to verify the account checksum and copy your new addresses.",
   "settings.paperWallet.numAddressesSelect.label": "Nombre d'adresses",
   "settings.paperWallet.printIdentificationCheckbox.label": "Imprimer le total de contrôle (checksum) de compte du Wallet Papier",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
