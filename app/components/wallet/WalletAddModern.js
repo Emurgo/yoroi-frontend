@@ -75,10 +75,10 @@ export default class WalletAddModern extends Component<Props> {
         {/* start page settings bar start */}
         <div className={styles.settingsBar}>
           <a href="main_window.html#/daedalus-transfer" className={styles.settingsBarLink}>
-            <SvgInline svg={daedalusIcon} width={45} height={40} />
+            <SvgInline svg={daedalusIcon} width="45" height="40" />
           </a>
           <a href="main_window.html#/settings" className={styles.settingsBarLink}>
-            <SvgInline svg={settingsIcon} width={30} height={30} />
+            <SvgInline svg={settingsIcon} width="30" height="30" />
           </a>
         </div>
         {/* start page settings bar end */}

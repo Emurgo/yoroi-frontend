@@ -211,6 +211,7 @@
   "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.trezor.description": "Create or restore a wallet connected to a Trezor device",
   "wallet.add.page.title": "Gateway to the financial world",
+  "wallet.add.subpage.title": "Yoroi light wallet for Cardano",
   "wallet.amountInput.feesLabel": "+ {amount} of fees",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "Continue",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Make sure nobody looks into your screen unless you want them to have access to your funds.",
