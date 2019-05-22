@@ -190,7 +190,6 @@ export default class UserPasswordDialog extends Component<Props> {
           />
         </div>
         <PasswordInstructions
-          isClassicThemeActive={classicTheme}
           instructionDescriptor={globalMessages.passwordInstructionsPaperWallet}
         />
 
