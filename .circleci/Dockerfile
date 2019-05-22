@@ -23,7 +23,7 @@ RUN /bin/bash -c 'set -e; \
     sudo chmod +x /usr/local/bin/chromedriver; \
     chromedriver --version'
 
-FROM circleci-node-8-browsers AS firefox-updated
+FROM circleci-node-8-browsers AS firefox-dev
 
 ENV FIREFOX_VERSION=67.0b9
 
