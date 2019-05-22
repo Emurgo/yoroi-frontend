@@ -164,6 +164,7 @@
   "settings.paperWallet.dialog.repeatPasswordLabel": "Repetir contraseña de la billetera de papel",
   "settings.paperWallet.dialog.repeatPasswordPlaceholder": "Ingresa nuevamente la contraseña de la billetera de papel",
   "settings.paperWallet.dialog.userPassword.title": "Asigna una contraseña exclusiva para tu billetera de papel",
+  "settings.paperWallet.dialog.verify.message": "This is the final step. Please verify the mnemonic phrase (printed on the PDF certificate) and the password to make sure you have all the valid information to *access your funds later*. On the next screen you will also be able to verify the account checksum and copy your new addresses.",
   "settings.paperWallet.numAddressesSelect.label": "Número de direcciones",
   "settings.paperWallet.printIdentificationCheckbox.label": "Imprimir el checksum de la cuenta de tu Billetera de Papel",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
