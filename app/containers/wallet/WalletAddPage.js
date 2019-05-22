@@ -93,7 +93,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           classicTheme={profile.isClassicTheme}
-          onClose={() => actions.dialogs.open.trigger({ dialog: WalletCreateListDialogContainer })}
+          onClose={() => actions.dialogs.open.trigger({ dialog: WalletCreateListDialog })}
         />
       );
     } else if (uiDialogs.isOpen(WalletCreateListDialog)) {
