@@ -61,8 +61,6 @@ export default class Dialog extends Component<Props> {
     } = this.props;
     const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
-    const themeClass = classicTheme ? 'YoroiClassic' : 'YoroiModern';
-
     return (
       <Modal
         isOpen
@@ -71,7 +69,7 @@ export default class Dialog extends Component<Props> {
         skin={this.setSkin}
       >
 
-        <div className={classnames([styles.component, className, themeClass])}>
+        <div className={classnames([styles.component, className])}>
           {title && (
             <div className={styles.title}>
               <h1>{title}</h1>
