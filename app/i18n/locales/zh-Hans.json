@@ -127,7 +127,7 @@
   "settings.general.languageSelect.labelInfo": "所选的语言翻译由社区志愿者提供",
   "settings.general.languageSelect.info": "For EMURGO, friendliness in Yoroi is an important topic. We believe understanding blockchain concepts is easier in your native language. We try supporting as many languages as possible, but for a broader selection of languages we need to accept the help from community translators. The selected language translation is fully provided by the community.",
   "settings.general.translation.acknowledgment": "感谢下列人员做出的贡献： ",
-  "settings.general.translation.contributors": "_",
+  "settings.general.translation.contributors": "Wang Yonggang",
   "settings.general.title": "一般设置",
   "settings.menu.aboutYroi.link.label": "Yoroi简介",
   "settings.menu.adaRedemption.link.label": "兑换ADA",
