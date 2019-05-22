@@ -253,6 +253,7 @@ const globalMessages = defineMessages({
   },
   translationContributors: {
     id: 'settings.general.translation.contributors',
+    // empty string can't be translated in CrowdIn so we use underscore instead
     defaultMessage: '_',
   },
   passwordInstructionsPaperWallet: {

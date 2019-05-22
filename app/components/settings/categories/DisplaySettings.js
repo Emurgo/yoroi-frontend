@@ -120,7 +120,7 @@ export default class DisplaySettings extends Component<Props> {
                     {intl.formatMessage(messages.themeWarning)}
                   </div>)
               }
-              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} />
+              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} themeKey="classic" />
               <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
             </button>
 
@@ -137,7 +137,7 @@ export default class DisplaySettings extends Component<Props> {
                         {intl.formatMessage(messages.themeWarning)}
                       </div>)
                   }
-                  <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} />
+                  <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
                   <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
                 </button>
               )
