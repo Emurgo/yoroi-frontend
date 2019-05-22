@@ -23,12 +23,16 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
-  onSubmit = (values: { locale: string }) => {
+  onSelectLanguage = (values: { locale: string }) => {
     this.props.actions.profile.updateLocale.trigger(values);
   };
 
+  onSubmit = (values: { locale: string }) => {
+    this.props.actions.profile.redirectToTermsOfUse.trigger(values);
+  };
+
   render() {
-    const { setProfileLocaleRequest, LANGUAGE_OPTIONS } = this.props.stores.profile;
+    const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
     const { topbar, profile } = this.props.stores;
     const topBartitle = (
@@ -48,8 +52,10 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         banner={<TestnetWarningBanner />}
       >
         <LanguageSelectionForm
+          onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
           isSubmitting={isSubmitting}
+          currentLocale={currentLocale}
           languages={LANGUAGE_OPTIONS}
           error={setProfileLocaleRequest.error}
         />

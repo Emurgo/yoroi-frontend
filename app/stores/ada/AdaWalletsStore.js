@@ -62,6 +62,7 @@ export default class AdaWalletsStore extends WalletStore {
     receiver: string,
     amount: string,
     password: string,
+    shouldSendAll: boolean,
   }) => {
     const wallet = this.active;
     if (!wallet) throw new Error('Active wallet required before sending.');
@@ -71,14 +72,15 @@ export default class AdaWalletsStore extends WalletStore {
     await this.sendMoneyRequest.execute({
       ...transactionDetails,
       sender: accountId,
-      getUTXOsForAddresses: this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
+      getUTXOsForAddresses:
+        this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      shouldSendAll: transactionDetails.shouldSendAll
     });
 
     this.refreshWalletsData();
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
-
     // go to transaction screen
     this.goToWalletRoute(wallet.id);
   };

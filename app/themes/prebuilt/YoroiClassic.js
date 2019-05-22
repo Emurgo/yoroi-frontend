@@ -145,6 +145,16 @@ const tabs = {
   '--tab-link-text-size': '16px',
   '--tab-link-line-height': '19px',
   '--tab-link-border-color': '#17D1AA',
+}
+
+// OPTION CARD
+const itemCard = {
+  '--card-bg-color': '#fff',
+  '--card-border-radius': '8px',
+  '--card-text-color': '#DAA49A',
+  '--card-text-size': '16px',
+  '--card-width': '250px',
+  '--card-height': '380px',
 };
 
 const rpYoroiTheme = {
@@ -162,6 +172,7 @@ const rpYoroiTheme = {
   ...rpSwitch,
   ...rpTextArea,
   ...tabs,
+  ...itemCard,
 };
 
 

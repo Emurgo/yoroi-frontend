@@ -157,5 +157,4 @@ export default class WalletAdd extends Component<Props> {
       </div>
     );
   }
-
 }

@@ -4,20 +4,14 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { MessageDescriptor } from 'react-intl';
 import FlagLabel from '../../widgets/FlagLabel';
-
-const messages = defineMessages({
-  languageSelectLabel: {
-    id: 'settings.general.languageSelect.label',
-    defaultMessage: '!!!Language',
-  },
-
-});
+import { tier1Languages } from '../../../config/languagesConfig';
+import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
 
 type Props = {
   languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
@@ -44,7 +38,7 @@ export default class GeneralSettings extends Component<Props> {
   form = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(messages.languageSelectLabel),
+        label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
         value: this.props.currentLocale,
       }
     }
@@ -69,6 +63,7 @@ export default class GeneralSettings extends Component<Props> {
       styles.language,
       isSubmitting ? styles.submitLanguageSpinner : null,
     ]);
+
     return (
       <div className={componentClassNames}>
 
@@ -83,6 +78,17 @@ export default class GeneralSettings extends Component<Props> {
           )}
         />
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+
+        {!tier1Languages.includes(languageId.value) &&
+          <div className={styles.info}>
+            <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
+            <p>
+              {intl.formatMessage(globalMessages.languageSelectInfo)}
+              {listOfTranslators(intl.formatMessage(globalMessages.translationContributors),
+                intl.formatMessage(globalMessages.translationAcknowledgment))}
+            </p>
+          </div>
+        }
 
       </div>
     );

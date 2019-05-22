@@ -98,13 +98,32 @@ describe('Create unsigned TX from UTXO', () => {
     expect(unsignedTxResponse.txBuilder.get_balance_without_fees().value().to_str()).toEqual('0.995000');
   });
 
-  it('Should fail due to insufficient funds', async () => {
-    const utxos: Array<UTXO> = [sampleUtxos[0]];
+  it('Should fail due to insufficient funds (bigger than all inputs)', async () => {
+    const utxos: Array<UTXO> = [sampleUtxos[1]];
     expect(newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1900000', // bigger than input including fees
       null,
       utxos
+    )).rejects.toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('Should fail due to insufficient funds (no inputs)', async () => {
+    expect(newAdaUnsignedTxFromUtxo(
+      'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+      '1', // bigger than input including fees
+      null,
+      [],
+    )).rejects.toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('Should fail due to insufficient funds (not enough to cover fees)', async () => {
+    const utxos: Array<UTXO> = [sampleUtxos[0]];
+    expect(newAdaUnsignedTxFromUtxo(
+      'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+      '1', // bigger than input including fees
+      null,
+      utxos,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -117,7 +136,7 @@ describe('Create unsigned TX from UTXO', () => {
       utxos
     );
     // input selection will only take 2 of the 3 inputs
-    // it takes 2 inputs because they come from the same address
+    // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
     expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1.007000');
     expect(unsignedTxResponse.txBuilder.get_output_total().to_str()).toEqual('0.831140');
@@ -146,25 +165,6 @@ describe('Create unsigned TX from addresses', () => {
     ).to_str()).toEqual('0.173707');
     // burns remaining amount
     expect(unsignedTxResponse.txBuilder.get_balance_without_fees().value().to_str()).toEqual('1.002000');
-  });
-});
-
-describe('Create send-all TX from UTXO', () => {
-  it('Create a transaction involving all input with no change', async () => {
-    const utxos: Array<UTXO> = [sampleUtxos[1], sampleUtxos[2]];
-    const sendAllResponse = await sendAllUnsignedTxFromUtxo(
-      'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
-      utxos,
-    );
-
-    expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    expect(sendAllResponse.txBuilder.get_input_total().to_str()).toEqual('11.000000');
-    expect(sendAllResponse.txBuilder.get_output_total().to_str()).toEqual('10.826205');
-    expect(sendAllResponse.txBuilder.estimate_fee(
-      RustModule.Wallet.LinearFeeAlgorithm.default()
-    ).to_str()).toEqual('0.173795');
-    // make sure we don't accidentally burn a lot of coins
-    expect(sendAllResponse.txBuilder.get_balance_without_fees().value().to_str()).toEqual('0.173795');
   });
 });
 
@@ -203,4 +203,41 @@ describe('Create signed transactions', () => {
       '788678511f7982f05fb949e69ec79d2cc561737716cee96ee06350076e5f857b2628d4b69d2878c1ab4a785d45526f2b8031cd25fc5c4adec86f414ff10cd10c'
     ]);
   });
+});
+
+describe('Create sendAll unsigned TX from UTXO', () => {
+  describe('Create send-all TX from UTXO', () => {
+    it('Create a transaction involving all input with no change', async () => {
+      const utxos: Array<UTXO> = [sampleUtxos[1], sampleUtxos[2]];
+      const sendAllResponse = await sendAllUnsignedTxFromUtxo(
+        'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+        utxos,
+      );
+
+      expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
+      expect(sendAllResponse.txBuilder.get_input_total().to_str()).toEqual('11.000000');
+      expect(sendAllResponse.txBuilder.get_output_total().to_str()).toEqual('10.826205');
+      expect(sendAllResponse.txBuilder.estimate_fee(
+        RustModule.Wallet.LinearFeeAlgorithm.default()
+      ).to_str()).toEqual('0.173795');
+      // make sure we don't accidentally burn a lot of coins
+      expect(sendAllResponse.txBuilder.get_balance_without_fees().value().to_str()).toEqual('0.173795');
+    });
+  });
+
+  it('Should fail due to insufficient funds (no inputs)', async () => {
+    expect(sendAllUnsignedTxFromUtxo(
+      'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+      [],
+    )).rejects.toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('Should fail due to insufficient funds (not enough to cover fees)', async () => {
+    const utxos: Array<UTXO> = [sampleUtxos[0]];
+    expect(sendAllUnsignedTxFromUtxo(
+      'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+      utxos,
+    )).rejects.toThrow(NotEnoughMoneyToSendError);
+  });
+
 });

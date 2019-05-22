@@ -151,3 +151,141 @@
   background-image: url(../../assets/images/footer/how-to-restore-wallet.inline.svg);
 
 }
+
+// new styles
+
+.hero {
+  overflow: overlay;
+  height: 100%;
+  max-width: 1366px;
+  margin: 0 auto;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+}
+
+.heroInner {
+  display: flex;
+  position: relative;
+  z-index: 1;
+}
+
+.heroLogo {
+  margin-bottom: 48px;
+  width: 156px;
+  height: 50px;
+  display: block;
+}
+
+.title {
+  font-family: var(--font-bold);
+  font-size: 54px;
+  line-height: 62px;
+  color: var(--theme-wallet-add-color);
+  margin-bottom: 15px;
+  margin-right: 42px;
+  width: 432px;
+}
+
+.subTitle {
+  font-family: var(--font-regular);
+  font-size: 22px;
+  line-height: 27px;
+  color: #fff;
+}
+
+.itemCard {
+  font-family: var(--font-regular);
+  padding: 32px 28px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  margin: 0 8px;
+  box-shadow: 0 10px 15px 0px rgba(0,0,0, .1);
+  cursor: pointer;
+
+  .itemCardTitle {
+    letter-spacing: -0.03em;
+  }
+
+  .itemCardBg {
+    flex: 1 0 auto;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+  }
+}
+
+.notification {
+  color: var(--theme-transactions-list-group-date-color);
+  font-family: var(--font-regular);
+  font-size: 16px;
+  line-height: 1.38;
+  margin-top: 10px;
+  opacity: 0.6;
+  text-align: center;
+}
+
+:global(.YoroiModern) {
+  .itemCard {
+    width: var(--card-width);
+    flex: 1 0 var(--card-width);
+    height: var(--card-height);
+    border-radius: var(--card-border-radius);
+    background-color: var(--card-bg-color);
+    color: var(--card-text-color);
+    font-size: var(--card-text-size);
+  }
+
+  .itemCardBg {
+    &.create {
+      background-image: url(../../assets/images/cards/create_card.svg);
+    }
+    &.restore {
+      background-image: url(../../assets/images/cards/restore_card.svg);
+    }
+    &.connect {
+      background-image: url(../../assets/images/cards/connect_card.svg);
+    }
+  }
+
+  .heroBg {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-image: url(../../assets/images/add-wallet-bg.svg);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 0 -200px;
+  }
+}
+
+:global(.YoroiClassic) {
+  .itemCard {
+    width: var(--card-width);
+    flex: 1 0 var(--card-width);
+    height: var(--card-height);
+    border-radius: var(--card-border-radius);
+    background-color: var(--card-bg-color);
+    color: var(--card-text-color);
+    font-size: var(--card-text-size);
+  }
+}
+.settingsBar {
+  position: absolute;
+  right: 22px;
+  top: 21px;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+}
+
+.settingsBarLink {
+  display: block;
+
+  + .settingsBarLink {
+    margin-left: 50px;
+  }
+}

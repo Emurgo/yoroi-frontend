@@ -92,7 +92,8 @@ export default class AdaTransactionsStore extends TransactionsStore {
   calculateTransactionFee = (
     walletId: string,
     receiver: string,
-    amount: string
+    amount: string,
+    shouldSendAll: boolean
   ): Promise<TransactionFeeResponse> => {
     // get HdWallet account
     const accountId = this.stores.substores.ada.addresses._getAccountIdByWalletId(walletId);
@@ -105,6 +106,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
       receiver,
       amount,
       getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+      shouldSendAll
     });
   };
 
