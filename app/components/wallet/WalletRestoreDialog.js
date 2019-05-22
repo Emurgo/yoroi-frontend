@@ -10,6 +10,7 @@ import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteS
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
+import InformativeMessage from '../widgets/InformativeMessage';
 import Dialog from '../widgets/Dialog';
 import {
   isValidWalletName,
@@ -123,6 +124,7 @@ type Props = {
   showPaperPassword?: boolean,
   classicTheme: boolean,
   initValues?: WalletRestoreDialogValues,
+  introMessage?: string,
 };
 
 @observer
@@ -135,6 +137,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     isVerificationMode: undefined,
     showPaperPassword: undefined,
     initValues: undefined,
+    introMessage: '',
   };
 
   static contextTypes = {
@@ -283,6 +286,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       classicTheme,
       mnemonicValidator,
       passwordValidator,
+      introMessage
     } = this.props;
     const {
       walletName,
@@ -381,7 +385,12 @@ export default class WalletRestoreDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
 
-        {isVerificationMode ? '' : (
+        {isVerificationMode ? (
+          introMessage && <InformativeMessage
+            subclass="component-bordered"
+            message={introMessage}
+          />
+        ) : (
           <Input
             className={walletNameFieldClasses}
             ref={(input) => { this.walletNameInput = input; }}

@@ -14,7 +14,8 @@ import {
 import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
 
 type Props = InjectedDialogContainerProps & {
-  mode: "regular" | "paper"
+  mode: "regular" | "paper",
+  introMessage?: string,
 };
 
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
@@ -130,6 +131,7 @@ export default class WalletRestoreDialogContainer
         showPaperPassword={isPaper}
         classicTheme={this.props.classicTheme}
         initValues={submitValues || undefined}
+        introMessage={this.props.introMessage || ''}
       />
     );
   }
