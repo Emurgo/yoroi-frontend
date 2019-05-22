@@ -449,7 +449,7 @@ export default class WalletRestoreDialog extends Component<Props> {
                 error={repeatedPasswordField.error}
                 skin={classicTheme ? InputSkin : InputOwnSkin}
               />
-              <PasswordInstructions isClassicThemeActive={classicTheme} />
+              <PasswordInstructions />
             </div>
           </div>
         )}

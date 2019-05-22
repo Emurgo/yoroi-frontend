@@ -235,7 +235,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             skin={classicTheme ? InputSkin : InputOwnSkin}
           />
 
-          <PasswordInstructions isClassicThemeActive={classicTheme} />
+          <PasswordInstructions />
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
