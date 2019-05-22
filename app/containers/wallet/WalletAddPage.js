@@ -92,8 +92,8 @@ export default class WalletAddPage extends Component<Props> {
         <WalletCreateDialogContainer
           actions={actions}
           stores={stores}
+          onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
-          onClose={() => actions.dialogs.open.trigger({ dialog: WalletCreateListDialog })}
         />
       );
     } else if (uiDialogs.isOpen(WalletCreateListDialog)) {
@@ -142,8 +142,8 @@ export default class WalletAddPage extends Component<Props> {
         <WalletTrezorConnectDialogContainer
           actions={actions}
           stores={stores}
+          onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
-          onClose={() => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })}
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
@@ -151,8 +151,8 @@ export default class WalletAddPage extends Component<Props> {
         <WalletLedgerConnectDialogContainer
           actions={actions}
           stores={stores}
+          onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
-          onClose={() => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })}
         />
       );
     } else {
