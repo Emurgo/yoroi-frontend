@@ -127,7 +127,7 @@
   "settings.general.languageSelect.labelInfo": "Выбранный языковой перевод полностью предоставлен сообществом",
   "settings.general.languageSelect.info": "Для EMURGO дружелюбие в Yoroi является важной темой. Мы считаем, что понимание концепций блокчейна дается легче на Вашем родном языке. Мы стараемся поддерживать как можно больше языков, но для более широкого выбора языков нам нужно принимать помощь от переводчиков сообщества. Выбранный языковой перевод полностью предоставлен сообществом.",
   "settings.general.translation.acknowledgment": "Выражаем благодарность следующим участникам за их вклад: ",
-  "settings.general.translation.contributors": "",
+  "settings.general.translation.contributors": "_",
   "settings.general.title": "Общие настройки",
   "settings.menu.aboutYroi.link.label": "Информация о Yoroi",
   "settings.menu.adaRedemption.link.label": "Ada обналичивание",
