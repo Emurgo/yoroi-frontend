@@ -253,7 +253,7 @@ const globalMessages = defineMessages({
   },
   translationContributors: {
     id: 'settings.general.translation.contributors',
-    defaultMessage: '!!!List of contributors',
+    defaultMessage: '_',
   },
   passwordInstructionsPaperWallet: {
     id: 'global.passwordInstructionsPaperWallet',

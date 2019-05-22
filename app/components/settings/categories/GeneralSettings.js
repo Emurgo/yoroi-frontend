@@ -84,6 +84,7 @@ export default class GeneralSettings extends Component<Props> {
             <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
             <p>
               {intl.formatMessage(globalMessages.languageSelectInfo)}
+              {' '}
               {listOfTranslators(intl.formatMessage(globalMessages.translationContributors),
                 intl.formatMessage(globalMessages.translationAcknowledgment))}
             </p>
