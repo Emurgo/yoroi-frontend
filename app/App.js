@@ -63,6 +63,8 @@ class App extends Component<{
     if (document && document.body instanceof HTMLBodyElement) {
       // Flow give error when directly assesing document.body.classList.[remove()]|[add()]
       const bodyClassList = document.body.classList;
+      // we can't simply set the className because there can be other classes present
+      // therefore we only remove & add those related to the theme
       const allThemes: Array<string> = Object.keys(THEMES).map(key => THEMES[key]);
       bodyClassList.remove(...allThemes);
       bodyClassList.add(currentTheme);
