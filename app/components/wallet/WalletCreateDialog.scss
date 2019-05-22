@@ -67,6 +67,11 @@
   position: relative;
   cursor: pointer;
   margin: 0 50px;
+  opacity: .5;
+
+  &.active {
+    opacity: 1;
+  }
 
   &::after {
     content: '';
@@ -126,10 +131,10 @@
     &::after {
       content: '';
       position: absolute;
-      left: -30px;
+      left: -40px;
       top: -1px;
       bottom: -1px;
-      right: -30px;
+      right: -40px;
       border-top: 1px solid #C2C9D3;
       border-bottom: 1px solid #C2C9D3;
       box-shadow: 0 15px 15px 0 rgba(0,0,0, .1);
