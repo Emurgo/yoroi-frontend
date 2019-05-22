@@ -41,7 +41,7 @@ const messages = defineMessages({
 type Props = {
   onCreate: Function,
   onRestore: Function,
-  onLedger: Function,
+  onHardwareConnect: Function,
   isRestoreActive: boolean,
   classicTheme: boolean,
   title: string,
@@ -59,7 +59,7 @@ export default class WalletAddModern extends Component<Props> {
     const {
       onCreate,
       onRestore,
-      onLedger,
+      onHardwareConnect,
       isRestoreActive,
       classicTheme,
       title,
@@ -105,7 +105,7 @@ export default class WalletAddModern extends Component<Props> {
                 </h3>
               </div>
             </button>
-            <button type="button" onClick={onLedger}>
+            <button type="button" onClick={onHardwareConnect}>
               <div className={styles.itemCard}>
                 <div className={`${styles.itemCardBg} ${styles.connect}`} />
                 <h3 className={styles.itemCardTitle}>

@@ -25,6 +25,8 @@ const messages = defineMessages({
 type Props = {
   onSubmit: Function,
   onCancel: Function,
+  onTrezor: Function,
+  onLedger: Function,
   classicTheme: boolean
 };
 
@@ -48,7 +50,7 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
 
   render() {
     const { intl } = this.context;
-    const { onCancel, classicTheme } = this.props;
+    const { onCancel, onTrezor, onLedger, classicTheme } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([
       styles.component,
@@ -66,27 +68,31 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
       >
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
-            <li className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.trezor}`} />
-              <h3 className={styles.walletTypeTitle}>
-                {intl.formatMessage(messages.walletTrezorTitle)}
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
+            <li className={styles.walletTypeListItem}>
+              <button type="button" onClick={onTrezor} className={styles.walletType}>
+                <div className={`${styles.walletTypeImg} ${styles.trezor}`} />
+                <h3 className={styles.walletTypeTitle}>
+                  {intl.formatMessage(messages.walletTrezorTitle)}
+                </h3>
+                <p className={styles.walletTypeDesc}>
+                  Lorem ipsum dolor sit amet, 
+                  consectetur adipiscing elit,
+                  sed do eiusmod tempor
+                </p>
+              </button>
             </li>
-            <li className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.ledger}`} />
-              <h3 className={styles.walletTypeTitle}>
-                {intl.formatMessage(messages.walletLedgerTitle)}
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
+            <li className={styles.walletTypeListItem}>
+              <button type="button" onClick={onLedger} className={styles.walletType}>
+                <div className={`${styles.walletTypeImg} ${styles.ledger}`} />
+                <h3 className={styles.walletTypeTitle}>
+                  {intl.formatMessage(messages.walletLedgerTitle)}
+                </h3>
+                <p className={styles.walletTypeDesc}>
+                  Lorem ipsum dolor sit amet, 
+                  consectetur adipiscing elit,
+                  sed do eiusmod tempor
+                </p>
+              </button>
             </li>
           </ul>
         </div>

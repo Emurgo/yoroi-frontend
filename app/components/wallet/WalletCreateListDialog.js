@@ -46,6 +46,7 @@ const messages = defineMessages({
 type Props = {
   onSubmit: Function,
   onCancel: Function,
+  onCreate: Function,
   classicTheme: boolean
 };
 
@@ -54,7 +55,7 @@ type State = {
 };
 
 @observer
-export default class WalletCreateDialogModern extends Component<Props, State> {
+export default class WalletCreateListDialog extends Component<Props, State> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -71,7 +72,7 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel, classicTheme } = this.props;
+    const { onCancel, onCreate, classicTheme } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([
       styles.component,
@@ -94,13 +95,13 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
             <li className={styles.walletTypeListItem}>
-              <button type="button" className={styles.walletType}>
+              <button type="button" onClick={onCreate} className={styles.walletType}>
                 <div className={`${styles.walletTypeImg} ${styles.mnemonic}`} />
                 <h3 className={styles.walletTypeTitle}>
                   {intl.formatMessage(messages.walletMnemonicTitle)}
                 </h3>
                 <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet, 
+                  Lorem ipsum dolor sit amet,
                   consectetur adipiscing elit,
                   sed do eiusmod tempor
                 </p>
@@ -113,7 +114,7 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
                   {intl.formatMessage(messages.walletMasterTitle)}
                 </h3>
                 <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet, 
+                  Lorem ipsum dolor sit amet,
                   consectetur adipiscing elit,
                   sed do eiusmod tempor
                 </p>
@@ -126,7 +127,7 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
                   {intl.formatMessage(messages.walletPaperTitle)}
                 </h3>
                 <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet, 
+                  Lorem ipsum dolor sit amet,
                   consectetur adipiscing elit,
                   sed do eiusmod tempor
                 </p>
