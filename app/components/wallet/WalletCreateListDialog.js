@@ -134,7 +134,7 @@ export default class WalletCreateListDialog extends Component<Props, State> {
                   {intl.formatMessage(messages.walletBusinessTitle)}
                 </h3>
                 <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet, 
+                  Lorem ipsum dolor sit amet,
                   consectetur adipiscing elit,
                   sed do eiusmod tempor
                 </p>

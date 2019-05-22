@@ -69,7 +69,7 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
                   {intl.formatMessage(messages.walletTrezorTitle)}
                 </h3>
                 <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet, 
+                  Lorem ipsum dolor sit amet,
                   consectetur adipiscing elit,
                   sed do eiusmod tempor
                 </p>
@@ -82,7 +82,7 @@ export default class WalletConnectHardwareDialog extends Component<Props, State>
                   {intl.formatMessage(messages.walletLedgerTitle)}
                 </h3>
                 <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet, 
+                  Lorem ipsum dolor sit amet,
                   consectetur adipiscing elit,
                   sed do eiusmod tempor
                 </p>
