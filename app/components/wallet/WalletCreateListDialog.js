@@ -8,6 +8,8 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
 import styles from './WalletCreateDialog.scss';
 
+import environment from '../../environment';
+
 const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.create.dialog.title',
@@ -101,45 +103,51 @@ export default class WalletCreateListDialog extends Component<Props, State> {
                 </p>
               </button>
             </li>
-            <li className={styles.walletTypeListItem}>
-              <button type="button" className={styles.walletType}>
-                <div className={`${styles.walletTypeImg} ${styles.master}`} />
-                <h3 className={styles.walletTypeTitle}>
-                  {intl.formatMessage(messages.walletMasterTitle)}
-                </h3>
-                <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit,
-                  sed do eiusmod tempor
-                </p>
-              </button>
-            </li>
-            <li className={styles.walletTypeListItem}>
-              <button type="button" className={styles.walletType}>
-                <div className={`${styles.walletTypeImg} ${styles.paper}`} />
-                <h3 className={styles.walletTypeTitle}>
-                  {intl.formatMessage(messages.walletPaperTitle)}
-                </h3>
-                <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit,
-                  sed do eiusmod tempor
-                </p>
-              </button>
-            </li>
-            <li className={styles.walletTypeListItem}>
-              <button type="button" className={styles.walletType}>
-                <div className={`${styles.walletTypeImg} ${styles.business}`} />
-                <h3 className={styles.walletTypeTitle}>
-                  {intl.formatMessage(messages.walletBusinessTitle)}
-                </h3>
-                <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit,
-                  sed do eiusmod tempor
-                </p>
-              </button>
-            </li>
+            {!environment.isMainnet() &&
+              <li className={styles.walletTypeListItem}>
+                <button type="button" className={styles.walletType}>
+                  <div className={`${styles.walletTypeImg} ${styles.master}`} />
+                  <h3 className={styles.walletTypeTitle}>
+                    {intl.formatMessage(messages.walletMasterTitle)}
+                  </h3>
+                  <p className={styles.walletTypeDesc}>
+                    Lorem ipsum dolor sit amet,
+                    consectetur adipiscing elit,
+                    sed do eiusmod tempor
+                  </p>
+                </button>
+              </li>
+            }
+            {!environment.isMainnet() &&
+              <li className={styles.walletTypeListItem}>
+                <button type="button" className={styles.walletType}>
+                  <div className={`${styles.walletTypeImg} ${styles.paper}`} />
+                  <h3 className={styles.walletTypeTitle}>
+                    {intl.formatMessage(messages.walletPaperTitle)}
+                  </h3>
+                  <p className={styles.walletTypeDesc}>
+                    Lorem ipsum dolor sit amet,
+                    consectetur adipiscing elit,
+                    sed do eiusmod tempor
+                  </p>
+                </button>
+              </li>
+            }
+            {!environment.isMainnet() &&
+              <li className={styles.walletTypeListItem}>
+                <button type="button" className={styles.walletType}>
+                  <div className={`${styles.walletTypeImg} ${styles.business}`} />
+                  <h3 className={styles.walletTypeTitle}>
+                    {intl.formatMessage(messages.walletBusinessTitle)}
+                  </h3>
+                  <p className={styles.walletTypeDesc}>
+                    Lorem ipsum dolor sit amet,
+                    consectetur adipiscing elit,
+                    sed do eiusmod tempor
+                  </p>
+                </button>
+              </li>
+            }
           </ul>
         </div>
       </Dialog>
