@@ -25,10 +25,10 @@ RUN /bin/bash -c 'set -e; \
 
 FROM circleci-node-8-browsers AS firefox-updated
 
-ENV FIREFOX_VERSION=67.0
+ENV FIREFOX_VERSION=67.0b9
 
-RUN /bin/bash -c 'set -e; \
-    curl -o /tmp/firefox.bz2 -sL https://download-installer.cdn.mozilla.net/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2; \
+RUN /bin/bash -c 'set -xe; \
+    curl -o /tmp/firefox.bz2 -sL https://download-installer.cdn.mozilla.net/pub/devedition/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2; \
     sudo tar -C /opt -jxf /tmp/firefox.bz2; \
     sudo rm -f /opt/firefox/firefox; \
     sudo rm -f /usr/local/bin/firefox; \

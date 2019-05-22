@@ -72,7 +72,7 @@ jobs:
       # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
       # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr,
       # so we use a custom image derivated from circleci's one:
-      - image: emurgornd/circleci-node-8-browsers:firefox-updated
+      - image: emurgornd/circleci-node-8-browsers:firefox-dev
 
     steps:
       - checkout

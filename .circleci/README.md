@@ -2,6 +2,6 @@
 
 Execute from git repo root:
 ```
-docker build --target firefox-updated -t emurgornd/circleci-node-8-browsers:firefox-updated .
+docker build --target firefox-updated -t emurgornd/circleci-node-8-browsers:firefox-dev .
 docker build --target brave -t emurgornd/circleci-node-8-browsers:brave .
 ```
