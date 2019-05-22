@@ -164,6 +164,7 @@
   "settings.paperWallet.dialog.repeatPasswordLabel": "종이 지갑 비밀번호를 반복 입력하세요.",
   "settings.paperWallet.dialog.repeatPasswordPlaceholder": "종이 지갑 비밀번호를 다시 입력하세요.",
   "settings.paperWallet.dialog.userPassword.title": "커스텀 지갑 비밀번호 설정",
+  "settings.paperWallet.dialog.verify.message": "This is the final step. Please verify the mnemonic phrase (printed on the PDF certificate) and the password to make sure you have all the valid information to *access your funds later*. On the next screen you will also be able to verify the account checksum and copy your new addresses.",
   "settings.paperWallet.numAddressesSelect.label": "주소 개수",
   "settings.paperWallet.printIdentificationCheckbox.label": "종이 지갑 계정 체크섬 출력",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
