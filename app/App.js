@@ -19,6 +19,7 @@ import { themeOverrides } from './themes/overrides';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
+import { THEMES } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import { hot } from 'react-hot-loader';
@@ -58,8 +59,17 @@ class App extends Component<{
     const currentTheme = stores.profile.currentTheme;
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
+    // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
+    if (document && document.body instanceof HTMLBodyElement) {
+      // Flow give error when directly assesing document.body.classList.[remove()]|[add()]
+      const bodyClassList = document.body.classList;
+      const allThemes: Array<string> = Object.keys(THEMES).map(key => THEMES[key]);
+      bodyClassList.remove(...allThemes);
+      bodyClassList.add(currentTheme);
+    }
+
     return (
-      <div className={currentTheme} style={{ height: '100%' }}>
+      <div style={{ height: '100%' }}>
         <ThemeManager variables={themeVars} />
 
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
