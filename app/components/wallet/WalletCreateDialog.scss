@@ -89,6 +89,12 @@
   padding: 10px 0 25px;
 }
 
+.walletTypeListItem {
+  &:not(:last-child) {
+    border-bottom: 1px solid #C2C9D3;
+  }
+}
+
 .walletType {
   font-family: var(--font-regular);
   display: flex;
@@ -97,13 +103,13 @@
   position: relative;
   cursor: pointer;
   z-index: 2;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid #C2C9D3;
-  }
+  text-align: left;
+  margin: 0;
+  width: 100%;
   
   .walletTypeImg {
     width: 60px;
+    flex: 0 0 60px;
     height: 100px;
     margin-right: 25px;
     background-size: contain;
@@ -116,7 +122,6 @@
     line-height: 22px;
     color: #2B2C32;
     max-width: 182px;
-    margin-right: 52px;
   }
 
   .walletTypeDesc {

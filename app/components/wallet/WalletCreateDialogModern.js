@@ -88,54 +88,62 @@ export default class WalletCreateDialogModern extends Component<Props, State> {
         classicTheme={classicTheme}
       >
         <div className={styles.tabs}>
-          <div className={`${styles.tabsLink} ${styles.active}`}>{intl.formatMessage(messages.walletTabsRecommended)}</div>
-          <div className={styles.tabsLink}>{intl.formatMessage(messages.walletTabsAdvanced)}</div>
+          <button type="button" className={`${styles.tabsLink} ${styles.active}`}>{intl.formatMessage(messages.walletTabsRecommended)}</button>
+          <button type="button" className={styles.tabsLink}>{intl.formatMessage(messages.walletTabsAdvanced)}</button>
         </div>
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
-            <li className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.mnemonic}`} />
-              <h3 className={styles.walletTypeTitle}>
-                {intl.formatMessage(messages.walletMnemonicTitle)}
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
+            <li className={styles.walletTypeListItem}>
+              <button type="button" className={styles.walletType}>
+                <div className={`${styles.walletTypeImg} ${styles.mnemonic}`} />
+                <h3 className={styles.walletTypeTitle}>
+                  {intl.formatMessage(messages.walletMnemonicTitle)}
+                </h3>
+                <p className={styles.walletTypeDesc}>
+                  Lorem ipsum dolor sit amet, 
+                  consectetur adipiscing elit,
+                  sed do eiusmod tempor
+                </p>
+              </button>
             </li>
-            <li className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.master}`} />
-              <h3 className={styles.walletTypeTitle}>
-                {intl.formatMessage(messages.walletMasterTitle)}
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
+            <li className={styles.walletTypeListItem}>
+              <button type="button" className={styles.walletType}>
+                <div className={`${styles.walletTypeImg} ${styles.master}`} />
+                <h3 className={styles.walletTypeTitle}>
+                  {intl.formatMessage(messages.walletMasterTitle)}
+                </h3>
+                <p className={styles.walletTypeDesc}>
+                  Lorem ipsum dolor sit amet, 
+                  consectetur adipiscing elit,
+                  sed do eiusmod tempor
+                </p>
+              </button>
             </li>
-            <li className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.paper}`} />
-              <h3 className={styles.walletTypeTitle}>
-                {intl.formatMessage(messages.walletPaperTitle)}
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
+            <li className={styles.walletTypeListItem}>
+              <button type="button" className={styles.walletType}>
+                <div className={`${styles.walletTypeImg} ${styles.paper}`} />
+                <h3 className={styles.walletTypeTitle}>
+                  {intl.formatMessage(messages.walletPaperTitle)}
+                </h3>
+                <p className={styles.walletTypeDesc}>
+                  Lorem ipsum dolor sit amet, 
+                  consectetur adipiscing elit,
+                  sed do eiusmod tempor
+                </p>
+              </button>
             </li>
-            <li className={styles.walletType}>
-              <div className={`${styles.walletTypeImg} ${styles.business}`} />
-              <h3 className={styles.walletTypeTitle}>
-                {intl.formatMessage(messages.walletBusinessTitle)}
-              </h3>
-              <p className={styles.walletTypeDesc}>
-                Lorem ipsum dolor sit amet, 
-                consectetur adipiscing elit,
-                sed do eiusmod tempor
-              </p>
+            <li className={styles.walletTypeListItem}>
+              <button type="button" className={styles.walletType}>
+                <div className={`${styles.walletTypeImg} ${styles.business}`} />
+                <h3 className={styles.walletTypeTitle}>
+                  {intl.formatMessage(messages.walletBusinessTitle)}
+                </h3>
+                <p className={styles.walletTypeDesc}>
+                  Lorem ipsum dolor sit amet, 
+                  consectetur adipiscing elit,
+                  sed do eiusmod tempor
+                </p>
+              </button>
             </li>
           </ul>
         </div>
