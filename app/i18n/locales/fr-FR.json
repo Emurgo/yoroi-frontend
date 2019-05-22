@@ -127,7 +127,7 @@
   "settings.general.languageSelect.labelInfo": "La traduction de la langue que vous avez choisie est entièrement assurée par la communauté",
   "settings.general.languageSelect.info": "Pour EMURGO, la convivialité de Yoroi est importante. Nous pensons qu'il est plus facile de comprendre les concepts autour des blockchains dans votre langue maternelle. Nous essayons de proposer autant de langues que possible, mais pour cela nous devons accepter l'aide de traducteurs issus de la communauté. La traduction de la langue que vous avez choisie est entièrement assurée par la communauté.",
   "settings.general.translation.acknowledgment": "Merci à eux pour leur contribution :",
-  "settings.general.translation.contributors": "",
+  "settings.general.translation.contributors": "_",
   "settings.general.title": "Paramètres",
   "settings.menu.aboutYroi.link.label": "A propos de Yoroi",
   "settings.menu.adaRedemption.link.label": "Récupération d'Ada",
