@@ -44,7 +44,6 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onSubmit: Function,
   onCancel: Function,
   onCreate: Function,
   classicTheme: boolean
@@ -60,10 +59,6 @@ export default class WalletCreateListDialog extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
 
-  state = {
-    isSubmitting: false,
-  };
-
   componentDidMount() {
     // setTimeout(() => { this.walletNameInput.focus(); });
   }
@@ -73,7 +68,6 @@ export default class WalletCreateListDialog extends Component<Props, State> {
   render() {
     const { intl } = this.context;
     const { onCancel, onCreate, classicTheme } = this.props;
-    const { isSubmitting } = this.state;
     const dialogClasses = classnames([
       styles.component,
       'WalletCreateDialog',
@@ -84,7 +78,7 @@ export default class WalletCreateListDialog extends Component<Props, State> {
         className={dialogClasses}
         title={intl.formatMessage(messages.dialogTitle)}
         closeOnOverlayClick={false}
-        onClose={!isSubmitting ? onCancel : null}
+        onClose={onCancel}
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
