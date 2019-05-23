@@ -177,7 +177,7 @@ export default class WalletAddPage extends Component<Props> {
           <WalletAddModern
             isCreateTrezorWalletActive={isCreateTrezorWalletActive}
             isCreateLedgerWalletActive={isCreateLedgerWalletActive}
-            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateListDialog })}
+            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
             onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
             onHardwareConnect={
               () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
@@ -196,7 +196,6 @@ export default class WalletAddPage extends Component<Props> {
     return (
       <MainLayout
         topbar={topBar}
-        footer={<AddWalletFooter />}
         hideTopbar={profile.isModernTheme && isWalletAdd}
         classicTheme={profile.isClassicTheme}
       >
