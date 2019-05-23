@@ -9,7 +9,6 @@ import SvgInline from 'react-svg-inline';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration-active.inline.svg';
-import HorizontalFlexContainer from '../layout/HorizontalFlexContainer';
 
 const messages = defineMessages({
   title: {
@@ -84,11 +83,11 @@ export default class WalletAddModern extends Component<Props> {
         {/* start page settings bar end */}
         <div className={styles.heroInner}>
           <div className={styles.heroLeft}>
-            <SvgInline svg={logoIcon} className={styles.heroLogo} />
+            <SvgInline svg={logoIcon} />
             <h2 className={styles.title}>{title}</h2>
             <h3 className={styles.subTitle}>{intl.formatMessage(messages.subTitle)}</h3>
           </div>
-          <HorizontalFlexContainer>
+          <div className={styles.cardList}>
             <button type="button" onClick={onCreate}>
               <div className={styles.itemCard}>
                 <div className={`${styles.itemCardBg} ${styles.create}`} />
@@ -121,7 +120,7 @@ export default class WalletAddModern extends Component<Props> {
                 />
               </div>
             ) : null}
-          </HorizontalFlexContainer>
+          </div>
         </div>
         {!classicTheme && <div className={styles.heroBg} />}
       </div>

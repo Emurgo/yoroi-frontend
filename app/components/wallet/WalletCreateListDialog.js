@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
@@ -51,21 +50,11 @@ type Props = {
   classicTheme: boolean
 };
 
-type State = {
-  isSubmitting: boolean,
-};
-
 @observer
-export default class WalletCreateListDialog extends Component<Props, State> {
+export default class WalletCreateListDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-  componentDidMount() {
-    // setTimeout(() => { this.walletNameInput.focus(); });
-  }
-
-  walletNameInput: Input;
 
   render() {
     const { intl } = this.context;

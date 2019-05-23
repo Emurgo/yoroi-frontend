@@ -29,19 +29,11 @@ type Props = {
   classicTheme: boolean
 };
 
-type State = {
-  isSubmitting: boolean,
-};
-
 @observer
-export default class WalletConnectHardwareDialog extends Component<Props, State> {
+export default class WalletConnectHardwareDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-  componentDidMount() {
-    // setTimeout(() => { this.walletNameInput.focus(); });
-  }
 
   render() {
     const { intl } = this.context;
