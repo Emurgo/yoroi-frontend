@@ -164,7 +164,7 @@
   "settings.paperWallet.dialog.repeatPasswordLabel": "Повторите пароль бумажного кошелька",
   "settings.paperWallet.dialog.repeatPasswordPlaceholder": "Введите пароль бумажного кошелька еще раз",
   "settings.paperWallet.dialog.userPassword.title": "Установить пароль бумажного кошелька",
-  "settings.paperWallet.dialog.verify.message": "This is the final step. Please verify the mnemonic phrase (printed on the PDF certificate) and the password to make sure you have all the valid information to *access your funds later*. On the next screen you will also be able to verify the account checksum and copy your new addresses.",
+  "settings.paperWallet.dialog.verify.message": "Это последний шаг. Пожалуйста, проверьте мнемоническую фразу (напечатанную в PDF-сертификате) и пароль, чтобы убедиться, что у Вас есть верная информация для * доступа к Вашим средствам в дальнейшем *. На следующем экране Вы также сможете проверить контрольную сумму учетной записи и скопировать Ваши новые адреса.",
   "settings.paperWallet.numAddressesSelect.label": "Количество адресов",
   "settings.paperWallet.printIdentificationCheckbox.label": "Распечатать контрольную сумму бумажного кошелька",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
