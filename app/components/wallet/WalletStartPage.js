@@ -48,7 +48,7 @@ type Props = {
 };
 
 @observer
-export default class WalletAddModern extends Component<Props> {
+export default class WalletStartPage extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -83,7 +83,7 @@ export default class WalletAddModern extends Component<Props> {
         {/* start page settings bar end */}
         <div className={styles.heroInner}>
           <div className={styles.heroLeft}>
-            <SvgInline svg={logoIcon} />
+            <SvgInline svg={logoIcon} className={styles.heroLogo} />
             <h2 className={styles.title}>{title}</h2>
             <h3 className={styles.subTitle}>{intl.formatMessage(messages.subTitle)}</h3>
           </div>
