@@ -43,7 +43,7 @@ Ex: A Derived Account wallet is one with accounts all being derived from a known
 
 **Warning:** `public key` and `private key` may actually mean extended public keys (xpub) and extended private keys (xprv) in the bip44 case
 
-**Define**: we define a numerical value for each derivation level and allow them to be compared with standard comparison operators like `<`. Here is the mapping with use
+**Define**: we define a numerical value for each derivation level and allow them to be compared with standard comparison operators like `<`. Here is the mapping we use
 * Root level = 0
 * Purpose level = 1
 * [...]
@@ -53,7 +53,7 @@ The reason we pick this order is because although bip44 mandates levels `[0,5]`,
 ```
 m / purpose' / coin_type' / account' / chain / address_index / foo / bar / baz
 ```
-Therefore, for our storage layer to be compatible with any cryptocurrency that supports HD wallets, we need to make the root level be level 0. Thsi means that `root < ... < account < chain < address` which may seem counter-intuitive.
+Therefore, for our storage layer to be compatible with any cryptocurrency that supports HD wallets, we need to make the root level be level 0. This means that `root < ... < account < chain < address`, which may seem counter-intuitive.
 
 ### Requirements
 
