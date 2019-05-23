@@ -13,6 +13,8 @@ export const formattedAmountToBigNumber = (amount: string) => {
 };
 
 /**
+ * Returns number in lovelaces
+ *
  * removes leading zeros
  * ensures `DECIMAL_PLACES_IN_ADA` decimal positions
  * shifts decimal places over to turn into a whole number

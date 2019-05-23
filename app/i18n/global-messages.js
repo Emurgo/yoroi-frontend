@@ -48,6 +48,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.confirm',
     defaultMessage: '!!!Confirm',
   },
+  continue: {
+    id: 'global.labels.continue',
+    defaultMessage: '!!!Continue',
+  },
   finish: {
     id: 'global.labels.finish',
     defaultMessage: '!!!Finish',

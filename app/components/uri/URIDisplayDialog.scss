@@ -1,0 +1,52 @@
+.component {
+
+  :global {
+    .Dialog_title {
+      // margin-bottom: 30px;
+    }
+  }
+
+  .uriDisplay {
+    margin-top: 50px;
+    margin-bottom: 10px;
+
+    .uri {
+      letter-spacing: 0px;
+      font-family: var(--font-mono-regular);
+      word-break: break-all;
+      font-size: 17px;
+      line-height: 23px;
+    }
+
+    .copyIcon {
+      cursor: pointer;
+      display: inline-flex;
+      object-fit: contain;
+      margin-left: 6px;
+      & > svg {
+        height: 14.5px;
+        width: 11.5px;
+        path {
+          fill: var(--theme-icon-copy-address-color);
+        }
+      }
+    }
+
+  }
+
+  .qrCode {
+    margin: 30px auto;
+    text-align: center;
+  }
+
+
+}
+
+:global(.YoroiModern) .component {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg);
+
+  .uri {
+    color: var(--theme-transactions-received-address-color);
+  }
+}
