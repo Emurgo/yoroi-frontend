@@ -14,6 +14,8 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './PaperWalletSettings.scss';
 import ReactMarkdown from 'react-markdown';
 import type { Node } from 'react';
+import { CheckboxOwnSkin } from '../../../themes/skins/CheckboxOwnSkin';
+import InformativeMessage from '../../widgets/InformativeMessage';
 
 const messages = defineMessages({
   numAddressesSelectLabel: {
@@ -23,6 +25,10 @@ const messages = defineMessages({
   printIdentificationSelectLabel: {
     id: 'settings.paperWallet.printIdentificationCheckbox.label',
     defaultMessage: '!!!Print Paper Wallet account checksum',
+  },
+  printIdentificationMessage: {
+    id: 'settings.paperWallet.printIdentificationCheckbox.description',
+    defaultMessage: '!!!Enabling this will forfeit plausible deniability',
   },
   createPaperLabel: {
     id: 'settings.paperWallet.createPaper.label',
@@ -106,10 +112,12 @@ export default class PaperWalletSettings extends Component<Props> {
         />
 
         <Checkbox
-          skin={CheckboxSkin}
+          skin={CheckboxOwnSkin}
           {...printPaperWalletIdentification.bind()}
           checked={printPaperWalletIdentification.value}
           onChange={this.setPrintPaperIdentification}
+          label={this.context.intl.formatMessage(messages.printIdentificationSelectLabel)}
+          description={this.context.intl.formatMessage(messages.printIdentificationMessage)}
         />
 
         <Button
