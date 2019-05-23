@@ -280,7 +280,7 @@
   "wallet.create.type.ledger.title": "Ledger Wallet",
   "wallet.create.tabs.recommended.title": "Empfohlen",
   "wallet.create.tabs.advanced.title": "Erweitert",
-  "wallet.connect.hardware.title": "Connect to hardware wallet",
+  "wallet.connect.hardware.title": "Mit der Hardware Wallet verbinden",
   "wallet.create.dialog.walletNameHint": "z.B. Einkaufs-Wallet",
   "wallet.create.dialog.walletPasswordLabel": "Ausgaben-Passwort",
   "wallet.footer.buyLedgerHardwareWallet.text": "Kaufe eine Ledger Hardware Wallet",
