@@ -125,7 +125,7 @@
   "settings.general.aboutYoroi.youtube": "EMURGO YouTube",
   "settings.general.languageSelect.label": "言語",
   "settings.general.languageSelect.labelInfo": "選択された言語はコミュニティーによって翻訳された内容になります",
-  "settings.general.languageSelect.info": "For EMURGO, friendliness in Yoroi is an important topic. We believe understanding blockchain concepts is easier in your native language. We try supporting as many languages as possible, but for a broader selection of languages we need to accept the help from community translators. The selected language translation is fully provided by the community.",
+  "settings.general.languageSelect.info": "ヨロイがユーザーにとって親しみやすいインターフェイスを持つことは重要だと、EMURGOは考えています。ユーザーの母国語であれば、ブロックチェーンの概念を理解するのもより容易になるはずです。EMURGOは出来る限り多くの言語をサポートしようとしていますが、多数の言語のサポートにはコミュニティの翻訳者の協力が必要です。サポートする言語の翻訳は、コミュニティにより提供されています。",
   "settings.general.translation.acknowledgment": "以下の方の貢献を感謝しております。",
   "settings.general.translation.contributors": " ",
   "settings.general.title": "一般設定",
