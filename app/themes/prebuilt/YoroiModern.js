@@ -145,7 +145,7 @@ const tabs = {
   '--tab-link-text-size': '16px',
   '--tab-link-line-height': '19px',
   '--tab-link-border-color': '#17D1AA',
-}
+};
 
 // OPTION CARD
 const itemCard = {
