@@ -31,6 +31,10 @@
     width: 100%;
   }
 
+  .title {
+    min-width: 300px;
+  }
+
   .title,
   .amount {
     color: var(--theme-transactions-list-item-details-color);
@@ -39,6 +43,41 @@
     height: 22px;
     line-height: 1.38;
     text-align: left;
+  }
+
+  .time {
+    font-family: var(--font-light);
+    font-size: 14px;
+    margin-left: 48px;
+    min-width: 120px;
+  }  
+
+  .label {
+    color: var(--theme-transactions-priority-color);
+    display: inline-block;
+    font-family: var(--font-bold);
+    font-size: 8px;
+    line-height: 16px;
+    padding: 0 9px;
+    text-transform: uppercase;
+    height: 17px;
+    margin-left: 130px;
+  }
+
+  .pendingLabel {
+    background-color: var(--theme-transactions-state-pending-background-color);
+    background-size: 50px 50px;
+    overflow: hidden;
+    background-image: linear-gradient(
+      -45deg,
+      var(--theme-transactions-state-pending-stripes-color) 25%,
+      transparent 25%,
+      transparent 50%,
+      var(--theme-transactions-state-pending-stripes-color) 50%,
+      var(--theme-transactions-state-pending-stripes-color) 75%,
+      transparent 75%,
+      transparent
+    );
   }
   
   .amount {
@@ -67,33 +106,6 @@
     }
   }
 
-  .label {
-    color: var(--theme-transactions-priority-color);
-    display: inline-block;
-    font-family: var(--font-bold);
-    font-size: 8px;
-    line-height: 16px;
-    padding: 0 9px;
-    text-transform: uppercase;
-    height: 17px;
-  }
-
-  .pendingLabel {
-    background-color: var(--theme-transactions-state-pending-background-color);
-    background-size: 50px 50px;
-    overflow: hidden;
-    background-image: linear-gradient(
-      -45deg,
-      var(--theme-transactions-state-pending-stripes-color) 25%,
-      transparent 25%,
-      transparent 50%,
-      var(--theme-transactions-state-pending-stripes-color) 50%,
-      var(--theme-transactions-state-pending-stripes-color) 75%,
-      transparent 75%,
-      transparent
-    );
-  }
-
   .failedLabel {
     background-color: var(--theme-transactions-state-failed-background-color);
   }
@@ -113,10 +125,20 @@
   .assuranceLevel {
     text-transform: capitalize;
   }
-
-  .type {
-    font-family: var(--font-light);
-    font-size: 14px;
+ 
+  .expandArrowBox {
+    margin-left: 40px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .expandArrow svg {
+    height: 8px;
+  }
+  
+  .collapseArrow svg {
+    height: 8px;
+    transform: rotate(180deg);
   }
   // ========= DETAILS =========
   .content {
@@ -190,12 +212,12 @@
 
 :global(.YoroiClassic) .component {
   // ========= TOGGLER =========
-  .amount {
-    letter-spacing: 1px;
+  .time {
+    // margin-left: 12px;
+    margin-top: 3px;
   }
 
   .label {
-    margin-left: 12px;
     margin-top: 2px;
   }
 
@@ -212,10 +234,9 @@
       }
     }
   }
-
-  .type {
-    margin-left: 12px;
-    margin-top: 3px;
+  
+  .amount {
+    letter-spacing: 1px;
   }
   // ========= DETAILS =========
   .content {
@@ -248,7 +269,7 @@
   }
 
   &.pending {
-    .title, .type, .amount, .details {
+    .title, .time, .amount, .details {
       color: var(--theme-transactions-state-pending-text-color);
     }
     .currencySymbol {
@@ -270,31 +291,15 @@
   }
   
   .title {
-    width: 146px;
     font-size: 18px;
     font-family: var(--font-medium);
-    text-align: center;
-    margin-right: 25px;
   }
-  
-  .amount {
+
+  .time {
     font-family: var(--font-regular);
-    font-size: 25px;
-  }
- 
-  .expandArrowBox {
-    margin-left: 40px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .expandArrow svg {
-    height: 8px;
-  }
-  
-  .collapseArrow svg {
-    height: 8px;
-    transform: rotate(180deg);
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 25px;
   }
 
   .label {
@@ -303,7 +308,6 @@
     line-height: 25px;
     padding: 0 15px;
     height: 25px;
-    min-width: 90px;
     text-align: center;
     border-radius: 15px;
   }
@@ -333,13 +337,9 @@
     }
   }
 
-  .type {
+  .amount {
     font-family: var(--font-regular);
-    font-size: 16px;
-    margin-right: 40px;
-    width: 100px;
-    letter-spacing: 0;
-    line-height: 25px;
+    font-size: 25px;
   }
   // ========= DETAILS =========
   .content {
@@ -356,7 +356,6 @@
     }
   
     span {
-      font-family: var(--font-regular);
       color: var(--theme-transactions-text-color);
       line-height: 1.57;
     }
