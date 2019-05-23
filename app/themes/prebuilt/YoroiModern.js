@@ -175,6 +175,11 @@ const rpYoroiTheme = {
   ...itemCard,
 };
 
+// Topbar gradient
+const topbarGradient = {
+  start: '#1e46bd',
+  end: '#4760ff',
+};
 
 export default {
   ...rpYoroiTheme,
@@ -286,7 +291,9 @@ export default {
 
   '--theme-topbar-category-background-color-hover': 'transparent',
   '--theme-topbar-category-text-color': '#ffffff',
-  '--theme-topbar-background-color': 'linear-gradient(to right, #1e46bd, #4760ff)',
+  '--theme-topbar-background-color-gradient-start': topbarGradient.start,
+  '--theme-topbar-background-color-gradient-end': topbarGradient.end,
+  '--theme-topbar-background-color': `linear-gradient(to right, ${topbarGradient.start}, ${topbarGradient.end})`,
   '--theme-topbar-wallet-name-color': '#ffffff',
   '--theme-topbar-wallet-info-color': '#ffffff',
   '--theme-topbar-layout-body-background-color': '#ffffff',

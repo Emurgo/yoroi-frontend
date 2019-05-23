@@ -222,7 +222,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
               skin={classicTheme ? InputSkin : InputOwnSkin}
             />
 
-            <PasswordInstructions isClassicThemeActive={classicTheme} />
+            <PasswordInstructions />
           </div>
         </div>
 

@@ -4,7 +4,6 @@ import styles from './PasswordInstructions.scss';
 import { defineMessages, intlShape, MessageDescriptor } from 'react-intl';
 
 type Props = {
-  isClassicThemeActive: boolean,
   instructionDescriptor?: MessageDescriptor
 };
 
@@ -27,18 +26,14 @@ export default class PasswordInstructions extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { isClassicThemeActive, instructionDescriptor } = this.props;
-
-    const passwordInstructionsClasses = isClassicThemeActive
-      ? styles.passwordInstructionsClassic
-      : styles.passwordInstructions;
+    const { instructionDescriptor } = this.props;
 
     const displayInstructionDescriptor = instructionDescriptor
       ? instructionDescriptor
       : messages.passwordInstructions;
 
     return (
-      <p className={passwordInstructionsClasses}>
+      <p className={styles.component}>
         {intl.formatMessage(displayInstructionDescriptor)}
       </p>
     );
