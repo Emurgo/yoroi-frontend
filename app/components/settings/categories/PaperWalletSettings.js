@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { Button } from 'react-polymorph/lib/components/Button';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
@@ -15,7 +14,6 @@ import styles from './PaperWalletSettings.scss';
 import ReactMarkdown from 'react-markdown';
 import type { Node } from 'react';
 import { CheckboxOwnSkin } from '../../../themes/skins/CheckboxOwnSkin';
-import InformativeMessage from '../../widgets/InformativeMessage';
 
 const messages = defineMessages({
   numAddressesSelectLabel: {

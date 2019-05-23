@@ -1,4 +1,3 @@
-// @flow
 import React, { Component } from 'react';
 import type { Children } from 'react';
 import { observer } from 'mobx-react';
@@ -35,13 +34,12 @@ export default class InformativeMessage extends Component<Props> {
           {children}
         </div>
       );
-    } else {
-      return (
-        <div className={messageStyle}>
-          {title && <h1>{title}</h1>}
-          {message && <ReactMarkdown source={message} />}
-        </div>
-      );
     }
+    return (
+      <div className={messageStyle}>
+        {title && <h1>{title}</h1>}
+        {message && <ReactMarkdown source={message} />}
+      </div>
+    );
   }
 }

@@ -46,16 +46,15 @@ export const CheckboxOwnSkin = (props: Props) => (
         props.checked ? props.theme[props.themeId].checked : null
       ])}
     />
-    
     <div
       className={styles.checkboxWrapper}
     >
       {props.label && (
+        // eslint-disable-next-line
         <label className={props.theme[props.themeId].label}>
           {props.label}
         </label>
       )}
-      <br />
       {props.description && (
         <ReactMarkdown source={props.description} />
       )}
