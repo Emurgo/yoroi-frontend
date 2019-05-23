@@ -60,11 +60,7 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
                 <h3 className={styles.walletTypeTitle}>
                   {intl.formatMessage(messages.walletTrezorTitle)}
                 </h3>
-                <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit,
-                  sed do eiusmod tempor
-                </p>
+                <p className={styles.walletTypeDesc} />
               </button>
             </li>
             <li className={styles.walletTypeListItem}>
@@ -73,11 +69,7 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
                 <h3 className={styles.walletTypeTitle}>
                   {intl.formatMessage(messages.walletLedgerTitle)}
                 </h3>
-                <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit,
-                  sed do eiusmod tempor
-                </p>
+                <p className={styles.walletTypeDesc} />
               </button>
             </li>
           </ul>

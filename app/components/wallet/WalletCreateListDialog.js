@@ -85,11 +85,7 @@ export default class WalletCreateListDialog extends Component<Props> {
                 <h3 className={styles.walletTypeTitle}>
                   {intl.formatMessage(messages.walletMnemonicTitle)}
                 </h3>
-                <p className={styles.walletTypeDesc}>
-                  Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit,
-                  sed do eiusmod tempor
-                </p>
+                <p className={styles.walletTypeDesc} />
               </button>
             </li>
             {!environment.isMainnet() &&
@@ -99,11 +95,7 @@ export default class WalletCreateListDialog extends Component<Props> {
                   <h3 className={styles.walletTypeTitle}>
                     {intl.formatMessage(messages.walletMasterTitle)}
                   </h3>
-                  <p className={styles.walletTypeDesc}>
-                    Lorem ipsum dolor sit amet,
-                    consectetur adipiscing elit,
-                    sed do eiusmod tempor
-                  </p>
+                  <p className={styles.walletTypeDesc} />
                 </button>
               </li>
             }
@@ -114,11 +106,7 @@ export default class WalletCreateListDialog extends Component<Props> {
                   <h3 className={styles.walletTypeTitle}>
                     {intl.formatMessage(messages.walletPaperTitle)}
                   </h3>
-                  <p className={styles.walletTypeDesc}>
-                    Lorem ipsum dolor sit amet,
-                    consectetur adipiscing elit,
-                    sed do eiusmod tempor
-                  </p>
+                  <p className={styles.walletTypeDesc} />
                 </button>
               </li>
             }
@@ -129,11 +117,7 @@ export default class WalletCreateListDialog extends Component<Props> {
                   <h3 className={styles.walletTypeTitle}>
                     {intl.formatMessage(messages.walletBusinessTitle)}
                   </h3>
-                  <p className={styles.walletTypeDesc}>
-                    Lorem ipsum dolor sit amet,
-                    consectetur adipiscing elit,
-                    sed do eiusmod tempor
-                  </p>
+                  <p className={styles.walletTypeDesc} />
                 </button>
               </li>
             }

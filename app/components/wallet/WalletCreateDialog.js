@@ -229,5 +229,4 @@ export default class WalletCreateDialog extends Component<Props, State> {
       </Dialog>
     );
   }
-
 }
