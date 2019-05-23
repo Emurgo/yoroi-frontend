@@ -19,7 +19,7 @@ import HWErrorBlock from '../common/HWErrorBlock';
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/ledger/connect-load.gif';
 import connectErrorSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error.inline.svg';
 
-import connectErrorLedgerSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error-ledger-modern.inline.svg';
+import connectErrorLedgerSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error-modern.inline.svg';
 import connectLoadLedgerGIF from '../../../../assets/images/hardware-wallet/ledger/connect-load-modern.inline.gif';
 
 import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
