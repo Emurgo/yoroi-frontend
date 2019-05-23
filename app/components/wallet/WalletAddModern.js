@@ -9,7 +9,6 @@ import SvgInline from 'react-svg-inline';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration-active.inline.svg';
-import HorizontalFlexContainer from '../layout/HorizontalFlexContainer';
 
 const messages = defineMessages({
   title: {
@@ -41,7 +40,7 @@ const messages = defineMessages({
 type Props = {
   onCreate: Function,
   onRestore: Function,
-  onLedger: Function,
+  onHardwareConnect: Function,
   isRestoreActive: boolean,
   classicTheme: boolean,
   title: string,
@@ -59,7 +58,7 @@ export default class WalletAddModern extends Component<Props> {
     const {
       onCreate,
       onRestore,
-      onLedger,
+      onHardwareConnect,
       isRestoreActive,
       classicTheme,
       title,
@@ -75,10 +74,10 @@ export default class WalletAddModern extends Component<Props> {
         {/* start page settings bar start */}
         <div className={styles.settingsBar}>
           <a href="main_window.html#/daedalus-transfer" className={styles.settingsBarLink}>
-            <SvgInline svg={daedalusIcon} width={45} height={40} />
+            <SvgInline svg={daedalusIcon} width="45" height="40" />
           </a>
           <a href="main_window.html#/settings" className={styles.settingsBarLink}>
-            <SvgInline svg={settingsIcon} width={30} height={30} />
+            <SvgInline svg={settingsIcon} width="30" height="30" />
           </a>
         </div>
         {/* start page settings bar end */}
@@ -88,7 +87,7 @@ export default class WalletAddModern extends Component<Props> {
             <h2 className={styles.title}>{title}</h2>
             <h3 className={styles.subTitle}>{intl.formatMessage(messages.subTitle)}</h3>
           </div>
-          <HorizontalFlexContainer>
+          <div className={styles.cardList}>
             <button type="button" onClick={onCreate}>
               <div className={styles.itemCard}>
                 <div className={`${styles.itemCardBg} ${styles.create}`} />
@@ -105,7 +104,7 @@ export default class WalletAddModern extends Component<Props> {
                 </h3>
               </div>
             </button>
-            <button type="button" onClick={onLedger}>
+            <button type="button" onClick={onHardwareConnect}>
               <div className={styles.itemCard}>
                 <div className={`${styles.itemCardBg} ${styles.connect}`} />
                 <h3 className={styles.itemCardTitle}>
@@ -121,7 +120,7 @@ export default class WalletAddModern extends Component<Props> {
                 />
               </div>
             ) : null}
-          </HorizontalFlexContainer>
+          </div>
         </div>
         {!classicTheme && <div className={styles.heroBg} />}
       </div>

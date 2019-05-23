@@ -27,4 +27,8 @@
       background-color: transparent !important;
     }
   }
+
+  :global(.YoroiModern) {
+    letter-spacing: 0;
+  }
 }
