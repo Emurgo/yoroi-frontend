@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import WalletAdd from '../../components/wallet/WalletAdd';
-import WalletStartPage from '../../components/wallet/WalletStartPage';
+import WalletAddModern from '../../components/wallet/WalletAddModern';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletCreateListDialog from '../../components/wallet/WalletCreateListDialog';
@@ -174,7 +174,7 @@ export default class WalletAddPage extends Component<Props> {
         );
       } else {
         content = (
-          <WalletStartPage
+          <WalletAddModern
             isCreateTrezorWalletActive={isCreateTrezorWalletActive}
             isCreateLedgerWalletActive={isCreateLedgerWalletActive}
             onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateListDialog })}
