@@ -164,7 +164,7 @@
   "settings.paperWallet.dialog.repeatPasswordLabel": "ペーパーウォレットのパスワードをもう一度入力",
   "settings.paperWallet.dialog.repeatPasswordPlaceholder": "ペーパーウォレットのパスワードをもう一度入力",
   "settings.paperWallet.dialog.userPassword.title": "カスタムのペーパーウォレットパスワードを設定する",
-  "settings.paperWallet.dialog.verify.message": "This is the final step. Please verify the mnemonic phrase (printed on the PDF certificate) and the password to make sure you have all the valid information to *access your funds later*. On the next screen you will also be able to verify the account checksum and copy your new addresses.",
+  "settings.paperWallet.dialog.verify.message": "最後のステップです。 PDF証明書に書き込まれてあるフレーズとパスワードを確認して、今後資金にアクセスするための必要な情報が揃えていることを確認してください。 次の画面では、アカウントのチェックサムを確認して新しいアドレスをコピーすることもできます。",
   "settings.paperWallet.numAddressesSelect.label": "アドレス数",
   "settings.paperWallet.printIdentificationCheckbox.label": "ペーパーウォレットのアカウントチェックサムを含める",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
