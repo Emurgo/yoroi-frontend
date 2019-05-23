@@ -18,8 +18,8 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import saveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-ledger-modern.inline.svg';
-import saveErrorImage from '../../../../assets/images/hardware-wallet/ledger/save-error-ledger-modern.inline.svg';
+import saveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-modern.inline.svg';
+import saveErrorImage from '../../../../assets/images/hardware-wallet/ledger/save-error-modern.inline.svg';
 
 import saveLoadSVG from '../../../../assets/images/hardware-wallet/ledger/save-load.inline.svg';
 import saveErrorSVG from '../../../../assets/images/hardware-wallet/ledger/save-error.inline.svg';
