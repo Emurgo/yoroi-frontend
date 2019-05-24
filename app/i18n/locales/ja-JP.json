@@ -167,6 +167,7 @@
   "settings.paperWallet.dialog.verify.message": "最後のステップです。 PDF証明書に書き込まれてあるフレーズとパスワードを確認して、今後資金にアクセスするための必要な情報が揃えていることを確認してください。 次の画面では、アカウントのチェックサムを確認して新しいアドレスをコピーすることもできます。",
   "settings.paperWallet.numAddressesSelect.label": "アドレス数",
   "settings.paperWallet.printIdentificationCheckbox.label": "ペーパーウォレットのアカウントチェックサムを含める",
+  "settings.paperWallet.printIdentificationCheckbox.description": "Enabling this will help you verify your wallet at the moment of restoration, but it will also **forfeit plausible deniability**.",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "こちらのブログ記事",
   "settings.support.faq.content": "ご不明な点がある場合は、こちら{faqLink}をご覧ください。",
