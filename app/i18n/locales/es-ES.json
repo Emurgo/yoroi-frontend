@@ -317,7 +317,7 @@
   "wallet.redeem.dialog.adaAmountHint": "Ingrese el monto de su ADA",
   "wallet.redeem.dialog.adaAmountLabel": "Monto de Ada",
   "wallet.redeem.dialog.adaPasscodeHint": "Ingrese su código de acceso Ada",
-  "wallet.redeem.dialog.adaPasscodeLabel": "Ada passcode",
+  "wallet.redeem.dialog.adaPasscodeLabel": "Código de acceso Ada",
   "wallet.redeem.dialog.certificateHint": "Drop the file with your certificate here or click to find on your computer",
   "wallet.redeem.dialog.certificateLabel": "Certificate",
   "wallet.redeem.dialog.decryptionKeyHint": "Enter your decryption key",
