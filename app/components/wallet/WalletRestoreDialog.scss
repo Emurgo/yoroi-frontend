@@ -33,6 +33,10 @@
 
     @include place-form-field-error-below-input;
   }
+
+  .paperPassword {
+    margin-top: 30px;
+  }
 }
 
 .walletPassword {
