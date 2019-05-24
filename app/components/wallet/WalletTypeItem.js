@@ -22,11 +22,11 @@ const messages = defineMessages({
   },
   trezor: {
     id: 'wallet.create.type.trezor.title',
-    defaultMessage: '!!!Trezor Wallet',
+    defaultMessage: '!!!Trezor Hardware Wallet',
   },
   ledger: {
     id: 'wallet.create.type.ledger.title',
-    defaultMessage: '!!!Ledger  Wallet',
+    defaultMessage: '!!!Ledger Hardware Wallet',
   },
   more: {
     id: 'settings.general.learn.more',
