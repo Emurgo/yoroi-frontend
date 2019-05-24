@@ -432,6 +432,7 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "您已成功创建新钱包",
   "wallet.summary.page.walletRestoredNotificationMessage": "您已成功还原您的钱包",
   "wallet.summary.page.yesterdayLabel": "昨天",
+  "wallet.topbar.totalbalance": "Total balance",
   "wallet.transaction.address.from": "源地址",
   "wallet.transaction.address.to": "目标地址",
   "wallet.transaction.addresses.from": "源地址",
