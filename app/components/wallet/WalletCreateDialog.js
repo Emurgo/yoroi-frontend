@@ -198,7 +198,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         <Input
           className="walletName"
           onKeyPress={this.checkForEnterKey.bind(this)}
-          ref={(input) => { this.walletNameInput = input; }}
+          inputRef={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
           done={isValidWalletName(walletName)}
           error={walletNameField.error}
