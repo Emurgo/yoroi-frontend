@@ -27,8 +27,6 @@ export default class WalletsStore extends Store {
 
   WALLET_REFRESH_INTERVAL = environment.walletRefreshInterval;
   ON_VISIBLE_DEBOUNCE_WAIT = 1000;
-  WAIT_FOR_SERVER_ERROR_TIME = 2000;
-  MIN_NOTIFICATION_TIME = 500;
 
   @observable active: ?Wallet = null;
   @observable activeAccount: ?WalletAccount = null;
@@ -38,10 +36,6 @@ export default class WalletsStore extends Store {
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>;
   @observable restoreRequest: Request<RestoreWalletFunc>;
   @observable isImportActive: boolean = false;
-
-  /** While restoration is taking place, we need to block users from starting a restoration
-   *  on a seperate wallet and explain to them why the action is blocked */
-  @observable isRestoreActive: boolean = false;
 
   _newWalletDetails: { name: string, mnemonic: string, password: string } = {
     name: '',
@@ -125,6 +119,8 @@ export default class WalletsStore extends Store {
     walletName: string,
     walletPassword: string,
   }) => {
+    this.restoreRequest.reset();
+
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const restoredWallet = await this.restoreRequest.execute({
       ...params,

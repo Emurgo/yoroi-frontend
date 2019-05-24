@@ -10,6 +10,7 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import WalletAccountIcon from '../topbar/WalletAccountIcon';
 import Dialog from '../widgets/Dialog';
 import type { WalletAccountNumberPlate } from '../../domain/Wallet';
+import LocalizableError from '../../i18n/LocalizableError';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -49,7 +50,9 @@ type Props = {
   onCopyAddress?: Function,
   onNext: Function,
   onCancel: Function,
+  isSubmitting: boolean,
   classicTheme: boolean,
+  error?: ?LocalizableError,
 };
 
 @observer
@@ -57,6 +60,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
   static defaultProps = {
     onBack: undefined,
     onCopyAddress: undefined,
+    error: undefined,
   };
 
   static contextTypes = {
@@ -68,6 +72,8 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     const {
       addresses,
       accountPlate,
+      error,
+      isSubmitting,
       onCancel,
       onNext,
       classicTheme,
@@ -86,7 +92,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         label: intl.formatMessage(globalMessages.confirm),
         onClick: onNext,
         primary: true,
-        className: confirmButtonClasses,
+        className: classnames(['confirmButton', isSubmitting ? styles.isSubmitting : null]),
       },
     ];
 
@@ -140,6 +146,8 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
             />
           ))}
         </div>
+
+        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
       </Dialog>
     );

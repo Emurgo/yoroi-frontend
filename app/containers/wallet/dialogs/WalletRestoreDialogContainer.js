@@ -108,7 +108,10 @@ export default class WalletRestoreDialogContainer
           accountPlate={accountPlate}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
+          isSubmitting={restoreRequest.isExecuting}
+          onSubmit={this.onSubmit}
           classicTheme={this.props.classicTheme}
+          error={restoreRequest.error}
         />
       );
     }
