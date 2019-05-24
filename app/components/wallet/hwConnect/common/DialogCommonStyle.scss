@@ -37,13 +37,17 @@ $opacityCommon: 0.7;
 
 .headerBlockClassic {
   width: 725px;
-  padding-top: 1em;
+  padding-top: 24px;
   span {
     font-family: var(--font-light);
     line-height: 1.38;
     font-size: 14px;
     opacity: $opacityCommon;
   }
+}
+
+.headerBlock {
+  padding-top: 24px;
 }
 
 .middleBlockClassic {

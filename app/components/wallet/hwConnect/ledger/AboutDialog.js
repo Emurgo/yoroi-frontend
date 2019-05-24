@@ -84,7 +84,7 @@ export default class AboutDialog extends Component<Props> {
     } = this.props;
     const headerBlockClasses = classicTheme
       ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
-      : classnames([headerMixin.headerBlock, 'small']);
+      : classnames([headerMixin.headerBlock, styles.headerBlock]);
     const middleBlockClasses = classicTheme
       ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])
       : classnames([styles.middleBlock, styles.middleAboutBlock]);

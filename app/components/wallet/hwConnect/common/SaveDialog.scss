@@ -1,7 +1,8 @@
 @import './DialogCommonStyle.scss';
 
-.headerSaveBlockClassic {
-  padding-top: 0;
+.headerSaveBlockClassic,
+.headerSaveBlock {
+  padding-top: 24px;
 }
 
 .middleSaveLoadBlock {

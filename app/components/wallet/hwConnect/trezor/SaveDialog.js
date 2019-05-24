@@ -99,7 +99,7 @@ export default class SaveDialog extends Component<Props> {
     const walletNameField = this.form.$('walletName');
     const headerBlockClasses = classicTheme
       ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
-      : headerMixin.headerBlock;
+      : classnames([headerMixin.headerBlock, styles.headerSaveBlock]);
     const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
     const middleBlockErrorClasses = classicTheme ? styles.middleSaveErrorBlockClassic : null;
 
