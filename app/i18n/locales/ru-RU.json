@@ -353,7 +353,7 @@
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "Неверная фраза восстановления",
   "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "количество оставшихся слов {number} ",
   "wallet.restore.dialog.paperPasswordLabel": "Пароль бумажного кошелька",
-  "wallet.restore.dialog.passwordDisclaimer": "Ввод неправильного пароля кошелька даст Вам другой кошелек. Это учитывает правдоподобное отрицание.",
+  "wallet.restore.dialog.passwordDisclaimer": "Ввод неправильного пароля кошелька даст Вам другой кошелек. Это делает возможным правдоподобное отрицание.",
   "wallet.restore.dialog.passwordFieldPlaceholder": "Пароль",
   "wallet.restore.dialog.recovery.phrase.input.hint": "Ввести фразу восстановления",
   "wallet.restore.dialog.recovery.phrase.input.label": "Фраза восстановления",
