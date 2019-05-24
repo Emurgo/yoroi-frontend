@@ -1061,7 +1061,8 @@ export default class AdaApi {
       const wallet: ?AdaWallet = await updateAdaWalletMetaParams(walletMeta);
       if (!wallet) throw new Error('not persistent wallet');
       Logger.debug('AdaApi::updateWalletMeta success: ' + stringifyData(wallet));
-      return _createWalletFromServerData(wallet);
+      const account = getCurrentCryptoAccount();
+      return _createWalletFromServerData(wallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::updateWalletMeta error: ' + stringifyError(error));
       throw new GenericApiError();
