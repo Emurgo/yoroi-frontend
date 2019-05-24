@@ -6,50 +6,32 @@
 import _ from 'lodash';
 import {
   toAdaAddress
-} from './lib/cardanoCrypto/cryptoToModel';
+} from './cryptoToModel';
 import {
   saveAddresses,
   getAddresses,
   getAddressesList,
   getAddressesListByType,
-} from './lib/lovefieldDatabase';
-import type {
-  AddressesTableRow,
-  CryptoAccount,
-} from './lib/lovefieldDatabase';
+} from './lovefieldDatabase';
 import {
   getLastReceiveAddressIndex,
   saveLastReceiveAddressIndex
 } from './adaLocalStorage';
 import {
   UnusedAddressesError,
-} from '../common';
+} from '../../../common';
 import {
-  getLatestUsedIndex
-} from './lib/utils';
+  getLatestUsedIndex,
+} from './helpers';
 import type {
   AdaAddresses,
   AdaAddress,
   AddressType
-} from './adaTypes';
-import {
-  Logger,
-  stringifyError
-} from '../../utils/logging';
-import { RustModule } from './lib/cardanoCrypto/rustLoader';
-
-export function isValidAdaAddress(address: string): Promise<boolean> {
-  try {
-    RustModule.Wallet.Address.from_base58(address);
-    return Promise.resolve(true);
-  } catch (validateAddressError) {
-    Logger.error('adaAddress::isValidAdaAddress error: ' +
-      stringifyError(validateAddressError));
-
-    // This error means the address is not valid
-    return Promise.resolve(false);
-  }
-}
+} from '../../adaTypes';
+import type {
+  SaveAsAdaAddressesRequeat,
+  SaveAsAdaAddressesResponse,
+} from './types';
 
 export type AdaAddressMap = {[key: string]:AdaAddress}
 
@@ -91,7 +73,7 @@ export async function popBip44Address(type: AddressType): Promise<AdaAddress> {
 
 async function popBip44InternalAddress(): Promise<AdaAddress> {
   const existingAddresses = await getAdaAddressesByType('Internal');
-  const nextAddressIndex = getLatestUsedIndex(existingAddresses) + 1;
+  const nextAddressIndex = (await getLatestUsedIndex('Internal')) + 1;
   if (nextAddressIndex === existingAddresses.length) {
     throw new UnusedAddressesError();
   }
@@ -113,28 +95,30 @@ async function popBip44ExternalAddress(): Promise<AdaAddress> {
 }
 
 /** Wrapper function to save addresses to LovefieldDB
- * Note: does NOT update lastReceiveAddressIndex
+ * Also updates lastReceiveAddressIndex
  */
-export function saveAdaAddress(
+export async function saveAdaAddress(
   address: AdaAddress,
   addressType: AddressType
-): Promise<Array<AddressesTableRow>> {
-  return saveAddresses([address], addressType);
+): Promise<void> {
+  await saveAddresses([address], addressType);
 }
 
 /** Save list of addresses to lovefieldDB
- * Note: does NOT update lastReceiveAddressIndex
+ * Also updates lastReceiveAddressIndex
  */
 export async function saveAsAdaAddresses(
-  cryptoAccount: CryptoAccount,
-  addresses: Array<string>,
-  offset: number,
-  addressType: AddressType
-): Promise<Array<AddressesTableRow>> {
-  const mappedAddresses: Array<AdaAddress> = addresses.map((hash, index) => (
-    toAdaAddress(cryptoAccount.account, addressType, index + offset, hash)
+  request: SaveAsAdaAddressesRequeat,
+): Promise<SaveAsAdaAddressesResponse> {
+  const mappedAddresses: Array<AdaAddress> = request.addresses.map((hash, index) => (
+    toAdaAddress(
+      request.accountIndex,
+      request.addressType,
+      index + request.offset,
+      hash
+    )
   ));
-  return saveAddresses(mappedAddresses, addressType);
+  await saveAddresses(mappedAddresses, request.addressType);
 }
 
 /** Follow heuristic to pick which address to send Daedalus/Redemption transfer to */

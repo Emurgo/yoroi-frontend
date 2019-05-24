@@ -1,16 +1,21 @@
+// @flow
+
 // Client-side database to avoid having to query Yoroi servers when state doesn't change
 
+// $FlowFixMe Flow doesn't like lovefield
 import lf, { Type } from 'lovefield';
 import type {
+  AdaAddress,
+  AdaAddresses,
   AdaTransaction,
   AdaTransactionCondition,
   AddressType
-} from '../adaTypes';
+} from '../../adaTypes';
 
 // Note: Schemes are inspired (but !=) to schemes used by importer & postgresDB
 
 // Goal: Pair AdaAddress with its AddressType
-declare type AddressesTableRow = {
+export type AddressesTableRow = {
   id: string, // AdaAddress.cadId (hash of address)
   type: AddressType,
   value: AdaAddress
@@ -25,7 +30,7 @@ const addressesTableSchema = {
 };
 
 // Goal: Flatten transaction data to easily query as DB table
-declare type TxsTableRow = {
+export type TxsTableRow = {
   id: string, // AdaTransaction.ctId (hash of transaction)
   date: Date, // AdaTransaction.ctMeta.ctmDate
   value: AdaTransaction,
@@ -44,7 +49,7 @@ const txsTableSchema = {
 };
 
 // Goal: Easily query all transactions an address is used in
-declare type TxAddressesTableRow = {
+export  type TxAddressesTableRow = {
   id: string, // concatenation of address hash + tx hash
   address: string, // AdaAddress.cadId
   tx: string // AdaTransaction.ctId
@@ -110,9 +115,12 @@ export const reset = (): Promise<void> => {
   const txAddressesTable = _getTxAddressesTable();
 
   // have to drop txAddresses first because of foreign keys
-  db.delete().from(txAddressesTable).exec();
-  db.delete().from(addressesTable).exec();
-  db.delete().from(txsTable).exec();
+  return db.delete().from(txAddressesTable).exec().then(() => (
+    Promise.all([
+      db.delete().from(addressesTable).exec(),
+      db.delete().from(txsTable).exec(),
+    ])
+  ));
 };
 
 export const deleteAddress = (
@@ -144,7 +152,7 @@ export const getAddressesList = (): Promise<Array<AdaAddress>> => {
 
 /* Get all AdaAddresses of a certain type with an updated isUsed status */
 export const getAddressesListByType = (
-  addressType
+  addressType: AddressType,
 ): Promise<AdaAddresses> => {
   const addressesTable = _getAddressesTable();
   const txAddressesTable = _getTxAddressesTable();
@@ -173,8 +181,8 @@ export const getAddressesListByType = (
 };
 
 export const saveAddresses = async (
-  addresses,
-  type
+  addresses: Array<AdaAddress>,
+  type: AddressType,
 ): Promise<Array<AddressesTableRow>> => {
   const rows = addresses.map(address => _addressToRow(address, type));
   return _insertOrReplaceQuery(rows, _getAddressesTable())
@@ -211,7 +219,7 @@ export const getTxsOrderedByDateDesc = function () : Promise<Array<AdaTransactio
 };
 
 /** Get date of most recent update or return the start of epoch time if no txs exist. */
-export const getTxsLastUpdatedDate = async (): Date => {
+export const getTxsLastUpdatedDate = async (): Promise<Date> => {
   const table = _getTxsTable();
   const result = await db.select(table[txsTableSchema.properties.lastUpdated])
     .from(table)

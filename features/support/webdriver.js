@@ -243,6 +243,12 @@ function CustomWorld(cmdInput: WorldInput) {
     }, transactions);
   };
 
+  this.saveLastReceiveAddressIndex = index => {
+    this.driver.executeScript(i => {
+      window.yoroi.api.ada.saveLastReceiveAddressIndex({ index: i });
+    }, index);
+  };
+
   this.chooseFile = async (filePath, fileType) => {
     const certificateFileContent = fs.readFileSync(filePath);
     await this.driver.executeScript((fileContent, type) => {

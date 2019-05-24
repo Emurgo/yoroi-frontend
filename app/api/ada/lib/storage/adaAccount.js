@@ -2,10 +2,10 @@
 
 // Wrapper for creating "accounts" as defined by bip44
 
-import { getCryptoWalletFromMasterKey } from './lib/cardanoCrypto/cryptoWallet';
+import { getCryptoWalletFromMasterKey } from '../cardanoCrypto/cryptoWallet';
 
-import { RustModule } from './lib/cardanoCrypto/rustLoader';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import { RustModule } from '../cardanoCrypto/rustLoader';
+import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 import type { CryptoAccount } from './adaLocalStorage';
 
 export function createCryptoAccount(

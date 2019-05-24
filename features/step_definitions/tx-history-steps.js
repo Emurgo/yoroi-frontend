@@ -58,6 +58,10 @@ Given(/^There are transactions already stored$/, async function () {
   await this.saveTxsToDB(formattedTransactions);
 });
 
+Given(/^There are ([0-9]+) generated addresses$/, async function (lastReceiveIndex) {
+  await this.saveLastReceiveAddressIndex(Number(lastReceiveIndex) - 1);
+});
+
 When(/^I see the transactions summary$/, async function () {
   await this.waitForElement('.WalletSummary_numberOfTransactions');
 });

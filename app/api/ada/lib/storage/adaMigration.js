@@ -5,14 +5,14 @@
 import {
   reset,
   getAddressesList
-} from './lib/lovefieldDatabase';
+} from './lovefieldDatabase';
 import {
   saveLastReceiveAddressIndex,
 } from './adaLocalStorage';
-import LocalStorageApi from '../localStorage/index';
+import LocalStorageApi from '../../../localStorage/index';
 import {
   Logger,
-} from '../../utils/logging';
+} from '../../../../utils/logging';
 
 const semver = require('semver');
 
