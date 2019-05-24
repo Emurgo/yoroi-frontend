@@ -167,6 +167,7 @@
   "settings.paperWallet.dialog.verify.message": "마지막 단계입니다. 연상 구절과 (PDF 인증서에 출력되어 있음) 추후 자산에 대한 접근 권한을 위한 암호를 확인해주세요. 다음 화면에서 여러분은 또한 계정에 대한 체크섬을 확인하고 새로 만들어진 주소들을 복사하실 수 있습니다.",
   "settings.paperWallet.numAddressesSelect.label": "주소 개수",
   "settings.paperWallet.printIdentificationCheckbox.label": "종이 지갑 계정 체크섬 출력",
+  "settings.paperWallet.printIdentificationCheckbox.description": "Enabling this will help you verify your wallet at the moment of restoration, but it will also **forfeit plausible deniability**.",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "블로그 포스팅",
   "settings.support.faq.content": "문제가 있으면 {faqLink}을(를) 참조하여 알려진 문제에서 도움을 받으십시오.",
