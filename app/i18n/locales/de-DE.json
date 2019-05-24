@@ -167,6 +167,7 @@
   "settings.paperWallet.dialog.verify.message": "Dies ist der letzte Schritt. Bitte überprüfe die geheimen einprägsamen Wörter (mnemonische Phrase, auf dem PDF-Zertifikat abgedruckt) und das Passwort, um sicherzustellen, dass Du alle gültigen Informationen hast, um später *auf Dein Guthaben zuzugreifen*. Auf dem nächsten Bildschirm kannst Du auch die Konto-Prüfsumme überprüfen und Deine neuen Adressen kopieren.",
   "settings.paperWallet.numAddressesSelect.label": "Anzahl der Adressen",
   "settings.paperWallet.printIdentificationCheckbox.label": "Drucke die Paper Wallet Konto-Prüfsumme",
+  "settings.paperWallet.printIdentificationCheckbox.description": "Enabling this will help you verify your wallet at the moment of restoration, but it will also **forfeit plausible deniability**.",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "Blog-Beitrag",
   "settings.support.faq.content": "Wenn es Probleme gibt, lies bitte die {faqLink} für eine Hilfestellung zu bekannten Problemen.",
