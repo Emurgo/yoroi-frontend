@@ -393,7 +393,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         ) : (
           <Input
             className={walletNameFieldClasses}
-            ref={(input) => { this.walletNameInput = input; }}
+            inputRef={(input) => { this.walletNameInput = input; }}
             {...walletNameField.bind()}
             done={isValidWalletName(walletName)}
             error={walletNameField.error}
