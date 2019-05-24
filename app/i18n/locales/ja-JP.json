@@ -432,6 +432,7 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "新しいウォレットが正しく作成されました",
   "wallet.summary.page.walletRestoredNotificationMessage": "ウォレットの復元が成功しました",
   "wallet.summary.page.yesterdayLabel": "昨日",
+  "wallet.topbar.totalbalance": "Total balance",
   "wallet.transaction.address.from": "送信アドレス",
   "wallet.transaction.address.to": "受信アドレス",
   "wallet.transaction.addresses.from": "送信アドレス",
