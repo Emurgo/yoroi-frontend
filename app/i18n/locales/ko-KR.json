@@ -432,6 +432,7 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "새로운 지갑이 생성되었습니다.",
   "wallet.summary.page.walletRestoredNotificationMessage": "지갑이 성공적으로 복원되었습니다.",
   "wallet.summary.page.yesterdayLabel": "어제",
+  "wallet.topbar.totalbalance": "Total balance",
   "wallet.transaction.address.from": "보낸 주소",
   "wallet.transaction.address.to": "받는 주소",
   "wallet.transaction.addresses.from": "보낸 주소",
