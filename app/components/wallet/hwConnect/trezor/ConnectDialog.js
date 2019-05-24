@@ -71,7 +71,7 @@ export default class ConnectDialog extends Component<Props> {
     } = this.props;
     const headerBlockClasses = classicTheme
       ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
-      : headerMixin.headerBlock;
+      : classnames([headerMixin.headerBlock, styles.headerBlock]);
     const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
     const middleConnectErrorBlockClasses = classicTheme
       ? styles.middleConnectErrorBlockClassic
