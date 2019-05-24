@@ -167,6 +167,7 @@
   "settings.paperWallet.dialog.verify.message": "Это последний шаг. Пожалуйста, проверьте мнемоническую фразу (напечатанную в PDF-сертификате) и пароль, чтобы убедиться, что у Вас есть верная информация для * доступа к Вашим средствам в дальнейшем *. На следующем экране Вы также сможете проверить контрольную сумму учетной записи и скопировать Ваши новые адреса.",
   "settings.paperWallet.numAddressesSelect.label": "Количество адресов",
   "settings.paperWallet.printIdentificationCheckbox.label": "Распечатать контрольную сумму бумажного кошелька",
+  "settings.paperWallet.printIdentificationCheckbox.description": "Enabling this will help you verify your wallet at the moment of restoration, but it will also **forfeit plausible deniability**.",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "блогом",
   "settings.support.faq.content": "Если Вы столкнулись с трудностями, пожалуйста, посетите раздел {faqLink} для поиска ответа на Ваш вопрос.",
