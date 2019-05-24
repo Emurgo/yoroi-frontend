@@ -69,7 +69,7 @@ export default class WalletAddPage extends Component<Props> {
     const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
-    const { isRestoreActive } = wallets;
+    const { restoreRequest } = wallets;
     const isCreateTrezorWalletActive = this._getTrezorConnectStore().isCreateHWActive;
     const isCreateLedgerWalletActive = this._getLedgerConnectStore().isCreateHWActive;
     const openTrezorConnectDialog = () => {
@@ -142,7 +142,7 @@ export default class WalletAddPage extends Component<Props> {
             onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
             onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
             onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-            isRestoreActive={isRestoreActive}
+            isRestoreActive={restoreRequest.isExecuting}
             classicTheme={profile.isClassicTheme}
             title={this.context.intl.formatMessage(messages.title)}
           />
@@ -157,7 +157,7 @@ export default class WalletAddPage extends Component<Props> {
             onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
             onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
             onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-            isRestoreActive={isRestoreActive}
+            isRestoreActive={restoreRequest.isExecuting}
             classicTheme={profile.isClassicTheme}
             title={this.context.intl.formatMessage(messages.title)}
             subTitle={this.context.intl.formatMessage(messages.subTitle)}
