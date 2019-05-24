@@ -432,6 +432,7 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "Ha creado con éxito una nueva Billetera",
   "wallet.summary.page.walletRestoredNotificationMessage": "Ha restaurado con éxito su Billetera",
   "wallet.summary.page.yesterdayLabel": "Ayer",
+  "wallet.topbar.totalbalance": "Total balance",
   "wallet.transaction.address.from": "Desde la dirección",
   "wallet.transaction.address.to": "A la dirección",
   "wallet.transaction.addresses.from": "Desde las direcciones",
