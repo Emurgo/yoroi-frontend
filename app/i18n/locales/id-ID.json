@@ -432,6 +432,7 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "Anda berhasil membuat Wallet baru",
   "wallet.summary.page.walletRestoredNotificationMessage": "Anda berhasil mengembalikan Wallet Anda",
   "wallet.summary.page.yesterdayLabel": "Kemarin",
+  "wallet.topbar.totalbalance": "Total balance",
   "wallet.transaction.address.from": "Dari address",
   "wallet.transaction.address.to": "Ke address",
   "wallet.transaction.addresses.from": "From addresses",
