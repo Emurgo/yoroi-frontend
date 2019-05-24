@@ -214,7 +214,7 @@ export default class Transaction extends Component<Props, State> {
               <div className={styles.title}>
                 { this.getTransactionHeaderMsg(intl, currency, data.type) }
               </div>
-              <div className={styles.type}>
+              <div className={styles.time}>
                 {moment(data.date).format('hh:mm:ss A')}
               </div>
               {state === transactionStates.OK ? (
@@ -233,11 +233,9 @@ export default class Transaction extends Component<Props, State> {
                 <SvgInline svg={symbol} className={styles.currencySymbol} />
               </div>
 
-              {!classicTheme && (
-                <div className={styles.expandArrowBox}>
-                  <SvgInline className={arrowClasses} svg={expandArrow} />
-                </div>
-              )}
+              <div className={styles.expandArrowBox}>
+                <SvgInline className={arrowClasses} svg={expandArrow} />
+              </div>
             </div>
           </div>
         </div>
