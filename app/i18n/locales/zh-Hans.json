@@ -167,6 +167,7 @@
   "settings.paperWallet.dialog.verify.message": "这是最后一步。请确认助记词（已打印在PDF文件中）和密码来确保今后资金的使用。下一个屏幕中，你能够校验账号的校验码以及复制新的地址。",
   "settings.paperWallet.numAddressesSelect.label": "地址数量",
   "settings.paperWallet.printIdentificationCheckbox.label": "打印纸钱包账户的校验码",
+  "settings.paperWallet.printIdentificationCheckbox.description": "Enabling this will help you verify your wallet at the moment of restoration, but it will also **forfeit plausible deniability**.",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "文章",
   "settings.support.faq.content": "如果遇到问题，请访问 {faqLink} 查看已知问题指南。",
