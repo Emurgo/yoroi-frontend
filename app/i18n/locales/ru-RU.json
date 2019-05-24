@@ -432,6 +432,7 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "Вы успешно создали новый кошелек",
   "wallet.summary.page.walletRestoredNotificationMessage": "Вы успешно восстановили свой кошелек",
   "wallet.summary.page.yesterdayLabel": "Вчера",
+  "wallet.topbar.totalbalance": "Total balance",
   "wallet.transaction.address.from": "С адреса",
   "wallet.transaction.address.to": "На адрес",
   "wallet.transaction.addresses.from": "С адресов",
