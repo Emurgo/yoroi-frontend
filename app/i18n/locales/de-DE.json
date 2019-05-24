@@ -432,6 +432,7 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "Die neue Wallet wurde erfolgreich erstellt",
   "wallet.summary.page.walletRestoredNotificationMessage": "Die Wallet wurde erfolgreich wiederhergestellt",
   "wallet.summary.page.yesterdayLabel": "Gestern",
+  "wallet.topbar.totalbalance": "Total balance",
   "wallet.transaction.address.from": "Absender-Adresse",
   "wallet.transaction.address.to": "Empfänger-Adresse",
   "wallet.transaction.addresses.from": "Absender-Adressen",
