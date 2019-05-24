@@ -97,22 +97,26 @@
 }
 
 .walletTypeListItem {
-  &:not(:last-child) {
-    border-bottom: 1px solid #C2C9D3;
+  box-shadow: 0 5px 10px 0 rgba(0,0,0, .1);
+  border-radius: 6px;
+
+  + .walletTypeListItem {
+    margin-top: 24px;
   }
 }
 
 .walletType {
   font-family: var(--font-regular);
-  display: flex;
-  align-items: center;
-  padding: 0 15px 0 10px;
-  position: relative;
-  cursor: pointer;
-  z-index: 2;
-  text-align: left;
-  margin: 0;
-  width: 100%;
+  letter-spacing: 0;
+
+  .walletTypeTop {
+    font-family: var(--font-regular);
+    display: flex;
+    align-items: center;
+    padding: 11px 40px;
+    cursor: pointer;
+    width: 100%;
+  }
   
   .walletTypeImg {
     width: 60px;
@@ -129,31 +133,61 @@
     line-height: 22px;
     color: #2B2C32;
     max-width: 182px;
+    text-align: left;
+    font-weight: var(--font-semibold);
   }
 
   .walletTypeDesc {
-    color: #ADAEB6;
-    font-size: 12px;
-    line-height: 14px;
-    margin-left: auto;
-    max-width: 158px;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 0 40px 20px;
   }
+}
+
+.walletTypeMore {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 300ms linear;
+  will-change: height;
+
+  &.showMore {
+    max-height: 300px;
+    transition: max-height 300ms linear;
+  }
+}
+
+.moreBtn {
+  color: #ADAEB6;
+  background-color: #F5F7F9;
+  display: block;
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  cursor: pointer;
+  border-radius: 0 0 5px 5px;
 
   &:hover {
-    &::after {
-      content: '';
-      position: absolute;
-      left: -40px;
-      top: -1px;
-      bottom: -1px;
-      right: -40px;
-      border-top: 1px solid #C2C9D3;
-      border-bottom: 1px solid #C2C9D3;
-      box-shadow: 0 15px 15px 0 rgba(0,0,0, .1);
-      background-color: white;
-      z-index: -1;
+    box-shadow: 0 3px 5px 0 rgba(0,0,0, .1);
+  }
+
+  svg {
+    transition: 300ms;
+  }
+
+  &.arrowUp {
+    svg {
+      transform: rotate(180deg);
     }
   }
+}
+
+.moreBtnIcon {
+  margin-left: 5px;
+  line-height: normal;
+  display: inline-block;
+  vertical-align: sub;
 }
 
 

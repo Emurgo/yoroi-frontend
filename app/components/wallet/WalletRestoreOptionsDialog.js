@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
@@ -10,35 +9,37 @@ import WalletTypeItem from './WalletTypeItem';
 
 const messages = defineMessages({
   dialogTitle: {
-    id: 'wallet.connect.hardware.title',
-    defaultMessage: '!!!Connect to hardware wallet',
+    id: 'wallet.restore.dialog.title.label',
+    defaultMessage: '!!!Restore wallet',
+  },
+  walletMnemonicTitle: {
+    id: 'wallet.create.type.mnemonic.title',
+    defaultMessage: '!!!Wallet from 15 mnemonic words',
+  },
+  walletPaperTitle: {
+    id: 'wallet.create.type.paper.title',
+    defaultMessage: '!!!Paper Wallet',
   },
 });
 
 type Props = {
   onCancel: Function,
-  onTrezor: Function,
-  onLedger: Function,
+  onCreate: Function,
   classicTheme: boolean
 };
 
 @observer
-export default class WalletConnectHardwareDialog extends Component<Props> {
+export default class WalletRestoreOptionsDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onTrezor, onLedger, classicTheme } = this.props;
-    const dialogClasses = classnames([
-      styles.component,
-      'WalletConnectDialog',
-    ]);
+    const { onCancel, onCreate, classicTheme } = this.props;
 
     return (
       <Dialog
-        className={dialogClasses}
         title={intl.formatMessage(messages.dialogTitle)}
         closeOnOverlayClick={false}
         onClose={onCancel}
@@ -47,8 +48,8 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
       >
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
-            <WalletTypeItem action={onTrezor} type="trezor" />
-            <WalletTypeItem action={onLedger} type="ledger" />
+            <WalletTypeItem action={onCreate} type="mnemonic" />
+            <WalletTypeItem action={onCreate} type="paper" />
           </ul>
         </div>
       </Dialog>
