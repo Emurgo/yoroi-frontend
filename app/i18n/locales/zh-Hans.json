@@ -347,7 +347,7 @@
   "wallet.redeem.disclaimerOverlay.title": "do not translate",
   "wallet.redeem.noWallets.createWalletLink": "创建你的第一个钱包",
   "wallet.redeem.noWallets.headLine": "不可赎回ADA，因为您没有任何钱包。",
-  "wallet.redeem.noWallets.instructions": "创建一个新钱包（或恢复现有钱包），然后回到这里并选择它进行ADA兑换。",
+  "wallet.redeem.noWallets.instructions": "创建一个新钱包（或恢复现有钱包），然后回到这里并选择该钱包进行ADA赎回。",
   "wallet.redeem.success.overlay.confirmButton": "很好",
   "wallet.redeem.success.overlay.headline": "您已成功兑换",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "助记词无效",
