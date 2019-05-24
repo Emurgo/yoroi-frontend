@@ -46,10 +46,6 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
       onCancelBackup,
       classicTheme
     } = this.props;
-    const dialogClasses = classnames([
-      styles.component,
-      'WalletRecoveryPhraseDisplayDialog',
-    ]);
 
     const actions = [
       {
@@ -61,7 +57,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
 
     return (
       <Dialog
-        className={dialogClasses}
+        className="WalletRecoveryPhraseDisplayDialog"
         title={intl.formatMessage(globalMessages.recoveryPhraseDialogTitle)}
         actions={actions}
         onClose={onCancelBackup}
