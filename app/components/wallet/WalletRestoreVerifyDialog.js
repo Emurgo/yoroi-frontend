@@ -81,7 +81,6 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
-    const confirmButtonClasses = classnames(['confirmButton']);
 
     const actions = [
       {

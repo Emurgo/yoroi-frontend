@@ -420,7 +420,6 @@
   "wallet.settings.password": "密碼",
   "wallet.settings.passwordLastUpdated": "上次更新日期 {lastUpdated}",
   "wallet.summary.no.transaction": "未找到任何交易",
-  "wallet.summary.no.transactions": "無最近交易",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "您已成功整合您的 Leger Nano S 設備",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "傳入擱置確認",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "傳出擱置確認",

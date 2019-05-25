@@ -117,7 +117,6 @@ type Props = {
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
-  classicTheme: boolean
 };
 
 type State = {
@@ -170,7 +169,7 @@ export default class Transaction extends Component<Props, State> {
 
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, formattedWalletAmount, classicTheme } = this.props;
+    const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state === transactionStates.FAILED;

@@ -420,7 +420,6 @@
   "wallet.settings.password": "암호",
   "wallet.settings.passwordLastUpdated": "마지막 업데이트 {lastUpdated}",
   "wallet.summary.no.transaction": "거래 없음",
-  "wallet.summary.no.transactions": "최근 거래 없음",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "Ledger Nano S 지갑과의 연결이 완료되었습니다.",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "수신 보류 확인",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "전송 보류 확인",
