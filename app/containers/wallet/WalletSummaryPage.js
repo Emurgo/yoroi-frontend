@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
@@ -20,13 +20,6 @@ const { formattedWalletAmount } = resolver('utils/formatters');
 
 type Props = InjectedProps
 
-const messages = defineMessages({
-  noTransactions: {
-    id: 'wallet.summary.no.transactions',
-    defaultMessage: '!!!No recent transactions',
-  }
-});
-
 const targetNotificationIds = [
   globalMessages.walletCreatedNotificationMessage.id,
   globalMessages.walletRestoredNotificationMessage.id,
@@ -42,7 +35,6 @@ export default class WalletSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { profile } = this.props.stores;
     const actions = this.props.actions;
     const { wallets, transactions } = this.props.stores.substores.ada;
     const {
@@ -71,7 +63,6 @@ export default class WalletSummaryPage extends Component<Props> {
     const { uiDialogs } = this.props.stores;
     if (searchOptions) {
       const { limit } = searchOptions;
-      const noTransactionsLabel = intl.formatMessage(messages.noTransactions);
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (recentTransactionsRequest.isExecutingFirstTime || hasAny) {
         walletTransactions = (
@@ -83,21 +74,12 @@ export default class WalletSummaryPage extends Component<Props> {
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
-            classicTheme={profile.isClassicTheme}
           />
         );
       } else if (!hasAny) {
         walletTransactions = (
           <WalletNoTransactions
             label={noTransactionsFoundLabel}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
-      } else if (!hasAny) {
-        walletTransactions = (
-          <WalletNoTransactions
-            label={noTransactionsLabel}
-            classicTheme={profile.isClassicTheme}
           />
         );
       }
