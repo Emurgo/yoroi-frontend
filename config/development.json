@@ -1,8 +1,8 @@
 {
   "network": {
     "protocolMagic": 633343913,
-    "backendUrl": "https://iohk-staging.yoroiwallet.com",
-    "websocketUrl": "wss://iohk-staging.yoroiwallet.com:443",
+    "backendUrl": "https://stg-yoroi-importer.emurgo.rocks:8200",
+    "websocketUrl": "wss://stg-yoroi-importer.emurgo.rocks:443",
     "name": "staging"
   },
   "app": {
