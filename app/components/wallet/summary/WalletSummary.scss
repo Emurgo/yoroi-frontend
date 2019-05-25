@@ -84,6 +84,7 @@ $rightBlockWidth: $leftBlockWidth;
 
   :global {
     .BorderedBox_component {
+      padding-left: 0;
       background: none;
       border: none;
 
@@ -101,6 +102,10 @@ $rightBlockWidth: $leftBlockWidth;
     }
   }
 
+  .leftBlock {
+    display: none;
+  }
+
   .leftBlock,
   .rightBlock {
     padding-top: 33px;
@@ -108,5 +113,6 @@ $rightBlockWidth: $leftBlockWidth;
 
   .middleBlock {
     border: none;
-  }  
+    text-align: left;    
+  }
 }
