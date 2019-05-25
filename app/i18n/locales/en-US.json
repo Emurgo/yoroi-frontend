@@ -441,6 +441,7 @@
   "wallet.transaction.assuranceLevel.high": "high",
   "wallet.transaction.assuranceLevel.low": "low",
   "wallet.transaction.assuranceLevel.medium": "medium",
+  "wallet.transaction.assuranceLevel.notApplicable": "N/A",
   "wallet.transaction.confirmations": "confirmations",
   "wallet.transaction.conversion.rate": "Conversion rate",
   "wallet.transaction.export.dialog.exportButton.label": "Export",

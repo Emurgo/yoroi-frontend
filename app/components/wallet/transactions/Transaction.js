@@ -27,6 +27,10 @@ const messages = defineMessages({
     id: 'wallet.transaction.assuranceLevel',
     defaultMessage: '!!!Transaction assurance level',
   },
+  assuranceLevelNotApplicable: {
+    id: 'wallet.transaction.assuranceLevel.notApplicable',
+    defaultMessage: '!!!N/A',
+  },
   confirmations: {
     id: 'wallet.transaction.confirmations',
     defaultMessage: '!!!confirmations',
@@ -287,7 +291,9 @@ export default class Transaction extends Component<Props, State> {
                       <span className={styles.assuranceLevel}>{status}</span>
                       . {data.numberOfConfirmations} {intl.formatMessage(messages.confirmations)}.
                     </span>
-                  ) : null}
+                  ) : (
+                    <span>{intl.formatMessage(messages.assuranceLevelNotApplicable)}</span>
+                  )}
                 </div>
               ) : null}
 
