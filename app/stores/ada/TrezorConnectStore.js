@@ -93,15 +93,19 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     try {
       /** Starting from v7 Trezor Connect Manifest has been made mandatory
         * https://github.com/trezor/connect/blob/develop/docs/index.md#trezor-connect-manifest */
-      const trezorTConfig = Config.wallets.hardwareWallet.trezorT;
-      TrezorConnect.manifest({
-        email: trezorTConfig.manifest.EMAIL,
-        appUrl: trezorTConfig.manifest.APP_URL
-      });
+      const { manifest } = Config.wallets.hardwareWallet.trezorT;
+
+      const trezorManifest = {};
+      trezorManifest.email = manifest.EMAIL;
+      // set appUrl depending upon browser
+      if (environment.userAgentInfo.isChromeBrowser()) {
+        trezorManifest.appUrl = manifest.appURL.CHROME;
+      } else if (environment.userAgentInfo.isFirefoxBrowser()) {
+        trezorManifest.appUrl = manifest.appURL.FIREFOX;
+      }
+      TrezorConnect.manifest(trezorManifest);
 
       /** Preinitialization of TrezorConnect API will result in faster first response */
-      // TODO [TREZOR]: sometimes when user does fast action initialization is still not complete
-      // try to use same approach as ledger [for now moving this from _init() to setup()]
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
