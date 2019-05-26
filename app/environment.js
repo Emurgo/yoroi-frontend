@@ -1,6 +1,8 @@
 // @flow
+
 import type { ConfigType, Network } from '../config/config-types';
 import { NetworkType } from '../config/config-types';
+import UserAgentInfo from './utils/userAgentInfo';
 
 declare var CONFIG: ConfigType;
 
@@ -21,6 +23,7 @@ export const environment = (Object.assign({
   isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
   isAdaApi: () => environment.API === 'ada',
   walletRefreshInterval: CONFIG.app.walletRefreshInterval,
+  userAgentInfo: new UserAgentInfo(),
 }, process.env): {
   NETWORK: Network,
   version: string,
@@ -32,7 +35,8 @@ export const environment = (Object.assign({
   isTest: void => boolean,
   isMainnet: void => boolean,
   isAdaApi: void => boolean,
-  walletRefreshInterval: number
+  walletRefreshInterval: number,
+  userAgentInfo: UserAgentInfo
 });
 
 export default environment;
