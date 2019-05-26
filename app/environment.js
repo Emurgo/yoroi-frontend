@@ -1,5 +1,4 @@
 // @flow
-import os from 'os';
 import type { ConfigType, Network } from '../config/config-types';
 import { NetworkType } from '../config/config-types';
 
@@ -21,7 +20,6 @@ export const environment = (Object.assign({
   isTest: () => environment.current === NetworkType.TEST,
   isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
   isAdaApi: () => environment.API === 'ada',
-  platform: os.platform(),
   walletRefreshInterval: CONFIG.app.walletRefreshInterval,
 }, process.env): {
   NETWORK: Network,
@@ -34,7 +32,6 @@ export const environment = (Object.assign({
   isTest: void => boolean,
   isMainnet: void => boolean,
   isAdaApi: void => boolean,
-  platform: string,
   walletRefreshInterval: number
 });
 
