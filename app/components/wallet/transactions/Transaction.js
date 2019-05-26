@@ -103,11 +103,11 @@ const assuranceLevelTranslations = defineMessages({
 const stateTranslations = defineMessages({
   [transactionStates.PENDING]: {
     id: 'wallet.transaction.state.pending',
-    defaultMessage: '!!!pending',
+    defaultMessage: '!!!Transaction pending',
   },
   [transactionStates.FAILED]: {
     id: 'wallet.transaction.state.failed',
-    defaultMessage: '!!!failed',
+    defaultMessage: '!!!Transaction failed',
   },
 });
 
