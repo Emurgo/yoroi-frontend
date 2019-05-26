@@ -221,6 +221,7 @@
 
   .label {
     margin-top: 2px;
+    min-width: 50px;
   }
 
   .pendingLabel {
@@ -309,6 +310,7 @@
     font-size: 15px;
     line-height: 25px;
     height: 25px;
+    min-width: 84px;
     border-radius: 8px;
   }
 
