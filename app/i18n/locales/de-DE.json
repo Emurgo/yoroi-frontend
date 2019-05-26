@@ -282,7 +282,7 @@
   "wallet.create.tabs.recommended.title": "Empfohlen",
   "wallet.create.tabs.advanced.title": "Erweitert",
   "wallet.connect.hardware.title": "Mit der Hardware Wallet verbinden",
-  "wallet.create.dialog.walletNameHint": "z.B. Einkaufs-Wallet",
+  "wallet.create.dialog.walletNameHint": "z.B: Shopping-Wallet",
   "wallet.create.dialog.walletPasswordLabel": "Ausgaben-Passwort",
   "wallet.footer.buyLedgerHardwareWallet.text": "Kaufe eine Ledger Hardware Wallet",
   "wallet.footer.buyTrezorHardwareWallet.text": "Kaufe eine Trezor Hardware Wallet",
