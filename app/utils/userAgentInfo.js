@@ -3,43 +3,20 @@
 import UAParser from 'ua-parser-js';
 
 export default class UserAgentInfo {
-  /** Object structured like this:
-    * Refer: https://www.npmjs.com/package/ua-parser-js
-    * {
-    *    ua: "",
-    *    browser: {
-    *      name: "",
-    *      version: ""
-    *    },
-    *    engine: {
-    *      name: "",
-    *      version: ""
-    *    },
-    *    os: {
-    *      name: "",
-    *      version: ""
-    *    },
-    *    device: {
-    *      model: "",
-    *      type: "",
-    *      vendor: ""
-    *    },
-    *    cpu: {
-    *      architecture: ""
-    *    }
-    *  }
-    */
+  // Refer: Refer: https://www.npmjs.com/package/ua-parser-js
   ua: UAParser.getResult;
 
   constructor() {
     this.ua = (new UAParser()).getResult();
   }
 
-  isChromeBrowser() {
-    return this.ua.browser.name === 'Chrome';
+  /** This method returns true for all browser that uses `chrome-extension:` protocol,
+    * hence it will return true for browsers like Google Chrome, Brave */
+  isChromeExtension() {
+    return location.protocol === 'chrome-extension:';
   }
 
-  isFirefoxBrowser() {
-    return this.ua.browser.name === 'Firefox';
+  isFirefoxExtension() {
+    return location.protocol === 'moz-extension:';
   }
 }

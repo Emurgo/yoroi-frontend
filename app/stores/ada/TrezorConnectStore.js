@@ -97,11 +97,13 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
       const trezorManifest = {};
       trezorManifest.email = manifest.EMAIL;
-      // set appUrl depending upon browser
-      if (environment.userAgentInfo.isChromeBrowser()) {
-        trezorManifest.appUrl = manifest.appURL.CHROME;
-      } else if (environment.userAgentInfo.isFirefoxBrowser()) {
+      if (environment.userAgentInfo.isFirefoxExtension()) {
+        // Set appUrl for `moz-extension:` protocol using browser (like Firefox)
         trezorManifest.appUrl = manifest.appURL.FIREFOX;
+      } else {
+        // For all other browser supported that uses `chrome-extension:` protocol
+        // In future if other non chrome like browser is supported them we can consider updating
+        trezorManifest.appUrl = manifest.appURL.CHROME;
       }
       TrezorConnect.manifest(trezorManifest);
 
