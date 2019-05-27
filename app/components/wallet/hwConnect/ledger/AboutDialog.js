@@ -150,8 +150,8 @@ export default class AboutDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        <HelpLinkBlock progressInfo={progressInfo} />
       </Dialog>);
   }
 }
