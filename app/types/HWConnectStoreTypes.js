@@ -44,7 +44,7 @@ export interface HWDeviceInfo {
   hwFeatures: HWFeatures
 }
 
-export interface HWConnectStoreTypes {
+export interface HWConnectStoreTypes<ConnectionResponse> {
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
   progressInfo: ProgressInfo;
@@ -101,11 +101,11 @@ export interface HWConnectStoreTypes {
   _checkAndStoreHWDeviceInfo(): Promise<void>;
 
   /** Validates the compatibility of data which we have received from hardware wallet */
-  _validateHWResponse(any, any): boolean;
+  _validateHWResponse(resp: ConnectionResponse): boolean;
 
   /** Converts a valid hardware wallet response to a common storable format
     * later the same format will be used to create wallet */
-  _normalizeHWResponse(any, any): HWDeviceInfo;
+  _normalizeHWResponse(resp: ConnectionResponse): HWDeviceInfo;
   // =================== CONNECT =================== //
 
   // =================== SAVE =================== //

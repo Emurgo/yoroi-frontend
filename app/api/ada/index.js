@@ -52,9 +52,9 @@ import {
   generateWalletMasterKey,
 } from './lib/cardanoCrypto/cryptoWallet';
 import type {
-  TrezorSignTxPayload,
   LedgerSignTxPayload,
 } from '../../domain/HWSignTx';
+import type { $CardanoSignTransaction } from 'trezor-connect/lib/types/cardano';
 import {
   createTrezorSignTxPayload,
   broadcastTrezorSignedTx,
@@ -283,7 +283,7 @@ export type CreateTrezorSignTxDataRequest = {
 };
 export type CreateTrezorSignTxDataResponse = {
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
-  trezorSignTxPayload: TrezorSignTxPayload,
+  trezorSignTxPayload: $CardanoSignTransaction,
   changeAddress: ?AdaAddress,
 };
 export type CreateTrezorSignTxDataFunc = (

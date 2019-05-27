@@ -52,9 +52,14 @@ import {
   stringifyError
 } from '../../utils/logging';
 
-/** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
-  * try to make a common base class */
-export default class LedgerConnectStore extends Store implements HWConnectStoreTypes {
+type LedgerConnectionResponse = {
+  versionResp: GetVersionResponse,
+  extendedPublicKeyResp: GetExtendedPublicKeyResponse,
+};
+
+export default class LedgerConnectStore
+  extends Store
+  implements HWConnectStoreTypes<LedgerConnectionResponse> {
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
@@ -170,7 +175,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
         const extendedPublicKeyResp: GetExtendedPublicKeyResponse
           = await ledgerBridge.getExtendedPublicKey(accountPath);
 
-        this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
+        this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp });
 
         this._goToSaveLoad();
         Logger.info('Ledger device OK');
@@ -183,10 +188,11 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   };
 
   _normalizeHWResponse = (
-    versionResp: GetVersionResponse,
-    extendedPublicKeyResp: GetExtendedPublicKeyResponse
+    resp: LedgerConnectionResponse,
   ): HWDeviceInfo => {
-    this._validateHWResponse(versionResp, extendedPublicKeyResp);
+    this._validateHWResponse(resp);
+
+    const { extendedPublicKeyResp, versionResp } = resp;
 
     return {
       publicMasterKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
@@ -204,9 +210,10 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   }
 
   _validateHWResponse = (
-    versionResp: GetVersionResponse,
-    extendedPublicKeyResp: GetExtendedPublicKeyResponse
+    resp: LedgerConnectionResponse,
   ): boolean => {
+    const { extendedPublicKeyResp, versionResp } = resp;
+
     if (versionResp == null) {
       throw new Error('Ledger device version response is undefined');
     }
