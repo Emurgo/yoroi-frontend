@@ -97,7 +97,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
       const trezorManifest = {};
       trezorManifest.email = manifest.EMAIL;
-      if (environment.userAgentInfo.isFirefoxExtension()) {
+      if (environment.userAgentInfo.isFirefoxExtension) {
         // Set appUrl for `moz-extension:` protocol using browser (like Firefox)
         trezorManifest.appUrl = manifest.appURL.FIREFOX;
       } else {

@@ -2,7 +2,8 @@
 
 import type { ConfigType, Network } from '../config/config-types';
 import { NetworkType } from '../config/config-types';
-import UserAgentInfo from './utils/userAgentInfo';
+import type { UserAgentInfo } from './utils/userAgentInfo';
+import userAgentInfo from './utils/userAgentInfo';
 
 declare var CONFIG: ConfigType;
 
@@ -23,7 +24,7 @@ export const environment = (Object.assign({
   isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
   isAdaApi: () => environment.API === 'ada',
   walletRefreshInterval: CONFIG.app.walletRefreshInterval,
-  userAgentInfo: new UserAgentInfo(),
+  userAgentInfo,
 }, process.env): {
   NETWORK: Network,
   version: string,
