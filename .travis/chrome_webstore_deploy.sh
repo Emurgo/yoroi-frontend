@@ -88,7 +88,7 @@ fi
 tar -zcf artifacts/build-${RELEASE_TAG}.tar.gz build
 echo "Release sha256 checksums:"
 find build -type f -exec sha256sum {} \; | tee -a artifacts/sha256sum.list
-sha256sum build*tar.gz | tee -a artifacts/sha256sum.list
+sha256sum artifacts/build*tar.gz | tee -a artifacts/sha256sum.list
 sha256sum artifacts/${CRX_NAME} | tee -a artifacts/sha256sum.list
 sha256sum artifacts/${XPI_NAME} | tee -a artifacts/sha256sum.list
 sha256sum artifacts/${ZIP_NAME} | tee -a artifacts/sha256sum.list
