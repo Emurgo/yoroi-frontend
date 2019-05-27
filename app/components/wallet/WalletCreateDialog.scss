@@ -114,8 +114,6 @@
     display: flex;
     align-items: center;
     padding: 11px 40px;
-    cursor: pointer;
-    width: 100%;
   }
   
   .walletTypeImg {
@@ -133,7 +131,13 @@
     line-height: 22px;
     color: #2B2C32;
     text-align: left;
+    font-family: var(--font-regular);
     font-weight: var(--font-semibold);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--theme-default-color-blue);
+    }
   }
 
   .walletTypeDesc {

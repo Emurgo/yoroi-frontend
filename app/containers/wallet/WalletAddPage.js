@@ -98,11 +98,11 @@ export default class WalletAddPage extends Component<Props> {
     } else if (uiDialogs.isOpen(WalletRestoreOptionsDialog)) {
       content = (
         <WalletRestoreOptionsDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
-          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
         />
       );
     } else if (uiDialogs.isOpen(WalletConnectHardwareDialog)) {

@@ -13,6 +13,22 @@ const messages = defineMessages({
     id: 'wallet.connect.hardware.title',
     defaultMessage: '!!!Connect to hardware wallet',
   },
+  trezorTitle: {
+    id: 'wallet.create.type.trezor.title',
+    defaultMessage: '!!!Trezor Hardware Wallet',
+  },
+  ledgerTitle: {
+    id: 'wallet.create.type.ledger.title',
+    defaultMessage: '!!!Ledger Hardware Wallet',
+  },
+  trezorDescription: {
+    id: 'wallet.create.type.trezor.description',
+    defaultMessage: '!!!Trezor Hardware Wallet Descriprion',
+  },
+  ledgerDescription: {
+    id: 'wallet.create.type.ledger.description',
+    defaultMessage: '!!!Ledger Hardware Wallet Descriprion',
+  },
 });
 
 type Props = {
@@ -47,8 +63,8 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
       >
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
-            <WalletTypeItem action={onLedger} type="ledger" />
-            <WalletTypeItem action={onTrezor} type="trezor" />
+            <WalletTypeItem action={onLedger} type="ledger" title={intl.formatMessage(messages.trezorTitle)} />
+            <WalletTypeItem action={onTrezor} type="trezor" title={intl.formatMessage(messages.ledgerTitle)} />
           </ul>
         </div>
       </Dialog>

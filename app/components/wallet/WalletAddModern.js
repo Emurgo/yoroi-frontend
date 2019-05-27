@@ -35,6 +35,10 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
   },
+  transferFundsTitle: {
+    id: 'daedalusTransfer.wallet.add.page.link.label',
+    defaultMessage: '!!!Transfer funds from Daedalus wallet to Yoroi',
+  },
 });
 
 type Props = {
@@ -84,6 +88,14 @@ export default class WalletAddModern extends Component<Props> {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.cardList}>
+              <button type="button" onClick={onHardwareConnect}>
+                <div className={styles.itemCard}>
+                  <div className={`${styles.itemCardBg} ${styles.connect}`} />
+                  <div className={styles.itemCardTitle}>
+                    {intl.formatMessage(messages.connectToHardwareDescription)}
+                  </div>
+                </div>
+              </button>
               <button type="button" onClick={onCreate}>
                 <div className={styles.itemCard}>
                   <div className={`${styles.itemCardBg} ${styles.create}`} />
@@ -100,14 +112,6 @@ export default class WalletAddModern extends Component<Props> {
                   </div>
                 </div>
               </button>
-              <button type="button" onClick={onHardwareConnect}>
-                <div className={styles.itemCard}>
-                  <div className={`${styles.itemCardBg} ${styles.connect}`} />
-                  <div className={styles.itemCardTitle}>
-                    {intl.formatMessage(messages.connectToHardwareDescription)}
-                  </div>
-                </div>
-              </button>
               {activeNotification ? (
                 <div className={styles.notification}>
                   <FormattedHTMLMessage
@@ -120,7 +124,7 @@ export default class WalletAddModern extends Component<Props> {
             <a href="main_window.html#/daedalus-transfer" className={`${styles.itemCard} ${styles.itemLink}`}>
               <SvgInline svg={daedalusIcon} width="45" height="40" className={styles.itemLinkIcon} />
               <div className={styles.itemCardTitle}>
-                Transfer funds from Daedalus wallet to Yoroi
+                {intl.formatMessage(messages.transferFundsTitle)}
               </div>
             </a>
           </div>

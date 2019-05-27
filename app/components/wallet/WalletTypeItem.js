@@ -8,26 +8,6 @@ import SvgInline from 'react-svg-inline';
 import arrowDown from '../../assets/images/expand-arrow.inline.svg';
 
 const messages = defineMessages({
-  dialogTitle: {
-    id: 'wallet.restore.dialog.title.label',
-    defaultMessage: '!!!Restore wallet',
-  },
-  mnemonic: {
-    id: 'wallet.create.type.mnemonic.title',
-    defaultMessage: '!!!Wallet from 15 mnemonic words',
-  },
-  paper: {
-    id: 'wallet.create.type.paper.title',
-    defaultMessage: '!!!Paper Wallet',
-  },
-  trezor: {
-    id: 'wallet.create.type.trezor.title',
-    defaultMessage: '!!!Trezor Hardware Wallet',
-  },
-  ledger: {
-    id: 'wallet.create.type.ledger.title',
-    defaultMessage: '!!!Ledger Hardware Wallet',
-  },
   more: {
     id: 'settings.general.learn.more',
     defaultMessage: '!!!Learn more',
@@ -36,7 +16,9 @@ const messages = defineMessages({
 
 type Props = {
   type: string,
-  action: Function
+  title: string,
+  description?: string,
+  action: Function,
 };
 
 type State = {
@@ -49,6 +31,10 @@ export default class WalletTypeItem extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
 
+  static defaultProps = {
+    description: undefined
+  }
+
   state = {
     showMore: false,
   };
@@ -59,7 +45,7 @@ export default class WalletTypeItem extends Component<Props, State> {
 
   render() {
     const { intl } = this.context;
-    const { action, type } = this.props;
+    const { action, type, title, description } = this.props;
 
     const showMoreClasses = classnames([
       styles.walletTypeMore,
@@ -74,23 +60,23 @@ export default class WalletTypeItem extends Component<Props, State> {
     return (
       <li className={styles.walletTypeListItem}>
         <div className={styles.walletType}>
-          <button type="button" onClick={action} className={styles.walletTypeTop}>
+          <div className={styles.walletTypeTop}>
             <div className={`${styles.walletTypeImg} ${styles[type]}`} />
-            <div className={styles.walletTypeTitle}>
-              {intl.formatMessage(messages[type])}
-            </div>
-          </button>
-          <div className={showMoreClasses}>
-            <p className={styles.walletTypeDesc}>
-              The simplest and most common way to create a Wallet.
-              Yoroi will generate 15 mnemonic words that you will have to store
-              in a safe place in order to restore the wallet.
-            </p>
+            <button onClick={action} type="button" className={styles.walletTypeTitle}>
+              {title}
+            </button>
           </div>
-          <button className={showMoreBtnClasses} type="button" onClick={this.toggleDesc.bind(this)}>
-            {intl.formatMessage(messages.more)}
-            <SvgInline svg={arrowDown} width="15px" height="15px" className={styles.moreBtnIcon} />
-          </button>
+          {description &&
+            <div>
+              <div className={showMoreClasses}>
+                <p className={styles.walletTypeDesc}>{description}</p>
+              </div>
+              <button className={showMoreBtnClasses} type="button" onClick={this.toggleDesc.bind(this)}>
+                {intl.formatMessage(messages.more)}
+                <SvgInline svg={arrowDown} width="15px" height="15px" className={styles.moreBtnIcon} />
+              </button>
+            </div>
+          }
         </div>
       </li>
     );

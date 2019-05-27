@@ -24,7 +24,8 @@ const messages = defineMessages({
 
 type Props = {
   onCancel: Function,
-  onCreate: Function,
+  onRestore: Function,
+  onPaperRestore: Function,
   classicTheme: boolean
 };
 
@@ -36,7 +37,7 @@ export default class WalletRestoreOptionsDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onCreate, classicTheme } = this.props;
+    const { onCancel, onRestore, onPaperRestore, classicTheme } = this.props;
 
     return (
       <Dialog
@@ -48,8 +49,8 @@ export default class WalletRestoreOptionsDialog extends Component<Props> {
       >
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
-            <WalletTypeItem action={onCreate} type="mnemonic" />
-            <WalletTypeItem action={onCreate} type="paper" />
+            <WalletTypeItem action={onRestore} type="mnemonic" title={intl.formatMessage(messages.walletMnemonicTitle)} />
+            <WalletTypeItem action={onPaperRestore} type="paper" title={intl.formatMessage(messages.walletPaperTitle)} />
           </ul>
         </div>
       </Dialog>
