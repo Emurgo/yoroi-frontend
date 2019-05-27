@@ -449,7 +449,7 @@
   "wallet.transaction.fee": "Gebühr",
   "wallet.transaction.received": "{currency} empfangen",
   "wallet.transaction.sent": "{currency} gesendet",
-  "wallet.transaction.state.failed": "failed",
+  "wallet.transaction.state.failed": "fehlgeschlagen",
   "wallet.transaction.state.pending": "pending",
   "wallet.transaction.transactionAmount": "Transaktionsgröße",
   "wallet.transaction.transactionId": "Transaktions-ID",
