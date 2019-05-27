@@ -167,7 +167,7 @@
   "settings.paperWallet.dialog.verify.message": "C'est la dernière étape. Veuillez vérifier la phrase mnémonique (imprimée sur le certificat PDF) et le mot de passe afin de vous assurer que vous avez toutes les informations valides pour *accéder à vos fonds plus tard*. Sur l'écran suivant, vous pourrez également vérifier le total de contrôle (checksum) du compte et copier vos nouvelles adresses.",
   "settings.paperWallet.numAddressesSelect.label": "Nombre d'adresses",
   "settings.paperWallet.printIdentificationCheckbox.label": "Imprimer le total de contrôle (checksum) de compte du Wallet Papier",
-  "settings.paperWallet.printIdentificationCheckbox.description": "Choisir cette option vous aidera à identifier votre wallet au moment de la récupération, mais cela rendra impossible toute dénégation plausible. ",
+  "settings.paperWallet.printIdentificationCheckbox.description": "Choisir cette option vous aidera à identifier votre wallet au moment de la récupération, mais **cela rendra impossible toute dénégation plausible**.",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "billet de blog",
   "settings.support.faq.content": "Si vous rencontrez un problème, veuillez consulter {faqLink} pour obtenir des réponses.",
