@@ -5,6 +5,7 @@ import { observable, action } from 'mobx';
 
 import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
 import type { DeviceMessage, UiMessage } from 'trezor-connect';
+import type { CardanoGetPublicKey$ } from 'trezor-connect/lib/types/cardano';
 
 import Config from '../../config';
 import environment from '../../environment';
@@ -37,9 +38,14 @@ import type {
   CreateHardwareWalletFunc,
 } from '../../api/ada';
 
-/** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
-  * try to make a common base class */
-export default class TrezorConnectStore extends Store implements HWConnectStoreTypes {
+type TrezorConnectionResponse = {
+  trezorResp: CardanoGetPublicKey$,
+  trezorEventDevice: DeviceMessage
+};
+
+export default class TrezorConnectStore
+  extends Store
+  implements HWConnectStoreTypes<TrezorConnectionResponse> {
 
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
@@ -177,7 +183,6 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     try {
       this.hwDeviceInfo = undefined;
 
-      // TODO: [TREZOR] fix type if possible
       const trezorResp = await TrezorConnect.cardanoGetPublicKey({
         // TODO: only support Trezor wallest on account 0
         path: derivePathPrefix(0)
@@ -187,7 +192,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
       /** Converts a valid hardware wallet response to a common storable format
         * later the same format will be used to create wallet */
-      this.hwDeviceInfo = this._normalizeHWResponse(trezorResp, trezorEventDevice);
+      this.hwDeviceInfo = this._normalizeHWResponse({ trezorResp, trezorEventDevice });
 
       // It's a valid trezor device, go to Save Load state
       this._goToSaveLoad();
@@ -202,10 +207,14 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
   };
 
   _normalizeHWResponse = (
-    trezorResp: any,
-    trezorEventDevice: DeviceMessage
+    resp: TrezorConnectionResponse,
   ): HWDeviceInfo => {
-    this._validateHWResponse(trezorResp, trezorEventDevice);
+    this._validateHWResponse(resp);
+    if (!resp.trezorResp.success) {
+      throw new Error('TrezorConnectStore::_normalizeHWResponse should never happen');
+    }
+
+    const { trezorResp, trezorEventDevice } = resp;
 
     /** This check aready done in _validateHWResponse but flow needs this */
     if (trezorEventDevice == null
@@ -232,9 +241,9 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
   /** Validates the compatibility of data which we have received from Trezor device */
   _validateHWResponse = (
-    trezorResp: any,
-    trezorEventDevice: DeviceMessage
+    resp: TrezorConnectionResponse,
   ): boolean => {
+    const { trezorResp, trezorEventDevice } = resp;
 
     if (trezorResp && !trezorResp.success) {
       switch (trezorResp.payload.error) {

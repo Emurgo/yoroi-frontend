@@ -26,9 +26,8 @@ import type {
   PrepareAndBroadcastLedgerSignedTxResponse
 } from '../index';
 import type {
-  TrezorInput,
-  TrezorOutput,
-  TrezorSignTxPayload,
+  CardanoInput,
+  CardanoOutput,
   LedgerSignTxPayload,
 } from '../../../domain/HWSignTx';
 import type {
@@ -40,6 +39,7 @@ import type {
   Witness
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
+import type { $CardanoSignTransaction } from 'trezor-connect/lib/types/cardano';
 
 import type { ConfigType } from '../../../../config/config-types';
 
@@ -55,7 +55,7 @@ export async function createTrezorSignTxPayload(
   senderUtxos: Array<UTXO>,
   unsignedTx: RustModule.Wallet.Transaction,
   getTxsBodiesForUTXOs: TxBodiesFunc,
-): Promise<TrezorSignTxPayload> {
+): Promise<$CardanoSignTransaction> {
   const txJson: TransactionType = unsignedTx.to_json();
 
   const utxoMap = utxosToLookupMap(senderUtxos);
@@ -115,7 +115,7 @@ function _transformToTrezorInputs(
   inputs: Array<TxoPointerType>,
   addressMap: AdaAddressMap,
   utxoMap: UtxoLookupMap,
-): Array<TrezorInput> {
+): Array<CardanoInput> {
   return inputs.map((input: TxoPointerType) => {
     const utxo = utxoMap[input.id][input.index];
     const addressInfo = addressMap[utxo.receiver];
@@ -131,22 +131,19 @@ function _transformToTrezorInputs(
 function _generateTrezorOutputs(
   txOutputs: Array<TxOutType>,
   changeAddr: ?AdaAddress,
-): Array<TrezorOutput> {
-  return txOutputs.map(txOutput => ({
-    amount: txOutput.value.toString(),
-    ..._outputAddressOrPath(txOutput, changeAddr)
-  }));
-}
-
-function _outputAddressOrPath(
-  txOutput: TxOutType,
-  changeAddr: ?AdaAddress,
-): { path: string } | { address: string } {
-  if (changeAddr && txOutput.address === changeAddr.cadId) {
-    return { path: derivePathAsString(changeAddr.account, changeAddr.change, changeAddr.index) };
-  }
-
-  return { address: txOutput.address };
+): Array<CardanoOutput> {
+  return txOutputs.map(txOutput => {
+    if (changeAddr && txOutput.address === changeAddr.cadId) {
+      return {
+        amount: txOutput.value.toString(),
+        path: derivePathAsString(changeAddr.account, changeAddr.change, changeAddr.index)
+      };
+    }
+    return {
+      address: txOutput.address,
+      amount: txOutput.value.toString(),
+    };
+  });
 }
 
 // ==================== LEDGER ==================== //
