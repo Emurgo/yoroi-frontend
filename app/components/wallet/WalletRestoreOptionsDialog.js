@@ -16,6 +16,10 @@ const messages = defineMessages({
     id: 'wallet.create.type.mnemonic.title',
     defaultMessage: '!!!Wallet from 15 mnemonic words',
   },
+  walletMnemonicDescription: {
+    id: 'wallet.create.type.mnemonic.description',
+    defaultMessage: '!!!The simplest and most common way to create a Wallet. Yoroi will generate 15 mnemonic words that you will have to store in a safe place in order to restore the wallet.',
+  },
   walletPaperTitle: {
     id: 'wallet.create.type.paper.title',
     defaultMessage: '!!!Paper Wallet',
@@ -49,8 +53,17 @@ export default class WalletRestoreOptionsDialog extends Component<Props> {
       >
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
-            <WalletTypeItem action={onRestore} type="mnemonic" title={intl.formatMessage(messages.walletMnemonicTitle)} />
-            <WalletTypeItem action={onPaperRestore} type="paper" title={intl.formatMessage(messages.walletPaperTitle)} />
+            <WalletTypeItem
+              action={onRestore}
+              type="mnemonic"
+              title={intl.formatMessage(messages.walletMnemonicTitle)}
+              description={intl.formatMessage(messages.walletMnemonicDescription)}
+            />
+            <WalletTypeItem
+              action={onPaperRestore}
+              type="paper"
+              title={intl.formatMessage(messages.walletPaperTitle)}
+            />
           </ul>
         </div>
       </Dialog>

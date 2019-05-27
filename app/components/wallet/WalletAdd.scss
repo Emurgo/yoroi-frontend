@@ -220,9 +220,13 @@
   display: flex;
   flex-direction: column;
   margin: 0 8px;
-  box-shadow: 0 10px 15px 0px rgba(0,0,0, .1);
+  box-shadow: 0 5px 20px 0px rgba(24,26,30, .08);
   margin-bottom: 15px;
   cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
+  }
 
   .itemCardTitle {
     letter-spacing: -0.03em;
@@ -272,13 +276,13 @@
 
   .itemCardBg {
     &.create {
-      background-image: url(../../assets/images/cards/create_card.svg);
+      background-image: url(../../assets/images/wallets/create.wallet.inline.svg);
     }
     &.restore {
-      background-image: url(../../assets/images/cards/restore_card.svg);
+      background-image: url(../../assets/images/wallets/restore.wallet.inline.svg);
     }
     &.connect {
-      background-image: url(../../assets/images/cards/connect_card.svg);
+      background-image: url(../../assets/images/wallets/hardware.wallet.inline.svg);
     }
   }
 
@@ -291,7 +295,7 @@
     background-image: url(../../assets/images/add-wallet-bg.svg);
     background-size: cover;
     background-repeat: no-repeat;
-    background-position: 0 -250px;
+    background-position: 0 -210px;
 
     @media screen and (max-width: 1600px) {
       background-position: 0 -100px;
@@ -314,6 +318,7 @@
     font-size: var(--card-text-size);
   }
 }
+
 .settingsBar {
   position: absolute;
   right: 28px;

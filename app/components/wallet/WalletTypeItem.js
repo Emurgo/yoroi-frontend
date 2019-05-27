@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
-import styles from './WalletCreateDialog.scss';
+import styles from './WalletTypeItem.scss';
 import SvgInline from 'react-svg-inline';
-import arrowDown from '../../assets/images/expand-arrow.inline.svg';
+import arrowDown from '../../assets/images/expand-arrow-grey.inline.svg';
 
 const messages = defineMessages({
   more: {
@@ -73,7 +73,7 @@ export default class WalletTypeItem extends Component<Props, State> {
               </div>
               <button className={showMoreBtnClasses} type="button" onClick={this.toggleDesc.bind(this)}>
                 {intl.formatMessage(messages.more)}
-                <SvgInline svg={arrowDown} width="15px" height="15px" className={styles.moreBtnIcon} />
+                <SvgInline svg={arrowDown} width="20px" height="20px" className={styles.moreBtnIcon} />
               </button>
             </div>
           }
