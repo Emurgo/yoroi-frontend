@@ -420,7 +420,6 @@
   "wallet.settings.password": "Kata sandi",
   "wallet.settings.passwordLastUpdated": "Terakhir diperbarui {lastUpdated}",
   "wallet.summary.no.transaction": "Tidak ada transaksi ditemukan",
-  "wallet.summary.no.transactions": "Tidak ada transaksi terbaru",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "You have successfully integrated with your Ledger Nano S device",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "Incoming pending confirmation",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "Outgoing pending confirmation",

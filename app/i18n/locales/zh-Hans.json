@@ -420,7 +420,6 @@
   "wallet.settings.password": "密码",
   "wallet.settings.passwordLastUpdated": "上次更新的 {lastUpdated}",
   "wallet.summary.no.transaction": "未找到交易",
-  "wallet.summary.no.transactions": "无最近的交易",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "您已成功整合您的Ledger Nano S设备",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "入账暂挂确认",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "出账暂挂确认",

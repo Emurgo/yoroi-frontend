@@ -420,7 +420,6 @@
   "wallet.settings.password": "Passwort",
   "wallet.settings.passwordLastUpdated": "Zuletzt aktualisiert {lastUpdated}",
   "wallet.summary.no.transaction": "Keine Transaktionen gefunden",
-  "wallet.summary.no.transactions": "Keine letzten Transaktionen",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "Die Integration mit dem Ledger Nano S war erfolgreich",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "Eingehende anstehende Bestätigung",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "Ausgehende anstehende Bestätigung",

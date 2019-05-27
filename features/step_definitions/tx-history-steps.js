@@ -161,7 +161,7 @@ const displayInfo = {
     txType: 'ADA intrawallet transaction',
     txAmount: '-0.999999',
     txTime: '2019-04-20T15:13:34.000Z',
-    txStatus: 'TRANSACTION PENDING',
+    txStatus: 'PENDING',
     txFrom: ['Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ'],
     txTo: [
       'Ae2tdPwUPEYwEnNsuY9uMAphecEWipHKEy9g8yZCJTJm4zxV1sTrQfTxPVX',
@@ -173,7 +173,7 @@ const displayInfo = {
     txType: 'ADA sent',
     txAmount: '-0.180000',
     txTime: '2019-04-21T15:13:33.000Z',
-    txStatus: 'TRANSACTION FAILED',
+    txStatus: 'FAILED',
     txFrom: ['Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv'],
     txTo: [
       'Ae2tdPwUPEZCvDkc6R9oNE7Qh1yFLDyu4mpVbGhqUHkNsoVjd2UPiWGoVes',

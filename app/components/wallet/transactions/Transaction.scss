@@ -1,16 +1,6 @@
 .component {
   color: var(--theme-transactions-list-item-details-color);
 
-  &.failed {
-    .title, .amount, .details {
-      color: var(--theme-transactions-state-failed-text-color);
-    }
-    .currencySymbol {
-      & > svg > g > g {
-        stroke: var(--theme-transactions-state-failed-text-color);
-      }
-    }
-  }
   // ========= TOGGLER =========
   .toggler {
     cursor: pointer;
@@ -58,10 +48,11 @@
     font-family: var(--font-bold);
     font-size: 8px;
     line-height: 16px;
-    padding: 0 9px;
     text-transform: uppercase;
     height: 17px;
     margin-left: 130px;
+    text-align: center;
+    padding: 0px 9px;
   }
 
   .pendingLabel {
@@ -124,6 +115,18 @@
   
   .assuranceLevel {
     text-transform: capitalize;
+  }
+
+
+  &.failed {
+    .title, .amount, .details {
+      color: var(--theme-transactions-state-failed-text-color);
+    }
+    .currencySymbol {
+      & > svg > g > g {
+        stroke: var(--theme-transactions-state-failed-text-color);
+      }
+    }
   }
  
   .expandArrowBox {
@@ -218,6 +221,7 @@
 
   .label {
     margin-top: 2px;
+    min-width: 50px;
   }
 
   .pendingLabel {
@@ -305,10 +309,9 @@
     font-family: var(--font-regular);
     font-size: 15px;
     line-height: 25px;
-    padding: 0 15px;
     height: 25px;
-    text-align: center;
-    border-radius: 15px;
+    min-width: 84px;
+    border-radius: 8px;
   }
 
   .pendingLabel {
