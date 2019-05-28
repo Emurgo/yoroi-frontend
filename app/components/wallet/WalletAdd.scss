@@ -292,14 +292,10 @@
     background-image: url(../../assets/images/add-wallet-bg.svg);
     background-size: cover;
     background-repeat: no-repeat;
-    background-position: 0 -210px;
-
-    @media screen and (max-width: 1600px) {
-      background-position: 0 -100px;
-    }
+    background-position: center -13vw;
 
     @media screen and (max-width: 1400px) {
-      background-position: 0;
+      background-position: 0 0;
     }
   }
 }
