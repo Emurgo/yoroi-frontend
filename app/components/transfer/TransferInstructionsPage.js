@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferInstructionsPage.scss';
@@ -95,7 +95,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                   {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
-                  {intl.formatMessage(messages.instructionsText)}
+                  <FormattedHTMLMessage {...messages.instructionsText} />
                 </div>
               </div>
 
@@ -126,7 +126,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                   {intl.formatMessage(messages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
-                  <p>{intl.formatMessage(messages.attentionText)}</p>
+                  <FormattedHTMLMessage {...messages.attentionText} />
                 </div>
               </div>
 
