@@ -3,7 +3,6 @@
 import { create, bodyParser, defaults } from 'json-server';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
-import { getFeatureData, getTxsMapList } from './mockDataBuilder';
 import type {
   AddressUtxoRequest, AddressUtxoResponse,
   UtxoSumRequest, UtxoSumResponse,
@@ -12,6 +11,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse
 } from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
+import mockImporter from './mockImporter';
 
 const middlewares = [...defaults(), bodyParser];
 
@@ -75,13 +75,14 @@ export function getMockServer(
       },
       res: { send(arg: AddressUtxoResponse): any }
     ): void => {
-      const featureData = getFeatureData();
-      const utxos = featureData
-        ? featureData.utxos
-        : undefined;
-      const filteredUtxos = utxos
-        ? utxos.filter(utxo => req.body.addresses.includes(utxo.receiver))
-        : [];
+      chai.assert.isTrue(_validateAddressesReq(req.body));
+      const filteredUtxos = Object.keys(mockImporter.utxoForAddresses)
+        .filter(addr => req.body.addresses.includes(addr))
+        .map(addr => mockImporter.utxoForAddresses[addr])
+        .reduce((utxos, arr) => {
+          utxos.push(...arr);
+          return utxos;
+        }, []);
       res.send(filteredUtxos);
     });
 
@@ -92,17 +93,13 @@ export function getMockServer(
       res: { send(arg: UtxoSumResponse): any }
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
-      const featureData = getFeatureData();
-      const utxos = featureData
-        ? featureData.utxos
-        : undefined;
-      const sumUtxos = !utxos ? 0 : utxos.reduce((sum, utxo) => {
-        if (req.body.addresses.includes(utxo.receiver)) {
-          return new BigNumber(utxo.amount).plus(sum);
-        }
-        return sum;
-      }, new BigNumber(0));
-      res.send({ sum: sumUtxos.toString() });
+      const sumUtxos = Object.keys(mockImporter.utxoSumForAddresses)
+        .filter(addr => req.body.addresses.includes(addr))
+        .map(addr => mockImporter.utxoSumForAddresses[addr])
+        .map(val => (val ? new BigNumber(val) : new BigNumber(0)))
+        .reduce((sum, value) => value.plus(sum), new BigNumber(0));
+      const result = sumUtxos.isZero() ? null : sumUtxos.toString();
+      res.send({ sum: result });
     });
 
     server.post('/api/txs/history', (
@@ -113,13 +110,16 @@ export function getMockServer(
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
       chai.assert.isTrue(_validateDatetimeReq(req.body));
-      const txsMapList = getTxsMapList(req.body.addresses);
-      // Filters all txs according to hash and date
-      const filteredTxs = txsMapList.filter(txMap => {
-        const includesAddress = req.body.addresses.includes(txMap.address);
-        const timeOkay = moment(txMap.tx.last_update) >= moment(req.body.dateFrom);
-        return includesAddress && timeOkay;
-      }).map(txMap => txMap.tx);
+
+      const addressSet = new Set(req.body.addresses);
+      const filteredTxs = mockImporter.history.filter(tx => {
+        if (moment(tx.last_update) < moment(req.body.dateFrom)) {
+          return false;
+        }
+        const includesAddress = tx.inputs_address.some(elem => addressSet.has(elem))
+          || tx.outputs_address.some(elem => addressSet.has(elem));
+        return includesAddress;
+      });
       // Returns a chunk of txs
       res.send(filteredTxs.slice(0, txsLimit));
     });
@@ -133,15 +133,8 @@ export function getMockServer(
       },
       res: { send(arg: FilterUsedResponse): any }
     ): void => {
-      const featureData = getFeatureData();
-      const usedAddresses = featureData
-        ? featureData.usedAddresses
-        : undefined;
-      const filteredAddresses = usedAddresses
-        ? usedAddresses.filter((address) => (
-          req.body.addresses.includes(address)
-        ))
-        : [];
+      const filteredAddresses = req.body.addresses
+        .filter((address) => mockImporter.usedAddresses.has(address));
       res.send(filteredAddresses);
     });
 

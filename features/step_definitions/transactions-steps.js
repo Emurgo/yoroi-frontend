@@ -99,21 +99,3 @@ Then(/^I should see an incorrect wallet password error message$/, async function
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.IncorrectPasswordError' });
   await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
 });
-
-/**
- * This is a hack to generate a completely different wallet within a test file
- */
-Given(/^I cleared my local balance$/, async function () {
-  // first switch the xpub so the generated addresses are different
-  const myAccount = await this.getFromLocalStorage('ACCOUNT');
-  myAccount.root_cached_key = '815c1f331d4a7bbf2c1e15ee8983bf9b7abb980f15cecb1f868920ec2b7cf19cab1e147544a2a0550a3d5d3b527aeb0db8af42756e68572e1e96142990d27d6c';
-  await this.saveToLocalStorage('ACCOUNT', myAccount);
-
-  // then drop the DB state so all previous saved addresses are gone
-  await this.dropDB();
-
-  // next clear the cached local balance
-  const myWallet = await this.getFromLocalStorage('WALLET');
-  myWallet.adaWallet.cwAmount = { getCCoin: '0' };
-  await this.saveToLocalStorage('WALLET', myWallet);
-});
