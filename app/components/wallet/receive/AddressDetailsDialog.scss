@@ -36,6 +36,6 @@
   }
 }
 
-.modalOverlay {
-  max-width: unset!important;
+:global(.YoroiModern) .component {
+  width: var(--modal-width-lg);
 }
