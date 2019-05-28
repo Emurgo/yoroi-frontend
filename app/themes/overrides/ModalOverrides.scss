@@ -6,9 +6,11 @@
 
 .modal {
   border-radius: 8px;
-  padding: 25px 40px 40px 40px;
+  padding: unset;
   display: flex;
   flex-direction: column;
+  min-width: unset;
+  max-width: unset;
 
   :global {
     .WalletExportDialogChoices_component {

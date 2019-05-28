@@ -85,8 +85,6 @@ const rpModal = {
   '--rp-modal-bg-color': '#fff',
   '--rp-modal-max-height': '97%',
   '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
-  '--rp-modal-max-width': `560px`,
-  '--rp-modal-min-width': `560px`,
 };
 
 // OPTIONS
@@ -181,8 +179,17 @@ const topbarGradient = {
   end: '#4760ff',
 };
 
+// Modal Margin
+const modalMargin = {
+  top: 25,
+  right: 40,
+  bottom: 40,
+  left: 40,
+};
+
 export default {
   ...rpYoroiTheme,
+  // FONTS
   '--preferred-font': '"Times New Roman", serif',
 
   '--font-ultralight': 'Rubik-Light',
@@ -200,7 +207,7 @@ export default {
   '--font-mono-regular': 'RobotoMono-Regular',
   '--font-mono-medium': 'RobotoMono-Medium',
   '--font-mono-bold': 'RobotoMono-Bold',
-
+  // COLORS
   '--theme-input-hint-font': 'Rubik-Regular',
   '--theme-footer-text-font': 'Helvetica-Regular',
 
@@ -387,4 +394,9 @@ export default {
   '--theme-footer-block-background-color-hover': 'rgba(21, 209, 170, 0.1)',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
+  // OTHERS
+  '--modal-margin-cmn': `${modalMargin.top}px ${modalMargin.right}px ${modalMargin.bottom}px ${modalMargin.left}px`,
+  '--modal-width-cmn': `${560 - (modalMargin.left + modalMargin.right)}px`,
+  '--modal-width-sm': `${465 - (modalMargin.left + modalMargin.right)}px`,
+  '--modal-width-lg': `${680 - (modalMargin.left + modalMargin.right)}px`
 };

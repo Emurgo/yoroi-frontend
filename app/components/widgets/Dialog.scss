@@ -44,6 +44,9 @@
 }
 
 :global(.YoroiModern) .component {
+  margin: var(--modal-margin-cmn);
+  width: var(--modal-width-cmn);
+
   & > .title {
     font-size: 16px;
     letter-spacing: 0px;
