@@ -76,6 +76,7 @@ export default class WalletAddModern extends Component<Props> {
     return (
       <div className={styles.hero}>
         <div className={styles.settingsBar}>
+          {/* TODO: change href="main_window.html#/settings" as an action */}
           <a href="main_window.html#/settings" className={styles.settingsBarLink}>
             <SvgInline svg={settingsIcon} width="30" height="30" />
           </a>
@@ -121,6 +122,7 @@ export default class WalletAddModern extends Component<Props> {
                 </div>
               ) : null}
             </div>
+            {/* TODO: change href="main_window.html#/daedalus-transfer" as an action */}
             <a href="main_window.html#/daedalus-transfer" className={`${styles.itemCard} ${styles.itemLink}`}>
               <SvgInline svg={daedalusIcon} width="45" height="40" className={styles.itemLinkIcon} />
               <div className={styles.itemCardTitle}>
