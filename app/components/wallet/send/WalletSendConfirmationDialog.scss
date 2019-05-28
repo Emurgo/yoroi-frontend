@@ -120,6 +120,7 @@
 }
 
 :global(.YoroiModern) .dialog {
+  width: var(--modal-width-lg);
   font-family: var(--font-regular);
 
   :global {
