@@ -35,13 +35,21 @@ env:
     - CHROME_DEV_APP_ID=febkioblpijdgicianpklkmolpbagnbo
     - CHROME_STG_APP_ID=bbaanljemfingpglehbbpdlhhahliihe
     - CHROME_PRO_APP_ID=fkkmcnnpaaimcaikbjgklcibgncdgejc
+    - SCREENSHOT_DIFF_THRESHOLD=0
+    - SCREENSHOT_DIFF_COLOR=yellow
     - DISPLAY=:0
     # Encrypted env vars from ui:
+    # AWS_ACCESS_KEY_ID="${ARTIFACTS_KEY}"
+    # AWS_SECRET_ACCESS_KEY="${ARTIFACTS_SECRET}"
+    # AWS_REGION="${ARTIFACTS_REGION}"
+    # S3_BUCKET="${ARTIFACTS_BUCKET}"
     # DOCKER_USERNAME
     # DOCKER_PASSWORD
+    # GITHUB_PAT
     # GOOGLE_CLIENT_ID
     # GOOGLE_CLIENT_SECRET
     # GOOGLE_REFRESH_TOKEN
+    # SLACK_ROOM_YOROI_CI
 
 before_install:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- ${DISPLAY} -ac -screen 0 ${SCREEN_RESOLUTION}"
@@ -113,9 +121,12 @@ matrix:
       install: bash .travis/e2e_tests_install.sh
       script: bash .travis/e2e_tests.sh
 
+    # stage: artifacts-deploy
     - stage: artifacts-deploy
-      name: "Upload artifacts to GH releases and extension stores"
-      script: bash .travis/chrome_webstore_deploy.sh
+      name: "Upload artifacts to GH releases, extension stores..."
+      script:
+        - bash .travis/chrome_webstore_deploy.sh
+        - bash .travis/pull_request_screenshots_upload.sh
       if: branch =~ ^develop|staging|master OR type = pull_request
       # env provides cache
       env:
@@ -137,9 +148,8 @@ matrix:
 
 deploy:
   - provider: releases
-    api_key:
-      # rnd-at-emurgo's personal access token
-      secure: TgLMF7n8XS489hV8FDgUQ0z5t7vTuQTmUu43HfzNihGtFI1/PVxuNve5l2IRzx9XvgE/RjDaYZn6VcHBBS/ItmXRdC03dzK6/V2xbVxgHY1B4nUPA0XciyRsfHhDKElog6GJFmlmiMEEmji8orTj7o9WhIwmV0kLjj4edtQB6kInOfjRs3O/GPAwrB6NGToDgEppBv5mDCJqwaKZ2ZPwINE9hnAb69yeH7sM1KVWL2+X1bK+4hKcOb8WL+vuMdHFkj2LzPGlk6Ln+X+0ApBMOn2NNaIA+kKLWrG0F4/ygpfziO1x4G6gCtoPoGjdQwyUHhwEyziBTzBW1SOaf3SDjwiuACNCMZqwxUTm2RYrJEGb+f1qq7ebNUNHjHemNf0qa6kuKwJ9nzD8ncSzo6WwSGksTPOPBj0teZsgw6LyMISFTbweaSVBasX3m/kEUtKrDgslNqGEqTNFEf55i1LBV7b8uW9WiWVRdZla6gMQ17PST+FM1rTWMxMbAFcxxxQE0JoQ1kVqEhYndV5VnKoYum5h9GF3unFIZyLVOwJVaVHSR+TV/5ZMCqEQDXdDnunzNuFesdRtSzJUcTCdEy7lNE6oHr7jCQRb+O3qUV3O5TahX/TovmYzOwzSwoSwvw1ynSncdHt5O9c8FiIENLdiaowu9qVDE0cbPpVb/cBBJUo=
+    # rnd-at-emurgo's personal access token
+    api_key: $GITHUB_PAT
     file_glob: true
     file:
       - artifacts/yoroi*zip
@@ -160,4 +170,4 @@ notifications:
     on_failure: always
     rooms:
       # notify #yoroi-ci
-      - secure: ns3f/upkx2Ibf88VsGIlfF4DAa8qdjLf8GzwkEtKfH74/Llv9ZW6LA+QLCVIXKDInL4uuTww34ynQ2BcFp13nmpwn6+FxBQp24I3ZBOQ39sUdKc2gBVQJUAzYjmQNONFAwVtl0GddcYR2ij58KDwDUMif9xJslyLkX3uLR4KoMC0CWh9ghzbF9xABLlAwXkqez1HVNnWOYp8ppsfQovfW2RhksnsfRSqFv/7maXJJhKqRO+W1B3ZY+PmWc4beB3uWgPHNN7kPT0LyJcsK86aa4fVix6As1HD6ur4QD+Nzy5qr0kp+8B+YCANhaL8RPjF2ecmVCXZ8lPIK719EtYLFz5/xltBItCHQQICrMEV6Eu3kWXly376w7BVbfWpIxJ1dsHzKWJWopfYBZzPmBJXPJqJ5TZ/0L4W+3NhwSKV1e6UneWRSdla+55jE63i9JGFLPDZR8rHEreYEUo+0F+ejKc9Y2L5JHuyEHJxZULvWq5Jttxx1Qr73xkWYYPd7HgHzNHPA43zRUfMY5ogO4XhTdgA6iX5enelDSzDAUPCVjqWQBEE++eh2Ffk8SPAqVntrlqR/pbFG62EATaSR97/gCkwV3SlOSWFfGfH5d3S8vR11sGW4JXc9cmQ2Qo8M6nlxTqVoG0pQ44g93qygrNXWLzB406MhH+BkGCiO02cXsk=
+      - $SLACK_ROOM_YOROI_CI
