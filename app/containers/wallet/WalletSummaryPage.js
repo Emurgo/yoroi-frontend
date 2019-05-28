@@ -60,7 +60,7 @@ export default class WalletSummaryPage extends Component<Props> {
       closeExportTransactionDialog,
     } = actions[environment.API].transactions;
 
-    const { uiDialogs } = this.props.stores;
+    const { uiDialogs, profile } = this.props.stores;
     if (searchOptions) {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
@@ -80,6 +80,7 @@ export default class WalletSummaryPage extends Component<Props> {
         walletTransactions = (
           <WalletNoTransactions
             label={noTransactionsFoundLabel}
+            classicTheme={profile.isClassicTheme}
           />
         );
       }
