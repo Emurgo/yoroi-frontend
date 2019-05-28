@@ -80,7 +80,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
             <div className={styles.body}>
 
-              <div>
+              <div className={styles.infoBlock}>
                 <div className={styles.title}>
                   {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
@@ -89,13 +89,15 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
               </div>
 
-              <Button
-                className={instructionsButtonClasses}
-                label={intl.formatMessage(messages.instructionsButton)}
-                onClick={onFollowInstructionsPrerequisites}
-                disabled={!disableTransferFunds}
-                skin={ButtonSkin}
-              />
+              <div className={styles.operationBlock}>
+                <Button
+                  className={instructionsButtonClasses}
+                  label={intl.formatMessage(messages.instructionsButton)}
+                  onClick={onFollowInstructionsPrerequisites}
+                  disabled={!disableTransferFunds}
+                  skin={ButtonSkin}
+                />
+              </div>
 
             </div>
 
@@ -109,42 +111,44 @@ export default class TransferInstructionsPage extends Component<Props> {
 
             <div className={styles.body}>
 
-              <div>
+              <div className={styles.infoBlock}>
                 <div className={styles.title}>
                   {intl.formatMessage(messages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
-                  {attentionText}
+                  <p>{attentionText}</p>
                 </div>
               </div>
 
-              <div className={styles.buttonTitle}>
-                {confirmationTitleText}
+              <div className={styles.operationBlock}>
+                <div className={styles.buttonTitle}>
+                  {confirmationTitleText}
+                </div>
+
+                <Button
+                  className={confirmButtonClasses}
+                  label={confirmationText}
+                  onClick={onConfirm}
+                  disabled={disableTransferFunds}
+                  skin={ButtonSkin}
+                />
+
+                <Button
+                  className={confirmButtonClasses}
+                  label={confirmationPaperText}
+                  onClick={onPaperConfirm}
+                  disabled={disableTransferFunds}
+                  skin={ButtonSkin}
+                />
+
+                <Button
+                  className={`masterKey ${confirmButtonClasses}`} // append class for testing
+                  label={confirmationMasterKeyText}
+                  onClick={onMasterKeyConfirm}
+                  disabled={disableTransferFunds}
+                  skin={ButtonSkin}
+                />
               </div>
-
-              <Button
-                className={confirmButtonClasses}
-                label={confirmationText}
-                onClick={onConfirm}
-                disabled={disableTransferFunds}
-                skin={ButtonSkin}
-              />
-
-              <Button
-                className={confirmButtonClasses}
-                label={confirmationPaperText}
-                onClick={onPaperConfirm}
-                disabled={disableTransferFunds}
-                skin={ButtonSkin}
-              />
-
-              <Button
-                className={`masterKey ${confirmButtonClasses}`} // append class for testing
-                label={confirmationMasterKeyText}
-                onClick={onMasterKeyConfirm}
-                disabled={disableTransferFunds}
-                skin={ButtonSkin}
-              />
 
             </div>
 
