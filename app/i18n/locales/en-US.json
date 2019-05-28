@@ -385,6 +385,7 @@
   "wallet.send.form.amount.equalsAda": "equals {amount} ADA",
   "wallet.send.form.amount.label": "Amount",
   "wallet.send.form.calculatingFee": "Calculating fee...",
+  "wallet.send.form.description.checkboxLabel": "Send all my ADA",
   "wallet.send.form.description.hint": "You can add a message if you want",
   "wallet.send.form.description.label": "Description",
   "wallet.send.form.errors.invalidAddress": "Please enter a valid address.",
