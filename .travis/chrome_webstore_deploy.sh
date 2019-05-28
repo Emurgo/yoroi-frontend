@@ -41,7 +41,12 @@ then
   export TEMPLATE="staging"
   echo "Building Yoroi-${RELEASE_TAG}..."
 
+  set +x
   ACCESS_TOKEN=$(curl -s -X POST -d "client_id=$GOOGLE_CLIENT_ID&client_secret=$GOOGLE_CLIENT_SECRET&refresh_token=$GOOGLE_REFRESH_TOKEN&grant_type=refresh_token" https://www.googleapis.com/oauth2/v4/token | grep access_token | awk -F: '{print $2}' | sed 's|.*"\(.*\)".*|\1|g')
+  set -x
+  yoroi-build
+
+  set +x
   APP_ID=$(curl  \
     -H "Authorization: Bearer ${ACCESS_TOKEN}"  \
     -H "x-goog-api-version: 2" \
@@ -49,8 +54,7 @@ then
     -T artifacts/${ZIP_NAME} \
     -v \
     ${CHROME_WEBSTORE_API_ENDPOINT}/items | sed 's|.*"id":"\(.*\)","upload.*|\1|g')
-
-  yoroi-build
+  set -x
 
   chrome-webstore-upndown
 
