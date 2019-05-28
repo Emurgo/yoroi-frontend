@@ -51,3 +51,7 @@
 .isSubmitting {
   @include loading-spinner("../../assets/images/spinner-light.svg");
 }
+
+:global(.YoroiModern) .dialog {
+  width: var(--modal-width-lg);
+}
