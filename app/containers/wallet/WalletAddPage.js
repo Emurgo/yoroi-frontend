@@ -202,7 +202,7 @@ export default class WalletAddPage extends Component<Props> {
     return (
       <MainLayout
         topbar={topBar}
-        hideTopbar={profile.isModernTheme && isWalletAdd}
+        hideTopbar
         classicTheme={profile.isClassicTheme}
       >
         {content}
