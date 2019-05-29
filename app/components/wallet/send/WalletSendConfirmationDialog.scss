@@ -6,7 +6,7 @@
 
   :global {
     .Dialog_title {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
   }
 
@@ -127,12 +127,6 @@
 
   .dialog {
     font-family: var(--font-regular);
-
-    :global {
-      .Dialog_title {
-        margin-bottom: 55px;
-      }
-    }
 
     .currencySymbol {
       font-family: var(--font-regular);
