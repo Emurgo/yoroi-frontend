@@ -133,6 +133,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
+        skinOverride={styles.skinOverride}
         classicTheme={classicTheme}
       >
         {infoBlock}
