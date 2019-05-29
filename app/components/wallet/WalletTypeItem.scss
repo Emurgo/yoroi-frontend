@@ -38,10 +38,6 @@
     font-family: var(--font-regular);
     font-weight: var(--font-semibold);
     cursor: pointer;
-
-    &:hover {
-      color: var(--theme-default-color-blue);
-    }
   }
 
   .walletTypeDesc {
@@ -128,6 +124,49 @@
 
     &.ledger {
       background-image: url(../../assets/images/wallets/modern/ledger.inline.svg);
+    }
+  }
+
+  .walletTypeTitle {
+    &:hover {
+      color: var(--theme-default-color-blue);
+    }
+  }
+}
+
+
+:global(.YoroiClassic) {
+
+  .walletTypeImg {
+
+    &.mnemonic {
+      background-image: url(../../assets/images/wallets/classic/mnemonimic_words_wallet.inline.svg);
+    }
+  
+    &.master {
+      background-image: url(../../assets/images/wallets/classic/master_key.inline.svg);
+    }
+  
+    &.paper {
+      background-image: url(../../assets/images/wallets/classic/paper_wallet.inline.svg);
+    }
+  
+    &.business {
+      background-image: url(../../assets/images/wallets/classic/business_wallet.inline.svg);
+    }
+
+    &.trezor {
+      background-image: url(../../assets/images/wallets/classic/trezor_wallet.inline.svg);
+    }
+
+    &.ledger {
+      background-image: url(../../assets/images/wallets/classic/ledger_wallet.inline.svg);
+    }
+  }
+
+  .walletTypeTitle {
+    &:hover {
+      color: var(--theme-default-main-color);
     }
   }
 }
