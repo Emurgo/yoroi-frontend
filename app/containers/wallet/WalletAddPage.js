@@ -154,9 +154,14 @@ export default class WalletAddPage extends Component<Props> {
           classicTheme={profile.isClassicTheme}
         />
       );
-    } else {
-      isWalletAdd = true;
-      content = (
+    }
+
+    return (
+      <MainLayout
+        topbar={topBar}
+        hideTopbar
+        classicTheme={profile.isClassicTheme}
+      >
         <WalletAdd
           onHardwareConnect={
             () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
@@ -173,15 +178,6 @@ export default class WalletAddPage extends Component<Props> {
           subTitle={this.context.intl.formatMessage(messages.subTitle)}
           classicTheme={profile.isClassicTheme}
         />
-      );
-    }
-
-    return (
-      <MainLayout
-        topbar={topBar}
-        hideTopbar
-        classicTheme={profile.isClassicTheme}
-      >
         {content}
       </MainLayout>
     );
