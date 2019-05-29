@@ -72,15 +72,10 @@
 
     .amount,
     .fees {
-      color: var(--theme-send-confirmation-dialog-send-values-color);
       font-size: 15px;
       line-height: 1.38;
       margin-top: 6px;
       word-break: break-word;
-    }
-
-    .fees {
-      opacity: 0.5;
     }
   }
 
@@ -116,6 +111,11 @@
     .fees {
       opacity: 0.5;
     }
+
+    .amount,
+    .fees {
+      color: var(--theme-send-confirmation-dialog-send-values-color);
+    }    
   }
 }
 
@@ -171,7 +171,6 @@
 
       .amount,
       .fees {
-        color: var(--theme-send-confirmation-dialog-send-values-color);
         font-size: 14px;
         line-height: 1.57;
         margin-top: 2px;
