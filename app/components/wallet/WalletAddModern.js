@@ -2,13 +2,14 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import styles from './WalletAdd.scss';
-import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 
 import SvgInline from 'react-svg-inline';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
-import daedalusIcon from '../../assets/images/top-bar/daedalus-migration-active.inline.svg';
+import daedalusIcon from '../../assets/images/top-bar/daedalus-migration-filled.inline.svg';
+
+import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
+import styles from './WalletAdd.scss';
 
 const messages = defineMessages({
   title: {
@@ -35,16 +36,22 @@ const messages = defineMessages({
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
   },
+  transferFundsTitle: {
+    id: 'daedalusTransfer.wallet.add.page.link.label',
+    defaultMessage: '!!!Transfer funds from Daedalus wallet to Yoroi',
+  },
 });
 
 type Props = {
   onCreate: Function,
   onRestore: Function,
   onHardwareConnect: Function,
+  onSettings: Function,
+  onDaedalusTransfer: Function,
   isRestoreActive: boolean,
-  classicTheme: boolean,
   title: string,
   subTitle: string,
+  classicTheme: boolean,
 };
 
 @observer
@@ -59,8 +66,9 @@ export default class WalletAddModern extends Component<Props> {
       onCreate,
       onRestore,
       onHardwareConnect,
+      onSettings,
+      onDaedalusTransfer,
       isRestoreActive,
-      classicTheme,
       title,
     } = this.props;
 
@@ -70,59 +78,63 @@ export default class WalletAddModern extends Component<Props> {
     }
 
     return (
-      <div className={styles.hero}>
-        {/* start page settings bar start */}
-        <div className={styles.settingsBar}>
-          <a href="main_window.html#/daedalus-transfer" className={styles.settingsBarLink}>
-            <SvgInline svg={daedalusIcon} width="45" height="40" />
-          </a>
-          <a href="main_window.html#/settings" className={styles.settingsBarLink}>
-            <SvgInline svg={settingsIcon} width="30" height="30" />
-          </a>
-        </div>
-        {/* start page settings bar end */}
-        <div className={styles.heroInner}>
-          <div className={styles.heroLeft}>
-            <SvgInline svg={logoIcon} className={styles.heroLogo} />
-            <h2 className={styles.title}>{title}</h2>
-            <h3 className={styles.subTitle}>{intl.formatMessage(messages.subTitle)}</h3>
+      <div className={styles.heroWrapper}>
+        <div className={styles.hero}>
+          <div className={styles.settingsBar}>
+            <button type="button" onClick={onSettings} className={styles.settingsBarLink}>
+              <SvgInline svg={settingsIcon} width="30" height="30" />
+            </button>
           </div>
-          <div className={styles.cardList}>
-            <button type="button" onClick={onCreate}>
-              <div className={styles.itemCard}>
-                <div className={`${styles.itemCardBg} ${styles.create}`} />
-                <h3 className={styles.itemCardTitle}>
-                  {intl.formatMessage(messages.createDescription)}
-                </h3>
+          <div className={styles.heroInner}>
+            <div className={styles.heroLeft}>
+              <SvgInline svg={logoIcon} className={styles.heroLogo} />
+              <h2 className={styles.title}>{title}</h2>
+              <h3 className={styles.subTitle}>{intl.formatMessage(messages.subTitle)}</h3>
+            </div>
+            <div className={styles.heroRight}>
+              <div className={styles.cardList}>
+                <button type="button" onClick={onHardwareConnect}>
+                  <div className={styles.itemCard}>
+                    <div className={`${styles.itemCardBg} ${styles.connect}`} />
+                    <div className={styles.itemCardTitle}>
+                      {intl.formatMessage(messages.connectToHardwareDescription)}
+                    </div>
+                  </div>
+                </button>
+                <button type="button" onClick={onCreate}>
+                  <div className={styles.itemCard}>
+                    <div className={`${styles.itemCardBg} ${styles.create}`} />
+                    <div className={styles.itemCardTitle}>
+                      {intl.formatMessage(messages.createDescription)}
+                    </div>
+                  </div>
+                </button>
+                <button type="button" onClick={onRestore}>
+                  <div className={styles.itemCard}>
+                    <div className={`${styles.itemCardBg} ${styles.restore}`} />
+                    <div className={styles.itemCardTitle}>
+                      {intl.formatMessage(messages.restoreDescription)}
+                    </div>
+                  </div>
+                </button>
+                {activeNotification ? (
+                  <div className={styles.notification}>
+                    <FormattedHTMLMessage
+                      {...messages[activeNotification]}
+                      values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
+                    />
+                  </div>
+                ) : null}
               </div>
-            </button>
-            <button type="button" onClick={onRestore}>
-              <div className={styles.itemCard}>
-                <div className={`${styles.itemCardBg} ${styles.restore}`} />
-                <h3 className={styles.itemCardTitle}>
-                  {intl.formatMessage(messages.restoreDescription)}
-                </h3>
-              </div>
-            </button>
-            <button type="button" onClick={onHardwareConnect}>
-              <div className={styles.itemCard}>
-                <div className={`${styles.itemCardBg} ${styles.connect}`} />
-                <h3 className={styles.itemCardTitle}>
-                  {intl.formatMessage(messages.connectToHardwareDescription)}
-                </h3>
-              </div>
-            </button>
-            {activeNotification ? (
-              <div className={styles.notification}>
-                <FormattedHTMLMessage
-                  {...messages[activeNotification]}
-                  values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
-                />
-              </div>
-            ) : null}
+              <button type="button" onClick={onDaedalusTransfer} className={`${styles.itemCard} ${styles.itemLink}`}>
+                <SvgInline svg={daedalusIcon} width="45" height="40" className={styles.itemLinkIcon} />
+                <div className={styles.itemCardTitle}>
+                  {intl.formatMessage(messages.transferFundsTitle)}
+                </div>
+              </button>
+            </div>
           </div>
         </div>
-        {!classicTheme && <div className={styles.heroBg} />}
       </div>
     );
   }

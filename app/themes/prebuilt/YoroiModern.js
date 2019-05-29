@@ -387,4 +387,25 @@ export default {
   '--theme-footer-block-background-color-hover': 'rgba(21, 209, 170, 0.1)',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
+
+  '--theme-default-color-blue': '#2249BE',
+  '--theme-default-color-blue-dark': '#1A44B7',
+  '--theme-default-color-blue-medium': '#4760FF',
+  '--theme-default-color-blue-light': '#E1F2FF',
+  '--theme-default-color-blue-lightsome': 'rgba(34, 73, 190, 0.6)',
+
+  '--theme-default-color-green': '#17D1AA',
+  '--theme-default-color-green-light': '#C9EDE5',
+
+  '--theme-default-color-red': '#FF1351',
+  '--theme-default-color-red-medium': 'rgba(255, 19, 81, 0.3)',
+  '--theme-default-color-red-light': 'rgba(255, 19, 81, 0.6)',
+
+  '--theme-default-color-grey': '#38393D',
+  '--theme-default-color-grey-1': '#464749',
+  '--theme-default-color-grey-2': '#93979C',
+  '--theme-default-color-grey-3': '#ADAEB6',
+  '--theme-default-color-grey-4': '#D9DAE0',
+  '--theme-default-color-grey-5': '#F0F3F5',
+
 };

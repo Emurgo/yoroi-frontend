@@ -153,7 +153,9 @@
 }
 
 // new styles
-
+.heroWrapper {
+  height: 100%;
+}
 .hero {
   overflow: overlay;
   height: 100%;
@@ -177,7 +179,7 @@
 
   @media screen and (max-width: 1300px) {
     flex-direction: column;
-    padding: 0 15px;
+    padding: 300px 15px 0;
   }
 }
 
@@ -220,8 +222,13 @@
   display: flex;
   flex-direction: column;
   margin: 0 8px;
-  box-shadow: 0 10px 15px 0px rgba(0,0,0, .1);
+  box-shadow: 0 5px 20px 0px rgba(24,26,30, .08);
+  margin-bottom: 15px;
   cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
+  }
 
   .itemCardTitle {
     letter-spacing: -0.03em;
@@ -248,7 +255,6 @@
 :global(.YoroiModern) {
   .itemCard {
     width: var(--card-width);
-    flex: 1 0 var(--card-width);
     height: var(--card-height);
     border-radius: var(--card-border-radius);
     background-color: var(--card-bg-color);
@@ -256,35 +262,40 @@
     font-size: var(--card-text-size);
   }
 
-  .itemCardBg {
-    &.create {
-      background-image: url(../../assets/images/cards/create_card.svg);
-    }
-    &.restore {
-      background-image: url(../../assets/images/cards/restore_card.svg);
-    }
-    &.connect {
-      background-image: url(../../assets/images/cards/connect_card.svg);
+  .itemLink {
+    width: calc(var(--card-width) *2 + 15px);
+    flex: auto;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    text-decoration: none;
+    padding: 24px 32px;
+
+    .itemLinkIcon {
+      margin-right: 30px;
     }
   }
 
-  .heroBg {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+  .itemCardBg {
+    &.create {
+      background-image: url(../../assets/images/wallets/create.wallet.inline.svg);
+    }
+    &.restore {
+      background-image: url(../../assets/images/wallets/restore.wallet.inline.svg);
+    }
+    &.connect {
+      background-image: url(../../assets/images/wallets/hardware.wallet.inline.svg);
+    }
+  }
+
+  .heroWrapper {
     background-image: url(../../assets/images/add-wallet-bg.svg);
     background-size: cover;
     background-repeat: no-repeat;
-    background-position: 0 -250px;
-
-    @media screen and (max-width: 1600px) {
-      background-position: 0 -100px;
-    }
+    background-position: center -13vw;
 
     @media screen and (max-width: 1400px) {
-      background-position: 0;
+      background-position: 0 0;
     }
   }
 }
@@ -300,10 +311,11 @@
     font-size: var(--card-text-size);
   }
 }
+
 .settingsBar {
   position: absolute;
   right: 28px;
-  top: 8px;
+  top: 13px;
   z-index: 99;
   display: flex;
   align-items: center;
@@ -311,6 +323,7 @@
 
 .settingsBarLink {
   display: block;
+  cursor: pointer;
 
   + .settingsBarLink {
     margin-left: 50px;
