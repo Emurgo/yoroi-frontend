@@ -5,7 +5,6 @@ import { intlShape, defineMessages } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import RouterActions from '../../actions/router-actions';
 import WalletAdd from '../../components/wallet/WalletAdd';
-import WalletAddModern from '../../components/wallet/WalletAddModern';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 import WalletRestoreOptionsDialog from '../../components/wallet/WalletRestoreOptionsDialog';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
@@ -157,46 +156,24 @@ export default class WalletAddPage extends Component<Props> {
       );
     } else {
       isWalletAdd = true;
-      if (profile.isClassicTheme) {
-        content = (
-          <WalletAddModern
-            onHardwareConnect={
-              () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
-            }
-            isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-            isCreateLedgerWalletActive={isCreateLedgerWalletActive}
-            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionsDialog })}
-            onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-            isRestoreActive={restoreRequest.isExecuting}
-            onSettings={this._goToSettingsRoot}
-            onDaedalusTransfer={this._goToDaedalusTransferRoot}
-            title={this.context.intl.formatMessage(messages.title)}
-            subTitle={this.context.intl.formatMessage(messages.subTitle)}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
-      } else {
-        content = (
-          <WalletAddModern
-            onHardwareConnect={
-              () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
-            }
-            isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-            isCreateLedgerWalletActive={isCreateLedgerWalletActive}
-            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionsDialog })}
-            onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-            isRestoreActive={restoreRequest.isExecuting}
-            onSettings={this._goToSettingsRoot}
-            onDaedalusTransfer={this._goToDaedalusTransferRoot}
-            title={this.context.intl.formatMessage(messages.title)}
-            subTitle={this.context.intl.formatMessage(messages.subTitle)}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
-      }
-
+      content = (
+        <WalletAdd
+          onHardwareConnect={
+            () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
+          }
+          isCreateTrezorWalletActive={isCreateTrezorWalletActive}
+          isCreateLedgerWalletActive={isCreateLedgerWalletActive}
+          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionsDialog })}
+          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
+          isRestoreActive={restoreRequest.isExecuting}
+          onSettings={this._goToSettingsRoot}
+          onDaedalusTransfer={this._goToDaedalusTransferRoot}
+          title={this.context.intl.formatMessage(messages.title)}
+          subTitle={this.context.intl.formatMessage(messages.subTitle)}
+          classicTheme={profile.isClassicTheme}
+        />
+      );
     }
 
     return (
