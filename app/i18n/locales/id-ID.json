@@ -402,6 +402,7 @@
   "wallet.send.form.sendingIsDisabled": "Tidak dapat mengirim transaksi baru selama transaksi lain masih tertunda.",
   "wallet.send.form.title.hint": "Misal. Uang untuk Frank",
   "wallet.send.form.title.label": "Judul",
+  "wallet.send.form.sendAll.checkboxLabel": "Send all {currency}",
   "wallet.send.form.transactionFeeError": "Ada tidak cukup untuk biaya. Coba kirim kembali dengan jumlah yang lebih kecil.",
   "wallet.send.ledger.confirmationDialog.info.line.1": "After connecting your Ledger device to your computer's USB port, press the Send using Ledger button.",
   "wallet.send.ledger.confirmationDialog.info.line.2": "Make sure the Cardano ADA app remains open on the Ledger device throughout the process.",
