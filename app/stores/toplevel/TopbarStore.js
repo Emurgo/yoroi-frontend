@@ -46,7 +46,7 @@ export default class TopbarStore extends Store {
       }
 
       // If there is not any active wallets then replace WALLETS Category by GO_BACK Category
-      if (!wallets.hasActiveWallet) {
+      if (!wallets.hasAnyLoaded) {
         // eslint-disable-next-line arrow-body-style
         const walletCategoryIndex = this.CATEGORIES.findIndex((item) => {
           return item.name === WALLETS.name;
