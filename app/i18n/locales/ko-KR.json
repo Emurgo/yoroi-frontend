@@ -402,6 +402,7 @@
   "wallet.send.form.sendingIsDisabled": "보류중인 거래가 있을때는 새로운 거래를 보낼수가 없습니다.",
   "wallet.send.form.title.hint": "예: Money for Frank",
   "wallet.send.form.title.label": "제목",
+  "wallet.send.form.sendAll.checkboxLabel": "Send all {currency}",
   "wallet.send.form.transactionFeeError": "수수료에 사용할 충분한 ADA가 없습니다. 더 적은 금액을 송금해 보십시오.",
   "wallet.send.ledger.confirmationDialog.info.line.1": "Ledger 지갑를 컴퓨터에 연결한 뒤, \"보내기\" 버튼을 눌러 주십시오.",
   "wallet.send.ledger.confirmationDialog.info.line.2": "과정이 진행되는 동안 Ledger 장치의 Cardano ADA 앱이 열려있어야 합니다.",
