@@ -107,27 +107,27 @@
   .walletTypeImg {
 
     &.mnemonic {
-      background-image: url(../../assets/images/wallets/mnemonic_wallet.svg);
+      background-image: url(../../assets/images/wallets/modern/mnemonic_wallet.svg);
     }
   
     &.master {
-      background-image: url(../../assets/images/wallets/master_key.svg);
+      background-image: url(../../assets/images/wallets/modern/master_key.svg);
     }
   
     &.paper {
-      background-image: url(../../assets/images/wallets/paper.wallet.inline.svg);
+      background-image: url(../../assets/images/wallets/modern/paper.wallet.inline.svg);
     }
   
     &.business {
-      background-image: url(../../assets/images/wallets/business_wallet.svg);
+      background-image: url(../../assets/images/wallets/modern/business_wallet.svg);
     }
 
     &.trezor {
-      background-image: url(../../assets/images/wallets/trezor.inline.svg);
+      background-image: url(../../assets/images/wallets/modern/trezor.inline.svg);
     }
 
     &.ledger {
-      background-image: url(../../assets/images/wallets/ledger.inline.svg);
+      background-image: url(../../assets/images/wallets/modern/ledger.inline.svg);
     }
   }
 }

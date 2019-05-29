@@ -159,17 +159,21 @@ export default class WalletAddPage extends Component<Props> {
       isWalletAdd = true;
       if (profile.isClassicTheme) {
         content = (
-          <WalletAdd
-            onTrezor={openTrezorConnectDialog}
+          <WalletAddModern
+            onHardwareConnect={
+              () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
+            }
             isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-            onLedger={openLedgerConnectDialog}
             isCreateLedgerWalletActive={isCreateLedgerWalletActive}
             onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionsDialog })}
             onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
             isRestoreActive={restoreRequest.isExecuting}
-            classicTheme={profile.isClassicTheme}
+            onSettings={this._goToSettingsRoot}
+            onDaedalusTransfer={this._goToDaedalusTransferRoot}
             title={this.context.intl.formatMessage(messages.title)}
+            subTitle={this.context.intl.formatMessage(messages.subTitle)}
+            classicTheme={profile.isClassicTheme}
           />
         );
       } else {
