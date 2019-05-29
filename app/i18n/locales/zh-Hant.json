@@ -402,6 +402,7 @@
   "wallet.send.form.sendingIsDisabled": "由於目前有待處理狀態的交易，新交易無法發送。",
   "wallet.send.form.title.hint": "例如：支付給 Frank 的款項",
   "wallet.send.form.title.label": "標題",
+  "wallet.send.form.sendAll.checkboxLabel": "Send all {currency}",
   "wallet.send.form.transactionFeeError": "費用所需的 Ada 不足。嘗試傳送較小的金額。",
   "wallet.send.ledger.confirmationDialog.info.line.1": "將 Ledger 設備連接到電腦USB後, 按下發送按鈕。",
   "wallet.send.ledger.confirmationDialog.info.line.2": "確保 Cardano ADA 應用程式在整個過程中保持在 Ledger 設備上的打開狀態。",
