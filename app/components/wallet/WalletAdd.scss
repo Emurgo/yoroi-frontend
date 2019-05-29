@@ -149,7 +149,8 @@
     }
   }
 
-  .heroCardsItemLinkIcon {
+  .heroCardsItemLinkIcon,
+  .settingsBarLink {
     path,
     polygon {
       fill: var(--theme-default-color-blue);
@@ -199,7 +200,8 @@
   }
 
   .heroLogo,
-  .heroCardsItemLinkIcon {
+  .heroCardsItemLinkIcon,
+  .settingsBarLink {
     path,
     polygon {
       fill: var(--theme-default-main-color);
