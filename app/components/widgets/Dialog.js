@@ -51,7 +51,7 @@ export default class Dialog extends Component<Props> {
       props.theme.modal.modal = `${props.theme.modal.modal} ${skinOverride}`;
     }
 
-    return ModalSkin(props);
+    return new ModalSkin(props);
   }
 
   render() {

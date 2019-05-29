@@ -36,6 +36,9 @@
   }
 }
 
-.skinOverride {
-  max-width: unset!important;
+:global(.YoroiModern) {
+  .skinOverride {
+    min-width: var(--theme-modal-width-lg);
+    max-width: var(--theme-modal-width-lg);
+  }
 }
