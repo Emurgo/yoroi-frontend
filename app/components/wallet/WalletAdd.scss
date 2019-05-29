@@ -1,10 +1,10 @@
 .heroWrapper {
   height: 100%;
+  overflow: auto;
 }
 
 .hero {
-  overflow: overlay;
-  height: 100%;
+  min-height: 100%;
   max-width: 1366px;
   margin: 0 auto;
   padding: 20px 15px;
@@ -25,7 +25,7 @@
 
   @media screen and (max-width: 1300px) {
     flex-direction: column;
-    padding: 300px 15px 0;
+    padding: 0 15px;
   }
 }
 
