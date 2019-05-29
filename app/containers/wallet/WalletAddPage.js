@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { ROUTES } from '../../routes-config';
+import RouterActions from '../../actions/router-actions';
 import WalletAdd from '../../components/wallet/WalletAdd';
 import WalletAddModern from '../../components/wallet/WalletAddModern';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
@@ -174,18 +175,20 @@ export default class WalletAddPage extends Component<Props> {
       } else {
         content = (
           <WalletAddModern
+            onHardwareConnect={
+              () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
+            }
             isCreateTrezorWalletActive={isCreateTrezorWalletActive}
             isCreateLedgerWalletActive={isCreateLedgerWalletActive}
             onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
             onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionsDialog })}
-            onHardwareConnect={
-              () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
-            }
             onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
             isRestoreActive={restoreRequest.isExecuting}
-            classicTheme={profile.isClassicTheme}
+            onSettings={this._goToSettingsRoot}
+            onDaedalusTransfer={this._goToDaedalusTransferRoot}
             title={this.context.intl.formatMessage(messages.title)}
             subTitle={this.context.intl.formatMessage(messages.subTitle)}
+            classicTheme={profile.isClassicTheme}
           />
         );
       }
@@ -203,6 +206,10 @@ export default class WalletAddPage extends Component<Props> {
     );
   }
 
+  _getRouter(): RouterActions {
+    return this.props.actions.router;
+  }
+
   _getWalletsStore(): AdaWalletsStore {
     return this.props.stores.substores[environment.API].wallets;
   }
@@ -213,5 +220,17 @@ export default class WalletAddPage extends Component<Props> {
 
   _getLedgerConnectStore(): LedgerConnectStore {
     return this.props.stores.substores[environment.API].ledgerConnect;
+  }
+
+  _goToSettingsRoot = (): void => {
+    this._getRouter().goToRoute.trigger({
+      route: ROUTES.SETTINGS.ROOT
+    });
+  }
+
+  _goToDaedalusTransferRoot = (): void => {
+    this._getRouter().goToRoute.trigger({
+      route: ROUTES.DAEDALUS_TRANFER.ROOT
+    });
   }
 }

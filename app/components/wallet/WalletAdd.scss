@@ -323,6 +323,7 @@
 
 .settingsBarLink {
   display: block;
+  cursor: pointer;
 
   + .settingsBarLink {
     margin-left: 50px;

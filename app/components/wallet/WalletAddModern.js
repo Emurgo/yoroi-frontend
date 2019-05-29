@@ -2,13 +2,14 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import styles from './WalletAdd.scss';
-import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 
 import SvgInline from 'react-svg-inline';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration-filled.inline.svg';
+
+import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
+import styles from './WalletAdd.scss';
 
 const messages = defineMessages({
   title: {
@@ -45,10 +46,12 @@ type Props = {
   onCreate: Function,
   onRestore: Function,
   onHardwareConnect: Function,
+  onSettings: Function,
+  onDaedalusTransfer: Function,
   isRestoreActive: boolean,
-  classicTheme: boolean,
   title: string,
   subTitle: string,
+  classicTheme: boolean,
 };
 
 @observer
@@ -63,6 +66,8 @@ export default class WalletAddModern extends Component<Props> {
       onCreate,
       onRestore,
       onHardwareConnect,
+      onSettings,
+      onDaedalusTransfer,
       isRestoreActive,
       classicTheme,
       title,
@@ -77,10 +82,9 @@ export default class WalletAddModern extends Component<Props> {
       <div className={styles.heroWrapper}>
         <div className={styles.hero}>
           <div className={styles.settingsBar}>
-            {/* TODO: change href="main_window.html#/settings" as an action */}
-            <a href="main_window.html#/settings" className={styles.settingsBarLink}>
+            <button type="button" onClick={onSettings} className={styles.settingsBarLink}>
               <SvgInline svg={settingsIcon} width="30" height="30" />
-            </a>
+            </button>
           </div>
           <div className={styles.heroInner}>
             <div className={styles.heroLeft}>
@@ -123,13 +127,12 @@ export default class WalletAddModern extends Component<Props> {
                   </div>
                 ) : null}
               </div>
-              {/* TODO: change href="main_window.html#/daedalus-transfer" as an action */}
-              <a href="main_window.html#/daedalus-transfer" className={`${styles.itemCard} ${styles.itemLink}`}>
+              <button type="button" onClick={onDaedalusTransfer} className={`${styles.itemCard} ${styles.itemLink}`}>
                 <SvgInline svg={daedalusIcon} width="45" height="40" className={styles.itemLinkIcon} />
                 <div className={styles.itemCardTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
                 </div>
-              </a>
+              </button>
             </div>
           </div>
         </div>
