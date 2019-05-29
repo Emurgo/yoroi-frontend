@@ -149,6 +149,13 @@
     }
   }
 
+  .heroCardsItemLinkIcon {
+    path,
+    polygon {
+      fill: var(--theme-default-color-blue);
+    }
+  }
+
   .heroCardsItemBg {
     &.create {
       background-image: url(../../assets/images/wallets/modern/create.wallet.inline.svg);
