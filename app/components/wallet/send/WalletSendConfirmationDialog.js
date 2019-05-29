@@ -138,6 +138,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
+        skinOverride={styles.skinOverride}
         classicTheme={classicTheme}
       >
         <div className={styles.walletPasswordFields}>
