@@ -100,7 +100,7 @@ export default class AddressDetailsDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        modalOverlay={styles.modalOverlay}
+        skinOverride={styles.skinOverride}
         classicTheme={classicTheme}
       >
         {walletAddress ? (

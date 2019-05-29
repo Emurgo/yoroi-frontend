@@ -18,7 +18,7 @@ type Props = {
   className?: string,
   onClose?: Function,
   closeOnOverlayClick?: boolean,
-  modalOverlay?: Object,
+  skinOverride?: Object,
   classicTheme: boolean
 };
 
@@ -33,18 +33,18 @@ export default class Dialog extends Component<Props> {
     className: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
-    modalOverlay: undefined,
+    skinOverride: undefined,
   };
 
+
+  /** Hack to override modal skin
+    * This enables to override skin which is places above main content in DOM */
   setSkin = (props) => {
-    const { modalOverlay } = this.props;
-    // hack to override modal styles
-    const newProps = _.set(
-      { ...props },
-      `theme.${props.themeId}.modal`,
-      `${props.theme[props.themeId].modal} ${modalOverlay}`
-    );
-    return ModalSkin(modalOverlay ? newProps : props);
+    const { skinOverride } = this.props;
+    if (skinOverride && props.theme.modal.modal.indexOf(skinOverride) === -1) {
+      props.theme.modal.modal = `${props.theme.modal.modal} ${skinOverride}`;
+    }
+    return ModalSkin(props);
   }
 
   render() {
