@@ -52,7 +52,7 @@ export default class WalletRestoreOptionsDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
         <div className={styles.tabsContent}>
-          <ul className={styles.walletTypeList}>
+          <ul className={styles.heroWalletTypeList}>
             <WalletTypeItem
               action={onRestore}
               type="mnemonic"
