@@ -402,6 +402,7 @@
   "wallet.send.form.sendingIsDisabled": "Невозможно совершить новую транзакцию пока текущая не завершена.",
   "wallet.send.form.title.hint": "Например: Деньги для Фрэнка",
   "wallet.send.form.title.label": "Название",
+  "wallet.send.form.sendAll.checkboxLabel": "Send all {currency}",
   "wallet.send.form.transactionFeeError": "Недостаточно Ada для оплаты комиссии. Попробуйте отправить меньшую сумму.",
   "wallet.send.ledger.confirmationDialog.info.line.1": "После подключения устройства Ledger к своему компьютеру, нажмите Отправить, используя кнопку Ledger.",
   "wallet.send.ledger.confirmationDialog.info.line.2": "Убедитесь, что приложение Cardano ADA остается открытым на устройстве Ledger в течении всего процесса.",
