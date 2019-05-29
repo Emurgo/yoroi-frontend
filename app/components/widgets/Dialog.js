@@ -41,9 +41,16 @@ export default class Dialog extends Component<Props> {
     * This enables to override skin which is places above main content in DOM */
   setSkin = (props) => {
     const { skinOverride } = this.props;
+
+    // Default overrides
+    if (styles.skinOverride && props.theme.modal.modal.indexOf(styles.skinOverride) === -1) {
+      props.theme.modal.modal = `${props.theme.modal.modal} ${styles.skinOverride}`;
+    }
+    // Dialog extended component override
     if (skinOverride && props.theme.modal.modal.indexOf(skinOverride) === -1) {
       props.theme.modal.modal = `${props.theme.modal.modal} ${skinOverride}`;
     }
+
     return ModalSkin(props);
   }
 

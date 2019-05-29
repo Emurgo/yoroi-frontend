@@ -85,8 +85,6 @@ const rpModal = {
   '--rp-modal-bg-color': '#fff',
   '--rp-modal-max-height': '97%',
   '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
-  '--rp-modal-max-width': `560px`,
-  '--rp-modal-min-width': `560px`,
 };
 
 // OPTIONS
@@ -408,4 +406,8 @@ export default {
   '--theme-default-color-grey-4': '#D9DAE0',
   '--theme-default-color-grey-5': '#F0F3F5',
 
+  '--theme-modal-padding-cmn': '25px 40px 40px 40px',
+  '--theme-modal-width-cmn': '560px',
+  '--theme-modal-width-sm': '465px',
+  '--theme-modal-width-lg': '680px',
 };

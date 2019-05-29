@@ -43,21 +43,27 @@
   }
 }
 
-:global(.YoroiModern) .component {
-  & > .title {
-    font-size: 16px;
-    letter-spacing: 0px;
-  }  
-}
-
 :global(.YoroiModern) {
-  .content {
-    padding: 0 40px;
-    margin: 0 -40px;
-    max-height: 60vh;
+  .skinOverride {
+    padding: var(--theme-modal-padding-cmn);
+    min-width: var(--theme-modal-width-cmn);
+    max-width: var(--theme-modal-width-cmn);
   }
 
-  .title {
-    letter-spacing: 0;
+  .component {
+    & > .title {
+      font-size: 16px;
+      letter-spacing: 0px;
+    }
+
+    .content {
+      padding: 0 40px;
+      margin: 0 -40px;
+      max-height: 60vh;
+    }
+
+    .title {
+      letter-spacing: 0;
+    }    
   }
 }
