@@ -378,4 +378,7 @@ export default {
   '--theme-footer-block-background-color-hover': 'rgba(218, 164, 154, 0.16)',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
+
+  '--theme-default-main-color': '#DAA49A',
+  '--theme-default-main-bg': '#F3F3F5',
 };

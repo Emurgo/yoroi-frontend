@@ -6,7 +6,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
-import daedalusIcon from '../../assets/images/top-bar/daedalus-migration-filled.inline.svg';
+import daedalusIcon from '../../assets/images/top-bar/daedalus-migration-active.inline.svg';
 
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 import styles from './WalletAdd.scss';
@@ -88,31 +88,31 @@ export default class WalletAddModern extends Component<Props> {
           <div className={styles.heroInner}>
             <div className={styles.heroLeft}>
               <SvgInline svg={logoIcon} className={styles.heroLogo} />
-              <h2 className={styles.title}>{title}</h2>
-              <h3 className={styles.subTitle}>{intl.formatMessage(messages.subTitle)}</h3>
+              <h2 className={styles.heroTitle}>{title}</h2>
+              <h3 className={styles.heroSubTitle}>{intl.formatMessage(messages.subTitle)}</h3>
             </div>
             <div className={styles.heroRight}>
-              <div className={styles.cardList}>
+              <div className={styles.heroCardsList}>
                 <button type="button" onClick={onHardwareConnect}>
-                  <div className={styles.itemCard}>
-                    <div className={`${styles.itemCardBg} ${styles.connect}`} />
-                    <div className={styles.itemCardTitle}>
+                  <div className={styles.heroCardsItem}>
+                    <div className={`${styles.heroCardsItemBg} ${styles.connect}`} />
+                    <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.connectToHardwareDescription)}
                     </div>
                   </div>
                 </button>
                 <button type="button" onClick={onCreate}>
-                  <div className={styles.itemCard}>
-                    <div className={`${styles.itemCardBg} ${styles.create}`} />
-                    <div className={styles.itemCardTitle}>
+                  <div className={styles.heroCardsItem}>
+                    <div className={`${styles.heroCardsItemBg} ${styles.create}`} />
+                    <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.createDescription)}
                     </div>
                   </div>
                 </button>
                 <button type="button" onClick={onRestore}>
-                  <div className={styles.itemCard}>
-                    <div className={`${styles.itemCardBg} ${styles.restore}`} />
-                    <div className={styles.itemCardTitle}>
+                  <div className={styles.heroCardsItem}>
+                    <div className={`${styles.heroCardsItemBg} ${styles.restore}`} />
+                    <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreDescription)}
                     </div>
                   </div>
@@ -126,9 +126,9 @@ export default class WalletAddModern extends Component<Props> {
                   </div>
                 ) : null}
               </div>
-              <button type="button" onClick={onDaedalusTransfer} className={`${styles.itemCard} ${styles.itemLink}`}>
-                <SvgInline svg={daedalusIcon} width="45" height="40" className={styles.itemLinkIcon} />
-                <div className={styles.itemCardTitle}>
+              <button type="button" onClick={onDaedalusTransfer} className={`${styles.heroCardsItem} ${styles.heroCardsItemLink}`}>
+                <SvgInline svg={daedalusIcon} width="45" height="40" className={styles.heroCardsItemLinkIcon} />
+                <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
                 </div>
               </button>
