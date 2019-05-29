@@ -402,7 +402,7 @@
   "wallet.send.form.sendingIsDisabled": "Impossible d'envoyer une nouvelle transaction lorsque la précédente n'est pas terminée.",
   "wallet.send.form.title.hint": "Ex: Envoi à Marc",
   "wallet.send.form.title.label": "Titre",
-  "wallet.send.form.sendAll.checkboxLabel": "Send all {currency}",
+  "wallet.send.form.sendAll.checkboxLabel": "Envoyer tous les {currency}",
   "wallet.send.form.transactionFeeError": "Fonds Ada insuffisants pour payer les frais de transaction. Essayez un montant plus petit.",
   "wallet.send.ledger.confirmationDialog.info.line.1": "Après avoir connecté votre périphérique Ledger au port USB de votre ordinateur, appuyez sur le bouton envoi du Ledger.",
   "wallet.send.ledger.confirmationDialog.info.line.2": "Assurez-vous que l’application Cardano ADA reste ouverte sur le périphérique Ledger durant tout le processus.",
