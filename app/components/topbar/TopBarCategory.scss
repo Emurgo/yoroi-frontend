@@ -76,6 +76,17 @@ $topBarHeight: 58px;
   }
 }
 
+.iconInlineText {
+  font-size: 16px;
+  line-height: 22px;
+  font-family: var(--font-light);
+}
+
+.goBackIcon {
+  margin-left: 20px;
+  margin-right: 6px;
+}
+
 .walletsIcon {
   flex-shrink: 0;
   & > svg {
@@ -123,6 +134,11 @@ $topBarHeight: 58px;
   .TopBarCategory_component {
     position: absolute;
     top: 0;
+
+    &.go-back {
+      left: 0px;
+      width: auto;
+    }
 
     &.wallets {
       left: 0;

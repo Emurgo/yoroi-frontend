@@ -223,12 +223,16 @@ export default class WalletAddPage extends Component<Props> {
   }
 
   _goToSettingsRoot = (): void => {
+    this.props.stores.topbar.initCategories();
+
     this._getRouter().goToRoute.trigger({
       route: ROUTES.SETTINGS.ROOT
     });
   }
 
   _goToDaedalusTransferRoot = (): void => {
+    this.props.stores.topbar.initCategories();
+
     this._getRouter().goToRoute.trigger({
       route: ROUTES.DAEDALUS_TRANFER.ROOT
     });

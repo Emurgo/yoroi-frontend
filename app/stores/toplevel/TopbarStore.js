@@ -3,9 +3,12 @@ import { observable, action } from 'mobx';
 import Store from '../base/Store';
 import resolver from '../../utils/imports';
 import environment from '../../environment';
+import { Logger } from '../../utils/logging';
 import {
   WITH_LEDGER_NANO_S_CATEGORIE as WITH_LEDGER_NANO_S,
   WITH_TREZOR_T_CATEGORIE as WITH_TREZOR_T,
+  GO_BACK_CATEGORIE as GO_BACK,
+  WALLETS_CATEGORIE as WALLETS,
 } from '../../config/topbarConfig';
 
 const topbarConfig = resolver('config/topbarConfig');
@@ -13,7 +16,7 @@ const topbarConfig = resolver('config/topbarConfig');
 export default class TopbarStore extends Store {
   CATEGORIES = topbarConfig.CATEGORIES;
 
-  @observable activeTopbarCategory: string = this.CATEGORIES[0].route;
+  @observable activeTopbarCategory: string = WALLETS.route;
 
   setup() {
     const actions = this.actions.topbar;
@@ -25,23 +28,36 @@ export default class TopbarStore extends Store {
   }
 
   /** Dynamic Initialization of Topbar Categories */
-  @action initCategories() {
+  @action initCategories(): void {
+    const { wallets } = this.stores.substores[environment.API];
+    // set it to the default
     this.CATEGORIES = topbarConfig.CATEGORIES;
 
-    const { wallets } = this.stores.substores[environment.API];
-    // If active wallet is TrezorTWallet then show with Trezor T Icon
-    if (wallets && wallets.first && wallets.first.isTrezorTWallet
-      && !this.CATEGORIES.find(category => category.name === WITH_TREZOR_T.name)) {
-      this.CATEGORIES.push(WITH_TREZOR_T);
+    // For rare of the rare case, make sure wallets store is initialized
+    if (wallets) {
+      // If active wallet is TrezorTWallet then show with Trezor T Icon
+      if (wallets.first && wallets.first.isTrezorTWallet) {
+        this.CATEGORIES.push(WITH_TREZOR_T);
+      }
+
+      // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
+      if (wallets.first && wallets.first.isLedgerNanoSWallet) {
+        this.CATEGORIES.push(WITH_LEDGER_NANO_S);
+      }
+
+      // If there is not any active wallets then replace WALLETS Category by GO_BACK Category
+      if (!wallets.hasActiveWallet) {
+        // eslint-disable-next-line arrow-body-style
+        const walletCategoryIndex = this.CATEGORIES.findIndex((item) => {
+          return item.name === WALLETS.name;
+        });
+        this.CATEGORIES[walletCategoryIndex] = GO_BACK;
+      }
+    } else {
+      Logger.warn('TopbarStore::initCategories::Wallets store is not ready yet');
     }
 
-    // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
-    if (wallets && wallets.first && wallets.first.isLedgerNanoSWallet
-      && !this.CATEGORIES.find(category => category.name === WITH_LEDGER_NANO_S.name)) {
-      this.CATEGORIES.push(WITH_LEDGER_NANO_S);
-    }
-
-    this.activeTopbarCategory = this.CATEGORIES[0].route;
+    this.activeTopbarCategory = WALLETS.route;
   }
 
   @action _onActivateTopbarCategory = (

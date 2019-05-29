@@ -69,7 +69,6 @@ export default class WalletAddModern extends Component<Props> {
       onSettings,
       onDaedalusTransfer,
       isRestoreActive,
-      classicTheme,
       title,
     } = this.props;
 
