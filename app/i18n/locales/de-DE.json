@@ -402,6 +402,7 @@
   "wallet.send.form.sendingIsDisabled": "Es kann keine neue Transaktion gesendet werden, solange noch eine bestehende aussteht.",
   "wallet.send.form.title.hint": "z.B. Geld für Frank",
   "wallet.send.form.title.label": "Titel",
+  "wallet.send.form.sendAll.checkboxLabel": "Send all {currency}",
   "wallet.send.form.transactionFeeError": "Nicht genug ADA für die Gebühren. Versuche einen kleineren Betrag zu senden.",
   "wallet.send.ledger.confirmationDialog.info.line.1": "Nachdem dein Ledger mit dem USB-Port deines Computers verbunden ist, klicke auf die Schaltfläche 'Senden über Ledger'.",
   "wallet.send.ledger.confirmationDialog.info.line.2": "Sorge dafür, dass die Cardano ADA-App auf dem Ledger-Gerät während des Prozesses durchweg geöffnet bleibt.",
