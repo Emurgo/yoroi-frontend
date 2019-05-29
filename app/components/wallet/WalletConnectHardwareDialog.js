@@ -57,8 +57,8 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
       >
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
-            <WalletTypeItem action={onTrezor} type="trezor" title={intl.formatMessage(messages.ledgerTitle)} />
-            <WalletTypeItem action={onLedger} type="ledger" title={intl.formatMessage(messages.trezorTitle)} />
+            <WalletTypeItem action={onLedger} type="ledger" title={intl.formatMessage(messages.ledgerTitle)} />
+            <WalletTypeItem action={onTrezor} type="trezor" title={intl.formatMessage(messages.trezorTitle)} />
           </ul>
         </div>
       </Dialog>
