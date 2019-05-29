@@ -65,7 +65,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "Vérification des adresses des fonds",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Obtention des adresses",
   "daedalusTransfer.waiting.title.label": "Le wallet Daedalus est en cours de récupération",
-  "daedalusTransfer.wallet.add.page.link.label": "Transfer funds from Daedalus wallet to Yoroi",
+  "daedalusTransfer.wallet.add.page.link.label": "Transférer des fonds à partir d'un wallet Daedalus vers Yoroi",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
