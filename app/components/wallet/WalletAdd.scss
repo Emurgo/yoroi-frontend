@@ -143,14 +143,14 @@
     height: auto;
   }
 
-  .heroLogo {
+  .heroLogo,
+  .settingsBarLink {
     path {
       fill: #fff;
     }
   }
 
-  .heroCardsItemLinkIcon,
-  .settingsBarLink {
+  .heroCardsItemLinkIcon {
     path,
     polygon {
       fill: var(--theme-default-color-blue);
