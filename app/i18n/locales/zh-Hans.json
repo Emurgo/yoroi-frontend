@@ -402,7 +402,7 @@
   "wallet.send.form.sendingIsDisabled": "由于目前有待处理状态的交易，新交易无法发送。",
   "wallet.send.form.title.hint": "例如：支付给 Frank 的款项",
   "wallet.send.form.title.label": "标题",
-  "wallet.send.form.sendAll.checkboxLabel": "Send all {currency}",
+  "wallet.send.form.sendAll.checkboxLabel": "发送所有的 {currency}",
   "wallet.send.form.transactionFeeError": "没有足够的 Ada 支付手续费。请尝试发送更小的金额。",
   "wallet.send.ledger.confirmationDialog.info.line.1": "将Ledger设备连接到电脑USB后，按下发送按钮。",
   "wallet.send.ledger.confirmationDialog.info.line.2": "确保Cardano ADA应用在整个过程中保持在Ledger设备上的打开状态。",
