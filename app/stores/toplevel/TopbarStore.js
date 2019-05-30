@@ -70,7 +70,7 @@ export default class TopbarStore extends Store {
     const { category } = params;
     if (category !== this.activeTopbarCategory) {
 
-      // Resetting Categories to defaults, as Categories are originally designed to static
+      // Resetting Categories to defaults, as Categories are originally designed to be static
       // but for making it dynamic this is the patch
       if (category === GO_BACK.route) {
         this._resetCategories();
