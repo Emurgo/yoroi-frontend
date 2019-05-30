@@ -6,7 +6,9 @@
 
 .modal {
   border-radius: 8px;
-  padding: 25px 40px 40px 40px;
+  padding: unset;
+  min-width: unset;
+  max-width: unset;
   display: flex;
   flex-direction: column;
 
