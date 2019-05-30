@@ -275,7 +275,7 @@ export default {
   '--theme-receive-qr-code-foreground-color': '#353535',
 
   '--theme-send-confirmation-dialog-send-values-color': '#15d1aa',
-  '--theme-trezor-send-confirmation-info-block-background-color': '#f0f3f5',
+  '--theme-hw-send-confirmation-info-block-background-color': '#f0f3f5',
 
   '--theme-settings-body-background-color': '#ffffff',
   '--theme-settings-pane-background-color': '#f0f3f5',
