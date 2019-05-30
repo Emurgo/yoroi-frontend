@@ -118,12 +118,13 @@ export default class AboutYoroiSettings extends Component {
           {intl.formatMessage(messages.commitLabel)}&nbsp;
           {environment.commit}
         </p>
-        <br />
-        <GridFlexContainer rowSize={3}>
-          {socialMediaLinks.map(link => (
-            <LinkButton key={link.url} {...link} textClassName={styles.socialMediaLinkText} />
-          ))}
-        </GridFlexContainer>
+        <div className={styles.aboutScoial}>
+          <GridFlexContainer rowSize={socialMediaLinks.length}>
+            {socialMediaLinks.map(link => (
+              <LinkButton key={link.url} {...link} textClassName={styles.socialMediaLinkText} />
+            ))}
+          </GridFlexContainer>
+        </div>
       </div>
     );
   }

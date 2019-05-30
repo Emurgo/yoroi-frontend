@@ -137,16 +137,6 @@ const SettingsSubpages = (stores, actions) => (
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
-      path={ROUTES.SETTINGS.DISPLAY}
-      component={(props) => <DisplaySettingsPage {...props} stores={stores} actions={actions} />}
-      exact
-    />
-    <Route
-      path={ROUTES.SETTINGS.ABOUT_YOROI}
-      component={(props) => <AboutYoroiSettings {...props} stores={stores} actions={actions} />}
-      exact
-    />
-    <Route
       exact
       path={ROUTES.SETTINGS.ADA_REDEMPTION}
       component={(props) => <AdaRedemptionPage {...props} stores={stores} actions={actions} />}

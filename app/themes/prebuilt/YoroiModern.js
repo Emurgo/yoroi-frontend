@@ -384,7 +384,7 @@ export default {
   '--theme-widgets-progress-step-common-color': '#15d1aa',
 
   '--theme-footer-block-background-color': '#fff',
-  '--theme-footer-block-background-color-hover': 'rgba(21, 209, 170, 0.1)',
+  '--theme-footer-block-background-color-hover': '#D9DDE0',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
 

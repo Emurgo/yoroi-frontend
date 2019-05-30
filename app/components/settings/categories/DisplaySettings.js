@@ -108,22 +108,6 @@ export default class DisplaySettings extends Component<Props> {
 
         <div className={styles.main}>
           <div className={styles.themesWrapper}>
-            {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
-            <button
-              type="button"
-              className={themeYoroiClassicClasses}
-              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
-            >
-              {(currentTheme === THEMES.YOROI_CLASSIC
-                && hasCustomTheme() &&
-                  <div className={styles.themeWarning}>
-                    {intl.formatMessage(messages.themeWarning)}
-                  </div>)
-              }
-              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} themeKey="classic" />
-              <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
-            </button>
-
             {!environment.isMainnet() && // a second theme to allow testing switching themes
               (
                 <button
@@ -138,10 +122,23 @@ export default class DisplaySettings extends Component<Props> {
                       </div>)
                   }
                   <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
-                  <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
                 </button>
               )
             }
+            {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
+            <button
+              type="button"
+              className={themeYoroiClassicClasses}
+              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
+            >
+              {(currentTheme === THEMES.YOROI_CLASSIC
+                && hasCustomTheme() &&
+                  <div className={styles.themeWarning}>
+                    {intl.formatMessage(messages.themeWarning)}
+                  </div>)
+              }
+              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} themeKey="classic" />
+            </button>
           </div>
           <Button
             className={exportButtonClasses}
