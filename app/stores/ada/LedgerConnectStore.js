@@ -312,6 +312,9 @@ export default class LedgerConnectStore
     const { wallets } = this.stores.substores[environment.API];
     await wallets._patchWalletRequestWithNewWallet(ledgerWallet);
 
+    // Dynamically update the topbar icons
+    this.stores.topbar.updateCategories();
+
     // goto the wallet transactions page
     Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');
     wallets.goToWalletRoute(ledgerWallet.id);
@@ -319,9 +322,6 @@ export default class LedgerConnectStore
     // fetch its data
     Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
     wallets.refreshWalletsData();
-
-    // Load the Yoroi with Ledger Icon
-    this.stores.topbar.initCategories();
 
     // show success notification
     wallets.showLedgerNanoSWalletIntegratedNotification();
