@@ -89,12 +89,21 @@ export default class AboutDialog extends Component<Props> {
       ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])
       : classnames([styles.middleBlock, styles.middleAboutBlock]);
 
-    const introBlock = (
+    const introBlock = classicTheme ? (
       <div className={headerBlockClasses}>
         <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine1)}</span><br />
         <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine2)}</span><br />
         <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine3)}</span><br />
-      </div>);
+      </div>
+    ) : (
+      <div className={headerBlockClasses}>
+        <span>
+          {intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine1) + ' '}
+          {intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine2) + ' '}
+          {intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine3)}
+        </span>
+      </div>
+    );
 
     const middleBlock = (
       <div className={middleBlockClasses}>
@@ -111,7 +120,7 @@ export default class AboutDialog extends Component<Props> {
             <li key="1">
               {intl.formatMessage(messages.aboutPrerequisite1Part1)}
               <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
-                {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText)}
+                {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText) + ' '}
                 <SvgInline svg={externalLinkSVG} />
               </a>
               {intl.formatMessage(messages.aboutPrerequisite1Part3)}

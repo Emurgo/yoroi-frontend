@@ -77,12 +77,24 @@ export default class ConnectDialog extends Component<Props> {
       ? styles.middleConnectErrorBlockClassic
       : null;
 
-    const introBlock = (
+    const introBlock = classicTheme ? (
       <div className={headerBlockClasses}>
-        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
-        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br />
-        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span><br />
-      </div>);
+        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span>
+        <br />
+        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span>
+        <br />
+        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span>
+        <br />
+      </div>
+    ) : (
+      <div className={headerBlockClasses}>
+        <span>
+          {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
+          {intl.formatMessage(messages.connectIntroTextLine2) + ' '}
+          {intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}
+        </span>
+      </div>
+    );
 
     let middleBlock = null;
     let backButton = null;
