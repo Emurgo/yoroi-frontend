@@ -43,3 +43,16 @@
     }
   }
 }
+
+
+:global(.YoroiModern) {
+  .content {
+    padding: 0 40px;
+    margin: 0 -40px;
+    max-height: 60vh;
+  }
+
+  .title {
+    letter-spacing: 0;
+  }
+}
