@@ -35,3 +35,8 @@
     border: var(--theme-bordered-box-border);
   }
 }
+
+:global(.YoroiModern) .component {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg); 
+}
