@@ -3,15 +3,23 @@
   padding-top: 30px;
 
   .main {
-    display: inline-block;
+    max-width: 1300px;
     text-align: center;
+    margin-top: 20px;
   }
 
-  & > .label {
+  .title {
     color: var(--theme-support-settings-text-color);
     font-family: var(--font-semibold);
-    line-height: 1.38;
-    margin-bottom: 11px;
+    font-size: 18px;
+    line-height: 22px;
+    margin-bottom: 12px;
+  }
+
+  .subTitle {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--theme-support-settings-text-color);
   }
 
   a,
@@ -19,7 +27,7 @@
     color: var(--theme-support-settings-text-color);
     font-family: var(--font-regular);
     font-size: 14px;
-    line-height: 19px;
+    line-height: 22px;
   }
 
   a {
@@ -27,26 +35,7 @@
   }
 
   p {
-    margin-bottom: 20px;
-  }
-}
-
-:global(.YoroiClassic) .component {
-  & > .label {
-    font-size: 16px;
-  }
-  a {
-    text-decoration: underline;
-  }
-}
-
-:global(.YoroiModern) .component {
-  & > .label {
-    font-size: 18px;
-  }
-  a {
-    text-decoration: none;
-    font-family: var(--font-semibold);
+    margin-bottom: 2px;
   }
 }
 
@@ -54,22 +43,25 @@
   position: relative;
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
 
   .themeImageWrapper {
     margin-bottom: 32px;
     position: relative;
+    width: 48%;
+    text-align: left;
 
-    + .themeImageWrapper {
-      margin-left: 24px;
-    }
-
-    & > div {
+    div {
       border-radius: 8px;
       overflow: hidden;
+      width: 100%;
+      margin-bottom: 8px;
     }
 
     svg {
       display: block;
+      width: 100%;
     }
 
     .themeWarning {
@@ -81,27 +73,12 @@
       padding: 10px;
     }
 
-    &.active {
-      div,
-      span {
-        opacity: 1;
-        transition: opacity 400ms ease;
-      }
-      .themeWarning {
-        opacity: 0.5;
-      }
-    }
-
     &.inactive {
       &:hover {
+        cursor: pointer;
+
         div {
           box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
-          cursor: pointer;
-          opacity: 1;
-        }
-
-        span {
-          opacity: 1;
         }
       }
     }

@@ -104,7 +104,7 @@ export default class AboutYoroiSettings extends Component {
 
     return (
       <div className={styles.component}>
-        <h1>{intl.formatMessage(messages.aboutYoroiLabel)}</h1>
+        <h2>{intl.formatMessage(messages.aboutYoroiLabel)}</h2>
 
         <p>
           {intl.formatMessage(messages.versionLabel)}&nbsp;

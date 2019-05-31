@@ -32,6 +32,10 @@ const messages = defineMessages({
     id: 'settings.display.themeWarning',
     defaultMessage: '!!!CHANGING THEME WILL REMOVE CUSTOMIZATION',
   },
+  themeNote: {
+    id: 'settings.display.themeNote',
+    defaultMessage: '!!!Note: changing theme will remove customization.',
+  },
   blog: {
     id: 'settings.display.blog',
     defaultMessage: '!!!You can read our {blogLink} on how to use this feature.',
@@ -100,10 +104,11 @@ export default class DisplaySettings extends Component<Props> {
     return (
       <div className={styles.component}>
 
-        <div className={styles.label}>
+        <h2 className={styles.title}>
           {intl.formatMessage(messages.themeLabel)}
-        </div>
+        </h2>
 
+        <p>{intl.formatMessage(messages.themeNote)}</p>
         <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
 
         <div className={styles.main}>
@@ -122,6 +127,7 @@ export default class DisplaySettings extends Component<Props> {
                       </div>)
                   }
                   <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
+                  <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
                 </button>
               )
             }
@@ -138,6 +144,7 @@ export default class DisplaySettings extends Component<Props> {
                   </div>)
               }
               <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} themeKey="classic" />
+              <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiClassic)}</h3>
             </button>
           </div>
           <Button

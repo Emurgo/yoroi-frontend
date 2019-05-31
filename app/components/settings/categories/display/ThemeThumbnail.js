@@ -14,7 +14,7 @@ export default class ThemeThumbnail extends Component<Props> {
     const gradientKey = `topbar-gradient-${themeKey}`;
     return (
       <div>
-        <svg width="445px" height="270px" viewBox="0 0 445 270" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 445 270" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id={gradientKey}>
               <stop stopColor={themeVars['--theme-topbar-background-color-gradient-start']} />
@@ -37,10 +37,7 @@ export default class ThemeThumbnail extends Component<Props> {
               <rect id="Rectangle-Copy-8" fill={themeVars['--theme-bordered-box-background-color']} x="25" y="70" width="395" height="32" rx="4" />
               <rect id="Rectangle-Copy-9" fill={themeVars['--theme-bordered-box-background-color']} x="25" y="118" width="395" height="32" rx="4" />
               <rect id="Rectangle-Copy-10" fill={themeVars['--theme-bordered-box-background-color']} x="25" y="166" width="395" height="32" rx="4" />
-              <text id="Changing-theme-will" fontFamily="Rubik-Regular, Rubik" fontSize="14" fontWeight="normal" line-spacing="22" fill="#ADAEB6">
-                <tspan x="75" y="87">Changing theme will remove customization</tspan>
-              </text>
-              <rect id="Rectangle-Copy-11" fill="#17D1AA" x="105" y="214" width="237" height="32" rx="4" />
+              <rect id="Rectangle-Copy-11" fill={themeVars['--theme-button-primary-background-color']} x="105" y="214" width="237" height="32" rx="4" />
             </g>
           </g>
         </svg>
