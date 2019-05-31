@@ -240,7 +240,7 @@
   "wallet.connect.hw.dialog.step.save.error.101": "Erreur durant la sauvegarde. Vérifiez votre connection internet et réessayez.",
   "wallet.connect.hw.dialog.step.save.label": "Sauvegarder",
   "wallet.connect.hw.dialog.step.save.walletName.hint": "Veuillez entrer le nom du wallet",
-  "wallet.connect.hw.dialog.step.save.walletName.label": "NOM DU WALLET",
+  "wallet.connect.hw.dialog.step.save.walletName.label": "Wallet name",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano-fr",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text": "Cliquez ici pour en savoir plus sur l’utilisation de Yoroi avec Ledger",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1": "Prend uniquement en charge",
