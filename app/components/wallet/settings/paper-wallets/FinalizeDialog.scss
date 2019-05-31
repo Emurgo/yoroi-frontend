@@ -54,3 +54,8 @@
   font-weight: 600;
   opacity: 0.7;
 }
+
+:global(.YoroiModern) .dialog {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg); 
+}

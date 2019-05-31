@@ -182,7 +182,10 @@ const topbarGradient = {
 };
 
 export default {
+  // REACT-POLYMORPH
   ...rpYoroiTheme,
+
+  // FONTS
   '--preferred-font': '"Times New Roman", serif',
 
   '--font-ultralight': 'SFUIDisplay-Ultralight',
@@ -203,6 +206,7 @@ export default {
 
   '--theme-input-hint-font': 'SFUIDisplay-Regular',
 
+  // COLORS
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
   '--theme-bordered-box-background-color': '#f3f3f5',
