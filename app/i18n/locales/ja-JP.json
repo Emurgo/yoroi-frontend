@@ -402,7 +402,7 @@
   "wallet.send.form.sendingIsDisabled": "取引が完了するまで別の取引を行うことはできません。",
   "wallet.send.form.title.hint": "例：フランク宛の資金",
   "wallet.send.form.title.label": "タイトル",
-  "wallet.send.form.sendAll.checkboxLabel": "Send all {currency}",
+  "wallet.send.form.sendAll.checkboxLabel": "{currency}を全て送信する",
   "wallet.send.form.transactionFeeError": "手数料に対する ADA が不足しています。送金額を減らして再度実行してください。",
   "wallet.send.ledger.confirmationDialog.info.line.1": "Ledgerデバイスをお使いのコンピューターに接続してから「Ledgerを使って送信」ボタンを押してください。",
   "wallet.send.ledger.confirmationDialog.info.line.2": "プロセスの実行中は、Ledgerデバイス上にCardano ADAアプリを開いたままにしてください。",
