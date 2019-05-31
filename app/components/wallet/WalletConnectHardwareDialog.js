@@ -22,11 +22,11 @@ const messages = defineMessages({
   },
   trezorDescription: {
     id: 'wallet.create.type.trezor.description',
-    defaultMessage: '!!!Trezor Hardware Wallet Descriprion',
+    defaultMessage: '!!!Trezor Hardware Wallet Descriprion', // TODO: add descriptionfor wallet
   },
   ledgerDescription: {
     id: 'wallet.create.type.ledger.description',
-    defaultMessage: '!!!Ledger Hardware Wallet Descriprion',
+    defaultMessage: '!!!Ledger Hardware Wallet Descriprion', // TODO: add descriptionfor wallet
   },
 });
 
@@ -57,8 +57,18 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
       >
         <div className={styles.tabsContent}>
           <ul className={styles.heroWalletTypeList}>
-            <WalletTypeItem action={onLedger} type="ledger" title={intl.formatMessage(messages.ledgerTitle)} />
-            <WalletTypeItem action={onTrezor} type="trezor" title={intl.formatMessage(messages.trezorTitle)} />
+            <WalletTypeItem
+              action={onLedger}
+              type="ledger"
+              title={intl.formatMessage(messages.ledgerTitle)}
+              description={intl.formatMessage(messages.ledgerDescription)}
+            />
+            <WalletTypeItem
+              action={onTrezor}
+              type="trezor"
+              title={intl.formatMessage(messages.trezorTitle)}
+              description={intl.formatMessage(messages.trezorDescription)}
+            />
           </ul>
         </div>
       </Dialog>

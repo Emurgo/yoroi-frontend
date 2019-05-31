@@ -20,6 +20,14 @@ const messages = defineMessages({
     id: 'wallet.create.type.mnemonic.description',
     defaultMessage: '!!!The simplest and most common way to create a Wallet. Yoroi will generate 15 mnemonic words that you will have to store in a safe place in order to restore the wallet.',
   },
+  walletPaperDescription: {
+    id: 'wallet.create.type.paper.description',
+    defaultMessage: '!!!Allows the generation of an offline wallet that should be printed. The process involves setting up an optional password for extra security and then printing a pdf that contains the mnemonics (for later recovery) and some Cardano addresses onto a paper.',
+  },
+  walletMasterDescription: {
+    id: 'wallet.create.type.master.description',
+    defaultMessage: '!!!Only useful if you have used a migration feature in another wallet. This allows you to import that wallet into Yoroi.',
+  },
   walletPaperTitle: {
     id: 'wallet.create.type.paper.title',
     defaultMessage: '!!!Paper Wallet',
@@ -63,6 +71,7 @@ export default class WalletRestoreOptionsDialog extends Component<Props> {
               action={onPaperRestore}
               type="paper"
               title={intl.formatMessage(messages.walletPaperTitle)}
+              description={intl.formatMessage(messages.walletPaperDescription)}
             />
           </ul>
         </div>
