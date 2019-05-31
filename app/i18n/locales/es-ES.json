@@ -240,7 +240,7 @@
   "wallet.connect.hw.dialog.step.save.error.101": "Falló en guardar. Por favor, compruebe su conexión a Internet y vuelva a intentarlo.",
   "wallet.connect.hw.dialog.step.save.label": "GUARDAR",
   "wallet.connect.hw.dialog.step.save.walletName.hint": "Ingrese el nombre de la billetera",
-  "wallet.connect.hw.dialog.step.save.walletName.label": "NOMBRE DE LA BILLETERA",
+  "wallet.connect.hw.dialog.step.save.walletName.label": "Wallet name",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text": "Haga clic aquí para saber más sobre el uso de Yoroi con Ledger",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1": "Sólo Soporta ",
