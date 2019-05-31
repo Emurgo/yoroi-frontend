@@ -240,7 +240,7 @@
   "wallet.connect.hw.dialog.step.save.error.101": "保存に失敗しました。インターネット接続を確認して再試行してください。",
   "wallet.connect.hw.dialog.step.save.label": "保存",
   "wallet.connect.hw.dialog.step.save.walletName.hint": "ウォレット名を入力",
-  "wallet.connect.hw.dialog.step.save.walletName.label": "ウォレット名",
+  "wallet.connect.hw.dialog.step.save.walletName.label": "Wallet name",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano-jp",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text": "Ledger連携のヨロイの使用方法はこちら",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1": " ",
