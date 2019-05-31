@@ -39,7 +39,7 @@
     .qrCode {
       align-items: flex-start;
       display: flex;
-      margin-left: 20px;
+      margin-left: auto;
   
       canvas {
         border: 4px solid var(--theme-receive-qr-code-background-color);
