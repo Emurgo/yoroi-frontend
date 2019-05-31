@@ -133,10 +133,10 @@ export default class WalletReceive extends Component<Props, State> {
             <div className={styles.instructionsText}>
               {intl.formatMessage(messages.walletReceiveInstructions)}
             </div>
+            {generateAddressForm}
             {error
               ? <p className={styles.error}>{intl.formatMessage(error)}</p>
-              : <p className={styles.error} />}
-            {generateAddressForm}
+              : <p className={styles.error}>&nbsp;</p>}
           </div>
           <div className={styles.qrCode}>
             <QRCode
