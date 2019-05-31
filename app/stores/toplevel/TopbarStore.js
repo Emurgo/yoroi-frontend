@@ -14,7 +14,7 @@ import {
 const topbarConfig = resolver('config/topbarConfig');
 
 export default class TopbarStore extends Store {
-  CATEGORIES = topbarConfig.CATEGORIES;
+  CATEGORIES = [...topbarConfig.CATEGORIES];
 
   @observable activeTopbarCategory: string = WALLETS.route;
 
@@ -28,10 +28,10 @@ export default class TopbarStore extends Store {
   }
 
   /** Dynamic Initialization of Topbar Categories */
-  @action initCategories(): void {
+  @action updateCategories(): void {
     const { wallets } = this.stores.substores[environment.API];
     // set it to the default
-    this.CATEGORIES = topbarConfig.CATEGORIES;
+    this.CATEGORIES = [...topbarConfig.CATEGORIES];
 
     // For rare of the rare case, make sure wallets store is initialized
     if (wallets) {
@@ -54,9 +54,13 @@ export default class TopbarStore extends Store {
         this.CATEGORIES[walletCategoryIndex] = GO_BACK;
       }
     } else {
-      Logger.warn('TopbarStore::initCategories::Wallets store is not ready yet');
+      Logger.warn('TopbarStore::updateCategories::Wallets store is not ready yet');
     }
+  }
 
+  /** Reset Categories to defaults */
+  @action _resetCategories(): void {
+    this.CATEGORIES = [...topbarConfig.CATEGORIES];
     this.activeTopbarCategory = WALLETS.route;
   }
 
@@ -65,6 +69,13 @@ export default class TopbarStore extends Store {
   ): void => {
     const { category } = params;
     if (category !== this.activeTopbarCategory) {
+
+      // Resetting Categories to defaults, as Categories are originally designed to be static
+      // but for making it dynamic this is the patch
+      if (category === GO_BACK.route) {
+        this._resetCategories();
+      }
+
       this.activeTopbarCategory = category;
       this.actions.router.goToRoute.trigger({ route: category });
     }
