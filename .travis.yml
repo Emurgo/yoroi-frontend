@@ -124,10 +124,10 @@ matrix:
     # stage: artifacts-deploy
     - stage: artifacts-deploy
       name: "Upload artifacts to GH releases, extension stores..."
+      if: branch =~ ^develop|staging|master OR type = pull_request
       script:
         - bash .travis/chrome_webstore_deploy.sh
         - bash .travis/pull_request_screenshots_upload.sh
-      if: branch =~ ^develop|staging|master OR type = pull_request
       # env provides cache
       env:
         - BROWSER=brave
@@ -138,7 +138,11 @@ matrix:
     #  script: false
 
   allow_failures:
-    - stage: build-docker
+    # Temporarily allow firefox to fail
+    - env:
+        - BROWSER=brave
+        - BROWSER=chrome
+        - BROWSER=firefox
 
 #before_deploy:
 #  - git config --local user.name "${GITHUB_USERNAME}";
