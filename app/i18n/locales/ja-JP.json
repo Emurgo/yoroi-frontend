@@ -277,7 +277,7 @@
   "wallet.create.dialog.repeatPasswordLabel": "送金パスワードを再入力してください",
   "wallet.create.dialog.title": "ウォレットを作成",
   "wallet.create.type.mnemonic.title": "15単語の復元フレーズで復元したウォレット",
-  "wallet.create.type.mnemonic.description": "The simplest and most common way to create a Wallet. Yoroi will generate 15 mnemonic words that you will have to store in a safe place in order to restore the wallet.",
+  "wallet.create.type.mnemonic.description": "ウォレットを作成する最もシンプルかつ一般的な方法です。ヨロイから15単語の復元フレーズが生成されますので、ウォレットの復元のために、安全な場所に保管してください。復元フレーズを紛失することがないようご注意ください。",
   "wallet.create.type.master.title": "マスターキー",
   "wallet.create.type.paper.title": "ペーパーウォレット",
   "wallet.create.type.business.title": "ビジネスウォレット",
