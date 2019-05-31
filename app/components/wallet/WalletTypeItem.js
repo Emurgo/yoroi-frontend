@@ -60,16 +60,18 @@ export default class WalletTypeItem extends Component<Props, State> {
     return (
       <li className={styles.walletTypeListItem}>
         <div className={styles.walletType}>
-          <div className={styles.walletTypeTop}>
+          <button onClick={action} type="button" className={styles.walletTypeTop}>
             <div className={`${styles.walletTypeImg} ${styles[type]}`} />
-            <button onClick={action} type="button" className={styles.walletTypeTitle}>
+            <div className={styles.walletTypeTitle}>
               {title}
-            </button>
-          </div>
+            </div>
+          </button>
           {description &&
             <div>
               <div className={showMoreClasses}>
-                <p className={styles.walletTypeDesc}>{description}</p>
+                <div className={styles.walletTypeMoreInner}>
+                  <p className={styles.walletTypeDesc}>{description}</p>
+                </div>
               </div>
               <button className={showMoreBtnClasses} type="button" onClick={this.toggleDesc.bind(this)}>
                 {intl.formatMessage(messages.more)}
