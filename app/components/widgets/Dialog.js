@@ -18,7 +18,6 @@ type Props = {
   className?: string,
   onClose?: Function,
   closeOnOverlayClick?: boolean,
-  modalOverlay?: Object,
   classicTheme: boolean
 };
 
@@ -33,19 +32,7 @@ export default class Dialog extends Component<Props> {
     className: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
-    modalOverlay: undefined,
   };
-
-  setSkin = (props) => {
-    const { modalOverlay } = this.props;
-    // hack to override modal styles
-    const newProps = _.set(
-      { ...props },
-      `theme.${props.themeId}.modal`,
-      `${props.theme[props.themeId].modal} ${modalOverlay}`
-    );
-    return ModalSkin(modalOverlay ? newProps : props);
-  }
 
   render() {
     const {
@@ -66,7 +53,7 @@ export default class Dialog extends Component<Props> {
         isOpen
         triggerCloseOnOverlayClick={closeOnOverlayClick}
         onClose={onClose}
-        skin={this.setSkin}
+        skin={ModalSkin}
       >
 
         <div className={classnames([styles.component, className])}>

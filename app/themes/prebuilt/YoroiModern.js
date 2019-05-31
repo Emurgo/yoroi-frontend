@@ -85,8 +85,6 @@ const rpModal = {
   '--rp-modal-bg-color': '#fff',
   '--rp-modal-max-height': '97%',
   '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
-  '--rp-modal-max-width': `560px`,
-  '--rp-modal-min-width': `560px`,
 };
 
 // OPTIONS
@@ -181,8 +179,19 @@ const topbarGradient = {
   end: '#4760ff',
 };
 
+// Modal Margin
+const modalMargin = {
+  top: 25,
+  right: 40,
+  bottom: 40,
+  left: 40,
+};
+
 export default {
+  // REACT-POLYMORPH
   ...rpYoroiTheme,
+
+  // FONTS
   '--preferred-font': '"Times New Roman", serif',
 
   '--font-ultralight': 'Rubik-Light',
@@ -204,6 +213,7 @@ export default {
   '--theme-input-hint-font': 'Rubik-Regular',
   '--theme-footer-text-font': 'Helvetica-Regular',
 
+  // COLORS
   '--theme-footer-background-color': '#fff',
 
   '--theme-scrollbar-thumb-background': '#c8ccce',
@@ -265,7 +275,7 @@ export default {
   '--theme-receive-qr-code-foreground-color': '#353535',
 
   '--theme-send-confirmation-dialog-send-values-color': '#15d1aa',
-  '--theme-trezor-send-confirmation-info-block-background-color': '#f0f3f5',
+  '--theme-hw-send-confirmation-info-block-background-color': '#f0f3f5',
 
   '--theme-settings-body-background-color': '#ffffff',
   '--theme-settings-pane-background-color': '#f0f3f5',
@@ -408,4 +418,9 @@ export default {
   '--theme-default-color-grey-4': '#D9DAE0',
   '--theme-default-color-grey-5': '#F0F3F5',
 
+  // OTHERS
+  '--theme-modal-margin-cmn': `${modalMargin.top}px ${modalMargin.right}px ${modalMargin.bottom}px ${modalMargin.left}px`,
+  '--theme-modal-min-max-width-cmn': `${560 - (modalMargin.left + modalMargin.right)}px`,
+  '--theme-modal-min-max-width-sm': `${465 - (modalMargin.left + modalMargin.right)}px`,
+  '--theme-modal-min-max-width-lg': `${680 - (modalMargin.left + modalMargin.right)}px`,
 };
