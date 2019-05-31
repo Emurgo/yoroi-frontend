@@ -240,7 +240,7 @@
   "wallet.connect.hw.dialog.step.save.error.101": "저장에 실패했습니다. 인터넷 연결상태를 확인하시고 다시 시도해 주십시오.",
   "wallet.connect.hw.dialog.step.save.label": "저장",
   "wallet.connect.hw.dialog.step.save.walletName.hint": "지갑 이름을 입력하세요.",
-  "wallet.connect.hw.dialog.step.save.walletName.label": "지갑 이름",
+  "wallet.connect.hw.dialog.step.save.walletName.label": "Wallet name",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano-ko",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text": "Ledger 지갑와 Yoroi 사용에 대한 자세한 내용을 보려면 여기를 클릭 하십시오.",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1": "지원 가능 모델 :",
