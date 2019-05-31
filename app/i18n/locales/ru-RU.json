@@ -240,7 +240,7 @@
   "wallet.connect.hw.dialog.step.save.error.101": "Не удалось сохранить. Проверьте подключение к Интернету и повторите попытку.",
   "wallet.connect.hw.dialog.step.save.label": "СОХРАНИТЬ",
   "wallet.connect.hw.dialog.step.save.walletName.hint": "Ввести имя кошелька",
-  "wallet.connect.hw.dialog.step.save.walletName.label": "ИМЯ КОШЕЛЬКА",
+  "wallet.connect.hw.dialog.step.save.walletName.label": "Wallet name",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano-ru",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text": "Нажмите здесь, чтобы узнать больше об использовании Yoroi с Ledger",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1": "Поддерживает только ",
