@@ -1,6 +1,6 @@
 //  ==== Theme: Yoroi Modern === //
 
-import global from './Global';
+import common from './Common';
 
 // FONTS
 const rpFonts = {
@@ -190,8 +190,8 @@ const modalMargin = {
 };
 
 export default {
-  // GLOBAL-THEME-INDEPENDENT
-  ...global,
+  // COMMON-THEME-INDEPENDENT
+  ...common,
 
   // REACT-POLYMORPH
   ...rpYoroiTheme,

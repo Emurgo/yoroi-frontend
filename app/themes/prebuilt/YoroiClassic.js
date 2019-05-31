@@ -1,6 +1,6 @@
 //  ==== Theme: Yoroi Classic === //
 
-import global from './Global';
+import common from './Common';
 
 // FONTS
 const rpFonts = {
@@ -184,8 +184,8 @@ const topbarGradient = {
 };
 
 export default {
-  // GLOBAL-THEME-INDEPENDENT
-  ...global,
+  // COMMON-THEME-INDEPENDENT
+  ...common,
 
   // REACT-POLYMORPH
   ...rpYoroiTheme,
