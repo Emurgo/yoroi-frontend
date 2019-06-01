@@ -1,14 +1,11 @@
 @import '../../themes/mixins/buttons';
 
-$topBarClassicHeight: 64px;
-$topBarHeight: 58px;
-
 .component {
   @include button;
   align-items: center;
   color: var(--theme-topbar-category-text-color);
   display: flex;
-  height: $topBarClassicHeight;
+  height: var(--cmn-topbar-height);
   justify-content: center;
   width: 87px;
 
@@ -98,7 +95,7 @@ $topBarHeight: 58px;
 .withLedgerNanoSIcon {
   flex-shrink: 0;
   & > svg {
-    width: 64px;
+    width: var(--cmn-topbar-icon-default-width);
     height: 42.5px;
     // plus-logo
     & > g > g:nth-child(1) {
@@ -116,7 +113,7 @@ $topBarHeight: 58px;
 .withTrezorTIcon {
   flex-shrink: 0;
   & > svg {
-    width: 64px;
+    width: var(--cmn-topbar-icon-default-width);
     height: 42.5px;
     // plus-logo
     & > g > g:nth-child(1) {
@@ -145,11 +142,11 @@ $topBarHeight: 58px;
     }
 
     &.with-trezor-t {
-      left: 64px;
+      left: var(--cmn-topbar-icon-default-width);
     }
 
     &.with-ledger-nano-s {
-      left: 64px;
+      left: var(--cmn-topbar-icon-default-width);
     }    
 
     &.daedalus-transfer {
@@ -165,8 +162,4 @@ $topBarHeight: 58px;
 .label {
   font-family: var(--font-regular);
   font-size: 18px;
-}
-
-:global(.YoroiModern) .component {
-  height: $topBarHeight;
 }

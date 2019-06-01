@@ -1,5 +1,3 @@
-$topBarClassicHeight: 64px;
-$topBarHeight: 58px;
 $footerHeight: 56px;
 
 .component {
@@ -12,7 +10,7 @@ $footerHeight: 56px;
   width: 100%;
   
   .topbar {
-    height: $topBarClassicHeight;    
+    height: var(--cmn-topbar-height);
     flex-shrink: 0;
     // Show elements that overflow the topbar above the content area
     z-index: 1;
@@ -59,10 +57,4 @@ $footerHeight: 56px;
   background-image: url(../../assets/images/select-language.svg);
   background-size: cover;
   background-position-y: bottom;
-}
-
-:global(.YoroiModern) .component {
-  .topbar {
-    height: $topBarHeight;
-  }  
 }
