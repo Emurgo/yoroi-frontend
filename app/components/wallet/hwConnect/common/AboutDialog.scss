@@ -34,17 +34,18 @@
 .middleAboutBlock {
   .prerequisiteBlock {
     display: inline-block;
-    padding-top: 15px;
+    padding-top: 30px;
     .prerequisiteHeaderText {
       font-family: var(--font-medium);
-      font-size: 18px;
       margin-left: 7px;
+      font-size: 18px;
+      line-height: 22px;
     }
     li {
       list-style-type: disc;
       margin-left: 18px;
       font-family: var(--font-regular);
-      line-height: 1.57;
+      line-height: 22px;
       font-size: 14px;
       letter-spacing: 0;
 

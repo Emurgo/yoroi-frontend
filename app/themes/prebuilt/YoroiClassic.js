@@ -1,5 +1,7 @@
 //  ==== Theme: Yoroi Classic === //
 
+import common from './Common';
+
 // FONTS
 const rpFonts = {
   '--rp-theme-font-thin': 'SFUIDisplay-Thin',
@@ -182,6 +184,9 @@ const topbarGradient = {
 };
 
 export default {
+  // COMMON-THEME-INDEPENDENT
+  ...common,
+
   // REACT-POLYMORPH
   ...rpYoroiTheme,
 

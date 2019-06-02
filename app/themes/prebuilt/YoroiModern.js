@@ -1,5 +1,7 @@
 //  ==== Theme: Yoroi Modern === //
 
+import common from './Common';
+
 // FONTS
 const rpFonts = {
   '--rp-theme-font-thin': 'Rubik-Light',
@@ -188,6 +190,9 @@ const modalMargin = {
 };
 
 export default {
+  // COMMON-THEME-INDEPENDENT
+  ...common,
+
   // REACT-POLYMORPH
   ...rpYoroiTheme,
 
