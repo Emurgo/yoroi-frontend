@@ -5,7 +5,7 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import ChangeWalletPasswordDialogContainer from './WalletSettingsPage';
-import DisplaySettingsBlock from '../../../components/settings/categories/general-setting/DisplaySettingsBlock';
+import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 
 @observer
@@ -52,7 +52,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
           isDialogOpen={uiDialogs.isOpen}
           dialog={changeDialog}
         />
-        <DisplaySettingsBlock
+        <ThemeSettingsBlock
           currentTheme={currentTheme}
           selectTheme={this.selectTheme}
           getThemeVars={this.getThemeVars}

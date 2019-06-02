@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import styles from './DisplaySettingsBlock.scss';
+import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../themes';
 import type { Theme } from '../../../../themes';
 import ThemeThumbnail from '../display/ThemeThumbnail';
@@ -60,7 +60,7 @@ type Props = {
 };
 
 @observer
-export default class DisplaySettings extends Component<Props> {
+export default class ThemeSettingsBlock extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
