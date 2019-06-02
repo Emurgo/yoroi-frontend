@@ -11,15 +11,15 @@ import type { Node } from 'react';
 import NoWalletsPage from './containers/wallet/NoWalletsPage';
 import WalletAddPage from './containers/wallet/WalletAddPage';
 import LanguageSelectionPage from './containers/profile/LanguageSelectionPage';
+import TermsOfUsePage from './containers/profile/TermsOfUsePage';
+
+// SETTINGS
 import Settings from './containers/settings/Settings';
 import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
-import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
-import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
-import TermsOfUsePage from './containers/profile/TermsOfUsePage';
-import DisplaySettingsPage from './containers/settings/categories/DisplaySettingsPage';
-import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
-import AboutYoroiSettings from './components/settings/categories/AboutYoroiSettings';
 import PaperWalletPage from './containers/settings/categories/PaperWalletPage';
+import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
+import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
+import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 const LoadingPage = resolver('containers/LoadingPage');
