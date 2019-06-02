@@ -6,21 +6,29 @@ import TopBarContainer from './TopBarContainer';
 import TopBarLayout from '../components/layout/TopBarLayout';
 import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBanner';
 import type { InjectedContainerProps } from '../types/injectedPropsType';
+import type { ActionsMap } from '../actions';
+import type { StoresMap } from '../stores';
 
 export type MainLayoutProps = InjectedContainerProps & {
-  topbar: ?Node,
+  topbar?: Node,
+  footer?: Node,
   classicTheme: boolean,
-  hideTopbar?: boolean,
-  footer: ?Node,
 };
 
 @observer
 export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     topbar: null,
-    hideTopbar: undefined,
     footer: null,
   };
+
+  _makeDefaultTopbar = (actions: ActionsMap, stores: StoresMap):?Node => {
+    /** Note: Sometimes MainLayout is called
+      * even before ActionsMap and StoresMap is fully initialized */
+    if (actions && stores) {
+      return <TopBarContainer actions={actions} stores={stores} />;
+    }
+  }
 
   render() {
     const {
@@ -28,18 +36,21 @@ export default class MainLayout extends Component<MainLayoutProps> {
       stores,
       topbar,
       classicTheme,
-      hideTopbar,
       footer
     } = this.props;
-    const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
+
+    let topbarComponent = topbar;
+    if (!topbarComponent) {
+      topbarComponent = this._makeDefaultTopbar(actions, stores);
+    }
+
     return (
       <TopBarLayout
         banner={<TestnetWarningBanner />}
         topbar={topbarComponent}
         notification={<div />}
-        classicTheme={classicTheme}
-        hideTopbar={hideTopbar}
         footer={footer}
+        classicTheme={classicTheme}
       >
         {this.props.children}
       </TopBarLayout>

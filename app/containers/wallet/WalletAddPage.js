@@ -17,8 +17,6 @@ import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
 import WalletRestoreOptionsDialogContainer from './dialogs/WalletRestoreOptionsDialogContainer';
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
 import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
-import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import TopBar from '../../components/topbar/TopBar';
 import environment from '../../environment';
 import resolver from '../../utils/imports';
 import type { InjectedProps } from '../../types/injectedPropsType';
@@ -54,25 +52,12 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { topbar, profile } = this.props.stores;
-    const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
-    const topBar = (
-      <TopBar
-        title={topbarTitle}
-        onCategoryClicked={category => {
-          actions.topbar.activateTopbarCategory.trigger({ category });
-        }}
-        categories={topbar.CATEGORIES}
-        activeTopbarCategory={topbar.activeTopbarCategory}
-        areCategoriesHidden={profile.isModernTheme}
-      />);
-
+    const { profile } = this.props.stores;
     const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
     const { restoreRequest } = wallets;
+
     const isCreateTrezorWalletActive = this._getTrezorConnectStore().isCreateHWActive;
     const isCreateLedgerWalletActive = this._getLedgerConnectStore().isCreateHWActive;
     const openTrezorConnectDialog = () => {
@@ -85,7 +70,6 @@ export default class WalletAddPage extends Component<Props> {
     };
 
     let content = null;
-    let isWalletAdd = false;
     if (uiDialogs.isOpen(WalletCreateDialog)) {
       content = (
         <WalletCreateDialogContainer
@@ -157,11 +141,7 @@ export default class WalletAddPage extends Component<Props> {
     }
 
     return (
-      <MainLayout
-        topbar={topBar}
-        hideTopbar
-        classicTheme={profile.isClassicTheme}
-      >
+      <MainLayout classicTheme={profile.isClassicTheme}>
         <WalletAdd
           onHardwareConnect={
             () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
