@@ -23,8 +23,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
   };
 
   _makeDefaultTopbar = (actions: ActionsMap, stores: StoresMap):?Node => {
-    /** Note: Sometimes MainLayout is called
-      * even before ActionsMap and StoresMap is fully initialized */
+    // Make sure MainLayout has ActionsMap and StoresMap
     if (actions && stores) {
       return <TopBarContainer actions={actions} stores={stores} />;
     }
