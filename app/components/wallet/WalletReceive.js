@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import classnames from 'classnames';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -131,7 +131,7 @@ export default class WalletReceive extends Component<Props, State> {
               isUsed={isWalletAddressUsed}
             />
             <div className={styles.instructionsText}>
-              {intl.formatMessage(messages.walletReceiveInstructions)}
+              <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </div>
             {generateAddressForm}
             {error

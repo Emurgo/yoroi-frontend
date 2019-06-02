@@ -304,7 +304,7 @@
   "wallet.receive.page.hideUsedLabel": "sembunyikan yang digunakan",
   "wallet.receive.page.showUsedLabel": "tampilkan yang digunakan",
   "wallet.receive.page.walletAddressLabel": "Address wallet Anda",
-  "wallet.receive.page.walletReceiveInstructions": "Bagikan address wallet ini untuk menerima pembayaran. Untuk melindungi privasi Anda, address baru akan dihasilkan secara otomatis setelah Anda menggunakannya.",
+  "wallet.receive.page.walletReceiveInstructions": "Bagikan address wallet ini untuk menerima pembayaran.<br>Untuk melindungi privasi Anda, address baru akan dihasilkan secara otomatis setelah Anda menggunakannya.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Hapus",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Tetapkan",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "Hapus yang terakhir",
