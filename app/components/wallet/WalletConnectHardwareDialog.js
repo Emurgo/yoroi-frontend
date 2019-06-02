@@ -12,21 +12,21 @@ const messages = defineMessages({
     id: 'wallet.connect.hardware.title',
     defaultMessage: '!!!Connect to hardware wallet',
   },
-  trezorTitle: {
-    id: 'wallet.create.type.trezor.title',
-    defaultMessage: '!!!Trezor Hardware Wallet',
-  },
   ledgerTitle: {
     id: 'wallet.create.type.ledger.title',
     defaultMessage: '!!!Ledger Hardware Wallet',
   },
-  trezorDescription: {
-    id: 'wallet.create.type.trezor.description',
-    defaultMessage: '!!!Trezor Hardware Wallet Descriprion', // TODO: add descriptionfor wallet
-  },
-  ledgerDescription: {
+  ledgerDescription: { // TODO: add descriptionfor wallet
     id: 'wallet.create.type.ledger.description',
-    defaultMessage: '!!!Ledger Hardware Wallet Descriprion', // TODO: add descriptionfor wallet
+    defaultMessage: '!!! TODO: Ledger Hardware Wallet Descriprion',
+  },
+  trezorTitle: {
+    id: 'wallet.create.type.trezor.title',
+    defaultMessage: '!!!Trezor Hardware Wallet',
+  },
+  trezorDescription: {  // TODO: add descriptionfor wallet
+    id: 'wallet.create.type.trezor.description',
+    defaultMessage: '!!! TODO: Trezor Hardware Wallet Descriprion',
   },
 });
 
