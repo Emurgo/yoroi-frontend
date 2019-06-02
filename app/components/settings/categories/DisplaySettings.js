@@ -34,7 +34,7 @@ const messages = defineMessages({
   },
   themeNote: {
     id: 'settings.display.themeNote',
-    defaultMessage: '!!!Note: changing theme will remove customization.',
+    defaultMessage: '!!!Note: Changing theme will remove customization.',
   },
   blog: {
     id: 'settings.display.blog',
