@@ -123,7 +123,7 @@
     "@cardano-foundation/ledgerjs-hw-app-cardano": "1.0.6",
     "@download/blockies": "1.0.3",
     "aes-js": "3.1.0",
-    "axios": "0.18.0",
+    "axios": "0.19.0",
     "bignumber.js": "5.0.0",
     "bip39": "3.0.0",
     "blakejs": "1.1.0",
