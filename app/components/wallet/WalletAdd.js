@@ -78,7 +78,7 @@ export default class WalletAdd extends Component<Props> {
     }
 
     return (
-      <div className={styles.heroWrapper}>
+      <div className={styles.component}>
         <div className={styles.hero}>
           <div className={styles.settingsBar}>
             <button type="button" onClick={onSettings} className={styles.settingsBarLink}>
