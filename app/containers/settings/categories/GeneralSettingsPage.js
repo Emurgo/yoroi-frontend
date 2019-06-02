@@ -1,11 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import GeneralSettings from '../../../components/settings/categories/GeneralSettings';
+import { handleExternalLinkClick } from '../../../utils/routing';
+import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import ChangeWalletPasswordDialogContainer from './WalletSettingsPage';
-import DisplaySettingsPage from './DisplaySettingsPage';
-import AboutYoroiSettings from '../../../components/settings/categories/AboutYoroiSettings';
+import DisplaySettingsBlock from '../../../components/settings/categories/general-setting/DisplaySettingsBlock';
+import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
@@ -13,6 +14,22 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
   onSelectLanguage = (values: { locale: string }) => {
     this.props.actions.profile.updateLocale.trigger(values);
   };
+
+  selectTheme = (values: { theme: string }) => {
+    this.props.actions.profile.updateTheme.trigger(values);
+  };
+
+  exportTheme = () => {
+    this.props.actions.profile.exportTheme.trigger();
+  };
+
+  getThemeVars = (theme: { theme: string }) => (
+    this.props.stores.profile.getThemeVars(theme)
+  )
+
+  hasCustomTheme = (): boolean => (
+    this.props.stores.profile.hasCustomTheme()
+  )
 
   render() {
     const { setProfileLocaleRequest, LANGUAGE_OPTIONS, currentLocale } = this.props.stores.profile;
@@ -22,6 +39,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
     const changeDialog = (
       <ChangeWalletPasswordDialogContainer actions={actions} stores={stores} />
     );
+    const { currentTheme } = this.props.stores.profile;
     return (
       <div>
         <GeneralSettings
@@ -34,8 +52,15 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
           isDialogOpen={uiDialogs.isOpen}
           dialog={changeDialog}
         />
-        <DisplaySettingsPage stores={stores} actions={actions} />
-        <AboutYoroiSettings />
+        <DisplaySettingsBlock
+          currentTheme={currentTheme}
+          selectTheme={this.selectTheme}
+          getThemeVars={this.getThemeVars}
+          exportTheme={this.exportTheme}
+          hasCustomTheme={this.hasCustomTheme}
+          onExternalLinkClick={handleExternalLinkClick}
+        />
+        <AboutYoroiSettingsBlock />
       </div>
     );
   }

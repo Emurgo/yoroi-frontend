@@ -5,11 +5,11 @@ import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import styles from './DisplaySettings.scss';
-import { THEMES } from '../../../themes';
-import type { Theme } from '../../../themes';
-import ThemeThumbnail from './display/ThemeThumbnail';
-import environment from '../../../environment';
+import styles from './DisplaySettingsBlock.scss';
+import { THEMES } from '../../../../themes';
+import type { Theme } from '../../../../themes';
+import ThemeThumbnail from '../display/ThemeThumbnail';
+import environment from '../../../../environment';
 
 const messages = defineMessages({
   themeLabel: {

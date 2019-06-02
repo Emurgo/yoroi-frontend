@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
-import styles from './AboutYoroiSettings.scss';
+import styles from './AboutYoroiSettingsBlock.scss';
 import { observer } from 'mobx-react';
 
-import GridFlexContainer from '../../layout/GridFlexContainer';
-import githubSvg from '../../../assets/images/social/github.inline.svg';
-import youtubeSvg from '../../../assets/images/social/youtube.inline.svg';
-import telegramSvg from '../../../assets/images/social/telegram.inline.svg';
-import twitterSvg from '../../../assets/images/social/twitter.inline.svg';
-import yoroiSvg from '../../../assets/images/yoroi-logo-shape-white.inline.svg';
-import facebookSvg from '../../../assets/images/social/facebook.inline.svg';
-import mediumSvg from '../../../assets/images/social/medium.inline.svg';
+import GridFlexContainer from '../../../layout/GridFlexContainer';
+import githubSvg from '../../../../assets/images/social/github.inline.svg';
+import youtubeSvg from '../../../../assets/images/social/youtube.inline.svg';
+import telegramSvg from '../../../../assets/images/social/telegram.inline.svg';
+import twitterSvg from '../../../../assets/images/social/twitter.inline.svg';
+import yoroiSvg from '../../../../assets/images/yoroi-logo-shape-white.inline.svg';
+import facebookSvg from '../../../../assets/images/social/facebook.inline.svg';
+import mediumSvg from '../../../../assets/images/social/medium.inline.svg';
 
-import environment from '../../../environment';
-import LinkButton from '../../widgets/LinkButton';
+import environment from '../../../../environment';
+import LinkButton from '../../../widgets/LinkButton';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -94,7 +94,7 @@ const socialMediaLinks = [{
 }];
 
 @observer
-export default class AboutYoroiSettings extends Component {
+export default class AboutYoroiSettingsBlock extends Component {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
