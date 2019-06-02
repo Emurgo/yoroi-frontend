@@ -74,9 +74,9 @@ export default class WalletAddPage extends Component<Props> {
       this.props.actions[environment.API].ledgerConnect.init.trigger();
     };
 
-    let content = null;
+    let activeDialog = null;
     if (uiDialogs.isOpen(WalletCreateDialog)) {
-      content = (
+      activeDialog = (
         <WalletCreateDialogContainer
           actions={actions}
           stores={stores}
@@ -85,7 +85,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
-      content = (
+      activeDialog = (
         <WalletBackupDialogContainer
           actions={actions}
           stores={stores}
@@ -94,7 +94,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreOptionsDialog)) {
-      content = (
+      activeDialog = (
         <WalletRestoreOptionsDialogContainer
           stores={stores}
           onClose={this.onClose}
@@ -105,7 +105,7 @@ export default class WalletAddPage extends Component<Props> {
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
       const restoreType = uiDialogs.getParam('restoreType');
-      content = (
+      activeDialog = (
         <WalletRestoreDialogContainer
           actions={actions}
           stores={stores}
@@ -115,7 +115,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletConnectHardwareDialog)) {
-      content = (
+      activeDialog = (
         <WalletConnectHardwareDialogContainer
           actions={actions}
           stores={stores}
@@ -126,7 +126,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
-      content = (
+      activeDialog = (
         <WalletTrezorConnectDialogContainer
           actions={actions}
           stores={stores}
@@ -135,7 +135,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
-      content = (
+      activeDialog = (
         <WalletLedgerConnectDialogContainer
           actions={actions}
           stores={stores}
@@ -143,26 +143,26 @@ export default class WalletAddPage extends Component<Props> {
           classicTheme={profile.isClassicTheme}
         />
       );
-    } else {
-      content = (
-        <WalletAdd
-          onHardwareConnect={
-            () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
-          }
-          isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-          isCreateLedgerWalletActive={isCreateLedgerWalletActive}
-          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionsDialog })}
-          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-          isRestoreActive={restoreRequest.isExecuting}
-          onSettings={this._goToSettingsRoot}
-          onDaedalusTransfer={this._goToDaedalusTransferRoot}
-          title={this.context.intl.formatMessage(messages.title)}
-          subTitle={this.context.intl.formatMessage(messages.subTitle)}
-          classicTheme={profile.isClassicTheme}
-        />
-      );
     }
+
+    const content = (
+      <WalletAdd
+        onHardwareConnect={
+          () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
+        }
+        isCreateTrezorWalletActive={isCreateTrezorWalletActive}
+        isCreateLedgerWalletActive={isCreateLedgerWalletActive}
+        onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+        onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionsDialog })}
+        onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
+        isRestoreActive={restoreRequest.isExecuting}
+        onSettings={this._goToSettingsRoot}
+        onDaedalusTransfer={this._goToDaedalusTransferRoot}
+        title={this.context.intl.formatMessage(messages.title)}
+        subTitle={this.context.intl.formatMessage(messages.subTitle)}
+        classicTheme={profile.isClassicTheme}
+      />
+    );
 
     return (
       <MainLayout
@@ -171,6 +171,7 @@ export default class WalletAddPage extends Component<Props> {
         classicTheme={profile.isClassicTheme}
       >
         {content}
+        {activeDialog}
       </MainLayout>
     );
   }

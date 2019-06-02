@@ -2,12 +2,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
-import TopBarContainer from './TopBarContainer';
 import TopBarLayout from '../components/layout/TopBarLayout';
 import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBanner';
 import type { InjectedContainerProps } from '../types/injectedPropsType';
-import type { ActionsMap } from '../actions';
-import type { StoresMap } from '../stores';
 
 export type MainLayoutProps = InjectedContainerProps & {
   topbar?: Node,
@@ -22,34 +19,14 @@ export default class MainLayout extends Component<MainLayoutProps> {
     footer: null,
   };
 
-  _makeDefaultTopbar = (actions: ActionsMap, stores: StoresMap):?Node => {
-    // Make sure MainLayout has ActionsMap and StoresMap
-    if (actions && stores) {
-      return <TopBarContainer actions={actions} stores={stores} />;
-    }
-  }
-
   render() {
-    const {
-      actions,
-      stores,
-      topbar,
-      classicTheme,
-      footer
-    } = this.props;
-
-    let topbarComponent = topbar;
-    if (!topbarComponent) {
-      topbarComponent = this._makeDefaultTopbar(actions, stores);
-    }
-
     return (
       <TopBarLayout
         banner={<TestnetWarningBanner />}
-        topbar={topbarComponent}
+        topbar={this.props.topbar}
         notification={<div />}
-        footer={footer}
-        classicTheme={classicTheme}
+        footer={this.props.footer}
+        classicTheme={this.props.classicTheme}
       >
         {this.props.children}
       </TopBarLayout>
