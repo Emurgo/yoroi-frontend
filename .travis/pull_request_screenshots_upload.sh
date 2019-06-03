@@ -19,19 +19,19 @@ BC_BIN=$(which bc); if [ -z "${BC_BIN}" ]; then sudo apt-get install -qqy bc; fi
 
 for browser in brave chrome firefox
 do
-  if [ -e "screenshots/screenshots-${browser}" ]
+  if [ -e "screenshots/${browser}" ]
   then
     if [ "${TRAVIS_PULL_REQUEST}" != "false" ]
     then
-      OBJECT_KEY_BASEPATH="screenshots-${browser}/${PR_NUMBER}-${GIT_SHORT_COMMIT}"
+      OBJECT_KEY_BASEPATH="${browser}/${PR_NUMBER}-${GIT_SHORT_COMMIT}"
     else
-      OBJECT_KEY_BASEPATH="screenshots-${browser}/${TRAVIS_BRANCH}"
+      OBJECT_KEY_BASEPATH="${browser}/${TRAVIS_BRANCH}"
     fi
     
     rm -f /tmp/pr-screenshots-urls
-    find screenshots/screenshots-${browser} -type f | while read file;
+    find screenshots/${browser} -type f | while read file;
     do
-      BASENAME=$(echo ${file} | sed "s|^screenshots/screenshots-${browser}||")
+      BASENAME=$(echo ${file} | sed "s|^screenshots/${browser}/||")
       OBJECT_KEY="${OBJECT_KEY_BASEPATH}/${BASENAME}"
       S3_URI="$(echo ${S3_ENDPOINT}/${OBJECT_KEY} | sed 's| |%20|g')"
       aws s3 cp "${file}" "s3://${S3_BUCKET}/${OBJECT_KEY}"
@@ -44,10 +44,10 @@ do
     then
     
       rm -f /tmp/pr-differences-urls
-      find screenshots/screenshots-${browser} -type f | while read file;
+      find screenshots/${browser} -type f | while read file;
       do
-        BASENAME=$(echo ${file} | sed "s|^screenshots/screenshots-${browser}||")
-        BASE_BRANCH_OBJECT_KEY="screenshots-${browser}/${TRAVIS_BRANCH}/${BASENAME}"
+        BASENAME=$(echo ${file} | sed "s|^screenshots/${browser}/||")
+        BASE_BRANCH_OBJECT_KEY="screenshots/${browser}/${TRAVIS_BRANCH}/${BASENAME}"
         BASE_BRANCH_S3_URI="$(echo ${S3_ENDPOINT}/${BASE_BRANCH_OBJECT_KEY} | sed 's| |%20|g')"
         DIFFERENCE_OBJECT_KEY="${OBJECT_KEY_BASEPATH}/differences/${BASENAME}"
         # TODO: implement cache (tho it might not make much sense)
