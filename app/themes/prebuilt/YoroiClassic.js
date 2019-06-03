@@ -293,7 +293,8 @@ export default {
   '--theme-system-error-overlay-button-text-color-hover': '#ab1700',
   '--theme-system-error-overlay-text-color': '#fafbfc',
 
-  '--theme-topbar-category-background-color-hover': '#373f52',
+  '--theme-topbar-category-background-color-hover': 'tranparent',
+  '--theme-topbar-item-selection-color': '#daa49a',
   '--theme-topbar-category-text-color': '#fafbfc',
   '--theme-topbar-background-color-gradient-start': topbarGradient.start,
   '--theme-topbar-background-color-gradient-end': topbarGradient.end,
