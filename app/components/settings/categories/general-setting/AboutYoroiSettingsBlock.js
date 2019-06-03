@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
-import styles from './AboutYoroiSettings.scss';
+import styles from './AboutYoroiSettingsBlock.scss';
 import { observer } from 'mobx-react';
 
-import GridFlexContainer from '../../layout/GridFlexContainer';
-import githubSvg from '../../../assets/images/social/github.inline.svg';
-import youtubeSvg from '../../../assets/images/social/youtube.inline.svg';
-import telegramSvg from '../../../assets/images/social/telegram.inline.svg';
-import twitterSvg from '../../../assets/images/social/twitter.inline.svg';
-import yoroiSvg from '../../../assets/images/yoroi-logo-shape-white.inline.svg';
-import facebookSvg from '../../../assets/images/social/facebook.inline.svg';
-import mediumSvg from '../../../assets/images/social/medium.inline.svg';
+import GridFlexContainer from '../../../layout/GridFlexContainer';
+import githubSvg from '../../../../assets/images/social/github.inline.svg';
+import youtubeSvg from '../../../../assets/images/social/youtube.inline.svg';
+import telegramSvg from '../../../../assets/images/social/telegram.inline.svg';
+import twitterSvg from '../../../../assets/images/social/twitter.inline.svg';
+import yoroiSvg from '../../../../assets/images/yoroi-logo-shape-white.inline.svg';
+import facebookSvg from '../../../../assets/images/social/facebook.inline.svg';
+import mediumSvg from '../../../../assets/images/social/medium.inline.svg';
 
-import environment from '../../../environment';
-import LinkButton from '../../widgets/LinkButton';
+import environment from '../../../../environment';
+import LinkButton from '../../../widgets/LinkButton';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -94,7 +94,7 @@ const socialMediaLinks = [{
 }];
 
 @observer
-export default class AboutYoroiSettings extends Component {
+export default class AboutYoroiSettingsBlock extends Component {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -104,7 +104,7 @@ export default class AboutYoroiSettings extends Component {
 
     return (
       <div className={styles.component}>
-        <h1>{intl.formatMessage(messages.aboutYoroiLabel)}</h1>
+        <h2>{intl.formatMessage(messages.aboutYoroiLabel)}</h2>
 
         <p>
           {intl.formatMessage(messages.versionLabel)}&nbsp;
@@ -118,12 +118,13 @@ export default class AboutYoroiSettings extends Component {
           {intl.formatMessage(messages.commitLabel)}&nbsp;
           {environment.commit}
         </p>
-        <br />
-        <GridFlexContainer rowSize={3}>
-          {socialMediaLinks.map(link => (
-            <LinkButton key={link.url} {...link} textClassName={styles.socialMediaLinkText} />
-          ))}
-        </GridFlexContainer>
+        <div className={styles.aboutScoial}>
+          <GridFlexContainer rowSize={socialMediaLinks.length}>
+            {socialMediaLinks.map(link => (
+              <LinkButton key={link.url} {...link} textClassName={styles.socialMediaLinkText} />
+            ))}
+          </GridFlexContainer>
+        </div>
       </div>
     );
   }
