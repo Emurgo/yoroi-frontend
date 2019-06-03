@@ -114,6 +114,7 @@
   "settings.display.themeNames.yoroiClassic": "經典Yoroi",
   "settings.display.themeNames.yoroiModern": "現代Yoroi",
   "settings.display.themeWarning": "更改主題將改變設定",
+  "settings.display.themeNote": "Note: Changing theme will remove customization.",
   "settings.general.aboutYoroi.commitLabel": "Commit:",
   "settings.general.aboutYoroi.facebook": "Yoroi Facebook",
   "settings.general.aboutYoroi.github": "Yoroi GitHub",
