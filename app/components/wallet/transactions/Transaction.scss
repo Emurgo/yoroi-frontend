@@ -12,6 +12,7 @@
   .togglerContent {
     flex: 1;
     padding-top: 1px;
+    white-space: nowrap;
   }
 
   .header,
@@ -22,7 +23,11 @@
   }
 
   .title {
-    min-width: 300px;
+    flex: 0 1 300px;
+    padding-right: 30px;
+    max-width: 300px;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   .title,
@@ -38,8 +43,6 @@
   .time {
     font-family: var(--font-light);
     font-size: 14px;
-    margin-left: 48px;
-    min-width: 120px;
   }  
 
   .label {
@@ -53,6 +56,10 @@
     margin-left: 130px;
     text-align: center;
     padding: 0px 9px;
+
+    @media (max-width: 1200px) {
+      margin-left: 50px;
+    }
   }
 
   .pendingLabel {
@@ -75,6 +82,7 @@
     margin-left: auto;
     font-family: var(--font-medium);
     font-size: 16px;
+    padding-left: 15px;
   }
 
   .amountSent {
