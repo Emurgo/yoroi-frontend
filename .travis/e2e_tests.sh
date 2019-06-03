@@ -9,3 +9,4 @@ npm run test-e2e-${BROWSER}
 mv screenshots screenshots-${BROWSER}
 mkdir screenshots
 mv screenshots-${BROWSER} screenshots
+ls -hl screenshots
