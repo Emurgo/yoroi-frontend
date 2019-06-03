@@ -53,7 +53,6 @@ then
     -H "x-goog-api-version: 2" \
     -X POST \
     -T artifacts/${ZIP_NAME} \
-    -v \
     ${CHROME_WEBSTORE_API_ENDPOINT}/items | sed 's|.*"id":"\(.*\)","upload.*|\1|g')
   set -x
 
