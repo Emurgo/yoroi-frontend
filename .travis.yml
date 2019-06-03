@@ -14,6 +14,7 @@ cache:
     # cache built artifacts from install phase to speedup e2e
     - build
     - artifacts
+    - screenshots
 
 env:
   global:
