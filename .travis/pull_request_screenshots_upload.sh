@@ -19,53 +19,55 @@ BC_BIN=$(which bc); if [ -z "${BC_BIN}" ]; then sudo apt-get install -qqy bc; fi
 
 for browser in brave chrome firefox
 do
-  if [ "${TRAVIS_PULL_REQUEST}" != "false" ]
+  if [ -e "screenshots/screenshots-${browser}" ]
   then
-    OBJECT_KEY_BASEPATH="screenshots-${browser}/${PR_NUMBER}-${GIT_SHORT_COMMIT}"
-  else
-    OBJECT_KEY_BASEPATH="screenshots-${browser}/${TRAVIS_BRANCH}"
-  fi
-  
-  rm -f /tmp/pr-screenshots-urls
-  find screenshots/screenshots-${browser} -type f | while read file;
-  do
-    BASENAME=$(echo ${file} | sed "s|^screenshots/screenshots-${browser}||")
-    OBJECT_KEY="${OBJECT_KEY_BASEPATH}/${BASENAME}"
-    S3_URI="$(echo ${S3_ENDPOINT}/${OBJECT_KEY} | sed 's| |%20|g')"
-    aws s3 cp "${file}" "s3://${S3_BUCKET}/${OBJECT_KEY}"
-    echo "**- $(echo ${BASENAME} | sed 's|.png||'):**" >> /tmp/pr-screenshots-urls
-    echo "![${BASENAME}](${S3_URI})" >> /tmp/pr-screenshots-urls
-  done
-  
-  # compare with PR base branch's screenshots and add diferences
-  if [ "${TRAVIS_PULL_REQUEST}" != "false" ]
-  then
-  
-    rm -f /tmp/pr-differences-urls
+    if [ "${TRAVIS_PULL_REQUEST}" != "false" ]
+    then
+      OBJECT_KEY_BASEPATH="screenshots-${browser}/${PR_NUMBER}-${GIT_SHORT_COMMIT}"
+    else
+      OBJECT_KEY_BASEPATH="screenshots-${browser}/${TRAVIS_BRANCH}"
+    fi
+    
+    rm -f /tmp/pr-screenshots-urls
     find screenshots/screenshots-${browser} -type f | while read file;
     do
       BASENAME=$(echo ${file} | sed "s|^screenshots/screenshots-${browser}||")
-      BASE_BRANCH_OBJECT_KEY="screenshots-${browser}/${TRAVIS_BRANCH}/${BASENAME}"
-      BASE_BRANCH_S3_URI="$(echo ${S3_ENDPOINT}/${BASE_BRANCH_OBJECT_KEY} | sed 's| |%20|g')"
-      DIFFERENCE_OBJECT_KEY="${OBJECT_KEY_BASEPATH}/differences/${BASENAME}"
-      # TODO: implement cache (tho it might not make much sense)
-      if [ ! -e "${BASE_BRANCH_OBJECT_KEY}" ]
-      then
-        curl -sLo base-image.png "${BASE_BRANCH_S3_URI}"
-      else
-        cp -a "${BASE_BRANCH_OBJECT_KEY}" base-image.png
-      fi
-      DIFF_VALUE=$(compare -metric RMSE -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png 2>&1| awk '{print $1}' | sed 's|\.||g')
-      if [ $DIFF_VALUE -gt $SCREENSHOT_DIFF_THRESHOLD ]
-      then
-        DIFFERENCE_S3_URI="$(echo ${S3_ENDPOINT}/${DIFFERENCE_OBJECT_KEY} | sed 's| |%20|g')"
-        aws s3 cp "difference.png" "s3://${S3_BUCKET}/${DIFFERENCE_OBJECT_KEY}"
-        echo "**- $(echo ${BASENAME} | sed 's|.png||'):**" >> /tmp/pr-differences-urls
-        echo "![${BASENAME}](${DIFFERENCE_S3_URI})" >> /tmp/pr-differences-urls
-      fi
+      OBJECT_KEY="${OBJECT_KEY_BASEPATH}/${BASENAME}"
+      S3_URI="$(echo ${S3_ENDPOINT}/${OBJECT_KEY} | sed 's| |%20|g')"
+      aws s3 cp "${file}" "s3://${S3_BUCKET}/${OBJECT_KEY}"
+      echo "**- $(echo ${BASENAME} | sed 's|.png||'):**" >> /tmp/pr-screenshots-urls
+      echo "![${BASENAME}](${S3_URI})" >> /tmp/pr-screenshots-urls
     done
-  
-    cat > /tmp/pr-comment.json <<EOF
+    
+    # compare with PR base branch's screenshots and add diferences
+    if [ "${TRAVIS_PULL_REQUEST}" != "false" ]
+    then
+    
+      rm -f /tmp/pr-differences-urls
+      find screenshots/screenshots-${browser} -type f | while read file;
+      do
+        BASENAME=$(echo ${file} | sed "s|^screenshots/screenshots-${browser}||")
+        BASE_BRANCH_OBJECT_KEY="screenshots-${browser}/${TRAVIS_BRANCH}/${BASENAME}"
+        BASE_BRANCH_S3_URI="$(echo ${S3_ENDPOINT}/${BASE_BRANCH_OBJECT_KEY} | sed 's| |%20|g')"
+        DIFFERENCE_OBJECT_KEY="${OBJECT_KEY_BASEPATH}/differences/${BASENAME}"
+        # TODO: implement cache (tho it might not make much sense)
+        if [ ! -e "${BASE_BRANCH_OBJECT_KEY}" ]
+        then
+          curl -sLo base-image.png "${BASE_BRANCH_S3_URI}"
+        else
+          cp -a "${BASE_BRANCH_OBJECT_KEY}" base-image.png
+        fi
+        DIFF_VALUE=$(compare -metric RMSE -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png 2>&1| awk '{print $1}' | sed 's|\.||g')
+        if [ $DIFF_VALUE -gt $SCREENSHOT_DIFF_THRESHOLD ]
+        then
+          DIFFERENCE_S3_URI="$(echo ${S3_ENDPOINT}/${DIFFERENCE_OBJECT_KEY} | sed 's| |%20|g')"
+          aws s3 cp "difference.png" "s3://${S3_BUCKET}/${DIFFERENCE_OBJECT_KEY}"
+          echo "**- $(echo ${BASENAME} | sed 's|.png||'):**" >> /tmp/pr-differences-urls
+          echo "![${BASENAME}](${DIFFERENCE_S3_URI})" >> /tmp/pr-differences-urls
+        fi
+      done
+    
+      cat > /tmp/pr-comment.json <<EOF
 { "body": "
 <details>\n
 EOF
@@ -83,10 +85,12 @@ $(cat /tmp/pr-screenshots-urls | while read line; do echo "\\n\\n  $line\\n\\n";
 "}
 EOF
   
-    curl -s -H "Authorization: token ${GITHUB_PAT}" \
-      -X POST --data @/tmp/pr-comment.json \
-      "https://api.github.com/repos/${REPO_SLUG}/issues/${PR_NUMBER}/comments"
-  
-    rm -rf ${OBJECT_KEY_BASEPATH}
-  
+      curl -s -H "Authorization: token ${GITHUB_PAT}" \
+        -X POST --data @/tmp/pr-comment.json \
+        "https://api.github.com/repos/${REPO_SLUG}/issues/${PR_NUMBER}/comments"
+    
+      rm -rf ${OBJECT_KEY_BASEPATH}
+    
+    fi
   fi
+done
