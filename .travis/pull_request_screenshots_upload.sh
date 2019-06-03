@@ -17,6 +17,12 @@ test -z $SCREENSHOT_DIFF_COLOR && SCREENSHOT_DIFF_COLOR=yellow
 # install bc calculator if not present
 BC_BIN=$(which bc); if [ -z "${BC_BIN}" ]; then sudo apt-get install -qqy bc; fi
 
+# comment header
+cat > /tmp/pr-comment.json <<EOF
+{ "body": "
+<details>\n
+EOF
+
 for browser in brave chrome firefox
 do
   # check if there are any screenshots
@@ -68,17 +74,13 @@ do
         fi
       done
     
-      cat > /tmp/pr-comment.json <<EOF
-{ "body": "
-<details>\n
-EOF
-  # add differences detail only if we found any
-  test -e /tmp/pr-differences-urls && cat >> /tmp/pr-comment.json <<EOF
+      # add differences detail only if we found any
+      test -e /tmp/pr-differences-urls && cat >> /tmp/pr-comment.json <<EOF
   <summary>E2E _${browser}_ screenshots differences between '**PR${PR_NUMBER}-${GIT_SHORT_COMMIT}**' and base branch '**${TRAVIS_BRANCH}**'</summary>\n\n
 $(cat /tmp/pr-differences-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
 </details>
 EOF
-  cat >> /tmp/pr-comment.json <<EOF
+      cat >> /tmp/pr-comment.json <<EOF
 <details>\n
   <summary>Complete E2E _${browser}_ screenshots collection for 'PR${PR_NUMBER}-${GIT_SHORT_COMMIT}'</summary>\n\n
 $(cat /tmp/pr-screenshots-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
@@ -86,12 +88,16 @@ $(cat /tmp/pr-screenshots-urls | while read line; do echo "\\n\\n  $line\\n\\n";
 "}
 EOF
   
-      curl -s -H "Authorization: token ${GITHUB_PAT}" \
-        -X POST --data @/tmp/pr-comment.json \
-        "https://api.github.com/repos/${REPO_SLUG}/issues/${PR_NUMBER}/comments"
-    
       rm -rf ${OBJECT_KEY_BASEPATH}
     
     fi
   fi
 done
+
+# check if there is something to comment
+if [ $(cat /tmp/pr-comment.json | wc -l) -gt 2 ]
+then
+  curl -s -H "Authorization: token ${GITHUB_PAT}" \
+    -X POST --data @/tmp/pr-comment.json \
+    "https://api.github.com/repos/${REPO_SLUG}/issues/${PR_NUMBER}/comments"
+fi
