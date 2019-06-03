@@ -19,13 +19,14 @@ BC_BIN=$(which bc); if [ -z "${BC_BIN}" ]; then sudo apt-get install -qqy bc; fi
 
 for browser in brave chrome firefox
 do
-  if [ -e "screenshots/${browser}" ]
+  # check if there are any screenshots
+  if [ $(find screenshots/${browser} -type f | wc -l) -gt 0 ]
   then
     if [ "${TRAVIS_PULL_REQUEST}" != "false" ]
     then
-      OBJECT_KEY_BASEPATH="${browser}/${PR_NUMBER}-${GIT_SHORT_COMMIT}"
+      OBJECT_KEY_BASEPATH="screenshots/${browser}/${PR_NUMBER}-${GIT_SHORT_COMMIT}"
     else
-      OBJECT_KEY_BASEPATH="${browser}/${TRAVIS_BRANCH}"
+      OBJECT_KEY_BASEPATH="screenshots/${browser}/${TRAVIS_BRANCH}"
     fi
     
     rm -f /tmp/pr-screenshots-urls
