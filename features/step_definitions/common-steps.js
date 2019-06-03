@@ -1,6 +1,6 @@
 // @flow
 
-import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper } from 'cucumber';
+import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
 import { getMockServer, closeMockServer } from '../mock-chain/mockServer';
 import i18nHelper from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
@@ -24,6 +24,7 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(screenshotsDir);
   fs.mkdirSync(screenshotsDir);
+  setDefaultTimeout(30 * 1000);
 
   getMockServer({});
 });
