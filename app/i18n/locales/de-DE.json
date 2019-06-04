@@ -299,7 +299,7 @@
   "wallet.navigation.receive": "Empfangen",
   "wallet.navigation.send": "Senden",
   "wallet.navigation.transactions": "Transaktionen",
-  "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Verify address",
+  "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Überprüfe die Adresse",
   "wallet.receive.confirmationDialog.addressLabel": "Adresse",
   "wallet.receive.confirmationDialog.derivationPathLabel": "Ableitungspfad",
   "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Durch Hardware Wallet überprüfen lassen",
