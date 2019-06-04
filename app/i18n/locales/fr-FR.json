@@ -304,7 +304,7 @@
   "wallet.receive.page.hideUsedLabel": "masquer les utilisées",
   "wallet.receive.page.showUsedLabel": "montrer les utilisées",
   "wallet.receive.page.walletAddressLabel": "Votre adresse de wallet",
-  "wallet.receive.page.walletReceiveInstructions": "Partagez cette adresse de wallet pour recevoir des paiements. Afin d'assurer votre sécurité, de nouvelles adresses sont générées à chaque utilisation.",
+  "wallet.receive.page.walletReceiveInstructions": "Partagez cette adresse de wallet pour recevoir des paiements.<br>Afin d'assurer votre sécurité, de nouvelles adresses sont générées à chaque utilisation.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Effacer",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Confirmer",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "Effacer le dernier",
