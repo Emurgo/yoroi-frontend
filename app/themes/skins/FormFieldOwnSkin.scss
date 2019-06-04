@@ -26,6 +26,8 @@
     box-sizing: border-box;
     line-height: 56px;
     padding: 0 15px;
+    margin-top: -17px;
+    border-radius: 8px;
   }
 
   /* By default, Chrome's styling for autofill inputs overlaps with floating labels.
@@ -63,11 +65,6 @@
   .inputWrapper {
     padding: 0 1px 1px;
   }
-  input {
-    border-radius: 8px;
-    margin-top: -17px;
-  }
-
   .legend {
     margin-left: 9px;
     font-family: var(--rp-theme-font-regular);
@@ -90,6 +87,10 @@
     display: block;
     font-size: 16px;
     margin-bottom: 10px;
+  }
+  input {
+    margin-top: 0;
+    border-radius: 0;
   }
   .inputWrapper {
     padding: 0;
