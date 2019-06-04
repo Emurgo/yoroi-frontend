@@ -202,7 +202,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
           {...walletNameField.bind()}
           done={isValidWalletName(walletName)}
           error={walletNameField.error}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
         />
 
         <div className={styles.walletPassword}>
@@ -212,14 +212,14 @@ export default class WalletCreateDialog extends Component<Props, State> {
               {...walletPasswordField.bind()}
               done={isValidWalletPassword(walletPassword)}
               error={walletPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={InputOwnSkin}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
               done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               error={repeatedPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={InputOwnSkin}
             />
 
             <PasswordInstructions />

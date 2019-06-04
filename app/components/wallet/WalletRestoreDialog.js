@@ -397,7 +397,7 @@ export default class WalletRestoreDialog extends Component<Props> {
             {...walletNameField.bind()}
             done={isValidWalletName(walletName)}
             error={walletNameField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
         )}
 
@@ -426,7 +426,7 @@ export default class WalletRestoreDialog extends Component<Props> {
                 {...paperPasswordField.bind()}
                 done={validatePaperPassword()}
                 error={paperPasswordField.error}
-                skin={classicTheme ? InputSkin : InputOwnSkin}
+                skin={InputOwnSkin}
               />
             </div>
           </div>
@@ -440,14 +440,14 @@ export default class WalletRestoreDialog extends Component<Props> {
                 {...walletPasswordField.bind()}
                 done={isValidWalletPassword(walletPassword)}
                 error={walletPasswordField.error}
-                skin={classicTheme ? InputSkin : InputOwnSkin}
+                skin={InputOwnSkin}
               />
               <Input
                 className="repeatedPassword"
                 {...repeatedPasswordField.bind()}
                 done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
                 error={repeatedPasswordField.error}
-                skin={classicTheme ? InputSkin : InputOwnSkin}
+                skin={InputOwnSkin}
               />
               <PasswordInstructions />
             </div>
