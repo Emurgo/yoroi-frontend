@@ -70,7 +70,9 @@ then
         echo "![${BASENAME}](${DIFFERENCE_S3_URI})" >> /tmp/pr-differences-urls
       fi
     done
-    aws s3 cp /tmp/pr-differences-urls "s3://${S3_BUCKET}/${OBJECT_KEY_BASEPATH}/pr-differences-urls"
-  
+    if [ -e /tmp/pr-differences-urls ]
+    then
+      aws s3 cp /tmp/pr-differences-urls "s3://${S3_BUCKET}/${OBJECT_KEY_BASEPATH}/pr-differences-urls"
+    fi
   fi
 fi
