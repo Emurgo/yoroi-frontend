@@ -104,7 +104,9 @@ matrix:
         - BROWSER=firefox
         - BROWSER=brave
       install: bash .travis/e2e_tests_install.sh
-      script: bash .travis/e2e_tests.sh
+      script: 
+        - bash .travis/e2e_tests.sh
+        - bash .travis/s3_screenshots_upload.sh
     - stage: e2e-tests
       if: branch =~ ^develop|staging|master OR type = pull_request
       name: "Chrome End-to-End tests"
@@ -113,7 +115,9 @@ matrix:
         - BROWSER=brave
         - BROWSER=chrome
       install: bash .travis/e2e_tests_install.sh
-      script: bash .travis/e2e_tests.sh
+      script: 
+        - bash .travis/e2e_tests.sh
+        - bash .travis/s3_screenshots_upload.sh
     - stage: e2e-tests
       if: branch =~ ^develop|staging|master OR type = pull_request
       name: "Firefox End-to-End tests"
