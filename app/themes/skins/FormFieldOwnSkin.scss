@@ -82,6 +82,9 @@
   .inputWrapper {
     border: 0;
   }
+  .iconsWrapper {
+    padding-top: 27px;
+  }
   .legend {
     font-family: var(--rp-theme-font-regular);
     display: block;
@@ -89,7 +92,7 @@
     margin-bottom: 10px;
   }
   input {
-    margin-top: 0;
+    margin: 0;
     border-radius: 0;
   }
   .inputWrapper {

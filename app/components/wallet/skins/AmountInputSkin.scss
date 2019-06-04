@@ -34,3 +34,17 @@
     }
   }
 }
+
+:global(.YoroiClassic) .component {
+  .fees {
+    bottom: 75px;
+  }
+
+  .total {
+    bottom: 35px;
+  
+    &.error {
+      right: 42px;
+    }
+  }
+}
