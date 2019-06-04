@@ -57,6 +57,7 @@ then
       else
         cp -a "${BASE_BRANCH_OBJECT_KEY}" base-image.png
       fi
+      compare -metric RMSE -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png
       DIFF_VALUE=$(compare -metric RMSE -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png 2>&1| awk '{print $1}' | sed 's|\.||g')
       if [ $DIFF_VALUE -gt $SCREENSHOT_DIFF_THRESHOLD ]
       then

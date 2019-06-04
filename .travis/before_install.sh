@@ -15,4 +15,3 @@ fi
 sudo ln -fs $HOME/.cargo/bin/* /usr/local/bin/
 
 sudo pip install awscli
-sudo apt-get install -y imagemagick
