@@ -304,7 +304,7 @@
   "wallet.receive.page.hideUsedLabel": "隐藏已使用",
   "wallet.receive.page.showUsedLabel": "显示已使用",
   "wallet.receive.page.walletAddressLabel": "您的钱包地址",
-  "wallet.receive.page.walletReceiveInstructions": "共享此钱包地址以接收付款。为保护您的隐私，在您使用地址后会自动生成新地址。",
+  "wallet.receive.page.walletReceiveInstructions": "共享此钱包地址以接收付款。<br>为保护您的隐私，在您使用地址后会自动生成新地址。",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "清除",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "确认",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "删除",
