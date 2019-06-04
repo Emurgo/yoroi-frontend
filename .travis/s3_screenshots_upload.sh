@@ -54,9 +54,11 @@ then
       if [ ! -e "${BASE_BRANCH_OBJECT_KEY}" ]
       then
         curl -sLo base-image.png "${BASE_BRANCH_S3_URI}"
-      else
         # workaround first deploy where branches images do not exist
-        cp -a "${file}" base-image.png
+        if [ -z "$(file base-image.png | awk -F: '{print $2}' | grep -i png)" ]
+        then
+          cp -a "${file}" base-image.png
+        fi
       fi
       compare -metric RMSE -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png
       DIFF_VALUE=$(compare -metric RMSE -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png 2>&1| awk '{print $1}' | sed 's|\.||g')
