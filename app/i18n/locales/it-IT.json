@@ -226,7 +226,7 @@
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "Per favore, verifica di aver scritto con cura la frase di recupero e custodiscila in un posto sicuro.\n Avrai bisogno di questa frase per usare e recuperare il tuo wallet. La frase riconosce le lettere maiuscole dalle minuscole.",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "Sì, la ho scritta.",
   "wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device": "Capisco che le mie chiavi segrete sono conservate in sicurezza soltanto su questo dispositivo, non sui server della azienda.",
-  "wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery": "I understand that if this application is moved to another device or deleted, my money can\n    be only recovered with the backup phrase that I have written down and saved in a secure place.",
+  "wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery": "Comprendo che se questa applicazione viene spostata su un altro dispositivo o cancellata, il mio denaro potrà essere recuperato solamente con la frase di recupero che io ho scritto e conservato in un luogo sicuro.",
   "wallet.backup.recovery.phrase.entry.dialog.verification.instructions": "Tap each word in the correct order to verify your recovery phrase",
   "wallet.connect.hw.dialog.connect.button.label": "Connect",
   "wallet.connect.hw.dialog.save.button.label": "Save",
