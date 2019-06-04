@@ -14,7 +14,7 @@ S3_ENDPOINT="https://${S3_BUCKET}.s3.amazonaws.com"
 # comment header
 cat > /tmp/pr-comment.json <<EOF
 { "body": "
-<details>\n
+\n
 EOF
 
 for browser in brave chrome firefox
@@ -32,18 +32,14 @@ do
       cat >> /tmp/pr-comment.json <<EOF
   <summary>E2E _${browser}_ screenshots differences between '**PR${PR_NUMBER}-${GIT_SHORT_COMMIT}**' and base branch '**${TRAVIS_BRANCH}**'</summary>\n\n
 $(cat /tmp/pr-differences-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
-</details>
 EOF
     fi
 
     if [ -e /tmp/pr-screenshots-urls ]
     then
       cat >> /tmp/pr-comment.json <<EOF
-<details>\n
   <summary>Complete E2E _${browser}_ screenshots collection for 'PR${PR_NUMBER}-${GIT_SHORT_COMMIT}'</summary>\n\n
 $(cat /tmp/pr-screenshots-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
-</details>
-"}
 EOF
     fi
   fi
@@ -52,6 +48,7 @@ done
 # check if there is something to comment
 if [ $(cat /tmp/pr-comment.json | wc -l) -gt 2 ]
 then
+  echo '}' >> /tmp/pr-comment.json
   curl -s -H "Authorization: token ${GITHUB_PAT}" \
     -X POST --data @/tmp/pr-comment.json \
     "https://api.github.com/repos/${REPO_SLUG}/issues/${PR_NUMBER}/comments"
