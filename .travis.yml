@@ -14,9 +14,6 @@ cache:
     # cache built artifacts from install phase to speedup e2e
     - build
     - artifacts
-    - screenshots/brave
-    - screenshots/chrome
-    - screenshots/firefox
 
 env:
   global:
