@@ -71,19 +71,22 @@ matrix:
 
     # stage: code-qa
     - stage: code-qa
+      if: branch =~ ^develop|staging|master OR type = pull_request
       name: "flow checks"
       script: npm run flow
     - stage: code-qa
+      if: branch =~ ^develop|staging|master OR type = pull_request
       name: "eslint checks"
       script: npm run eslint
     - stage: code-qa
+      if: branch =~ ^develop|staging|master OR type = pull_request
       name: "jest checks"
       script: npm run jest
 
     # stage: build-yoroi
     # 3x env in order to satisfy (build|artifacts) cache for e2e-tests
     - stage: build-yoroi
-      #if: branch = master
+      if: branch =~ ^develop|staging|master OR type = pull_request
       name: "build Yoroi extension"
       env:
         - BROWSER=chrome
