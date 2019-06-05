@@ -14,7 +14,6 @@ S3_ENDPOINT="https://${S3_BUCKET}.s3.amazonaws.com"
 # comment header
 cat > /tmp/pr-comment.json <<EOF
 { "body": "
-<details>\n
 EOF
 
 for browser in brave chrome firefox
@@ -30,6 +29,7 @@ do
     if [ -e /tmp/${browser}-pr-differences-urls ]
     then
       cat >> /tmp/pr-comment.json <<EOF
+<details>\n
   <summary>E2E _${browser}_ screenshots differences between '**PR${PR_NUMBER}-${GIT_SHORT_COMMIT}**' and base branch '**${TRAVIS_BRANCH}**'</summary>\n\n
 $(cat /tmp/${browser}-pr-differences-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
 EOF
@@ -42,6 +42,9 @@ EOF
 $(cat /tmp/${browser}-pr-screenshots-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
 EOF
     fi
+    cat >> /tmp/pr-comment.json <<EOF
+</details>\n
+EOF
   fi
 done
   
