@@ -30,21 +30,21 @@ do
     then
       cat >> /tmp/pr-comment.json <<EOF
 <details>\n
-  <summary>E2E _${browser}_ screenshots differences between '**PR${PR_NUMBER}-${GIT_SHORT_COMMIT}**' and base branch '**${TRAVIS_BRANCH}**'</summary>\n\n
+  <summary>E2E _${browser}_ screenshots differences between 'PR${PR_NUMBER}-${GIT_SHORT_COMMIT}' and base branch '${TRAVIS_BRANCH}'</summary>\n\n
 $(cat /tmp/${browser}-pr-differences-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
+</details>\n
 EOF
     fi
 
     if [ -e /tmp/${browser}-pr-screenshots-urls ]
     then
       cat >> /tmp/pr-comment.json <<EOF
+<details>\n
   <summary>Complete E2E _${browser}_ screenshots collection for 'PR${PR_NUMBER}-${GIT_SHORT_COMMIT}'</summary>\n\n
 $(cat /tmp/${browser}-pr-screenshots-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
-EOF
-    fi
-    cat >> /tmp/pr-comment.json <<EOF
 </details>\n
 EOF
+    fi
   fi
 done
   
