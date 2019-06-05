@@ -2,9 +2,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import DialogCloseButton from '../widgets/DialogCloseButton';
-import Dialog from '../widgets/Dialog';
-import styles from './WalletCreateDialog.scss';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../widgets/Dialog';
+import styles from './WalletCreateOptions.scss';
 import WalletTypeItem from './WalletTypeItem';
 
 const messages = defineMessages({
@@ -38,7 +38,7 @@ type Props = {
 };
 
 @observer
-export default class WalletConnectHardwareDialog extends Component<Props> {
+export default class WalletConnectHwDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -56,7 +56,7 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
         <div className={styles.tabsContent}>
-          <ul className={styles.heroWalletTypeList}>
+          <ul className={styles.WalletTypeList}>
             <WalletTypeItem
               action={onLedger}
               type="ledger"

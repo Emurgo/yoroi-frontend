@@ -1,0 +1,48 @@
+.WalletTypeList {
+  padding: 15px 0 25px;
+  max-width: 480px;
+  min-width: 100%;
+}
+
+// TABS
+.tabs {
+  font-family: var(--font-regular);
+  display: flex;
+  justify-content: center;
+  margin-bottom: 35px;
+  margin-top: 10px;
+}
+
+.tabsLink {
+  padding: 5px 0;
+  position: relative;
+  cursor: pointer;
+  margin: 0 50px;
+  opacity: .5;
+
+  &.active {
+    opacity: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+  }
+}
+
+:global(.YoroiModern) {
+  .tabsLink {
+    color: var(--tab-link-text-color);
+    font-size: var(--tab-link-text-size);
+    line-height: var(--tab-link-line-height);
+
+    &.active::after {
+      background-color: var(--tab-link-border-color);
+    }
+  }
+}

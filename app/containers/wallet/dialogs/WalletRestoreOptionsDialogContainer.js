@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import WalletRestoreOptionsDialog from '../../../components/wallet/WalletRestoreOptionsDialog';
+import WalletRestoreOptionsDialog from '../../../components/wallet/add/WalletRestoreOptionsDialog';
 
 type Props = {
   onClose: Function,

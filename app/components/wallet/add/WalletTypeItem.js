@@ -5,7 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import styles from './WalletTypeItem.scss';
 import SvgInline from 'react-svg-inline';
-import arrowDown from '../../assets/images/expand-arrow-grey.inline.svg';
+import arrowDown from '../../../assets/images/expand-arrow-grey.inline.svg';
 
 const messages = defineMessages({
   more: {
