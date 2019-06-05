@@ -22,24 +22,24 @@ do
 
   if [ "${TRAVIS_PULL_REQUEST}" != "false" ]
   then
-    OBJECT_KEY_BASEPATH="screenshots/${BROWSER}/${PR_NUMBER}-${GIT_SHORT_COMMIT}"
+    OBJECT_KEY_BASEPATH="screenshots/${browser}/${PR_NUMBER}-${GIT_SHORT_COMMIT}"
 
-    set +e; aws s3 cp "s3://${S3_BUCKET}/${OBJECT_KEY_BASEPATH}/pr-screenshots-urls" /tmp/pr-screenshots-urls; set -e
-    set +e; aws s3 cp "s3://${S3_BUCKET}/${OBJECT_KEY_BASEPATH}/pr-differences-urls" /tmp/pr-differences-urls; set -e
+    set +e; aws s3 cp "s3://${S3_BUCKET}/${OBJECT_KEY_BASEPATH}/pr-screenshots-urls" /tmp/${browser}-pr-screenshots-urls; set -e
+    set +e; aws s3 cp "s3://${S3_BUCKET}/${OBJECT_KEY_BASEPATH}/pr-differences-urls" /tmp/${browser}-pr-differences-urls; set -e
     # add differences detail only if we found any
-    if [ -e /tmp/pr-differences-urls ]
+    if [ -e /tmp/${browser}-pr-differences-urls ]
     then
       cat >> /tmp/pr-comment.json <<EOF
   <summary>E2E _${browser}_ screenshots differences between '**PR${PR_NUMBER}-${GIT_SHORT_COMMIT}**' and base branch '**${TRAVIS_BRANCH}**'</summary>\n\n
-$(cat /tmp/pr-differences-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
+$(cat /tmp/${browser}-pr-differences-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
 EOF
     fi
 
-    if [ -e /tmp/pr-screenshots-urls ]
+    if [ -e /tmp/${browser}-pr-screenshots-urls ]
     then
       cat >> /tmp/pr-comment.json <<EOF
   <summary>Complete E2E _${browser}_ screenshots collection for 'PR${PR_NUMBER}-${GIT_SHORT_COMMIT}'</summary>\n\n
-$(cat /tmp/pr-screenshots-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
+$(cat /tmp/${browser}-pr-screenshots-urls | while read line; do echo "\\n\\n  $line\\n\\n"; done)\n\n
 EOF
     fi
   fi
