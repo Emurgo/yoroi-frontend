@@ -13,3 +13,5 @@ then
   rustup target add ${RUST_TARGETS} --toolchain ${RUST_VERSION}
 fi
 sudo ln -fs $HOME/.cargo/bin/* /usr/local/bin/
+
+sudo pip install awscli
