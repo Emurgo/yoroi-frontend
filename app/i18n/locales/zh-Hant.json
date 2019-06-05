@@ -415,7 +415,6 @@
   "wallet.settings.changePassword.dialog.title.changePassword": "變更密碼",
   "wallet.settings.changePassword.dialog.title.setPassword": "密碼",
   "wallet.settings.changePassword.dialog.walletPasswordLabel": "錢包密碼",
-  "wallet.settings.exportWalletButtonLabel": "匯出錢包",
   "wallet.settings.name.label": "錢包名稱",
   "wallet.settings.password": "密碼",
   "wallet.settings.passwordLastUpdated": "上次更新日期 {lastUpdated}",

@@ -415,7 +415,6 @@
   "wallet.settings.changePassword.dialog.title.changePassword": "암호 변경",
   "wallet.settings.changePassword.dialog.title.setPassword": "암호",
   "wallet.settings.changePassword.dialog.walletPasswordLabel": "지갑 암호",
-  "wallet.settings.exportWalletButtonLabel": "지갑 내보내기",
   "wallet.settings.name.label": "지갑명",
   "wallet.settings.password": "암호",
   "wallet.settings.passwordLastUpdated": "마지막 업데이트 {lastUpdated}",

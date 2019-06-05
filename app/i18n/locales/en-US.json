@@ -423,7 +423,6 @@
   "wallet.settings.changePassword.dialog.title.changePassword": "Change password",
   "wallet.settings.changePassword.dialog.title.setPassword": "Password",
   "wallet.settings.changePassword.dialog.walletPasswordLabel": "Wallet password",
-  "wallet.settings.exportWalletButtonLabel": "Export wallet",
   "wallet.settings.name.label": "Wallet Name",
   "wallet.settings.password": "Password",
   "wallet.settings.passwordLastUpdated": "Last updated {lastUpdated}",

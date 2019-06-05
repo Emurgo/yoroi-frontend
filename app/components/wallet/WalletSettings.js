@@ -24,10 +24,6 @@ const messages = defineMessages({
     id: 'wallet.settings.passwordLastUpdated',
     defaultMessage: '!!!Last updated',
   },
-  exportButtonLabel: {
-    id: 'wallet.settings.exportWalletButtonLabel',
-    defaultMessage: '!!!Export wallet',
-  },
 });
 
 type Props = {

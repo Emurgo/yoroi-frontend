@@ -415,7 +415,6 @@
   "wallet.settings.changePassword.dialog.title.changePassword": "パスワードの変更",
   "wallet.settings.changePassword.dialog.title.setPassword": "パスワード",
   "wallet.settings.changePassword.dialog.walletPasswordLabel": "ウォレットのパスワード",
-  "wallet.settings.exportWalletButtonLabel": "ウォレットをエクスポートする",
   "wallet.settings.name.label": "ウォレット名",
   "wallet.settings.password": "パスワード",
   "wallet.settings.passwordLastUpdated": "最終更新日 {lastUpdated}",

@@ -415,7 +415,6 @@
   "wallet.settings.changePassword.dialog.title.changePassword": "Изменить пароль",
   "wallet.settings.changePassword.dialog.title.setPassword": "Пароль",
   "wallet.settings.changePassword.dialog.walletPasswordLabel": "Пароль кошелька",
-  "wallet.settings.exportWalletButtonLabel": "Экспорт кошелька",
   "wallet.settings.name.label": "Имя кошелька",
   "wallet.settings.password": "Пароль",
   "wallet.settings.passwordLastUpdated": "Последнее обновление {lastUpdated}",
