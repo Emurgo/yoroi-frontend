@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import WalletConnectOptionsDialog from '../../../components/wallet/add/WalletConnectHwOptionsDialog';
+import WalletConnectHwOptionsDialog from '../../../components/wallet/add/WalletConnectHwOptionsDialog';
 
 type Props = {
   onClose: Function,
@@ -15,7 +15,7 @@ export default class WalletConnectHwDialogContainer extends Component<Props> {
 
   render() {
     return (
-      <WalletConnectOptionsDialog
+      <WalletConnectHwOptionsDialog
         classicTheme={this.props.classicTheme}
         onCancel={this.props.onClose}
         onTrezor={this.props.onTrezor}
