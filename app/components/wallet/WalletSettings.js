@@ -14,11 +14,11 @@ import type { Node } from 'react';
 const messages = defineMessages({
   name: {
     id: 'wallet.settings.name.label',
-    defaultMessage: '!!!Name',
+    defaultMessage: '!!!Wallet name',
   },
   passwordLabel: {
     id: 'wallet.settings.password',
-    defaultMessage: '!!!Password',
+    defaultMessage: '!!!Spending password',
   },
   passwordLastUpdated: {
     id: 'wallet.settings.passwordLastUpdated',
