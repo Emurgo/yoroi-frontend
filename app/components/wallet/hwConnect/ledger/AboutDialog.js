@@ -82,28 +82,10 @@ export default class AboutDialog extends Component<Props> {
       cancel,
       classicTheme,
     } = this.props;
-    const headerBlockClasses = classicTheme
-      ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
-      : classnames([headerMixin.headerBlock, styles.headerBlock]);
+
     const middleBlockClasses = classicTheme
       ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])
       : classnames([styles.middleBlock, styles.middleAboutBlock]);
-
-    const introBlock = classicTheme ? (
-      <div className={headerBlockClasses}>
-        <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine1)}</span><br />
-        <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine2)}</span><br />
-        <span>{intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine3)}</span><br />
-      </div>
-    ) : (
-      <div className={headerBlockClasses}>
-        <span>
-          {intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine1) + ' '}
-          {intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine2) + ' '}
-          {intl.formatMessage(globalMessages.hwConnectDialogAboutIntroTextLine3)}
-        </span>
-      </div>
-    );
 
     const middleBlock = (
       <div className={middleBlockClasses}>
@@ -157,7 +139,6 @@ export default class AboutDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
-        {introBlock}
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
         <HelpLinkBlock progressInfo={progressInfo} />

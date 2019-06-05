@@ -151,18 +151,6 @@ const globalMessages = defineMessages({
     id: 'wallet.connect.hw.dialog.save.button.label',
     defaultMessage: '!!!Save',
   },
-  hwConnectDialogAboutIntroTextLine1: {
-    id: 'wallet.connect.hw.dialog.step.about.introText.line.1',
-    defaultMessage: '!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.',
-  },
-  hwConnectDialogAboutIntroTextLine2: {
-    id: 'wallet.connect.hw.dialog.step.about.introText.line.2',
-    defaultMessage: '!!!It is more secure because your private key never leaves the hardware wallet.',
-  },
-  hwConnectDialogAboutIntroTextLine3: {
-    id: 'wallet.connect.hw.dialog.step.about.introText.line.3',
-    defaultMessage: '!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.',
-  },
   hwConnectDialogAboutPrerequisite4: {
     id: 'wallet.connect.hw.dialog.step.about.prerequisite.4',
     defaultMessage: '!!!Your computer must remain connected to the Internet throughout the process.',
