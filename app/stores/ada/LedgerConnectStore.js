@@ -91,8 +91,8 @@ export default class LedgerConnectStore
     const ledgerConnectAction = this.actions.ada.ledgerConnect;
     ledgerConnectAction.init.listen(this._init);
     ledgerConnectAction.cancel.listen(this._cancel);
-    ledgerConnectAction.submitAbout.listen(this._submitAbout);
-    ledgerConnectAction.goBackToAbout.listen(this._goBackToAbout);
+    ledgerConnectAction.submitCheck.listen(this._submitCheck);
+    ledgerConnectAction.goBackToCheck.listen(this._goBackToCheck);
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
   }
@@ -121,7 +121,7 @@ export default class LedgerConnectStore
     this.ledgerBridge = undefined;
 
     this.progressInfo = {
-      currentStep: ProgressStep.ABOUT,
+      currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
     };
 
@@ -129,20 +129,20 @@ export default class LedgerConnectStore
     this.hwDeviceInfo = undefined;
   };
 
-  // =================== ABOUT =================== //
-  /** ABOUT dialog submit(Next button) */
-  @action _submitAbout = (): void => {
+  // =================== CHECK =================== //
+  /** CHECK dialog submit(Next button) */
+  @action _submitCheck = (): void => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
   };
-  // =================== ABOUT =================== //
+  // =================== CHECK =================== //
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToAbout = (): void => {
+  @action _goBackToCheck = (): void => {
     this.error = undefined;
-    this.progressInfo.currentStep = ProgressStep.ABOUT;
+    this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
