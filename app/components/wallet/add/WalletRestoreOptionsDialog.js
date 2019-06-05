@@ -67,18 +67,6 @@ export default class WalletRestoreOptionsDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
-        {/* <div className={styles.tabs}>
-          <button
-            type="button"
-            className={`${styles.tabsLink} ${styles.active}`}>
-            {intl.formatMessage(messages.walletTabsRecommended)}
-          </button>
-          <button
-            type="button"
-            className={styles.tabsLink}>
-            {intl.formatMessage(messages.walletTabsAdvanced)}
-          </button>
-        </div> */}
         <div className={styles.tabsContent}>
           <ul className={styles.WalletTypeList}>
             <WalletTypeItem
