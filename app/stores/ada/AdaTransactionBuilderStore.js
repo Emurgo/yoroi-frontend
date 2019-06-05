@@ -112,7 +112,10 @@ export default class AdaTransactionBuilderStore extends Store {
 
   _updateTxBuilderReaction = reaction(
     () => [
-      toJS(this.plannedTxInfo), // need this for mobx to react to array
+      // Need toJS for mobx to react to an array.
+      // Note: will not trigger if re-asigned same value
+      toJS(this.plannedTxInfo),
+      this.shouldSendAll,
       // whenever the user wallet updates, we probably have to refresh the utxo set
       this.stores.substores.ada.wallets.active,
       // need to recalculate when there are no more pending transactions
