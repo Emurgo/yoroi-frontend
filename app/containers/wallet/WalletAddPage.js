@@ -25,8 +25,8 @@ import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer
 import WalletRestoreOptionsDialog from '../../components/wallet/add/WalletRestoreOptionsDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 
-import WalletConnectHardwareDialogContainer from './dialogs/WalletConnectHardwareDialogContainer';
-import WalletConnectHwDialog from '../../components/wallet/add/WalletConnectHwDialog';
+import WalletConnectHwDialogContainer from './dialogs/WalletConnectHwDialogContainer';
+import WalletConnectHwOptionsDialog from '../../components/wallet/add/WalletConnectHwOptionsDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 
@@ -114,9 +114,9 @@ export default class WalletAddPage extends Component<Props> {
           mode={restoreType || 'regular'}
         />
       );
-    } else if (uiDialogs.isOpen(WalletConnectHwDialog)) {
+    } else if (uiDialogs.isOpen(WalletConnectHwOptionsDialog)) {
       activeDialog = (
-        <WalletConnectHardwareDialogContainer
+        <WalletConnectHwDialogContainer
           actions={actions}
           stores={stores}
           onClose={this.onClose}
@@ -148,7 +148,7 @@ export default class WalletAddPage extends Component<Props> {
     const content = (
       <WalletAdd
         onHardwareConnect={
-          () => actions.dialogs.open.trigger({ dialog: WalletConnectHwDialog })
+          () => actions.dialogs.open.trigger({ dialog: WalletConnectHwOptionsDialog })
         }
         isCreateTrezorWalletActive={isCreateTrezorWalletActive}
         isCreateLedgerWalletActive={isCreateLedgerWalletActive}

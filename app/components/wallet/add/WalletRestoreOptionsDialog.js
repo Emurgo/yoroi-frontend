@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import Dialog from '../../widgets/Dialog';
-import styles from './WalletCreateOptions.scss';
+import styles from './WalletOptionsDialog.scss';
 import WalletTypeItem from './WalletTypeItem';
 
 const messages = defineMessages({
