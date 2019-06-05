@@ -228,7 +228,7 @@
   "wallet.connect.hardware.title": "Connect to hardware wallet",
   "wallet.connect.hw.dialog.connect.button.label": "Connect",
   "wallet.connect.hw.dialog.save.button.label": "Save",
-  "wallet.connect.hw.dialog.step.about.label": "ABOUT",
+  "wallet.connect.hw.dialog.step.about.label": "CHECK",
   "wallet.connect.hw.dialog.step.about.prerequisite.4": "Your computer must remain connected to the Internet throughout the process.",
   "wallet.connect.hw.dialog.step.about.prerequisite.header": "Prerequisites",
   "wallet.connect.hw.dialog.step.connect.introText.line.3": "This process shares the Cardano public key with Yoroi.",

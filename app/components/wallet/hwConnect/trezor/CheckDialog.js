@@ -16,14 +16,13 @@ import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
-import aboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/about-prerequisite-header-icon.inline.svg';
-import aboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-wallet/trezor/about.inline.svg';
-import aboutTrezorSvg from '../../../../assets/images/hardware-wallet/trezor/about-modern.inline.svg';
+import aboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
+import aboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-wallet/trezor/check.inline.svg';
+import aboutTrezorSvg from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
-import styles from '../common/AboutDialog.scss';
-import headerMixin from '../../../mixins/HeaderBlock.scss';
+import styles from '../common/CheckDialog.scss';
 
 const messages = defineMessages({
   aboutPrerequisite1Part1: {
@@ -66,7 +65,7 @@ type Props = {
 };
 
 @observer
-export default class AboutDialog extends Component<Props> {
+export default class CheckDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -84,8 +83,8 @@ export default class AboutDialog extends Component<Props> {
     } = this.props;
 
     const middleBlockClasses = classicTheme
-      ? classnames([styles.middleBlockClassic, styles.middleAboutBlockClassic])
-      : classnames([styles.middleBlock, styles.middleAboutBlock]);
+      ? classnames([styles.middleBlockClassic, styles.middleCheckBlockClassic])
+      : classnames([styles.middleBlock, styles.middleCheckBlock]);
 
     const middleBlock = (
       <div className={middleBlockClasses}>
@@ -131,7 +130,7 @@ export default class AboutDialog extends Component<Props> {
 
     return (
       <Dialog
-        className={classnames([styles.component, 'AboutDialog'])}
+        className={classnames([styles.component, 'CheckDialog'])}
         title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
         actions={dailogActions}
         closeOnOverlayClick={false}
