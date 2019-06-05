@@ -211,7 +211,7 @@
   "wallet.add.dialog.title.label": "Añadir billetera",
   "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.trezor.description": "Crear o restaurar una billetera conectada a un dispositivo Trezor",
-  "wallet.add.page.title": "Gateway to the financial world",
+  "wallet.add.page.title": "Gateway <br> to the financial <br> world",
   "wallet.add.subpage.title": "Yoroi light wallet for Cardano",
   "wallet.amountInput.feesLabel": "+ {amount} de las tarifas",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "Continuar",

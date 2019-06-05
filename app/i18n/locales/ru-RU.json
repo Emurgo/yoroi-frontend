@@ -211,7 +211,7 @@
   "wallet.add.dialog.title.label": "Добавить кошелек",
   "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.trezor.description": "Создать или восстановить кошелек, подключенный к устройству Trezor",
-  "wallet.add.page.title": "Gateway to the financial world",
+  "wallet.add.page.title": "Gateway <br> to the financial <br> world",
   "wallet.add.subpage.title": "Yoroi light wallet for Cardano",
   "wallet.amountInput.feesLabel": "+ комиссия {amount}",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "Продолжить",

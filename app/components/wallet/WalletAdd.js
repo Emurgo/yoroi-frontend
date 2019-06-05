@@ -13,8 +13,8 @@ import styles from './WalletAdd.scss';
 
 const messages = defineMessages({
   title: {
-    id: 'wallet.add.dialog.title.label',
-    defaultMessage: '!!!Add wallet',
+    id: 'wallet.add.page.title',
+    defaultMessage: '!!!Gateway to the financial world',
   },
   subTitle: {
     id: 'wallet.add.dialog.subtitle.label',
@@ -49,8 +49,6 @@ type Props = {
   onSettings: Function,
   onDaedalusTransfer: Function,
   isRestoreActive: boolean,
-  title: string,
-  subTitle: string,
   classicTheme: boolean,
 };
 
@@ -69,7 +67,6 @@ export default class WalletAdd extends Component<Props> {
       onSettings,
       onDaedalusTransfer,
       isRestoreActive,
-      title,
     } = this.props;
 
     let activeNotification = null;
@@ -88,7 +85,9 @@ export default class WalletAdd extends Component<Props> {
           <div className={styles.heroInner}>
             <div className={styles.heroLeft}>
               <SvgInline svg={logoIcon} className={styles.heroLogo} />
-              <h2 className={styles.heroTitle}>{title}</h2>
+              <h2 className={styles.heroTitle}>
+                <FormattedHTMLMessage {...(messages.title)} />
+              </h2>
               <h3 className={styles.heroSubTitle}>{intl.formatMessage(messages.subTitle)}</h3>
             </div>
             <div className={styles.heroRight}>

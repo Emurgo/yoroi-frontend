@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
@@ -31,17 +31,6 @@ import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDia
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 
 type Props = InjectedProps;
-
-const messages = defineMessages({
-  title: {
-    id: 'wallet.add.page.title',
-    defaultMessage: '!!!Add Wallet',
-  },
-  subTitle: {
-    id: 'wallet.add.subpage.title',
-    defaultMessage: '!!!Yoroi light wallet for Cardano',
-  },
-});
 
 @observer
 export default class WalletAddPage extends Component<Props> {
@@ -158,8 +147,6 @@ export default class WalletAddPage extends Component<Props> {
         isRestoreActive={restoreRequest.isExecuting}
         onSettings={this._goToSettingsRoot}
         onDaedalusTransfer={this._goToDaedalusTransferRoot}
-        title={this.context.intl.formatMessage(messages.title)}
-        subTitle={this.context.intl.formatMessage(messages.subTitle)}
         classicTheme={profile.isClassicTheme}
       />
     );

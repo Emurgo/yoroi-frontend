@@ -211,7 +211,7 @@
   "wallet.add.dialog.title.label": "新增錢包",
   "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.trezor.description": "創建或還原連接到 Trezor 設備的錢包",
-  "wallet.add.page.title": "Gateway to the financial world",
+  "wallet.add.page.title": "Gateway <br> to the financial <br> world",
   "wallet.add.subpage.title": "Yoroi light wallet for Cardano",
   "wallet.amountInput.feesLabel": "+ {amount} 費用",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "繼續",
