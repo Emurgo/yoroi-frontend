@@ -304,8 +304,8 @@ export default {
   '--theme-system-error-overlay-button-text-color-hover': '#ab1700',
   '--theme-system-error-overlay-text-color': '#fafbfc',
 
-  '--theme-topbar-category-background-color-hover': 'tranparent',
-  '--theme-topbar-item-selection-color': '#17d1aa',
+  '--theme-topbar-active-item-bottom-border': '5px solid #17d1aa',
+  '--theme-topbar-active-item-top-border': '5px solid transparent',
   '--theme-topbar-category-text-color': '#fafbfc',
   '--theme-topbar-background-color-gradient-start': topbarGradient.start,
   '--theme-topbar-background-color-gradient-end': topbarGradient.end,

@@ -7,15 +7,11 @@
   display: flex;
   height: var(--cmn-topbar-height);
   justify-content: center;
-
-  &:hover {
-    background-color: var(--theme-topbar-category-background-color-hover);
-  }
 }
 
 .component.active {
-  border-top:  5px solid transparent;
-  border-bottom: 5px solid var(--theme-topbar-item-selection-color);
+  border-top: var(--theme-topbar-active-item-top-border);
+  border-bottom: var(--theme-topbar-active-item-bottom-border);
   &:hover {
     cursor: default;
   }
