@@ -63,7 +63,7 @@
 
 :global(.YoroiModern) {
   .inputWrapper {
-    padding: 0 1px 1px;
+    padding: 0;
   }
   .legend {
     margin-left: 9px;
@@ -81,6 +81,7 @@
 :global(.YoroiClassic) {
   .inputWrapper {
     border: 0;
+    padding: 0;
   }
   .iconsWrapper {
     padding-top: 27px;
@@ -89,13 +90,10 @@
     font-family: var(--rp-theme-font-regular);
     display: block;
     font-size: 16px;
-    margin-bottom: 10px;
+    margin: 0 0 10px 10px;
   }
   input {
     margin: 0;
     border-radius: 0;
-  }
-  .inputWrapper {
-    padding: 0;
   }
 }
