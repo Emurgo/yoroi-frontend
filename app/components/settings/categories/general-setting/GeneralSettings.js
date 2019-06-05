@@ -5,13 +5,13 @@ import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import LocalizableError from '../../../i18n/LocalizableError';
+import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
 import type { MessageDescriptor } from 'react-intl';
-import FlagLabel from '../../widgets/FlagLabel';
-import { tier1Languages } from '../../../config/languagesConfig';
-import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
+import FlagLabel from '../../../widgets/FlagLabel';
+import { tier1Languages } from '../../../../config/languagesConfig';
+import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
 
 type Props = {
   languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,

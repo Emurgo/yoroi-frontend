@@ -264,6 +264,10 @@ const globalMessages = defineMessages({
     id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase',
     defaultMessage: '!!!Short recovery phrase',
   },
+  goBack: {
+    id: 'global.labels.goBack',
+    defaultMessage: '!!!Go back label',
+  },
 });
 export default globalMessages;
 

@@ -409,6 +409,9 @@ export default class TrezorConnectStore
     const { wallets } = this.stores.substores[environment.API];
     await wallets._patchWalletRequestWithNewWallet(trezorWallet);
 
+    // Dynamically update the topbar icons
+    this.stores.topbar.updateCategories();
+
     // goto the wallet transactions page
     Logger.debug('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
     wallets.goToWalletRoute(trezorWallet.id);
@@ -416,9 +419,6 @@ export default class TrezorConnectStore
     // fetch its data
     Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
     wallets.refreshWalletsData();
-
-    // Load the Yoroi with Trezor Icon
-    this.stores.topbar.initCategories();
 
     // show success notification
     wallets.showTrezorTWalletIntegratedNotification();

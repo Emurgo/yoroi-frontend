@@ -301,7 +301,7 @@
   "wallet.receive.page.hideUsedLabel": "使用済のアドレスを非表示にする",
   "wallet.receive.page.showUsedLabel": "使用済のアドレスを表示する",
   "wallet.receive.page.walletAddressLabel": "あなたのウォレットのアドレス",
-  "wallet.receive.page.walletReceiveInstructions": "ADAを受信する為に、以上のアドレスを送金先に共有してください。お客様のプライバシーを保護するために既存のアドレスを使用する度に新規のアドレスが自動的に生成されます。",
+  "wallet.receive.page.walletReceiveInstructions": "ADAを受信する為に、以上のアドレスを送金先に共有してください。<br>お客様のプライバシーを保護するために既存のアドレスを使用する度に新規のアドレスが自動的に生成されます。",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "クリア",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "確認",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "１つ削除",

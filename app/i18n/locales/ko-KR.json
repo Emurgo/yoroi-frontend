@@ -301,7 +301,7 @@
   "wallet.receive.page.hideUsedLabel": "숨기기 사용됨",
   "wallet.receive.page.showUsedLabel": "표시 사용됨",
   "wallet.receive.page.walletAddressLabel": "내 지갑 주소",
-  "wallet.receive.page.walletReceiveInstructions": "돈을 받으려면 이 지갑 주소를 공유하십시오.  개인정보를 보호하기 위해 새 주소를 사용하면 새 주소가 자동으로 생성됩니다.",
+  "wallet.receive.page.walletReceiveInstructions": "돈을 받으려면 이 지갑 주소를 공유하십시오.<br>개인정보를 보호하기 위해 새 주소를 사용하면 새 주소가 자동으로 생성됩니다.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "지우기",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "확인",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "마지막 단어를 제거하세요.",

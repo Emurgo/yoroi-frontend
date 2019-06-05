@@ -1,5 +1,7 @@
 //  ==== Theme: Yoroi Classic === //
 
+import common from './Common';
+
 // FONTS
 const rpFonts = {
   '--rp-theme-font-thin': 'SFUIDisplay-Thin',
@@ -182,7 +184,13 @@ const topbarGradient = {
 };
 
 export default {
+  // COMMON-THEME-INDEPENDENT
+  ...common,
+
+  // REACT-POLYMORPH
   ...rpYoroiTheme,
+
+  // FONTS
   '--preferred-font': '"Times New Roman", serif',
 
   '--font-ultralight': 'SFUIDisplay-Ultralight',
@@ -203,6 +211,7 @@ export default {
 
   '--theme-input-hint-font': 'SFUIDisplay-Regular',
 
+  // COLORS
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
   '--theme-bordered-box-background-color': '#f3f3f5',
@@ -284,7 +293,8 @@ export default {
   '--theme-system-error-overlay-button-text-color-hover': '#ab1700',
   '--theme-system-error-overlay-text-color': '#fafbfc',
 
-  '--theme-topbar-category-background-color-hover': '#373f52',
+  '--theme-topbar-active-item-bottom-border': '5px solid #daa49a',
+  '--theme-topbar-active-item-top-border': '5px solid transparent',  
   '--theme-topbar-category-text-color': '#fafbfc',
   '--theme-topbar-background-color-gradient-start': topbarGradient.start,
   '--theme-topbar-background-color-gradient-end': topbarGradient.end,
@@ -375,7 +385,7 @@ export default {
   '--theme-widgets-progress-step-common-color': '#daa49a',
 
   '--theme-footer-block-background-color': 'rgba(218, 164, 154, 0.06)',
-  '--theme-footer-block-background-color-hover': 'rgba(218, 164, 154, 0.16)',
+  '--theme-footer-block-background-color-hover': '#D9DDE0',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
 };

@@ -301,7 +301,7 @@
   "wallet.receive.page.hideUsedLabel": "benutzte ausblenden",
   "wallet.receive.page.showUsedLabel": "benutzte anzeigen",
   "wallet.receive.page.walletAddressLabel": "Deine Wallet-Adresse",
-  "wallet.receive.page.walletReceiveInstructions": "Teile diese Wallet-Adresse mit, um Zahlungen zu erhalten. Um deine Privatsphäre zu schützen, werden jedes Mal neue Adressen erzeugt, sobald sie verwendet wurden.",
+  "wallet.receive.page.walletReceiveInstructions": "Teile diese Wallet-Adresse mit, um Zahlungen zu erhalten.<br>Um deine Privatsphäre zu schützen, werden jedes Mal neue Adressen erzeugt, sobald sie verwendet wurden.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Löschen",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Bestätigen",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "Letzte entfernen",

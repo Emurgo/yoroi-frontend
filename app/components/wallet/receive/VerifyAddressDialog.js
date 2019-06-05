@@ -19,12 +19,12 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 
 import LocalizableError from '../../../i18n/LocalizableError';
-import styles from './AddressDetailsDialog.scss';
+import styles from './VerifyAddressDialog.scss';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
     id: 'wallet.receive.confirmationDialog.addressDetailsTitleLabel',
-    defaultMessage: '!!!Address details',
+    defaultMessage: '!!!Verify address',
   },
   verifyAddressButtonLabel: {
     id: 'wallet.receive.confirmationDialog.verifyAddressButtonLabel',
@@ -52,7 +52,7 @@ type Props = {
 };
 
 @observer
-export default class AddressDetailsDialog extends Component<Props> {
+export default class VerifyAddressDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -89,18 +89,17 @@ export default class AddressDetailsDialog extends Component<Props> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const labelStyle = classicTheme ?
-      'SimpleFormField_label FormFieldOverridesClassic_label AddressDetailsDialog_header' :
-      'SimpleFormField_label FormFieldOverrides_label AddressDetailsDialog_header';
+      'SimpleFormField_label FormFieldOverridesClassic_label VerifyAddressDialog_header' :
+      'SimpleFormField_label FormFieldOverrides_label VerifyAddressDialog_header';
 
     return (
       <Dialog
-        className={classnames([styles.component, 'AddressDetailsDialog'])}
+        className={classnames([styles.component, 'VerifyAddressDialog'])}
         title={intl.formatMessage(messages.addressDetailsTitleLabel)}
         actions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        modalOverlay={styles.modalOverlay}
         classicTheme={classicTheme}
       >
         {walletAddress ? (

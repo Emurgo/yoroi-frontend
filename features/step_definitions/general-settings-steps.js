@@ -24,7 +24,7 @@ When(/^I click on secondary menu "([^"]*)" item$/, async function (buttonName) {
 });
 
 When(/^I select second theme$/, async function () {
-  await this.click('.DisplaySettings_themesWrapper > button:nth-child(2)');
+  await this.click('.ThemeSettingsBlock_themesWrapper > button:nth-child(2)');
 });
 
 When(/^I open General Settings language selection dropdown$/, async function () {
@@ -47,7 +47,7 @@ Then(/^The Japanese language should be selected$/, async function () {
 });
 
 Then(/^I should see second theme as selected$/, async function () {
-  await this.waitForElement('.DisplaySettings_themesWrapper button:nth-child(2).DisplaySettings_active');
+  await this.waitForElement('.ThemeSettingsBlock_themesWrapper button:nth-child(2).ThemeSettingsBlock_active');
 });
 
 // ========== Paper wallet ==========

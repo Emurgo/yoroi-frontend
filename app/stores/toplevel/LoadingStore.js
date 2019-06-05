@@ -79,7 +79,7 @@ export default class LoadingStore extends Store {
         const firstWallet: Wallet = wallets.first;
 
         // Dynamic Initialization of Topbar Categories
-        this.stores.topbar.initCategories();
+        this.stores.topbar.updateCategories();
 
         this.actions.router.goToRoute.trigger({
           route: ROUTES.WALLETS.TRANSACTIONS,

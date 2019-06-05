@@ -58,7 +58,11 @@
   }
 }
 
-// new styles 
+// new styles
+
+.walletTypeList {
+  padding: 10px 0 25px;
+}
 
 // TABS
 .tabs {
@@ -91,72 +95,6 @@
   }
 }
 
-// WALLETS
-.walletTypeList {
-  padding: 10px 0 25px;
-}
-
-.walletTypeListItem {
-  &:not(:last-child) {
-    border-bottom: 1px solid #C2C9D3;
-  }
-}
-
-.walletType {
-  font-family: var(--font-regular);
-  display: flex;
-  align-items: center;
-  padding: 0 15px 0 10px;
-  position: relative;
-  cursor: pointer;
-  z-index: 2;
-  text-align: left;
-  margin: 0;
-  width: 100%;
-  
-  .walletTypeImg {
-    width: 60px;
-    flex: 0 0 60px;
-    height: 100px;
-    margin-right: 25px;
-    background-size: contain;
-    background-position: center 10px;
-    background-repeat: no-repeat;
-  }
-
-  .walletTypeTitle {
-    font-size: 16px;
-    line-height: 22px;
-    color: #2B2C32;
-    max-width: 182px;
-  }
-
-  .walletTypeDesc {
-    color: #ADAEB6;
-    font-size: 12px;
-    line-height: 14px;
-    margin-left: auto;
-    max-width: 158px;
-  }
-
-  &:hover {
-    &::after {
-      content: '';
-      position: absolute;
-      left: -40px;
-      top: -1px;
-      bottom: -1px;
-      right: -40px;
-      border-top: 1px solid #C2C9D3;
-      border-bottom: 1px solid #C2C9D3;
-      box-shadow: 0 15px 15px 0 rgba(0,0,0, .1);
-      background-color: white;
-      z-index: -1;
-    }
-  }
-}
-
-
 :global(.YoroiModern) {
   .tabsLink {
     color: var(--tab-link-text-color);
@@ -165,33 +103,6 @@
 
     &.active::after {
       background-color: var(--tab-link-border-color);
-    }
-  }
-
-  .walletTypeImg {
-
-    &.mnemonic {
-      background-image: url(../../assets/images/wallets/mnemonic_wallet.svg);
-    }
-  
-    &.master {
-      background-image: url(../../assets/images/wallets/master_key.svg);
-    }
-  
-    &.paper {
-      background-image: url(../../assets/images/wallets/paper_wallet.svg);
-    }
-  
-    &.business {
-      background-image: url(../../assets/images/wallets/business_wallet.svg);
-    }
-
-    &.trezor {
-      background-image: url(../../assets/images/wallets/trezor_wallet.svg);
-    }
-
-    &.ledger {
-      background-image: url(../../assets/images/wallets/ledger_wallet.svg);
     }
   }
 }

@@ -17,7 +17,8 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
-import globalMessages from '../../../i18n/global-messages';
+import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
+import environment from '../../../environment';
 import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from './HWSendConfirmationDialog';
 import {
@@ -62,8 +63,8 @@ const messages = defineMessages({
     defaultMessage: '!!!You can add a message if you want',
   },
   checkboxLabel: {
-    id: 'wallet.send.form.description.checkboxLabel',
-    defaultMessage: '!!!Use all my ADA',
+    id: 'wallet.send.form.sendAll.checkboxLabel',
+    defaultMessage: '!!!Send all {coinName}',
   },
   invalidAddress: {
     id: 'wallet.send.form.errors.invalidAddress',
@@ -233,6 +234,7 @@ export default class WalletSendForm extends Component<Props, State> {
         <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
       </div>
     );
+    const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
 
     return (
       <div className={styles.component}>
@@ -269,7 +271,7 @@ export default class WalletSendForm extends Component<Props, State> {
           </div>
           <div className={styles.checkbox}>
             <Checkbox
-              label={intl.formatMessage(messages.checkboxLabel)}
+              label={intl.formatMessage(messages.checkboxLabel, { currency })}
               onChange={(newState) => {
                 this.setShouldSendAll(newState);
                 this._updateTxValues({

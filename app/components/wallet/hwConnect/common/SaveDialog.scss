@@ -5,6 +5,23 @@
   padding-top: 24px;
 }
 
+.walletNameInfoWrapper {
+  display: flex;
+  height: 28px;
+}
+
+.walletNameInfoIcon {
+  margin-right: 6px;
+}
+
+.walletNameInfo {
+  padding-top: 2px;
+  font-family: var(--font-regular);
+  font-size: 12px;
+  line-height: 14px;
+  opacity: 0.5;
+}
+
 .middleSaveLoadBlock {
   padding: 0px;
   text-align: center;
