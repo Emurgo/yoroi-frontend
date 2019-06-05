@@ -163,7 +163,7 @@ function CustomWorld(cmdInput: WorldInput) {
     return this.driver.wait(condition);
   };
 
-  this.waitUntilText = async (locator, text, timeout = 60000) => {
+  this.waitUntilText = async (locator, text, timeout = 75000) => {
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -174,7 +174,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
-  this.waitUntilContainsText = async (locator, text, timeout = 10000) => {
+  this.waitUntilContainsText = async (locator, text, timeout = 15000) => {
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -258,4 +258,4 @@ function CustomWorld(cmdInput: WorldInput) {
 }
 
 setWorldConstructor(CustomWorld);
-setDefaultTimeout(20 * 1000);
+setDefaultTimeout(30 * 1000);

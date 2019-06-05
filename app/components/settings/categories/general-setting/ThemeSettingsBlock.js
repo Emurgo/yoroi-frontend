@@ -5,11 +5,11 @@ import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import styles from './DisplaySettings.scss';
-import { THEMES } from '../../../themes';
-import type { Theme } from '../../../themes';
-import ThemeThumbnail from './display/ThemeThumbnail';
-import environment from '../../../environment';
+import styles from './ThemeSettingsBlock.scss';
+import { THEMES } from '../../../../themes';
+import type { Theme } from '../../../../themes';
+import ThemeThumbnail from '../display/ThemeThumbnail';
+import environment from '../../../../environment';
 
 const messages = defineMessages({
   themeLabel: {
@@ -31,6 +31,10 @@ const messages = defineMessages({
   themeWarning: {
     id: 'settings.display.themeWarning',
     defaultMessage: '!!!CHANGING THEME WILL REMOVE CUSTOMIZATION',
+  },
+  themeNote: {
+    id: 'settings.display.themeNote',
+    defaultMessage: '!!!Note: Changing theme will remove customization.',
   },
   blog: {
     id: 'settings.display.blog',
@@ -56,7 +60,7 @@ type Props = {
 };
 
 @observer
-export default class DisplaySettings extends Component<Props> {
+export default class ThemeSettingsBlock extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -100,30 +104,15 @@ export default class DisplaySettings extends Component<Props> {
     return (
       <div className={styles.component}>
 
-        <div className={styles.label}>
+        <h2 className={styles.title}>
           {intl.formatMessage(messages.themeLabel)}
-        </div>
+        </h2>
 
+        <p>{intl.formatMessage(messages.themeNote)}</p>
         <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
 
         <div className={styles.main}>
           <div className={styles.themesWrapper}>
-            {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
-            <button
-              type="button"
-              className={themeYoroiClassicClasses}
-              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
-            >
-              {(currentTheme === THEMES.YOROI_CLASSIC
-                && hasCustomTheme() &&
-                  <div className={styles.themeWarning}>
-                    {intl.formatMessage(messages.themeWarning)}
-                  </div>)
-              }
-              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} themeKey="classic" />
-              <span>{intl.formatMessage(messages.themeYoroiClassic)}</span>
-            </button>
-
             {!environment.isMainnet() && // a second theme to allow testing switching themes
               (
                 <button
@@ -138,10 +127,25 @@ export default class DisplaySettings extends Component<Props> {
                       </div>)
                   }
                   <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
-                  <span>{intl.formatMessage(messages.themeYoroiModern)}</span>
+                  <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
                 </button>
               )
             }
+            {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
+            <button
+              type="button"
+              className={themeYoroiClassicClasses}
+              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
+            >
+              {(currentTheme === THEMES.YOROI_CLASSIC
+                && hasCustomTheme() &&
+                  <div className={styles.themeWarning}>
+                    {intl.formatMessage(messages.themeWarning)}
+                  </div>)
+              }
+              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} themeKey="classic" />
+              <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiClassic)}</h3>
+            </button>
           </div>
           <Button
             className={exportButtonClasses}

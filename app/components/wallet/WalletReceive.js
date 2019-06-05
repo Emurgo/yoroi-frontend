@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import classnames from 'classnames';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -10,7 +10,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
-import magnifyingGlass from '../../assets/images/search-ic-dark.inline.svg';
+import verifyIcon from '../../assets/images/verify-icon.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
@@ -46,6 +46,10 @@ const messages = defineMessages({
     id: 'wallet.receive.page.copyAddressLabel',
     defaultMessage: '!!!Copy address',
   },
+  verifyAddressLabel: {
+    id: 'wallet.receive.page.verifyAddressLabel',
+    defaultMessage: '!!!Verify address',
+  },
 });
 
 type Props = {
@@ -54,7 +58,7 @@ type Props = {
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
   onCopyAddress: Function,
-  onAddressDetail: Function,
+  onVerifyAddress: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
 };
@@ -90,7 +94,7 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress, onAddressDetail,
+      onCopyAddress, onVerifyAddress,
       isSubmitting, error, isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
@@ -131,12 +135,12 @@ export default class WalletReceive extends Component<Props, State> {
               isUsed={isWalletAddressUsed}
             />
             <div className={styles.instructionsText}>
-              {intl.formatMessage(messages.walletReceiveInstructions)}
+              <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </div>
+            {generateAddressForm}
             {error
               ? <p className={styles.error}>{intl.formatMessage(error)}</p>
-              : <p className={styles.error} />}
-            {generateAddressForm}
+              : <p className={styles.error}>&nbsp;</p>}
           </div>
           <div className={styles.qrCode}>
             <QRCode
@@ -165,28 +169,46 @@ export default class WalletReceive extends Component<Props, State> {
             ]);
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
+                {/* Address Id */}
                 <div className={styles.addressId}>{address.id}</div>
+                {/* Address Action block start */}
                 <div className={styles.addressActions}>
-                  <span className={styles.addressIcon}>
-                    <SvgInline
-                      svg={magnifyingGlass}
-                      className={styles.copyIcon}
+                  {/* Verify Address action */}
+                  <div className={classnames([
+                    styles.addressActionItemBlock,
+                    styles.verifyActionBlock])}
+                  >
+                    <button
+                      type="button"
                       onClick={
-                        onAddressDetail.bind(this, { address: address.id, path: address.path })
+                        onVerifyAddress.bind(this, { address: address.id, path: address.path })
                       }
-                    />
-                  </span>
-                  &nbsp;
+                    >
+                      <div>
+                        <SvgInline
+                          svg={verifyIcon}
+                          className={styles.verifyIcon}
+                        />
+                        <span className={styles.actionIconText}>
+                          {intl.formatMessage(messages.verifyAddressLabel)}
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                  {/* Copy Address action */}
                   <CopyToClipboard
                     text={address.id}
                     onCopy={onCopyAddress.bind(this, address.id)}
                   >
-                    <span className={styles.addressIcon}>
+                    <div className={styles.addressActionItemBlock}>
                       <SvgInline svg={iconCopy} className={styles.copyIcon} />
-                      <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
-                    </span>
+                      <span className={styles.actionIconText}>
+                        {intl.formatMessage(messages.copyAddressLabel)}
+                      </span>
+                    </div>
                   </CopyToClipboard>
                 </div>
+                {/* Action block end */}
               </div>
             );
           })}
