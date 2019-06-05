@@ -1,8 +1,11 @@
 @import './DialogCommonStyle.scss';
 
-.headerSaveBlockClassic,
 .headerSaveBlock {
-  padding-top: 24px;
+  margin-bottom: 0px;
+}
+
+.headerSaveBlockClassic{
+  margin-bottom: 12px;
 }
 
 .walletNameInfoWrapper {
