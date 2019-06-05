@@ -413,8 +413,6 @@
   "wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder": "Passwort wiederholen",
   "wallet.settings.changePassword.dialog.repeatPasswordLabel": "Passwort wiederholen",
   "wallet.settings.changePassword.dialog.title.changePassword": "Passwort ändern",
-  "wallet.settings.changePassword.dialog.title.setPassword": "Passwort",
-  "wallet.settings.changePassword.dialog.walletPasswordLabel": "Wallet-Passwort",
   "wallet.settings.name.label": "Wallet-Name",
   "wallet.settings.password": "Passwort",
   "wallet.settings.passwordLastUpdated": "Zuletzt aktualisiert {lastUpdated}",

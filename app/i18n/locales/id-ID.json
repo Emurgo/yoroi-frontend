@@ -413,8 +413,6 @@
   "wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder": "Ulangi kata sandi baru",
   "wallet.settings.changePassword.dialog.repeatPasswordLabel": "Ulangi kata sandi",
   "wallet.settings.changePassword.dialog.title.changePassword": "Ubah kata sandi",
-  "wallet.settings.changePassword.dialog.title.setPassword": "Kata sandi",
-  "wallet.settings.changePassword.dialog.walletPasswordLabel": "Kata sandi wallet",
   "wallet.settings.name.label": "Nama Wallet",
   "wallet.settings.password": "Kata sandi",
   "wallet.settings.passwordLastUpdated": "Terakhir diperbarui {lastUpdated}",
