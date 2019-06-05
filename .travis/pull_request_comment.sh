@@ -14,7 +14,7 @@ S3_ENDPOINT="https://${S3_BUCKET}.s3.amazonaws.com"
 # comment header
 cat > /tmp/pr-comment.json <<EOF
 { "body": "
-\n
+<details>\n
 EOF
 
 for browser in brave chrome firefox
@@ -48,7 +48,10 @@ done
 # check if there is something to comment
 if [ $(cat /tmp/pr-comment.json | wc -l) -gt 2 ]
 then
-  echo '}' >> /tmp/pr-comment.json
+  cat >> /tmp/pr-comment.json <<EOF
+"}
+EOF
+  set +e; aws s3 cp /tmp/pr-comment.json "s3://${S3_BUCKET}/${OBJECT_KEY_BASEPATH}/pr-comment.json"; set -e
   curl -s -H "Authorization: token ${GITHUB_PAT}" \
     -X POST --data @/tmp/pr-comment.json \
     "https://api.github.com/repos/${REPO_SLUG}/issues/${PR_NUMBER}/comments"
