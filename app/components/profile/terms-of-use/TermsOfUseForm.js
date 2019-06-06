@@ -70,7 +70,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
       <div className={styles.component}>
         <div className={styles.centeredBox}>
 
-          <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} />
+          <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} fixedHeight />
 
           <div className={styles.checkbox}>
             <Checkbox
