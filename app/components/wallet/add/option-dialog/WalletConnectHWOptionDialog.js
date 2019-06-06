@@ -2,10 +2,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import Dialog from '../../widgets/Dialog';
-import styles from './WalletOptionsDialog.scss';
-import WalletTypeItem from './WalletTypeItem';
+
+import Dialog from '../../../widgets/Dialog';
+import DialogCloseButton from '../../../widgets/DialogCloseButton';
+import OptionBlock from './OptionBlock';
+import styles from './OptionListWrapperStyle.scss';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -38,7 +39,7 @@ type Props = {
 };
 
 @observer
-export default class WalletConnectHwOptionsDialog extends Component<Props> {
+export default class WalletConnectHWOptionDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -55,24 +56,23 @@ export default class WalletConnectHwOptionsDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
-        <div className={styles.tabsContent}>
-          <ul className={styles.WalletTypeList}>
-            <WalletTypeItem
-              action={onLedger}
-              type="ledger"
+        <div className={styles.component}>
+          <ul className={styles.optionBlockList}>
+            <OptionBlock
+              onSubmit={onLedger}
+              type="connectLedger"
               title={intl.formatMessage(messages.ledgerTitle)}
-              description={intl.formatMessage(messages.ledgerDescription)}
+              learnMoreText={intl.formatMessage(messages.ledgerDescription)}
             />
-            <WalletTypeItem
-              action={onTrezor}
-              type="trezor"
+            <OptionBlock
+              onSubmit={onTrezor}
+              type="connectTrezor"
               title={intl.formatMessage(messages.trezorTitle)}
-              description={intl.formatMessage(messages.trezorDescription)}
+              learnMoreText={intl.formatMessage(messages.trezorDescription)}
             />
           </ul>
         </div>
       </Dialog>
     );
   }
-
 }

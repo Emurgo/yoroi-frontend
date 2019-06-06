@@ -1,0 +1,200 @@
+.optionBlockListItem {
+  box-shadow: 0 5px 20px 0px rgba(24, 26, 30, 0.08);
+  border-radius: 8px;
+  transition: 250ms;
+
+  + .optionBlockListItem {
+    margin-top: 24px;
+  }
+
+  .optionBlockWrapper {
+    font-family: var(--font-regular);
+    letter-spacing: 0;
+  
+    // TITLE BLOCK
+    .optionSubmitButton {
+      font-family: var(--font-regular);
+      display: flex;
+      align-items: center;
+      padding: 11px 30px;
+      background-color: #fff;
+      width: 100%;
+      cursor: pointer;
+      transition: 100ms;
+      border-radius: 8px;
+  
+      .optionTitle {
+        font-size: 18px;
+        line-height: 22px;
+        color: #2B2C32;
+        text-align: left;
+        font-family: var(--font-regular);
+        font-weight: var(--font-semibold);
+        transition: 100ms;
+      }
+  
+      .optionImage {
+        width: 70px;
+        flex: 0 0 70px;
+        height: 100px;
+        margin-right: 25px;
+        background-size: contain;
+        background-position: center 10px;
+        background-repeat: no-repeat;
+      }
+
+      &:hover {
+        box-shadow: 0 5px 20px 0px rgba(24, 26, 30, 0.12);
+      }
+    }
+
+    // LEARN MORE TEXT BLOCK
+    .learnMoreTextBlock {
+      overflow: hidden;
+      max-height: 0;
+      transition: 300ms linear;
+      will-change: height;
+      background-color: #F5F7F9;
+
+      .leramMoreTextWrapper {
+        padding: 20px 40px 15px;
+
+        .learnMoreText {
+          font-size: 14px;
+          line-height: 22px;
+        }        
+      }
+
+      &.showlearnMore {
+        max-height: 300px;
+        transition: max-height 300ms linear;
+      }
+    }
+
+    // LEARN MORE BUTTON
+    .learnMoreButton {
+      color: #ADAEB6;
+      background-color: #F5F7F9;
+      display: block;
+      font-size: 14px;
+      text-align: center;
+      width: 100%;
+      height: 30px;
+      line-height: 30px;
+      cursor: pointer;
+      border-radius: 0 0 5px 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-regular);
+      transition: 100ms;
+    
+      &:hover {
+        box-shadow: 0 8px 10px 0px rgba(24,26,30, .06);
+      }
+    
+      svg {
+        transition: 300ms;
+      }
+    
+      &.arrowUp {
+        svg {
+          transform: rotate(180deg);
+        }
+      }
+
+      .learnMoreButtonIcon {
+        margin-left: 5px;
+        margin-top: 3px;
+        line-height: normal;
+      }      
+    }
+  }
+}
+
+:global(.YoroiClassic) {
+  .optionBlockListItem {
+    .optionBlockWrapper {
+      .optionSubmitButton {
+        &:hover {
+          .optionTitle {
+            color: var(--theme-default-main-color); 
+          }
+        }
+        
+        .optionImage {
+          // CONNECT HARDWARE WALLET
+          &.connectLedger {
+            background-image: url(../../../../assets/images/wallets/classic/ledger_wallet.inline.svg);
+          }
+
+          &.connectTrezor {
+            background-image: url(../../../../assets/images/wallets/classic/trezor_wallet.inline.svg);
+          }
+
+          // CREATE WALLET [NOT YET]
+          
+          &.master {
+            background-image: url(../../../../assets/images/wallets/classic/master_key.inline.svg);
+          }
+          
+          &.business {
+            background-image: url(../../../../assets/images/wallets/classic/business_wallet.inline.svg);
+          }
+
+          // RESTORE WALLET
+          &.restoreNormalWallet {
+            background-image: url(../../../../assets/images/wallets/classic/mnemonimic_words_wallet.inline.svg);
+          }
+        
+          &.restorePaperWallet {
+            background-image: url(../../../../assets/images/wallets/classic/paper_wallet.inline.svg);
+          }
+        }
+      }
+    }
+  }
+}
+
+:global(.YoroiModern) {
+  .optionBlockListItem {
+    .optionBlockWrapper {
+      .optionSubmitButton {
+        &:hover {
+          .optionTitle {
+            color: var(--theme-default-color-blue); 
+          }
+        }
+
+        .optionImage {
+          // CONNECT HARDWARE WALLET
+          &.connectLedger {
+            background-image: url(../../../../assets/images/wallets/modern/ledger.inline.svg);
+          }
+      
+          &.connectTrezor {
+            background-image: url(../../../../assets/images/wallets/modern/trezor.inline.svg);
+          }
+
+          // CREATE WALLET [NOT ANY YET]
+          &.master {
+            background-image: url(../../../../assets/images/wallets/modern/master_key.svg);
+          }
+        
+          &.business {
+            background-image: url(../../../../assets/images/wallets/modern/business_wallet.svg);
+          }
+
+          // RESTORE WALLET
+          &.restoreNormalWallet {
+            background-image: url(../../../../assets/images/wallets/modern/mnemonic_wallet.svg);
+          }
+        
+          &.restorePaperWallet {
+            background-image: url(../../../../assets/images/wallets/modern/paper.wallet.inline.svg);
+          }
+        }
+      }
+    }
+  }
+}

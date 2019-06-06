@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import WalletRestoreOptionsDialog from '../../../components/wallet/add/WalletRestoreOptionsDialog';
+import WalletRestoreOptionDialog from '../../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
 
 type Props = {
   onClose: Function,
@@ -10,11 +10,11 @@ type Props = {
   onPaperRestore: Function,
 };
 @observer
-export default class WalletRestoreOptionsDialogContainer extends Component<Props> {
+export default class WalletRestoreOptionDialogContainer extends Component<Props> {
 
   render() {
     return (
-      <WalletRestoreOptionsDialog
+      <WalletRestoreOptionDialog
         classicTheme={this.props.classicTheme}
         onCancel={this.props.onClose}
         onRestore={this.props.onRestore}

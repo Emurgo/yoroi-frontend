@@ -2,10 +2,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import Dialog from '../../widgets/Dialog';
-import styles from './WalletOptionsDialog.scss';
-import WalletTypeItem from './WalletTypeItem';
+import DialogCloseButton from '../../../widgets/DialogCloseButton';
+import Dialog from '../../../widgets/Dialog';
+import styles from './OptionListWrapperStyle.scss';
+import OptionBlock from './OptionBlock';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -50,7 +50,7 @@ type Props = {
 };
 
 @observer
-export default class WalletRestoreOptionsDialog extends Component<Props> {
+export default class WalletRestoreOptionDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -68,16 +68,16 @@ export default class WalletRestoreOptionsDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
         <div className={styles.tabsContent}>
-          <ul className={styles.WalletTypeList}>
-            <WalletTypeItem
-              action={onRestore}
-              type="mnemonic"
+          <ul className={styles.optionBlockList}>
+            <OptionBlock
+              onSubmit={onRestore}
+              type="restoreNormalWallet"
               title={intl.formatMessage(messages.walletMnemonicTitle)}
               description={intl.formatMessage(messages.walletMnemonicDescription)}
             />
-            <WalletTypeItem
-              action={onPaperRestore}
-              type="paper"
+            <OptionBlock
+              onSubmit={onPaperRestore}
+              type="restorePaperWallet"
               title={intl.formatMessage(messages.walletPaperTitle)}
               description={intl.formatMessage(messages.walletPaperDescription)}
             />
@@ -86,5 +86,4 @@ export default class WalletRestoreOptionsDialog extends Component<Props> {
       </Dialog>
     );
   }
-
 }
