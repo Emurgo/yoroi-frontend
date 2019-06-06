@@ -9,7 +9,7 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 const messages = defineMessages({
   stepAboutLabel: {
     id: 'wallet.connect.hw.dialog.step.about.label',
-    defaultMessage: '!!!ABOUT',
+    defaultMessage: '!!!CHECK',
   },
   stepConnectLabel: {
     id: 'wallet.connect.hw.dialog.step.connect.label',

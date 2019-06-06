@@ -132,7 +132,7 @@ export default class ConnectDialog extends Component<Props> {
 
     return (
       <Dialog
-        className={classnames([styles.component, 'AboutDialog'])}
+        className={classnames([styles.component, 'ConnectDialog'])}
         title={intl.formatMessage(globalMessages.ledgerConnectAllDialogTitle)}
         actions={dailogActions}
         closeOnOverlayClick={false}

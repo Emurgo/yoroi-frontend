@@ -18,12 +18,13 @@ function yoroi-build(){
 function chrome-webstore-upndown(){
 
   webstore upload --source "artifacts/${ZIP_NAME}" --extension-id="${APP_ID}" --client-id="${GOOGLE_CLIENT_ID}" --client-secret="${GOOGLE_CLIENT_SECRET}" --refresh-token="${GOOGLE_REFRESH_TOKEN}" --trusted-testers
+  set +x
+  ACCESS_TOKEN=$(curl -s -X POST -d "client_id=$GOOGLE_CLIENT_ID&client_secret=$GOOGLE_CLIENT_SECRET&refresh_token=$GOOGLE_REFRESH_TOKEN&grant_type=refresh_token" https://www.googleapis.com/oauth2/v4/token | grep access_token | awk -F: '{print $2}' | sed 's|.*"\(.*\)".*|\1|g')
   curl -o artifacts/${CRX_NAME} \
     -H "Authorization: Bearer ${ACCESS_TOKEN}"  \
     -H "x-goog-api-version: 2" \
-    -X GET \
-    -v \
-    ${CHROME_WEBSTORE_API_ENDPOINT}/items/${APP_ID}
+    https://www.googleapis.com/chromewebstore/v1.1/items/${APP_ID}
+  set -x
 
 }
 
@@ -42,7 +43,7 @@ then
   echo "Building Yoroi-${RELEASE_TAG}..."
 
   set +x
-  ACCESS_TOKEN=$(curl -s -X POST -d "client_id=$GOOGLE_CLIENT_ID&client_secret=$GOOGLE_CLIENT_SECRET&refresh_token=$GOOGLE_REFRESH_TOKEN&grant_type=refresh_token" https://www.googleapis.com/oauth2/v4/token | grep access_token | awk -F: '{print $2}' | sed 's|.*"\(.*\)".*|\1|g')
+  export ACCESS_TOKEN=$(curl -s -X POST -d "client_id=$GOOGLE_CLIENT_ID&client_secret=$GOOGLE_CLIENT_SECRET&refresh_token=$GOOGLE_REFRESH_TOKEN&grant_type=refresh_token" https://www.googleapis.com/oauth2/v4/token | grep access_token | awk -F: '{print $2}' | sed 's|.*"\(.*\)".*|\1|g')
   set -x
   yoroi-build
 
@@ -52,7 +53,6 @@ then
     -H "x-goog-api-version: 2" \
     -X POST \
     -T artifacts/${ZIP_NAME} \
-    -v \
     ${CHROME_WEBSTORE_API_ENDPOINT}/items | sed 's|.*"id":"\(.*\)","upload.*|\1|g')
   set -x
 
