@@ -9,7 +9,6 @@ import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
 import styles from './CreatePaperDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
-import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
 import download from '../../../../assets/images/import-ic.inline.svg';
 import { PdfGenSteps } from '../../../../api/ada/paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from '../../../../api/ada/paperWallet/paperWalletPdf';
@@ -187,10 +186,18 @@ export default class CreatePaperDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancel} />}
         classicTheme={classicTheme}
       >
-        <AnnotatedLoader
-          title={this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
-          details={this.statusToMessage(renderStatus)}
-        />
+        <div className={styles.walletLoaderWrapper}>
+
+          <div className={styles.walletLoader} />
+
+          <div className={styles.walletLoaderTitle}>
+            {this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
+          </div>
+
+          <div className={styles.walletLoaderProgressInfo}>
+            {this.statusToMessage(renderStatus)}
+          </div>
+        </div>
       </Dialog>
     );
   }

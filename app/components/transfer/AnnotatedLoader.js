@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './AnnotatedLoader.scss';
 
 type Props = {
@@ -24,7 +25,7 @@ export default class AnnotatedLoader extends Component<Props> {
         <div>
           <div className={styles.body}>
 
-            <div className={styles.walletLoader} />
+            <LoadingSpinner />
 
             <div className={styles.title}>
               {title}

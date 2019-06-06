@@ -31,25 +31,4 @@
       color: var(--rp-theme-color-error);
     }
   }
-
-  .walletLoader {
-    margin: 20px auto;
-    width: 170px;
-    height: 190px;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-  }  
-}
-
-:global(.YoroiModern) {
-  .walletLoader {
-    background-image: url("../../assets/images/paper-wallet-loader.gif");
-  }
-}
-
-:global(.YoroiClassic) {
-  .walletLoader {
-    background-image: url("../../assets/images/paper-wallet-loader.gif");
-  }
 }

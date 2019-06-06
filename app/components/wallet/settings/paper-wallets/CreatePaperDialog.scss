@@ -41,3 +41,51 @@
 .downloadPaperIntroLine1 {
   text-align: center;
 }
+
+.walletLoaderWrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  color: var(--theme-bordered-box-text-color);
+  font-family: var(--font-regular);
+  font-size: 14px;
+  line-height: 19px;
+
+  .walletLoaderWrapperTitle {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 6px;
+    word-break: break-all;
+    text-align: center;
+  }
+
+  .walletLoaderWrapperProgressInfo {
+    color: var(--theme-default-color-grey-3);
+    font-size: 14px;
+    line-height: 22px;
+    margin-bottom: 12px;
+    word-break: break-word;
+    text-align: center;
+  }
+
+  .walletLoader {
+    margin: 20px auto;
+    width: 170px;
+    height: 190px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+  }  
+}
+
+:global(.YoroiModern) {
+  .walletLoader {
+    background-image: url("../../../../assets/images/paper-wallet-loader.gif");
+  }
+}
+
+:global(.YoroiClassic) {
+  .walletLoader {
+    background-image: url("../../../../assets/images/paper-wallet-loader.gif");
+  }
+}
