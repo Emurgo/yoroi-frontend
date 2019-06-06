@@ -48,7 +48,7 @@
   "daedalusTransfer.error.transferFundsError": "Impossibile trasferire fondi.",
   "daedalusTransfer.error.webSocketRestoreError": "Errore durante il ripristino degli indirizzi blockchain.",
   "daedalusTransfer.errorPage.title.label": "Impossibile ripristinare il portafoglio Daedalus.",
-  "daedalusTransfer.form.instructions.step0.text": "Inserisci la frase di recupero di 12 parole utilizzata per eseguire il backup del tuo Wallet Daedalus per ripristinare il saldo e trasferire tutti i fondi da Daedalus a Yoroi.",
+  "daedalusTransfer.form.instructions.step0.text": "Inserisci la frase di recupero di 12 parole utilizzata per eseguire il backup del tuo portafoglio Daedalus per ripristinare il saldo e trasferire tutti i fondi da Daedalus a Yoroi.",
   "daedalusTransfer.form.instructions.step0MasterKey.text": "Inserisci la chiave principale non cifrata per il tuo Wallet Daedalus per ripristinare il saldo e trasferire tutti i fondi da Daedalus a Yoroi.",
   "daedalusTransfer.form.instructions.step0Paper.text": "Inserisci la frase di recupero di 27 parole utilizzata per eseguire il backup del tuo Wallet cartaceo (o \"Paper Wallet\") Daedalus per ripristinare il saldo e trasferire tutti i fondi da Daedalus a Yoroi.",
   "daedalusTransfer.instructions.attention.button.label": "Portafoglio Daedalus",
