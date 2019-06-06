@@ -278,8 +278,6 @@
   "wallet.create.type.business.title": "비즈니스용 지갑",
   "wallet.create.type.trezor.title": "Trezor 지갑",
   "wallet.create.type.ledger.title": "Ledger 지갑",
-  "wallet.create.tabs.recommended.title": "추천",
-  "wallet.create.tabs.advanced.title": "고급",
   "wallet.connect.hardware.title": "하드웨어 지갑에 연결하기",
   "wallet.create.dialog.walletNameHint": "예: 쇼핑 지갑",
   "wallet.create.dialog.walletPasswordLabel": "지불 암호",

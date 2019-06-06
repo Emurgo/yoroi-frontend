@@ -274,8 +274,6 @@
   "wallet.create.dialog.title": "Create wallet",
   "wallet.create.dialog.walletNameHint": "e.g: Shopping Wallet",
   "wallet.create.dialog.walletPasswordLabel": "Spending password",
-  "wallet.create.tabs.advanced.title": "Advanced",
-  "wallet.create.tabs.recommended.title": "Recommended",
   "wallet.create.type.business.title": "Business Wallet",
   "wallet.create.type.ledger.description": "Ledger Hardware Wallet Descriprion",
   "wallet.create.type.ledger.title": "Ledger Hardware Wallet",

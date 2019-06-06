@@ -278,8 +278,6 @@
   "wallet.create.type.business.title": "Business Wallet",
   "wallet.create.type.trezor.title": "Trezor Wallet",
   "wallet.create.type.ledger.title": "Ledger Wallet",
-  "wallet.create.tabs.recommended.title": "Recommended",
-  "wallet.create.tabs.advanced.title": "Advanced",
   "wallet.connect.hardware.title": "Connect to hardware wallet",
   "wallet.create.dialog.walletNameHint": "例：ショッピングウォレット",
   "wallet.create.dialog.walletPasswordLabel": "送金パスワード",

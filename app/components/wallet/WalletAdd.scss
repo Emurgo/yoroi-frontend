@@ -163,14 +163,16 @@
     }
   
     .heroCardsItemBg {
-      &.create {
-        background-image: url(../../assets/images/wallets/classic/create_wallet.inline.svg);
-      }
-      &.restore {
-        background-image: url(../../assets/images/wallets/classic/restore_wallet.inline.svg);
-      }
       &.connect {
-        background-image: url(../../assets/images/wallets/classic/hardware_wallet.inline.svg);
+        background-image: url(../../assets/images/add-wallet/connect-hw-classic.inline.svg);
+      }
+
+      &.create {
+        background-image: url(../../assets/images/add-wallet/create-wallet-classic.inline.svg);
+      }
+
+      &.restore {
+        background-image: url(../../assets/images/add-wallet/restore-wallet-classic.inline.svg);
       }
     }
   }
@@ -178,7 +180,7 @@
 
 :global(.YoroiModern) {
   .component {
-    background-image: url(../../assets/images/add-wallet-bg.svg);
+    background-image: url(../../assets/images/add-wallet/add-wallet-bg-modern.inline.svg);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center -13vw;
@@ -215,14 +217,16 @@
     }
 
     .heroCardsItemBg {
-      &.create {
-        background-image: url(../../assets/images/wallets/modern/create.wallet.inline.svg);
-      }
-      &.restore {
-        background-image: url(../../assets/images/wallets/modern/restore.wallet.inline.svg);
-      }
       &.connect {
-        background-image: url(../../assets/images/wallets/modern/hardware.wallet.inline.svg);
+        background-image: url(../../assets/images/add-wallet/connect-hw-modern.inline.svg);
+      }
+
+      &.create {
+        background-image: url(../../assets/images/add-wallet/create-wallet-modern.inline.svg);
+      }
+
+      &.restore {
+        background-image: url(../../assets/images/add-wallet/restore-wallet-modern.inline.svg);
       }
     }
   }

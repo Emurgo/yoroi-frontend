@@ -278,8 +278,6 @@
   "wallet.create.type.business.title": "Wallet d’affaires",
   "wallet.create.type.trezor.title": "Wallet Trezor",
   "wallet.create.type.ledger.title": "Wallet Ledger",
-  "wallet.create.tabs.recommended.title": "Recommandé",
-  "wallet.create.tabs.advanced.title": "Avancé",
   "wallet.connect.hardware.title": "Se connecter au hardware wallet",
   "wallet.create.dialog.walletNameHint": "ex: Wallet de shopping",
   "wallet.create.dialog.walletPasswordLabel": "Mot de passe de paiement",

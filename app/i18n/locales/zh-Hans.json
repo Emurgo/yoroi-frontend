@@ -278,8 +278,6 @@
   "wallet.create.type.business.title": "公务钱包",
   "wallet.create.type.trezor.title": "Trezor钱包",
   "wallet.create.type.ledger.title": "Ledger钱包",
-  "wallet.create.tabs.recommended.title": "推荐",
-  "wallet.create.tabs.advanced.title": "高级",
   "wallet.connect.hardware.title": "连接到硬件钱包",
   "wallet.create.dialog.walletNameHint": "例如：购物钱包",
   "wallet.create.dialog.walletPasswordLabel": "支付密码",
