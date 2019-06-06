@@ -5,6 +5,8 @@ import HorizontalFlexContainer from '../../components/layout/HorizontalFlexConta
 import buyTrezorSvg from '../../assets/images/footer/buy-trezor.inline.svg';
 import howCreateWalletSvg from '../../assets/images/footer/how-to-create-wallet.inline.svg';
 import howRestoreWalletSvg from '../../assets/images/footer/how-to-restore-wallet.inline.svg';
+import whatIsHardwareWalletSvg from '../../assets/images/footer/what-is-hardware-wallet.inline.svg';
+import howConnetTrezorSvg from '../../assets/images/footer/how-to-connect-trezor.inline.svg';
 
 import { defineMessages } from 'react-intl';
 
@@ -25,20 +27,20 @@ const messages = defineMessages({
     id: 'wallet.footer.howToRestoreWallet.text',
     defaultMessage: '!!!How to restore a wallet.',
   },
-  /* Temporarily disable
-   * re-enable when new design is ready and if it's still needed
-   * if it's not needed in new design,
-   * then delete this as well as it's assets and translations */
-  // whatIsHardwareWallet: {
-  //   id: 'wallet.footer.whatIsHardwareWallet.text',
-  //   defaultMessage: '!!!What is a hardware wallet',
-  // },
-  // howToConnectTrezor: {
-  //   id: 'wallet.footer.howToConnectTrezor.text',
-  //   defaultMessage: '!!!How to connect a Trezor.',
-  // },
+  whatIsHardwareWallet: {
+    id: 'wallet.footer.whatIsHardwareWallet.text',
+    defaultMessage: '!!!What is a hardware wallet',
+  },
+  howToConnectTrezor: {
+    id: 'wallet.footer.howToConnectTrezor.text',
+    defaultMessage: '!!!How to connect a Trezor.',
+  },
 });
 
+/* This Component is not used from anywhere
+ * re-enable when new design is ready and if it's still needed
+ * if it's not needed in new design,
+ * then delete this as well as it's assets and translations */
 export default class AddWalletFooter extends Component {
 
   render() {
@@ -64,22 +66,16 @@ export default class AddWalletFooter extends Component {
           svg={howRestoreWalletSvg}
           message={messages.howToRestoreWallet}
         />
-        {
-          /* Temporarily disable
-           * re-enable when new design is ready and if it's still needed
-           * if it's not needed in new design,
-           * then delete this as well as it's assets and translations */
-        }
-        {/* <FooterItem
+        <FooterItem
           url="https://medium.com/@emurgo_io/whats-a-hardware-wallet-b3605a026008"
           svg={whatIsHardwareWalletSvg}
           message={messages.whatIsHardwareWallet}
-        /> */}
-        {/* <FooterItem
+        />
+        <FooterItem
           url="https://youtu.be/Dp0wXwtToX0"
           svg={howConnetTrezorSvg}
           message={messages.howToConnectTrezor}
-        /> */}
+        />
       </HorizontalFlexContainer>
     );
   }
