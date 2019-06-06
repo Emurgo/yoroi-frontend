@@ -1,24 +1,20 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import classnames from 'classnames';
-import styles from './OptionBlock.scss';
 import SvgInline from 'react-svg-inline';
-import arrowDownSVG from '../../../../assets/images/expand-arrow-grey.inline.svg';
 
-const messages = defineMessages({
-  more: {
-    id: 'settings.general.learn.more',
-    defaultMessage: '!!!Learn more',
-  },
-});
+import globalMessages from '../../../../i18n/global-messages';
+import arrowDownSVG from '../../../../assets/images/expand-arrow-grey.inline.svg';
+import styles from './OptionBlock.scss';
 
 type Props = {
   type: string,
   title: string,
   onSubmit: Function,
-  learnMoreText?: string, // If learnMoreText is not provided, learn more block will disabled
+  // If learnMoreText is not provided, learn more block will disabled
+  learnMoreText?: string,
 };
 
 type State = {
@@ -80,7 +76,7 @@ export default class OptionBlock extends Component<Props, State> {
                 type="button"
                 onClick={this.toggleLearnMore.bind(this)}
               >
-                {intl.formatMessage(messages.more)}
+                {intl.formatMessage(globalMessages.learnMore)}
                 <SvgInline
                   svg={arrowDownSVG}
                   width="20px"

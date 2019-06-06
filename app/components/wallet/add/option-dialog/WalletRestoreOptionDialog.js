@@ -61,13 +61,13 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
               onSubmit={onRestore}
               type="restoreNormalWallet"
               title={intl.formatMessage(messages.walletMnemonicTitle)}
-              description={intl.formatMessage(messages.walletMnemonicDescription)}
+              learnMoreText={intl.formatMessage(messages.walletMnemonicDescription)}
             />
             <OptionBlock
               onSubmit={onPaperRestore}
               type="restorePaperWallet"
               title={intl.formatMessage(messages.walletPaperTitle)}
-              description={intl.formatMessage(messages.walletPaperDescription)}
+              learnMoreText={intl.formatMessage(messages.walletPaperDescription)}
             />
           </ul>
         </div>

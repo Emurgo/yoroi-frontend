@@ -10,24 +10,24 @@ import styles from './OptionListWrapperStyle.scss';
 
 const messages = defineMessages({
   dialogTitle: {
-    id: 'wallet.connect.hardware.title',
+    id: 'wallet.add.optionDialog.connect.hw.dialogTitle',
     defaultMessage: '!!!Connect to hardware wallet',
   },
   ledgerTitle: {
-    id: 'wallet.create.type.ledger.title',
+    id: 'wallet.add.optionDialog.connect.hw.ledger.title',
     defaultMessage: '!!!Ledger Hardware Wallet',
   },
-  ledgerDescription: { // TODO: add descriptionfor wallet
-    id: 'wallet.create.type.ledger.description',
-    defaultMessage: '!!! TODO: Ledger Hardware Wallet Descriprion',
+  ledgerDescription: {
+    id: 'wallet.add.optionDialog.connect.hw.ledger.learnMoreText',
+    defaultMessage: '!!!A Ledger hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
   },
   trezorTitle: {
-    id: 'wallet.create.type.trezor.title',
+    id: 'wallet.add.optionDialog.connect.hw.trezor.title',
     defaultMessage: '!!!Trezor Hardware Wallet',
   },
-  trezorDescription: {  // TODO: add descriptionfor wallet
-    id: 'wallet.create.type.trezor.description',
-    defaultMessage: '!!! TODO: Trezor Hardware Wallet Descriprion',
+  trezorDescription: {
+    id: 'wallet.add.optionDialog.connect.hw.trezor.learnMoreText',
+    defaultMessage: '!!!A Trezor hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
   },
 });
 
