@@ -208,7 +208,11 @@ export default class AdaTransactionBuilderStore extends Store {
 
     // creation of unsigned tx may still be running when we try and reset
     // we need to wait for it to finish then clear the result since we can't cancel the promise
-    await this.createUnsignedTx.promise;
+    try {
+      await this.createUnsignedTx.promise;
+    } catch (err) {
+      // ignore
+    }
     this.createUnsignedTx.reset();
     runInAction(() => {
       this.plannedTx = null;
