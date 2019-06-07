@@ -415,7 +415,7 @@
   "wallet.settings.changePassword.dialog.title.changePassword": "Cambiar la contraseña",
   "wallet.settings.changePassword.dialog.title.setPassword": "Contraseña",
   "wallet.settings.changePassword.dialog.walletPasswordLabel": "Contraseña de la billetera",
-  "wallet.settings.exportWalletButtonLabel": "Exportar la billetera",  
+  "wallet.settings.exportWalletButtonLabel": "Exportar la billetera",
   "wallet.settings.name.label": "Nombre de la Billetera",
   "wallet.settings.password": "Contraseña",
   "wallet.settings.passwordLastUpdated": "Última actualización {lastUpdated}",

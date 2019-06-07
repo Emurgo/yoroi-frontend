@@ -415,7 +415,7 @@
   "wallet.settings.changePassword.dialog.title.changePassword": "Modifier le mot de passe",
   "wallet.settings.changePassword.dialog.title.setPassword": "Mot de passe",
   "wallet.settings.changePassword.dialog.walletPasswordLabel": "Mot de passe du wallet",
-  "wallet.settings.exportWalletButtonLabel": "Exporter le wallet",  
+  "wallet.settings.exportWalletButtonLabel": "Exporter le wallet",
   "wallet.settings.name.label": "Nom du wallet",
   "wallet.settings.password": "Mot de passe",
   "wallet.settings.passwordLastUpdated": "Dernière mise à jour {lastUpdated}",
