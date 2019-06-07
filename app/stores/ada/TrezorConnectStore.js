@@ -91,8 +91,8 @@ export default class TrezorConnectStore
     const trezorConnectAction = this.actions.ada.trezorConnect;
     trezorConnectAction.init.listen(this._init);
     trezorConnectAction.cancel.listen(this._cancel);
-    trezorConnectAction.submitAbout.listen(this._submitAbout);
-    trezorConnectAction.goBackToAbout.listen(this._goBackToAbout);
+    trezorConnectAction.submitCheck.listen(this._submitCheck);
+    trezorConnectAction.goBackToCheck.listen(this._goBackToCheck);
     trezorConnectAction.submitConnect.listen(this._submitConnect);
     trezorConnectAction.submitSave.listen(this._submitSave);
 
@@ -140,7 +140,7 @@ export default class TrezorConnectStore
 
   @action _reset = (): void => {
     this.progressInfo = {
-      currentStep: ProgressStep.ABOUT,
+      currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
     };
     this.error = undefined;
@@ -152,9 +152,9 @@ export default class TrezorConnectStore
     this.teardown();
   };
 
-  // =================== ABOUT =================== //
-  /** ABOUT dialog submit(Next button) */
-  @action _submitAbout = (): void => {
+  // =================== CHECK =================== //
+  /** CHECK dialog submit(Next button) */
+  @action _submitCheck = (): void => {
     this.error = undefined;
     this.trezorEventDevice = undefined;
     this._removeTrezorConnectEventListeners();
@@ -162,13 +162,13 @@ export default class TrezorConnectStore
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
   };
-  // =================== ABOUT =================== //
+  // =================== CHECK =================== //
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToAbout = (): void => {
+  @action _goBackToCheck = (): void => {
     this.error = undefined;
-    this.progressInfo.currentStep = ProgressStep.ABOUT;
+    this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
