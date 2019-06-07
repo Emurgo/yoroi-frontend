@@ -1,11 +1,8 @@
-$topBarClassicHeight: 64px;
-$topBarHeight: 58px;
-
 .topBar {
   align-items: center;
   background: var(--theme-topbar-background-color);
   display: flex;
-  height: $topBarClassicHeight;
+  height: var(--cmn-topbar-height);
   padding: 0;
   position: relative;
   z-index: 100;
@@ -13,8 +10,4 @@ $topBarHeight: 58px;
   .topBarTitle {
     flex-grow: 1;
   }  
-}
-
-:global(.YoroiModern) .topBar {
-  height: $topBarHeight;
 }

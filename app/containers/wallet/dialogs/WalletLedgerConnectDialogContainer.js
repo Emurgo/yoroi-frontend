@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 
-import AboutDialog from '../../../components/wallet/hwConnect/ledger/AboutDialog';
+import CheckDialog from '../../../components/wallet/hwConnect/ledger/CheckDialog';
 import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDialog';
 import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
 
@@ -33,13 +33,13 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
     let component = null;
 
     switch (ledgerConnectStore.progressInfo.currentStep) {
-      case ProgressStep.ABOUT:
+      case ProgressStep.CHECK:
         component = (
-          <AboutDialog
+          <CheckDialog
             progressInfo={ledgerConnectStore.progressInfo}
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
-            submit={hwConnectActions.submitAbout.trigger}
+            submit={hwConnectActions.submitCheck.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
           />);
@@ -50,7 +50,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             progressInfo={ledgerConnectStore.progressInfo}
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
-            goBack={hwConnectActions.goBackToAbout.trigger}
+            goBack={hwConnectActions.goBackToCheck.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}

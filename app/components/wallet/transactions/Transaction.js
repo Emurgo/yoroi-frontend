@@ -99,11 +99,11 @@ const assuranceLevelTranslations = defineMessages({
 const stateTranslations = defineMessages({
   [transactionStates.PENDING]: {
     id: 'wallet.transaction.state.pending',
-    defaultMessage: '!!!Transaction pending',
+    defaultMessage: '!!!pending',
   },
   [transactionStates.FAILED]: {
     id: 'wallet.transaction.state.failed',
-    defaultMessage: '!!!Transaction failed',
+    defaultMessage: '!!!failed',
   },
 });
 
@@ -113,7 +113,6 @@ type Props = {
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
-  classicTheme: boolean
 };
 
 type State = {
@@ -166,7 +165,7 @@ export default class Transaction extends Component<Props, State> {
 
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, formattedWalletAmount, classicTheme } = this.props;
+    const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state === transactionStates.FAILED;
@@ -214,7 +213,7 @@ export default class Transaction extends Component<Props, State> {
               <div className={styles.title}>
                 { this.getTransactionHeaderMsg(intl, currency, data.type) }
               </div>
-              <div className={styles.type}>
+              <div className={styles.time}>
                 {moment(data.date).format('hh:mm:ss A')}
               </div>
               {state === transactionStates.OK ? (
@@ -233,11 +232,9 @@ export default class Transaction extends Component<Props, State> {
                 <SvgInline svg={symbol} className={styles.currencySymbol} />
               </div>
 
-              {!classicTheme && (
-                <div className={styles.expandArrowBox}>
-                  <SvgInline className={arrowClasses} svg={expandArrow} />
-                </div>
-              )}
+              <div className={styles.expandArrowBox}>
+                <SvgInline className={arrowClasses} svg={expandArrow} />
+              </div>
             </div>
           </div>
         </div>

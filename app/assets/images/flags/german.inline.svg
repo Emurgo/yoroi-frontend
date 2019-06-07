@@ -1,1 +1,26 @@
-<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><circle id="a" cx="8" cy="8" r="8"/></defs><g transform="translate(1 1)" fill="none" fill-rule="evenodd"><mask id="b" fill="#fff"><use xlink:href="#a"/></mask><circle stroke-opacity=".303" stroke="#4A4A4A" stroke-width=".5" cx="8" cy="8" r="8.25"/><g mask="url(#b)"><path fill="#D81F26" d="M4 23V-6h7v29z"/><path fill="#1D1D20" d="M-2 23V-6h7v29z"/><path fill="#F8C801" d="M11 23V-6h7v29z"/></g></g></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>germany</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="8" cy="8" r="8"></circle>
+    </defs>
+    <g id="germany" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ru-copy-2" transform="translate(1.000000, 1.000000)">
+            <g id="Group">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <circle stroke-opacity="0.302790987" stroke="#4A4A4A" stroke-width="0.5" cx="8" cy="8" r="8.25"></circle>
+                <g id="if_210_Ensign_Flag_Nation_russia_2634398-Copy" mask="url(#mask-2)">
+                    <g transform="translate(-7.000000, -2.000000)" id="Rectangle">
+                        <polygon fill="#D81F26" points="0.5 6.5 29.5 6.5 29.5 13.5 0.5 13.5"></polygon>
+                        <polygon fill="#1D1D20" points="0.5 0.5 29.5 0.5 29.5 7.5 0.5 7.5"></polygon>
+                        <polygon fill="#F8C801" points="0.5 13.5 29.5 13.5 29.5 20.5 0.5 20.5"></polygon>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

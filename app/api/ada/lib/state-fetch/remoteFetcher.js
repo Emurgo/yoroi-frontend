@@ -36,8 +36,8 @@ const backendUrl = CONFIG.network.backendUrl;
  * https://github.com/Emurgo/yoroi-backend-service/
  */
 export class RemoteFetcher implements IFetcher {
-  getUTXOsForAddresses(body: AddressUtxoRequest): Promise<AddressUtxoResponse> {
-    return axios(
+  getUTXOsForAddresses = (body: AddressUtxoRequest): Promise<AddressUtxoResponse> => (
+    axios(
       `${backendUrl}/api/txs/utxoForAddresses`,
       {
         method: 'post',
@@ -49,11 +49,11 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::getUTXOsForAddresses error: ' + stringifyError(error));
         throw new GetUtxosForAddressesApiError();
-      });
-  }
+      })
+  )
 
-  getTxsBodiesForUTXOs(body: TxBodiesRequest): Promise<TxBodiesResponse> {
-    return axios(
+  getTxsBodiesForUTXOs = (body: TxBodiesRequest): Promise<TxBodiesResponse> => (
+    axios(
       `${backendUrl}/api/txs/txBodies`,
       {
         method: 'post',
@@ -65,11 +65,11 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::getTxsBodiesForUTXOs error: ' + stringifyError(error));
         throw new GetTxsBodiesForUTXOsApiError();
-      });
-  }
+      })
+  )
 
-  getUTXOsSumsForAddresses(body: UtxoSumRequest): Promise<UtxoSumResponse> {
-    return axios(
+  getUTXOsSumsForAddresses = (body: UtxoSumRequest): Promise<UtxoSumResponse> => (
+    axios(
       `${backendUrl}/api/txs/utxoSumForAddresses`,
       {
         method: 'post',
@@ -81,11 +81,11 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::getUTXOsSumsForAddresses error: ' + stringifyError(error));
         throw new GetUtxosSumsForAddressesApiError();
-      });
-  }
+      })
+  )
 
-  getTransactionsHistoryForAddresses(body: HistoryRequest): Promise<HistoryResponse> {
-    return axios(
+  getTransactionsHistoryForAddresses = (body: HistoryRequest): Promise<HistoryResponse> => (
+    axios(
       `${backendUrl}/api/txs/history`,
       {
         method: 'post',
@@ -98,10 +98,10 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::getTransactionsHistoryForAddresses error: ' + stringifyError(error));
         throw new GetTxHistoryForAddressesApiError();
-      });
-  }
+      })
+  )
 
-  sendTx(body: SignedRequest): Promise<SignedResponse> {
+  sendTx = (body: SignedRequest): Promise<SignedResponse> => {
     const signedTxHex = Buffer.from(
       body.signedTx.to_hex(),
       'hex'
@@ -127,8 +127,8 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse> {
-    return axios(
+  checkAddressesInUse = (body: FilterUsedRequest): Promise<FilterUsedResponse> => (
+    axios(
       `${backendUrl}/api/addresses/filterUsed`,
       {
         method: 'post',
@@ -140,6 +140,6 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::checkAddressesInUse error: ' + stringifyError(error));
         throw new CheckAdressesInUseApiError();
-      });
-  }
+      })
+  )
 }

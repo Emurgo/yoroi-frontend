@@ -6,27 +6,11 @@
 
 .modal {
   border-radius: 8px;
-  padding: 25px 40px 40px 40px;
+  padding: unset;
+  min-width: unset;
+  max-width: unset;
   display: flex;
   flex-direction: column;
-
-  :global {
-    .WalletExportDialogChoices_component {
-      & > button {
-        color: var(--theme-dialog-choice-tabs-text-color);
-      }
-
-      & > .WalletExportDialogChoices_activeButton {
-        color: var(--theme-dialog-choice-tabs-text-color-active);
-        border-bottom: 2px solid var(--theme-dialog-choice-tabs-bottom-border-color-active);
-      }
-    }
-
-    .SimpleInput_input,
-    .SimpleAutocomplete_autocompleteContent {
-      background-color: transparent !important;
-    }
-  }
 
   :global(.YoroiModern) {
     letter-spacing: 0;

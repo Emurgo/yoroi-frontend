@@ -10,6 +10,10 @@ $opacityCommon: 0.7;
   @include loading-spinner("../../../../assets/images/spinner-light.svg");
 }
 
+:global(.ProgressSteps_component) {
+  margin-bottom: 24px;
+}
+
 .actions {
   display: flex;
   flex-shrink: 0;
@@ -29,21 +33,21 @@ $opacityCommon: 0.7;
   }
 }
 
-:global {
-  .AboutDialog_headerBlock.small span {
-    font-size: 12px;
-  }
-}
-
 .headerBlockClassic {
+  margin-bottom: 16px;
   width: 725px;
-  padding-top: 1em;
   span {
     font-family: var(--font-light);
     line-height: 1.38;
     font-size: 14px;
     opacity: $opacityCommon;
   }
+}
+
+.headerBlock {
+  margin-bottom: 16px;
+  font-size: 12px;
+  line-height: 18px;
 }
 
 .middleBlockClassic {
@@ -53,7 +57,6 @@ $opacityCommon: 0.7;
   border-radius: 4px;  
   width: 725px;
   height: 280px;
-  margin-top: 1em;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 10px;
@@ -63,6 +66,5 @@ $opacityCommon: 0.7;
   overflow: hidden;  
   background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
   object-fit: contain;
-  margin-top: 12px;
   border-radius: 8px;
 }

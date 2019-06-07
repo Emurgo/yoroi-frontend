@@ -65,8 +65,12 @@ export default class WalletRestoreDialogContainer
       }
       resolvedRecoveryPhrase = newPhrase;
     }
-    const { addresses, accountPlate } =  mnemonicsToAddresses(resolvedRecoveryPhrase,
-      isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES);
+    const { addresses, accountPlate } =  mnemonicsToAddresses(
+      resolvedRecoveryPhrase,
+      0, // show addresses for account #0
+      isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES,
+      'External',
+    );
     this.setState({
       verifyRestore: { addresses, accountPlate },
       submitValues: values,
@@ -108,7 +112,10 @@ export default class WalletRestoreDialogContainer
           accountPlate={accountPlate}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
+          isSubmitting={restoreRequest.isExecuting}
+          onSubmit={this.onSubmit}
           classicTheme={this.props.classicTheme}
+          error={restoreRequest.error}
         />
       );
     }

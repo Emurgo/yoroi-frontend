@@ -1,0 +1,21 @@
+.checkboxWrapper {
+  margin: var(--rp-checkbox-label-margin, 10px 0 0 20px);
+
+  label {
+    margin: 0;
+  }
+
+  p {
+    font-family: var(--font-regular);
+    color: var(--theme-terms-of-use-text-color);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+    margin-top: 5px;
+    margin-bottom: 11px;
+
+    strong, em {
+      font-weight: 500;
+    }
+  }
+}

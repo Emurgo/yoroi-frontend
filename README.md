@@ -67,10 +67,10 @@ $ npm run flow
 $ npm run eslint
 # features (command to run all existing tests)
 $ npm run test-e2e-chrome
-# How to run one .feature file (One feature file = one covered component from youtrack)
-$ npm run test-by-feature feature/wallet-creation.feature
+# How to run one .feature file
+$ npm run test-by-feature-chrome features/wallet-creation.feature
 # How to run one test.
-$ npm run test-by-tag @it-10
+$ npm run test-by-tag-chrome @it-10
 ```
 
 ### Jest

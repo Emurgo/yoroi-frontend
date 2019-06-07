@@ -13,7 +13,7 @@
 */
 
 import BigNumber from 'bignumber.js';
-import type { AdaAddressMap } from './adaAddress';
+import type { AdaAddressMap } from './lib/storage/adaAddress';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 /*
@@ -112,11 +112,6 @@ export type AdaTransaction = {
   ctCondition: AdaTransactionCondition,
 };
 
-export type AdaTransactions = [
-  Array<AdaTransaction>,
-  number, // length
-];
-
 export type AdaTransactionInputOutput = [
   string, // output address
   AdaAmount,
@@ -167,10 +162,10 @@ export type AdaHardwareWalletParams = {
 export type Transaction = {
   hash: string,
   inputs_address: Array<string>,
-  inputs_amount: Array<string>, // bingint[]
+  inputs_amount: Array<string>, // bigint[]
   outputs_address: Array<string>,
-  outputs_amount: Array<string>, // bingint[]
-  block_num: ?string, // null if transaction failed
+  outputs_amount: Array<string>, // bigint[]
+  block_num: ?string, // null if transaction pending/failed
   time: string, // timestamp with timezone
   best_block_num: string, // bigint
   last_update: string, // timestamp with timezone
@@ -178,7 +173,7 @@ export type Transaction = {
 };
 
 export type UTXO = {
-  utxo_id: string,
+  utxo_id: string, // concat tx_hash and tx_index
   tx_hash: string,
   tx_index: number,
   receiver: string,

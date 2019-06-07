@@ -3,8 +3,7 @@ Feature: Ada Redemption
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And I am testing "Ada Redemption"
-    And There is a wallet stored named Test
+    Given There is a wallet stored named empty-wallet
     And I go to the ada redemption screen
 
   Scenario: User accepts "Daedalus Redemption Disclaimer"
@@ -14,7 +13,7 @@ Feature: Ada Redemption
     Then I should not see the "Daedalus Redemption Disclaimer" overlay anymore
     And I should still be on the ada redemption screen
 
-  @it-73
+  @it-82
   Scenario: User redeems manually entered "Regular" redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I enter a valid "Regular" redemption key

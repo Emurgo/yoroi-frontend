@@ -108,59 +108,21 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== WALLET RESTORATION ==================== //
 
-  @action _setIsRestoreActive = (active: boolean) => {
-    this.isRestoreActive = active;
-  };
-
-  @action _restoreWallet = async (params: {
+  _restoreWallet = async (params: {
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
   }) => {
-    this.restoreRequest.reset();
-    this._setIsRestoreActive(true);
-    // Hide restore wallet dialog some time after restore has been started
-    // ...or keep it open in case it has error'd out (so that error message can be shown)
-    setTimeout(() => {
-      if (!this.restoreRequest.isExecuting) this._setIsRestoreActive(false);
-      if (!this.restoreRequest.isError) this._toggleAddWalletDialogOnActiveRestoreOrImport();
-    }, this.WAIT_FOR_SERVER_ERROR_TIME);
+    await this._restore(params);
 
-    const restoredWallet = await this.restoreRequest.execute({
-      ...params,
-      checkAddressesInUse: this.stores.substores.ada.stateFetchStore.fetcher.checkAddressesInUse,
-    }).promise;
-
-    // if the restore wallet call ended with no error, we close the dialog.
-    setTimeout(() => {
-      this._setIsRestoreActive(false);
-      this.actions.dialogs.closeActiveDialog.trigger(); // WalletRestoreDialog
-    }, this.MIN_NOTIFICATION_TIME);
-
-    if (!restoredWallet) throw new Error('Restored wallet was not received correctly');
-    this.restoreRequest.reset();
-    await this._patchWalletRequestWithNewWallet(restoredWallet);
-    this.refreshWalletsData();
-    // show success notification
     this.showWalletRestoredNotification();
   };
 
   // =================== WALLET IMPORTING ==================== //
 
-  @action _setIsImportActive = (active: boolean) => {
-    this.isImportActive = active;
-  };
-
   // Similar to wallet restoration
   @action _importWalletFromFile = async (params: WalletImportFromFileParams) => {
     this.importFromFileRequest.reset();
-    this._setIsImportActive(true);
-    // Hide import wallet dialog some time after import has been started
-    // ...or keep it open in case it has errored out (so that error message can be shown)
-    setTimeout(() => {
-      if (!this.importFromFileRequest.isExecuting) this._setIsImportActive(false);
-      if (!this.importFromFileRequest.isError) this._toggleAddWalletDialogOnActiveRestoreOrImport();
-    }, this.WAIT_FOR_SERVER_ERROR_TIME);
 
     const { filePath, walletName, walletPassword } = params;
     this.importFromFileRequest.execute({
@@ -168,10 +130,7 @@ export default class AdaWalletsStore extends WalletStore {
     });
     // $FlowFixMe fix if we ever implement this
     const importedWallet = await this.importFromFileRequest.promise;
-    setTimeout(() => {
-      this._setIsImportActive(false);
-      this.actions.dialogs.closeActiveDialog.trigger();
-    }, this.MIN_NOTIFICATION_TIME);
+
     if (!importedWallet) throw new Error('Imported wallet was not received correctly');
     this.importFromFileRequest.reset();
     await this._patchWalletRequestWithNewWallet(importedWallet);
@@ -214,20 +173,4 @@ export default class AdaWalletsStore extends WalletStore {
     };
     this.actions.notifications.open.trigger(notification);
   }
-
-  // =================== PRIVATE API ==================== //
-
-  /** If no wallet was restored, we don't close the dialog (keep the spinner)
-   * but if the user pressed the X button we make sure they go to the wallet add screen
-   *
-   * If a wallet does exist, we just close the dialog
-   */
-  _toggleAddWalletDialogOnActiveRestoreOrImport = () => {
-    if (this.hasLoadedWallets && !this.hasAnyWallets) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-    } else {
-      this.actions.dialogs.closeActiveDialog.trigger();
-    }
-  };
-
 }

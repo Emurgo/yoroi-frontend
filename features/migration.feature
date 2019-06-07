@@ -3,9 +3,8 @@ Feature: Migration
   Background:
     Given I have opened the extension
     
-  @it-19
+  @it-83
   Scenario: Version set on first launch
-    Given I have opened the extension
     And I am on the language selection screen
     Then Last launch version is updated
     Then I decreast last launch version

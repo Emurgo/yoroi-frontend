@@ -6,25 +6,22 @@ import type {
   OutputTypeAddress,
   OutputTypeChange,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { $Path } from 'trezor-connect/lib/types/params';
 
-export type TrezorInput = {
-  path: string,
+// replace with real types once this PR is merged
+// https://github.com/trezor/connect/pull/404
+export type CardanoInput = {
+  path: $Path,
   prev_hash: string,
-  prev_index: number, // I’m not sure what it is. cuOutIndex
-  type: number // refers to script type
+  prev_index: number,
+  type: number,
 }
-
-export type TrezorOutput = {
-  address?: string,
-  path?: string,
+export type CardanoOutput = {
+  path: $Path,
   amount: string,
-}
-
-export type TrezorSignTxPayload = {
-  inputs: Array<TrezorInput>,
-  outputs: Array<TrezorOutput>,
-  transactions: Array<string>,
-  protocol_magic: number // 764824073 = mainnet | 1097911063 = testnet (not yet supported)
+} | {
+  address: string,
+  amount: string,
 }
 
 export type LedgerSignTxPayload = {

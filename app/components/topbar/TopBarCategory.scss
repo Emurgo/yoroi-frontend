@@ -1,63 +1,17 @@
 @import '../../themes/mixins/buttons';
 
-$topBarClassicHeight: 64px;
-$topBarHeight: 58px;
-
 .component {
   @include button;
   align-items: center;
   color: var(--theme-topbar-category-text-color);
   display: flex;
-  height: $topBarClassicHeight;
+  height: var(--cmn-topbar-height);
   justify-content: center;
-  width: 87px;
-
-  &:hover {
-    background-color: var(--theme-topbar-category-background-color-hover);
-  }
 }
 
-.active {
-  .icon:not(.withLedgerNanoSIcon):not(.withTrezorTIcon) path {
-    stroke: var(--theme-button-primary-background-color);
-    fill: var(--theme-button-primary-background-color);
-  }
-
-  .icon:not(.walletsIcon):not(.withLedgerNanoSIcon):not(.withTrezorTIcon) {
-    path, polygon {
-      fill: var(--theme-button-primary-background-color);
-    }
-  }
-
-  .withLedgerNanoSIcon {
-    & > svg {
-      // plus-logo
-      & > g > g:nth-child(1) {
-        stroke: none;
-        fill: var(--theme-button-primary-background-color);
-      }
-      // Ledger Nano S icon
-      & > g > g:nth-child(2) path {
-        stroke: none;
-        fill: var(--theme-button-primary-background-color);
-      }
-    }
-  }  
-
-  .withTrezorTIcon {
-    & > svg {
-      // plus-logo
-      & > g > g:nth-child(1) {
-        stroke: none;
-        fill: var(--theme-button-primary-background-color);
-      }
-      // Trezor Model T icon
-      & > g > g:nth-child(2) {
-        stroke: var(--theme-button-primary-background-color);
-      }
-    }
-  }
-
+.component.active {
+  border-top: var(--theme-topbar-active-item-top-border);
+  border-bottom: var(--theme-topbar-active-item-bottom-border);
   &:hover {
     cursor: default;
   }
@@ -76,6 +30,17 @@ $topBarHeight: 58px;
   }
 }
 
+.iconInlineText {
+  font-size: 16px;
+  line-height: 22px;
+  font-family: var(--font-light);
+}
+
+.goBackIcon {
+  margin-left: 20px;
+  margin-right: 6px;
+}
+
 .walletsIcon {
   flex-shrink: 0;
   & > svg {
@@ -87,7 +52,7 @@ $topBarHeight: 58px;
 .withLedgerNanoSIcon {
   flex-shrink: 0;
   & > svg {
-    width: 64px;
+    width: var(--cmn-topbar-icon-default-width);
     height: 42.5px;
     // plus-logo
     & > g > g:nth-child(1) {
@@ -105,7 +70,7 @@ $topBarHeight: 58px;
 .withTrezorTIcon {
   flex-shrink: 0;
   & > svg {
-    width: 64px;
+    width: var(--cmn-topbar-icon-default-width);
     height: 42.5px;
     // plus-logo
     & > g > g:nth-child(1) {
@@ -124,24 +89,32 @@ $topBarHeight: 58px;
     position: absolute;
     top: 0;
 
+    &.go-back {
+      left: 0px;
+      width: auto;
+    }
+
     &.wallets {
       left: 0;
+      width: 56px;
+      margin-left: 14px;
     }
 
+    &.with-ledger-nano-s,
     &.with-trezor-t {
-      left: 64px;
+      left: 56px;
+      width: 64px;
+      margin-left: 14px;
     }
-
-    &.with-ledger-nano-s {
-      left: 64px;
-    }    
 
     &.daedalus-transfer {
-      right: 87px;
+      right: 86px;
+      width: 72px;
     }
 
     &.settings {
-      right: 0;
+      right: 14px;
+      width: 72px;
     }
   }
 }
@@ -149,8 +122,4 @@ $topBarHeight: 58px;
 .label {
   font-family: var(--font-regular);
   font-size: 18px;
-}
-
-:global(.YoroiModern) .component {
-  height: $topBarHeight;
 }

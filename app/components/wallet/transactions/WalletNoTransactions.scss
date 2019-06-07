@@ -1,8 +1,14 @@
 .component {
+  flex-direction: column;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  .imageWrappper {
+    display: block;
+    margin-bottom: 42px;
+  }
 
   .label {
     opacity: 0.5;
@@ -10,14 +16,5 @@
     line-height: 1.38;
     font-family: var(--font-regular);
     color: var(--theme-main-body-messages-color);
-  }
-}
-
-:global(.YoroiModern) .component {
-  flex-direction: column;
-
-  .imageWrappper {
-    display: block;
-    margin-bottom: 42px;
   }
 }

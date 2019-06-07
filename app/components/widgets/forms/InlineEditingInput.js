@@ -170,7 +170,7 @@ export default class InlineEditingInput extends Component<Props, State> {
           onKeyDown={event => this.handleInputKeyDown(event)}
           error={isActive ? inputField.error : null}
           disabled={!isActive}
-          ref={(input) => { this.inputField = input; }}
+          inputRef={(input) => { this.inputField = input; }}
           skin={classicTheme ? InputSkin : InputOwnSkin}
         />
 

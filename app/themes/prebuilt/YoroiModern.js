@@ -1,5 +1,7 @@
 //  ==== Theme: Yoroi Modern === //
 
+import common from './Common';
+
 // FONTS
 const rpFonts = {
   '--rp-theme-font-thin': 'Rubik-Light',
@@ -85,8 +87,6 @@ const rpModal = {
   '--rp-modal-bg-color': '#fff',
   '--rp-modal-max-height': '97%',
   '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
-  '--rp-modal-max-width': `560px`,
-  '--rp-modal-min-width': `560px`,
 };
 
 // OPTIONS
@@ -181,8 +181,22 @@ const topbarGradient = {
   end: '#4760ff',
 };
 
+// Modal Margin
+const modalMargin = {
+  top: 25,
+  right: 40,
+  bottom: 40,
+  left: 40,
+};
+
 export default {
+  // COMMON-THEME-INDEPENDENT
+  ...common,
+
+  // REACT-POLYMORPH
   ...rpYoroiTheme,
+
+  // FONTS
   '--preferred-font': '"Times New Roman", serif',
 
   '--font-ultralight': 'Rubik-Light',
@@ -204,6 +218,7 @@ export default {
   '--theme-input-hint-font': 'Rubik-Regular',
   '--theme-footer-text-font': 'Helvetica-Regular',
 
+  // COLORS
   '--theme-footer-background-color': '#fff',
 
   '--theme-scrollbar-thumb-background': '#c8ccce',
@@ -265,7 +280,7 @@ export default {
   '--theme-receive-qr-code-foreground-color': '#353535',
 
   '--theme-send-confirmation-dialog-send-values-color': '#15d1aa',
-  '--theme-trezor-send-confirmation-info-block-background-color': '#f0f3f5',
+  '--theme-hw-send-confirmation-info-block-background-color': '#f0f3f5',
 
   '--theme-settings-body-background-color': '#ffffff',
   '--theme-settings-pane-background-color': '#f0f3f5',
@@ -289,8 +304,9 @@ export default {
   '--theme-system-error-overlay-button-text-color-hover': '#ab1700',
   '--theme-system-error-overlay-text-color': '#fafbfc',
 
-  '--theme-topbar-category-background-color-hover': 'transparent',
-  '--theme-topbar-category-text-color': '#ffffff',
+  '--theme-topbar-active-item-bottom-border': '5px solid #17d1aa',
+  '--theme-topbar-active-item-top-border': '5px solid transparent',
+  '--theme-topbar-category-text-color': '#fafbfc',
   '--theme-topbar-background-color-gradient-start': topbarGradient.start,
   '--theme-topbar-background-color-gradient-end': topbarGradient.end,
   '--theme-topbar-background-color': `linear-gradient(to right, ${topbarGradient.start}, ${topbarGradient.end})`,
@@ -304,8 +320,8 @@ export default {
   '--theme-transactions-list-group-date-color': '#2b2c32',
   '--theme-transactions-list-item-details-color': '#2b2c32',
   '--theme-transactions-state-failed-background-color': '#fa5380',
-  '--theme-transactions-state-failed-text-color': '#4a4a4a',
-  '--theme-transactions-state-pending-background-color': '#afafb8',
+  '--theme-transactions-state-failed-text-color': '#bdc5ce',
+  '--theme-transactions-state-pending-background-color': '#FF1351',
   '--theme-transactions-state-pending-stripes-color': '#c5c6cc',
   '--theme-transactions-state-pending-text-color': '#adaeb6',
   '--theme-transactions-priority-color': '#fff',
@@ -384,7 +400,33 @@ export default {
   '--theme-widgets-progress-step-common-color': '#15d1aa',
 
   '--theme-footer-block-background-color': '#fff',
-  '--theme-footer-block-background-color-hover': 'rgba(21, 209, 170, 0.1)',
+  '--theme-footer-block-background-color-hover': '#D9DDE0',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
+
+  '--theme-default-color-blue': '#2249BE',
+  '--theme-default-color-blue-dark': '#1A44B7',
+  '--theme-default-color-blue-medium': '#4760FF',
+  '--theme-default-color-blue-light': '#E1F2FF',
+  '--theme-default-color-blue-lightsome': 'rgba(34, 73, 190, 0.6)',
+
+  '--theme-default-color-green': '#17D1AA',
+  '--theme-default-color-green-light': '#C9EDE5',
+
+  '--theme-default-color-red': '#FF1351',
+  '--theme-default-color-red-medium': 'rgba(255, 19, 81, 0.3)',
+  '--theme-default-color-red-light': 'rgba(255, 19, 81, 0.6)',
+
+  '--theme-default-color-grey': '#38393D',
+  '--theme-default-color-grey-1': '#464749',
+  '--theme-default-color-grey-2': '#93979C',
+  '--theme-default-color-grey-3': '#ADAEB6',
+  '--theme-default-color-grey-4': '#D9DAE0',
+  '--theme-default-color-grey-5': '#F0F3F5',
+
+  // OTHERS
+  '--theme-modal-margin-cmn': `${modalMargin.top}px ${modalMargin.right}px ${modalMargin.bottom}px ${modalMargin.left}px`,
+  '--theme-modal-min-max-width-cmn': `${560 - (modalMargin.left + modalMargin.right)}px`,
+  '--theme-modal-min-max-width-sm': `${465 - (modalMargin.left + modalMargin.right)}px`,
+  '--theme-modal-min-max-width-lg': `${680 - (modalMargin.left + modalMargin.right)}px`,
 };

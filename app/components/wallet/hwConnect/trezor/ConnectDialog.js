@@ -71,18 +71,30 @@ export default class ConnectDialog extends Component<Props> {
     } = this.props;
     const headerBlockClasses = classicTheme
       ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
-      : headerMixin.headerBlock;
+      : classnames([headerMixin.headerBlock, styles.headerBlock]);
     const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
     const middleConnectErrorBlockClasses = classicTheme
       ? styles.middleConnectErrorBlockClassic
       : null;
 
-    const introBlock = (
+    const introBlock = classicTheme ? (
       <div className={headerBlockClasses}>
-        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span><br />
-        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span><br />
-        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span><br />
-      </div>);
+        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span>
+        <br />
+        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span>
+        <br />
+        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span>
+        <br />
+      </div>
+    ) : (
+      <div className={headerBlockClasses}>
+        <span>
+          {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
+          {intl.formatMessage(messages.connectIntroTextLine2) + ' '}
+          {intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}
+        </span>
+      </div>
+    );
 
     let middleBlock = null;
     let backButton = null;
@@ -124,7 +136,7 @@ export default class ConnectDialog extends Component<Props> {
 
     return (
       <Dialog
-        className={classnames([styles.component, 'AboutDialog'])}
+        className={classnames([styles.component, 'ConnectDialog'])}
         title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
         actions={dailogActions}
         closeOnOverlayClick={false}
@@ -136,8 +148,8 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
       </Dialog>);
   }
 }

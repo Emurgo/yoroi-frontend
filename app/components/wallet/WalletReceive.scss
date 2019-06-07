@@ -15,31 +15,18 @@
     display: block;
   }
 
-  .copyIcon {
-    cursor: pointer;
-    object-fit: contain;
-    margin-left: 4px;
-    & > svg {
-      height: 12px;
-      width: 10px;
-      path {
-        fill: var(--theme-icon-copy-address-color);
-      }
-    }  
-  }
-
   .qrCodeAndInstructions {
     border-bottom: 1px solid var(--theme-separation-border-color);
     display: flex;
     flex-direction: row;
-    margin: 0 0 18px;
-    padding-bottom: 26px;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
     position: relative;
   
     .qrCode {
       align-items: flex-start;
       display: flex;
-      margin-left: 20px;
+      margin-left: 150px;
   
       canvas {
         border: 4px solid var(--theme-receive-qr-code-background-color);
@@ -79,7 +66,7 @@
         font-size: 15px;
         letter-spacing: 0.5px;
         line-height: 22px;
-        margin-bottom: 12px;
+        margin-bottom: 40px;
         word-break: break-word;
       }
   
@@ -90,10 +77,12 @@
           @include loading-spinner("../../assets/images/spinner-light.svg");
         }
       }
-  
+
       .error {
+        @include error-message;
         text-align: left;
-      }
+        margin-top: 5px;
+      }      
     }
   }
 
@@ -107,7 +96,6 @@
       font-family: var(--font-medium);
       text-transform: uppercase;
       font-size: 11px;
-      font-weight: 600;
   
       button {
         color: var(--theme-label-button-color);
@@ -143,10 +131,13 @@
       }
   
       .addressActions {
-        .addressIcon {
+        display: inline-flex;
+        align-items: flex-start;
+
+        .addressActionItemBlock {
           cursor: pointer;
-          display: inline-block;
           letter-spacing: 0.5px;
+          margin-left: 24px;
           line-height: 20px;
           vertical-align: top;
           white-space: nowrap;
@@ -157,30 +148,53 @@
   
           span {
             color: var(--theme-label-button-color);
+            font-family: var(--font-regular);            
             font-size: 14px;
             margin-left: 6px;
-            opacity: 0.65;
+          }
+          
+          .actionIconText {
+             opacity: 0.5;
+          }
+
+          .verifyIcon,
+          .copyIcon {
+            cursor: pointer;
+            display: inline-flex;
+            object-fit: contain;
+            margin-left: 4px;
+            & > svg {
+              height: 14.5px;
+              width: 11.5px;
+              path {
+                fill: var(--theme-icon-copy-address-color);
+              }
+            }
+          }
+        
+          .verifyIcon {
+            & > svg {
+              height: 20px;
+              width: 20px;
+            }
+          }        
+        }
+
+        .verifyActionBlock {
+          margin-left: unset;
+          
+          button {
+            cursor: pointer;
           }
         }
       }
     }
   
     .usedWalletAddress {
-      .addressId,
-      .addressActions .addressIcon img {
+      .addressId {
         opacity: 0.4;
       }
-  
-      .addressActions .addressIcon span {
-        opacity: 0.3;
-      }
     }
-  }
-
-  .error {
-    @include error-message;
-    margin-bottom: 1rem;
-    text-align: center;
   }
 }
 
@@ -196,21 +210,19 @@
       .usedHash {
         opacity: 0.4;
       }
-    }
 
-    .hashLabel {
-      font-weight: 600;
-      opacity: 0.5;
+      .hashLabel {
+        font-family: var(--font-medium);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }      
     }
   }
 
   .generatedAddresses {
     h2 {
       font-weight: 600;
-    }
-
-    button {
-      opacity: 0.55;
+      margin-bottom: 10px;
     }
   }
 }
@@ -219,8 +231,6 @@
   padding: 30px;
 
   .qrCodeAndInstructions {
-    margin: 0 0 50px;
-    padding-bottom: 50px;
   
     .instructions {
       .hash {
@@ -244,13 +254,6 @@
         font-size: 14px;
         letter-spacing: 0;
         line-height: 1.57;
-        margin-bottom: 25px;
-      }
-  
-      .error {
-        height: 21px;
-        margin-bottom: 53px;
-        text-align: left;
       }
     }
   }
@@ -280,26 +283,6 @@
       .addressId {
         margin-right: 32.5px;
         color: var(--theme-transactions-received-address-color);
-      }
-  
-      .addressActions {
-        .addressIcon {
-          span {
-            font-family: var(--font-medium);
-            opacity: 0.4;
-            text-transform: uppercase;
-          }
-        }
-  
-        .copyIcon {
-          display: inline-flex;
-        }
-      }
-    }
-  
-    .usedWalletAddress {
-      .addressActions .addressIcon span {
-        opacity: 0.2;
       }
     }
   }  

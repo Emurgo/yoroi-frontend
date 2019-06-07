@@ -10,12 +10,12 @@ import {
 import {
   getMockServer,
   closeMockServer
-} from '../support/mockServer';
+} from '../mock-chain/mockServer';
 import {
   getMockWebSocketServer,
   closeMockWebSocketServer,
   mockRestoredDaedalusAddresses
-} from '../support/mockWebSocketServer';
+} from '../mock-chain/mockWebSocketServer';
 import {
   navigateTo,
   waitUntilUrlEquals

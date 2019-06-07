@@ -18,6 +18,8 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
+import infoIconSVG from '../../../../assets/images/hardware-wallet/info-icon.inline.svg';
+
 import saveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-modern.inline.svg';
 import saveErrorImage from '../../../../assets/images/hardware-wallet/ledger/save-error-modern.inline.svg';
 
@@ -95,7 +97,8 @@ export default class SaveDialog extends Component<Props> {
 
     const headerBlockClasses = classicTheme
       ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
-      : headerMixin.headerBlock;
+      : classnames([headerMixin.headerBlock, styles.headerSaveBlock]);
+
     const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
     const middleBlockErrorClasses = classicTheme ? styles.middleSaveErrorBlockClassic : null;
     const walletNameFieldClasses = classnames([
@@ -106,13 +109,20 @@ export default class SaveDialog extends Component<Props> {
 
     const walletNameBlock = (
       <div className={headerBlockClasses}>
+        <div className={styles.walletNameInfoWrapper}>
+          <div className={styles.walletNameInfoIcon}>
+            <SvgInline svg={infoIconSVG} width="20" height="20" />
+          </div>
+          <div className={styles.walletNameInfo}>
+            {intl.formatMessage(messages.saveWalletNameInputBottomInfo)}
+          </div>
+        </div>
         <Input
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
           skin={classicTheme ? InputSkin : InputOwnSkin}
         />
-        <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);
 
     let middleBlock = null;
@@ -162,8 +172,8 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {walletNameBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        <HelpLinkBlock progressInfo={progressInfo} />
       </Dialog>);
   }
 

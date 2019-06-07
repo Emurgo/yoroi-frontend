@@ -1,24 +1,32 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
 import styles from './WalletCreateDialog.scss';
+import WalletTypeItem from './WalletTypeItem';
 
 const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.connect.hardware.title',
     defaultMessage: '!!!Connect to hardware wallet',
   },
-  walletTrezorTitle: {
+  trezorTitle: {
     id: 'wallet.create.type.trezor.title',
-    defaultMessage: '!!!Trezor Wallet',
+    defaultMessage: '!!!Trezor Hardware Wallet',
   },
-  walletLedgerTitle: {
+  ledgerTitle: {
     id: 'wallet.create.type.ledger.title',
-    defaultMessage: '!!!Ledger  Wallet',
+    defaultMessage: '!!!Ledger Hardware Wallet',
+  },
+  trezorDescription: {
+    id: 'wallet.create.type.trezor.description',
+    defaultMessage: '!!!Trezor Hardware Wallet Descriprion',
+  },
+  ledgerDescription: {
+    id: 'wallet.create.type.ledger.description',
+    defaultMessage: '!!!Ledger Hardware Wallet Descriprion',
   },
 });
 
@@ -38,14 +46,9 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { onCancel, onTrezor, onLedger, classicTheme } = this.props;
-    const dialogClasses = classnames([
-      styles.component,
-      'WalletConnectDialog',
-    ]);
 
     return (
       <Dialog
-        className={dialogClasses}
         title={intl.formatMessage(messages.dialogTitle)}
         closeOnOverlayClick={false}
         onClose={onCancel}
@@ -54,24 +57,8 @@ export default class WalletConnectHardwareDialog extends Component<Props> {
       >
         <div className={styles.tabsContent}>
           <ul className={styles.walletTypeList}>
-            <li className={styles.walletTypeListItem}>
-              <button type="button" onClick={onTrezor} className={styles.walletType}>
-                <div className={`${styles.walletTypeImg} ${styles.trezor}`} />
-                <h3 className={styles.walletTypeTitle}>
-                  {intl.formatMessage(messages.walletTrezorTitle)}
-                </h3>
-                <p className={styles.walletTypeDesc} />
-              </button>
-            </li>
-            <li className={styles.walletTypeListItem}>
-              <button type="button" onClick={onLedger} className={styles.walletType}>
-                <div className={`${styles.walletTypeImg} ${styles.ledger}`} />
-                <h3 className={styles.walletTypeTitle}>
-                  {intl.formatMessage(messages.walletLedgerTitle)}
-                </h3>
-                <p className={styles.walletTypeDesc} />
-              </button>
-            </li>
+            <WalletTypeItem action={onLedger} type="ledger" title={intl.formatMessage(messages.ledgerTitle)} />
+            <WalletTypeItem action={onTrezor} type="trezor" title={intl.formatMessage(messages.trezorTitle)} />
           </ul>
         </div>
       </Dialog>

@@ -1,6 +1,7 @@
 // @flow
 import { action, observable } from 'mobx';
 import TrezorConnect from 'trezor-connect';
+import type { CardanoSignTransaction$ } from 'trezor-connect/lib/types/cardano';
 
 import Store from '../base/Store';
 import environment from '../../environment';
@@ -85,9 +86,7 @@ export default class TrezorSendStore extends Store {
 
       const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
 
-      // TODO: [TREZOR] fix type if possible
       const trezorSignTxResp = await await TrezorConnect.cardanoSignTransaction(
-        // $FlowFixMe Trezor types in Yoroi are all wrong for no good reason. TODO: fix this
         { ...trezorSignTxDataResp.trezorSignTxPayload }
       );
 
@@ -109,8 +108,11 @@ export default class TrezorSendStore extends Store {
   };
 
   _brodcastSignedTx = async (
-    trezorSignTxResp,
+    trezorSignTxResp: CardanoSignTransaction$,
   ): Promise<void> => {
+    if (!trezorSignTxResp.success) {
+      throw new Error('TrezorSendStore::_brodcastSignedTx should never happen');
+    }
     await this.broadcastTrezorSignedTxRequest.execute({
       signedTxHex: trezorSignTxResp.payload.body,
       sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
