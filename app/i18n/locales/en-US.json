@@ -74,7 +74,7 @@
   "global.errors.invalidRepeatPassword": "Doesn't match.",
   "global.errors.invalidWalletName": "Wallet name requires at least 1 and at most 40 letters.",
   "global.errors.invalidWalletPassword": "Invalid password",
-  "global.labels.LearnMore": "Click here to Learn more",
+  "global.labels.LearnMore": "Learn more",
   "global.labels.back": "Back",
   "global.labels.cancel": "Cancel",
   "global.labels.change": "Change",
