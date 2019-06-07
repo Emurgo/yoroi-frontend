@@ -210,7 +210,7 @@
   "wallet.add.dialog.restore.description": "Restore a wallet",
   "wallet.add.dialog.restore.paper.description": "Restore Yoroi Paper Wallet",
   "wallet.add.dialog.restoreNotificationMessage": "Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.",
-  "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
+  "wallet.add.page.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.title.label": "Add wallet",
   "wallet.add.dialog.trezor.description": "Create or restore a wallet connected to a Trezor device",
   "wallet.add.page.title": "Gateway <br> to the <br> financial world",

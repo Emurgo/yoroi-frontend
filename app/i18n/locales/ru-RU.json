@@ -209,7 +209,7 @@
   "wallet.add.dialog.restore.paper.description": "Восстановить Бумажный кошелек Yoroi",
   "wallet.add.dialog.restoreNotificationMessage": "В настоящее время осуществляется восстановление кошелька. До его полного завершения, невозможно восстановить или импортировать новые кошельки.",
   "wallet.add.dialog.title.label": "Добавить кошелек",
-  "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
+  "wallet.add.page.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.trezor.description": "Создать или восстановить кошелек, подключенный к устройству Trezor",
   "wallet.add.page.title": "Gateway <br> to the financial <br> world",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "Connect to hardware wallet",  

@@ -209,7 +209,7 @@
   "wallet.add.dialog.restore.paper.description": "ヨロイペーパーウォレットを復元する",
   "wallet.add.dialog.restoreNotificationMessage": "ウォレットの復元が進行中です。完了するまで、新しいウォレットを復元またはインポートすることはできません。",
   "wallet.add.dialog.title.label": "ウォレットを追加する",
-  "wallet.add.dialog.subtitle.label": "ヨロイ、CARDANOのライトウォレット",
+  "wallet.add.page.subtitle.label": "ヨロイ、CARDANOのライトウォレット",
   "wallet.add.dialog.trezor.description": "Trezor連携のウォレットを作成・復元する",
   "wallet.add.page.title": "金融世界への扉",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "Connect to hardware wallet",  

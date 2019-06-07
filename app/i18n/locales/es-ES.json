@@ -209,7 +209,7 @@
   "wallet.add.dialog.restore.paper.description": "Restaurar Billetera de Papel Yoroi",
   "wallet.add.dialog.restoreNotificationMessage": "La restauración de la billetera está actualmente en curso. Hasta que se complete, no es posible restaurar o importar billeteras nuevas.",
   "wallet.add.dialog.title.label": "Añadir billetera",
-  "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
+  "wallet.add.page.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.trezor.description": "Crear o restaurar una billetera conectada a un dispositivo Trezor",
   "wallet.add.page.title": "Gateway <br> to the financial <br> world",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "Connect to hardware wallet",  

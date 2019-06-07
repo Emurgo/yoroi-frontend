@@ -209,7 +209,7 @@
   "wallet.add.dialog.restore.paper.description": "Restaurer un Wallet Papier Yoroi",
   "wallet.add.dialog.restoreNotificationMessage": "La restauration du wallet est en cours. Vous ne pouvez pas restaurer ou importer d'autres wallets durant cette procédure.",
   "wallet.add.dialog.title.label": "Ajouter un wallet",
-  "wallet.add.dialog.subtitle.label": "Wallet léger Yoroi pour Cardano",
+  "wallet.add.page.subtitle.label": "Wallet léger Yoroi pour Cardano",
   "wallet.add.dialog.trezor.description": "Créer ou restaurer un wallet connecté à un périphérique Trezor",
   "wallet.add.page.title": "Une entrée sur le monde de la finance",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "Se connecter au hardware wallet",  

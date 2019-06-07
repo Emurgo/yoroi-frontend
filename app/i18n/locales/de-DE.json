@@ -209,7 +209,7 @@
   "wallet.add.dialog.restore.paper.description": "Eine Yoroi Paper Wallet wiederherstellen",
   "wallet.add.dialog.restoreNotificationMessage": "Die Wiederherstellung der Wallet ist in Bearbeitung. Solange kann keine Wallet neu erstellt oder wiederhergestellt werden.",
   "wallet.add.dialog.title.label": "Wallet hinzufügen",
-  "wallet.add.dialog.subtitle.label": "Yoroi Light-Wallet für Cardano",
+  "wallet.add.page.subtitle.label": "Yoroi Light-Wallet für Cardano",
   "wallet.add.dialog.trezor.description": "Erstelle oder stelle ein Wallet wieder her, das mit einem Tresor-Gerät verbunden ist",
   "wallet.add.page.title": "Tor zur Finanzwelt",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "Mit der Hardware Wallet verbinden",  

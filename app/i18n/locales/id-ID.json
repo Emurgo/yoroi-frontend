@@ -209,7 +209,7 @@
   "wallet.add.dialog.restore.paper.description": "Restore Yoroi Paper Wallet",
   "wallet.add.dialog.restoreNotificationMessage": "Pengembalian wallet sedang dilakukan. Sebelum ini selesai, tidak dimungkinkan untuk mengembalikan atau mengimpor wallet baru.",
   "wallet.add.dialog.title.label": "Tambah wallet",
-  "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
+  "wallet.add.page.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.trezor.description": "Create or restore a wallet connected to a Trezor device",
   "wallet.add.page.title": "Gateway <br> to the financial <br> world",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "Connect to hardware wallet",  

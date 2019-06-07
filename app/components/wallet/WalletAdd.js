@@ -17,7 +17,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Gateway to the financial world',
   },
   subTitle: {
-    id: 'wallet.add.dialog.subtitle.label',
+    id: 'wallet.add.page.subtitle.label',
     defaultMessage: '!!!Yoroi light wallet for Cardano',
   },
   createDescription: {

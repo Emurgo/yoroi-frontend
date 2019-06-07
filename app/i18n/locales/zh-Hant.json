@@ -210,7 +210,7 @@
   "wallet.add.dialog.restoreNotificationMessage": "目前正在修復錢包中。在完成之前，無法恢復或導入新錢包。",
   "wallet.add.dialog.title.label": "新增錢包",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "Connect to hardware wallet",  
-  "wallet.add.dialog.subtitle.label": "Yoroi light wallet for Cardano",
+  "wallet.add.page.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.dialog.trezor.description": "創建或還原連接到 Trezor 設備的錢包",
   "wallet.add.page.title": "Gateway <br> to the financial <br> world",
   "wallet.add.subpage.title": "Yoroi light wallet for Cardano",

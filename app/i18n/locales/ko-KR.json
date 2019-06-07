@@ -209,7 +209,7 @@
   "wallet.add.dialog.restore.paper.description": "요로이 종이 지갑 복원",
   "wallet.add.dialog.restoreNotificationMessage": "현재 지갑을 복원하고 있습니다.  완료될 때까지 새 지갑을 복원하거나 가져올 수 없습니다.",
   "wallet.add.dialog.title.label": "지갑 추가",
-  "wallet.add.dialog.subtitle.label": "카르다노용 요로이 라이트 지갑",
+  "wallet.add.page.subtitle.label": "카르다노용 요로이 라이트 지갑",
   "wallet.add.dialog.trezor.description": "트레저 디바이스에 연결된 지갑 생성 또는 복원",
   "wallet.add.page.title": "금융 세계로의 관문",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "하드웨어 지갑에 연결하기",  
