@@ -1,3 +1,4 @@
+// @flow
 //  ==== Theme: Yoroi Modern === //
 
 import common from './Common';
@@ -28,6 +29,9 @@ const rpBubble = {
   '--rp-bubble-bg-color': '#fff',
   '--rp-bubble-border-color': '#fff',
   '--rp-bubble-border-radius': '8px',
+  // arrows are actually used by tooltips
+  '--rp-bubble-arrow-width': '14px',
+  '--rp-bubble-arrow-height': '4px',
 };
 
 // BUTTON
@@ -403,6 +407,7 @@ export default {
   '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#ffffff',
 
   '--theme-widgets-progress-step-common-color': '#15d1aa',
+  '--theme-widgets-explorable-hash-underline-color': '#adaeB6',
 
   '--theme-footer-block-background-color': '#fff',
   '--theme-footer-block-background-color-hover': '#D9DDE0',

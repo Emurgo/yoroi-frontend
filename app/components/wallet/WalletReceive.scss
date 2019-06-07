@@ -123,11 +123,9 @@
         border-top: 1px solid var(--theme-separation-border-color);
       }
   
-      .addressId {
-        font-family: var(--font-mono-regular);
-        flex-grow: 1;
+      .addressMargin {
         margin-right: 32.5px;
-        letter-spacing: 0;
+        flex-grow: 1;
       }
   
       .addressActions {
@@ -187,12 +185,6 @@
             cursor: pointer;
           }
         }
-      }
-    }
-  
-    .usedWalletAddress {
-      .addressId {
-        opacity: 0.4;
       }
     }
   }
@@ -279,9 +271,12 @@
       & + .walletAddress {
         border-top: 1px solid var(--theme-separation-border-color);
       }
-  
-      .addressId {
+
+      .addressMargin {
         margin-right: 32.5px;
+      }
+
+      .addressId {
         color: var(--theme-transactions-received-address-color);
       }
     }
