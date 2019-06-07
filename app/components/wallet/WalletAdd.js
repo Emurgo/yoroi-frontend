@@ -20,25 +20,33 @@ const messages = defineMessages({
     id: 'wallet.add.page.subtitle.label',
     defaultMessage: '!!!Yoroi light wallet for Cardano',
   },
-  createDescription: {
-    id: 'wallet.add.dialog.create.description',
-    defaultMessage: '!!!Create wallet',
-  },
-  connectToHardwareDescription: {
-    id: 'wallet.add.dialog.hardware.description',
+  connectToHWTitle: {
+    id: 'wallet.add.page.hw.title',
     defaultMessage: '!!!Connect to hardware wallet',
   },
-  restoreDescription: {
-    id: 'wallet.add.dialog.restore.description',
+  createTitle: {
+    id: 'wallet.add.page.create.title',
+    defaultMessage: '!!!Create wallet',
+  },
+  restoreTitle: {
+    id: 'wallet.add.page.restore.title',
     defaultMessage: '!!!Restore wallet',
+  },
+  transferFundsTitle: {
+    id: 'wallet.add.page.daedalusTransfer.title',
+    defaultMessage: '!!!Transfer funds from Daedalus wallet to Yoroi',
   },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',
     defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
   },
-  transferFundsTitle: {
-    id: 'daedalusTransfer.wallet.add.page.link.label',
-    defaultMessage: '!!!Transfer funds from Daedalus wallet to Yoroi',
+  createTrezorWalletNotificationMessage: {
+    id: 'wallet.add.dialog.createTrezorWalletNotificationMessage',
+    defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
+  },
+  createLedgerWalletNotificationMessage: {
+    id: 'wallet.add.dialog.createLedgerWalletNotificationMessage',
+    defaultMessage: '!!!Ledger Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
   },
 });
 
@@ -96,7 +104,7 @@ export default class WalletAdd extends Component<Props> {
                   <div className={styles.heroCardsItem}>
                     <div className={`${styles.heroCardsItemBg} ${styles.connect}`} />
                     <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.connectToHardwareDescription)}
+                      {intl.formatMessage(messages.connectToHWTitle)}
                     </div>
                   </div>
                 </button>
@@ -104,7 +112,7 @@ export default class WalletAdd extends Component<Props> {
                   <div className={styles.heroCardsItem}>
                     <div className={`${styles.heroCardsItemBg} ${styles.create}`} />
                     <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.createDescription)}
+                      {intl.formatMessage(messages.createTitle)}
                     </div>
                   </div>
                 </button>
@@ -112,7 +120,7 @@ export default class WalletAdd extends Component<Props> {
                   <div className={styles.heroCardsItem}>
                     <div className={`${styles.heroCardsItemBg} ${styles.restore}`} />
                     <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.restoreDescription)}
+                      {intl.formatMessage(messages.restoreTitle)}
                     </div>
                   </div>
                 </button>
