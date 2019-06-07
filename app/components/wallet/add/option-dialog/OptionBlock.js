@@ -10,6 +10,7 @@ import arrowDownSVG from '../../../../assets/images/expand-arrow-grey.inline.svg
 import styles from './OptionBlock.scss';
 
 type Props = {
+  parentName: string,
   type: string,
   title: string,
   onSubmit: Function,
@@ -41,7 +42,7 @@ export default class OptionBlock extends Component<Props, State> {
 
   render() {
     const { intl } = this.context;
-    const { onSubmit, type, title, learnMoreText } = this.props;
+    const { parentName, type, title, learnMoreText, onSubmit } = this.props;
 
     const learnMoreTextBlockClasses = classnames([
       styles.learnMoreTextBlock,
@@ -57,7 +58,14 @@ export default class OptionBlock extends Component<Props, State> {
       <li className={styles.optionBlockListItem}>
         <div className={styles.optionBlockWrapper}>
           {/* Submit button block */}
-          <button onClick={onSubmit} type="button" className={styles.optionSubmitButton}>
+          <button
+            onClick={onSubmit}
+            type="button"
+            className={classnames([
+              styles.optionSubmitButton,
+              `${parentName}_${type}`
+            ])}
+          >
             <div className={`${styles.optionImage} ${styles[type]}`} />
             <div className={styles.optionTitle}>
               {title}

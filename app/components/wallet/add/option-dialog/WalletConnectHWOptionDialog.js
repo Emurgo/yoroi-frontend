@@ -6,6 +6,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import OptionBlock from './OptionBlock';
+
 import styles from './OptionListWrapperStyle.scss';
 
 const messages = defineMessages({
@@ -59,14 +60,16 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
         <div className={styles.component}>
           <ul className={styles.optionBlockList}>
             <OptionBlock
-              onSubmit={onLedger}
+              parentName={this.constructor.name}
               type="connectLedger"
               title={intl.formatMessage(messages.ledgerTitle)}
               learnMoreText={intl.formatMessage(messages.ledgerDescription)}
+              onSubmit={onLedger}
             />
             <OptionBlock
-              onSubmit={onTrezor}
+              parentName={this.constructor.name}
               type="connectTrezor"
+              onSubmit={onTrezor}
               title={intl.formatMessage(messages.trezorTitle)}
               learnMoreText={intl.formatMessage(messages.trezorDescription)}
             />

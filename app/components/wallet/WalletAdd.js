@@ -108,7 +108,7 @@ export default class WalletAdd extends Component<Props> {
                 {/* Connect to hardware wallet */}
                 <button
                   type="button"
-                  className="WalletAdd_btnConnectHW"
+                  className={`${this.constructor.name}_btnConnectHW`}
                   onClick={onHardwareConnect}
                 >
                   <div className={styles.heroCardsItem}>
@@ -121,7 +121,7 @@ export default class WalletAdd extends Component<Props> {
                 {/* Create wallet */}
                 <button
                   type="button"
-                  className="WalletAdd_btnCreateWallet"
+                  className={`${this.constructor.name}_btnCreateWallet`}
                   onClick={onCreate}
                 >
                   <div className={styles.heroCardsItem}>
@@ -134,7 +134,7 @@ export default class WalletAdd extends Component<Props> {
                 {/* Restore wallet */}
                 <button
                   type="button"
-                  className="WalletAdd_btnRestoreWallet"
+                  className={`${this.constructor.name}_btnRestoreWallet`}
                   onClick={onRestore}
                 >
                   <div className={styles.heroCardsItem}>
