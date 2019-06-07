@@ -34,7 +34,7 @@ const messages = defineMessages({
   },
   transferFundsTitle: {
     id: 'wallet.add.page.daedalusTransfer.title',
-    defaultMessage: '!!!Transfer funds from Daedalus wallet to Yoroi',
+    defaultMessage: '!!!Transfer funds from a Daedalus wallet to Yoroi',
   },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',

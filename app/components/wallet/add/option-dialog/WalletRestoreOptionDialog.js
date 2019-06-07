@@ -14,7 +14,7 @@ const messages = defineMessages({
   },
   restoreNormalTitle: {
     id: 'wallet.add.optionDialog.restore.normalWallet.title',
-    defaultMessage: '!!!Wallet from 15 mnemonic words',
+    defaultMessage: '!!!Enter a 15-word Yoroi recovery phrase',
   },
   restoreNormalDescription: {
     id: 'wallet.add.optionDialog.restore.normalWallet.description',

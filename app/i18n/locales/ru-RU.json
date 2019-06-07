@@ -205,7 +205,7 @@
   "wallet.add.dialog.createTrezorWalletNotificationMessage": "В настоящее время осуществляется Trezor Connect. До его полного завершения, невозможно восстановить или импортировать новые кошельки.",
   "wallet.add.page.hw.title": "Connect to  hardware wallet",
   "wallet.add.dialog.ledger.description": "Создать или восстановить кошелек, подключенный к устройству Ledger",
-  "wallet.add.page.restore.title": "Restore a wallet",
+  "wallet.add.page.restore.title": "Restore wallet",
   "wallet.add.dialog.restore.paper.description": "Восстановить Бумажный кошелек Yoroi",
   "wallet.add.dialog.restoreNotificationMessage": "В настоящее время осуществляется восстановление кошелька. До его полного завершения, невозможно восстановить или импортировать новые кошельки.",
   "wallet.add.dialog.title.label": "Добавить кошелек",

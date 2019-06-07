@@ -73,7 +73,7 @@ const globalMessages = defineMessages({
   },
   learnMore: {
     id: 'global.labels.LearnMore',
-    defaultMessage: '!!!Learn more',
+    defaultMessage: '!!!Click here to Learn more',
   },  
   languageEnglish: {
     id: 'global.language.english',
