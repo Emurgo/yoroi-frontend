@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import classnames from 'classnames';
 
 import SvgInline from 'react-svg-inline';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
@@ -84,13 +85,16 @@ export default class WalletAdd extends Component<Props> {
 
     return (
       <div className={styles.component}>
+        {/* Setting button */}
         <div className={styles.hero}>
           <div className={styles.settingsBar}>
             <button type="button" onClick={onSettings} className={styles.settingsBarLink}>
               <SvgInline svg={settingsIcon} width="30" height="30" />
             </button>
           </div>
+
           <div className={styles.heroInner}>
+            {/* Left block  */}
             <div className={styles.heroLeft}>
               <SvgInline svg={logoIcon} className={styles.heroLogo} />
               <h2 className={styles.heroTitle}>
@@ -98,27 +102,45 @@ export default class WalletAdd extends Component<Props> {
               </h2>
               <h3 className={styles.heroSubTitle}>{intl.formatMessage(messages.subTitle)}</h3>
             </div>
+            {/* Right block  */}
             <div className={styles.heroRight}>
               <div className={styles.heroCardsList}>
-                <button type="button" onClick={onHardwareConnect}>
+                {/* Connect to hardware wallet */}
+                <button
+                  type="button"
+                  className="WalletAdd_btnConnectHW"
+                  onClick={onHardwareConnect}
+                >
                   <div className={styles.heroCardsItem}>
-                    <div className={`${styles.heroCardsItemBg} ${styles.connect}`} />
+                    <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.connectToHWTitle)}
                     </div>
                   </div>
                 </button>
-                <button type="button" onClick={onCreate}>
+                {/* Create wallet */}
+                <button
+                  type="button"
+                  className="WalletAdd_btnCreateWallet"
+                  onClick={onCreate}
+                >
                   <div className={styles.heroCardsItem}>
-                    <div className={`${styles.heroCardsItemBg} ${styles.create}`} />
+                    <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.createTitle)}
                     </div>
                   </div>
                 </button>
-                <button type="button" onClick={onRestore}>
+                {/* Restore wallet */}
+                <button
+                  type="button"
+                  className="WalletAdd_btnRestoreWallet"
+                  onClick={onRestore}
+                >
                   <div className={styles.heroCardsItem}>
-                    <div className={`${styles.heroCardsItemBg} ${styles.restore}`} />
+                    <div
+                      className={classnames([styles.heroCardsItemBg, styles.bgRestoreWallet])}
+                    />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreTitle)}
                     </div>
@@ -133,8 +155,18 @@ export default class WalletAdd extends Component<Props> {
                   </div>
                 ) : null}
               </div>
-              <button type="button" onClick={onDaedalusTransfer} className={`${styles.heroCardsItem} ${styles.heroCardsItemLink}`}>
-                <SvgInline svg={daedalusIcon} width="45" height="40" className={styles.heroCardsItemLinkIcon} />
+              {/* Transfer funds from a Daedalus wallet to Yoroi */}
+              <button
+                type="button"
+                onClick={onDaedalusTransfer}
+                className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
+              >
+                <SvgInline
+                  svg={daedalusIcon}
+                  width="45"
+                  height="40"
+                  className={styles.heroCardsItemLinkIcon}
+                />
                 <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
                 </div>

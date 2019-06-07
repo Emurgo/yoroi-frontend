@@ -163,15 +163,15 @@
     }
   
     .heroCardsItemBg {
-      &.connect {
+      &.bgConnectHW {
         background-image: url(../../assets/images/add-wallet/connect-hw-classic.inline.svg);
       }
 
-      &.create {
+      &.bgCreateWallet {
         background-image: url(../../assets/images/add-wallet/create-wallet-classic.inline.svg);
       }
 
-      &.restore {
+      &.bgRestoreWallet {
         background-image: url(../../assets/images/add-wallet/restore-wallet-classic.inline.svg);
       }
     }
@@ -217,15 +217,15 @@
     }
 
     .heroCardsItemBg {
-      &.connect {
+      &.bgConnectHW {
         background-image: url(../../assets/images/add-wallet/connect-hw-modern.inline.svg);
       }
 
-      &.create {
+      &.bgCreateWallet {
         background-image: url(../../assets/images/add-wallet/create-wallet-modern.inline.svg);
       }
 
-      &.restore {
+      &.bgRestoreWallet {
         background-image: url(../../assets/images/add-wallet/restore-wallet-modern.inline.svg);
       }
     }
