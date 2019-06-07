@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
@@ -131,7 +130,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
               autoComplete="off"
               {...masterKeyField.bind()}
               error={masterKeyField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={InputOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>

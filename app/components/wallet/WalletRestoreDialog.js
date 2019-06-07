@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
-import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -408,7 +407,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-          skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
+          skin={AutocompleteOwnSkin}
           preselectedOptions={recoveryPhraseField.value}
         />
 

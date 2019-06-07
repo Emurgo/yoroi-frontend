@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
@@ -174,7 +173,7 @@ export default class UserPasswordDialog extends Component<Props> {
             {...paperPasswordField.bind()}
             done={isValidPaperPassword(paperPassword)}
             error={paperPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
         </div>
         <div className={repeatedPasswordClasses}>
@@ -186,7 +185,7 @@ export default class UserPasswordDialog extends Component<Props> {
             done={repeatPassword && isValidRepeatPassword(paperPassword, repeatPassword)}
             {...repeatedPasswordField.bind()}
             error={repeatedPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
         </div>
         <PasswordInstructions

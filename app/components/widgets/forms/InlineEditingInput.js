@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
@@ -171,7 +170,7 @@ export default class InlineEditingInput extends Component<Props, State> {
           error={isActive ? inputField.error : null}
           disabled={!isActive}
           inputRef={(input) => { this.inputField = input; }}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
         />
 
         {isActive && (
