@@ -256,6 +256,14 @@ const globalMessages = defineMessages({
     id: 'global.labels.goBack',
     defaultMessage: '!!!Go back label',
   },
+  supportRequestLinkUrl: {
+    id: 'settings.support.faq.supportRequestLinkURL',
+    defaultMessage: '!!!https://zendesk.com/support/',
+  },
+  contactSupport: {
+    id: 'global.contact',
+    defaultMessage: '!!!contact support',
+  },
 });
 export default globalMessages;
 
