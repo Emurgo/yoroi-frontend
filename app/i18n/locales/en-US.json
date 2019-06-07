@@ -218,7 +218,7 @@
   "wallet.amountInput.feesLabel": "+ {amount} of fees",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "Continue",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Make sure nobody looks into your screen unless you want them to have access to your funds.",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is\n    your wallet backup phrase. It can be entered in any version of Yoroi in order\n    to back up or restore your wallet’s funds and private key.",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is\n    your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order\n    to back up or restore your wallet’s funds and private key.",
   "wallet.backup.recovery.phrase.dialog.title": "Recovery phrase",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "Please, make sure you have carefully written down your recovery phrase somewhere safe.\n    You will need this phrase to use and restore your wallet. Phrase is case sensitive.",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "Yes, I’ve written it down.",
