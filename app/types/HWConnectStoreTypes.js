@@ -10,7 +10,7 @@ import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../a
 
 export type ProgressStepEnum = 0 | 1 | 2;
 export const ProgressStep = {
-  ABOUT: 0,
+  CHECK: 0,
   CONNECT: 1,
   SAVE: 2,
 };
@@ -84,14 +84,14 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
 
   _cancel(): void;
 
-  // =================== ABOUT =================== //
-  /** ABOUT dialog submit(Next button) */
-  _submitAbout(): void;
-  // =================== ABOUT =================== //
+  // =================== CHECK =================== //
+  /** CHECK dialog submit(Next button) */
+  _submitCheck(): void;
+  // =================== CHECK =================== //
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  _goBackToAbout(): void;
+  _goBackToCheck(): void;
 
   /** CONNECT dialog submit (Connect button) */
   _submitConnect(): void;

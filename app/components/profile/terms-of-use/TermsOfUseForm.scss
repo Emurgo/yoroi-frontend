@@ -35,15 +35,11 @@
   }
   
   .checkbox {
-    margin-bottom: 30px;
     padding-top: 10px;
+    padding-right: 15px;
   
     :global .SimpleCheckbox_label {
       font-family: var(--rp-theme-font-regular);
-    }
-  
-    :global .SimpleCheckbox_root {
-      margin-bottom: 30px;
     }
   }  
 }
@@ -63,6 +59,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 60px;
+    padding-top: 52px;
   }  
 }
