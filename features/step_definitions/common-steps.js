@@ -131,11 +131,13 @@ Given(/^I have opened the extension$/, async function () {
 
 Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
+  await this.driver.sleep(500); // give time for page to reload
 });
 
 Given(/^I restart the browser$/, async function () {
   await this.driver.manage().deleteAllCookies();
   await this.driver.navigate().refresh();
+  await this.driver.sleep(500); // give time for page to reload
 });
 
 Given(/^There is no wallet stored$/, async function () {
