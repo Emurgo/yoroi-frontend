@@ -95,6 +95,7 @@
   "global.language.korean": "Coreano",
   "global.language.russian": "Russo",
   "global.language.spanish": "Español",
+  "global.language.italian": "Italiano",
   "global.passwordInstructions": "Nota: la password di spesa deve essere lunga almeno 12 caratteri.",
   "global.passwordInstructionsPaperWallet": "Nota: la password del wallet cartaceo (o \"Paper Wallet\") deve essere lunga almeno 12 caratteri.",
   "global.unit.ada": "Ada",
