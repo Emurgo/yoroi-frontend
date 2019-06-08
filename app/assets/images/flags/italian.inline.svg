@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>italian</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="8" cy="8" r="8"></circle>
+    </defs>
+    <g id="italian" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ru-copy-2" transform="translate(1.000000, 1.000000)">
+            <g id="Group">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <circle stroke-opacity="0.302790987" stroke="#4A4A4A" stroke-width="0.5" cx="8" cy="8" r="8.25"></circle>
+                <g id="if_210_Ensign_Flag_Nation_russia_2634398-Copy" mask="url(#mask-2)">
+                    <g transform="translate(-2.000000, -6.000000)" id="Rectangle">
+                        <polygon fill="#FFFFFF" transform="translate(9.500000, 14.500000) rotate(-90.000000) translate(-9.500000, -14.500000) " points="-5 11 24 11 24 18 -5 18"></polygon>
+                        <polygon fill="#029246" transform="translate(3.500000, 14.500000) rotate(-90.000000) translate(-3.500000, -14.500000) " points="-11 11 18 11 18 18 -11 18"></polygon>
+                        <polygon fill="#D81F26" transform="translate(16.500000, 14.500000) rotate(-90.000000) translate(-16.500000, -14.500000) " points="2 11 31 11 31 18 2 18"></polygon>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
