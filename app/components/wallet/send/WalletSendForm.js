@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
+import { reaction } from 'mobx';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -12,22 +13,23 @@ import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
-import SvgInline from 'react-svg-inline';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
 import environment from '../../../environment';
-import WalletSendConfirmationDialog from './WalletSendConfirmationDialog';
-import HWSendConfirmationDialog from './HWSendConfirmationDialog';
+
 import {
+  formattedWalletAmount,
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits
 } from '../../../utils/formatters';
-import dangerIcon from '../../../assets/images/danger.inline.svg';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import LocalizableError from '../../../i18n/LocalizableError';
+
+import WarningBox from '../../widgets/forms/WarningBox';
 
 const messages = defineMessages({
   titleLabel: {
@@ -97,62 +99,60 @@ type Props = {
   currencyMaxIntegerDigits: number,
   currencyMaxFractionalDigits: number,
   hasAnyPending: boolean,
-  isHardwareWallet: boolean,
   validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
-  calculateTransactionFee: (
-    receiver: string,
-    amount: string,
-    shouldSendAll: boolean
-  ) => Promise<BigNumber>,
+  onSubmit: void => void,
   addressValidator: Function,
-  openDialogAction: Function,
-  isDialogOpen: Function,
-  webWalletConfirmationDialogRenderCallback: Function,
-  hardwareWalletConfirmationDialogRenderCallback: Function,
-  totalBalance: BigNumber,
+  totalInput: BigNumber,
   classicTheme: boolean,
-};
-
-type State = {
-  isTransactionFeeCalculated: boolean,
-  transactionFee: BigNumber,
-  transactionFeeError: ?string,
-  shouldSendAll: boolean
+  updateReceiver: (void | string) => void,
+  updateAmount: (void | number) => void,
+  shouldSendAll: boolean,
+  toggleSendAll: void => void,
+  fee: ?BigNumber,
+  isCalculatingFee: boolean,
+  reset: void => void,
+  error: ?LocalizableError,
 };
 
 @observer
-export default class WalletSendForm extends Component<Props, State> {
+export default class WalletSendForm extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
-  state = {
-    isTransactionFeeCalculated: false,
-    transactionFee: new BigNumber(0),
-    transactionFeeError: null,
-    shouldSendAll: false
-  };
-
-  /** We need to track form submitting state in order to avoid calling
-    * calculate/reset transaction fee functions which causes them to flicker */
-  _isSubmitting = false;
-
-  /** We need to track the mounted state in order to avoid calling
-    * setState promise handling code after the component was already unmounted:
-    * TODO: https://facebook.github.io/react/blog/2015/12/16/ismounted-antipattern.html */
-  _isMounted = false;
+  amountFieldReactionDisposer = null;
 
   componentDidMount() {
-    this._isMounted = true;
+    this.props.reset();
+
+    /**
+     * Mobx-react-form doesn't allow the value field to be updated based on a computed variable
+     * so instead we register a reaction to update it
+     */
+    this.amountFieldReactionDisposer = reaction(
+      () => [this.props.shouldSendAll, this.props.totalInput],
+      () => {
+        if (!this.props.totalInput || !this.props.fee) {
+          return;
+        }
+        if (!this.props.shouldSendAll) {
+          return;
+        }
+        // once sendAll is triggered, set the amount field to the total input
+        this.form.$('amount').value = formattedWalletAmount(
+          this.props.totalInput.minus(this.props.fee)
+        );
+      },
+    );
   }
 
   componentWillUnmount() {
-    this._isMounted = false;
-  }
-
-  setShouldSendAll(newState: boolean) {
-    this.setState({ shouldSendAll: newState });
+    this.props.reset();
+    // dispose reaction
+    if (this.amountFieldReactionDisposer) {
+      this.amountFieldReactionDisposer();
+    }
   }
 
   // FORM VALIDATION
@@ -165,12 +165,16 @@ export default class WalletSendForm extends Component<Props, State> {
         validators: [({ field }) => {
           const receiverValue = field.value;
           if (receiverValue === '') {
-            this._resetTransactionFee();
+            this.props.updateReceiver();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           return this.props.addressValidator(receiverValue)
-            .then(async isValidReceiver => {
-              await this._updateTxValues({ isValidReceiver });
+            .then(isValidReceiver => {
+              if (isValidReceiver) {
+                this.props.updateReceiver(receiverValue);
+              } else {
+                this.props.updateReceiver();
+              }
               return [isValidReceiver, this.context.intl.formatMessage(messages.invalidAddress)];
             });
         }],
@@ -180,20 +184,22 @@ export default class WalletSendForm extends Component<Props, State> {
         placeholder: `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}`,
         value: '',
         validators: [async ({ field }) => {
-          const { shouldSendAll } = this.state;
-          if (shouldSendAll) {
+          if (this.props.shouldSendAll) {
             // sendall doesn't depend on the amount so always succeed
             return true;
           }
           const amountValue = field.value;
           if (amountValue === '') {
-            this._resetTransactionFee();
+            this.props.updateAmount();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          const isValidAmount = await this.props.validateAmount(
-            formattedAmountToNaturalUnits(amountValue)
-          );
-          await this._updateTxValues({ isValidAmount });
+          const formattedAmount = formattedAmountToNaturalUnits(amountValue);
+          const isValidAmount = await this.props.validateAmount(formattedAmount);
+          if (isValidAmount) {
+            this.props.updateAmount(Number(formattedAmount));
+          } else {
+            this.props.updateAmount();
+          }
           return [isValidAmount, this.context.intl.formatMessage(messages.invalidAmount)];
         }],
       },
@@ -217,24 +223,31 @@ export default class WalletSendForm extends Component<Props, State> {
       hasAnyPending,
       classicTheme,
     } = this.props;
-    const {
-      transactionFee,
-      transactionFeeError,
-      shouldSendAll
-    } = this.state;
 
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
     const amountFieldProps = amountField.bind();
-    const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
+
+    const transactionFee = this.props.fee || new BigNumber(0);
+
+    const totalAmount = this.props.totalInput
+      || formattedAmountToBigNumber(amountFieldProps.value);
 
     const pendingTxWarningComponent = (
-      <div className={styles.contentWarning}>
-        <SvgInline svg={dangerIcon} className={styles.icon} />
-        <p className={styles.warning}>{intl.formatMessage(messages.sendingIsDisabled)}</p>
-      </div>
+      <WarningBox>
+        {intl.formatMessage(messages.sendingIsDisabled)}
+      </WarningBox>
     );
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
+
+    let transactionFeeError = null;
+    if (this.props.isCalculatingFee) {
+      transactionFeeError = this.context.intl.formatMessage(messages.calculatingFee);
+    }
+    if (this.props.error) {
+      transactionFeeError = this.context.intl.formatMessage(this.props.error);
+    }
+
 
     return (
       <div className={styles.component}>
@@ -259,7 +272,7 @@ export default class WalletSendForm extends Component<Props, State> {
               label={intl.formatMessage(messages.amountLabel)}
               maxBeforeDot={currencyMaxIntegerDigits}
               maxAfterDot={currencyMaxFractionalDigits}
-              disabled={shouldSendAll}
+              disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
               currency={currencyUnit}
@@ -272,13 +285,15 @@ export default class WalletSendForm extends Component<Props, State> {
           <div className={styles.checkbox}>
             <Checkbox
               label={intl.formatMessage(messages.checkboxLabel, { currency })}
-              onChange={(newState) => {
-                this.setShouldSendAll(newState);
-                this._updateTxValues({
-                  shouldSendAll: newState,
-                });
+              onChange={() => {
+                this.props.toggleSendAll();
+                if (this.props.shouldSendAll) {
+                  this.props.updateAmount(Number(formattedAmountToNaturalUnits(
+                    this.form.$('amount').value
+                  )));
+                }
               }}
-              checked={shouldSendAll}
+              checked={this.props.shouldSendAll}
               skin={CheckboxSkin}
             />
           </div>
@@ -287,16 +302,10 @@ export default class WalletSendForm extends Component<Props, State> {
 
         </BorderedBox>
 
-        {this._makeConfirmationDialogComponent()}
-
       </div>
     );
   }
 
-  /** Makes custom button component depends on type of active wallet
-    * basically controlles which confirmation dialog to open
-    * CASE 1: Web Wallet
-    * CASE 2: Hardware Wallet (Trezor or Ledger) */
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
 
@@ -306,165 +315,18 @@ export default class WalletSendForm extends Component<Props, State> {
     ]);
 
     const {
-      openDialogAction,
       hasAnyPending,
     } = this.props;
-    const { isTransactionFeeCalculated } = this.state;
-
-    /** TODO: [REFACTOR]
-      * too bad, opening dialog directly without its container dialog
-      * WalletSendForm.js is a component and we already have Send Confirmation dialog's containers
-      * WalletSendForm.js tries to open a container but invoking it component
-      * this whole logic should be in WalletSendForm's container */
-    const targetDialog =  this.props.isHardwareWallet ?
-      HWSendConfirmationDialog :
-      WalletSendConfirmationDialog;
-    const onMouseUp = () => openDialogAction({
-      dialog: targetDialog
-    });
 
     return (
       <Button
         className={buttonClasses}
         label={intl.formatMessage(globalMessages.nextButtonLabel)}
-        onMouseUp={onMouseUp}
+        onMouseUp={this.props.onSubmit}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
-        disabled={!isTransactionFeeCalculated || hasAnyPending}
+        disabled={!this.props.fee || hasAnyPending}
         skin={ButtonSkin}
       />);
-  }
-
-  /** Makes component for respective send confirmation dialog
-    * returns null when dialog is not needed
-    * CASE 1: Web Wallet
-    * CASE 2: Hardware Wallet (Trezor or Ledger) */
-  _makeConfirmationDialogComponent(): Node {
-    let component = null;
-
-    const {
-      isDialogOpen,
-      webWalletConfirmationDialogRenderCallback,
-      hardwareWalletConfirmationDialogRenderCallback
-    } = this.props;
-
-    // this function is called from render hence it should return ASAP, hence using renderCB
-    let renderCB = null;
-    if (isDialogOpen(WalletSendConfirmationDialog)) {
-      renderCB = webWalletConfirmationDialogRenderCallback;
-    } else if (isDialogOpen(HWSendConfirmationDialog)) {
-      renderCB = hardwareWalletConfirmationDialogRenderCallback;
-    }
-
-    if (renderCB) {
-      const { form } = this;
-
-      const {
-        currencyUnit,
-        currencyMaxFractionalDigits,
-      } = this.props;
-      const { transactionFee, shouldSendAll } = this.state;
-
-      const amountField = form.$('amount');
-      const receiverField = form.$('receiver');
-      const receiverFieldProps = receiverField.bind();
-      const amountFieldProps = amountField.bind();
-      const totalAmount = formattedAmountToBigNumber(amountFieldProps.value).add(transactionFee);
-
-      const dialogProps = {
-        amount: amountFieldProps.value,
-        receiver: receiverFieldProps.value,
-        totalAmount: totalAmount.toFormat(currencyMaxFractionalDigits),
-        transactionFee: transactionFee.toFormat(currencyMaxFractionalDigits),
-        amountToNaturalUnits: formattedAmountToNaturalUnits,
-        currencyUnit,
-        shouldSendAll
-      };
-
-      component = (
-        <div>
-          {renderCB(dialogProps)}
-        </div>);
-    }
-
-    return component;
-  }
-
-  _resetTransactionFee() {
-    if (this._isMounted && !this._isSubmitting) {
-      this.setState({
-        isTransactionFeeCalculated: false,
-        transactionFee: new BigNumber(0),
-        transactionFeeError: null,
-      });
-    }
-  }
-
-  async _calculateTransactionFee(receiver: string, amountValue: string, shouldSendAll: boolean) {
-    if (this._isSubmitting) return;
-    this._resetTransactionFee();
-    const amount = formattedAmountToNaturalUnits(amountValue);
-    try {
-      this.setState({
-        transactionFeeError: this.context.intl.formatMessage(messages.calculatingFee)
-      });
-
-      const fee = await this.props.calculateTransactionFee(receiver, amount, shouldSendAll);
-      if (this._isMounted) {
-        this.setState({
-          isTransactionFeeCalculated: true,
-          transactionFee: fee,
-          transactionFeeError: null,
-        });
-      }
-    } catch (error) {
-      if (this._isMounted) {
-        this.setState({
-          transactionFeeError: this.context.intl.formatMessage(error)
-        });
-      }
-    }
-  }
-
-  /**
-   * Precondition: both amount and redeiver are valid
-   */
-  async _updateTxValues(checkers: {
-    isValidAmount?: boolean,
-    isValidReceiver?: boolean,
-    shouldSendAll?: boolean,
-  }) {
-    let { isValidAmount, isValidReceiver, shouldSendAll } = checkers;
-    if (shouldSendAll === undefined) {
-      shouldSendAll = this.state.shouldSendAll;
-    }
-
-    let amountValue;
-    if (shouldSendAll) {
-      amountValue = '1'; // arbitrary value as it isn't used in sendAll case
-      isValidAmount = true;
-    } else {
-      amountValue = this.form.$('amount').value;
-
-      if (isValidAmount === undefined) {
-        isValidAmount = this.form.$('amount').isValid;
-      }
-    }
-
-    if (isValidReceiver === undefined) {
-      isValidReceiver = this.form.$('receiver').isValid;
-    }
-    if (!isValidAmount || !isValidReceiver) {
-      this._resetTransactionFee();
-      return;
-    }
-    const receiverValue = this.form.$('receiver').value;
-    await this._calculateTransactionFee(receiverValue, amountValue, shouldSendAll);
-    if (shouldSendAll) {
-      const { totalBalance } = this.props;
-      const { transactionFee } = this.state;
-      const sendAllAmount = totalBalance.minus(transactionFee);
-      this.form.$('amount').value = sendAllAmount.toString();
-    }
   }
 }
