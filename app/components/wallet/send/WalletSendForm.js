@@ -140,9 +140,9 @@ export default class WalletSendForm extends Component<Props> {
           return;
         }
         // once sendAll is triggered, set the amount field to the total input
-        this.form.$('amount').value = formattedWalletAmount(
+        this.form.$('amount').set('value', formattedWalletAmount(
           this.props.totalInput.minus(this.props.fee)
-        );
+        ));
       },
     );
   }
