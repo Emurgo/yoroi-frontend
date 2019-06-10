@@ -324,6 +324,7 @@ export default {
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
   '--theme-transactions-sent-color': '#4a4a4a',
+  '--theme-transactions-received-address-color': '#000000',
   '--theme-transactions-received-color': '#54ca87',
 
   '--theme-ada-redemption-headline-color': '#121327',

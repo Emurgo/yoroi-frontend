@@ -118,6 +118,10 @@
       display: flex;
       padding: 8.5px 0;
       word-break: break-all;
+
+      .addressId {
+        color: var(--theme-transactions-received-address-color);
+      }
   
       & + .walletAddress {
         border-top: 1px solid var(--theme-separation-border-color);
@@ -274,10 +278,6 @@
 
       .addressMargin {
         margin-right: 32.5px;
-      }
-
-      .addressId {
-        color: var(--theme-transactions-received-address-color);
       }
     }
   }  
