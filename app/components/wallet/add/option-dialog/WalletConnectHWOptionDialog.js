@@ -56,18 +56,19 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
+        className="WalletConnectHWOptionDialog"
       >
         <div className={styles.component}>
           <ul className={styles.optionBlockList}>
             <OptionBlock
-              parentName={this.constructor.name}
+              parentName="WalletConnectHWOptionDialog"
               type="connectLedger"
               title={intl.formatMessage(messages.ledgerTitle)}
               learnMoreText={intl.formatMessage(messages.ledgerDescription)}
               onSubmit={onLedger}
             />
             <OptionBlock
-              parentName={this.constructor.name}
+              parentName="WalletConnectHWOptionDialog"
               type="connectTrezor"
               onSubmit={onTrezor}
               title={intl.formatMessage(messages.trezorTitle)}

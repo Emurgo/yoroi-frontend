@@ -98,7 +98,12 @@ async function takeScreenshot(driver, name) {
 Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
-  await this.click('.restoreWalletButton');
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
+
+  // TODO: delete line after fixing all E2E await this.click('.restoreWalletButton');
   await this.input("input[name='walletName']", restoreInfo.name);
   await enterRecoveryPhrase(
     this,

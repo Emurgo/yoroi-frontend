@@ -56,18 +56,19 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
+        className="WalletRestoreOptionDialog"
       >
         <div className={styles.component}>
           <ul className={styles.optionBlockList}>
             <OptionBlock
-              parentName={this.constructor.name}
+              parentName="WalletRestoreOptionDialog"
               type="restoreNormalWallet"
               title={intl.formatMessage(messages.restoreNormalTitle)}
               learnMoreText={intl.formatMessage(messages.restoreNormalDescription)}
               onSubmit={onRestore}
             />
             <OptionBlock
-              parentName={this.constructor.name}
+              parentName="WalletRestoreOptionDialog"
               type="restorePaperWallet"
               title={intl.formatMessage(messages.restorePaperWalletTitle)}
               learnMoreText={intl.formatMessage(messages.restorePaperWalletDescription)}
