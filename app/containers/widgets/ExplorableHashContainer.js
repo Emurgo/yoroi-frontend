@@ -18,7 +18,7 @@ export default class ExplorableHashContainer extends Component<Props> {
     const seizaAddress = 'https://seiza.com/blockchain/address/';
     return (
       <ExplorableHash
-        explorerName={'Seiza'}
+        explorerName="Seiza"
         url={seizaAddress + this.props.hash}
         onExternalLinkClick={handleExternalLinkClick}
       >
