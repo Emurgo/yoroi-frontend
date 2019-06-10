@@ -10,7 +10,13 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 }
 
 When(/^I click the restore button$/, async function () {
-  await this.click('.restoreWalletButton');
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
+  // TODO: delete line after fixing all E2E
+  // await this.click('.restoreWalletButton');
 });
 
 When(/^I click the restore paper wallet button$/, async function () {
