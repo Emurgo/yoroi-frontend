@@ -134,7 +134,6 @@ export default class InlineEditingInput extends Component<Props, State> {
       isActive,
       inputFieldValue,
       successfullyUpdated,
-      classicTheme,
     } = this.props;
     const { intl } = this.context;
     const inputField = validator.$('inputField');
