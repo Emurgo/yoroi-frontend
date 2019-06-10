@@ -103,7 +103,8 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
   await this.waitForElement('.WalletRestoreDialog');
 
-  // TODO: delete line after fixing all E2E await this.click('.restoreWalletButton');
+  // TODO: delete line after fixing all E2E
+  // await this.click('.restoreWalletButton');
   await this.input("input[name='walletName']", restoreInfo.name);
   await enterRecoveryPhrase(
     this,
@@ -147,7 +148,8 @@ Given(/^I restart the browser$/, async function () {
 
 Given(/^There is no wallet stored$/, async function () {
   await refreshWallet(this);
-  // TODO: delete line after fixing all E2E await this.waitForElement('.WalletAdd');
+  // TODO: delete line after fixing all E2E
+  // await this.waitForElement('.WalletAdd');
   await this.waitForElement('.WalletAdd_component');
 });
 
