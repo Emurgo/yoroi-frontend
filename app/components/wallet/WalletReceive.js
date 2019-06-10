@@ -173,7 +173,9 @@ export default class WalletReceive extends Component<Props, State> {
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
                 {/* Address Id */}
-                <ExplorableHashContainer>
+                <ExplorableHashContainer
+                  hash={address.id}
+                >
                   <UsableHash isUsed={address.isUsed}>
                     <RawHash>
                       <span className={styles.addressId}>{address.id}</span>

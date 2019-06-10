@@ -8,16 +8,18 @@ import ExplorableHash from '../../components/widgets/hashWrappers/ExplorableHash
 
 type Props = {
   children: ?Node,
+  hash: string,
 };
 
 @observer
 export default class ExplorableHashContainer extends Component<Props> {
 
   render() {
+    const seizaAddress = 'https://seiza.com/blockchain/address/';
     return (
       <ExplorableHash
-        explorerName={"Seiza"}
-        url={"https://seiza.com"}
+        explorerName={'Seiza'}
+        url={seizaAddress + this.props.hash}
         onExternalLinkClick={handleExternalLinkClick}
       >
         {this.props.children}
