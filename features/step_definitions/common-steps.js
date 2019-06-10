@@ -147,7 +147,8 @@ Given(/^I restart the browser$/, async function () {
 
 Given(/^There is no wallet stored$/, async function () {
   await refreshWallet(this);
-  await this.waitForElement('.WalletAdd');
+  // TODO: delete line after fixing all E2E await this.waitForElement('.WalletAdd');
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {
