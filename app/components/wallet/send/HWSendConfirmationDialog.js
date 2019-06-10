@@ -8,6 +8,7 @@ import type { MessageDescriptor } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
+import WarningBox from '../../widgets/forms/WarningBox';
 
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -21,8 +22,9 @@ type ExpectedMessages = {
 };
 
 type Props = {
+  staleTx: boolean,
   amount: string,
-  receiver: string,
+  receivers: Array<string>,
   totalAmount: string,
   transactionFee: string,
   currencyUnit: string,
@@ -30,10 +32,9 @@ type Props = {
   messages: ExpectedMessages,
   isSubmitting: boolean,
   error: ?LocalizableError,
-  onSubmit: Function,
+  onSubmit: void => void,
   onCancel: Function,
   classicTheme: boolean,
-  shouldSendAll: boolean,
 };
 
 @observer
@@ -47,7 +48,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     const { intl } = this.context;
     const {
       amount,
-      receiver,
+      receivers,
       totalAmount,
       transactionFee,
       currencyUnit,
@@ -57,6 +58,13 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       onCancel,
       classicTheme,
     } = this.props;
+
+    const staleTxWarning = (
+      <WarningBox>
+        {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
+        {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+      </WarningBox>
+    );
 
     const infoBlock = (
       <div className={styles.infoBlock}>
@@ -71,7 +79,10 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         <div className={styles.addressToLabel}>
           {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
         </div>
-        <div className={styles.addressTo}>{receiver}</div>
+        {receivers.map((receiver, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          (<div key={receiver + i} className={styles.addressTo}>{receiver}</div>)
+        ))}
       </div>);
 
     const amountBlock = (
@@ -118,7 +129,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       },
       {
         label: intl.formatMessage(messages.sendUsingHWButtonLabel),
-        onClick: this.submit,
+        onClick: this.props.onSubmit,
         primary: true,
         className: confirmButtonClasses,
         disabled: isSubmitting,
@@ -135,21 +146,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
+        {this.props.staleTx && staleTxWarning}
         {infoBlock}
         {addressBlock}
         {amountBlock}
         {totalAmountBlock}
         <ErrorBlock error={error} />
       </Dialog>);
-  }
-
-  submit = () => {
-    const { receiver, amount, amountToNaturalUnits, shouldSendAll } = this.props;
-    const transactionData = {
-      receiver,
-      amount: amountToNaturalUnits(amount),
-      shouldSendAll
-    };
-    this.props.onSubmit(transactionData);
   }
 }

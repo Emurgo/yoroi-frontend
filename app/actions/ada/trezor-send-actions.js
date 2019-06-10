@@ -1,9 +1,9 @@
 // @flow
 import Action from '../lib/Action';
+import type { BaseSignRequest } from '../../api/ada/adaTypes';
 
 export type SendUsingTrezorParams = {
-  receiver: string,
-  amount: string
+  signRequest: BaseSignRequest,
 };
 
 // ======= Sending ADA using Trezor ACTIONS =======

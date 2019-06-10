@@ -6,6 +6,7 @@ import i18nHelper from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
+import { resetChain } from '../mock-chain/mockImporter';
 import { expect } from 'chai';
 
 const { promisify } = require('util');
@@ -38,6 +39,9 @@ Before((scenario) => {
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
   testProgress.step = 0;
+
+  // reset our mock chain to avoid modifications bleeding into other tests
+  resetChain();
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {

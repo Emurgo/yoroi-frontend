@@ -260,6 +260,14 @@ const globalMessages = defineMessages({
     id: 'global.labels.goBack',
     defaultMessage: '!!!Go back label',
   },
+  staleTxnWarningLine1: {
+    id: 'global.staleTxnWarningLine1',
+    defaultMessage: '!!!Your wallet has changed since you created this transaction.',
+  },
+  staleTxnWarningLine2: {
+    id: 'global.staleTxnWarningLine2',
+    defaultMessage: '!!!You can still send this transaction but it may fail.',
+  },
 });
 export default globalMessages;
 
