@@ -393,7 +393,7 @@
   "wallet.send.form.amount.equalsAda": "等于 {amount} ADA",
   "wallet.send.form.amount.label": "金额",
   "wallet.send.form.calculatingFee": "正在计算手续费...",
-  "wallet.send.form.description.checkboxLabel": "Send all my ADA",
+  "wallet.send.form.description.checkboxLabel": "发送我的ADA",
   "wallet.send.form.description.hint": "如果愿意，您可以添加一条消息",
   "wallet.send.form.description.label": "描述",
   "wallet.send.form.errors.invalidAddress": "请输入有效地址。",
