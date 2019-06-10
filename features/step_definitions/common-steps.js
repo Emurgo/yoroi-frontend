@@ -98,8 +98,10 @@ async function takeScreenshot(driver, name) {
 Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
+
   await this.click('.WalletAdd_btnRestoreWallet');
   await this.waitForElement('.WalletRestoreOptionDialog');
+
   await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
   await this.waitForElement('.WalletRestoreDialog');
 
