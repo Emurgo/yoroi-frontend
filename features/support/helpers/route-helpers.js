@@ -18,3 +18,11 @@ export const navigateTo = function (requestedRoute: string) {
     window.yoroi.actions.router.goToRoute.trigger({ route });
   }, requestedRoute);
 };
+
+/** This will reture true for:
+  * Wallet/Transaction page
+  * Wallet/Send page
+  * Wallet/Setting page */
+export const isAnyWalletsRoute = async function () {
+  return (await getCurrentAppRoute.call(this)).startsWith('/wallets');
+};

@@ -4,17 +4,20 @@ import { Given, When, Then } from 'cucumber';
 import _ from 'lodash';
 import {
   waitUntilUrlEquals,
+  isAnyWalletsRoute,
 } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 When(/^I navigate to the general settings screen$/, async function () {
-  await this.waitForElement('.WalletAdd_component');
-  await this.click('.WalletAdd_settingsBarLink');
+  if (await isAnyWalletsRoute.call(this)) {
+    await this.click('.TopBarCategory_component.settings');
+  } else {
+    await this.waitForElement('.WalletAdd_component');
+    await this.click('.WalletAdd_settingsBarLink');
+  }
 
-  // TODO: delete line after fixing all E2E
-  // await this.click('.TopBarCategory_component.settings');
   await waitUntilUrlEquals.call(this, '/settings/general');
   await this.waitForElement('.SettingsLayout_component');
 });
