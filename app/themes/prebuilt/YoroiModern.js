@@ -370,7 +370,8 @@ export default {
   '--theme-icon-transactions-ada-symbol-color': '#353535',
   '--theme-icon-transaction-type-color': '#fafbfc',
 
-  '--theme-wallet-add-color': '#ffffff',
+  '--theme-wallet-add-title-color': '#ffffff',
+  '--theme-wallet-add-sub-title-color': '#ffffff',
   '--theme-wallet-add-translucent-color': 'rgba(255, 255, 255, 0.5)',
   '--theme-wallet-add-footer-text-color': '#353535',
 

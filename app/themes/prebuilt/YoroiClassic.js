@@ -358,6 +358,8 @@ export default {
   '--theme-icon-transactions-ada-symbol-color': '#121327',
   '--theme-icon-transaction-type-color': '#fafbfc',
 
+  '--theme-wallet-add-title-color': '#141415',
+  '--theme-wallet-add-sub-title-color': '#888893',
   '--theme-backup-mnemonic-background-color': '#f3f3f5',
 
   '--theme-instructions-text-color': '#121327',

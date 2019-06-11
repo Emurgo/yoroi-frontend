@@ -39,7 +39,6 @@
     font-family: var(--font-bold);
     font-size: 54px;
     line-height: 62px;
-    color: var(--theme-wallet-add-color);
     margin-bottom: 15px;
     margin-right: 42px;
     width: 432px;
@@ -49,7 +48,6 @@
     font-family: var(--font-regular);
     font-size: 22px;
     line-height: 27px;
-    color: #fff;
   
     @media screen and (max-width: 1300px) {
       margin-bottom: 30px;
@@ -130,7 +128,7 @@
 
 :global(.YoroiClassic) {
   .component {
-    background-image: linear-gradient(to right, var(--theme-default-main-bg) 65%, #fff 65%);
+    background-image: linear-gradient(to right, var(--theme-default-main-bg) 65%, var(--cmn-color-white) 65%);
 
     .heroCardsItem {
       width: var(--card-width);
@@ -155,11 +153,11 @@
     }
 
     .heroTitle {
-      color: #141415;
+      color: var(--theme-wallet-add-title-color);      
     }
-  
+
     .heroSubTitle {
-      color: #888893;
+      color: var(--theme-wallet-add-sub-title-color);      
     }
   
     .heroCardsItemBg {
@@ -188,7 +186,15 @@
     @media screen and (max-width: 1400px) {
       background-position: 0 0;
     }
-    
+
+    .heroTitle {
+      color: var(--theme-wallet-add-title-color);      
+    }
+
+    .heroSubTitle {
+      color: var(--theme-wallet-add-sub-title-color);      
+    }
+
     .heroCardsItem {
       width: var(--card-width);
       height: var(--card-height);
@@ -206,7 +212,7 @@
     .heroLogo,
     .settingsBarLink {
       path {
-        fill: #fff;
+        fill: var(--cmn-color-white);
       }
     }
 
