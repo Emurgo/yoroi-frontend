@@ -19,6 +19,7 @@ When(/^I navigate to the general settings screen$/, async function () {
   //   await this.click('.WalletAdd_settingsBarLink');
   // }
 
+  await navigateTo.call(this, '/settings');
   await navigateTo.call(this, '/settings/general');
 
   await waitUntilUrlEquals.call(this, '/settings/general');
