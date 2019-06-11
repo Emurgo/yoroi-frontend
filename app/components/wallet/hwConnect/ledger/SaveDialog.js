@@ -93,6 +93,8 @@ export default class SaveDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
+    const { form } = this;
+    const { walletName } = form.values();
 
     const headerBlockClasses = classicTheme
       ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
@@ -121,6 +123,7 @@ export default class SaveDialog extends Component<Props> {
           {...walletNameField.bind()}
           error={walletNameField.error}
           skin={InputOwnSkin}
+          done={isValidWalletName(walletName)}
         />
       </div>);
 
