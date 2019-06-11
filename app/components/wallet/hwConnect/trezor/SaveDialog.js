@@ -90,9 +90,9 @@ export default class SaveDialog extends Component<Props> {
   }
 
   render() {
-    const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
     const { form } = this;
+    const { intl } = form.context;
+    const { progressInfo, isActionProcessing, error, cancel, classicTheme } = form.props;
     const { walletName } = form.values();
 
     const walletNameFieldClasses = classnames([
