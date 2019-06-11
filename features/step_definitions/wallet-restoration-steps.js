@@ -15,8 +15,6 @@ When(/^I click the restore button$/, async function () {
 
   await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
   await this.waitForElement('.WalletRestoreDialog');
-  // TODO: delete line after fixing all E2E
-  // await this.click('.restoreWalletButton');
 });
 
 When(/^I click the restore paper wallet button$/, async function () {
@@ -25,8 +23,6 @@ When(/^I click the restore paper wallet button$/, async function () {
 
   await this.click('.WalletRestoreOptionDialog_restorePaperWallet');
   await this.waitForElement('.WalletRestoreDialog');
-  // TODO: delete line after fixing all E2E
-  // await this.click('.restorePaperWalletButton');
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {

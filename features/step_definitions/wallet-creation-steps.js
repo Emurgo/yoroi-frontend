@@ -10,8 +10,6 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 }
 
 When(/^I click the create button$/, async function () {
-  // TODO: delete line after fixing all E2E
-  // await this.click('.createWalletButton');
   await this.click('.WalletAdd_btnCreateWallet');
 });
 

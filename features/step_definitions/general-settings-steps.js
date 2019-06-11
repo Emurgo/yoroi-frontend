@@ -11,14 +11,6 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 When(/^I navigate to the general settings screen$/, async function () {
-  // TODO: delete line after fixing all E2E
-  // if (await isAnyWalletsRoute.call(this)) {
-  //   await this.click('.TopBarCategory_component.settings');
-  // } else {
-  //   await this.waitForElement('.WalletAdd_component');
-  //   await this.click('.WalletAdd_settingsBarLink');
-  // }
-
   await navigateTo.call(this, '/settings');
   await navigateTo.call(this, '/settings/general');
 
