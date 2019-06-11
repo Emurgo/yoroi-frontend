@@ -248,6 +248,7 @@ export default class WalletSendForm extends Component<Props, State> {
               {...receiverField.bind()}
               error={receiverField.error}
               skin={InputOwnSkin}
+              done={receiverField.isValid}
             />
           </div>
 
