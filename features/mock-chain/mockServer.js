@@ -76,9 +76,10 @@ export function getMockServer(
       res: { send(arg: AddressUtxoResponse): any }
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
-      const filteredUtxos = Object.keys(mockImporter.utxoForAddresses)
+      const utxoForAddresses = mockImporter.utxoForAddresses();
+      const filteredUtxos = Object.keys(utxoForAddresses)
         .filter(addr => req.body.addresses.includes(addr))
-        .map(addr => mockImporter.utxoForAddresses[addr])
+        .map(addr => utxoForAddresses[addr])
         .reduce((utxos, arr) => {
           utxos.push(...arr);
           return utxos;
@@ -93,9 +94,10 @@ export function getMockServer(
       res: { send(arg: UtxoSumResponse): any }
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
-      const sumUtxos = Object.keys(mockImporter.utxoSumForAddresses)
+      const utxoSumForAddresses = mockImporter.utxoSumForAddresses();
+      const sumUtxos = Object.keys(utxoSumForAddresses)
         .filter(addr => req.body.addresses.includes(addr))
-        .map(addr => mockImporter.utxoSumForAddresses[addr])
+        .map(addr => utxoSumForAddresses[addr])
         .map(val => (val ? new BigNumber(val) : new BigNumber(0)))
         .reduce((sum, value) => value.plus(sum), new BigNumber(0));
       const result = sumUtxos.isZero() ? null : sumUtxos.toString();
@@ -112,7 +114,8 @@ export function getMockServer(
       chai.assert.isTrue(_validateDatetimeReq(req.body));
 
       const addressSet = new Set(req.body.addresses);
-      const filteredTxs = mockImporter.history.filter(tx => {
+      const history = mockImporter.history();
+      const filteredTxs = history.filter(tx => {
         if (moment(tx.last_update) < moment(req.body.dateFrom)) {
           return false;
         }
@@ -133,8 +136,9 @@ export function getMockServer(
       },
       res: { send(arg: FilterUsedResponse): any }
     ): void => {
+      const usedAddresses = mockImporter.usedAddresses();
       const filteredAddresses = req.body.addresses
-        .filter((address) => mockImporter.usedAddresses.has(address));
+        .filter((address) => usedAddresses.has(address));
       res.send(filteredAddresses);
     });
 

@@ -11,11 +11,12 @@ import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type {
-  CreateTransactionFunc, CreateWalletFunc,
+  SignAndBroadcastFunc, CreateWalletFunc,
   GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
 import type { DeleteWalletFunc } from '../../api/common';
+import type { BaseSignRequest } from '../../api/ada/adaTypes';
 
 export default class AdaWalletsStore extends WalletStore {
 
@@ -32,8 +33,8 @@ export default class AdaWalletsStore extends WalletStore {
   @observable deleteWalletRequestt: Request<DeleteWalletFunc>
     = new Request<DeleteWalletFunc>(() => Promise.resolve(true));
 
-  @observable sendMoneyRequest: Request<CreateTransactionFunc>
-    = new Request<CreateTransactionFunc>(this.api.ada.createTransaction);
+  @observable sendMoneyRequest: Request<SignAndBroadcastFunc>
+    = new Request<SignAndBroadcastFunc>(this.api.ada.signAndBroadcast);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
@@ -59,10 +60,8 @@ export default class AdaWalletsStore extends WalletStore {
 
   /** Send money and then return to transaction screen */
   _sendMoney = async (transactionDetails: {
-    receiver: string,
-    amount: string,
+    signRequest: BaseSignRequest,
     password: string,
-    shouldSendAll: boolean,
   }) => {
     const wallet = this.active;
     if (!wallet) throw new Error('Active wallet required before sending.');
@@ -71,11 +70,7 @@ export default class AdaWalletsStore extends WalletStore {
 
     await this.sendMoneyRequest.execute({
       ...transactionDetails,
-      sender: accountId,
-      getUTXOsForAddresses:
-        this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-      shouldSendAll: transactionDetails.shouldSendAll
     });
 
     this.refreshWalletsData();

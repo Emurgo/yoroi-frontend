@@ -5,8 +5,8 @@ import {
   stringifyData
 } from '../../../utils/logging';
 import type {
-  AdaAddress,
-  UTXO
+  AddressingInfo,
+  BaseSignRequest,
 } from '../adaTypes';
 import type { UtxoLookupMap }  from '../lib/utils';
 import { utxosToLookupMap, derivePathAsString }  from '../lib/utils';
@@ -50,27 +50,24 @@ declare var CONFIG: ConfigType;
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
-  addressesMap: AdaAddressMap,
-  changeAddr: ?AdaAddress,
-  senderUtxos: Array<UTXO>,
-  unsignedTx: RustModule.Wallet.Transaction,
+  signRequest: BaseSignRequest,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<$CardanoSignTransaction> {
-  const txJson: TransactionType = unsignedTx.to_json();
+  const txJson: TransactionType = signRequest.unsignedTx.to_json();
 
-  const utxoMap = utxosToLookupMap(senderUtxos);
+  const utxoMap = utxosToLookupMap(signRequest.senderUtxos);
 
   // Inputs
   const trezorInputs = _transformToTrezorInputs(
     txJson.inputs,
-    addressesMap,
+    signRequest.addressesMap,
     utxoMap
   );
 
   // Output
   const trezorOutputs = _generateTrezorOutputs(
     txJson.outputs,
-    changeAddr
+    signRequest.changeAddr
   );
 
   // Transactions
@@ -130,13 +127,14 @@ function _transformToTrezorInputs(
 
 function _generateTrezorOutputs(
   txOutputs: Array<TxOutType>,
-  changeAddr: ?AdaAddress,
+  changeAddr: Array<TxOutType & AddressingInfo>,
 ): Array<CardanoOutput> {
   return txOutputs.map(txOutput => {
-    if (changeAddr && txOutput.address === changeAddr.cadId) {
+    const change = changeAddr.find(addr => addr.address === txOutput.address);
+    if (change) {
       return {
         amount: txOutput.value.toString(),
-        path: derivePathAsString(changeAddr.account, changeAddr.change, changeAddr.index)
+        path: derivePathAsString(change.account, change.change, change.index)
       };
     }
     return {
@@ -149,24 +147,21 @@ function _generateTrezorOutputs(
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
 export async function createLedgerSignTxPayload(
-  addressesMap: AdaAddressMap,
-  changeAddr: ?AdaAddress,
-  senderUtxos: Array<UTXO>,
-  unsignedTx: RustModule.Wallet.Transaction,
+  signRequest: BaseSignRequest,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<LedgerSignTxPayload> {
-  const txJson: TransactionType = unsignedTx.to_json();
+  const txJson: TransactionType = signRequest.unsignedTx.to_json();
   // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
   const txsHashes = [...new Set(txJson.inputs.map(x => x.id))];
   const txsBodiesMap = await getTxsBodiesForUTXOs({ txsHashes });
 
-  const utxoMap = utxosToLookupMap(senderUtxos);
+  const utxoMap = utxosToLookupMap(signRequest.senderUtxos);
 
   // Inputs
   const ledgerInputs: Array<InputTypeUTxO> =
     _transformToLedgerInputs(
       txJson.inputs,
-      addressesMap,
+      signRequest.addressesMap,
       utxoMap,
       txsBodiesMap,
     );
@@ -175,7 +170,7 @@ export async function createLedgerSignTxPayload(
   const ledgerOutputs: Array<OutputTypeAddress | OutputTypeChange> =
     _transformToLedgerOutputs(
       txJson.outputs,
-      changeAddr,
+      signRequest.changeAddr,
     );
 
   return {
@@ -203,7 +198,7 @@ function _transformToLedgerInputs(
 
 function _transformToLedgerOutputs(
   txOutputs: Array<TxOutType>,
-  changeAddr: ?AdaAddress,
+  changeAddr: Array<TxOutType & AddressingInfo>,
 ): Array<OutputTypeAddress | OutputTypeChange> {
   return txOutputs.map(txOutput => ({
     amountStr: txOutput.value.toString(),
@@ -213,10 +208,11 @@ function _transformToLedgerOutputs(
 
 function _ledgerOutputAddress58OrPath(
   txOutput: TxOutType,
-  changeAddr: ?AdaAddress,
+  changeAddr: Array<TxOutType & AddressingInfo>,
 ): { address58: string } | { path: BIP32Path }  {
-  if (changeAddr && txOutput.address === changeAddr.cadId) {
-    return { path: makeCardanoBIP44Path(changeAddr.account, changeAddr.change, changeAddr.index) };
+  const change = changeAddr.find(addr => addr.address === txOutput.address);
+  if (change) {
+    return { path: makeCardanoBIP44Path(change.account, change.change, change.index) };
   }
 
   return { address58: txOutput.address };
@@ -257,8 +253,8 @@ function prepareWitness(
   ledgerWitness: Witness,
   cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
 ): void {
-  const pubKey = cryptoAccount.address_key(
-    ledgerWitness.path[3] === 1,
+  const chain = cryptoAccount.bip44_chain(ledgerWitness.path[3] === 1);
+  const pubKey = chain.address_key(
     RustModule.Wallet.AddressKeyIndex.new(ledgerWitness.path[4])
   );
 
