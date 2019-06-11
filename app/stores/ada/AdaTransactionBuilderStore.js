@@ -163,6 +163,7 @@ export default class AdaTransactionBuilderStore extends Store {
 
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     if (this.createUnsignedTx.promise) {
+      // eslint-disable-next-line no-unused-vars
       await this.createUnsignedTx.promise.catch(err => { /* do nothing */ });
     }
     this.createUnsignedTx.execute({
