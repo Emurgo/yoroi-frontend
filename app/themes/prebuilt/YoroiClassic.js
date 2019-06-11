@@ -360,6 +360,10 @@ export default {
 
   '--theme-wallet-add-title-color': '#141415',
   '--theme-wallet-add-sub-title-color': '#888893',
+  '--theme-wallet-add-option-dialog-item-title-color': '#2B2C32',
+  '--theme-wallet-add-option-dialog-item-learn-more-block-bg-color': '#F5F7F9',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-color': '#ADAEB6',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',
   '--theme-backup-mnemonic-background-color': '#f3f3f5',
 
   '--theme-instructions-text-color': '#121327',

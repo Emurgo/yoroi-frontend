@@ -17,7 +17,7 @@
       display: flex;
       align-items: center;
       padding: 11px 30px;
-      background-color: #fff;
+      background-color: var(--cmn-color-white);
       width: 100%;
       cursor: pointer;
       transition: 100ms;
@@ -26,7 +26,7 @@
       .optionTitle {
         font-size: 18px;
         line-height: 22px;
-        color: #2B2C32;
+        color: var(--theme-wallet-add-option-dialog-item-title-color);
         text-align: left;
         font-family: var(--font-regular);
         font-weight: var(--font-semibold);
@@ -54,7 +54,7 @@
       max-height: 0;
       transition: 300ms linear;
       will-change: height;
-      background-color: #F5F7F9;
+      background-color: var(--theme-wallet-add-option-dialog-item-learn-more-block-bg-color);
 
       .leramMoreTextWrapper {
         padding: 20px 40px 15px;
@@ -73,8 +73,8 @@
 
     // LEARN MORE BUTTON
     .learnMoreButton {
-      color: #ADAEB6;
-      background-color: #F5F7F9;
+      color: var(--theme-wallet-add-option-dialog-item-learn-more-button-color);
+      background-color: var(--theme-wallet-add-option-dialog-item-learn-more-button-bg-color);
       display: block;
       font-size: 14px;
       text-align: center;
