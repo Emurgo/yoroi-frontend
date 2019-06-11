@@ -2,7 +2,6 @@
 
 
 .component {
-  text-align: center;
 
   .checkbox {
     margin-top: 30px;
@@ -60,7 +59,7 @@
 
 :global(.YoroiModern) {
   .component {
-    min-height: 132px;
+    text-align: left;
 
     label {
       font-size: 14px;
