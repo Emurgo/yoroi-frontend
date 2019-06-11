@@ -262,7 +262,7 @@ const globalMessages = defineMessages({
   },
   supportRequestLinkUrl: {
     id: 'settings.support.faq.supportRequestLinkURL',
-    defaultMessage: '!!!https://zendesk.com/support/',
+    defaultMessage: '!!!https://yoroi-wallet.com/support/',
   },
   contactSupport: {
     id: 'global.contact',
