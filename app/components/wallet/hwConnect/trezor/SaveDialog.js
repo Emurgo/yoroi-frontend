@@ -5,7 +5,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
 
 import globalMessages from '../../../../i18n/global-messages';
@@ -93,6 +92,8 @@ export default class SaveDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
+    const { form } = this;
+    const { walletName } = form.values();
 
     const walletNameFieldClasses = classnames([
       'walletName',
@@ -120,7 +121,8 @@ export default class SaveDialog extends Component<Props> {
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
+          done={isValidWalletName(walletName)}
         />
       </div>);
 
