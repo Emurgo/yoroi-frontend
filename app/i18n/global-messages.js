@@ -260,6 +260,14 @@ const globalMessages = defineMessages({
     id: 'global.labels.goBack',
     defaultMessage: '!!!Go back label',
   },
+  supportRequestLinkUrl: {
+    id: 'settings.support.faq.supportRequestLinkURL',
+    defaultMessage: '!!!https://yoroi-wallet.com/support/',
+  },
+  contactSupport: {
+    id: 'global.contact',
+    defaultMessage: '!!!contact support', 
+  },
   staleTxnWarningLine1: {
     id: 'global.staleTxnWarningLine1',
     defaultMessage: '!!!Your wallet has changed since you created this transaction.',
