@@ -107,7 +107,7 @@
   "inline.editing.input.change.label": "ändern",
   "inline.editing.input.changesSaved": "Die Änderungen wurden gespeichert",
   "loading.screen.loading": "Lade Komponenten",
-  "loading.screen.error": "Check the dev console for more information or {supportRequestLink}",
+  "loading.screen.error": "Überprüfe die Entwicklerkonsole um mehr Informationen zu bekommen oder {supportRequestLink}",
   "profile.languageSelect.form.languageSelectLabel": "Wähle deine Sprache",
   "profile.languageSelect.form.submitLabel": "Weiter",
   "profile.languageSelect.title": "Sprachauswahl",
