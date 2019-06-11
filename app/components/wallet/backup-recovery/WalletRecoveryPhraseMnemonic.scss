@@ -30,3 +30,13 @@
   padding: 14px;
   border: 2px solid var(--theme-mnemonic-border-filled-color);
 }
+
+:global(.YoroiModern) {
+  .component {
+    min-height: 132px;
+
+    label {
+      font-size: 14px;
+    }
+  }  
+}
