@@ -63,7 +63,6 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       styles.component,
       'WalletBackupPrivacyWarningDialog',
     ]);
-    const checkboxClasses = classicTheme ? styles.checkboxClassic : styles.checkbox;
 
     const actions = [
       {
@@ -89,7 +88,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
           instructionsText={intl.formatMessage(messages.recoveryPhraseInstructions)}
           classicTheme={classicTheme}
         />
-        <div className={checkboxClasses}>
+        <div className={styles.checkbox}>
           <Checkbox
             label={intl.formatMessage(messages.termNobodyWatching)}
             onChange={onAcceptPrivacyNotice}
