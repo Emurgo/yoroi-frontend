@@ -102,7 +102,13 @@ async function takeScreenshot(driver, name) {
 Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
-  await this.click('.restoreWalletButton');
+
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
+
   await this.input("input[name='walletName']", restoreInfo.name);
   await enterRecoveryPhrase(
     this,
@@ -146,7 +152,7 @@ Given(/^I restart the browser$/, async function () {
 
 Given(/^There is no wallet stored$/, async function () {
   await refreshWallet(this);
-  await this.waitForElement('.WalletAdd');
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {

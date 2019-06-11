@@ -38,16 +38,15 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
-    const topBar = (
+    const topBar = profile.isClassicTheme ? (
       <TopBar
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
-      />);
+      />) : undefined;
     return (
       <TopBarLayout
         topbar={topBar}
         classicTheme={profile.isClassicTheme}
-        hideTopbar={profile.isModernTheme}
         languageSelectionBackground
         banner={<TestnetWarningBanner />}
       >

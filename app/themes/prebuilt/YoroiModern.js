@@ -86,7 +86,7 @@ const rpInput = {
 const rpModal = {
   '--rp-modal-bg-color': '#fff',
   '--rp-modal-max-height': '97%',
-  '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
+  '--rp-modal-overlay-bg-color': 'rgba(6, 13, 36, 0.8)', // #060D24
 };
 
 // OPTIONS
@@ -370,7 +370,12 @@ export default {
   '--theme-icon-transactions-ada-symbol-color': '#353535',
   '--theme-icon-transaction-type-color': '#fafbfc',
 
-  '--theme-wallet-add-color': '#ffffff',
+  '--theme-wallet-add-title-color': '#ffffff',
+  '--theme-wallet-add-sub-title-color': '#ffffff',
+  '--theme-wallet-add-option-dialog-item-title-color': '#2B2C32',
+  '--theme-wallet-add-option-dialog-item-learn-more-block-bg-color': '#F5F7F9',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-color': '#ADAEB6',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',  
   '--theme-wallet-add-translucent-color': 'rgba(255, 255, 255, 0.5)',
   '--theme-wallet-add-footer-text-color': '#353535',
 

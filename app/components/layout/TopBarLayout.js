@@ -6,37 +6,35 @@ import classnames from 'classnames';
 import styles from './TopBarLayout.scss';
 
 type Props = {
-  topbar: Node,
+  banner?: Node,
+  topbar?: Node,
   children?: ?Node,
   notification?: ?Node,
-  banner?: Node,
-  hideTopbar?: boolean,
   languageSelectionBackground?: boolean,
-  classicTheme?: boolean,
   footer?: Node,
+  classicTheme?: boolean,
 };
 
 /** Adds a top bar above the wrapped node */
 @observer
 export default class TopBarLayout extends Component<Props> {
   static defaultProps = {
+    banner: undefined,
+    topbar: undefined,
     children: undefined,
     notification: undefined,
-    banner: undefined,
-    hideTopbar: undefined,
     languageSelectionBackground: false,
     withFooter: false,
-    classicTheme: false,
     footer: undefined,
+    classicTheme: false,
   };
 
   render() {
     const {
       banner,
-      children,
       topbar,
+      children,
       notification,
-      hideTopbar,
       languageSelectionBackground,
       footer,
       classicTheme
@@ -56,7 +54,7 @@ export default class TopBarLayout extends Component<Props> {
 
           {banner}
 
-          {hideTopbar ? null : (
+          {topbar && (
             <div className={styles.topbar}>
               {topbar}
             </div>
