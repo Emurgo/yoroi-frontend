@@ -9,6 +9,7 @@ import ExplorableHash from '../../components/widgets/hashWrappers/ExplorableHash
 type Props = {
   children: ?Node,
   hash: string,
+  isUsed: boolean,
 };
 
 @observer
@@ -20,6 +21,7 @@ export default class ExplorableHashContainer extends Component<Props> {
       <ExplorableHash
         explorerName="Seiza"
         url={seizaAddress + this.props.hash}
+        isUsed={this.props.isUsed}
         onExternalLinkClick={handleExternalLinkClick}
       >
         {this.props.children}

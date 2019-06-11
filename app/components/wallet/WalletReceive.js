@@ -175,6 +175,7 @@ export default class WalletReceive extends Component<Props, State> {
                 {/* Address Id */}
                 <ExplorableHashContainer
                   hash={address.id}
+                  isUsed={address.isUsed}
                 >
                   <UsableHash isUsed={address.isUsed}>
                     <RawHash>

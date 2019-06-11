@@ -13,9 +13,18 @@
 
 .url {
   text-decoration: none;
+
 }
 
-.hash :hover {
-  box-sizing: border-box;
-  border-bottom: 0.1px solid var(--theme-widgets-explorable-hash-underline-color);
+.usedHash {
+  &:hover {
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-used-color);
+  }
+}
+.unusedHash {
+  &:hover {
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-unused-color);
+  }
 }

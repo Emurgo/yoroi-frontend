@@ -3,6 +3,7 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import classnames from 'classnames';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import styles from './ExplorableHash.scss';
 
@@ -20,6 +21,7 @@ type Props = {
   children: ?Node,
   explorerName: string,
   url: string,
+  isUsed: boolean,
   onExternalLinkClick: Function,
 };
 
@@ -29,6 +31,9 @@ export default class ExplorableHash extends Component<Props> {
   render() {
     const { explorerName, onExternalLinkClick } = this.props;
 
+    const addressClass = classnames([
+      this.props.isUsed ? styles.usedHash : styles.unusedHash
+    ]);
     return (
       <Tooltip
         className={styles.component}
@@ -42,7 +47,7 @@ export default class ExplorableHash extends Component<Props> {
           href={this.props.url}
           onClick={event => onExternalLinkClick(event)}
         >
-          <span className={styles.hash}>{this.props.children}</span>
+          <span className={addressClass}>{this.props.children}</span>
         </a>
       </Tooltip>
     );
