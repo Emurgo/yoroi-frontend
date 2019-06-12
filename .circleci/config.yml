@@ -106,15 +106,17 @@ workflows:
           requires:
             - build-setup
       - test-chrome:
-          branches:
-            ignore:
-              - l10n_develop
+          filters:
+            branches:
+              ignore:
+                - l10n_develop
           requires:
             - build-setup
       - test-firefox:
-          branches:
-            ignore:
-              - l10n_develop
+          filters:
+            branches:
+              ignore:
+                - l10n_develop
           requires:
             - build-setup
       - deploy-testnet:
