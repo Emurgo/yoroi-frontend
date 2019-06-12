@@ -130,7 +130,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
 
                 <Button
-                  className={`fromDaedalusWallet ${commonClasses}`}
+                  className={`confirmButton fromDaedalusWallet ${commonClasses}`}
                   label={intl.formatMessage(messages.transferText)}
                   onClick={onConfirm}
                   disabled={disableTransferFunds}
@@ -138,7 +138,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 />
 
                 <Button
-                  className={`fromDaedalusPaperWallet ${commonClasses}`}
+                  className={`confirmButton fromDaedalusPaperWallet ${commonClasses}`}
                   label={intl.formatMessage(messages.transferPaperText)}
                   onClick={onPaperConfirm}
                   disabled={disableTransferFunds}
@@ -146,7 +146,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 />
 
                 <Button
-                  className={`fromDaedalusMasterKey ${commonClasses}`}
+                  className={`confirmButton fromDaedalusMasterKey ${commonClasses}`}
                   label={intl.formatMessage(messages.transferMasterKeyText)}
                   onClick={onMasterKeyConfirm}
                   disabled={disableTransferFunds}
