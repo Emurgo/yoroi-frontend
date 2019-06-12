@@ -123,7 +123,7 @@ const manyTx1 = {
   tx_state: 'Successful'
 };
 const manyTx2 = {
-  hash: cryptoRandomString(64),
+  hash: '60493bf26e60b0b98f143647613be2ec1c6f50bd5fc15a14a2ff518f5fa36be0',
   inputs: [
     { id: distributorTx.hash, index: 5 }
   ],
@@ -171,7 +171,6 @@ const manyTx4 = {
   tx_state: 'Successful'
 };
 
-
 const useChange = {
   hash: '0a073669845fea4ae83cd4418a0b4fd56610097a89601a816b5891f667e3496c',
   inputs: [
@@ -187,6 +186,36 @@ const useChange = {
   time: '2019-04-21T15:13:33.000Z',
   last_update: '2019-05-21T23:14:51.899Z',
   tx_state: 'Successful'
+};
+
+export const postLaunchSuccessfulTx = {
+  hash: '350632adedd456cf607ed01a84f8c6c49d32f17e0e63447be7f7b69cb37ef446',
+  inputs: [
+    { id: manyTx2.hash, index: 1 }
+  ],
+  outputs: [
+    // address not belonging to any wallet
+    { address: 'Ae2tdPwUPEZCvDkc6R9oNE7Qh1yFLDyu4mpVbGhqUHkNsoVjd2UPiWGoVes', value: 500000 },
+  ],
+  block_num: '202',
+  time: '2019-04-22T15:15:33.000Z',
+  last_update: '2019-05-22T23:16:51.899Z',
+  tx_state: 'Successful'
+};
+
+export const postLaunchPendingTx = {
+  hash: '350632adedd456cf607ed01a84f8c6c49d32f17e0e63447be7f7b69cb37ef446',
+  inputs: [
+    { id: manyTx2.hash, index: 1 }
+  ],
+  outputs: [
+    // address not belonging to any wallet
+    { address: 'Ae2tdPwUPEZCvDkc6R9oNE7Qh1yFLDyu4mpVbGhqUHkNsoVjd2UPiWGoVes', value: 500000 },
+  ],
+  block_num: '202',
+  time: '2019-04-22T15:15:33.000Z',
+  last_update: '2019-05-22T23:16:51.899Z',
+  tx_state: 'Pending'
 };
 
 // ====================
@@ -210,55 +239,40 @@ const failedTx = {
   tx_state: 'Failed'
 };
 
-// Bundle all txs together to form the blockchain
-const transactions: Array<MockTx> = [
-  // test setup
-  genesisTx, distributorTx,
-  // simple-pending-wallet
-  pendingTx1, pendingTx2,
-  // many-tx-wallet
-  manyTx1, manyTx2, manyTx3, manyTx4, useChange,
-  // failed-single-tx
-  failedTx,
-];
+// =================
+//   Manage state
+// =================
 
-/**
- * Helper functions to mock the backend response
- */
+let transactions: Array<MockTx> = [];
 
-const usedAddresses = new Set<string>();
-
-const txHashMap = _.keyBy(transactions, tx => tx.hash);
-
-const utxoMap: { [key: string]: $Exact<UTXO> } = {};
-for (let i = 0; i < transactions.length; i++) {
-  const tx = transactions[i];
-
-  for (let j = 0; j < tx.inputs.length; j++) {
-    const input = tx.inputs[j];
-    if (input.id === genesisTransaction) {
-      continue;
-    }
-
-    usedAddresses.add(txHashMap[input.id].outputs[input.index].address);
-
-    const key = JSON.stringify(input);
-    delete utxoMap[key];
-  }
-  for (let j = 0; j < tx.outputs.length; j++) {
-    const key = JSON.stringify({
-      id: tx.hash,
-      index: j
-    });
-    utxoMap[key] = {
-      utxo_id: tx.hash + j,
-      tx_hash: tx.hash,
-      tx_index: j,
-      receiver: tx.outputs[j].address,
-      amount: tx.outputs[j].value.toString(),
-    };
-  }
+export function addTransaction(tx: MockTx) {
+  transactions.push(tx);
 }
+
+export function resetChain() {
+  transactions = [];
+  // test setup
+  addTransaction(genesisTx);
+  addTransaction(distributorTx);
+  // test setup
+  addTransaction(genesisTx);
+  addTransaction(distributorTx);
+  // simple-pending-wallet
+  addTransaction(pendingTx1);
+  addTransaction(pendingTx2);
+  // many-tx-wallet
+  addTransaction(manyTx1);
+  addTransaction(manyTx2);
+  addTransaction(manyTx3);
+  addTransaction(manyTx4);
+  addTransaction(useChange);
+  // failed-single-tx
+  addTransaction(failedTx);
+}
+
+// ====================
+//   Helper functinos
+// ====================
 
 function nullifyIfZero(num: BigNumber) {
   if (num.isZero()) {
@@ -267,22 +281,12 @@ function nullifyIfZero(num: BigNumber) {
   return num;
 }
 
-const utxos = Object.keys(utxoMap).map(key => utxoMap[key]);
-const utxoForAddresses: { [key: string]: Array<UTXO> } = _.groupBy(utxos, utxo => utxo.receiver);
-const utxoSumForAddresses: { [key: string]: ?string } = _.mapValues(
-  utxoForAddresses,
-  arr => nullifyIfZero(arr
-    .reduce(
-      (sum, utxo) => sum.plus(new BigNumber(utxo.amount)),
-      new BigNumber(0),
-    ))
-);
-
 function inputToAddress(input: TxoPointerType): string {
   if (input.id === genesisTransaction) {
     return genesisAddress;
   }
 
+  const txHashMap = _.keyBy(transactions, transaction => transaction.hash);
   return txHashMap[input.id].outputs[input.index].address;
 }
 
@@ -291,24 +295,13 @@ function inputoToValue(input: TxoPointerType): string {
     return genesisTxValue.toString();
   }
 
+  const txHashMap = _.keyBy(transactions, transaction => transaction.hash);
   return txHashMap[input.id].outputs[input.index].value.toString();
 }
 
-const bestBlockNum = Math.max(...transactions.map(
-  tx => (tx.block_num ? Number(tx.block_num) : 0)
-)).toString();
-const history: Array<Transaction> = transactions.map(tx => ({
-  hash: tx.hash,
-  inputs_address: tx.inputs.map(input => inputToAddress(input)),
-  inputs_amount: tx.inputs.map(input => inputoToValue(input)),
-  outputs_address: tx.outputs.map(output => output.address),
-  outputs_amount: tx.outputs.map(output => output.value.toString()),
-  block_num: tx.block_num,
-  time: tx.time,
-  best_block_num: bestBlockNum,
-  last_update: tx.last_update,
-  tx_state: tx.tx_state
-}));
+// =================
+//   Special UTXOs
+// =================
 
 const redemptionUtxoForAddresses = {
   Ae2tdPwUPEZ2XP4BGUHeMDRohtbLMm8MgwwwW86a2Mozyh3oMhza2f1H6Lz: [{
@@ -360,12 +353,98 @@ const daedalusUtxoForAddresses = {
   }],
 };
 
-export default {
-  utxoForAddresses: Object.assign(
-    utxoForAddresses,
+// =====================
+//   Recalculate state
+// =====================
+
+function calcUtxoMap(): { [key: string]: $Exact<UTXO> }  {
+  const utxoMap = {};
+  for (const tx of transactions) {
+    for (let j = 0; j < tx.inputs.length; j++) {
+      const input = tx.inputs[j];
+      if (input.id === genesisTransaction) {
+        continue;
+      }
+
+      const key = JSON.stringify(input);
+      delete utxoMap[key];
+    }
+    for (let j = 0; j < tx.outputs.length; j++) {
+      const key = JSON.stringify({
+        id: tx.hash,
+        index: j
+      });
+      utxoMap[key] = {
+        utxo_id: tx.hash + j,
+        tx_hash: tx.hash,
+        tx_index: j,
+        receiver: tx.outputs[j].address,
+        amount: tx.outputs[j].value.toString(),
+      };
+    }
+  }
+  return utxoMap;
+}
+
+function history(): Array<Transaction> {
+  const bestBlockNum = Math.max(...transactions.map(
+    tx => (tx.block_num ? Number(tx.block_num) : 0)
+  )).toString();
+
+  return transactions.map(tx => ({
+    hash: tx.hash,
+    inputs_address: tx.inputs.map(input => inputToAddress(input)),
+    inputs_amount: tx.inputs.map(input => inputoToValue(input)),
+    outputs_address: tx.outputs.map(output => output.address),
+    outputs_amount: tx.outputs.map(output => output.value.toString()),
+    block_num: tx.block_num,
+    time: tx.time,
+    best_block_num: bestBlockNum,
+    last_update: tx.last_update,
+    tx_state: tx.tx_state
+  }));
+}
+
+
+function utxoForAddresses(): { [key: string]: Array<UTXO> } {
+  const utxoMap = calcUtxoMap();
+  const utxos = Object.keys(utxoMap).map(key => utxoMap[key]);
+  const regularUtxoMapping = _.groupBy(utxos, utxo => utxo.receiver);
+  return Object.assign(
+    regularUtxoMapping,
     redemptionUtxoForAddresses,
     daedalusUtxoForAddresses
-  ),
+  );
+}
+function utxoSumForAddresses(): { [key: string]: ?string } {
+  const result = _.mapValues(
+    utxoForAddresses(),
+    arr => nullifyIfZero(arr
+      .reduce(
+        (sum, utxo) => sum.plus(new BigNumber(utxo.amount)),
+        new BigNumber(0),
+      ))
+  );
+  return result;
+}
+
+function usedAddresses(): Set<string> {
+  const set = new Set<string>();
+  const txHashMap = _.keyBy(transactions, transaction => transaction.hash);
+
+  for (const tx of transactions) {
+    for (const input of tx.inputs) {
+      if (input.id === genesisTransaction) {
+        continue;
+      }
+      set.add(txHashMap[input.id].outputs[input.index].address);
+    }
+  }
+  return set;
+}
+
+export default {
+  utxoForAddresses,
   utxoSumForAddresses,
   usedAddresses,
   history,

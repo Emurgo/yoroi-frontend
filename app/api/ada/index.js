@@ -41,7 +41,6 @@ import {
   refreshTxs,
 } from './adaTransactions/adaTransactionsHistory';
 import {
-  getAdaTransactionFee,
   newAdaUnsignedTx,
   sendAllUnsignedTx,
   signTransaction,
@@ -76,6 +75,8 @@ import type {
   AdaTransactionInputOutput,
   AdaWallet,
   AdaAssurance,
+  BaseSignRequest,
+  UnsignedTxResponse,
 } from './adaTypes';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -258,33 +259,28 @@ export type CreateWalletFunc = (
   request: CreateWalletRequest
 ) => Promise<CreateWalletResponse>;
 
-// createTransaction
+// signAndBroadcast
 
-export type CreateTransactionRequest = {
-  receiver: string,
-  amount: string,
+export type SignAndBroadcastRequest = {
+  signRequest: BaseSignRequest,
   password: string,
-  getUTXOsForAddresses: AddressUtxoFunc,
   sendTx: SendFunc,
-  shouldSendAll: boolean,
 };
-export type CreateTransactionResponse = SignedResponse;
-export type CreateTransactionFunc = (
-  request: CreateTransactionRequest
-) => Promise<CreateTransactionResponse>;
+export type SignAndBroadcastResponse = SignedResponse;
+export type SignAndBroadcastFunc = (
+  request: SignAndBroadcastRequest
+) => Promise<SignAndBroadcastResponse>;
 
 // createTrezorSignTxData
 
 export type CreateTrezorSignTxDataRequest = {
-  receiver: string,
-  amount: string,
+  signRequest: BaseSignRequest,
   getUTXOsForAddresses: AddressUtxoFunc,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 };
 export type CreateTrezorSignTxDataResponse = {
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   trezorSignTxPayload: $CardanoSignTransaction,
-  changeAddress: ?AdaAddress,
 };
 export type CreateTrezorSignTxDataFunc = (
   request: CreateTrezorSignTxDataRequest
@@ -304,15 +300,11 @@ export type BroadcastTrezorSignedTxFunc = (
 // createLedgerSignTxData
 
 export type CreateLedgerSignTxDataRequest = {
-  receiver: string,
-  amount: string,
-  getUTXOsForAddresses: AddressUtxoFunc,
+  signRequest: BaseSignRequest,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 };
 export type CreateLedgerSignTxDataResponse = {
   ledgerSignTxPayload: LedgerSignTxPayload,
-  changeAddress: ?AdaAddress,
-  unsignedTx: RustModule.Wallet.Transaction
 };
 export type CreateLedgerSignTxDataFunc = (
   request: CreateLedgerSignTxDataRequest
@@ -330,20 +322,20 @@ export type PrepareAndBroadcastLedgerSignedTxFunc = (
   request: PrepareAndBroadcastLedgerSignedTxRequest
 ) => Promise<PrepareAndBroadcastLedgerSignedTxResponse>;
 
-// calculateTransactionFee
+// createUnsignedTx
 
-export type TransactionFeeRequest = {
-  sender: string,
+export type CreateUnsignedTxRequest = {
+  accountId: number,
   receiver: string,
-  amount: string,
+  amount: string, // in lovelaces
   getUTXOsForAddresses: AddressUtxoFunc,
   shouldSendAll: boolean,
 };
-export type TransactionFeeResponse = BigNumber;
+export type CreateUnsignedTxResponse = UnsignedTxResponse;
 
-export type TransactionFeeFunc = (
-  request: TransactionFeeRequest
-) => Promise<TransactionFeeResponse>;
+export type CreateUnsignedTxFunc = (
+  request: CreateUnsignedTxRequest
+) => Promise<CreateUnsignedTxResponse>;
 
 // createAddress
 
@@ -740,30 +732,12 @@ export default class AdaApi {
     });
   }
 
-  async createTransaction(
-    request: CreateTransactionRequest
-  ): Promise<CreateTransactionResponse> {
-    Logger.debug('AdaApi::createTransaction called');
-    const { receiver, amount, password, shouldSendAll } = request;
+  async signAndBroadcast(
+    request: SignAndBroadcastRequest
+  ): Promise<SignAndBroadcastResponse> {
+    Logger.debug('AdaApi::signAndBroadcast called');
+    const { password, signRequest } = request;
     try {
-      const allAdaAddresses = await getAdaAddressesList();
-      const changeAdaAddr = await popBip44Address('Internal');
-      let unsignedTx;
-      if (shouldSendAll) {
-        unsignedTx = await sendAllUnsignedTx(
-          receiver,
-          allAdaAddresses,
-          request.getUTXOsForAddresses,
-        );
-      } else {
-        unsignedTx = await newAdaUnsignedTx(
-          receiver,
-          amount,
-          changeAdaAddr,
-          allAdaAddresses,
-          request.getUTXOsForAddresses,
-        );
-      }
       const masterKey = getWalletMasterKey();
       const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
       const currAccount = getCurrentAccountIndex();
@@ -771,19 +745,19 @@ export default class AdaApi {
         RustModule.Wallet.AccountIndex.new(currAccount | HARD_DERIVATION_START)
       );
       const signedTx = await signTransaction(
-        unsignedTx,
+        signRequest,
         accountPrivateKey
       );
       const response = request.sendTx({ signedTx });
       Logger.debug(
-        'AdaApi::createTransaction success: ' + stringifyData(response)
+        'AdaApi::signAndBroadcast success: ' + stringifyData(response)
       );
       return response;
     } catch (error) {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
-      Logger.error('AdaApi::createTransaction error: ' + stringifyError(error));
+      Logger.error('AdaApi::signAndBroadcast error: ' + stringifyError(error));
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
       }
@@ -796,32 +770,16 @@ export default class AdaApi {
   ): Promise<CreateTrezorSignTxDataResponse> {
     try {
       Logger.debug('AdaApi::createTrezorSignTxData called');
-      const { receiver, amount } = request;
-
-      const allAdaAddresses = await getAdaAddressesList();
-      const changeAdaAddr = await popBip44Address('Internal');
-      const unsignedTxResponse = await newAdaUnsignedTx(
-        receiver,
-        amount,
-        changeAdaAddr,
-        allAdaAddresses,
-        request.getUTXOsForAddresses,
-      );
-
-      const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
+      const { signRequest } = request;
 
       const trezorSignTxPayload = await createTrezorSignTxPayload(
-        unsignedTxResponse.addressesMap,
-        changeAdaAddr,
-        unsignedTxResponse.senderUtxos,
-        unsignedTx,
+        signRequest,
         request.getTxsBodiesForUTXOs,
       );
       Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
 
       return {
         trezorSignTxPayload,
-        changeAddress: changeAdaAddr,
       };
     } catch (error) {
       Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
@@ -861,33 +819,16 @@ export default class AdaApi {
   ): Promise<CreateLedgerSignTxDataResponse> {
     try {
       Logger.debug('AdaApi::createLedgerSignTxData called');
-      const { receiver, amount } = request;
-
-      const allAdaAddresses = await getAdaAddressesList();
-      const changeAdaAddr = await popBip44Address('Internal');
-      const unsignedTxResponse = await newAdaUnsignedTx(
-        receiver,
-        amount,
-        changeAdaAddr,
-        allAdaAddresses,
-        request.getUTXOsForAddresses,
-      );
-
-      const unsignedTx = unsignedTxResponse.txBuilder.make_transaction();
+      const { signRequest, getTxsBodiesForUTXOs } = request;
 
       const ledgerSignTxPayload = await createLedgerSignTxPayload(
-        unsignedTxResponse.addressesMap,
-        changeAdaAddr,
-        unsignedTxResponse.senderUtxos,
-        unsignedTx,
-        request.getTxsBodiesForUTXOs,
+        signRequest,
+        getTxsBodiesForUTXOs,
       );
 
       Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
       return {
         ledgerSignTxPayload,
-        changeAddress: changeAdaAddr,
-        unsignedTx,
       };
     } catch (error) {
       Logger.error('AdaApi::createLedgerSignTxData error: ' + stringifyError(error));
@@ -936,30 +877,38 @@ export default class AdaApi {
     }
   }
 
-  async calculateTransactionFee(
-    request: TransactionFeeRequest
-  ): Promise<TransactionFeeResponse> {
-    Logger.debug('AdaApi::calculateTransactionFee called');
+  async createUnsignedTx(
+    request: CreateUnsignedTxRequest
+  ): Promise<CreateUnsignedTxResponse> {
+    Logger.debug('AdaApi::createUnsignedTx called');
     const { receiver, amount, shouldSendAll } = request;
     const allAdaAddresses = await getAdaAddressesList();
     try {
       const changeAdaAddr = await popBip44Address('Internal');
-      const feeResponse = await getAdaTransactionFee(
-        receiver,
-        amount,
-        changeAdaAddr,
-        allAdaAddresses,
-        request.getUTXOsForAddresses,
-        shouldSendAll,
-      );
-      const fee = feeResponse.fee.to_str();
+
+      let unsignedTxResponse;
+      if (shouldSendAll) {
+        unsignedTxResponse = await sendAllUnsignedTx(
+          receiver,
+          allAdaAddresses,
+          request.getUTXOsForAddresses
+        );
+      } else {
+        unsignedTxResponse = await newAdaUnsignedTx(
+          receiver,
+          amount,
+          [changeAdaAddr],
+          allAdaAddresses,
+          request.getUTXOsForAddresses
+        );
+      }
       Logger.debug(
-        'AdaApi::calculateTransactionFee success: ' + stringifyData(fee)
+        'AdaApi::createUnsignedTx success: ' + stringifyData(unsignedTxResponse)
       );
-      return _createTransactionFeeFromServerData(fee);
+      return unsignedTxResponse;
     } catch (error) {
       Logger.error(
-        'AdaApi::calculateTransactionFee error: ' + stringifyError(error)
+        'AdaApi::createUnsignedTx error: ' + stringifyError(error)
       );
       if (error.id.includes('NotEnoughMoneyToSendError')) throw error;
       throw new GenericApiError();
@@ -1519,11 +1468,4 @@ const _createTransactionFromServerData = action(
       state: _conditionToTxState(data.ctCondition)
     });
   }
-);
-
-const _createTransactionFeeFromServerData = action(
-  'AdaApi::_createTransactionFeeFromServerData',
-  (fee: string) => (
-    new BigNumber(fee)
-  )
 );

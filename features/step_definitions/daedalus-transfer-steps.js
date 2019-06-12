@@ -78,7 +78,7 @@ When(/^I click next button on the Daedalus transfer page$/, async function () {
   await this.click("//button[contains(@label, 'Next')]", By.xpath);
 });
 
-When(/^I click back button on the Daedalus transfer page$/, async function () {
+When(/^I click the back button$/, async function () {
   await this.click("//button[contains(@label, 'Back')]", By.xpath);
 });
 

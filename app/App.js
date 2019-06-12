@@ -13,6 +13,7 @@ import de from 'react-intl/locale-data/de';
 import fr from 'react-intl/locale-data/fr';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
+import it from 'react-intl/locale-data/it';
 import { Routes } from './Routes';
 import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
 import { themeOverrides } from './themes/overrides';
@@ -25,7 +26,7 @@ import environment from './environment';
 import { hot } from 'react-hot-loader';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
 
 @observer
 class App extends Component<{
@@ -55,7 +56,14 @@ class App extends Component<{
     // (missed in object keys) just stay in english
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
-    const themeVars = stores.profile.currentThemeVars;
+    const themeVars = Object.assign(
+      stores.profile.currentThemeVars,
+      {
+        // show wingdings on dev builds when no font is set to easily find missing font bugs
+        // however, on production, we use Times New Roman which looks ugly but at least it's readable.
+        '--default-font': environment.isDev() ? 'wingdings' : 'Times New Roman',
+      }
+    );
     const currentTheme = stores.profile.currentTheme;
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 

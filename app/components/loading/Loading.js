@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -18,7 +19,8 @@ type Props = {
   loadingDataForNextScreenMessage: MessageDescriptor,
   hasLoadedCurrentLocale: boolean,
   hasLoadedCurrentTheme: boolean,
-  error: ?LocalizableError
+  error: ?LocalizableError,
+  getErrorMessage: void => Node,
 };
 
 @observer
@@ -78,7 +80,8 @@ export default class Loading extends Component<Props> {
             {error && (
               <div className={styles.loading}>
                 <h1 className={styles.error}>
-                  {intl.formatMessage(error)}
+                  {intl.formatMessage(error)}<br />
+                  {this.props.getErrorMessage()}
                 </h1>
               </div>
             )}

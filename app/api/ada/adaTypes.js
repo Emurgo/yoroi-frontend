@@ -65,6 +65,12 @@ export type AdaAmount = {
 };
 export type AdaTransactionTag = 'CTIn' | 'CTOut';
 
+export type AddressingInfo = {
+  account: number,
+  change: number,
+  index: number,
+};
+
 export type AdaAddress = {
   /**
    * TODO: misleading as the value inside DB is always stale
@@ -78,10 +84,7 @@ export type AdaAddress = {
    * Is is only updated in-memory after DB fetch
   */
   cadIsUsed: boolean,
-  account: number,
-  change: number,
-  index: number
-};
+} & AddressingInfo;
 
 export type AdaAddresses = Array<AdaAddress>;
 
@@ -117,17 +120,20 @@ export type AdaTransactionInputOutput = [
   AdaAmount,
 ];
 
-export type AdaFeeEstimateResponse = {
-  fee: RustModule.Wallet.Coin,
-};
-
 export type UnsignedTxFromUtxoResponse = {
   senderUtxos: Array<UTXO>,
   txBuilder: RustModule.Wallet.TransactionBuilder,
+  changeAddr: Array<TxOutType & AddressingInfo>,
 };
 export type UnsignedTxResponse = UnsignedTxFromUtxoResponse & {
   addressesMap: AdaAddressMap,
 };
+export type BaseSignRequest = {
+  addressesMap: AdaAddressMap,
+  changeAddr: Array<TxOutType & AddressingInfo>,
+  senderUtxos: Array<UTXO>,
+  unsignedTx: RustModule.Wallet.Transaction,
+}
 
 export type AdaWallet = {
   cwAmount: AdaAmount,

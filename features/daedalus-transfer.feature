@@ -82,7 +82,7 @@ Feature: Transfer Daedalus Wallet funds
     Then I should see "This field is required." error message:
     | message                                            |
     | global.errors.fieldIsRequired                      |
-    When I click back button on the Daedalus transfer page
+    When I click the back button
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
     |instructionMessage                              | attentionMessage| 
     |transfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|

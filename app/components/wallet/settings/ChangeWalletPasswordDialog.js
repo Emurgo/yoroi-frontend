@@ -17,41 +17,33 @@ import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import PasswordInstructions from '../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
-  dialogTitleSetPassword: {
-    id: 'wallet.settings.changePassword.dialog.title.setPassword',
-    defaultMessage: '!!!Password',
-  },
   dialogTitleChangePassword: {
     id: 'wallet.settings.changePassword.dialog.title.changePassword',
-    defaultMessage: '!!!Change password',
-  },
-  walletPasswordLabel: {
-    id: 'wallet.settings.changePassword.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Wallet password',
+    defaultMessage: '!!!Change spending password',
   },
   currentPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordLabel',
-    defaultMessage: '!!!Current password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat password',
+    defaultMessage: '!!!Current spending password',
   },
   currentPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type current password',
-  },
-  newPasswordFieldPlaceholder: {
-    id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type new password',
+    defaultMessage: '!!!Type current spending password',
   },
   newPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
-    defaultMessage: '!!!New password',
+    defaultMessage: '!!!New spending password',
+  },
+  newPasswordFieldPlaceholder: {
+    id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type new spending password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat new spending password',
   },
   repeatPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Repeat new password',
+    defaultMessage: '!!!Type new spending password',
   },
 });
 
