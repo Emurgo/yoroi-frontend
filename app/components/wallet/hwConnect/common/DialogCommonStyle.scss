@@ -32,38 +32,42 @@ $opacityCommon: 0.7;
   }
 }
 
-.headerBlockClassic {
-  margin-bottom: 16px;
-  width: 725px;
-  span {
-    font-family: var(--font-light);
-    line-height: 1.38;
-    font-size: 14px;
-    opacity: $opacityCommon;
-  }
-}
-
 .headerBlock {
   margin-bottom: 16px;
-  font-size: 12px;
-  line-height: 18px;
-}
-
-.middleBlockClassic {
-  overflow: hidden;  
-  background-color: var(--theme-hw-connect-dialog-middle-block-common-background-color);
-  object-fit: contain;
-  border-radius: 4px;  
-  width: 725px;
-  height: 280px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 10px;
 }
 
 .middleBlock {
-  overflow: hidden;  
-  background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
   object-fit: contain;
-  border-radius: 8px;
+}
+
+:global(.YoroiClassic) {
+  .headerBlock {
+    width: 725px;
+
+    span {
+      font-family: var(--font-light);
+      line-height: 1.38;
+      font-size: 14px;
+      opacity: $opacityCommon;
+    }
+  }
+  .middleBlock {
+    background-color: var(--theme-hw-connect-dialog-middle-block-common-background-color);
+    border-radius: 4px;  
+    width: 725px;
+    height: 280px;
+    padding: 10px 0 10px 10px;
+  }
+}
+
+:global(.YoroiModern) {
+  .headerBlock {
+    font-size: 12px;
+    line-height: 18px;
+  }
+  .middleBlock {
+    background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
+    border-radius: 8px;
+    overflow: hidden;  
+  }
 }

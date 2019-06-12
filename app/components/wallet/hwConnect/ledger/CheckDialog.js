@@ -82,12 +82,8 @@ export default class CheckDialog extends Component<Props> {
       classicTheme,
     } = this.props;
 
-    const middleBlockClasses = classicTheme
-      ? classnames([styles.middleBlockClassic, styles.middleCheckBlockClassic])
-      : classnames([styles.middleBlock, styles.middleCheckBlock]);
-
     const middleBlock = (
-      <div className={middleBlockClasses}>
+      <div className={classnames([styles.middleBlock, styles.component])}>
         {!classicTheme && <SvgInline svg={aboutLedgerSVG} />}
 
         <div className={styles.prerequisiteBlock}>

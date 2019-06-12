@@ -66,16 +66,12 @@ export default class ConnectDialog extends Component<Props> {
       progressInfo, isActionProcessing, error,
       goBack, submit, cancel, classicTheme,
     } = this.props;
-    const headerBlockClasses = classicTheme
-      ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
-      : classnames([headerMixin.headerBlock, styles.headerBlock]);
-    const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
     const middleConnectErrorBlockClasses = classicTheme
       ? styles.middleConnectErrorBlockClassic
       : null;
 
     const introBlock = classicTheme ? (
-      <div className={headerBlockClasses}>
+      <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
         <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span>
         <br />
         <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span>
@@ -84,7 +80,7 @@ export default class ConnectDialog extends Component<Props> {
         <br />
       </div>
     ) : (
-      <div className={headerBlockClasses}>
+      <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
         <span>
           {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
           {intl.formatMessage(messages.connectIntroTextLine2) + ' '}
@@ -100,21 +96,21 @@ export default class ConnectDialog extends Component<Props> {
       case StepState.LOAD:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleConnectLoadBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
             <img src={classicTheme ? connectLoadGIF : connectLoadLedgerGIF} alt="" />
           </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleConnectProcessBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
             <img src={classicTheme ? connectStartGIF : connectLoadLedgerGIF} alt="" />
           </div>);
         break;
       case StepState.ERROR:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([middleBlockClasses, middleConnectErrorBlockClasses])}>
+          <div className={classnames([styles.middleBlock, middleConnectErrorBlockClasses])}>
             <SvgInline svg={classicTheme ? connectErrorSVG : connectErrorLedgerSVG} />
           </div>);
         break;
