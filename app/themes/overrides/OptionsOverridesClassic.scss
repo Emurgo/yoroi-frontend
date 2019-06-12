@@ -1,15 +1,2 @@
 // Css module overrides go here …
 
-.ul {
-  overflow-x: hidden;
-  overflow-y: overlay;
-  max-height: 300px;
-  &::-webkit-scrollbar-button {
-    height: 7px;
-    display: block;
-  }
-  li {
-    // need this to give room to the scrollbar
-    margin-right: 10px;
-  }
-}
