@@ -66,6 +66,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "Memeriksa dana yang ada di address",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Mengambil address",
   "daedalusTransfer.waiting.title.label": "Wallet Daedalus sedang dipulihkan",
+  "daedalusTransfer.waiting.warning": "⚠️ This may take a long time or fail on poor internet connections",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
