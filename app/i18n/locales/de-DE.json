@@ -66,7 +66,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "Überprüfe den Kontostand der Adressen",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Adressen werden abgerufen",
   "daedalusTransfer.waiting.title.label": "Daedalus Wallet wird wiederhergestellt",
-  "daedalusTransfer.waiting.warning": "⚠️ This may take a long time or fail on poor internet connections",
+  "daedalusTransfer.waiting.warning": "⚠️ Dies kann lange dauern oder bei schlechten Internet-Verbindungen fehlschlagen",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
@@ -457,5 +457,5 @@
   "wallet.transaction.type.exchange": "Börse",
   "wallet.transaction.type.intrawallet": "{currency} interne Wallet-Transaktion",
   "wallet.transaction.type.multiparty": "{currency} mehrfach-Teilnehmer Transaktion",
-  "widgets.explorer.tooltip": "Go to {explorerName} Blockchain Explorer"
+  "widgets.explorer.tooltip": "Gehe zum {explorerName} Blockchain-Explorer"
 }
