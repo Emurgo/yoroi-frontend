@@ -66,6 +66,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "アドレスファンドを確認中",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "アドレスの取得中",
   "daedalusTransfer.waiting.title.label": "ダイダロスウォレットを復元中です...",
+  "daedalusTransfer.waiting.warning": "⚠️ This may take a long time or fail on poor internet connections",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
