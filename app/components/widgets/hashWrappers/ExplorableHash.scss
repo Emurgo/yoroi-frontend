@@ -16,15 +16,15 @@
 
 }
 
-.usedHash {
+.darkColor {
   &:hover {
     box-sizing: border-box;
-    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-used-color);
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-dark-color);
   }
 }
-.unusedHash {
+.lightColor {
   &:hover {
     box-sizing: border-box;
-    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-unused-color);
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-light-color);
   }
 }

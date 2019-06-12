@@ -17,7 +17,6 @@ import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
-import UsableHash from '../widgets/hashWrappers/UsableHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 
 const messages = defineMessages({
@@ -119,6 +118,10 @@ export default class WalletReceive extends Component<Props, State> {
       />
     );
 
+    const copyableHashClass = classnames([
+      styles.copyableHash,
+    ]);
+
     // Get QRCode color value from active theme's CSS variable
     const qrCodeBackgroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
@@ -133,10 +136,19 @@ export default class WalletReceive extends Component<Props, State> {
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
             <CopyableAddress
-              address={walletAddress}
+              hash={walletAddress}
               onCopyAddress={onCopyAddress}
-              isUsed={isWalletAddressUsed}
-            />
+            >
+              <ExplorableHashContainer
+                hash={walletAddress}
+                light={isWalletAddressUsed}
+              >
+                <RawHash light={isWalletAddressUsed}>
+                  <span className={copyableHashClass}>{walletAddress}</span>
+                </RawHash>
+              </ExplorableHashContainer>
+            </CopyableAddress>
+            <div className={styles.postCopyMargin} />
             <div className={styles.instructionsText}>
               <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </div>
@@ -175,13 +187,11 @@ export default class WalletReceive extends Component<Props, State> {
                 {/* Address Id */}
                 <ExplorableHashContainer
                   hash={address.id}
-                  isUsed={address.isUsed}
+                  light={address.isUsed}
                 >
-                  <UsableHash isUsed={address.isUsed}>
-                    <RawHash>
-                      <span className={styles.addressId}>{address.id}</span>
-                    </RawHash>
-                  </UsableHash>
+                  <RawHash light={address.isUsed}>
+                    {address.id}
+                  </RawHash>
                 </ExplorableHashContainer>
                 <div className={styles.addressMargin} />
                 {/* Address Action block start */}

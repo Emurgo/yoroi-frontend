@@ -6,11 +6,11 @@ import { handleExternalLinkClick } from '../../utils/routing';
 
 import ExplorableHash from '../../components/widgets/hashWrappers/ExplorableHash';
 
-type Props = {
+type Props = {|
   children: ?Node,
   hash: string,
-  isUsed: boolean,
-};
+  light: boolean,
+|};
 
 @observer
 export default class ExplorableHashContainer extends Component<Props> {
@@ -21,7 +21,7 @@ export default class ExplorableHashContainer extends Component<Props> {
       <ExplorableHash
         explorerName="Seiza"
         url={seizaAddress + this.props.hash}
-        isUsed={this.props.isUsed}
+        light={this.props.light}
         onExternalLinkClick={handleExternalLinkClick}
       >
         {this.props.children}

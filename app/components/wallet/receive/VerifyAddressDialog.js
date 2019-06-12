@@ -17,6 +17,8 @@ import {
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './VerifyAddressDialog.scss';
@@ -92,6 +94,8 @@ export default class VerifyAddressDialog extends Component<Props> {
       'SimpleFormField_label FormFieldOverridesClassic_label VerifyAddressDialog_header' :
       'SimpleFormField_label FormFieldOverrides_label VerifyAddressDialog_header';
 
+    const derivationClasses = classnames([styles.infoBlock, styles.derivation]);
+
     return (
       <Dialog
         className={classnames([styles.component, 'VerifyAddressDialog'])}
@@ -118,13 +122,22 @@ export default class VerifyAddressDialog extends Component<Props> {
               {intl.formatMessage(messages.addressLabel)}
             </span>
             <div className={styles.infoBlock}>
-              <p>{walletAddress}</p>
+              <p>
+                <ExplorableHashContainer
+                  light
+                  hash={walletAddress}
+                >
+                  <RawHash light>
+                    {walletAddress}
+                  </RawHash>
+                </ExplorableHashContainer>
+              </p>
             </div>
             <br />
             <span className={labelStyle}>
               {intl.formatMessage(messages.derivationPathLabel)}
             </span>
-            <div className={styles.infoBlock}>
+            <div className={derivationClasses}>
               <p>{toDerivationPathString(walletPath)}</p>
             </div>
           </div>

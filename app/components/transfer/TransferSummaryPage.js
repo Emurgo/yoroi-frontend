@@ -9,6 +9,8 @@ import BorderedBox from '../widgets/BorderedBox';
 import styles from './TransferSummaryPage.scss';
 import type { TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
+import RawHash from '../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -104,8 +106,18 @@ export default class TransferSummaryPage extends Component<Props> {
                   ]);
 
                   return (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <div key={index} className={addressesClasses}>{sender}</div>
+                    <div>
+                      <div className={styles.addressSubLabel} />
+                      <ExplorableHashContainer
+                        light
+                        key={index} // eslint-disable-line react/no-array-index-key
+                        hash={sender}
+                      >
+                        <RawHash light>
+                          <span className={addressesClasses}>{sender}</span>
+                        </RawHash>
+                      </ExplorableHashContainer>
+                    </div>
                   );
                 })
               }

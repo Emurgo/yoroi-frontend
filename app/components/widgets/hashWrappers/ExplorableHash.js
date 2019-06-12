@@ -17,13 +17,13 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   children: ?Node,
   explorerName: string,
   url: string,
-  isUsed: boolean,
+  light: boolean,
   onExternalLinkClick: Function,
-};
+|};
 
 @observer
 export default class ExplorableHash extends Component<Props> {
@@ -32,7 +32,7 @@ export default class ExplorableHash extends Component<Props> {
     const { explorerName, onExternalLinkClick } = this.props;
 
     const addressClass = classnames([
-      this.props.isUsed ? styles.usedHash : styles.unusedHash
+      this.props.light ? styles.lightColor : styles.darkColor
     ]);
     return (
       <Tooltip

@@ -338,7 +338,6 @@ export default {
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
   '--theme-transactions-sent-color': '#4a4a4a',
   '--theme-transactions-received-color': '#15d1aa',
-  '--theme-transactions-received-address-color': '#9b9b9b',
   '--theme-transactions-text-color': '#adaeb6',
 
   '--theme-ada-redemption-headline-color': '#121327',
@@ -407,8 +406,10 @@ export default {
   '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#ffffff',
 
   '--theme-widgets-progress-step-common-color': '#15d1aa',
-  '--theme-widgets-explorable-hash-underline-used-color': '#adaeB6',
-  '--theme-widgets-explorable-hash-underline-unused-color': '#464749',
+  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
+  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-widgets-hash-dark-color': '#464749',
+  '--theme-widgets-hash-light-color': '#adaeB6',
 
   '--theme-footer-block-background-color': '#fff',
   '--theme-footer-block-background-color-hover': '#D9DDE0',
