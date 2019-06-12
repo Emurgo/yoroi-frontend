@@ -66,6 +66,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "正在检查资金地址",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "正在获取地址",
   "daedalusTransfer.waiting.title.label": "正在恢复 Daedalus 钱包...",
+  "daedalusTransfer.waiting.warning": "⚠️ This may take a long time or fail on poor internet connections",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
