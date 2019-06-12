@@ -20,7 +20,7 @@ const messages = defineMessages({
   },
   restoreNormalDescription: {
     id: 'wallet.add.optionDialog.restore.normalWallet.description',
-    defaultMessage: '!!!The simplest and most common way to create a Wallet. Yoroi will generate 15 mnemonic words that you will have to store in a safe place in order to restore the wallet.',
+    defaultMessage: '!!!If you have a Yoroi recovery phrase consisting of 15 words generated when you created a Yoroi Wallet, choose this option to restore your wallet.',
   },
   restorePaperWalletTitle: {
     id: 'wallet.add.optionDialog.restore.paperWallet.title',
@@ -28,7 +28,7 @@ const messages = defineMessages({
   },
   restorePaperWalletDescription: {
     id: 'wallet.add.optionDialog.restore.paperWallet.description',
-    defaultMessage: '!!!Allows the generation of an offline wallet that should be printed. The process involves setting up an optional password for extra security and then printing a pdf that contains the mnemonics (for later recovery) and some Cardano addresses onto a paper.',
+    defaultMessage: '!!!If you have generated a Yoroi paper wallet (which is usually printed and kept offline), you can choose this option to import the funds from your Yoroi paper wallet.',
   },
 });
 
