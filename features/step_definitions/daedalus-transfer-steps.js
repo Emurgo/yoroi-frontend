@@ -59,15 +59,15 @@ Given(/^I am on the Daedalus Transfer instructions screen$/, async function () {
 });
 
 When(/^I click on the create Yoroi wallet button$/, async function () {
-  await this.click('.instructionsButton');
+  await this.click('.createYoroiWallet');
 });
 
 When(/^I click on the transfer funds from Daedalus button$/, async function () {
-  await this.click('.confirmButton');
+  await this.click('.fromDaedalusWallet');
 });
 
 When(/^I click on the transfer funds from Daedalus master key button$/, async function () {
-  await this.click('.masterKey');
+  await this.click('.fromDaedalusMasterKey');
 });
 
 When(/^I proceed with the recovery$/, async function () {

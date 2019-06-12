@@ -70,13 +70,7 @@ export default class TransferInstructionsPage extends Component<Props> {
       disableTransferFunds,
     } = this.props;
 
-    const instructionsButtonClasses = classnames([
-      'instructionsButton',
-      'primary',
-      styles.button,
-    ]);
-
-    const transferButtonClasses = classnames([
+    const commonClasses = classnames([
       'primary',
       styles.button,
     ]);
@@ -101,7 +95,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <div className={styles.operationBlock}>
                 <Button
-                  className={`createYoroiWallet ${instructionsButtonClasses}`}
+                  className={`createYoroiWallet ${commonClasses}`}
                   label={intl.formatMessage(messages.instructionsButton)}
                   onClick={onFollowInstructionsPrerequisites}
                   disabled={!disableTransferFunds}
@@ -136,7 +130,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
 
                 <Button
-                  className={`fromDaedalusWallet ${transferButtonClasses}`}
+                  className={`fromDaedalusWallet ${commonClasses}`}
                   label={intl.formatMessage(messages.transferText)}
                   onClick={onConfirm}
                   disabled={disableTransferFunds}
@@ -144,7 +138,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 />
 
                 <Button
-                  className={`fromDaedalusPaperWallet ${transferButtonClasses}`}
+                  className={`fromDaedalusPaperWallet ${commonClasses}`}
                   label={intl.formatMessage(messages.transferPaperText)}
                   onClick={onPaperConfirm}
                   disabled={disableTransferFunds}
@@ -152,7 +146,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 />
 
                 <Button
-                  className={`fromDaedalusMasterKey ${transferButtonClasses}`}
+                  className={`fromDaedalusMasterKey ${commonClasses}`}
                   label={intl.formatMessage(messages.transferMasterKeyText)}
                   onClick={onMasterKeyConfirm}
                   disabled={disableTransferFunds}
