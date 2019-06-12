@@ -1,3 +1,4 @@
+// @flow
 import LocalizableError from './LocalizableError';
 
 export class InvalidMnemonicError extends LocalizableError {

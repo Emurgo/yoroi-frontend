@@ -1,3 +1,4 @@
+// @flow
 import { defineMessages } from 'react-intl';
 
 /*
@@ -300,7 +301,10 @@ export const environmentSpecificMessages = {
   }),
 };
 
-export function listOfTranslators(contributorsList, contributorsAck): string {
+export function listOfTranslators(
+  contributorsList: string,
+  contributorsAck: string,
+): string {
   let output = '';
   // append name of contributors only if the message is not empty
   if (contributorsList !== globalMessages.translationContributors.defaultMessage) {

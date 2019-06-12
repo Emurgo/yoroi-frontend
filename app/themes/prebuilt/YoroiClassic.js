@@ -1,3 +1,4 @@
+// @flow
 //  ==== Theme: Yoroi Classic === //
 
 import common from './Common';

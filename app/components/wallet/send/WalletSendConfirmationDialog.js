@@ -16,7 +16,6 @@ import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 import config from '../../../config';
-import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 
 import WarningBox from '../../widgets/forms/WarningBox';
 
@@ -41,7 +40,6 @@ type Props = {
   receivers: Array<string>,
   totalAmount: string,
   transactionFee: string,
-  signRequest: BaseSignRequest,
   onSubmit: ({ password: string }) => void,
   amountToNaturalUnits: (amountWithFractions: string) => string,
   onCancel: Function,
@@ -83,7 +81,6 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
   submit() {
     this.form.submit({
       onSuccess: (form) => {
-        const { signRequest } = this.props;
         const { walletPassword } = form.values();
         const transactionData = {
           password: walletPassword,

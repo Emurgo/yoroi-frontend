@@ -1,4 +1,6 @@
+// @flow
 import React, { Component } from 'react';
+import type { MessageDescriptor } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import { intlShape } from 'react-intl';
 import styles from './LinkButton.scss';
@@ -6,12 +8,15 @@ import styles from './LinkButton.scss';
 type Props = {
   url: string,
   svg: string,
-  message: any,
-  svgClassName: string,
-  textClassName: String
+  message: MessageDescriptor,
+  svgClass?: string,
+  textClassName: string
 };
 
 export default class LinkButton extends Component<Props> {
+  static defaultProps = {
+    svgClass: undefined
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -19,7 +24,7 @@ export default class LinkButton extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { url, svg, message, svgClassName, textClassName } = this.props;
+    const { url, svg, message, svgClass, textClassName } = this.props;
 
     return (
       <div className={styles.component}>
@@ -32,7 +37,7 @@ export default class LinkButton extends Component<Props> {
             title={intl.formatMessage(message)}
           >
             <div className={styles.icon}>
-              <SvgInline svg={svg} className={svgClassName} />
+              <SvgInline svg={svg} className={svgClass} />
             </div>
             <div className={styles.text}>
               <span className={textClassName}>

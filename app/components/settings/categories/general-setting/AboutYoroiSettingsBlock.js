@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
@@ -67,7 +68,7 @@ const socialMediaLinks = [{
   svg: twitterSvg,
   message: messages.aboutYoroiTwitter
 }, {
-  svgClassName: styles.yoroiLogo,
+  svgClass: styles.yoroiLogo,
   url: 'https://yoroi-wallet.com',
   svg: yoroiSvg,
   message: messages.aboutYoroiWebsite
@@ -94,7 +95,7 @@ const socialMediaLinks = [{
 }];
 
 @observer
-export default class AboutYoroiSettingsBlock extends Component {
+export default class AboutYoroiSettingsBlock extends Component<{}> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };

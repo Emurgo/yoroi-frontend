@@ -22,7 +22,8 @@ import connectErrorSVG from '../../../../assets/images/hardware-wallet/ledger/co
 import connectErrorLedgerSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error-modern.inline.svg';
 import connectLoadLedgerGIF from '../../../../assets/images/hardware-wallet/ledger/connect-load-modern.inline.gif';
 
-import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { StepState } from '../../../widgets/ProgressSteps';
 
 import { Logger } from '../../../../utils/logging';
 

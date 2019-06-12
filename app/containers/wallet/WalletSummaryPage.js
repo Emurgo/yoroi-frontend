@@ -113,6 +113,7 @@ export default class WalletSummaryPage extends Component<Props> {
             error={exportError}
             submit={exportTransactionsToFile.trigger}
             cancel={closeExportTransactionDialog.trigger}
+            classicTheme={profile.isClassicTheme}
           />
         ) : null}
 
