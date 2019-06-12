@@ -42,7 +42,7 @@
   "api.errors.unusedAddressesError": "您不能产生超过20个连续的未使用地址。",
   "api.errors.updateAdaTxsHistoryError": "更新 ada 交易历史时发生错误。",
   "api.errors.updateAdaWalletError": "更新 ada 钱包时发生错误。",
-  "app.errors.unableToLoad": "Unable to load!",
+  "app.errors.unableToLoad": "无法加载！",
   "app.errors.unexpectedError": "发生意外错误。请重试。",
   "app.errors.unknowError": "未知错误。",
   "daedalusTransfer.error.noTransferTxError": "没有要发送的交易。",
