@@ -49,6 +49,7 @@ $opacityCommon: 0.7;
       opacity: $opacityCommon;
     }
   }
+
   .middleBlock {
     background-color: var(--theme-hw-connect-dialog-middle-block-common-background-color);
     border-radius: 4px;  
@@ -63,6 +64,7 @@ $opacityCommon: 0.7;
     font-size: 12px;
     line-height: 18px;
   }
+
   .middleBlock {
     background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
     border-radius: 8px;

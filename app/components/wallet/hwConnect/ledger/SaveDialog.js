@@ -97,12 +97,6 @@ export default class SaveDialog extends Component<Props> {
     const { intl } = this.context;
     const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
 
-    const headerBlockClasses = classicTheme
-      ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
-      : classnames([headerMixin.headerBlock, styles.headerSaveBlock]);
-
-    const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
-    const middleBlockErrorClasses = classicTheme ? styles.middleSaveErrorBlockClassic : null;
     const walletNameFieldClasses = classnames([
       'walletName',
       styles.walletName,
@@ -110,7 +104,7 @@ export default class SaveDialog extends Component<Props> {
     const walletNameField = this.form.$('walletName');
 
     const walletNameBlock = (
-      <div className={headerBlockClasses}>
+      <div className={classnames([headerMixin.headerBlock, styles.headerSaveBlock])}>
         <div className={styles.walletNameInfoWrapper}>
           <div className={styles.walletNameInfoIcon}>
             <SvgInline svg={infoIconSVG} width="20" height="20" />
@@ -132,19 +126,19 @@ export default class SaveDialog extends Component<Props> {
     switch (progressInfo.stepState) {
       case StepState.LOAD:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleSaveLoadBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
             <SvgInline svg={classicTheme ? saveLoadSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleSaveStartProcessBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
             <SvgInline svg={classicTheme ? saveStartSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, middleBlockErrorClasses])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
             <SvgInline svg={classicTheme ? saveErrorSVG : saveErrorImage} />
           </div>);
         break;

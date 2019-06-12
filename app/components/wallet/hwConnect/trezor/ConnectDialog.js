@@ -70,9 +70,6 @@ export default class ConnectDialog extends Component<Props> {
       cancel,
       classicTheme
     } = this.props;
-    const middleConnectErrorBlockClasses = classicTheme
-      ? styles.middleConnectErrorBlockClassic
-      : null;
 
     const introBlock = classicTheme ? (
       <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
@@ -114,7 +111,7 @@ export default class ConnectDialog extends Component<Props> {
       case StepState.ERROR:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([styles.middleBlock, middleConnectErrorBlockClasses])}>
+          <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
             <SvgInline svg={classicTheme ? connectErrorSVG : connectErrorImage} />
           </div>);
         break;
