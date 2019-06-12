@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferInstructionsPage.scss';
@@ -75,8 +76,7 @@ export default class TransferInstructionsPage extends Component<Props> {
       styles.button,
     ]);
 
-    const confirmButtonClasses = classnames([
-      'confirmButton',
+    const transferButtonClasses = classnames([
       'primary',
       styles.button,
     ]);
@@ -101,7 +101,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <div className={styles.operationBlock}>
                 <Button
-                  className={instructionsButtonClasses}
+                  className={`createYoroiWallet ${instructionsButtonClasses}`}
                   label={intl.formatMessage(messages.instructionsButton)}
                   onClick={onFollowInstructionsPrerequisites}
                   disabled={!disableTransferFunds}
@@ -136,7 +136,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
 
                 <Button
-                  className={confirmButtonClasses}
+                  className={`fromDaedalusWallet ${transferButtonClasses}`}
                   label={intl.formatMessage(messages.transferText)}
                   onClick={onConfirm}
                   disabled={disableTransferFunds}
@@ -144,7 +144,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 />
 
                 <Button
-                  className={confirmButtonClasses}
+                  className={`fromDaedalusPaperWallet ${transferButtonClasses}`}
                   label={intl.formatMessage(messages.transferPaperText)}
                   onClick={onPaperConfirm}
                   disabled={disableTransferFunds}
@@ -152,7 +152,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 />
 
                 <Button
-                  className={`masterKey ${confirmButtonClasses}`} // append class for testing
+                  className={`fromDaedalusMasterKey ${transferButtonClasses}`}
                   label={intl.formatMessage(messages.transferMasterKeyText)}
                   onClick={onMasterKeyConfirm}
                   disabled={disableTransferFunds}
