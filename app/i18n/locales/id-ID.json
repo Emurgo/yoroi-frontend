@@ -455,5 +455,6 @@
   "wallet.transaction.type": "{currency} transaksi",
   "wallet.transaction.type.exchange": "Exchange",
   "wallet.transaction.type.intrawallet": "{currency} transaksi intrawallet",
-  "wallet.transaction.type.multiparty": "{currency} transaksi multiparty"
+  "wallet.transaction.type.multiparty": "{currency} transaksi multiparty",
+  "widgets.explorer.tooltip": "Go to {explorerName} Blockchain Explorer"
 }
