@@ -56,7 +56,14 @@ class App extends Component<{
     // (missed in object keys) just stay in english
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
-    const themeVars = stores.profile.currentThemeVars;
+    const themeVars = Object.assign(
+      stores.profile.currentThemeVars,
+      {
+        // show wingdings on dev builds when no font is set to easily find missing font bugs
+        // however, on production, we use Times New Roman which looks ugly but at least it's readable.
+        '--default-font': environment.isDev() ? 'wingdings' : 'Times New Roman',
+      }
+    );
     const currentTheme = stores.profile.currentTheme;
     const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
