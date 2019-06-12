@@ -66,6 +66,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "주소의 자금 확인 중",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "주소 가져오는 중",
   "daedalusTransfer.waiting.title.label": "Daedalus 지갑 복원 중...",
+  "daedalusTransfer.waiting.warning": "⚠️ This may take a long time or fail on poor internet connections",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
