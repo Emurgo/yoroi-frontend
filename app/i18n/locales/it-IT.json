@@ -106,7 +106,7 @@
   "inline.editing.input.cancel.label": "annulla",
   "inline.editing.input.change.label": "modificare",
   "inline.editing.input.changesSaved": "Le modifiche sono state salvate",
-  "loading.screen.error": "For more help, you can {supportRequestLink}",
+  "loading.screen.error": "Per ricevere aiuto {supportRequestLink}",
   "loading.screen.loading": "Caricamento dei componenti",
   "profile.languageSelect.form.languageSelectLabel": "Seleziona la tua lingua",
   "profile.languageSelect.form.submitLabel": "Continua",
