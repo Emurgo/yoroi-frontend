@@ -455,5 +455,6 @@
   "wallet.transaction.type": "{currency} 交易",
   "wallet.transaction.type.exchange": "交易所",
   "wallet.transaction.type.intrawallet": "{currency} 钱包内交易",
-  "wallet.transaction.type.multiparty": "{currency} 多方交易"
+  "wallet.transaction.type.multiparty": "{currency} 多方交易",
+  "widgets.explorer.tooltip": "Go to {explorerName} Blockchain Explorer"
 }
