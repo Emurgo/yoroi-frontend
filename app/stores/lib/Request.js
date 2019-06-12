@@ -65,6 +65,8 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
             if (this._currentApiCall) this._currentApiCall.result = result;
             this.isExecuting = false;
             this.wasExecuted = true;
+            this.error = null;
+            this.isError = false;
             this._isWaitingForResponse = false;
             resolve(result);
           }), 1);
@@ -73,6 +75,7 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
         .catch(action('Request::execute/catch', (error) => {
           setTimeout(action(() => {
             this.error = error;
+            this.result = null;
             this.isExecuting = false;
             this.isError = true;
             this.wasExecuted = true;
