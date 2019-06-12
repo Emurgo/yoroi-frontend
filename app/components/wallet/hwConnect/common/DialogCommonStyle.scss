@@ -3,42 +3,40 @@
 $opacityCommon: 0.7;
 
 .component {
-}
+  overflow: hidden;
 
-.processing {
-  @include loading-spinner("../../../../assets/images/spinner-light.svg");
-}
+  .processing {
+    @include loading-spinner("../../../../assets/images/spinner-light.svg");
+  }
 
-:global(.ProgressSteps_component) {
-  margin-bottom: 24px;
-}
-
-.actions {
-  display: flex;
-  flex-shrink: 0;
-  margin-top: 20px;
-
-  button {
-    width: 50%;
-
-    &:only-child {
-      margin: auto;
-      width: 100%;
+  .actions {
+    display: flex;
+    flex-shrink: 0;
+    margin-top: 20px;
+  
+    button {
+      width: 50%;
+  
+      &:only-child {
+        margin: auto;
+        width: 100%;
+      }
+  
+      & + button {
+        margin-left: 20px;
+      }
     }
-
-    & + button {
-      margin-left: 20px;
-    }
+  }
+  
+  .headerBlock {
+    margin-bottom: 16px;
+  }
+  
+  .middleBlock {
+    object-fit: contain;
   }
 }
 
-.headerBlock {
-  margin-bottom: 16px;
-}
-
-.middleBlock {
-  object-fit: contain;
-}
 
 :global(.YoroiClassic) {
   .headerBlock {
