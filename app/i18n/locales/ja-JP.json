@@ -107,7 +107,7 @@
   "inline.editing.input.change.label": "変更",
   "inline.editing.input.changesSaved": "変更が保存されました",
   "loading.screen.loading": "コンポーネントをロードしています",
-  "loading.screen.error": "Check the dev console for more information or {supportRequestLink}",
+  "loading.screen.error": "詳細は開発用コンソールを確認するか、{supportRequestLink}",
   "profile.languageSelect.form.languageSelectLabel": "使用する言語を選んでください",
   "profile.languageSelect.form.submitLabel": "続ける",
   "profile.languageSelect.title": "言語の選択",
