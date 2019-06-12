@@ -30,10 +30,6 @@ const messages = defineMessages({
     id: 'settings.support.reportProblem.link',
     defaultMessage: '!!!Support request',
   },
-  supportRequestLinkUrl: {
-    id: 'settings.support.faq.supportRequestLinkURL',
-    defaultMessage: '!!!https://zendesk.com/support/',
-  },
   logsTitle: {
     id: 'settings.support.logs.title',
     defaultMessage: '!!!Logs',
@@ -75,7 +71,7 @@ export default class SupportSettings extends Component<Props> {
 
     const supportRequestLink = (
       <a
-        href={intl.formatMessage(messages.supportRequestLinkUrl)}
+        href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
         {intl.formatMessage(messages.supportRequestLink)}

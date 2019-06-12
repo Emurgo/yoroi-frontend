@@ -11,8 +11,5 @@
   max-width: unset;
   display: flex;
   flex-direction: column;
-
-  :global(.YoroiModern) {
-    letter-spacing: 0;
-  }
+  letter-spacing: 0;
 }

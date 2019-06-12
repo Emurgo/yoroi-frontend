@@ -71,45 +71,53 @@ const globalMessages = defineMessages({
     id: 'global.labels.save',
     defaultMessage: '!!!Save',
   },
+  learnMore: {
+    id: 'global.labels.LearnMore',
+    defaultMessage: '!!!Learn more',
+  },  
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
   },
   languageJapanese: {
     id: 'global.language.japanese',
-    defaultMessage: '!!!Japanese',
+    defaultMessage: '!!!日本語',
   },
   languageRussian: {
     id: 'global.language.russian',
-    defaultMessage: '!!!Russian',
+    defaultMessage: '!!!Pусский',
   },
   languageChineseSimplified: {
     id: 'global.language.chinese.simplified',
-    defaultMessage: '!!!Chinese Simplified',
+    defaultMessage: '!!!简体中文',
   },
   languageChineseTraditional: {
     id: 'global.language.chinese.traditional',
-    defaultMessage: '!!!Chinese Traditional',
+    defaultMessage: '!!!繁體中文',
   },
   languageKorean: {
     id: 'global.language.korean',
-    defaultMessage: '!!!Korean',
+    defaultMessage: '!!!한국어',
   },
   languageGerman: {
     id: 'global.language.german',
-    defaultMessage: '!!!German',
+    defaultMessage: '!!!Deutsch',
   },
   languageFrench: {
     id: 'global.language.french',
-    defaultMessage: '!!!French',
+    defaultMessage: '!!!Français',
   },
   languageIndonesian: {
     id: 'global.language.indonesian',
-    defaultMessage: '!!!Indonesian',
+    defaultMessage: '!!!Bahasa Indonesia',
   },
   languageSpanish: {
     id: 'global.language.spanish',
-    defaultMessage: '!!!Spanish',
+    defaultMessage: '!!!Español',
+  },
+  languageItalian: {
+    id: 'global.language.italian',
+    defaultMessage: '!!!Italiano',
   },
   unitAda: {
     id: 'global.unit.ada',
@@ -255,6 +263,22 @@ const globalMessages = defineMessages({
   goBack: {
     id: 'global.labels.goBack',
     defaultMessage: '!!!Go back label',
+  },
+  supportRequestLinkUrl: {
+    id: 'settings.support.faq.supportRequestLinkURL',
+    defaultMessage: '!!!https://yoroi-wallet.com/support/',
+  },
+  contactSupport: {
+    id: 'global.contact',
+    defaultMessage: '!!!contact support', 
+  },
+  staleTxnWarningLine1: {
+    id: 'global.staleTxnWarningLine1',
+    defaultMessage: '!!!Your wallet has changed since you created this transaction.',
+  },
+  staleTxnWarningLine2: {
+    id: 'global.staleTxnWarningLine2',
+    defaultMessage: '!!!You can still send this transaction but it may fail.',
   },
 });
 export default globalMessages;

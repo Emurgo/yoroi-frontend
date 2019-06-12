@@ -15,6 +15,9 @@ import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 import config from '../../../config';
+import type { BaseSignRequest } from '../../../api/ada/adaTypes';
+
+import WarningBox from '../../widgets/forms/WarningBox';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -32,18 +35,19 @@ const messages = defineMessages({
 });
 
 type Props = {
+  staleTx: boolean,
   amount: string,
-  receiver: string,
+  receivers: Array<string>,
   totalAmount: string,
   transactionFee: string,
-  onSubmit: Function,
+  signRequest: BaseSignRequest,
+  onSubmit: ({ password: string }) => void,
   amountToNaturalUnits: (amountWithFractions: string) => string,
   onCancel: Function,
   isSubmitting: boolean,
   error: ?LocalizableError,
   currencyUnit: string,
   classicTheme: boolean,
-  shouldSendAll: boolean
 };
 
 @observer
@@ -78,13 +82,10 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
   submit() {
     this.form.submit({
       onSuccess: (form) => {
-        const { receiver, amount, amountToNaturalUnits, shouldSendAll } = this.props;
+        const { signRequest } = this.props;
         const { walletPassword } = form.values();
         const transactionData = {
-          receiver,
-          amount: amountToNaturalUnits(amount),
           password: walletPassword,
-          shouldSendAll
         };
         this.props.onSubmit(transactionData);
       },
@@ -99,7 +100,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     const {
       onCancel,
       amount,
-      receiver,
+      receivers,
       totalAmount,
       transactionFee,
       isSubmitting,
@@ -107,6 +108,13 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       currencyUnit,
       classicTheme
     } = this.props;
+
+    const staleTxWarning = (
+      <WarningBox>
+        {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
+        {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+      </WarningBox>
+    );
 
     const confirmButtonClasses = classnames([
       'confirmButton',
@@ -139,12 +147,17 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
+        {this.props.staleTx && staleTxWarning}
+
         <div className={styles.walletPasswordFields}>
           <div className={styles.addressToLabelWrapper}>
             <div className={styles.addressToLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
             </div>
-            <div className={styles.addressTo}>{receiver}</div>
+            {receivers.map((receiver, i) => (
+              // eslint-disable-next-line react/no-array-index-key
+              (<div key={receiver + i} className={styles.addressTo}>{receiver}</div>)
+            ))}
           </div>
 
           <div className={styles.amountFeesWrapper}>

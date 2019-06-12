@@ -28,6 +28,10 @@ export default class Store {
 
   initialize() {
     this.setup();
+    this.startReactions();
+  }
+
+  startReactions() {
     this._reactions.forEach(reaction => reaction.start());
   }
 

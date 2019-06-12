@@ -1,6 +1,11 @@
 .terms {
   text-align: justify;
 
+  &.fixedHeight {
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+  }
+
   h1, h2 {
     font-family: var(--rp-theme-font-medium);
     font-size: 17px;

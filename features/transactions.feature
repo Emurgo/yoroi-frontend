@@ -15,6 +15,7 @@ Feature: Send transaction
     And The transaction fees are "<fee>"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
+    Then I should see no warning block
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
@@ -94,7 +95,7 @@ Feature: Send transaction
     Given There is a wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
-	And I click on "Use all my ADA" checkbox
+	And I click on "Send all my ADA" checkbox
     And I fill the address of the form:
       | address                                                     |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
@@ -170,3 +171,62 @@ Feature: Send transaction
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.100000 |
     Then I should see a not enough ada error
+
+  @it-59
+  Scenario: Display warning if wallet changes during confirmation (IT-59)
+    Given There is a wallet stored named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
+    And The transaction fees are "0.215719"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    Then A successful tx gets sent from my wallet from another client
+    Then I should see a warning block
+    # cancelling the transaction and trying again should get rid of the rror
+    Then I click the back button
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    Then I should see no warning block
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+  @it-60
+  Scenario: User can send a tx after invalid password attempt (IT-60)
+    Given There is a wallet stored named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
+    And The transaction fees are "0.199723"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password      |
+      | WrongPassword |
+    And I submit the wallet send form
+    Then I should see an incorrect wallet password error message
+    And I clear the wallet password
+    And I enter the wallet password:
+      | password      |
+      | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+  @it-61
+  Scenario: Display warning if wallet changes during send screen (IT-59)
+    Given There is a wallet stored named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
+    And The transaction fees are "0.215719"
+    Then A pending tx gets sent from my wallet from another client
+    Then I should see a warning block

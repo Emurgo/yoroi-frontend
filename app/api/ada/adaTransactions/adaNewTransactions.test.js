@@ -85,7 +85,7 @@ describe('Create unsigned TX from UTXO', () => {
     const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '5000', // smaller than input
-      null,
+      [],
       utxos
     );
     expect(unsignedTxResponse.senderUtxos).toEqual(utxos);
@@ -103,7 +103,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1900000', // bigger than input including fees
-      null,
+      [],
       utxos
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
@@ -112,7 +112,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1', // bigger than input including fees
-      null,
+      [],
       [],
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
@@ -122,7 +122,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1', // bigger than input including fees
-      null,
+      [],
       utxos,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
@@ -132,7 +132,7 @@ describe('Create unsigned TX from UTXO', () => {
     const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1000', // smaller than input
-      sampleAdaAddresses[0],
+      [sampleAdaAddresses[0]],
       utxos
     );
     // input selection will only take 2 of the 3 inputs
@@ -153,7 +153,7 @@ describe('Create unsigned TX from addresses', () => {
     const unsignedTxResponse = await newAdaUnsignedTx(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '5000', // smaller than input
-      null,
+      [],
       [sampleAdaAddresses[1]],
       makeNetworkMock(utxos),
     );
@@ -174,10 +174,16 @@ describe('Create signed transactions', () => {
     const unsignedTxResponse = await newAdaUnsignedTx(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '5000', // smaller than input
-      null,
+      [],
       [sampleAdaAddresses[1]],
       makeNetworkMock(utxos),
     );
+    const signRequest = {
+      addressesMap: unsignedTxResponse.addressesMap,
+      changeAddr: unsignedTxResponse.changeAddr,
+      senderUtxos: unsignedTxResponse.senderUtxos,
+      unsignedTx: unsignedTxResponse.txBuilder.make_transaction(),
+    };
 
     const accountPrivateKey = RustModule.Wallet.Bip44AccountPrivate.new(
       RustModule.Wallet.PrivateKey.from_hex(
@@ -186,7 +192,7 @@ describe('Create signed transactions', () => {
       RustModule.Wallet.DerivationScheme.v2()
     );
     const signedTx = signTransaction(
-      unsignedTxResponse,
+      signRequest,
       accountPrivateKey
     );
     const witnesses = signedTx.to_json().witness;

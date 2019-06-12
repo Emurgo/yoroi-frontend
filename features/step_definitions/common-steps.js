@@ -6,6 +6,7 @@ import i18nHelper from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
+import { resetChain } from '../mock-chain/mockImporter';
 import { expect } from 'chai';
 
 const { promisify } = require('util');
@@ -38,6 +39,9 @@ Before((scenario) => {
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
   testProgress.step = 0;
+
+  // reset our mock chain to avoid modifications bleeding into other tests
+  resetChain();
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {
@@ -98,7 +102,13 @@ async function takeScreenshot(driver, name) {
 Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
-  await this.click('.restoreWalletButton');
+
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
+
   await this.input("input[name='walletName']", restoreInfo.name);
   await enterRecoveryPhrase(
     this,
@@ -131,16 +141,18 @@ Given(/^I have opened the extension$/, async function () {
 
 Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
+  await this.driver.sleep(500); // give time for page to reload
 });
 
 Given(/^I restart the browser$/, async function () {
   await this.driver.manage().deleteAllCookies();
   await this.driver.navigate().refresh();
+  await this.driver.sleep(500); // give time for page to reload
 });
 
 Given(/^There is no wallet stored$/, async function () {
   await refreshWallet(this);
-  await this.waitForElement('.WalletAdd');
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {

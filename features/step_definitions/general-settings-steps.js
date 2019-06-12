@@ -4,13 +4,16 @@ import { Given, When, Then } from 'cucumber';
 import _ from 'lodash';
 import {
   waitUntilUrlEquals,
+  navigateTo,
 } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 When(/^I navigate to the general settings screen$/, async function () {
-  await this.click('.TopBarCategory_component.settings');
+  await navigateTo.call(this, '/settings');
+  await navigateTo.call(this, '/settings/general');
+
   await waitUntilUrlEquals.call(this, '/settings/general');
   await this.waitForElement('.SettingsLayout_component');
 });
