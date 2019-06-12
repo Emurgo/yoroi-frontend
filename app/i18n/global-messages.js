@@ -71,6 +71,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.save',
     defaultMessage: '!!!Save',
   },
+  learnMore: {
+    id: 'global.labels.LearnMore',
+    defaultMessage: '!!!Learn more',
+  },  
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
@@ -259,6 +263,14 @@ const globalMessages = defineMessages({
   goBack: {
     id: 'global.labels.goBack',
     defaultMessage: '!!!Go back label',
+  },
+  supportRequestLinkUrl: {
+    id: 'settings.support.faq.supportRequestLinkURL',
+    defaultMessage: '!!!https://yoroi-wallet.com/support/',
+  },
+  contactSupport: {
+    id: 'global.contact',
+    defaultMessage: '!!!contact support', 
   },
   staleTxnWarningLine1: {
     id: 'global.staleTxnWarningLine1',

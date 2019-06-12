@@ -1,45 +1,36 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
+
+import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import RouterActions from '../../actions/router-actions';
-import WalletAdd from '../../components/wallet/WalletAdd';
-import WalletAddModern from '../../components/wallet/WalletAddModern';
-import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
-import WalletRestoreOptionsDialog from '../../components/wallet/WalletRestoreOptionsDialog';
-import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
-import WalletConnectHardwareDialog from '../../components/wallet/WalletConnectHardwareDialog';
-import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-import WalletConnectHardwareDialogContainer from './dialogs/WalletConnectHardwareDialogContainer';
-import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
-import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
-import WalletRestoreOptionsDialogContainer from './dialogs/WalletRestoreOptionsDialogContainer';
-import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
-import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
-import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import TopBar from '../../components/topbar/TopBar';
-import environment from '../../environment';
-import resolver from '../../utils/imports';
 import type { InjectedProps } from '../../types/injectedPropsType';
+
 import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
 import TrezorConnectStore from '../../stores/ada/TrezorConnectStore';
 import LedgerConnectStore from '../../stores/ada/LedgerConnectStore';
 
-type Props = InjectedProps;
-const MainLayout = resolver('containers/MainLayout');
+import MainLayout from '../MainLayout';
+import WalletAdd from '../../components/wallet/WalletAdd';
 
-const messages = defineMessages({
-  title: {
-    id: 'wallet.add.page.title',
-    defaultMessage: '!!!Add Wallet',
-  },
-  subTitle: {
-    id: 'wallet.add.subpage.title',
-    defaultMessage: '!!!Yoroi light wallet for Cardano',
-  },
-});
+import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
+import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
+import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
+import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
+
+import WalletRestoreOptionDialogContainer from './dialogs/WalletRestoreOptionDialogContainer';
+import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
+import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
+import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
+
+import WalletConnectHWOptionDialogContainer from './dialogs/WalletConnectHWOptionDialogContainer';
+import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
+import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
+import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
+
+type Props = InjectedProps;
 
 @observer
 export default class WalletAddPage extends Component<Props> {
@@ -55,25 +46,12 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { topbar, profile } = this.props.stores;
-    const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
-    const topBar = (
-      <TopBar
-        title={topbarTitle}
-        onCategoryClicked={category => {
-          actions.topbar.activateTopbarCategory.trigger({ category });
-        }}
-        categories={topbar.CATEGORIES}
-        activeTopbarCategory={topbar.activeTopbarCategory}
-        areCategoriesHidden={profile.isModernTheme}
-      />);
-
+    const { profile } = this.props.stores;
     const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
     const { restoreRequest } = wallets;
+
     const isCreateTrezorWalletActive = this._getTrezorConnectStore().isCreateHWActive;
     const isCreateLedgerWalletActive = this._getLedgerConnectStore().isCreateHWActive;
     const openTrezorConnectDialog = () => {
@@ -85,10 +63,9 @@ export default class WalletAddPage extends Component<Props> {
       this.props.actions[environment.API].ledgerConnect.init.trigger();
     };
 
-    let content = null;
-    let isWalletAdd = false;
+    let activeDialog = null;
     if (uiDialogs.isOpen(WalletCreateDialog)) {
-      content = (
+      activeDialog = (
         <WalletCreateDialogContainer
           actions={actions}
           stores={stores}
@@ -96,9 +73,18 @@ export default class WalletAddPage extends Component<Props> {
           classicTheme={profile.isClassicTheme}
         />
       );
-    } else if (uiDialogs.isOpen(WalletRestoreOptionsDialog)) {
-      content = (
-        <WalletRestoreOptionsDialogContainer
+    } else if (uiDialogs.isOpen(WalletBackupDialog)) {
+      activeDialog = (
+        <WalletBackupDialogContainer
+          actions={actions}
+          stores={stores}
+          onClose={this.onClose}
+          classicTheme={profile.isClassicTheme}
+        />
+      );
+    } else if (uiDialogs.isOpen(WalletRestoreOptionDialog)) {
+      activeDialog = (
+        <WalletRestoreOptionDialogContainer
           stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
@@ -106,20 +92,9 @@ export default class WalletAddPage extends Component<Props> {
           onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
         />
       );
-    } else if (uiDialogs.isOpen(WalletConnectHardwareDialog)) {
-      content = (
-        <WalletConnectHardwareDialogContainer
-          actions={actions}
-          stores={stores}
-          onClose={this.onClose}
-          classicTheme={profile.isClassicTheme}
-          onTrezor={openTrezorConnectDialog}
-          onLedger={openLedgerConnectDialog}
-        />
-      );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
       const restoreType = uiDialogs.getParam('restoreType');
-      content = (
+      activeDialog = (
         <WalletRestoreDialogContainer
           actions={actions}
           stores={stores}
@@ -128,17 +103,19 @@ export default class WalletAddPage extends Component<Props> {
           mode={restoreType || 'regular'}
         />
       );
-    } else if (uiDialogs.isOpen(WalletBackupDialog)) {
-      content = (
-        <WalletBackupDialogContainer
+    } else if (uiDialogs.isOpen(WalletConnectHWOptionDialog)) {
+      activeDialog = (
+        <WalletConnectHWOptionDialogContainer
           actions={actions}
           stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
+          onTrezor={openTrezorConnectDialog}
+          onLedger={openLedgerConnectDialog}
         />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
-      content = (
+      activeDialog = (
         <WalletTrezorConnectDialogContainer
           actions={actions}
           stores={stores}
@@ -147,7 +124,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
-      content = (
+      activeDialog = (
         <WalletLedgerConnectDialogContainer
           actions={actions}
           stores={stores}
@@ -155,53 +132,33 @@ export default class WalletAddPage extends Component<Props> {
           classicTheme={profile.isClassicTheme}
         />
       );
-    } else {
-      isWalletAdd = true;
-      if (profile.isClassicTheme) {
-        content = (
-          <WalletAdd
-            onTrezor={openTrezorConnectDialog}
-            isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-            onLedger={openLedgerConnectDialog}
-            isCreateLedgerWalletActive={isCreateLedgerWalletActive}
-            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
-            onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-            isRestoreActive={restoreRequest.isExecuting}
-            classicTheme={profile.isClassicTheme}
-            title={this.context.intl.formatMessage(messages.title)}
-          />
-        );
-      } else {
-        content = (
-          <WalletAddModern
-            onHardwareConnect={
-              () => actions.dialogs.open.trigger({ dialog: WalletConnectHardwareDialog })
-            }
-            isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-            isCreateLedgerWalletActive={isCreateLedgerWalletActive}
-            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionsDialog })}
-            onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-            isRestoreActive={restoreRequest.isExecuting}
-            onSettings={this._goToSettingsRoot}
-            onDaedalusTransfer={this._goToDaedalusTransferRoot}
-            title={this.context.intl.formatMessage(messages.title)}
-            subTitle={this.context.intl.formatMessage(messages.subTitle)}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
-      }
-
     }
+
+    const content = (
+      <WalletAdd
+        onHardwareConnect={
+          () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
+        }
+        isCreateTrezorWalletActive={isCreateTrezorWalletActive}
+        isCreateLedgerWalletActive={isCreateLedgerWalletActive}
+        onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+        onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+        onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
+        isRestoreActive={restoreRequest.isExecuting}
+        onSettings={this._goToSettingsRoot}
+        onDaedalusTransfer={this._goToDaedalusTransferRoot}
+        classicTheme={profile.isClassicTheme}
+      />
+    );
 
     return (
       <MainLayout
-        topbar={topBar}
-        hideTopbar={profile.isModernTheme && isWalletAdd}
+        actions={actions}
+        stores={stores}
         classicTheme={profile.isClassicTheme}
       >
         {content}
+        {activeDialog}
       </MainLayout>
     );
   }
