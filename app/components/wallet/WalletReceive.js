@@ -16,6 +16,9 @@ import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
+import RawHash from '../widgets/hashWrappers/RawHash';
+import UsableHash from '../widgets/hashWrappers/UsableHash';
+import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -170,7 +173,17 @@ export default class WalletReceive extends Component<Props, State> {
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
                 {/* Address Id */}
-                <div className={styles.addressId}>{address.id}</div>
+                <ExplorableHashContainer
+                  hash={address.id}
+                  isUsed={address.isUsed}
+                >
+                  <UsableHash isUsed={address.isUsed}>
+                    <RawHash>
+                      <span className={styles.addressId}>{address.id}</span>
+                    </RawHash>
+                  </UsableHash>
+                </ExplorableHashContainer>
+                <div className={styles.addressMargin} />
                 {/* Address Action block start */}
                 <div className={styles.addressActions}>
                   {/* Verify Address action */}

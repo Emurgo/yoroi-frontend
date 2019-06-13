@@ -26,7 +26,7 @@ Note: Chrome extensions [update automatically](https://developer.chrome.com/exte
 
 ## (Firefox) Signed build (XPI)
 
-TODO: Firefox
+The same steps as Chrome also produce an `xpi` file. You can upload this directly to the [EMURGO AMO account](https://addons.mozilla.org/en-US/firefox/user/14971548/)
 
 # Deploying new version
 
