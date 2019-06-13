@@ -10,6 +10,7 @@ import cardanoLogo from '../assets/images/cardano-logo.inline.svg';
 import type { InjectedProps } from '../types/injectedPropsType';
 import { handleExternalLinkClick } from '../utils/routing';
 import globalMessages from '../i18n/global-messages';
+import { downloadLogs } from '../utils/logging';
 
 const messages = defineMessages({
   loading: {
@@ -18,7 +19,7 @@ const messages = defineMessages({
   },
   error: {
     id: 'loading.screen.error',
-    defaultMessage: '!!!Check the dev console for more information or {supportRequestLink}',
+    defaultMessage: '!!!For more help, you can {supportRequestLink}',
   },
 });
 
@@ -52,6 +53,16 @@ export default class LoadingPage extends Component<InjectedProps> {
   getErrorMessage = (): Node => {
     const { intl } = this.context;
 
+    const downloadLogsLink = (
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+      <a
+        href="#"
+        onClick={event => downloadLogs()}
+      >
+        {intl.formatMessage(globalMessages.downloadLogsLink)}
+      </a>
+    );
+
     const supportRequestLink = (
       <a
         href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
@@ -63,6 +74,7 @@ export default class LoadingPage extends Component<InjectedProps> {
 
     return (
       <p>
+        <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /><br />
         <FormattedMessage {...messages.error} values={{ supportRequestLink }} />
       </p>
     );

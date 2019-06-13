@@ -34,14 +34,6 @@ const messages = defineMessages({
     id: 'settings.support.logs.title',
     defaultMessage: '!!!Logs',
   },
-  logsContent: {
-    id: 'settings.support.logs.content',
-    defaultMessage: '!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.',
-  },
-  downloadLogsLink: {
-    id: 'settings.support.logs.downloadLogsLink',
-    defaultMessage: '!!!download them here',
-  },
 });
 
 type Props = {
@@ -80,7 +72,7 @@ export default class SupportSettings extends Component<Props> {
 
     const downloadLogsLink = (
       <button type="button" onClick={onDownloadLogs}>
-        {intl.formatMessage(messages.downloadLogsLink)}
+        {intl.formatMessage(globalMessages.downloadLogsLink)}
       </button>
     );
 
@@ -98,7 +90,7 @@ export default class SupportSettings extends Component<Props> {
 
         <h1>{intl.formatMessage(messages.logsTitle)}</h1>
 
-        <p><FormattedMessage {...messages.logsContent} values={{ downloadLogsLink }} /></p>
+        <p><FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /></p>
 
       </div>
     );
