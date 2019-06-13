@@ -282,7 +282,7 @@
   "wallet.create.dialog.passwordFieldPlaceholder": "Mot de passe de paiement",
   "wallet.create.dialog.repeatPasswordFieldPlaceholder": "Répétez votre mot de passe de paiement",
   "wallet.create.dialog.repeatPasswordLabel": "Répétez votre mot de passe de paiement",
-  "wallet.create.dialog.title": "Créer un portefeuille",
+  "wallet.create.dialog.title": "Créer un wallet",
   "wallet.create.dialog.walletNameHint": "ex: Wallet de shopping",
   "wallet.create.dialog.walletPasswordLabel": "Mot de passe de paiement",
   "wallet.footer.buyLedgerHardwareWallet.text": "Acheter un hardware wallet Ledger",
