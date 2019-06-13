@@ -12,16 +12,17 @@
   line-height: 19px;
 
   .title {
-    font-size: 16px;
-    line-height: 22px;
+    font-size: 19px;
+    font-family: var(--font-medium);
+    line-height: 23px;
     margin-bottom: 6px;
     word-break: break-all;
     text-align: center;
+    text-transform: uppercase;
   }
 
   .progressInfo {
-    color: var(--theme-default-color-grey-3);
-    font-size: 14px;
+    font-size: 16px;
     line-height: 22px;
     margin-bottom: 12px;
     word-break: break-word;

@@ -25,11 +25,11 @@ export default class AnnotatedLoader extends Component<Props> {
         <div>
           <div className={styles.body}>
 
-            <LoadingSpinner />
-
             <div className={styles.title}>
               {title}
             </div>
+
+            <LoadingSpinner />
 
             <div className={styles.progressInfo}>
               {details}<br /><br />
