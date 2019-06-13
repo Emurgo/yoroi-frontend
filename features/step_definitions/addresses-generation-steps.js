@@ -30,7 +30,7 @@ When(/^I click on the Generate new address button ([0-9]+) times$/, async functi
 });
 
 Then(/^I should see my latest address "([^"]*)" at the top$/, async function (address) {
-  await this.waitUntilText('.CopyableAddress_hash', address);
+  await this.waitUntilText('.WalletReceive_copyableHash', address);
 });
 
 Then(/^I see every generated address is unique$/, async function () {
