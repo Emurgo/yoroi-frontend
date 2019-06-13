@@ -112,7 +112,7 @@
   "profile.languageSelect.form.languageSelectLabel": "使用する言語を選んでください",
   "profile.languageSelect.form.submitLabel": "続ける",
   "profile.languageSelect.title": "言語の選択",
-  "profile.termsOfUse.checkboxLabel": "利用規約に同意します",
+  "profile.termsOfUse.checkboxLabel": "I agree with the terms of use",
   "profile.termsOfUse.submitLabel": "続ける",
   "profile.termsOfUse.title": "利用規約",
   "settings.display.blog": "この機能を使用する方法については{blogLink}をご覧ください。",
