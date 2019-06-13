@@ -142,6 +142,7 @@ export default class WalletReceive extends Component<Props, State> {
               <ExplorableHashContainer
                 hash={walletAddress}
                 light={isWalletAddressUsed}
+                linkType="address"
               >
                 <RawHash light={isWalletAddressUsed}>
                   <span className={copyableHashClass}>{walletAddress}</span>
@@ -188,6 +189,7 @@ export default class WalletReceive extends Component<Props, State> {
                 <ExplorableHashContainer
                   hash={address.id}
                   light={address.isUsed}
+                  linkType="address"
                 >
                   <RawHash light={address.isUsed}>
                     {address.id}

@@ -174,7 +174,7 @@
   
     .rowData {
       font-size: 14px;
-      font-family: var(--font-light);
+      font-family: var(--font-regular);
       word-break: break-all;
       line-height: 22px;
     }
@@ -356,8 +356,8 @@
       line-height: 1.38;
     }
   
-    span {
-      color: var(--theme-transactions-text-color);
+    .rowData {
+      color: var(--theme-widgets-hash-light-color);
       line-height: 1.57;
     }
   }

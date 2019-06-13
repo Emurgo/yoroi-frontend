@@ -276,6 +276,7 @@ export default class Transaction extends Component<Props, State> {
                   key={`${data.id}-from-${address}`}
                   hash={address}
                   light
+                  linkType="address"
                 >
                   <RawHash light>
                     {address}<br />
@@ -291,6 +292,7 @@ export default class Transaction extends Component<Props, State> {
                   key={`${data.id}-to-${address}-${addressIndex}`}
                   hash={address}
                   light
+                  linkType="address"
                 >
                   <RawHash light>
                     {address}<br />
@@ -314,6 +316,7 @@ export default class Transaction extends Component<Props, State> {
               <ExplorableHashContainer
                 hash={data.id}
                 light
+                linkType="transaction"
               >
                 <RawHash light>
                   {data.id}

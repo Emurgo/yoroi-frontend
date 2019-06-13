@@ -11,15 +11,15 @@ import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 
 const messages = defineMessages({
-  explorerTip: {
+  websiteTip: {
     id: 'widgets.explorer.tooltip',
-    defaultMessage: '!!!Go to {explorerName} Blockchain Explorer',
+    defaultMessage: '!!!Go to {websiteName}',
   },
 });
 
 type Props = {|
   children: ?Node,
-  explorerName: string,
+  websiteName: string,
   url: string,
   light: boolean,
   tooltipOpensUpward?: boolean,
@@ -33,7 +33,7 @@ export default class ExplorableHash extends Component<Props> {
   };
 
   render() {
-    const { explorerName, onExternalLinkClick } = this.props;
+    const { websiteName, onExternalLinkClick } = this.props;
 
     const addressClass = classnames([
       this.props.light ? styles.lightColor : styles.darkColor
@@ -44,7 +44,7 @@ export default class ExplorableHash extends Component<Props> {
         skin={TooltipSkin}
         isOpeningUpward={this.props.tooltipOpensUpward}
         arrowRelativeToTip
-        tip={<FormattedMessage {...messages.explorerTip} values={{ explorerName }} />}
+        tip={<FormattedMessage {...messages.websiteTip} values={{ websiteName }} />}
       >
         <a
           className={styles.url}

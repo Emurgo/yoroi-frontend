@@ -134,6 +134,7 @@ export default class FinalizeDialog extends Component<Props> {
                 hash={a}
                 light
                 tooltipOpensUpward
+                linkType="address"
               >
                 <RawHash light>
                   {a}

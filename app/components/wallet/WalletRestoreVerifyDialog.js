@@ -147,6 +147,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
                 hash={a}
                 light
                 tooltipOpensUpward
+                linkType="address"
               >
                 <RawHash light>
                   {a}

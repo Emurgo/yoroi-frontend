@@ -113,6 +113,7 @@ export default class TransferSummaryPage extends Component<Props> {
                       <ExplorableHashContainer
                         light
                         hash={sender}
+                        linkType="address"
                       >
                         <RawHash light>
                           <span className={addressesClasses}>{sender}</span>
@@ -131,6 +132,7 @@ export default class TransferSummaryPage extends Component<Props> {
               <ExplorableHashContainer
                 light
                 hash={receiver}
+                linkType="address"
               >
                 <RawHash light>
                   <span className={styles.address}>{receiver}</span>

@@ -87,6 +87,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
             key={receiver + i} // eslint-disable-line react/no-array-index-key
             hash={receiver}
             light
+            linkType="address"
           >
             <RawHash light>
               <span className={styles.addressTo}>

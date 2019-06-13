@@ -126,6 +126,7 @@ export default class VerifyAddressDialog extends Component<Props> {
                 <ExplorableHashContainer
                   light
                   hash={walletAddress}
+                  linkType="address"
                 >
                   <RawHash light>
                     {walletAddress}
