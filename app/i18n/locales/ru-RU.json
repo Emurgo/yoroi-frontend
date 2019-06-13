@@ -112,7 +112,7 @@
   "profile.languageSelect.form.languageSelectLabel": "Выберите язык",
   "profile.languageSelect.form.submitLabel": "Продолжить",
   "profile.languageSelect.title": "Выбор языка",
-  "profile.termsOfUse.checkboxLabel": "Я согласен с условиями использования",
+  "profile.termsOfUse.checkboxLabel": "I agree with the terms of use",
   "profile.termsOfUse.submitLabel": "Продолжить",
   "profile.termsOfUse.title": "Условия использования",
   "settings.display.blog": "Вы можете ознакомится с нашим {blogLink} о том, как использовать эту функцию.",
