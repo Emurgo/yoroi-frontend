@@ -78,13 +78,13 @@
   }  
 }
 
-:global(.YoroiModern) {
+:global(.YoroiClassic) {
   .walletLoader {
-    background-image: url("../../../../assets/images/paper-wallet-loader.gif");
+    background-image: url("../../../../assets/images/paper-wallet-loader-classic.gif");
   }
 }
 
-:global(.YoroiClassic) {
+:global(.YoroiModern) {
   .walletLoader {
     background-image: url("../../../../assets/images/paper-wallet-loader.gif");
   }
