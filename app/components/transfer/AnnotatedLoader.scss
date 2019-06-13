@@ -26,5 +26,9 @@
     margin-bottom: 12px;
     word-break: break-word;
     text-align: center;
+
+    .error {
+      color: var(--rp-theme-color-error);
+    }
   }
 }

@@ -24,7 +24,7 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(screenshotsDir);
   fs.mkdirSync(screenshotsDir);
-  setDefaultTimeout(30 * 1000);
+  setDefaultTimeout(60 * 1000);
 
   getMockServer({});
 });

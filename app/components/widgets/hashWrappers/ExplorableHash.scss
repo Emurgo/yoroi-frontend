@@ -1,0 +1,30 @@
+
+.component {
+  :global(.SimpleBubble_bubble) {
+    margin-top: -8px !important;
+    font-size: 12px;
+    height: 30px;
+    font-family: var(--font-regular);
+    min-width: auto;
+    background-color: rgba(56, 57, 61, 0.7);
+    padding: 4px 12px 4px 12px;
+  }
+}
+
+.url {
+  text-decoration: none;
+
+}
+
+.usedHash {
+  &:hover {
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-used-color);
+  }
+}
+.unusedHash {
+  &:hover {
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-unused-color);
+  }
+}

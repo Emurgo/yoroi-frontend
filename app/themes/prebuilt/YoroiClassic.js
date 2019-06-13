@@ -1,3 +1,4 @@
+// @flow
 //  ==== Theme: Yoroi Classic === //
 
 import common from './Common';
@@ -27,6 +28,9 @@ const rpBubble = {
   '--rp-bubble-bg-color': '#f3f3f5',
   '--rp-bubble-border-color': '#c6cdd6',
   '--rp-bubble-border-radius': '2px',
+  // arrows are actually used by tooltips
+  '--rp-bubble-arrow-width': '14px',
+  '--rp-bubble-arrow-height': '4px',
 };
 
 // BUTTON
@@ -320,6 +324,7 @@ export default {
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
   '--theme-transactions-sent-color': '#4a4a4a',
+  '--theme-transactions-received-address-color': '#000000',
   '--theme-transactions-received-color': '#54ca87',
 
   '--theme-ada-redemption-headline-color': '#121327',
@@ -383,6 +388,8 @@ export default {
   '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
+  '--theme-widgets-explorable-hash-underline-used-color': '#adaeB6',
+  '--theme-widgets-explorable-hash-underline-unused-color': '#464749',
 
   '--theme-footer-block-background-color': 'rgba(218, 164, 154, 0.06)',
   '--theme-footer-block-background-color-hover': '#D9DDE0',

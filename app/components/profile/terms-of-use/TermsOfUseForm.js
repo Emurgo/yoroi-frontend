@@ -14,7 +14,7 @@ import styles from './TermsOfUseForm.scss';
 const messages = defineMessages({
   checkboxLabel: {
     id: 'profile.termsOfUse.checkboxLabel',
-    defaultMessage: '!!!I agree with terms of use',
+    defaultMessage: '!!!I agree with the terms of use',
   },
   submitLabel: {
     id: 'profile.termsOfUse.submitLabel',

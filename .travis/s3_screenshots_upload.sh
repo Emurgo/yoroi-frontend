@@ -60,7 +60,7 @@ then
           cp -a "${file}" base-image.png
         fi
       fi
-      compare -metric RMSE -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png
+      compare -metric RMSE -lowlight-color transparent -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png
       DIFF_VALUE=$(compare -metric RMSE -highlight-color ${SCREENSHOT_DIFF_COLOR} base-image.png "${file}" difference.png 2>&1| awk '{print $1}' | sed 's|\.||g')
       if [ $DIFF_VALUE -gt $SCREENSHOT_DIFF_THRESHOLD ]
       then
