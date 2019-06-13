@@ -40,7 +40,7 @@ const messages = defineMessages({
     id: 'api.errors.pendingTransactionError',
     defaultMessage: '!!!Error while updating pending transactions.',
   },
-  getAddressesWithFundsError: {
+  getAddressesKeysError: {
     id: 'api.errors.getAddressesWithFundsError',
     defaultMessage: '!!!Error while getting addresses with funds.',
   },
@@ -223,11 +223,11 @@ export class PendingTransactionError extends LocalizableError {
   }
 }
 
-export class GetAddressesWithFundsError extends LocalizableError {
+export class GetAddressesKeysError extends LocalizableError {
   constructor() {
     super({
-      id: messages.getAddressesWithFundsError.id,
-      defaultMessage: messages.getAddressesWithFundsError.defaultMessage || '',
+      id: messages.getAddressesKeysError.id,
+      defaultMessage: messages.getAddressesKeysError.defaultMessage || '',
     });
   }
 }
