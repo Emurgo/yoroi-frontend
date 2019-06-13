@@ -280,6 +280,14 @@ const globalMessages = defineMessages({
     id: 'global.staleTxnWarningLine2',
     defaultMessage: '!!!You can still send this transaction but it may fail.',
   },
+  logsContent: {
+    id: 'settings.support.logs.content',
+    defaultMessage: '!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.',
+  },
+  downloadLogsLink: {
+    id: 'settings.support.logs.downloadLogsLink',
+    defaultMessage: '!!!download them here',
+  },
 });
 export default globalMessages;
 

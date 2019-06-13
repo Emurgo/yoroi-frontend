@@ -258,4 +258,4 @@ function CustomWorld(cmdInput: WorldInput) {
 }
 
 setWorldConstructor(CustomWorld);
-setDefaultTimeout(30 * 1000);
+setDefaultTimeout(60 * 1000);

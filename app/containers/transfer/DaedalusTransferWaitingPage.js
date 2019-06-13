@@ -20,6 +20,10 @@ const messages = defineMessages({
   generatingTx: {
     id: 'daedalusTransfer.waiting.checkingAddresses.generatingTx',
     defaultMessage: '!!!Generating transfer transaction',
+  },
+  internetConnectionWarning: {
+    id: 'daedalusTransfer.waiting.warning',
+    defaultMessage: '!!!⚠️ This may take a long time or fail on poor internet connections',
   }
 });
 
@@ -42,6 +46,7 @@ export default class DaedalusTransferWaitingPage extends Component<Props> {
       <AnnotatedLoader
         title={intl.formatMessage(messages.title)}
         details={intl.formatMessage(messages[status])}
+        warning={intl.formatMessage(messages.internetConnectionWarning)}
       />
     );
   }
