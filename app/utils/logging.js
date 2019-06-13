@@ -23,6 +23,7 @@ export const Logger = {
   },
 
   error: (data : string) => {
+    // fix format so it shows up properly in Chrome console
     const fixedString = data.replace(/\\n/g, '\n');
     logger.error(fixedString);
     logs.enq(`[${moment().format()}] ${fixedString}\n`);
@@ -31,6 +32,14 @@ export const Logger = {
   warn: (data : string) => {
     logger.warn(data);
   }
+};
+
+export const silenceLogsForTesting = () => {
+  // hack since we don't have log level filtering
+  Logger.debug = () => {};
+  Logger.info = () => {};
+  Logger.error = () => {};
+  Logger.warn = () => {};
 };
 
 export const downloadLogs = () => {
