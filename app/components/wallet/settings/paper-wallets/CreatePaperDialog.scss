@@ -1,7 +1,7 @@
 @import '../../../../themes/mixins/loading-spinner';
 @import '../../../../themes/mixins/error-message';
 
-.dialog {
+.component {
   font-family: var(--font-light);
   .walletPassword {
     & + .walletPasswordFields {
@@ -16,76 +16,80 @@
     text-align: center;
     margin-top: 27px;
   }
-}
 
-.button {
-  cursor: pointer;
-  align-self: center;
-  background: transparent !important;;
-  color: transparent !important;;
-}
-
-.icon {
-  & > svg {
-    max-height: 75px;
-    max-width: 75px;
-    width: 100%;
+  .button {
+    cursor: pointer;
+    align-self: center;
+    background: transparent !important;;
+    color: transparent !important;;
   }
-}
-
-.label {
-  font-family: var(--font-light);
-  color: black;
-}
-
-.downloadPaperIntroLine1 {
-  text-align: center;
-}
-
-.walletLoaderWrapper {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  color: var(--theme-bordered-box-text-color);
-  font-family: var(--font-regular);
-  font-size: 14px;
-  line-height: 19px;
-
-  .walletLoaderWrapperTitle {
-    font-size: 16px;
-    line-height: 22px;
-    margin-bottom: 6px;
-    word-break: break-all;
+  
+  .icon {
+    & > svg {
+      max-height: 75px;
+      max-width: 75px;
+      width: 100%;
+    }
+  }
+  
+  .label {
+    font-family: var(--font-light);
+    color: black;
+  }
+  
+  .downloadPaperIntroLine1 {
     text-align: center;
   }
-
-  .walletLoaderWrapperProgressInfo {
-    color: var(--theme-default-color-grey-3);
+  
+  .walletLoaderWrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    color: var(--theme-bordered-box-text-color);
+    font-family: var(--font-regular);
     font-size: 14px;
-    line-height: 22px;
-    margin-bottom: 12px;
-    word-break: break-word;
-    text-align: center;
+    line-height: 19px;
+  
+    .walletLoaderWrapperTitle {
+      font-size: 16px;
+      line-height: 22px;
+      margin-bottom: 6px;
+      word-break: break-all;
+      text-align: center;
+    }
+  
+    .walletLoaderWrapperProgressInfo {
+      color: var(--theme-default-color-grey-3);
+      font-size: 14px;
+      line-height: 22px;
+      margin-bottom: 12px;
+      word-break: break-word;
+      text-align: center;
+    }
+  
+    .walletLoader {
+      margin: 20px auto;
+      width: 170px;
+      height: 190px;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: contain;
+    }  
   }
-
-  .walletLoader {
-    margin: 20px auto;
-    width: 170px;
-    height: 190px;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-  }  
 }
 
 :global(.YoroiClassic) {
-  .walletLoader {
-    background-image: url("../../../../assets/images/paper-wallet-loader-classic.gif");
+  .component {
+    .walletLoader {
+      background-image: url("../../../../assets/images/paper-wallet-loader-classic.gif");
+    }
   }
 }
 
 :global(.YoroiModern) {
-  .walletLoader {
-    background-image: url("../../../../assets/images/paper-wallet-loader.gif");
+  .component {
+    .walletLoader {
+      background-image: url("../../../../assets/images/paper-wallet-loader.gif");
+    }
   }
 }

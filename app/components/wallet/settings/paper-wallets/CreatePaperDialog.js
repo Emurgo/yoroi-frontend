@@ -123,7 +123,7 @@ export default class CreatePaperDialog extends Component<Props> {
       classicTheme,
     } = this.props;
 
-    const dialogClasses = classnames(['createPaperDialog', styles.dialog]);
+    const dialogClasses = classnames(['createPaperDialog', styles.component]);
     const confirmButtonClasses = classnames(['confirmButton']);
     const buttonClassNames = classnames(['primary', styles.button]);
     const downloadPaperIntroLine1ClassNames = classnames([
