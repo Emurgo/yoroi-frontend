@@ -106,11 +106,12 @@ export default class TransferSummaryPage extends Component<Props> {
                   ]);
 
                   return (
-                    <div>
+                    <div
+                      key={index /* eslint-disable-line react/no-array-index-key */}
+                    >
                       <div className={styles.addressSubLabel} />
                       <ExplorableHashContainer
                         light
-                        key={index} // eslint-disable-line react/no-array-index-key
                         hash={sender}
                       >
                         <RawHash light>
@@ -127,7 +128,14 @@ export default class TransferSummaryPage extends Component<Props> {
               <div className={styles.addressLabel}>
                 {intl.formatMessage(messages.addressToLabel)}
               </div>
-              <div className={styles.address}>{receiver}</div>
+              <ExplorableHashContainer
+                light
+                hash={receiver}
+              >
+                <RawHash light>
+                  <span className={styles.address}>{receiver}</span>
+                </RawHash>
+              </ExplorableHashContainer>
             </div>
 
             <div className={styles.amountFeesWrapper}>

@@ -10,10 +10,14 @@ type Props = {|
   children: ?Node,
   hash: string,
   light: boolean,
+  tooltipOpensUpward?: boolean,
 |};
 
 @observer
 export default class ExplorableHashContainer extends Component<Props> {
+  static defaultProps = {
+    tooltipOpensUpward: false,
+  };
 
   render() {
     const seizaAddress = 'https://seiza.com/blockchain/address/';
@@ -23,6 +27,7 @@ export default class ExplorableHashContainer extends Component<Props> {
         url={seizaAddress + this.props.hash}
         light={this.props.light}
         onExternalLinkClick={handleExternalLinkClick}
+        tooltipOpensUpward={this.props.tooltipOpensUpward}
       >
         {this.props.children}
       </ExplorableHash>

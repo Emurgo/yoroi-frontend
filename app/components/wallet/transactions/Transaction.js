@@ -13,6 +13,8 @@ import type { TransactionState } from '../../../domain/WalletTransaction';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
 import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 
 const messages = defineMessages({
   type: {
@@ -261,28 +263,46 @@ export default class Transaction extends Component<Props, State> {
                   <h2>
                     {intl.formatMessage(messages.fee)}
                   </h2>
-                  <span>{formattedWalletAmount(data.fee.abs(), false)}</span>
+                  <span className={styles.rowData}>
+                    {formattedWalletAmount(data.fee.abs(), false)}
+                  </span>
                 </div>
               )}
               <h2>
                 {intl.formatMessage(messages.fromAddresses)}
               </h2>
               {uniq(data.addresses.from).map(address => (
-                <span key={`${data.id}-from-${address}`} className={styles.address}>{address}</span>
+                <ExplorableHashContainer
+                  key={`${data.id}-from-${address}`}
+                  hash={address}
+                  light
+                >
+                  <RawHash light>
+                    {address}<br />
+                  </RawHash>
+                </ExplorableHashContainer>
               ))}
               <h2>
                 {intl.formatMessage(messages.toAddresses)}
               </h2>
               {data.addresses.to.map((address, addressIndex) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <span key={`${data.id}-to-${address}-${addressIndex}`} className={styles.address}>{address}</span>
+                <ExplorableHashContainer
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`${data.id}-to-${address}-${addressIndex}`}
+                  hash={address}
+                  light
+                >
+                  <RawHash light>
+                    {address}<br />
+                  </RawHash>
+                </ExplorableHashContainer>
               ))}
 
               {environment.isAdaApi() ? (
                 <div className={styles.row}>
                   <h2>{intl.formatMessage(messages.assuranceLevel)}</h2>
                   {state === transactionStates.OK ? (
-                    <span>
+                    <span className={styles.rowData}>
                       <span className={styles.assuranceLevel}>{status}</span>
                       . {data.numberOfConfirmations} {intl.formatMessage(messages.confirmations)}.
                     </span>
@@ -291,7 +311,14 @@ export default class Transaction extends Component<Props, State> {
               ) : null}
 
               <h2>{intl.formatMessage(messages.transactionId)}</h2>
-              <span className={styles.address}>{data.id}</span>
+              <ExplorableHashContainer
+                hash={data.id}
+                light
+              >
+                <RawHash light>
+                  {data.id}
+                </RawHash>
+              </ExplorableHashContainer>
             </div>
           </div>
         </div>

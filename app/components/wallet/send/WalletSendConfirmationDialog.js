@@ -17,6 +17,8 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 import config from '../../../config';
 import type { BaseSignRequest } from '../../../api/ada/adaTypes';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import RawHash from '../../widgets/hashWrappers/RawHash';
 
 import WarningBox from '../../widgets/forms/WarningBox';
 
@@ -156,8 +158,17 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
             </div>
             {receivers.map((receiver, i) => (
-              // eslint-disable-next-line react/no-array-index-key
-              (<div key={receiver + i} className={styles.addressTo}>{receiver}</div>)
+              <ExplorableHashContainer
+                key={receiver + i} // eslint-disable-line react/no-array-index-key
+                hash={receiver}
+                light
+              >
+                <RawHash light>
+                  <span className={styles.addressTo}>
+                    {receiver}
+                  </span>
+                </RawHash>
+              </ExplorableHashContainer>
             ))}
           </div>
 

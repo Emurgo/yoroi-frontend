@@ -172,17 +172,11 @@
       margin-bottom: 8px;
     }
   
-    span {
-      font-family: var(--font-light);
+    .rowData {
       font-size: 14px;
+      font-family: var(--font-light);
       word-break: break-all;
-  
-      &.address {
-        display: block;
-        line-height: 19px;
-        font-family: var(--font-mono-light);
-        letter-spacing: 0;
-      }
+      line-height: 22px;
     }
   }
 

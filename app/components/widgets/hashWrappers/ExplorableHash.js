@@ -22,11 +22,15 @@ type Props = {|
   explorerName: string,
   url: string,
   light: boolean,
+  tooltipOpensUpward?: boolean,
   onExternalLinkClick: Function,
 |};
 
 @observer
 export default class ExplorableHash extends Component<Props> {
+  static defaultProps = {
+    tooltipOpensUpward: false,
+  };
 
   render() {
     const { explorerName, onExternalLinkClick } = this.props;
@@ -38,7 +42,7 @@ export default class ExplorableHash extends Component<Props> {
       <Tooltip
         className={styles.component}
         skin={TooltipSkin}
-        isOpeningUpward={false}
+        isOpeningUpward={this.props.tooltipOpensUpward}
         arrowRelativeToTip
         tip={<FormattedMessage {...messages.explorerTip} values={{ explorerName }} />}
       >

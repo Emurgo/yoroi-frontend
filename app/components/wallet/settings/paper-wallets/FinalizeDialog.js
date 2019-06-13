@@ -133,6 +133,7 @@ export default class FinalizeDialog extends Component<Props> {
               <ExplorableHashContainer
                 hash={a}
                 light
+                tooltipOpensUpward
               >
                 <RawHash light>
                   {a}
