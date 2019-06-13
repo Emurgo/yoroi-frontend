@@ -112,7 +112,7 @@
   "profile.languageSelect.form.languageSelectLabel": "Choisissez votre langue",
   "profile.languageSelect.form.submitLabel": "Continuer",
   "profile.languageSelect.title": "Sélection de la langue",
-  "profile.termsOfUse.checkboxLabel": "J'accepte les conditions d'utilisation",
+  "profile.termsOfUse.checkboxLabel": "I agree with the terms of use",
   "profile.termsOfUse.submitLabel": "Continuer",
   "profile.termsOfUse.title": "Conditions d'utilisation",
   "settings.display.blog": "Vous pouvez lire notre {blogLink} à propos de l'utilisation de cette fonctionnalité.",
