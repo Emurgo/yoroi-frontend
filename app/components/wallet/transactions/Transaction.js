@@ -213,9 +213,6 @@ export default class Transaction extends Component<Props, State> {
       // $FlowFixMe flow doesn't support type refinments with enums
       : intl.formatMessage(stateTranslations[state]);
 
-    // const status = state === transactionStates.OK
-    //   ? intl.formatMessage(assuranceLevelTranslations[assuranceLevel])
-    //   : intl.formatMessage(stateTranslations[state]);
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
     const symbol = adaSymbol;
 
