@@ -1,7 +1,7 @@
 .component {
-  background-color: var(--theme-mnemonic-background-color);
-  font-family: var(--font-regular);
-  color: var(--theme-mnemonic-button-text-color);
+  background-color: var(--theme-mnemonic-background-color)!important;
+  font-family: var(--font-regular)!important;
+  color: var(--theme-mnemonic-button-text-color)!important;
 
   &.disabled {
     cursor: default;

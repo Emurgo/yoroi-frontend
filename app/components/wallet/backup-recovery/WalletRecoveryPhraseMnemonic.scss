@@ -10,6 +10,7 @@
   &.filled {
     padding: 14px;
     border: 2px solid var(--theme-mnemonic-border-filled-color);
+    min-height: 132px;
   }
 }
 
@@ -30,6 +31,5 @@
     text-align: left;
     font-family: var(--font-regular);
     color: var(--theme-instructions-recovery-text-color);
-    min-height: 132px;
   }
 }
