@@ -145,7 +145,7 @@
     "pbkdf2": "3.0.17",
     "pdfjs-dist": "2.0.943",
     "qr-image": "3.2.0",
-    "qrcode.react": "0.8.0",
+    "qrcode.react": "0.9.3",
     "react": "16.8.6",
     "react-blockies": "1.4.1",
     "react-copy-to-clipboard": "5.0.0",
