@@ -112,26 +112,24 @@ export default class ThemeSettingsBlock extends Component<Props> {
         <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
 
         <div className={styles.main}>
+          {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
           <div className={styles.themesWrapper}>
-            {!environment.isMainnet() && // a second theme to allow testing switching themes
-              (
-                <button
-                  type="button"
-                  className={themeYoroiModernClasses}
-                  onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
-                >
-                  {(currentTheme === THEMES.YOROI_MODERN
-                    && hasCustomTheme() &&
-                      <div className={styles.themeWarning}>
-                        {intl.formatMessage(messages.themeWarning)}
-                      </div>)
-                  }
-                  <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
-                  <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
-                </button>
-              )
-            }
-            {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
+            {/* Modern Theme */}
+            <button
+              type="button"
+              className={themeYoroiModernClasses}
+              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
+            >
+              {(currentTheme === THEMES.YOROI_MODERN
+                && hasCustomTheme() &&
+                  <div className={styles.themeWarning}>
+                    {intl.formatMessage(messages.themeWarning)}
+                  </div>)
+              }
+              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
+              <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
+            </button>
+            {/* Classic Theme */}
             <button
               type="button"
               className={themeYoroiClassicClasses}
