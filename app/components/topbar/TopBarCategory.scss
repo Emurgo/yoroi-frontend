@@ -100,7 +100,13 @@
       margin-left: 14px;
     }
 
-    &.with-ledger-nano-s,
+    &.with-ledger-nano-s{
+      left: 56px;
+      width: 72px;
+      margin-left: 14px;
+      padding-right: 8px;
+    }
+
     &.with-trezor-t {
       left: 56px;
       width: 64px;
