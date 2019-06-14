@@ -67,7 +67,7 @@ When(/^I submit the wallet password dialog$/, async function () {
   await this.click('.confirmButton');
 });
 
-When(/^I press the next button$/, async function () {
+When(/^I click the next button$/, async function () {
   await this.click('.confirmButton');
 });
 
