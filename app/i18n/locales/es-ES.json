@@ -42,7 +42,7 @@
   "api.errors.unusedAddressesError": "No puedes generar más de 20 direcciones sin usar de forma consecutiva.",
   "api.errors.updateAdaTxsHistoryError": "Error al actualizar el historial de transacciones ADA.",
   "api.errors.updateAdaWalletError": "Error en la actualización de la billetera Ada.",
-  "app.errors.unableToLoad": "Unable to load!",
+  "app.errors.unableToLoad": "No es posible cargar el contenido",
   "app.errors.unexpectedError": "Sucedió algo inesperado. Por favor, reinténtelo.",
   "app.errors.unknowError": "Error desconocido.",
   "daedalusTransfer.error.noTransferTxError": "No hay ninguna transacción para ser enviada.",
