@@ -1062,7 +1062,8 @@ export default class AdaApi {
       );
 
       Logger.debug('AdaApi::restoreWallet success');
-      return _createWalletFromServerData(adaWallet);
+      const account = getCurrentCryptoAccount();
+      return _createWalletFromServerData(adaWallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::restoreWallet error: ' + stringifyError(error));
       // TODO: backend will return something different here, if multiple wallets
@@ -1094,6 +1095,7 @@ export default class AdaApi {
     try {
       const wallet: ?AdaWallet = await updateAdaWalletMetaParams(walletMeta);
       if (!wallet) throw new Error('not persistent wallet');
+
       Logger.debug('AdaApi::updateWalletMeta success: ' + stringifyData(wallet));
       const account = getCurrentCryptoAccount();
       return _createWalletFromServerData(wallet, [account]);
@@ -1175,7 +1177,8 @@ export default class AdaApi {
       );
 
       Logger.debug('AdaApi::createHardwareWallet success');
-      return _createWalletFromServerData(hardwareWallet);
+      const account = getCurrentCryptoAccount();
+      return _createWalletFromServerData(hardwareWallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::createHardwareWallet error: ' + stringifyError(error));
 
