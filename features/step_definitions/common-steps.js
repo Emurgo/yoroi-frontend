@@ -25,7 +25,7 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(screenshotsDir);
   fs.mkdirSync(screenshotsDir);
-  setDefaultTimeout(30 * 1000);
+  setDefaultTimeout(60 * 1000);
 
   getMockServer({});
 });
@@ -66,6 +66,9 @@ After(async function () {
 
 const writeFile = promisify(fs.writeFile);
 
+// Steps that contain these patterns will trigger screenshots:
+const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I click', 'by clicking'];
+
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {
   if (!pattern) {
@@ -77,8 +80,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
-
-    if (cleanString.includes('I should see')) {
+    if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
     }
 
@@ -102,7 +104,13 @@ async function takeScreenshot(driver, name) {
 Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
-  await this.click('.restoreWalletButton');
+
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
+
   await this.input("input[name='walletName']", restoreInfo.name);
   await enterRecoveryPhrase(
     this,
@@ -146,7 +154,7 @@ Given(/^I restart the browser$/, async function () {
 
 Given(/^There is no wallet stored$/, async function () {
   await refreshWallet(this);
-  await this.waitForElement('.WalletAdd');
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {

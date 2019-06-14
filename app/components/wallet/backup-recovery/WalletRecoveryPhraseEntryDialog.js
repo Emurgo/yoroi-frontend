@@ -153,11 +153,11 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
           />
         ) : null}
 
-        <WalletRecoveryPhraseMnemonic
+        {!isValid && <WalletRecoveryPhraseMnemonic
           filled={!classicTheme && Boolean(enteredPhrase.length)}
           phrase={classicTheme ? phraseOld : phrase}
           classicTheme={classicTheme}
-        />
+        />}
 
         {!isValid && (
           <div className={wordsClasses}>

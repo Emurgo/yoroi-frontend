@@ -1,3 +1,4 @@
+// @flow
 //  ==== Theme: Yoroi Modern === //
 
 import common from './Common';
@@ -28,6 +29,9 @@ const rpBubble = {
   '--rp-bubble-bg-color': '#fff',
   '--rp-bubble-border-color': '#fff',
   '--rp-bubble-border-radius': '8px',
+  // arrows are actually used by tooltips
+  '--rp-bubble-arrow-width': '14px',
+  '--rp-bubble-arrow-height': '4px',
 };
 
 // BUTTON
@@ -86,7 +90,7 @@ const rpInput = {
 const rpModal = {
   '--rp-modal-bg-color': '#fff',
   '--rp-modal-max-height': '97%',
-  '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
+  '--rp-modal-overlay-bg-color': 'rgba(6, 13, 36, 0.8)', // #060D24
 };
 
 // OPTIONS
@@ -370,7 +374,12 @@ export default {
   '--theme-icon-transactions-ada-symbol-color': '#353535',
   '--theme-icon-transaction-type-color': '#fafbfc',
 
-  '--theme-wallet-add-color': '#ffffff',
+  '--theme-wallet-add-title-color': '#ffffff',
+  '--theme-wallet-add-sub-title-color': '#ffffff',
+  '--theme-wallet-add-option-dialog-item-title-color': '#2B2C32',
+  '--theme-wallet-add-option-dialog-item-learn-more-block-bg-color': '#F5F7F9',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-color': '#ADAEB6',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',  
   '--theme-wallet-add-translucent-color': 'rgba(255, 255, 255, 0.5)',
   '--theme-wallet-add-footer-text-color': '#353535',
 
@@ -398,6 +407,8 @@ export default {
   '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#ffffff',
 
   '--theme-widgets-progress-step-common-color': '#15d1aa',
+  '--theme-widgets-explorable-hash-underline-used-color': '#adaeB6',
+  '--theme-widgets-explorable-hash-underline-unused-color': '#464749',
 
   '--theme-footer-block-background-color': '#fff',
   '--theme-footer-block-background-color-hover': '#D9DDE0',

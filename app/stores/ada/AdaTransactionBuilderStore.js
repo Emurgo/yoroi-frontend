@@ -121,7 +121,8 @@ export default class AdaTransactionBuilderStore extends Store {
       // need to recalculate when there are no more pending transactions
       this.stores.substores.ada.transactions.hasAnyPending,
     ],
-    () => this._updateTxBuilder(),
+    // $FlowFixMe error in mobx types
+    async () => await this._updateTxBuilder(),
   )
 
   _canCompute(): boolean {
@@ -141,7 +142,7 @@ export default class AdaTransactionBuilderStore extends Store {
    * Note: need to check state outside of runInAction
    * Otherwise reaction won't trigger
    */
-  _updateTxBuilder = () => {
+  _updateTxBuilder = async (): Promise<void> => {
     runInAction(() => {
       this.createUnsignedTx.reset();
       this.plannedTx = null;
@@ -161,6 +162,10 @@ export default class AdaTransactionBuilderStore extends Store {
     const shouldSendAll = this.shouldSendAll;
 
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+    if (this.createUnsignedTx.promise) {
+      // eslint-disable-next-line no-unused-vars
+      await this.createUnsignedTx.promise.catch(err => { /* do nothing */ });
+    }
     this.createUnsignedTx.execute({
       accountId: account.account,
       receiver,
@@ -168,6 +173,7 @@ export default class AdaTransactionBuilderStore extends Store {
       getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
       shouldSendAll,
     });
+
   }
 
   // ===========

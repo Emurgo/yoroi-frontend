@@ -180,13 +180,13 @@ Feature: Wallet UI Settings
     Then I click the create paper wallet button
     Then I enter the paper wallet password "cool password"
     And I repeat the wallet password "cool password"
-    Then I press the next button
+    Then I click the next button
     # wait for paper wallet generation then go to next
-    Then I press the next button
+    Then I click the next button
     And I enter the paper recovery phrase
     And I enter the paper wallet password "cool password"
     # swap addresses for UI testing
     Given I swap the paper wallet addresses
     Then I click then button labeled "Verify wallet"
     Then I should see two addresses displayed
-    Then I press the next button
+    Then I click the next button

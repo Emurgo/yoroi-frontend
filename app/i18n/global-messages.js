@@ -71,6 +71,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.save',
     defaultMessage: '!!!Save',
   },
+  learnMore: {
+    id: 'global.labels.LearnMore',
+    defaultMessage: '!!!Learn more',
+  },  
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
@@ -260,6 +264,14 @@ const globalMessages = defineMessages({
     id: 'global.labels.goBack',
     defaultMessage: '!!!Go back label',
   },
+  supportRequestLinkUrl: {
+    id: 'settings.support.faq.supportRequestLinkURL',
+    defaultMessage: '!!!https://yoroi-wallet.com/support/',
+  },
+  contactSupport: {
+    id: 'global.contact',
+    defaultMessage: '!!!contact support', 
+  },
   staleTxnWarningLine1: {
     id: 'global.staleTxnWarningLine1',
     defaultMessage: '!!!Your wallet has changed since you created this transaction.',
@@ -267,6 +279,14 @@ const globalMessages = defineMessages({
   staleTxnWarningLine2: {
     id: 'global.staleTxnWarningLine2',
     defaultMessage: '!!!You can still send this transaction but it may fail.',
+  },
+  logsContent: {
+    id: 'settings.support.logs.content',
+    defaultMessage: '!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.',
+  },
+  downloadLogsLink: {
+    id: 'settings.support.logs.downloadLogsLink',
+    defaultMessage: '!!!download them here',
   },
 });
 export default globalMessages;

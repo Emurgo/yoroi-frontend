@@ -1,3 +1,4 @@
+// @flow
 //  ==== Theme: Yoroi Classic === //
 
 import common from './Common';
@@ -27,6 +28,9 @@ const rpBubble = {
   '--rp-bubble-bg-color': '#f3f3f5',
   '--rp-bubble-border-color': '#c6cdd6',
   '--rp-bubble-border-radius': '2px',
+  // arrows are actually used by tooltips
+  '--rp-bubble-arrow-width': '14px',
+  '--rp-bubble-arrow-height': '4px',
 };
 
 // BUTTON
@@ -88,7 +92,7 @@ const rpInput = {
 const rpModal = {
   '--rp-modal-bg-color': '#fafbfc',
   '--rp-modal-max-height': '90%',
-  '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
+  '--rp-modal-overlay-bg-color': 'rgba(11, 6, 6, 0.8)', // #0B0606
 };
 
 // OPTIONS
@@ -320,6 +324,7 @@ export default {
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
   '--theme-transactions-sent-color': '#4a4a4a',
+  '--theme-transactions-received-address-color': '#000000',
   '--theme-transactions-received-color': '#54ca87',
 
   '--theme-ada-redemption-headline-color': '#121327',
@@ -358,6 +363,12 @@ export default {
   '--theme-icon-transactions-ada-symbol-color': '#121327',
   '--theme-icon-transaction-type-color': '#fafbfc',
 
+  '--theme-wallet-add-title-color': '#141415',
+  '--theme-wallet-add-sub-title-color': '#888893',
+  '--theme-wallet-add-option-dialog-item-title-color': '#2B2C32',
+  '--theme-wallet-add-option-dialog-item-learn-more-block-bg-color': '#F5F7F9',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-color': '#ADAEB6',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',
   '--theme-backup-mnemonic-background-color': '#f3f3f5',
 
   '--theme-instructions-text-color': '#121327',
@@ -383,9 +394,14 @@ export default {
   '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
+  '--theme-widgets-explorable-hash-underline-used-color': '#adaeB6',
+  '--theme-widgets-explorable-hash-underline-unused-color': '#464749',
 
   '--theme-footer-block-background-color': 'rgba(218, 164, 154, 0.06)',
   '--theme-footer-block-background-color-hover': '#D9DDE0',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
+
+  '--theme-default-main-color': '#DAA49A',
+  '--theme-default-main-bg': '#F3F3F5',
 };

@@ -10,11 +10,19 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 }
 
 When(/^I click the restore button$/, async function () {
-  await this.click('.restoreWalletButton');
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
 });
 
 When(/^I click the restore paper wallet button$/, async function () {
-  await this.click('.restorePaperWalletButton');
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restorePaperWallet');
+  await this.waitForElement('.WalletRestoreDialog');
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {
@@ -88,7 +96,7 @@ Then(/^I should stay in the restore wallet dialog$/, async function () {
   await this.waitUntilText('.Dialog_title', restoreMessage.toUpperCase(), 2000);
 });
 
-Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
+Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
   const webElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
   for (let i = 0; i < webElements.length; i++) {
     await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);

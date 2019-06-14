@@ -1,5 +1,6 @@
 // @flow
 import { observable, computed, when, runInAction } from 'mobx';
+import { defineMessages } from 'react-intl';
 import Store from '../base/Store';
 import Wallet from '../../domain/Wallet';
 import environment from '../../environment';
@@ -14,6 +15,13 @@ import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+
+const messages = defineMessages({
+  unableToLoad: {
+    id: 'app.errors.unableToLoad',
+    defaultMessage: '!!!Unable to load!',
+  },
+});
 
 /** Load dependencies before launching the app */
 export default class LoadingStore extends Store {
@@ -95,8 +103,8 @@ export default class LoadingStore extends Store {
 export class UnableToLoadError extends LocalizableError {
   constructor() {
     super({
-      id: 'app.errors.unableToLoad',
-      defaultMessage: '!!!Unable to load',
+      id: messages.unableToLoad.id,
+      defaultMessage: messages.unableToLoad.defaultMessage || '',
     });
   }
 }
