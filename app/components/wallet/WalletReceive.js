@@ -18,6 +18,7 @@ import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -56,6 +57,7 @@ const messages = defineMessages({
 
 type Props = {
   walletAddress: string,
+  selectedExplorer: ExplorerType,
   isWalletAddressUsed: boolean,
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
@@ -140,6 +142,7 @@ export default class WalletReceive extends Component<Props, State> {
               onCopyAddress={onCopyAddress}
             >
               <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
                 hash={walletAddress}
                 light={isWalletAddressUsed}
                 linkType="address"
@@ -187,6 +190,7 @@ export default class WalletReceive extends Component<Props, State> {
               <div key={`gen-${address.id}`} className={addressClasses}>
                 {/* Address Id */}
                 <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
                   hash={address.id}
                   light={address.isUsed}
                   linkType="address"

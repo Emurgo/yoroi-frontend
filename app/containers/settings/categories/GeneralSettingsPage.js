@@ -3,16 +3,22 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
+import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
-import ChangeWalletPasswordDialogContainer from './WalletSettingsPage';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
+import type { ExplorerType } from '../../../domain/Explorer';
+import { Explorer, explorerInfo } from '../../../domain/Explorer';
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
 
   onSelectLanguage = (values: { locale: string }) => {
     this.props.actions.profile.updateLocale.trigger(values);
+  };
+
+  onSelecExplorer = (values: { explorer: ExplorerType }) => {
+    this.props.actions.profile.updateSelectedExplorer.trigger(values);
   };
 
   selectTheme = (values: { theme: string }) => {
@@ -32,25 +38,36 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
   )
 
   render() {
-    const { setProfileLocaleRequest, LANGUAGE_OPTIONS, currentLocale } = this.props.stores.profile;
-    const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const { actions, stores } = this.props;
-    const { uiDialogs } = stores;
-    const changeDialog = (
-      <ChangeWalletPasswordDialogContainer actions={actions} stores={stores} />
-    );
+    const {
+      setSelectedExplorerRequest,
+      setProfileLocaleRequest,
+      LANGUAGE_OPTIONS,
+      currentLocale,
+      selectedExplorer,
+    } = this.props.stores.profile;
+    const isSubmittingLocale = setProfileLocaleRequest.isExecuting;
+    const isSubmittingExplorer = setSelectedExplorerRequest.isExecuting;
+    const explorerOptions = Object.keys(Explorer)
+      .map(key => ({
+        value: Explorer[key],
+        label: explorerInfo[Explorer[key]].name,
+      }));
     const { currentTheme } = this.props.stores.profile;
     return (
       <div>
         <GeneralSettings
           onSelectLanguage={this.onSelectLanguage}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmittingLocale}
           languages={LANGUAGE_OPTIONS}
           currentLocale={currentLocale}
           error={setProfileLocaleRequest.error}
-          openDialogAction={actions.dialogs.open.trigger}
-          isDialogOpen={uiDialogs.isOpen}
-          dialog={changeDialog}
+        />
+        <ExplorerSettings
+          onSelectExplorer={this.onSelecExplorer}
+          isSubmitting={isSubmittingExplorer}
+          explorers={explorerOptions}
+          selectedExplorer={selectedExplorer}
+          error={setSelectedExplorerRequest.error}
         />
         <ThemeSettingsBlock
           currentTheme={currentTheme}

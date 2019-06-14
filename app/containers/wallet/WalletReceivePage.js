@@ -95,6 +95,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       <VerticalFlexContainer>
         <WalletReceive
           walletAddress={walletAddress}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
           isWalletAddressUsed={isWalletAddressUsed}
           walletAddresses={walletAddresses}
           onGenerateAddress={this.handleGenerateAddress}
@@ -119,6 +120,7 @@ export default class WalletReceivePage extends Component<Props, State> {
         {uiDialogs.isOpen(VerifyAddressDialog) && hwVerifyAddress.selectedAddress ? (
           <VerifyAddressDialog
             isActionProcessing={hwVerifyAddress.isActionProcessing}
+            selectedExplorer={this.props.stores.profile.selectedExplorer}
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}

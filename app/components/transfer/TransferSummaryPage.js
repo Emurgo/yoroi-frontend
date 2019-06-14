@@ -11,6 +11,7 @@ import type { TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -45,6 +46,7 @@ const messages = defineMessages({
 
 type Props = {
   formattedWalletAmount: Function,
+  selectedExplorer: ExplorerType,
   transferTx: TransferTx,
   onSubmit: Function,
   isSubmitting: boolean,
@@ -111,6 +113,7 @@ export default class TransferSummaryPage extends Component<Props> {
                     >
                       <div className={styles.addressSubLabel} />
                       <ExplorableHashContainer
+                        selectedExplorer={this.props.selectedExplorer}
                         light
                         hash={sender}
                         linkType="address"
@@ -130,6 +133,7 @@ export default class TransferSummaryPage extends Component<Props> {
                 {intl.formatMessage(messages.addressToLabel)}
               </div>
               <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
                 light
                 hash={receiver}
                 linkType="address"

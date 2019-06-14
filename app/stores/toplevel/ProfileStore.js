@@ -9,6 +9,10 @@ import { THEMES } from '../../themes';
 import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
+import type { ExplorerType } from '../../domain/Explorer';
+import type {
+  GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
+} from '../../api/ada';
 
 export default class ProfileStore extends Store {
 
@@ -39,7 +43,6 @@ export default class ProfileStore extends Store {
     fractionGroupSize: 0
   };
 
-  /* eslint-disable max-len */
   @observable getProfileLocaleRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getUserLocale);
 
@@ -73,10 +76,15 @@ export default class ProfileStore extends Store {
   @observable setLastLaunchVersionRequest: Request<string => Promise<void>>
     = new Request<string => Promise<void>>(this.api.localStorage.setLastLaunchVersion);
 
-  /* eslint-enable max-len */
+  @observable getSelectedExplorerRequest: Request<GetSelectedExplorerFunc>
+    = new Request<GetSelectedExplorerFunc>(this.api.ada.getSelectedExplorer);
+
+  @observable setSelectedExplorerRequest: Request<SaveSelectedExplorerFunc>
+    = new Request<SaveSelectedExplorerFunc>(this.api.ada.saveSelectedExplorer);
 
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
+    this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
@@ -287,6 +295,25 @@ export default class ProfileStore extends Store {
     return (
       this.getLastLaunchVersionRequest.wasExecuted &&
       this.getLastLaunchVersionRequest.result !== null
+    );
+  }
+
+  // ========== Selected Explorer ========== //
+
+  @computed get selectedExplorer(): ExplorerType {
+    const { result } = this.getSelectedExplorerRequest.execute();
+    return result || 'seiza';
+  }
+
+  setSelectedExplorer = async ({ explorer }: { explorer: ExplorerType }) => {
+    await this.setSelectedExplorerRequest.execute({ explorer });
+    await this.getSelectedExplorerRequest.execute(); // eagerly cache
+  };
+
+  @computed get hasLoadedSelectedExplorer(): boolean {
+    return (
+      this.getSelectedExplorerRequest.wasExecuted &&
+      this.getSelectedExplorerRequest.result !== null
     );
   }
 

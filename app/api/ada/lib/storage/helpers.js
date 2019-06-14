@@ -88,6 +88,9 @@ export const changeAdaWalletSpendingPassword = (
   // update spending password
   {
     const walletMasterKey = getWalletMasterKey();
+    if (!walletMasterKey) {
+      throw new Error('No master key stored');
+    }
     const updatedWalletMasterKey = updateWalletMasterKeyPassword(
       walletMasterKey,
       oldPassword,
@@ -117,7 +120,7 @@ export const updateBestBlockNumber = async (
   request: UpdateBestBlockNumberRequest
 ): Promise<void> => {
   const lastKnownBlockNumber = getLastBlockNumber();
-  if (!lastKnownBlockNumber || request.bestBlockNum > lastKnownBlockNumber) {
+  if (request.bestBlockNum > lastKnownBlockNumber) {
     saveLastBlockNumber(request.bestBlockNum);
   }
 };
