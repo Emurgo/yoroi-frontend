@@ -60,7 +60,7 @@
     "@babel/preset-env": "7.4.5",
     "@babel/preset-flow": "7.0.0",
     "@babel/preset-react": "7.0.0",
-    "@babel/register": "7.0.0",
+    "@babel/register": "7.4.4",
     "@babel/runtime": "7.1.5",
     "@babel/runtime-corejs2": "7.1.5",
     "autoprefixer": "7.2.5",
