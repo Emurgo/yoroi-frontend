@@ -762,12 +762,12 @@ export default class AdaApi {
     const { password, signRequest } = request;
     try {
       const masterKey = getWalletMasterKey();
-      if (!masterKey) {
+      if (masterKey == null) {
         throw new Error('No master key stored');
       }
       const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
       const currAccount = getCurrentAccountIndex();
-      if (!currAccount) {
+      if (currAccount == null) {
         throw new Error('no account selected');
       }
       const accountPrivateKey = cryptoWallet.bip44_account(

@@ -88,7 +88,7 @@ export const changeAdaWalletSpendingPassword = (
   // update spending password
   {
     const walletMasterKey = getWalletMasterKey();
-    if (!walletMasterKey) {
+    if (walletMasterKey == null) {
       throw new Error('No master key stored');
     }
     const updatedWalletMasterKey = updateWalletMasterKeyPassword(
