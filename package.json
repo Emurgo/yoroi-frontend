@@ -164,7 +164,7 @@
     "semver": "6.1.1",
     "tinycolor2": "1.4.1",
     "trezor-connect": "7.0.2",
-    "ua-parser-js": "0.7.19",
+    "ua-parser-js": "0.7.20",
     "unorm": "1.4.1",
     "validator": "6.3.0",
     "yoroi-extension-ledger-bridge": "git+https://github.com/Emurgo/yoroi-extension-ledger-bridge.git"
