@@ -109,7 +109,7 @@
     "sass-loader": "7.1.0",
     "selenium-webdriver": "git+https://github.com/SebastienGllmt/selenium-webdriver-fix.git",
     "sha3": "2.0.0",
-    "shelljs": "0.7.0",
+    "shelljs": "0.8.3",
     "style-loader": "0.23.1",
     "svg-inline-loader": "0.8.0",
     "url-loader": "1.1.2",
