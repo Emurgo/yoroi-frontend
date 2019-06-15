@@ -54,7 +54,7 @@
   "daedalusTransfer.instructions.attention.button.label": "Wallet Daedalus",
   "daedalusTransfer.instructions.attention.confirmation": "Transférer tous les fonds du wallet Daedalus",
   "daedalusTransfer.instructions.attention.confirmationMasterKey": "Transférer tous les fonds à partir d'une clé maître Daedalus",
-  "daedalusTransfer.instructions.attention.confirmationPaper": "Transférer tous les fonds d'un wallet papier Daedalus",  
+  "daedalusTransfer.instructions.attention.confirmationPaper": "Transférer tous les fonds d'un wallet papier Daedalus",
   "daedalusTransfer.instructions.attention.masterKey.button.label": "Clé maître Daedalus",
   "daedalusTransfer.instructions.attention.paper.button.label": "Wallet Papier Daedalus",
   "daedalusTransfer.instructions.attention.text": "Yoroi et Daedalus utilisent des fonctions de dérivation de clés différentes qui ont chacune un format distinct pour les adresses. Pour cette raison, vous ne pouvez pas directement restaurer votre wallet Daedalus dans Yoroi. Vous devez d'abord créer un wallet Yoroi avant de transférer vos fonds (cela changera à l’avenir). Daedalus et Yoroi sont toutefois entièrement compatibles pour l'envoi de fonds. Si vous n’avez pas de copie de Daedalus fonctionnelle, vous pouvez utiliser votre phrase de secours de 12 mots (ou de 27 mots dans le cas d'un wallet papier Daedalus) pour transférer vos fonds de Daedalus à Yoroi.",
