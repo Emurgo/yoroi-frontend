@@ -122,24 +122,26 @@ export default class VerifyAddressDialog extends Component<Props> {
               {intl.formatMessage(messages.addressLabel)}
             </span>
             <div className={styles.infoBlock}>
-              <p>
+              <div className={styles.data}>
                 <ExplorableHashContainer
-                  light
+                  light={false}
                   hash={walletAddress}
                   linkType="address"
                 >
-                  <RawHash light>
+                  <RawHash light={false}>
                     {walletAddress}
                   </RawHash>
                 </ExplorableHashContainer>
-              </p>
+              </div>
             </div>
             <br />
             <span className={labelStyle}>
               {intl.formatMessage(messages.derivationPathLabel)}
             </span>
             <div className={derivationClasses}>
-              <p>{toDerivationPathString(walletPath)}</p>
+              <div className={styles.data}>
+                {toDerivationPathString(walletPath)}
+              </div>
             </div>
           </div>
         ) : null}
