@@ -25,8 +25,8 @@ const OPEN_TAB_ID_KEY = 'openTabId';
  *
  * Note: this may cause two copies of Yoroi loading at the same time close each other
  */
-export function addCloseListener(window: any) {
-  window.onstorage = (e: StorageEvent) => {
+export function addCloseListener(yoroiWindow: typeof window) {
+  yoroiWindow.onstorage = (e: StorageEvent) => {
     // if another Yoroi tab open, close this tab
     if (e.key === OPEN_TAB_ID_KEY) {
       // note: we don't need "tabs" permission to get or remove our own tab

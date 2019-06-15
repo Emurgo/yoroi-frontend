@@ -28,7 +28,7 @@ type Props = {
 @observer
 export default class ProgressSteps extends Component<Props> {
 
-  createSetps = (
+  createSteps = (
     stepsList: Array<string>,
     currentStep : number,
     stepState: StepStateEnum,
@@ -55,9 +55,7 @@ export default class ProgressSteps extends Component<Props> {
           styles.stepTextDone
         ]);
       } else if (idx === currentStep) {
-        // for current step, 0 = LOAD | 1 = PROCESS | 9 = ERROR
-        // 0 = LOAD and 1 = PROCESS has same icon but for 9 = ERROR there is a error icon
-        displayIcon = (stepState === 9) ? 'error' : 'none';
+        displayIcon = (stepState === StepState.ERROR) ? 'error' : 'none';
         stepTopBarStyle = classNames([
           styles.stepTopBar,
           styles.stepTopBarActive
@@ -92,7 +90,7 @@ export default class ProgressSteps extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        {this.createSetps(
+        {this.createSteps(
           stepsList,
           currentStep < 0 ? 0 : currentStep,
           stepState

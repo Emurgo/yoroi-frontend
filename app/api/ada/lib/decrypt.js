@@ -42,11 +42,11 @@ const hashData = (data) => {
 
 export const decryptRegularVend = (
   key: string,
-  data: any,
+  data: string | Uint8Array,
 ) => decryptWithAES(blake2b(fromMnemonic(key)), data);
 export const decryptForceVend = (
   key: Array<string>,
-  data: any
+  data: string | Uint8Array
 ) => (
   decryptWithAES(blake2b(key[0].trim().toLowerCase() +
     hashData(key[1].trim()) + key[2].trim()), data)
@@ -56,7 +56,7 @@ export const decryptForceVend = (
 export const decryptRecoveryRegularVend = decryptRegularVend;
 export const decryptRecoveryForceVend = (
   key: string,
-  data: any
+  data: string | Uint8Array
 ) => {
   // There are 3 possible decryption key formats:
   // 1) base64 string (most common)
