@@ -94,6 +94,9 @@ export default class TransferInstructionsPage extends Component<Props> {
               </div>
 
               <div className={styles.operationBlock}>
+                <div className={styles.title}>
+                  &nbsp;{/* pretend we have a title to get the button alignment correct */}
+                </div>
                 <Button
                   className={`createYoroiWallet ${commonClasses}`}
                   label={intl.formatMessage(messages.instructionsButton)}

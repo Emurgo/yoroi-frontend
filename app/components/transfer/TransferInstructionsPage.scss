@@ -7,7 +7,7 @@
   .buttonTitle {
     margin-bottom: 30px;
     line-height: 1.38;
-    text-align: center;
+    text-align: left;
     font-size: 11px;
     font-family: var(--font-medium);
   }
@@ -28,13 +28,13 @@
       padding-right: 60px;
       .title {
         line-height: 1.38;
-        margin-bottom: 4px;
+        margin-bottom: 16px;
         font-size: 11px;
         font-family: var(--font-medium);
       }
 
       .text {
-        font-size: 16px;
+        font-size: 14px;
         line-height: 22px;
         margin-bottom: 12px;
         word-break: break-word;
@@ -43,6 +43,7 @@
 
     .operationBlock {
       padding-right: 40px;
+      margin-left: auto;
     }
   }
 }
