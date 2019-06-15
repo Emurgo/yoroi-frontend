@@ -62,11 +62,15 @@ export default class AdaCertificateUploadWidget extends Component<Props> {
               multiple={false}
               accept={acceptedFileTypes}
             >
-              <div className={styles.instructions}>
-                <div className={styles.title}>
-                  {intl.formatMessage(messages.orClickToUpload)}
+              {({ getRootProps }) => (
+                <div {...getRootProps()}>
+                  <div className={styles.instructions}>
+                    <div className={styles.title}>
+                      {intl.formatMessage(messages.orClickToUpload)}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </Dropzone>
           )}
         </div>
