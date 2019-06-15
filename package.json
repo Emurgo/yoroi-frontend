@@ -151,7 +151,7 @@
     "react-copy-to-clipboard": "5.0.0",
     "react-css-themr": "2.1.2",
     "react-dom": "16.8.6",
-    "react-dropzone": "4.2.3",
+    "react-dropzone": "10.1.5",
     "react-hot-loader": "4.3.12",
     "react-intl": "2.7.2",
     "react-markdown": "2.5.0",
