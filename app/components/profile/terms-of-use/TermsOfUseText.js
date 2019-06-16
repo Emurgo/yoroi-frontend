@@ -24,7 +24,7 @@ export default class TermsOfUseText extends Component<Props> {
 
     return (
       <div className={termsClassNames}>
-        <ReactMarkdown source={this.props.localizedTermsOfUse} />
+        <ReactMarkdown source={this.props.localizedTermsOfUse} escapeHtml={false} />
       </div>
     );
   }
