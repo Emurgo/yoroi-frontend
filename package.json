@@ -117,7 +117,7 @@
     "webpack-cli": "3.1.2",
     "webpack-hot-middleware": "2.24.3",
     "webpack-httpolyglot-server": "0.3.0",
-    "ws": "5.2.2"
+    "ws": "7.0.0"
   },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "1.0.6",
