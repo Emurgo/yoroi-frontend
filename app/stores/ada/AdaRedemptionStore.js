@@ -322,7 +322,7 @@ export default class AdaRedemptionStore extends Store {
   };
 
   _getTransactionAmountInAda = (transactionAmountInLovelace: BigNumber): BigNumber => (
-    transactionAmountInLovelace.shift(-DECIMAL_PLACES_IN_ADA)
+    transactionAmountInLovelace.shiftedBy(-DECIMAL_PLACES_IN_ADA)
   );
 
 }
