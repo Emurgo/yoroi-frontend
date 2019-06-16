@@ -196,7 +196,7 @@
   "transfer.form.recovery.phrase.input.noResults": "Nessun risultato",
   "transfer.instructions.attention.title.label": "Attenzione",
   "transfer.instructions.instructions.button.label": "Crea il tuo Wallet Yoroi",
-  "transfer.instructions.instructions.text": "Before you can transfer funds, you must create a Yoroi wallet and back it up.<br>Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.",
+  "transfer.instructions.instructions.text": "Prima di poter trasferire fondi, devi creare un portafoglio Yoroi e eseguirne il backup.<br>Al completamento, riceverai una frase di recupero di 15 parole che potrà essere utilizzata per ripristinare il tuo portafoglio Yoroi in qualsiasi momento.",
   "transfer.instructions.instructions.title.label": "Istruzioni",
   "transfer.summary.addressFrom.label": "Da",
   "transfer.summary.addressTo.label": "A",
