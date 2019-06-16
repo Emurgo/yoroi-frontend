@@ -112,7 +112,6 @@ export default class ThemeSettingsBlock extends Component<Props> {
         <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
 
         <div className={styles.main}>
-          {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
           <div className={styles.themesWrapper}>
             {/* Modern Theme */}
             <button
