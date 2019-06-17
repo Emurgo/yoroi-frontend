@@ -294,7 +294,7 @@ export default {
   '--theme-settings-menu-item-text-color': '#adaeb6',
   '--theme-settings-menu-item-text-color-active': '#2b2c32',
   '--theme-settings-menu-item-text-color-enabled-hover': '#2b2c32',
-  '--theme-settings-menu-item-text-color-disabled': '#b3b3b3',
+  '--theme-settings-menu-item-text-color-disabled': '#D9DAE1',
   '--theme-settings-menu-item-background-color-active': '#ffffff',
   '--theme-settings-menu-item-left-border-color-active': '#3d5cdb',
   '--theme-settings-theme-select-title-color': '#2b2c32',
