@@ -218,9 +218,7 @@ export default class WalletReceive extends Component<Props, State> {
                           svg={verifyIcon}
                           className={styles.verifyIcon}
                         />
-                        <span className={styles.actionIconText}>
-                          {intl.formatMessage(messages.verifyAddressLabel)}
-                        </span>
+                        <span>{intl.formatMessage(messages.verifyAddressLabel)}</span>
                       </div>
                     </button>
                   </div>
@@ -231,9 +229,7 @@ export default class WalletReceive extends Component<Props, State> {
                   >
                     <div className={styles.addressActionItemBlock}>
                       <SvgInline svg={iconCopy} className={styles.copyIcon} />
-                      <span className={styles.actionIconText}>
-                        {intl.formatMessage(messages.copyAddressLabel)}
-                      </span>
+                      <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
                     </div>
                   </CopyToClipboard>
                 </div>
