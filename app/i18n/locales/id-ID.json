@@ -121,6 +121,7 @@
   "settings.display.themeWarning": "MENGUBAH TEMA AKAN MENGHAPUS KUSTOMISASI",
   "settings.general.aboutYoroi.commitLabel": "Lakukan:",
   "settings.general.aboutYoroi.facebook": "Facebook Yoroi",
+  "settings.general.aboutYoroi.git.branch": "Branch:",
   "settings.general.aboutYoroi.github": "Github Yoroi",
   "settings.general.aboutYoroi.label": "Tentang Yoroi",
   "settings.general.aboutYoroi.medium": "Medium EMURGO",
