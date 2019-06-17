@@ -6,23 +6,45 @@ import { handleExternalLinkClick } from '../../utils/routing';
 
 import ExplorableHash from '../../components/widgets/hashWrappers/ExplorableHash';
 
-type Props = {
+export type LinkType = 'address' | 'transaction';
+export type ExplorerName = 'seiza';
+
+type Props = {|
   children: ?Node,
   hash: string,
-  isUsed: boolean,
+  light: boolean,
+  linkType: LinkType,
+  tooltipOpensUpward?: boolean,
+|};
+
+type Explorer = {
+  name: string,
+  address: string,
+  transaction: string,
+}
+const explorerInfo: { [key: ExplorerName]: Explorer } = {
+  seiza: {
+    name: 'Seiza Blockchain Explorer',
+    address: 'https://seiza.com/blockchain/address/',
+    transaction: 'https://seiza.com/blockchain/transaction/',
+  }
 };
 
 @observer
 export default class ExplorableHashContainer extends Component<Props> {
+  static defaultProps = {
+    tooltipOpensUpward: false,
+  };
 
   render() {
-    const seizaAddress = 'https://seiza.com/blockchain/address/';
+    const explorer = explorerInfo.seiza;
     return (
       <ExplorableHash
-        explorerName="Seiza"
-        url={seizaAddress + this.props.hash}
-        isUsed={this.props.isUsed}
+        websiteName={explorer.name}
+        url={explorer[this.props.linkType] + this.props.hash}
+        light={this.props.light}
         onExternalLinkClick={handleExternalLinkClick}
+        tooltipOpensUpward={this.props.tooltipOpensUpward}
       >
         {this.props.children}
       </ExplorableHash>

@@ -112,6 +112,9 @@ export const handleExternalLinkClick = (event: MouseEvent) => {
   event.preventDefault();
   let target = event.target;
   while (!(target instanceof HTMLAnchorElement)) {
+    if (!(target instanceof Element)) {
+      return;
+    }
     target = target.parentNode;
   }
   if (target instanceof HTMLAnchorElement) {

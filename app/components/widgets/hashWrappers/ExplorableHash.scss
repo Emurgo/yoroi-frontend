@@ -1,13 +1,30 @@
 
 .component {
   :global(.SimpleBubble_bubble) {
-    margin-top: -8px !important;
     font-size: 12px;
     height: 30px;
     font-family: var(--font-regular);
-    min-width: auto;
+    letter-spacing: 1px;
+    color: white;
     background-color: rgba(56, 57, 61, 0.7);
-    padding: 4px 12px 4px 12px;
+
+    // size tooltip to text contained inside
+    min-width: auto;
+    padding: 4px 12px 4px 12px !important;
+
+    // use this to vertical-align
+    line-height: 22px;
+  }
+
+  :global(.SimpleBubble_root.SimpleBubble_transparent:not(.SimpleBubble_openUpward))  {
+    :global(.SimpleBubble_bubble) {
+      margin-top: -8px !important;
+    }
+  }
+  :global(.SimpleBubble_root.SimpleBubble_transparent.SimpleBubble_openUpward)  {
+    :global(.SimpleBubble_bubble) {
+      margin-bottom: -8px !important;
+    }
   }
 }
 
@@ -16,15 +33,15 @@
 
 }
 
-.usedHash {
+.darkColor {
   &:hover {
     box-sizing: border-box;
-    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-used-color);
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-dark-color);
   }
 }
-.unusedHash {
+.lightColor {
   &:hover {
     box-sizing: border-box;
-    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-unused-color);
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-light-color);
   }
 }
