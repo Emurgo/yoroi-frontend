@@ -55,7 +55,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   walletAddress: string,
   selectedExplorer: ExplorerType,
   isWalletAddressUsed: boolean,
@@ -65,7 +65,7 @@ type Props = {
   onVerifyAddress: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 type State = {
   showUsed: boolean,

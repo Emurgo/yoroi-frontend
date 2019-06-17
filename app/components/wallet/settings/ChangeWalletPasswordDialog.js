@@ -47,7 +47,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   currentPasswordValue: string,
   newPasswordValue: string,
   repeatedPasswordValue: string,
@@ -58,7 +58,7 @@ type Props = {
   isSubmitting: boolean,
   error: ?LocalizableError,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class ChangeWalletPasswordDialog extends Component<Props> {

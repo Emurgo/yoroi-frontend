@@ -43,7 +43,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   isActionProcessing: boolean,
   error: ?LocalizableError,
   verify: Function,
@@ -53,7 +53,7 @@ type Props = {
   walletAddress: string,
   walletPath: BIP32Path,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class VerifyAddressDialog extends Component<Props> {

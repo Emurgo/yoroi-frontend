@@ -23,10 +23,10 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   isActiveNavItem: Function,
   onNavItemClick: Function,
-};
+|};
 
 @observer
 export default class WalletNavigation extends Component<Props> {

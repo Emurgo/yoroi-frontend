@@ -94,7 +94,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   currencyUnit: string,
   currencyMaxIntegerDigits: number,
   currencyMaxFractionalDigits: number,
@@ -112,7 +112,7 @@ type Props = {
   isCalculatingFee: boolean,
   reset: void => void,
   error: ?LocalizableError,
-};
+|};
 
 @observer
 export default class WalletSendForm extends Component<Props> {

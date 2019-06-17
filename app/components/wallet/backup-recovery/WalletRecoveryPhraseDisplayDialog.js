@@ -23,12 +23,12 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   recoveryPhrase: string,
   onStartWalletBackup: Function,
   onCancelBackup: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> {

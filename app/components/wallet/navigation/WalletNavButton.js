@@ -4,13 +4,13 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './WalletNavButton.scss';
 
-type Props = {
+type Props = {|
   label: string,
   icon: string,
   isActive: boolean,
   onClick: Function,
   className?: string,
-};
+|};
 
 @observer
 export default class WalletNavButton extends Component<Props> {

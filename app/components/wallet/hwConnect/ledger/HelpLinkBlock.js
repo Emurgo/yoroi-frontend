@@ -19,9 +19,9 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
-};
+|};
 
 @observer
 export default class HelpLinkBlock extends Component<Props> {

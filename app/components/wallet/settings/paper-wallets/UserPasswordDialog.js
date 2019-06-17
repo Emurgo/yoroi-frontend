@@ -51,14 +51,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   passwordValue: string,
   repeatedPasswordValue: string,
   onNext: Function,
   onCancel: Function,
   onDataChange: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class UserPasswordDialog extends Component<Props> {
