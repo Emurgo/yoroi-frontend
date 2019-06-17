@@ -24,12 +24,14 @@ type Props = {|
   light: boolean,
   tooltipOpensUpward?: boolean,
   onExternalLinkClick: Function,
+  arrowRelativeToTip?: boolean,
 |};
 
 @observer
 export default class ExplorableHash extends Component<Props> {
   static defaultProps = {
     tooltipOpensUpward: false,
+    arrowRelativeToTip: true,
   };
 
   render() {
@@ -43,7 +45,7 @@ export default class ExplorableHash extends Component<Props> {
         className={styles.component}
         skin={TooltipSkin}
         isOpeningUpward={this.props.tooltipOpensUpward}
-        arrowRelativeToTip
+        arrowRelativeToTip={this.props.arrowRelativeToTip}
         tip={<FormattedMessage {...messages.websiteTip} values={{ websiteName }} />}
       >
         <a
