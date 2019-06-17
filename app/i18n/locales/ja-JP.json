@@ -454,5 +454,5 @@
   "wallet.transaction.type.exchange": "交換",
   "wallet.transaction.type.intrawallet": "{currency} ウォレット内トランザクション",
   "wallet.transaction.type.multiparty": "{currency} 複数人数トランザクション",
-  "widgets.explorer.tooltip": "{explorerName}ブロックチェーンエキスプローラへ"
+  "widgets.explorer.tooltip": "Go to {websiteName}"
 }
