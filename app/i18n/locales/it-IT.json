@@ -121,6 +121,7 @@
   "settings.display.themeWarning": "CAMBIO TEMA RIMUOVE LA PERSONALIZZAZIONE",
   "settings.general.aboutYoroi.commitLabel": "Commit:",
   "settings.general.aboutYoroi.facebook": "Yoroi Facebook",
+  "settings.general.aboutYoroi.git.branch": "Branch:",
   "settings.general.aboutYoroi.github": "Yoroi GitHub",
   "settings.general.aboutYoroi.label": "A proposito di Yoroi",
   "settings.general.aboutYoroi.medium": "EMURGO Medium",
