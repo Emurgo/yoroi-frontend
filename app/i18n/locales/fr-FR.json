@@ -454,5 +454,5 @@
   "wallet.transaction.type.exchange": "Échange",
   "wallet.transaction.type.intrawallet": "Transaction entre wallets {currency}",
   "wallet.transaction.type.multiparty": "Transaction multiparties {currency}",
-  "widgets.explorer.tooltip": "Aller sur l'Explorateur de Blockchain {explorerName}"
+  "widgets.explorer.tooltip": "Go to {websiteName}"
 }
