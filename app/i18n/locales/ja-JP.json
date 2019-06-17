@@ -121,6 +121,7 @@
   "settings.display.themeWarning": "テーマを変更するとカスタマイズ設定が削除されます",
   "settings.general.aboutYoroi.commitLabel": "コミット：",
   "settings.general.aboutYoroi.facebook": "ヨロイ Facebook",
+  "settings.general.aboutYoroi.git.branch": "Branch:",
   "settings.general.aboutYoroi.github": "ヨロイ GitHub",
   "settings.general.aboutYoroi.label": "ヨロイについて",
   "settings.general.aboutYoroi.medium": "EMURGO ミーディアム",
