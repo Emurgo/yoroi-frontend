@@ -130,6 +130,7 @@
   "settings.general.aboutYoroi.versionLabel": "當前版本:",
   "settings.general.aboutYoroi.website": "Yoroi網站",
   "settings.general.aboutYoroi.youtube": "EMURGO YouTube",
+  "settings.general.explorer": "Blockchain Explorer",
   "settings.general.languageSelect.info": "For EMURGO, friendliness in Yoroi is an important topic. We believe understanding blockchain concepts is easier in your native language. We try supporting as many languages as possible, but for a broader selection of languages we need to accept the help from community translators. The selected language translation is fully provided by the community.",
   "settings.general.languageSelect.labelInfo": "The selected language translation is fully provided by the community",
   "settings.general.title": "一般設定",
