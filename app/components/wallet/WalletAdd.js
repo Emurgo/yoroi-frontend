@@ -51,7 +51,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onCreate: Function,
   onRestore: Function,
   onHardwareConnect: Function,
@@ -59,7 +59,7 @@ type Props = {
   onDaedalusTransfer: Function,
   isRestoreActive: boolean,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletAdd extends Component<Props> {

@@ -15,7 +15,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   currency: string,
   fees: BigNumber,
   total: BigNumber,
@@ -27,7 +27,8 @@ type Props = {
   themeId: string,
   value: string,
   type: string,
-};
+  classicTheme: boolean
+|};
 
 export default class AmountInputSkin extends Component<Props> {
   static defaultProps = {

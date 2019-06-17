@@ -113,14 +113,14 @@ const stateTranslations = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   data: WalletTransaction,
   state: TransactionState,
   selectedExplorer: ExplorerType,
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
-};
+|};
 
 type State = {
   isExpanded: boolean,

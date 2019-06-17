@@ -27,13 +27,13 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   isActionProcessing: ?boolean,
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class ExportTransactionDialog extends Component<Props> {

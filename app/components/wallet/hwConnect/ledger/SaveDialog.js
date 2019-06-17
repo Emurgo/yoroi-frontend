@@ -47,7 +47,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   error: ?LocalizableError,
   isActionProcessing: boolean,
@@ -55,7 +55,7 @@ type Props = {
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class SaveDialog extends Component<Props> {

@@ -47,7 +47,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   error: ?LocalizableError,
   isActionProcessing: boolean,
@@ -55,7 +55,7 @@ type Props = {
   submit: Function,
   cancel: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class SaveDialog extends Component<Props> {
@@ -174,7 +174,7 @@ export default class SaveDialog extends Component<Props> {
         {walletNameBlock}
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <HelpLinkBlock />
       </Dialog>);
   }
 

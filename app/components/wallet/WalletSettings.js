@@ -26,7 +26,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   walletName: string,
   walletPasswordUpdateDate: ?Date,
   error?: ?LocalizableError,
@@ -44,7 +44,7 @@ type Props = {
   lastUpdatedField: ?string,
   showPasswordBlock: boolean,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletSettings extends Component<Props> {

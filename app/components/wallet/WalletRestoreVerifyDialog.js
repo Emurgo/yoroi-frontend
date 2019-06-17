@@ -47,7 +47,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   addresses: Array<string>,
   accountPlate: WalletAccountNumberPlate,
   selectedExplorer: ExplorerType,
@@ -57,12 +57,11 @@ type Props = {
   isSubmitting: boolean,
   classicTheme: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 @observer
 export default class WalletRestoreVerifyDialog extends Component<Props> {
   static defaultProps = {
-    onBack: undefined,
     onCopyAddress: undefined,
     error: undefined,
   };
@@ -88,7 +87,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
     const actions = [
       {
-        label: intl.formatMessage(globalMessages.cancel),
+        label: intl.formatMessage(globalMessages.backButtonLabel),
         onClick: onCancel
       },
       {

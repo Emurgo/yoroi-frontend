@@ -21,10 +21,10 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class ProgressStepBlock extends Component<Props> {

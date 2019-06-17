@@ -37,7 +37,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   staleTx: boolean,
   selectedExplorer: ExplorerType,
   amount: string,
@@ -51,7 +51,7 @@ type Props = {
   error: ?LocalizableError,
   currencyUnit: string,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletSendConfirmationDialog extends Component<Props> {

@@ -32,12 +32,12 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onCancel: Function,
   onRestore: Function,
   onPaperRestore: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletRestoreOptionDialog extends Component<Props> {

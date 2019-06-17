@@ -109,7 +109,7 @@ export type WalletRestoreDialogValues = {
   paperPassword: string,
 }
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onCancel: Function,
   onBack?: Function,
@@ -125,7 +125,7 @@ type Props = {
   classicTheme: boolean,
   initValues?: WalletRestoreDialogValues,
   introMessage?: string,
-};
+|};
 
 @observer
 export default class WalletRestoreDialog extends Component<Props> {

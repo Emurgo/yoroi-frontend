@@ -25,7 +25,7 @@ type ExpectedMessages = {
   sendUsingHWButtonLabel: MessageDescriptor,
 };
 
-type Props = {
+type Props = {|
   staleTx: boolean,
   selectedExplorer: ExplorerType,
   amount: string,
@@ -40,7 +40,7 @@ type Props = {
   onSubmit: void => void,
   onCancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class HWSendConfirmationDialog extends Component<Props> {
