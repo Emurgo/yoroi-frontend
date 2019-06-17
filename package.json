@@ -11,6 +11,8 @@
     "build-compress-crx:production": "npm run build -- --env 'mainnet' && npm run compress -- --env 'mainnet' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
     "build-compress:staging": "npm run build -- --env 'staging' && npm run compress -- --env 'staging' --app-id 'yoroi-stag' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-staging-extension.crx' --key ./staging-key.pem",
     "build-compress-crx:staging": "npm run build -- --env 'staging' && npm run compress -- --env 'staging' --app-id 'yoroi-stag' --codebase 'https://yoroiwallet.com/dw/yoroi-staging-extension.crx' --key ./staging-key.pem",
+    "build-compress": "npm run build -- --env ${CARDANO_NETWORK:-testnet} && npm run compress -- --env ${CARDANO_NETWORK:-testnet} --app-id yoroi-${CARDANO_NETWORK:-testnet} --zip-only --codebase https://yoroiwallet.com/dw/yoroi-${CARDANO_NETWORK:-testnet}-extension.crx",
+    "build-compress-crx": "npm run build -- --env ${CARDANO_NETWORK:-testnet} && npm run compress -- --env ${CARDANO_NETWORK:-testnet} --app-id yoroi-${CARDANO_NETWORK:-testnet} --codebase https://yoroiwallet.com/dw/yoroi-${CARDANO_NETWORK:-testnet}-extension.crx --key ./${CARDANO_NETWORK:-testnet}-key.pem",
     "compress-keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx",
     "flow": "flow --show-all-errors .",
