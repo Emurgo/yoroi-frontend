@@ -410,8 +410,8 @@ export default {
   '--theme-widgets-hash-dark-color': '#464749',
   '--theme-widgets-hash-light-color': '#adaeB6',
 
-  '--theme-footer-block-background-color': '#fff',
-  '--theme-footer-block-background-color-hover': '#D9DDE0',
+  '--theme-link-button-background-color-hover': '#D9DDE0',
+  '--theme-link-button-text-color': '#000',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
 
