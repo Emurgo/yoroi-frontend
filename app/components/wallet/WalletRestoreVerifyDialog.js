@@ -88,7 +88,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
     const actions = [
       {
-        label: intl.formatMessage(globalMessages.cancel),
+        label: intl.formatMessage(globalMessages.backButtonLabel),
         onClick: onCancel
       },
       {
