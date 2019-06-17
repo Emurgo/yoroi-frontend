@@ -13,6 +13,9 @@ import WarningBox from '../../widgets/forms/WarningBox';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+
 import styles from './HWSendConfirmationDialog.scss';
 
 type ExpectedMessages = {
@@ -80,8 +83,18 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
         </div>
         {receivers.map((receiver, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          (<div key={receiver + i} className={styles.addressTo}>{receiver}</div>)
+          <ExplorableHashContainer
+            key={receiver + i} // eslint-disable-line react/no-array-index-key
+            hash={receiver}
+            light
+            linkType="address"
+          >
+            <RawHash light>
+              <span className={styles.addressTo}>
+                {receiver}
+              </span>
+            </RawHash>
+          </ExplorableHashContainer>
         ))}
       </div>);
 

@@ -38,7 +38,7 @@ export default class InformativeMessage extends Component<Props> {
     return (
       <div className={messageStyle}>
         {title && <h1>{title}</h1>}
-        {message && <ReactMarkdown source={message} />}
+        {message && <ReactMarkdown source={message} escapeHtml={false} />}
       </div>
     );
   }

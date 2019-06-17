@@ -98,7 +98,7 @@ export default class PaperWalletSettings extends Component<Props> {
       <div className={componentClassNames}>
 
         <div className={styles.intro}>
-          <ReactMarkdown source={paperWalletsIntroText} />
+          <ReactMarkdown source={paperWalletsIntroText} escapeHtml={false} />
         </div>
 
         <Select
