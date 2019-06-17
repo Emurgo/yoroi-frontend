@@ -454,5 +454,5 @@
   "wallet.transaction.type.exchange": "Exchange",
   "wallet.transaction.type.intrawallet": "{valuta} transazione intrawallet",
   "wallet.transaction.type.multiparty": "{valuta} transazione multiparty",
-  "widgets.explorer.tooltip": "Go to {websiteName}"
+  "widgets.explorer.tooltip": "Vai a {websiteName}"
 }
