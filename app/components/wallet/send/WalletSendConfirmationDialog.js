@@ -19,6 +19,7 @@ import config from '../../../config';
 import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 import WarningBox from '../../widgets/forms/WarningBox';
 
@@ -39,6 +40,7 @@ const messages = defineMessages({
 
 type Props = {
   staleTx: boolean,
+  selectedExplorer: ExplorerType,
   amount: string,
   receivers: Array<string>,
   totalAmount: string,
@@ -160,6 +162,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             {receivers.map((receiver, i) => (
               <ExplorableHashContainer
                 key={receiver + i} // eslint-disable-line react/no-array-index-key
+                selectedExplorer={this.props.selectedExplorer}
                 hash={receiver}
                 light
                 linkType="address"

@@ -196,6 +196,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <TransferLayout>
               <DaedalusTransferSummaryPage
                 formattedWalletAmount={formattedWalletAmount}
+                selectedExplorer={this.props.stores.profile.selectedExplorer}
                 transferTx={daedalusTransfer.transferTx}
                 onSubmit={this.tranferFunds}
                 isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}

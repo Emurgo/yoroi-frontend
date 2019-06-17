@@ -108,6 +108,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
         return (
           <FinalizeDialog
             paper={getPaperFromStore()}
+            selectedExplorer={this.props.stores.profile.selectedExplorer}
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}

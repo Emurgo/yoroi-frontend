@@ -19,6 +19,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './VerifyAddressDialog.scss';
@@ -47,6 +48,7 @@ type Props = {
   error: ?LocalizableError,
   verify: Function,
   cancel: Function,
+  selectedExplorer: ExplorerType,
   isHardware: boolean,
   walletAddress: string,
   walletPath: BIP32Path,
@@ -125,6 +127,7 @@ export default class VerifyAddressDialog extends Component<Props> {
               <div className={styles.data}>
                 <ExplorableHashContainer
                   light={false}
+                  selectedExplorer={this.props.selectedExplorer}
                   hash={walletAddress}
                   linkType="address"
                 >

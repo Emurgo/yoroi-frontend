@@ -185,6 +185,7 @@ export default class WalletSendPage extends Component<Props> {
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
           amount={formattedWalletAmount(totalInput.minus(fee))}
           receivers={receivers}
           totalAmount={formattedWalletAmount(totalInput)}
@@ -208,6 +209,7 @@ export default class WalletSendPage extends Component<Props> {
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
           amount={formattedWalletAmount(totalInput.minus(fee))}
           receivers={receivers}
           totalAmount={formattedWalletAmount(totalInput)}

@@ -89,14 +89,19 @@ import {
   getLastReceiveAddressIndex,
   getCurrentAccountIndex,
   getCurrentCryptoAccount,
+  getSelectedExplorer,
   getWalletMasterKey,
   saveCryptoAccount,
   saveLastReceiveAddressIndex,
+  saveSelectedExplorer,
   createStoredWallet,
 } from './lib/storage/adaLocalStorage';
 import type {
-  CryptoAccount
+  CryptoAccount,
 } from './lib/storage/adaLocalStorage';
+import type {
+  ExplorerType,
+} from '../../domain/Explorer';
 import LocalStorageApi from '../localStorage/index';
 import {
   getPendingTxs,
@@ -375,6 +380,24 @@ export type SaveTxResponse = void;
 export type SaveTxFunc = (
   request: SaveTxRequest
 ) => Promise<SaveTxResponse>;
+
+// getSelectedExplorer
+
+export type GetSelectedExplorerRequest = void;
+export type GetSelectedExplorerResponse = ExplorerType;
+export type GetSelectedExplorerFunc = (
+  request: GetSelectedExplorerRequest
+) => Promise<GetSelectedExplorerResponse>;
+
+// saveSelectedExplorer
+
+export type SaveSelectedExplorerRequest = {
+  explorer: ExplorerType,
+};
+export type SaveSelectedExplorerResponse = void;
+export type SaveSelectedExplorerFunc = (
+  request: SaveSelectedExplorerRequest
+) => Promise<SaveSelectedExplorerResponse>;
 
 // isValidAddress
 
@@ -739,8 +762,14 @@ export default class AdaApi {
     const { password, signRequest } = request;
     try {
       const masterKey = getWalletMasterKey();
+      if (masterKey == null) {
+        throw new Error('No master key stored');
+      }
       const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
       const currAccount = getCurrentAccountIndex();
+      if (currAccount == null) {
+        throw new Error('no account selected');
+      }
       const accountPrivateKey = cryptoWallet.bip44_account(
         RustModule.Wallet.AccountIndex.new(currAccount | HARD_DERIVATION_START)
       );
@@ -963,6 +992,30 @@ export default class AdaApi {
       await updateLastReceiveAddressIndex();
     } catch (error) {
       Logger.error('AdaApi::saveTxs error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getSelectedExplorer(
+    request: GetSelectedExplorerRequest
+  ): Promise<GetSelectedExplorerResponse> {
+    Logger.debug('AdaApi::getSelectedExplorer called');
+    try {
+      return getSelectedExplorer();
+    } catch (error) {
+      Logger.error('AdaApi::getSelectedExplorer error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async saveSelectedExplorer(
+    request: SaveSelectedExplorerRequest
+  ): Promise<SaveSelectedExplorerResponse> {
+    Logger.debug('AdaApi::saveSelectedExplorer called');
+    try {
+      saveSelectedExplorer(request.explorer);
+    } catch (error) {
+      Logger.error('AdaApi::saveSelectedExplorer error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

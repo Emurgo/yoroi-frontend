@@ -13,6 +13,7 @@ import Dialog from '../widgets/Dialog';
 import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -49,6 +50,7 @@ const messages = defineMessages({
 type Props = {
   addresses: Array<string>,
   accountPlate: WalletAccountNumberPlate,
+  selectedExplorer: ExplorerType,
   onCopyAddress?: Function,
   onNext: Function,
   onCancel: Function,
@@ -144,6 +146,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
               key={a}
             >
               <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
                 hash={a}
                 light
                 tooltipOpensUpward

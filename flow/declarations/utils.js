@@ -1,4 +1,4 @@
-
+declare type $Inexact<T: Object> = {...T};
 declare type ExtractReturnType = <R>((...arg: any) => R) => R;
 declare type ReturnType<Func> = $Call<ExtractReturnType, Func>;
 
