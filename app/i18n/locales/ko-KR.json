@@ -121,6 +121,7 @@
   "settings.display.themeWarning": "이 테마를 변경하시면 사용자이 지정한 것 제거 됩니다.",
   "settings.general.aboutYoroi.commitLabel": "진행:",
   "settings.general.aboutYoroi.facebook": "요로이 Facebook",
+  "settings.general.aboutYoroi.git.branch": "Branch:",
   "settings.general.aboutYoroi.github": "요로이 GitHub",
   "settings.general.aboutYoroi.label": "요로이란",
   "settings.general.aboutYoroi.medium": "EMURGO Medium",
