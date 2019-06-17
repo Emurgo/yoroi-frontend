@@ -21,6 +21,7 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../../domain/Explorer';
 
 import WarningBox from '../../widgets/forms/WarningBox';
+import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -46,6 +47,7 @@ type Props = {|
   transactionFee: string,
   onSubmit: ({ password: string }) => void,
   amountToNaturalUnits: (amountWithFractions: string) => string,
+  signRequest: BaseSignRequest,
   onCancel: Function,
   isSubmitting: boolean,
   error: ?LocalizableError,
