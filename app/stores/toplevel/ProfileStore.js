@@ -154,6 +154,11 @@ export default class ProfileStore extends Store {
   // ========== Current/Custom Theme ========== //
 
   @computed get currentTheme(): Theme {
+    // TODO: Tests were written for the old theme so we need to use it for testing
+    if (environment.isTest()) {
+      return THEMES.YOROI_CLASSIC;
+    }
+
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet && result) {
       // verify content is an actual theme
@@ -162,11 +167,9 @@ export default class ProfileStore extends Store {
         return result;
       }
     }
-    // TODO: We temporarily disable the new theme on mainnet until it's ready
-    // TODO: Tests were written for the old theme so we need to use it for testing
-    return (environment.isMainnet() || environment.isTest()) ?
-      THEMES.YOROI_CLASSIC :
-      THEMES.YOROI_MODERN;
+
+    // THEMES.YOROI_MODERN is the default theme
+    return THEMES.YOROI_MODERN;
   }
 
   @computed get isModernTheme(): boolean {
