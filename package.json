@@ -82,7 +82,7 @@
     "crx": "5.0.0",
     "css-loader": "1.0.1",
     "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
-    "eslint": "5.8.0",
+    "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
     "eslint-plugin-flowtype": "3.10.3",
     "eslint-plugin-import": "2.16.0",
