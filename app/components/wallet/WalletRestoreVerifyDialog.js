@@ -7,10 +7,13 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletRestoreVerifyDialog.scss';
 import DialogBackButton from '../widgets/DialogBackButton';
 import CopyableAddress from '../widgets/CopyableAddress';
+import RawHash from '../widgets/hashWrappers/RawHash';
 import WalletAccountIcon from '../topbar/WalletAccountIcon';
 import Dialog from '../widgets/Dialog';
 import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 import LocalizableError from '../../i18n/LocalizableError';
+import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -47,6 +50,7 @@ const messages = defineMessages({
 type Props = {
   addresses: Array<string>,
   accountPlate: WalletAccountNumberPlate,
+  selectedExplorer: ExplorerType,
   onCopyAddress?: Function,
   onNext: Function,
   onCancel: Function,
@@ -137,14 +141,25 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
           </h2>
           {addresses.map(a => (
             <CopyableAddress
-              address={a}
-              isClassicThemeActive={classicTheme}
+              hash={a}
               onCopyAddress={onCopyAddress}
-              isUsed={classicTheme /* pretend isUsed on classic theme for stylistic purposes */}
               key={a}
-            />
+            >
+              <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
+                hash={a}
+                light
+                tooltipOpensUpward
+                linkType="address"
+              >
+                <RawHash light>
+                  {a}
+                </RawHash>
+              </ExplorableHashContainer>
+            </CopyableAddress>
           ))}
         </div>
+        <div className={styles.postCopyMargin} />
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 

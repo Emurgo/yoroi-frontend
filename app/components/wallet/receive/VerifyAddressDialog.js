@@ -17,6 +17,9 @@ import {
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './VerifyAddressDialog.scss';
@@ -45,6 +48,7 @@ type Props = {
   error: ?LocalizableError,
   verify: Function,
   cancel: Function,
+  selectedExplorer: ExplorerType,
   isHardware: boolean,
   walletAddress: string,
   walletPath: BIP32Path,
@@ -92,6 +96,8 @@ export default class VerifyAddressDialog extends Component<Props> {
       'SimpleFormField_label FormFieldOverridesClassic_label VerifyAddressDialog_header' :
       'SimpleFormField_label FormFieldOverrides_label VerifyAddressDialog_header';
 
+    const derivationClasses = classnames([styles.infoBlock, styles.derivation]);
+
     return (
       <Dialog
         className={classnames([styles.component, 'VerifyAddressDialog'])}
@@ -118,14 +124,27 @@ export default class VerifyAddressDialog extends Component<Props> {
               {intl.formatMessage(messages.addressLabel)}
             </span>
             <div className={styles.infoBlock}>
-              <p>{walletAddress}</p>
+              <div className={styles.data}>
+                <ExplorableHashContainer
+                  light={false}
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={walletAddress}
+                  linkType="address"
+                >
+                  <RawHash light={false}>
+                    {walletAddress}
+                  </RawHash>
+                </ExplorableHashContainer>
+              </div>
             </div>
             <br />
             <span className={labelStyle}>
               {intl.formatMessage(messages.derivationPathLabel)}
             </span>
-            <div className={styles.infoBlock}>
-              <p>{toDerivationPathString(walletPath)}</p>
+            <div className={derivationClasses}>
+              <div className={styles.data}>
+                {toDerivationPathString(walletPath)}
+              </div>
             </div>
           </div>
         ) : null}

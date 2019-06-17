@@ -19,14 +19,16 @@
   padding-right: 0px;
 }
 
-.infoBlock {
+.derivation {
   font-family: var(--font-mono-regular);
   letter-spacing: 0;
+}
+
+.infoBlock {
   font-size: 15px;
-  opacity: 0.7;
   text-align: center;
 
-  p {
+  .data {
     line-height: 30px;
     height: 30px;
     padding-left: 5px;

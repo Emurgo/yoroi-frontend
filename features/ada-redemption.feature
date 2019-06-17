@@ -44,15 +44,6 @@ Feature: Ada Redemption
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue
     And I should see the summary screen
 
-  Scenario: User redeems "Regular" encrypted PDF certificate
-    Given I have accepted "Daedalus Redemption Disclaimer"
-    And I select a valid "Regular" encrypted PDF certificate
-    And I enter a valid "Regular" encrypted PDF certificate passphrase
-    And ada redemption form submit button is no longer disabled
-    When I submit the ada redemption form
-    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
-    And I should see the summary screen
-
   Scenario: User redeems manually entered "Force vended" redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I click on ada redemption choices "Force vended" tab

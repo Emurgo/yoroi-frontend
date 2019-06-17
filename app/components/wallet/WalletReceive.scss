@@ -43,17 +43,14 @@
       justify-content: space-between;
       line-height: 19px;
       letter-spacing: 0;
-  
-      .hash {
-        font-size: 14px;
-        font-family: var(--font-mono-medium);
-        line-height: 23px;
+
+      .postCopyMargin {
         margin-bottom: 6px;
-        word-break: break-all;
       }
-  
-      .usedHash {
-        opacity: 0.4;
+
+      .copyableHash {
+        letter-spacing: 0px;
+        font-size: 17px;
       }
   
       .hashLabel {
@@ -123,11 +120,9 @@
         border-top: 1px solid var(--theme-separation-border-color);
       }
   
-      .addressId {
-        font-family: var(--font-mono-regular);
-        flex-grow: 1;
+      .addressMargin {
         margin-right: 32.5px;
-        letter-spacing: 0;
+        flex-grow: 1;
       }
   
       .addressActions {
@@ -189,12 +184,6 @@
         }
       }
     }
-  
-    .usedWalletAddress {
-      .addressId {
-        opacity: 0.4;
-      }
-    }
   }
 }
 
@@ -207,10 +196,6 @@
 
   .qrCodeAndInstructions {
     .instructions {
-      .usedHash {
-        opacity: 0.4;
-      }
-
       .hashLabel {
         font-family: var(--font-medium);
         font-weight: 600;
@@ -231,16 +216,10 @@
   padding: 30px;
 
   .qrCodeAndInstructions {
-  
     .instructions {
-      .hash {
-        display: flex;
-        align-items: center;
+      .copyableHash {
+        font-size: 14px;
         line-height: 1.57;
-      }
-  
-      .usedHash > span {
-        opacity: 0.4;
       }
   
       .hashLabel {
@@ -279,10 +258,9 @@
       & + .walletAddress {
         border-top: 1px solid var(--theme-separation-border-color);
       }
-  
-      .addressId {
+
+      .addressMargin {
         margin-right: 32.5px;
-        color: var(--theme-transactions-received-address-color);
       }
     }
   }  

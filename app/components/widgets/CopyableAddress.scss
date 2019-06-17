@@ -1,13 +1,4 @@
 .component {
-  .hash {
-    letter-spacing: 0px;
-    margin-bottom: 6px;
-    font-family: var(--font-mono-regular);
-    word-break: break-all;
-    font-size: 17px;
-    line-height: 23px;
-  }
-
   .copyIconBig {
     cursor: pointer;
     object-fit: contain;
@@ -19,22 +10,5 @@
         fill: var(--theme-icon-copy-address-color);
       }
     }
-  }
-
-  .usedWalletAddress {
-    span,
-    img {
-      opacity: 0.4;
-    }
-  }
-}
-
-:global(.YoroiModern) .component {
-  .hash {
-    font-size: 14px;
-    line-height: 1.57;
-    color: var(--theme-transactions-received-address-color);
-    display: flex;
-    align-items: center;
   }
 }

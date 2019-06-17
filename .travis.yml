@@ -108,7 +108,7 @@ matrix:
         - bash .travis/e2e_tests.sh
         - bash .travis/s3_screenshots_upload.sh
     - stage: e2e-tests
-      if: ( branch =~ ^develop|staging|master OR ( type = pull_request AND != branch = l10n_develop ) )
+      if: ( ( branch =~ ^develop|staging|master AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) OR ( type = pull_request AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) )
       name: "Chrome End-to-End tests"
       env:
         - BROWSER=firefox
@@ -119,7 +119,7 @@ matrix:
         - bash .travis/e2e_tests.sh
         - bash .travis/s3_screenshots_upload.sh
     - stage: e2e-tests
-      if: ( branch =~ ^develop|staging|master OR ( type = pull_request AND != branch = l10n_develop ) )
+      if: ( ( branch =~ ^develop|staging|master AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) OR ( type = pull_request AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) )
       name: "Firefox End-to-End tests"
       env:
         - BROWSER=brave

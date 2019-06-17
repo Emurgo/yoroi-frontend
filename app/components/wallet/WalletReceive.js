@@ -16,6 +16,9 @@ import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
+import RawHash from '../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -54,6 +57,7 @@ const messages = defineMessages({
 
 type Props = {
   walletAddress: string,
+  selectedExplorer: ExplorerType,
   isWalletAddressUsed: boolean,
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
@@ -116,6 +120,10 @@ export default class WalletReceive extends Component<Props, State> {
       />
     );
 
+    const copyableHashClass = classnames([
+      styles.copyableHash,
+    ]);
+
     // Get QRCode color value from active theme's CSS variable
     const qrCodeBackgroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
@@ -130,10 +138,21 @@ export default class WalletReceive extends Component<Props, State> {
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
             <CopyableAddress
-              address={walletAddress}
+              hash={walletAddress}
               onCopyAddress={onCopyAddress}
-              isUsed={isWalletAddressUsed}
-            />
+            >
+              <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
+                hash={walletAddress}
+                light={isWalletAddressUsed}
+                linkType="address"
+              >
+                <RawHash light={isWalletAddressUsed}>
+                  <span className={copyableHashClass}>{walletAddress}</span>
+                </RawHash>
+              </ExplorableHashContainer>
+            </CopyableAddress>
+            <div className={styles.postCopyMargin} />
             <div className={styles.instructionsText}>
               <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </div>
@@ -170,7 +189,17 @@ export default class WalletReceive extends Component<Props, State> {
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
                 {/* Address Id */}
-                <div className={styles.addressId}>{address.id}</div>
+                <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={address.id}
+                  light={address.isUsed}
+                  linkType="address"
+                >
+                  <RawHash light={address.isUsed}>
+                    {address.id}
+                  </RawHash>
+                </ExplorableHashContainer>
+                <div className={styles.addressMargin} />
                 {/* Address Action block start */}
                 <div className={styles.addressActions}>
                   {/* Verify Address action */}

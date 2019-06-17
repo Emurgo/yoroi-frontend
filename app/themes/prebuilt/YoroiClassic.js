@@ -28,6 +28,9 @@ const rpBubble = {
   '--rp-bubble-bg-color': '#f3f3f5',
   '--rp-bubble-border-color': '#c6cdd6',
   '--rp-bubble-border-radius': '2px',
+  // arrows are actually used by tooltips
+  '--rp-bubble-arrow-width': '14px',
+  '--rp-bubble-arrow-height': '4px',
 };
 
 // BUTTON
@@ -390,6 +393,10 @@ export default {
   '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
+  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
+  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-widgets-hash-dark-color': '#000000',
+  '--theme-widgets-hash-light-color': '#929293',
 
   '--theme-footer-block-background-color': 'rgba(218, 164, 154, 0.06)',
   '--theme-footer-block-background-color-hover': '#D9DDE0',

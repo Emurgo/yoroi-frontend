@@ -9,8 +9,11 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './FinalizeDialog.scss';
 import DialogBackButton from '../../../widgets/DialogBackButton';
 import CopyableAddress from '../../../widgets/CopyableAddress';
+import RawHash from '../../../widgets/hashWrappers/RawHash';
 import type { AdaPaper } from '../../../../api/ada';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
+import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../../../domain/Explorer';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -41,6 +44,7 @@ const messages = defineMessages({
 
 type Props = {
   onCopyAddress?: Function,
+  selectedExplorer: ExplorerType,
   paper: AdaPaper,
   onNext: Function,
   onCancel: Function,
@@ -124,12 +128,24 @@ export default class FinalizeDialog extends Component<Props> {
           </h2>
           {paper.addresses.map(a => (
             <CopyableAddress
-              address={a}
+              hash={a}
               onCopyAddress={onCopyAddress}
-              isUsed={classicTheme /* pretend isUsed on classic theme for stylistic purposes */}
               key={a}
-            />
+            >
+              <ExplorableHashContainer
+                hash={a}
+                selectedExplorer={this.props.selectedExplorer}
+                light
+                tooltipOpensUpward
+                linkType="address"
+              >
+                <RawHash light>
+                  {a}
+                </RawHash>
+              </ExplorableHashContainer>
+            </CopyableAddress>
           ))}
+          <div className={styles.postCopyMargin} />
         </div>
 
       </Dialog>
