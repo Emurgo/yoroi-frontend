@@ -42,7 +42,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onCopyAddress?: Function,
   selectedExplorer: ExplorerType,
   paper: AdaPaper,
@@ -50,7 +50,7 @@ type Props = {
   onCancel: Function,
   onBack?: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class FinalizeDialog extends Component<Props> {

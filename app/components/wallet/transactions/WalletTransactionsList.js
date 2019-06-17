@@ -31,7 +31,7 @@ const messages = defineMessages({
 
 const dateFormat = 'YYYY-MM-DD';
 
-type Props = {
+type Props = {|
   transactions: Array<WalletTransaction>,
   isLoadingTransactions: boolean,
   hasMoreToLoad: boolean,
@@ -40,7 +40,7 @@ type Props = {
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
-};
+|};
 
 @observer
 export default class WalletTransactionsList extends Component<Props> {

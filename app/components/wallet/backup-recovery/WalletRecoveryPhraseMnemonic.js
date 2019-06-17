@@ -5,11 +5,11 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './WalletRecoveryPhraseMnemonic.scss';
 
-type Props = {
+type Props = {|
   phrase: string | Element<any>,
   classicTheme: boolean,
   filled?: boolean
-};
+|};
 
 @observer
 export default class WalletRecoveryPhraseMnemonic extends Component<Props> {

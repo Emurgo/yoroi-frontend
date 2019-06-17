@@ -42,7 +42,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
   enteredPhrase: Array<{ word: string }>,
   isValid: boolean,
@@ -59,7 +59,7 @@ type Props = {
   removeWord: Function,
   hasWord: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {

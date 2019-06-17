@@ -55,14 +55,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class CheckDialog extends Component<Props> {
@@ -141,7 +141,7 @@ export default class CheckDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock progressInfo={progressInfo} />
+        <HelpLinkBlock />
       </Dialog>);
   }
 }

@@ -6,13 +6,13 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import styles from './MnemonicWord.scss';
 
-type Props = {
+type Props = {|
   word: string,
   index: number,
   isActive: boolean,
   onClick: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class MnemonicWord extends Component<Props> {
