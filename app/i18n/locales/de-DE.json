@@ -121,6 +121,7 @@
   "settings.display.themeWarning": "BEIM DESIGNWECHSEL GEHT DIE PERSONALISIERUNG VERLOREN",
   "settings.general.aboutYoroi.commitLabel": "Commit:",
   "settings.general.aboutYoroi.facebook": "Yoroi Facebook",
+  "settings.general.aboutYoroi.git.branch": "Branch:",
   "settings.general.aboutYoroi.github": "Yoroi GitHub",
   "settings.general.aboutYoroi.label": "Über Yoroi",
   "settings.general.aboutYoroi.medium": "EMURGO Medium",
@@ -455,5 +456,5 @@
   "wallet.transaction.type.exchange": "Börse",
   "wallet.transaction.type.intrawallet": "{currency} interne Wallet-Transaktion",
   "wallet.transaction.type.multiparty": "{currency} mehrfach-Teilnehmer Transaktion",
-  "widgets.explorer.tooltip": "Go to {websiteName}"
+  "widgets.explorer.tooltip": "Gehe zu {websiteName}"
 }
