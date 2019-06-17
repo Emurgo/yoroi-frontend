@@ -13,3 +13,13 @@
   height: calc(100% - 40px);
   overflow: auto;
 }
+
+:global(.YoroiModern) {
+  .navigation {
+    height: 50px;
+  }
+
+  .page {
+    height: calc(100% - 50px);
+  }  
+}
