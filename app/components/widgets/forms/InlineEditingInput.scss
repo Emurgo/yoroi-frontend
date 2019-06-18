@@ -32,6 +32,9 @@
     &:hover {
       opacity: 1;
     }
+    &.error {
+      right: 50px;
+    }
   }
 
   @keyframes animateSavingResultLabel {
@@ -74,9 +77,5 @@
 
   .button {
     bottom: 37px;
-
-    &.error {
-      right: 50px;
-    }
   }
 }
