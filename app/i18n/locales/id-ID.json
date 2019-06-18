@@ -169,7 +169,7 @@
   "settings.paperWallet.dialog.password.intro.line3": "It is <strong>your own</strong> responsibility to make sure you remember it.",
   "settings.paperWallet.dialog.repeatPasswordLabel": "Ulangi kata sandi paper wallet",
   "settings.paperWallet.dialog.repeatPasswordPlaceholder": "Ketikkan kembali kata sandi paper wallet",
-  "settings.paperWallet.dialog.userPassword.title": "Set custom paper wallet password",
+  "settings.paperWallet.dialog.userPassword.title": "Atur kustom kata sandi paper wallet",
   "settings.paperWallet.dialog.verify.message": "This is the final step. Please verify the mnemonic phrase (printed on the PDF certificate) and the password to make sure you have all the valid information to *access your funds later*. On the next screen you will also be able to verify the account checksum and copy your new addresses.",
   "settings.paperWallet.numAddressesSelect.label": "Jumlah address",
   "settings.paperWallet.printIdentificationCheckbox.description": "Enabling this will help you verify your wallet at the moment of restoration, but it will also **forfeit plausible deniability**.",
@@ -225,7 +225,7 @@
   "wallet.add.page.hw.title": "Terhubung ke hardware wallet",
   "wallet.add.page.restore.title": "Kembalikan wallet",
   "wallet.add.page.subtitle.label": "Light wallet Yoroi untuk Cardano",
-  "wallet.add.page.title": "Gateway <br> to the <br> financial world",
+  "wallet.add.page.title": "Gerbang <br> menuju <br> dunia finansial",
   "wallet.amountInput.feesLabel": "+ {amount} biaya",
   "wallet.backup.privacy.warning.dialog..button.labelContinue": "Lanjut",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Pastikan tidak ada yang melihat layar Anda kecuali Anda menginginkan mereka mengakses dana Anda.",
@@ -240,7 +240,7 @@
   "wallet.connect.hw.dialog.save.button.label": "Simpan",
   "wallet.connect.hw.dialog.step.about.label": "PERIKSA",
   "wallet.connect.hw.dialog.step.about.prerequisite.4": "Your computer must remain connected to the Internet throughout the process.",
-  "wallet.connect.hw.dialog.step.about.prerequisite.header": "Prerequisites",
+  "wallet.connect.hw.dialog.step.about.prerequisite.header": "Prasyarat",
   "wallet.connect.hw.dialog.step.connect.introText.line.3": "Proses ini membagikan public key Cardano dengan Yoroi.",
   "wallet.connect.hw.dialog.step.connect.label": "MENYAMBUNG",
   "wallet.connect.hw.dialog.step.save.error.101": "Gagal menyimpan. Harap periksa koneksi internet Anda dan coba kembali.",
@@ -456,5 +456,5 @@
   "wallet.transaction.type.exchange": "Exchange",
   "wallet.transaction.type.intrawallet": "{currency} transaksi intrawallet",
   "wallet.transaction.type.multiparty": "{currency} transaksi multiparty",
-  "widgets.explorer.tooltip": "Go to {websiteName}"
+  "widgets.explorer.tooltip": "Pergi ke {websiteName}"
 }
