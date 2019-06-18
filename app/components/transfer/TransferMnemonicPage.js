@@ -34,7 +34,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onBack: Function,
   mnemonicValidator: Function,
@@ -42,7 +42,7 @@ type Props = {
   step0: string,
   mnemonicLength: number,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class TransferMnemonicPage extends Component<Props> {
