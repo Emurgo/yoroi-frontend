@@ -405,4 +405,6 @@ export default {
 
   '--theme-default-main-color': '#DAA49A',
   '--theme-default-main-bg': '#F3F3F5',
+
+  '--theme-wallet-navigation-tab-height': '40px',
 };
