@@ -85,6 +85,8 @@ export default class AdaWalletsStore extends WalletStore {
     if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params))) {
       this.sendMoneyRequest.reset();
     }
+    // TODO: patch for triggering topbar update, there should be a better way of doing it
+    this.stores.topbar.updateCategories();
   };
 
   // =================== VALIDITY CHECK ==================== //
@@ -111,8 +113,6 @@ export default class AdaWalletsStore extends WalletStore {
     await this._restore(params);
 
     this.showWalletRestoredNotification();
-    // TODO: patch for triggering topbar update, there should be a better way of doing it
-    this.stores.topbar.updateCategories();
   };
 
   // =================== WALLET IMPORTING ==================== //
