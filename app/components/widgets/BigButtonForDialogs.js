@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import styles from './BigButtonForDialogs.scss';
 
-type Props = {
+type Props = {|
   label: string,
   description: string,
   onClick: Function,
   isDisabled: boolean,
   className: string,
-};
+|};
 
 export default class BigButtonForDialogs extends Component<Props> {
 

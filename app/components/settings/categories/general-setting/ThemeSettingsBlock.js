@@ -50,14 +50,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   currentTheme: Theme,
   selectTheme: Function,
   exportTheme: Function,
   getThemeVars: Function,
   hasCustomTheme: Function,
   onExternalLinkClick: Function,
-};
+|};
 
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {

@@ -7,9 +7,9 @@ import dangerIcon from '../../../assets/images/danger.inline.svg';
 
 import styles from './WarningBox.scss';
 
-type Props = {
+type Props = {|
   children: ?Node
-};
+|};
 
 export default class WarningBox extends Component<Props> {
 

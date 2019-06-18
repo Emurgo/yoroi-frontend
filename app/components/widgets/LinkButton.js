@@ -3,13 +3,13 @@ import SvgInline from 'react-svg-inline';
 import { intlShape } from 'react-intl';
 import styles from './LinkButton.scss';
 
-type Props = {
+type Props = {|
   url: string,
   svg: string,
   message: any,
   svgClassName: string,
   textClassName: String
-};
+|};
 
 export default class LinkButton extends Component<Props> {
 

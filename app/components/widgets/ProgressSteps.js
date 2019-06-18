@@ -9,14 +9,14 @@ import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
 import iconCrossGreenSVG from '../../assets/images/widget/cross-green.inline.svg';
 import styles from './ProgressSteps.scss';
 
-type Props = {
+type Props = {|
   stepsList: Array<string>,
   progressInfo: {
     currentStep : number, // example, 0 = pointing to stepsList[0]
     stepState: number, // has three states, 0 = LOAD | 1 = PROCESS | 9 = ERROR
   },
   classicTheme: boolean
-};
+|};
 @observer
 export default class ProgressSteps extends Component<Props> {
 

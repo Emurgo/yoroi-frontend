@@ -5,12 +5,12 @@ import ReactMarkdown from 'react-markdown';
 import classNames from 'classnames';
 import styles from './InformativeMessage.scss';
 
-type Props = {
+type Props = {|
   title?: string,
   message?: string,
   subclass?: string,
   children?: Children
-};
+|};
 
 @observer
 export default class InformativeMessage extends Component<Props> {
