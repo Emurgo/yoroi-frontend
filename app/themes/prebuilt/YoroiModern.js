@@ -440,4 +440,6 @@ export default {
   '--theme-modal-min-max-width-cmn': `${560 - (modalMargin.left + modalMargin.right)}px`,
   '--theme-modal-min-max-width-sm': `${465 - (modalMargin.left + modalMargin.right)}px`,
   '--theme-modal-min-max-width-lg': `${680 - (modalMargin.left + modalMargin.right)}px`,
+
+  '--theme-wallet-navigation-tab-height': '50px',
 };
