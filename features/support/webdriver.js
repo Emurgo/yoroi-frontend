@@ -8,6 +8,10 @@ import path from 'path';
 
 const fs = require('fs');
 
+function encode(file) {
+  return fs.readFileSync(file, { encoding: 'base64' });
+}
+
 /**
  * Chrome extension URLs are fixed and never change. This is a security problem as it allows
  * websites to check if you have certain known extensions installed by monitoring the browser's
@@ -39,7 +43,7 @@ function getBraveBuilder() {
     .setChromeOptions(new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
       .addArguments('--start-maximized', '--disable-setuid-sandbox', '--no-sandbox')
-      .addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
+      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx'))));
 }
 
 function getChromeBuilder() {
@@ -52,7 +56,8 @@ function getChromeBuilder() {
       }
     })
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
+    .setChromeOptions(new chrome.Options()
+      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx'))));
 }
 
 function getFirefoxBuilder() {
