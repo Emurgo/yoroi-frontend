@@ -217,7 +217,7 @@
   "wallet.add.optionDialog.connect.hw.trezor.title": "Trezor硬件钱包",
   "wallet.add.optionDialog.restore.dialogTitle": "恢复钱包",
   "wallet.add.optionDialog.restore.normalWallet.description": "如果您创建Yoroi钱包时恢复密钥为15个助记词，请选择此选项来恢复您的钱包。",
-  "wallet.add.optionDialog.restore.normalWallet.title": "请输入Yoroi钱包的15个助记词",
+  "wallet.add.optionDialog.restore.normalWallet.title": "点此输入Yoroi钱包的15个助记词",
   "wallet.add.optionDialog.restore.paperWallet.description": "如果您已生成了一个Yoroi纸钱包（通常打印后离线保存），您可以选择此选项将纸钱包中的资金导入。",
   "wallet.add.optionDialog.restore.paperWallet.title": "纸钱包",
   "wallet.add.page.create.title": "创建钱包",
