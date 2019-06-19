@@ -22,7 +22,8 @@ import connectErrorImage from '../../../../assets/images/hardware-wallet/trezor/
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
 import connectErrorSVG from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
 
-import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { StepState } from '../../../widgets/ProgressSteps';
 
 import { Logger } from '../../../../utils/logging';
 

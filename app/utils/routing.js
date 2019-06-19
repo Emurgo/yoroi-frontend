@@ -1,6 +1,7 @@
+// @flow
 import RouteParser from 'route-parser';
 
-export const matchRoute = (pattern, path) => new RouteParser(pattern).match(path);
+export const matchRoute = (pattern: string, path: string) => new RouteParser(pattern).match(path);
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
@@ -14,7 +15,7 @@ export const matchRoute = (pattern, path) => new RouteParser(pattern).match(path
  * @param pattern
  * @param params
  */
-export const buildRoute = (pattern, params) => {
+export const buildRoute = (pattern: string, params: ?{ [key: any]: any }) => {
   function toArray(val) {
     return Object.prototype.toString.call(val) !== '[object Array]' ? [val] : val;
   }
@@ -30,8 +31,10 @@ export const buildRoute = (pattern, params) => {
   const tokens = {};
 
   if (params) {
+    // assert not null
+    const paramsArgs = params;
     Object.keys(params).forEach((paramName) => {
-      let paramValue = params[paramName];
+      let paramValue = paramsArgs[paramName];
 
       // special param name in RR, used for '*' and '**' placeholders
       if (paramName === 'splat') {
@@ -65,6 +68,7 @@ export const buildRoute = (pattern, params) => {
         // - '/path(/:param/:another_param)'
         const paramRegex = new RegExp('(/|\\(|\\)|^):' + paramName + '(/|\\)|\\(|$)');
         routePath = routePath.replace(paramRegex, (match, g1, g2) => {
+          // $FlowFixMe
           tokens[paramName] = encodeURIComponent(paramValue);
           return `${g1}<${paramName}>${g2}`;
         });
@@ -97,7 +101,7 @@ export const buildRoute = (pattern, params) => {
  * @param url
  * @returns {string}
  */
-export const getUrlParameterByName = (name, url) => {
+export const getUrlParameterByName = (name: string, url?: string) => {
   if (!url) url = window.location.href;
   name = name.replace(/[[\]]/g, '\\$&');
   const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');

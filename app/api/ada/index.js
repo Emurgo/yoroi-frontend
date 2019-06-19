@@ -11,7 +11,7 @@ import WalletTransaction, {
   transactionTypes
 } from '../../domain/WalletTransaction';
 import type {
-  TransactionType
+  TransactionDirectionType
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA, HARD_DERIVATION_START } from '../../config/numbersConfig';
@@ -1385,7 +1385,7 @@ export default class AdaApi {
 async function _getTxFinancialInfo(
   data: AdaTransaction
 ): Promise<{
-  type: TransactionType,
+  type: TransactionDirectionType,
   amount: BigNumber,
   fee: BigNumber
 }> {
@@ -1506,7 +1506,7 @@ const _conditionToTxState = (condition: AdaTransactionCondition) => {
 
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
-  (data: AdaTransaction, type: TransactionType, amount: BigNumber, fee: BigNumber) => {
+  (data: AdaTransaction, type: TransactionDirectionType, amount: BigNumber, fee: BigNumber) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,

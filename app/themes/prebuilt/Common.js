@@ -1,3 +1,4 @@
+// @flow
 //  ==== Common: Theme independent === //
 
 export default {

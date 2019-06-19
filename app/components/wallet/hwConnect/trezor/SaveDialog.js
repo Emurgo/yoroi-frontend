@@ -29,7 +29,8 @@ import saveErrorSVG from '../../../../assets/images/hardware-wallet/trezor/save-
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import { isValidWalletName } from '../../../../utils/validations';
 
-import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { StepState } from '../../../widgets/ProgressSteps';
 
 import { Logger } from '../../../../utils/logging';
 

@@ -1,4 +1,6 @@
+// @flow
 import React, { Component } from 'react';
+import type { Ref } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
@@ -17,11 +19,21 @@ type Props = {|
   currency: string,
   fees: BigNumber,
   total: BigNumber,
-  error: boolean,
+  error?: string,
+  classicTheme: boolean,
+  // inherited from InputOwnSkin
+  inputRef: Ref<'input'>,
+  theme: Object,
+  themeId: string,
+  value: string,
+  type: string,
   classicTheme: boolean
 |};
 
 export default class AmountInputSkin extends Component<Props> {
+  static defaultProps = {
+    error: undefined,
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
