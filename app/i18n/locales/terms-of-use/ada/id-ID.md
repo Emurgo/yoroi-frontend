@@ -42,9 +42,9 @@ DALAM HAL APA PUN PERUSAHAAN ATAU PEMEGANG SAHAM, DIREKTUR, PEJABAT, KARYAWAN, A
 
 Pengguna setuju untuk mengganti rugi, tidak membahayakan, dan membela Perusahaan, pemegang saham, direktur, pejabat, karyawan, afiliasi, dan agennya ("Pihak Ganti Rugi") dari dan terhadap tindakan apa pun, menyebabkan, mengklaim, merusak, utang, permintaan atau kewajiban, termasuk biaya dan biaya pengacara, ditegaskan oleh siapa saja, yang timbul dari atau berkaitan dengan: (a) Perjanjian ini; (b) Akses, penggunaan, atau instalasi Perangkat Lunak oleh Pengguna, termasuk data atau pekerjaan apa pun yang dikirimkan atau diterima oleh Pengguna; dan (c) setiap penggunaan Perangkat Lunak yang tidak dapat diterima oleh siapa pun, termasuk, namun tidak terbatas pada, pernyataan, data atau konten apa pun yang dibuat, ditransmisikan atau diterbitkan ulang oleh Pengguna atau siapa pun yang dilarang sebagai tidak dapat diterima berdasarkan Bagian 4. GANTI RUGI INI MENCAKUP GANTI RUGI TEGAS DARI PERUSAHAAN DAN SEMUA PIHAK YANG DIBERI GANTI RUGI UNTUK SETIAP KELALAIAN YANG DITUDUHKAN (TERMASUK SEGALA KELALAIAN YANG DITUDUHKAN). ATAU DUGAAN PELANGGARAN PERUSAHAAN ATAU PIHAK YANG MENDAPAT GANTI RUGI APA PUN.
 
-## 9. Intellectual Property
+## 9. Properti Intelektual
 
-The Company retains all right, title, and interest in and to all of the Company's brands, logos, and trademarks, including, but not limited to, EMURGO Co., Ltd., EMURGO, Yoroi, Yoroi Cryptocurrency Wallet, Yoroi Wallet, Yoroi App, and variations of the wording of the aforementioned brands, logos, and trademarks.
+Perusahaan memiliki semua hak, kepemilikan, dan kepentingan dalam dan untuk semua merek, logo, dan merek dagang Perusahaan, termasuk, tetapi tidak terbatas pada, EMURGO Co., Ltd., EMURGO, Yoroi, Wallet Cryptocurrency Yoroi, Wallet Yoroi, Aplikasi Yoroi, dan variasi kata-kata dari merek, logo, dan merek dagang yang disebutkan di atas.
 
 ## 10. Warnings
 
