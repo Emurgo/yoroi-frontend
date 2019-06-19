@@ -98,7 +98,7 @@ const rules = [
           sourceMap: true,
           modules: {
             mode: 'local',
-            localIdentName: '[name]__[local]___[hash:base64:5]',
+            localIdentName: '[name]_[local]',
           }
         },
       },
