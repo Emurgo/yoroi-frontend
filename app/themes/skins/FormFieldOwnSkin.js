@@ -10,7 +10,9 @@ import PasswordHiddenSvg from '../../assets/images/input/password.hiden.inline.s
 import SuccessSvg from '../../assets/images/widget/tick-green.inline.svg';
 import styles from './FormFieldOwnSkin.scss';
 
-type Props = {|
+// This type should be kept open (not "exact") because it is a react-polymorph skin
+// and should be able to pass any extra properties from react-polymorph down.
+type Props = {
   className: string,
   disabled: boolean,
   error: string | Element<any>,
@@ -24,7 +26,7 @@ type Props = {|
   done?: boolean,
   type: string,
   focused: boolean,
-|};
+};
 
 type State = {
   isPasswordShown: boolean,
