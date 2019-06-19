@@ -10,7 +10,7 @@ import PasswordHiddenSvg from '../../assets/images/input/password.hiden.inline.s
 import SuccessSvg from '../../assets/images/widget/tick-green.inline.svg';
 import styles from './FormFieldOwnSkin.scss';
 
-type Props = {
+type Props = {|
   className: string,
   disabled: boolean,
   error: string | Element<any>,
@@ -24,7 +24,7 @@ type Props = {
   done?: boolean,
   type: string,
   focused: boolean,
-};
+|};
 
 type State = {
   isPasswordShown: boolean,

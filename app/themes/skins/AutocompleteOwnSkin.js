@@ -14,7 +14,7 @@ import { Options } from 'react-polymorph/lib/components/Options';
 import { FormFieldOwnSkin } from './FormFieldOwnSkin';
 import { OptionsSkin } from 'react-polymorph/lib/skins/simple/OptionsSkin';
 
-type Props = {
+type Props = {|
   className: string,
   error: string,
   filteredOptions: Array<any>,
@@ -45,7 +45,7 @@ type Props = {
   toggleMouseLocation: Function,
   toggleOpen: Function,
   done: Boolean
-};
+|};
 
 export const AutocompleteOwnSkin = (props: Props) => {
   const theme = props.theme[props.themeId];

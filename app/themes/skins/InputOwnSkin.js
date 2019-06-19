@@ -16,7 +16,7 @@ import { pickDOMProps } from 'react-polymorph/lib/utils/props';
 
 import styles from './InputOwnSkin.scss';
 
-type Props = {
+type Props = {|
   className?: ?string,
   disabled?: boolean,
   error?: string,
@@ -33,7 +33,7 @@ type Props = {
   value: string,
   done?: boolean,
   type: string,
-};
+|};
 
 type State = {
   focused: boolean,

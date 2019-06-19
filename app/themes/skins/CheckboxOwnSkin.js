@@ -8,7 +8,7 @@ import { pickDOMProps } from 'react-polymorph/lib/utils/props';
 import ReactMarkdown from 'react-markdown';
 import styles from './CheckboxOwnSkin.scss';
 
-type Props = {
+type Props = {|
   checked: boolean,
   className: string,
   disabled: boolean,
@@ -17,7 +17,7 @@ type Props = {
   description: string | Element<any>,
   theme: Object,
   themeId: string
-};
+|};
 
 export const CheckboxOwnSkin = (props: Props) => (
   <div
