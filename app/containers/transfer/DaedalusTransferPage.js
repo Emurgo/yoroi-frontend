@@ -41,17 +41,6 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     });
   }
 
-  goToReceiveScreen = () => {
-    const wallet = this._getWalletsStore().active;
-    this._getRouter().goToRoute.trigger({
-      route: ROUTES.WALLETS.PAGE,
-      params: {
-        id: wallet && wallet.id,
-        page: 'receive'
-      },
-    });
-  }
-
   startTransferFunds = () => {
     this._getDaedalusTransferActions().startTransferFunds.trigger();
   }
@@ -123,7 +112,6 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <TransferLayout>
               <TransferInstructionsPage
                 onFollowInstructionsPrerequisites={this.goToCreateWallet}
-                onAnswerYes={this.goToReceiveScreen}
                 onConfirm={this.startTransferFunds}
                 onPaperConfirm={this.startTransferPaperFunds}
                 onMasterKeyConfirm={this.startTransferMasterKey}

@@ -4,11 +4,11 @@ import { observer } from 'mobx-react';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './AnnotatedLoader.scss';
 
-type Props = {
+type Props = {|
   title: string,
   details: string,
   warning?: string,
-};
+|};
 
 @observer
 export default class AnnotatedLoader extends Component<Props> {

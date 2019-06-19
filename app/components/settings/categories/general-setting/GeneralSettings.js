@@ -13,13 +13,13 @@ import FlagLabel from '../../../widgets/FlagLabel';
 import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
 
-type Props = {
+type Props = {|
   languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
   currentLocale: string,
   onSelectLanguage: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 @observer
 export default class GeneralSettings extends Component<Props> {

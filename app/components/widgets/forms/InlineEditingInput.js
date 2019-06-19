@@ -25,7 +25,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   className?: string,
   isActive: boolean,
   inputFieldLabel: string,
@@ -38,7 +38,7 @@ type Props = {
   validationErrorMessage: string,
   successfullyUpdated: boolean,
   classicTheme: boolean,
-};
+|};
 
 type State = {
   isActive: boolean,

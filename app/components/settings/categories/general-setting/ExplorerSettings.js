@@ -12,13 +12,13 @@ import globalMessages from '../../../../i18n/global-messages';
 import type { ExplorerType } from '../../../../domain/Explorer';
 
 
-type Props = {
+type Props = {|
   explorers: Array<{ value: ExplorerType, label: string }>,
   selectedExplorer: ExplorerType,
   onSelectExplorer: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 @observer
 export default class ExplorerSettings extends Component<Props> {

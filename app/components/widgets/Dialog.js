@@ -18,7 +18,7 @@ type ActionType = {
   className?: ?string
 };
 
-type Props = {
+type Props = {|
   title?: string,
   children?: Node,
   actions?: Array<ActionType>,
@@ -28,7 +28,7 @@ type Props = {
   onClose?: ?Function,
   closeOnOverlayClick?: boolean,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class Dialog extends Component<Props> {

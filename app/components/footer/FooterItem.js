@@ -4,11 +4,11 @@ import type { MessageDescriptor } from 'react-intl';
 import LinkButton from '../widgets/LinkButton';
 import styles from './FooterItem.scss';
 
-type Props = {
+type Props = {|
   url: string,
   svg: string,
   message: MessageDescriptor
-};
+|};
 
 export default class FooterItem extends Component<Props> {
 

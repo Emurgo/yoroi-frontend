@@ -4,9 +4,9 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './VerticalFlexContainer.scss';
 
-type Props = {
+type Props = {|
   children: ?Node,
-};
+|};
 
 @observer
 export default class VerticalFlexContainer extends Component<Props> {
