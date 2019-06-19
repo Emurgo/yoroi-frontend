@@ -10,14 +10,14 @@ import globalMessages from '../../i18n/global-messages';
 import type { Category } from '../../config/topbarConfig';
 import { GO_BACK_CATEGORIE } from '../../config/topbarConfig';
 
-type Props = {
+type Props = {|
   children?: ?Node,
   title: ?Node,
   categories?: Array<Category>,
   activeTopbarCategory: string,
   onCategoryClicked?: Function,
   areCategoriesHidden?: boolean
-};
+|};
 
 @observer
 export default class TopBar extends Component<Props> {

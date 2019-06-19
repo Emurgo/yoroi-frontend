@@ -9,7 +9,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
-type Props = {
+type Props = {|
   title?: string,
   children?: Node,
   actions?: Node,
@@ -19,7 +19,7 @@ type Props = {
   onClose?: Function,
   closeOnOverlayClick?: boolean,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class Dialog extends Component<Props> {

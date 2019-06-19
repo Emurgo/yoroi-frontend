@@ -17,8 +17,8 @@ import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
-import UsableHash from '../widgets/hashWrappers/UsableHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -55,8 +55,9 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   walletAddress: string,
+  selectedExplorer: ExplorerType,
   isWalletAddressUsed: boolean,
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
@@ -64,7 +65,7 @@ type Props = {
   onVerifyAddress: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 type State = {
   showUsed: boolean,
@@ -119,6 +120,10 @@ export default class WalletReceive extends Component<Props, State> {
       />
     );
 
+    const copyableHashClass = classnames([
+      styles.copyableHash,
+    ]);
+
     // Get QRCode color value from active theme's CSS variable
     const qrCodeBackgroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
@@ -133,10 +138,21 @@ export default class WalletReceive extends Component<Props, State> {
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
             <CopyableAddress
-              address={walletAddress}
+              hash={walletAddress}
               onCopyAddress={onCopyAddress}
-              isUsed={isWalletAddressUsed}
-            />
+            >
+              <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
+                hash={walletAddress}
+                light={isWalletAddressUsed}
+                linkType="address"
+              >
+                <RawHash light={isWalletAddressUsed}>
+                  <span className={copyableHashClass}>{walletAddress}</span>
+                </RawHash>
+              </ExplorableHashContainer>
+            </CopyableAddress>
+            <div className={styles.postCopyMargin} />
             <div className={styles.instructionsText}>
               <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </div>
@@ -174,14 +190,14 @@ export default class WalletReceive extends Component<Props, State> {
               <div key={`gen-${address.id}`} className={addressClasses}>
                 {/* Address Id */}
                 <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
                   hash={address.id}
-                  isUsed={address.isUsed}
+                  light={address.isUsed}
+                  linkType="address"
                 >
-                  <UsableHash isUsed={address.isUsed}>
-                    <RawHash>
-                      <span className={styles.addressId}>{address.id}</span>
-                    </RawHash>
-                  </UsableHash>
+                  <RawHash light={address.isUsed}>
+                    {address.id}
+                  </RawHash>
                 </ExplorableHashContainer>
                 <div className={styles.addressMargin} />
                 {/* Address Action block start */}
@@ -202,9 +218,7 @@ export default class WalletReceive extends Component<Props, State> {
                           svg={verifyIcon}
                           className={styles.verifyIcon}
                         />
-                        <span className={styles.actionIconText}>
-                          {intl.formatMessage(messages.verifyAddressLabel)}
-                        </span>
+                        <span>{intl.formatMessage(messages.verifyAddressLabel)}</span>
                       </div>
                     </button>
                   </div>
@@ -215,9 +229,7 @@ export default class WalletReceive extends Component<Props, State> {
                   >
                     <div className={styles.addressActionItemBlock}>
                       <SvgInline svg={iconCopy} className={styles.copyIcon} />
-                      <span className={styles.actionIconText}>
-                        {intl.formatMessage(messages.copyAddressLabel)}
-                      </span>
+                      <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
                     </div>
                   </CopyToClipboard>
                 </div>

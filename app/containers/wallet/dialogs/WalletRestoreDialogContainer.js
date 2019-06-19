@@ -110,10 +110,10 @@ export default class WalletRestoreDialogContainer
         <WalletRestoreVerifyDialog
           addresses={addresses}
           accountPlate={accountPlate}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
           isSubmitting={restoreRequest.isExecuting}
-          onSubmit={this.onSubmit}
           classicTheme={this.props.classicTheme}
           error={restoreRequest.error}
         />

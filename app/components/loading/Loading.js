@@ -12,7 +12,7 @@ import type { MessageDescriptor } from 'react-intl';
 import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
 
-type Props = {
+type Props = {|
   currencyIcon: string,
   apiIcon: string,
   isLoadingDataForNextScreen: boolean,
@@ -21,7 +21,7 @@ type Props = {
   hasLoadedCurrentTheme: boolean,
   error: ?LocalizableError,
   getErrorMessage: void => Node,
-};
+|};
 
 @observer
 export default class Loading extends Component<Props> {

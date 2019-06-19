@@ -56,7 +56,7 @@ export const CheckboxOwnSkin = (props: Props) => (
         </label>
       )}
       {props.description && (
-        <ReactMarkdown source={props.description} />
+        <ReactMarkdown source={props.description} escapeHtml={false} />
       )}
     </div>
   </div>

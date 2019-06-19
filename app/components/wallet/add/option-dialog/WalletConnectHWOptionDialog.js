@@ -32,12 +32,12 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onCancel: Function,
   onTrezor: Function,
   onLedger: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletConnectHWOptionDialog extends Component<Props> {

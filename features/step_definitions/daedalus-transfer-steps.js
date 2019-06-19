@@ -59,15 +59,15 @@ Given(/^I am on the Daedalus Transfer instructions screen$/, async function () {
 });
 
 When(/^I click on the create Yoroi wallet button$/, async function () {
-  await this.click('.instructionsButton');
+  await this.click('.createYoroiWallet');
 });
 
 When(/^I click on the transfer funds from Daedalus button$/, async function () {
-  await this.click('.confirmButton');
+  await this.click('.fromDaedalusWallet');
 });
 
 When(/^I click on the transfer funds from Daedalus master key button$/, async function () {
-  await this.click('.masterKey');
+  await this.click('.fromDaedalusMasterKey');
 });
 
 When(/^I proceed with the recovery$/, async function () {
@@ -128,14 +128,16 @@ Then(/^I should wait until funds are recovered:$/, async function (table) {
   await _checkTotalAmountIsCorrect(rows, this);
 });
 
-Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/, async function (table) {
-  const messages = table.hashes()[0];
-  const instructionMessage = await this.intl(messages.instructionMessage);
-  const attentionMessage = await this.intl(messages.attentionMessage);
-  await this.waitForElement(`//div[@class='TransferInstructionsPage_text' and contains(text(), '${instructionMessage}')]`, By.xpath);
-  await this.waitForElement(`//div[contains(text(), 'Attention')]//following::div[@class='TransferInstructionsPage_text' and contains(text(), '${attentionMessage}')]`, By.xpath);
-  await this.waitForElement(`//button[contains(@class, 'disabled') and contains(text(), 'Create Yoroi wallet')]`, By.xpath); // Disabled "Create yoroi" button
-  await this.waitForElement(`//button[contains(@class, 'confirmButton') and contains(text(), 'Daedalus Wallet')]`, By.xpath);
+Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/, async function () {
+  const textCreateYoroiWallet = await this.intl('transfer.instructions.instructions.button.label');
+  const textDaedalusWallet = await this.intl('daedalusTransfer.instructions.attention.button.label');
+  const textDaedalusPaperWallet = await this.intl('daedalusTransfer.instructions.attention.paper.button.label');
+  const textDaedalusMasterKey = await this.intl('daedalusTransfer.instructions.attention.masterKey.button.label');
+
+  await this.waitForElement(`//button[contains(@class, 'createYoroiWallet') and contains(text(), '${textCreateYoroiWallet}')]`, By.xpath);
+  await this.waitForElement(`//button[contains(@class, 'fromDaedalusWallet') and contains(text(), '${textDaedalusWallet}')]`, By.xpath);
+  await this.waitForElement(`//button[contains(@class, 'fromDaedalusPaperWallet') and contains(text(), '${textDaedalusPaperWallet}')]`, By.xpath);
+  await this.waitForElement(`//button[contains(@class, 'fromDaedalusMasterKey') and contains(text(), '${textDaedalusMasterKey}')]`, By.xpath);
 });
 
 async function _checkDaedalusAddressesRecoveredAreCorrect(rows, world) {

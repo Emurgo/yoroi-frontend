@@ -22,14 +22,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSelectLanguage: Function,
   languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
   onSubmit: Function,
   isSubmitting: boolean,
   currentLocale: string,
   error?: ?LocalizableError,
-};
+|};
 
 @observer
 export default class LanguageSelectionForm extends Component<Props> {

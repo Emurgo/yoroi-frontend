@@ -7,7 +7,7 @@ import type { InjectedProps } from '../../types/injectedPropsType';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import TransferLayout from '../../components/transfer/TransferLayout';
-import DaedalusTransferInstructionsPage from './DaedalusTransferInstructionsPage';
+import TransferInstructionsPage from '../../components/transfer/TransferInstructionsPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
 import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
@@ -38,17 +38,6 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   goToCreateWallet = () => {
     this._getRouter().goToRoute.trigger({
       route: ROUTES.WALLETS.ADD
-    });
-  }
-
-  goToReceiveScreen = () => {
-    const wallet = this._getWalletsStore().active;
-    this._getRouter().goToRoute.trigger({
-      route: ROUTES.WALLETS.PAGE,
-      params: {
-        id: wallet && wallet.id,
-        page: 'receive'
-      },
     });
   }
 
@@ -121,9 +110,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         return (
           <MainLayout topbar={topBar} classicTheme={profile.isClassicTheme}>
             <TransferLayout>
-              <DaedalusTransferInstructionsPage
+              <TransferInstructionsPage
                 onFollowInstructionsPrerequisites={this.goToCreateWallet}
-                onAnswerYes={this.goToReceiveScreen}
                 onConfirm={this.startTransferFunds}
                 onPaperConfirm={this.startTransferPaperFunds}
                 onMasterKeyConfirm={this.startTransferMasterKey}
@@ -196,6 +184,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <TransferLayout>
               <DaedalusTransferSummaryPage
                 formattedWalletAmount={formattedWalletAmount}
+                selectedExplorer={this.props.stores.profile.selectedExplorer}
                 transferTx={daedalusTransfer.transferTx}
                 onSubmit={this.tranferFunds}
                 isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}

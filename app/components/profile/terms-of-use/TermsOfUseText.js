@@ -5,10 +5,10 @@ import ReactMarkdown from 'react-markdown';
 import styles from './TermsOfUseText.scss';
 import classNames from 'classnames';
 
-type Props = {
+type Props = {|
   localizedTermsOfUse: string,
   fixedHeight?: bool,
-};
+|};
 
 @observer
 export default class TermsOfUseText extends Component<Props> {
@@ -24,7 +24,7 @@ export default class TermsOfUseText extends Component<Props> {
 
     return (
       <div className={termsClassNames}>
-        <ReactMarkdown source={this.props.localizedTermsOfUse} />
+        <ReactMarkdown source={this.props.localizedTermsOfUse} escapeHtml={false} />
       </div>
     );
   }

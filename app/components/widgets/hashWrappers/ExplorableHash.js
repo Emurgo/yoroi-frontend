@@ -11,36 +11,42 @@ import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 
 const messages = defineMessages({
-  explorerTip: {
+  websiteTip: {
     id: 'widgets.explorer.tooltip',
-    defaultMessage: '!!!Go to {explorerName} Blockchain Explorer',
+    defaultMessage: '!!!Go to {websiteName}',
   },
 });
 
-type Props = {
+type Props = {|
   children: ?Node,
-  explorerName: string,
+  websiteName: string,
   url: string,
-  isUsed: boolean,
+  light: boolean,
+  tooltipOpensUpward?: boolean,
   onExternalLinkClick: Function,
-};
+  arrowRelativeToTip?: boolean,
+|};
 
 @observer
 export default class ExplorableHash extends Component<Props> {
+  static defaultProps = {
+    tooltipOpensUpward: false,
+    arrowRelativeToTip: true,
+  };
 
   render() {
-    const { explorerName, onExternalLinkClick } = this.props;
+    const { websiteName, onExternalLinkClick } = this.props;
 
     const addressClass = classnames([
-      this.props.isUsed ? styles.usedHash : styles.unusedHash
+      this.props.light ? styles.lightColor : styles.darkColor
     ]);
     return (
       <Tooltip
         className={styles.component}
         skin={TooltipSkin}
-        isOpeningUpward={false}
-        arrowRelativeToTip
-        tip={<FormattedMessage {...messages.explorerTip} values={{ explorerName }} />}
+        isOpeningUpward={this.props.tooltipOpensUpward}
+        arrowRelativeToTip={this.props.arrowRelativeToTip}
+        tip={<FormattedMessage {...messages.websiteTip} values={{ websiteName }} />}
       >
         <a
           className={styles.url}

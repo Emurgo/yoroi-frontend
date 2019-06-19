@@ -100,7 +100,7 @@ Given(/^I swap the paper wallet addresses$/, async function () {
 });
 
 Then(/^I should see two addresses displayed$/, async function () {
-  const addressesElem = await this.driver.findElements(By.xpath("//div[contains(@class, 'CopyableAddress_hash')]"));
+  const addressesElem = await this.driver.findElements(By.xpath("//span[contains(@class, 'RawHash_hash')]"));
   expect(addressesElem.length).to.be.equal(fakeAddresses.length);
   for (let i = 0; i < fakeAddresses.length; i++) {
     const address = await addressesElem[i].getText();

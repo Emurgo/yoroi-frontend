@@ -70,8 +70,6 @@ Feature: Transfer Daedalus Wallet funds
     And My Daedalus wallet hasn't funds
     And I am on the Daedalus Transfer instructions screen
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
-    |instructionMessage                              | attentionMessage| 
-    |transfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
 
   @it-37 @withWebSocketConnection
   Scenario: "Daedalus-transfer" page buttons test (IT-37)
@@ -84,8 +82,6 @@ Feature: Transfer Daedalus Wallet funds
     | global.errors.fieldIsRequired                      |
     When I click the back button
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
-    |instructionMessage                              | attentionMessage| 
-    |transfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
 
   @withWebSocketConnection @it-19
   Scenario: User can transfer Daedalus funds to Yoroi using master key (IT-19)

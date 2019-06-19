@@ -324,7 +324,6 @@ export default {
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
   '--theme-transactions-sent-color': '#4a4a4a',
-  '--theme-transactions-received-address-color': '#000000',
   '--theme-transactions-received-color': '#54ca87',
 
   '--theme-ada-redemption-headline-color': '#121327',
@@ -394,14 +393,18 @@ export default {
   '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
-  '--theme-widgets-explorable-hash-underline-used-color': '#adaeB6',
-  '--theme-widgets-explorable-hash-underline-unused-color': '#464749',
+  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
+  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-widgets-hash-dark-color': '#000000',
+  '--theme-widgets-hash-light-color': '#929293',
 
-  '--theme-footer-block-background-color': 'rgba(218, 164, 154, 0.06)',
-  '--theme-footer-block-background-color-hover': '#D9DDE0',
+  '--theme-link-button-background-color-hover': '#D9DDE0',
+  '--theme-link-button-text-color': '#000',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
 
   '--theme-default-main-color': '#DAA49A',
   '--theme-default-main-bg': '#F3F3F5',
+
+  '--theme-wallet-navigation-tab-height': '40px',
 };

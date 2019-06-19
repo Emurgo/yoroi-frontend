@@ -13,13 +13,13 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   currency: string,
   fees: BigNumber,
   total: BigNumber,
   error: boolean,
   classicTheme: boolean
-};
+|};
 
 export default class AmountInputSkin extends Component<Props> {
 

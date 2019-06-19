@@ -4,10 +4,10 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './SettingsLayout.scss';
 
-type Props = {
+type Props = {|
   children: Node,
   menu: Node,
-};
+|};
 
 @observer
 export default class SettingsLayout extends Component<Props> {

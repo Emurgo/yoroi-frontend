@@ -36,10 +36,10 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onExternalLinkClick: Function,
   onDownloadLogs: Function,
-};
+|};
 
 @observer
 export default class SupportSettings extends Component<Props> {

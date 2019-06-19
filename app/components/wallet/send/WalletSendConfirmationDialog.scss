@@ -34,13 +34,9 @@
   }
 
   .addressTo {
-    font-family: var(--font-mono-light);
-    letter-spacing: 0;
     font-size: 15px;
     line-height: 1.38;
     margin-top: 6px;
-    opacity: 0.5;
-    word-wrap: break-word;
   }
 
   .amountFeesWrapper {
@@ -142,11 +138,9 @@
   }
 
   .addressTo {
-    font-family: var(--font-mono-regular);
     font-size: 14px;
     line-height: 1.57;
     margin-top: 2px;
-    opacity: 0.4;
   }
 
   .amountFeesWrapper {

@@ -45,6 +45,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     return (
       <WalletSendConfirmationDialog
         staleTx={this.props.staleTx}
+        selectedExplorer={this.props.stores.profile.selectedExplorer}
         amount={formattedWalletAmount(totalInput.minus(fee))}
         receivers={receivers}
         totalAmount={formattedWalletAmount(totalInput)}

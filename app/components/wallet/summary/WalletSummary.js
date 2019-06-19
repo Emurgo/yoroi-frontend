@@ -29,12 +29,12 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   numberOfTransactions: number,
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
   openExportTxToFileDialog: Function,
-};
+|};
 
 @observer
 export default class WalletSummary extends Component<Props> {

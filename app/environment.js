@@ -19,6 +19,7 @@ export const environment = (Object.assign({
   API: ('ada': Currency), // Note: can't change at runtime
   MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
   commit: process.env.COMMIT || '',
+  branch: process.env.BRANCH || '',
   isDev: () => environment.current === NetworkType.DEVELOPMENT,
   isTest: () => environment.current === NetworkType.TEST,
   isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
@@ -32,6 +33,7 @@ export const environment = (Object.assign({
   API: Currency,
   MOBX_DEV_TOOLS: ?string,
   commit: string,
+  branch: string,
   isDev: void => boolean,
   isTest: void => boolean,
   isMainnet: void => boolean,

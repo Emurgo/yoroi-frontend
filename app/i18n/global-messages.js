@@ -288,6 +288,10 @@ const globalMessages = defineMessages({
     id: 'settings.support.logs.downloadLogsLink',
     defaultMessage: '!!!download them here',
   },
+  blockchainExplorer: {
+    id: 'settings.general.explorer',
+    defaultMessage: '!!!Blockchain Explorer',
+  },
 });
 export default globalMessages;
 

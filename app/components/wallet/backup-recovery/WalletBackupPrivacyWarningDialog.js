@@ -30,7 +30,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   countdownRemaining: number,
   canPhraseBeShown: boolean,
   isPrivacyNoticeAccepted: boolean,
@@ -38,7 +38,7 @@ type Props = {
   onContinue: Function,
   onCancelBackup: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletBackupPrivacyWarningDialog extends Component<Props> {

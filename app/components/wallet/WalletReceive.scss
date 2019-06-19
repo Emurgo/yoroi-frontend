@@ -43,6 +43,15 @@
       justify-content: space-between;
       line-height: 19px;
       letter-spacing: 0;
+
+      .postCopyMargin {
+        margin-bottom: 6px;
+      }
+
+      .copyableHash {
+        letter-spacing: 0px;
+        font-size: 17px;
+      }
   
       .hashLabel {
         font-size: 11px;
@@ -106,10 +115,6 @@
       display: flex;
       padding: 8.5px 0;
       word-break: break-all;
-
-      .addressId {
-        color: var(--theme-transactions-received-address-color);
-      }
   
       & + .walletAddress {
         border-top: 1px solid var(--theme-separation-border-color);
@@ -141,10 +146,6 @@
             font-family: var(--font-regular);            
             font-size: 14px;
             margin-left: 6px;
-          }
-          
-          .actionIconText {
-             opacity: 0.5;
           }
 
           .verifyIcon,
@@ -191,10 +192,6 @@
 
   .qrCodeAndInstructions {
     .instructions {
-      .usedHash {
-        opacity: 0.4;
-      }
-
       .hashLabel {
         font-family: var(--font-medium);
         font-weight: 600;
@@ -215,16 +212,10 @@
   padding: 30px;
 
   .qrCodeAndInstructions {
-  
     .instructions {
-      .hash {
-        display: flex;
-        align-items: center;
+      .copyableHash {
+        font-size: 14px;
         line-height: 1.57;
-      }
-  
-      .usedHash > span {
-        opacity: 0.4;
       }
   
       .hashLabel {

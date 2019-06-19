@@ -9,6 +9,9 @@ import BorderedBox from '../widgets/BorderedBox';
 import styles from './TransferSummaryPage.scss';
 import type { TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
+import RawHash from '../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -41,8 +44,9 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   formattedWalletAmount: Function,
+  selectedExplorer: ExplorerType,
   transferTx: TransferTx,
   onSubmit: Function,
   isSubmitting: boolean,
@@ -50,7 +54,7 @@ type Props = {
   error: ?LocalizableError,
   addressFromSubLabel: string,
   classicTheme: boolean
-};
+|};
 
 /** Show user what the transfer would do to get final confirmation */
 @observer
@@ -104,8 +108,21 @@ export default class TransferSummaryPage extends Component<Props> {
                   ]);
 
                   return (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <div key={index} className={addressesClasses}>{sender}</div>
+                    <div
+                      key={index /* eslint-disable-line react/no-array-index-key */}
+                    >
+                      <div className={styles.addressSubLabel} />
+                      <ExplorableHashContainer
+                        selectedExplorer={this.props.selectedExplorer}
+                        light
+                        hash={sender}
+                        linkType="address"
+                      >
+                        <RawHash light>
+                          <span className={addressesClasses}>{sender}</span>
+                        </RawHash>
+                      </ExplorableHashContainer>
+                    </div>
                   );
                 })
               }
@@ -115,7 +132,16 @@ export default class TransferSummaryPage extends Component<Props> {
               <div className={styles.addressLabel}>
                 {intl.formatMessage(messages.addressToLabel)}
               </div>
-              <div className={styles.address}>{receiver}</div>
+              <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
+                light
+                hash={receiver}
+                linkType="address"
+              >
+                <RawHash light>
+                  <span className={styles.address}>{receiver}</span>
+                </RawHash>
+              </ExplorableHashContainer>
             </div>
 
             <div className={styles.amountFeesWrapper}>

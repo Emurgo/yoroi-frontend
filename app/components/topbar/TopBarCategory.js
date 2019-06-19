@@ -7,13 +7,13 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './TopBarCategory.scss';
 
-type Props = {
+type Props = {|
   icon: string,
   inlineTextMD: ?MessageDescriptor,
   active: boolean,
   onClick: Function,
   className: string,
-};
+|};
 
 @observer
 export default class TopBarCategory extends Component<Props> {
