@@ -65,7 +65,8 @@ export default class SaveDialog extends Component<Props> {
 
   form: typeof ReactToolboxMobxForm;
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     const { intl } = this.context;
     const { defaultWalletName } = this.props;
 
