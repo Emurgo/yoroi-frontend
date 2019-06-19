@@ -83,7 +83,6 @@ export default class WalletAddPage extends Component<Props> {
     } else if (uiDialogs.isOpen(WalletRestoreOptionDialog)) {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
-          stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
@@ -104,8 +103,6 @@ export default class WalletAddPage extends Component<Props> {
     } else if (uiDialogs.isOpen(WalletConnectHWOptionDialog)) {
       activeDialog = (
         <WalletConnectHWOptionDialogContainer
-          actions={actions}
-          stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
           onTrezor={openTrezorConnectDialog}
