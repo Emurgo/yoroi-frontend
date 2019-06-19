@@ -7,47 +7,50 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  .container {
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: var(--theme-wallet-navigation-tab-height);
+  }
+  
+  .label {
+    font-size: 12px;
+    font-family: var(--font-regular);
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    display: block;
+    overflow: visible;
+    text-transform: uppercase;
+  }
+  
+  .icon {
+    margin-right: 10px;
+    & > svg {
+      max-height: 19px;
+      max-width: 19px;
+    }
+  
+    @media (max-width: 950px) {
+      display: none;
+    }
+  }  
 }
 
-.container {
-  text-align: center;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 40px;
-}
-
-.labelClassic {
-  font-size: 12px;
-  font-family: var(--font-regular);
-  font-weight: 600;
-  display: block;
-  letter-spacing: 0.4px;
-  overflow: visible;
-  text-transform: uppercase;
-}
-
-.label {
-  font-size: 16px;
-  font-family: var(--font-medium);
-  font-weight: 500;
-  display: block;
-  letter-spacing: 0;
-  overflow: visible;
-  text-transform: uppercase;
-}
-
-.icon {
-  margin-right: 10px;
-  & > svg {
-    max-height: 19px;
-    max-width: 19px;
+:global(.YoroiModern) .component {
+  .container {
+    height: var(--theme-wallet-navigation-tab-height);
   }
 
-  @media (max-width: 950px) {
-    display: none;
+  .label {
+    font-size: 16px;
+    font-family: var(--font-medium);
+    font-weight: 500;
+    letter-spacing: 0;
   }
 }
 

@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import MainLayout from '../MainLayout';
+import TopBarContainer from '../TopBarContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
@@ -33,12 +34,15 @@ export default class Wallet extends Component<Props> {
 
   render() {
     const { wallets, adaRedemption } = this.props.stores.substores.ada;
-    const { actions, stores, } = this.props;
+    const { actions, stores } = this.props;
     const { profile } = stores;
     const { showAdaRedemptionSuccessMessage, amountRedeemed } = adaRedemption;
+    const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
+
     if (!wallets.active) {
       return (
         <MainLayout
+          topbar={topbarContainer}
           actions={actions}
           stores={stores}
           classicTheme={profile.isClassicTheme}
@@ -50,6 +54,7 @@ export default class Wallet extends Component<Props> {
 
     return (
       <MainLayout
+        topbar={topbarContainer}
         actions={actions}
         stores={stores}
         classicTheme={profile.isClassicTheme}
@@ -57,7 +62,6 @@ export default class Wallet extends Component<Props> {
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
-          classicTheme={profile.isClassicTheme}
         >
           {this.props.children}
         </WalletWithNavigation>

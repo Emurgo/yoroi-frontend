@@ -9,7 +9,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
-type Props = {
+type Props = {|
   title?: string,
   children?: Node,
   actions?: Node,
@@ -18,9 +18,8 @@ type Props = {
   className?: string,
   onClose?: Function,
   closeOnOverlayClick?: boolean,
-  modalOverlay?: Object,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class Dialog extends Component<Props> {
@@ -33,19 +32,7 @@ export default class Dialog extends Component<Props> {
     className: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
-    modalOverlay: undefined,
   };
-
-  setSkin = (props) => {
-    const { modalOverlay } = this.props;
-    // hack to override modal styles
-    const newProps = _.set(
-      { ...props },
-      `theme.${props.themeId}.modal`,
-      `${props.theme[props.themeId].modal} ${modalOverlay}`
-    );
-    return ModalSkin(modalOverlay ? newProps : props);
-  }
 
   render() {
     const {
@@ -59,7 +46,6 @@ export default class Dialog extends Component<Props> {
       backButton,
       classicTheme
     } = this.props;
-    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
     const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
     return (
@@ -67,12 +53,12 @@ export default class Dialog extends Component<Props> {
         isOpen
         triggerCloseOnOverlayClick={closeOnOverlayClick}
         onClose={onClose}
-        skin={this.setSkin}
+        skin={ModalSkin}
       >
 
-        <div className={classnames([styles.dialogWrapper, className])}>
+        <div className={classnames([styles.component, className])}>
           {title && (
-            <div className={titleClasses}>
+            <div className={styles.title}>
               <h1>{title}</h1>
             </div>)
           }

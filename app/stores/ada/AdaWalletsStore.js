@@ -11,11 +11,12 @@ import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type {
-  CreateTransactionFunc, CreateWalletFunc,
+  SignAndBroadcastFunc, CreateWalletFunc,
   GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
 import type { DeleteWalletFunc } from '../../api/common';
+import type { BaseSignRequest } from '../../api/ada/adaTypes';
 
 export default class AdaWalletsStore extends WalletStore {
 
@@ -32,8 +33,8 @@ export default class AdaWalletsStore extends WalletStore {
   @observable deleteWalletRequestt: Request<DeleteWalletFunc>
     = new Request<DeleteWalletFunc>(() => Promise.resolve(true));
 
-  @observable sendMoneyRequest: Request<CreateTransactionFunc>
-    = new Request<CreateTransactionFunc>(this.api.ada.createTransaction);
+  @observable sendMoneyRequest: Request<SignAndBroadcastFunc>
+    = new Request<SignAndBroadcastFunc>(this.api.ada.signAndBroadcast);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
@@ -59,8 +60,7 @@ export default class AdaWalletsStore extends WalletStore {
 
   /** Send money and then return to transaction screen */
   _sendMoney = async (transactionDetails: {
-    receiver: string,
-    amount: string,
+    signRequest: BaseSignRequest,
     password: string,
   }) => {
     const wallet = this.active;
@@ -70,15 +70,12 @@ export default class AdaWalletsStore extends WalletStore {
 
     await this.sendMoneyRequest.execute({
       ...transactionDetails,
-      sender: accountId,
-      getUTXOsForAddresses: this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
     });
 
     this.refreshWalletsData();
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
-
     // go to transaction screen
     this.goToWalletRoute(wallet.id);
   };
@@ -88,6 +85,8 @@ export default class AdaWalletsStore extends WalletStore {
     if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params))) {
       this.sendMoneyRequest.reset();
     }
+    // TODO: patch for triggering topbar update, there should be a better way of doing it
+    this.stores.topbar.updateCategories();
   };
 
   // =================== VALIDITY CHECK ==================== //
@@ -106,59 +105,21 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== WALLET RESTORATION ==================== //
 
-  @action _setIsRestoreActive = (active: boolean) => {
-    this.isRestoreActive = active;
-  };
-
-  @action _restoreWallet = async (params: {
+  _restoreWallet = async (params: {
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
   }) => {
-    this.restoreRequest.reset();
-    this._setIsRestoreActive(true);
-    // Hide restore wallet dialog some time after restore has been started
-    // ...or keep it open in case it has error'd out (so that error message can be shown)
-    setTimeout(() => {
-      if (!this.restoreRequest.isExecuting) this._setIsRestoreActive(false);
-      if (!this.restoreRequest.isError) this._toggleAddWalletDialogOnActiveRestoreOrImport();
-    }, this.WAIT_FOR_SERVER_ERROR_TIME);
+    await this._restore(params);
 
-    const restoredWallet = await this.restoreRequest.execute({
-      ...params,
-      checkAddressesInUse: this.stores.substores.ada.stateFetchStore.fetcher.checkAddressesInUse,
-    }).promise;
-
-    // if the restore wallet call ended with no error, we close the dialog.
-    setTimeout(() => {
-      this._setIsRestoreActive(false);
-      this.actions.dialogs.closeActiveDialog.trigger(); // WalletRestoreDialog
-    }, this.MIN_NOTIFICATION_TIME);
-
-    if (!restoredWallet) throw new Error('Restored wallet was not received correctly');
-    this.restoreRequest.reset();
-    await this._patchWalletRequestWithNewWallet(restoredWallet);
-    this.refreshWalletsData();
-    // show success notification
     this.showWalletRestoredNotification();
   };
 
   // =================== WALLET IMPORTING ==================== //
 
-  @action _setIsImportActive = (active: boolean) => {
-    this.isImportActive = active;
-  };
-
   // Similar to wallet restoration
   @action _importWalletFromFile = async (params: WalletImportFromFileParams) => {
     this.importFromFileRequest.reset();
-    this._setIsImportActive(true);
-    // Hide import wallet dialog some time after import has been started
-    // ...or keep it open in case it has errored out (so that error message can be shown)
-    setTimeout(() => {
-      if (!this.importFromFileRequest.isExecuting) this._setIsImportActive(false);
-      if (!this.importFromFileRequest.isError) this._toggleAddWalletDialogOnActiveRestoreOrImport();
-    }, this.WAIT_FOR_SERVER_ERROR_TIME);
 
     const { filePath, walletName, walletPassword } = params;
     this.importFromFileRequest.execute({
@@ -166,10 +127,7 @@ export default class AdaWalletsStore extends WalletStore {
     });
     // $FlowFixMe fix if we ever implement this
     const importedWallet = await this.importFromFileRequest.promise;
-    setTimeout(() => {
-      this._setIsImportActive(false);
-      this.actions.dialogs.closeActiveDialog.trigger();
-    }, this.MIN_NOTIFICATION_TIME);
+
     if (!importedWallet) throw new Error('Imported wallet was not received correctly');
     this.importFromFileRequest.reset();
     await this._patchWalletRequestWithNewWallet(importedWallet);
@@ -212,20 +170,4 @@ export default class AdaWalletsStore extends WalletStore {
     };
     this.actions.notifications.open.trigger(notification);
   }
-
-  // =================== PRIVATE API ==================== //
-
-  /** If no wallet was restored, we don't close the dialog (keep the spinner)
-   * but if the user pressed the X button we make sure they go to the wallet add screen
-   *
-   * If a wallet does exist, we just close the dialog
-   */
-  _toggleAddWalletDialogOnActiveRestoreOrImport = () => {
-    if (this.hasLoadedWallets && !this.hasAnyWallets) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-    } else {
-      this.actions.dialogs.closeActiveDialog.trigger();
-    }
-  };
-
 }

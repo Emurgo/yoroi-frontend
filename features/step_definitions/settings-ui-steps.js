@@ -12,7 +12,7 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dia
 });
 
 When(/^I click on "name" input field$/, async function () {
-  await this.click('.SettingsLayout_settingsPane .InlineEditingInput_componentClassic');
+  await this.click('.SettingsLayout_settingsPane .InlineEditingInput_component');
 });
 
 When(/^I enter new wallet name:$/, async function (table) {
@@ -23,8 +23,11 @@ When(/^I enter new wallet name:$/, async function (table) {
    * https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/214
    * We instead repeatedly delete characters until we've deleted the whole name
   */
-  const currentName = 'Test';  // can't programmtically get the wallet name due to the issue above
-  for (let i = 0; i < currentName.length; i++) {
+
+  // can't programmtically get the wallet name due to the issue above
+  // so assume max length
+  const maxNameLength = 40;
+  for (let i = 0; i < maxNameLength; i++) {
     // Chrome and Firefox select the text field starting at the left / right respectively
     await this.input(walletNameInputSelector, Key.BACK_SPACE); // Firefox
     await this.input(walletNameInputSelector, Key.DELETE); // Chrome
@@ -64,7 +67,7 @@ When(/^I submit the wallet password dialog$/, async function () {
   await this.click('.confirmButton');
 });
 
-When(/^I press the next button$/, async function () {
+When(/^I click the next button$/, async function () {
   await this.click('.confirmButton');
 });
 
@@ -101,7 +104,7 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 Then(/^I should stay in the change password dialog$/, async function () {
   const changePasswordMessage = await i18n.formatMessage(this.driver,
     { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
-  await this.waitUntilText('.Dialog_titleClassic', changePasswordMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.Dialog_title', changePasswordMessage.toUpperCase(), 2000);
 });
 
 Then(/^I should see support screen$/, async function () {

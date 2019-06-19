@@ -17,7 +17,6 @@ import TransactionsStore from '../base/TransactionsStore';
 import { transactionTypes } from '../../domain/WalletTransaction';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import type {
-  TransactionFeeResponse,
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
 
@@ -87,26 +86,6 @@ export default class AdaTransactionsStore extends TransactionsStore {
     }
     return unconfirmedAmount;
   }
-
-  /** Calculate transaction fee without requiring spending password */
-  calculateTransactionFee = (
-    walletId: string,
-    receiver: string,
-    amount: string
-  ): Promise<TransactionFeeResponse> => {
-    // get HdWallet account
-    const accountId = this.stores.substores.ada.addresses._getAccountIdByWalletId(walletId);
-    if (!accountId) throw new Error('Active account required before calculating transaction fees.');
-
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-    // calculate fee
-    return this.api.ada.calculateTransactionFee({
-      sender: accountId,
-      receiver,
-      amount,
-      getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
-    });
-  };
 
   /** Wrap utility function to expose to components/containers */
   validateAmount = (amountInLovelaces: string): Promise<boolean> => (

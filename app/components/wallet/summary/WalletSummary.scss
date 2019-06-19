@@ -15,75 +15,76 @@ $rightBlockWidth: $leftBlockWidth;
   }
 }
 
-.componentClassic {
+.component {
   margin-top: 20px;
   margin-left: 20px;
   margin-right: 20px;
-}
 
-.leftBlock {
-  float: left;
-  padding-top: 20px;
-  width: $leftBlockWidth;
-}
-
-.rightBlock {
-  float: right;
-  padding-top: 20px;
-  width: $rightBlockWidth;
-
-  .exportTxToFileSvg {
-    pointer-events: auto;
+  .leftBlock {
+    float: left;
+    padding-top: 20px;
+    width: $leftBlockWidth;
+  }
+  
+  .rightBlock {
     float: right;
-  }
-
-  .exportTxToFileSvg:hover {
-    cursor: pointer;
-    circle {
-      fill: var(--theme-export-transactions-to-file);
+    padding-top: 20px;
+    width: $rightBlockWidth;
+  
+    .exportTxToFileSvg {
+      pointer-events: auto;
+      float: right;
     }
-  }
-}
-
-.middleBlock {
-  display: inline-block;
-  text-align: center;
-  border-bottom: 1px solid var(--theme-separation-border-color);
-  width: calc(100% - #{$leftBlockWidth + $rightBlockWidth});
-
-  :global {
-    .BorderedBox_component {
-      background: none;
-      border: none;
-    }
-  }
-}
-
-.pendingConfirmation {
-  @extend %smallText;
-  & > .currencySymbolSmallest {
-    display: inline-block;
-    margin-left: 1px;
-    & > svg {
-      height: 15px;
-      width: 19px;
-      & > g > g {
-        stroke: var(--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color);
+  
+    .exportTxToFileSvg:hover {
+      cursor: pointer;
+      circle {
+        fill: var(--theme-export-transactions-to-file);
       }
     }
   }
+  
+  .middleBlock {
+    display: inline-block;
+    text-align: center;
+    border-bottom: 1px solid var(--theme-separation-border-color);
+    width: calc(100% - #{$leftBlockWidth + $rightBlockWidth});
+  
+    :global {
+      .BorderedBox_component {
+        background: none;
+        border: none;
+      }
+    }
+  }
+  
+  .pendingConfirmation {
+    @extend %smallText;
+    & > .currencySymbolSmallest {
+      display: inline-block;
+      margin-left: 1px;
+      & > svg {
+        height: 15px;
+        width: 19px;
+        & > g > g {
+          stroke: var(--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color);
+        }
+      }
+    }
+  }
+  
+  .numberOfTransactions {
+    @extend %smallText;
+  }  
 }
 
-.numberOfTransactions {
-  @extend %smallText;
-}
-
-.component {
-  margin-top: 20px;
+:global(.YoroiModern) .component {
   margin-left: 30px;
   margin-right: 30px;
+
   :global {
     .BorderedBox_component {
+      padding-left: 0;
       background: none;
       border: none;
 
@@ -101,11 +102,17 @@ $rightBlockWidth: $leftBlockWidth;
     }
   }
 
-  .leftBlock, .rightBlock {
+  .leftBlock {
+    display: none;
+  }
+
+  .leftBlock,
+  .rightBlock {
     padding-top: 33px;
   }
 
   .middleBlock {
     border: none;
+    text-align: left;    
   }
 }

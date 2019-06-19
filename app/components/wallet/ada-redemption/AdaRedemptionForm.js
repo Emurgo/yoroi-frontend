@@ -157,7 +157,7 @@ where Ada should be redeemed and enter {adaRedemptionPassphraseLength} word mnem
   },
 });
 
-type Props = {
+type Props = {|
   wallets: Array<{ value: string, label: string }>,
   onAcceptRedemptionDisclaimer: Function,
   onChooseRedemptionType: Function,
@@ -187,7 +187,7 @@ type Props = {
   error: ?LocalizableError,
   suggestedMnemonics: Array<string>,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class AdaRedemptionForm extends Component<Props> {

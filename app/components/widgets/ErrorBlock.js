@@ -8,24 +8,19 @@ import { Logger, stringifyError } from '../../utils/logging';
 
 import styles from './ErrorBlock.scss';
 
-type Props = {
+type Props = {|
   error: ?LocalizableError,
-  classicTheme?: boolean
-};
+|};
 
 @observer
 export default class ErrorBlock extends Component<Props> {
-  static defaultProps = {
-    classicTheme: false
-  }
-
   static contextTypes = {
     intl: intlShape.isRequired
   };
 
   render() {
     const { intl } = this.context;
-    const { error, classicTheme } = this.props;
+    const { error } = this.props;
 
     let errorText = '';
     try {
@@ -35,7 +30,7 @@ export default class ErrorBlock extends Component<Props> {
     }
 
     return (
-      <div className={classicTheme ? styles.errorBlockClassic : styles.errorBlock}>
+      <div className={styles.component}>
         <span>{errorText}</span>
       </div>);
   }

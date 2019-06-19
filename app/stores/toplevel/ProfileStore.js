@@ -9,6 +9,10 @@ import { THEMES } from '../../themes';
 import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
+import type { ExplorerType } from '../../domain/Explorer';
+import type {
+  GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
+} from '../../api/ada';
 
 export default class ProfileStore extends Store {
 
@@ -21,10 +25,11 @@ export default class ProfileStore extends Store {
     { value: 'ru-RU', label: globalMessages.languageRussian, svg: require('../../assets/images/flags/russian.inline.svg') },
     { value: 'de-DE', label: globalMessages.languageGerman, svg: require('../../assets/images/flags/german.inline.svg') },
     { value: 'fr-FR', label: globalMessages.languageFrench, svg: require('../../assets/images/flags/french.inline.svg') },
+    { value: 'es-ES', label: globalMessages.languageSpanish, svg: require('../../assets/images/flags/spanish.inline.svg') },
+    { value: 'it-IT', label: globalMessages.languageItalian, svg: require('../../assets/images/flags/italian.inline.svg') },
     ...(!environment.isMainnet()
       ? [
         { value: 'id-ID', label: globalMessages.languageIndonesian, svg: require('../../assets/images/flags/indonesian.inline.svg') },
-        { value: 'es-ES', label: globalMessages.languageSpanish, svg: require('../../assets/images/flags/spanish.inline.svg') },
       ]
       : [])
   ];
@@ -38,7 +43,6 @@ export default class ProfileStore extends Store {
     fractionGroupSize: 0
   };
 
-  /* eslint-disable max-len */
   @observable getProfileLocaleRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getUserLocale);
 
@@ -72,13 +76,19 @@ export default class ProfileStore extends Store {
   @observable setLastLaunchVersionRequest: Request<string => Promise<void>>
     = new Request<string => Promise<void>>(this.api.localStorage.setLastLaunchVersion);
 
-  /* eslint-enable max-len */
+  @observable getSelectedExplorerRequest: Request<GetSelectedExplorerFunc>
+    = new Request<GetSelectedExplorerFunc>(this.api.ada.getSelectedExplorer);
+
+  @observable setSelectedExplorerRequest: Request<SaveSelectedExplorerFunc>
+    = new Request<SaveSelectedExplorerFunc>(this.api.ada.saveSelectedExplorer);
 
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
+    this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
+    this.actions.profile.redirectToTermsOfUse.listen(this._redirectToTermsOfUse);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -152,6 +162,11 @@ export default class ProfileStore extends Store {
   // ========== Current/Custom Theme ========== //
 
   @computed get currentTheme(): Theme {
+    // TODO: Tests were written for the old theme so we need to use it for testing
+    if (environment.isTest()) {
+      return THEMES.YOROI_CLASSIC;
+    }
+
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet && result) {
       // verify content is an actual theme
@@ -160,11 +175,9 @@ export default class ProfileStore extends Store {
         return result;
       }
     }
-    // TODO: We temporarily disable the new theme on mainnet until it's ready
-    // TODO: Tests were written for the old theme so we need to use it for testing
-    return (environment.isMainnet() || environment.isTest()) ?
-      THEMES.YOROI_CLASSIC :
-      THEMES.YOROI_MODERN;
+
+    // THEMES.YOROI_MODERN is the default theme
+    return THEMES.YOROI_MODERN;
   }
 
   @computed get isModernTheme(): boolean {
@@ -285,18 +298,48 @@ export default class ProfileStore extends Store {
     );
   }
 
+  // ========== Selected Explorer ========== //
+
+  @computed get selectedExplorer(): ExplorerType {
+    const { result } = this.getSelectedExplorerRequest.execute();
+    return result || 'seiza';
+  }
+
+  setSelectedExplorer = async ({ explorer }: { explorer: ExplorerType }) => {
+    await this.setSelectedExplorerRequest.execute({ explorer });
+    await this.getSelectedExplorerRequest.execute(); // eagerly cache
+  };
+
+  @computed get hasLoadedSelectedExplorer(): boolean {
+    return (
+      this.getSelectedExplorerRequest.wasExecuted &&
+      this.getSelectedExplorerRequest.result !== null
+    );
+  }
+
   // ========== Redirec Logic ========== //
 
   _redirectToLanguageSelectionIfNoLocaleSet = () => {
     const { isLoading } = this.stores.loading;
-    if (!isLoading && this.hasLoadedCurrentLocale && !this.isCurrentLocaleSet) {
+    if (!isLoading && !this.areTermsOfUseAccepted && !this.isCurrentLocaleSet) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
     }
   };
 
   _redirectToTermsOfUseScreenIfTermsNotAccepted = () => {
-    if (this.isCurrentLocaleSet &&
-      this.hasLoadedTermsOfUseAcceptance && !this.areTermsOfUseAccepted) {
+    if (this.isCurrentLocaleSet && !this.areTermsOfUseAccepted &&
+      this.stores.app.currentRoute !== ROUTES.PROFILE.TERMS_OF_USE &&
+      this.stores.app.currentRoute !== ROUTES.PROFILE.LANGUAGE_SELECTION) {
+      this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
+    }
+  }
+
+  _redirectToTermsOfUse = async (values) => {
+    // this await call is needed because when the language select from
+    // is submitted without changing the default option, then the onChange
+    // event never gets called and updateLocale is never triggered.
+    await this._updateLocale(values);
+    if (!this.areTermsOfUseAccepted && this.isCurrentLocaleSet) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
     }
   };

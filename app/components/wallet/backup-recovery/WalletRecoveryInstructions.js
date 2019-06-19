@@ -4,10 +4,10 @@ import type { Element } from 'react';
 import { observer } from 'mobx-react';
 import styles from './WalletRecoveryInstructions.scss';
 
-type Props = {
+type Props = {|
   instructionsText: string | Element<any>,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletRecoveryInstructions extends Component<Props> {

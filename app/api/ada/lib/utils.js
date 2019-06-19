@@ -2,15 +2,15 @@
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
-  AdaAddress,
   AdaTransactionInputOutput,
+  BaseSignRequest,
   Transaction,
   AdaTransaction,
   AdaTransactionCondition,
   UTXO,
 } from '../adaTypes';
 import type { TransactionExportRow } from '../../export';
-import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+import { DECIMAL_PLACES_IN_ADA, LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 import { RustModule } from './cardanoCrypto/rustLoader';
 
 export const toAdaTx = function (
@@ -157,21 +157,6 @@ export function formatBigNumberToFloatString(x: BigNumber): string {
   return x.isInteger() ? x.toFixed(1) : x.toString();
 }
 
-/**
- * Note: returns -1 if no used addresses exist
- */
-export function getLatestUsedIndex(addresses: Array<AdaAddress>): number {
-  const usedAddresses = addresses.filter(address => address.cadIsUsed);
-  if (usedAddresses.length === 0) {
-    return -1;
-  }
-
-  return Math.max(
-    ...usedAddresses
-      .map(address => address.index)
-  );
-}
-
 export type UtxoLookupMap = { [string]: { [number]: UTXO }};
 export function utxosToLookupMap(
   utxos: Array<UTXO>
@@ -208,4 +193,72 @@ export function coinToBigNumber(coin: RustModule.Wallet.Coin): BigNumber {
   const ada = new BigNumber(coin.ada());
   const lovelace = ada.times(LOVELACES_PER_ADA).add(coin.lovelace());
   return lovelace;
+}
+
+export function signRequestFee(req: BaseSignRequest, shift: boolean): BigNumber {
+  /**
+   * Note: input-output != estimated fee
+   *
+   * Imagine you send a transaction with 1000 ADA input, 1 ADA output (no change)
+   * Your fee is very small, but the difference between the input & output is high
+   *
+   * Therefore we instead display input - output as the fee in Yoroi
+   * This is safer and gives a more consistent UI
+   */
+
+  const inputTotal = req.senderUtxos
+    .map(utxo => new BigNumber(utxo.amount))
+    .reduce((sum, val) => sum.plus(val), new BigNumber(0));
+
+  const tx: TransactionType = req.unsignedTx.to_json();
+  const outputTotal = tx.outputs
+    .map(val => new BigNumber(val.value))
+    .reduce((sum, val) => sum.plus(val), new BigNumber(0));
+
+  let result = inputTotal.minus(outputTotal);
+  if (shift) {
+    result = result.shift(-DECIMAL_PLACES_IN_ADA);
+  }
+  return result;
+}
+
+export function signRequestTotalInput(req: BaseSignRequest, shift: boolean): BigNumber {
+  const inputTotal = req.senderUtxos
+    .map(utxo => new BigNumber(utxo.amount))
+    .reduce((sum, val) => sum.plus(val), new BigNumber(0));
+
+  const change = req.changeAddr
+    .map(val => new BigNumber(val.value))
+    .reduce((sum, val) => sum.plus(val), new BigNumber(0));
+
+  let result = inputTotal.minus(change);
+  if (shift) {
+    result = result.shift(-DECIMAL_PLACES_IN_ADA);
+  }
+  return result;
+}
+
+export function signRequestReceivers(req: BaseSignRequest, includeChange: boolean): Array<string> {
+  const tx: TransactionType = req.unsignedTx.to_json();
+  let receivers = tx.outputs
+    .map(val => val.address);
+
+  if (!includeChange) {
+    const changeAddrs = req.changeAddr.map(change => change.address);
+    receivers = receivers.filter(addr => !changeAddrs.includes(addr));
+  }
+  return receivers;
+}
+
+/**
+ * Signing a tx is a destructive operation in Rust
+ * We create a copy of the tx so the user can retry if they get the password wrong
+ */
+export function copySignRequest(req: BaseSignRequest): BaseSignRequest {
+  return {
+    addressesMap: req.addressesMap,
+    changeAddr: req.changeAddr,
+    senderUtxos: req.senderUtxos,
+    unsignedTx: req.unsignedTx.clone(),
+  };
 }

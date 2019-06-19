@@ -1,10 +1,13 @@
 // @flow
 
-import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper } from 'cucumber';
-import { getMockServer, closeMockServer } from '../support/mockServer';
-import { buildFeatureData, getFeatureData, getFakeAddresses } from '../support/mockDataBuilder';
+import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
+import { getMockServer, closeMockServer } from '../mock-chain/mockServer';
 import i18nHelper from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
+import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
+import { testWallets } from '../mock-chain/TestWallets';
+import { resetChain } from '../mock-chain/mockImporter';
+import { expect } from 'chai';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -22,6 +25,7 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(screenshotsDir);
   fs.mkdirSync(screenshotsDir);
+  setDefaultTimeout(60 * 1000);
 
   getMockServer({});
 });
@@ -35,6 +39,9 @@ Before((scenario) => {
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
   testProgress.step = 0;
+
+  // reset our mock chain to avoid modifications bleeding into other tests
+  resetChain();
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {
@@ -59,6 +66,9 @@ After(async function () {
 
 const writeFile = promisify(fs.writeFile);
 
+// Steps that contain these patterns will trigger screenshots:
+const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I click', 'by clicking'];
+
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {
   if (!pattern) {
@@ -70,8 +80,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
-
-    if (cleanString.includes('I should see')) {
+    if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
     }
 
@@ -92,8 +101,27 @@ async function takeScreenshot(driver, name) {
   await writeFile(path, screenshot, 'base64');
 }
 
-Given(/^I am testing "([^"]*)"$/, feature => {
-  buildFeatureData(feature);
+Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
+  const restoreInfo = testWallets[walletName];
+  expect(restoreInfo).to.not.equal(undefined);
+
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
+
+  await this.input("input[name='walletName']", restoreInfo.name);
+  await enterRecoveryPhrase(
+    this,
+    restoreInfo.mnemonic,
+  );
+  await this.input("input[name='walletPassword']", restoreInfo.password);
+  await this.input("input[name='repeatPassword']", restoreInfo.password);
+  await this.click('.WalletRestoreDialog .primary');
+  await assertPlate(this, restoreInfo.plate);
+  await this.click('.confirmButton');
+  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
 });
 
 Given(/^I have completed the basic setup$/, async function () {
@@ -102,6 +130,7 @@ Given(/^I have completed the basic setup$/, async function () {
 
   await i18nHelper.setActiveLanguage(this.driver);
 
+  await this.click('.LanguageSelectionForm_submitButton');
   await this.waitForElement('.TermsOfUseForm_component');
   await this.driver.executeScript(() => {
     window.yoroi.actions.profile.acceptTermsOfUse.trigger();
@@ -114,21 +143,18 @@ Given(/^I have opened the extension$/, async function () {
 
 Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
+  await this.driver.sleep(500); // give time for page to reload
 });
 
 Given(/^I restart the browser$/, async function () {
   await this.driver.manage().deleteAllCookies();
   await this.driver.navigate().refresh();
+  await this.driver.sleep(500); // give time for page to reload
 });
 
 Given(/^There is no wallet stored$/, async function () {
   await refreshWallet(this);
-  await this.waitForElement('.WalletAdd');
-});
-
-Given(/^There is a wallet stored named (.*)$/, async function (walletName) {
-  await storeWallet(this, walletName);
-  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {
@@ -142,76 +168,4 @@ function refreshWallet(client) {
       .then(done)
       .catch(err => done(err));
   });
-}
-
-/**
- * Note: this function is called multiple times
- * Once for each wallet in the inheritance hierarchy of the test
- * Notably, if the test loads a wallet in "Background" and again in a specific test
- */
-async function storeWallet(client, walletName) {
-  const featureData = getFeatureData();
-  if (!featureData) {
-    return;
-  }
-  const {
-    masterKey,
-    wallet,
-    cryptoAccount,
-    adaAddresses,
-    walletInitialData,
-    usedAddresses
-  } = featureData;
-
-  if (wallet === undefined) {
-    return;
-  }
-  wallet.cwMeta.cwName = walletName;
-
-  const totalGeneratedAddresses = (
-    walletName &&
-    walletInitialData &&
-    walletInitialData[walletName] &&
-    walletInitialData[walletName].totalAddresses
-  ) || 0;
-
-  await client.saveToLocalStorage('WALLET', {
-    adaWallet: wallet,
-    masterKey,
-    lastReceiveAddressIndex: Math.max(
-      // usedAddresses.length is not accurate here unless used addresses are all sequential
-      // good enough for our tests
-      usedAddresses ? usedAddresses.length - 1 : 0,
-      0
-    )
-  });
-  await client.saveToLocalStorage('ACCOUNT', cryptoAccount);
-
-  let externalAddressesToSave = [];
-
-  /* Obs: If "with $number addresses" is include in the sentence,
-     we override the wallet with fake addresses" */
-  if (totalGeneratedAddresses) {
-    externalAddressesToSave = getFakeAddresses(
-      totalGeneratedAddresses,
-      // $FlowFixMe walletInitialData has to exist for this branch to be hit so ignore the error
-      walletInitialData[walletName].addressesStartingWith,
-    );
-  } else if (adaAddresses) {
-    externalAddressesToSave = adaAddresses;
-  }
-
-  client.saveAddressesToDB(externalAddressesToSave, 'External');
-  client.saveAddressesToDB([{
-    cadAmount: {
-      getCCoin: '0'
-    },
-    cadId: 'Ae2tdPwUPEZJ9HwF8zATdjWcbMTpWAMSMLMxpzdwxiou6evpT57cixBaVyh',
-    cadIsUsed: false,
-    account: 0,
-    change: 1,
-    index: 0
-  }], 'Internal');
-
-  await refreshWallet(client);
 }

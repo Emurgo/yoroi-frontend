@@ -1,0 +1,186 @@
+#language: bash
+sudo: true
+dist: xenial
+language: node_js
+node_js: '10'
+services:
+  - docker
+
+cache:
+  directories:
+    - ~/.npm
+    - ~/.rustup
+    - ~/.cargo
+    # cache built artifacts from install phase to speedup e2e
+    - build
+    - artifacts
+
+env:
+  global:
+    # runtime versions
+    - RUST_VERSION=1.32.0
+    - RUST_TARGETS=wasm32-unknown-unknown
+    # browser versions
+    - FIREFOX_VERSION=67.0b9
+    - CHROME_VERSION=google-chrome-stable
+    - BRAVE_CHROMEDRIVER_VERSION=2.33
+    # Xorg config
+    - SCREEN_RESOLUTION=1280x1024x24
+    # misc
+    - GITHUB_USERNAME=rnd-at-emurgo
+    - GITHUB_EMAIL=rnd@emurgo.io
+    - GIT_SHORT_COMMIT=${TRAVIS_COMMIT:0:7}
+    - CHROME_CODEBASE_URL=https://www.sample.com/dw/yoroi-extension.crx
+    - CHROME_WEBSTORE_API_ENDPOINT=https://www.googleapis.com/upload/chromewebstore/v1.1
+    - CHROME_DEV_APP_ID=febkioblpijdgicianpklkmolpbagnbo
+    - CHROME_STG_APP_ID=bbaanljemfingpglehbbpdlhhahliihe
+    - CHROME_PRO_APP_ID=fkkmcnnpaaimcaikbjgklcibgncdgejc
+    - SCREENSHOT_DIFF_THRESHOLD=0
+    - SCREENSHOT_DIFF_COLOR=yellow
+    - DISPLAY=:0
+    # Encrypted env vars from ui:
+    # AWS_ACCESS_KEY_ID="${ARTIFACTS_KEY}"
+    # AWS_SECRET_ACCESS_KEY="${ARTIFACTS_SECRET}"
+    # AWS_REGION="${ARTIFACTS_REGION}"
+    # S3_BUCKET="${ARTIFACTS_BUCKET}"
+    # DOCKER_USERNAME
+    # DOCKER_PASSWORD
+    # GITHUB_PAT
+    # GOOGLE_CLIENT_ID
+    # GOOGLE_CLIENT_SECRET
+    # GOOGLE_REFRESH_TOKEN
+    # SLACK_ROOM_YOROI_CI
+
+before_install:
+  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- ${DISPLAY} -ac -screen 0 ${SCREEN_RESOLUTION}"
+  - bash .travis/before_install.sh
+
+install:
+  - npm ci
+
+stages:
+  - code-qa
+  - build-yoroi
+  - e2e-tests
+  - deploy-artifacts
+#  - build-docker
+
+matrix:
+  fast_finish: true
+  include:
+
+    # stage: code-qa
+    - stage: code-qa
+      if: branch =~ ^develop|staging|master OR type = pull_request
+      name: "flow checks"
+      script: npm run flow
+    - stage: code-qa
+      if: branch =~ ^develop|staging|master OR type = pull_request
+      name: "eslint checks"
+      script: npm run eslint
+    - stage: code-qa
+      if: branch =~ ^develop|staging|master OR type = pull_request
+      name: "jest checks"
+      script: npm run jest
+
+    # stage: build-yoroi
+    # 3x env in order to satisfy (build|artifacts) cache for e2e-tests
+    - stage: build-yoroi
+      if: branch =~ ^develop|staging|master OR type = pull_request
+      name: "build Yoroi extension"
+      env:
+        - BROWSER=chrome
+        - BROWSER=firefox
+        - BROWSER=brave
+      script: bash .travis/build_yoroi.sh
+
+    # stage: e2e-tests
+    # NOTE: 3x $BROWSER is a hack to share cache from build-yoroi stage. Last env var prevails.
+    - stage: e2e-tests
+      name: "Brave End-to-End tests"
+      if: branch = master
+      env:
+        - BROWSER=chrome
+        - BROWSER=firefox
+        - BROWSER=brave
+      install: bash .travis/e2e_tests_install.sh
+      script: 
+        - bash .travis/e2e_tests.sh
+        - bash .travis/s3_screenshots_upload.sh
+    - stage: e2e-tests
+      if: ( ( branch =~ ^develop|staging|master AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) OR ( type = pull_request AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) )
+      name: "Chrome End-to-End tests"
+      env:
+        - BROWSER=firefox
+        - BROWSER=brave
+        - BROWSER=chrome
+      install: bash .travis/e2e_tests_install.sh
+      script: 
+        - bash .travis/e2e_tests.sh
+        - bash .travis/s3_screenshots_upload.sh
+    - stage: e2e-tests
+      if: ( ( branch =~ ^develop|staging|master AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) OR ( type = pull_request AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) )
+      name: "Firefox End-to-End tests"
+      env:
+        - BROWSER=brave
+        - BROWSER=chrome
+        - BROWSER=firefox
+      install: bash .travis/e2e_tests_install.sh
+      script: 
+        - bash .travis/e2e_tests.sh
+        - bash .travis/s3_screenshots_upload.sh
+
+    # stage: artifacts-deploy
+    - stage: artifacts-deploy
+      name: "Upload artifacts to GH releases, extension stores..."
+      if: branch =~ ^develop|staging|master OR type = pull_request
+      script:
+        - bash .travis/chrome_webstore_deploy.sh
+        - bash .travis/pull_request_comment.sh
+      # env provides cache
+      env:
+        - BROWSER=brave
+        - BROWSER=chrome
+        - BROWSER=firefox
+
+    #- stage: build-docker
+    #  script: false
+
+  allow_failures:
+    # Temporarily allow firefox to fail
+    - env:
+        - BROWSER=brave
+        - BROWSER=chrome
+        - BROWSER=firefox
+
+#before_deploy:
+#  - git config --local user.name "${GITHUB_USERNAME}";
+#  - git config --local user.email "${GITHUB_EMAIL}";
+#  - export RELEASE_TAG="$(echo ${TRAVIS_BRANCH} | sed 's|/|-|g')-${GIT_SHORT_COMMIT}"
+#  - git tag $RELEASE_TAG;
+
+deploy:
+  - provider: releases
+    # rnd-at-emurgo's personal access token
+    api_key: $GITHUB_PAT
+    file_glob: true
+    file:
+      - artifacts/yoroi*zip
+      - artifacts/yoroi*xpi
+      - artifacts/yoroi*crx
+      - artifacts/build*.tar.gz
+      - artifacts/sha256sum.list
+    overwrite: true
+    skip_cleanup: true
+    draft: true
+    on:
+      all_branches: true
+      condition: ( $TRAVIS_BRANCH =~ staging|master ) && ( $TRAVIS_BUILD_STAGE_NAME = Artifacts-deploy )
+
+notifications:
+  slack:
+    on_success: always
+    on_failure: always
+    rooms:
+      # notify #yoroi-ci
+      - secure: ns3f/upkx2Ibf88VsGIlfF4DAa8qdjLf8GzwkEtKfH74/Llv9ZW6LA+QLCVIXKDInL4uuTww34ynQ2BcFp13nmpwn6+FxBQp24I3ZBOQ39sUdKc2gBVQJUAzYjmQNONFAwVtl0GddcYR2ij58KDwDUMif9xJslyLkX3uLR4KoMC0CWh9ghzbF9xABLlAwXkqez1HVNnWOYp8ppsfQovfW2RhksnsfRSqFv/7maXJJhKqRO+W1B3ZY+PmWc4beB3uWgPHNN7kPT0LyJcsK86aa4fVix6As1HD6ur4QD+Nzy5qr0kp+8B+YCANhaL8RPjF2ecmVCXZ8lPIK719EtYLFz5/xltBItCHQQICrMEV6Eu3kWXly376w7BVbfWpIxJ1dsHzKWJWopfYBZzPmBJXPJqJ5TZ/0L4W+3NhwSKV1e6UneWRSdla+55jE63i9JGFLPDZR8rHEreYEUo+0F+ejKc9Y2L5JHuyEHJxZULvWq5Jttxx1Qr73xkWYYPd7HgHzNHPA43zRUfMY5ogO4XhTdgA6iX5enelDSzDAUPCVjqWQBEE++eh2Ffk8SPAqVntrlqR/pbFG62EATaSR97/gCkwV3SlOSWFfGfH5d3S8vR11sGW4JXc9cmQ2Qo8M6nlxTqVoG0pQ44g93qygrNXWLzB406MhH+BkGCiO02cXsk=

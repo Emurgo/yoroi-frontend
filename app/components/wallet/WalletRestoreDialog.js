@@ -10,6 +10,7 @@ import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteS
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../widgets/DialogCloseButton';
+import InformativeMessage from '../widgets/InformativeMessage';
 import Dialog from '../widgets/Dialog';
 import {
   isValidWalletName,
@@ -108,7 +109,7 @@ export type WalletRestoreDialogValues = {
   paperPassword: string,
 }
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onCancel: Function,
   onBack?: Function,
@@ -123,7 +124,8 @@ type Props = {
   showPaperPassword?: boolean,
   classicTheme: boolean,
   initValues?: WalletRestoreDialogValues,
-};
+  introMessage?: string,
+|};
 
 @observer
 export default class WalletRestoreDialog extends Component<Props> {
@@ -135,6 +137,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     isVerificationMode: undefined,
     showPaperPassword: undefined,
     initValues: undefined,
+    introMessage: '',
   };
 
   static contextTypes = {
@@ -201,7 +204,8 @@ export default class WalletRestoreDialog extends Component<Props> {
         },
         ({ field }) => ([
           // TODO: Should we allow 0-length paper wallet passwords?
-          // Disable for now to avoid user accidentally forgetting to enter his password and pressing restore
+          // Disable for now to avoid user accidentally forgetting
+          // to enter his password and pressing restore
           field.value.length > 0,
           this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
         ]),
@@ -282,6 +286,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       classicTheme,
       mnemonicValidator,
       passwordValidator,
+      introMessage
     } = this.props;
     const {
       walletName,
@@ -380,10 +385,15 @@ export default class WalletRestoreDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
 
-        {isVerificationMode ? '' : (
+        {isVerificationMode ? (
+          introMessage && <InformativeMessage
+            subclass="component-bordered"
+            message={introMessage}
+          />
+        ) : (
           <Input
             className={walletNameFieldClasses}
-            ref={(input) => { this.walletNameInput = input; }}
+            inputRef={(input) => { this.walletNameInput = input; }}
             {...walletNameField.bind()}
             done={isValidWalletName(walletName)}
             error={walletNameField.error}
@@ -439,7 +449,7 @@ export default class WalletRestoreDialog extends Component<Props> {
                 error={repeatedPasswordField.error}
                 skin={classicTheme ? InputSkin : InputOwnSkin}
               />
-              <PasswordInstructions isClassicThemeActive={classicTheme} />
+              <PasswordInstructions />
             </div>
           </div>
         )}

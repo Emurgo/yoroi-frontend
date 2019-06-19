@@ -29,10 +29,10 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   classicTheme: boolean,
-};
+|};
 
 type State = {
   isAccepted: boolean,

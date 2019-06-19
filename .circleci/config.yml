@@ -49,7 +49,7 @@ jobs:
   test-brave:
     working_directory: ~/repo
     docker:
-      - image: rcmorano/circleci-node-8-browsers:brave
+      - image: emurgornd/circleci-node-8-browsers:brave
 
     steps:
       - checkout
@@ -72,7 +72,7 @@ jobs:
       # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
       # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr,
       # so we use a custom image derivated from circleci's one:
-      - image: rcmorano/circleci-node-8-browsers:firefox-nightly
+      - image: emurgornd/circleci-node-8-browsers:firefox-dev
 
     steps:
       - checkout
@@ -106,9 +106,17 @@ workflows:
           requires:
             - build-setup
       - test-chrome:
+          filters:
+            branches:
+              ignore:
+                - l10n_develop
           requires:
             - build-setup
       - test-firefox:
+          filters:
+            branches:
+              ignore:
+                - l10n_develop
           requires:
             - build-setup
       - deploy-testnet:

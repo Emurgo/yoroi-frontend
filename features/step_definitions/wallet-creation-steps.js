@@ -10,7 +10,7 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 }
 
 When(/^I click the create button$/, async function () {
-  await this.click('.createWalletButton');
+  await this.click('.WalletAdd_btnCreateWallet');
 });
 
 When(/^I enter the created wallet password:$/, async function (table) {
@@ -76,8 +76,8 @@ Then(/^I see All selected words are cleared$/, async function () {
 });
 
 Then(/^I should stay in the create wallet dialog$/, async function () {
-  const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.add.dialog.create.description' });
-  await this.waitUntilText('.Dialog_titleClassic', createMessage.toUpperCase(), 2000);
+  const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.create.dialog.title' });
+  await this.waitUntilText('.Dialog_title', createMessage.toUpperCase(), 2000);
 });
 
 Then(/^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/, async function (data) {

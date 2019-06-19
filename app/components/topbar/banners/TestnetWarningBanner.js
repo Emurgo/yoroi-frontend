@@ -16,9 +16,8 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
-  classicTheme: ?boolean,
-};
+type Props = {|
+|};
 
 @observer
 export default class TestnetWarningBanner extends Component<Props> {
@@ -29,9 +28,6 @@ export default class TestnetWarningBanner extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { classicTheme } = this.props;
-
-    const testnetClasses = classicTheme ? styles.testnetWarningClassic : styles.testnetWarning;
 
     const faqLink = (
       <a
@@ -44,25 +40,15 @@ export default class TestnetWarningBanner extends Component<Props> {
 
     return (
       <div>
-        {
-          environment.isMainnet() ? null : (
-            <div className={testnetClasses}>
-              {classicTheme ?
-                (
-                  <FormattedMessage
-                    {...messages.testnetLabel}
-                    values={{ faqLink, network: environment.NETWORK }}
-                  />
-                ) :
-                ([
-                  <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />,
-                  <FormattedMessage
-                    {...messages.testnetLabel}
-                    values={{ faqLink, network: environment.NETWORK }}
-                    key="1"
-                  />
-                ])}
-            </div>)
+        {environment.isMainnet() ? null : (
+          <div className={styles.testnetWarning}>
+            <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />
+            <FormattedMessage
+              {...messages.testnetLabel}
+              values={{ faqLink, network: environment.NETWORK }}
+              key="1"
+            />
+          </div>)
         }
       </div>
     );

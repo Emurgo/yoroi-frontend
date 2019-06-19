@@ -1,3 +1,6 @@
+@import '../../themes/mixins/loading-spinner';
+@import '../../themes/mixins/error-message';
+
 .dialog {
   font-family: var(--font-light);
 
@@ -26,6 +29,10 @@
   margin-bottom: 10px;
 }
 
+.postCopyMargin {
+  margin-bottom: 6px;
+}
+
 .plateRowDiv {
   display: table;
 }
@@ -37,4 +44,19 @@
   font-size: 35px;
   font-weight: 600;
   opacity: 0.7;
+}
+
+.error {
+  @include error-message;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.isSubmitting {
+  @include loading-spinner("../../assets/images/spinner-light.svg");
+}
+
+:global(.YoroiModern) .dialog {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg); 
 }

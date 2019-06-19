@@ -2,49 +2,63 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import environment from '../../../environment';
-import resolver from '../../../utils/imports';
 import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { BaseSignRequest } from '../../../api/ada/adaTypes';
+import {
+  copySignRequest,
+  signRequestFee,
+  signRequestReceivers,
+  signRequestTotalInput,
+} from '../../../api/ada/lib/utils';
+import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
+import {
+  formattedWalletAmount,
+  formattedAmountToNaturalUnits,
+} from '../../../utils/formatters';
 
-const WalletSendConfirmationDialog = resolver('components/wallet/send/WalletSendConfirmationDialog');
-
-export type DialogProps = {
-  amount: string,
-  receiver: string,
-  totalAmount: string,
-  transactionFee: string,
-  amountToNaturalUnits: (amountWithFractions: string) => string,
+type DialogProps = {
+  signRequest: BaseSignRequest,
   currencyUnit: string,
+  staleTx: boolean,
 };
 type Props = InjectedProps & DialogProps;
 
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
-  handleWalletSendFormSubmit = (values: Object) => {
-    this.props.actions[environment.API].wallets.sendMoney.trigger(values);
-  };
-
   render() {
     const {
-      actions, amount, receiver, totalAmount,
-      transactionFee, amountToNaturalUnits, currencyUnit,
-      stores
+      actions, currencyUnit,
+      signRequest, stores,
     } = this.props;
     const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
     const activeWallet = wallets.active;
     const { profile } = stores;
+    const { sendMoney } = this.props.actions[environment.API].wallets;
 
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
+    const totalInput = signRequestTotalInput(signRequest, true);
+    const fee = signRequestFee(signRequest, true);
+    const receivers = signRequestReceivers(signRequest, false);
     return (
       <WalletSendConfirmationDialog
-        amount={amount}
-        receiver={receiver}
-        totalAmount={totalAmount}
-        transactionFee={transactionFee}
-        amountToNaturalUnits={amountToNaturalUnits}
-        onSubmit={this.handleWalletSendFormSubmit}
+        staleTx={this.props.staleTx}
+        selectedExplorer={this.props.stores.profile.selectedExplorer}
+        amount={formattedWalletAmount(totalInput.minus(fee))}
+        receivers={receivers}
+        totalAmount={formattedWalletAmount(totalInput)}
+        transactionFee={formattedWalletAmount(fee)}
+        amountToNaturalUnits={formattedAmountToNaturalUnits}
+        signRequest={signRequest}
+        onSubmit={({ password }) => {
+          const copyRequest = copySignRequest(signRequest);
+          sendMoney.trigger({
+            signRequest: copyRequest,
+            password,
+          });
+        }}
         isSubmitting={sendMoneyRequest.isExecuting}
         onCancel={() => {
           actions.dialogs.closeActiveDialog.trigger();

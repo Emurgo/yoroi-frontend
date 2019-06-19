@@ -4,13 +4,16 @@ import { Given, When, Then } from 'cucumber';
 import _ from 'lodash';
 import {
   waitUntilUrlEquals,
+  navigateTo,
 } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 When(/^I navigate to the general settings screen$/, async function () {
-  await this.click('.TopBarCategory_componentClassic.settings');
+  await navigateTo.call(this, '/settings');
+  await navigateTo.call(this, '/settings/general');
+
   await waitUntilUrlEquals.call(this, '/settings/general');
   await this.waitForElement('.SettingsLayout_component');
 });
@@ -24,7 +27,7 @@ When(/^I click on secondary menu "([^"]*)" item$/, async function (buttonName) {
 });
 
 When(/^I select second theme$/, async function () {
-  await this.click('.DisplaySettings_themesWrapper > button:nth-child(2)');
+  await this.click('.ThemeSettingsBlock_themesWrapper > button:nth-child(2)');
 });
 
 When(/^I open General Settings language selection dropdown$/, async function () {
@@ -47,7 +50,7 @@ Then(/^The Japanese language should be selected$/, async function () {
 });
 
 Then(/^I should see second theme as selected$/, async function () {
-  await this.waitForElement('.DisplaySettings_themesWrapper button:nth-child(2).DisplaySettings_active');
+  await this.waitForElement('.ThemeSettingsBlock_themesWrapper button:nth-child(2).ThemeSettingsBlock_active');
 });
 
 // ========== Paper wallet ==========
@@ -97,7 +100,7 @@ Given(/^I swap the paper wallet addresses$/, async function () {
 });
 
 Then(/^I should see two addresses displayed$/, async function () {
-  const addressesElem = await this.driver.findElements(By.xpath("//div[contains(@class, 'CopyableAddress_hash')]"));
+  const addressesElem = await this.driver.findElements(By.xpath("//span[contains(@class, 'RawHash_hash')]"));
   expect(addressesElem.length).to.be.equal(fakeAddresses.length);
   for (let i = 0; i < fakeAddresses.length; i++) {
     const address = await addressesElem[i].getText();

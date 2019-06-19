@@ -3,7 +3,6 @@ Feature: Restore Wallet
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And I am testing "Restore wallet"
     And There is no wallet stored
 
   @it-6
@@ -15,10 +14,10 @@ Feature: Restore Wallet
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | aaSecret_123 | aaSecret_123       |
+    | asdfasdfasdf | asdfasdfasdf       |
     And I click the "Restore Wallet" button
     Then I should see a plate EAJD-7036
-    Then I press the next button
+    Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -32,7 +31,7 @@ Feature: Restore Wallet
     And I enter the recovery phrase:
     | recoveryPhrase                                                                             |
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
-    Then I delete recovery phrase by pressing "x" signs
+    Then I delete recovery phrase by clicking "x" signs
   
   @it-86
   Scenario: Successfully restoring a simple wallet
@@ -43,11 +42,12 @@ Feature: Restore Wallet
     | shoe rose battle fine shoulder address kite coffee jaguar proof practice area party sphere train |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | aaSecret_123 | aaSecret_123       |
+    | asdfasdfasdf | asdfasdfasdf       |
     And I click the "Restore Wallet" button
     Then I should see a plate SETH-7545
-    Then I press the next button
+    Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
+    Given There are 2 generated addresses
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
@@ -63,11 +63,12 @@ Feature: Restore Wallet
     | offer liberty horror emerge twice behind tag agree october dismiss vehicle obtain anchor endorse town |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | aaSecret_123 | aaSecret_123       |
+    | asdfasdfasdf | asdfasdfasdf       |
     And I click the "Restore Wallet" button
     Then I should see a plate DADJ-4614
-    Then I press the next button
+    Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
+    Given There are 6 generated addresses
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
@@ -87,10 +88,10 @@ Feature: Restore Wallet
     | grace saddle snake vocal amateur coin inside ginger leopard place liar patrol usual joy around |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | aaSecret_123 | aaSecret_123       |
+    | asdfasdfasdf | asdfasdfasdf       |
     And I click the "Restore Wallet" button
     Then I should see a plate HNHT-5379
-    Then I press the next button
+    Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
@@ -106,8 +107,8 @@ Feature: Restore Wallet
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | aaSecret_123 | aaSecret_123       |
-    And I clear the restored wallet password aaSecret_123
+    | asdfasdfasdf | asdfasdfasdf       |
+    And I clear the restored wallet password asdfasdfasdf
     And I click the "Restore Wallet" button
     Then I should stay in the restore wallet dialog
     
@@ -120,7 +121,7 @@ Feature: Restore Wallet
     | <recoveryPhrase> |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
-    | aaSecret_123 | aaSecret_123       |
+    | asdfasdfasdf | asdfasdfasdf       |
     And I click the "Restore Wallet" button
     Then I should stay in the restore wallet dialog
     And I should see an "Invalid recovery phrase" error message:
@@ -152,10 +153,10 @@ Feature: Restore Wallet
       And I enter the paper wallet password "cool password"
       And I enter the restored wallet password:
       | password   | repeatedPassword |
-      | aaSecret_123 | aaSecret_123       |
+      | asdfasdfasdf | asdfasdfasdf       |
       And I click the "Restore Wallet" button
       Then I should see a plate KOTZ-1730
-      Then I press the next button
+      Then I click the next button
       Then I should see the opened wallet with name "Restored Wallet"
       And I go to the receive screen
       And I should see the addresses exactly list them

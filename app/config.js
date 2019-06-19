@@ -11,8 +11,11 @@ export default {
         VENDOR: 'trezor.io',
         MODEL: 'T',
         manifest: {
-          EMAIL: 'systems@emurgo.io',
-          APP_URL: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb'
+          EMAIL: 'rnd@emurgo.io',
+          appURL: {
+            CHROME: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb',
+            FIREFOX: 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/'
+          }
         }
       },
       ledgerNanoS: {

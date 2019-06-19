@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 
-import AboutDialog from '../../../components/wallet/hwConnect/trezor/AboutDialog';
+import CheckDialog from '../../../components/wallet/hwConnect/trezor/CheckDialog';
 import ConnectDialog from '../../../components/wallet/hwConnect/trezor/ConnectDialog';
 import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
@@ -32,13 +32,13 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
     let component = null;
 
     switch (trezorConnectStore.progressInfo.currentStep) {
-      case ProgressStep.ABOUT:
+      case ProgressStep.CHECK:
         component = (
-          <AboutDialog
+          <CheckDialog
             progressInfo={trezorConnectStore.progressInfo}
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
-            submit={hwConnectActions.submitAbout.trigger}
+            submit={hwConnectActions.submitCheck.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
           />);
@@ -49,7 +49,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             progressInfo={trezorConnectStore.progressInfo}
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
-            goBack={hwConnectActions.goBackToAbout.trigger}
+            goBack={hwConnectActions.goBackToCheck.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}

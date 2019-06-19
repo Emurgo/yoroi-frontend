@@ -6,27 +6,10 @@
 
 .modal {
   border-radius: 8px;
-  padding: 25px 30px 30px;
+  padding: unset;
+  min-width: unset;
+  max-width: unset;
   display: flex;
   flex-direction: column;
-  min-width: 465px;
-  max-width: 465px;
-
-  :global {
-    .WalletExportDialogChoices_component {
-      & > button {
-        color: var(--theme-dialog-choice-tabs-text-color);
-      }
-
-      & > .WalletExportDialogChoices_activeButton {
-        color: var(--theme-dialog-choice-tabs-text-color-active);
-        border-bottom: 2px solid var(--theme-dialog-choice-tabs-bottom-border-color-active);
-      }
-    }
-
-    .SimpleInput_input,
-    .SimpleAutocomplete_autocompleteContent {
-      background-color: transparent !important;
-    }
-  }
+  letter-spacing: 0;
 }

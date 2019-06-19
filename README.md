@@ -1,5 +1,12 @@
 # Yoroi - Cardano ADA wallet
 
+### Download
+
+[<img src="https://pbs.twimg.com/profile_images/1138489258207899648/9_KBUEn7_400x400.jpg" width="48">](https://addons.mozilla.org/en-US/firefox/addon/yoroi/)
+[<img src="https://pbs.twimg.com/profile_images/1037025533182193664/aCWlGSZF_400x400.jpg" width="48">](https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb)
+
+Looking for Yoroi Mobile? See [here](https://github.com/Emurgo/yoroi-mobile)
+
 ## Contributing
 
 Check out our [documents](docs/specs/meta) on the governance of this project.
@@ -67,10 +74,10 @@ $ npm run flow
 $ npm run eslint
 # features (command to run all existing tests)
 $ npm run test-e2e-chrome
-# How to run one .feature file (One feature file = one covered component from youtrack)
-$ npm run test-by-feature feature/wallet-creation.feature
+# How to run one .feature file
+$ npm run test-by-feature-chrome features/wallet-creation.feature
 # How to run one test.
-$ npm run test-by-tag @it-10
+$ npm run test-by-tag-chrome @it-10
 ```
 
 ### Jest

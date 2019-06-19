@@ -3,9 +3,9 @@ import SvgInline from 'react-svg-inline';
 import backArrow from '../../assets/images/back-arrow-ic.inline.svg';
 import styles from './DialogBackButton.scss';
 
-type Props = {
+type Props = {|
   onBack: Function
-};
+|};
 
 export default class DialogBackButton extends Component<Props> {
 

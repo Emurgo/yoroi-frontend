@@ -10,7 +10,7 @@ import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../a
 
 export type ProgressStepEnum = 0 | 1 | 2;
 export const ProgressStep = {
-  ABOUT: 0,
+  CHECK: 0,
   CONNECT: 1,
   SAVE: 2,
 };
@@ -44,7 +44,7 @@ export interface HWDeviceInfo {
   hwFeatures: HWFeatures
 }
 
-export interface HWConnectStoreTypes {
+export interface HWConnectStoreTypes<ConnectionResponse> {
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
   progressInfo: ProgressInfo;
@@ -84,14 +84,14 @@ export interface HWConnectStoreTypes {
 
   _cancel(): void;
 
-  // =================== ABOUT =================== //
-  /** ABOUT dialog submit(Next button) */
-  _submitAbout(): void;
-  // =================== ABOUT =================== //
+  // =================== CHECK =================== //
+  /** CHECK dialog submit(Next button) */
+  _submitCheck(): void;
+  // =================== CHECK =================== //
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  _goBackToAbout(): void;
+  _goBackToCheck(): void;
 
   /** CONNECT dialog submit (Connect button) */
   _submitConnect(): void;
@@ -101,11 +101,11 @@ export interface HWConnectStoreTypes {
   _checkAndStoreHWDeviceInfo(): Promise<void>;
 
   /** Validates the compatibility of data which we have received from hardware wallet */
-  _validateHWResponse(any, any): boolean;
+  _validateHWResponse(resp: ConnectionResponse): boolean;
 
   /** Converts a valid hardware wallet response to a common storable format
     * later the same format will be used to create wallet */
-  _normalizeHWResponse(any, any): HWDeviceInfo;
+  _normalizeHWResponse(resp: ConnectionResponse): HWDeviceInfo;
   // =================== CONNECT =================== //
 
   // =================== SAVE =================== //

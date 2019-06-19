@@ -7,9 +7,9 @@ To create a release candidate you must compress a local build.
 Zip files can be shared
 
 ```bash
-# compress build folder to {manifest.name}.zip and crx
-$ npm run build -- --env "${network}"
-$ npm run compress -- --env "${network}" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx"
+# compress build folder to {manifest.name}.zip
+# if CARDANO_NETWORK is not provided, it defaults to "testnet"
+$ CARDANO_NETWORK=staging npm run build-compress
 ```
 
 ## (Chrome) Signed build
@@ -26,7 +26,7 @@ Note: Chrome extensions [update automatically](https://developer.chrome.com/exte
 
 ## (Firefox) Signed build (XPI)
 
-TODO: Firefox
+The same steps as Chrome also produce an `xpi` file. You can upload this directly to the [EMURGO AMO account](https://addons.mozilla.org/en-US/firefox/user/14971548/)
 
 # Deploying new version
 

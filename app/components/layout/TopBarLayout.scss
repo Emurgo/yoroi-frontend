@@ -1,6 +1,5 @@
-$topBarClassicHeight: 64px;
-$topBarHeight: 58px;
 $footerHeight: 56px;
+
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
   box-shadow: 0 0 70px 0 rgba(0,0,0,0.75);
@@ -9,60 +8,53 @@ $footerHeight: 56px;
   height: 100%;
   overflow: hidden;
   width: 100%;
+  
+  .topbar {
+    height: var(--cmn-topbar-height);
+    flex-shrink: 0;
+    // Show elements that overflow the topbar above the content area
+    z-index: 1;
+  }
+  
+  .content {
+    height: 100%;
+  }
+  
+  .contentWithFooter {
+    height: calc(100% - #{$footerHeight});
+  }
+  
+  .contentWrapper {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: relative;
+    &::-webkit-scrollbar-button {
+      height: 7px;
+      display: block;
+    }
+  }
+  
+  .footer {
+    height: $footerHeight;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    z-index: 1;
+  }
+  
+  .main {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
 }
 
 .languageSelectionBackground {
   background-image: url(../../assets/images/select-language.svg);
   background-size: cover;
   background-position-y: bottom;
-}
-
-.topbarClassic {
-  height: $topBarClassicHeight;
-  flex-shrink: 0;
-  // Show elements that overflow the topbar above the content area
-  z-index: 1;
-}
-
-.topbar {
-  height: $topBarHeight;
-  flex-shrink: 0;
-  // Show elements that overflow the topbar above the content area
-  z-index: 1;
-}
-
-.content {
-  height: 100%;
-}
-
-.contentWithFooter {
-  height: calc(100% - #{$footerHeight});
-}
-
-.contentWrapper {
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  position: relative;
-  &::-webkit-scrollbar-button {
-    height: 7px;
-    display: block;
-  }
-}
-
-.footer {
-  height: $footerHeight;
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  z-index: 1;
-}
-
-.main {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: relative;
 }

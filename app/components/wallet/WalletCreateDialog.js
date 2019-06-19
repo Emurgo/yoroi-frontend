@@ -50,11 +50,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onCancel: Function,
   classicTheme: boolean
-};
+|};
 
 type State = {
   isSubmitting: boolean,
@@ -198,7 +198,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         <Input
           className="walletName"
           onKeyPress={this.checkForEnterKey.bind(this)}
-          ref={(input) => { this.walletNameInput = input; }}
+          inputRef={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
           done={isValidWalletName(walletName)}
           error={walletNameField.error}
@@ -222,12 +222,11 @@ export default class WalletCreateDialog extends Component<Props, State> {
               skin={classicTheme ? InputSkin : InputOwnSkin}
             />
 
-            <PasswordInstructions isClassicThemeActive={classicTheme} />
+            <PasswordInstructions />
           </div>
         </div>
 
       </Dialog>
     );
   }
-
 }

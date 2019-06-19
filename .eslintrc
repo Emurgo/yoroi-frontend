@@ -55,6 +55,7 @@
     "react/require-default-props": 1,
     "react/sort-comp": 0,
     "class-methods-use-this": 0,
+    "no-continue": 0,
     "no-duplicate-imports": 0,
     "no-param-reassign": 0,
     "no-plusplus": 0,

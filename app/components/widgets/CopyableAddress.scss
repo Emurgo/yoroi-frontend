@@ -1,49 +1,14 @@
-@mixin hashBase {
-  letter-spacing: 0px;
-  margin-bottom: 6px;
-  font-family: var(--font-mono-regular);
-  word-break: break-all;
-}
-.hash {
-  @include hashBase;
-  color: var(--theme-transactions-received-address-color);
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  line-height: 1.57;
-} 
-.hashClassic {
-  @include hashBase;
-  font-size: 17px;
-  line-height: 23px;
-}
-
-.copyIconBig {
-  cursor: pointer;
-  object-fit: contain;
-}
-
-.copyIconBig {
-  margin-left: 6px;
-  & > svg {
-    height: 14.5px;
-    width: 11.5px;
-    path {
-      fill: var(--theme-icon-copy-address-color);
+.component {
+  .copyIconBig {
+    cursor: pointer;
+    object-fit: contain;
+    margin-left: 6px;
+    & > svg {
+      height: 14.5px;
+      width: 11.5px;
+      path {
+        fill: var(--theme-icon-copy-address-color);
+      }
     }
-  }
-}
-
-.usedWalletAddressClassic {
-  span,
-  img {
-    opacity: 0.4;
-  }
-}
-
-.usedWalletAddress {
-  span,
-  img {
-    opacity: 0.4;
   }
 }

@@ -17,7 +17,6 @@ module.exports = function(api) {
       "@babel/preset-react"
     ],
     "plugins": [
-      "react-hot-loader/babel",
       [
         "@babel/plugin-proposal-decorators",
         {
@@ -55,6 +54,7 @@ module.exports = function(api) {
     "env": {
       "development": {
         "plugins": [
+          "react-hot-loader/babel",
           "@babel/plugin-transform-runtime"
         ]
       }

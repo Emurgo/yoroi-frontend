@@ -29,13 +29,12 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   numberOfTransactions: number,
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
   openExportTxToFileDialog: Function,
-  classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletSummary extends Component<Props> {
@@ -50,12 +49,11 @@ export default class WalletSummary extends Component<Props> {
       numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
-      classicTheme,
     } = this.props;
     const { intl } = this.context;
-    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
+
     return (
-      <div className={componentClasses}>
+      <div className={styles.component}>
         <div className={styles.leftBlock} />
         <div className={styles.middleBlock}>
           <BorderedBox>

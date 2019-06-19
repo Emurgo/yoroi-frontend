@@ -14,7 +14,7 @@ import styles from './TermsOfUseForm.scss';
 const messages = defineMessages({
   checkboxLabel: {
     id: 'profile.termsOfUse.checkboxLabel',
-    defaultMessage: '!!!I agree with terms of use',
+    defaultMessage: '!!!I agree with the terms of use',
   },
   submitLabel: {
     id: 'profile.termsOfUse.submitLabel',
@@ -22,12 +22,12 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   localizedTermsOfUse: string,
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 type State = {
   areTermsOfUseAccepted: boolean,
@@ -70,7 +70,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
       <div className={styles.component}>
         <div className={styles.centeredBox}>
 
-          <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} />
+          <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} fixedHeight />
 
           <div className={styles.checkbox}>
             <Checkbox

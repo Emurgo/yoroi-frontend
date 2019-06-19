@@ -29,12 +29,12 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onBack: Function,
   step0: string,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class TransferMasterKeyPage extends Component<Props> {

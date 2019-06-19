@@ -7,7 +7,7 @@ import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
-import AddressDetailsDialog from '../../components/wallet/receive/AddressDetailsDialog';
+import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedProps } from '../../types/injectedPropsType';
 
@@ -95,6 +95,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       <VerticalFlexContainer>
         <WalletReceive
           walletAddress={walletAddress}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
           isWalletAddressUsed={isWalletAddressUsed}
           walletAddresses={walletAddresses}
           onGenerateAddress={this.handleGenerateAddress}
@@ -106,21 +107,20 @@ export default class WalletReceivePage extends Component<Props, State> {
               message: messages.message
             });
           }}
-          onAddressDetail={({ address, path }) => {
+          onVerifyAddress={({ address, path }) => {
             actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
-            this.openAddressDetailsDialog();
+            this.openVerifyAddressDialog();
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
-          classicTheme={profile.isClassicTheme}
-          notification={notificationComponent}
         />
 
-        {profile.isClassicTheme && notificationComponent}
+        {notificationComponent}
 
-        {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
-          <AddressDetailsDialog
+        {uiDialogs.isOpen(VerifyAddressDialog) && hwVerifyAddress.selectedAddress ? (
+          <VerifyAddressDialog
             isActionProcessing={hwVerifyAddress.isActionProcessing}
+            selectedExplorer={this.props.stores.profile.selectedExplorer}
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
@@ -135,8 +135,8 @@ export default class WalletReceivePage extends Component<Props, State> {
     );
   }
 
-  openAddressDetailsDialog = (): void => {
+  openVerifyAddressDialog = (): void => {
     const { actions } = this.props;
-    actions.dialogs.open.trigger({ dialog: AddressDetailsDialog });
+    actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
   }
 }

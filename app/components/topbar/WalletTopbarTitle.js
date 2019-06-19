@@ -9,8 +9,16 @@ import Wallet from '../../domain/Wallet';
 import WalletAccountIcon from './WalletAccountIcon';
 import { WalletTypeOption } from '../../types/WalletType';
 import type { WalletAccount } from '../../domain/Wallet';
+import { defineMessages, intlShape } from 'react-intl';
 
-type Props = {
+const messages = defineMessages({
+  totalBalance: {
+    id: 'wallet.topbar.totalbalance',
+    defaultMessage: '!!!Total balance',
+  },
+});
+
+type Props = {|
   wallet: ?Wallet,
   account: ?WalletAccount,
   currentRoute: string,
@@ -18,7 +26,7 @@ type Props = {
   themeProperties?: {
     identiconSaturationFactor: number,
   },
-};
+|};
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<any>] {
   const { plate: { hash, id } } = account;
@@ -42,11 +50,16 @@ export default class WalletTopbarTitle extends Component<Props> {
     },
   };
 
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
+
   render() {
     const {
       wallet, account, currentRoute, formattedWalletAmount, themeProperties
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
+    const { intl } = this.context;
 
     // If we are looking at a wallet, show its name and balance
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
@@ -69,7 +82,9 @@ export default class WalletTopbarTitle extends Component<Props> {
           <div className={styles.walletAmount}>
             { wallet && formattedWalletAmount(wallet.amount) + ' ADA' }
           </div>
-          <div className={styles.walletAmountLabel}>Total balance</div>
+          <div className={styles.walletAmountLabel}>
+            {intl.formatMessage(messages.totalBalance)}
+          </div>
         </div>
       </div>
     ) : null;

@@ -107,9 +107,16 @@ export const getUrlParameterByName = (name, url) => {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
 
+/** pre-req: either the target is an anchor or is the child of an anchor */
 export const handleExternalLinkClick = (event: MouseEvent) => {
   event.preventDefault();
-  const target = event.target;
+  let target = event.target;
+  while (!(target instanceof HTMLAnchorElement)) {
+    if (!(target instanceof Element)) {
+      return;
+    }
+    target = target.parentNode;
+  }
   if (target instanceof HTMLAnchorElement) {
     window.open(target.href, '_blank');
   }

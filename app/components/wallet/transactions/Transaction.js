@@ -13,6 +13,9 @@ import type { TransactionState } from '../../../domain/WalletTransaction';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
 import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 const messages = defineMessages({
   type: {
@@ -99,22 +102,22 @@ const assuranceLevelTranslations = defineMessages({
 const stateTranslations = defineMessages({
   [transactionStates.PENDING]: {
     id: 'wallet.transaction.state.pending',
-    defaultMessage: '!!!Transaction pending',
+    defaultMessage: '!!!pending',
   },
   [transactionStates.FAILED]: {
     id: 'wallet.transaction.state.failed',
-    defaultMessage: '!!!Transaction failed',
+    defaultMessage: '!!!failed',
   },
 });
 
-type Props = {
+type Props = {|
   data: WalletTransaction,
   state: TransactionState,
+  selectedExplorer: ExplorerType,
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
-  classicTheme: boolean
-};
+|};
 
 type State = {
   isExpanded: boolean,
@@ -155,9 +158,9 @@ export default class Transaction extends Component<Props, State> {
     }
   }
 
-  getAmountStyle(amt: BigNumber, classicTheme: boolean) {
+  getAmountStyle(amt: BigNumber) {
     return classNames([
-      classicTheme ? styles.amountClassic : styles.amount,
+      styles.amount,
       amt.lt(0)
         ? styles.amountSent
         : styles.amountReceived
@@ -166,42 +169,38 @@ export default class Transaction extends Component<Props, State> {
 
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, formattedWalletAmount, classicTheme } = this.props;
+    const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state === transactionStates.FAILED;
     const isPendingTransaction = state === transactionStates.PENDING;
 
     const componentStyles = classNames([
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       isFailedTransaction ? styles.failed : null,
       isPendingTransaction ? styles.pending : null,
     ]);
 
     const contentStyles = classNames([
-      classicTheme ? styles.contentClassic : styles.content,
+      styles.content,
       isLastInList ? styles.last : null
     ]);
 
     const detailsStyles = classNames([
-      classicTheme ? styles.detailsClassic : styles.details,
+      styles.details,
       isExpanded ? styles.expanded : styles.closed
     ]);
 
-    const togglerClasses = classicTheme ? styles.togglerClassic : styles.toggler;
-    const titleClasses = classicTheme ? styles.titleClassic : styles.title;
-    const typeClasses = classicTheme ? styles.typeClassic : styles.type;
     const labelOkClasses = classNames([
-      classicTheme ? styles.labelClassic : styles.label,
+      styles.label,
       styles[assuranceLevel]
     ]);
+
     const labelClasses = classNames([
-      classicTheme ? styles.labelClassic : styles.label,
-      classicTheme ? styles[`${state}LabelClassic`] : styles[`${state}Label`]
+      styles.label,
+      styles[`${state}Label`]
     ]);
-    const currencySymbolClasses = classicTheme
-      ? styles.currencySymbolClassic
-      : styles.currencySymbol;
+
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
     const status = intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
@@ -212,13 +211,13 @@ export default class Transaction extends Component<Props, State> {
       <div className={componentStyles}>
 
         {/* ==== Clickable Header -> toggles details ==== */}
-        <div className={togglerClasses} onClick={this.toggleDetails.bind(this)} role="presentation" aria-hidden>
+        <div className={styles.toggler} onClick={this.toggleDetails.bind(this)} role="presentation" aria-hidden>
           <div className={styles.togglerContent}>
             <div className={styles.header}>
-              <div className={titleClasses}>
+              <div className={styles.title}>
                 { this.getTransactionHeaderMsg(intl, currency, data.type) }
               </div>
-              <div className={typeClasses}>
+              <div className={styles.time}>
                 {moment(data.date).format('hh:mm:ss A')}
               </div>
               {state === transactionStates.OK ? (
@@ -229,19 +228,17 @@ export default class Transaction extends Component<Props, State> {
                 </div>
               )}
 
-              <div className={this.getAmountStyle(data.amount, classicTheme)}>
+              <div className={this.getAmountStyle(data.amount)}>
                 {
                   // hide currency (we are showing symbol instead)
                   formattedWalletAmount(data.amount, false)
                 }
-                <SvgInline svg={symbol} className={currencySymbolClasses} />
+                <SvgInline svg={symbol} className={styles.currencySymbol} />
               </div>
 
-              {!classicTheme && (
-                <div className={styles.expandArrowBox}>
-                  <SvgInline className={arrowClasses} svg={expandArrow} />
-                </div>
-              )}
+              <div className={styles.expandArrowBox}>
+                <SvgInline className={arrowClasses} svg={expandArrow} />
+              </div>
             </div>
           </div>
         </div>
@@ -268,28 +265,50 @@ export default class Transaction extends Component<Props, State> {
                   <h2>
                     {intl.formatMessage(messages.fee)}
                   </h2>
-                  <span>{formattedWalletAmount(data.fee.abs(), false)}</span>
+                  <span className={styles.rowData}>
+                    {formattedWalletAmount(data.fee.abs(), false)}
+                  </span>
                 </div>
               )}
               <h2>
                 {intl.formatMessage(messages.fromAddresses)}
               </h2>
               {uniq(data.addresses.from).map(address => (
-                <span key={`${data.id}-from-${address}`} className={styles.address}>{address}</span>
+                <ExplorableHashContainer
+                  key={`${data.id}-from-${address}`}
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={address}
+                  light
+                  linkType="address"
+                >
+                  <RawHash light>
+                    {address}<br />
+                  </RawHash>
+                </ExplorableHashContainer>
               ))}
               <h2>
                 {intl.formatMessage(messages.toAddresses)}
               </h2>
               {data.addresses.to.map((address, addressIndex) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <span key={`${data.id}-to-${address}-${addressIndex}`} className={styles.address}>{address}</span>
+                <ExplorableHashContainer
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`${data.id}-to-${address}-${addressIndex}`}
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={address}
+                  light
+                  linkType="address"
+                >
+                  <RawHash light>
+                    {address}<br />
+                  </RawHash>
+                </ExplorableHashContainer>
               ))}
 
               {environment.isAdaApi() ? (
                 <div className={styles.row}>
                   <h2>{intl.formatMessage(messages.assuranceLevel)}</h2>
                   {state === transactionStates.OK ? (
-                    <span>
+                    <span className={styles.rowData}>
                       <span className={styles.assuranceLevel}>{status}</span>
                       . {data.numberOfConfirmations} {intl.formatMessage(messages.confirmations)}.
                     </span>
@@ -298,7 +317,16 @@ export default class Transaction extends Component<Props, State> {
               ) : null}
 
               <h2>{intl.formatMessage(messages.transactionId)}</h2>
-              <span className={styles.address}>{data.id}</span>
+              <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
+                hash={data.id}
+                light
+                linkType="transaction"
+              >
+                <RawHash light>
+                  {data.id}
+                </RawHash>
+              </ExplorableHashContainer>
             </div>
           </div>
         </div>

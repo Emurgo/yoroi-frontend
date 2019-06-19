@@ -42,6 +42,7 @@ type Props = {
   suggestionsRef: ElementRef<any>,
   theme: Object,
   themeId: string,
+  toggleMouseLocation: Function,
   toggleOpen: Function,
   done: Boolean
 };
@@ -71,7 +72,7 @@ export const AutocompleteOwnSkin = (props: Props) => {
     if (props.selectedOptions && !props.renderSelections) {
       // render default skin
       return props.selectedOptions.map((selectedOption, index) => (
-        <span className={theme.selectedWordBox} key={selectedOption.id}>
+        <span className={theme.selectedWordBox} key={`${selectedOption}-${index.toString()}`}>
           <span className={theme.selectedWordValue}>
             {selectedOption}
             <span
@@ -148,6 +149,7 @@ export const AutocompleteOwnSkin = (props: Props) => {
         selectedOptions={props.selectedOptions}
         skin={OptionsSkin}
         targetRef={props.suggestionsRef}
+        toggleMouseLocation={props.toggleMouseLocation}
         toggleOpen={props.toggleOpen}
       />
     </div>

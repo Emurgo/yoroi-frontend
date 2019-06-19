@@ -25,7 +25,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   className?: string,
   isActive: boolean,
   inputFieldLabel: string,
@@ -38,7 +38,7 @@ type Props = {
   validationErrorMessage: string,
   successfullyUpdated: boolean,
   classicTheme: boolean,
-};
+|};
 
 type State = {
   isActive: boolean,
@@ -141,7 +141,7 @@ export default class InlineEditingInput extends Component<Props, State> {
     const inputField = validator.$('inputField');
     const componentStyles = classnames([
       className,
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       isActive ? null : styles.inactive,
     ]);
     const inputStyles = classnames([
@@ -170,7 +170,7 @@ export default class InlineEditingInput extends Component<Props, State> {
           onKeyDown={event => this.handleInputKeyDown(event)}
           error={isActive ? inputField.error : null}
           disabled={!isActive}
-          ref={(input) => { this.inputField = input; }}
+          inputRef={(input) => { this.inputField = input; }}
           skin={classicTheme ? InputSkin : InputOwnSkin}
         />
 

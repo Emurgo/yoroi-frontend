@@ -16,12 +16,12 @@ import type {
   TransferTx
 } from '../../types/TransferTypes';
 import {
-  getAddressesWithFunds,
+  getAddressesKeys,
   generateTransferTx
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
-import { batchUTXOsForAddresses } from '../../api/ada/lib/state-fetch/helpers';
+import { getReceiverAddress } from '../../api/ada/lib/storage/adaAddress';
 import {
   getCryptoDaedalusWalletFromMnemonics,
   getCryptoDaedalusWalletFromMasterKey
@@ -131,13 +131,14 @@ export default class DaedalusTransferStore extends Store {
         if (data.msg === MSG_TYPE_RESTORE) {
           this._updateStatus('checkingAddresses');
           const checker = RustModule.Wallet.DaedalusAddressChecker.new(wallet);
-          const addressesWithFunds = getAddressesWithFunds({ checker, fullUtxo: data.addresses });
+          const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
+          const outputAddr = await getReceiverAddress();
           const transferTx = await generateTransferTx({
-            addressesWithFunds,
-            getUTXOsForAddresses: batchUTXOsForAddresses(
-              this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses
-            ),
+            outputAddr,
+            addressKeys,
+            getUTXOsForAddresses:
+              this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
           });
           runInAction(() => {
             this.transferTx = transferTx;

@@ -25,22 +25,22 @@ When(/^I click on the Hide used addresses button$/, async function () {
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {
   for (let curr = 1; curr <= times; curr++) {
     await this.click('.generateAddressButton');
-    await this.waitForElement(`.generatedAddress-${curr + 1} .WalletReceive_addressId`);
+    await this.waitForElement(`.generatedAddress-${curr + 1} .RawHash_hash`);
   }
 });
 
 Then(/^I should see my latest address "([^"]*)" at the top$/, async function (address) {
-  await this.waitUntilText('.CopyableAddress_hashClassic', address);
+  await this.waitUntilText('.WalletReceive_copyableHash', address);
 });
 
 Then(/^I see every generated address is unique$/, async function () {
-  const addresses = await this.driver.findElements(By.xpath("//div[@class='WalletReceive_addressId']"));
+  const addresses = await this.driver.findElements(By.xpath("//div[@class='RawHash_hash']"));
 
   const addressesStringArray = Array
     .from({ length: addresses.length }, (x, i) => i + 1)
     .map(async i => (
       await this.driver
-        .findElement(By.css(`.generatedAddress-${i} .WalletReceive_addressId`))
+        .findElement(By.css(`.generatedAddress-${i} .RawHash_hash`))
         .getText()
     ));
 
@@ -57,12 +57,12 @@ Then(/^I should see the addresses exactly list them$/, async function (table) {
   const rows = table.hashes();
   const waitUntilAddressesAppeared = rows.map((row, index) => (
     this.waitUntilText(
-      `.generatedAddress-${index + 1} .WalletReceive_addressId`,
+      `.generatedAddress-${index + 1} .RawHash_hash`,
       row.address
     )
   ));
   const noMoreAddressAppeared = this.waitForElementNotPresent(
-    `.generatedAddress-${rows.length + 1} .WalletReceive_addressId`
+    `.generatedAddress-${rows.length + 1} .RawHash_hash`
   );
   waitUntilAddressesAppeared.push(noMoreAddressAppeared);
   await Promise.all(waitUntilAddressesAppeared);
