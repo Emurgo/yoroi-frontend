@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import _ from 'lodash';
 
-type Props = {
+type Props = {|
   variables: { [key: string]: string },
   children?: Node,
-};
+|};
 
 /** Allow to swap the CSS used at runtime to allow user-defined themes */
 export default class ThemeManager extends Component<Props> {
