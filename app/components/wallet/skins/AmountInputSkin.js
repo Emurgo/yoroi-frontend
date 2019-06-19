@@ -27,7 +27,6 @@ type Props = {|
   themeId: string,
   value: string,
   type: string,
-  classicTheme: boolean
 |};
 
 export default class AmountInputSkin extends Component<Props> {
@@ -40,12 +39,33 @@ export default class AmountInputSkin extends Component<Props> {
   };
 
   render() {
-    const { error, fees, total, currency, classicTheme } = this.props;
+    const {
+      currency,
+      fees,
+      total,
+      error,
+      classicTheme,
+      inputRef,
+      theme,
+      themeId,
+      value,
+      type,
+    } = this.props;
     const { intl } = this.context;
 
     return (
       <div className={styles.component}>
-        {classicTheme ? <InputSkin {...this.props} /> : <InputOwnSkin {...this.props} />}
+        {classicTheme ?
+          <InputSkin {...this.props} /> :
+          <InputOwnSkin
+            error={error}
+            inputRef={inputRef}
+            theme={theme}
+            themeId={themeId}
+            value={value}
+            type={type}
+          />
+        }
         {!error && (
           <span className={styles.fees}>
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
