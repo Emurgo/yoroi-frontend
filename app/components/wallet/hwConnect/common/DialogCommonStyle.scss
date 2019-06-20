@@ -3,7 +3,6 @@
 $opacityCommon: 0.7;
 
 .component {
-  overflow: hidden;
 
   .processing {
     @include loading-spinner("../../../../assets/images/spinner-light.svg");
@@ -68,6 +67,5 @@ $opacityCommon: 0.7;
   .middleBlock {
     background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
     border-radius: 8px;
-    overflow: hidden;  
   }
 }
