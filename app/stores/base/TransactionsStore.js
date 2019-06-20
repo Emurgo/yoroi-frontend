@@ -1,7 +1,6 @@
 // @flow
 import { observable, computed, action, extendObservable } from 'mobx';
 import _ from 'lodash';
-import BigNumber from 'bignumber.js';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
