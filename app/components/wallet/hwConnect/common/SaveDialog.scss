@@ -4,8 +4,6 @@
 
   .walletNameInfoWrapper {
     display: flex;
-    height: 28px;
-    margin-bottom: 10px;
   }
 
   .walletNameInfoIcon {
@@ -13,7 +11,7 @@
   }
 
   .walletNameInfo {
-    padding-top: 2px;
+    padding-top: 1px;
     font-family: var(--font-regular);
     font-size: 12px;
     line-height: 14px;
