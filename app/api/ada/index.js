@@ -997,7 +997,7 @@ export default class AdaApi {
   }
 
   async getSelectedExplorer(
-    request: GetSelectedExplorerRequest
+    _request: GetSelectedExplorerRequest
   ): Promise<GetSelectedExplorerResponse> {
     Logger.debug('AdaApi::getSelectedExplorer called');
     try {
