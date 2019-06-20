@@ -21,5 +21,5 @@ export default class WalletsActions {
     signRequest: BaseSignRequest,
     password: string,
   }> = new Action();
-  updateBalance: Action <{ amount: BigNumber }> = new Action();
+  updateBalance: Action <BigNumber> = new Action();
 }

@@ -1334,7 +1334,7 @@ export default class AdaApi {
 
   redeemAda = async (
     request: RedeemAdaRequest
-  ): RedeemAdaResponse => {
+  ): Promise<RedeemAdaResponse> => {
     Logger.debug('AdaApi::redeemAda called');
     try {
       const transactionAmount = await redeemAda(request);
@@ -1351,7 +1351,7 @@ export default class AdaApi {
 
   redeemPaperVendedAda = async (
     request: RedeemPaperVendedAdaRequest
-  ): RedeemPaperVendedAdaResponse => {
+  ): Promise<RedeemPaperVendedAdaResponse> => {
     Logger.debug('AdaApi::redeemAdaPaperVend called');
     try {
       const transactionAmount = await redeemPaperVendedAda(request);
