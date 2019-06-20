@@ -9,7 +9,6 @@ import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../themes';
 import type { Theme } from '../../../../themes';
 import ThemeThumbnail from '../display/ThemeThumbnail';
-import environment from '../../../../environment';
 
 const messages = defineMessages({
   themeLabel: {
