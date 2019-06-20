@@ -298,7 +298,7 @@ export default {
   '--theme-system-error-overlay-text-color': '#fafbfc',
 
   '--theme-topbar-active-item-bottom-border': '5px solid #daa49a',
-  '--theme-topbar-active-item-top-border': '5px solid transparent',  
+  '--theme-topbar-active-item-top-border': '5px solid transparent',
   '--theme-topbar-category-text-color': '#fafbfc',
   '--theme-topbar-background-color-gradient-start': topbarGradient.start,
   '--theme-topbar-background-color-gradient-end': topbarGradient.end,
