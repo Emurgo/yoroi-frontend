@@ -54,8 +54,6 @@ then
 
 else
 
-  echo "Building Yoroi-${RELEASE_TAG}..."
-
   if [ "${CIRCLE_BRANCH}" == "develop" ]
   then
     export TEMPLATE="staging"
@@ -64,6 +62,7 @@ else
     export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
     export CRX_NAME="yoroi-${RELEASE_TAG}.crx"
     export APP_ID="${CHROME_DEV_APP_ID}"
+    echo "Building Yoroi-${RELEASE_TAG}..."
     yoroi-build
     chrome-webstore-upndown
   fi
@@ -75,6 +74,7 @@ else
     export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
     export CRX_NAME="yoroi-${RELEASE_TAG}.crx"
     export APP_ID="${CHROME_STG_APP_ID}"
+    echo "Building Yoroi-${RELEASE_TAG}..."
     yoroi-build
     chrome-webstore-upndown
   fi
@@ -86,16 +86,20 @@ else
     export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
     export CRX_NAME="yoroi-${RELEASE_TAG}.crx"
     export APP_ID="${CHROME_PRO_APP_ID}"
+    echo "Building Yoroi-${RELEASE_TAG}..."
     yoroi-build
     chrome-webstore-upndown
     # maybe apply diff settings to the upload?
   fi
 fi
 
-tar -zcf artifacts/build-${RELEASE_TAG}.tar.gz build
-echo "Release sha256 checksums:"
-find build -type f -exec sha256sum {} \; | tee -a artifacts/sha256sum.list
-sha256sum artifacts/build*tar.gz | tee -a artifacts/sha256sum.list
-sha256sum artifacts/${CRX_NAME} | tee -a artifacts/sha256sum.list
-sha256sum artifacts/${XPI_NAME} | tee -a artifacts/sha256sum.list
-sha256sum artifacts/${ZIP_NAME} | tee -a artifacts/sha256sum.list
+if [[ ! -z $(echo ${BRANCH} | grep "^develop$\|^staging$\|^master$") ]] || [[ ! -z "${PR_NUMBER}" ]]
+then
+  tar -zcf artifacts/build-${RELEASE_TAG}.tar.gz build
+  echo "Release sha256 checksums:"
+  find build -type f -exec sha256sum {} \; | tee -a artifacts/sha256sum.list
+  sha256sum artifacts/build*tar.gz | tee -a artifacts/sha256sum.list
+  sha256sum artifacts/${CRX_NAME} | tee -a artifacts/sha256sum.list
+  sha256sum artifacts/${XPI_NAME} | tee -a artifacts/sha256sum.list
+  sha256sum artifacts/${ZIP_NAME} | tee -a artifacts/sha256sum.list
+fi
