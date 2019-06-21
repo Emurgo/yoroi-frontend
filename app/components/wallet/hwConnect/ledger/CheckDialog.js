@@ -27,22 +27,26 @@ import styles from '../common/CheckDialog.scss';
 const messages = defineMessages({
   aboutPrerequisite1Part1: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1',
-    defaultMessage: '!!!Only Supports ',
+    defaultMessage: '!!!Ledger Nano S',
   },
-  aboutPrerequisite1Part2Link: {
-    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link',
+  aboutPrerequisite1Part1Link: {
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1.link',
     defaultMessage: '!!!https://www.ledger.com/products/ledger-nano-s',
   },
-  aboutPrerequisite1Part2LinkText: {
-    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link.text',
-    defaultMessage: '!!!Ledger Nano S',
+  aboutPrerequisite1Part2: {
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2',
+    defaultMessage: '!!! or ',
   },
   aboutPrerequisite1Part3: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3',
-    defaultMessage: '!!! model.',
+    defaultMessage: '!!!Ledger Nano X(Using USB cable)',
+  },
+  aboutPrerequisite1Part3Link: {
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3.link',
+    defaultMessage: '!!!https://shop.ledger.com/pages/ledger-nano-x/',
   },
   aboutPrerequisite2: {
-    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part2',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2',
     defaultMessage: '!!!Cardano ADA app must be installed on the Ledger device.',
   },
   aboutPrerequisite3: {
@@ -99,12 +103,15 @@ export default class CheckDialog extends Component<Props> {
           </div>
           <ul>
             <li key="1">
-              {intl.formatMessage(messages.aboutPrerequisite1Part1)}
-              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
-                {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText) + ' '}
+              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part1Link)}>
+                {intl.formatMessage(messages.aboutPrerequisite1Part1) + ' '}
                 <SvgInline svg={externalLinkSVG} />
               </a>
-              {intl.formatMessage(messages.aboutPrerequisite1Part3)}
+              {intl.formatMessage(messages.aboutPrerequisite1Part2)}
+              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part3Link)}>
+                {intl.formatMessage(messages.aboutPrerequisite1Part3) + ' '}
+                <SvgInline svg={externalLinkSVG} />
+              </a>
             </li>
             <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
             <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
