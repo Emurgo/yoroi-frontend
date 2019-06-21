@@ -25,20 +25,16 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import styles from '../common/CheckDialog.scss';
 
 const messages = defineMessages({
-  aboutPrerequisite1Part1: {
+  aboutPrerequisite1Part1Text: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part1',
-    defaultMessage: '!!!Only Supports',
-  },
-  aboutPrerequisite1Part2Link: {
-    id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link',
-    defaultMessage: '!!!https://github.com/trezor/trezor-core/blob/master/ChangeLog',
-  },
-  aboutPrerequisite1Part2LinkText: {
-    id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part2.link.text',
     defaultMessage: '!!!Trezor Model T with version 2.0.8',
   },
-  aboutPrerequisite1Part3: {
-    id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part3',
+  aboutPrerequisite1Part1Link: {
+    id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.link',
+    defaultMessage: '!!!https://github.com/trezor/trezor-core/blob/master/ChangeLog',
+  },
+  aboutPrerequisite1Part2: {
+    id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part2',
     defaultMessage: '!!!or later',
   },
   aboutPrerequisite2: {
@@ -95,12 +91,11 @@ export default class CheckDialog extends Component<Props> {
           </div>
           <ul>
             <li key="1">
-              {intl.formatMessage(messages.aboutPrerequisite1Part1)}
-              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
-                {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText) + ' '}
+              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part1Link)}>
+                {intl.formatMessage(messages.aboutPrerequisite1Part1Text) + ' '}
                 <SvgInline svg={externalLinkSVG} />
               </a>
-              {intl.formatMessage(messages.aboutPrerequisite1Part3)}
+              {intl.formatMessage(messages.aboutPrerequisite1Part2)}
             </li>
             <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
             <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
