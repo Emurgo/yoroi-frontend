@@ -264,7 +264,7 @@
   "wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor": "https://youtu.be/Dp0wXwtToX0",
   "wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor.text": "Click here to learn more about using Yoroi with Trezor",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1": "Trezor Model T with version 2.1.0",
-  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.link": "https://github.com/trezor/trezor-core/blob/master/ChangeLog",
+  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.link": "https://shop.trezor.io/product/trezor-model-t",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2": " or later.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.2": "The Trezor device must be pre-initialized.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.3": "The Trezor device screen must be unlocked.",

@@ -31,7 +31,7 @@ const messages = defineMessages({
   },
   aboutPrerequisite1Part1Link: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.link',
-    defaultMessage: '!!!https://github.com/trezor/trezor-core/blob/master/ChangeLog',
+    defaultMessage: '!!!https://shop.trezor.io/product/trezor-model-t',
   },
   aboutPrerequisite1Part2: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part2',
