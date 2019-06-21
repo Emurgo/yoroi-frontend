@@ -76,7 +76,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       },
       repeatPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(globalMessagessages.repeatPasswordLabel),
+        label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
         placeholder: this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
