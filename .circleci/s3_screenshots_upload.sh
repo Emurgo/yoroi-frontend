@@ -42,7 +42,7 @@ do
       do
         BASENAME=$(echo ${file} | sed "s|^screenshots/${browser}/||")
         OBJECT_KEY="${OBJECT_KEY_BASEPATH}/${BASENAME}"
-        S3_URI="$(echo ${S3_ENDPOINT}/${OBJECT_KEY} | sed 's| |%20|g')"
+        S3_URI="$(echo "${S3_ENDPOINT}/${OBJECT_KEY}" | sed 's| |%20|g')"
         echo "**- $(echo ${BASENAME} | sed 's|.png||'):**" >> /tmp/pr-screenshots-urls
         echo "![${BASENAME}](${S3_URI})" >> /tmp/pr-screenshots-urls
       done
@@ -60,9 +60,9 @@ do
       do
         BASENAME=$(echo ${file} | sed "s|^screenshots/${browser}/||")
         BASE_BRANCH_OBJECT_KEY="screenshots/${browser}/${PR_BASE_BRANCH}/${BASENAME}"
-        BASE_BRANCH_S3_URI="$(echo ${S3_ENDPOINT}/${BASE_BRANCH_OBJECT_KEY} | sed 's| |%20|g')"
+        BASE_BRANCH_S3_URI="$(echo "${S3_ENDPOINT}/${BASE_BRANCH_OBJECT_KEY}" | sed 's| |%20|g')"
         PR_OBJECT_KEY="${OBJECT_KEY_BASEPATH}/${BASENAME}"
-        PR_S3_URI="$(echo ${S3_ENDPOINT}/${PR_OBJECT_KEY} | sed 's| |%20|g')"
+        PR_S3_URI="$(echo "${S3_ENDPOINT}/${PR_OBJECT_KEY}" | sed 's| |%20|g')"
         if [ ! -e "${BASE_BRANCH_OBJECT_KEY}" ]
         then
           curl -sLo base-image.png "${BASE_BRANCH_S3_URI}"
@@ -79,7 +79,7 @@ do
         if [ $DIFF_VALUE -gt $SCREENSHOT_DIFF_THRESHOLD ]
         then
           DIFFERENCE_OBJECT_KEY="${DIFFERENCES_OBJECT_KEY}/${BASENAME}"
-          DIFFERENCE_S3_URI="$(echo ${S3_ENDPOINT}/${DIFFERENCE_OBJECT_KEY} | sed 's| |%20|g')"
+          DIFFERENCE_S3_URI="$(echo "${S3_ENDPOINT}/${DIFFERENCE_OBJECT_KEY}" | sed 's| |%20|g')"
           mkdir -p "$(dirname "${DIFFERENCES_OBJECT_KEY}/${BASENAME}")"
           cp -a difference.png "${DIFFERENCES_OBJECT_KEY}/${BASENAME}"
           echo "**- $(echo ${BASENAME} | sed 's|.png||'):**" >> /tmp/pr-differences-urls
