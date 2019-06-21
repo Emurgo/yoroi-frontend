@@ -1,32 +1,35 @@
-.componentClassic {
-  padding: 14px;
-  border-radius: 2px;
-  text-align: center;
-  background-color: var(--theme-backup-mnemonic-background-color);
-  font-family: var(--font-medium);
-  font-size: 16px;
-  line-height: 1.38;
-  color: var(--theme-instructions-text-color);
-  min-height: 50px;
-  word-spacing: 10px;
-  -webkit-user-select: none;
-}
-
 .component {
   padding: 14px;
   text-align: left;
-  font-family: var(--font-regular);
   font-size: 16px;
   line-height: 1.38;
-  color: var(--theme-instructions-recovery-text-color);
-  min-height: 50px;
   word-spacing: 10px;
   -webkit-user-select: none;
-  border-radius: 8px;
   border: 1px solid var(--theme-mnemonic-border-color);
+
+  &.filled {
+    padding: 14px;
+    border: 2px solid var(--theme-mnemonic-border-filled-color);
+    min-height: 132px;
+  }
 }
 
-.filled {
-  padding: 14px;
-  border: 2px solid var(--theme-mnemonic-border-filled-color);
+:global(.YoroiClassic) {
+  .component {
+    border-radius: 2px;
+    text-align: center;
+    font-family: var(--font-medium);
+    color: var(--theme-instructions-text-color);
+    background-color: var(--theme-backup-mnemonic-background-color);
+    min-height: 52px;
+  }
+}
+
+:global(.YoroiModern) {
+  .component {
+    border-radius: 8px;
+    text-align: left;
+    font-family: var(--font-regular);
+    color: var(--theme-instructions-recovery-text-color);
+  }
 }

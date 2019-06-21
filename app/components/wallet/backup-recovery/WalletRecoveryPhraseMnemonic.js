@@ -18,9 +18,9 @@ export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
   }
 
   render() {
-    const { phrase, classicTheme, filled } = this.props;
+    const { phrase, filled } = this.props;
     const componentClasses = classnames([
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       filled ? styles.filled : ''
     ]);
     return (
