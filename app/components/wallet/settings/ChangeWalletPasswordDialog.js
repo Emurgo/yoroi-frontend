@@ -29,22 +29,6 @@ const messages = defineMessages({
     id: 'wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder',
     defaultMessage: '!!!Type current spending password',
   },
-  newPasswordLabel: {
-    id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
-    defaultMessage: '!!!New spending password',
-  },
-  newPasswordFieldPlaceholder: {
-    id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type new spending password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat new spending password',
-  },
-  repeatPasswordFieldPlaceholder: {
-    id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type new spending password',
-  },
 });
 
 type Props = {|
@@ -76,8 +60,8 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       },
       walletPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.newPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.newPasswordFieldPlaceholder),
+        label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
+        placeholder: this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -92,8 +76,8 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       },
       repeatPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
+        label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
+        placeholder: this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
