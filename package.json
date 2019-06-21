@@ -39,6 +39,11 @@
     "type": "git",
     "url": "https://github.com/Emurgo/yoroi-frontend"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run flow && npm run eslint && npm run jest"
+    }
+  },
   "keywords": [
     "yoroi",
     "icarus",
@@ -95,6 +100,7 @@
     "html-loader": "0.5.5",
     "html-webpack-harddisk-plugin": "1.0.1",
     "html-webpack-plugin": "4.0.0-beta.5",
+    "husky": "2.4.1",
     "jest": "24.7.1",
     "json-server": "0.13.0",
     "markdown-loader": "5.0.0",
