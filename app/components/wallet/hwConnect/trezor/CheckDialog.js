@@ -59,6 +59,7 @@ type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
+  onExternalLinkClick: Function,
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
@@ -77,6 +78,7 @@ export default class CheckDialog extends Component<Props> {
       progressInfo,
       isActionProcessing,
       error,
+      onExternalLinkClick,
       submit,
       cancel,
       classicTheme,
@@ -141,7 +143,7 @@ export default class CheckDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock />
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 }
