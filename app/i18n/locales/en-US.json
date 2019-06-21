@@ -250,7 +250,7 @@
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger": "https://emurgo.io/#/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano",
   "wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text": "Click here to learn more about using Yoroi with Ledger",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1": "Ledger Nano S",
-  "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1.link": "https://www.ledger.com/products/ledger-nano-s",
+  "wallet.connect.ledger.dialog.step.about.prerequisite.1.part1.link": "https://shop.ledger.com/products/ledger-nano-s/",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part2": " or ",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part3": "Ledger Nano X (Using USB cable)",
   "wallet.connect.ledger.dialog.step.about.prerequisite.1.part3.link": "https://shop.ledger.com/pages/ledger-nano-x/",

@@ -31,7 +31,7 @@ const messages = defineMessages({
   },
   aboutPrerequisite1Part1Link: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1.link',
-    defaultMessage: '!!!https://www.ledger.com/products/ledger-nano-s',
+    defaultMessage: '!!!https://shop.ledger.com/products/ledger-nano-s/',
   },
   aboutPrerequisite1Part2: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2',
