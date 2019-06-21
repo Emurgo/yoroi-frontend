@@ -80,22 +80,6 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.paperPasswordLabel',
     defaultMessage: '!!!Paper wallet password',
   },
-  walletPasswordLabel: {
-    id: 'wallet.restore.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
-  },
-  passwordFieldPlaceholder: {
-    id: 'wallet.restore.dialog.passwordFieldPlaceholder',
-    defaultMessage: '!!!Spending Password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.restore.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat spending password',
-  },
-  repeatPasswordFieldPlaceholder: {
-    id: 'wallet.restore.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Repeat spending password',
-  },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',
     defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
@@ -213,8 +197,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       } : undefined,
       walletPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.walletPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
+        placeholder: this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder),
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -229,8 +213,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       },
       repeatPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
+        label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
+        placeholder: this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder),
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
