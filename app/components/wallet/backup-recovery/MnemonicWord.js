@@ -22,7 +22,7 @@ export default class MnemonicWord extends Component<Props> {
 
     const componentClasses = classnames([
       classicTheme ? 'flat' : null,
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component
     ]);
 
     return (

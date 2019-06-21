@@ -1,26 +1,27 @@
-.componentClassic {
-  font-family: var(--font-light);
-  font-size: 16px;
-  line-height: 1.38;
-  color: var(--theme-instructions-text-color);
+.component {
+  line-height: 22px;
   margin-bottom: 10px;
-  text-align: center;
 
   strong {
     font-family: var(--font-medium);
   }
 }
 
-.component {
-  font-family: var(--font-regular);
-  font-size: 14px;
-  line-height: 22px;
-  color: var(--theme-instructions-recovery-text-color);
-  margin-bottom: 10px;
-  text-align: left;
-  letter-spacing: 0;
+:global(.YoroiClassic) {
+  .component {
+    font-family: var(--font-light);
+    font-size: 16px;
+    color: var(--theme-instructions-text-color);
+    text-align: center;
+  }
+}
 
-  strong {
-    font-family: var(--font-medium);
+:global(.YoroiModern) {
+  .component {
+    font-family: var(--font-regular);
+    font-size: 14px;
+    color: var(--theme-instructions-recovery-text-color);
+    text-align: left;
+    letter-spacing: 0;
   }
 }
