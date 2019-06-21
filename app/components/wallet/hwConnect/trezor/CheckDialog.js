@@ -102,7 +102,10 @@ export default class CheckDialog extends Component<Props> {
           <ul>
             <li key="1">
               {intl.formatMessage(messages.aboutPrerequisite1Part1)}
-              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
+              <a
+                href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}
+                onClick={event => onExternalLinkClick(event)}
+              >
                 {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText) + ' '}
                 <SvgInline svg={externalLinkSVG} />
               </a>
