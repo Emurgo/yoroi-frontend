@@ -52,6 +52,7 @@ type Props = {|
   error: ?LocalizableError,
   isActionProcessing: boolean,
   defaultWalletName: string,
+  onExternalLinkClick: Function,
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
@@ -95,7 +96,14 @@ export default class SaveDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      onExternalLinkClick,
+      cancel,
+      classicTheme
+    } = this.props;
 
     const headerBlockClasses = classicTheme
       ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
@@ -175,7 +183,7 @@ export default class SaveDialog extends Component<Props> {
         {walletNameBlock}
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock progressInfo={progressInfo} />
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 

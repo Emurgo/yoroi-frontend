@@ -47,6 +47,7 @@ type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
+  onExternalLinkClick: Function,
   goBack: Function,
   submit: Function,
   cancel: Function,
@@ -63,9 +64,16 @@ export default class ConnectDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
-      progressInfo, isActionProcessing, error,
-      goBack, submit, cancel, classicTheme,
+      progressInfo,
+      isActionProcessing,
+      error,
+      onExternalLinkClick,
+      goBack,
+      submit,
+      cancel,
+      classicTheme,
     } = this.props;
+
     const headerBlockClasses = classicTheme
       ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
       : classnames([headerMixin.headerBlock, styles.headerBlock]);
@@ -146,7 +154,7 @@ export default class ConnectDialog extends Component<Props> {
         {introBlock}
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock progressInfo={progressInfo} />
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 }
