@@ -55,7 +55,7 @@ export class UnexpectedError extends LocalizableError {
   }
 }
 
-export function localizedError(error: any): LocalizableError {
+export function localizedError(error: Error): LocalizableError {
   if (error instanceof LocalizableError) {
     return error;
   }

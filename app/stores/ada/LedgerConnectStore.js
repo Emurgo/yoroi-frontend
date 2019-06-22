@@ -225,7 +225,7 @@ export default class LedgerConnectStore
     return true;
   };
 
-  _handleConnectError = (error: any): void => {
+  _handleConnectError = (error: Error): void => {
     Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;
