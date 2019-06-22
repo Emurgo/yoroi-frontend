@@ -11,6 +11,7 @@ import { WalletTypeOption } from '../../types/WalletType';
 import type { WalletAccount } from '../../domain/Wallet';
 import { defineMessages, intlShape } from 'react-intl';
 
+
 const messages = defineMessages({
   totalBalance: {
     id: 'wallet.topbar.totalbalance',
@@ -28,7 +29,7 @@ type Props = {|
   },
 |};
 
-function constructPlate(account, saturationFactor, divClass): [string, React$Element<any>] {
+function constructPlate(account, saturationFactor, divClass): [string, React$Element<'div'>] {
   const { plate: { hash, id } } = account;
   return [id, (
     <div className={divClass}>
