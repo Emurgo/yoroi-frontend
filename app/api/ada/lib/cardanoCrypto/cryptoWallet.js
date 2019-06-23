@@ -117,7 +117,7 @@ export const scramblePaperAdaMnemonic = (
   phrase: string,
   password: string,
 ): string => {
-  const salt = new Uint8Array(Buffer.from(cryptoRandomString(2 * 8), 'hex'));
+  const salt = new Uint8Array(Buffer.from(cryptoRandomString({ length: 2 * 8 }), 'hex'));
   const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(phrase);
   const bytes = RustModule.Wallet.paper_wallet_scramble(entropy, salt, password);
   return entropyToMnemonic(Buffer.from(bytes), wordlists.ENGLISH);
