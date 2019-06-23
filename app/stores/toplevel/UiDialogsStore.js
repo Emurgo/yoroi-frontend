@@ -24,7 +24,7 @@ export default class UiDialogsStore extends Store {
   }
 
   isOpen = (dialog: Function): boolean => this.activeDialog === dialog;
-  getParam = (key: any): any => this.paramsForActiveDialog[key];
+  getParam = (key: string): string => this.paramsForActiveDialog[key];
 
   countdownSinceDialogOpened = (countDownTo: number) => (
     Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
