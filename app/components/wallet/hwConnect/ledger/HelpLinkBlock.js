@@ -20,7 +20,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  progressInfo: ProgressInfo,
+  onExternalLinkClick: Function,
 |};
 
 @observer
@@ -32,10 +32,14 @@ export default class HelpLinkBlock extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const { onExternalLinkClick } = this.props;
 
     return (
       <div className={styles.component}>
-        <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.helpLinkYoroiWithLedger)}>
+        <a
+          href={intl.formatMessage(messages.helpLinkYoroiWithLedger)}
+          onClick={event => onExternalLinkClick(event)}
+        >
           {intl.formatMessage(messages.helpLinkYoroiWithLedgerText)}
           <SvgInline svg={externalLinkSVG} />
         </a>

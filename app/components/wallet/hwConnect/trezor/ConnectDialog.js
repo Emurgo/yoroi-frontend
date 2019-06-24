@@ -47,6 +47,7 @@ type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
+  onExternalLinkClick: Function,
   goBack: Function,
   submit: Function,
   cancel: Function,
@@ -65,6 +66,7 @@ export default class ConnectDialog extends Component<Props> {
       progressInfo,
       isActionProcessing,
       error,
+      onExternalLinkClick,
       goBack,
       submit,
       cancel,
@@ -143,7 +145,7 @@ export default class ConnectDialog extends Component<Props> {
         {introBlock}
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock />
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 }

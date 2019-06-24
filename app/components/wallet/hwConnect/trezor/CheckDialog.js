@@ -55,6 +55,7 @@ type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
+  onExternalLinkClick: Function,
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
@@ -73,6 +74,7 @@ export default class CheckDialog extends Component<Props> {
       progressInfo,
       isActionProcessing,
       error,
+      onExternalLinkClick,
       submit,
       cancel,
       classicTheme,
@@ -91,7 +93,10 @@ export default class CheckDialog extends Component<Props> {
           </div>
           <ul>
             <li key="1">
-              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part1Link)}>
+              <a
+                href={intl.formatMessage(messages.aboutPrerequisite1Part1Link)}
+                onClick={event => onExternalLinkClick(event)}
+              >
                 {intl.formatMessage(messages.aboutPrerequisite1Part1Text) + ' '}
                 <SvgInline svg={externalLinkSVG} />
               </a>
@@ -132,7 +137,7 @@ export default class CheckDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock />
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 }
