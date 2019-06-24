@@ -22,12 +22,12 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   localizedTermsOfUse: string,
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 type State = {
   areTermsOfUseAccepted: boolean,

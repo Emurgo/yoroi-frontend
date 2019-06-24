@@ -15,6 +15,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 import styles from './HWSendConfirmationDialog.scss';
 
@@ -24,8 +25,9 @@ type ExpectedMessages = {
   sendUsingHWButtonLabel: MessageDescriptor,
 };
 
-type Props = {
+type Props = {|
   staleTx: boolean,
+  selectedExplorer: ExplorerType,
   amount: string,
   receivers: Array<string>,
   totalAmount: string,
@@ -38,7 +40,7 @@ type Props = {
   onSubmit: void => void,
   onCancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class HWSendConfirmationDialog extends Component<Props> {
@@ -85,6 +87,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         {receivers.map((receiver, i) => (
           <ExplorableHashContainer
             key={receiver + i} // eslint-disable-line react/no-array-index-key
+            selectedExplorer={this.props.selectedExplorer}
             hash={receiver}
             light
             linkType="address"

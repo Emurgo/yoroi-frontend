@@ -82,7 +82,7 @@ const _tx = (
 });
 
 const _coin = (x: number): AdaAmount => ({
-  getCCoin: new BigNumber(x)
+  getCCoin: x.toString()
 });
 
 const _expRow = (

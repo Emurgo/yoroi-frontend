@@ -5,37 +5,29 @@ import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranc
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
 
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
-export type TransactionState = 'pending' | 'failed' | 'ok';
-export type TransactionType = 'card' | 'expend' | 'income' | 'exchange' | 'self' | 'multi';
 
-export const transactionStates: {
-  PENDING: TransactionState,
-  FAILED: TransactionState,
-  OK: TransactionState,
-} = {
+export const transactionStates = Object.freeze({
   PENDING: 'pending',
   FAILED: 'failed',
   OK: 'ok',
-};
+});
+export type TransactionState =  $Values<typeof transactionStates>;
 
-export const transactionTypes: {
-  EXPEND: TransactionType,
-  INCOME: TransactionType,
-  EXCHANGE: TransactionType,
-  SELF: TransactionType,
-  MULTI: TransactionType
-} = {
+export const transactionTypes = Object.freeze({
+  CARD: 'card',
   EXPEND: 'expend',
   INCOME: 'income',
   EXCHANGE: 'exchange',
   SELF: 'self',
-  MULTI: 'multi'
-};
+  MULTI: 'multi',
+});
+export type TransactionDirectionType = $Values<typeof transactionTypes>;
+
 
 export default class WalletTransaction {
 
   @observable id: string = '';
-  @observable type: TransactionType;
+  @observable type: TransactionDirectionType;
   @observable title: string = '';
   @observable amount: BigNumber; // fee included
   @observable fee: BigNumber;
@@ -47,7 +39,7 @@ export default class WalletTransaction {
 
   constructor(data: {
     id: string,
-    type: TransactionType,
+    type: TransactionDirectionType,
     title: string,
     amount: BigNumber,
     fee: BigNumber,

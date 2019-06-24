@@ -55,14 +55,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class CheckDialog extends Component<Props> {
@@ -82,12 +82,8 @@ export default class CheckDialog extends Component<Props> {
       classicTheme,
     } = this.props;
 
-    const middleBlockClasses = classicTheme
-      ? classnames([styles.middleBlockClassic, styles.middleCheckBlockClassic])
-      : classnames([styles.middleBlock, styles.middleCheckBlock]);
-
     const middleBlock = (
-      <div className={middleBlockClasses}>
+      <div className={classnames([styles.middleBlock, styles.component])}>
         {!classicTheme && <SvgInline svg={aboutTrezorSvg} />}
 
         <div className={styles.prerequisiteBlock}>
@@ -141,7 +137,7 @@ export default class CheckDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock progressInfo={progressInfo} />
+        <HelpLinkBlock />
       </Dialog>);
   }
 }

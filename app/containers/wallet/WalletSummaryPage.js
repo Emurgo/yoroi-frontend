@@ -68,6 +68,7 @@ export default class WalletSummaryPage extends Component<Props> {
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
+            selectedExplorer={this.props.stores.profile.selectedExplorer}
             isLoadingTransactions={recentTransactionsRequest.isExecuting}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
@@ -113,6 +114,7 @@ export default class WalletSummaryPage extends Component<Props> {
             error={exportError}
             submit={exportTransactionsToFile.trigger}
             cancel={closeExportTransactionDialog.trigger}
+            classicTheme={profile.isClassicTheme}
           />
         ) : null}
 

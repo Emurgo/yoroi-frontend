@@ -45,13 +45,13 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
   onPaperConfirm: Function,
   onMasterKeyConfirm: Function,
   disableTransferFunds: boolean,
-};
+|};
 
 @observer
 export default class TransferInstructionsPage extends Component<Props> {

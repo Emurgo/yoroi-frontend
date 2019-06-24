@@ -16,6 +16,8 @@ import { pickDOMProps } from 'react-polymorph/lib/utils/props';
 
 import styles from './InputOwnSkin.scss';
 
+// This type should be kept open (not "exact") because it is a react-polymorph skin
+// and should be able to pass any extra properties from react-polymorph down.
 type Props = {
   className?: ?string,
   disabled?: boolean,

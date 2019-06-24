@@ -28,7 +28,8 @@ import saveErrorSVG from '../../../../assets/images/hardware-wallet/trezor/save-
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import { isValidWalletName } from '../../../../utils/validations';
 
-import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { StepState } from '../../../widgets/ProgressSteps';
 
 import { Logger } from '../../../../utils/logging';
 
@@ -45,7 +46,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   error: ?LocalizableError,
   isActionProcessing: boolean,
@@ -53,7 +54,7 @@ type Props = {
   submit: Function,
   cancel: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class SaveDialog extends Component<Props> {
@@ -63,7 +64,8 @@ export default class SaveDialog extends Component<Props> {
 
   form: typeof ReactToolboxMobxForm;
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     const { intl } = this.context;
     const { defaultWalletName } = this.props;
 
@@ -100,15 +102,9 @@ export default class SaveDialog extends Component<Props> {
       styles.walletName,
     ]);
     const walletNameField = this.form.$('walletName');
-    const headerBlockClasses = classicTheme
-      ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
-      : classnames([headerMixin.headerBlock, styles.headerSaveBlock]);
-
-    const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
-    const middleBlockErrorClasses = classicTheme ? styles.middleSaveErrorBlockClassic : null;
 
     const walletNameBlock = (
-      <div className={headerBlockClasses}>
+      <div className={classnames([headerMixin.headerBlock, styles.headerSaveBlock])}>
         <div className={styles.walletNameInfoWrapper}>
           <div className={styles.walletNameInfoIcon}>
             <SvgInline svg={infoIconSVG} width="20" height="20" />
@@ -132,19 +128,19 @@ export default class SaveDialog extends Component<Props> {
     switch (progressInfo.stepState) {
       case StepState.LOAD:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleSaveLoadBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
             <SvgInline svg={classicTheme ? saveLoadSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleSaveStartProcessBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
             <SvgInline svg={classicTheme ? saveStartSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, middleBlockErrorClasses])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
             <SvgInline svg={classicTheme ? saveErrorSVG : saveErrorImage} />
           </div>);
         break;
@@ -175,7 +171,7 @@ export default class SaveDialog extends Component<Props> {
         {walletNameBlock}
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <HelpLinkBlock />
       </Dialog>);
   }
 

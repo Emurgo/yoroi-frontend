@@ -1,25 +1,34 @@
+// @flow
 import React, { Component } from 'react';
 import _ from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import type { Node } from 'react';
+import type { Node, Element } from 'react';
 import { Modal } from 'react-polymorph/lib/components/Modal';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
-type Props = {
+type ActionType = {
+  label: string,
+  onClick: Function,
+  primary?: boolean,
+  disabled?: boolean,
+  className?: ?string
+};
+
+type Props = {|
   title?: string,
   children?: Node,
-  actions?: Node,
-  closeButton?: Node,
+  actions?: Array<ActionType>,
+  closeButton?: Element<any>,
   backButton?: Node,
   className?: string,
-  onClose?: Function,
+  onClose?: ?Function,
   closeOnOverlayClick?: boolean,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class Dialog extends Component<Props> {

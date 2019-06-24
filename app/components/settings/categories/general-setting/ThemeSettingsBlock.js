@@ -9,7 +9,6 @@ import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../themes';
 import type { Theme } from '../../../../themes';
 import ThemeThumbnail from '../display/ThemeThumbnail';
-import environment from '../../../../environment';
 
 const messages = defineMessages({
   themeLabel: {
@@ -50,14 +49,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   currentTheme: Theme,
   selectTheme: Function,
   exportTheme: Function,
   getThemeVars: Function,
   hasCustomTheme: Function,
   onExternalLinkClick: Function,
-};
+|};
 
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
@@ -113,25 +112,22 @@ export default class ThemeSettingsBlock extends Component<Props> {
 
         <div className={styles.main}>
           <div className={styles.themesWrapper}>
-            {!environment.isMainnet() && // a second theme to allow testing switching themes
-              (
-                <button
-                  type="button"
-                  className={themeYoroiModernClasses}
-                  onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
-                >
-                  {(currentTheme === THEMES.YOROI_MODERN
-                    && hasCustomTheme() &&
-                      <div className={styles.themeWarning}>
-                        {intl.formatMessage(messages.themeWarning)}
-                      </div>)
-                  }
-                  <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
-                  <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
-                </button>
-              )
-            }
-            {/* @Todo: Theme Preview Enumeration should be more dynamic? */}
+            {/* Modern Theme */}
+            <button
+              type="button"
+              className={themeYoroiModernClasses}
+              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
+            >
+              {(currentTheme === THEMES.YOROI_MODERN
+                && hasCustomTheme() &&
+                  <div className={styles.themeWarning}>
+                    {intl.formatMessage(messages.themeWarning)}
+                  </div>)
+              }
+              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
+              <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
+            </button>
+            {/* Classic Theme */}
             <button
               type="button"
               className={themeYoroiClassicClasses}

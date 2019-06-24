@@ -9,6 +9,10 @@ import { THEMES } from '../../themes';
 import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
+import type { ExplorerType } from '../../domain/Explorer';
+import type {
+  GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
+} from '../../api/ada';
 
 export default class ProfileStore extends Store {
 
@@ -39,7 +43,6 @@ export default class ProfileStore extends Store {
     fractionGroupSize: 0
   };
 
-  /* eslint-disable max-len */
   @observable getProfileLocaleRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getUserLocale);
 
@@ -73,10 +76,15 @@ export default class ProfileStore extends Store {
   @observable setLastLaunchVersionRequest: Request<string => Promise<void>>
     = new Request<string => Promise<void>>(this.api.localStorage.setLastLaunchVersion);
 
-  /* eslint-enable max-len */
+  @observable getSelectedExplorerRequest: Request<GetSelectedExplorerFunc>
+    = new Request<GetSelectedExplorerFunc>(this.api.ada.getSelectedExplorer);
+
+  @observable setSelectedExplorerRequest: Request<SaveSelectedExplorerFunc>
+    = new Request<SaveSelectedExplorerFunc>(this.api.ada.saveSelectedExplorer);
 
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
+    this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
@@ -154,6 +162,11 @@ export default class ProfileStore extends Store {
   // ========== Current/Custom Theme ========== //
 
   @computed get currentTheme(): Theme {
+    // TODO: Tests were written for the old theme so we need to use it for testing
+    if (environment.isTest()) {
+      return THEMES.YOROI_CLASSIC;
+    }
+
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet && result) {
       // verify content is an actual theme
@@ -162,11 +175,9 @@ export default class ProfileStore extends Store {
         return result;
       }
     }
-    // TODO: We temporarily disable the new theme on mainnet until it's ready
-    // TODO: Tests were written for the old theme so we need to use it for testing
-    return (environment.isMainnet() || environment.isTest()) ?
-      THEMES.YOROI_CLASSIC :
-      THEMES.YOROI_MODERN;
+
+    // THEMES.YOROI_MODERN is the default theme
+    return THEMES.YOROI_MODERN;
   }
 
   @computed get isModernTheme(): boolean {
@@ -284,6 +295,25 @@ export default class ProfileStore extends Store {
     return (
       this.getLastLaunchVersionRequest.wasExecuted &&
       this.getLastLaunchVersionRequest.result !== null
+    );
+  }
+
+  // ========== Selected Explorer ========== //
+
+  @computed get selectedExplorer(): ExplorerType {
+    const { result } = this.getSelectedExplorerRequest.execute();
+    return result || 'seiza';
+  }
+
+  setSelectedExplorer = async ({ explorer }: { explorer: ExplorerType }) => {
+    await this.setSelectedExplorerRequest.execute({ explorer });
+    await this.getSelectedExplorerRequest.execute(); // eagerly cache
+  };
+
+  @computed get hasLoadedSelectedExplorer(): boolean {
+    return (
+      this.getSelectedExplorerRequest.wasExecuted &&
+      this.getSelectedExplorerRequest.result !== null
     );
   }
 

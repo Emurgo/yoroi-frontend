@@ -93,7 +93,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   currencyUnit: string,
   currencyMaxIntegerDigits: number,
   currencyMaxFractionalDigits: number,
@@ -101,7 +101,7 @@ type Props = {
   validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
   onSubmit: void => void,
   addressValidator: Function,
-  totalInput: BigNumber,
+  totalInput: ?BigNumber,
   classicTheme: boolean,
   updateReceiver: (void | string) => void,
   updateAmount: (void | number) => void,
@@ -111,7 +111,7 @@ type Props = {
   isCalculatingFee: boolean,
   reset: void => void,
   error: ?LocalizableError,
-};
+|};
 
 @observer
 export default class WalletSendForm extends Component<Props> {
@@ -135,12 +135,14 @@ export default class WalletSendForm extends Component<Props> {
         if (!this.props.totalInput || !this.props.fee) {
           return;
         }
+        const totalInput = this.props.totalInput;
+        const fee = this.props.fee;
         if (!this.props.shouldSendAll) {
           return;
         }
         // once sendAll is triggered, set the amount field to the total input
         this.form.$('amount').set('value', formattedWalletAmount(
-          this.props.totalInput.minus(this.props.fee)
+          totalInput.minus(fee)
         ));
       },
     );

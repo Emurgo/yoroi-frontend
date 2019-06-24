@@ -13,6 +13,7 @@ import RawHash from '../../../widgets/hashWrappers/RawHash';
 import type { AdaPaper } from '../../../../api/ada';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../../../domain/Explorer';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -41,14 +42,15 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onCopyAddress?: Function,
+  selectedExplorer: ExplorerType,
   paper: AdaPaper,
   onNext: Function,
   onCancel: Function,
   onBack?: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class FinalizeDialog extends Component<Props> {
@@ -132,6 +134,7 @@ export default class FinalizeDialog extends Component<Props> {
             >
               <ExplorableHashContainer
                 hash={a}
+                selectedExplorer={this.props.selectedExplorer}
                 light
                 tooltipOpensUpward
                 linkType="address"

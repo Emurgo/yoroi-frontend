@@ -10,10 +10,15 @@ import actions from '../../app/actions/index';
 import Action from '../../app/actions/lib/Action';
 import App from '../../app/App';
 import '../../app/themes/index.global.scss';
+import BigNumber from 'bignumber.js';
 import { addCloseListener } from '../../app/utils/tabManager';
 
 // run MobX in strict mode
 useStrict(true);
+
+// Only throw on an invalid BigNumber value if BigNumber.DEBUG is true
+// Since Yoroi handles money, it's better to error our than proceed if an error occurs
+BigNumber.DEBUG = true;
 
 // Entry point into our application
 const initializeYoroi = async () => {

@@ -2,9 +2,9 @@
 import React, { Component } from 'react';
 import styles from './StaticTopbarTitle.scss';
 
-type Props = {
+type Props = {|
   title: string,
-};
+|};
 
 /** Static text styled for the center-text of a topbar */
 export default class StaticTopbarTitle extends Component<Props> {

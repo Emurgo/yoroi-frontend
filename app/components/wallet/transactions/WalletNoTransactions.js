@@ -6,10 +6,10 @@ import styles from './WalletNoTransactions.scss';
 import noTransactionClassicSvg from '../../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
 import noTransactionModernSvg from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 
-type Props = {
+type Props = {|
   label: string,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletNoTransactions extends Component<Props> {

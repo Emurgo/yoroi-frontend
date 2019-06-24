@@ -78,22 +78,6 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.paperPasswordLabel',
     defaultMessage: '!!!Paper wallet password',
   },
-  walletPasswordLabel: {
-    id: 'wallet.restore.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
-  },
-  passwordFieldPlaceholder: {
-    id: 'wallet.restore.dialog.passwordFieldPlaceholder',
-    defaultMessage: '!!!Spending Password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.restore.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat spending password',
-  },
-  repeatPasswordFieldPlaceholder: {
-    id: 'wallet.restore.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Repeat spending password',
-  },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',
     defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
@@ -107,7 +91,7 @@ export type WalletRestoreDialogValues = {
   paperPassword: string,
 }
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onCancel: Function,
   onBack?: Function,
@@ -123,7 +107,7 @@ type Props = {
   classicTheme: boolean,
   initValues?: WalletRestoreDialogValues,
   introMessage?: string,
-};
+|};
 
 @observer
 export default class WalletRestoreDialog extends Component<Props> {
@@ -211,8 +195,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       } : undefined,
       walletPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.walletPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
+        placeholder: this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder),
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -227,8 +211,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       },
       repeatPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
+        label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
+        placeholder: this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder),
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -299,11 +283,6 @@ export default class WalletRestoreDialog extends Component<Props> {
       'WalletRestoreDialog',
     ]);
 
-    const walletNameFieldClasses = classnames([
-      'walletName',
-      classicTheme ? styles.walletNameClassic : styles.walletName,
-    ]);
-
     const paperPasswordFieldClasses = classnames([
       'paperPassword',
       styles.paperPassword,
@@ -313,10 +292,6 @@ export default class WalletRestoreDialog extends Component<Props> {
       styles.walletPasswordFields,
       styles.show,
     ]);
-
-    const walletPasswordClasses = classicTheme
-      ? styles.walletPasswordClassic
-      : styles.walletPassword;
 
     const validatePaperPassword = () => {
       let condition = isValidWalletPassword(paperPassword);
@@ -390,7 +365,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           />
         ) : (
           <Input
-            className={walletNameFieldClasses}
+            className={styles.walletName}
             inputRef={(input) => { this.walletNameInput = input; }}
             {...walletNameField.bind()}
             done={isValidWalletName(walletName)}
@@ -412,7 +387,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         />
 
         {showPaperPassword ? (
-          <div className={walletPasswordClasses}>
+          <div className={styles.walletPassword}>
             <div className={paperPasswordFieldClasses}>
               {isVerificationMode ? '' : (
                 <div className={headerBlockClasses}>
@@ -431,7 +406,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         ) : ''}
 
         {isVerificationMode ? '' : (
-          <div className={walletPasswordClasses}>
+          <div className={styles.walletPassword}>
             <div className={walletPasswordFieldsClasses}>
               <Input
                 className="walletPassword"

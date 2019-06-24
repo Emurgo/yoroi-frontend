@@ -49,11 +49,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onCancel: Function,
   classicTheme: boolean
-};
+|};
 
 type State = {
   isSubmitting: boolean,

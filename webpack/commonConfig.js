@@ -52,11 +52,21 @@ const rules = [
     test: /\.css$/,
     use: [
       'style-loader',
-      'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+      {
+        loader: 'css-loader',
+        options: {
+          importLoaders: 1,
+          sourceMap: true,
+          modules: {
+            mode: 'local',
+            localIdentName: '[name]__[local]___[hash:base64:5]',
+          }
+        },
+      },
       {
         loader: 'postcss-loader',
         options: {
-          plugins: () => [autoprefixer]
+          plugins: () => [autoprefixer],
         }
       }
     ]
@@ -65,7 +75,15 @@ const rules = [
     test: /\.global\.scss$/,
     use: [
       'style-loader?sourceMap',
-      'css-loader?sourceMap',
+      {
+        loader: 'css-loader',
+        options: {
+          sourceMap: true,
+          modules: {
+            mode: 'global',
+          },
+        },
+      },
       'sass-loader?sourceMap'
     ]
   },
@@ -73,7 +91,17 @@ const rules = [
     test: /^((?!\.global).)*\.scss$/,
     use: [
       'style-loader?sourceMap',
-      'css-loader?sourceMap&modules&localIdentName=[name]_[local]&importLoaders=1',
+      {
+        loader: 'css-loader',
+        options: {
+          importLoaders: 1,
+          sourceMap: true,
+          modules: {
+            mode: 'local',
+            localIdentName: '[name]_[local]',
+          }
+        },
+      },
       'sass-loader?sourceMap'
     ]
   },
@@ -124,7 +152,8 @@ const resolve = {
 const definePlugin = (networkName) => ({
   'process.env': {
     NODE_ENV: JSON.stringify(networkName),
-    COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim())
+    COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
+    BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim())
   }
 });
 

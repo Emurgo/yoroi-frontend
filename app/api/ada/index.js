@@ -11,7 +11,7 @@ import WalletTransaction, {
   transactionTypes
 } from '../../domain/WalletTransaction';
 import type {
-  TransactionType
+  TransactionDirectionType
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA, HARD_DERIVATION_START } from '../../config/numbersConfig';
@@ -89,14 +89,19 @@ import {
   getLastReceiveAddressIndex,
   getCurrentAccountIndex,
   getCurrentCryptoAccount,
+  getSelectedExplorer,
   getWalletMasterKey,
   saveCryptoAccount,
   saveLastReceiveAddressIndex,
+  saveSelectedExplorer,
   createStoredWallet,
 } from './lib/storage/adaLocalStorage';
 import type {
-  CryptoAccount
+  CryptoAccount,
 } from './lib/storage/adaLocalStorage';
+import type {
+  ExplorerType,
+} from '../../domain/Explorer';
 import LocalStorageApi from '../localStorage/index';
 import {
   getPendingTxs,
@@ -375,6 +380,24 @@ export type SaveTxResponse = void;
 export type SaveTxFunc = (
   request: SaveTxRequest
 ) => Promise<SaveTxResponse>;
+
+// getSelectedExplorer
+
+export type GetSelectedExplorerRequest = void;
+export type GetSelectedExplorerResponse = ExplorerType;
+export type GetSelectedExplorerFunc = (
+  request: GetSelectedExplorerRequest
+) => Promise<GetSelectedExplorerResponse>;
+
+// saveSelectedExplorer
+
+export type SaveSelectedExplorerRequest = {
+  explorer: ExplorerType,
+};
+export type SaveSelectedExplorerResponse = void;
+export type SaveSelectedExplorerFunc = (
+  request: SaveSelectedExplorerRequest
+) => Promise<SaveSelectedExplorerResponse>;
 
 // isValidAddress
 
@@ -739,8 +762,14 @@ export default class AdaApi {
     const { password, signRequest } = request;
     try {
       const masterKey = getWalletMasterKey();
+      if (masterKey == null) {
+        throw new Error('No master key stored');
+      }
       const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
       const currAccount = getCurrentAccountIndex();
+      if (currAccount == null) {
+        throw new Error('no account selected');
+      }
       const accountPrivateKey = cryptoWallet.bip44_account(
         RustModule.Wallet.AccountIndex.new(currAccount | HARD_DERIVATION_START)
       );
@@ -967,6 +996,30 @@ export default class AdaApi {
     }
   }
 
+  async getSelectedExplorer(
+    _request: GetSelectedExplorerRequest
+  ): Promise<GetSelectedExplorerResponse> {
+    Logger.debug('AdaApi::getSelectedExplorer called');
+    try {
+      return getSelectedExplorer();
+    } catch (error) {
+      Logger.error('AdaApi::getSelectedExplorer error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async saveSelectedExplorer(
+    request: SaveSelectedExplorerRequest
+  ): Promise<SaveSelectedExplorerResponse> {
+    Logger.debug('AdaApi::saveSelectedExplorer called');
+    try {
+      saveSelectedExplorer(request.explorer);
+    } catch (error) {
+      Logger.error('AdaApi::saveSelectedExplorer error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
   isValidAddress(
     request: IsValidAddressRequest
   ): Promise<IsValidAddressResponse> {
@@ -1062,7 +1115,8 @@ export default class AdaApi {
       );
 
       Logger.debug('AdaApi::restoreWallet success');
-      return _createWalletFromServerData(adaWallet);
+      const account = getCurrentCryptoAccount();
+      return _createWalletFromServerData(adaWallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::restoreWallet error: ' + stringifyError(error));
       // TODO: backend will return something different here, if multiple wallets
@@ -1094,6 +1148,7 @@ export default class AdaApi {
     try {
       const wallet: ?AdaWallet = await updateAdaWalletMetaParams(walletMeta);
       if (!wallet) throw new Error('not persistent wallet');
+
       Logger.debug('AdaApi::updateWalletMeta success: ' + stringifyData(wallet));
       const account = getCurrentCryptoAccount();
       return _createWalletFromServerData(wallet, [account]);
@@ -1175,7 +1230,8 @@ export default class AdaApi {
       );
 
       Logger.debug('AdaApi::createHardwareWallet success');
-      return _createWalletFromServerData(hardwareWallet);
+      const account = getCurrentCryptoAccount();
+      return _createWalletFromServerData(hardwareWallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::createHardwareWallet error: ' + stringifyError(error));
 
@@ -1278,7 +1334,7 @@ export default class AdaApi {
 
   redeemAda = async (
     request: RedeemAdaRequest
-  ): RedeemAdaResponse => {
+  ): Promise<RedeemAdaResponse> => {
     Logger.debug('AdaApi::redeemAda called');
     try {
       const transactionAmount = await redeemAda(request);
@@ -1295,7 +1351,7 @@ export default class AdaApi {
 
   redeemPaperVendedAda = async (
     request: RedeemPaperVendedAdaRequest
-  ): RedeemPaperVendedAdaResponse => {
+  ): Promise<RedeemPaperVendedAdaResponse> => {
     Logger.debug('AdaApi::redeemAdaPaperVend called');
     try {
       const transactionAmount = await redeemPaperVendedAda(request);
@@ -1329,7 +1385,7 @@ export default class AdaApi {
 async function _getTxFinancialInfo(
   data: AdaTransaction
 ): Promise<{
-  type: TransactionType,
+  type: TransactionDirectionType,
   amount: BigNumber,
   fee: BigNumber
 }> {
@@ -1450,7 +1506,7 @@ const _conditionToTxState = (condition: AdaTransactionCondition) => {
 
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
-  (data: AdaTransaction, type: TransactionType, amount: BigNumber, fee: BigNumber) => {
+  (data: AdaTransaction, type: TransactionDirectionType, amount: BigNumber, fee: BigNumber) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,

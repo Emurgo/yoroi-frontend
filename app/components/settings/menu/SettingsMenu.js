@@ -35,13 +35,13 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
   currentLocale: string,
   currentTheme: Theme,
-};
+|};
 
 @observer
 export default class SettingsMenu extends Component<Props> {

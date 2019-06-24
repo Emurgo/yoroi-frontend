@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import FooterItem from '../../components/footer/FooterItem';
 import HorizontalFlexContainer from '../../components/layout/HorizontalFlexContainer';
@@ -41,7 +42,7 @@ const messages = defineMessages({
  * re-enable when new design is ready and if it's still needed
  * if it's not needed in new design,
  * then delete this as well as it's assets and translations */
-export default class AddWalletFooter extends Component {
+export default class AddWalletFooter extends Component<{}> {
 
   render() {
     return (

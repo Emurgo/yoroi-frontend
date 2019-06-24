@@ -1,7 +1,6 @@
 // @flow
 import { observable, computed, action, extendObservable } from 'mobx';
 import _ from 'lodash';
-import BigNumber from 'bignumber.js';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
@@ -154,12 +153,15 @@ export default class TransactionsStore extends Store {
 
           const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate();
           // Note: cache based on lastUpdateDate even though it's not used in balanceRequest
-          return this._getBalanceRequest(wallet.id).execute({
+          const req = this._getBalanceRequest(wallet.id);
+          req.execute({
             date: lastUpdateDate,
             getUTXOsSumsForAddresses: stateFetcher.getUTXOsSumsForAddresses,
           });
+          if (!req.promise) throw new Error('should never happen');
+          return req.promise;
         })
-        .then((updatedBalance: BigNumber) => {
+        .then((updatedBalance) => {
           if (walletsStore.active && walletsStore.active.id === wallet.id) {
             walletsActions.updateBalance.trigger(updatedBalance);
           }

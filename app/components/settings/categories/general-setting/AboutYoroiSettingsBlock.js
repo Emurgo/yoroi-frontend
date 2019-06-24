@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
@@ -14,6 +15,9 @@ import mediumSvg from '../../../../assets/images/social/medium.inline.svg';
 
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
+import RawHash from '../../../widgets/hashWrappers/RawHash';
+import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
+import { handleExternalLinkClick } from '../../../../utils/routing';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -60,6 +64,10 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.commitLabel',
     defaultMessage: '!!!Commit:',
   },
+  branchLabel: {
+    id: 'settings.general.aboutYoroi.git.branch',
+    defaultMessage: '!!!Branch:',
+  },
 });
 
 const socialMediaLinks = [{
@@ -67,7 +75,7 @@ const socialMediaLinks = [{
   svg: twitterSvg,
   message: messages.aboutYoroiTwitter
 }, {
-  svgClassName: styles.yoroiLogo,
+  svgClass: styles.yoroiLogo,
   url: 'https://yoroi-wallet.com',
   svg: yoroiSvg,
   message: messages.aboutYoroiWebsite
@@ -93,8 +101,10 @@ const socialMediaLinks = [{
   message: messages.aboutYoroiGithub
 }];
 
+const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
+
 @observer
-export default class AboutYoroiSettingsBlock extends Component {
+export default class AboutYoroiSettingsBlock extends Component<{}> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -106,18 +116,53 @@ export default class AboutYoroiSettingsBlock extends Component {
       <div className={styles.component}>
         <h2>{intl.formatMessage(messages.aboutYoroiLabel)}</h2>
 
-        <p>
-          {intl.formatMessage(messages.versionLabel)}&nbsp;
-          {environment.version}
-        </p>
-        <p>
+        <p className={styles.aboutLine}>
           {intl.formatMessage(messages.networkLabel)}&nbsp;
           {environment.NETWORK}
         </p>
-        <p>
+        <div className={styles.aboutLine}>
+          {intl.formatMessage(messages.versionLabel)}&nbsp;
+          <ExplorableHash
+            websiteName="Github"
+            url={baseGithubUrl + 'releases/'}
+            light={false}
+            arrowRelativeToTip={false /* branch name may be too small otherwise */}
+            onExternalLinkClick={handleExternalLinkClick}
+          >
+            <RawHash light={false}>
+              {environment.version}
+            </RawHash>
+          </ExplorableHash>
+        </div>
+        <div className={styles.aboutLine}>
           {intl.formatMessage(messages.commitLabel)}&nbsp;
-          {environment.commit}
-        </p>
+          <ExplorableHash
+            websiteName="Github"
+            url={baseGithubUrl + 'commit/' + environment.commit}
+            light={false}
+            onExternalLinkClick={handleExternalLinkClick}
+          >
+            <RawHash light={false}>
+              {environment.commit}
+            </RawHash>
+          </ExplorableHash>
+        </div>
+        {!environment.isMainnet() &&
+          <div className={styles.aboutLine}>
+            {intl.formatMessage(messages.branchLabel)}&nbsp;
+            <ExplorableHash
+              websiteName="Github"
+              url={baseGithubUrl + 'tree/' + environment.branch}
+              light={false}
+              arrowRelativeToTip={false /* branch name may be too small otherwise */}
+              onExternalLinkClick={handleExternalLinkClick}
+            >
+              <RawHash light={false}>
+                {environment.branch}
+              </RawHash>
+            </ExplorableHash>
+          </div>
+        }
         <div className={styles.aboutScoial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>
             {socialMediaLinks.map(link => (

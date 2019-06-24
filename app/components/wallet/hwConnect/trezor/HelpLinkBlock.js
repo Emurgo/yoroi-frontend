@@ -5,7 +5,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 
 import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
-import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import styles from '../common/HelpLinkBlock.scss';
 
 const messages = defineMessages({
@@ -19,9 +18,8 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
-  progressInfo: ProgressInfo,
-};
+type Props = {|
+|};
 
 @observer
 export default class HelpLinkBlock extends Component<Props> {

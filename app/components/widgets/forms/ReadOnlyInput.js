@@ -10,13 +10,13 @@ import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import editSvg from '../../../assets/images/edit.inline.svg';
 import styles from './ReadOnlyInput.scss';
 
-type Props = {
+type Props = {|
   label: string,
   value: string,
   isSet: boolean,
   onClick: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class ReadOnlyInput extends Component<Props> {

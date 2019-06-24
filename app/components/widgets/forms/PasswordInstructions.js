@@ -1,11 +1,13 @@
+// @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import styles from './PasswordInstructions.scss';
-import { defineMessages, intlShape, MessageDescriptor } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 
-type Props = {
+type Props = {|
   instructionDescriptor?: MessageDescriptor
-};
+|};
 
 const messages = defineMessages({
   passwordInstructions: {

@@ -17,7 +17,7 @@ export default class AdaRedemptionActions {
   redeemAda: Action<{ walletId: string }> = new Action();
   // eslint-disable-next-line max-len
   redeemPaperVendedAda: Action<{ walletId: string, shieldedRedemptionKey: string }> = new Action();
-  adaSuccessfullyRedeemed: Action<{ walletId: string, amount: number }> = new Action();
+  adaSuccessfullyRedeemed: Action<{ walletId: string, amount: string }> = new Action();
   acceptRedemptionDisclaimer: Action<void> = new Action();
   closeAdaRedemptionSuccessOverlay: Action<void> = new Action();
 }

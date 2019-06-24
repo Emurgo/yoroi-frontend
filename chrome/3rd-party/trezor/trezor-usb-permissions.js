@@ -1,6 +1,9 @@
+// @flow
 /*
 Handling messages from usb permissions iframe
 */
+
+declare var chrome; // TODO: no type for chrome
 
 const switchToPopupTab = (event) => {
     window.removeEventListener('beforeunload', switchToPopupTab);
@@ -37,6 +40,9 @@ const switchToPopupTab = (event) => {
 window.addEventListener('message', event => {
     if (event.data === 'usb-permissions-init') {
         const iframe = document.getElementById('trezor-usb-permissions');
+        if (!iframe || !(iframe instanceof HTMLIFrameElement)) {
+            throw new Error('trezor-usb-permissions missing or incorrect dom type');
+        }
         iframe.contentWindow.postMessage({
             type: 'usb-permissions-init',
             extension: chrome.runtime.id,
