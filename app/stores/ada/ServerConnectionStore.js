@@ -25,7 +25,7 @@ export default class ServerConnectionStore extends Store {
     try {
       const response: ServerStatusResponse = await checkServerStatusFunc();
       runInAction('refresh server status', () => {
-        this.serverStatus = 'server'; // TODO: use response.status;
+        this.serverStatus = response.status === true ? null : 'server';
       });
     } catch (err) {
       runInAction('refresh server status', () => {
