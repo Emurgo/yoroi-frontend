@@ -8,6 +8,7 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import styles from './ServerErrorBanner.scss';
 import environment from '../../../environment';
 import warningSvg from '../../../assets/images/warning.inline.svg';
+import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
 
 const messages = defineMessages({
   serverErrorLabel: {
@@ -20,10 +21,8 @@ const messages = defineMessages({
   },
 });
 
-export type ErrorType = 'server' | 'network';
-
 type Props = {
-  errorType: ?ErrorType,
+  errorType: ?ServerStatusErrorType,
 };
 
 

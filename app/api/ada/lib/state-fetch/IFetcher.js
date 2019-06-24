@@ -6,7 +6,8 @@ import type {
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
-  FilterUsedRequest, FilterUsedResponse
+  FilterUsedRequest, FilterUsedResponse,
+  ServerStatusResponse
 } from './types';
 
 export interface IFetcher {
@@ -15,5 +16,6 @@ export interface IFetcher {
   getUTXOsSumsForAddresses(body: UtxoSumRequest): Promise<UtxoSumResponse>;
   getTransactionsHistoryForAddresses(body: HistoryRequest): Promise<HistoryResponse>;
   sendTx(body: SignedRequest): Promise<SignedResponse>;
-  checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>
+  checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
+  checkServerStatus(): Promise<ServerStatusResponse>;
 }

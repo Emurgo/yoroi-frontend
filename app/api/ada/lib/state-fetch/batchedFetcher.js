@@ -8,11 +8,13 @@ import type {
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
+  ServerStatusResponse,
   AddressUtxoFunc,
   FilterFunc,
   HistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
+  ServerStatusFunc,
 } from './types';
 
 import type {
@@ -79,6 +81,10 @@ export class BatchedFetcher implements IFetcher {
 
   checkAddressesInUse = (body: FilterUsedRequest): Promise<FilterUsedResponse> => (
     batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
+  )
+
+  checkServerStatus = (): Promise<ServerStatusResponse> => (
+    this.baseFetcher.checkServerStatus()
   )
 }
 
