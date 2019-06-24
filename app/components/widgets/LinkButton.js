@@ -10,7 +10,8 @@ type Props = {|
   svg: string,
   message: MessageDescriptor,
   svgClass?: string,
-  textClassName: string
+  textClassName: string,
+  onExternalLinkClick: Function,
 |};
 
 export default class LinkButton extends Component<Props> {
@@ -24,15 +25,21 @@ export default class LinkButton extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { url, svg, message, svgClass, textClassName } = this.props;
+    const {
+      url,
+      svg,
+      message,
+      svgClass,
+      textClassName,
+      onExternalLinkClick
+    } = this.props;
 
     return (
       <div className={styles.component}>
         {
           <a
             href={url}
-            target="_blank"
-            rel="noopener noreferrer"
+            onClick={event => onExternalLinkClick(event)}
             className={styles.block}
             title={intl.formatMessage(message)}
           >

@@ -1,7 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+
 import FooterItem from '../../components/footer/FooterItem';
 import HorizontalFlexContainer from '../../components/layout/HorizontalFlexContainer';
+
+import { handleExternalLinkClick } from '../../utils/routing';
 
 import buyTrezorSvg from '../../assets/images/footer/buy-trezor.inline.svg';
 import howCreateWalletSvg from '../../assets/images/footer/how-to-create-wallet.inline.svg';
@@ -51,31 +54,37 @@ export default class AddWalletFooter extends Component<{}> {
           url="https://yoroi-wallet.com/get-trezor"
           svg={buyTrezorSvg}
           message={messages.buyTrezorHardwareWallet}
+          onExternalLinkClick={handleExternalLinkClick}
         />
         <FooterItem
           url="https://yoroi-wallet.com/get-ledger"
           svg={buyTrezorSvg}
           message={messages.buyLedgerHardwareWallet}
+          onExternalLinkClick={handleExternalLinkClick}
         />
         <FooterItem
           url="https://youtu.be/9jg8lsreIQ8?t=56"
           svg={howCreateWalletSvg}
           message={messages.howToCreateWallet}
+          onExternalLinkClick={handleExternalLinkClick}
         />
         <FooterItem
           url="https://youtu.be/PKKWgTNKSks?t=14"
           svg={howRestoreWalletSvg}
           message={messages.howToRestoreWallet}
+          onExternalLinkClick={handleExternalLinkClick}
         />
         <FooterItem
           url="https://medium.com/@emurgo_io/whats-a-hardware-wallet-b3605a026008"
           svg={whatIsHardwareWalletSvg}
           message={messages.whatIsHardwareWallet}
+          onExternalLinkClick={handleExternalLinkClick}
         />
         <FooterItem
           url="https://youtu.be/Dp0wXwtToX0"
           svg={howConnetTrezorSvg}
           message={messages.howToConnectTrezor}
+          onExternalLinkClick={handleExternalLinkClick}
         />
       </HorizontalFlexContainer>
     );
