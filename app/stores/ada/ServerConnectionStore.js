@@ -1,37 +1,36 @@
 // @flow
 
-import { computed } from 'mobx';
+import { action, observable, computed, runInAction } from 'mobx';
 import Store from '../base/Store';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import environment from '../../environment';
-import { ServerStatusError } from '../../api/ada/errors';
+import type { ServerStatusResponse } from '../../api/ada/lib/state-fetch/types';
 
 export default class ServerConnectionStore extends Store {
   SERVER_STATUS_REFRESH_INTERVAL = 20000;
   // TODO: set using environment.serverStatusRefreshInterval;
+  @observable serverStatus: ?ServerStatusErrorType = null;
 
   setup() {
     setInterval(this._checkServerStatus, this.SERVER_STATUS_REFRESH_INTERVAL);
   }
 
-  @computed get checkAdaServerStatus(): ServerStatusErrorType {
-    return this._checkServerStatus();
+  @computed get checkAdaServerStatus(): ?ServerStatusErrorType {
+    return this.serverStatus;
   }
 
-  async _checkServerStatus(): ServerStatusErrorType {
+  @action _checkServerStatus = async (): Promise<Void> => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const checkServerStatusFunc = stateFetcher.checkServerStatus;
     try {
-      const serverStatus = await checkServerStatusFunc();
-      return serverStatus.status === false ? 'server' : null;
-      // I'm having an error here because flow is considering serverStatus
-      // as a Promise yet and not as the object returned by the GET.
+      const response: ServerStatusResponse = await checkServerStatusFunc();
+      runInAction('refresh server status', () => {
+        this.serverStatus = 'server'; // TODO: use response.status;
+      });
     } catch (err) {
-      if (err instanceof ServerStatusError) {
-        return 'network';
-        // Same here as line 27.
-      }
-      throw new Error('Unexpected Error');
+      runInAction('refresh server status', () => {
+        this.serverStatus = 'network';
+      });
     }
   }
 }
