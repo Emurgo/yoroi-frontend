@@ -13,6 +13,6 @@ export type InjectedContainerProps = InjectedProps & {
 };
 
 export type InjectedDialogContainerProps = InjectedContainerProps & {
-  onClose: Function,
+  onClose: void => void,
   classicTheme: boolean
 };

@@ -3,7 +3,7 @@
 
 // $FlowFixMe require.context comes from webpack
 const req = require.context('./locales', true, /\.json.*$/);
-const translations: { [key: string]: any} = {};
+const translations: { [locale: string]: { [key: string]: string } } = {};
 
 req.keys().forEach((file) => {
   const locale = file.replace('./', '').replace('.json', '');

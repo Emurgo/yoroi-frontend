@@ -289,7 +289,7 @@ const _getAddressesIn = (
 /** Create a row containing an transaction that can be then added to the TxsTable */
 const _txToRow = (
   tx: AdaTransaction
-) => {
+) : TxsTableRow => {
   const newRow: TxsTableRow =
   {
     id: tx.ctId,
@@ -305,7 +305,7 @@ const _txToRow = (
 const _addressToRow = (
   address: AdaAddress,
   type: AddressType
-) => {
+) : AddressesTableRow => {
   const newRow: AddressesTableRow =
   {
     id: address.cadId,
@@ -317,7 +317,7 @@ const _addressToRow = (
 
 /* Helper functions */
 
-const _insertOrReplaceQuery = (rows: Array<any>, table) => (
+const _insertOrReplaceQuery = (rows: Array<AddressesTableRow|TxsTableRow>, table) => (
   db.insertOrReplace().into(table).values(rows)
 );
 
