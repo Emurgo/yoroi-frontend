@@ -28,31 +28,29 @@ const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefox
 
 function getBraveBuilder() {
   return new Builder()
-    .withCapabilities({
-      chromeOptions: {
-        args: [
-          'start-maximized'
-        ]
-      }
-    })
     .forBrowser('chrome')
     .setChromeOptions(new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
-      .addArguments('--start-maximized', '--disable-setuid-sandbox', '--no-sandbox')
+      .addArguments(
+        '--start-maximized',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      )
       .addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
 }
 
 function getChromeBuilder() {
   return new Builder()
-    .withCapabilities({
-      chromeOptions: {
-        args: [
-          'start-maximized'
-        ]
-      }
-    })
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
+    .setChromeOptions(new chrome.Options()
+      .addExtensions(path.resolve(__dirname, '../../yoroi-test.crx'))
+      .addArguments(
+        '--start-maximized',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      ));
 }
 
 function getFirefoxBuilder() {
