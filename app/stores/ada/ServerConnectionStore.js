@@ -19,7 +19,7 @@ export default class ServerConnectionStore extends Store {
     return this.serverStatus;
   }
 
-  @action _checkServerStatus = async (): Promise<Void> => {
+  @action _checkServerStatus = async (): Promise<void> => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const checkServerStatusFunc = stateFetcher.checkServerStatus;
     try {
