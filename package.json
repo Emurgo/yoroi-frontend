@@ -157,7 +157,7 @@
     "react-dom": "16.8.6",
     "react-dropzone": "10.1.5",
     "react-hot-loader": "4.3.12",
-    "react-intl": "2.7.2",
+    "react-intl": "2.9.0",
     "react-markdown": "4.1.0",
     "react-polymorph": "git+https://github.com/SebastienGllmt/react-polymorph-fix.git",
     "react-router": "5.0.1",
