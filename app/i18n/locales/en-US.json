@@ -217,7 +217,7 @@
   "wallet.add.optionDialog.connect.hw.trezor.title": "Trezor Hardware Wallet",
   "wallet.add.optionDialog.restore.dialogTitle": "Restore wallet",
   "wallet.add.optionDialog.restore.normalWallet.description": "If you have a Yoroi recovery phrase consisting of 15 words generated when you created a Yoroi Wallet, choose this option to restore your wallet.",
-  "wallet.add.optionDialog.restore.normalWallet.title": "Enter a 15-word Yoroi recovery phrase",
+  "wallet.add.optionDialog.restore.normalWallet.title": "Enter a 15-word recovery phrase",
   "wallet.add.optionDialog.restore.paperWallet.description": "If you have generated a Yoroi paper wallet (which is usually printed and kept offline), you can choose this option to import the funds from your Yoroi paper wallet.",
   "wallet.add.optionDialog.restore.paperWallet.title": "Paper Wallet",
   "wallet.add.page.create.title": "Create wallet",
