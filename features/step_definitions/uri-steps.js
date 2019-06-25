@@ -3,7 +3,6 @@
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
-import { getExtensionId } from '../support/helpers/route-helpers';
 
 When(/^I click on "generate payment URL" button$/, async function () {
   await this.click('.WalletReceive_btnGenerateURI');
@@ -30,12 +29,8 @@ Then(/^I should see "URL successfully copied" notification:$/, async function (d
 });
 
 When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async function (address, amount) {
-  // retreive extension ID in order to build an absolute URL with the cardano URI embeded
-  const extId = await getExtensionId.call(this);
-  expect(extId).to.not.be.null;
   // In practice, clicking a cardano URI will cause the browser to open a URL of this form
-  const uri = 'chrome-extension://' + extId +
-    '/main_window.html#/send-from-uri?q=web+cardano:' + address + '?amount=' + amount;
+  const uri = this.getExtensionUrl() + '#/send-from-uri?q=web+cardano:' + address + '?amount=' + amount;
   await this.driver.get('about:blank'); // dummy step, but needed
   await this.driver.get(uri);
 });
@@ -65,12 +60,9 @@ Then(/^I should land on send wallet screen with prefilled parameters$/, async fu
 });
 
 When(/^I open an invalid cardano URI$/, async function () {
-  const extId = await getExtensionId.call(this);
-  expect(extId).to.not.be.null;
   const invalidAddress = 'Ae2tdPwUPEZKmw0y3AU3cXb5Chnasj6mvVNxV1H11997q3VW5IhbSfQwGpm';
   const amount = '1';
-  const uri = 'chrome-extension://' + extId +
-    '/main_window.html#/send-from-uri?q=web+cardano:' + invalidAddress + '?amount=' + amount;
+  const uri = this.getExtensionUrl() + '#/send-from-uri?q=web+cardano:' + invalidAddress + '?amount=' + amount;
   await this.driver.get('about:blank'); // dummy step, but needed
   await this.driver.get(uri);
 });
