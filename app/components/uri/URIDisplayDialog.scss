@@ -9,19 +9,26 @@
   .uriDisplay {
     margin-top: 50px;
     margin-bottom: 10px;
+    width: 75%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
 
     .uri {
-      letter-spacing: 0px;
-      font-family: var(--font-mono-regular);
+      order: 0;
+      font-family: var(--font-regular);
       word-break: break-all;
-      font-size: 17px;
-      line-height: 23px;
+      font-size: 16px;
+      line-height: 22px;
+      text-align: center;
+    }
+
+    .test {
+      order: 1;
     }
 
     .copyIcon {
       cursor: pointer;
-      display: inline-flex;
-      object-fit: contain;
       margin-left: 6px;
       & > svg {
         height: 14.5px;

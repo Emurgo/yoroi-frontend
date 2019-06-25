@@ -85,17 +85,6 @@ export default class URIDisplayDialog extends Component<Props, State> {
         >
           {intl.formatMessage(messages.uriDisplayDialogCopyNotification)}
         </NotificationMessage>
-        <div className={styles.uriDisplay}>
-          <span className={styles.uri}>{uri}</span>
-          <CopyToClipboard
-            text={uri}
-            onCopy={this.onCopy}
-          >
-            <span>
-              <SvgInline svg={iconCopy} className={styles.copyIcon} />
-            </span>
-          </CopyToClipboard>
-        </div>
         <div className={styles.qrCode}>
           <QRCode
             value={uri}
@@ -103,6 +92,19 @@ export default class URIDisplayDialog extends Component<Props, State> {
             fgColor={qrCodeForegroundColor}
             size={152}
           />
+        </div>
+        <div className={styles.uriDisplay}>
+          <span className={styles.uri}>{uri}</span>
+          <span className={styles.test}>
+            <CopyToClipboard
+              text={uri}
+              onCopy={this.onCopy}
+            >
+              <span>
+                <SvgInline svg={iconCopy} className={styles.copyIcon} />
+              </span>
+            </CopyToClipboard>
+          </span>
         </div>
       </Dialog>
 
