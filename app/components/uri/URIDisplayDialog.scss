@@ -1,11 +1,4 @@
 .component {
-
-  :global {
-    .Dialog_title {
-      // margin-bottom: 30px;
-    }
-  }
-
   .uriDisplay {
     margin-top: 50px;
     margin-bottom: 10px;
@@ -15,16 +8,11 @@
     align-items: center;
 
     .uri {
-      order: 0;
       font-family: var(--font-regular);
       word-break: break-all;
       font-size: 16px;
       line-height: 22px;
       text-align: center;
-    }
-
-    .test {
-      order: 1;
     }
 
     .copyIcon {
@@ -38,15 +26,12 @@
         }
       }
     }
-
   }
 
   .qrCode {
     margin: 30px auto;
     text-align: center;
   }
-
-
 }
 
 :global(.YoroiModern) .component {

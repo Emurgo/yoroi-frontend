@@ -32,7 +32,7 @@
 
 :global(.YoroiClassic) .component {
   .receiverLabel {
-    font-family: var(--rp-formfield-label-font-family, var(--rp-theme-font-medium, "NotoSans-Medium, NotoSansCJKjp-Medium"), sans-serif), sans-serif;
+    font-family: var(--font-medium);
     text-transform: uppercase;
     font-size: 11px;
     font-weight: 600;
@@ -43,7 +43,6 @@
 }
 
 :global(.YoroiModern) .component {
-  // padding: 15px;
   min-width: var(--theme-modal-min-max-width-lg);
   max-width: var(--theme-modal-min-max-width-lg);
 

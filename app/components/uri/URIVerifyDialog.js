@@ -8,7 +8,8 @@ import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import DialogBackButton from '../widgets/DialogBackButton';
 import type { UriParams } from '../../utils/URIHandling';
-import globalMessages from '../../i18n/global-messages';
+import globalMessages, { environmentSpecificMessages } from '../../i18n/global-messages';
+import environment from '../../environment';
 import { formattedWalletAmount } from '../../utils/formatters';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../widgets/hashWrappers/RawHash';
@@ -50,6 +51,8 @@ export default class URIVerifyDialog extends Component<Props> {
   render() {
     const { onCancel, onSubmit, classicTheme } = this.props;
     const { intl } = this.context;
+
+    const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
 
     const dialogClasses = classnames([
       styles.dialog,
@@ -100,7 +103,7 @@ export default class URIVerifyDialog extends Component<Props> {
             {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}:
           </h2>
           <span className={styles.amount}>
-            {formattedWalletAmount(this.props.uriParams.amount)} ADA
+            {formattedWalletAmount(this.props.uriParams.amount)} {currency}
           </span>
         </div>
         <p className={styles.textBlock}>
