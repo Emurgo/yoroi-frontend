@@ -266,7 +266,7 @@
   "wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor.text": "Klicke hier, um mehr über die Verwendung von Yoroi zusammen mit Trezor zu erfahren",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1": "Trezor Modell T mit Version 2.1.0",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.link": "https://shop.trezor.io/product/trezor-model-t",
-  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2": " or later.",
+  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2": " oder höher.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.2": "Das Trezor-Gerät muss vorinitialisiert sein.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.3": "Der Trezor-Bildschirm muss entsperrt werden.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.5": "Das Trezor-Gerät muss während des gesamten Prozesses mit deinem Computer verbunden bleiben.",
