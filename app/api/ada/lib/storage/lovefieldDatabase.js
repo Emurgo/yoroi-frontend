@@ -1,5 +1,3 @@
-// @flow
-
 // Client-side database to avoid having to query Yoroi servers when state doesn't change
 
 // $FlowFixMe Flow doesn't like lovefield
