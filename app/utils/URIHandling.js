@@ -1,8 +1,5 @@
 // @flow
 
-// TODO:
-// - change file name to something more generic like URIHandling.js
-
 import BigNumber from 'bignumber.js';
 import { DECIMAL_PLACES_IN_ADA } from '../config/numbersConfig';
 import { isValidAmountInLovelaces } from './validations';
