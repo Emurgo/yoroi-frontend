@@ -264,7 +264,7 @@
   "wallet.connect.ledger.error.101": "Verbindung fehlgeschlagen. Bitte überprüfe dein Ledger-Gerät und versuche es erneut.",
   "wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor": "https://youtu.be/Dp0wXwtToX0",
   "wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor.text": "Klicke hier, um mehr über die Verwendung von Yoroi zusammen mit Trezor zu erfahren",
-  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1": "Trezor Model T with version 2.1.0",
+  "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1": "Trezor Modell T mit Version 2.1.0",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.link": "https://shop.trezor.io/product/trezor-model-t",
   "wallet.connect.trezor.dialog.step.about.prerequisite.1.part2": " or later.",
   "wallet.connect.trezor.dialog.step.about.prerequisite.2": "Das Trezor-Gerät muss vorinitialisiert sein.",
