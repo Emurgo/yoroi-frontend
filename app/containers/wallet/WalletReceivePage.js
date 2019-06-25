@@ -107,6 +107,8 @@ export default class WalletReceivePage extends Component<Props, State> {
       </NotificationMessage>
     );
 
+    const uriCopyNotificationId = `${wallet.id}-uri-copyNotification`;
+
     return (
       <VerticalFlexContainer>
         <WalletReceive
@@ -152,6 +154,12 @@ export default class WalletReceivePage extends Component<Props, State> {
           <URIDisplayDialog
             uri={uiDialogs.getParam('uri')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
+            showNotification={uiNotifications.isOpen(uriCopyNotificationId)}
+            onCopy={(message) => actions.notifications.open.trigger({
+              id: uriCopyNotificationId,
+              duration: config.wallets.ADDRESS_COPY_NOTIFICATION_DURATION,
+              message})
+            }
             classicTheme={profile.isClassicTheme}
           />
         ) : null}
@@ -189,7 +197,6 @@ export default class WalletReceivePage extends Component<Props, State> {
 
   generateURI = (address: string, amount: number) => {
     const { actions } = this.props;
-    // actions.dialogs.closeActiveDialog.trigger();
     actions.dialogs.open.trigger({
       dialog: URIDisplayDialog,
       params: { uri: buildURI(address, amount) }

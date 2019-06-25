@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import SvgInline from 'react-svg-inline';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { intlShape, defineMessages } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 import QRCode from 'qrcode.react';
 
 import Dialog from '../widgets/Dialog';
@@ -29,6 +30,8 @@ const messages = defineMessages({
 type Props = {
   onClose: void => void,
   classicTheme: boolean,
+  showNotification: boolean,
+  onCopy: MessageDescriptor => void,
   uri: string,
 };
 
@@ -48,7 +51,7 @@ export default class URIDisplayDialog extends Component<Props, State> {
     copiedURI: '',
   };
 
-  onCopy = (uri: string): void => {
+  saveUriToState = (uri: string): void => {
     this.setState({ copiedURI: uri });
   };
 
@@ -56,6 +59,8 @@ export default class URIDisplayDialog extends Component<Props, State> {
     const {
       onClose,
       classicTheme,
+      showNotification,
+      onCopy,
       uri
     } = this.props;
 
@@ -69,7 +74,7 @@ export default class URIDisplayDialog extends Component<Props, State> {
     const qrCodeForegroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
-
+    const message = intl.formatMessage(messages.uriDisplayDialogCopyNotification);
     return (
       <Dialog
         title={intl.formatMessage(messages.uriDisplayDialogTitle)}
@@ -81,9 +86,9 @@ export default class URIDisplayDialog extends Component<Props, State> {
       >
         <NotificationMessage
           icon={successIcon}
-          show={!!copiedURI}
+          show={!!copiedURI && showNotification}
         >
-          {intl.formatMessage(messages.uriDisplayDialogCopyNotification)}
+          {message}
         </NotificationMessage>
         <div className={styles.qrCode}>
           <QRCode
@@ -95,16 +100,17 @@ export default class URIDisplayDialog extends Component<Props, State> {
         </div>
         <div className={styles.uriDisplay}>
           <span className={styles.uri}>{uri}</span>
-          <span className={styles.test}>
-            <CopyToClipboard
-              text={uri}
-              onCopy={this.onCopy}
-            >
-              <span>
-                <SvgInline svg={iconCopy} className={styles.copyIcon} />
-              </span>
-            </CopyToClipboard>
-          </span>
+          <CopyToClipboard
+            text={uri}
+            onCopy={(uriText) => {
+              this.saveUriToState(uriText);
+              onCopy(message);
+            }}
+          >
+            <span>
+              <SvgInline svg={iconCopy} className={styles.copyIcon} />
+            </span>
+          </CopyToClipboard>
         </div>
       </Dialog>
 
