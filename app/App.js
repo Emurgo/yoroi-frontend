@@ -50,6 +50,7 @@ class App extends Component<{
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
+    const version = stores.profile.lastLaunchVersion;
 
     // Merged english messages with selected by user locale messages
     // In this case all english data would be overridden to user selected locale, but untranslated

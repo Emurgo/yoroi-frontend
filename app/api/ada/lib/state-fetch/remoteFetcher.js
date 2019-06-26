@@ -43,6 +43,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           addresses: body.addresses
+        },
+        headers: {
+          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
+          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
         }
       }
     ).then(response => response.data)
@@ -59,6 +63,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           txsHashes: body.txsHashes
+        },
+        headers: {
+          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
+          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
         }
       }
     ).then(response => response.data)
@@ -75,6 +83,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           addresses: body.addresses
+        },
+        headers: {
+          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
+          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
         }
       }
     ).then(response => response.data)
@@ -92,6 +104,10 @@ export class RemoteFetcher implements IFetcher {
         data: {
           addresses: body.addresses,
           dateFrom: body.dateFrom
+        },
+        headers: {
+          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
+          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
         }
       }
     ).then(response => response.data)
@@ -113,6 +129,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           signedTx: signedTx64
+        },
+        headers: {
+          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
+          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
         }
       }
     ).then(() => ({
@@ -134,6 +154,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           addresses: body.addresses
+        },
+        headers: {
+          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
+          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
         }
       }
     ).then(response => response.data)
