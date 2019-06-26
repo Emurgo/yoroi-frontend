@@ -29,6 +29,7 @@ const WalletSendPage = resolver('containers/wallet/WalletSendPage');
 const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
 const DaedalusTransferPage = resolver('containers/transfer/DaedalusTransferPage');
 const AdaRedemptionPage = resolver('containers/wallet/AdaRedemptionPage');
+const URILandingPage = resolver('containers/uri/URILandingPage');
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -82,6 +83,11 @@ export const Routes = (
         exact
         path={ROUTES.DAEDALUS_TRANFER.ROOT}
         component={(props) => <DaedalusTransferPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.SEND_FROM_URI.ROOT}
+        component={(props) => <URILandingPage {...props} stores={stores} actions={actions} />}
       />
       <Redirect to={ROUTES.WALLETS.ADD} />
     </Switch>
