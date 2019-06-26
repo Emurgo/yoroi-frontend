@@ -105,7 +105,6 @@
     "json-server": "0.15.0",
     "markdown-loader": "5.0.0",
     "minimist": "1.2.0",
-    "mobx-react-devtools": "^6.0.3",
     "node-sass": "4.12.0",
     "postcss-loader": "3.0.0",
     "raw-loader": "3.0.0",

@@ -121,12 +121,6 @@ declare module 'lovefield' {
     toSql(): string;
   }
 
-  declare interface Bob {
-    test(): Promise<number>;
-    zxcv(): number;
-  }
-
-
   declare type lf$query$Delete = {
     from(table: lf$schema$Table): lf$query$Delete,
     where(predicate: lf$Predicate): lf$query$Delete

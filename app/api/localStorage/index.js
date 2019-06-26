@@ -11,6 +11,11 @@ const storageKeys = {
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER'
 };
 
+export type SetCustomUserThemeRequest = {
+  customThemeVars: string,
+  currentThemeVars: Object,
+};
+
 /**
  * This api layer provides access to the electron local storage
  * for user settings that are not synced with any coin backend.
@@ -115,18 +120,20 @@ export default class LocalStorageApi {
   });
 
   setCustomUserTheme = (
-    customThemeVars: string,
-    currentThemeVars: Object
+    request: {
+      customThemeVars: string,
+      currentThemeVars: Object,
+    }
   ): Promise<void> => new Promise((resolve, reject) => {
     try {
       // Convert CSS String into Javascript Object
-      const vars = customThemeVars.split(';');
+      const vars = request.customThemeVars.split(';');
       const themeObject = {};
       vars.forEach(v => {
         const varData = v.split(':');
         const key = varData[0];
         const value = varData[1];
-        if (key && value && currentThemeVars[key.trim()] !== value.trim()) {
+        if (key && value && request.currentThemeVars[key.trim()] !== value.trim()) {
           themeObject[key.trim()] = value.trim();
         }
       });
