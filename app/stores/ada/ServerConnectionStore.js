@@ -7,8 +7,8 @@ import environment from '../../environment';
 import type { ServerStatusResponse } from '../../api/ada/lib/state-fetch/types';
 
 export default class ServerConnectionStore extends Store {
-  SERVER_STATUS_REFRESH_INTERVAL = 20000;
-  // TODO: set using environment.serverStatusRefreshInterval;
+  SERVER_STATUS_REFRESH_INTERVAL = environment.serverStatusRefreshInterval;
+
   @observable serverStatus: ?ServerStatusErrorType = null;
 
   setup() {
@@ -25,7 +25,7 @@ export default class ServerConnectionStore extends Store {
     try {
       const response: ServerStatusResponse = await checkServerStatusFunc();
       runInAction('refresh server status', () => {
-        this.serverStatus = response.status === true ? null : 'server';
+        this.serverStatus = response.apiStatus === true ? null : 'server';
       });
     } catch (err) {
       runInAction('refresh server status', () => {

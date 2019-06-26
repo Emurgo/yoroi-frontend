@@ -34,11 +34,6 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     this.props.actions.profile.redirectToTermsOfUse.trigger(values);
   };
 
-  displayedBanner = (connectionErrorType: ?ServerStatusErrorType) => {
-    connectionErrorType === null ?
-      <TestnetWarningBanner /> :
-      <ServerErrorBanner errorType={connectionErrorType} />;
-  };
 
   render() {
     const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
@@ -54,12 +49,17 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
       />) : undefined;
+    const displayedBanner = (connectionErrorType: ?ServerStatusErrorType) => {
+      connectionErrorType === null ?
+        <TestnetWarningBanner /> :
+        <ServerErrorBanner errorType={connectionErrorType} />;
+    };
     return (
       <TopBarLayout
         topbar={topBar}
         classicTheme={profile.isClassicTheme}
         languageSelectionBackground
-        banner={this.displayedBanner(checkAdaServerStatus)}
+        banner={displayedBanner(checkAdaServerStatus)}
       >
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}

@@ -14,7 +14,6 @@ import type {
   HistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
-  ServerStatusFunc,
 } from './types';
 
 import type {

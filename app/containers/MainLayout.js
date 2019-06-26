@@ -23,14 +23,15 @@ export default class MainLayout extends Component<MainLayoutProps> {
     connectionErrorType: null,
   };
 
-  displayedBanner = this.props.connectionErrorType === null ?
-    <TestnetWarningBanner /> :
-    <ServerErrorBanner errorType={this.props.connectionErrorType} />;
 
   render() {
+    const displayedBanner = this.props.connectionErrorType === null ?
+      <TestnetWarningBanner /> :
+      <ServerErrorBanner errorType={this.props.connectionErrorType} />;
+
     return (
       <TopBarLayout
-        banner={this.displayedBanner}
+        banner={displayedBanner}
         topbar={this.props.topbar}
         notification={<div />}
         footer={this.props.footer}
