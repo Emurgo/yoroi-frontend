@@ -60,13 +60,10 @@ export default class WalletTopbarTitle extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  updateHideBalance = () => {;
-    this.props.onUpdateHideBalance.trigger();
-  }
-
   render() {
     const {
-      wallet, account, currentRoute, formattedWalletAmount, themeProperties, shouldHideBalance
+      wallet, account, currentRoute, formattedWalletAmount, themeProperties,
+      shouldHideBalance, onUpdateHideBalance
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
     const { intl } = this.context;
@@ -90,11 +87,12 @@ export default class WalletTopbarTitle extends Component<Props> {
         </div>
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
-            { wallet && shouldHideBalance ? "*****" :
+            { wallet && shouldHideBalance ?
+              formattedWalletAmount(wallet.amount).replace(/./g,'*') + ' ADA' :
               formattedWalletAmount(wallet.amount) + ' ADA' }
             <button
               type="button"
-              onClick={this.updateHideBalance()}
+              onClick={onUpdateHideBalance}
             >
               {shouldHideBalance ? (
                 <SvgInline

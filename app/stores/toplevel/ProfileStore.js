@@ -336,12 +336,22 @@ export default class ProfileStore extends Store {
   // ========== Show/hide Balance ========== //
 
   @computed get shouldHideBalance(): boolean {
-    return !!this.getHideBalanceRequest.result;
+    const { result } = this.getHideBalanceRequest.execute();
+    return result === true;
+  }
+
+  @computed get isHideBalanceSet(): boolean {
+    return (
+      this.getHideBalanceRequest.wasExecuted &&
+      this.getHideBalanceRequest.result !== null
+    );
   }
 
   _updateHideBalance = async () => {
     await this.updateHideBalanceRequest.execute();
+    await this.getHideBalanceRequest.execute();
   };
+
 
   // ========== Redirec Logic ========== //
 

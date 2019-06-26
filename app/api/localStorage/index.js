@@ -198,10 +198,14 @@ export default class LocalStorageApi {
 
   // ========== Show/hide Balance ========== //
 
-  getHideBalance = (): Promise<void> => new Promise((resolve, reject) => {
+  getHideBalance = (): Promise<boolean> => new Promise((resolve, reject) => {
     try {
-      localStorage.getItem(storageKeys.HIDE_BALANCE);
-      resolve();
+      const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
+      // console.log('localStorage:getHideBalance: hideBalance ' + hideBalance);
+      // console.log('localStorage:getHideBalance: !hideBalance ' + !hideBalance);
+      // console.log('localStoragegetHideBalance: JSON.parse(hideBalance)' + JSON.parse(hideBalance));
+      if (!hideBalance) return resolve(false);
+      resolve(JSON.parse(hideBalance));
       } catch (error) {
         return reject(error);
     }
@@ -209,12 +213,21 @@ export default class LocalStorageApi {
 
   updateHideBalance = (): Promise<void> => new Promise((resolve, reject) => {
     try {
-      const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
-      localStorage.setItem(storageKeys.HIDE_BALANCE, !hideBalance);
+      let hideBalance = JSON.parse(localStorage.getItem(storageKeys.HIDE_BALANCE));
+      if (!hideBalance) {
+        localStorage.setItem(storageKeys.HIDE_BALANCE, JSON.stringify(true));
+      } else localStorage.setItem(storageKeys.HIDE_BALANCE, JSON.stringify(false));
       resolve();
     } catch (error) {
       return reject(error);
     }
+  });
+
+  unsetHideBalance = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.HIDE_BALANCE);
+      resolve();
+    } catch (error) {} // eslint-disable-line
   });
 
 
@@ -223,6 +236,7 @@ export default class LocalStorageApi {
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
+    await this.unsetHideBalance();
   }
 
 }

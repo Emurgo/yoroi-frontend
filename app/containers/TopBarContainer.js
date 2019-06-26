@@ -14,6 +14,11 @@ type Props = InjectedProps;
 @observer
 export default class TopBarContainer extends Component<Props> {
 
+  updateHideBalance = () => {;
+    this.props.actions.profile.updateHideBalance.trigger();
+    console.log('as seen by UI: ' + this.props.stores.profile.shouldHideBalance);
+  }
+
   render() {
     const { actions, stores } = this.props;
     const { app, topbar, profile } = stores;
@@ -27,7 +32,7 @@ export default class TopBarContainer extends Component<Props> {
       themeProperties={{
         identiconSaturationFactor: profile.isClassicTheme ? -5 : 0
       }}
-      onUpdateHideBalance={actions.profile.updateHideBalance}
+      onUpdateHideBalance={this.updateHideBalance}
       shouldHideBalance={profile.shouldHideBalance}
     />);
     return (
