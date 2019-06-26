@@ -75,7 +75,7 @@ const globalMessages = defineMessages({
   learnMore: {
     id: 'global.labels.LearnMore',
     defaultMessage: '!!!Learn more',
-  },  
+  },
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
@@ -271,7 +271,7 @@ const globalMessages = defineMessages({
   },
   contactSupport: {
     id: 'global.contact',
-    defaultMessage: '!!!contact support', 
+    defaultMessage: '!!!contact support',
   },
   staleTxnWarningLine1: {
     id: 'global.staleTxnWarningLine1',

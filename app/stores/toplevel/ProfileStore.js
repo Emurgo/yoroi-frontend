@@ -15,7 +15,7 @@ import type {
 } from '../../api/ada';
 import type {
   SetCustomUserThemeRequest
-} from '../../api/localstorage/index';
+} from '../../api/localStorage/index';
 
 export default class ProfileStore extends Store {
 
@@ -62,7 +62,9 @@ export default class ProfileStore extends Store {
     = new Request<void => Promise<string>>(this.api.localStorage.getCustomUserTheme);
 
   @observable setCustomThemeRequest: Request<SetCustomUserThemeRequest => Promise<void>>
-    = new Request<SetCustomUserThemeRequest => Promise<void>>(this.api.localStorage.setCustomUserTheme);
+    = new Request<SetCustomUserThemeRequest => Promise<void>>(
+      this.api.localStorage.setCustomUserTheme
+    );
 
   @observable unsetCustomThemeRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.localStorage.unsetCustomUserTheme);

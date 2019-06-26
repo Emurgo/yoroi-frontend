@@ -2,9 +2,6 @@
 import './lib/test-config';
 import AdaApi from './index';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
-import {
-  silenceLogsForTesting,
-} from '../../utils/logging';
 
 import type {
   FilterUsedRequest,
@@ -13,7 +10,6 @@ import type {
 
 beforeAll(async () => {
   await RustModule.load();
-  //silenceLogsForTesting();
 });
 
 test('Restore wallet', async () => {
