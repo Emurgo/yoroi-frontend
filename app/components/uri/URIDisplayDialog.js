@@ -7,8 +7,10 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { intlShape, defineMessages } from 'react-intl';
 import type { MessageDescriptor } from 'react-intl';
 import QRCode from 'qrcode.react';
+import { buildURI } from '../../utils/URIHandling';
 
 import Dialog from '../widgets/Dialog';
+import DialogBackButton from '../widgets/DialogBackButton';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import NotificationMessage from '../widgets/NotificationMessage';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
@@ -32,7 +34,9 @@ type Props = {
   classicTheme: boolean,
   showNotification: boolean,
   onCopy: MessageDescriptor => void,
-  uri: string,
+  onBack: void => void,
+  address: string,
+  amount: number,
 };
 
 type State = {
@@ -58,12 +62,15 @@ export default class URIDisplayDialog extends Component<Props, State> {
   render() {
     const {
       onClose,
+      onBack,
       classicTheme,
       showNotification,
       onCopy,
-      uri
+      address,
+      amount,
     } = this.props;
 
+    const uri = buildURI(address, amount);
     const { copiedURI } = this.state;
 
     const { intl } = this.context;
@@ -83,6 +90,7 @@ export default class URIDisplayDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
         onClose={onClose}
+        backButton={<DialogBackButton onBack={onBack} />}
       >
         <NotificationMessage
           icon={successIcon}
