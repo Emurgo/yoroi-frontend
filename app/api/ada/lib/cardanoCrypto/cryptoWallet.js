@@ -159,13 +159,17 @@ export function updateWalletMasterKeyPassword(
   return encryptWithPassword(newPassword, masterKey);
 }
 
-/** Decrypt a /wallet/ to create transactions. Do not save this. Regenerate every time. */
-export function getCryptoWalletFromMasterKey(
+export function getCryptoWalletFromEncryptedMasterKey(
   encryptedMasterKey: string,
   password: string
 ): RustModule.Wallet.Bip44RootPrivateKey {
   const masterKeyBytes = decryptWithPassword(password, encryptedMasterKey);
   const masterKeyHex = Buffer.from(masterKeyBytes).toString('hex');
+  return getCryptoWalletFromMasterKey(masterKeyHex);
+}
+export function getCryptoWalletFromMasterKey(
+  masterKeyHex: string,
+): RustModule.Wallet.Bip44RootPrivateKey {
   const privateKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
   const cryptoWallet = RustModule.Wallet.Bip44RootPrivateKey.new(
     privateKey,
@@ -211,7 +215,7 @@ export const mnemonicsToAddresses = (
   type: AddressType = 'External'
 ): { addresses: Array<string>, accountPlate: WalletAccountNumberPlate } => {
   const masterKey = generateWalletMasterKey(mnemonic, '');
-  const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, '');
+  const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(masterKey, '');
   const account = cryptoWallet.bip44_account(
     RustModule.Wallet.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
   );

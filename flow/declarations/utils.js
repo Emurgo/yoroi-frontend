@@ -5,6 +5,8 @@ declare type ReturnType<Func> = $Call<ExtractReturnType, Func>;
 declare type ExtractPromisslessReturnType = <R>((...arg: any) => Promise<R>) => R;
 declare type PromisslessReturnType<Func> = $Call<ExtractPromisslessReturnType, Func>;
 
+declare type ToSchemaProp = <K, V>(K, V) => K;
+
 /* eslint-disable no-redeclare */
 declare function arguments<A>(() => any): []
 declare function arguments<A>((A) => any): [A]

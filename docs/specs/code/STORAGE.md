@@ -135,6 +135,8 @@ Note: we don't enfroce a checksum in the storage layer. Deciding whether or not 
 
 This table represents a specific instance of a derivation level. We need this to represent the relation between a private key and a public key, and also need this to store whether or not a level is hardened.
 
+Note: You can implicitly figure out if a derivation is hardened or not by the index. However, we have no index in the ad-hoc case so it needs to be stored explicitly somewhere and this felt like an appropriate places.
+
 Note: This allows our storage to represent any combination of hardened & unhardened levels for a wallet and not just the one recommended by bip44.
 
 #### Bip44DerivationMapping Table
