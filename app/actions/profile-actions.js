@@ -11,4 +11,5 @@ export default class ProfileActions {
   updateTheme: Action<{ theme: string }> = new Action();
   exportTheme: Action<void> = new Action();
   redirectToTermsOfUse: Action<{ locale: string }> = new Action();
+  updateHideBalance: Action<void> = new Action();
 }

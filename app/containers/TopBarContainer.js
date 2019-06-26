@@ -27,6 +27,8 @@ export default class TopBarContainer extends Component<Props> {
       themeProperties={{
         identiconSaturationFactor: profile.isClassicTheme ? -5 : 0
       }}
+      onUpdateHideBalance={actions.profile.updateHideBalance}
+      shouldHideBalance={profile.shouldHideBalance}
     />);
     return (
       <TopBar

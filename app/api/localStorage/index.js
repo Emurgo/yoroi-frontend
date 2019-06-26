@@ -8,7 +8,8 @@ const storageKeys = {
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
   THEME: networkForLocalStorage + '-THEME',
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
-  VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER'
+  VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
+  HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
 };
 
 export type SetCustomUserThemeRequest = {
@@ -195,10 +196,33 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== Show/hide Balance ========== //
+
+  getHideBalance = (): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.getItem(storageKeys.HIDE_BALANCE);
+      resolve();
+      } catch (error) {
+        return reject(error);
+    }
+  });
+
+  updateHideBalance = (): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
+      localStorage.setItem(storageKeys.HIDE_BALANCE, !hideBalance);
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+
   async reset() {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
   }
+
 }
