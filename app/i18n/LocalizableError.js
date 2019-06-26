@@ -28,7 +28,8 @@ class LocalizableError extends ExtendableError {
   ) {
     if (!id) throw new Error('id:string is required.');
     if (!defaultMessage) throw new Error('defaultMessage:string is required.');
-    super(`${id}: ${JSON.stringify(values)}`);
+    const json = values === undefined ? 'undefined' : JSON.stringify(values);
+    super(`${id}: ${json}`);
     this.id = id;
     this.defaultMessage = defaultMessage;
     this.values = values || {};

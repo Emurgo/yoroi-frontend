@@ -14,6 +14,9 @@ import type { ExplorerType } from '../../domain/Explorer';
 import type {
   GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
 } from '../../api/ada';
+import type {
+  SetCustomUserThemeRequest
+} from '../../api/localStorage/index';
 
 export default class ProfileStore extends Store {
 
@@ -59,8 +62,10 @@ export default class ProfileStore extends Store {
   @observable getCustomThemeRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getCustomUserTheme);
 
-  @observable setCustomThemeRequest: Request<(string, Object) => Promise<void>>
-    = new Request<(string, Object) => Promise<void>>(this.api.localStorage.setCustomUserTheme);
+  @observable setCustomThemeRequest: Request<SetCustomUserThemeRequest => Promise<void>>
+    = new Request<SetCustomUserThemeRequest => Promise<void>>(
+      this.api.localStorage.setCustomUserTheme
+    );
 
   @observable unsetCustomThemeRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.localStorage.unsetCustomUserTheme);
@@ -229,8 +234,10 @@ export default class ProfileStore extends Store {
     if (html) {
       const attributes: any = html.attributes;
       await this.unsetCustomThemeRequest.execute();
-      await this.setCustomThemeRequest.execute(attributes.style.value,
-        this.getThemeVars({ theme: this.currentTheme }));
+      await this.setCustomThemeRequest.execute({
+        customThemeVars: (attributes.style.value: string),
+        currentThemeVars: this.getThemeVars({ theme: this.currentTheme })
+      });
       await this.getCustomThemeRequest.execute(); // eagerly cache
     }
   };
