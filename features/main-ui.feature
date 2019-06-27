@@ -44,3 +44,11 @@ Feature: Main UI
     When There is no wallet stored
     And I am on the Daedalus Transfer instructions screen
     Then I see transactions buttons are disabled
+
+  @serverDown @it-31
+  Scenario: The networkError banner must be displayed if the server is not reachable
+  Then I should see the networkError banner
+
+  @serverMaintenance @it-32
+  Scenario: The serverError banner must be displayed for as long as the server reports an issue
+  Then I should see the serverError banner
