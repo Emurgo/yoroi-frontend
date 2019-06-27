@@ -36,6 +36,15 @@ const backendUrl = CONFIG.network.backendUrl;
  * https://github.com/Emurgo/yoroi-backend-service/
  */
 export class RemoteFetcher implements IFetcher {
+
+  lastLaunchVersion: () => string;
+  currentLocale: () => string;
+
+  constructor(lastLaunchVersion: () => string, currentLocale: () => string) {
+    this.lastLaunchVersion = lastLaunchVersion;
+    this.currentLocale = currentLocale;
+  }
+
   getUTXOsForAddresses = (body: AddressUtxoRequest): Promise<AddressUtxoResponse> => (
     axios(
       `${backendUrl}/api/txs/utxoForAddresses`,
@@ -45,8 +54,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
-          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
+          'x-yoroi-version': this.lastLaunchVersion(),
+          'x-yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -65,8 +74,8 @@ export class RemoteFetcher implements IFetcher {
           txsHashes: body.txsHashes
         },
         headers: {
-          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
-          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
+          'x-yoroi-version': this.lastLaunchVersion(),
+          'x-yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -85,8 +94,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
-          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
+          'x-yoroi-version': this.lastLaunchVersion(),
+          'x-yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -106,8 +115,8 @@ export class RemoteFetcher implements IFetcher {
           dateFrom: body.dateFrom
         },
         headers: {
-          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
-          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
+          'x-yoroi-version': this.lastLaunchVersion(),
+          'x-yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -131,8 +140,8 @@ export class RemoteFetcher implements IFetcher {
           signedTx: signedTx64
         },
         headers: {
-          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
-          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
+          'x-yoroi-version': this.lastLaunchVersion(),
+          'x-yoroi-locale': this.currentLocale()
         }
       }
     ).then(() => ({
@@ -156,8 +165,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'x-yoroi-version': window.yoroi.stores.profile.lastLaunchVersion,
-          'x-yoroi-locale': window.yoroi.stores.profile.currentLocale
+          'x-yoroi-version': this.lastLaunchVersion(),
+          'x-yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
