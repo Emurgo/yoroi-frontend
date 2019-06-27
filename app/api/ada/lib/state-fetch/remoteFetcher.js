@@ -54,8 +54,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'x-yoroi-version': this.lastLaunchVersion(),
-          'x-yoroi-locale': this.currentLocale()
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -74,8 +74,8 @@ export class RemoteFetcher implements IFetcher {
           txsHashes: body.txsHashes
         },
         headers: {
-          'x-yoroi-version': this.lastLaunchVersion(),
-          'x-yoroi-locale': this.currentLocale()
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -94,8 +94,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'x-yoroi-version': this.lastLaunchVersion(),
-          'x-yoroi-locale': this.currentLocale()
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -115,8 +115,8 @@ export class RemoteFetcher implements IFetcher {
           dateFrom: body.dateFrom
         },
         headers: {
-          'x-yoroi-version': this.lastLaunchVersion(),
-          'x-yoroi-locale': this.currentLocale()
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -140,8 +140,8 @@ export class RemoteFetcher implements IFetcher {
           signedTx: signedTx64
         },
         headers: {
-          'x-yoroi-version': this.lastLaunchVersion(),
-          'x-yoroi-locale': this.currentLocale()
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(() => ({
@@ -165,8 +165,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'x-yoroi-version': this.lastLaunchVersion(),
-          'x-yoroi-locale': this.currentLocale()
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
