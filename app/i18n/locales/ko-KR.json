@@ -55,7 +55,7 @@
   "daedalusTransfer.instructions.attention.button.label": "Daedalus 지갑",
   "daedalusTransfer.instructions.attention.masterKey.button.label": "Daedalus 복구 구문",
   "daedalusTransfer.instructions.attention.paper.button.label": "Daedalus 종이 지갑",
-  "daedalusTransfer.instructions.attention.text": "Yoroi and Daedalus wallets use different key derivation schemes, and the address format is different on each. Due to this, at present the funds from a Daedalus wallet cannot be simply imported directly into Yoroi. Instead, you must create a Yoroi wallet and transfer your funds over from Daedalus. (Daedalus and Yoroi wallets are fully compatible for transferring funds.)<br><br>If you do not currently have Daedalus installed, or if you cannot access it, you can enter your 12-word recovery phrase from Daedalus (or 27 words for a paper wallet) and transfer your entire wallet balance over from Daedalus into Yoroi.",
+  "daedalusTransfer.instructions.attention.text": "요로이와 다이달로스 지갑은 서로 다른 키 생성 방식과 주소 형식을 가지고 있습니다. 때문에, 현재로서는 다이달로스 지갑의 자금을 곧바로 요로이 지갑으로 불러오는 것은 불가능합니다. 그 대신, 여러분은 요로이 지갑을 생성한 후, 다이달로스 지갑에서 자금을 전송하셔야 합니다. (다이달로스와 요로이 지갑은 자금 전송에 대해서는 상호 호환됩니다.)<br><br>만약 여러분이 현재 설치되어있는 다이달로스 지갑이 없거나, 혹은 접근할 수 없는 상태인 경우라면, 다이달로스의 12 단어 복구 구절 또는 종이 지갑의 27 단어 복구 구절을 입력하고 다이달로스 지갑의 전체 자금을 요로이 지갑으로 전송할 수 있습니다.",
   "daedalusTransfer.instructions.attention.title": "Transfer all funds from",
   "daedalusTransfer.summary.addressFrom.subLabel": "Daedalus 지갑 주소",
   "daedalusTransfer.title": "Daedalus에서 자금 이체",
