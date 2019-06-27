@@ -201,22 +201,23 @@ export default class LocalStorageApi {
   getHideBalance = (): Promise<boolean> => new Promise((resolve, reject) => {
     try {
       const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
-      // console.log('localStorage:getHideBalance: hideBalance ' + hideBalance);
-      // console.log('localStorage:getHideBalance: !hideBalance ' + !hideBalance);
-      // console.log('localStoragegetHideBalance: JSON.parse(hideBalance)' + JSON.parse(hideBalance));
       if (!hideBalance) return resolve(false);
       resolve(JSON.parse(hideBalance));
-      } catch (error) {
-        return reject(error);
+    } catch (error) {
+      return reject(error);
     }
   });
 
   updateHideBalance = (): Promise<void> => new Promise((resolve, reject) => {
     try {
-      let hideBalance = JSON.parse(localStorage.getItem(storageKeys.HIDE_BALANCE));
+      const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
       if (!hideBalance) {
         localStorage.setItem(storageKeys.HIDE_BALANCE, JSON.stringify(true));
-      } else localStorage.setItem(storageKeys.HIDE_BALANCE, JSON.stringify(false));
+      } else {
+        localStorage.setItem(
+          storageKeys.HIDE_BALANCE, JSON.stringify(!JSON.parse(hideBalance))
+        );
+      }
       resolve();
     } catch (error) {
       return reject(error);

@@ -59,16 +59,29 @@
       word-break: break-all;
     }
 
+    .hiddenWalletAmount {
+      letter-spacing: 2px;
+    }
+
+    .walletAmountLabelBlock {
+      // padding-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .walletAmountLabel {
       text-transform: none;
-      padding-top: 2px;
       font-size: 14px;
       font-weight: 300;
       opacity: 0.7;
     }
 
     .showHideBalanceIcon {
-      
+      & > svg {
+        margin-left: 5px;
+        margin-top: 3px;
+      }
     }
   }
 }

@@ -30,7 +30,7 @@ type Props = {|
   themeProperties?: {
     identiconSaturationFactor: number,
   },
-  onUpdateHideBalance?: Function,
+  onUpdateHideBalance: Function,
   shouldHideBalance: boolean
 |};
 
@@ -73,6 +73,7 @@ export default class WalletTopbarTitle extends Component<Props> {
     const showWalletInfo = walletRoutesMatch && wallet;
 
     const isHardwareWallet = (wallet && wallet.type) === WalletTypeOption.HARDWARE_WALLET;
+    const currency = ' ADA';
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
     const [accountPlateId, iconComponent] = account ?
       constructPlate(account, identiconSaturationFactor, iconDivClass)
@@ -88,27 +89,28 @@ export default class WalletTopbarTitle extends Component<Props> {
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
             { wallet && shouldHideBalance ?
-              formattedWalletAmount(wallet.amount).replace(/./g,'*') + ' ADA' :
-              formattedWalletAmount(wallet.amount) + ' ADA' }
-            <button
-              type="button"
-              onClick={onUpdateHideBalance}
-            >
-              {shouldHideBalance ? (
-                <SvgInline
-                  svg={showBalanceIcon}
-                  className={styles.showHideBalanceIcon}
-                />
-              ) : (
-                <SvgInline
-                  svg={hideBalanceIcon}
-                  className={styles.showHideBalanceIcon}
-                />
-              )}
-            </button>
+              <span className={styles.hiddenWalletAmount}>
+                {formattedWalletAmount(wallet.amount).replace(/./g, '*')}
+              </span> :
+              wallet && formattedWalletAmount(wallet.amount)
+            }
+            { currency }
           </div>
-          <div className={styles.walletAmountLabel}>
-            {intl.formatMessage(messages.totalBalance)}
+          <div className={styles.walletAmountLabelBlock}>
+            <div className={styles.walletAmountLabel}>
+              {intl.formatMessage(messages.totalBalance)}
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={onUpdateHideBalance}
+              >
+                <SvgInline
+                  svg={shouldHideBalance ? showBalanceIcon : hideBalanceIcon}
+                  className={styles.showHideBalanceIcon}
+                />
+              </button>
+            </div>
           </div>
         </div>
       </div>
