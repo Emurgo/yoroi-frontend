@@ -5,7 +5,7 @@
 
   .button {
     display: block !important;
-    margin: 0 auto 0;
+    margin: 20px auto 0;
   }
   
   .body {
@@ -46,6 +46,11 @@
 }
 
 :global(.YoroiClassic) .component {
+
+  .button {
+    margin: 0 auto 0;
+  }
+
   .body {
     .title {
       font-size: 11px;
