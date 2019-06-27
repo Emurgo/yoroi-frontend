@@ -221,7 +221,7 @@
   "uri.landing.dialog.title": "Melakukan transaksi dari URL Cardano",
   "uri.landing.dialog.warning.line1": "Pastikan:",
   "uri.landing.dialog.warning.line2": "Anda berada dalam ekstensi official Yoroi.",
-  "uri.landing.dialog.warning.line3": "You are not being victim of a phishing or man-in-the-middle attack.",
+  "uri.landing.dialog.warning.line3": "Anda tidak sedang menjadi korban phishing atau seseorang yang sedang diserang.",
   "uri.verify.dialog.address.label": "Address penerima",
   "uri.verify.dialog.text": "Sebelum melanjutkan, pastikan detail transaksi sudah benar.",
   "uri.verify.dialog.title": "Detail transaksi",
