@@ -2,77 +2,56 @@
 @import '../../../../themes/mixins/error-message';
 
 .component {
-  font-family: var(--font-light);
-  .walletPassword {
-    & + .walletPasswordFields {
-      .newPassword {
-        margin-top: 20px;
-      }
-    }
-  }
+  text-align: center;
+  font-family: var(--font-regular);
+  line-height: 22px;
 
-  .error {
-    @include error-message;
-    text-align: center;
-    margin-top: 27px;
-  }
-
-  .button {
-    cursor: pointer;
-    align-self: center;
-    background: transparent !important;;
-    color: transparent !important;;
-  }
-  
-  .icon {
-    & > svg {
-      max-height: 75px;
-      max-width: 75px;
-      width: 100%;
-    }
-  }
-  
-  .label {
-    font-family: var(--font-light);
-    color: black;
-  }
-  
   .downloadPaperIntroLine1 {
-    text-align: center;
+    font-size: 16px;
+  }
+  
+  .downloadIcon {
+    cursor: pointer;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-top: 16px;
+    margin-bottom: 24px;
+    width: 75px;
+    height: 75px;
+  }
+  
+  .labelDownload {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .labelDownloadSize {
+    font-size: 14px;
+    color: var(--cmn-default-color-grey-3);
   }
   
   .walletLoaderWrapper {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    color: var(--theme-bordered-box-text-color);
-    font-family: var(--font-regular);
-    font-size: 14px;
-    line-height: 19px;
-  
-    .walletLoaderWrapperTitle {
-      font-size: 16px;
-      line-height: 22px;
-      margin-bottom: 6px;
-      word-break: break-all;
-      text-align: center;
-    }
-  
-    .walletLoaderWrapperProgressInfo {
-      color: var(--theme-default-color-grey-3);
-      font-size: 14px;
-      line-height: 22px;
-      margin-bottom: 12px;
-      word-break: break-word;
-      text-align: center;
-    }
-  
     .walletLoader {
+      display: inline-block;
+      background-repeat: no-repeat;
+      background-size: contain;
+      margin-top: 10px;
+      margin-bottom: 20px;
       width: 170px;
       height: 190px;
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: contain;
+    }    
+  
+    .walletLoaderTitle {
+      word-break: break-all;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+  
+    .walletLoaderProgressInfo {
+      font-size: 14px;
+      color: var(--cmn-default-color-grey-3);
+      word-break: break-word;
     }
   }
 }
@@ -82,6 +61,10 @@
     .walletLoader {
       background-image: url("../../../../assets/images/paper-wallet/create-paper-wallet-loader-classic.gif");
     }
+
+    .downloadIcon {
+      background-image: url("../../../../assets/images/paper-wallet/download-certificate-classic.inline.svg");
+    }
   }
 }
 
@@ -90,5 +73,9 @@
     .walletLoader {
       background-image: url("../../../../assets/images/paper-wallet/create-paper-wallet-loader-modern.gif");
     }
+
+    .downloadIcon {
+      background-image: url("../../../../assets/images/paper-wallet/download-certificate-modern.inline.svg");
+    }    
   }
 }
