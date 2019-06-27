@@ -216,7 +216,7 @@
   "uri.generate.dialog.title": "URLを生成する",
   "uri.invalid.dialog.title": "URLが無効です",
   "uri.invalid.dialog.warning.text1": "クリックしたリンクは無効です",
-  "uri.invalid.dialog.warning.text2": "Please ask the receiver to double-check the format.",
+  "uri.invalid.dialog.warning.text2": "受信者に形式の再確認を依頼してください。",
   "uri.landing.dialog.confirm.label": "I understand",
   "uri.landing.dialog.title": "Perform a transaction from a Cardano URL",
   "uri.landing.dialog.warning.line1": "Make sure:",
