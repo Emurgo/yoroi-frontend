@@ -30,7 +30,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   countdownRemaining: number,
   canPhraseBeShown: boolean,
   isPrivacyNoticeAccepted: boolean,
@@ -38,7 +38,7 @@ type Props = {
   onContinue: Function,
   onCancelBackup: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
@@ -63,7 +63,6 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       styles.component,
       'WalletBackupPrivacyWarningDialog',
     ]);
-    const checkboxClasses = classicTheme ? styles.checkboxClassic : styles.checkbox;
 
     const actions = [
       {
@@ -89,7 +88,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
           instructionsText={<FormattedHTMLMessage {...messages.recoveryPhraseInstructions} />}
           classicTheme={classicTheme}
         />
-        <div className={checkboxClasses}>
+        <div className={styles.checkbox}>
           <Checkbox
             label={intl.formatMessage(messages.termNobodyWatching)}
             onChange={onAcceptPrivacyNotice}

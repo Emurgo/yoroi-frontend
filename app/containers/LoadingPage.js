@@ -57,7 +57,7 @@ export default class LoadingPage extends Component<InjectedProps> {
       // eslint-disable-next-line jsx-a11y/anchor-is-valid
       <a
         href="#"
-        onClick={event => downloadLogs()}
+        onClick={_event => downloadLogs()}
       >
         {intl.formatMessage(globalMessages.downloadLogsLink)}
       </a>

@@ -1,3 +1,4 @@
+// @flow
 import { defineMessages } from 'react-intl';
 
 /*
@@ -288,6 +289,26 @@ const globalMessages = defineMessages({
     id: 'settings.support.logs.downloadLogsLink',
     defaultMessage: '!!!download them here',
   },
+  blockchainExplorer: {
+    id: 'settings.general.explorer',
+    defaultMessage: '!!!Blockchain Explorer',
+  },
+  newPasswordLabel: {
+    id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
+    defaultMessage: '!!!New spending password',
+  },
+  newPasswordFieldPlaceholder: {
+    id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type new spending password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat new spending password',
+  },
+  repeatPasswordFieldPlaceholder: {
+    id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type new spending password',
+  },
 });
 export default globalMessages;
 
@@ -308,7 +329,10 @@ export const environmentSpecificMessages = {
   }),
 };
 
-export function listOfTranslators(contributorsList, contributorsAck): string {
+export function listOfTranslators(
+  contributorsList: string,
+  contributorsAck: string,
+): string {
   let output = '';
   // append name of contributors only if the message is not empty
   if (contributorsList !== globalMessages.translationContributors.defaultMessage) {

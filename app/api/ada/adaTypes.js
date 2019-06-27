@@ -12,7 +12,6 @@
  * https://github.com/input-output-hk/cardano-sl/pull/3700
 */
 
-import BigNumber from 'bignumber.js';
 import type { AdaAddressMap } from './lib/storage/adaAddress';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
@@ -61,7 +60,7 @@ export type AdaHardwareWalletInitData = {
 };
 
 export type AdaAmount = {
-  getCCoin: BigNumber,
+  getCCoin: string,
 };
 export type AdaTransactionTag = 'CTIn' | 'CTOut';
 

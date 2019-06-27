@@ -18,7 +18,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   wallet: ?Wallet,
   account: ?WalletAccount,
   currentRoute: string,
@@ -26,7 +26,7 @@ type Props = {
   themeProperties?: {
     identiconSaturationFactor: number,
   },
-};
+|};
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<any>] {
   const { plate: { hash, id } } = account;

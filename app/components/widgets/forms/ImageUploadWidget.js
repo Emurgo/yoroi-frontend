@@ -15,9 +15,9 @@ export const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   label: string
-};
+|};
 
 @observer
 export default class ImageUploadWidget extends Component<Props> {

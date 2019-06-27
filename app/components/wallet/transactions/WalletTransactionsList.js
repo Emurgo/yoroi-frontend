@@ -12,6 +12,7 @@ import WalletTransaction from '../../../domain/WalletTransaction';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 const messages = defineMessages({
   today: {
@@ -30,15 +31,16 @@ const messages = defineMessages({
 
 const dateFormat = 'YYYY-MM-DD';
 
-type Props = {
+type Props = {|
   transactions: Array<WalletTransaction>,
   isLoadingTransactions: boolean,
   hasMoreToLoad: boolean,
+  selectedExplorer: ExplorerType,
   assuranceMode: AssuranceMode,
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
-};
+|};
 
 @observer
 export default class WalletTransactionsList extends Component<Props> {
@@ -47,7 +49,8 @@ export default class WalletTransactionsList extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this.localizedDateFormat = moment.localeData().longDateFormat('L');
     // Localized dateFormat:
     // English - MM/DD/YYYY
@@ -130,6 +133,7 @@ export default class WalletTransactionsList extends Component<Props> {
               {group.transactions.map((transaction, transactionIndex) => (
                 <Transaction
                   key={`${walletId}-${transaction.id}-${transaction.type}`}
+                  selectedExplorer={this.props.selectedExplorer}
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}

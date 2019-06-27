@@ -1,3 +1,4 @@
+// @flow
 import aesjs from 'aes-js';
 import { validateMnemonic } from 'bip39';
 import blakejs from 'blakejs';
@@ -5,7 +6,7 @@ import crypto from 'crypto';
 import validWords from 'bip39/src/wordlists/english.json';
 import { RustModule } from './cardanoCrypto/rustLoader';
 
-const isBase64 = (string) => {
+const isBase64 = (string: string) => {
   const criteria = '(?:^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$)';
   const regex = new RegExp(`(?:^${criteria}?$)`);
 
@@ -20,12 +21,15 @@ function decryptWithAES(aesKey, bytes) {
 
 const blake2b = (data) => blakejs.blake2b(data, null, 32);
 
-const fromMnemonic = (words) => {
+const fromMnemonic = (words: string) => {
   const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(words);
   return new Uint8Array(entropy.to_array());
 };
 
-export const isValidMnemonic = (phrase, numberOfWords = 9) => (
+export const isValidMnemonic = (
+  phrase: string,
+  numberOfWords: number = 9
+) => (
   (phrase.split(' ').length === numberOfWords && validateMnemonic(phrase, validWords))
 );
 
@@ -36,15 +40,24 @@ const hashData = (data) => {
   return hash.digest('hex');
 };
 
-export const decryptRegularVend = (key, data) => decryptWithAES(blake2b(fromMnemonic(key)), data);
-export const decryptForceVend = (key, data) => (
+export const decryptRegularVend = (
+  key: string,
+  data: string | Uint8Array,
+) => decryptWithAES(blake2b(fromMnemonic(key)), data);
+export const decryptForceVend = (
+  key: Array<string>,
+  data: string | Uint8Array
+) => (
   decryptWithAES(blake2b(key[0].trim().toLowerCase() +
     hashData(key[1].trim()) + key[2].trim()), data)
 );
 
 // Recovery service certificates decryption
 export const decryptRecoveryRegularVend = decryptRegularVend;
-export const decryptRecoveryForceVend = (key, data) => {
+export const decryptRecoveryForceVend = (
+  key: string,
+  data: string | Uint8Array
+) => {
   // There are 3 possible decryption key formats:
   // 1) base64 string (most common)
   // 2) hex string

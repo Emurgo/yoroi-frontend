@@ -1,48 +1,49 @@
-.componentClassic {
-  background-color: var(--theme-mnemonic-background-color) !important;
-  font-size: 15px !important;
-  margin: 5px 0;
-  height: 40px;
-  padding: 10px 20px;
-  width: 140px !important;
+.component {
+  background-color: var(--theme-mnemonic-background-color)!important;
+  font-family: var(--font-regular)!important;
+  color: var(--theme-mnemonic-button-text-color)!important;
 
   &.disabled {
-    cursor: default !important;
-    opacity: 0.3;
+    cursor: default;
   }
 
   &:not(.disabled) {
     &:active {
       cursor: pointer;
       &:hover {
-        background-color: var(--theme-mnemonic-background-color-hover) !important;
+        background-color: var(--theme-mnemonic-background-color-hover);
       }
     }
   }
 }
 
-.component {
-  background-color: var(--theme-mnemonic-background-color) !important;
-  font-size: 14px!important;
-  font-family: var(--font-regular)!important;
-  margin: 5px 10px 5px 0;
-  height: 30px!important;
-  padding: 3px 13px!important;
-  width: auto!important;
-  color: var(--theme-mnemonic-button-text-color)!important;
-  text-transform: none!important;
-
-  &.disabled {
-    cursor: default !important;
-    opacity: 0;
-  }
-
-  &:not(.disabled) {
-    &:active {
-      cursor: pointer;
-      &:hover {
-        background-color: var(--theme-mnemonic-background-color-hover) !important;
-      }
+:global(.YoroiClassic) {
+  .component {
+    font-size: 15px;
+    margin: 5px 0;
+    height: 40px;
+    padding: 10px 20px;
+    width: 140px;
+  
+    &.disabled {
+      opacity: 0.3;
     }
   }
+
+}
+
+:global(.YoroiModern) {
+  .component {
+    font-size: 14px;
+    margin: 5px 10px 5px 0;
+    height: 30px;
+    padding: 3px 13px;
+    width: auto;
+    text-transform: none;
+
+    &.disabled {
+      opacity: 0;
+    }
+  }
+  
 }

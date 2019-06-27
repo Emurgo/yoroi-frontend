@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -64,7 +65,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         classicTheme={profile.isClassicTheme}
       >
         <SettingsLayout menu={menu}>
-          {children}
+          {children || null /* the "|| null" part keeps flow happy */}
         </SettingsLayout>
       </Layout>
     );

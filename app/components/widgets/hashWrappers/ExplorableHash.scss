@@ -16,15 +16,11 @@
     line-height: 22px;
   }
 
-  :global(.SimpleBubble_root.SimpleBubble_transparent:not(.SimpleBubble_openUpward))  {
-    :global(.SimpleBubble_bubble) {
+  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward))  {
       margin-top: -8px !important;
-    }
   }
   :global(.SimpleBubble_root.SimpleBubble_transparent.SimpleBubble_openUpward)  {
-    :global(.SimpleBubble_bubble) {
       margin-bottom: -8px !important;
-    }
   }
 }
 

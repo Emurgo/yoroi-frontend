@@ -50,14 +50,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   passwordValue: string,
   repeatedPasswordValue: string,
   onNext: Function,
   onCancel: Function,
   onDataChange: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class UserPasswordDialog extends Component<Props> {
@@ -132,8 +132,6 @@ export default class UserPasswordDialog extends Component<Props> {
 
     const dialogClasses = classnames(['userPasswordDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
-    const paperPasswordClasses = classnames([styles.paperPassword]);
-    const repeatedPasswordClasses = classnames([styles.repeatedPassword]);
 
     const actions = [
       {
@@ -164,10 +162,10 @@ export default class UserPasswordDialog extends Component<Props> {
           <span><FormattedHTMLMessage {...messages.paperPasswordIntroLine3} /></span><br />
         </div>
 
-        <div className={paperPasswordClasses}>
+        <div className={styles.paperPassword}>
           <Input
             type="password"
-            className={paperPasswordClasses}
+            className={styles.paperPassword}
             value={passwordValue}
             onChange={(value) => this.handleDataChange('passwordValue', value)}
             {...paperPasswordField.bind()}
@@ -176,10 +174,10 @@ export default class UserPasswordDialog extends Component<Props> {
             skin={InputOwnSkin}
           />
         </div>
-        <div className={repeatedPasswordClasses}>
+        <div className={styles.repeatedPassword}>
           <Input
             type="password"
-            className={repeatedPasswordClasses}
+            className={styles.repeatedPassword}
             value={repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
             done={repeatPassword && isValidRepeatPassword(paperPassword, repeatPassword)}

@@ -1,16 +1,17 @@
+// @flow
 import React, { Component } from 'react';
-import type { Children } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import ReactMarkdown from 'react-markdown';
 import classNames from 'classnames';
 import styles from './InformativeMessage.scss';
 
-type Props = {
+type Props = {|
   title?: string,
   message?: string,
   subclass?: string,
-  children?: Children
-};
+  children?: Node
+|};
 
 @observer
 export default class InformativeMessage extends Component<Props> {

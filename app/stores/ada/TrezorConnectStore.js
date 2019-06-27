@@ -22,11 +22,11 @@ import { derivePathPrefix } from '../../api/ada/lib/utils';
 // This is actually just an interface
 import {
   HWConnectStoreTypes,
-  StepState,
   ProgressStep,
   ProgressInfo,
   HWDeviceInfo
 } from '../../types/HWConnectStoreTypes';
+import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
   Logger,

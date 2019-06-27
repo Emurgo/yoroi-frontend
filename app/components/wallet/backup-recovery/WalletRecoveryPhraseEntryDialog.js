@@ -42,7 +42,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
   enteredPhrase: Array<{ word: string }>,
   isValid: boolean,
@@ -59,7 +59,7 @@ type Props = {
   removeWord: Function,
   hasWord: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
@@ -89,10 +89,9 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       classicTheme,
     } = this.props;
     const dialogClasses = classnames([
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       'WalletRecoveryPhraseEntryDialog',
     ]);
-    const wordsClasses = classicTheme ? styles.wordsClassic : styles.words;
 
     const enteredPhraseString = enteredPhrase.reduce((phrase, { word }) => `${phrase} ${word}`, '');
 
@@ -160,7 +159,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         />}
 
         {!isValid && (
-          <div className={wordsClasses}>
+          <div className={styles.words}>
             {recoveryPhraseSorted.map(({ word, isActive }, index) => (
               <MnemonicWord
                 key={word + index} // eslint-disable-line react/no-array-index-key

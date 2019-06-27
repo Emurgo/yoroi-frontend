@@ -5,7 +5,7 @@ import WalletBackupPrivacyWarningDialog from './backup-recovery/WalletBackupPriv
 import WalletRecoveryPhraseDisplayDialog from './backup-recovery/WalletRecoveryPhraseDisplayDialog';
 import WalletRecoveryPhraseEntryDialog from './backup-recovery/WalletRecoveryPhraseEntryDialog';
 
-type Props = {
+type Props = {|
   currentStep: ?string,
   canPhraseBeShown: boolean,
   isPrivacyNoticeAccepted: boolean,
@@ -30,7 +30,7 @@ type Props = {
   removeWord: Function,
   hasWord: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletBackupDialog extends Component<Props> {

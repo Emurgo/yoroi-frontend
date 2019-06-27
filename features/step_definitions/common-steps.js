@@ -67,7 +67,12 @@ After(async function () {
 const writeFile = promisify(fs.writeFile);
 
 // Steps that contain these patterns will trigger screenshots:
-const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I click', 'by clicking'];
+const SCREENSHOT_STEP_PATTERNS = [
+  'I should see',
+  'I see',
+  'I click',
+  'by clicking',
+];
 
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {

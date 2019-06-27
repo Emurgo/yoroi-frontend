@@ -11,11 +11,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onBack: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class DaedalusTransferMasterKeyFormPage extends Component<Props> {

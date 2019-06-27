@@ -15,11 +15,12 @@ import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 import config from '../../../config';
-import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 import WarningBox from '../../widgets/forms/WarningBox';
+import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -36,21 +37,22 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   staleTx: boolean,
+  selectedExplorer: ExplorerType,
   amount: string,
   receivers: Array<string>,
   totalAmount: string,
   transactionFee: string,
-  signRequest: BaseSignRequest,
   onSubmit: ({ password: string }) => void,
   amountToNaturalUnits: (amountWithFractions: string) => string,
+  signRequest: BaseSignRequest,
   onCancel: Function,
   isSubmitting: boolean,
   error: ?LocalizableError,
   currencyUnit: string,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletSendConfirmationDialog extends Component<Props> {
@@ -84,7 +86,6 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
   submit() {
     this.form.submit({
       onSuccess: (form) => {
-        const { signRequest } = this.props;
         const { walletPassword } = form.values();
         const transactionData = {
           password: walletPassword,
@@ -159,6 +160,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             {receivers.map((receiver, i) => (
               <ExplorableHashContainer
                 key={receiver + i} // eslint-disable-line react/no-array-index-key
+                selectedExplorer={this.props.selectedExplorer}
                 hash={receiver}
                 light
                 linkType="address"

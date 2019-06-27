@@ -27,12 +27,13 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   isActionProcessing: ?boolean,
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
-};
+  classicTheme: boolean,
+|};
 
 @observer
 export default class ExportTransactionDialog extends Component<Props> {
@@ -59,7 +60,7 @@ export default class ExportTransactionDialog extends Component<Props> {
       className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(messages.exportButtonLabel),
       primary: true,
-      disabled: isActionProcessing,
+      disabled: isActionProcessing || false,
       onClick: submit,
     }];
 
@@ -71,6 +72,7 @@ export default class ExportTransactionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
+        classicTheme={this.props.classicTheme}
       >
         {infoBlock}
         <ErrorBlock error={error} />

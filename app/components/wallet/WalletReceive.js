@@ -18,6 +18,7 @@ import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -54,8 +55,9 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   walletAddress: string,
+  selectedExplorer: ExplorerType,
   isWalletAddressUsed: boolean,
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
@@ -63,7 +65,7 @@ type Props = {
   onVerifyAddress: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 type State = {
   showUsed: boolean,
@@ -140,6 +142,7 @@ export default class WalletReceive extends Component<Props, State> {
               onCopyAddress={onCopyAddress}
             >
               <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
                 hash={walletAddress}
                 light={isWalletAddressUsed}
                 linkType="address"
@@ -187,6 +190,7 @@ export default class WalletReceive extends Component<Props, State> {
               <div key={`gen-${address.id}`} className={addressClasses}>
                 {/* Address Id */}
                 <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
                   hash={address.id}
                   light={address.isUsed}
                   linkType="address"
@@ -214,9 +218,7 @@ export default class WalletReceive extends Component<Props, State> {
                           svg={verifyIcon}
                           className={styles.verifyIcon}
                         />
-                        <span className={styles.actionIconText}>
-                          {intl.formatMessage(messages.verifyAddressLabel)}
-                        </span>
+                        <span>{intl.formatMessage(messages.verifyAddressLabel)}</span>
                       </div>
                     </button>
                   </div>
@@ -227,9 +229,7 @@ export default class WalletReceive extends Component<Props, State> {
                   >
                     <div className={styles.addressActionItemBlock}>
                       <SvgInline svg={iconCopy} className={styles.copyIcon} />
-                      <span className={styles.actionIconText}>
-                        {intl.formatMessage(messages.copyAddressLabel)}
-                      </span>
+                      <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
                     </div>
                   </CopyToClipboard>
                 </div>

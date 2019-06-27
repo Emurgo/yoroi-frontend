@@ -65,7 +65,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   renderStatus: ?PdfGenStepType,
   paperFile: ?Blob,
   onNext: Function,
@@ -73,7 +73,7 @@ type Props = {
   onDownload: Function,
   onDataChange: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class CreatePaperDialog extends Component<Props> {

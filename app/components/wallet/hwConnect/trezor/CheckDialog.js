@@ -55,14 +55,15 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
+  onExternalLinkClick: Function,
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class CheckDialog extends Component<Props> {
@@ -77,17 +78,14 @@ export default class CheckDialog extends Component<Props> {
       progressInfo,
       isActionProcessing,
       error,
+      onExternalLinkClick,
       submit,
       cancel,
       classicTheme,
     } = this.props;
 
-    const middleBlockClasses = classicTheme
-      ? classnames([styles.middleBlockClassic, styles.middleCheckBlockClassic])
-      : classnames([styles.middleBlock, styles.middleCheckBlock]);
-
     const middleBlock = (
-      <div className={middleBlockClasses}>
+      <div className={classnames([styles.middleBlock, styles.component])}>
         {!classicTheme && <SvgInline svg={aboutTrezorSvg} />}
 
         <div className={styles.prerequisiteBlock}>
@@ -100,7 +98,10 @@ export default class CheckDialog extends Component<Props> {
           <ul>
             <li key="1">
               {intl.formatMessage(messages.aboutPrerequisite1Part1)}
-              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
+              <a
+                href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}
+                onClick={event => onExternalLinkClick(event)}
+              >
                 {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText) + ' '}
                 <SvgInline svg={externalLinkSVG} />
               </a>
@@ -141,7 +142,7 @@ export default class CheckDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock progressInfo={progressInfo} />
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 }

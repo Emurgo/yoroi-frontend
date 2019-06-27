@@ -8,13 +8,13 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './ErrorPage.scss';
 
-type Props = {
+type Props = {|
   error?: ?LocalizableError,
   onCancel: Function,
   title: string,
   backButtonLabel: string,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class ErrorPage extends Component<Props> {

@@ -5,11 +5,21 @@
 }
 
 .navigation {
-  height: 40px;
+  height: var(--theme-wallet-navigation-tab-height);
   flex-shrink: 0;
 }
 
 .page {
-  height: calc(100% - 40px);
+  height: calc(100% - var(--theme-wallet-navigation-tab-height));
   overflow: auto;
+}
+
+:global(.YoroiModern) {
+  .navigation {
+    height: var(--theme-wallet-navigation-tab-height);
+  }
+
+  .page {
+    height: calc(100% - var(--theme-wallet-navigation-tab-height));
+  }  
 }

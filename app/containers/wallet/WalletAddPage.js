@@ -52,8 +52,6 @@ export default class WalletAddPage extends Component<Props> {
     const { uiDialogs } = stores;
     const { restoreRequest } = wallets;
 
-    const isCreateTrezorWalletActive = this._getTrezorConnectStore().isCreateHWActive;
-    const isCreateLedgerWalletActive = this._getLedgerConnectStore().isCreateHWActive;
     const openTrezorConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
       this.props.actions[environment.API].trezorConnect.init.trigger();
@@ -85,7 +83,6 @@ export default class WalletAddPage extends Component<Props> {
     } else if (uiDialogs.isOpen(WalletRestoreOptionDialog)) {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
-          stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
@@ -106,8 +103,6 @@ export default class WalletAddPage extends Component<Props> {
     } else if (uiDialogs.isOpen(WalletConnectHWOptionDialog)) {
       activeDialog = (
         <WalletConnectHWOptionDialogContainer
-          actions={actions}
-          stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
           onTrezor={openTrezorConnectDialog}
@@ -139,11 +134,8 @@ export default class WalletAddPage extends Component<Props> {
         onHardwareConnect={
           () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
         }
-        isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-        isCreateLedgerWalletActive={isCreateLedgerWalletActive}
         onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
         onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
-        onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
         isRestoreActive={restoreRequest.isExecuting}
         onSettings={this._goToSettingsRoot}
         onDaedalusTransfer={this._goToDaedalusTransferRoot}

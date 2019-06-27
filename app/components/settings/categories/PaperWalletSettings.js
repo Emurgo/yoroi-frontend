@@ -34,13 +34,13 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onCreatePaper: Function,
   dialog: Node,
   paperWalletsIntroText: string,
   isDialogOpen: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 @observer
 export default class PaperWalletSettings extends Component<Props> {

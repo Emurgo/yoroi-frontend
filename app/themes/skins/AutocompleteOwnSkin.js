@@ -14,6 +14,8 @@ import { Options } from 'react-polymorph/lib/components/Options';
 import { FormFieldOwnSkin } from './FormFieldOwnSkin';
 import { OptionsSkin } from 'react-polymorph/lib/skins/simple/OptionsSkin';
 
+// This type should be kept open (not "exact") because it is a react-polymorph skin
+// and should be able to pass any extra properties from react-polymorph down.
 type Props = {
   className: string,
   error: string,
