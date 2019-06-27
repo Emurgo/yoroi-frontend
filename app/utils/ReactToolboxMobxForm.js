@@ -1,3 +1,4 @@
+// @flow
 import MobxReactForm from 'mobx-react-form';
 
 /** Custom Rewriter

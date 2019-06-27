@@ -83,7 +83,6 @@ export default class WalletAddPage extends Component<Props> {
     } else if (uiDialogs.isOpen(WalletRestoreOptionDialog)) {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
-          stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
@@ -91,21 +90,22 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      const restoreType = uiDialogs.getParam('restoreType');
+      const mode = uiDialogs.getParam('restoreType') || 'regular';
+      if ((mode !== 'regular') && (mode !== 'paper')) {
+        throw new Error('Invalid restore type');
+      }
       activeDialog = (
         <WalletRestoreDialogContainer
           actions={actions}
           stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
-          mode={restoreType || 'regular'}
+          mode={mode}
         />
       );
     } else if (uiDialogs.isOpen(WalletConnectHWOptionDialog)) {
       activeDialog = (
         <WalletConnectHWOptionDialogContainer
-          actions={actions}
-          stores={stores}
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
           onTrezor={openTrezorConnectDialog}

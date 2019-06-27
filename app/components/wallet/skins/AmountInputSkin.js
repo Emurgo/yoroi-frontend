@@ -1,4 +1,6 @@
+// @flow
 import React, { Component } from 'react';
+import type { Ref } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
@@ -13,15 +15,26 @@ const messages = defineMessages({
   },
 });
 
-type Props = {|
+// This type should be kept open (not "exact") because it is a react-polymorph skin
+// and should be able to pass any extra properties from react-polymorph down.
+type Props = {
   currency: string,
   fees: BigNumber,
   total: BigNumber,
-  error: boolean,
-  classicTheme: boolean
-|};
+  error?: string,
+  classicTheme: boolean,
+  // inherited from InputOwnSkin
+  inputRef: Ref<'input'>,
+  theme: Object,
+  themeId: string,
+  value: string,
+  type: string,
+};
 
 export default class AmountInputSkin extends Component<Props> {
+  static defaultProps = {
+    error: undefined,
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -42,11 +55,11 @@ export default class AmountInputSkin extends Component<Props> {
 
         {classicTheme ? (
           <span className={styles.total}>
-            {!error && `= ${total} `}{currency}
+            {!error && `= ${total.toString()} `}{currency}
           </span>
         ) : (
           <span className={classnames([styles.total, error ? styles.error : ''])}>
-            {!error && `= ${total} `}{currency}
+            {!error && `= ${total.toString()} `}{currency}
           </span>
         )}
       </div>

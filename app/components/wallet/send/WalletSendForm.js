@@ -19,6 +19,7 @@ import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
 import environment from '../../../environment';
+import type { UriParams } from '../../../utils/URIHandling';
 
 import {
   formattedWalletAmount,
@@ -102,7 +103,7 @@ type Props = {|
   validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
   onSubmit: void => void,
   addressValidator: Function,
-  totalInput: BigNumber,
+  totalInput: ?BigNumber,
   classicTheme: boolean,
   updateReceiver: (void | string) => void,
   updateAmount: (void | number) => void,
@@ -112,6 +113,8 @@ type Props = {|
   isCalculatingFee: boolean,
   reset: void => void,
   error: ?LocalizableError,
+  uriParams: ?UriParams,
+  resetUriParams: void => void,
 |};
 
 @observer
@@ -125,6 +128,15 @@ export default class WalletSendForm extends Component<Props> {
 
   componentDidMount() {
     this.props.reset();
+    if (this.props.uriParams) {
+      // assert not null
+      const uriParams = this.props.uriParams;
+      const adjustedAmount = formattedAmountToNaturalUnits(uriParams.amount.toString());
+      // note: assume these are validated externally
+      this.props.updateAmount(Number(adjustedAmount));
+      this.props.updateReceiver(uriParams.address);
+      this.props.resetUriParams();
+    }
 
     /**
      * Mobx-react-form doesn't allow the value field to be updated based on a computed variable
@@ -136,12 +148,14 @@ export default class WalletSendForm extends Component<Props> {
         if (!this.props.totalInput || !this.props.fee) {
           return;
         }
+        const totalInput = this.props.totalInput;
+        const fee = this.props.fee;
         if (!this.props.shouldSendAll) {
           return;
         }
         // once sendAll is triggered, set the amount field to the total input
         this.form.$('amount').set('value', formattedWalletAmount(
-          this.props.totalInput.minus(this.props.fee)
+          totalInput.minus(fee)
         ));
       },
     );
@@ -161,7 +175,9 @@ export default class WalletSendForm extends Component<Props> {
       receiver: {
         label: this.context.intl.formatMessage(messages.receiverLabel),
         placeholder: this.context.intl.formatMessage(messages.receiverHint),
-        value: '',
+        value: this.props.uriParams
+          ? this.props.uriParams.address
+          : '',
         validators: [({ field }) => {
           const receiverValue = field.value;
           if (receiverValue === '') {
@@ -182,7 +198,9 @@ export default class WalletSendForm extends Component<Props> {
       amount: {
         label: this.context.intl.formatMessage(messages.amountLabel),
         placeholder: `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}`,
-        value: '',
+        value: this.props.uriParams
+          ? formattedWalletAmount(this.props.uriParams.amount)
+          : '',
         validators: [async ({ field }) => {
           if (this.props.shouldSendAll) {
             // sendall doesn't depend on the amount so always succeed
@@ -206,6 +224,8 @@ export default class WalletSendForm extends Component<Props> {
     },
   }, {
     options: {
+      // if fields are pre-populated by URI, validate them right away
+      showErrorsOnInit: this.props.uriParams,
       validateOnBlur: false,
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,

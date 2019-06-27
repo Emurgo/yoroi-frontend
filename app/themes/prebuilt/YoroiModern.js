@@ -377,7 +377,7 @@ export default {
   '--theme-wallet-add-option-dialog-item-title-color': '#2B2C32',
   '--theme-wallet-add-option-dialog-item-learn-more-block-bg-color': '#F5F7F9',
   '--theme-wallet-add-option-dialog-item-learn-more-button-color': '#ADAEB6',
-  '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',  
+  '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',
   '--theme-wallet-add-translucent-color': 'rgba(255, 255, 255, 0.5)',
   '--theme-wallet-add-footer-text-color': '#353535',
 

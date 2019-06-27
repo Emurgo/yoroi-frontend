@@ -13,9 +13,9 @@ type Props = {|
 export default class WalletRecoveryInstructions extends Component<Props> {
 
   render() {
-    const { instructionsText, classicTheme } = this.props;
+    const { instructionsText } = this.props;
     return (
-      <div className={classicTheme ? styles.componentClassic : styles.component}>
+      <div className={styles.component}>
         {instructionsText}
       </div>
     );

@@ -27,9 +27,9 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   status: string
-};
+|};
 
 @observer
 export default class DaedalusTransferWaitingPage extends Component<Props> {

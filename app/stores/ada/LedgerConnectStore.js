@@ -31,11 +31,11 @@ import {
 // This is actually just an interface
 import {
   HWConnectStoreTypes,
-  StepState,
   ProgressStep,
   ProgressInfo,
   HWDeviceInfo
 } from '../../types/HWConnectStoreTypes';
+import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
   prepareLedgerBridger,
@@ -225,7 +225,7 @@ export default class LedgerConnectStore
     return true;
   };
 
-  _handleConnectError = (error: any): void => {
+  _handleConnectError = (error: Error): void => {
     Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;

@@ -1,0 +1,22 @@
+.component {
+
+  font-family: var(--font-regular);
+  font-size: 16px;
+
+  .warningText {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .continueButton {
+    display: block !important;
+    margin: 30px auto 0;
+  }
+
+  .invalidURIImg {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -8,11 +8,13 @@ import { pickDOMProps } from 'react-polymorph/lib/utils/props';
 import ReactMarkdown from 'react-markdown';
 import styles from './CheckboxOwnSkin.scss';
 
+// This type should be kept open (not "exact") because it is a react-polymorph skin
+// and should be able to pass any extra properties from react-polymorph down.
 type Props = {
   checked: boolean,
   className: string,
   disabled: boolean,
-  onChange: Function,
+  onChange: (boolean, Event) => void,
   label: string | Element<any>,
   description: string | Element<any>,
   theme: Object,

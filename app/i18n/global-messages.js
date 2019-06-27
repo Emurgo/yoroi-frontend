@@ -1,3 +1,4 @@
+// @flow
 import { defineMessages } from 'react-intl';
 
 /*
@@ -47,6 +48,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.confirm',
     defaultMessage: '!!!Confirm',
   },
+  continue: {
+    id: 'global.labels.continue',
+    defaultMessage: '!!!Continue',
+  },
   finish: {
     id: 'global.labels.finish',
     defaultMessage: '!!!Finish',
@@ -74,7 +79,7 @@ const globalMessages = defineMessages({
   learnMore: {
     id: 'global.labels.LearnMore',
     defaultMessage: '!!!Learn more',
-  },  
+  },
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
@@ -270,7 +275,7 @@ const globalMessages = defineMessages({
   },
   contactSupport: {
     id: 'global.contact',
-    defaultMessage: '!!!contact support', 
+    defaultMessage: '!!!contact support',
   },
   staleTxnWarningLine1: {
     id: 'global.staleTxnWarningLine1',
@@ -292,6 +297,22 @@ const globalMessages = defineMessages({
     id: 'settings.general.explorer',
     defaultMessage: '!!!Blockchain Explorer',
   },
+  newPasswordLabel: {
+    id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
+    defaultMessage: '!!!New spending password',
+  },
+  newPasswordFieldPlaceholder: {
+    id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type new spending password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat new spending password',
+  },
+  repeatPasswordFieldPlaceholder: {
+    id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type new spending password',
+  },
 });
 export default globalMessages;
 
@@ -312,7 +333,10 @@ export const environmentSpecificMessages = {
   }),
 };
 
-export function listOfTranslators(contributorsList, contributorsAck): string {
+export function listOfTranslators(
+  contributorsList: string,
+  contributorsAck: string,
+): string {
   let output = '';
   // append name of contributors only if the message is not empty
   if (contributorsList !== globalMessages.translationContributors.defaultMessage) {
