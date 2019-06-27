@@ -44,3 +44,11 @@ Feature: Main UI
     When There is no wallet stored
     And I am on the Daedalus Transfer instructions screen
     Then I see transactions buttons are disabled
+
+  @it-110
+  Scenario: Ensure user can hide balance (IT-110)
+    And There is a wallet stored named many-tx-wallet
+    And I click on hide balance button
+    Then I should see my balance hidden
+    When I refresh the page
+    Then I should see my balance hidden

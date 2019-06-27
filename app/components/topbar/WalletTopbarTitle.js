@@ -104,6 +104,7 @@ export default class WalletTopbarTitle extends Component<Props> {
               <button
                 type="button"
                 onClick={onUpdateHideBalance}
+                className={classNames(['hideBalanceButton'])}
               >
                 <SvgInline
                   svg={shouldHideBalance ? showBalanceIcon : hideBalanceIcon}
