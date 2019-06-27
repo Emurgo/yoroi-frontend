@@ -15,7 +15,7 @@ const messages = defineMessages({
   },
 });
 
-export function convertToLocalizableError(error: any): LocalizableError {
+export function convertToLocalizableError(error: Error): LocalizableError {
   let localizableError: ?LocalizableError = null;
 
   if (error instanceof LocalizableError) {

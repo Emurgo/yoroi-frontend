@@ -80,14 +80,14 @@ export default class Dialog extends Component<Props> {
 
           {actions && (
             <div className={styles.actions}>
-              {_.map(actions, (action, key) => {
+              {_.map(actions, (action, i: number) => {
                 const buttonClasses = classnames([
                   action.className ? action.className : null,
                   action.primary ? 'primary' : secondaryButton,
                 ]);
                 return (
                   <Button
-                    key={key}
+                    key={i}
                     className={buttonClasses}
                     label={action.label}
                     onClick={action.onClick}

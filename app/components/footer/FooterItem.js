@@ -7,13 +7,19 @@ import styles from './FooterItem.scss';
 type Props = {|
   url: string,
   svg: string,
-  message: MessageDescriptor
+  message: MessageDescriptor,
+  onExternalLinkClick: Function,
 |};
 
 export default class FooterItem extends Component<Props> {
 
   render() {
-    const { url, svg, message } = this.props;
+    const {
+      url,
+      svg,
+      message,
+      onExternalLinkClick,
+    } = this.props;
 
     return (
       <LinkButton
@@ -21,6 +27,7 @@ export default class FooterItem extends Component<Props> {
         svg={svg}
         message={message}
         textClassName={styles.text}
+        onExternalLinkClick={onExternalLinkClick}
       />
     );
   }

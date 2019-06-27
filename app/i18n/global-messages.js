@@ -48,6 +48,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.confirm',
     defaultMessage: '!!!Confirm',
   },
+  continue: {
+    id: 'global.labels.continue',
+    defaultMessage: '!!!Continue',
+  },
   finish: {
     id: 'global.labels.finish',
     defaultMessage: '!!!Finish',
@@ -75,7 +79,7 @@ const globalMessages = defineMessages({
   learnMore: {
     id: 'global.labels.LearnMore',
     defaultMessage: '!!!Learn more',
-  },  
+  },
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
@@ -271,7 +275,7 @@ const globalMessages = defineMessages({
   },
   contactSupport: {
     id: 'global.contact',
-    defaultMessage: '!!!contact support', 
+    defaultMessage: '!!!contact support',
   },
   staleTxnWarningLine1: {
     id: 'global.staleTxnWarningLine1',

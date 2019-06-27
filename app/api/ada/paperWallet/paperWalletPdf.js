@@ -29,7 +29,7 @@ export type PdfGenStepType = $Values<typeof PdfGenSteps>;
 
 export const generateAdaPaperPdf = async (
   request: PaperRequest,
-  updateStatus: (PdfGenStepType => ?any) = () => {}
+  updateStatus: (PdfGenStepType => void) = () => {}
 ): Promise<?Blob> => {
   // Prepare params
   // eslint-disable-next-line no-unused-vars

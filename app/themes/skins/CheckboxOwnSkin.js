@@ -14,7 +14,7 @@ type Props = {
   checked: boolean,
   className: string,
   disabled: boolean,
-  onChange: Function,
+  onChange: (boolean, Event) => void,
   label: string | Element<any>,
   description: string | Element<any>,
   theme: Object,

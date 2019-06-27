@@ -1,3 +1,5 @@
+// @flow
+
 import React from 'react';
 import { render } from 'react-dom';
 import { action, useStrict } from 'mobx';
@@ -39,9 +41,13 @@ const initializeYoroi = async () => {
     })
   };
 
+  const root = document.querySelector('#root');
+  if (root == null) {
+    throw new Error('Root element not found.');
+  }
   render(
     <App stores={stores} actions={actions} history={history} />,
-    document.querySelector('#root')
+    root
   );
 };
 

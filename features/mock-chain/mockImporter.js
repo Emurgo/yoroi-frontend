@@ -36,7 +36,7 @@ type ServerStatus = {
  */
 
 const genesisTx = {
-  hash: cryptoRandomString({length: 64 }),
+  hash: cryptoRandomString({ length: 64 }),
   inputs: [
     { id: genesisTransaction, index: 0 }
   ],
@@ -49,7 +49,7 @@ const genesisTx = {
   tx_state: 'Successful'
 };
 const distributorTx = {
-  hash: cryptoRandomString({length: 64 }),
+  hash: cryptoRandomString({ length: 64 }),
   inputs: [
     { id: genesisTx.hash, index: 0 }
   ],
@@ -80,7 +80,7 @@ const distributorTx = {
 // =========================
 
 const pendingTx1 = {
-  hash: cryptoRandomString({length: 64 }),
+  hash: cryptoRandomString({ length: 64 }),
   inputs: [
     { id: distributorTx.hash, index: 2 }
   ],
@@ -113,7 +113,7 @@ const pendingTx2 = {
 // ==================
 
 const manyTx1 = {
-  hash: cryptoRandomString({length: 64 }),
+  hash: cryptoRandomString({ length: 64 }),
   inputs: [
     { id: distributorTx.hash, index: 4 }
   ],
@@ -145,7 +145,7 @@ const manyTx2 = {
   tx_state: 'Successful'
 };
 const manyTx3 = {
-  hash: cryptoRandomString({length: 64 }),
+  hash: cryptoRandomString({ length: 64 }),
   inputs: [
     { id: distributorTx.hash, index: 6 }
   ],
@@ -161,7 +161,7 @@ const manyTx3 = {
   tx_state: 'Successful'
 };
 const manyTx4 = {
-  hash: cryptoRandomString({length: 64 }),
+  hash: cryptoRandomString({ length: 64 }),
   inputs: [
     { id: distributorTx.hash, index: 7 }
   ],

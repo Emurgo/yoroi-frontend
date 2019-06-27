@@ -1,4 +1,4 @@
-# Paper Wallet
+# Paper Wallets
 
 Un ** Paper Wallet ** è un documento speciale, contenente delle parole chiave segrete ed un piccolo insieme di indirizzi. Quando un Paper Wallet viene creato, ** NON viene mai salvato su Yoroi **. Il documento PDF che viene generato è la unica copia esistente di questo portafoglio.
 

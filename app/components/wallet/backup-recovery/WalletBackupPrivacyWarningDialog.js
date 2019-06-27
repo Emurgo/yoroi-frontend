@@ -20,10 +20,6 @@ const messages = defineMessages({
     your wallet backup phrase. It can be entered in any version of Daedalus application in order
     to back up or restore your wallet’s funds and private key.`,
   },
-  buttonLabelContinue: {
-    id: 'wallet.backup.privacy.warning.dialog..button.labelContinue', // TODO: fix translation key path 'dialog..button'
-    defaultMessage: '!!!Continue',
-  },
   termNobodyWatching: {
     id: 'wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching',
     defaultMessage: '!!!Make sure nobody looks into your screen unless you want them to have access to your funds.',
@@ -66,7 +62,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
 
     const actions = [
       {
-        label: intl.formatMessage(messages.buttonLabelContinue) + countdownDisplay,
+        label: intl.formatMessage(globalMessages.continue) + countdownDisplay,
         onClick: onContinue,
         disabled: !canPhraseBeShown,
         primary: true

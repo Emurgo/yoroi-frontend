@@ -176,7 +176,7 @@ export type CreateAdaPaperPdfRequest = {
   paper: AdaPaper,
   network: Network,
   printAccountPlate?: boolean,
-  updateStatus?: PdfGenStepType => ?any,
+  updateStatus?: PdfGenStepType => boolean,
 };
 
 export type CreateAdaPaperPdfResponse = ?Blob;
@@ -608,7 +608,9 @@ export default class AdaApi {
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
-      return !updateStatus || updateStatus(s);
+      if (updateStatus) {
+        updateStatus(s);
+      }
     });
     return res;
   }

@@ -34,19 +34,6 @@ class App extends Component<{
   actions: ActionsMap,
   history: Object,
 }> {
-
-  mobxDevToolsInstanceIfDevEnv(): ?React$Element<any> {
-    if (!environment.isDev()) return undefined;
-    try {
-      const mobxDevToolsPackage = require('mobx-react-devtools').default;
-      return React.createElement(mobxDevToolsPackage, {
-        position: 'topRight'
-      });
-    } catch (err) {
-      return undefined;
-    }
-  }
-
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -66,7 +53,6 @@ class App extends Component<{
       }
     );
     const currentTheme = stores.profile.currentTheme;
-    const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
     // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
     if (document && document.body instanceof HTMLBodyElement) {
@@ -95,7 +81,6 @@ class App extends Component<{
             </Router>
           </IntlProvider>
         </ThemeProvider>
-        {mobxDevTools}
       </div>
     );
   }

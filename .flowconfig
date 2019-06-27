@@ -15,6 +15,7 @@
 
 [untyped]
 .*/node_modules/trezor-connect/lib/popup/PopupManager.js
+.*/node_modules/trezor-connect/lib/iframe/builder.js
 
 [libs]
 flow/declarations/

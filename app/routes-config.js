@@ -25,5 +25,8 @@ export const ROUTES = {
   },
   DAEDALUS_TRANFER: {
     ROOT: '/daedalus-transfer',
-  }
+  },
+  SEND_FROM_URI: {
+    ROOT: '/send-from-uri',
+  },
 };

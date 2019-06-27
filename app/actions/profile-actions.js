@@ -9,6 +9,6 @@ export default class ProfileActions {
   updateLocale: Action<{ locale: string }> = new Action();
   updateSelectedExplorer: Action<{ explorer: ExplorerType }> = new Action();
   updateTheme: Action<{ theme: string }> = new Action();
-  exportTheme: Action<any> = new Action();
+  exportTheme: Action<void> = new Action();
   redirectToTermsOfUse: Action<{ locale: string }> = new Action();
 }
