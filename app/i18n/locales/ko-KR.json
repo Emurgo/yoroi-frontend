@@ -198,7 +198,7 @@
   "transfer.form.recovery.phrase.input.noResults": "결과가 없습니다.",
   "transfer.instructions.attention.title.label": "주의사항",
   "transfer.instructions.instructions.button.label": "요로이 지갑 만들기",
-  "transfer.instructions.instructions.text": "Before you can transfer funds, you must create a Yoroi wallet and back it up.<br>Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.",
+  "transfer.instructions.instructions.text": "송금하기 전에 요로이 지갑을 생성하여 백업할 필요가 있습니다. <br>이를 완료하면, 언제라도 요로이 지갑을 복원할 수 있는 15단어로 구성된 복구 구절이 생성됩니다.",
   "transfer.instructions.instructions.title.label": "사용 설명",
   "transfer.summary.addressFrom.label": "보내는 사람",
   "transfer.summary.addressTo.label": "받는 사람",
