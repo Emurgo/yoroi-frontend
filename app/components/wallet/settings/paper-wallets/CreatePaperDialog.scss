@@ -68,20 +68,19 @@
     }
   
     .walletLoader {
-      margin: 20px auto;
       width: 170px;
       height: 190px;
       background-repeat: no-repeat;
       background-position: center center;
       background-size: contain;
-    }  
+    }
   }
 }
 
 :global(.YoroiClassic) {
   .component {
     .walletLoader {
-      background-image: url("../../../../assets/images/paper-wallet/paper-wallet-loader-classic.gif");
+      background-image: url("../../../../assets/images/paper-wallet/create-paper-wallet-loader-classic.gif");
     }
   }
 }
@@ -89,7 +88,7 @@
 :global(.YoroiModern) {
   .component {
     .walletLoader {
-      background-image: url("../../../../assets/images/paper-wallet/paper-wallet-loader.gif");
+      background-image: url("../../../../assets/images/paper-wallet/create-paper-wallet-loader-modern.gif");
     }
   }
 }
