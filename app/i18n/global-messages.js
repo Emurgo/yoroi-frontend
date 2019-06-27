@@ -132,10 +132,6 @@ const globalMessages = defineMessages({
     id: 'settings.support.faq.faqLinkURL',
     defaultMessage: '!!!https://yoroi-wallet.com/faq/',
   },
-  twitterLinkUrl: {
-    id: 'settings.support.twitterLinkURL',
-    defaultMessage: '!!!https://twitter.com/YoroiWallet/',
-  },
   walletSendConfirmationDialogTitle: {
     id: 'wallet.send.confirmationDialog.title',
     defaultMessage: '!!!Confirm transaction',

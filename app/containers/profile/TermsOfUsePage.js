@@ -10,7 +10,6 @@ import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 
 const messages = defineMessages({
   title: {
@@ -30,18 +29,15 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     this.props.actions.profile.acceptTermsOfUse.trigger();
   };
 
-  displayedBanner = (connectionErrorType: ?ServerStatusErrorType) => {
-    connectionErrorType === null ?
-      <TestnetWarningBanner /> :
-      <ServerErrorBanner errorType={connectionErrorType} />;
-  };
-
   render() {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
     const { stores } = this.props;
     const { topbar, profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+    const displayedBanner = checkAdaServerStatus === null ?
+      <TestnetWarningBanner /> :
+      <ServerErrorBanner errorType={checkAdaServerStatus} />;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -54,7 +50,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
       <TopBarLayout
         topbar={topbarElement}
         classicTheme={profile.isClassicTheme}
-        banner={this.displayedBanner(checkAdaServerStatus)}
+        banner={displayedBanner}
       >
         <TermsOfUseForm
           localizedTermsOfUse={termsOfUse}
