@@ -52,3 +52,5 @@ Feature: Main UI
     Then I should see my balance hidden
     When I refresh the page
     Then I should see my balance hidden
+    When I click on hide balance button
+    Then I should see the balance number "3.110004 ADA"

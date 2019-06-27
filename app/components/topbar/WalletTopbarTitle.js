@@ -89,9 +89,7 @@ export default class WalletTopbarTitle extends Component<Props> {
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
             { wallet && shouldHideBalance ?
-              <span className={styles.hiddenWalletAmount}>
-                {formattedWalletAmount(wallet.amount).replace(/./g, '*')}
-              </span> :
+              <span className={styles.hiddenWalletAmount}>******</span> :
               wallet && formattedWalletAmount(wallet.amount)
             }
             { currency }

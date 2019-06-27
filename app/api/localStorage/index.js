@@ -201,8 +201,8 @@ export default class LocalStorageApi {
   getHideBalance = (): Promise<boolean> => new Promise((resolve, reject) => {
     try {
       const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
-      if (!hideBalance) return resolve(false);
-      resolve(JSON.parse(hideBalance));
+      if (!hideBalance) resolve(false);
+      else resolve(JSON.parse(hideBalance));
     } catch (error) {
       return reject(error);
     }
