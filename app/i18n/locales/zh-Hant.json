@@ -198,7 +198,7 @@
   "transfer.form.recovery.phrase.input.noResults": "無結果",
   "transfer.instructions.attention.title.label": "注意",
   "transfer.instructions.instructions.button.label": "建立 Yoroi 錢包",
-  "transfer.instructions.instructions.text": "Before you can transfer funds, you must create a Yoroi wallet and back it up.<br>Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.",
+  "transfer.instructions.instructions.text": "在轉帳前, 你必須創建一個Yoroi錢包並將其備份。<br>完成後, 您將收到一個15字的恢復短語, 可用於隨時恢復您的 Yoroi 錢包。",
   "transfer.instructions.instructions.title.label": "指示",
   "transfer.summary.addressFrom.label": "寄件人",
   "transfer.summary.addressTo.label": "收件人",
