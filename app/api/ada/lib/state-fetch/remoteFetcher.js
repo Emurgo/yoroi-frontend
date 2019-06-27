@@ -36,6 +36,15 @@ const backendUrl = CONFIG.network.backendUrl;
  * https://github.com/Emurgo/yoroi-backend-service/
  */
 export class RemoteFetcher implements IFetcher {
+
+  lastLaunchVersion: () => string;
+  currentLocale: () => string;
+
+  constructor(lastLaunchVersion: () => string, currentLocale: () => string) {
+    this.lastLaunchVersion = lastLaunchVersion;
+    this.currentLocale = currentLocale;
+  }
+
   getUTXOsForAddresses = (body: AddressUtxoRequest): Promise<AddressUtxoResponse> => (
     axios(
       `${backendUrl}/api/txs/utxoForAddresses`,
@@ -43,6 +52,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           addresses: body.addresses
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -59,6 +72,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           txsHashes: body.txsHashes
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -75,6 +92,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           addresses: body.addresses
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -92,6 +113,10 @@ export class RemoteFetcher implements IFetcher {
         data: {
           addresses: body.addresses,
           dateFrom: body.dateFrom
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
@@ -113,6 +138,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           signedTx: signedTx64
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(() => ({
@@ -134,6 +163,10 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: {
           addresses: body.addresses
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
         }
       }
     ).then(response => response.data)
