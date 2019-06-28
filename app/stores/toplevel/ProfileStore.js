@@ -88,6 +88,12 @@ export default class ProfileStore extends Store {
   @observable setSelectedExplorerRequest: Request<SaveSelectedExplorerFunc>
     = new Request<SaveSelectedExplorerFunc>(this.api.ada.saveSelectedExplorer);
 
+  @observable getHideBalanceRequest: Request<void => Promise<boolean>>
+    = new Request<void => Promise<boolean>>(this.api.localStorage.getHideBalance);
+
+  @observable setHideBalanceRequest: Request<boolean => Promise<void>>
+    = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
+
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
@@ -95,6 +101,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.redirectToTermsOfUse.listen(this._redirectToTermsOfUse);
+    this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -325,6 +332,20 @@ export default class ProfileStore extends Store {
       this.getSelectedExplorerRequest.result !== null
     );
   }
+
+  // ========== Show/hide Balance ========== //
+
+  @computed get shouldHideBalance(): boolean {
+    const { result } = this.getHideBalanceRequest.execute();
+    return result === true;
+  }
+
+  _updateHideBalance = async () => {
+    const shouldHideBalance = this.shouldHideBalance;
+    await this.setHideBalanceRequest.execute(shouldHideBalance);
+    await this.getHideBalanceRequest.execute();
+  };
+
 
   // ========== Redirec Logic ========== //
 

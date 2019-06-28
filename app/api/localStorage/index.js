@@ -8,7 +8,8 @@ const storageKeys = {
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
   THEME: networkForLocalStorage + '-THEME',
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
-  VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER'
+  VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
+  HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
 };
 
 export type SetCustomUserThemeRequest = {
@@ -195,10 +196,41 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== Show/hide Balance ========== //
+
+  getHideBalance = (): Promise<boolean> => new Promise((resolve, reject) => {
+    try {
+      const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
+      if (!hideBalance) resolve(false);
+      else resolve(JSON.parse(hideBalance));
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setHideBalance = (hideBalance: boolean): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.HIDE_BALANCE, JSON.stringify(!hideBalance));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetHideBalance = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.HIDE_BALANCE);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
+
   async reset() {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
+    await this.unsetHideBalance();
   }
+
 }
