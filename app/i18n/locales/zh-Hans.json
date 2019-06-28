@@ -210,7 +210,7 @@
   "uri.display.dialog.copy.notification": "成功复制链接地址",
   "uri.display.dialog.title": "生成链接",
   "uri.generate.dialog.address.label": "收款方地址",
-  "uri.generate.dialog.amount.label": "Amount ({currency})",
+  "uri.generate.dialog.amount.label": "数量{currency}",
   "uri.generate.dialog.confirm.label": "生成",
   "uri.generate.dialog.invalid.amount": "请输入有效金额。",
   "uri.generate.dialog.title": "生成链接",
