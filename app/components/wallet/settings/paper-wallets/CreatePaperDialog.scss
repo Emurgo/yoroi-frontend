@@ -17,6 +17,10 @@
     width: 92px;
     height: 92px;
   }
+
+  .downloadIcon:focus {
+    outline: none;
+  }
   
   .labelDownload {
     font-size: 16px;
