@@ -131,7 +131,7 @@ export default class VerifyAddressDialog extends Component<Props> {
                   hash={walletAddress}
                   linkType="address"
                 >
-                  <RawHash light={false}>
+                  <RawHash light>
                     {walletAddress}
                   </RawHash>
                 </ExplorableHashContainer>
