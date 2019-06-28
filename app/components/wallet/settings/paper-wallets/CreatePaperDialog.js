@@ -7,7 +7,6 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
 import styles from './CreatePaperDialog.scss';
-import headerMixin from '../../../mixins/HeaderBlock.scss';
 import { PdfGenSteps } from '../../../../api/ada/paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from '../../../../api/ada/paperWallet/paperWalletPdf';
 
@@ -20,17 +19,13 @@ const messages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.loader.label',
     defaultMessage: '!!!Rendering PDF Certificate',
   },
-  downloadPaperButtonLabel: {
-    id: 'settings.paperWallet.dialog.createPaper.download.label',
-    defaultMessage: '!!!Download Paper Wallet Certificate',
-  },
-  downloadPaperIntroLine1: {
-    id: 'settings.paperWallet.dialog.createPaper.download.intro.line1',
+  downloadReadyInfo: {
+    id: 'settings.paperWallet.dialog.createPaper.downloadReadyInfo',
     defaultMessage: '!!!Your paper wallet PDF is ready',
   },
-  downloadPaperIntroLine2: {
-    id: 'settings.paperWallet.dialog.createPaper.download.intro.line2',
-    defaultMessage: '!!!Download size (Mb)',
+  downloadSizeInfo: {
+    id: 'settings.paperWallet.dialog.createPaper.downloadSizeInfo',
+    defaultMessage: '!!!Download Paper Wallet Certificate. Size (Mb):',
   },
   pdfGenInitializing: {
     id: 'settings.paperWallet.dialog.createPaper.initializing',
@@ -122,10 +117,6 @@ export default class CreatePaperDialog extends Component<Props> {
     } = this.props;
 
     const dialogClasses = classnames(['createPaperDialog', styles.component]);
-    const downloadPaperIntroLine1ClassNames = classnames([
-      classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock,
-      styles.downloadPaperIntroLine1,
-    ]);
 
     const actions = [
       {
@@ -149,9 +140,6 @@ export default class CreatePaperDialog extends Component<Props> {
           closeButton={<DialogCloseButton onClose={onCancel} />}
           classicTheme={classicTheme}
         >
-          <div className={downloadPaperIntroLine1ClassNames}>
-            <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span>
-          </div>
           <div
             role="button"
             tabIndex={0}
@@ -160,10 +148,10 @@ export default class CreatePaperDialog extends Component<Props> {
             onKeyPress={() => null}
           />
           <div className={styles.labelDownload}>
-            {this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
+            {this.context.intl.formatMessage(messages.downloadReadyInfo)}
           </div>
           <div className={styles.labelDownloadSize}>
-            {intl.formatMessage(messages.downloadPaperIntroLine2)}: {pdfSizeMb}
+            {intl.formatMessage(messages.downloadSizeInfo)}: {pdfSizeMb}
           </div>
         </Dialog>
       );
