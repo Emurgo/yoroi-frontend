@@ -208,16 +208,9 @@ export default class LocalStorageApi {
     }
   });
 
-  updateHideBalance = (): Promise<void> => new Promise((resolve, reject) => {
+  setHideBalance = (hideBalance: boolean): Promise<void> => new Promise((resolve, reject) => {
     try {
-      const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
-      if (!hideBalance) {
-        localStorage.setItem(storageKeys.HIDE_BALANCE, JSON.stringify(true));
-      } else {
-        localStorage.setItem(
-          storageKeys.HIDE_BALANCE, JSON.stringify(!JSON.parse(hideBalance))
-        );
-      }
+      localStorage.setItem(storageKeys.HIDE_BALANCE, JSON.stringify(!hideBalance));
       resolve();
     } catch (error) {
       return reject(error);

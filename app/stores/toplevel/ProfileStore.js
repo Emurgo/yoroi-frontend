@@ -91,8 +91,8 @@ export default class ProfileStore extends Store {
   @observable getHideBalanceRequest: Request<void => Promise<boolean>>
     = new Request<void => Promise<boolean>>(this.api.localStorage.getHideBalance);
 
-  @observable updateHideBalanceRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.localStorage.updateHideBalance);
+  @observable setHideBalanceRequest: Request<boolean => Promise<void>>
+    = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
 
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
@@ -340,15 +340,9 @@ export default class ProfileStore extends Store {
     return result === true;
   }
 
-  @computed get isHideBalanceSet(): boolean {
-    return (
-      this.getHideBalanceRequest.wasExecuted &&
-      this.getHideBalanceRequest.result !== null
-    );
-  }
-
   _updateHideBalance = async () => {
-    await this.updateHideBalanceRequest.execute();
+    const shouldHideBalance = this.shouldHideBalance;
+    await this.setHideBalanceRequest.execute(shouldHideBalance);
     await this.getHideBalanceRequest.execute();
   };
 
