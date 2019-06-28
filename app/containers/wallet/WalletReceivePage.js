@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { defineMessages, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ellipsis } from '../../utils/strings';
-import { buildURI } from '../../utils/URIHandling';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
@@ -141,6 +140,7 @@ export default class WalletReceivePage extends Component<Props, State> {
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
             walletAddress={uiDialogs.getParam('address')}
+            amount={uiDialogs.getParam('amount')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
             onGenerate={(address, amount) => { this.generateURI(address, amount); }}
             classicTheme={profile.isClassicTheme}
@@ -152,8 +152,13 @@ export default class WalletReceivePage extends Component<Props, State> {
 
         {uiDialogs.isOpen(URIDisplayDialog) ? (
           <URIDisplayDialog
-            uri={uiDialogs.getParam('uri')}
+            address={uiDialogs.getParam('address')}
+            amount={uiDialogs.getParam('amount')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
+            onBack={() => this.openURIGenerateDialog(
+              uiDialogs.getParam('address'),
+              uiDialogs.getParam('amount'),
+            )}
             showNotification={uiNotifications.isOpen(uriCopyNotificationId)}
             onCopy={(message) => actions.notifications.open.trigger({
               id: uriCopyNotificationId,
@@ -187,11 +192,11 @@ export default class WalletReceivePage extends Component<Props, State> {
     actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
   }
 
-  openURIGenerateDialog = (address: string): void => {
+  openURIGenerateDialog = (address: string, amount?: number): void => {
     const { actions } = this.props;
     actions.dialogs.open.trigger({
       dialog: URIGenerateDialog,
-      params: { address }
+      params: { address, amount }
     });
   }
 
@@ -199,7 +204,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     const { actions } = this.props;
     actions.dialogs.open.trigger({
       dialog: URIDisplayDialog,
-      params: { uri: buildURI(address, amount) }
+      params: { address, amount }
     });
   }
 }
