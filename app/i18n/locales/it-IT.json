@@ -210,7 +210,7 @@
   "uri.display.dialog.copy.notification": "URL copiato con successo",
   "uri.display.dialog.title": "URL generato",
   "uri.generate.dialog.address.label": "Indirizzo del ricevente",
-  "uri.generate.dialog.amount.label": "Importo (ADA)",
+  "uri.generate.dialog.amount.label": "Amount ({currency})",
   "uri.generate.dialog.confirm.label": "Genera",
   "uri.generate.dialog.invalid.amount": "Si prega di inserire un importo valido",
   "uri.generate.dialog.title": "Genera URL",
