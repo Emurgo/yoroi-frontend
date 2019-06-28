@@ -212,7 +212,7 @@ Feature: Send transaction
       | WrongPassword |
     And I submit the wallet send form
     Then I should see an incorrect wallet password error message
-    And I clear the wallet password
+    And I clear the wallet password WrongPassword
     And I enter the wallet password:
       | password      |
       | asdfasdfasdf |
