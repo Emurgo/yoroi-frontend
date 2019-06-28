@@ -11,6 +11,28 @@
     margin-bottom: 10px;
     padding-top: 10px;
   }
+
+  :global(.SimpleCheckbox_check) {
+    align-self: start;
+  }
+  
+  :global(.CheckboxOwnSkin_checkboxWrapper) {
+    margin-top: 2px;
+  }
+
+  :global(.SimpleCheckbox_root) {
+    margin-top: 14px;
+
+    label {
+      font-family: var(--font-regular);
+    }
+
+    p {
+      cursor: pointer;
+      font-family: var(--font-regular);
+      color: var(--theme-default-color-grey);
+    }
+  }
 }
 
 .numAddressesSelect {
@@ -25,19 +47,16 @@
 }
 
 .button {
-  margin-top: 20px;
+  margin-top: 23px;
 }
 
 .numAddressesSelect {
-  margin-top: 20px;
-}
-
-.paperTypeSelect {
-  margin-top: 20px;
+  margin-top: 34px;
 }
 
 .intro {
-  color: var(--theme-terms-of-use-text-color);
+  color: var(--theme-default-color-grey);
+  font-family: var(--font-regular);
   text-align: justify;
 
   h1, h2 {
