@@ -37,6 +37,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       restartWalletBackup,
       finishWalletBackup,
       removeOneMnemonicWord,
+      continueToPrivacyWarning,
       acceptPrivacyNoticeForWalletBackup,
       continueToRecoveryPhraseForWalletBackup
     } = actions.walletBackup;
@@ -53,6 +54,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         isPrivacyNoticeAccepted={isPrivacyNoticeAccepted}
         countdownRemaining={countdownRemaining}
         onAcceptPrivacyNotice={acceptPrivacyNoticeForWalletBackup.trigger}
+        onBack={continueToPrivacyWarning.trigger}
         onContinue={continueToRecoveryPhraseForWalletBackup.trigger}
         // Props for WalletRecoveryPhraseDisplayDialog
         recoveryPhrase={recoveryPhraseWords.reduce((phrase, { word }) => `${phrase} ${word}`, '')}
