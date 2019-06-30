@@ -108,6 +108,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       actions.unshift({
         label: intl.formatMessage(messages.buttonLabelClear),
         onClick: onClear,
+        disabled: !hasWord,
         primary: true
       });
     } else {
