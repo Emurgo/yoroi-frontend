@@ -163,6 +163,8 @@ export default class CreatePaperDialog extends Component<Props> {
         actions={actions}
         closeOnOverlayClick={false}
         className={dialogClasses}
+        onClose={onCancel}
+        closeButton={<DialogCloseButton onClose={onCancel} />}
         classicTheme={classicTheme}
       >
         <div className={styles.walletLoaderWrapper}>
