@@ -117,11 +117,11 @@ export default class AboutYoroiSettingsBlock extends Component<{}> {
         <h2>{intl.formatMessage(messages.aboutYoroiLabel)}</h2>
 
         <p className={styles.aboutLine}>
-          {intl.formatMessage(messages.networkLabel)}&nbsp;
+          <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
           {environment.NETWORK}
         </p>
         <div className={styles.aboutLine}>
-          {intl.formatMessage(messages.versionLabel)}&nbsp;
+          <strong>{intl.formatMessage(messages.versionLabel)}</strong>&nbsp;
           <ExplorableHash
             websiteName="Github"
             url={baseGithubUrl + 'releases/'}
@@ -135,7 +135,7 @@ export default class AboutYoroiSettingsBlock extends Component<{}> {
           </ExplorableHash>
         </div>
         <div className={styles.aboutLine}>
-          {intl.formatMessage(messages.commitLabel)}&nbsp;
+          <strong>{intl.formatMessage(messages.commitLabel)}</strong>&nbsp;
           <ExplorableHash
             websiteName="Github"
             url={baseGithubUrl + 'commit/' + environment.commit}
@@ -149,7 +149,7 @@ export default class AboutYoroiSettingsBlock extends Component<{}> {
         </div>
         {!environment.isMainnet() &&
           <div className={styles.aboutLine}>
-            {intl.formatMessage(messages.branchLabel)}&nbsp;
+            <strong>{intl.formatMessage(messages.branchLabel)}</strong>&nbsp;
             <ExplorableHash
               websiteName="Github"
               url={baseGithubUrl + 'tree/' + environment.branch}
