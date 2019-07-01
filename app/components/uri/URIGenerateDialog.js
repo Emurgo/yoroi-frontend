@@ -12,7 +12,8 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import globalMessages from '../../i18n/global-messages';
+import environment from '../../environment';
+import globalMessages, { environmentSpecificMessages } from '../../i18n/global-messages';
 
 import { formattedAmountToNaturalUnits } from '../../utils/formatters';
 import config from '../../config';
@@ -34,7 +35,7 @@ const messages = defineMessages({
   },
   uriGenerateDialogAmountLabel: {
     id: 'uri.generate.dialog.amount.label',
-    defaultMessage: '!!!Amount (ADA)',
+    defaultMessage: '!!!Amount ({currency})',
   },
   uriGenerateDialogInvalidAmount: {
     id: 'uri.generate.dialog.invalid.amount',
@@ -47,6 +48,7 @@ type Props = {
   onGenerate: (address: string, amount: number) => void,
   classicTheme: boolean,
   walletAddress: string,
+  amount?: number,
   currencyMaxIntegerDigits: number,
   currencyMaxFractionalDigits: number,
   validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
@@ -54,10 +56,24 @@ type Props = {
 
 @observer
 export default class URIGenerateDialog extends Component<Props> {
+  static defaultProps = {
+    amount: undefined,
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
   };
+
+  getAmountLabel = (): string => {
+    const currency = this.context.intl.formatMessage(
+      environmentSpecificMessages[environment.API].currency
+    );
+    const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
+      currency
+    });
+
+    return label;
+  }
 
   // FORM VALIDATION
   form = new ReactToolboxMobxForm({
@@ -67,7 +83,7 @@ export default class URIGenerateDialog extends Component<Props> {
         value: this.props.walletAddress,
       },
       amount: {
-        label: this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel),
+        label: this.getAmountLabel(),
         placeholder: `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}`,
         value: '',
         validators: [async ({ field }) => {
@@ -92,6 +108,14 @@ export default class URIGenerateDialog extends Component<Props> {
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
   });
+
+  componentDidMount() {
+    const amountField = this.form.$('amount');
+    amountField.set(
+      'value',
+      this.props.amount ? this.props.amount.toString() : ''
+    );
+  }
 
   render() {
     const {
@@ -134,7 +158,7 @@ export default class URIGenerateDialog extends Component<Props> {
             <NumericInput
               {...amountField.bind()}
               className="amount"
-              label={intl.formatMessage(messages.uriGenerateDialogAmountLabel)}
+              label={this.getAmountLabel()}
               maxBeforeDot={currencyMaxIntegerDigits}
               maxAfterDot={currencyMaxFractionalDigits}
               skin={classicTheme ? InputSkin : InputOwnSkin}

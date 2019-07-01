@@ -52,3 +52,13 @@ Feature: Main UI
   @serverMaintenance @it-32
   Scenario: The serverError banner must be displayed for as long as the server reports an issue
   Then I should see the serverError banner
+
+  @it-110
+  Scenario: Ensure user can hide balance (IT-110)
+    And There is a wallet stored named many-tx-wallet
+    And I click on hide balance button
+    Then I should see my balance hidden
+    When I refresh the page
+    Then I should see my balance hidden
+    When I click on hide balance button
+    Then I should see the balance number "3.110004 ADA"

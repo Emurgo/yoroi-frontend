@@ -49,3 +49,12 @@ Then(/^I should see the networkError banner$/, async function () {
 Then(/^I should see the serverError banner$/, async function () {
   await this.waitForElement('.ServerErrorBanner_serverError');
 });
+
+Then(/^I click on hide balance button$/, async function () {
+  await this.click('.hideBalanceButton');
+});
+
+Then(/^I should see my balance hidden$/, async function () {
+  await this.waitForElement('.WalletTopbarTitle_hiddenWalletAmount');
+  await this.waitUntilContainsText('.WalletTopbarTitle_hiddenWalletAmount', '***');
+});

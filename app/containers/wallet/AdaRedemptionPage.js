@@ -13,8 +13,6 @@ import environment from '../../environment';
 
 @observer
 export default class AdaRedemptionPage extends Component<InjectedProps> {
-  static defaultProps = { actions: null, stores: null };
-
   onSubmit = (values: { walletId: string }) => {
     this.props.actions.ada.adaRedemption.redeemAda.trigger(values);
   };

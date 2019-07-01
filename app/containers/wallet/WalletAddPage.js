@@ -100,6 +100,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
+          onBack={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
           classicTheme={profile.isClassicTheme}
           mode={mode}
         />
@@ -119,6 +120,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
+          onBack={() => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })}
           classicTheme={profile.isClassicTheme}
         />
       );
@@ -128,6 +130,7 @@ export default class WalletAddPage extends Component<Props> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
+          onBack={() => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })}
           classicTheme={profile.isClassicTheme}
         />
       );

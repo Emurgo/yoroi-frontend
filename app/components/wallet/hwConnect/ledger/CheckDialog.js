@@ -10,6 +10,7 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
+import DialogBackButton from '../../../widgets/DialogBackButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
@@ -66,6 +67,7 @@ type Props = {|
   onExternalLinkClick: Function,
   submit: Function,
   cancel: Function,
+  onBack: void => void,
   classicTheme: boolean,
 |};
 
@@ -145,6 +147,7 @@ export default class CheckDialog extends Component<Props> {
         actions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
+        backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
         classicTheme={classicTheme}
       >

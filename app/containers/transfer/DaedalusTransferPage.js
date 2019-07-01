@@ -14,12 +14,11 @@ import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
 import DaedalusTransferSummaryPage from './DaedalusTransferSummaryPage';
 import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
 import environment from '../../environment';
-import resolver from '../../utils/imports';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
 
-const { formattedWalletAmount } = resolver('utils/formatters');
-const MainLayout = resolver('containers/MainLayout');
+import { formattedWalletAmount } from '../../utils/formatters';
+import MainLayout from '../MainLayout';
 
 const messages = defineMessages({
   title: {
@@ -114,6 +113,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             topbar={topBar}
             classicTheme={profile.isClassicTheme}
             connectionErrorType={checkAdaServerStatus}
+            actions={actions}
+            stores={stores}
           >
             <TransferLayout>
               <TransferInstructionsPage
@@ -132,6 +133,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             topbar={topBar}
             classicTheme={profile.isClassicTheme}
             connectionErrorType={checkAdaServerStatus}
+            actions={actions}
+            stores={stores}
           >
             <TransferLayout>
               <DaedalusTransferFormPage
@@ -154,6 +157,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             topbar={topBar}
             classicTheme={profile.isClassicTheme}
             connectionErrorType={checkAdaServerStatus}
+            actions={actions}
+            stores={stores}
           >
             <TransferLayout>
               <DaedalusTransferFormPage
@@ -173,6 +178,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             topbar={topBar}
             classicTheme={profile.isClassicTheme}
             connectionErrorType={checkAdaServerStatus}
+            actions={actions}
+            stores={stores}
           >
             <TransferLayout>
               <DaedalusTransferMasterKeyFormPage
@@ -191,6 +198,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             topbar={topBar}
             classicTheme={profile.isClassicTheme}
             connectionErrorType={checkAdaServerStatus}
+            actions={actions}
+            stores={stores}
           >
             <TransferLayout>
               <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
@@ -206,6 +215,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             topbar={topBar}
             classicTheme={profile.isClassicTheme}
             connectionErrorType={checkAdaServerStatus}
+            actions={actions}
+            stores={stores}
           >
             <TransferLayout>
               <DaedalusTransferSummaryPage
@@ -227,6 +238,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             topbar={topBar}
             classicTheme={profile.isClassicTheme}
             connectionErrorType={checkAdaServerStatus}
+            actions={actions}
+            stores={stores}
           >
             <TransferLayout>
               <DaedalusTransferErrorPage

@@ -16,7 +16,10 @@ import HWConnectActions from '../../../actions/ada/hw-connect-actions';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 
-type Props = InjectedDialogContainerProps;
+type Props = InjectedDialogContainerProps & {
+  onBack: void => void,
+};
+
 @observer
 export default class WalletLedgerConnectDialogContainer extends Component<Props> {
 
@@ -43,6 +46,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             submit={hwConnectActions.submitCheck.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
+            onBack={this.props.onBack}
           />);
         break;
       case ProgressStep.CONNECT:
