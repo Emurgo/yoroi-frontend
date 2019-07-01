@@ -62,6 +62,6 @@ export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse
 // checkServer
 
 export type ServerStatusResponse = {
-  apiStatus: boolean
+  isServerOk: boolean
 };
 export type ServerStatusFunc = () => Promise<ServerStatusResponse>;

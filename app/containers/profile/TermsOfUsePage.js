@@ -35,7 +35,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     const { stores } = this.props;
     const { topbar, profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const displayedBanner = checkAdaServerStatus === null ?
+    const displayedBanner = checkAdaServerStatus === 'healthy' ?
       <TestnetWarningBanner /> :
       <ServerErrorBanner errorType={checkAdaServerStatus} />;
     const topbarTitle = (

@@ -12,7 +12,7 @@ export type MainLayoutProps = InjectedContainerProps & {
   topbar?: Node,
   footer?: Node,
   classicTheme: boolean,
-  connectionErrorType: ?ServerStatusErrorType,
+  connectionErrorType: ServerStatusErrorType,
 };
 
 @observer
@@ -25,7 +25,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
 
 
   render() {
-    const displayedBanner = this.props.connectionErrorType === null ?
+    const displayedBanner = this.props.connectionErrorType === 'healthy' ?
       <TestnetWarningBanner /> :
       <ServerErrorBanner errorType={this.props.connectionErrorType} />;
 

@@ -49,8 +49,8 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
       />) : undefined;
-    const displayedBanner = (connectionErrorType: ?ServerStatusErrorType) => {
-      connectionErrorType === null ?
+    const displayedBanner = (connectionErrorType: ServerStatusErrorType) => {
+      connectionErrorType === 'healthy' ?
         <TestnetWarningBanner /> :
         <ServerErrorBanner errorType={connectionErrorType} />;
     };

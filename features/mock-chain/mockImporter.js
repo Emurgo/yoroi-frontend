@@ -24,8 +24,8 @@ type MockTx = {
 
 type ServerStatus = {
   id: number,
-  apiStatus: boolean,
-  time: string, // timestamp with timezone
+  status: boolean,
+  time: string // timestamp with timezone
 }
 
 /**
@@ -368,7 +368,7 @@ const addServerStatus  = (serverStatus: ServerStatus) => apiStatuses.push(server
 
 const initialServerOk: ServerStatus = {
   id: 1,
-  apiStatus: true,
+  status: true,
   time: '2019-01-01T15:13:33.000Z'
 };
 
@@ -377,7 +377,7 @@ addServerStatus(initialServerOk);
 export function serverIssue() {
   addServerStatus({
     id: 2,
-    apiStatus: false,
+    status: false,
     time: '2019-01-02T15:13:33.000Z'
   });
 }
@@ -385,7 +385,7 @@ export function serverIssue() {
 export function serverFixed() {
   addServerStatus({
     id: 3,
-    apiStatus: true,
+    status: true,
     time: '2019-01-03T15:13:33.000Z'
   });
 }
@@ -481,7 +481,7 @@ function usedAddresses(): Set<string> {
 }
 
 function getApiStatus(): boolean {
-  return apiStatuses.slice(-1)[0].apiStatus;
+  return apiStatuses.slice(-1)[0].status;
 }
 
 export default {

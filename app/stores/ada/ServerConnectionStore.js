@@ -9,13 +9,13 @@ import type { ServerStatusResponse } from '../../api/ada/lib/state-fetch/types';
 export default class ServerConnectionStore extends Store {
   SERVER_STATUS_REFRESH_INTERVAL = environment.serverStatusRefreshInterval;
 
-  @observable serverStatus: ?ServerStatusErrorType = null;
+  @observable serverStatus: ServerStatusErrorType = 'healthy';
 
   setup() {
     setInterval(this._checkServerStatus, this.SERVER_STATUS_REFRESH_INTERVAL);
   }
 
-  @computed get checkAdaServerStatus(): ?ServerStatusErrorType {
+  @computed get checkAdaServerStatus(): ServerStatusErrorType {
     return this.serverStatus;
   }
 
@@ -25,7 +25,7 @@ export default class ServerConnectionStore extends Store {
     try {
       const response: ServerStatusResponse = await checkServerStatusFunc();
       runInAction('refresh server status', () => {
-        this.serverStatus = response.apiStatus === true ? null : 'server';
+        this.serverStatus = response.isServerOk === true ? 'healthy' : 'server';
       });
     } catch (err) {
       runInAction('refresh server status', () => {

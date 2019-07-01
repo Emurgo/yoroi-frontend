@@ -1,2 +1,2 @@
 // @flow
-export type ServerStatusErrorType = 'server' | 'network';
+export type ServerStatusErrorType = 'server' | 'network' | 'healthy';
