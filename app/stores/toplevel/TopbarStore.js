@@ -1,7 +1,6 @@
 // @flow
 import { observable, action } from 'mobx';
 import Store from '../base/Store';
-import resolver from '../../utils/imports';
 import environment from '../../environment';
 import { Logger } from '../../utils/logging';
 import {
@@ -9,12 +8,12 @@ import {
   WITH_TREZOR_T_CATEGORIE as WITH_TREZOR_T,
   GO_BACK_CATEGORIE as GO_BACK,
   WALLETS_CATEGORIE as WALLETS,
+  CURRENCY_SPECIFIC_CATEGORIES,
+  COMMON_CATEGORIES,
 } from '../../config/topbarConfig';
 
-const topbarConfig = resolver('config/topbarConfig');
-
 export default class TopbarStore extends Store {
-  CATEGORIES = [...topbarConfig.CATEGORIES];
+  CATEGORIES = [...COMMON_CATEGORIES, ...CURRENCY_SPECIFIC_CATEGORIES[environment.API]];
 
   @observable activeTopbarCategory: string = WALLETS.route;
 
@@ -31,7 +30,7 @@ export default class TopbarStore extends Store {
   @action updateCategories(): void {
     const { wallets } = this.stores.substores[environment.API];
     // set it to the default
-    this.CATEGORIES = [...topbarConfig.CATEGORIES];
+    this.CATEGORIES = [...COMMON_CATEGORIES, ...CURRENCY_SPECIFIC_CATEGORIES[environment.API]];
 
     // For rare of the rare case, make sure wallets store is initialized
     if (wallets) {
@@ -60,7 +59,7 @@ export default class TopbarStore extends Store {
 
   /** Reset Categories to defaults */
   @action _resetCategories(): void {
-    this.CATEGORIES = [...topbarConfig.CATEGORIES];
+    this.CATEGORIES = [...COMMON_CATEGORIES, ...CURRENCY_SPECIFIC_CATEGORIES[environment.API]];
     this.activeTopbarCategory = WALLETS.route;
   }
 

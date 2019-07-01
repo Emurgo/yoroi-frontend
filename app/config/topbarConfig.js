@@ -37,14 +37,19 @@ export const GO_BACK_CATEGORIE: Category = {
   icon: goBackIcon,
 };
 
+export const CURRENCY_SPECIFIC_CATEGORIES = {
+  ada: [
+    {
+      name: 'DAEDALUS_TRANSFER',
+      route: ROUTES.DAEDALUS_TRANFER.ROOT,
+      icon: daedalusTransferIcon,
+    }
+  ]
+};
+
 // It's kind of defalut category
-export const CATEGORIES = ([
+export const COMMON_CATEGORIES = ([
   WALLETS_CATEGORIE,
-  {
-    name: 'DAEDALUS_TRANSFER',
-    route: ROUTES.DAEDALUS_TRANFER.ROOT,
-    icon: daedalusTransferIcon,
-  },
   {
     name: 'SETTINGS',
     route: ROUTES.SETTINGS.ROOT,
