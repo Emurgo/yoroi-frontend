@@ -149,7 +149,7 @@
   "settings.paperWallet.dialog.createPaper.backpage": "Die Rückseite erstellen",
   "settings.paperWallet.dialog.createPaper.done": "Alles erledigt!",
   "settings.paperWallet.dialog.createPaper.downloadReadyInfo": "Dein Paper Wallet-PDF steht bereit",
-  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Das Paper Wallet-Zertifikat herunterladen. Größe (MB)",
+  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (MB)",
   "settings.paperWallet.dialog.createPaper.frontpage": "Die Vorderseite erstellen",
   "settings.paperWallet.dialog.createPaper.initializing": "Das Dokument initialisieren",
   "settings.paperWallet.dialog.createPaper.loader.label": "Das PDF-Zertifikat rendern",
