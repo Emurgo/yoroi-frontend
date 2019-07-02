@@ -1,7 +1,8 @@
 const tasks = require('./tasks');
 const argv = require('minimist')(process.argv.slice(2));
 
-process.env.NODE_ENV = argv.env;
+process.env.NODE_ENV = 'production';
+process.env.NODE_CONFIG_ENV = argv.env;
 
 tasks.replaceWebpack();
 console.log('[Copy assets]');
