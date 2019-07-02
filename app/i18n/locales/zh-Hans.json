@@ -149,7 +149,7 @@
   "settings.paperWallet.dialog.createPaper.backpage": "正在创建背面",
   "settings.paperWallet.dialog.createPaper.done": "完成！",
   "settings.paperWallet.dialog.createPaper.downloadReadyInfo": "纸钱包PDF文件已就绪",
-  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "下载纸钱包证书。大小（Mb）",
+  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (MB)",
   "settings.paperWallet.dialog.createPaper.frontpage": "正在创建首页",
   "settings.paperWallet.dialog.createPaper.initializing": "准备创建文档",
   "settings.paperWallet.dialog.createPaper.loader.label": "正在渲染PDF证书",
