@@ -246,7 +246,7 @@
   "wallet.add.page.title": "Портал <br> в <br> финансовый мир",
   "wallet.amountInput.feesLabel": "+ комиссия {amount}",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Убедитесь, что никто не смотрит на экран Вашего устройства, если только Вы не собираетесь предоставить им доступ к Вашим средствам.",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "В следующем окне Вы увидите набор случайных слов. Это   \n    резервная фраза Вашего кошелька. Она может быть введена в любой версии Yoroi для\n    создания резервной копии или восстановления средств Вашего кошелька и личных ключей.",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order to back up or restore your wallet’s funds and private key.",
   "wallet.backup.recovery.phrase.dialog.title": "Фраза восстановления",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "Пожалуйста, убедитесь, что Вы внимательно записали восстановительную фразу в безопасном месте.\n    Вам будет нужна эта фраза для использования и восстановления Вашего кошелька. Фраза чувствительна к регистру.",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "Да, я записал фразу.",
