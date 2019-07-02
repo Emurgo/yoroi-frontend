@@ -246,7 +246,7 @@
   "wallet.add.page.title": "Porta d'accesso al mondo finanziario",
   "wallet.amountInput.feesLabel": "+ {amount} di commissioni",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Assicurati che nessuno guardi il tuo schermo, a meno che tu voglia che abbiano accesso ai tuoi fondi.",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "Nella prossima schermata vedrai un insieme di 15 parole casuali. Questa è la frase di recupero del tuo wallet. Può essere introdotta su qualunque versione di Yoroi per recuperare e ripristinare i tuoi fondi e la chiave privata.",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order to back up or restore your wallet’s funds and private key.",
   "wallet.backup.recovery.phrase.dialog.title": "Frase di recupero",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "Per favore, verifica di aver scritto con cura la frase di recupero e custodiscila in un posto sicuro.\n Avrai bisogno di questa frase per usare e recuperare il tuo wallet. La frase riconosce le lettere maiuscole dalle minuscole.",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "Sì, l'ho scritta.",
