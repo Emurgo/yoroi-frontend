@@ -208,6 +208,7 @@
   "transfer.summary.transferButton.label": "Transfer Funds",
   "uri.display.dialog.copy.notification": "URL successfully copied",
   "uri.display.dialog.title": "Generated URL",
+  "uri.display.dialog.usabilityWarning": "This link can only be opened by users with Yoroi installed on their browser",
   "uri.generate.dialog.address.label": "Receiver address",
   "uri.generate.dialog.amount.label": "Amount ({currency})",
   "uri.generate.dialog.confirm.label": "Generate",

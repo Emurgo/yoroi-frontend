@@ -1,8 +1,8 @@
 .contentWarning {
   display: flex;
-  flex-flow: column;
+  flex-flow: row;
   align-items: center;
-  margin-bottom: 1em;
+  justify-content: center;
 }
 
 .warning {
@@ -11,7 +11,7 @@
   font-size: 12px;
   font-weight: 600;
   text-align: center;
-  margin-bottom: 0.5em;
+  margin-left: 1em;
   color: var(--rp-theme-color-error);
 }
 
@@ -21,5 +21,4 @@
     width: 26px;
     height: 26px;
   }
-  margin: 1em 0;
 }

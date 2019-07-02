@@ -65,10 +65,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     } = this.props;
 
     const staleTxWarning = (
-      <WarningBox>
-        {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
-        {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
-      </WarningBox>
+      <div className={styles.warningBox}>
+        <WarningBox>
+          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
+          {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+        </WarningBox>
+      </div>
     );
 
     const infoBlock = (
