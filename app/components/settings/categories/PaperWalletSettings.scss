@@ -4,7 +4,7 @@
   margin-bottom: 20px;
 
   h1 {
-    color: var(--theme-support-settings-text-color);
+    color: var(--cmn-default-color-grey);
     font-family: var(--font-semibold);
     font-size: 16px;
     line-height: 1.38;
@@ -30,7 +30,7 @@
 }
 
 .intro {
-  color: var(--theme-default-color-grey);
+  color: var(--cmn-default-color-grey);
   font-family: var(--font-regular);
   text-align: justify;
 
@@ -50,6 +50,7 @@
   }
 
   p, li {
+    color: var(--cmn-default-color-grey);
     font-family: var(--font-regular);
     font-size: 14px;
     letter-spacing: 0.5px;
