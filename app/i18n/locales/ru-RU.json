@@ -149,7 +149,7 @@
   "settings.paperWallet.dialog.createPaper.backpage": "Подготовка последней страницы",
   "settings.paperWallet.dialog.createPaper.done": "Все готово!",
   "settings.paperWallet.dialog.createPaper.downloadReadyInfo": "Your paper wallet PDF is ready",
-  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (Mb)",
+  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (MB)",
   "settings.paperWallet.dialog.createPaper.frontpage": "Подготовка главной страницы",
   "settings.paperWallet.dialog.createPaper.initializing": "Инициализация документа",
   "settings.paperWallet.dialog.createPaper.loader.label": "Предоставление PDF сертификата",
