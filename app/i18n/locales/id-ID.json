@@ -149,7 +149,7 @@
   "settings.paperWallet.dialog.createPaper.backpage": "Mempersiapkan halaman belakang",
   "settings.paperWallet.dialog.createPaper.done": "Semua selesai!",
   "settings.paperWallet.dialog.createPaper.downloadReadyInfo": "Paper wallet PDF Anda sudah siap",
-  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Unduh Sertifikat Paper Wallet. Ukuran (Mb)",
+  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (MB)",
   "settings.paperWallet.dialog.createPaper.frontpage": "Mempersiapkan halaman depan",
   "settings.paperWallet.dialog.createPaper.initializing": "Menginisialisasi dokumen",
   "settings.paperWallet.dialog.createPaper.loader.label": "Rendering Sertifikat PDF",
