@@ -117,7 +117,7 @@
   "settings.display.themeLabel": "테마",
   "settings.display.themeNames.yoroiClassic": "Yoroi 클래식",
   "settings.display.themeNames.yoroiModern": "Yoroi 모던",
-  "settings.display.themeNote": "참고: 테마를 변경하면 사용자 설정 사항이 지워집니다.",
+  "settings.display.themeNote": "<strong>Note:</strong> Changing theme will remove customization.",
   "settings.display.themeWarning": "이 테마를 변경하시면 사용자이 지정한 것 제거 됩니다.",
   "settings.general.aboutYoroi.commitLabel": "진행:",
   "settings.general.aboutYoroi.facebook": "요로이 Facebook",
