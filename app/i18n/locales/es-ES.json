@@ -246,7 +246,7 @@
   "wallet.add.page.title": "Puerta de entrada <br> al <br> mundo financiero",
   "wallet.amountInput.feesLabel": "+ {amount} de las tarifas",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Asegúrese de que nadie vea su pantalla a menos que desee que tengan acceso a sus fondos.",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "En la siguiente pantalla, verás un conjunto de 15 palabras aleatorias. Esta es\nla frase de respaldo de tu billetera. Se puede ingresar en cualquier versión de Yoroi \npara respaldar o restaurar los fondos de tu billetera y la llave privada.",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order to back up or restore your wallet’s funds and private key.",
   "wallet.backup.recovery.phrase.dialog.title": "Frase de recuperación",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "Por favor, asegúrese de haber escrito cuidadosamente su frase de recuperación en un lugar seguro.\n    Necesitará esta frase para usar y restaurar su billetera. La frase distingue entre mayúsculas y minúsculas.",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "Sí, lo he escrito.",
