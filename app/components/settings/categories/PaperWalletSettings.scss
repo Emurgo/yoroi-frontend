@@ -11,28 +11,6 @@
     margin-bottom: 10px;
     padding-top: 10px;
   }
-
-  :global(.SimpleCheckbox_check) {
-    align-self: start;
-  }
-  
-  :global(.CheckboxOwnSkin_checkboxWrapper) {
-    margin-top: 0px;
-  }
-
-  :global(.SimpleCheckbox_root) {
-    margin-top: 14px;
-
-    label {
-      font-family: var(--font-regular);
-    }
-
-    p {
-      cursor: pointer;
-      font-family: var(--font-regular);
-      color: var(--theme-default-color-grey);
-    }
-  }
 }
 
 .numAddressesSelect {
