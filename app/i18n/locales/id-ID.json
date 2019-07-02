@@ -246,7 +246,7 @@
   "wallet.add.page.title": "Gerbang <br> menuju <br> dunia finansial",
   "wallet.amountInput.feesLabel": "+ {amount} biaya",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Pastikan tidak ada yang melihat layar Anda kecuali Anda menginginkan mereka mengakses dana Anda.",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "Pada layar berikut, Anda akan melihat 15 kata yang dipilih secara acak. Ini adalah \n    frase back up wallet Anda. Ini dapat dimasukkan dalam Yoroi versi mana pun untuk \n    mem-back up atau mengembalikan dana wallet dan private key Anda.",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order to back up or restore your wallet’s funds and private key.",
   "wallet.backup.recovery.phrase.dialog.title": "Frasa pemulihan",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "Harap pastikan Anda telah menyalin frasa pemulihan dengan hati-hati di tempat yang aman. \n    Anda akan memerlukan frasa ini untuk menggunakan dan memulihkan wallet Anda. Huruf besar-kecil berpengaruh untuk frasa.",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "Ya, saya sudah menyalinnya.",
