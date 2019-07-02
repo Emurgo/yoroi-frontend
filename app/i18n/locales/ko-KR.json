@@ -149,7 +149,7 @@
   "settings.paperWallet.dialog.createPaper.backpage": "뒤 페이지 준비 중",
   "settings.paperWallet.dialog.createPaper.done": "완료!",
   "settings.paperWallet.dialog.createPaper.downloadReadyInfo": "Your paper wallet PDF is ready",
-  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (Mb)",
+  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (MB)",
   "settings.paperWallet.dialog.createPaper.frontpage": "앞 페이지 준비 중",
   "settings.paperWallet.dialog.createPaper.initializing": "문서 초기화 중",
   "settings.paperWallet.dialog.createPaper.loader.label": "PDF 증명서 렌더링",
