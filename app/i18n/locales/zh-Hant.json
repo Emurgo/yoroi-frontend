@@ -246,7 +246,7 @@
   "wallet.add.page.title": "Gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount} 費用",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "確保無人窺視您的螢幕，除非您希望他們存取您的資金。",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "在下列螢幕上，您將看到一組 15個 隨機單詞。這是\n    您的錢包恢復短語備份片語。可將其輸入任何版本的 Daedalus 應用程式，\n    以備份或恢復您的錢包資金與私密金鑰。",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order to back up or restore your wallet’s funds and private key.",
   "wallet.backup.recovery.phrase.dialog.title": "恢復短語",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "請確保您已於某個安全之處小心地寫下您的復原片語。\n    您下一次使用與復原時將需要用到此片語。片語區分大小寫。",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "是，我已寫下",
