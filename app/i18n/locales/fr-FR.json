@@ -117,7 +117,7 @@
   "settings.display.themeLabel": "Thème",
   "settings.display.themeNames.yoroiClassic": "Yoroi classique",
   "settings.display.themeNames.yoroiModern": "Yoroi moderne",
-  "settings.display.themeNote": "Remarque : Changer de thème effacera les paramètres de personnalisation.",
+  "settings.display.themeNote": "<strong>Note:</strong> Changing theme will remove customization.",
   "settings.display.themeWarning": "CHANGER DE THÈME SUPPRIMERA LA PERSONNALISATION",
   "settings.general.aboutYoroi.commitLabel": "Validation:",
   "settings.general.aboutYoroi.facebook": "Yoroi Facebook",
