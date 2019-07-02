@@ -22,6 +22,12 @@ type MockTx = {
   tx_state: AdaTxsState
 }
 
+type ServerStatus = {
+  id: number,
+  status: boolean,
+  time: string // timestamp with timezone
+}
+
 /**
  * To simplify, our genesis is a single address which gives all its ada to a "distributor"
  * The distributor gives ADA to a bunch of addresses to setup the tests
@@ -353,6 +359,37 @@ const daedalusUtxoForAddresses = {
   }],
 };
 
+// =========================
+//   server-status
+// =========================
+const apiStatuses: Array<ServerStatus> = [];
+
+const addServerStatus  = (serverStatus: ServerStatus) => apiStatuses.push(serverStatus);
+
+const initialServerOk: ServerStatus = {
+  id: 1,
+  status: true,
+  time: '2019-01-01T15:13:33.000Z'
+};
+
+addServerStatus(initialServerOk);
+
+export function serverIssue() {
+  addServerStatus({
+    id: 2,
+    status: false,
+    time: '2019-01-02T15:13:33.000Z'
+  });
+}
+
+export function serverFixed() {
+  addServerStatus({
+    id: 3,
+    status: true,
+    time: '2019-01-03T15:13:33.000Z'
+  });
+}
+
 // =====================
 //   Recalculate state
 // =====================
@@ -443,9 +480,14 @@ function usedAddresses(): Set<string> {
   return set;
 }
 
+function getApiStatus(): boolean {
+  return apiStatuses.slice(-1)[0].status;
+}
+
 export default {
   utxoForAddresses,
   utxoSumForAddresses,
   usedAddresses,
-  history,
+  getApiStatus,
+  history
 };

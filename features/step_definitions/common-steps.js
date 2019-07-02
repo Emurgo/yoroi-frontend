@@ -6,7 +6,7 @@ import i18nHelper from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
-import { resetChain } from '../mock-chain/mockImporter';
+import { resetChain, serverIssue, serverFixed } from '../mock-chain/mockImporter';
 import { expect } from 'chai';
 
 const { promisify } = require('util');
@@ -42,6 +42,22 @@ Before((scenario) => {
 
   // reset our mock chain to avoid modifications bleeding into other tests
   resetChain();
+});
+
+Before({ tags: '@serverDown' }, () => {
+  closeMockServer();
+});
+
+After({ tags: '@serverDown' }, () => {
+  getMockServer({});
+});
+
+Before({ tags: '@serverMaintenance' }, () => {
+  serverIssue();
+});
+
+After({ tags: '@serverMaintenance' }, () => {
+  serverFixed();
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {

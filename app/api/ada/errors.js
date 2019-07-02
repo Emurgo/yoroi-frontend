@@ -139,6 +139,10 @@ const messages = defineMessages({
   redemptionKeyAlreadyUsedError: {
     id: 'api.errors.redemptionKeyAlreadyUsedError',
     defaultMessage: '!!!Redemption key has already been used.',
+  },
+  serverStatusError: {
+    id: 'api.errors.serverStatusError',
+    defaultMessage: '!!!Connection to the server failed. Please check your internet connection or our Twitter account (https://twitter.com/YoroiWallet).',
   }
 });
 
@@ -444,6 +448,15 @@ export class RedemptionKeyAlreadyUsedError extends LocalizableError {
     super({
       id: messages.redemptionKeyAlreadyUsedError.id,
       defaultMessage: messages.redemptionKeyAlreadyUsedError.defaultMessage || '',
+    });
+  }
+}
+
+export class ServerStatusError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.serverStatusError.id,
+      defaultMessage: messages.serverStatusError.defaultMessage || '',
     });
   }
 }

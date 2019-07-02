@@ -6,7 +6,8 @@ import type {
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
-  FilterUsedRequest, FilterUsedResponse
+  FilterUsedRequest, FilterUsedResponse,
+  ServerStatusResponse
 } from './types';
 
 import type { IFetcher } from './IFetcher';
@@ -24,6 +25,7 @@ import {
   SendTransactionApiError,
   CheckAdressesInUseApiError,
   InvalidWitnessError,
+  ServerStatusError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -173,6 +175,19 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::checkAddressesInUse error: ' + stringifyError(error));
         throw new CheckAdressesInUseApiError();
+      })
+  )
+
+  checkServerStatus = (): Promise<ServerStatusResponse> => (
+    axios(
+      `${backendUrl}/api/status`,
+      {
+        method: 'get'
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error('RemoteFetcher::checkServerStatus error: ' + stringifyError(error));
+        throw new ServerStatusError();
       })
   )
 }
