@@ -117,7 +117,7 @@
   "settings.display.themeLabel": "テーマ",
   "settings.display.themeNames.yoroiClassic": "ヨロイクラシック",
   "settings.display.themeNames.yoroiModern": "ヨロイモダン",
-  "settings.display.themeNote": "<strong>Note:</strong> Changing theme will remove customization.",
+  "settings.display.themeNote": "<strong>※</strong>テーマーを変更するとカスタマイズの設定が削除されます。",
   "settings.display.themeWarning": "テーマを変更するとカスタマイズ設定が削除されます",
   "settings.general.aboutYoroi.commitLabel": "コミット：",
   "settings.general.aboutYoroi.facebook": "ヨロイ Facebook",
