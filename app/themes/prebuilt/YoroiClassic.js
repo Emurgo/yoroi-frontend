@@ -157,7 +157,7 @@ const tabs = {
 const itemCard = {
   '--card-bg-color': '#fff',
   '--card-border-radius': '8px',
-  '--card-text-color': '#DAA49A',
+  '--card-text-color': '#2b2c32',
   '--card-text-size': '16px',
   '--card-width': '250px',
   '--card-height': '380px',
