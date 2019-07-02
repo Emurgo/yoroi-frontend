@@ -387,7 +387,7 @@ export default {
 
   '--theme-label-button-color': '#353535',
 
-  '--theme-terms-of-use-text-color': '#9b9b9b',
+  '--theme-terms-of-use-text-color': '#38293d',
 
   '--theme-mnemonic-background-color': '#f0f3f5',
   '--theme-mnemonic-background-color-hover': '#f0f3f5',
