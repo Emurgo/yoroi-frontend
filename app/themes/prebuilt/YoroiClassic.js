@@ -53,7 +53,7 @@ const rpCheckbox = {
   '--rp-checkbox-border': '1px solid #daa49a',
   '--rp-checkbox-border-color-disabled': 'rgba(218, 164, 154, 0.2)', // #DAA49A
   '--rp-checkbox-check-bg-color': '#daa49a',
-  '--rp-checkbox-label-text-color': '#121327',
+  '--rp-checkbox-label-text-color': common['--cmn-default-color-grey'],
   '--rp-checkbox-label-text-color-disabled': 'rgba(18, 19, 39, 0.3)', // #121327
 };
 

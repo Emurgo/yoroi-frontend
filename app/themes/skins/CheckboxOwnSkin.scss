@@ -3,11 +3,12 @@
 
   label {
     margin: 0;
+    font-family: var(--font-regular);
   }
 
   p {
     font-family: var(--font-regular);
-    color: var(--theme-terms-of-use-text-color);
+    color: var(--cmn-default-color-grey);
     font-size: 13px;
     letter-spacing: 0.5px;
     line-height: 1.38;
