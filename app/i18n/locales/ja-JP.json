@@ -246,7 +246,7 @@
   "wallet.add.page.title": "金融世界<br>への<br>扉",
   "wallet.amountInput.feesLabel": "+{amount}の手数料",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "他人に画面を見られないよう注意してください。",
-  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "次の画面では、15個のランダムな単語のセットが表示されます。これは、\n    ウォレットの復元アップフレーズです。ヨロイのどのバージョンにも入力でき、\n    ウォレットの資金と秘密鍵を、バックアップまたは復元することができます。",
+  "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order to back up or restore your wallet’s funds and private key.",
   "wallet.backup.recovery.phrase.dialog.title": "復元フレーズ",
   "wallet.backup.recovery.phrase.display.dialog.backup.instructions": "復元フレーズは、安全な場所に保存してください。\n次回のウォレット使用時や復元の際に使用します。復元フレーズでは大文字と小文字が区別されます。",
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "はい。書き留めました",
