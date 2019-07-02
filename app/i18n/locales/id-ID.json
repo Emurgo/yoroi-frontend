@@ -210,7 +210,7 @@
   "uri.display.dialog.copy.notification": "URL berhasil disalin",
   "uri.display.dialog.title": "Menghasilkan URL",
   "uri.generate.dialog.address.label": "Address penerima",
-  "uri.generate.dialog.amount.label": "Jumlah (ADA)",
+  "uri.generate.dialog.amount.label": "Amount ({currency})",
   "uri.generate.dialog.confirm.label": "Menghasilkan",
   "uri.generate.dialog.invalid.amount": "Harap masukkan jumlah yang benar",
   "uri.generate.dialog.title": "Menghasilkan URL",

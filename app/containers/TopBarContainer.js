@@ -5,9 +5,8 @@ import TopBar from '../components/topbar/TopBar';
 import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
-import resolver from '../utils/imports';
 
-const { formattedWalletAmount } = resolver('utils/formatters');
+import { formattedWalletAmount } from '../utils/formatters';
 
 type Props = InjectedProps;
 
