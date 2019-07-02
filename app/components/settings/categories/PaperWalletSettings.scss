@@ -67,3 +67,11 @@
     }
   }
 }
+
+:global(.YoroiClassic) {
+  .component {
+    :global(.SimpleOptions_options.SimpleOptions_openUpward) {
+      margin-bottom: 10px;
+    }    
+  }
+}

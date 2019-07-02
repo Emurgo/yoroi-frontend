@@ -21,6 +21,20 @@
   }
 }
 
+:global(.YoroiClassic) .component {
+  .fees {
+    bottom: 75px;
+  }
+
+  .total {
+    bottom: 38px;
+  
+    &.error {
+      right: 42px;
+    }
+  }
+}
+
 :global(.YoroiModern) .component {
   .fees {
     bottom: 80px;

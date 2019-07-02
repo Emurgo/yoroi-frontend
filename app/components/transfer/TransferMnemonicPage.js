@@ -4,7 +4,6 @@ import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
-import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
@@ -152,7 +151,7 @@ export default class TransferMnemonicPage extends Component<Props> {
               error={recoveryPhraseField.error}
               maxVisibleOptions={5}
               noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
+              skin={AutocompleteOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>
