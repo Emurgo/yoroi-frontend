@@ -46,7 +46,7 @@ const baseDevConfig = (networkName) => ({
   },
   plugins: [
     ...commonConfig.plugins('dev'),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName)),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false)),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.prod$/),
