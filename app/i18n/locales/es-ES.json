@@ -149,7 +149,7 @@
   "settings.paperWallet.dialog.createPaper.backpage": "Preparando la contraportada",
   "settings.paperWallet.dialog.createPaper.done": "¡Todo listo!",
   "settings.paperWallet.dialog.createPaper.downloadReadyInfo": "Your paper wallet PDF is ready",
-  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (Mb)",
+  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (MB)",
   "settings.paperWallet.dialog.createPaper.frontpage": "Preparando la primera página",
   "settings.paperWallet.dialog.createPaper.initializing": "Inicializando el documento",
   "settings.paperWallet.dialog.createPaper.loader.label": "Desplegando Certificado en PDF",
