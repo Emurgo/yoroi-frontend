@@ -149,7 +149,7 @@
   "settings.paperWallet.dialog.createPaper.backpage": "バックページを用意しています",
   "settings.paperWallet.dialog.createPaper.done": "完了しました!",
   "settings.paperWallet.dialog.createPaper.downloadReadyInfo": "ペーパーウォレットPDFの用意ができました",
-  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "ペーパーウォレット証明書をダウンロードする。サイズ（MB）",
+  "settings.paperWallet.dialog.createPaper.downloadSizeInfo": "Download Paper Wallet Certificate. Size (MB)",
   "settings.paperWallet.dialog.createPaper.frontpage": "フロントページを用意しています",
   "settings.paperWallet.dialog.createPaper.initializing": "文書を初期化しています",
   "settings.paperWallet.dialog.createPaper.loader.label": "PDF証明書を生成しています",
