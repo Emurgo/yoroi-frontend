@@ -16,8 +16,6 @@
 
 :global(.YoroiModern) .component {
   margin-top: 24px;
-  /* Fix: non-zero vertical margin (including bottom) helps dynamic height rendering. Removing it causes unnecessary scrollbars  */
-  margin-bottom: 1px; 
   font-size: 14px;
   letter-spacing: 0;
 
