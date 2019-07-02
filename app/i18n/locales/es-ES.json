@@ -186,6 +186,8 @@
   "settings.support.reportProblem.content": "Si las preguntas frecuentes no resuelven el problema que está experimentando, utilice nuestra función (solicitud de soporte) {supportRequestLink}.",
   "settings.support.reportProblem.link": "Solicitud de soporte",
   "settings.support.reportProblem.title": "Reportar un problema",
+  "serverError.label.message": "WARNING: Server experiencing difficulties.<br>Please check <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>Your funds are safe, you can check them in any block explorer.",
+  "networkError.label.message": "WARNING: Connection to the server failed.<br>Please check your internet connection or <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>Your funds are safe, you can check them in any block explorer.",
   "testnet.label.message": "ADVERTENCIA: Se trata de una red {network}. ADA no tiene valor monetario aquí. Para obtener más información, consulte las preguntas frecuentes en {faqLink}",
   "transfer.form.errors.invalidRecoveryPhrase": "Frase de recuperación no válida",
   "transfer.form.instructions.step1.text": "Tardará aproximadamente 1 minuto en restablecer su saldo. En el siguiente paso, se le presentará una transacción que moverá todos sus fondos. Por favor, revise los detalles de la transacción cuidadosamente. Tendrá que pagar una tarifa de transacción estándar en la red de Cardano para realizar la transacción.",
