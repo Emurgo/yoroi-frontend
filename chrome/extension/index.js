@@ -5,7 +5,6 @@ import { render } from 'react-dom';
 import { action, configure } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { createHashHistory } from 'history';
-import environment from '../../app/environment';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
 import translations from '../../app/i18n/translations';
@@ -16,8 +15,8 @@ import '../../app/themes/index.global.scss';
 import BigNumber from 'bignumber.js';
 import { addCloseListener } from '../../app/utils/tabManager';
 
-// run MobX in strict mode on non-prod
-configure({ enforceActions: environment.isMainnet() ? 'never' : 'always' });
+// run MobX in strict mode
+configure({ enforceActions: 'always' });
 
 // Only throw on an invalid BigNumber value if BigNumber.DEBUG is true
 // Since Yoroi handles money, it's better to error our than proceed if an error occurs
