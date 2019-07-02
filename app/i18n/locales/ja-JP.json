@@ -186,6 +186,8 @@
   "settings.support.reportProblem.content": "「よくある質問」で問題が解決しない場合は、{supportRequestLink}機能を使用してください。",
   "settings.support.reportProblem.link": "サポート依頼",
   "settings.support.reportProblem.title": "問題を報告する",
+  "serverError.label.message": "WARNING: Server experiencing difficulties.<br>Please check <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>Your funds are safe, you can check them in any block explorer.",
+  "networkError.label.message": "WARNING: Connection to the server failed.<br>Please check your internet connection or <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>Your funds are safe, you can check them in any block explorer.",
   "testnet.label.message": "注意：{network}上のADAには貨幣価値がありません。詳細は、FAQ({faqLink})をご参照ください。",
   "transfer.form.errors.invalidRecoveryPhrase": "復元フレーズが無効です",
   "transfer.form.instructions.step1.text": "残高が復元されるまで1分程度かかります。復元後、ダイダロスウォレットからヨロイウォレットへの送金取引が表示されます。トランザクションの詳細を慎重に確認してください。 トランザクションを行うには、Cardanoネットワークの標準トランザクション手数料を支払う必要があります。",
