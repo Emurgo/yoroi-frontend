@@ -187,7 +187,7 @@
   "settings.support.reportProblem.link": "Permintaan dukungan",
   "settings.support.reportProblem.title": "Melaporkan masalah",
   "serverError.label.message": "PERHATIAN: Server mengalami kesulitan.<br>Harap periksa <a target='blank' href='https://twitter.com/YoroiWallet'>akun Twitter kami</a>.<br>Dana Anda tersimpan dengan aman, Anda bisa memeriksa nya pada block explorer manapun.",
-  "networkError.label.message": "WARNING: Connection to the server failed.<br>Please check your internet connection or <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>Your funds are safe, you can check them in any block explorer.",
+  "networkError.label.message": "PERHATIAN: Koneksi ke server gagal.<br>Harap periksa koneksi internet Anda atau <a target='blank' href='https://twitter.com/YoroiWallet'>akun Twitter kami</a>.<br>Dana Anda tersimpan dengan aman, Anda bisa memeriksa nya pada block explorer manapun.",
   "testnet.label.message": "PERINGATAN: Ini adalah jaringan {network}. ADA tidak memiliki nilai moneter di sini. Untuk informasi lebih lanjut, lihat FAQ di {faqLink}",
   "transfer.form.errors.invalidRecoveryPhrase": "Frase pemulihan tidak valid",
   "transfer.form.instructions.step1.text": "Diperlukan sekitar 1 menit untuk mengembalikan saldo Anda. Pada langkah berikutnya, Anda akan diberikan transaksi yang akan memindahkan semua dana Anda. Harap tinjau detail transaksi dengan cermat. Anda harus membayar biaya transaksi standar pada jaringan Cardano untuk melakukan transaksi.",
