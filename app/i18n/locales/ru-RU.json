@@ -237,7 +237,7 @@
   "wallet.add.optionDialog.connect.hw.trezor.title": "Аппаратный кошелек Trezor",
   "wallet.add.optionDialog.restore.dialogTitle": "Восстановить кошелек",
   "wallet.add.optionDialog.restore.normalWallet.description": "Если у Вас есть фраза восстановления из 15 слов для Yoroi, сгенерированная при создании кошелька Yoroi, выберите этот вариант, чтобы восстановить свой кошелек.",
-  "wallet.add.optionDialog.restore.normalWallet.title": "Введите восстановительную фразу Yoroi из 15 слов",
+  "wallet.add.optionDialog.restore.normalWallet.title": "Enter a 15-word recovery phrase",
   "wallet.add.optionDialog.restore.paperWallet.description": "Если Вы создали бумажный кошелек Yoroi (который обычно печатается и хранится в офлайн), Вы можете выбрать этот вариант, чтобы импортировать средства из бумажного кошелька Yoroi.",
   "wallet.add.optionDialog.restore.paperWallet.title": "Бумажный кошелек",
   "wallet.add.page.create.title": "Создать кошелек",
