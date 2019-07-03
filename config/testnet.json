@@ -8,7 +8,7 @@
   "app": {
     "walletRefreshInterval": 20000,
     "logsBufferSize": 500,
-    "logsFileSuffix": "-yoroi.log",
+    "logsFileSuffix": "-yoroi-testnet.log",
     "addressScanSize": 20,
     "addressRequestSize": 50,
     "txsBodiesRequestSize": 150
