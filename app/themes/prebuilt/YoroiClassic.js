@@ -158,6 +158,7 @@ const itemCard = {
   '--card-bg-color': '#fff',
   '--card-border-radius': '8px',
   '--card-text-color': '#2b2c32',
+  '--card-text-color-hover': '#DAA49A',
   '--card-text-size': '16px',
   '--card-width': '250px',
   '--card-height': '380px',
