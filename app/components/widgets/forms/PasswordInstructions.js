@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import styles from './PasswordInstructions.scss';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import type { MessageDescriptor } from 'react-intl';
 
 type Props = {|
@@ -36,7 +36,7 @@ export default class PasswordInstructions extends Component<Props> {
 
     return (
       <p className={styles.component}>
-        {intl.formatMessage(displayInstructionDescriptor)}
+        <FormattedHTMLMessage {...displayInstructionDescriptor} />
       </p>
     );
   }

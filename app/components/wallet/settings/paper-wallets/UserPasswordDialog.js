@@ -137,11 +137,17 @@ export default class UserPasswordDialog extends Component<Props> {
     const dialogClasses = classnames(['userPasswordDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
 
+    const disabledCondition = !(
+      isValidPaperPassword(paperPassword)
+      && isValidRepeatPassword(paperPassword, repeatPassword)
+    );
+
     const actions = [
       {
         label: intl.formatMessage(globalMessages.nextButtonLabel),
         onClick: this.submit,
         primary: true,
+        disabled: disabledCondition,
         className: confirmButtonClasses,
       },
     ];

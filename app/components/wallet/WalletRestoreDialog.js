@@ -364,7 +364,6 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         {isVerificationMode ? (
           introMessage && <InformativeMessage
-            subclass="component-bordered"
             message={introMessage}
           />
         ) : (

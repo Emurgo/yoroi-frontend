@@ -37,11 +37,13 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       restartWalletBackup,
       finishWalletBackup,
       removeOneMnemonicWord,
+      continueToPrivacyWarning,
       acceptPrivacyNoticeForWalletBackup,
       continueToRecoveryPhraseForWalletBackup
     } = actions.walletBackup;
     const { createWalletRequest } = stores.substores[environment.API].wallets;
     const { classicTheme } = this.props;
+    const hasWord = (enteredPhrase.length > 0);
     return (
       <WalletBackupDialog
         // Global props for all dialogs
@@ -52,6 +54,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         isPrivacyNoticeAccepted={isPrivacyNoticeAccepted}
         countdownRemaining={countdownRemaining}
         onAcceptPrivacyNotice={acceptPrivacyNoticeForWalletBackup.trigger}
+        onBack={continueToPrivacyWarning.trigger}
         onContinue={continueToRecoveryPhraseForWalletBackup.trigger}
         // Props for WalletRecoveryPhraseDisplayDialog
         recoveryPhrase={recoveryPhraseWords.reduce((phrase, { word }) => `${phrase} ${word}`, '')}
@@ -59,7 +62,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         // Props for WalletRecoveryPhraseEntryDialog
         isTermDeviceAccepted={isTermDeviceAccepted}
         enteredPhrase={enteredPhrase}
-        hasWord={() => recoveryPhraseWords.length > 0}
+        hasWord={hasWord}
         isTermRecoveryAccepted={isTermRecoveryAccepted}
         isValid={isRecoveryPhraseValid}
         isSubmitting={createWalletRequest.isExecuting}
