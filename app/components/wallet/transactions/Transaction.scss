@@ -40,8 +40,8 @@
   .time {
     font-family: var(--font-light);
     font-size: 14px;
-    min-width: 100px;
-  }  
+    min-width: 110px;
+  }
 
   .label {
     color: var(--theme-transactions-priority-color);
@@ -54,6 +54,7 @@
     margin-left: 130px;
     text-align: center;
     padding: 0px 9px;
+    min-width: 130px;
 
     @media (max-width: 1200px) {
       margin-left: 50px;
@@ -221,7 +222,6 @@
 
   .label {
     margin-top: 2px;
-    min-width: 50px;
   }
 
   .pendingLabel {
@@ -310,7 +310,6 @@
     font-size: 15px;
     line-height: 25px;
     height: 25px;
-    min-width: 84px;
     border-radius: 8px;
   }
 
