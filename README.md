@@ -19,25 +19,39 @@ Check out our [documents](docs/specs/meta) on the governance of this project.
 
 ## Build Yoroi Chrome extension
 
-Extension can be built for both the Cardano mainnet and testnet:
+Extension can be built for both the Cardano mainnet and [Byron testnet](https://testnet.iohkdev.io/cardano/byron/about/testnet-introduction/):
 
-- Localhost _(recommended)_
+####  Run project with testnet _(recommended)_
 ```bash
 # build files to './dev'
 $ npm run dev
 ```
 
-- Mainnet
+This command will run extension as locally-hosted, create a `./dev` directory in the project, and then you can "load unpacked" extension from there. When you stop the running process - extension will stop working, but it also means you can create code-changes while process is running and extension will be hot-reloaded with these changes.
+
+This build connects to the public testnet.
+
+#### Mainnet
 ```bash
 # build files to './build'
 $ npm run build -- --env "mainnet"
 ```
 
-- Testnet (not supported yet)
+This command will create a full build of the extension in the `./build` directory, which you can also "load unpacked" into your browser, and it will not require you to keep a running process to continue working (standalone build).
+
+This one will connect to the Cardano mainnet with ADA coins having real monetary value (equal to what users are downloading from browser stores). 
+
+#### Testnet
 ```bash
 # build files to './build'
 $ npm run build -- --env "testnet"
 ```
+
+Same as previous but connects to the [Byron testnet](https://testnet.iohkdev.io/cardano/byron/about/testnet-introduction/).
+ 
+ You can get free testnet coins from public Faucet: [https://testnet.iohkdev.io/cardano/byron/faucet/](https://testnet.iohkdev.io/cardano/byron/faucet/).
+ 
+ Note that testnet addresses look different from regular mainnet addresses. This is an intentional feature of "address segregation", mainnet addresses don't work on testnet and will be rejected by the Faucet and by core nodes.
 
 ## Run Yoroi Chrome extension
 
