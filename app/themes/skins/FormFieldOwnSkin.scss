@@ -47,11 +47,6 @@
   }
 }
 
-.error {
-  border-color: var(--rp-theme-color-error);
-  color: var(--rp-theme-color-error)!important;
-}
-
 :global(.YoroiModern) {
   .legend {
     margin-left: 9px;
@@ -68,12 +63,17 @@
    * The following fix delays webkit-autofill transition to avoid Chrome setting its
    * own style and thus floating fields are not overlapped.
    */
-   input:-webkit-autofill,
-   input:-webkit-autofill:hover,
-   input:-webkit-autofill:focus,
-   input:-webkit-autofill:active {
-     -webkit-transition-delay: 99999s;
-   }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-transition-delay: 99999s;
+  }
+
+  .error {
+    border-color: var(--rp-theme-color-error);
+    color: var(--rp-theme-color-error)!important;
+  }
 }
 
 :global(.YoroiClassic) {
