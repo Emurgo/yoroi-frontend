@@ -407,4 +407,7 @@ export default {
   '--theme-default-main-bg': '#F3F3F5',
 
   '--theme-wallet-navigation-tab-height': '40px',
+
+  '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)',
+  '--theme-warning-box-bg-shadow': '0 2px 40px 0 rgba(242, 242, 242, 0.5)',
 };
