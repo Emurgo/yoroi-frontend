@@ -244,7 +244,6 @@
   .content {
     border-bottom: 1px solid var(--theme-separation-border-color);
   }
-
   .details {
     h2 {
       font-weight: 600;
@@ -255,6 +254,12 @@
   .currencySymbol {
     margin-bottom: -1px;
   }  
+}
+
+:global(.YoroiClassic) .component:last-of-type {
+  .content {
+    border-bottom: 0;
+  }
 }
 
 :global(.YoroiModern) .component {
