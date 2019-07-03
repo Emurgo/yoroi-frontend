@@ -54,7 +54,6 @@
     margin-left: 130px;
     text-align: center;
     padding: 0px 9px;
-    min-width: 130px;
 
     @media (max-width: 1200px) {
       margin-left: 50px;
@@ -222,6 +221,7 @@
 
   .label {
     margin-top: 2px;
+    min-width: 90px;
   }
 
   .pendingLabel {
@@ -311,6 +311,7 @@
     line-height: 25px;
     height: 25px;
     border-radius: 8px;
+    min-width: 130px;
   }
 
   .pendingLabel {
