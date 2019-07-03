@@ -237,7 +237,7 @@
   "wallet.add.optionDialog.connect.hw.trezor.title": "Trezor Hardware Wallet",
   "wallet.add.optionDialog.restore.dialogTitle": "Kembalikan wallet",
   "wallet.add.optionDialog.restore.normalWallet.description": "Jika Anda memiliki frasa pemulihan Yoroi yang terdiri dari 15 kata yang dihasilkan saat Anda membuat Wallet Yoroi, pilih opsi ini untuk mengembalikan wallet Anda.",
-  "wallet.add.optionDialog.restore.normalWallet.title": "Masukkan 15-kata frasa pemulihan",
+  "wallet.add.optionDialog.restore.normalWallet.title": "Enter a 15-word recovery phrase",
   "wallet.add.optionDialog.restore.paperWallet.description": "Jika Anda sudah membuat paper wallet Yoroi (yang biasanya dicetak dan disimpan secara offline), Anda dapat memilih opsi ini untuk mengimpor dana dari paper wallet Yoroi Anda.",
   "wallet.add.optionDialog.restore.paperWallet.title": "Paper Wallet",
   "wallet.add.page.create.title": "Buat wallet",
