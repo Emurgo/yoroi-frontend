@@ -36,7 +36,7 @@
       }
   
       & > div {
-        margin-top: 30px;
+        margin-top: 0;
       }
   
       @include place-form-field-error-below-input;

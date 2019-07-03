@@ -42,6 +42,14 @@ Then(/^I see transactions buttons are disabled$/, async function () {
   expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
 });
 
+Then(/^I should see the networkError banner$/, async function () {
+  await this.waitForElement('.ServerErrorBanner_serverError');
+});
+
+Then(/^I should see the serverError banner$/, async function () {
+  await this.waitForElement('.ServerErrorBanner_serverError');
+});
+
 Then(/^I click on hide balance button$/, async function () {
   await this.click('.hideBalanceButton');
 });

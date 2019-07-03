@@ -5,6 +5,7 @@ import { NetworkType } from '../config/config-types';
 import type { UserAgentInfo } from './utils/userAgentInfo';
 import userAgentInfo from './utils/userAgentInfo';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 declare type Currency = 'ada';
@@ -14,22 +15,23 @@ export const environment = (Object.assign({
   NETWORK: CONFIG.network.name,
   version: require('../chrome/manifest.' + CONFIG.network.name + '.json').version,
   /** Environment used during webpack build */
-  current: process.env.NODE_ENV,
+  env_type: process.env.NODE_ENV,
 
   API: ('ada': Currency), // Note: can't change at runtime
   MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
   commit: process.env.COMMIT || '',
   branch: process.env.BRANCH || '',
-  isDev: () => environment.current === NetworkType.DEVELOPMENT,
-  isTest: () => environment.current === NetworkType.TEST,
+  isDev: () => CONFIG.network.name === NetworkType.DEVELOPMENT,
+  isTest: () => CONFIG.network.name === NetworkType.TEST,
   isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
   isAdaApi: () => environment.API === 'ada',
   walletRefreshInterval: CONFIG.app.walletRefreshInterval,
+  serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
   userAgentInfo,
 }, process.env): {
   NETWORK: Network,
   version: string,
-  current: ?string,
+  env_type: ?string,
   API: Currency,
   MOBX_DEV_TOOLS: ?string,
   commit: string,
@@ -39,6 +41,7 @@ export const environment = (Object.assign({
   isMainnet: void => boolean,
   isAdaApi: void => boolean,
   walletRefreshInterval: number,
+  serverStatusRefreshInterval: number,
   userAgentInfo: UserAgentInfo
 });
 

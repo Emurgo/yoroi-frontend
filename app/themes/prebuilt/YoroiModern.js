@@ -53,7 +53,7 @@ const rpCheckbox = {
   '--rp-checkbox-border': '2px solid #353535',
   '--rp-checkbox-border-color-disabled': 'rgba(21, 209, 170, 0.2)', // #15d1aa
   '--rp-checkbox-check-bg-color': '#15d1aa',
-  '--rp-checkbox-label-text-color': '#353535',
+  '--rp-checkbox-label-text-color': common['--cmn-default-color-grey'],
   '--rp-checkbox-label-text-color-disabled': 'rgba(53, 53, 53, 0.3)', // #353535
 };
 
@@ -387,7 +387,7 @@ export default {
 
   '--theme-label-button-color': '#353535',
 
-  '--theme-terms-of-use-text-color': '#9b9b9b',
+  '--theme-terms-of-use-text-color': '#38293d',
 
   '--theme-mnemonic-background-color': '#f0f3f5',
   '--theme-mnemonic-background-color-hover': '#f0f3f5',

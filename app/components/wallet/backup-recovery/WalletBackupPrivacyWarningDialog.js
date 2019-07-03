@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -81,7 +81,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       >
         {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} />}
         <WalletRecoveryInstructions
-          instructionsText={intl.formatMessage(messages.recoveryPhraseInstructions)}
+          instructionsText={<FormattedHTMLMessage {...messages.recoveryPhraseInstructions} />}
           classicTheme={classicTheme}
         />
         <div className={styles.checkbox}>

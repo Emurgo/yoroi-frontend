@@ -2,6 +2,10 @@
 
 .root {
   align-items: center;
+
+  // Remove once this PR is merged
+  // https://github.com/input-output-hk/react-polymorph/pull/118
+  width: fit-content;
   
   .checked {
     background-color: var(--rp-checkbox-check-bg-color);
