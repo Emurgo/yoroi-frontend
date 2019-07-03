@@ -237,7 +237,7 @@
   "wallet.add.optionDialog.connect.hw.trezor.title": "Trezorハードウェアウォレット",
   "wallet.add.optionDialog.restore.dialogTitle": "ウォレットを復元する",
   "wallet.add.optionDialog.restore.normalWallet.description": "新規のヨロイウォレットを作成する時に発行された、15個の単語からなるヨロイの復元フレーズをお持ちでしたらこのオプションを選択してウォレットを復元できます。",
-  "wallet.add.optionDialog.restore.normalWallet.title": "15単語の復元フレーズを入力します",
+  "wallet.add.optionDialog.restore.normalWallet.title": "Enter a 15-word recovery phrase",
   "wallet.add.optionDialog.restore.paperWallet.description": "通常印刷してオフラインで保管するものですが、ヨロイのペーパーウォレットをお持ちの方はこのオプションを選択してペーパーウォレットの残高をヨロイウォレットにインポートすることができます。",
   "wallet.add.optionDialog.restore.paperWallet.title": "ペーパーウォレット",
   "wallet.add.page.create.title": "ウォレットを作成する",
