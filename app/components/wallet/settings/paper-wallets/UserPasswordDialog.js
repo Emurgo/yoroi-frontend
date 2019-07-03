@@ -6,6 +6,7 @@ import { Input } from 'react-polymorph/lib/components/Input';
 import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import { isValidRepeatPassword, isValidPaperPassword } from '../../../../utils/validations';
@@ -102,6 +103,9 @@ export default class UserPasswordDialog extends Component<Props> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 

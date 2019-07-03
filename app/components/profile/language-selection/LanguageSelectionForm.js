@@ -62,10 +62,6 @@ export default class LanguageSelectionForm extends Component<Props> {
         value: this.props.currentLocale,
       }
     }
-  }, {
-    options: {
-      validateOnChange: false,
-    },
   });
 
   render() {

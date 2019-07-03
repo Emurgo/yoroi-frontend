@@ -42,10 +42,6 @@ export default class GeneralSettings extends Component<Props> {
         value: this.props.currentLocale,
       }
     }
-  }, {
-    options: {
-      validateOnChange: false,
-    },
   });
 
   render() {

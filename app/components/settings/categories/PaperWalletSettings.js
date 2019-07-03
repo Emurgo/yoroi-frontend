@@ -71,10 +71,6 @@ export default class PaperWalletSettings extends Component<Props> {
         value: true,
       },
     }
-  }, {
-    options: {
-      validateOnChange: false,
-    },
   });
 
   setPrintPaperIdentification = (printPaperWalletIdentification: boolean) => {
