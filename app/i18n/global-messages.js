@@ -293,6 +293,10 @@ const globalMessages = defineMessages({
     id: 'settings.support.logs.downloadLogsLink',
     defaultMessage: '!!!download them here',
   },
+  downloadLogsButtonLabel: {
+    id: 'settings.support.logs.downloadLogsButtonLabel',
+    defaultMessage: '!!!Download Logs',
+  },
   blockchainExplorer: {
     id: 'settings.general.explorer',
     defaultMessage: '!!!Blockchain Explorer',
