@@ -27,7 +27,7 @@ const messages = defineMessages({
   },
   internetConnectionWarning: {
     id: 'daedalusTransfer.waiting.warning',
-    defaultMessage: '!!!⚠️ This may take a long time or fail on poor internet connections',
+    defaultMessage: '!!!This may take a long time or fail on poor internet connections',
   }
 });
 
