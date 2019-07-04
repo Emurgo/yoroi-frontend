@@ -25,14 +25,17 @@ export default class WarningBox extends Component<Props> {
     const { intl } = this.context;
     const { children } = this.props;
     return (
-      <div className={styles.contentWarning}>
+      <div className={styles.component}>
+        {/* Warning header  */}
         <div className={styles.header}>
           <div className={styles.headerIcon} />
           <span className={styles.headerText}>
             {intl.formatMessage(messages.headerText)}
           </span>
         </div>
+        {/* Warning content  */}
         <div className={styles.warning}>{children}</div>
+
       </div>
     );
   }

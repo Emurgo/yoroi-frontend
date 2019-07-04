@@ -436,6 +436,7 @@ export default {
 
   '--theme-wallet-navigation-tab-height': '50px',
 
-  '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)',
-  '--theme-warning-box-bg-shadow': '0 2px 40px 0 rgba(242, 242, 242, 0.5)',
+  '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)', // #FF1351
+
+  '--theme-warning-color': `#FF1351`,
 };

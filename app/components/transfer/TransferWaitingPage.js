@@ -46,11 +46,15 @@ export default class TransferWaitingPage extends Component<Props> {
     const { intl } = this.context;
     const { status } = this.props;
 
+    const internetConnectionWarningComponent = (
+      <WarningBox>
+        {intl.formatMessage(messages.internetConnectionWarning)}
+      </WarningBox>
+    );
+
     return (
       <div className={styles.component}>
-        <WarningBox>
-          {intl.formatMessage(messages.internetConnectionWarning)}
-        </WarningBox>
+        {internetConnectionWarningComponent}
 
         <div className={styles.annotatedLoaderWrapper}>
           <AnnotatedLoader

@@ -408,6 +408,7 @@ export default {
 
   '--theme-wallet-navigation-tab-height': '40px',
 
-  '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)',
-  '--theme-warning-box-bg-shadow': '0 2px 40px 0 rgba(242, 242, 242, 0.5)',
+  '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
+
+  '--theme-warning-color': `#E9483D`,
 };
