@@ -4,7 +4,7 @@
   margin-bottom: 20px;
 
   h1 {
-    color: var(--theme-support-settings-text-color);
+    color: var(--cmn-default-color-grey);
     font-family: var(--font-semibold);
     font-size: 16px;
     line-height: 1.38;
@@ -14,6 +14,7 @@
 }
 
 .numAddressesSelect {
+  margin: 34px 0 14px 0;
   label {
     background-color: var(--theme-settings-pane-background-color);
   }
@@ -25,19 +26,12 @@
 }
 
 .button {
-  margin-top: 20px;
-}
-
-.numAddressesSelect {
-  margin-top: 20px;
-}
-
-.paperTypeSelect {
-  margin-top: 20px;
+  margin-top: 34px;
 }
 
 .intro {
-  color: var(--theme-terms-of-use-text-color);
+  color: var(--cmn-default-color-grey);
+  font-family: var(--font-regular);
   text-align: justify;
 
   h1, h2 {
@@ -56,6 +50,7 @@
   }
 
   p, li {
+    color: var(--cmn-default-color-grey);
     font-family: var(--font-regular);
     font-size: 14px;
     letter-spacing: 0.5px;

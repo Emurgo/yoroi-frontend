@@ -41,10 +41,6 @@ export default class ExplorerSettings extends Component<Props> {
         value: this.props.selectedExplorer
       }
     }
-  }, {
-    options: {
-      validateOnChange: false,
-    },
   });
 
   render() {

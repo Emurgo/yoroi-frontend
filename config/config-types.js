@@ -7,6 +7,7 @@ export type ConfigType = {
 
 export type AppConfigType = {
   walletRefreshInterval: number,
+  serverStatusRefreshInterval: number,
   logsBufferSize: number,
   logsFileSuffix: string,
   /** Defined by bip44

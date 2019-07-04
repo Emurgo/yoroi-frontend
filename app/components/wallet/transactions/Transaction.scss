@@ -40,7 +40,8 @@
   .time {
     font-family: var(--font-light);
     font-size: 14px;
-  }  
+    min-width: 110px;
+  }
 
   .label {
     color: var(--theme-transactions-priority-color);
@@ -220,7 +221,7 @@
 
   .label {
     margin-top: 2px;
-    min-width: 50px;
+    min-width: 90px;
   }
 
   .pendingLabel {
@@ -244,7 +245,6 @@
   .content {
     border-bottom: 1px solid var(--theme-separation-border-color);
   }
-
   .details {
     h2 {
       font-weight: 600;
@@ -255,6 +255,12 @@
   .currencySymbol {
     margin-bottom: -1px;
   }  
+}
+
+:global(.YoroiClassic) .component:last-of-type {
+  .content {
+    border-bottom: 0;
+  }
 }
 
 :global(.YoroiModern) .component {
@@ -309,8 +315,8 @@
     font-size: 15px;
     line-height: 25px;
     height: 25px;
-    min-width: 84px;
     border-radius: 8px;
+    min-width: 130px;
   }
 
   .pendingLabel {

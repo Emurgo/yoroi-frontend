@@ -1,5 +1,5 @@
 // @flow
-import { observable, computed, action, extendObservable } from 'mobx';
+import { observable, computed, action, runInAction } from 'mobx';
 import _ from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
@@ -29,7 +29,7 @@ export default class TransactionsStore extends Store {
     getBalanceRequest: CachedRequest<GetBalanceFunc>
   }> = [];
 
-  @observable _searchOptionsForWallets = {};
+  @observable _searchOptionsForWallets = observable.map();
 
   _hasAnyPending: boolean = false;
 
@@ -60,16 +60,19 @@ export default class TransactionsStore extends Store {
   @computed get searchOptions(): ?GetTransactionsRequestOptions {
     const wallet = this.stores.substores[environment.API].wallets.active;
     if (!wallet) return null;
-    let options = this._searchOptionsForWallets[wallet.id];
+    let options = this._searchOptionsForWallets.get(wallet.id);
     if (!options) {
       // Setup options for each requested wallet
-      extendObservable(this._searchOptionsForWallets, {
-        [wallet.id]: {
-          limit: this.INITIAL_SEARCH_LIMIT,
-          skip: this.SEARCH_SKIP
-        }
+      runInAction(() => {
+        this._searchOptionsForWallets.set(
+          wallet.id,
+          {
+            limit: this.INITIAL_SEARCH_LIMIT,
+            skip: this.SEARCH_SKIP
+          }
+        );
       });
-      options = this._searchOptionsForWallets[wallet.id];
+      options = this._searchOptionsForWallets.get(wallet.id);
     }
     return options;
   }

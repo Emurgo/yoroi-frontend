@@ -5,6 +5,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
+import DialogBackButton from '../../widgets/DialogBackButton';
 import Dialog from '../../widgets/Dialog';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
@@ -27,6 +28,7 @@ type Props = {|
   recoveryPhrase: string,
   onStartWalletBackup: Function,
   onCancelBackup: Function,
+  onBack: Function,
   classicTheme: boolean
 |};
 
@@ -43,6 +45,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
       recoveryPhrase,
       onStartWalletBackup,
       onCancelBackup,
+      onBack,
       classicTheme
     } = this.props;
 
@@ -62,6 +65,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
         onClose={onCancelBackup}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
+        backButton={<DialogBackButton onBack={onBack} />}
         classicTheme={classicTheme}
       >
         {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryPhraseSvg} />}

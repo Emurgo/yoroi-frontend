@@ -26,6 +26,7 @@ import saveLoadSVG from '../../../../assets/images/hardware-wallet/ledger/save-l
 import saveErrorSVG from '../../../../assets/images/hardware-wallet/ledger/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import { isValidWalletName } from '../../../../utils/validations';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
@@ -89,6 +90,9 @@ export default class SaveDialog extends Component<Props> {
       options: {
         validateOnChange: true,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+      },
+      plugins: {
+        vjf: vjf()
       },
     });
   }

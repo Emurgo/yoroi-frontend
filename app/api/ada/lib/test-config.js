@@ -10,6 +10,7 @@ const CONFIG: ConfigType = {
   },
   app: {
     walletRefreshInterval: 10,
+    serverStatusRefreshInterval: 10,
     logsBufferSize: 10,
     logsFileSuffix: 'log',
     addressScanSize: 20,

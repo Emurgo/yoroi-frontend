@@ -1,18 +1,28 @@
-.checkboxWrapper {
-  margin: var(--rp-checkbox-label-margin, 10px 0 0 20px);
 
-  label {
+.checkBlockTop {
+  align-self: start !important;
+}
+
+.checkBlockCenter {
+  align-self: center !important;
+}
+
+.checkboxWrapper {
+  margin: var(--rp-checkbox-label-margin, 0 0 0 20px);
+
+  .labelText {
     margin: 0;
+    line-height: 20px;
+    font-family: var(--font-regular);
   }
 
-  p {
+  .descriptionText {
     font-family: var(--font-regular);
-    color: var(--theme-terms-of-use-text-color);
-    font-size: 13px;
+    color: var(--cmn-default-color-grey);
+    font-size: 12px;
     letter-spacing: 0.5px;
     line-height: 1.38;
-    margin-top: 5px;
-    margin-bottom: 11px;
+    margin-top: 8px;
 
     strong, em {
       font-weight: 500;

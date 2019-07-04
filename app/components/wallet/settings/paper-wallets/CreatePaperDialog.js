@@ -25,7 +25,7 @@ const messages = defineMessages({
   },
   downloadSizeInfo: {
     id: 'settings.paperWallet.dialog.createPaper.downloadSizeInfo',
-    defaultMessage: '!!!Download Paper Wallet Certificate. Size (Mb):',
+    defaultMessage: '!!!Download Paper Wallet Certificate. Size (MB):',
   },
   pdfGenInitializing: {
     id: 'settings.paperWallet.dialog.createPaper.initializing',

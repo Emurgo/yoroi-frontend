@@ -3,7 +3,6 @@
 .*/node_modules/electron-packager/.*
 .*/node_modules/npm/.*
 .*/node_modules/oboe/.*
-.*/node_modules/mobx/lib/mobx.js.flow
 .*/dist/.*
 .*/release/.*
 .*/.git/.*

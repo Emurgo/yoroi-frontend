@@ -96,10 +96,13 @@ export default class LoadingStore extends Store {
   @action
   validateUriPath = async (): Promise<void> => {
     if (this.fromUriScheme) {
-      this._uriParams = await getURIParameters(
+      const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
         this.stores.substores.ada.wallets.isValidAddress
       );
+      runInAction(() => {
+        this._uriParams = uriParams;
+      });
     }
   }
 

@@ -58,3 +58,10 @@ export type FilterUsedRequest = {
 };
 export type FilterUsedResponse = Array<string>;
 export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse>;
+
+// checkServer
+
+export type ServerStatusResponse = {
+  isServerOk: boolean
+};
+export type ServerStatusFunc = () => Promise<ServerStatusResponse>;

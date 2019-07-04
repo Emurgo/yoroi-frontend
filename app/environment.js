@@ -26,6 +26,7 @@ export const environment = (Object.assign({
   isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
   isAdaApi: () => environment.API === 'ada',
   walletRefreshInterval: CONFIG.app.walletRefreshInterval,
+  serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
   userAgentInfo,
 }, process.env): {
   NETWORK: Network,
@@ -40,6 +41,7 @@ export const environment = (Object.assign({
   isMainnet: void => boolean,
   isAdaApi: void => boolean,
   walletRefreshInterval: number,
+  serverStatusRefreshInterval: number,
   userAgentInfo: UserAgentInfo
 });
 
