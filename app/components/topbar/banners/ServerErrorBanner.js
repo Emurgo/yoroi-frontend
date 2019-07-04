@@ -10,11 +10,11 @@ import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType
 const messages = defineMessages({
   serverErrorLabel: {
     id: 'serverError.label.message',
-    defaultMessage: '!!!WARNING: Server experiencing difficulties.<br>Please check <a target="blank" href="https://twitter.com/YoroiWallet">our Twitter account</a>.<br>Your funds are safe, you can check them in any block explorer.',
+    defaultMessage: '!!!WARNING: Server experiencing difficulties.<br>Please check <a target="blank" href="https://twitter.com/YoroiWallet">our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.',
   },
   networkErrorLabel: {
     id: 'networkError.label.message',
-    defaultMessage: '!!!WARNING: Connection to the server failed.<br>Please check your internet connection or <a target="blank" href="https://twitter.com/YoroiWallet">our Twitter account</a>.<br>Your funds are safe, you can check them in any block explorer.',
+    defaultMessage: '!!!WARNING: Connection to the server failed.<br>Please check your internet connection or <a target="blank" href="https://twitter.com/YoroiWallet">our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.',
   },
 });
 
