@@ -19,7 +19,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../../domain/Explorer';
 
-import WarningBox from '../../widgets/forms/WarningBox';
+import WarningBox from '../../widgets/WarningBox';
 import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 
 const messages = defineMessages({

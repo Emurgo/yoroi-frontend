@@ -8,7 +8,7 @@ import type { MessageDescriptor } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
-import WarningBox from '../../widgets/forms/WarningBox';
+import WarningBox from '../../widgets/WarningBox';
 
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';

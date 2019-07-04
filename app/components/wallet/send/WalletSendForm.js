@@ -29,7 +29,7 @@ import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 
-import WarningBox from '../../widgets/forms/WarningBox';
+import WarningBox from '../../widgets/WarningBox';
 
 const messages = defineMessages({
   titleLabel: {

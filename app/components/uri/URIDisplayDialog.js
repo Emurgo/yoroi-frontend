@@ -15,7 +15,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import NotificationMessage from '../widgets/NotificationMessage';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
 import successIcon from '../../assets/images/success-small.inline.svg';
-import WarningBox from '../widgets/forms/WarningBox';
+import WarningBox from '../widgets/WarningBox';
 
 import styles from './URIDisplayDialog.scss';
 
