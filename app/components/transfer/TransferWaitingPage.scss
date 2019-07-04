@@ -5,6 +5,13 @@ $margin: 20px;
   height: calc(100% - var(--theme-wallet-navigation-tab-height));
 
   .annotatedLoaderWrapper {
+    :global(.LoadingSpinner_component) {
+      width: 60px;
+      height: 60px;
+      background-size: 60px;
+      margin-bottom: 40px;
+    }
+    
     display: flex;
     flex-flow: column;
     margin: $margin;
