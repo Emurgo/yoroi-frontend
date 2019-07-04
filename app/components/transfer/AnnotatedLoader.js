@@ -7,17 +7,13 @@ import styles from './AnnotatedLoader.scss';
 type Props = {|
   title: string,
   details: string,
-  warning?: string,
 |};
 
 @observer
 export default class AnnotatedLoader extends Component<Props> {
-  static defaultProps = {
-    warning: undefined,
-  };
 
   render() {
-    const { title, details, warning } = this.props;
+    const { title, details } = this.props;
 
     return (
       <div className={styles.component}>
@@ -32,12 +28,7 @@ export default class AnnotatedLoader extends Component<Props> {
             <LoadingSpinner />
 
             <div className={styles.progressInfo}>
-              {details}<br /><br />
-              {warning &&
-                <div className={styles.error}>
-                  {warning}
-                </div>
-              }
+              {details}
             </div>
           </div>
         </div>
