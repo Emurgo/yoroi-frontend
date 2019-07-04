@@ -72,6 +72,10 @@
   
     &:hover {
       box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
+
+      .heroCardsItemTitle {
+        color: var(--card-text-color-hover);
+      }
     }
   
     .heroCardsItemTitle {

@@ -45,8 +45,8 @@ When(/^I clear the receiver$/, async function () {
   await this.clearInput("input[name='receiver']");
 });
 
-When(/^I clear the wallet password$/, async function () {
-  await this.clearInput("input[name='walletPassword']");
+When(/^I clear the wallet password ([^"]*)$/, async function (password) {
+  await this.clearInputUpdatingForm("input[name='walletPassword']", password.length);
 });
 
 When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {

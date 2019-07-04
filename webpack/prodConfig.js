@@ -28,7 +28,7 @@ const baseProdConfig = (networkName) => ({
   },
   plugins: [
     ...commonConfig.plugins('build'),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName)),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, true)),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],

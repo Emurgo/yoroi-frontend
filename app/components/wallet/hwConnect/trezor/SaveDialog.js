@@ -5,7 +5,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
 
 import globalMessages from '../../../../i18n/global-messages';
@@ -27,6 +26,7 @@ import saveLoadSVG from '../../../../assets/images/hardware-wallet/trezor/save-l
 import saveErrorSVG from '../../../../assets/images/hardware-wallet/trezor/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import { isValidWalletName } from '../../../../utils/validations';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
@@ -90,11 +90,17 @@ export default class SaveDialog extends Component<Props> {
         validateOnChange: true,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
+      plugins: {
+        vjf: vjf()
+      },
     });
   }
 
   render() {
+    const { form } = this;
     const { intl } = this.context;
+
+    const { walletName } = form.values();
     const {
       progressInfo,
       isActionProcessing,
@@ -124,7 +130,8 @@ export default class SaveDialog extends Component<Props> {
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
+          done={isValidWalletName(walletName)}
         />
       </div>);
 

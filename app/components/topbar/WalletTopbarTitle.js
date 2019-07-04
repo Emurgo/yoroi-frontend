@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
 import styles from './WalletTopbarTitle.scss';
 import { matchRoute } from '../../utils/routing';
@@ -10,6 +11,8 @@ import WalletAccountIcon from './WalletAccountIcon';
 import { WalletTypeOption } from '../../types/WalletType';
 import type { WalletAccount } from '../../domain/Wallet';
 import { defineMessages, intlShape } from 'react-intl';
+import hideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
+import showBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
 
 
 const messages = defineMessages({
@@ -27,6 +30,8 @@ type Props = {|
   themeProperties?: {
     identiconSaturationFactor: number,
   },
+  onUpdateHideBalance: Function,
+  shouldHideBalance: boolean
 |};
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<'div'>] {
@@ -57,7 +62,8 @@ export default class WalletTopbarTitle extends Component<Props> {
 
   render() {
     const {
-      wallet, account, currentRoute, formattedWalletAmount, themeProperties
+      wallet, account, currentRoute, formattedWalletAmount, themeProperties,
+      shouldHideBalance, onUpdateHideBalance
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
     const { intl } = this.context;
@@ -67,6 +73,7 @@ export default class WalletTopbarTitle extends Component<Props> {
     const showWalletInfo = walletRoutesMatch && wallet;
 
     const isHardwareWallet = (wallet && wallet.type) === WalletTypeOption.HARDWARE_WALLET;
+    const currency = ' ADA';
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
     const [accountPlateId, iconComponent] = account ?
       constructPlate(account, identiconSaturationFactor, iconDivClass)
@@ -81,10 +88,28 @@ export default class WalletTopbarTitle extends Component<Props> {
         </div>
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
-            { wallet && formattedWalletAmount(wallet.amount) + ' ADA' }
+            { wallet && shouldHideBalance ?
+              <span className={styles.hiddenWalletAmount}>******</span> :
+              wallet && formattedWalletAmount(wallet.amount)
+            }
+            { currency }
           </div>
-          <div className={styles.walletAmountLabel}>
-            {intl.formatMessage(messages.totalBalance)}
+          <div className={styles.walletAmountLabelBlock}>
+            <div className={styles.walletAmountLabel}>
+              {intl.formatMessage(messages.totalBalance)}
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={onUpdateHideBalance}
+                className={classNames([styles.hideBalanceButton, 'hideBalanceButton'])}
+              >
+                <SvgInline
+                  svg={shouldHideBalance ? showBalanceIcon : hideBalanceIcon}
+                  className={styles.showHideBalanceIcon}
+                />
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -53,7 +53,7 @@ const rpCheckbox = {
   '--rp-checkbox-border': '1px solid #daa49a',
   '--rp-checkbox-border-color-disabled': 'rgba(218, 164, 154, 0.2)', // #DAA49A
   '--rp-checkbox-check-bg-color': '#daa49a',
-  '--rp-checkbox-label-text-color': '#121327',
+  '--rp-checkbox-label-text-color': common['--cmn-default-color-grey'],
   '--rp-checkbox-label-text-color-disabled': 'rgba(18, 19, 39, 0.3)', // #121327
 };
 
@@ -157,7 +157,8 @@ const tabs = {
 const itemCard = {
   '--card-bg-color': '#fff',
   '--card-border-radius': '8px',
-  '--card-text-color': '#DAA49A',
+  '--card-text-color': '#2b2c32',
+  '--card-text-color-hover': '#DAA49A',
   '--card-text-size': '16px',
   '--card-width': '250px',
   '--card-height': '380px',

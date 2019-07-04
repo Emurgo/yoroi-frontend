@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../themes';
 import type { Theme } from '../../../../themes';
@@ -107,7 +107,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
           {intl.formatMessage(messages.themeLabel)}
         </h2>
 
-        <p>{intl.formatMessage(messages.themeNote)}</p>
+        <p><FormattedHTMLMessage {...messages.themeNote} /></p>
         <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
 
         <div className={styles.main}>

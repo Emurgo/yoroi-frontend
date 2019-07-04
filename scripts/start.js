@@ -6,6 +6,8 @@ const argv = require('minimist')(process.argv.slice(2));
 
 const config = require(`../webpack/devConfig`);
 
+process.env.NODE_CONFIG_ENV = argv.env;
+
 tasks.replaceWebpack();
 console.log('[Copy assets]');
 console.log('-'.repeat(80));

@@ -4,7 +4,6 @@ import type { Ref } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import styles from './AmountInputSkin.scss';
 
@@ -41,27 +40,21 @@ export default class AmountInputSkin extends Component<Props> {
   };
 
   render() {
-    const { error, fees, total, currency, classicTheme } = this.props;
+    const { error, fees, total, currency } = this.props;
     const { intl } = this.context;
 
     return (
       <div className={styles.component}>
-        {classicTheme ? <InputSkin {...this.props} /> : <InputOwnSkin {...this.props} />}
+        <InputOwnSkin {...this.props} />
         {!error && (
           <span className={styles.fees}>
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
           </span>
         )}
 
-        {classicTheme ? (
-          <span className={styles.total}>
-            {!error && `= ${total.toString()} `}{currency}
-          </span>
-        ) : (
-          <span className={classnames([styles.total, error ? styles.error : ''])}>
-            {!error && `= ${total.toString()} `}{currency}
-          </span>
-        )}
+        <span className={classnames([styles.total, error ? styles.error : ''])}>
+          {!error && `= ${total.toString()} `}{currency}
+        </span>
       </div>
     );
   }

@@ -8,6 +8,7 @@ import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -106,6 +107,9 @@ export default class URIGenerateDialog extends Component<Props> {
       validateOnBlur: false,
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 

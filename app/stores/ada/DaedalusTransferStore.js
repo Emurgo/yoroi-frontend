@@ -110,19 +110,23 @@ export default class DaedalusTransferStore extends Store {
     wallet: RustModule.Wallet.DaedalusWallet,
   ): void => {
     this._updateStatus('restoringAddresses');
-    this.ws = new WebSocket(websocketUrl);
-    this.ws.addEventListener('open', () => {
+    runInAction(() => {
+      this.ws = new WebSocket(websocketUrl);
+    });
+    if (!this.ws) { throw new Error('Invalid WebSocket'); }
+    const ws = this.ws; // assert non-null
+
+    ws.addEventListener('open', () => {
       Logger.info('[ws::connected]');
       if (!this.ws) { throw new Error('Invalid WebSocket'); }
       this.ws.send(JSON.stringify({
         msg: MSG_TYPE_RESTORE,
       }));
     });
-    if (!this.ws) { throw new Error('Invalid WebSocket'); }
     /*  TODO: Remove 'any' from event
         There is an open issue with this https://github.com/facebook/flow/issues/3116
     */
-    this.ws.addEventListener('message', async (event: any) => {
+    ws.addEventListener('message', async (event: any) => {
       try {
         // Note: we only expect a single message from our WS so we can close it right away.
         // Not closing it right away will cause a WS timeout as we don't keep the connection alive.

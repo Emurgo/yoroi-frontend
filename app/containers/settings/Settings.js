@@ -2,15 +2,15 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+import environment from '../../environment';
 import SettingsLayout from '../../components/settings/SettingsLayout';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
-import resolver from '../../utils/imports';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
-const Layout = resolver('containers/MainLayout');
+import MainLayout from '../MainLayout';
 
 const messages = defineMessages({
   title: {
@@ -37,6 +37,7 @@ export default class Settings extends Component<InjectedContainerProps> {
   render() {
     const { actions, stores, children } = this.props;
     const { profile, topbar } = stores;
+    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
 
     const menu = (
       <SettingsMenu
@@ -51,7 +52,7 @@ export default class Settings extends Component<InjectedContainerProps> {
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
     return (
-      <Layout
+      <MainLayout
         topbar={(
           <TopBar
             title={topbarTitle}
@@ -62,12 +63,15 @@ export default class Settings extends Component<InjectedContainerProps> {
             activeTopbarCategory={topbar.activeTopbarCategory}
           />
         )}
+        connectionErrorType={checkAdaServerStatus}
         classicTheme={profile.isClassicTheme}
+        actions={actions}
+        stores={stores}
       >
         <SettingsLayout menu={menu}>
           {children || null /* the "|| null" part keeps flow happy */}
         </SettingsLayout>
-      </Layout>
+      </MainLayout>
     );
   }
 }

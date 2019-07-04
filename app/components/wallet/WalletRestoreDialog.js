@@ -4,11 +4,10 @@ import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
-import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import InformativeMessage from '../widgets/InformativeMessage';
 import Dialog from '../widgets/Dialog';
@@ -231,6 +230,9 @@ export default class WalletRestoreDialog extends Component<Props> {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
+    plugins: {
+      vjf: vjf()
+    },
   });
 
   submit = () => {
@@ -362,7 +364,6 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         {isVerificationMode ? (
           introMessage && <InformativeMessage
-            subclass="component-bordered"
             message={introMessage}
           />
         ) : (
@@ -372,7 +373,7 @@ export default class WalletRestoreDialog extends Component<Props> {
             {...walletNameField.bind()}
             done={isValidWalletName(walletName)}
             error={walletNameField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
         )}
 
@@ -384,7 +385,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-          skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
+          skin={AutocompleteOwnSkin}
           preselectedOptions={recoveryPhraseField.value}
         />
 
@@ -401,7 +402,7 @@ export default class WalletRestoreDialog extends Component<Props> {
                 {...paperPasswordField.bind()}
                 done={validatePaperPassword()}
                 error={paperPasswordField.error}
-                skin={classicTheme ? InputSkin : InputOwnSkin}
+                skin={InputOwnSkin}
               />
             </div>
           </div>
@@ -415,14 +416,14 @@ export default class WalletRestoreDialog extends Component<Props> {
                 {...walletPasswordField.bind()}
                 done={isValidWalletPassword(walletPassword)}
                 error={walletPasswordField.error}
-                skin={classicTheme ? InputSkin : InputOwnSkin}
+                skin={InputOwnSkin}
               />
               <Input
                 className="repeatedPassword"
                 {...repeatedPasswordField.bind()}
                 done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
                 error={repeatedPasswordField.error}
-                skin={classicTheme ? InputSkin : InputOwnSkin}
+                skin={InputOwnSkin}
               />
               <PasswordInstructions />
             </div>

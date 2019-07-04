@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import Dialog from '../../widgets/Dialog';
 import { isValidWalletPassword, isValidRepeatPassword } from '../../../utils/validations';
@@ -93,6 +93,9 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -184,7 +187,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
         </div>
 
@@ -197,7 +200,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...newPasswordField.bind()}
             done={isValidWalletPassword(newPassword)}
             error={newPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
 
           <Input
@@ -208,7 +211,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...repeatedPasswordField.bind()}
             done={repeatedPassword && isValidRepeatPassword(newPassword, repeatedPassword)}
             error={repeatedPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
 
           <PasswordInstructions />

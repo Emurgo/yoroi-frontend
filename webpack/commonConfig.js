@@ -39,6 +39,7 @@ const plugins = (folder) => ([
    * But we need this written to disk so the extension can be loaded by Chrome
    */
   new HtmlWebpackHarddiskPlugin(),
+  // populates the CONFIG global based on ENV
   new ConfigWebpackPlugin(),
 ]);
 
@@ -149,9 +150,9 @@ const resolve = {
   extensions: ['*', '.js', '.wasm']
 };
 
-const definePlugin = (networkName) => ({
+const definePlugin = (networkName, isProd) => ({
   'process.env': {
-    NODE_ENV: JSON.stringify(networkName),
+    NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
     BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim())
   }

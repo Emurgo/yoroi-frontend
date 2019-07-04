@@ -46,6 +46,10 @@
 }
 
 :global(.YoroiClassic) .component {
+  .button {
+    margin: 0 auto 0;
+  }
+
   .body {
     .title {
       font-size: 11px;
