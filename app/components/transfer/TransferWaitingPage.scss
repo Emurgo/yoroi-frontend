@@ -18,3 +18,11 @@ $margin: 20px;
     height: calc(100% - #{#{$margin}*2} - var(--theme-wallet-navigation-tab-height));
   }
 }
+
+:global(.YoroiClassic) {
+  .component {
+    .annotatedLoaderWrapper {
+      height: calc(100% - #{#{$margin}*3} - var(--theme-wallet-navigation-tab-height));
+    }
+  }
+}
