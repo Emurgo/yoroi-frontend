@@ -15,7 +15,6 @@
   }
 
   a,
-  button,
   p {
     color: var(--theme-support-settings-text-color);
     font-family: var(--font-regular);
@@ -23,20 +22,24 @@
     line-height: 19px;
   }
 
-  a,
-  button {
+  a {
     color: var(--theme-support-settings-link-color);
   }
-
-  button {
-    cursor: pointer;
-    letter-spacing: 1px;
-    text-decoration: underline;    
-  }
-
+  
   p {
     margin-bottom: 10px;
   }
+  
+  .link {
+    cursor: pointer;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-dark-color);
+    text-decoration: none;
+  }
+
+  .link:focus {
+    outline: none;
+  }  
 }
 
 :global(.YoroiClassic) .component {
