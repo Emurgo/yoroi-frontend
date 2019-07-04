@@ -4,4 +4,4 @@
 
 事前に生成されたアドレスを使用して、ペーパーウォレットで通貨を受け取ることが可能です。また、ペーパーウォレットはいつでもヨロイに復元して、資金にアクセスすることができます。しかし、資金を復元したあとは「コールドウォレット」ではなくなるため、ペーパーウォレットを使用することはできません。
 
-Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret words. Even if someone gets access to this paper-wallet, they will also need to know your password to gain access to the funds. **But if you lose or forget your password, your funds will be lost forever and no one will be able to restore them**. Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.
+ヨロイペーパーウォレットは**カスタムユーザーパスワード**で保護され、21の秘密鍵を含みます。ペーパーウォレットが第三者の手に渡った場合でも、パスワードがなければ資金にアクセスすることはできません。**しかし、ユーザーがパスワードを紛失または失念した場合は、資金は永遠に失われ、いかなる手段によっても復元することはできません。**ウォレットパスワードを誤って入力した場合、異なるウォレットが作成されます。これは妥当な否認権を認めるものです。
