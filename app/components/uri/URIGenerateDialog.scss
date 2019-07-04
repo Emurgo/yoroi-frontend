@@ -1,4 +1,6 @@
 .component {
+  min-width: var(--theme-modal-min-max-width-lg) !important;
+  max-width: var(--theme-modal-min-max-width-lg) !important;
 
   :global {
     .Dialog_title {
@@ -43,11 +45,7 @@
 }
 
 :global(.YoroiModern) .component {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);
-
   .generateButton {
     margin: 20px auto 0;
   }
-
 }

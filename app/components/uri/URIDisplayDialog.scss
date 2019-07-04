@@ -1,4 +1,7 @@
-.component {
+.component {  
+  min-width: var(--theme-modal-min-max-width-lg) !important;
+  max-width: var(--theme-modal-min-max-width-lg) !important;
+
   :global {
     .Dialog_title {
       margin-bottom: 24px;
@@ -41,9 +44,6 @@
 }
 
 :global(.YoroiModern) .component {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);
-
   .uri {
     color: var(--theme-transactions-received-address-color);
   }
