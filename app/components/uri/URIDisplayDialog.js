@@ -103,14 +103,15 @@ export default class URIDisplayDialog extends Component<Props, State> {
         onClose={onClose}
         backButton={<DialogBackButton onBack={onBack} />}
       >
-        {uriUsabilityWarning}
-
         <NotificationMessage
           icon={successIcon}
           show={!!copiedURI && showNotification}
         >
           {message}
         </NotificationMessage>
+
+        {uriUsabilityWarning}
+
         <div className={styles.qrCode}>
           <QRCode
             value={uri}

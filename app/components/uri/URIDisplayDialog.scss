@@ -1,4 +1,10 @@
 .component {
+  :global {
+    .Dialog_title {
+      margin-bottom: 24px;
+    }
+  }
+
   .uriDisplay {
     width: 75%;
     margin-left: auto;
@@ -29,7 +35,7 @@
   }
 
   .qrCode {
-    margin: 34px auto;
+    margin: 34px auto 20px auto;
     text-align: center;
   }
 }
