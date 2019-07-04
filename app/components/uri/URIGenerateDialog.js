@@ -4,8 +4,8 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
+import { Input } from 'react-polymorph/lib/components/Input';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -126,7 +126,6 @@ export default class URIGenerateDialog extends Component<Props> {
       onClose,
       onGenerate,
       classicTheme,
-      walletAddress,
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
     } = this.props;
@@ -139,8 +138,8 @@ export default class URIGenerateDialog extends Component<Props> {
     const { form } = this;
     const { intl } = this.context;
 
-    const amountField = form.$('amount');
     const receiverField = form.$('receiver');
+    const amountField = form.$('amount');
 
     return (
       <Dialog
@@ -152,22 +151,25 @@ export default class URIGenerateDialog extends Component<Props> {
         onClose={onClose}
       >
         <div>
-          <h2 className={styles.receiverLabel}>
-            {intl.formatMessage(messages.uriGenerateDialogAddressLabel)}
-          </h2>
-          <div className={styles.receiverField}>
-            {walletAddress}
+          <div className={styles.receiverInput}>
+            <Input
+              className="receiver"
+              {...receiverField.bind()}
+              skin={InputOwnSkin}
+              disabled
+            />
           </div>
           <div className={styles.amountField}>
             <NumericInput
-              {...amountField.bind()}
               className="amount"
+              {...amountField.bind()}
               label={this.getAmountLabel()}
+              error={amountField.error}
               maxBeforeDot={currencyMaxIntegerDigits}
               maxAfterDot={currencyMaxFractionalDigits}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={InputOwnSkin}
+              done={amountField.isValid}
               classicTheme={classicTheme}
-              error={amountField.error}
               autoFocus
             />
           </div>
