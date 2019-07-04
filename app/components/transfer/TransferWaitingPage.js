@@ -2,7 +2,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+
 import AnnotatedLoader from './AnnotatedLoader';
+import WarningBox from '../widgets/WarningBox';
+
 import styles from './TransferWaitingPage.scss';
 
 const messages = defineMessages({
@@ -45,11 +48,16 @@ export default class TransferWaitingPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <AnnotatedLoader
-          title={intl.formatMessage(messages.title)}
-          details={intl.formatMessage(messages[status])}
-          warning={intl.formatMessage(messages.internetConnectionWarning)}
-        />
+        <WarningBox>
+          {intl.formatMessage(messages.internetConnectionWarning)}
+        </WarningBox>
+
+        <div className={styles.annotatedLoaderWrapper}>
+          <AnnotatedLoader
+            title={intl.formatMessage(messages.title)}
+            details={intl.formatMessage(messages[status])}
+          />
+        </div>
       </div>
     );
   }
