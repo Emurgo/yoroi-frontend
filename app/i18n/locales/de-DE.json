@@ -114,7 +114,7 @@
   "profile.languageSelect.title": "Sprachauswahl",
   "profile.termsOfUse.checkboxLabel": "Ich stimme den Nutzungsbedingungen zu",
   "profile.termsOfUse.title": "Nutzungsbestimmungen",
-  "serverError.label.message": "WARNING: Server experiencing difficulties.<br>Please check <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.",
+  "serverError.label.message": "WARNUNG: Der Server hat Probleme.<br>Bitte überprüfe <a target='blank' href='https://twitter.com/YoroiWallet'>unser Twitter Konto</a>.<br>Das angezeigte Guthaben und der Transaktions-Verlauf könnte unvollständig erscheinen, bis unsere Server wieder in Normalbetrieb sind. Dein effektives Guthaben ist davon aber nicht betroffen.",
   "settings.display.blog": "Wie diese Funktion verwendet wird, kannst Du in unserem {blogLink} nachlesen.",
   "settings.display.themeExportButton": "DESIGN EXPORTIEREN",
   "settings.display.themeLabel": "Design",
