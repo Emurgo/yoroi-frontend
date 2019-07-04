@@ -103,6 +103,8 @@ export default class URIDisplayDialog extends Component<Props, State> {
         onClose={onClose}
         backButton={<DialogBackButton onBack={onBack} />}
       >
+        {uriUsabilityWarning}
+
         <NotificationMessage
           icon={successIcon}
           show={!!copiedURI && showNotification}
@@ -131,7 +133,6 @@ export default class URIDisplayDialog extends Component<Props, State> {
             </span>
           </CopyToClipboard>
         </div>
-        {uriUsabilityWarning}
       </Dialog>
 
     );
