@@ -25,7 +25,7 @@
       font-family: var(--font-medium);
       color: var(--theme-warning-color);
       font-size: 16px;
-      font-weight: bold;
+      font-weight: 500;
       margin-left: 6px;
     }
   }
@@ -44,6 +44,10 @@
   .component {
     .headerIcon {
       background-image: url(../../assets/images/attention-classic.inline.svg);      
+    }
+
+    .headerText {
+      font-weight: bold;
     }
   }
 }
