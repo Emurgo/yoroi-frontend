@@ -211,7 +211,7 @@
   "uri.display.dialog.copy.notification": "URLをコピーしました",
   "uri.display.dialog.title": "生成されたURL",
   "uri.generate.dialog.address.label": "受信者アドレス",
-  "uri.generate.dialog.amount.label": "Amount ({currency})",
+  "uri.generate.dialog.amount.label": "金額 ({currency})",
   "uri.generate.dialog.confirm.label": "生成する",
   "uri.generate.dialog.invalid.amount": "有効な金額を入力してください。",
   "uri.generate.dialog.title": "URLを生成する",
