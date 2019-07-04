@@ -38,7 +38,7 @@
   "api.errors.redemptionKeyAlreadyUsedError": "do not translate",
   "api.errors.sendTransactionApiError": "Erreur reçue du serveur lors de l'envoi de la transaction.",
   "api.errors.sendTransactionError": "Erreur reçue de l'API lors de l'envoi de la transaction.",
-  "api.errors.serverStatusError": "Connection to the server failed. Please check your internet connection or our Twitter account (https://twitter.com/YoroiWallet).",
+  "api.errors.serverStatusError": "La connexion au serveur a échoué. Veuillez vérifier votre connexion internet ou notre compte Twitter (https://twitter.com/YoroiWallet).",
   "api.errors.transactionError": "Erreur lors de la création de la transaction.",
   "api.errors.unusedAddressesError": "Vous ne pouvez pas générer plus de 20 adresses consécutives non utilisées.",
   "api.errors.updateAdaTxsHistoryError": "Erreur lors de la mise à jour de l'historique des transactions.",
