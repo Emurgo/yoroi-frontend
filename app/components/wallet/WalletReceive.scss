@@ -45,7 +45,7 @@
       letter-spacing: 0;
 
       .postCopyMargin {
-        margin-bottom: 6px;
+        margin-bottom: 16px;
       }
 
       .copyableHash {
@@ -54,8 +54,11 @@
       }
 
       .hashLabel {
-        font-size: 11px;
-        margin-bottom: 6px;
+        font-size: 18px;
+        font-family: var(--font-medium);
+        font-weight: 500;
+        line-height: 22px;
+        margin-bottom: 16px;
       }
 
       .instructionsText {
@@ -89,18 +92,20 @@
     line-height: 22px;
 
     h2 {
+      font-size: 18px;
       font-family: var(--font-medium);
-      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      line-height: 22px;
 
       button {
         color: var(--theme-label-button-color);
         cursor: pointer;
         float: right;
-        font-family: var(--font-regular);
-        font-size: 14px;
-        line-height: 22px;
+        font-family: var(--font-medium);
+        font-size: 16px;
         margin-left: 12px;
-        opacity: 0.55;
+        text-transform: uppercase;
 
         &:hover {
           text-decoration: underline;
@@ -193,25 +198,6 @@
       padding-bottom: 6px;
     }
   }
-
-  .qrCodeAndInstructions {
-    .instructions {
-      .hashLabel {
-        font-family: var(--font-medium);
-        font-weight: 600;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-      }
-    }
-  }
-
-  .generatedAddresses {
-    h2 {
-      font-weight: 600;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-  }
 }
 
 :global(.YoroiModern) .component {
@@ -224,13 +210,6 @@
         line-height: 1.57;
       }
 
-      .hashLabel {
-        font-size: 18px;
-        margin-bottom: 30px;
-        line-height: 1.31;
-        font-family: var(--font-medium);
-      }
-
       .instructionsText {
         font-size: 14px;
         letter-spacing: 0;
@@ -241,19 +220,6 @@
 
   .generatedAddresses {
     font-size: 14px;
-
-    h2 {
-      font-size: 18px;
-      line-height: 1.31;
-      letter-spacing: 0;
-      margin-bottom: 20px;
-
-      button {
-        font-family: var(--font-medium);
-        text-transform: uppercase;
-        font-size: 16px;
-      }
-    }
 
     .walletAddress {
       padding: 12px 0;
