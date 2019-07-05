@@ -27,11 +27,11 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
   };
 
   onSelectLanguage = (values: { locale: string }) => {
-    this.props.actions.profile.updateLocale.trigger(values);
+    this.props.actions.profile.updateTentativeLocale.trigger(values);
   };
 
   onSubmit = (values: { locale: string }) => {
-    this.props.actions.profile.redirectToTermsOfUse.trigger(values);
+    this.props.actions.profile.commitLocaleToStorage.trigger(values);
   };
 
 
