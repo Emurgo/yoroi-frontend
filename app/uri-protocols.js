@@ -2,6 +2,7 @@
 
 import { ROUTES } from './routes-config';
 import { Logger, stringifyError } from './utils/logging';
+import environment from './environment';
 
 
 const cardanoURI = {
@@ -11,13 +12,11 @@ const cardanoURI = {
 };
 
 const registerProtocols = () => {
-
-  // $FlowFixMe InstallTrigger is a global from the browser
-  const isFirefox = typeof InstallTrigger !== 'undefined';
-  const isChrome = !!window.chrome &&
-    (!!window.chrome.webstore || !!window.chrome.runtime) &&
-    !isFirefox;
-  if (isChrome) {
+  if (!environment.userAgentInfo.isExtension) {
+    Logger.error(`uri-protocols:registerProtocols URI Scheme not supported if not an extension`);
+  }
+  // protocol is automatically registered by manifest in Firefox
+  if (environment.userAgentInfo.isChrome) {
     try {
       navigator.registerProtocolHandler(
         cardanoURI.PROTOCOL,
