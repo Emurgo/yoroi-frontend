@@ -83,7 +83,7 @@ export default class YoroiTransferStore extends Store {
       const account = cryptoWallet.bip44_account(
         RustModule.Wallet.AccountIndex.new(accountIndex | HARD_DERIVATION_START)
       );
-      const chainPrv = account.bip44_chain(addressType === 'Interanl');
+      const chainPrv = account.bip44_chain(addressType === 'Internal');
       const keyPrv = chainPrv.address_key(RustModule.Wallet.AddressKeyIndex.new(index));
       addressKeys[address] = keyPrv;
     });
