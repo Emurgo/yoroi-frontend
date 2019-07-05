@@ -63,7 +63,7 @@ export function getAddressesKeys(payload: {
 
 /**
  Generate transaction including all addresses with no change.
- If filterSender is true, only include addresses that have outstanding
+ If filterSenders is true, only include addresses that have outstanding
  UTXOs in the senders property.
 */
 export async function generateTransferTx(
@@ -71,10 +71,10 @@ export async function generateTransferTx(
     outputAddr: string,
     addressKeys: AddressKeyMap,
     getUTXOsForAddresses: AddressUtxoFunc,
-  },
-  filterSender: boolean = false
+    filterSenders?: boolean
+  }
 ): Promise<TransferTx> {
-  const { outputAddr, addressKeys, getUTXOsForAddresses } = payload;
+  const { outputAddr, addressKeys, getUTXOsForAddresses, filterSenders = false } = payload;
 
   // fetch data to make transaction
   const senders = Object.keys(addressKeys);
@@ -90,12 +90,13 @@ export async function generateTransferTx(
     addressKeys,
     senderUtxos,
     outputAddr,
-  }, filterSender);
+    filterSenders,
+  });
 }
 
 /**
   Generate transaction including all addresses with no change.
-  If filterSender is true, only include addresses that have outstanding
+  If filterSenders is true, only include addresses that have outstanding
   UTXOs in the senders property.
 */
 export async function buildTransferTx(
@@ -103,11 +104,11 @@ export async function buildTransferTx(
     addressKeys: AddressKeyMap,
     senderUtxos: Array<UTXO>,
     outputAddr: string,
-  },
-  filterSenders : boolean = false
+    filterSenders?: boolean
+  }
 ): Promise<TransferTx> {
   try {
-    const { addressKeys, senderUtxos, outputAddr } = payload;
+    const { addressKeys, senderUtxos, outputAddr, filterSenders = false } = payload;
 
     const totalBalance = senderUtxos
       .map(utxo => new BigNumber(utxo.amount))

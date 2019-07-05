@@ -95,7 +95,8 @@ export default class YoroiTransferStore extends Store {
       addressKeys,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-    }, true);
+      filterSenders: true
+    });
 
     runInAction(() => {
       this.transferTx = transferTx;
