@@ -201,7 +201,7 @@
   "transfer.instructions.attention.title.label": "注意",
   "transfer.instructions.instructions.button.label": "ヨロイウォレットを作成",
   "transfer.instructions.instructions.text": "送金する前に、ヨロイウォレットを作成してヨロイウォレットの復元フレーズを書き留める必要があります。<br>15単語から成る復元フレーズがあれば、いつでもウォレットを復元することができます。",
-  "transfer.instructions.instructions.title.label": "指示説明",
+  "transfer.instructions.instructions.title.label": "送金の仕方",
   "transfer.summary.addressFrom.label": "送信者",
   "transfer.summary.addressTo.label": "受信者",
   "transfer.summary.cancelTransferButton.label": "キャンセル",
