@@ -7,63 +7,37 @@ import type { InjectedProps } from '../../types/injectedPropsType';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import TransferLayout from '../../components/transfer/TransferLayout';
-import TransferInstructionsPage from '../../components/transfer/TransferInstructionsPage';
-import DaedalusTransferFormPage from './DaedalusTransferFormPage';
-import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
-import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
-import DaedalusTransferSummaryPage from './DaedalusTransferSummaryPage';
-import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
-import environment from '../../environment';
-import { ROUTES } from '../../routes-config';
-import config from '../../config';
-
-import { formattedWalletAmount } from '../../utils/formatters';
+import YoroiTransferFormPage from './YoroiTransferFormPage';
+import YoroiTransferSummaryPage from './YoroiTransferSummaryPage';
+import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
+import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import MainLayout from '../MainLayout';
+import environment from '../../environment';
+import config from '../../config';
+import { formattedWalletAmount } from '../../utils/formatters';
 
 const messages = defineMessages({
   title: {
-    id: 'daedalusTransfer.title',
-    defaultMessage: '!!!Transfer funds from Daedalus',
+    id: 'yoroiTransfer.title',
+    defaultMessage: '!!!Transfer funds from another wallet',
   },
 });
 
 @observer
-export default class DaedalusTransferPage extends Component<InjectedProps> {
+export default class YoroiTransferPage extends Component<InjectedProps> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
-  goToCreateWallet = () => {
-    this._getRouter().goToRoute.trigger({
-      route: ROUTES.WALLETS.ADD
-    });
-  }
-
-  startTransferFunds = () => {
-    this._getDaedalusTransferActions().startTransferFunds.trigger();
-  }
-
-  startTransferPaperFunds = () => {
-    this._getDaedalusTransferActions().startTransferPaperFunds.trigger();
-  }
-
-  startTransferMasterKey = () => {
-    this._getDaedalusTransferActions().startTransferMasterKey.trigger();
-  }
-
   setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }) => {
-    this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
-  };
-
-  setupTransferFundsWithMasterKey = (payload: { masterKey: string }) => {
-    this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger(payload);
+    this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
   tranferFunds = () => {
     // broadcast transfer transaction then call continuation
-    this._getDaedalusTransferActions().transferFunds.trigger({
+    this._getYoroiTransferActions().transferFunds.trigger({
       next: () => {
         const walletsStore = this._getWalletsStore();
         walletsStore.refreshWalletsData();
@@ -78,12 +52,13 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   }
 
   backToUninitialized = () => {
-    this._getDaedalusTransferActions().backToUninitialized.trigger();
+    // FIXME: need the unintilized page design
   }
 
   cancelTransferFunds = () => {
-    this._getDaedalusTransferActions().cancelTransferFunds.trigger();
+    this._getYoroiTransferActions().cancelTransferFunds.trigger();
   }
+
 
   render() {
     const { stores, actions } = this.props;
@@ -104,29 +79,9 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
       />
     );
     const wallets = this._getWalletsStore();
-    const daedalusTransfer = this._getDaedalusTransferStore();
+    const yoroiTransfer = this._getYoroiTransferStore();
 
-    switch (daedalusTransfer.status) {
-      case 'uninitialized':
-        return (
-          <MainLayout
-            topbar={topBar}
-            classicTheme={profile.isClassicTheme}
-            connectionErrorType={checkAdaServerStatus}
-            actions={actions}
-            stores={stores}
-          >
-            <TransferLayout>
-              <TransferInstructionsPage
-                onFollowInstructionsPrerequisites={this.goToCreateWallet}
-                onConfirm={this.startTransferFunds}
-                onPaperConfirm={this.startTransferPaperFunds}
-                onMasterKeyConfirm={this.startTransferMasterKey}
-                disableTransferFunds={daedalusTransfer.disableTransferFunds}
-              />
-            </TransferLayout>
-          </MainLayout>
-        );
+    switch (yoroiTransfer.status) {
       case 'gettingMnemonics':
         return (
           <MainLayout
@@ -137,54 +92,15 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             stores={stores}
           >
             <TransferLayout>
-              <DaedalusTransferFormPage
+              <YoroiTransferFormPage
                 onSubmit={this.setupTransferFundsWithMnemonic}
                 onBack={this.backToUninitialized}
                 mnemonicValidator={mnemonic => wallets.isValidMnemonic(
                   mnemonic,
-                  config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
+                  config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
                 )}
                 validWords={validWords}
-                mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
-                classicTheme={profile.isClassicTheme}
-              />
-            </TransferLayout>
-          </MainLayout>
-        );
-      case 'gettingPaperMnemonics':
-        return (
-          <MainLayout
-            topbar={topBar}
-            classicTheme={profile.isClassicTheme}
-            connectionErrorType={checkAdaServerStatus}
-            actions={actions}
-            stores={stores}
-          >
-            <TransferLayout>
-              <DaedalusTransferFormPage
-                onSubmit={this.setupTransferFundsWithMnemonic}
-                onBack={this.backToUninitialized}
-                mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
-                validWords={validWords}
-                mnemonicLength={27}
-                classicTheme={profile.isClassicTheme}
-              />
-            </TransferLayout>
-          </MainLayout>
-        );
-      case 'gettingMasterKey':
-        return (
-          <MainLayout
-            topbar={topBar}
-            classicTheme={profile.isClassicTheme}
-            connectionErrorType={checkAdaServerStatus}
-            actions={actions}
-            stores={stores}
-          >
-            <TransferLayout>
-              <DaedalusTransferMasterKeyFormPage
-                onSubmit={this.setupTransferFundsWithMasterKey}
-                onBack={this.backToUninitialized}
+                mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
                 classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
@@ -202,12 +118,12 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             stores={stores}
           >
             <TransferLayout>
-              <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
+              <YoroiTransferWaitingPage status={yoroiTransfer.status} />
             </TransferLayout>
           </MainLayout>
         );
       case 'readyToTransfer':
-        if (daedalusTransfer.transferTx == null) {
+        if (yoroiTransfer.transferTx == null) {
           return null; // TODO: throw error? Shoudln't happen
         }
         return (
@@ -219,14 +135,14 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             stores={stores}
           >
             <TransferLayout>
-              <DaedalusTransferSummaryPage
+              <YoroiTransferSummaryPage
                 formattedWalletAmount={formattedWalletAmount}
                 selectedExplorer={this.props.stores.profile.selectedExplorer}
-                transferTx={daedalusTransfer.transferTx}
+                transferTx={yoroiTransfer.transferTx}
                 onSubmit={this.tranferFunds}
-                isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
+                isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
                 onCancel={this.cancelTransferFunds}
-                error={daedalusTransfer.error}
+                error={yoroiTransfer.error}
                 classicTheme={profile.isClassicTheme}
               />
             </TransferLayout>
@@ -242,8 +158,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             stores={stores}
           >
             <TransferLayout>
-              <DaedalusTransferErrorPage
-                error={daedalusTransfer.error}
+              <YoroiTransferErrorPage
+                error={yoroiTransfer.error}
                 onCancel={this.cancelTransferFunds}
                 classicTheme={profile.isClassicTheme}
               />
@@ -263,11 +179,12 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     return this.props.stores.substores[environment.API].wallets;
   }
 
-  _getDaedalusTransferStore() {
-    return this.props.stores.substores.ada.daedalusTransfer;
+  _getYoroiTransferStore() {
+    return this.props.stores.substores.ada.yoroiTransfer;
   }
 
-  _getDaedalusTransferActions() {
-    return this.props.actions.ada.daedalusTransfer;
+  _getYoroiTransferActions() {
+    return this.props.actions.ada.yoroiTransfer;
   }
+
 }

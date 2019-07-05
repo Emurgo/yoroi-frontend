@@ -28,6 +28,7 @@ import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
 import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
+import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import AdaRedemptionPage from './containers/wallet/AdaRedemptionPage';
 import URILandingPage from './containers/uri/URILandingPage';
 
@@ -93,6 +94,11 @@ export const Routes = (
         exact
         path={ROUTES.SEND_FROM_URI.ROOT}
         component={(props) => <URILandingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.YOROI_TRANSFER.ROOT}
+        component={(props) => <YoroiTransferPage {...props} stores={stores} actions={actions} />}
       />
       <Redirect to={ROUTES.WALLETS.ADD} />
     </Switch>
