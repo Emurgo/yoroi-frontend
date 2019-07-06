@@ -64,7 +64,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "Überprüfe den Kontostand der Adressen",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Adressen werden abgerufen",
   "daedalusTransfer.waiting.title.label": "Daedalus Wallet wird wiederhergestellt",
-  "daedalusTransfer.waiting.warning": "This may take a long time or fail on poor internet connections",
+  "daedalusTransfer.waiting.warning": "Dies kann lange dauern oder bei schlechten Internet-Verbindungen fehlschlagen",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
@@ -211,7 +211,7 @@
   "transfer.summary.transferButton.label": "Geld überweisen",
   "uri.display.dialog.copy.notification": "URL erfolgreich kopiert",
   "uri.display.dialog.title": "Generierte URL",
-  "uri.display.dialog.usabilityWarning": "This link can only be opened by users with Yoroi installed on their browser",
+  "uri.display.dialog.usabilityWarning": "Dieser Link kann nur von Benutzern geöffnet werden, die Yoroi in ihrem Browser installiert haben",
   "uri.generate.dialog.address.label": "Empfängeradresse",
   "uri.generate.dialog.amount.label": "Betrag ({currency})",
   "uri.generate.dialog.confirm.label": "Erstellen",
@@ -467,5 +467,5 @@
   "wallet.transaction.type.intrawallet": "{currency} interne Wallet-Transaktion",
   "wallet.transaction.type.multiparty": "{currency} mehrfach-Teilnehmer Transaktion",
   "widgets.explorer.tooltip": "Gehe zu {websiteName}",
-  "widgets.warningBox.headerText": "ATTENTION:"
+  "widgets.warningBox.headerText": "ACHTUNG:"
 }
