@@ -64,7 +64,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "Vérification des adresses des fonds",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Obtention des adresses",
   "daedalusTransfer.waiting.title.label": "Le wallet Daedalus est en cours de récupération",
-  "daedalusTransfer.waiting.warning": "This may take a long time or fail on poor internet connections",
+  "daedalusTransfer.waiting.warning": "Cela peut prendre du temps ou échouer si vous avez une mauvaise connexion internet",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
