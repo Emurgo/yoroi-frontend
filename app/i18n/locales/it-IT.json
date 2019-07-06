@@ -64,7 +64,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "Controllo dei fondi degli indirizzi",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Recupero degli indirizzi",
   "daedalusTransfer.waiting.title.label": "Il portafoglio Daedalus è in fase di ripristino",
-  "daedalusTransfer.waiting.warning": "This may take a long time or fail on poor internet connections",
+  "daedalusTransfer.waiting.warning": "Questo potrebbe richiedere tempi lunghi o anche fallire su connessioni lente",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
