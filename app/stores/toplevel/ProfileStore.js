@@ -44,18 +44,63 @@ export default class ProfileStore extends Store {
    * is at the language select screen. Only commit to storage once the user accepts.
    */
   @observable
-  inMemoryLanguage: string = ProfileStore.getDefaultLocale();
+  inMemoryLanguage: null | string = null;
+
+  /**
+   * We only want to redirect users once when the app launches
+   */
+  @observable
+  hasRedirected: boolean = false;
 
   /** Linear list of steps that need to be completed before app start */
   @observable
-  STEUP_STEPS = [
+  SETUP_STEPS = [
     {
       isDone: () => (this.isCurrentLocaleSet),
-      route: ROUTES.PROFILE.LANGUAGE_SELECTION,
+      action: () => {
+        const route = ROUTES.PROFILE.LANGUAGE_SELECTION;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
     },
     {
       isDone: () => this.areTermsOfUseAccepted,
-      route: ROUTES.PROFILE.TERMS_OF_USE,
+      action: () => {
+        const route = ROUTES.PROFILE.TERMS_OF_USE;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
+    },
+    {
+      isDone: () => this.hasRedirected,
+      action: async () => {
+        const { wallets } = this.stores.substores[environment.API];
+        await wallets.refreshWalletsData();
+        if (wallets.first) {
+          const firstWallet = wallets.first;
+
+          // Dynamic Initialization of Topbar Categories
+          this.stores.topbar.updateCategories();
+
+          if (this.stores.loading.fromUriScheme) {
+            this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
+          } else {
+            this.actions.router.goToRoute.trigger({
+              route: ROUTES.WALLETS.TRANSACTIONS,
+              params: { id: firstWallet.id }
+            });
+          }
+        } else {
+          this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+        }
+        runInAction(() => {
+          this.hasRedirected = true;
+        });
+      }
     }
   ];
 
@@ -73,6 +118,9 @@ export default class ProfileStore extends Store {
 
   @observable setProfileLocaleRequest: Request<string => Promise<void>>
     = new Request<string => Promise<void>>(this.api.localStorage.setUserLocale);
+
+  @observable unsetProfileLocaleRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.localStorage.unsetUserLocale);
 
   @observable getThemeRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getUserTheme);
@@ -152,11 +200,14 @@ export default class ProfileStore extends Store {
   // ========== Locale ========== //
 
   @computed get currentLocale(): string {
+    // allow to override the language shown to allow user to pick a language during first app start
+    if (this.inMemoryLanguage !== null) {
+      return this.inMemoryLanguage;
+    }
     const { result } = this.getProfileLocaleRequest.execute();
     if (this.isCurrentLocaleSet && result) return result;
 
-    // fallback to whatever langauge the user has selected in the language-select menu
-    return this.inMemoryLanguage;
+    return ProfileStore.getDefaultLocale();
   }
 
   @computed get hasLoadedCurrentLocale(): boolean {
@@ -181,10 +232,14 @@ export default class ProfileStore extends Store {
 
   _acceptLocale = async () => {
     // commit in-memory language to storage
-    await this.setProfileLocaleRequest.execute(this.inMemoryLanguage);
+    await this.setProfileLocaleRequest.execute(
+      this.inMemoryLanguage
+        ? this.inMemoryLanguage
+        : ProfileStore.getDefaultLocale()
+    );
     await this.getProfileLocaleRequest.execute(); // eagerly cache
     runInAction(() => {
-      this.inMemoryLanguage = ProfileStore.getDefaultLocale();
+      this.inMemoryLanguage = null;
     });
   }
 
@@ -385,45 +440,18 @@ export default class ProfileStore extends Store {
 
   // ========== Redirec Logic ========== //
 
-  _checkSetupSteps = () => {
+  _checkSetupSteps = async () => {
     const { isLoading } = this.stores.loading;
     if (isLoading) {
       return;
     }
-    // do nothing if we've completed all setup steps
-    if (this.STEUP_STEPS.length === 0) {
-      return;
-    }
-    // pop all done elements from the start
-    // this makes that when all setup steps are done, the array is empty
-    // we need this to differentiate the first time we get to 0 elements
-    // since only the first time we need to redirect to root
-    while (this.STEUP_STEPS.length && this.STEUP_STEPS[0].isDone()) {
-      runInAction(() => {
-        this.STEUP_STEPS.shift();
-      });
-    }
-    if (this.STEUP_STEPS.length === 0) {
-      // all setup steps are done
-      this._redirectToRoot();
-      return;
-    }
-    for (const step of this.STEUP_STEPS) {
+    for (const step of this.SETUP_STEPS) {
       if (!step.isDone()) {
-        if (this.stores.app.currentRoute === step.route) {
-          return;
-        }
-        this.actions.router.goToRoute.trigger({ route: step.route });
+        await step.action();
         return;
       }
     }
   }
-
-  _redirectToRoot = () => {
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
-  };
-
-  _isOnTermsOfUsePage = () => this.stores.app.currentRoute === ROUTES.PROFILE.TERMS_OF_USE;
 
   // ========== URI protocol registration ========== //
 
