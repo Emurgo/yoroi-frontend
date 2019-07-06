@@ -211,7 +211,7 @@
   "transfer.summary.transferButton.label": "Transférer des fonds",
   "uri.display.dialog.copy.notification": "URL copiée avec succès",
   "uri.display.dialog.title": "URL générée",
-  "uri.display.dialog.usabilityWarning": "This link can only be opened by users with Yoroi installed on their browser",
+  "uri.display.dialog.usabilityWarning": "Ce lien ne peut être ouvert que par des utilisateurs ayant installé Yoroi sur leurs navigateurs",
   "uri.generate.dialog.address.label": "Adresse du destinataire",
   "uri.generate.dialog.amount.label": "Montant ({currency})",
   "uri.generate.dialog.confirm.label": "Générer",
@@ -467,5 +467,5 @@
   "wallet.transaction.type.intrawallet": "Transaction entre wallets {currency}",
   "wallet.transaction.type.multiparty": "Transaction multiparties {currency}",
   "widgets.explorer.tooltip": "Aller sur {websiteName}",
-  "widgets.warningBox.headerText": "ATTENTION:"
+  "widgets.warningBox.headerText": "ATTENTION :"
 }
