@@ -68,7 +68,7 @@
     "@babel/register": "7.4.4",
     "@babel/runtime": "7.4.5",
     "@babel/runtime-corejs2": "7.4.5",
-    "autoprefixer": "9.6.0",
+    "autoprefixer": "9.6.1",
     "babel-eslint": "10.0.2",
     "babel-jest": "24.8.0",
     "babel-loader": "8.0.6",
