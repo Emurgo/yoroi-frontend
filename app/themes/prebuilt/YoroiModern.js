@@ -436,4 +436,8 @@ export default {
   '--theme-modal-min-max-width-lg': `${680 - (modalMargin.left + modalMargin.right)}px`,
 
   '--theme-wallet-navigation-tab-height': '50px',
+
+  '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)', // #FF1351
+
+  '--theme-warning-color': `#FF1351`,
 };

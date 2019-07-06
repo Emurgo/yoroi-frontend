@@ -1,0 +1,61 @@
+.component {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0 16px 0;
+  border-radius: 8px;
+  background-color: var(--theme-warning-box-bg-color);
+  box-shadow: var(--cmn-warning-box-bg-shadow);
+
+  .header {
+    display: inline-flex;
+    align-items: flex-end;
+  
+    .headerIcon {
+      width: 20px;
+      height: 20px;
+      background-size: contain;
+      background-position: center center;
+      background-repeat: no-repeat;
+      margin-bottom: 1px
+    }
+  
+    .headerText {
+      font-family: var(--font-medium);
+      color: var(--theme-warning-color);
+      font-size: 16px;
+      font-weight: 500;
+      margin-left: 6px;
+    }
+  }
+
+  .warning {
+    margin-top: 4px;
+    line-height: 22px;
+    font-family: var(--font-regular);
+    color: var(--theme-warning-color);
+    font-size: 12px;
+    text-align: center;
+  }  
+}
+
+:global(.YoroiClassic) {
+  .component {
+    .headerIcon {
+      background-image: url(../../assets/images/attention-classic.inline.svg);      
+    }
+
+    .headerText {
+      font-weight: bold;
+    }
+  }
+}
+
+:global(.YoroiModern) {
+  .component {
+    .headerIcon {
+      background-image: url(../../assets/images/attention-modern.inline.svg);
+    }    
+  }
+}
