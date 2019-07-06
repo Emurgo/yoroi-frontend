@@ -64,7 +64,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "Controllo dei fondi degli indirizzi",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Recupero degli indirizzi",
   "daedalusTransfer.waiting.title.label": "Il portafoglio Daedalus è in fase di ripristino",
-  "daedalusTransfer.waiting.warning": "⚠️ Questo potrebbe richiedere tempi lunghi o anche fallire su connessioni lente",
+  "daedalusTransfer.waiting.warning": "This may take a long time or fail on poor internet connections",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
@@ -211,6 +211,7 @@
   "transfer.summary.transferButton.label": "Trasferimento fondi",
   "uri.display.dialog.copy.notification": "URL copiato con successo",
   "uri.display.dialog.title": "URL generato",
+  "uri.display.dialog.usabilityWarning": "This link can only be opened by users with Yoroi installed on their browser",
   "uri.generate.dialog.address.label": "Indirizzo del ricevente",
   "uri.generate.dialog.amount.label": "Importo ({currency})",
   "uri.generate.dialog.confirm.label": "Genera",
@@ -465,5 +466,6 @@
   "wallet.transaction.type.exchange": "Exchange",
   "wallet.transaction.type.intrawallet": "{currency} transazione intrawallet",
   "wallet.transaction.type.multiparty": "{currency} transazione multiparty",
-  "widgets.explorer.tooltip": "Vai a {websiteName}"
+  "widgets.explorer.tooltip": "Vai a {websiteName}",
+  "widgets.warningBox.headerText": "ATTENTION:"
 }
