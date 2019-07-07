@@ -214,6 +214,8 @@
   "transfer.instructions.instructions.button.label": "Create Yoroi wallet",
   "transfer.instructions.instructions.text": "Before you can transfer funds, you must create a Yoroi wallet and back it up.<br>Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.",
   "transfer.instructions.instructions.title.label": "Instructions",
+  "transfer.navigation.fromDaedalus": "!!!Transfer funds from Daedalus",
+  "transfer.navigation.fromYoroi": "!!!Transfer funds from another wallet",
   "transfer.summary.addressFrom.label": "From",
   "transfer.summary.addressTo.label": "To",
   "transfer.summary.cancelTransferButton.label": "Cancel",

@@ -24,11 +24,10 @@ export const ROUTES = {
     SUPPORT: '/settings/support',
     ADA_REDEMPTION: '/settings/ada-redemption',
   },
-  DAEDALUS_TRANFER: {
-    ROOT: '/daedalus-transfer',
-  },
-  YOROI_TRANSFER: {
-    ROOT: '/yoroi-transfer',
+  TRANSFER: {
+    ROOT: '/transfer',
+    DAEDALUS: '/transfer/daedalus',
+    YOROI: '/transfer/yoroi',
   },
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',

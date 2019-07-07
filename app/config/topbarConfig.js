@@ -41,7 +41,7 @@ export const CURRENCY_SPECIFIC_CATEGORIES = {
   ada: [
     {
       name: 'DAEDALUS_TRANSFER',
-      route: ROUTES.DAEDALUS_TRANFER.ROOT,
+      route: ROUTES.TRANSFER.ROOT,
       icon: daedalusTransferIcon,
     }
   ]
