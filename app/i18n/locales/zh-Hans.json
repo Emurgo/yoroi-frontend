@@ -64,7 +64,7 @@
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "正在检查资金地址",
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "正在获取地址",
   "daedalusTransfer.waiting.title.label": "正在恢复 Daedalus 钱包...",
-  "daedalusTransfer.waiting.warning": "This may take a long time or fail on poor internet connections",
+  "daedalusTransfer.waiting.warning": "这会花费较长时间，网络不佳可能失败",
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
@@ -185,7 +185,7 @@
   "settings.support.faq.title": "常见问题",
   "settings.support.logs.content": "如果想要查看日志，您可以 {downloadLogsLink}。日志不包含敏感信息，将日志附到问题报告上有助于团队调查您遇到的问题。在使用问题报告功能时，会自动附带日志。",
   "settings.support.logs.downloadLogsLink": "于此处下载记录",
-  "settings.support.logs.downloadLogsButtonLabel": "Download Logs",
+  "settings.support.logs.downloadLogsButtonLabel": "下载日志文件",
   "settings.support.logs.title": "日志",
   "settings.support.reportProblem.content": "如果常见问题解答无法解决您遇到的问题，请使用我们的 {supportRequestLink} 功能。",
   "settings.support.reportProblem.link": "支援请求",
@@ -468,5 +468,5 @@
   "wallet.transaction.type.intrawallet": "{currency} 钱包内交易",
   "wallet.transaction.type.multiparty": "{currency} 多方交易",
   "widgets.explorer.tooltip": "前往{websiteName}",
-  "widgets.warningBox.headerText": "ATTENTION:"
+  "widgets.warningBox.headerText": "注意："
 }
