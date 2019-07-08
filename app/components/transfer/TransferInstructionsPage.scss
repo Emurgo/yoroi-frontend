@@ -5,11 +5,11 @@
   min-width: 650px;
 
   .buttonTitle {
+    font-size: 18px;
+    font-family: var(--font-semibold);
     margin-bottom: 30px;
     line-height: 1.38;
     text-align: left;
-    font-size: 11px;
-    font-family: var(--font-medium);
   }
   
   .button {
@@ -27,10 +27,10 @@
     .infoBlock {
       padding-right: 60px;
       .title {
+        font-size: 18px;
+        font-family: var(--font-semibold);
         line-height: 1.38;
         margin-bottom: 16px;
-        font-size: 11px;
-        font-family: var(--font-medium);
       }
 
       .text {
@@ -44,35 +44,6 @@
     .operationBlock {
       padding-right: 40px;
       margin-left: auto;
-    }
-  }
-}
-
-:global(.YoroiClassic) .component {
-  .buttonTitle {
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
-  .body {
-    .title {
-      font-weight: 600;
-      padding-left: 10px;
-      text-transform: uppercase;
-    }
-  }  
-}
-
-:global(.YoroiModern) .component {
-  .buttonTitle {
-    font-size: 18px;
-    font-family: var(--font-semibold);
-  }
-    
-  .body {
-    .title {
-      font-size: 18px;
-      font-family: var(--font-semibold);
     }
   }
 }
