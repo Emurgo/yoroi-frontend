@@ -11,6 +11,7 @@ import NoWalletsPage from './containers/wallet/NoWalletsPage';
 import WalletAddPage from './containers/wallet/WalletAddPage';
 import LanguageSelectionPage from './containers/profile/LanguageSelectionPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
+import UriPromptPage from './containers/profile/UriPromptPage';
 
 // SETTINGS
 import Settings from './containers/settings/Settings';
@@ -51,6 +52,11 @@ export const Routes = (
         exact
         path={ROUTES.PROFILE.TERMS_OF_USE}
         component={(props) => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.URI_PROMPT}
+        component={(props) => <UriPromptPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact

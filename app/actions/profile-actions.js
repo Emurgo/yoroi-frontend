@@ -6,6 +6,7 @@ import type { ExplorerType } from '../domain/Explorer';
 
 export default class ProfileActions {
   acceptTermsOfUse: Action<void> = new Action();
+  acceptUriScheme: Action<void> = new Action();
   updateTentativeLocale: Action<{ locale: string }> = new Action();
   updateLocale: Action<{ locale: string }> = new Action();
   updateSelectedExplorer: Action<{ explorer: ExplorerType }> = new Action();
