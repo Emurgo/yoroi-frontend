@@ -62,6 +62,7 @@ export default class SupportSettings extends Component<Props> {
 
     const faqLink = (
       <a
+        className={styles.link}
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
@@ -71,6 +72,7 @@ export default class SupportSettings extends Component<Props> {
 
     const supportRequestLink = (
       <a
+        className={styles.link}
         href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
@@ -79,9 +81,15 @@ export default class SupportSettings extends Component<Props> {
     );
 
     const downloadLogsLink = (
-      <button type="button" onClick={onDownloadLogs}>
+      <span
+        role="button"
+        tabIndex={0}
+        onKeyPress={() => null}
+        className={styles.link}
+        onClick={onDownloadLogs}
+      >
         {intl.formatMessage(globalMessages.downloadLogsLink)}
-      </button>
+      </span>
     );
 
     return (

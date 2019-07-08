@@ -157,7 +157,8 @@ const tabs = {
 const itemCard = {
   '--card-bg-color': '#fff',
   '--card-border-radius': '8px',
-  '--card-text-color': '#DAA49A',
+  '--card-text-color': '#2b2c32',
+  '--card-text-color-hover': '#DAA49A',
   '--card-text-size': '16px',
   '--card-width': '250px',
   '--card-height': '380px',
@@ -407,4 +408,8 @@ export default {
   '--theme-default-main-bg': '#F3F3F5',
 
   '--theme-wallet-navigation-tab-height': '40px',
+
+  '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
+
+  '--theme-warning-color': `#E9483D`,
 };

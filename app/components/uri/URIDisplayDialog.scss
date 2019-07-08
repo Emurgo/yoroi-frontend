@@ -1,9 +1,18 @@
-.component {
+.component {  
+  min-width: var(--theme-modal-min-max-width-lg) !important;
+  max-width: var(--theme-modal-min-max-width-lg) !important;
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 24px;
+    }
+  }
+
   .uriDisplay {
-    margin-top: 50px;
-    margin-bottom: 10px;
     width: 75%;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 24px;
     display: flex;
     align-items: center;
 
@@ -29,15 +38,12 @@
   }
 
   .qrCode {
-    margin: 30px auto;
+    margin: 34px auto 20px auto;
     text-align: center;
   }
 }
 
 :global(.YoroiModern) .component {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);
-
   .uri {
     color: var(--theme-transactions-received-address-color);
   }

@@ -9,6 +9,7 @@ import { Input } from 'react-polymorph/lib/components/Input';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
@@ -19,7 +20,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../../domain/Explorer';
 
-import WarningBox from '../../widgets/forms/WarningBox';
+import WarningBox from '../../widgets/WarningBox';
 import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 
 const messages = defineMessages({
@@ -81,6 +82,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
+    plugins: {
+      vjf: vjf()
+    },
   });
 
   submit() {
@@ -113,10 +117,12 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     } = this.props;
 
     const staleTxWarning = (
-      <WarningBox>
-        {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
-        {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
-      </WarningBox>
+      <div className={styles.warningBox}>
+        <WarningBox>
+          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
+          {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+        </WarningBox>
+      </div>
     );
 
     const confirmButtonClasses = classnames([

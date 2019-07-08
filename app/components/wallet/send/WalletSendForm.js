@@ -13,6 +13,7 @@ import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
@@ -29,7 +30,7 @@ import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 
-import WarningBox from '../../widgets/forms/WarningBox';
+import WarningBox from '../../widgets/WarningBox';
 
 const messages = defineMessages({
   titleLabel: {
@@ -229,6 +230,9 @@ export default class WalletSendForm extends Component<Props> {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
+    plugins: {
+      vjf: vjf()
+    },
   });
 
   render() {
@@ -253,9 +257,11 @@ export default class WalletSendForm extends Component<Props> {
       || formattedAmountToBigNumber(amountFieldProps.value);
 
     const pendingTxWarningComponent = (
-      <WarningBox>
-        {intl.formatMessage(messages.sendingIsDisabled)}
-      </WarningBox>
+      <div className={styles.warningBox}>
+        <WarningBox>
+          {intl.formatMessage(messages.sendingIsDisabled)}
+        </WarningBox>
+      </div>
     );
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
 

@@ -17,6 +17,8 @@
     .title {
       line-height: 1.38;
       margin-bottom: 4px;
+      font-size: 18px;
+      font-family: var(--font-semibold);
     }
   
     .text {
@@ -49,27 +51,10 @@
   .button {
     margin: 0 auto 0;
   }
-
-  .body {
-    .title {
-      font-size: 11px;
-      font-family: var(--font-medium);
-      font-weight: 600;
-      padding-left: 10px;
-      text-transform: uppercase;
-    }
-  }
 }
 
 :global(.YoroiModern) .component {
   .inputWrapper span[class*='selectedWordBox'] {
     background-color: var(--rp-autocomplete-selected-word-box-bg-color-secondary);
-  }
-
-  .body {
-    .title {
-      font-size: 18px;
-      font-family: var(--font-semibold);
-    }
   }
 }

@@ -7,6 +7,7 @@ import { Input } from 'react-polymorph/lib/components/Input';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import InformativeMessage from '../widgets/InformativeMessage';
 import Dialog from '../widgets/Dialog';
@@ -229,6 +230,9 @@ export default class WalletRestoreDialog extends Component<Props> {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
+    plugins: {
+      vjf: vjf()
+    },
   });
 
   submit = () => {
@@ -360,7 +364,6 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         {isVerificationMode ? (
           introMessage && <InformativeMessage
-            subclass="component-bordered"
             message={introMessage}
           />
         ) : (

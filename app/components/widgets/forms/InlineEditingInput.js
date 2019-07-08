@@ -5,6 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
@@ -73,6 +74,9 @@ export default class InlineEditingInput extends Component<Props, State> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 

@@ -15,6 +15,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import NotificationMessage from '../widgets/NotificationMessage';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
 import successIcon from '../../assets/images/success-small.inline.svg';
+import WarningBox from '../widgets/WarningBox';
 
 import styles from './URIDisplayDialog.scss';
 
@@ -26,6 +27,10 @@ const messages = defineMessages({
   uriDisplayDialogCopyNotification: {
     id: 'uri.display.dialog.copy.notification',
     defaultMessage: '!!!URL successfully copied',
+  },
+  usabilityWarning: {
+    id: 'uri.display.dialog.usabilityWarning',
+    defaultMessage: 'This link can only be opened by users with Yoroi installed on their browser',
   }
 });
 
@@ -81,6 +86,12 @@ export default class URIDisplayDialog extends Component<Props, State> {
     const qrCodeForegroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
+    const uriUsabilityWarning = (
+      <WarningBox>
+        {intl.formatMessage(messages.usabilityWarning)}
+      </WarningBox>
+    );
+
     const message = intl.formatMessage(messages.uriDisplayDialogCopyNotification);
     return (
       <Dialog
@@ -98,6 +109,9 @@ export default class URIDisplayDialog extends Component<Props, State> {
         >
           {message}
         </NotificationMessage>
+
+        {uriUsabilityWarning}
+
         <div className={styles.qrCode}>
           <QRCode
             value={uri}

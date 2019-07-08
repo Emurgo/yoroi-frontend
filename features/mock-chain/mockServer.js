@@ -144,6 +144,7 @@ export function getMockServer(
     });
 
     server.get('/api/status', (
+      req,
       res: { send(arg: ServerStatusResponse): any }
     ): void => {
       const isServerOk = mockImporter.getApiStatus();
