@@ -12,7 +12,7 @@ export default {
     { language }: { language: string } = {}
   ) => (
     await client.executeScript(locale => {
-      yoroi.actions.profile.updateLocale.trigger({ locale });
+      yoroi.actions.profile.updateTentativeLocale.trigger({ locale });
     }, language || DEFAULT_LANGUAGE)
   ),
 

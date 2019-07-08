@@ -1,5 +1,5 @@
 // @flow
-import { observable, computed } from 'mobx';
+import { action, observable, computed, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import moment from 'moment/moment';
 import Store from '../base/Store';
@@ -39,6 +39,71 @@ export default class ProfileStore extends Store {
       : [])
   ];
 
+  /**
+   * Need to store the selected language in-memory for when the user
+   * is at the language select screen. Only commit to storage once the user accepts.
+   */
+  @observable
+  inMemoryLanguage: null | string = null;
+
+  /**
+   * We only want to redirect users once when the app launches
+   */
+  @observable
+  hasRedirected: boolean = false;
+
+  /** Linear list of steps that need to be completed before app start */
+  @observable
+  SETUP_STEPS = [
+    {
+      isDone: () => (this.isCurrentLocaleSet),
+      action: () => {
+        const route = ROUTES.PROFILE.LANGUAGE_SELECTION;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
+    },
+    {
+      isDone: () => this.areTermsOfUseAccepted,
+      action: () => {
+        const route = ROUTES.PROFILE.TERMS_OF_USE;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
+    },
+    {
+      isDone: () => this.hasRedirected,
+      action: async () => {
+        const { wallets } = this.stores.substores[environment.API];
+        await wallets.refreshWalletsData();
+        if (wallets.first) {
+          const firstWallet = wallets.first;
+
+          // Dynamic Initialization of Topbar Categories
+          this.stores.topbar.updateCategories();
+
+          if (this.stores.loading.fromUriScheme) {
+            this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
+          } else {
+            this.actions.router.goToRoute.trigger({
+              route: ROUTES.WALLETS.TRANSACTIONS,
+              params: { id: firstWallet.id }
+            });
+          }
+        } else {
+          this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+        }
+        runInAction(() => {
+          this.hasRedirected = true;
+        });
+      }
+    }
+  ];
+
   @observable bigNumberDecimalFormat = {
     decimalSeparator: '.',
     groupSeparator: ',',
@@ -53,6 +118,9 @@ export default class ProfileStore extends Store {
 
   @observable setProfileLocaleRequest: Request<string => Promise<void>>
     = new Request<string => Promise<void>>(this.api.localStorage.setUserLocale);
+
+  @observable unsetProfileLocaleRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.localStorage.unsetUserLocale);
 
   @observable getThemeRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getUserTheme);
@@ -97,18 +165,17 @@ export default class ProfileStore extends Store {
 
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
+    this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
-    this.actions.profile.redirectToTermsOfUse.listen(this._redirectToTermsOfUse);
+    this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
-      this._redirectToLanguageSelectionIfNoLocaleSet,
-      this._redirectToTermsOfUseScreenIfTermsNotAccepted,
-      this._redirectToMainUiAfterTermsAreAccepted,
+      this._checkSetupSteps,
       this._attemptURIProtocolRegistrationIfNoLocaleSet,
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
@@ -123,7 +190,7 @@ export default class ProfileStore extends Store {
   };
 
 
-  static getDefaultLocale() {
+  static getDefaultLocale(): string {
     return 'en-US';
   }
   static getDefaultTheme(): Theme {
@@ -133,8 +200,13 @@ export default class ProfileStore extends Store {
   // ========== Locale ========== //
 
   @computed get currentLocale(): string {
+    // allow to override the language shown to allow user to pick a language during first app start
+    if (this.inMemoryLanguage !== null) {
+      return this.inMemoryLanguage;
+    }
     const { result } = this.getProfileLocaleRequest.execute();
     if (this.isCurrentLocaleSet && result) return result;
+
     return ProfileStore.getDefaultLocale();
   }
 
@@ -148,10 +220,28 @@ export default class ProfileStore extends Store {
     return (this.getProfileLocaleRequest.result !== null && this.getProfileLocaleRequest.result !== '');
   }
 
+  @action
+  _updateTentativeLocale = ({ locale }: { locale: string }) => {
+    this.inMemoryLanguage = locale;
+  };
+
   _updateLocale = async ({ locale }: { locale: string }) => {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
+
+  _acceptLocale = async () => {
+    // commit in-memory language to storage
+    await this.setProfileLocaleRequest.execute(
+      this.inMemoryLanguage
+        ? this.inMemoryLanguage
+        : ProfileStore.getDefaultLocale()
+    );
+    await this.getProfileLocaleRequest.execute(); // eagerly cache
+    runInAction(() => {
+      this.inMemoryLanguage = null;
+    });
+  }
 
   _updateMomentJsLocaleAfterLocaleChange = () => {
     moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
@@ -350,42 +440,18 @@ export default class ProfileStore extends Store {
 
   // ========== Redirec Logic ========== //
 
-  _redirectToLanguageSelectionIfNoLocaleSet = () => {
+  _checkSetupSteps = async () => {
     const { isLoading } = this.stores.loading;
-    if (!isLoading && !this.areTermsOfUseAccepted && !this.isCurrentLocaleSet) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.LANGUAGE_SELECTION });
+    if (isLoading) {
+      return;
     }
-  };
-
-  _redirectToTermsOfUseScreenIfTermsNotAccepted = () => {
-    if (this.isCurrentLocaleSet && !this.areTermsOfUseAccepted &&
-      this.stores.app.currentRoute !== ROUTES.PROFILE.TERMS_OF_USE &&
-      this.stores.app.currentRoute !== ROUTES.PROFILE.LANGUAGE_SELECTION) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
+    for (const step of this.SETUP_STEPS) {
+      if (!step.isDone()) {
+        await step.action();
+        return;
+      }
     }
   }
-
-  _redirectToTermsOfUse = async (values) => {
-    // this await call is needed because when the language select from
-    // is submitted without changing the default option, then the onChange
-    // event never gets called and updateLocale is never triggered.
-    await this._updateLocale(values);
-    if (!this.areTermsOfUseAccepted && this.isCurrentLocaleSet) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.PROFILE.TERMS_OF_USE });
-    }
-  };
-
-  _redirectToRoot = () => {
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
-  };
-
-  _isOnTermsOfUsePage = () => this.stores.app.currentRoute === ROUTES.PROFILE.TERMS_OF_USE;
-
-  _redirectToMainUiAfterTermsAreAccepted = () => {
-    if (this.areTermsOfUseAccepted && this._isOnTermsOfUsePage()) {
-      this._redirectToRoot();
-    }
-  };
 
   // ========== URI protocol registration ========== //
 
