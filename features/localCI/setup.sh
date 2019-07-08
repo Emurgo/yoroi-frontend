@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # install same base as our CI build
-sudo docker run --name yoroi_ci -p 5900:5900 -dit rcmorano/circleci-node-8-browsers:firefox-nightly
+# TODO: make this use emurgornd once the emurgornd image auto-updates to latest chromedriver
+sudo docker run --name yoroi_ci -p 5900:5900 -dit circleci/node:8-browsers
 
 sudo docker cp features/localCI/. yoroi_ci:/CI
 user=$(sudo docker exec -t yoroi_ci whoami | tr -d '\r')
