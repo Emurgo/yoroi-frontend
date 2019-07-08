@@ -32,11 +32,21 @@
 
   .warning {
     margin-top: 4px;
-    line-height: 22px;
-    font-family: var(--font-regular);
-    color: var(--theme-warning-color);
-    font-size: 12px;
     text-align: center;
+
+    & *,
+    & {
+      line-height: 22px;
+      font-family: var(--font-regular);
+      color: var(--theme-warning-color);
+      font-size: 12px;
+    }
+    a, button {
+      border-bottom: 1px solid var(--theme-warning-color);
+      line-height: initial;
+      text-decoration: none;
+      cursor: pointer;
+    }
   }  
 }
 

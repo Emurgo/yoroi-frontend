@@ -9,7 +9,6 @@ import { THEMES } from '../../themes';
 import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
-import registerProtocols from '../../uri-protocols';
 import type { ExplorerType } from '../../domain/Explorer';
 import type {
   GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
@@ -76,6 +75,23 @@ export default class ProfileStore extends Store {
       },
     },
     {
+      isDone: () => {
+        const canSkip =
+          // can't register uri scheme when using Yoroi as a website
+          !environment.userAgentInfo.isExtension
+          // Firefox users don't have to accept a prompt to register a protocol
+          || environment.userAgentInfo.isFirefox;
+        return canSkip || this.isUriSchemeAccepted;
+      },
+      action: () => {
+        const route = ROUTES.PROFILE.URI_PROMPT;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
+    },
+    {
       isDone: () => this.hasRedirected,
       action: async () => {
         const { wallets } = this.stores.substores[environment.API];
@@ -101,7 +117,7 @@ export default class ProfileStore extends Store {
           this.hasRedirected = true;
         });
       }
-    }
+    },
   ];
 
   @observable bigNumberDecimalFormat = {
@@ -145,6 +161,12 @@ export default class ProfileStore extends Store {
   @observable setTermsOfUseAcceptanceRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.localStorage.setTermsOfUseAcceptance);
 
+  @observable getUriSchemeAcceptanceRequest: Request<void => Promise<boolean>>
+  = new Request<void => Promise<boolean>>(this.api.localStorage.getUriSchemeAcceptance);
+
+  @observable setUriSchemeAcceptanceRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.localStorage.setUriSchemeAcceptance);
+
   @observable getLastLaunchVersionRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getLastLaunchVersion);
 
@@ -168,6 +190,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
+    this.actions.profile.acceptUriScheme.listen(this._acceptUriScheme);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
@@ -176,9 +199,9 @@ export default class ProfileStore extends Store {
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
       this._checkSetupSteps,
-      this._attemptURIProtocolRegistrationIfNoLocaleSet,
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
+    this._getUriSchemeAcceptance(); // eagerly cache
   }
 
   teardown() {
@@ -386,6 +409,28 @@ export default class ProfileStore extends Store {
     this.getTermsOfUseAcceptanceRequest.execute();
   };
 
+  // ========== URI Scheme acceptance ========== //
+
+  @computed get hasLoadedUriSchemeAcceptance(): boolean {
+    return (
+      this.getUriSchemeAcceptanceRequest.wasExecuted &&
+      this.getUriSchemeAcceptanceRequest.result !== null
+    );
+  }
+
+  @computed get isUriSchemeAccepted(): boolean {
+    return this.getUriSchemeAcceptanceRequest.result === true;
+  }
+
+  _acceptUriScheme = async () => {
+    await this.setUriSchemeAcceptanceRequest.execute();
+    await this.getUriSchemeAcceptanceRequest.execute(); // eagerly cache
+  };
+
+  _getUriSchemeAcceptance = () => {
+    this.getUriSchemeAcceptanceRequest.execute();
+  };
+
   // ========== Last Launch Version ========== //
 
   @computed get lastLaunchVersion(): string {
@@ -452,14 +497,4 @@ export default class ProfileStore extends Store {
       }
     }
   }
-
-  // ========== URI protocol registration ========== //
-
-  _attemptURIProtocolRegistrationIfNoLocaleSet = () => {
-    const { isLoading } = this.stores.loading;
-    if (!isLoading && !this.areTermsOfUseAccepted && !this.isCurrentLocaleSet) {
-      // this is likely the first time the user launches the app
-      registerProtocols();
-    }
-  };
 }
