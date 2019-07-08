@@ -1,5 +1,5 @@
 // @flow
-const { rm, mkdir, cp } = require('shelljs/global');
+import { rm, mkdir, cp } from 'shelljs';
 
 exports.replaceWebpack = () => {
   const replaceTasks = [{
