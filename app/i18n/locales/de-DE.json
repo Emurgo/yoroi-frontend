@@ -185,7 +185,7 @@
   "settings.support.faq.title": "Häufig gestellte Fragen",
   "settings.support.logs.content": "Wenn Du die Logs überprüfen möchtest, kannst Du diese {downloadLogsLink}. Logs enthalten keine sensiblen Informationen, und es wäre hilfreich, wenn sie zusammen mit den Problem-Berichten gesendet werden, um dem Team bei der Untersuchung des Problems zu helfen.",
   "settings.support.logs.downloadLogsLink": "hier herunterladen",
-  "settings.support.logs.downloadLogsButtonLabel": "Download Logs",
+  "settings.support.logs.downloadLogsButtonLabel": "Logs herunterladen",
   "settings.support.logs.title": "Logs",
   "settings.support.reportProblem.content": "Wenn die FAQs nicht zur Hilfe des aufgetretenen Problems beitragen, benutze bitte die {supportRequestLink} Funktion.",
   "settings.support.reportProblem.link": "Support-Anfrage",
