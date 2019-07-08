@@ -52,7 +52,12 @@ const rules = [
   {
     test: /\.css$/,
     use: [
-      'style-loader',
+      {
+        loader: 'style-loader',
+        options: {
+          hmr: false,
+        },
+      },
       {
         loader: 'css-loader',
         options: {
@@ -75,7 +80,13 @@ const rules = [
   {
     test: /\.global\.scss$/,
     use: [
-      'style-loader?sourceMap',
+      {
+        loader: 'style-loader',
+        options: {
+          hmr: false,
+          sourceMap: true,
+        },
+      },
       {
         loader: 'css-loader',
         options: {
@@ -91,7 +102,13 @@ const rules = [
   {
     test: /^((?!\.global).)*\.scss$/,
     use: [
-      'style-loader?sourceMap',
+      {
+        loader: 'style-loader',
+        options: {
+          hmr: false,
+          sourceMap: true,
+        },
+      },
       {
         loader: 'css-loader',
         options: {
