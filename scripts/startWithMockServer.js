@@ -1,6 +1,5 @@
-const path = require('path');
-const { getMockServer, closeMockServer } = require('../features/mock-chain/mockServer');
-const { testWallets } = require('../features/mock-chain/TestWallets');
+// @flow
+const { getMockServer } = require('../features/mock-chain/mockServer');
 const  { resetChain } = require('../features/mock-chain/mockImporter');
 
 getMockServer({});

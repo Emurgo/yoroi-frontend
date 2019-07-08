@@ -1,5 +1,7 @@
+// @flow
 const tasks = require('./tasks');
 const argv = require('minimist')(process.argv.slice(2));
+const shell = require('shelljs');
 
 // ovrerride NODE_ENV for ConfigWebpackPlugin
 process.env.NODE_CONFIG_ENV = argv.env;
@@ -12,4 +14,4 @@ tasks.copyAssets('build', argv.env);
 console.log('[Webpack Build]');
 console.log('-'.repeat(80));
 
-process.exit(exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --colors --env=${argv.env}`).code);
+process.exit(shell.exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --colors --env=${argv.env}`).code);
