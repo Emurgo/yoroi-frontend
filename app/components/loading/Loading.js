@@ -111,6 +111,7 @@ export default class Loading extends Component<Props> {
     const downloadLogsLink = (
       // eslint-disable-next-line jsx-a11y/anchor-is-valid
       <a
+        className={styles.link}
         href="#"
         onClick={_event => downloadLogs()}
       >
@@ -120,6 +121,7 @@ export default class Loading extends Component<Props> {
 
     const supportRequestLink = (
       <a
+        className={styles.link}
         href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
