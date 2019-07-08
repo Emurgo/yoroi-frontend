@@ -196,7 +196,7 @@
   "settings.support.faq.title": "Foire aux Questions",
   "settings.support.logs.content": "Si vous voulez explorer les journaux d'entrées, vous pouvez les télécharger ici {downloadLogsLink}. Les journaux d'entrées ne contiennent aucune information privée ou sensible. Il est utile de les attacher lorsque vous nous faites par d'un problème afin d'aider notre équipe technique à en identifier la cause.",
   "settings.support.logs.downloadLogsLink": "téléchargez les ici",
-  "settings.support.logs.downloadLogsButtonLabel": "Download Logs",
+  "settings.support.logs.downloadLogsButtonLabel": "Télécharger les logs",
   "settings.support.logs.title": "Logs",
   "settings.support.reportProblem.content": "Si vous ne trouvez pas de réponse à votre question dans notre Foire aux Questions, veuillez utiliser notre fonctionnalité {supportRequestLink}.",
   "settings.support.reportProblem.link": "Contacter le service d'assistance",
