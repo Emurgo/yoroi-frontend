@@ -155,10 +155,12 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.click('.TermsOfUseForm_submitButton');
 
   // uri prompt page
-  await this.waitForElement('.UriPromptForm_component');
-  await this.click('.allowButton');
-  await this.waitForElement('.UriAccept_component');
-  await this.click('.finishButton');
+  if (this.getBrowser() !== 'firefox') {
+    await this.waitForElement('.UriPromptForm_component');
+    await this.click('.allowButton');
+    await this.waitForElement('.UriAccept_component');
+    await this.click('.finishButton');
+  }
 });
 
 Given(/^I have opened the extension$/, async function () {
