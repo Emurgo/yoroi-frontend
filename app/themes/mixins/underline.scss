@@ -1,4 +1,5 @@
 @mixin underline($color) {
+  cursor: pointer;
   box-sizing: border-box;
   border-bottom: 1px solid $color;
   text-decoration: none;
