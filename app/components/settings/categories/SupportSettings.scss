@@ -39,7 +39,11 @@
 
   .link:focus {
     outline: none;
-  }  
+  }
+
+  .downloadButton {
+    margin-top: 20px;
+  }
 }
 
 :global(.YoroiClassic) .component {
