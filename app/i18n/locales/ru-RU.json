@@ -124,7 +124,7 @@
   "profile.uriPrompt.form.explanation": "Вы хотите включить платежные Cardano-URL?",
   "profile.uriPrompt.form.skipLabel": "Пропустить",
   "profile.uriSkip.descriptionLine1": "Несмотря на то, что Вы не сможете использовать платежные URL-адреса, Вы все равно сможете их генерировать.",
-  "profile.uriSkip.descriptionLine2": "You can enable this feature any time in the settings menu.",
+  "profile.uriSkip.descriptionLine2": "Вы можете включить эту функцию в любое время в меню «Настройки».",
   "serverError.label.message": "ПРЕДУПРЕЖДЕНИЕ: Возникли трудности в работе сервера<br>Пожалуйста, проверьте <a target='blank' href='https://twitter.com/YoroiWallet'>наш Twitter-аккаунт</a>.<br>Отображаемый баланс и история транзакций могут отображаться неккоректно, пока наши серверы не вернутся в нормальное состояние, но на Ваш фактический баланс это никоим образом не влияет.",
   "settings.display.blog": "Вы можете ознакомится с нашим {blogLink} о том, как использовать эту функцию.",
   "settings.display.themeExportButton": "ЭКСПОРТ ТЕМЫ",
