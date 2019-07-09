@@ -12,20 +12,18 @@ const cardanoURI = {
 };
 
 const registerProtocols = () => {
-  if (!environment.userAgentInfo.isExtension) {
-    Logger.error(`uri-protocols:registerProtocols URI Scheme not supported if not an extension`);
+  if (!environment.userAgentInfo.canRegisterProtocol()) {
+    Logger.error(`uri-protocols:registerProtocols cannot use registerProtocolHandler on this page`);
+    return;
   }
-  // protocol is automatically registered by manifest in Firefox
-  if (environment.userAgentInfo.isChrome) {
-    try {
-      navigator.registerProtocolHandler(
-        cardanoURI.PROTOCOL,
-        cardanoURI.URL,
-        cardanoURI.TITLE
-      );
-    } catch (err) {
-      Logger.error(`uri-protocols:registerProtocols ${stringifyError(err)}`);
-    }
+  try {
+    navigator.registerProtocolHandler(
+      cardanoURI.PROTOCOL,
+      cardanoURI.URL,
+      cardanoURI.TITLE
+    );
+  } catch (err) {
+    Logger.error(`uri-protocols:registerProtocols ${stringifyError(err)}`);
   }
 };
 
