@@ -102,7 +102,7 @@
   "global.language.spanish": "Español",
   "global.passwordInstructions": "Примечание: Пароль должен содержать не менее <strong>12 символов</strong>.",
   "global.passwordInstructionsPaperWallet": "Примечание: Пароль бумажного кошелька должен содержать не менее <strong>12 символов</strong>.",
-  "global.promptWarningLine1": "You will not see a prompt if you have previously accepted or rejected it in the past.",
+  "global.promptWarningLine1": "Вы не увидите запрос на подтверждение, если ранее приняли или отклонили его.",
   "global.promptWarningLine2": "Вы можете разблокировать или убрать разрешение с Вашего {browserSettingsLink}",
   "global.staleTxnWarningLine1": "Ваш кошелек был изменен с момента создания этой транзакции.",
   "global.staleTxnWarningLine2": "Вы все еще можете отправить эту транзакцию, но она может быть неудачной.",
