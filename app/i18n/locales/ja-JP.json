@@ -68,7 +68,7 @@
   "environment.apiName.cardano": "Cardano",
   "environment.apiVersion.cardano": "1.0.4",
   "environment.currency.ada": "ADA",
-  "global.browserSettings": "browser settings",
+  "global.browserSettings": "ブラウザ設定",
   "global.contact": "サポートにお問い合わせください。",
   "global.errors.fieldIsRequired": "この項目は必須です。",
   "global.errors.invalidMasterKey": "入力されたマスターキーは無効です。確認してください。",
