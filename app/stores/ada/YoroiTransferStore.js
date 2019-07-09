@@ -128,8 +128,8 @@ export default class YoroiTransferStore extends Store {
       await this.transferFundsRequest.execute({
         signedTx: this.transferTx.signedTx
       });
-      // TBD: why do we need a continuation instead of just pustting the code here directly?
-      next();
+      this._updateStatus('success');
+      await next();
       this._reset();
     } catch (error) {
       Logger.error(`YoroiTransferStore::transferFunds ${stringifyError(error)}`);

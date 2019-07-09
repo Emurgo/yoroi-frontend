@@ -9,9 +9,13 @@ import YoroiTransferFormPage from './YoroiTransferFormPage';
 import YoroiTransferSummaryPage from './YoroiTransferSummaryPage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
+import YoroiTransferSuccessPage from './YoroiTransferSuccessPage';
 import environment from '../../environment';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
+
+// Stay this long on the success page, then jump to the wallet transactions page
+const SUCCESS_PAGE_STAY_TIME = 5*1000;
 
 const messages = defineMessages({
   title: {
@@ -35,16 +39,18 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   tranferFunds = () => {
     // broadcast transfer transaction then call continuation
     this._getYoroiTransferActions().transferFunds.trigger({
-      next: () => {
-        const walletsStore = this._getWalletsStore();
-        walletsStore.refreshWalletsData();
-        if (walletsStore.activeWalletRoute != null) {
-          const newRoute = walletsStore.activeWalletRoute;
-          this._getRouter().goToRoute.trigger({
-            route: newRoute
-          });
-        }
-      }
+      next: () => new Promise(resolve => {
+        setTimeout(() => {
+          const walletsStore = this._getWalletsStore();
+          walletsStore.refreshWalletsData();
+          if (walletsStore.activeWalletRoute != null) {
+            const newRoute = walletsStore.activeWalletRoute;
+            this._getRouter().goToRoute.trigger({
+              route: newRoute
+            });
+          }
+        }, SUCCESS_PAGE_STAY_TIME)
+      })
     });
   }
 
@@ -112,6 +118,14 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
             <YoroiTransferErrorPage
               error={yoroiTransfer.error}
               onCancel={this.cancelTransferFunds}
+              classicTheme={profile.isClassicTheme}
+            />
+          </TransferLayout>
+        );
+      case 'success':
+        return (
+          <TransferLayout>
+            <YoroiTransferSuccessPage
               classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>
