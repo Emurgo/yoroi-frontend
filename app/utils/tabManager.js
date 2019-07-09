@@ -1,4 +1,7 @@
 // @flow
+
+declare var chrome; // TODO: no type for chrome
+
 /**
  * We may run into bugs if the user has two copies of Yoroi running on the same localstorage
  * Since Yoroi data process is not transactional.
@@ -61,4 +64,11 @@ export function addCloseListener(yoroiWindow: typeof window) {
 */
 export function closeOtherInstances() {
   localStorage.setItem(OPEN_TAB_ID_KEY, Date.now().toString());
+}
+
+export const handlersSettingUrl: string = 'chrome://settings/handlers';
+
+/** To open special URLs like chrome://settings you need to use the Chrome API */
+export function openSandboxedTab(url: string) {
+  chrome.tabs.create({ url });
 }

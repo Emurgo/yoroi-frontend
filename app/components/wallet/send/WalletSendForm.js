@@ -30,7 +30,7 @@ import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 
-import WarningBox from '../../widgets/forms/WarningBox';
+import WarningBox from '../../widgets/WarningBox';
 
 const messages = defineMessages({
   titleLabel: {
@@ -257,9 +257,11 @@ export default class WalletSendForm extends Component<Props> {
       || formattedAmountToBigNumber(amountFieldProps.value);
 
     const pendingTxWarningComponent = (
-      <WarningBox>
-        {intl.formatMessage(messages.sendingIsDisabled)}
-      </WarningBox>
+      <div className={styles.warningBox}>
+        <WarningBox>
+          {intl.formatMessage(messages.sendingIsDisabled)}
+        </WarningBox>
+      </div>
     );
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
 

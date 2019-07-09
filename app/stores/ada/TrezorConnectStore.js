@@ -103,7 +103,7 @@ export default class TrezorConnectStore
 
       const trezorManifest = {};
       trezorManifest.email = manifest.EMAIL;
-      if (environment.userAgentInfo.isFirefoxExtension) {
+      if (environment.userAgentInfo.isFirefox) {
         // Set appUrl for `moz-extension:` protocol using browser (like Firefox)
         trezorManifest.appUrl = manifest.appURL.FIREFOX;
       } else {
