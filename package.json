@@ -3,9 +3,10 @@
   "version": "1.7.0",
   "description": "Cardano ADA wallet",
   "scripts": {
-    "dev": "node scripts/start --env 'development'",
-    "build": "node scripts/build",
-    "compress": "node scripts/compress",
+    "dev": "babel-node scripts/start --env 'development'",
+    "dev-mock-backend": "babel-node scripts/startWithMockServer.js",
+    "build": "babel-node scripts/build",
+    "compress": "babel-node scripts/compress",
     "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "build-compress:production": "npm run build -- --env 'mainnet' && npm run compress -- --env 'mainnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
     "build-compress-crx:production": "npm run build -- --env 'mainnet' && npm run compress -- --env 'mainnet' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
@@ -56,6 +57,7 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "7.5.0",
+    "@babel/node": "7.5.0",
     "@babel/plugin-proposal-class-properties": "7.5.0",
     "@babel/plugin-proposal-decorators": "7.4.4",
     "@babel/plugin-proposal-export-default-from": "7.2.0",
