@@ -102,7 +102,7 @@
   "global.language.spanish": "Spanyol",
   "global.passwordInstructions": "Catatan: Kata sandi pengeluaran setidaknya memerlukan <strong>12 karakter</strong>.",
   "global.passwordInstructionsPaperWallet": "Catatan: Kata sandi Paper Wallet setidaknya memerlukan <strong>12 karakter</strong>.",
-  "global.promptWarningLine1": "You will not see a prompt if you have previously accepted or rejected it in the past.",
+  "global.promptWarningLine1": "Anda tidak akan melihat sebuah pesan jika sebelumnya Anda telah menerima atau menolaknya.",
   "global.promptWarningLine2": "Anda dapat membuka blokir atau menghapus izin dari {browserSettingsLink} Anda",
   "global.staleTxnWarningLine1": "Wallet Anda telah berubah sejak Anda membuat transaksi ini.",
   "global.staleTxnWarningLine2": "Anda tetap dapat mengirim transaksi ini tetapi ada kemungkinan gagal.",
