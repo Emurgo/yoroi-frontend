@@ -1,4 +1,5 @@
 @import './DialogCommonStyle.scss';
+@import '../../../../themes/mixins/underline';
 
 .component {
   .prerequisiteBlock {
@@ -24,6 +25,7 @@
 
       a {
         color: var(--font-black);
+        @include underline(var(--theme-underline-dark-color));
       }
     }
   }
