@@ -262,4 +262,13 @@ export default class LocalStorageApi {
     await this.unsetHideBalance();
   }
 
+  setLocalStorage = (dataToImport: string): Promise<void> => new Promise((resolve) => {
+    const localStorageData = JSON.parse(dataToImport);
+    Object.keys(localStorageData).forEach(key => localStorage.setItem(key, localStorageData[key]));
+    resolve();
+  });
+
+  getLocalStorage = (): Promise<string> => new Promise((resolve) => {
+    resolve(JSON.stringify(localStorage));
+  });
 }
