@@ -32,6 +32,18 @@ export class UserAgentInfo {
       (!!window.chrome.webstore || !!window.chrome.runtime) &&
       !this.isFirefox;
   }
+
+  canRegisterProtocol = (): boolean => {
+    // Moz-Extension specify the protocol in the manifest not at runtime
+    if (this.isExtension && this.isFirefox) {
+      return false;
+    }
+    // Can only register a protocol to a website if it's https
+    if (!this.isExtension && window.location.protocol !== 'https:') {
+      return false;
+    }
+    return true;
+  }
 }
 
 export default new UserAgentInfo();
