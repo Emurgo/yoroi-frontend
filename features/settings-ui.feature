@@ -2,11 +2,11 @@ Feature: Wallet UI Settings
 
   Background:
     Given I have opened the extension
-    And I have completed the basic setup
 
   @it-12
   Scenario Outline: User can't change password if it doesn't meet complexity requirements (IT-12)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
+    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -24,7 +24,8 @@ Feature: Wallet UI Settings
 
 @it-94
   Scenario Outline: User is able to change spending password (IT-94)
-    And There is a wallet stored named tx-big-input-wallet
+    And I import a snapshot named tx-big-input-wallet
+    And I refresh the page
     And I have a wallet with funds
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
@@ -56,7 +57,8 @@ Feature: Wallet UI Settings
   
   @it-91
   Scenario Outline: Password should be case-sensitive [Wallet password changing] (IT-91)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
+    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -77,7 +79,8 @@ Feature: Wallet UI Settings
   
   @it-8
   Scenario Outline: Wallet renaming (IT-8)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
+    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on "name" input field
@@ -98,7 +101,8 @@ Feature: Wallet UI Settings
 
   @it-41
   Scenario Outline: Wallet can't be renamed if new wallet name doesn't meet requirements (IT-41)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
+    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on "name" input field
@@ -115,7 +119,8 @@ Feature: Wallet UI Settings
 
   @it-14
   Scenario: User can't change the password without entering old password (IT-14)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
+    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -129,7 +134,8 @@ Feature: Wallet UI Settings
 
   @it-40
   Scenario: User can't change password without filling Password repeat field (IT-40)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
+    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -146,6 +152,7 @@ Feature: Wallet UI Settings
 
   @it-2
   Scenario: Change language in General Settings (IT-2)
+    And I have completed the basic setup
     When I navigate to the general settings screen
     And I open General Settings language selection dropdown
     And I select Japanese language
@@ -155,24 +162,28 @@ Feature: Wallet UI Settings
 
   @it-3
   Scenario: Yoroi Settings Screen / Terms of Use in Default English(IT-3)
+    And I have completed the basic setup
     And I navigate to the general settings screen
     And I click on secondary menu "Terms of use" item
     Then I should see the "Terms of use" screen
 
   @it-23
   Scenario: Wallet settings tab isn't active if wallet is not created (IT-23)
+    And I have completed the basic setup
     When There is no wallet stored
     And I navigate to the general settings screen
     Then I should see secondary menu "wallet" item disabled
 
   @it-4
   Scenario: Yoroi Settings Screen / Support (IT-4)
+    And I have completed the basic setup
     And I navigate to the general settings screen
     And I click on secondary menu "support" item
     Then I should see support screen
 
   @it-77
   Scenario: Paper wallet creation (IT-77)
+    And I have completed the basic setup
     And I navigate to the general settings screen
     Then I click on secondary menu "paperWallet" item
     Then I open Number of Adddresses selection dropdown

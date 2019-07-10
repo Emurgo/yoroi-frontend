@@ -3,7 +3,7 @@ Feature: Ada Redemption
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    Given There is a wallet stored named empty-wallet
+	  Given There is a wallet stored named empty-wallet
     And I go to the ada redemption screen
 
   Scenario: User accepts "Daedalus Redemption Disclaimer"

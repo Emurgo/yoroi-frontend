@@ -13,7 +13,7 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 
 const screenshotsDir = './screenshots/';
-const snapshotsDir = './features/yoroi_snapshots';
+const snapshotsDir = './features/yoroi_snapshots/';
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
@@ -143,7 +143,6 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await assertPlate(this, restoreInfo.plate);
   await this.click('.confirmButton');
   await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
-  await exportYoroiSnapshot(this, snapshotsDir.concat('/test'));
 });
 
 Given(/^I have completed the basic setup$/, async function () {
@@ -171,7 +170,7 @@ Given(/^I have opened the extension$/, async function () {
 
 Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
-  await this.driver.sleep(500); // give time for page to reload
+  await this.driver.sleep(400); // give time for page to reload
 });
 
 Given(/^I restart the browser$/, async function () {
@@ -189,6 +188,13 @@ Then(/^I click then button labeled (.*)$/, async function (buttonName) {
   await this.click(`//button[contains(text(), ${buttonName})]`, By.xpath);
 });
 
+Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
+  await exportYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
+});
+
+Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
+  await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
+});
 
 function refreshWallet(client) {
   return client.driver.executeAsyncScript((done) => {
@@ -225,22 +231,29 @@ async function exportIndexedDB(client, exportDir: string) {
   });
   await writeFile(indexedDBPath, indexedDB);
 }
-/*
-async function importYoroiSnapshot(importDir: string) {
+
+async function importYoroiSnapshot(client, importDir: string) {
   if (!fs.existsSync(importDir)) {
-    throw new Error("Directory doesn't exists");
+    throw new Error('The directory must exists!');
   }
-
-  const localStoragePath = `${importDir}/localStorage.json`;
-  await readFile(localStoragePath, (err, localStorage) => {
-    if (err) throw err;
-    LocalStorageApi.setLocalStorage(localStorage);
-  });
-
-  const indexedDBPath = `${importDir}/indexedDB.json`;
-  await readFile(indexedDBPath, (err, indexedDB) => {
-    if (err) throw new Error(err);
-    importLovefieldDatabase(indexedDB);
-  });
+  importLocalStorage(client, importDir);
+  importIndexedDB(client, importDir);
 }
-*/
+
+async function importLocalStorage(client, importDir: string) {
+  const localStoragePath = `${importDir}/localStorage.json`;
+  const localStorageData = fs.readFileSync(localStoragePath);
+  await client.driver.executeScript((data) => {
+    window.yoroi.api.localStorage.setLocalStorage(data);
+    // $FlowFixMe Flow thinks that localStorageData is of type Buffer
+  }, JSON.parse(localStorageData));
+}
+
+async function importIndexedDB(client, importDir: string) {
+  const indexedDBPath = `${importDir}/indexedDB.json`;
+  const indexedDBData = fs.readFileSync(indexedDBPath);
+  await client.driver.executeScript((data) => {
+    window.yoroi.api.ada.importLocalDatabase(data);
+    // $FlowFixMe Flow thinks that indexedDBData is of type Buffer
+  }, JSON.parse(indexedDBData));
+}

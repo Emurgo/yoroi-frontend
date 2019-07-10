@@ -1382,8 +1382,8 @@ export default class AdaApi {
     await migrateToLatest(localstorageApi);
   }
 
-  importLocalDatabase = async (data: string): Promise<void> => {
-    importLovefieldDatabase(JSON.parse(data));
+  importLocalDatabase = async (data: any): Promise<void> => {
+    importLovefieldDatabase(data);
   }
 
   exportLocalDatabase = async (): Promise<string> => {
