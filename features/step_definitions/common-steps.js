@@ -13,6 +13,7 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 
 const screenshotsDir = './screenshots/';
+const snapshotsDir = './features/yoroi_snapshots';
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
@@ -142,6 +143,7 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await assertPlate(this, restoreInfo.plate);
   await this.click('.confirmButton');
   await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
+  await exportYoroiSnapshot(this, snapshotsDir.concat('/test'));
 });
 
 Given(/^I have completed the basic setup$/, async function () {
@@ -195,3 +197,50 @@ function refreshWallet(client) {
       .catch(err => done(err));
   });
 }
+
+async function exportYoroiSnapshot(client, exportDir: string) {
+  if (!fs.existsSync(exportDir)) {
+    fs.mkdirSync(exportDir);
+  }
+  exportLocalStorage(client, exportDir);
+  exportIndexedDB(client, exportDir);
+}
+
+async function exportLocalStorage(client, exportDir: string) {
+  const localStoragePath = `${exportDir}/localStorage.json`;
+  const localStorage = await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.localStorage.getLocalStorage()
+      .then(done)
+      .catch(err => done(err));
+  });
+  await writeFile(localStoragePath, localStorage);
+}
+
+async function exportIndexedDB(client, exportDir: string) {
+  const indexedDBPath = `${exportDir}/indexedDB.json`;
+  const indexedDB = await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.ada.exportLocalDatabase()
+      .then(done)
+      .catch(err => done(err));
+  });
+  await writeFile(indexedDBPath, indexedDB);
+}
+/*
+async function importYoroiSnapshot(importDir: string) {
+  if (!fs.existsSync(importDir)) {
+    throw new Error("Directory doesn't exists");
+  }
+
+  const localStoragePath = `${importDir}/localStorage.json`;
+  await readFile(localStoragePath, (err, localStorage) => {
+    if (err) throw err;
+    LocalStorageApi.setLocalStorage(localStorage);
+  });
+
+  const indexedDBPath = `${importDir}/indexedDB.json`;
+  await readFile(indexedDBPath, (err, indexedDB) => {
+    if (err) throw new Error(err);
+    importLovefieldDatabase(indexedDB);
+  });
+}
+*/

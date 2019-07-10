@@ -111,6 +111,8 @@ import {
   saveTxs,
   loadLovefieldDB,
   reset,
+  importLovefieldDatabase,
+  exportLovefieldDatabase,
 } from './lib/storage/lovefieldDatabase';
 import type {
   FilterFunc,
@@ -1378,6 +1380,15 @@ export default class AdaApi {
 
   migrate = async (localstorageApi: LocalStorageApi): Promise<void> => {
     await migrateToLatest(localstorageApi);
+  }
+
+  importLocalDatabase = async (data: string): Promise<void> => {
+    importLovefieldDatabase(JSON.parse(data));
+  }
+
+  exportLocalDatabase = async (): Promise<string> => {
+    const data = await exportLovefieldDatabase();
+    return JSON.stringify(data);
   }
 }
 // ========== End of class AdaApi =========
