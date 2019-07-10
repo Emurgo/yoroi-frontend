@@ -10,6 +10,7 @@ import YoroiTransferSummaryPage from './YoroiTransferSummaryPage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import YoroiTransferSuccessPage from './YoroiTransferSuccessPage';
+import YoroiTransferStartPage from '../../components/transfer/YoroiTransferStartPage';
 import environment from '../../environment';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
@@ -30,6 +31,10 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
+
+  startTransferFunds = () => {
+    this._getYoroiTransferActions().startTransferFunds.trigger();
+  }
 
   setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }) => {
     this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
@@ -55,7 +60,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   }
 
   backToUninitialized = () => {
-    // FIXME: need the unintilized page design
+    this._getYoroiTransferActions().backToUninitialized.trigger();
   }
 
   cancelTransferFunds = () => {
@@ -70,6 +75,15 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     const yoroiTransfer = this._getYoroiTransferStore();
 
     switch (yoroiTransfer.status) {
+      case 'uninitialized':
+        return (
+          <TransferLayout>
+            <YoroiTransferStartPage
+              onNext={this.startTransferFunds}
+              classicTheme={profile.isClassicTheme}
+            />
+          </TransferLayout>
+        );
       case 'gettingMnemonics':
         return (
           <TransferLayout>

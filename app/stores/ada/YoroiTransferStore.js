@@ -34,7 +34,7 @@ type TransferFundsFunc = (
 
 export default class YoroiTransferStore extends Store {
 
-  @observable status: TransferStatus = 'gettingMnemonics';
+  @observable status: TransferStatus = 'uninitialized';
   @observable transferFundsRequest: Request<TransferFundsFunc>
     = new Request<TransferFundsFunc>(this._transferFundsRequest);
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
@@ -57,6 +57,7 @@ export default class YoroiTransferStore extends Store {
 
   setup(): void {
     const actions = this.actions.ada.yoroiTransfer;
+    actions.startTransferFunds.listen(this._startTransferFunds)
     actions.setupTransferFundsWithMnemonic.listen(
       this._errorWrapper(this._setupTransferFundsWithMnemonic)
     );
@@ -68,6 +69,10 @@ export default class YoroiTransferStore extends Store {
   teardown(): void {
     super.teardown();
     this._reset();
+  }
+
+  _startTransferFunds = () => {
+    this._updateStatus('gettingMnemonics');
   }
 
   _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
