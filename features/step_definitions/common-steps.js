@@ -2,7 +2,6 @@
 
 import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
 import { getMockServer, closeMockServer } from '../mock-chain/mockServer';
-import i18nHelper from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
@@ -146,16 +145,22 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
 });
 
 Given(/^I have completed the basic setup$/, async function () {
-  // Default Profile Configs (language and terms of use)
+  // langauge select page
   await this.waitForElement('.LanguageSelectionForm_component');
-
-  await i18nHelper.setActiveLanguage(this.driver);
-
   await this.click('.LanguageSelectionForm_submitButton');
+
+  // ToS page
   await this.waitForElement('.TermsOfUseForm_component');
-  await this.driver.executeScript(() => {
-    window.yoroi.actions.profile.acceptTermsOfUse.trigger();
-  });
+  await this.click('.SimpleCheckbox_check');
+  await this.click('.TermsOfUseForm_submitButton');
+
+  // uri prompt page
+  if (this.getBrowser() !== 'firefox') {
+    await this.waitForElement('.UriPromptForm_component');
+    await this.click('.allowButton');
+    await this.waitForElement('.UriAccept_component');
+    await this.click('.finishButton');
+  }
 });
 
 Given(/^I have opened the extension$/, async function () {

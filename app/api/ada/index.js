@@ -232,6 +232,7 @@ export type GetTransactionsRequestOptions = {
 export type GetTransactionsRequest = {
   ...$Shape<GetTransactionsRequestOptions>,
   walletId: string,
+  isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
 };
@@ -694,7 +695,7 @@ export default class AdaApi {
     const { skip = 0, limit } = request;
     try {
       const account = getCurrentCryptoAccount();
-      if (account) {
+      if (account && !request.isLocalRequest) {
         const existingTxs = await getTxsOrderedByLastUpdateDesc();
         const newTxs = await refreshTxs(
           account.root_cached_key,

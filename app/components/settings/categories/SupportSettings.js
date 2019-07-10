@@ -2,6 +2,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './SupportSettings.scss';
 
@@ -52,8 +55,14 @@ export default class SupportSettings extends Component<Props> {
     const { onExternalLinkClick, onDownloadLogs } = this.props;
     const { intl } = this.context;
 
+    const buttonClasses = classnames([
+      'primary',
+      styles.downloadButton
+    ]);
+
     const faqLink = (
       <a
+        className={styles.link}
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
@@ -63,6 +72,7 @@ export default class SupportSettings extends Component<Props> {
 
     const supportRequestLink = (
       <a
+        className={styles.link}
         href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
@@ -71,9 +81,15 @@ export default class SupportSettings extends Component<Props> {
     );
 
     const downloadLogsLink = (
-      <button type="button" onClick={onDownloadLogs}>
+      <span
+        role="button"
+        tabIndex={0}
+        onKeyPress={() => null}
+        className={styles.link}
+        onClick={onDownloadLogs}
+      >
         {intl.formatMessage(globalMessages.downloadLogsLink)}
-      </button>
+      </span>
     );
 
     return (
@@ -91,6 +107,13 @@ export default class SupportSettings extends Component<Props> {
         <h1>{intl.formatMessage(messages.logsTitle)}</h1>
 
         <p><FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /></p>
+
+        <Button
+          className={buttonClasses}
+          label={intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
+          onClick={onDownloadLogs}
+          skin={ButtonSkin}
+        />
 
       </div>
     );

@@ -269,6 +269,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.goBack',
     defaultMessage: '!!!Go back label',
   },
+  allowLabel: {
+    id: 'global.label.allow',
+    defaultMessage: '!!!Allow',
+  },
   supportRequestLinkUrl: {
     id: 'settings.support.faq.supportRequestLinkURL',
     defaultMessage: '!!!https://yoroi-wallet.com/support/',
@@ -293,6 +297,10 @@ const globalMessages = defineMessages({
     id: 'settings.support.logs.downloadLogsLink',
     defaultMessage: '!!!download them here',
   },
+  downloadLogsButtonLabel: {
+    id: 'settings.support.logs.downloadLogsButtonLabel',
+    defaultMessage: '!!!Download Logs',
+  },
   blockchainExplorer: {
     id: 'settings.general.explorer',
     defaultMessage: '!!!Blockchain Explorer',
@@ -312,6 +320,26 @@ const globalMessages = defineMessages({
   repeatPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
     defaultMessage: '!!!Type new spending password',
+  },
+  uriSchemeLabel: {
+    id: 'global.uriSchemeTitleLabel',
+    defaultMessage: '!!!Cardano Payment URLs',
+  },
+  promptWarningLine1: {
+    id: 'global.promptWarningLine1',
+    defaultMessage: '!!!You will not see a prompt if you have previously accepted or rejected it in the past.',
+  },
+  promptWarningLine2: {
+    id: 'global.promptWarningLine2',
+    defaultMessage: '!!!You can unblock or remove permission from your {browserSettingsLink}',
+  },
+  browserSettings: {
+    id: 'global.browserSettings',
+    defaultMessage: '!!!browser settings',
+  },
+  uriExplanation: {
+    id: 'global.uriExplanation',
+    defaultMessage: '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
   },
 });
 export default globalMessages;

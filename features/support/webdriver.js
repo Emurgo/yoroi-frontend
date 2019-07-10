@@ -105,6 +105,8 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   }
 
+  this.getBrowser = (): string => cmdInput.parameters.browser;
+
   this.getExtensionUrl = (): string => {
     if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
       /**
