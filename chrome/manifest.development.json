@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0",
+  "version": "1.8.1",
   "name": "yoroi",
   "manifest_version": 2,
   "description": "[dev] Cardano ADA wallet",
