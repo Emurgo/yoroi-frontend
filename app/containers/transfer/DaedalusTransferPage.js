@@ -99,7 +99,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         onCategoryClicked={category => {
           actions.topbar.activateTopbarCategory.trigger({ category });
         }}
-        categories={topbar.CATEGORIES}
+        isActiveCategory={topbar.isActiveCategory}
+        categories={topbar.categories}
         activeTopbarCategory={topbar.activeTopbarCategory}
       />
     );
