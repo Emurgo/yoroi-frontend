@@ -38,7 +38,7 @@ export default class YoroiTransferStartPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onNext, classicTheme } = this.props;
+    const { onNext } = this.props;
 
     const commonClasses = classnames([
       'primary',
@@ -46,37 +46,37 @@ export default class YoroiTransferStartPage extends Component<Props> {
     ]);
 
     return (
-        <div className={styles.component}>
-          <BorderedBox>
+      <div className={styles.component}>
+        <BorderedBox>
 
-            <div className={styles.body}>
+          <div className={styles.body}>
 
-              <div className={styles.infoBlock}>
-                <div className={styles.title}>
-                  {intl.formatMessage(messages.title)}
-                </div>
-                <div className={styles.text}>
-                  <FormattedHTMLMessage {...messages.text} />
-                </div>
+            <div className={styles.infoBlock}>
+              <div className={styles.title}>
+                {intl.formatMessage(messages.title)}
               </div>
-
-              <div className={styles.operationBlock}>
-                <div className={styles.title}>
-                  &nbsp;{/* pretend we have a title to get the button alignment correct */}
-                </div>
-                <Button
-                  className={`createYoroiWallet ${commonClasses}`}
-                  label={intl.formatMessage(messages.button)}
-                  onClick={onNext}
-                  skin={ButtonSkin}
-                />
+              <div className={styles.text}>
+                <FormattedHTMLMessage {...messages.text} />
               </div>
-
             </div>
 
-          </BorderedBox>
+            <div className={styles.operationBlock}>
+              <div className={styles.title}>
+                &nbsp;{/* pretend we have a title to get the button alignment correct */}
+              </div>
+              <Button
+                className={`createYoroiWallet ${commonClasses}`}
+                label={intl.formatMessage(messages.button)}
+                onClick={onNext}
+                skin={ButtonSkin}
+              />
+            </div>
 
-        </div>
+          </div>
+
+        </BorderedBox>
+
+      </div>
     );
   }
 }

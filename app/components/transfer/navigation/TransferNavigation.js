@@ -38,7 +38,6 @@ export default class TransferNavigation extends Component<Props> {
           <TransferNavButton
             className="from-daedalus"
             label={intl.formatMessage(messages.fromDaedalus)}
-            icon={null}
             isActive={isActiveNavItem('daedalus')}
             onClick={() => onNavItemClick('daedalus')}
           />
@@ -48,7 +47,6 @@ export default class TransferNavigation extends Component<Props> {
           <TransferNavButton
             className="from-yoroi"
             label={intl.formatMessage(messages.fromYoroi)}
-            icon={null}
             isActive={isActiveNavItem('yoroi')}
             onClick={() => onNavItemClick('yoroi')}
           />

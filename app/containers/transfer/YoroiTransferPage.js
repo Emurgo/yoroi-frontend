@@ -16,14 +16,7 @@ import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
 
 // Stay this long on the success page, then jump to the wallet transactions page
-const SUCCESS_PAGE_STAY_TIME = 5*1000;
-
-const messages = defineMessages({
-  title: {
-    id: 'yoroiTransfer.title',
-    defaultMessage: '!!!Transfer funds from another wallet',
-  },
-});
+const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 
 @observer
 export default class YoroiTransferPage extends Component<InjectedProps> {
@@ -45,31 +38,33 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     // broadcast transfer transaction then call continuation
     this._getYoroiTransferActions().transferFunds.trigger({
       next: () => new Promise(resolve => {
+        const walletsStore = this._getWalletsStore();
+        walletsStore.refreshWalletsData();
+
         setTimeout(() => {
-          const walletsStore = this._getWalletsStore();
-          walletsStore.refreshWalletsData();
           if (walletsStore.activeWalletRoute != null) {
             const newRoute = walletsStore.activeWalletRoute;
             this._getRouter().goToRoute.trigger({
               route: newRoute
             });
           }
-        }, SUCCESS_PAGE_STAY_TIME)
+          resolve();
+        }, SUCCESS_PAGE_STAY_TIME);
       })
     });
   }
 
   backToUninitialized = () => {
     this._getYoroiTransferActions().backToUninitialized.trigger();
-  }
+  };
 
   cancelTransferFunds = () => {
     this._getYoroiTransferActions().cancelTransferFunds.trigger();
-  }
+  };
 
 
   render() {
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     const { profile } = stores;
     const wallets = this._getWalletsStore();
     const yoroiTransfer = this._getYoroiTransferStore();

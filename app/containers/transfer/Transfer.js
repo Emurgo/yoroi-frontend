@@ -25,7 +25,7 @@ export default class Transfer extends Component<InjectedContainerProps> {
     });
   }
 
-  render () {
+  render() {
     const { actions, stores } = this.props;
     const { profile } = stores;
     const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);

@@ -12,6 +12,7 @@ export type TransferStatus =
   | 'generatingTx'
   | 'readyToTransfer'
   | 'error'
+  | 'success'
 
 /** Contains all information necessary to send and display the Daedalus transfer transaction */
 export type TransferTx = {

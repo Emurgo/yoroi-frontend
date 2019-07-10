@@ -6,7 +6,6 @@ import styles from './TransferNavButton.scss';
 
 type Props = {|
   label: string,
-  icon: string,
   isActive: boolean,
   onClick: Function,
   className?: string,
@@ -19,7 +18,7 @@ export default class TransferNavButton extends Component<Props> {
   };
 
   render() {
-    const { isActive, onClick, className } = this.props;
+    const { isActive, onClick, className, label } = this.props;
     const componentClasses = classnames([
       className,
       styles.component,
@@ -28,7 +27,7 @@ export default class TransferNavButton extends Component<Props> {
     return (
       <button type="button" className={componentClasses} onClick={onClick}>
         <div className={styles.container}>
-          <span className={styles.label}>{this.props.label}</span>
+          <span className={styles.label}>{label}</span>
         </div>
       </button>
     );

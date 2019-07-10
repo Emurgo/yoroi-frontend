@@ -492,7 +492,6 @@
   "yoroiTransfer.successPage.text": "Your funds were successfully transfered.",
   "yoroiTransfer.successPage.title": "success",
   "yoroiTransfer.summary.addressFrom.subLabel": "Wallet Addresses",
-  "yoroiTransfer.title": "Transfer funds from another wallet",
   "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
   "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
   "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
