@@ -2,6 +2,7 @@
 
 import { ROUTES } from './routes-config';
 import { Logger, stringifyError } from './utils/logging';
+import environment from './environment';
 
 
 const cardanoURI = {
@@ -11,22 +12,18 @@ const cardanoURI = {
 };
 
 const registerProtocols = () => {
-
-  // $FlowFixMe InstallTrigger is a global from the browser
-  const isFirefox = typeof InstallTrigger !== 'undefined';
-  const isChrome = !!window.chrome &&
-    (!!window.chrome.webstore || !!window.chrome.runtime) &&
-    !isFirefox;
-  if (isChrome) {
-    try {
-      navigator.registerProtocolHandler(
-        cardanoURI.PROTOCOL,
-        cardanoURI.URL,
-        cardanoURI.TITLE
-      );
-    } catch (err) {
-      Logger.error(`uri-protocols:registerProtocols ${stringifyError(err)}`);
-    }
+  if (!environment.userAgentInfo.canRegisterProtocol()) {
+    Logger.error(`uri-protocols:registerProtocols cannot use registerProtocolHandler on this page`);
+    return;
+  }
+  try {
+    navigator.registerProtocolHandler(
+      cardanoURI.PROTOCOL,
+      cardanoURI.URL,
+      cardanoURI.TITLE
+    );
+  } catch (err) {
+    Logger.error(`uri-protocols:registerProtocols ${stringifyError(err)}`);
   }
 };
 
