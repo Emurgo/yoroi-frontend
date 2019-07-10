@@ -1,15 +1,19 @@
 // Css module overrides go here …
 
-.error {
-  font-size: 11px;
-  line-height: 1.38;
-  margin: 0 10px 6px;
+.root {
+  padding-bottom: 20px;
+  margin-bottom: 10px;
 }
 
-.label {
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  padding-left: 10px;
-  text-transform: uppercase;
+.error {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  line-height: 1.33;
+  font-size: 12px;
+
+  & + label {
+    color: var(--rp-theme-color-error);
+  }
 }

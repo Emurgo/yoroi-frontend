@@ -15,14 +15,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onBack: Function,
   mnemonicValidator: Function,
   validWords: Array<string>,
   mnemonicLength: number,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class DaedalusTransferFormPage extends Component<Props> {

@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
@@ -74,7 +75,7 @@ const socialMediaLinks = [{
   svg: twitterSvg,
   message: messages.aboutYoroiTwitter
 }, {
-  svgClassName: styles.yoroiLogo,
+  svgClass: styles.yoroiLogo,
   url: 'https://yoroi-wallet.com',
   svg: yoroiSvg,
   message: messages.aboutYoroiWebsite
@@ -103,7 +104,7 @@ const socialMediaLinks = [{
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 @observer
-export default class AboutYoroiSettingsBlock extends Component {
+export default class AboutYoroiSettingsBlock extends Component<{}> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -116,11 +117,11 @@ export default class AboutYoroiSettingsBlock extends Component {
         <h2>{intl.formatMessage(messages.aboutYoroiLabel)}</h2>
 
         <p className={styles.aboutLine}>
-          {intl.formatMessage(messages.networkLabel)}&nbsp;
+          <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
           {environment.NETWORK}
         </p>
         <div className={styles.aboutLine}>
-          {intl.formatMessage(messages.versionLabel)}&nbsp;
+          <strong>{intl.formatMessage(messages.versionLabel)}</strong>&nbsp;
           <ExplorableHash
             websiteName="Github"
             url={baseGithubUrl + 'releases/'}
@@ -134,7 +135,7 @@ export default class AboutYoroiSettingsBlock extends Component {
           </ExplorableHash>
         </div>
         <div className={styles.aboutLine}>
-          {intl.formatMessage(messages.commitLabel)}&nbsp;
+          <strong>{intl.formatMessage(messages.commitLabel)}</strong>&nbsp;
           <ExplorableHash
             websiteName="Github"
             url={baseGithubUrl + 'commit/' + environment.commit}
@@ -148,7 +149,7 @@ export default class AboutYoroiSettingsBlock extends Component {
         </div>
         {!environment.isMainnet() &&
           <div className={styles.aboutLine}>
-            {intl.formatMessage(messages.branchLabel)}&nbsp;
+            <strong>{intl.formatMessage(messages.branchLabel)}</strong>&nbsp;
             <ExplorableHash
               websiteName="Github"
               url={baseGithubUrl + 'tree/' + environment.branch}
@@ -165,7 +166,12 @@ export default class AboutYoroiSettingsBlock extends Component {
         <div className={styles.aboutScoial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>
             {socialMediaLinks.map(link => (
-              <LinkButton key={link.url} {...link} textClassName={styles.socialMediaLinkText} />
+              <LinkButton
+                key={link.url}
+                {...link}
+                textClassName={styles.socialMediaLinkText}
+                onExternalLinkClick={handleExternalLinkClick}
+              />
             ))}
           </GridFlexContainer>
         </div>

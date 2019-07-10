@@ -44,7 +44,8 @@ export default class ProgressStepBlock extends Component<Props> {
           intl.formatMessage(messages.stepConnectLabel),
           intl.formatMessage(messages.stepSaveLabel)
         ]}
-        progressInfo={progressInfo}
+        currentStep={progressInfo.currentStep}
+        stepState={progressInfo.stepState}
         classicTheme={classicTheme}
       />);
   }

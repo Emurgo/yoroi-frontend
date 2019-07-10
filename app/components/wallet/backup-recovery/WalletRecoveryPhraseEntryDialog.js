@@ -89,10 +89,9 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       classicTheme,
     } = this.props;
     const dialogClasses = classnames([
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       'WalletRecoveryPhraseEntryDialog',
     ]);
-    const wordsClasses = classicTheme ? styles.wordsClassic : styles.words;
 
     const enteredPhraseString = enteredPhrase.reduce((phrase, { word }) => `${phrase} ${word}`, '');
 
@@ -109,6 +108,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       actions.unshift({
         label: intl.formatMessage(messages.buttonLabelClear),
         onClick: onClear,
+        disabled: !hasWord,
         primary: true
       });
     } else {
@@ -160,7 +160,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         />}
 
         {!isValid && (
-          <div className={wordsClasses}>
+          <div className={styles.words}>
             {recoveryPhraseSorted.map(({ word, isActive }, index) => (
               <MnemonicWord
                 key={word + index} // eslint-disable-line react/no-array-index-key

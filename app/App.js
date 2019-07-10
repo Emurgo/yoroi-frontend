@@ -1,4 +1,5 @@
 // @flow
+import { hot } from 'react-hot-loader/root';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
@@ -23,7 +24,6 @@ import type { ActionsMap } from './actions';
 import { THEMES } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
-import { hot } from 'react-hot-loader';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
@@ -34,19 +34,6 @@ class App extends Component<{
   actions: ActionsMap,
   history: Object,
 }> {
-
-  mobxDevToolsInstanceIfDevEnv(): ?React$Element<any> {
-    if (!environment.isDev()) return undefined;
-    try {
-      const mobxDevToolsPackage = require('mobx-react-devtools').default;
-      return React.createElement(mobxDevToolsPackage, {
-        position: 'topRight'
-      });
-    } catch (err) {
-      return undefined;
-    }
-  }
-
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -59,13 +46,13 @@ class App extends Component<{
     const themeVars = Object.assign(
       stores.profile.currentThemeVars,
       {
-        // show wingdings on dev builds when no font is set to easily find missing font bugs
-        // however, on production, we use Times New Roman which looks ugly but at least it's readable.
+        // show wingdings on dev builds when no font is set to easily find
+        // missing font bugshowever, on production, we use Times New Roman
+        // which looks ugly but at least it's readable.
         '--default-font': environment.isDev() ? 'wingdings' : 'Times New Roman',
       }
     );
     const currentTheme = stores.profile.currentTheme;
-    const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
 
     // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
     if (document && document.body instanceof HTMLBodyElement) {
@@ -94,10 +81,9 @@ class App extends Component<{
             </Router>
           </IntlProvider>
         </ThemeProvider>
-        {mobxDevTools}
       </div>
     );
   }
 }
 
-export default hot(module)(App);
+export default hot(App);

@@ -10,6 +10,7 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
+import DialogBackButton from '../../../widgets/DialogBackButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
@@ -27,22 +28,26 @@ import styles from '../common/CheckDialog.scss';
 const messages = defineMessages({
   aboutPrerequisite1Part1: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1',
-    defaultMessage: '!!!Only Supports ',
-  },
-  aboutPrerequisite1Part2Link: {
-    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link',
-    defaultMessage: '!!!https://www.ledger.com/products/ledger-nano-s',
-  },
-  aboutPrerequisite1Part2LinkText: {
-    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2.link.text',
     defaultMessage: '!!!Ledger Nano S',
+  },
+  aboutPrerequisite1Part1Link: {
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1.link',
+    defaultMessage: '!!!https://shop.ledger.com/products/ledger-nano-s/',
+  },
+  aboutPrerequisite1Part2: {
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2',
+    defaultMessage: '!!! or ',
   },
   aboutPrerequisite1Part3: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3',
-    defaultMessage: '!!! model.',
+    defaultMessage: '!!!Ledger Nano X(Using USB cable)',
+  },
+  aboutPrerequisite1Part3Link: {
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3.link',
+    defaultMessage: '!!!https://shop.ledger.com/pages/ledger-nano-x/',
   },
   aboutPrerequisite2: {
-    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2.part2',
+    id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2',
     defaultMessage: '!!!Cardano ADA app must be installed on the Ledger device.',
   },
   aboutPrerequisite3: {
@@ -59,8 +64,10 @@ type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
+  onExternalLinkClick: Function,
   submit: Function,
   cancel: Function,
+  onBack: void => void,
   classicTheme: boolean,
 |};
 
@@ -77,17 +84,14 @@ export default class CheckDialog extends Component<Props> {
       progressInfo,
       isActionProcessing,
       error,
+      onExternalLinkClick,
       submit,
       cancel,
       classicTheme,
     } = this.props;
 
-    const middleBlockClasses = classicTheme
-      ? classnames([styles.middleBlockClassic, styles.middleCheckBlockClassic])
-      : classnames([styles.middleBlock, styles.middleCheckBlock]);
-
     const middleBlock = (
-      <div className={middleBlockClasses}>
+      <div className={classnames([styles.middleBlock, styles.component])}>
         {!classicTheme && <SvgInline svg={aboutLedgerSVG} />}
 
         <div className={styles.prerequisiteBlock}>
@@ -99,12 +103,21 @@ export default class CheckDialog extends Component<Props> {
           </div>
           <ul>
             <li key="1">
-              {intl.formatMessage(messages.aboutPrerequisite1Part1)}
-              <a target="_blank" rel="noopener noreferrer" href={intl.formatMessage(messages.aboutPrerequisite1Part2Link)}>
-                {intl.formatMessage(messages.aboutPrerequisite1Part2LinkText) + ' '}
+              <a
+                href={intl.formatMessage(messages.aboutPrerequisite1Part1Link)}
+                onClick={event => onExternalLinkClick(event)}
+              >
+                {intl.formatMessage(messages.aboutPrerequisite1Part1) + ' '}
                 <SvgInline svg={externalLinkSVG} />
               </a>
-              {intl.formatMessage(messages.aboutPrerequisite1Part3)}
+              {intl.formatMessage(messages.aboutPrerequisite1Part2)}
+              <a
+                href={intl.formatMessage(messages.aboutPrerequisite1Part3Link)}
+                onClick={event => onExternalLinkClick(event)}
+              >
+                {intl.formatMessage(messages.aboutPrerequisite1Part3) + ' '}
+                <SvgInline svg={externalLinkSVG} />
+              </a>
             </li>
             <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
             <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
@@ -134,13 +147,14 @@ export default class CheckDialog extends Component<Props> {
         actions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
+        backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
         classicTheme={classicTheme}
       >
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {middleBlock}
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock progressInfo={progressInfo} />
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 }

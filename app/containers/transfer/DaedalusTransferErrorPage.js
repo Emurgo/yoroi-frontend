@@ -13,11 +13,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   error?: ?LocalizableError,
   onCancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class DaedalusTransferErrorPage extends Component<Props> {

@@ -36,5 +36,11 @@
 
   .button {
     bottom: 37px;
+  }
+}
+
+:global(.YoroiClassic) .component {
+  .button {
+    bottom: 35px;
   }  
 }

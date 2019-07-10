@@ -22,7 +22,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  amount: number,
+  amount: string,
   onClose: Function,
   classicTheme: boolean,
 |};

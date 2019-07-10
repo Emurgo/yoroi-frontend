@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import globalMessages from '../../../i18n/global-messages';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import editSvg from '../../../assets/images/edit.inline.svg';
@@ -51,7 +50,7 @@ export default class ReadOnlyInput extends Component<Props> {
           label={label}
           value={value}
           disabled
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
         />
 
         <button

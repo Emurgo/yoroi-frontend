@@ -14,8 +14,7 @@ type Props = {|
 |};
 
 @observer
-export default @observer
-class HWErrorBlock extends Component<Props> {
+export default class HWErrorBlock extends Component<Props> {
   render() {
     return <ErrorBlock error={this.props.error} />;
   }

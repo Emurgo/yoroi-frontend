@@ -1,4 +1,5 @@
-require('shelljs/global');
+// @flow
+import { rm, mkdir, cp } from 'shelljs';
 
 exports.replaceWebpack = () => {
   const replaceTasks = [{
@@ -12,7 +13,7 @@ exports.replaceWebpack = () => {
   replaceTasks.forEach(task => cp(task.from, task.to));
 };
 
-exports.copyAssets = (type, env) => {
+exports.copyAssets = (type: string, env: string) => {
   rm('-rf', type);
   mkdir(type);
   mkdir(`${type}/js`);

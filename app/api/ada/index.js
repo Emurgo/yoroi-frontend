@@ -11,7 +11,7 @@ import WalletTransaction, {
   transactionTypes
 } from '../../domain/WalletTransaction';
 import type {
-  TransactionType
+  TransactionDirectionType
 } from '../../domain/WalletTransaction';
 import WalletAddress from '../../domain/WalletAddress';
 import { LOVELACES_PER_ADA, HARD_DERIVATION_START } from '../../config/numbersConfig';
@@ -176,7 +176,7 @@ export type CreateAdaPaperPdfRequest = {
   paper: AdaPaper,
   network: Network,
   printAccountPlate?: boolean,
-  updateStatus?: PdfGenStepType => ?any,
+  updateStatus?: PdfGenStepType => boolean,
 };
 
 export type CreateAdaPaperPdfResponse = ?Blob;
@@ -608,7 +608,9 @@ export default class AdaApi {
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
-      return !updateStatus || updateStatus(s);
+      if (updateStatus) {
+        updateStatus(s);
+      }
     });
     return res;
   }
@@ -997,7 +999,7 @@ export default class AdaApi {
   }
 
   async getSelectedExplorer(
-    request: GetSelectedExplorerRequest
+    _request: GetSelectedExplorerRequest
   ): Promise<GetSelectedExplorerResponse> {
     Logger.debug('AdaApi::getSelectedExplorer called');
     try {
@@ -1334,7 +1336,7 @@ export default class AdaApi {
 
   redeemAda = async (
     request: RedeemAdaRequest
-  ): RedeemAdaResponse => {
+  ): Promise<RedeemAdaResponse> => {
     Logger.debug('AdaApi::redeemAda called');
     try {
       const transactionAmount = await redeemAda(request);
@@ -1351,7 +1353,7 @@ export default class AdaApi {
 
   redeemPaperVendedAda = async (
     request: RedeemPaperVendedAdaRequest
-  ): RedeemPaperVendedAdaResponse => {
+  ): Promise<RedeemPaperVendedAdaResponse> => {
     Logger.debug('AdaApi::redeemAdaPaperVend called');
     try {
       const transactionAmount = await redeemPaperVendedAda(request);
@@ -1385,7 +1387,7 @@ export default class AdaApi {
 async function _getTxFinancialInfo(
   data: AdaTransaction
 ): Promise<{
-  type: TransactionType,
+  type: TransactionDirectionType,
   amount: BigNumber,
   fee: BigNumber
 }> {
@@ -1506,7 +1508,7 @@ const _conditionToTxState = (condition: AdaTransactionCondition) => {
 
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
-  (data: AdaTransaction, type: TransactionType, amount: BigNumber, fee: BigNumber) => {
+  (data: AdaTransaction, type: TransactionDirectionType, amount: BigNumber, fee: BigNumber) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,

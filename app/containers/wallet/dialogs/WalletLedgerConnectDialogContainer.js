@@ -4,19 +4,22 @@ import { observer } from 'mobx-react';
 
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
+import { Logger } from '../../../utils/logging';
+import { handleExternalLinkClick } from '../../../utils/routing';
 
 import CheckDialog from '../../../components/wallet/hwConnect/ledger/CheckDialog';
 import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDialog';
 import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
-
-import { Logger } from '../../../utils/logging';
 
 import LedgerConnectStore from '../../../stores/ada/LedgerConnectStore';
 import HWConnectActions from '../../../actions/ada/hw-connect-actions';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 
-type Props = InjectedDialogContainerProps;
+type Props = InjectedDialogContainerProps & {
+  onBack: void => void,
+};
+
 @observer
 export default class WalletLedgerConnectDialogContainer extends Component<Props> {
 
@@ -39,9 +42,11 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             progressInfo={ledgerConnectStore.progressInfo}
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
+            onExternalLinkClick={handleExternalLinkClick}
             submit={hwConnectActions.submitCheck.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
+            onBack={this.props.onBack}
           />);
         break;
       case ProgressStep.CONNECT:
@@ -50,6 +55,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             progressInfo={ledgerConnectStore.progressInfo}
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
+            onExternalLinkClick={handleExternalLinkClick}
             goBack={hwConnectActions.goBackToCheck.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
@@ -63,6 +69,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
             defaultWalletName={ledgerConnectStore.defaultWalletName}
+            onExternalLinkClick={handleExternalLinkClick}
             submit={hwConnectActions.submitSave.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}

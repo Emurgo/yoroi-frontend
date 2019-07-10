@@ -1,7 +1,7 @@
-# Paper Wallets
+# 紙錢包
 
-A **"Paper Wallet"** is a special document, containing secret mnemonics words and a small set of addresses. When a paper wallet is created **it is NOT stored by Yoroi**. The generated PDF document is the only copy of this wallet in existence.
+**“紙錢包”**是一個特殊文檔，包含秘密助記詞和一小組地址。 當創建紙質錢包**時，Yoroi **不會存儲它。 生成的PDF文檔是此錢包的唯一副本。
 
-You can use a paper wallet to receive coins using the pre-generated addresses. You can restore your paper wallet at any time into Yoroi to access the funds. However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
+你可以使用紙錢包中預先生成的地址接受ADA。 在之後的任何時候你都可以恢復紙錢包，進入Yoroi錢包以便使用其資金。 一旦你恢復後應停止使用紙錢包，因為它不再是一個“冷存儲”的錢包了。
 
-Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret words. Even if someone gets access to this paper-wallet, they will also need to know your password to gain access to the funds. **But if you lose or forget your password, your funds will be lost forever and no one will be able to restore them!**. Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.
+Yoroi紙錢包會被**用戶設定的密碼**和21個助記詞所保護。 即便有人能夠接觸到這個紙錢包，他們仍還需知道您的密碼才能動用其中的資金。 **但如果你丟失或忘記了密碼，其中的資金也將永久遺失並且無人能夠恢復**。 如果輸入了錯誤的錢包密碼，將會得到一個不同的錢包。能夠讓你合理拒絕（在受脅迫的情況下不會暴露原有資金）。

@@ -14,14 +14,17 @@ import { Options } from 'react-polymorph/lib/components/Options';
 import { FormFieldOwnSkin } from './FormFieldOwnSkin';
 import { OptionsSkin } from 'react-polymorph/lib/skins/simple/OptionsSkin';
 
+type GetSelectionPropsT = (...args: any) => Object;
+// This type should be kept open (not "exact") because it is a react-polymorph skin
+// and should be able to pass any extra properties from react-polymorph down.
 type Props = {
   className: string,
   error: string,
   filteredOptions: Array<any>,
-  getSelectionProps: Function,
-  handleAutocompleteClick: Function,
+  getSelectionProps: GetSelectionPropsT,
+  handleAutocompleteClick: MouseEvent => void,
   handleChange: Function,
-  handleInputChange: Function,
+  handleInputChange: Event => void,
   inputRef: ElementRef<any>,
   inputValue: string,
   isOpeningUpward: boolean,
@@ -29,13 +32,13 @@ type Props = {
   label: string | Element<any>,
   maxSelections: number,
   maxVisibleOptions: number,
-  onKeyDown: Function,
+  onKeyDown: KeyboardEvent => void,
   options: Array<any>,
   optionsRef: ElementRef<any>,
   optionsMaxHeight: number,
   placeholder: string,
-  removeOption: Function,
-  renderSelections: Function,
+  removeOption: number => void,
+  renderSelections: GetSelectionPropsT => React$Element<any>,
   renderOptions: Function,
   rootRef: ElementRef<any>,
   selectedOptions: Array<any>,

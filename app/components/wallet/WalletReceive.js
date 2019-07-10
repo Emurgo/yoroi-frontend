@@ -11,6 +11,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
 import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
 import verifyIcon from '../../assets/images/verify-icon.inline.svg';
+import generateURIIcon from '../../assets/images/generate-uri.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
@@ -53,6 +54,10 @@ const messages = defineMessages({
     id: 'wallet.receive.page.verifyAddressLabel',
     defaultMessage: '!!!Verify address',
   },
+  generatePaymentURLLabel: {
+    id: 'wallet.receive.page.generatePaymentURLLabel',
+    defaultMessage: '!!!Generate payment URL',
+  },
 });
 
 type Props = {|
@@ -63,6 +68,7 @@ type Props = {|
   onGenerateAddress: Function,
   onCopyAddress: Function,
   onVerifyAddress: Function,
+  onGeneratePaymentURI: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
 |};
@@ -98,7 +104,7 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress, onVerifyAddress,
+      onCopyAddress, onVerifyAddress, onGeneratePaymentURI,
       isSubmitting, error, isWalletAddressUsed,
     } = this.props;
     const { intl } = this.context;
@@ -202,6 +208,27 @@ export default class WalletReceive extends Component<Props, State> {
                 <div className={styles.addressMargin} />
                 {/* Address Action block start */}
                 <div className={styles.addressActions}>
+                  {/* Generate payment URL for Address action */}
+                  <div className={classnames([
+                    styles.addressActionItemBlock,
+                    styles.generateURLActionBlock])}
+                  >
+                    <button
+                      type="button"
+                      onClick={onGeneratePaymentURI.bind(this, address.id)}
+                      className={styles.btnGenerateURI}
+                    >
+                      <div className={styles.generateURLActionBlock}>
+                        <SvgInline
+                          svg={generateURIIcon}
+                          className={styles.generateURIIcon}
+                        />
+                        <span className={styles.actionIconText}>
+                          {intl.formatMessage(messages.generatePaymentURLLabel)}
+                        </span>
+                      </div>
+                    </button>
+                  </div>
                   {/* Verify Address action */}
                   <div className={classnames([
                     styles.addressActionItemBlock,

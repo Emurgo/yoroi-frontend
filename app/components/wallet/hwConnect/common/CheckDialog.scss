@@ -1,53 +1,22 @@
 @import './DialogCommonStyle.scss';
 
-.middleCheckBlockClassic {
+.component {
   .prerequisiteBlock {
     display: inline-block;
-    width: 520px;
-    height: 280px;
-    .prerequisiteHeaderText {
-      font-family: var(--font-semibold);
-      line-height: 1.38;
-      font-size: 18px;
-      opacity: $opacityCommon;
-      margin-left: 10px;
-    }
-    li {
-      list-style-type: disc;
-      margin-left: 18px;
-      margin-top: 12px;
-      font-family: var(--font-regular);
-      line-height: 1.38;
-      font-size: 16px;
-      opacity: $opacityCommon;
-      a {
-        color: var(--font-black);
-      }
-    }
-  }
-  .hwImageBlock {
-    vertical-align: baseline;
-    display: inline-block;
-  }
-}
 
-.middleCheckBlock {
-  .prerequisiteBlock {
-    display: inline-block;
-    margin-top: 16px;
     .prerequisiteHeaderText {
-      font-family: var(--font-medium);
-      margin-left: 7px;
       font-size: 18px;
       line-height: 22px;
     }
+
     li {
       list-style-type: disc;
       margin-left: 18px;
       font-family: var(--font-regular);
       line-height: 22px;
-      font-size: 14px;
+      font-size: 16px;
       letter-spacing: 0;
+      margin-top: 6px;
 
       &:first-child {
         margin-top: 8px;
@@ -58,8 +27,46 @@
       }
     }
   }
-  .trezorImageBlock {
+
+  .hwImageBlock {
     vertical-align: baseline;
     display: inline-block;
+  }
+}
+
+:global(.YoroiClassic) {
+  .component {
+    .prerequisiteBlock {
+      width: 520px;
+      height: 280px;
+    }
+
+    .prerequisiteHeaderText {
+      font-family: var(--font-semibold);
+      margin-left: 10px;
+      opacity: $opacityCommon;
+    }
+
+    li {
+      margin-top: 12px;
+      opacity: $opacityCommon;
+    }
+  }
+}
+
+:global(.YoroiModern) {
+  .component {
+    .prerequisiteBlock {
+      margin-top: 16px;
+    }
+
+    .prerequisiteHeaderText {
+      font-family: var(--font-medium);
+      margin-left: 7px;
+    }
+
+    li {
+      font-size: 14px;
+    }
   }
 }

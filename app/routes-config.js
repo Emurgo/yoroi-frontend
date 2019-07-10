@@ -5,6 +5,7 @@ export const ROUTES = {
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
     TERMS_OF_USE: '/profile/terms-of-use',
+    URI_PROMPT: '/profile/uri-prompt',
   },
   WALLETS: {
     ROOT: '/wallets',
@@ -25,5 +26,8 @@ export const ROUTES = {
   },
   DAEDALUS_TRANFER: {
     ROOT: '/daedalus-transfer',
-  }
+  },
+  SEND_FROM_URI: {
+    ROOT: '/send-from-uri',
+  },
 };

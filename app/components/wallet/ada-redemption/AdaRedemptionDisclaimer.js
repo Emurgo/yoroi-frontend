@@ -9,6 +9,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import attentionIcon from '../../../assets/images/attention-big-light.inline.svg';
 import styles from './AdaRedemptionDisclaimer.scss';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   disclaimerTitle: {
@@ -22,10 +23,6 @@ const messages = defineMessages({
   checkboxLabel: {
     id: 'wallet.redeem.disclaimerOverlay.checkboxLabel',
     defaultMessage: '!!!I’ve understood the information above',
-  },
-  submitLabel: {
-    id: 'wallet.redeem.disclaimerOverlay.submitLabel',
-    defaultMessage: '!!!Continue',
   },
 });
 
@@ -78,7 +75,7 @@ export default class AdaRedemptionDisclaimer extends Component<Props, State> {
 
         <Button
           className="disclaimer"
-          label={intl.formatMessage(messages.submitLabel)}
+          label={intl.formatMessage(globalMessages.continue)}
           onClick={() => isAccepted && onSubmit()}
           disabled={!isAccepted}
           skin={ButtonSkin}

@@ -9,7 +9,7 @@ Given(/^I have a wallet with funds$/, async function () {
   await this.driver.wait(async () => {
     try {
       const { adaWallet } = await this.getFromLocalStorage('WALLET');
-      expect(adaWallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
+      expect(Number(adaWallet.cwAmount.getCCoin), 'Available founds').to.be.above(0);
       return true;
     } catch (err) {
       return false;
@@ -45,8 +45,8 @@ When(/^I clear the receiver$/, async function () {
   await this.clearInput("input[name='receiver']");
 });
 
-When(/^I clear the wallet password$/, async function () {
-  await this.clearInput("input[name='walletPassword']");
+When(/^I clear the wallet password ([^"]*)$/, async function (password) {
+  await this.clearInputUpdatingForm("input[name='walletPassword']", password.length);
 });
 
 When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {

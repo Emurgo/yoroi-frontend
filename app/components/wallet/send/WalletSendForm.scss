@@ -7,6 +7,10 @@
   padding-bottom: 20px;
   padding-left: 20px;
 
+  .warningBox {
+    margin-bottom: 30px;
+  }
+
   .receiverInput {
     position: relative;
 
@@ -39,6 +43,7 @@
 
   .checkbox {
     font-family: var(--font-mono-light);
+    width: fit-content;
   }
 }
 

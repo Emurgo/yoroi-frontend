@@ -154,7 +154,7 @@ export const updateAdaWalletBalance = async (
   // Calculate and set new user balance
   const updatedWallet = Object.assign({}, persistentWallet, {
     cwAmount: {
-      getCCoin: balance
+      getCCoin: balance.toString()
     }
   });
 

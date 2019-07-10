@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import { isValidRepeatPassword, isValidPaperPassword } from '../../../../utils/validations';
@@ -104,6 +104,9 @@ export default class UserPasswordDialog extends Component<Props> {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
+    plugins: {
+      vjf: vjf()
+    },
   });
 
   submit = () => {
@@ -133,14 +136,18 @@ export default class UserPasswordDialog extends Component<Props> {
 
     const dialogClasses = classnames(['userPasswordDialog', styles.dialog]);
     const confirmButtonClasses = classnames(['confirmButton']);
-    const paperPasswordClasses = classnames([styles.paperPassword]);
-    const repeatedPasswordClasses = classnames([styles.repeatedPassword]);
+
+    const disabledCondition = !(
+      isValidPaperPassword(paperPassword)
+      && isValidRepeatPassword(paperPassword, repeatPassword)
+    );
 
     const actions = [
       {
         label: intl.formatMessage(globalMessages.nextButtonLabel),
         onClick: this.submit,
         primary: true,
+        disabled: disabledCondition,
         className: confirmButtonClasses,
       },
     ];
@@ -165,28 +172,28 @@ export default class UserPasswordDialog extends Component<Props> {
           <span><FormattedHTMLMessage {...messages.paperPasswordIntroLine3} /></span><br />
         </div>
 
-        <div className={paperPasswordClasses}>
+        <div className={styles.paperPassword}>
           <Input
             type="password"
-            className={paperPasswordClasses}
+            className={styles.paperPassword}
             value={passwordValue}
             onChange={(value) => this.handleDataChange('passwordValue', value)}
             {...paperPasswordField.bind()}
             done={isValidPaperPassword(paperPassword)}
             error={paperPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
         </div>
-        <div className={repeatedPasswordClasses}>
+        <div className={styles.repeatedPassword}>
           <Input
             type="password"
-            className={repeatedPasswordClasses}
+            className={styles.repeatedPassword}
             value={repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
             done={repeatPassword && isValidRepeatPassword(paperPassword, repeatPassword)}
             {...repeatedPasswordField.bind()}
             error={repeatedPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
         </div>
         <PasswordInstructions

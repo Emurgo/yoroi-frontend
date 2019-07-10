@@ -29,19 +29,7 @@
     line-height: 56px;
     padding: 0 15px;
     border-radius: 8px;
-
     margin-top: -17px;
-  }
-
-  /* By default, Chrome's styling for autofill inputs overlaps with floating labels.
-   * The following fix delays webkit-autofill transition to avoid Chrome setting its
-   * own style and thus floating fields are not overlapped.
-   */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    -webkit-transition-delay: 99999s;
   }
 
   &:hover {
@@ -59,19 +47,52 @@
   }
 }
 
-.legend {
-  margin-left: 9px;
-  font-family: var(--rp-theme-font-regular);
-  font-size: 12px;
-  font-weight: normal;
-  padding: 0 6px;
-  z-index: 1;
+:global(.YoroiModern) {
+  .legend {
+    margin-left: 9px;
+    font-family: var(--rp-theme-font-regular);
+    font-size: 12px;
+    font-weight: normal;
+    padding: 0 6px;
+    z-index: 1;
+  
+    line-height: 1.38;
+    margin-bottom: 10px;
+  }
+    /* By default, Chrome's styling for autofill inputs overlaps with floating labels.
+   * The following fix delays webkit-autofill transition to avoid Chrome setting its
+   * own style and thus floating fields are not overlapped.
+   */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-transition-delay: 99999s;
+  }
 
-  line-height: 1.38;
-  margin-bottom: 10px;
+  .error {
+    border-color: var(--rp-theme-color-error);
+    color: var(--rp-theme-color-error)!important;
+  }
 }
 
-.error {
-  border-color: var(--rp-theme-color-error);
-  color: var(--rp-theme-color-error)!important;
+:global(.YoroiClassic) {
+  .inputWrapper {
+    border: 0;
+    padding: 0;
+    line-height: normal;
+  }
+  .iconsWrapper {
+    padding-top: 27px;
+  }
+  .legend {
+    font-family: var(--rp-theme-font-regular);
+    display: block;
+    font-size: 16px;
+    margin: 0 0 10px 0;
+  }
+  input {
+    margin: 0;
+    border-radius: 0;
+  }
 }

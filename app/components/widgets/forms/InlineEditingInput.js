@@ -4,8 +4,8 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
@@ -75,6 +75,9 @@ export default class InlineEditingInput extends Component<Props, State> {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
+    plugins: {
+      vjf: vjf()
+    },
   });
 
   submit = () => {
@@ -135,7 +138,6 @@ export default class InlineEditingInput extends Component<Props, State> {
       isActive,
       inputFieldValue,
       successfullyUpdated,
-      classicTheme,
     } = this.props;
     const { intl } = this.context;
     const inputField = validator.$('inputField');
@@ -171,7 +173,7 @@ export default class InlineEditingInput extends Component<Props, State> {
           error={isActive ? inputField.error : null}
           disabled={!isActive}
           inputRef={(input) => { this.inputField = input; }}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
         />
 
         {isActive && (

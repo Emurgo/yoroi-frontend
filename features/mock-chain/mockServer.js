@@ -8,7 +8,8 @@ import type {
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
-  FilterUsedRequest, FilterUsedResponse
+  FilterUsedRequest, FilterUsedResponse,
+  ServerStatusResponse
 } from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
 import mockImporter from './mockImporter';
@@ -140,6 +141,14 @@ export function getMockServer(
       const filteredAddresses = req.body.addresses
         .filter((address) => usedAddresses.has(address));
       res.send(filteredAddresses);
+    });
+
+    server.get('/api/status', (
+      req,
+      res: { send(arg: ServerStatusResponse): any }
+    ): void => {
+      const isServerOk = mockImporter.getApiStatus();
+      res.send({ isServerOk });
     });
 
     MockServer = server.listen(port, () => {

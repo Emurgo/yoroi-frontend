@@ -32,6 +32,9 @@
     &:hover {
       opacity: 1;
     }
+    &.error {
+      right: 50px;
+    }
   }
 
   @keyframes animateSavingResultLabel {
@@ -61,6 +64,10 @@
 
 :global(.YoroiClassic) .component {
   margin-bottom: 10px;
+
+  .button {
+    bottom: 35px;
+  }
 }
 
 :global(.YoroiModern) .component {
@@ -70,9 +77,5 @@
 
   .button {
     bottom: 37px;
-
-    &.error {
-      right: 50px;
-    }
   }
 }

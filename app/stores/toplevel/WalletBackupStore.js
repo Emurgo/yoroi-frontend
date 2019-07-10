@@ -32,6 +32,7 @@ class WalletBackupStore extends Store {
   setup() {
     const a = this.actions.walletBackup;
     a.initiateWalletBackup.listen(this._initiateWalletBackup);
+    a.continueToPrivacyWarning.listen(this._continueToPrivacyWarning);
     a.acceptPrivacyNoticeForWalletBackup.listen(this._acceptPrivacyNoticeForWalletBackup);
     a.continueToRecoveryPhraseForWalletBackup.listen(this._continueToRecoveryPhraseForWalletBackup);
     a.startWalletBackup.listen(this._startWalletBackup);
@@ -71,6 +72,10 @@ class WalletBackupStore extends Store {
     this.actions.dialogs.open.trigger({
       dialog: WalletBackupDialog,
     });
+  };
+
+  @action _continueToPrivacyWarning = () => {
+    this.currentStep = 'privacyWarning';
   };
 
   @action _acceptPrivacyNoticeForWalletBackup = () => {

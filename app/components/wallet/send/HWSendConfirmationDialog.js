@@ -8,7 +8,7 @@ import type { MessageDescriptor } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
-import WarningBox from '../../widgets/forms/WarningBox';
+import WarningBox from '../../widgets/WarningBox';
 
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -65,10 +65,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     } = this.props;
 
     const staleTxWarning = (
-      <WarningBox>
-        {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
-        {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
-      </WarningBox>
+      <div className={styles.warningBox}>
+        <WarningBox>
+          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
+          {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+        </WarningBox>
+      </div>
     );
 
     const infoBlock = (

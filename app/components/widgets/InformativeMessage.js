@@ -1,5 +1,6 @@
+// @flow
 import React, { Component } from 'react';
-import type { Children } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import ReactMarkdown from 'react-markdown';
 import classNames from 'classnames';
@@ -9,7 +10,7 @@ type Props = {|
   title?: string,
   message?: string,
   subclass?: string,
-  children?: Children
+  children?: Node
 |};
 
 @observer

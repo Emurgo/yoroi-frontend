@@ -8,8 +8,12 @@ import { BatchedFetcher } from '../../api/ada/lib/state-fetch/batchedFetcher';
 
 export default class StateFetchStore extends Store {
 
-  @observable fetcher: IFetcher = new BatchedFetcher(new RemoteFetcher());
+  @observable fetcher: IFetcher;
 
   setup() {
+    this.fetcher = new BatchedFetcher(new RemoteFetcher(
+      lastLaunchVersion => this.stores.profile.lastLaunchVersion,
+      currentLocale => this.stores.profile.currentLocale
+    ));
   }
 }

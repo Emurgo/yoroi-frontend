@@ -1,4 +1,6 @@
-import React, { Component, Element } from 'react';
+// @flow
+import React, { Component } from 'react';
+import type { Element } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import SvgInline from 'react-svg-inline';
@@ -9,23 +11,30 @@ import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
 import iconCrossGreenSVG from '../../assets/images/widget/cross-green.inline.svg';
 import styles from './ProgressSteps.scss';
 
+// TODO: move to type folder?
+export const StepState = Object.freeze({
+  LOAD: 0,
+  PROCESS: 1,
+  ERROR: 9,
+});
+export type StepStateEnum = $Values<typeof StepState>;
+
 type Props = {|
   stepsList: Array<string>,
-  progressInfo: {
-    currentStep : number, // example, 0 = pointing to stepsList[0]
-    stepState: number, // has three states, 0 = LOAD | 1 = PROCESS | 9 = ERROR
-  },
+  currentStep : number, // example, 0 = pointing to stepsList[0]
+  stepState: StepStateEnum,
   classicTheme: boolean
 |};
 @observer
 export default class ProgressSteps extends Component<Props> {
 
-  createSetps = (stepsList, progressInfo): Array<Element> => {
+  createSteps = (
+    stepsList: Array<string>,
+    currentStep : number,
+    stepState: StepStateEnum,
+  ): Array<Element<any>> => {
     const { classicTheme } = this.props;
     const steps = [];
-
-    // currentStep should not be less than 0
-    const currentStep = progressInfo.currentStep < 0 ? 0 : progressInfo.currentStep;
 
     for (let idx = 0; idx < stepsList.length; idx++) {
       const stepText = stepsList[idx];
@@ -46,9 +55,7 @@ export default class ProgressSteps extends Component<Props> {
           styles.stepTextDone
         ]);
       } else if (idx === currentStep) {
-        // for current step, 0 = LOAD | 1 = PROCESS | 9 = ERROR
-        // 0 = LOAD and 1 = PROCESS has same icon but for 9 = ERROR there is a error icon
-        displayIcon = (progressInfo.stepState === 9) ? 'error' : 'none';
+        displayIcon = (stepState === StepState.ERROR) ? 'error' : 'none';
         stepTopBarStyle = classNames([
           styles.stepTopBar,
           styles.stepTopBarActive
@@ -79,10 +86,15 @@ export default class ProgressSteps extends Component<Props> {
   }
 
   render() {
-    const { stepsList, progressInfo } = this.props;
+    const { stepsList, currentStep, stepState } = this.props;
+
     return (
       <div className={styles.component}>
-        {this.createSetps(stepsList, progressInfo)}
+        {this.createSteps(
+          stepsList,
+          currentStep < 0 ? 0 : currentStep,
+          stepState
+        )}
       </div>
     );
   }
