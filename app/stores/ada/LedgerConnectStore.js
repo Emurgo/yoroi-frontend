@@ -312,9 +312,6 @@ export default class LedgerConnectStore
     const { wallets } = this.stores.substores[environment.API];
     await wallets._patchWalletRequestWithNewWallet(ledgerWallet);
 
-    // Dynamically update the topbar icons
-    this.stores.topbar.updateCategories();
-
     // goto the wallet transactions page
     Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');
     wallets.goToWalletRoute(ledgerWallet.id);

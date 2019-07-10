@@ -2,15 +2,14 @@
 import { observable, computed, action } from 'mobx';
 import Store from '../base/Store';
 import environment from '../../environment';
-import { Logger } from '../../utils/logging';
 import type { Category } from '../../config/topbarConfig';
 import {
-  WITH_LEDGER_NANO_S_CATEGORY as WITH_LEDGER_NANO_S,
-  WITH_TREZOR_T_CATEGORY as WITH_TREZOR_T,
-  GO_BACK_CATEGORY as GO_BACK,
-  WALLETS_CATEGORY as WALLETS,
+  WITH_LEDGER_NANO_S,
+  WITH_TREZOR_T,
+  GO_BACK,
+  WALLETS,
   CURRENCY_SPECIFIC_CATEGORIES,
-  COMMON_CATEGORIES,
+  SETTINGS
 } from '../../config/topbarConfig';
 
 export default class TopbarStore extends Store {
@@ -18,6 +17,7 @@ export default class TopbarStore extends Store {
   @observable activeTopbarCategory: string = WALLETS.route;
 
   setup() {
+    this.isActiveCategory = this.isActiveCategory.bind(this);
     this.actions.topbar.activateTopbarCategory.listen(this._onActivateTopbarCategory);
     this.actions.topbar.walletSelected.listen(this._onWalletSelected);
     this.registerReactions([
@@ -26,43 +26,22 @@ export default class TopbarStore extends Store {
   }
 
   @computed get categories(): Array<Category> {
-    return [...COMMON_CATEGORIES, ...CURRENCY_SPECIFIC_CATEGORIES[environment.API]];
+    const { wallets } = this.stores.substores[environment.API];
+    return [
+      (wallets && !wallets.hasAnyLoaded) ? GO_BACK : WALLETS,
+      ...(wallets && wallets.first && wallets.first.isTrezorTWallet) ? [WITH_TREZOR_T] : [],
+      ...(wallets && wallets.first && wallets.first.isLedgerNanoSWallet) ? [WITH_LEDGER_NANO_S] : [],
+      SETTINGS,
+      ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
+    ];
   }
 
-  @computed get isActiveCategory(): boolean {
-    //return (route => (this.activeTopbarCategory && this.activeTopbarCategory === route));
-    return false; // TODO
-  }
-
-  /** Dynamic Initialization of Topbar Categories */
-  @action updateCategories(): void {
-    /*const { wallets } = this.stores.substores[environment.API];
-    // set it to the default
-    this.CATEGORIES = [...COMMON_CATEGORIES, ...CURRENCY_SPECIFIC_CATEGORIES[environment.API]];
-
-    // For rare of the rare case, make sure wallets store is initialized
-    if (wallets) {
-      // If active wallet is TrezorTWallet then show with Trezor T Icon
-      if (wallets.first && wallets.first.isTrezorTWallet) {
-        this.CATEGORIES.push(WITH_TREZOR_T);
-      }
-
-      // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
-      if (wallets.first && wallets.first.isLedgerNanoSWallet) {
-        this.CATEGORIES.push(WITH_LEDGER_NANO_S);
-      }
-
-      // If there is not any active wallets then replace WALLETS Category by GO_BACK Category
-      if (!wallets.hasAnyLoaded) {
-        // eslint-disable-next-line arrow-body-style
-        const walletCategoryIndex = this.CATEGORIES.findIndex((item) => {
-          return item.name === WALLETS.name;
-        });
-        this.CATEGORIES[walletCategoryIndex] = GO_BACK;
-      }
-    } else {
-      Logger.warn('TopbarStore::updateCategories::Wallets store is not ready yet');
-    }*/
+  // @computed decorator for methods with parameters are not supported in this
+  // version of mobx. Instead, making a regular function that calls `computed`
+  isActiveCategory = category => {
+    return computed(
+      () => this.activeTopbarCategory && this.activeTopbarCategory === category.route
+    ).get();
   }
 
   @action _onActivateTopbarCategory = (

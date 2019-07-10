@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import TopBarCategory from './TopBarCategory';
 import styles from './TopBar.scss';
 import type { Category } from '../../config/topbarConfig';
-import { GO_BACK_CATEGORY } from '../../config/topbarConfig';
 
 type Props = {|
   children?: ?Node,
@@ -45,8 +44,8 @@ export default class TopBar extends Component<Props> {
               className={category.className}
               icon={category.icon}
               iconStyle={category.iconStyle}
-              inlineTextMD={category.messageDescriptor}
-              active={activeTopbarCategory === category.route} // TODO
+              inlineTextMD={category.inlineText}
+              active={isActiveCategory !== undefined && isActiveCategory(category)}
               onClick={() => {
                 if (onCategoryClicked) {
                   onCategoryClicked(category.route);
