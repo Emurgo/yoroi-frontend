@@ -1,0 +1,47 @@
+.component {
+  margin-top: 122px;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+
+  .centeredBox {
+    overflow: visible;
+    width: 594px;
+  }
+
+  .explanation {
+    margin-top: 49px;
+    margin-bottom: 34px;
+    font-family: var(--font-regular);
+    color: var(--cmn-default-color-grey);
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .aboutSvg {
+    & > svg {
+      // match size of previous URI prompt SVG
+      transform: scale(1.5, 1.5);
+      display: block;
+      margin: auto;
+      height: 128px;
+      width: 319px;
+      margin-top: 49px;
+      // line up text and button with URI prompt page
+      margin-bottom: 154px
+    }
+  }
+
+  .submitButton {
+    display: block !important;
+    margin: 0;
+    width: 287px !important;
+  }
+
+  .buttonsWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 34px;
+  }
+}

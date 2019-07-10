@@ -2,7 +2,6 @@
 import { action, observable, computed, when, runInAction } from 'mobx';
 import { defineMessages } from 'react-intl';
 import Store from '../base/Store';
-import Wallet from '../../domain/Wallet';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import { matchRoute } from '../../utils/routing';
@@ -66,7 +65,6 @@ export default class LoadingStore extends Store {
           currVersion: environment.version
         }).promise;
         await this.validateUriPath();
-        await this._openPageAfterLoad();
         runInAction(() => {
           this.error = null;
           this._loading = false;
@@ -128,29 +126,6 @@ export default class LoadingStore extends Store {
       // note: we don't validate the path since we need to wait for the WASM bindings to load first
     });
     this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
-  }
-
-  /** Select which page to open after app is done loading */
-  _openPageAfterLoad = async (): Promise<void> => {
-    const { app } = this.stores;
-    const { wallets } = this.stores.substores[environment.API];
-    await wallets.refreshWalletsData();
-    if (app.currentRoute === ROUTES.ROOT) {
-      if (wallets.first) {
-        const firstWallet: Wallet = wallets.first;
-
-        if (this.fromUriScheme) {
-          this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
-        } else {
-          this.actions.router.goToRoute.trigger({
-            route: ROUTES.WALLETS.TRANSACTIONS,
-            params: { id: firstWallet.id }
-          });
-        }
-      } else {
-        this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-      }
-    }
   }
 }
 

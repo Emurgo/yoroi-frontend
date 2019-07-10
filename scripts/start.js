@@ -1,3 +1,4 @@
+// @flow
 const tasks = require('./tasks');
 
 const createWebpackServer = require('webpack-httpolyglot-server');

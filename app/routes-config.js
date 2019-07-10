@@ -5,6 +5,7 @@ export const ROUTES = {
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
     TERMS_OF_USE: '/profile/terms-of-use',
+    URI_PROMPT: '/profile/uri-prompt',
   },
   WALLETS: {
     ROOT: '/wallets',

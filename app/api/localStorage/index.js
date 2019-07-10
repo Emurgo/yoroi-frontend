@@ -6,6 +6,7 @@ const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
+  URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
   THEME: networkForLocalStorage + '-THEME',
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
@@ -76,6 +77,34 @@ export default class LocalStorageApi {
   unsetTermsOfUseAcceptance = (): Promise<void> => new Promise((resolve) => {
     try {
       localStorage.removeItem(storageKeys.TERMS_OF_USE_ACCEPTANCE);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
+  // ========== URI Scheme acceptance ========== //
+
+  getUriSchemeAcceptance = (): Promise<boolean> => new Promise((resolve, reject) => {
+    try {
+      const accepted = localStorage.getItem(storageKeys.URI_SCHEME_ACCEPTANCE);
+      if (!accepted) return resolve(false);
+      resolve(JSON.parse(accepted));
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setUriSchemeAcceptance = (): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.URI_SCHEME_ACCEPTANCE, JSON.stringify(true));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetUriSchemeAcceptance = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.URI_SCHEME_ACCEPTANCE);
       resolve();
     } catch (error) {} // eslint-disable-line
   });
