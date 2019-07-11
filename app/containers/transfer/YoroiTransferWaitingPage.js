@@ -46,7 +46,6 @@ export default class YoroiTransferWaitingPage extends Component<Props> {
       <AnnotatedLoader
         title={intl.formatMessage(messages.title)}
         details={intl.formatMessage(messages[status])}
-        warning={intl.formatMessage(messages.internetConnectionWarning)}
       />
     );
   }

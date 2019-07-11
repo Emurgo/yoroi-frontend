@@ -6,7 +6,15 @@ import {
   DECIMAL_PLACES_IN_ADA
 } from '../../../app/config/numbersConfig';
 
-export async function checkAddressesRecoveredAreCorrect(rows, world) {
+type TransferSourceType = Array<{|
+  fromAddress: string,
+  amount: string | number
+|}>;
+
+export async function checkAddressesRecoveredAreCorrect(
+  rows:TransferSourceType,
+  world:Object
+):Promise<void> {
   const waitUntilAddressesRecoveredAppeared = rows.map((row, index) => (
     world.waitUntilText(
       `.addressRecovered-${index + 1}`,
@@ -16,7 +24,10 @@ export async function checkAddressesRecoveredAreCorrect(rows, world) {
   await Promise.all(waitUntilAddressesRecoveredAppeared);
 }
 
-export async function checkTotalAmountIsCorrect(rows, world) {
+export async function checkTotalAmountIsCorrect(
+  rows:TransferSourceType,
+  world:Object
+):Promise<void> {
   const totalAmount = rows.reduce(
     (acc, row) => acc.plus(new BigNumber(row.amount)), new BigNumber(0)
   );
