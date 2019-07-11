@@ -7,6 +7,7 @@ import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import { resetChain, serverIssue, serverFixed } from '../mock-chain/mockImporter';
 import { expect } from 'chai';
+import { navigateToTransactionsList } from '../support/helpers/route-helpers';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -170,7 +171,7 @@ Given(/^I have opened the extension$/, async function () {
 
 Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
-  await this.driver.sleep(400); // give time for page to reload
+  await this.driver.sleep(500); // give time for page to reload
 });
 
 Given(/^I restart the browser$/, async function () {
@@ -194,13 +195,12 @@ Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
 
 Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
-  await this.driver.sleep(100);
-  await this.driver.navigate().refresh();
+  await navigateToTransactionsList(this);
   await refreshWallet(this);
 });
 
 function refreshWallet(client) {
-  return client.driver.executeAsyncScript((done) => {
+  return client.driver.executeScript((done) => {
     window.yoroi.stores.substores.ada.wallets.refreshWalletsData()
       .then(done)
       .catch(err => done(err));

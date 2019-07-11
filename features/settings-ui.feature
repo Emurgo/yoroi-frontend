@@ -2,6 +2,7 @@ Feature: Wallet UI Settings
 
   Background:
     Given I have opened the extension
+    And I have completed the basic setup
 
   @it-12
   Scenario Outline: User can't change password if it doesn't meet complexity requirements (IT-12)
@@ -145,7 +146,6 @@ Feature: Wallet UI Settings
 
   @it-2
   Scenario: Change language in General Settings (IT-2)
-    And I have completed the basic setup
     When I navigate to the general settings screen
     And I open General Settings language selection dropdown
     And I select Japanese language
@@ -155,28 +155,24 @@ Feature: Wallet UI Settings
 
   @it-3
   Scenario: Yoroi Settings Screen / Terms of Use in Default English(IT-3)
-    And I have completed the basic setup
     And I navigate to the general settings screen
     And I click on secondary menu "Terms of use" item
     Then I should see the "Terms of use" screen
 
   @it-23
   Scenario: Wallet settings tab isn't active if wallet is not created (IT-23)
-    And I have completed the basic setup
     When There is no wallet stored
     And I navigate to the general settings screen
     Then I should see secondary menu "wallet" item disabled
 
   @it-4
   Scenario: Yoroi Settings Screen / Support (IT-4)
-    And I have completed the basic setup
     And I navigate to the general settings screen
     And I click on secondary menu "support" item
     Then I should see support screen
 
   @it-77
   Scenario: Paper wallet creation (IT-77)
-    And I have completed the basic setup
     And I navigate to the general settings screen
     Then I click on secondary menu "paperWallet" item
     Then I open Number of Adddresses selection dropdown

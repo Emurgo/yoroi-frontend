@@ -2,10 +2,10 @@ Feature: Main UI
 
   Background:
     Given I have opened the extension
+    And I have completed the basic setup
 
   @it-81
   Scenario: Restore wallet and get balance with many addresses
-    And I have completed the basic setup
     And There is a wallet stored named many-tx-wallet
     Then I should see the balance number "3.110004 ADA"
 
@@ -41,19 +41,16 @@ Feature: Main UI
 
   @it-30
   Scenario: User can't restore Daedalus wallet in Yoroi if Yoroi wallet is not created (IT-30)
-    And I have completed the basic setup
     When There is no wallet stored
     And I am on the Daedalus Transfer instructions screen
     Then I see transactions buttons are disabled
 
   @serverDown @it-31
   Scenario: The networkError banner must be displayed if the server is not reachable
-  And I have completed the basic setup
   Then I should see the networkError banner
 
   @serverMaintenance @it-32
   Scenario: The serverError banner must be displayed for as long as the server reports an issue
-  And I have completed the basic setup
   Then I should see the serverError banner
 
   @it-110

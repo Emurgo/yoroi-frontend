@@ -108,7 +108,7 @@ export const loadLovefieldDB = () => {
 };
 
 export const importLovefieldDatabase = async (data: object): Promise<void> => {
-  reset();
+  await reset();
   db.import(data);
 };
 
