@@ -133,7 +133,7 @@
   "settings.display.themeNames.yoroiModern": "Yoroi 모던",
   "settings.display.themeNote": "<strong>참고:</strong> 테마를 변경하면 사용자 설정 사항이 지워집니다.",
   "settings.display.themeWarning": "테마를 변경하면 사용자 커스텀 테마 설정이 제거됩니다.",
-  "settings.general.aboutYoroi.commitLabel": "진행:",
+  "settings.general.aboutYoroi.commitLabel": "커밋 ID:",
   "settings.general.aboutYoroi.facebook": "요로이 Facebook",
   "settings.general.aboutYoroi.git.branch": "Branch:",
   "settings.general.aboutYoroi.github": "요로이 GitHub",
