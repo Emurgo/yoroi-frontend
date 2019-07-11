@@ -194,6 +194,9 @@ Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
 
 Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
+  await this.driver.sleep(100);
+  await this.driver.navigate().refresh();
+  await refreshWallet(this);
 });
 
 function refreshWallet(client) {

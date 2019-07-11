@@ -12,7 +12,6 @@ Feature: Main UI
   @it-15
   Scenario: Main Screen Tabs Switching (IT-15)
     When I import a snapshot named empty-wallet
-    And I refresh the page
     And I go to the send transaction screen
     Then I should see send transaction screen
     When I go to the receive screen
@@ -23,7 +22,6 @@ Feature: Main UI
   @it-21
   Scenario: Yoroi Wallet "Home Button" Test (IT-21)
   When I import a snapshot named empty-wallet
-    And I refresh the page
     And I am on the Daedalus Transfer instructions screen
     And I go to the main screen
     Then I should see the transactions screen
@@ -34,7 +32,6 @@ Feature: Main UI
   @it-25
   Scenario: Ensure user can copy Wallet address to Windows clipboard via "Copy address" buttons (IT-25)
     When I import a snapshot named empty-wallet
-    And I refresh the page
     When I go to the receive screen
     Then I should see the Receive screen
     When I click on "copy to clipboard" button
@@ -62,7 +59,6 @@ Feature: Main UI
   @it-110
   Scenario: Ensure user can hide balance (IT-110)
     And I import a snapshot named many-tx-wallet
-    And I refresh the page
     And I click on hide balance button
     Then I should see my balance hidden
     When I refresh the page

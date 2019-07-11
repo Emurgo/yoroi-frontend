@@ -6,7 +6,6 @@ Feature: Wallet UI Settings
   @it-12
   Scenario Outline: User can't change password if it doesn't meet complexity requirements (IT-12)
     And I import a snapshot named empty-wallet
-    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -25,7 +24,6 @@ Feature: Wallet UI Settings
 @it-94
   Scenario Outline: User is able to change spending password (IT-94)
     And I import a snapshot named tx-big-input-wallet
-    And I refresh the page
     And I have a wallet with funds
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
@@ -58,7 +56,6 @@ Feature: Wallet UI Settings
   @it-91
   Scenario Outline: Password should be case-sensitive [Wallet password changing] (IT-91)
     And I import a snapshot named empty-wallet
-    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -80,7 +77,6 @@ Feature: Wallet UI Settings
   @it-8
   Scenario Outline: Wallet renaming (IT-8)
     And I import a snapshot named empty-wallet
-    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on "name" input field
@@ -102,7 +98,6 @@ Feature: Wallet UI Settings
   @it-41
   Scenario Outline: Wallet can't be renamed if new wallet name doesn't meet requirements (IT-41)
     And I import a snapshot named empty-wallet
-    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on "name" input field
@@ -120,7 +115,6 @@ Feature: Wallet UI Settings
   @it-14
   Scenario: User can't change the password without entering old password (IT-14)
     And I import a snapshot named empty-wallet
-    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -135,7 +129,6 @@ Feature: Wallet UI Settings
   @it-40
   Scenario: User can't change password without filling Password repeat field (IT-40)
     And I import a snapshot named empty-wallet
-    And I refresh the page
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
