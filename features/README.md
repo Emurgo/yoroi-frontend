@@ -10,6 +10,8 @@ Note: The JSON file is just miscellaneous faked data. It is
 - Not a blockchain
 - Not a valid state in Cardano
 
+Each scenario is tagged with `@it-<number>` so that we can use run specific scenarios by their tags, such as `npm run test-by-tag-chrome @it-99`. To add new scenarios, pick unique numbers as tags. This command may suggest from which number to start: `grep -oh '@it-[0-9]*' features/*.feature | sort -Vr | head`.
+
 ## Local CI
 
 Sometimes it is useful and faster to simulate running our CI on your local machine. We do this by creating the same docker container that our CI uses and locally copying your code to the docker container.

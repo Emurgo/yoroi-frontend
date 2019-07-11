@@ -46,36 +46,38 @@ export default class YoroiTransferStartPage extends Component<Props> {
     ]);
 
     return (
-      <div className={styles.component}>
-        <BorderedBox>
+      <div className="yoroiTransferStartPageComponent">
+        <div className={styles.component}>
+          <BorderedBox>
 
-          <div className={styles.body}>
+            <div className={styles.body}>
 
-            <div className={styles.infoBlock}>
-              <div className={styles.title}>
-                {intl.formatMessage(messages.title)}
+              <div className={styles.infoBlock}>
+                <div className={styles.title}>
+                  {intl.formatMessage(messages.title)}
+                </div>
+                <div className={styles.text}>
+                  <FormattedHTMLMessage {...messages.text} />
+                </div>
               </div>
-              <div className={styles.text}>
-                <FormattedHTMLMessage {...messages.text} />
+
+              <div className={styles.operationBlock}>
+                <div className={styles.title}>
+                  &nbsp;{/* pretend we have a title to get the button alignment correct */}
+                </div>
+                <Button
+                  className={`next ${commonClasses}`}
+                  label={intl.formatMessage(messages.button)}
+                  onClick={onNext}
+                  skin={ButtonSkin}
+                />
               </div>
+
             </div>
 
-            <div className={styles.operationBlock}>
-              <div className={styles.title}>
-                &nbsp;{/* pretend we have a title to get the button alignment correct */}
-              </div>
-              <Button
-                className={`createYoroiWallet ${commonClasses}`}
-                label={intl.formatMessage(messages.button)}
-                onClick={onNext}
-                skin={ButtonSkin}
-              />
-            </div>
+          </BorderedBox>
 
-          </div>
-
-        </BorderedBox>
-
+        </div>
       </div>
     );
   }
