@@ -333,7 +333,7 @@
   "wallet.receive.page.showUsedLabel": "표시 사용됨",
   "wallet.receive.page.verifyAddressLabel": "주소 검증하기",
   "wallet.receive.page.walletAddressLabel": "내 지갑 주소",
-  "wallet.receive.page.walletReceiveInstructions": "송금을 받기 위해서는 이 지갑 주소를 공유하세요. <br> 개인정보 보호를 위해서 매 번 새로운 주소가 생성됩니다.",
+  "wallet.receive.page.walletReceiveInstructions": "송금을 받기 위해서는 이 지갑 주소를 공유하세요. <br> 개인정보 보호를 위해서 사용된 후에는 매 번 새로운 주소가 자동으로 생성됩니다.",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "지우기",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "확인",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "마지막 단어를 제거하세요.",
