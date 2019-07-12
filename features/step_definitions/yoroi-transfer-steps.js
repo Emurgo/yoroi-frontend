@@ -42,3 +42,11 @@ Then(/^I should see the Yoroi transfer success screen$/, async function () {
     { id: 'yoroiTransfer.successPage.title' });
   await this.waitUntilText('.SuccessPage_title', successPageTitle.toUpperCase());
 });
+
+Then(/^I should see the next button on the Yoroi transfer start screen disabled$/, async function () {
+  await this.waitDisable('.YoroiTransferStartPage_button.next');
+});
+
+Then(/^I should see the "CREATE YOROI WALLET" button disabled$/, async function () {
+  await this.waitDisable('.createYoroiWallet.YoroiTransferStartPage_button');
+});

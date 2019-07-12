@@ -11,14 +11,6 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './TransferInstructionsPage.scss';
 
 const messages = defineMessages({
-  instructionsText: {
-    id: 'transfer.instructions.instructions.text',
-    defaultMessage: '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
-  },
-  instructionsButton: {
-    id: 'transfer.instructions.instructions.button.label',
-    defaultMessage: '!!!Create Yoroi wallet',
-  },
   attentionTitle: {
     id: 'transfer.instructions.attention.title.label',
     defaultMessage: '!!!Attention',
@@ -89,7 +81,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                   {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
-                  <FormattedHTMLMessage {...messages.instructionsText} />
+                  <FormattedHTMLMessage {...globalMessages.transferInstructionsText} />
                 </div>
               </div>
 
@@ -99,7 +91,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
                 <Button
                   className={`createYoroiWallet ${commonClasses}`}
-                  label={intl.formatMessage(messages.instructionsButton)}
+                  label={intl.formatMessage(globalMessages.transferInstructionsButton)}
                   onClick={onFollowInstructionsPrerequisites}
                   disabled={!disableTransferFunds}
                   skin={ButtonSkin}

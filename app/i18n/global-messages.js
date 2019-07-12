@@ -341,6 +341,14 @@ const globalMessages = defineMessages({
     id: 'global.uriExplanation',
     defaultMessage: '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
   },
+  transferInstructionsText: {
+    id: 'transfer.instructions.instructions.text',
+    defaultMessage: '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
+  },
+  transferInstructionsButton: {
+    id: 'transfer.instructions.instructions.button.label',
+    defaultMessage: '!!!Create Yoroi wallet',
+  },
 });
 export default globalMessages;
 

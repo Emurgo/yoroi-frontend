@@ -12,6 +12,7 @@ import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import YoroiTransferSuccessPage from './YoroiTransferSuccessPage';
 import YoroiTransferStartPage from '../../components/transfer/YoroiTransferStartPage';
 import environment from '../../environment';
+import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
 
@@ -24,6 +25,12 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
+
+  goToCreateWallet = () => {
+    this._getRouter().goToRoute.trigger({
+      route: ROUTES.WALLETS.ADD
+    });
+  }
 
   startTransferFunds = () => {
     this._getYoroiTransferActions().startTransferFunds.trigger();
@@ -76,6 +83,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
             <YoroiTransferStartPage
               onNext={this.startTransferFunds}
               classicTheme={profile.isClassicTheme}
+              onFollowInstructionsPrerequisites={this.goToCreateWallet}
+              disableTransferFunds={yoroiTransfer.disableTransferFunds}
             />
           </TransferLayout>
         );

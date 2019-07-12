@@ -92,9 +92,7 @@ When(/^I confirm Daedalus transfer funds$/, async function () {
 });
 
 Then(/^I should see the Create wallet screen$/, async function () {
-  const createWalletTitle = await i18n.formatMessage(this.driver,
-    { id: 'wallet.add.page.title' });
-  await this.waitUntilText('.StaticTopbarTitle_topbarTitleText', createWalletTitle.toUpperCase());
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I should see the Receive screen$/, async function () {

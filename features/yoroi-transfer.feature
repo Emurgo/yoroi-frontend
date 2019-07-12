@@ -3,11 +3,12 @@ Feature: Transfer Yoroi Wallet funds
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    Given There is a wallet stored named empty-wallet
 
   @it-110
   Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-110)
+    Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
+    And I should see the "CREATE YOROI WALLET" button disabled
     When I click on the next button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
@@ -19,7 +20,8 @@ Feature: Transfer Yoroi Wallet funds
   Scenario: User can transfer funds from another Yoroi wallet (IT-111)
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
-    # /features/mock-chain/mockImporter.js 
+    # /features/mock-chain/mockImporter.js
+    Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
     When I click on the next button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
@@ -32,3 +34,9 @@ Feature: Transfer Yoroi Wallet funds
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
     
+  @it-112
+  Scenario: Yoroi transfer should be disabled when user hasn't created a wallet
+    And I am on the Yoroi Transfer start screen
+    Then I should see the next button on the Yoroi transfer start screen disabled
+    When I click on the create Yoroi wallet button
+    Then I should see the Create wallet screen

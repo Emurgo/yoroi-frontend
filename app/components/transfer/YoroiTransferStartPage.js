@@ -13,13 +13,15 @@ import globalMessages from '../../i18n/global-messages';
 const messages = defineMessages({
   text: {
     id: 'yoroiTransfer.start.instructions.text',
-    defaultMessage: '!!!Transfer funds from another wallet.',
+    defaultMessage: '!!!Transfer funds from another wallet (Yoroi, AdaLite, etc.).',
   }
 });
 
 type Props = {|
   onNext: void => void,
   classicTheme: boolean,
+  onFollowInstructionsPrerequisites: void => void,
+  disableTransferFunds: boolean,
 |};
 
 @observer
@@ -31,7 +33,11 @@ export default class YoroiTransferStartPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onNext } = this.props;
+    const {
+      onNext,
+      onFollowInstructionsPrerequisites,
+      disableTransferFunds,
+    } = this.props;
 
     const commonClasses = classnames([
       'primary',
@@ -40,6 +46,8 @@ export default class YoroiTransferStartPage extends Component<Props> {
 
     return (
       <div className="yoroiTransferStartPageComponent">
+
+        { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
         <div className={styles.component}>
           <BorderedBox>
 
@@ -50,7 +58,7 @@ export default class YoroiTransferStartPage extends Component<Props> {
                   {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
-                  <FormattedHTMLMessage {...messages.text} />
+                  <FormattedHTMLMessage {...globalMessages.transferInstructionsText} />
                 </div>
               </div>
 
@@ -59,10 +67,38 @@ export default class YoroiTransferStartPage extends Component<Props> {
                   &nbsp;{/* pretend we have a title to get the button alignment correct */}
                 </div>
                 <Button
+                  className={`createYoroiWallet ${commonClasses}`}
+                  label={intl.formatMessage(globalMessages.transferInstructionsButton)}
+                  onClick={onFollowInstructionsPrerequisites}
+                  disabled={!disableTransferFunds}
+                  skin={ButtonSkin}
+                />
+              </div>
+
+            </div>
+
+          </BorderedBox>
+
+        </div>
+
+        <div className={styles.component}>
+          <BorderedBox>
+
+            <div className={styles.body}>
+
+              <div className={styles.infoBlock}>
+                <div className={styles.text}>
+                  <FormattedHTMLMessage {...messages.text} />
+                </div>
+              </div>
+
+              <div className={styles.operationBlock}>
+                <Button
                   className={`next ${commonClasses}`}
                   label={intl.formatMessage(globalMessages.nextButtonLabel)}
                   onClick={onNext}
                   skin={ButtonSkin}
+                  disabled={disableTransferFunds}
                 />
               </div>
 
