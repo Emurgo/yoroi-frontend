@@ -5,20 +5,20 @@ import type { InjectedContainerProps } from '../../types/injectedPropsType';
 import MainLayout from '../MainLayout';
 import TopBarContainer from '../TopBarContainer';
 import TransferWithNavigation from '../../components/transfer/layouts/TransferWithNavigation';
+import type { TransferNavigationProps } from '../../components/transfer/layouts/TransferWithNavigation';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 
-type TransferNavigationPageName = 'daedalus' | 'yoroi';
 
 @observer
 export default class Transfer extends Component<InjectedContainerProps> {
 
-  isActiveScreen = (page: TransferNavigationPageName) => {
+  isActiveScreen : $PropertyType<TransferNavigationProps, 'isActiveNavItem'> = page => {
     const { app } = this.props.stores;
     return app.currentRoute.endsWith(page);
   };
 
-  handleTransferNavItemClick = (page: TransferNavigationPageName) => {
+  handleTransferNavItemClick : $PropertyType<TransferNavigationProps, 'onNavItemClick'> = page => {
 
     this.props.actions.router.goToRoute.trigger({
       route: { daedalus: ROUTES.TRANSFER.DAEDALUS, yoroi: ROUTES.TRANSFER.YOROI }[page],

@@ -16,13 +16,15 @@ const messages = defineMessages({
   },
 });
 
-type Props = {|
-  isActiveNavItem: Function,
-  onNavItemClick: Function,
+type TransferNavigationPageName = 'daedalus' | 'yoroi';
+
+export type TransferNavigationProps = {|
+  isActiveNavItem: TransferNavigationPageName => boolean,
+  onNavItemClick: TransferNavigationPageName => void,
 |};
 
 @observer
-export default class TransferNavigation extends Component<Props> {
+export default class TransferNavigation extends Component<TransferNavigationProps> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
