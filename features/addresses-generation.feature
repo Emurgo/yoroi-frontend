@@ -2,7 +2,7 @@ Feature: Generate Addresses
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And There is a wallet stored named small-single-tx
+    And I import a snapshot named small-single-tx
     And I go to the receive screen
 
   @it-106
