@@ -495,7 +495,6 @@
   "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
   "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
   "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored",
-  "yoroiTransfer.waiting.warning": "⚠️ This may take a long time or fail on poor internet connections"
+  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
 }
 

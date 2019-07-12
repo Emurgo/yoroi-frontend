@@ -20,10 +20,6 @@ const messages = defineMessages({
   generatingTx: {
     id: 'yoroiTransfer.waiting.checkingAddresses.generatingTx',
     defaultMessage: '!!!Generating transfer transaction',
-  },
-  internetConnectionWarning: {
-    id: 'yoroiTransfer.waiting.warning',
-    defaultMessage: '!!!⚠️ This may take a long time or fail on poor internet connections',
   }
 });
 
