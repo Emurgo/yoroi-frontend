@@ -485,7 +485,7 @@
   "yoroiTransfer.error.noTransferTxError": "There is no transfer transaction to send.",
   "yoroiTransfer.errorPage.title.label": "Unable to transfer from another wallet",
   "yoroiTransfer.error.transferFundsError": "Unable to transfer funds.",
-  "yoroiTransfer.form.instructions.step0.text": "Enter the 15-word recovery phrase used to back up anothe wallet to restore the balance and transfer all the funds to current wallet.",
+  "yoroiTransfer.form.instructions.step0.text": "Enter the 15-word recovery phrase used to back up your other wallet to restore the balance and transfer all the funds to current wallet.",
   "yoroiTransfer.start.instructions.button.label": "next",
   "yoroiTransfer.start.instructions.text": "Transfer funds from another wallet.",
   "yoroiTransfer.start.instructions.title": "instruction",
