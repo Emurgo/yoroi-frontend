@@ -8,20 +8,13 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 import BorderedBox from '../widgets/BorderedBox';
 import styles from './YoroiTransferStartPage.scss';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
-  title: {
-    id: 'yoroiTransfer.start.instructions.title',
-    defaultMessage: '!!!instruction',
-  },
   text: {
     id: 'yoroiTransfer.start.instructions.text',
     defaultMessage: '!!!Transfer funds from another wallet.',
-  },
-  button: {
-    id: 'yoroiTransfer.start.instructions.button.label',
-    defaultMessage: '!!!next',
-  },
+  }
 });
 
 type Props = {|
@@ -54,7 +47,7 @@ export default class YoroiTransferStartPage extends Component<Props> {
 
               <div className={styles.infoBlock}>
                 <div className={styles.title}>
-                  {intl.formatMessage(messages.title)}
+                  {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
                   <FormattedHTMLMessage {...messages.text} />
@@ -67,7 +60,7 @@ export default class YoroiTransferStartPage extends Component<Props> {
                 </div>
                 <Button
                   className={`next ${commonClasses}`}
-                  label={intl.formatMessage(messages.button)}
+                  label={intl.formatMessage(globalMessages.nextButtonLabel)}
                   onClick={onNext}
                   skin={ButtonSkin}
                 />
