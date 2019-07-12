@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev": "babel-node scripts/start --env 'development'",
