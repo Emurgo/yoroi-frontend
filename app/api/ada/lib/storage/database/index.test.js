@@ -1,5 +1,6 @@
 // @flow
 
+import '../../test-config';
 import { loadLovefieldDB } from './index';
 import {
   addKey,
@@ -19,6 +20,10 @@ import {
 import { HARD_DERIVATION_START } from '../../../../../config/numbersConfig';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
+
+import { Bip44Wallet } from '../models/Bip44Wallet';
+import { LovefieldBridge } from '../bridge/LovefieldBridge';
+import { LovefieldDerive } from '../bridge/LovefieldDerive';
 
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 const password = 'greatest_password_ever';
@@ -233,4 +238,12 @@ test('Can add and fetch address in wallet', async () => {
       }
     }
   ]));
+
+  const bridge = new LovefieldBridge(db);
+  const bipWallet = new Bip44Wallet(
+    conceptualWallet.ConceptualWalletId,
+    wrapper.Bip44WrapperId,
+  );
+  await bridge.addBip44WalletFunctionality(bipWallet);
+  expect(bipWallet instanceof LovefieldDerive).toEqual(true);
 });

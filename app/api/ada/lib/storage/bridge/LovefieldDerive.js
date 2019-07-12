@@ -86,7 +86,7 @@ function _derive(
       PrivateDeriverSchema.properties.Bip44WrapperId,
     );
     if (privateDeriver === undefined) {
-      throw new StaleStateError('LovelaceDerive::_derive privateDeriver');
+      throw new StaleStateError('LovefieldDerive::_derive privateDeriver');
     }
     const bip44Derivation = await getRowFromKey<Bip44DerivationRow>(
       db,
@@ -95,7 +95,7 @@ function _derive(
       Bip44DerivationSchema.properties.Bip44DerivationId,
     );
     if (bip44Derivation === undefined || bip44Derivation.PrivateKeyId === null) {
-      throw new StaleStateError('LovelaceDerive::_derive bip44Derivation');
+      throw new StaleStateError('LovefieldDerive::_derive bip44Derivation');
     }
     const privateKeyRow = await getRowFromKey<KeyRow>(
       db,
@@ -104,7 +104,7 @@ function _derive(
       KeySchema.properties.KeyId,
     );
     if (privateKeyRow === undefined) {
-      throw new StaleStateError('LovelaceDerive::_derive privateKeyRow');
+      throw new StaleStateError('LovefieldDerive::_derive privateKeyRow');
     }
     let rootPk;
     if (privateKeyRow.IsEncrypted) {
@@ -156,7 +156,7 @@ function _derive(
       Bip44WrapperSchema.properties.Bip44WrapperId,
     );
     if (wrapper === undefined) {
-      throw new StaleStateError('LovelaceDerive::_derive wrapper');
+      throw new StaleStateError('LovefieldDerive::_derive wrapper');
     }
     const pubDeriver = await addPublicDeriver({
       db,
@@ -182,7 +182,7 @@ function _derive(
   };
 }
 
-export class LovelaceDerive
+export class LovefieldDerive
   extends IDerive<LovefieldDeriveRequest, PublicDeriverRow> {
 
   constructor(

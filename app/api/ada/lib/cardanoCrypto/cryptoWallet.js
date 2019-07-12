@@ -10,7 +10,6 @@ import { Logger, stringifyError } from '../../../../utils/logging';
 
 import { encryptWithPassword, decryptWithPassword } from '../../../../utils/passwordCipher';
 
-import type { ConfigType } from '../../../../../config/config-types';
 import * as unorm from 'unorm';
 import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 
@@ -22,7 +21,6 @@ import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../../../../domain/Wallet';
 import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 
-declare var CONFIG : ConfigType;
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic(160).split(' ');

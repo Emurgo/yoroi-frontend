@@ -23,7 +23,7 @@ import { getRowFromKey } from '../database/utils';
 
 import { appendChain } from './appendChain';
 
-import { LovelaceDerive } from './LovefieldDerive';
+import { LovefieldDerive } from './LovefieldDerive';
 
 export class LovefieldBridge implements IStorageBridge {
   db: lf$Database;
@@ -57,7 +57,7 @@ export class LovefieldBridge implements IStorageBridge {
     if (privateDeriver !== undefined) {
       appendChain(
         bip44Wallet,
-        new LovelaceDerive(
+        new LovefieldDerive(
           this.db,
           bip44Wallet.bip44WrapperId,
         ),
