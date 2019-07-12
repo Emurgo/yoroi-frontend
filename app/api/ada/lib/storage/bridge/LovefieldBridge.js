@@ -62,7 +62,6 @@ export class LovefieldBridge implements IStorageBridge {
           bip44Wallet.bip44WrapperId,
         ),
       );
-      // TODO: add functionality
     }
     return Promise.resolve();
   }

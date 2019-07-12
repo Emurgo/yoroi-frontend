@@ -130,33 +130,35 @@ test('Can add and fetch address in wallet', async () => {
   const bip44AccountPk = rootPk.bip44_account(
     RustModule.Wallet.AccountIndex.new(accountIndex)
   );
-  const privateAccountKey = await addKey({
-    db,
-    row: {
-      Hash: bip44AccountPk.key().to_hex(),
-      IsEncrypted: false,
-      PasswordLastUpdate: null,
-    }
-  });
-  const addAccountResult = await addBip44Account({
-    db,
-    keyInfo: {
-      PublicKeyId: null,
-      PrivateKeyId: privateAccountKey.KeyId,
-      Index: accountIndex,
-    },
-    derivationInfo: id => ({
+  const bridge = new LovefieldBridge(db);
+  const bipWallet = new Bip44Wallet(
+    conceptualWallet.ConceptualWalletId,
+    wrapper.Bip44WrapperId,
+  );
+  await bridge.addBip44WalletFunctionality(bipWallet);
+  expect(bipWallet instanceof LovefieldDerive).toEqual(true);
+  if (!(bipWallet instanceof LovefieldDerive)) {
+    throw new Error('should never happen due to assertion above');
+  }
+  const pubDeriver = await bipWallet.derive({
+    publicDeriverInsert: id => ({
       Bip44DerivationId: id,
-    })
-  });
-
-  const pubDeriver = await addPublicDeriver({
-    db,
-    row: {
-      Bip44DerivationId: addAccountResult.derivationTableResult.Bip44DerivationId,
       Name: 'Checking account',
       LastBlockSync: 0,
-    }
+    }),
+    levelSpecificInsert: {},
+    pathToPublic: [
+      purposeIndex, coinTypeIndex, accountIndex
+    ],
+    decryptPrivateDeriverPassword: null,
+    publicDeriverPublicKey: {
+      password: null, // TODO
+      lastUpdate: null,
+    },
+    publicDeriverPrivateKey: {
+      password: null, // TODO
+      lastUpdate: null,
+    },
   });
 
   const externalChain = await deriveFromAccount({
@@ -238,12 +240,4 @@ test('Can add and fetch address in wallet', async () => {
       }
     }
   ]));
-
-  const bridge = new LovefieldBridge(db);
-  const bipWallet = new Bip44Wallet(
-    conceptualWallet.ConceptualWalletId,
-    wrapper.Bip44WrapperId,
-  );
-  await bridge.addBip44WalletFunctionality(bipWallet);
-  expect(bipWallet instanceof LovefieldDerive).toEqual(true);
 });

@@ -38,7 +38,7 @@ type KeyInfo = {
   lastUpdate: Date | null
 };
 export type LovefieldDeriveRequest = {
-  publicDeriverInsert: PublicDeriverInsert,
+  publicDeriverInsert: number => PublicDeriverInsert,
   levelSpecificInsert: Object,
   /**
    * Path is relative to private deriver
@@ -158,11 +158,7 @@ function _derive(
     if (wrapper === undefined) {
       throw new StaleStateError('LovefieldDerive::_derive wrapper');
     }
-    const pubDeriver = await addPublicDeriver({
-      db,
-      row: body.publicDeriverInsert,
-    });
-    await addByLevel(
+    const derivationResult = await addByLevel(
       {
         db,
         keyInfo: {
@@ -177,6 +173,10 @@ function _derive(
       },
       wrapper.PublicDeriverLevel
     );
+    const pubDeriver = await addPublicDeriver({
+      db,
+      row: body.publicDeriverInsert(derivationResult.derivationTableResult.Bip44DerivationId),
+    });
 
     return pubDeriver;
   };
