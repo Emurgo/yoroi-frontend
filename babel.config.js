@@ -10,7 +10,7 @@ module.exports = function(api) {
         "@babel/preset-env",
         {
           "corejs": 2,
-          "modules": "commonjs",
+          "modules": api.env('jest') ? "commonjs" : 'auto',
           "useBuiltIns": "entry"
         }
       ],
