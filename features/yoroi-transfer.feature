@@ -3,6 +3,7 @@ Feature: Transfer Yoroi Wallet funds
   Background:
     Given I have opened the extension
     And I have completed the basic setup
+    Then I should see the Create wallet screen
 
   @it-110
   Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-110)
