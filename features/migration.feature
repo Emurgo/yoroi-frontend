@@ -4,7 +4,7 @@ Feature: Migration
     Given I have opened the extension
     
   @it-83
-  Scenario: Version set on first launch
+  Scenario: Version set on first launch (IT-83)
     And I am on the language selection screen
     Then Last launch version is updated
     Then I decrease last launch version

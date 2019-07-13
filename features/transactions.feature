@@ -91,7 +91,7 @@ Feature: Send transaction
     And I should not be able to submit
 
   @it-55
-  Scenario Outline: User can send all funds from one Yoroi wallet to another
+  Scenario Outline: User can send all funds from one Yoroi wallet to another (IT-55)
     Given There is a wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
@@ -113,7 +113,7 @@ Feature: Send transaction
       | 0.221520  |
 
   @invalidWitnessTest @it-20
-  Scenario: Sending a Tx and receiving from the server an invalid signature error
+  Scenario: Sending a Tx and receiving from the server an invalid signature error (IT-20)
     Given There is a wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
@@ -220,7 +220,7 @@ Feature: Send transaction
     Then I should see the summary screen
 
   @it-61
-  Scenario: Display warning if wallet changes during send screen (IT-59)
+  Scenario: Display warning if wallet changes during send screen (IT-61)
     Given There is a wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
