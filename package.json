@@ -144,7 +144,7 @@
     "lovefield": "2.1.12",
     "mobx": "5.11.0",
     "mobx-react": "6.1.1",
-    "mobx-react-form": "2.0.3",
+    "mobx-react-form": "2.0.4",
     "mobx-react-router": "4.0.7",
     "moment": "2.21.0",
     "pbkdf2": "3.0.17",
