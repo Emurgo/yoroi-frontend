@@ -46,11 +46,11 @@ Feature: Main UI
     Then I see transactions buttons are disabled
 
   @serverDown @it-31
-  Scenario: The networkError banner must be displayed if the server is not reachable
+  Scenario: The networkError banner must be displayed if the server is not reachable (IT-31)
   Then I should see the networkError banner
 
   @serverMaintenance @it-32
-  Scenario: The serverError banner must be displayed for as long as the server reports an issue
+  Scenario: The serverError banner must be displayed for as long as the server reports an issue (IT-32)
   Then I should see the serverError banner
 
   @it-110
