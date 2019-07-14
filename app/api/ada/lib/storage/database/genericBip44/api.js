@@ -2,6 +2,7 @@
 
 import type {
   lf$Database,
+  lf$Transaction,
 } from 'lovefield';
 
 import type {
@@ -320,6 +321,7 @@ export const getBip44Wrapper = async (
 
 export type AddDerivationRequest<Insert> = {|
   db: lf$Database,
+  tx: lf$Transaction,
   keyInfo: Bip44DerivationInsert,
   derivationInfo: number => Insert,
 |};
@@ -333,13 +335,17 @@ async function _addDerivation<Insert, Row>(
 }> {
   const derivationTableResult =
     await addToTable<Bip44DerivationInsert, Bip44DerivationRow>(
-      { db: request.db, row: request.keyInfo },
+      { db: request.db, tx: request.tx, row: request.keyInfo },
       Tables.Bip44DerivationSchema.name,
     );
 
   const specificDerivationResult =
     await addToTable<Insert, Row>(
-      { db: request.db, row: request.derivationInfo(derivationTableResult.Bip44DerivationId) },
+      {
+        db: request.db,
+        tx: request.tx,
+        row: request.derivationInfo(derivationTableResult.Bip44DerivationId)
+      },
       tableName,
     );
 
@@ -351,6 +357,7 @@ async function _addDerivation<Insert, Row>(
 
 export type DeriveFromRequest<T> = {|
   db: lf$Database,
+  tx: lf$Transaction,
   parentDerivationId: number,
   keyInfo: Bip44DerivationInsert,
   derivationInfo: number => T,
@@ -367,6 +374,7 @@ async function _addDerivationWithParent<Insert, Row>(
   const derivationResult = await _addDerivation<Insert, Row>(
     {
       db: request.db,
+      tx: request.tx,
       keyInfo: request.keyInfo,
       derivationInfo: request.derivationInfo,
     },
@@ -380,7 +388,7 @@ async function _addDerivationWithParent<Insert, Row>(
 
   const mappingTableResult =
     await addToTable<Bip44DerivationMappingInsert, Bip44DerivationMappingRow>(
-      { db: request.db, row: mappingInsert },
+      { db: request.db, tx: request.tx, row: mappingInsert },
       Tables.Bip44DerivationMappingSchema.name,
     );
 

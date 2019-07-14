@@ -2,11 +2,13 @@
 
 import type {
   lf$Database,
-  lf$Row
+  lf$Row,
+  lf$Transaction,
 } from 'lovefield';
 
 export type AddRowRequest<T> = {
   db: lf$Database,
+  tx: lf$Transaction,
   row: T,
 };
 
@@ -17,11 +19,12 @@ export async function addToTable<Insert, Row>(
   const table = request.db.getSchema().table(tableName);
   const newRow = table.createRow(request.row);
 
-  const result: Row = (await request.db
-    .insertOrReplace()
-    .into(table)
-    .values(([newRow]: Array<lf$Row>))
-    .exec())[0];
+  const result: Row = (await request.tx.attach(
+    request.db
+      .insertOrReplace()
+      .into(table)
+      .values(([newRow]: Array<lf$Row>))
+  ))[0];
 
   return result;
 }
