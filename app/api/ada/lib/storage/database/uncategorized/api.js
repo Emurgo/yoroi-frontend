@@ -2,6 +2,7 @@
 
 import type {
   lf$Database,
+  lf$Transaction,
 } from 'lovefield';
 
 import type {
@@ -40,10 +41,12 @@ export const addConceptualWallet = async (
 
 export const getConceptualWallet = async (
   db: lf$Database,
+  tx: lf$Transaction,
   key: number,
 ): Promise<ConceptualWalletRow | typeof undefined> => (
   await getRowFromKey<ConceptualWalletRow>(
     db,
+    tx,
     key,
     Tables.ConceptualWalletSchema.name,
     Tables.ConceptualWalletSchema.properties.ConceptualWalletId,

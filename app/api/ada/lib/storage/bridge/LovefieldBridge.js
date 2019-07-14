@@ -34,13 +34,16 @@ export class LovefieldBridge implements IStorageBridge {
 
   // TODO: maybe flatten these?
   getConceptualWalletData = (key: number): Promise<ConceptualWalletRow | typeof undefined> => {
-    return getConceptualWallet(this.db, key);
+    //return getConceptualWallet(this.db, key);
+    return Promise.resolve(undefined);
   }
   getPublicDeriverData = (key: number): Promise<PublicDeriverRow | typeof undefined> => {
-    return getPublicDeriver(this.db, key);
+    //return getPublicDeriver(this.db, key);
+    return Promise.resolve(undefined);
   }
   getBip44WrapperData = (key: number): Promise<Bip44WrapperRow | typeof undefined> => {
-    return getBip44Wrapper(this.db, key);
+    //return getBip44Wrapper(this.db, key);
+    return Promise.resolve(undefined);
   }
 
   addPublicDeriverFunctionality = (publicDeriver: PublicDeriver): Promise<void> => {
@@ -48,12 +51,21 @@ export class LovefieldBridge implements IStorageBridge {
     return Promise.resolve();
   }
   addBip44WalletFunctionality = async (bip44Wallet: Bip44Wallet): Promise<void> => {
+    const Bip44PrivateDeriverTable = this.db.getSchema().table(PrivateDeriverSchema.name);
+    const getFunctionalityTx = this.db.createTransaction();
+    await getFunctionalityTx
+      .begin([
+        Bip44PrivateDeriverTable,
+      ]);
+
     const privateDeriver = await getRowFromKey<PrivateDeriverRow>(
       this.db,
+      getFunctionalityTx,
       bip44Wallet.bip44WrapperId,
       PrivateDeriverSchema.name,
       PrivateDeriverSchema.properties.Bip44WrapperId,
     );
+    getFunctionalityTx.commit();
     if (privateDeriver !== undefined) {
       appendChain(
         bip44Wallet,

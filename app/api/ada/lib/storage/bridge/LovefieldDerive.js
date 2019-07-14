@@ -135,60 +135,52 @@ function _derive(
     let privateDeriverRow: PrivateDeriverRow;
     {
       // Get Private Deriver
-      const query = db
-        .select()
-        .from(Bip44PrivateDeriverTable)
-        .where(
-          Bip44PrivateDeriverTable[PrivateDeriverSchema.properties.Bip44WrapperId]
-            .eq(bip44WrapperId)
-        );
-
-      const result = await getKeyTx.attach(query);
-      if (result.length !== 1) {
-        throw new StaleStateError('LovefieldDerive::_derive Bip44PrivateDeriverTable');
+      const result = await getRowFromKey<PrivateDeriverRow>(
+        db,
+        getKeyTx,
+        bip44WrapperId,
+        PrivateDeriverSchema.name,
+        PrivateDeriverSchema.properties.Bip44WrapperId,
+      );
+      if (result === undefined) {
+        throw new StaleStateError('LovefieldDerive::_derive privateDeriver');
       }
-      privateDeriverRow = result[0];
+      privateDeriverRow = result;
     }
 
-    let keyId: number;
+    let privateKeyId: number;
     {
       // Private Deriver => Bip44Derivation
-      const query = db
-        .select()
-        .from(Bip44DerivationTable)
-        .where(
-          Bip44DerivationTable[Bip44DerivationSchema.properties.Bip44DerivationId]
-            .eq(privateDeriverRow.Bip44DerivationId)
-        );
-
-      const result = await getKeyTx.attach(query);
-      if (result.length !== 1) {
+      const result = await getRowFromKey<Bip44DerivationRow>(
+        db,
+        getKeyTx,
+        privateDeriverRow.Bip44DerivationId,
+        Bip44DerivationSchema.name,
+        Bip44DerivationSchema.properties.Bip44DerivationId,
+      );
+      if (result === undefined) {
         throw new StaleStateError('LovefieldDerive::_derive Bip44DerivationTable');
       }
-      const derivationRow: Bip44DerivationRow = result[0];
-      if (derivationRow.PrivateKeyId === null) {
+      if (result.PrivateKeyId === null) {
         throw new StaleStateError('LovefieldDerive::_derive PrivateKeyId');
       }
-      keyId = derivationRow.PrivateKeyId;
+      privateKeyId = result.PrivateKeyId;
     }
 
     let privateKeyRow: KeyRow;
     {
       // Bip44Derivation => Private key
-
-      const query = db
-        .select()
-        .from(KeyTable)
-        .where(
-          KeyTable[KeySchema.properties.KeyId]
-            .eq(keyId)
-        );
-
-      const result = await getKeyTx.attach(query);
-      if (result.length !== 1) {
+      const result = await getRowFromKey<KeyRow>(
+        db,
+        getKeyTx,
+        privateKeyId,
+        KeySchema.name,
+        KeySchema.properties.KeyId,
+      );
+      if (result === undefined) {
         throw new StaleStateError('LovefieldDerive::_derive KeyTable');
       }
-      privateKeyRow = result[0];
+      privateKeyRow = result;
     }
 
     let newPrivateKey: KeyRow | null;
@@ -255,7 +247,7 @@ function _derive(
         row: body.publicDeriverInsert(insertResult.derivationTableResult.Bip44DerivationId),
       });
     }
-    
+
     await getKeyTx.commit();
 
     return pubDeriver;

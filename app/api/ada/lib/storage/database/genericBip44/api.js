@@ -293,10 +293,12 @@ export const getBip44Address = async (
 
 export const getPublicDeriver = async (
   db: lf$Database,
+  tx: lf$Transaction,
   key: number,
 ): Promise<PublicDeriverRow | typeof undefined> => (
   await getRowFromKey<PublicDeriverRow>(
     db,
+    tx,
     key,
     Tables.PublicDeriverSchema.name,
     Tables.PublicDeriverSchema.properties.PublicDeriverId,
@@ -305,10 +307,12 @@ export const getPublicDeriver = async (
 
 export const getBip44Wrapper = async (
   db: lf$Database,
+  tx: lf$Transaction,
   key: number,
 ): Promise<Bip44WrapperRow | typeof undefined> => (
   await getRowFromKey<Bip44WrapperRow>(
     db,
+    tx,
     key,
     Tables.Bip44WrapperSchema.name,
     Tables.Bip44WrapperSchema.properties.Bip44WrapperId,

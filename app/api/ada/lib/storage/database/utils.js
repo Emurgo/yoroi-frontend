@@ -31,6 +31,7 @@ export async function addToTable<Insert, Row>(
 
 export const getRowFromKey = async <T>(
   db: lf$Database,
+  tx: lf$Transaction,
   key: number,
   tableName: string,
   keyRowName: string,
@@ -40,7 +41,7 @@ export const getRowFromKey = async <T>(
     .select()
     .from(table)
     .where(table[keyRowName].eq(key));
-  const result = await query.exec();
+  const result = await tx.attach(query);
   if (result.length === 0) {
     return undefined;
   }
