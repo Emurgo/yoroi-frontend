@@ -13,9 +13,11 @@ import {
   addBip44Root, addBip44Purpose, addBip44CoinType, addBip44Account,
   addPrivateDeriver,
   addPublicDeriver,
+  deriveFromRoot, deriveFromPurpose,
   deriveFromAccount, deriveFromChain,
   getDerivationsByPath,
   getBip44Address,
+  TableMap,
 } from './genericBip44/api';
 import {
   Bip44WrapperSchema, PrivateDeriverSchema,
@@ -60,6 +62,7 @@ test('Can add and fetch address in wallet', async () => {
   await tx1.begin([
     ConceptualWalletTable,
     KeyTable,
+    Bip44DerivationMappingTable,
     Bip44WrapperTable,
     PrivateDeriverTable,
     Bip44DerivationTable,
@@ -128,7 +131,7 @@ test('Can add and fetch address in wallet', async () => {
     RustModule.Wallet.DerivationScheme.v2(),
     purposeIndex,
   );
-  const addPurposeResult = await addBip44Purpose({
+  const addPurposeResult = await deriveFromRoot({
     db,
     tx: tx1,
     keyInfo: {
@@ -136,6 +139,7 @@ test('Can add and fetch address in wallet', async () => {
       PrivateKeyId: null,
       Index: purposeIndex,
     },
+    parentDerivationId: privateDeriver.Bip44DerivationId,
     derivationInfo: id => ({
       Bip44DerivationId: id,
     })
@@ -146,7 +150,7 @@ test('Can add and fetch address in wallet', async () => {
     RustModule.Wallet.DerivationScheme.v2(),
     coinTypeIndex,
   );
-  const addCoinTypeResult = await addBip44CoinType({
+  const addCoinTypeResult = await deriveFromPurpose({
     db,
     tx: tx1,
     keyInfo: {
@@ -154,11 +158,12 @@ test('Can add and fetch address in wallet', async () => {
       PrivateKeyId: null,
       Index: coinTypeIndex,
     },
+    parentDerivationId: addPurposeResult.derivationTableResult.Bip44DerivationId,
     derivationInfo: id => ({
       Bip44DerivationId: id,
     })
   });
-  
+
   await tx1.commit();
 
   const accountIndex = 0 | HARD_DERIVATION_START;
@@ -257,16 +262,23 @@ test('Can add and fetch address in wallet', async () => {
 
   await tx2.commit();
 
+  const tx3 = db.createTransaction();
+  await tx3.begin([
+    Bip44DerivationMappingTable, Bip44DerivationTable, Bip44AddressTable,
+  ]);
   const addressesForAccount = await getDerivationsByPath(
     db,
+    tx3,
     pubDeriver.Bip44DerivationId,
     [purposeIndex, coinTypeIndex, accountIndex],
     [null, null]
   );
-  const dbAddresses = await getBip44Address(db, Array.from(addressesForAccount.keys()));
+  const dbAddresses = await getBip44Address(db, tx3, Array.from(addressesForAccount.keys()));
   const result = dbAddresses.map(row => (
     { hash: row.Hash, addressing: addressesForAccount.get(row.Bip44DerivationId) }
   ));
+
+  await tx3.commit();
 
   expect(result.length).toEqual(1);
   expect(result[0].hash).toEqual(addressHash);

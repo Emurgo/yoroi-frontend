@@ -13,14 +13,20 @@ import {
   PrivateDeriverSchema,
   Bip44DerivationSchema,
   Bip44WrapperSchema,
-  PublicDeriverSchema
+  PublicDeriverSchema,
+  Bip44DerivationMappingSchema
 } from '../database/genericBip44/tables';
 import type {
   PrivateDeriverRow, Bip44DerivationRow,
   PublicDeriverInsert, PublicDeriverRow,
   Bip44WrapperRow,
 } from '../database/genericBip44/tables';
-import { addPublicDeriver, addByLevel, TableMap, } from '../database/genericBip44/api';
+import {
+  addPublicDeriver,
+  addByLevel,
+  TableMap,
+  getDerivationsByPath
+} from '../database/genericBip44/api';
 
 import { KeySchema } from '../database/uncategorized/tables';
 import type { KeyRow } from '../database/uncategorized/tables';
@@ -119,6 +125,7 @@ function _derive(
     const Bip44PrivateDeriverTable = db.getSchema().table(PrivateDeriverSchema.name);
     const Bip44DerivationTable = db.getSchema().table(Bip44DerivationSchema.name);
     const PublicDeriverTable = db.getSchema().table(PublicDeriverSchema.name);
+    const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
     const KeyTable = db.getSchema().table(KeySchema.name);
     const Bip44WrapperTable = db.getSchema().table(Bip44WrapperSchema.name);
 
@@ -126,7 +133,7 @@ function _derive(
     await getKeyTx
       .begin([
         Bip44PrivateDeriverTable, Bip44DerivationTable, KeyTable, Bip44WrapperTable,
-        PublicDeriverTable,
+        PublicDeriverTable, Bip44DerivationMappingTable,
         // we don't know which level the public deriver will be
         // so we lock the table for every level
         ...Array.from(TableMap, ([key, value]) => db.getSchema().table(value))
@@ -218,8 +225,20 @@ function _derive(
 
     let insertResult;
     {
-      // add derivation information for the level
-      // TODO: missing updating on mapping table
+      // add get parent of the new derivation
+      const newLevelParent = await getDerivationsByPath(
+        db,
+        getKeyTx,
+        privateDeriverRow.Bip44DerivationId,
+        [],
+        Array.from(body.pathToPublic.slice(0, body.pathToPublic.length - 1)),
+      );
+      const parentDerivationId = newLevelParent.keys().next().value;
+      if (parentDerivationId === undefined) {
+        throw new StaleStateError('LovefieldDerive::_derive newLevelParent');
+      }
+
+      // add derivation itself
       insertResult = await addByLevel(
         {
           db,
@@ -229,6 +248,7 @@ function _derive(
             PrivateKeyId: newPrivateKey ? newPrivateKey.KeyId : null,
             Index: body.pathToPublic[body.pathToPublic.length - 1],
           },
+          parentDerivationId,
           derivationInfo: id => ({
             Bip44DerivationId: id,
             ...body.levelSpecificInsert,

@@ -50,6 +50,7 @@ export const getRowFromKey = async <T>(
 
 export async function getRowIn<Row>(
   db: lf$Database,
+  tx: lf$Transaction, 
   tableName: string,
   keyRowName: string,
   list: Array<any>,
@@ -59,5 +60,5 @@ export async function getRowIn<Row>(
     .select()
     .from(table)
     .where(table[keyRowName].in(list));
-  return await query.exec();
+  return await tx.attach(query);
 }

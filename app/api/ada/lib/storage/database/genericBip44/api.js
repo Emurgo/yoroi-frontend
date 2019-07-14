@@ -67,6 +67,7 @@ export const TableMap = new Map<number, any>(
  */
 export const getDerivationsByPath = async (
   db: lf$Database,
+  tx: lf$Transaction,
   derivationId: number,
   commonPrefix: Array<number>,
   queryPath: BIP32QueryPath,
@@ -74,6 +75,7 @@ export const getDerivationsByPath = async (
   const pathMap = new Map([[derivationId, commonPrefix]]);
   const result = await _getDerivationsByPath(
     db,
+    tx,
     pathMap,
     commonPrefix.concat(queryPath),
     commonPrefix.length,
@@ -83,6 +85,7 @@ export const getDerivationsByPath = async (
 
 export const _getDerivationsByPath = async (
   db: lf$Database,
+  tx: lf$Transaction,
   pathMap: PathMapType,
   queryPath: BIP32QueryPath,
   currPathIndex: number,
@@ -122,7 +125,7 @@ export const _getDerivationsByPath = async (
   const queryResult: Array<{
     Bip44DerivationMapping: Bip44DerivationMappingRow,
     Bip44Derivation: Bip44DerivationRow,
-  }> = await query.exec();
+  }> = await tx.attach(query);
   const nextPathMap = new Map(queryResult.map(row => {
     const path = pathMap.get(row.Bip44DerivationMapping.Parent);
     if (!path) throw new Error('genericBip44::_getDerivationsByPath Should never happen');
@@ -138,6 +141,7 @@ export const _getDerivationsByPath = async (
 
   const result = _getDerivationsByPath(
     db,
+    tx,
     nextPathMap,
     queryPath,
     currPathIndex + 1,
@@ -214,28 +218,19 @@ export const addBip44Address = async (
   )
 );
 
-export async function addByLevel<Insert, Row>(
-  request: AddDerivationRequest<Insert>,
-  level: number,
-) {
-  const tableName = TableMap.get(level);
-  if (tableName == null) {
-    throw new Error('api::addByLevel Unknown table queried');
-  }
-  return await _addDerivation<Insert, Row>(request, tableName);
-}
-
 // ======
 //   Get
 // ======
 
 export const _getByIds = async<Row>(
   db: lf$Database,
+  tx: lf$Transaction,
   derivationIds: Array<number>,
   tableName: string
 ): Promise<Array<Row>> => (
   await getRowIn<Row>(
     db,
+    tx,
     tableName,
     Tables.Bip44DerivationSchema.properties.Bip44DerivationId,
     derivationIds,
@@ -244,50 +239,56 @@ export const _getByIds = async<Row>(
 
 export const getBip44Root = async (
   db: lf$Database,
+  tx: lf$Transaction,
   derivationIds: Array<number>,
 ) => (
   await _getByIds<Bip44RootRow>(
-    db, derivationIds, Tables.Bip44RootSchema.name,
+    db, tx, derivationIds, Tables.Bip44RootSchema.name,
   )
 );
 export const getBip44Purpose = async (
   db: lf$Database,
+  tx: lf$Transaction,
   derivationIds: Array<number>,
 ) => (
   await _getByIds<Bip44PurposeRow>(
-    db, derivationIds, Tables.Bip44PurposeSchema.name,
+    db, tx, derivationIds, Tables.Bip44PurposeSchema.name,
   )
 );
 export const getBip44CoinType = async (
   db: lf$Database,
+  tx: lf$Transaction,
   derivationIds: Array<number>,
 ) => (
   await _getByIds<Bip44CoinTypeRow>(
-    db, derivationIds, Tables.Bip44CoinTypeSchema.name,
+    db, tx, derivationIds, Tables.Bip44CoinTypeSchema.name,
   )
 );
 export const getBip44Account = async (
   db: lf$Database,
+  tx: lf$Transaction,
   derivationIds: Array<number>,
 ) => (
   await _getByIds<Bip44AccountRow>(
-    db, derivationIds, Tables.Bip44AccountSchema.name,
+    db, tx, derivationIds, Tables.Bip44AccountSchema.name,
   )
 );
 export const getBip44Chain = async (
   db: lf$Database,
+  tx: lf$Transaction,
   derivationIds: Array<number>,
 ) => (
   await _getByIds<Bip44ChainRow>(
-    db, derivationIds, Tables.Bip44ChainSchema.name,
+    db, tx, derivationIds, Tables.Bip44ChainSchema.name,
   )
 );
 export const getBip44Address = async (
   db: lf$Database,
+  tx: lf$Transaction,
   derivationIds: Array<number>,
 ) => (
   await _getByIds<Bip44AddressRow>(
-    db, derivationIds, Tables.Bip44AddressSchema.name,
+    db, tx, derivationIds, Tables.Bip44AddressSchema.name,
   )
 );
 
@@ -368,8 +369,8 @@ export type DeriveFromRequest<T> = {|
 |};
 
 async function _addDerivationWithParent<Insert, Row>(
-  tableName: string,
   request: DeriveFromRequest<Insert>,
+  tableName: string,
 ): Promise<{
   derivationTableResult: Bip44DerivationRow,
   mappingTableResult: Bip44DerivationMappingRow,
@@ -402,38 +403,49 @@ async function _addDerivationWithParent<Insert, Row>(
   };
 }
 
+export async function addByLevel<Insert, Row>(
+  request: DeriveFromRequest<Insert>,
+  level: number,
+) {
+  const tableName = TableMap.get(level);
+  if (tableName == null) {
+    throw new Error('api::addByLevel Unknown table queried');
+  }
+  return await _addDerivationWithParent<Insert, Row>(request, tableName);
+}
+
 export const deriveFromRoot = async (
   request: DeriveFromRequest<Bip44PurposeInsert>,
 ) => (
   await _addDerivationWithParent<Bip44PurposeInsert, Bip44PurposeRow>(
-    Tables.Bip44PurposeSchema.name, request,
+    request, Tables.Bip44PurposeSchema.name,
   )
 );
 export const deriveFromPurpose = async (
   request: DeriveFromRequest<Bip44CoinTypeInsert>,
 ) => (
   await _addDerivationWithParent<Bip44CoinTypeInsert, Bip44CoinTypeRow>(
-    Tables.Bip44CoinTypeSchema.name, request,
+    request, Tables.Bip44CoinTypeSchema.name,
   )
 );
 export const deriveFromCoinType = async (
   request: DeriveFromRequest<Bip44AccountInsert>,
 ) => (
   await _addDerivationWithParent<Bip44AccountInsert, Bip44AccountRow>(
-    Tables.Bip44AccountSchema.name, request,
+    request, Tables.Bip44AccountSchema.name,
   )
 );
 export const deriveFromAccount = async (
   request: DeriveFromRequest<Bip44ChainInsert>,
 ) => (
   await _addDerivationWithParent<Bip44ChainInsert, Bip44ChainRow>(
-    Tables.Bip44ChainSchema.name, request,
+    request, Tables.Bip44ChainSchema.name,
   )
 );
 export const deriveFromChain = async (
   request: DeriveFromRequest<Bip44AddressInsert>,
 ) => (
   await _addDerivationWithParent<Bip44AddressInsert, Bip44AddressRow>(
-    Tables.Bip44AddressSchema.name, request,
+    request, Tables.Bip44AddressSchema.name,
   )
 );
