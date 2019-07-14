@@ -123,157 +123,140 @@ function _derive(
     const Bip44WrapperTable = db.getSchema().table(Bip44WrapperSchema.name);
 
     const getKeyTx = db.createTransaction();
-    const pubDeriver = getKeyTx
+    await getKeyTx
       .begin([
         Bip44PrivateDeriverTable, Bip44DerivationTable, KeyTable, Bip44WrapperTable,
         PublicDeriverTable,
         // we don't know which level the public deriver will be
         // so we lock the table for every level
         ...Array.from(TableMap, ([key, value]) => db.getSchema().table(value))
-      ])
-      .then(() => {
-        // Get Private Deriver
-        const query = db
-          .select()
-          .from(Bip44PrivateDeriverTable)
-          .where(
-            Bip44PrivateDeriverTable[PrivateDeriverSchema.properties.Bip44WrapperId]
-              .eq(bip44WrapperId)
-          );
+      ]);
 
-        return getKeyTx.attach(query);
-      })
-      .then(result => {
-        // Private Deriver => Bip44Derivation
-        if (result.length !== 1) {
-          throw new StaleStateError('LovefieldDerive::_derive Bip44PrivateDeriverTable');
-        }
-        const privateDeriverRow: PrivateDeriverRow = result[0];
-
-        const query = db
-          .select()
-          .from(Bip44DerivationTable)
-          .where(
-            Bip44DerivationTable[Bip44DerivationSchema.properties.Bip44DerivationId]
-              .eq(privateDeriverRow.Bip44DerivationId)
-          );
-
-        return getKeyTx.attach(query);
-      })
-      .then(result => {
-        // Bip44Derivation => Private key
-        if (result.length !== 1) {
-          throw new StaleStateError('LovefieldDerive::_derive Bip44DerivationTable');
-        }
-        const derivationRow: Bip44DerivationRow = result[0];
-        if (derivationRow.PrivateKeyId === null) {
-          throw new StaleStateError('LovefieldDerive::_derive PrivateKeyId');
-        }
-        const keyId = derivationRow.PrivateKeyId;
-
-        const query = db
-          .select()
-          .from(KeyTable)
-          .where(
-            KeyTable[KeySchema.properties.KeyId]
-              .eq(keyId)
-          );
-
-        return getKeyTx.attach(query);
-      })
-      .then(async result => {
-        // Decrypt key and derive new key and save the result
-        if (result.length !== 1) {
-          throw new StaleStateError('LovefieldDerive::_derive KeyTable');
-        }
-        const privateKeyRow: KeyRow = result[0];
-
-        const rootPrivateKey = _decryptKey(
-          privateKeyRow,
-          body.decryptPrivateDeriverPassword,
-        );
-        const newKey = _deriveKey(
-          rootPrivateKey,
-          body.pathToPublic,
+    let privateDeriverRow: PrivateDeriverRow;
+    {
+      // Get Private Deriver
+      const query = db
+        .select()
+        .from(Bip44PrivateDeriverTable)
+        .where(
+          Bip44PrivateDeriverTable[PrivateDeriverSchema.properties.Bip44WrapperId]
+            .eq(bip44WrapperId)
         );
 
-        // save new key
-        const newPrivateKey = body.publicDeriverPrivateKey
-          ? await _saveKey(
-            db,
-            getKeyTx,
-            body.publicDeriverPrivateKey,
-            newKey.to_hex(),
-          )
-          : null;
-        const newPublicKey = body.publicDeriverPublicKey
-          ? await _saveKey(
-            db,
-            getKeyTx,
-            body.publicDeriverPublicKey,
-            newKey.public().to_hex(),
-          )
-          : null;
+      const result = await getKeyTx.attach(query);
+      if (result.length !== 1) {
+        throw new StaleStateError('LovefieldDerive::_derive Bip44PrivateDeriverTable');
+      }
+      privateDeriverRow = result[0];
+    }
 
-
-        return { newPrivateKey, newPublicKey };
-      })
-      .then(async result => {
-        // Fetch public level used for this specified wallet
-        const query = db
-          .select()
-          .from(Bip44WrapperTable)
-          .where(
-            Bip44WrapperTable[Bip44WrapperSchema.properties.Bip44WrapperId]
-              .eq(bip44WrapperId)
-          );
-        const wrapperResult = await getKeyTx.attach(query);
-        if (wrapperResult.length !== 1) {
-          throw new StaleStateError('LovefieldDerive::_derive wrapperResult');
-        }
-        const wrapper: Bip44WrapperRow = wrapperResult[0];
-
-        return {
-          ...result,
-          level: wrapper.PublicDeriverLevel,
-        };
-      })
-      .then(result => {
-        // add derivation information for the level
-        // TODO: missing updating on mapping table
-        return addByLevel(
-          {
-            db,
-            tx: getKeyTx,
-            keyInfo: {
-              PublicKeyId: result.newPublicKey ? result.newPublicKey.KeyId : null,
-              PrivateKeyId: result.newPublicKey ? result.newPublicKey.KeyId : null,
-              Index: body.pathToPublic[body.pathToPublic.length - 1],
-            },
-            derivationInfo: id => ({
-              Bip44DerivationId: id,
-              ...body.levelSpecificInsert,
-            }),
-          },
-          result.level
+    let keyId: number;
+    {
+      // Private Deriver => Bip44Derivation
+      const query = db
+        .select()
+        .from(Bip44DerivationTable)
+        .where(
+          Bip44DerivationTable[Bip44DerivationSchema.properties.Bip44DerivationId]
+            .eq(privateDeriverRow.Bip44DerivationId)
         );
 
-      })
-      .then(result => {
-        // add the public deriver
-        return addPublicDeriver({
+      const result = await getKeyTx.attach(query);
+      if (result.length !== 1) {
+        throw new StaleStateError('LovefieldDerive::_derive Bip44DerivationTable');
+      }
+      const derivationRow: Bip44DerivationRow = result[0];
+      if (derivationRow.PrivateKeyId === null) {
+        throw new StaleStateError('LovefieldDerive::_derive PrivateKeyId');
+      }
+      keyId = derivationRow.PrivateKeyId;
+    }
+
+    let privateKeyRow: KeyRow;
+    {
+      // Bip44Derivation => Private key
+
+      const query = db
+        .select()
+        .from(KeyTable)
+        .where(
+          KeyTable[KeySchema.properties.KeyId]
+            .eq(keyId)
+        );
+
+      const result = await getKeyTx.attach(query);
+      if (result.length !== 1) {
+        throw new StaleStateError('LovefieldDerive::_derive KeyTable');
+      }
+      privateKeyRow = result[0];
+    }
+
+    let newPrivateKey: KeyRow | null;
+    let newPublicKey: KeyRow | null;
+    {
+      // Decrypt key and derive new key and save the result
+
+      const rootPrivateKey = _decryptKey(
+        privateKeyRow,
+        body.decryptPrivateDeriverPassword,
+      );
+      const newKey = _deriveKey(
+        rootPrivateKey,
+        body.pathToPublic,
+      );
+
+      // save new key
+      newPrivateKey = body.publicDeriverPrivateKey
+        ? await _saveKey(
+          db,
+          getKeyTx,
+          body.publicDeriverPrivateKey,
+          newKey.to_hex(),
+        )
+        : null;
+      newPublicKey = body.publicDeriverPublicKey
+        ? await _saveKey(
+          db,
+          getKeyTx,
+          body.publicDeriverPublicKey,
+          newKey.public().to_hex(),
+        )
+        : null;
+    }
+
+    let insertResult;
+    {
+      // add derivation information for the level
+      // TODO: missing updating on mapping table
+      insertResult = await addByLevel(
+        {
           db,
           tx: getKeyTx,
-          row: body.publicDeriverInsert(result.derivationTableResult.Bip44DerivationId),
-        });
-      })
-      .then(async result => {
-        await getKeyTx.commit();
-        return result;
-      })
-      .catch(e => {
-        throw e;
+          keyInfo: {
+            PublicKeyId: newPublicKey ? newPublicKey.KeyId : null,
+            PrivateKeyId: newPrivateKey ? newPrivateKey.KeyId : null,
+            Index: body.pathToPublic[body.pathToPublic.length - 1],
+          },
+          derivationInfo: id => ({
+            Bip44DerivationId: id,
+            ...body.levelSpecificInsert,
+          }),
+        },
+        privateDeriverRow.Level + body.pathToPublic.length
+      );
+    }
+
+    let pubDeriver: PublicDeriverRow;
+    {
+      // add the public deriver
+      pubDeriver = await addPublicDeriver({
+        db,
+        tx: getKeyTx,
+        row: body.publicDeriverInsert(insertResult.derivationTableResult.Bip44DerivationId),
       });
+    }
+    
+    await getKeyTx.commit();
 
     return pubDeriver;
   };
