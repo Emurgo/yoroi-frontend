@@ -39,11 +39,20 @@ export class WalletBuilder {
   }
 
   static addAsdf<T>(
-    builder: { asdf: number }
+    builder: { asdf: number } & T
   ): T & { zxcv: number} {
-    return Object.assign(
-      { zxcv: 5 },
-      builder,
-    );
+    return {
+      ...{ zxcv: 5, },
+      ...builder,
+    };
+  }
+
+  static addZxcv<T>(
+    builder: { asdf: number, zxcv: number } & T
+  ): T & { qwer: number} {
+    return {
+      ...{ qwer: builder.asdf },
+      ...builder,
+    };
   }
 }

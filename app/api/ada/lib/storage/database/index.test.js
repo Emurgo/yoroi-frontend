@@ -56,7 +56,12 @@ test('Can add and fetch address in wallet', async () => {
   helper = WalletBuilder.addAsdf<typeof helper>(helper);
   console.log(helper.asdf);
   console.log(helper.zxcv);
+  //console.log(helper.qwer);
+  helper = WalletBuilder.addZxcv<typeof helper>(helper);
+  console.log(helper.asdf);
+  console.log(helper.zxcv);
   console.log(helper.qwer);
+  //console.log(helper.qwerqwer);
 
   const ConceptualWalletTable = db.getSchema().table(ConceptualWalletSchema.name);
   const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
