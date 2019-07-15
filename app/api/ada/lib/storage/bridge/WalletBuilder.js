@@ -9,42 +9,79 @@ import type {
 import type { ConceptualWalletRow } from '../database/uncategorized/tables';
 import type { PrivateDeriverRow } from '../database/genericBip44/tables';
 
-export class WalletBuilder {
+type PlainStateType = {
   db: lf$Database;
   tx: lf$Transaction;
-
   tables: Array<lf$schema$Table>;
+};
+type GenericStateType<Data> ={
+  data: Data;
+};
 
-  constructor(db: lf$Database) {
-    this.db = db;
-    this.tx = db.createTransaction();
-    this.tables = [];
+class BuilderState<Data> {
+  plain: PlainStateType;
+  generic: GenericStateType<Data>;
+
+  constructor(plain: PlainStateType, generic: GenericStateType<Data>) {
+    this.plain = plain;
+    this.generic = generic;
   }
+}
 
-  // static start(db: lf$Database): WalletBuilder<$Shape<{||}>> {
-  //   return new WalletBuilder(db, {});
-  // }
+function updateData<T, NewAddition>(
+  oldBuilder: BuilderState<T>,
+  addition: NewAddition,
+): BuilderState<
+  T & NewAddition
+> {
+  return new BuilderState<
+    T & NewAddition
+  >(
+    oldBuilder.plain,
+    {
+      ...oldBuilder.generic.data,
+      ...addition,
+    },
+  );
+}
 
-  commit = async (): Promise<void> => {
-    await this.tx.commit();
-  }
+export class WalletBuilder {
 
-  static addConceptual<T>(
-    builder: T
-  ): T & { asdf: number} {
-    return Object.assign(
-      { asdf: 5 },
-      builder,
+  static start(db: lf$Database): BuilderState<$Shape<{||}>> {
+    return new BuilderState(
+      {
+        db,
+        tx: db.createTransaction(),
+        tables: [],
+      },
+      {},
     );
   }
 
-  static addAsdf<T>(
-    builder: { asdf: number } & T
-  ): T & { zxcv: number} {
-    return {
-      ...{ zxcv: 5, },
-      ...builder,
-    };
+  static async commit<T>(builderState: BuilderState<T>): Promise<void> {
+    await builderState.plain.tx.commit();
+  }
+
+  static addConceptual<
+    T: {}
+  >(
+    builderState: BuilderState<T>
+  ): BuilderState<T & { asdf: null | number }> {
+    return updateData(
+      builderState,
+      { asdf: 5 },
+    );
+  }
+
+  static addAsdf<
+    T: { asdf: null | number }
+  >(
+    builderState: BuilderState<T>
+  ): BuilderState<T & { zxcv: number}> {
+    return updateData(
+      builderState,
+      { zxcv: 5 },
+    );
   }
 
   static addZxcv<T>(

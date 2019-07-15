@@ -49,19 +49,23 @@ test('Can add and fetch address in wallet', async () => {
 
   const db = await loadLovefieldDB(true);
 
-  let helper: $Shape<{||}> = {};
-  const builder = new WalletBuilder(db);
-  helper = WalletBuilder.addConceptual<typeof helper>(helper);
-  console.log(helper.asdf);
-  helper = WalletBuilder.addAsdf<typeof helper>(helper);
-  console.log(helper.asdf);
-  console.log(helper.zxcv);
-  //console.log(helper.qwer);
-  helper = WalletBuilder.addZxcv<typeof helper>(helper);
-  console.log(helper.asdf);
-  console.log(helper.zxcv);
-  console.log(helper.qwer);
-  //console.log(helper.qwerqwer);
+  // let helper: $Shape<{||}> = {};
+  // const builder = new WalletBuilder(db);
+  // helper = WalletBuilder.addConceptual<typeof helper>(helper);
+  // console.log(helper.asdf);
+  // helper = WalletBuilder.addAsdf<typeof helper>(helper);
+  // console.log(helper.asdf);
+  // console.log(helper.zxcv);
+  // //console.log(helper.qwer);
+  // helper = WalletBuilder.addZxcv<typeof helper>(helper);
+  // console.log(helper.asdf);
+  // console.log(helper.zxcv);
+  // console.log(helper.qwer);
+  // //console.log(helper.qwerqwer);
+
+  let state = WalletBuilder.start(db);
+  state = WalletBuilder.addConceptual(state);
+  state = WalletBuilder.addAsdf(state);
 
   const ConceptualWalletTable = db.getSchema().table(ConceptualWalletSchema.name);
   const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
