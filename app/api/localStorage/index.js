@@ -2,6 +2,8 @@
 
 import environment from '../../environment';
 
+declare var chrome;
+
 const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
@@ -18,6 +20,49 @@ export type SetCustomUserThemeRequest = {
   currentThemeVars: Object,
 };
 
+const getLocalItemExtension = (key) => new Promise((resolve, reject) => {
+  chrome.storage.local.get(key, (data, error) => {
+    if (error) reject(error);
+    const value = data[key];
+    if (value === undefined) resolve('');
+    resolve(value);
+  });
+});
+
+const getLocalItemWeb = (key) => new Promise((resolve, reject) => {
+  try {
+    const locale = localStorage.getItem(key);
+    if (!locale) return resolve('');
+    resolve(locale);
+  } catch (error) {
+    return reject(error);
+  }
+});
+
+const getLocalItem = environment.userAgentInfo.isExtension ?
+  getLocalItemExtension : getLocalItemWeb;
+
+const setLocalItemExtension = (key, value) => new Promise((resolve, reject) => {
+  try {
+    chrome.storage.local.set({ [key]: value });
+    resolve();
+  } catch (error) {
+    return reject(error);
+  }
+});
+
+const setLocalItemWeb = (key, value) => new Promise((resolve, reject) => {
+  try {
+    localStorage.setItem(key, value);
+    resolve();
+  } catch (error) {
+    return reject(error);
+  }
+});
+
+const setLocalItem = environment.userAgentInfo.isExtension ?
+  setLocalItemExtension : setLocalItemWeb;
+
 /**
  * This api layer provides access to the electron local storage
  * for user settings that are not synced with any coin backend.
@@ -27,24 +72,9 @@ export default class LocalStorageApi {
 
   // ========== Locale ========== //
 
-  getUserLocale = (): Promise<string> => new Promise((resolve, reject) => {
-    try {
-      const locale = localStorage.getItem(storageKeys.USER_LOCALE);
-      if (!locale) return resolve('');
-      resolve(locale);
-    } catch (error) {
-      return reject(error);
-    }
-  });
+  getUserLocale = (): Promise<string> => getLocalItem(storageKeys.USER_LOCALE);
 
-  setUserLocale = (locale: string): Promise<void> => new Promise((resolve, reject) => {
-    try {
-      localStorage.setItem(storageKeys.USER_LOCALE, locale);
-      resolve();
-    } catch (error) {
-      return reject(error);
-    }
-  });
+  setUserLocale = (locale: string): Promise<void> => setLocalItem(storageKeys.USER_LOCALE, locale);
 
   unsetUserLocale = (): Promise<void> => new Promise((resolve) => {
     try {
