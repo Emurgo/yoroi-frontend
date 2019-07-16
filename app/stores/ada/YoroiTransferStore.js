@@ -42,6 +42,8 @@ export default class YoroiTransferStore extends Store {
     = new Request(this.api.ada.restoreWalletForTransfer);
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
+  // The addresses and their corresponding keys from which funds will be transferred.
+  addressKeysCache: ?{[addr: string]: RustModule.Wallet.PrivateKey} = null;
 
   _errorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
     try {
@@ -114,6 +116,7 @@ export default class YoroiTransferStore extends Store {
       const keyPrv = chainPrv.address_key(RustModule.Wallet.AddressKeyIndex.new(index));
       addressKeys[address] = keyPrv;
     });
+    this.addressKeysCache = addressKeys;
 
     const outputAddr = await getReceiverAddress();
     // Possible exception: NotEnoughMoneyToSendError
@@ -159,10 +162,45 @@ export default class YoroiTransferStore extends Store {
       await next();
       this._reset();
     } catch (error) {
-      Logger.error(`YoroiTransferStore::transferFunds ${stringifyError(error)}`);
-      runInAction(() => {
-        this.error = new TransferFundsError();
-      });
+      /* Determine and handle the scenario where the wallet has changed since
+         the tx has been generated.
+         Since the backend API returns a generic error message, we determine
+         the case by re-generate the transaction and compare with the previous
+         one.
+      */
+      let walletChanged = false;
+      let transferTx;
+      if (error.id === 'api.errors.sendTransactionApiError') {
+        const outputAddr = await getReceiverAddress();
+        if (!this.addressKeysCache) {
+          // Should never happen but need to please flow
+          throw new Error('No address keys');
+        }
+        transferTx = await generateTransferTx({
+          outputAddr,
+          addressKeys: this.addressKeysCache,
+          getUTXOsForAddresses:
+            this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
+          filterSenders: true
+        });
+        if (!this.transferTx) {
+          throw new NoTransferTxError();
+        }
+        if (!transferTx.recoveredBalance.isEqualTo(this.transferTx.recoveredBalance)) {
+          walletChanged = true;
+        }
+      }
+      if (walletChanged) {
+        runInAction(() => {
+          this.transferTx = transferTx;
+          this.error = new WalletChangedError();
+        });
+      } else {
+        Logger.error(`YoroiTransferStore::transferFunds ${stringifyError(error)}`);
+        runInAction(() => {
+          this.error = new TransferFundsError();
+        });
+      }
     }
   }
 
@@ -206,6 +244,10 @@ const messages = defineMessages({
     id: 'yoroiTransfer.error.noTransferTxError',
     defaultMessage: '!!!There is no transfer transaction to send.',
   },
+  walletChangedError: {
+    id: 'yoroiTransfer.error.walletChangedError',
+    defaultMessage: '!!!The wallet has changed. Please re-confirm your transaction.',
+  }
 });
 
 export class TransferFundsError extends LocalizableError {
@@ -224,6 +266,16 @@ export class NoTransferTxError extends LocalizableError {
       id: messages.noTransferTxError.id,
       defaultMessage: messages.noTransferTxError.defaultMessage || '',
       description: messages.noTransferTxError.description,
+    });
+  }
+}
+
+class WalletChangedError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.walletChangedError.id,
+      defaultMessage: messages.walletChangedError.defaultMessage || '',
+      description: messages.walletChangedError.description,
     });
   }
 }

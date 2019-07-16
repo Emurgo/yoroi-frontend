@@ -41,3 +41,26 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see the next button on the Yoroi transfer start screen disabled
     When I click on the create Yoroi wallet button
     Then I should see the Create wallet screen
+
+  @it-113
+  Scenario: Wallet changes after transaction is generated (IT-113)
+    Given There is a wallet stored named empty-wallet
+    And I am on the Yoroi Transfer start screen
+    When I click on the next button on the Yoroi Transfer start screen
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
+    And I proceed with the recovery
+    Then I should see on the Yoroi transfer summary screen:
+    | fromAddress                                                 | amount           |   
+    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567898765    |
+    Then I transfer some Ada out of the source wallet
+    | fromAddress                                                 | amount     |   
+    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1000000000 |
+    When I confirm Yoroi transfer funds
+    Then I should see wallet changed notice
+    And I should see on the Yoroi transfer summary screen:
+    | fromAddress                                                 | amount           |   
+    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1233567898765    |
+    When I confirm Yoroi transfer funds
+    Then I should see the Yoroi transfer success screen

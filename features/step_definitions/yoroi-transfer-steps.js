@@ -1,6 +1,7 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
+import BigNumber from 'bignumber.js';
 import {
   navigateTo,
   waitUntilUrlEquals
@@ -10,6 +11,10 @@ import {
   checkAddressesRecoveredAreCorrect,
   checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
+import {
+  signedTransactionHandler,
+  utxoForAddressesHook,
+} from '../mock-chain/mockServer';
 
 Given(/^I am on the Yoroi Transfer start screen$/, async function () {
   await navigateTo.call(this, '/transfer/yoroi');
@@ -49,4 +54,27 @@ Then(/^I should see the next button on the Yoroi transfer start screen disabled$
 
 Then(/^I should see the "CREATE YOROI WALLET" button disabled$/, async function () {
   await this.waitDisable('.createYoroiWallet.YoroiTransferStartPage_button');
+});
+
+Then(/^I transfer some Ada out of the source wallet$/, async (table) => {
+  const { fromAddress, amount } = table.hashes()[0];
+  // Next request to /api/txs/signed should fail
+  signedTransactionHandler.push((req, res) => {
+    res.status(500);
+    // Mimicking the backend behavior
+    res.send({ code: 'Internal', message: 'Error trying to connect with importer' });
+  });
+  utxoForAddressesHook.push(utxos => utxos.map(utxo => {
+    if (utxo.receiver === fromAddress) {
+      return Object.assign(utxo, { amount:
+        new BigNumber(utxo.amount).minus(new BigNumber(amount)).toString() });
+    }
+    return utxo;
+  }));
+});
+
+Then(/^I should see wallet changed notice$/, async function () {
+  const walletChangedError = await i18n.formatMessage(this.driver,
+    { id: 'yoroiTransfer.error.walletChangedError' });
+  await this.waitUntilText('.TransferSummaryPage_error', walletChangedError);
 });

@@ -52,6 +52,9 @@ function _defaultSignedTransaction(
 
 let MockServer = null;
 
+export const signedTransactionHandler = [];
+export const utxoForAddressesHook = [];
+
 export function getMockServer(
   settings: {
     signedTransaction?: (
@@ -78,13 +81,16 @@ export function getMockServer(
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
       const utxoForAddresses = mockImporter.utxoForAddresses();
-      const filteredUtxos = Object.keys(utxoForAddresses)
+      let filteredUtxos = Object.keys(utxoForAddresses)
         .filter(addr => req.body.addresses.includes(addr))
         .map(addr => utxoForAddresses[addr])
         .reduce((utxos, arr) => {
           utxos.push(...arr);
           return utxos;
         }, []);
+      if (utxoForAddressesHook.length) {
+        filteredUtxos = utxoForAddressesHook.pop()(filteredUtxos);
+      }
       res.send(filteredUtxos);
     });
 
@@ -128,8 +134,20 @@ export function getMockServer(
       res.send(filteredTxs.slice(0, txsLimit));
     });
 
-    server.post('/api/txs/signed', settings.signedTransaction ?
-      settings.signedTransaction : _defaultSignedTransaction);
+    server.post('/api/txs/signed', (
+      req: {
+        body: SignedRequest
+      },
+      res: { send(arg: SignedResponse): any, status: Function }
+    ): void => {
+      if (signedTransactionHandler.length) {
+        signedTransactionHandler.pop()(req, res);
+      } else if (settings.signedTransaction) {
+        settings.signedTransaction(req, res);
+      } else {
+        _defaultSignedTransaction(req, res);
+      }
+    });
 
     server.post('/api/addresses/filterUsed', (
       req: {
