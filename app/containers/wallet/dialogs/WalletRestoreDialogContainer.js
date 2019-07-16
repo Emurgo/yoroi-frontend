@@ -29,10 +29,6 @@ type Props = InjectedDialogContainerProps & {
   onBack: void => void,
 };
 
-type State = {
-  copiedAddress: string,
-};
-
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
@@ -53,7 +49,6 @@ export default class WalletRestoreDialogContainer
     verifyRestore: undefined,
     submitValues: undefined,
     resolvedRecoveryPhrase: undefined,
-    copiedAddress: '',
   };
 
   onVerifiedSubmit = () => {
@@ -109,7 +104,6 @@ export default class WalletRestoreDialogContainer
   };
 
   render() {
-    const { copiedAddress } = this.state;
     const actions = this.props.actions;
     const { uiNotifications, profile } = this.props.stores;
     const wallets = this._getWalletsStore();
@@ -138,14 +132,13 @@ export default class WalletRestoreDialogContainer
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
           onCopyAddressTooltip={(address) => {
-            this.setState({ copiedAddress: address });
             actions.notifications.open.trigger({
               id: tooltipNotification.id,
               duration: tooltipNotification.duration,
               message: messages.copyTooltipMessage
             });
           }}
-          showNotification={ uiNotifications.getTooltipActiveNotification(tooltipNotification.id) }
+          showNotification={uiNotifications.getTooltipActiveNotification(tooltipNotification.id)}
           isSubmitting={restoreRequest.isExecuting}
           classicTheme={this.props.classicTheme}
           error={restoreRequest.error}

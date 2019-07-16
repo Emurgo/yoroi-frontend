@@ -135,7 +135,7 @@ export default class FinalizeDialog extends Component<Props> {
               hash={a}
               onCopyAddress={onCopyAddressTooltip}
               showNotification={showNotification}
-              tooltipOpensUpward={true}
+              tooltipOpensUpward
               key={a}
             >
               <ExplorableHashContainer

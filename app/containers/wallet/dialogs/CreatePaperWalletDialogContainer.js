@@ -125,14 +125,13 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onBack={paperActions.backToCreate.trigger}
             classicTheme={profile.isClassicTheme}
             onCopyAddressTooltip={(address) => {
-              this.setState({ copiedAddress: address });
               actions.notifications.open.trigger({
                 id: tooltipNotification.id,
                 duration: tooltipNotification.duration,
                 message: messages.copyTooltipMessage
               });
             }}
-            showNotification={ uiNotifications.getTooltipActiveNotification(tooltipNotification.id) }
+            showNotification={uiNotifications.getTooltipActiveNotification(tooltipNotification.id)}
           />
         );
       default:

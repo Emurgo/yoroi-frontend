@@ -141,7 +141,7 @@ export default class WalletReceivePage extends Component<Props, State> {
               message: messages.copyTooltipMessage
             });
           }}
-          showNotification={ uiNotifications.getTooltipActiveNotification(tooltipNotification.id) }
+          showNotification={uiNotifications.getTooltipActiveNotification(tooltipNotification.id)}
           onVerifyAddress={({ address, path }) => {
             actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
             this.openVerifyAddressDialog();

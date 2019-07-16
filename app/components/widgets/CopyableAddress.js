@@ -52,14 +52,14 @@ export default class CopyableAddress extends Component<Props> {
         skin={TooltipSkin}
         isOpeningUpward={this.props.tooltipOpensUpward}
         arrowRelativeToTip={this.props.arrowRelativeToTip}
-        tip={ !notification
+        tip={!notification
           ? intl.formatMessage(messages.copyTooltipMessage)
           : intl.formatMessage(notification.message)
         }
       >
         <SvgInline svg={iconCopy} className={styles.copyIconBig} />
       </Tooltip>
-    )
+    );
 
     return (
       <div className={styles.component}>
