@@ -35,6 +35,12 @@ Then(/^I should see "You have successfully copied wallet address" pop up:$/, asy
   await this.waitForElement(`//div[@class='VerticalFlexContainer_component']//span[contains(text(), '${errorMessage}')]`, By.xpath);
 });
 
+Then(/^I should see "copied" tooltip message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorMessage = await this.intl(error.message);
+  await this.waitForElement(`//div[@class='SimpleBubble_bubble'][contains(text(), '${errorMessage}')]`, By.xpath);
+});
+
 Then(/^I see transactions buttons are disabled$/, async function () {
   const disabledButtons = await this.driver.findElement(By.xpath("//button[contains(@class, 'confirmButton') and contains(@class, 'disabled')]"));
   const pageUrl = await this.driver.getCurrentUrl();
