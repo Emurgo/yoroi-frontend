@@ -67,6 +67,8 @@ type Props = {|
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
   onCopyAddress: Function,
+  onCopyAddressTooltip: Function,
+  showNotification: Function,
   onVerifyAddress: Function,
   onGeneratePaymentURI: Function,
   isSubmitting: boolean,
@@ -106,6 +108,7 @@ export default class WalletReceive extends Component<Props, State> {
       walletAddress, walletAddresses,
       onCopyAddress, onVerifyAddress, onGeneratePaymentURI,
       isSubmitting, error, isWalletAddressUsed,
+      onCopyAddressTooltip, showNotification,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -145,7 +148,8 @@ export default class WalletReceive extends Component<Props, State> {
             </div>
             <CopyableAddress
               hash={walletAddress}
-              onCopyAddress={onCopyAddress}
+              onCopyAddress={onCopyAddressTooltip}
+              showNotification={showNotification}
             >
               <ExplorableHashContainer
                 selectedExplorer={this.props.selectedExplorer}

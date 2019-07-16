@@ -3,6 +3,8 @@
     cursor: pointer;
     object-fit: contain;
     margin-left: 6px;
+    padding: 7px 9px 3px 7px;
+    border-radius: 15px;
     & > svg {
       height: 14.5px;
       width: 11.5px;
@@ -10,5 +12,15 @@
         fill: var(--theme-icon-copy-address-color);
       }
     }
+  }
+  .copyIconBig:hover {
+    background-color: var(--theme-icon-copy-address-button-background-color);
+  }
+}
+
+.SimpleTooltip {
+  div[data-bubble-container] {
+    transform: translate(-50%, 0); // center the tooltip no matter how long is the text inside
+    margin-left: 22px; // offset = horizontal padding of icon and tooltip
   }
 }

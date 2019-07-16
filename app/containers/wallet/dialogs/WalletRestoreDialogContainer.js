@@ -1,6 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { ellipsis } from '../../../utils/strings';
+import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
@@ -13,10 +16,21 @@ import {
 } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
 
+const messages = defineMessages({
+  copyTooltipMessage: {
+    id: 'wallet.receive.page.addressCopyTooltipNotificationMessage',
+    defaultMessage: '!!!Coppied'
+  },
+});
+
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper",
   introMessage?: string,
   onBack: void => void,
+};
+
+type State = {
+  copiedAddress: string,
 };
 
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
@@ -39,6 +53,7 @@ export default class WalletRestoreDialogContainer
     verifyRestore: undefined,
     submitValues: undefined,
     resolvedRecoveryPhrase: undefined,
+    copiedAddress: '',
   };
 
   onVerifiedSubmit = () => {
@@ -94,7 +109,9 @@ export default class WalletRestoreDialogContainer
   };
 
   render() {
-
+    const { copiedAddress } = this.state;
+    const actions = this.props.actions;
+    const { uiNotifications, profile } = this.props.stores;
     const wallets = this._getWalletsStore();
     const { restoreRequest } = wallets;
 
@@ -104,6 +121,12 @@ export default class WalletRestoreDialogContainer
       throw new Error('Unexpected restore mode: ' + this.props.mode);
     }
 
+    const tooltipNotification = {
+      id: `copyTooltipNotification`,
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: messages.copyTooltipMessage,
+    };
+
     const { verifyRestore, submitValues } = this.state;
     if (verifyRestore) {
       const { addresses, accountPlate } = verifyRestore;
@@ -111,9 +134,18 @@ export default class WalletRestoreDialogContainer
         <WalletRestoreVerifyDialog
           addresses={addresses}
           accountPlate={accountPlate}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={profile.selectedExplorer}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
+          onCopyAddressTooltip={(address) => {
+            this.setState({ copiedAddress: address });
+            actions.notifications.open.trigger({
+              id: tooltipNotification.id,
+              duration: tooltipNotification.duration,
+              message: messages.copyTooltipMessage
+            });
+          }}
+          showNotification={ uiNotifications.getTooltipActiveNotification(tooltipNotification.id) }
           isSubmitting={restoreRequest.isExecuting}
           classicTheme={this.props.classicTheme}
           error={restoreRequest.error}

@@ -358,6 +358,7 @@ export default {
   '--theme-icon-ada-redemption-certificate-color': '#9eabbb',
   '--theme-icon-ada-redemption-no-wallets': '#121327',
   '--theme-icon-copy-address-color': '#121327',
+  '--theme-icon-copy-address-button-background-color': '#D9DDE0',
   '--theme-icon-back-button-color': '#121327',
   '--theme-icon-close-button-color': '#121327',
   '--theme-icon-transactions-ada-symbol-color': '#121327',

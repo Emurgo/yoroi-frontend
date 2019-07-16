@@ -325,6 +325,8 @@
   "wallet.receive.confirmationDialog.derivationPathLabel": "Derivation Path",
   "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Verify on hardware wallet",
   "wallet.receive.page.addressCopyNotificationMessage": "You have successfully copied your wallet address",
+  "wallet.receive.page.addressCopyTooltipMessage": "Copy to clipboard",
+  "wallet.receive.page.addressCopyTooltipNotificationMessage": "Copied",
   "wallet.receive.page.copyAddressLabel": "Copy address",
   "wallet.receive.page.generateNewAddressButtonLabel": "Generate new address",
   "wallet.receive.page.generatePaymentURLLabel": "Generate payment URL",

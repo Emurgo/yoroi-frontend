@@ -24,6 +24,10 @@ const messages = defineMessages({
     id: 'wallet.receive.page.addressCopyNotificationMessage',
     defaultMessage: '!!!You have successfully copied wallet address',
   },
+  copyTooltipMessage: {
+    id: 'wallet.receive.page.addressCopyTooltipNotificationMessage',
+    defaultMessage: '!!!Coppied'
+  },
 });
 
 type Props = InjectedProps;
@@ -87,6 +91,11 @@ export default class WalletReceivePage extends Component<Props, State> {
 
     const walletAddresses = addresses.all.slice().reverse();
 
+    const tooltipNotification = {
+      id: `${wallet.id}-copyTooltipNotification`,
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: messages.copyTooltipMessage,
+    };
     const notification = {
       id: `${wallet.id}-copyNotification`,
       duration: config.wallets.ADDRESS_COPY_NOTIFICATION_DURATION,
@@ -124,6 +133,15 @@ export default class WalletReceivePage extends Component<Props, State> {
               message: messages.message
             });
           }}
+          onCopyAddressTooltip={(address) => {
+            this.setState({ copiedAddress: address });
+            actions.notifications.open.trigger({
+              id: tooltipNotification.id,
+              duration: tooltipNotification.duration,
+              message: messages.copyTooltipMessage
+            });
+          }}
+          showNotification={ uiNotifications.getTooltipActiveNotification(tooltipNotification.id) }
           onVerifyAddress={({ address, path }) => {
             actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
             this.openVerifyAddressDialog();

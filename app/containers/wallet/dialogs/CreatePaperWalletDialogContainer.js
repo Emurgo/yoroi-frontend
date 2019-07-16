@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import UserPasswordDialog from '../../../components/wallet/settings/paper-wallets/UserPasswordDialog';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
+import config from '../../../config';
 import PaperWalletsActions from '../../../actions/ada/paper-wallets-actions';
 import PaperWalletCreateStore, { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
 import { Logger } from '../../../utils/logging';
@@ -19,6 +20,10 @@ const messages = defineMessages({
     id: 'settings.paperWallet.dialog.verify.message',
     defaultMessage: '!!!Verify your paper wallet',
   },
+  copyTooltipMessage: {
+    id: 'wallet.receive.page.addressCopyTooltipNotificationMessage',
+    defaultMessage: '!!!Coppied'
+  },
 });
 
 @observer
@@ -31,7 +36,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
   render() {
     const { intl } = this.context;
     const { actions } = this.props;
-    const { uiDialogs, profile } = this.props.stores;
+    const { uiDialogs, uiNotifications, profile } = this.props.stores;
     const { updateDataForActiveDialog } = actions.dialogs;
     const dialogData = uiDialogs.dataForActiveDialog;
 
@@ -44,6 +49,12 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
         throw new Error('Internal error! Paper instance is not available when should be.');
       }
       return paper;
+    };
+
+    const tooltipNotification = {
+      id: `copyTooltipNotification`,
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: messages.copyTooltipMessage,
     };
 
     const onCancel = () => {
@@ -113,6 +124,15 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
             classicTheme={profile.isClassicTheme}
+            onCopyAddressTooltip={(address) => {
+              this.setState({ copiedAddress: address });
+              actions.notifications.open.trigger({
+                id: tooltipNotification.id,
+                duration: tooltipNotification.duration,
+                message: messages.copyTooltipMessage
+              });
+            }}
+            showNotification={ uiNotifications.getTooltipActiveNotification(tooltipNotification.id) }
           />
         );
       default:

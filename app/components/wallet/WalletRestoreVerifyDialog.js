@@ -52,6 +52,8 @@ type Props = {|
   accountPlate: WalletAccountNumberPlate,
   selectedExplorer: ExplorerType,
   onCopyAddress?: Function,
+  onCopyAddressTooltip: Function,
+  showNotification: Function,
   onNext: Function,
   onCancel: Function,
   isSubmitting: boolean,
@@ -81,6 +83,8 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       onNext,
       classicTheme,
       onCopyAddress,
+      onCopyAddressTooltip,
+      showNotification,
     } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
@@ -141,7 +145,9 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
           {addresses.map(a => (
             <CopyableAddress
               hash={a}
-              onCopyAddress={onCopyAddress}
+              onCopyAddress={onCopyAddressTooltip}
+              showNotification={showNotification}
+              tooltipOpensUpward={true}
               key={a}
             >
               <ExplorableHashContainer

@@ -44,6 +44,8 @@ const messages = defineMessages({
 
 type Props = {|
   onCopyAddress?: Function,
+  onCopyAddressTooltip: Function,
+  showNotification: Function,
   selectedExplorer: ExplorerType,
   paper: AdaPaper,
   onNext: Function,
@@ -72,6 +74,8 @@ export default class FinalizeDialog extends Component<Props> {
       onBack,
       classicTheme,
       onCopyAddress,
+      onCopyAddressTooltip,
+      showNotification,
     } = this.props;
 
     const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
@@ -129,7 +133,9 @@ export default class FinalizeDialog extends Component<Props> {
           {paper.addresses.map(a => (
             <CopyableAddress
               hash={a}
-              onCopyAddress={onCopyAddress}
+              onCopyAddress={onCopyAddressTooltip}
+              showNotification={showNotification}
+              tooltipOpensUpward={true}
               key={a}
             >
               <ExplorableHashContainer
