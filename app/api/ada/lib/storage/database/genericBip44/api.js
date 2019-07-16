@@ -160,13 +160,24 @@ export const addBip44Wrapper = async (
     request, Tables.Bip44WrapperSchema.name,
   )
 );
-export const addPrivateDeriver = async (
-  request: AddRowRequest<PrivateDeriverInsert>,
-): Promise<PrivateDeriverRow> => (
-  await addToTable<PrivateDeriverInsert, PrivateDeriverRow>(
-    request, Tables.PrivateDeriverSchema.name,
-  )
-);
+export const addPrivateDeriver = async <Insert>(
+  privateDeriverRequest: AddRowRequest<PrivateDeriverInsert>,
+  addLevelRequest: AddDerivationRequest<Insert>,
+  level: number,
+) => {
+  const privateDeriverResult = await addToTable<PrivateDeriverInsert, PrivateDeriverRow>(
+    privateDeriverRequest, Tables.PrivateDeriverSchema.name,
+  );
+  const levelResult = await addByLevel(
+    addLevelRequest,
+    level,
+  );
+  return {
+    privateDeriverResult,
+    levelResult,
+  };
+};
+
 export const addPublicDeriver = async (
   request: AddRowRequest<PublicDeriverInsert>,
 ): Promise<PublicDeriverRow> => (
@@ -403,15 +414,26 @@ async function _addDerivationWithParent<Insert, Row>(
   };
 }
 
-export async function addByLevel<Insert, Row>(
+export async function addByLevelWithParent<Insert, Row>(
   request: DeriveFromRequest<Insert>,
+  level: number,
+) {
+  const tableName = TableMap.get(level);
+  if (tableName == null) {
+    throw new Error('api::addByLevelWithParent Unknown table queried');
+  }
+  return await _addDerivationWithParent<Insert, Row>(request, tableName);
+}
+
+export async function addByLevel<Insert, Row>(
+  request: AddDerivationRequest<Insert>,
   level: number,
 ) {
   const tableName = TableMap.get(level);
   if (tableName == null) {
     throw new Error('api::addByLevel Unknown table queried');
   }
-  return await _addDerivationWithParent<Insert, Row>(request, tableName);
+  return await _addDerivation<Insert, Row>(request, tableName);
 }
 
 export const deriveFromRoot = async (

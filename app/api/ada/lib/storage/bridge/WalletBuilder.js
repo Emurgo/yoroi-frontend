@@ -25,36 +25,45 @@ import {
   addBip44Wrapper,
 } from '../database/genericBip44/api';
 
-type PlainStateType = {
+class BuilderState<Data> {
   db: lf$Database;
   tx: lf$Transaction;
   tables: Array<string>;
-  buildSteps: Array<mixed => Promise<void>>;
-};
-type GenericStateType<Data> = Data;
+  buildSteps: Array<Data => Promise<void>>;
+  data: Data;
 
-class BuilderState<Data> {
-  plain: PlainStateType;
-  generic: GenericStateType<Data>;
-
-  constructor(plain: PlainStateType, generic: GenericStateType<Data>) {
-    this.plain = plain;
-    this.generic = generic;
+  constructor(
+    db: lf$Database,
+    tx: lf$Transaction,
+    tables: Array<string>,
+    buildSteps: Array<Data => Promise<void>>,
+    data: Data,
+  ) {
+    this.db = db;
+    this.tx = tx;
+    this.tables = tables;
+    this.buildSteps = buildSteps;
+    this.data = data;
   }
 }
 
 function updateData<T, NewAddition>(
   oldBuilder: BuilderState<T>,
   addition: NewAddition,
+  newTable: string,
+  newStep: (T & NewAddition) => Promise<void>,
 ): BuilderState<
   T & NewAddition
 > {
   return new BuilderState<
     T & NewAddition
   >(
-    oldBuilder.plain,
+    oldBuilder.db,
+    oldBuilder.tx,
+    oldBuilder.tables.concat([newTable]),
+    oldBuilder.buildSteps.concat(newStep),
     {
-      ...oldBuilder.generic,
+      ...oldBuilder.data,
       ...addition,
     },
   );
@@ -64,54 +73,48 @@ export class WalletBuilder {
 
   static start(db: lf$Database): BuilderState<$Shape<{||}>> {
     return new BuilderState(
-      {
-        db,
-        tx: db.createTransaction(),
-        tables: [],
-        buildSteps: [],
-      },
+      db,
+      db.createTransaction(),
+      [],
+      [],
       {},
     );
   }
 
   static async commit<T>(builderState: BuilderState<T>): Promise<void> {
     // lock used tables
-    const usedTables = builderState.plain.tables.map(
-      name => builderState.plain.db.getSchema().table(name)
+    const usedTables = builderState.tables.map(
+      name => builderState.db.getSchema().table(name)
     );
-    await builderState.plain.tx.begin(usedTables);
+    await builderState.tx.begin(usedTables);
 
     // perform all insertions
-    for (const step of builderState.plain.buildSteps) {
-      await step();
+    for (const step of builderState.buildSteps) {
+      await step(builderState.data);
     }
 
     // commit result
-    await builderState.plain.tx.commit();
+    await builderState.tx.commit();
   }
 
   static addConceptualWallet<
     T: {}
   >(
     builderState: BuilderState<T>,
-    insert: ConceptualWalletInsert,
+    insert: T => ConceptualWalletInsert,
   ): BuilderState<T & HasConceptualWallet> {
-    const newBuilder = updateData<
-      T,
-      HasConceptualWallet,
-    >(
+    return updateData(
       builderState,
-      AsNotNull({ conceptualWalletRow: null }),
+      AsNotNull<HasConceptualWallet>({ conceptualWalletRow: null }),
+      ConceptualWalletSchema.name,
+      async (finalData) => {
+        finalData.conceptualWalletRow = await addConceptualWallet({
+          db: builderState.db,
+          tx: builderState.tx,
+          row: insert(finalData)
+        });
+      },
     );
-    newBuilder.plain.tables.push(ConceptualWalletSchema.name);
-    newBuilder.plain.buildSteps.push(async () => {
-      newBuilder.generic.conceptualWalletRow = await addConceptualWallet({
-        db: newBuilder.plain.db,
-        tx: newBuilder.plain.tx,
-        row: insert,
-      });
-    });
-    return newBuilder;
   }
 
   static addBip44Wrapper<
@@ -120,31 +123,30 @@ export class WalletBuilder {
     builderState: BuilderState<T>,
     insert: T => Bip44WrapperInsert,
   ): BuilderState<T & HasBip44Wrapper> {
-    const newBuilder = updateData(
-      builderState,
-      AsNotNull({ bip44WrapperRow: null }),
-    );
-    newBuilder.plain.tables.push(Bip44WrapperSchema.name);
-    newBuilder.plain.buildSteps.push(async (finalData: T) => {
-      newBuilder.generic.bip44WrapperRow = await addBip44Wrapper({
-        db: newBuilder.plain.db,
-        tx: newBuilder.plain.tx,
-        row: insert(finalData)
-      });
-    });
-    return newBuilder;
-  }
-
-  static addPrivateDeriver<
-    T: HasBip44Wrapper
-  >(
-    builderState: BuilderState<T>
-  ): BuilderState<T & HasPrivateDeriver> {
     return updateData(
       builderState,
-      AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
+      AsNotNull<HasBip44Wrapper>({ bip44WrapperRow: null }),
+      Bip44WrapperSchema.name,
+      async (finalData) => {
+        finalData.bip44WrapperRow = await addBip44Wrapper({
+          db: builderState.db,
+          tx: builderState.tx,
+          row: insert(finalData)
+        });
+      },
     );
   }
+
+  // static addPrivateDeriver<
+  //   T: HasBip44Wrapper
+  // >(
+  //   builderState: BuilderState<T>
+  // ): BuilderState<T & HasPrivateDeriver> {
+  //   return updateData(
+  //     builderState,
+  //     AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
+  //   );
+  // }
 }
 
 /**

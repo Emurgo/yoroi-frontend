@@ -23,7 +23,7 @@ import type {
 } from '../database/genericBip44/tables';
 import {
   addPublicDeriver,
-  addByLevel,
+  addByLevelWithParent,
   TableMap,
   getDerivationsByPath
 } from '../database/genericBip44/api';
@@ -239,7 +239,7 @@ function _derive(
       }
 
       // add derivation itself
-      insertResult = await addByLevel(
+      insertResult = await addByLevelWithParent(
         {
           db,
           tx: getKeyTx,

@@ -54,10 +54,10 @@ test('Can add and fetch address in wallet', async () => {
     state = WalletBuilder.start(db);
     state = WalletBuilder.addConceptualWallet(
       state,
-      {
+      _finalState => ({
         CoinType: coinTypeIndex,
         Name: 'My Test Wallet',
-      }
+      })
     );
     state = WalletBuilder.addBip44Wrapper(
       state,
@@ -119,15 +119,30 @@ test('Can add and fetch address in wallet', async () => {
     })
   });
 
-  const privateDeriver = await addPrivateDeriver({
-    db,
-    tx: tx1,
-    row: {
-      Bip44WrapperId: state.generic.bip44WrapperRow.Bip44WrapperId,
-      Bip44DerivationId: addRootResult.derivationTableResult.Bip44DerivationId,
-      Level: DerivationLevels.ROOT.level,
-    }
-  });
+  const privateDeriver = await addPrivateDeriver(
+    {
+      db,
+      tx: tx1,
+      row: {
+        Bip44WrapperId: state.data.bip44WrapperRow.Bip44WrapperId,
+        Bip44DerivationId: addRootResult.derivationTableResult.Bip44DerivationId,
+        Level: DerivationLevels.ROOT.level,
+      }
+    },
+    {
+      db,
+      tx: tx1,
+      keyInfo: {
+        PublicKeyId: null,
+        PrivateKeyId: privateRootKey.KeyId,
+        Index: 0,
+      },
+      derivationInfo: id => ({
+        Bip44DerivationId: id,
+      })
+    },
+    DerivationLevels.ROOT.level,
+  );
 
   // Add purpose
   const purposeKey = rootPk.key().derive(
@@ -142,7 +157,7 @@ test('Can add and fetch address in wallet', async () => {
       PrivateKeyId: null,
       Index: purposeIndex,
     },
-    parentDerivationId: privateDeriver.Bip44DerivationId,
+    parentDerivationId: privateDeriver.privateDeriverResult.Bip44DerivationId,
     derivationInfo: id => ({
       Bip44DerivationId: id,
     })
@@ -175,8 +190,8 @@ test('Can add and fetch address in wallet', async () => {
   );
   const bridge = new LovefieldBridge(db);
   const bipWallet = new Bip44Wallet(
-    state.generic.conceptualWalletRow.ConceptualWalletId,
-    state.generic.bip44WrapperRow.Bip44WrapperId,
+    state.data.conceptualWalletRow.ConceptualWalletId,
+    state.data.bip44WrapperRow.Bip44WrapperId,
   );
   await bridge.addBip44WalletFunctionality(bipWallet);
   expect(bipWallet instanceof LovefieldDerive).toEqual(true);
