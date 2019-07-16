@@ -29,7 +29,7 @@ import {
 } from '../database/genericBip44/api';
 
 import { KeySchema } from '../database/uncategorized/tables';
-import type { KeyRow } from '../database/uncategorized/tables';
+import type { KeyInsert, KeyRow } from '../database/uncategorized/tables';
 import { addKey, } from '../database/uncategorized/api';
 
 import { StaleStateError, WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
@@ -93,12 +93,10 @@ function _deriveKey(
   return currKey;
 }
 
-async function _saveKey(
-  db: lf$Database,
-  tx: lf$Transaction,
+async function _toKeyInsert(
   keyInfo: KeyInfo,
   keyHex: string,
-): Promise<KeyRow> {
+): Promise<KeyInsert> {
   const hash = keyInfo.password
     ? encryptWithPassword(
       keyInfo.password,
@@ -106,15 +104,11 @@ async function _saveKey(
     )
     : keyHex;
 
-  return await addKey({
-    db,
-    tx,
-    row: {
-      Hash: hash,
-      IsEncrypted: keyInfo.password != null,
-      PasswordLastUpdate: keyInfo.lastUpdate,
-    }
-  });
+  return {
+    Hash: hash,
+    IsEncrypted: keyInfo.password != null,
+    PasswordLastUpdate: keyInfo.lastUpdate,
+  };
 }
 
 function _derive(
@@ -190,8 +184,8 @@ function _derive(
       privateKeyRow = result;
     }
 
-    let newPrivateKey: KeyRow | null;
-    let newPublicKey: KeyRow | null;
+    let newPrivateKey: KeyInsert | null;
+    let newPublicKey: KeyInsert | null;
     {
       // Decrypt key and derive new key and save the result
 
@@ -206,17 +200,13 @@ function _derive(
 
       // save new key
       newPrivateKey = body.publicDeriverPrivateKey
-        ? await _saveKey(
-          db,
-          getKeyTx,
+        ? await _toKeyInsert(
           body.publicDeriverPrivateKey,
           newKey.to_hex(),
         )
         : null;
       newPublicKey = body.publicDeriverPublicKey
-        ? await _saveKey(
-          db,
-          getKeyTx,
+        ? await _toKeyInsert(
           body.publicDeriverPublicKey,
           newKey.public().to_hex(),
         )
@@ -243,13 +233,15 @@ function _derive(
         {
           db,
           tx: getKeyTx,
-          keyInfo: {
-            PublicKeyId: newPublicKey ? newPublicKey.KeyId : null,
-            PrivateKeyId: newPrivateKey ? newPrivateKey.KeyId : null,
+          privateKeyInfo: newPrivateKey,
+          publicKeyInfo: newPublicKey,
+          derivationInfo: keys => ({
+            PublicKeyId: keys.public,
+            PrivateKeyId: keys.private,
             Index: body.pathToPublic[body.pathToPublic.length - 1],
-          },
+          }),
           parentDerivationId,
-          derivationInfo: id => ({
+          levelInfo: id => ({
             Bip44DerivationId: id,
             ...body.levelSpecificInsert,
           }),

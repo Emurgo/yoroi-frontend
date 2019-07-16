@@ -20,6 +20,8 @@ import type {
   Bip44WrapperInsert, Bip44WrapperRow,
 } from './tables';
 import * as Tables from './tables';
+import type { KeyInsert } from '../uncategorized/tables';
+import { addKey } from '../uncategorized/api';
 import { addToTable, getRowIn, getRowFromKey } from '../utils';
 import type { AddRowRequest } from '../utils';
 
@@ -161,16 +163,17 @@ export const addBip44Wrapper = async (
   )
 );
 export const addPrivateDeriver = async <Insert>(
-  privateDeriverRequest: AddRowRequest<PrivateDeriverInsert>,
   addLevelRequest: AddDerivationRequest<Insert>,
   level: number,
+  privateDeriverRequest: number => AddRowRequest<PrivateDeriverInsert>,
 ) => {
-  const privateDeriverResult = await addToTable<PrivateDeriverInsert, PrivateDeriverRow>(
-    privateDeriverRequest, Tables.PrivateDeriverSchema.name,
-  );
   const levelResult = await addByLevel(
     addLevelRequest,
     level,
+  );
+  const privateDeriverResult = await addToTable<PrivateDeriverInsert, PrivateDeriverRow>(
+    privateDeriverRequest(levelResult.derivationTableResult.Bip44DerivationId),
+    Tables.PrivateDeriverSchema.name,
   );
   return {
     privateDeriverResult,
@@ -338,8 +341,13 @@ export const getBip44Wrapper = async (
 export type AddDerivationRequest<Insert> = {|
   db: lf$Database,
   tx: lf$Transaction,
-  keyInfo: Bip44DerivationInsert,
-  derivationInfo: number => Insert,
+  privateKeyInfo: KeyInsert | null,
+  publicKeyInfo: KeyInsert | null,
+  derivationInfo: {|
+      private: number | null,
+      public: number | null,
+    |} => Bip44DerivationInsert,
+  levelInfo: number => Insert,
 |};
 
 async function _addDerivation<Insert, Row>(
@@ -349,9 +357,31 @@ async function _addDerivation<Insert, Row>(
   derivationTableResult: Bip44DerivationRow,
   specificDerivationResult: Row,
 }> {
+  const privateKey = request.privateKeyInfo === null
+    ? null
+    : await addKey({
+      db: request.db,
+      tx: request.tx,
+      row: request.privateKeyInfo
+    });
+  const publicKey = request.publicKeyInfo === null
+    ? null
+    : await addKey({
+      db: request.db,
+      tx: request.tx,
+      row: request.publicKeyInfo
+    });
+
   const derivationTableResult =
     await addToTable<Bip44DerivationInsert, Bip44DerivationRow>(
-      { db: request.db, tx: request.tx, row: request.keyInfo },
+      {
+        db: request.db,
+        tx: request.tx,
+        row: request.derivationInfo({
+          private: privateKey ? privateKey.KeyId : null,
+          public: publicKey ? publicKey.KeyId : null,
+        })
+      },
       Tables.Bip44DerivationSchema.name,
     );
 
@@ -360,7 +390,7 @@ async function _addDerivation<Insert, Row>(
       {
         db: request.db,
         tx: request.tx,
-        row: request.derivationInfo(derivationTableResult.Bip44DerivationId)
+        row: request.levelInfo(derivationTableResult.Bip44DerivationId)
       },
       tableName,
     );
@@ -372,11 +402,8 @@ async function _addDerivation<Insert, Row>(
 }
 
 export type DeriveFromRequest<T> = {|
-  db: lf$Database,
-  tx: lf$Transaction,
   parentDerivationId: number,
-  keyInfo: Bip44DerivationInsert,
-  derivationInfo: number => T,
+  ...AddDerivationRequest<T>
 |};
 
 async function _addDerivationWithParent<Insert, Row>(
@@ -391,8 +418,10 @@ async function _addDerivationWithParent<Insert, Row>(
     {
       db: request.db,
       tx: request.tx,
-      keyInfo: request.keyInfo,
+      privateKeyInfo: request.privateKeyInfo,
+      publicKeyInfo: request.publicKeyInfo,
       derivationInfo: request.derivationInfo,
+      levelInfo: request.levelInfo,
     },
     tableName,
   );
