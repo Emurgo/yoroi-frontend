@@ -49,23 +49,28 @@ test('Can add and fetch address in wallet', async () => {
 
   const db = await loadLovefieldDB(true);
 
-  // let helper: $Shape<{||}> = {};
-  // const builder = new WalletBuilder(db);
-  // helper = WalletBuilder.addConceptual<typeof helper>(helper);
-  // console.log(helper.asdf);
-  // helper = WalletBuilder.addAsdf<typeof helper>(helper);
-  // console.log(helper.asdf);
-  // console.log(helper.zxcv);
-  // //console.log(helper.qwer);
-  // helper = WalletBuilder.addZxcv<typeof helper>(helper);
-  // console.log(helper.asdf);
-  // console.log(helper.zxcv);
-  // console.log(helper.qwer);
-  // //console.log(helper.qwerqwer);
-
-  let state = WalletBuilder.start(db);
-  state = WalletBuilder.addConceptual(state);
-  state = WalletBuilder.addAsdf(state);
+  let state;
+  {
+    state = WalletBuilder.start(db);
+    state = WalletBuilder.addConceptualWallet(
+      state,
+      {
+        CoinType: coinTypeIndex,
+        Name: 'My Test Wallet',
+      }
+    );
+    state = WalletBuilder.addBip44Wrapper(
+      state,
+      finalState => ({
+        ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+        IsBundled: false,
+        SignerLevel: DerivationLevels.ACCOUNT.level,
+        PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
+        Version: 2,
+      })
+    );
+    await WalletBuilder.commit(state);
+  }
 
   const ConceptualWalletTable = db.getSchema().table(ConceptualWalletSchema.name);
   const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
@@ -89,15 +94,6 @@ test('Can add and fetch address in wallet', async () => {
     Bip44PurposeTable,
     Bip44CoinTypeTable,
   ]);
-  const conceptualWallet = await addConceptualWallet({
-    db,
-    tx: tx1,
-    row: {
-      CoinType: coinTypeIndex,
-      Name: 'My Test Wallet',
-    }
-  });
-
 
   const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonic);
   const rootPk = RustModule.Wallet.Bip44RootPrivateKey.recover(entropy, '');
@@ -123,23 +119,11 @@ test('Can add and fetch address in wallet', async () => {
     })
   });
 
-  const wrapper = await addBip44Wrapper({
-    db,
-    tx: tx1,
-    row: {
-      ConceptualWalletId: conceptualWallet.ConceptualWalletId,
-      IsBundled: false,
-      SignerLevel: DerivationLevels.ACCOUNT.level,
-      PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
-      Version: 2,
-    }
-  });
-
   const privateDeriver = await addPrivateDeriver({
     db,
     tx: tx1,
     row: {
-      Bip44WrapperId: wrapper.Bip44WrapperId,
+      Bip44WrapperId: state.generic.bip44WrapperRow.Bip44WrapperId,
       Bip44DerivationId: addRootResult.derivationTableResult.Bip44DerivationId,
       Level: DerivationLevels.ROOT.level,
     }
@@ -191,8 +175,8 @@ test('Can add and fetch address in wallet', async () => {
   );
   const bridge = new LovefieldBridge(db);
   const bipWallet = new Bip44Wallet(
-    conceptualWallet.ConceptualWalletId,
-    wrapper.Bip44WrapperId,
+    state.generic.conceptualWalletRow.ConceptualWalletId,
+    state.generic.bip44WrapperRow.Bip44WrapperId,
   );
   await bridge.addBip44WalletFunctionality(bipWallet);
   expect(bipWallet instanceof LovefieldDerive).toEqual(true);
