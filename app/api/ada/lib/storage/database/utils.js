@@ -7,20 +7,20 @@ import type {
 } from 'lovefield';
 
 export type AddRowRequest<T> = {
-  db: lf$Database,
-  tx: lf$Transaction,
   row: T,
 };
 
 export async function addToTable<Insert, Row>(
+  db: lf$Database,
+  tx: lf$Transaction,
   request: AddRowRequest<Insert>,
   tableName: string,
 ): Promise<Row> {
-  const table = request.db.getSchema().table(tableName);
+  const table = db.getSchema().table(tableName);
   const newRow = table.createRow(request.row);
 
-  const result: Row = (await request.tx.attach(
-    request.db
+  const result: Row = (await tx.attach(
+    db
       .insertOrReplace()
       .into(table)
       .values(([newRow]: Array<lf$Row>))

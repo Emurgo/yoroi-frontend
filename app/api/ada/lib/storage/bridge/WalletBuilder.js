@@ -6,7 +6,7 @@ import type {
 } from 'lovefield';
 
 import type {
-  ConceptualWalletRow, ConceptualWalletInsert
+  ConceptualWalletRow, ConceptualWalletInsert,
 } from '../database/uncategorized/tables';
 import {
   ConceptualWalletSchema,
@@ -16,7 +16,7 @@ import {
 } from '../database/uncategorized/api';
 import type {
   Bip44WrapperRow, Bip44WrapperInsert,
-  PrivateDeriverRow,
+  PrivateDeriverRow, PrivateDeriverInsert,
 } from '../database/genericBip44/tables';
 import {
   Bip44WrapperSchema,
@@ -108,11 +108,11 @@ export class WalletBuilder {
       AsNotNull<HasConceptualWallet>({ conceptualWalletRow: null }),
       ConceptualWalletSchema.name,
       async (finalData) => {
-        finalData.conceptualWalletRow = await addConceptualWallet({
-          db: builderState.db,
-          tx: builderState.tx,
-          row: insert(finalData)
-        });
+        finalData.conceptualWalletRow = await addConceptualWallet(
+          builderState.db,
+          builderState.tx,
+          { row: insert(finalData) }
+        );
       },
     );
   }
@@ -128,11 +128,11 @@ export class WalletBuilder {
       AsNotNull<HasBip44Wrapper>({ bip44WrapperRow: null }),
       Bip44WrapperSchema.name,
       async (finalData) => {
-        finalData.bip44WrapperRow = await addBip44Wrapper({
-          db: builderState.db,
-          tx: builderState.tx,
-          row: insert(finalData)
-        });
+        finalData.bip44WrapperRow = await addBip44Wrapper(
+          builderState.db,
+          builderState.tx,
+          { row: insert(finalData) }
+        );
       },
     );
   }
@@ -140,11 +140,20 @@ export class WalletBuilder {
   // static addPrivateDeriver<
   //   T: HasBip44Wrapper
   // >(
-  //   builderState: BuilderState<T>
+  //   builderState: BuilderState<T>,
+  //   insert: T => PrivateDeriverInsert, // TODO: wrong type
   // ): BuilderState<T & HasPrivateDeriver> {
   //   return updateData(
   //     builderState,
   //     AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
+  //     Bip44WrapperSchema.name,
+  //     async (finalData) => {
+  //       finalData.bip44WrapperRow = await addPrivateDeriver(
+  //         builderState.db,
+  //         builderState.tx,
+  //         { row: insert(finalData) }
+  //       );
+  //     },
   //   );
   // }
 }

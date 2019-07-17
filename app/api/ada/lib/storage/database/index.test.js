@@ -100,34 +100,33 @@ test('Can add and fetch address in wallet', async () => {
 
   const wrapperId = state.data.bip44WrapperRow.Bip44WrapperId;
   const privateDeriver = await addPrivateDeriver(
+    db, tx1,
     {
-      db,
-      tx: tx1,
-      privateKeyInfo: {
-        Hash: rootPk.key().to_hex(),
-        IsEncrypted: false,
-        PasswordLastUpdate: null,
+      addLevelRequest: {
+        privateKeyInfo: {
+          Hash: rootPk.key().to_hex(),
+          IsEncrypted: false,
+          PasswordLastUpdate: null,
+        },
+        publicKeyInfo: null,
+        derivationInfo: keys => ({
+          PublicKeyId: keys.public,
+          PrivateKeyId: keys.private,
+          Index: 0,
+        }),
+        levelInfo: id => ({
+          Bip44DerivationId: id,
+        })
       },
-      publicKeyInfo: null,
-      derivationInfo: keys => ({
-        PublicKeyId: keys.public,
-        PrivateKeyId: keys.private,
-        Index: 0,
+      level: DerivationLevels.ROOT.level,
+      privateDeriverRequest: derivationId => ({
+        row: {
+          Bip44WrapperId: wrapperId,
+          Bip44DerivationId: derivationId,
+          Level: DerivationLevels.ROOT.level,
+        }
       }),
-      levelInfo: id => ({
-        Bip44DerivationId: id,
-      })
-    },
-    DerivationLevels.ROOT.level,
-    derivationId => ({
-      db,
-      tx: tx1,
-      row: {
-        Bip44WrapperId: wrapperId,
-        Bip44DerivationId: derivationId,
-        Level: DerivationLevels.ROOT.level,
-      }
-    }),
+    }
   );
 
   // Add purpose
@@ -135,42 +134,44 @@ test('Can add and fetch address in wallet', async () => {
     RustModule.Wallet.DerivationScheme.v2(),
     purposeIndex,
   );
-  const addPurposeResult = await deriveFromRoot({
-    db,
-    tx: tx1,
-    privateKeyInfo: null,
-    publicKeyInfo: null,
-    derivationInfo: keys => ({
-      PublicKeyId: keys.public,
-      PrivateKeyId: keys.private,
-      Index: purposeIndex,
-    }),
-    parentDerivationId: privateDeriver.privateDeriverResult.Bip44DerivationId,
-    levelInfo: id => ({
-      Bip44DerivationId: id,
-    })
-  });
+  const addPurposeResult = await deriveFromRoot(
+    db, tx1,
+    {
+      privateKeyInfo: null,
+      publicKeyInfo: null,
+      derivationInfo: keys => ({
+        PublicKeyId: keys.public,
+        PrivateKeyId: keys.private,
+        Index: purposeIndex,
+      }),
+      parentDerivationId: privateDeriver.privateDeriverResult.Bip44DerivationId,
+      levelInfo: id => ({
+        Bip44DerivationId: id,
+      })
+    }
+  );
 
   // Add coin type
   const coinTypeKey = purposeKey.derive(
     RustModule.Wallet.DerivationScheme.v2(),
     coinTypeIndex,
   );
-  const addCoinTypeResult = await deriveFromPurpose({
-    db,
-    tx: tx1,
-    privateKeyInfo: null,
-    publicKeyInfo: null,
-    derivationInfo: keys => ({
-      PublicKeyId: keys.public,
-      PrivateKeyId: keys.private,
-      Index: coinTypeIndex,
-    }),
-    parentDerivationId: addPurposeResult.derivationTableResult.Bip44DerivationId,
-    levelInfo: id => ({
-      Bip44DerivationId: id,
-    })
-  });
+  const addCoinTypeResult = await deriveFromPurpose(
+    db, tx1,
+    {
+      privateKeyInfo: null,
+      publicKeyInfo: null,
+      derivationInfo: keys => ({
+        PublicKeyId: keys.public,
+        PrivateKeyId: keys.private,
+        Index: coinTypeIndex,
+      }),
+      parentDerivationId: addPurposeResult.derivationTableResult.Bip44DerivationId,
+      levelInfo: id => ({
+        Bip44DerivationId: id,
+      })
+    }
+  );
 
   await tx1.commit();
 
@@ -222,57 +223,60 @@ test('Can add and fetch address in wallet', async () => {
     Bip44AddressTable,
   ]);
 
-  const externalChain = await deriveFromAccount({
-    db,
-    tx: tx2,
-    parentDerivationId: pubDeriver.Bip44DerivationId,
-    privateKeyInfo: null,
-    publicKeyInfo: null,
-    derivationInfo: keys => ({
-      PublicKeyId: keys.public,
-      PrivateKeyId: keys.private,
-      Index: 0,
-    }),
-    levelInfo: id => ({
-      Bip44DerivationId: id,
-      LastReceiveIndex: 0,
-    }),
-  });
-  const internalChain = await deriveFromAccount({
-    db,
-    tx: tx2,
-    parentDerivationId: pubDeriver.Bip44DerivationId,
-    privateKeyInfo: null,
-    publicKeyInfo: null,
-    derivationInfo: keys => ({
-      PublicKeyId: keys.public,
-      PrivateKeyId: keys.private,
-      Index: 1,
-    }),
-    levelInfo: id => ({
-      Bip44DerivationId: id,
-      LastReceiveIndex: null,
-    }),
-  });
+  const externalChain = await deriveFromAccount(
+    db, tx2,
+    {
+      parentDerivationId: pubDeriver.Bip44DerivationId,
+      privateKeyInfo: null,
+      publicKeyInfo: null,
+      derivationInfo: keys => ({
+        PublicKeyId: keys.public,
+        PrivateKeyId: keys.private,
+        Index: 0,
+      }),
+      levelInfo: id => ({
+        Bip44DerivationId: id,
+        LastReceiveIndex: 0,
+      }),
+    }
+  );
+  const internalChain = await deriveFromAccount(
+    db, tx2,
+    {
+      parentDerivationId: pubDeriver.Bip44DerivationId,
+      privateKeyInfo: null,
+      publicKeyInfo: null,
+      derivationInfo: keys => ({
+        PublicKeyId: keys.public,
+        PrivateKeyId: keys.private,
+        Index: 1,
+      }),
+      levelInfo: id => ({
+        Bip44DerivationId: id,
+        LastReceiveIndex: null,
+      }),
+    }
+  );
 
   const addressPk = bip44AccountPk.bip44_chain(false).address_key(RustModule.Wallet.AddressKeyIndex.new(0));
   const addressHash = addressPk.public().bootstrap_era_address(setting).to_base58();
-  const address = await deriveFromChain({
-    db,
-    tx: tx2,
-    parentDerivationId: externalChain.derivationTableResult.Bip44DerivationId,
-    privateKeyInfo: null,
-    publicKeyInfo: null,
-    derivationInfo: keys => ({
-      PublicKeyId: keys.public,
-      PrivateKeyId: keys.private,
-      Index: 0,
-    }),
-    levelInfo: id => ({
-      Bip44DerivationId: id,
-      Hash: addressHash,
-    }),
-  });
+  const address = await deriveFromChain(
+    db, tx2,
+    {
+      parentDerivationId: externalChain.derivationTableResult.Bip44DerivationId,
+      privateKeyInfo: null,
+      publicKeyInfo: null,
+      derivationInfo: keys => ({
+        PublicKeyId: keys.public,
+        PrivateKeyId: keys.private,
+        Index: 0,
+      }),
+      levelInfo: id => ({
+        Bip44DerivationId: id,
+        Hash: addressHash,
+      }),
+    }
+  );
 
   await tx2.commit();
 

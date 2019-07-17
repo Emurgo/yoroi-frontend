@@ -21,16 +21,22 @@ import type { Bip44WrapperRow } from '../genericBip44/tables';
 
 
 export const addKey = async (
+  db: lf$Database,
+  tx: lf$Transaction,
   request: AddRowRequest<KeyInsert>,
 ): Promise<KeyRow> => (
   await addToTable<KeyInsert, KeyRow>(
+    db, tx,
     request, Tables.KeySchema.name
   )
 );
 export const addConceptualWallet = async (
+  db: lf$Database,
+  tx: lf$Transaction,
   request: AddRowRequest<ConceptualWalletInsert>,
 ): Promise<ConceptualWalletRow> => (
   await addToTable<ConceptualWalletInsert, ConceptualWalletRow>(
+    db, tx,
     request, Tables.ConceptualWalletSchema.name
   )
 );

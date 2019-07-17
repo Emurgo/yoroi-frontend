@@ -230,9 +230,8 @@ function _derive(
 
       // add derivation itself
       insertResult = await addByLevelWithParent(
+        db, getKeyTx,
         {
-          db,
-          tx: getKeyTx,
           privateKeyInfo: newPrivateKey,
           publicKeyInfo: newPublicKey,
           derivationInfo: keys => ({
@@ -253,11 +252,13 @@ function _derive(
     let pubDeriver: PublicDeriverRow;
     {
       // add the public deriver
-      pubDeriver = await addPublicDeriver({
+      pubDeriver = await addPublicDeriver(
         db,
-        tx: getKeyTx,
-        row: body.publicDeriverInsert(insertResult.derivationTableResult.Bip44DerivationId),
-      });
+        getKeyTx,
+        {
+          row: body.publicDeriverInsert(insertResult.derivationTableResult.Bip44DerivationId),
+        }
+      );
     }
 
     await getKeyTx.commit();
