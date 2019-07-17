@@ -46,6 +46,8 @@ test('Can add and fetch address in wallet', async () => {
   const setting = RustModule.Wallet.BlockchainSettings.from_json({
     protocol_magic: 764824073 // mainnet
   });
+  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonic);
+  const rootPk = RustModule.Wallet.Bip44RootPrivateKey.recover(entropy, '');
 
   const db = await loadLovefieldDB(true);
 
@@ -67,6 +69,35 @@ test('Can add and fetch address in wallet', async () => {
         SignerLevel: DerivationLevels.ACCOUNT.level,
         PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
         Version: 2,
+      })
+    );
+    state = WalletBuilder.addPrivateDeriver(
+      state,
+      finalState => ({
+        addLevelRequest: {
+          privateKeyInfo: {
+            Hash: rootPk.key().to_hex(),
+            IsEncrypted: false,
+            PasswordLastUpdate: null,
+          },
+          publicKeyInfo: null,
+          derivationInfo: keys => ({
+            PublicKeyId: keys.public,
+            PrivateKeyId: keys.private,
+            Index: 0,
+          }),
+          levelInfo: id => ({
+            Bip44DerivationId: id,
+          })
+        },
+        level: DerivationLevels.ROOT.level,
+        addPrivateDeriverRequest: derivationId => ({
+          row: {
+            Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
+            Bip44DerivationId: derivationId,
+            Level: DerivationLevels.ROOT.level,
+          }
+        }),
       })
     );
     await WalletBuilder.commit(state);
@@ -95,40 +126,6 @@ test('Can add and fetch address in wallet', async () => {
     Bip44CoinTypeTable,
   ]);
 
-  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonic);
-  const rootPk = RustModule.Wallet.Bip44RootPrivateKey.recover(entropy, '');
-
-  const wrapperId = state.data.bip44WrapperRow.Bip44WrapperId;
-  const privateDeriver = await addPrivateDeriver(
-    db, tx1,
-    {
-      addLevelRequest: {
-        privateKeyInfo: {
-          Hash: rootPk.key().to_hex(),
-          IsEncrypted: false,
-          PasswordLastUpdate: null,
-        },
-        publicKeyInfo: null,
-        derivationInfo: keys => ({
-          PublicKeyId: keys.public,
-          PrivateKeyId: keys.private,
-          Index: 0,
-        }),
-        levelInfo: id => ({
-          Bip44DerivationId: id,
-        })
-      },
-      level: DerivationLevels.ROOT.level,
-      privateDeriverRequest: derivationId => ({
-        row: {
-          Bip44WrapperId: wrapperId,
-          Bip44DerivationId: derivationId,
-          Level: DerivationLevels.ROOT.level,
-        }
-      }),
-    }
-  );
-
   // Add purpose
   const purposeKey = rootPk.key().derive(
     RustModule.Wallet.DerivationScheme.v2(),
@@ -144,7 +141,7 @@ test('Can add and fetch address in wallet', async () => {
         PrivateKeyId: keys.private,
         Index: purposeIndex,
       }),
-      parentDerivationId: privateDeriver.privateDeriverResult.Bip44DerivationId,
+      parentDerivationId: state.data.privateDeriver.privateDeriverResult.Bip44DerivationId,
       levelInfo: id => ({
         Bip44DerivationId: id,
       })

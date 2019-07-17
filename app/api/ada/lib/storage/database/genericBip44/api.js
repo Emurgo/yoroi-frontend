@@ -165,14 +165,15 @@ export const addBip44Wrapper = async (
     request, Tables.Bip44WrapperSchema.name,
   )
 );
+export type PrivateDeriverRequest<Insert> = {
+  addLevelRequest: AddDerivationRequest<Insert>,
+  level: number,
+  addPrivateDeriverRequest: number => AddRowRequest<PrivateDeriverInsert>,
+};
 export const addPrivateDeriver = async <Insert>(
   db: lf$Database,
   tx: lf$Transaction,
-  request: {
-    addLevelRequest: AddDerivationRequest<Insert>,
-    level: number,
-    privateDeriverRequest: number => AddRowRequest<PrivateDeriverInsert>,
-  }
+  request: PrivateDeriverRequest<Insert>,
 ) => {
   const levelResult = await addByLevel(
     db, tx,
@@ -181,7 +182,7 @@ export const addPrivateDeriver = async <Insert>(
   );
   const privateDeriverResult = await addToTable<PrivateDeriverInsert, PrivateDeriverRow>(
     db, tx,
-    request.privateDeriverRequest(levelResult.derivationTableResult.Bip44DerivationId),
+    request.addPrivateDeriverRequest(levelResult.derivationTableResult.Bip44DerivationId),
     Tables.PrivateDeriverSchema.name,
   );
   return {
