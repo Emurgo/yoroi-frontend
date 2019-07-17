@@ -58,8 +58,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       }));
     const { currentTheme } = this.props.stores.profile;
 
-    // can't register URI scheme when using Yoroi as a website
-    const uriSettings = environment.userAgentInfo.isExtension
+    const uriSettings = environment.userAgentInfo.canRegisterProtocol()
       ? (
         <UriSettingsBlock
           openSettingsPage={() => openSandboxedTab(handlersSettingUrl)}

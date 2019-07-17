@@ -76,12 +76,7 @@ export default class ProfileStore extends Store {
     },
     {
       isDone: () => {
-        const canSkip =
-          // can't register uri scheme when using Yoroi as a website
-          !environment.userAgentInfo.isExtension
-          // Firefox users don't have to accept a prompt to register a protocol
-          || environment.userAgentInfo.isFirefox;
-        return canSkip || this.isUriSchemeAccepted;
+        return !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted;
       },
       action: () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
@@ -364,7 +359,7 @@ export default class ProfileStore extends Store {
   };
 
   getThemeVars = ({ theme }: { theme: string }) => {
-    if (theme) return require(`../../themes/prebuilt/${theme}.js`);
+    if (theme) return require(`../../themes/prebuilt/${theme}.js`).default;
     return require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`); // default
   };
 
@@ -386,7 +381,8 @@ export default class ProfileStore extends Store {
   // ========== Terms of Use ========== //
 
   @computed get termsOfUse(): string {
-    return require(`../../i18n/locales/terms-of-use/${environment.API}/${this.currentLocale}.md`);
+    const API = environment.API;
+    return require(`../../i18n/locales/terms-of-use/${API}/${this.currentLocale}.md`);
   }
 
   @computed get hasLoadedTermsOfUseAcceptance(): boolean {
