@@ -33,6 +33,8 @@ import { LovefieldDerive } from '../bridge/LovefieldDerive';
 import { WalletBuilder } from '../bridge/WalletBuilder';
 import { ConceptualWalletSchema, KeySchema } from './uncategorized/tables';
 
+import * as NEW from './genericBip44/newApi';
+
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 const password = 'greatest_password_ever';
 const coinTypeIndex = 0x80000000 + 1815;
@@ -50,6 +52,22 @@ test('Can add and fetch address in wallet', async () => {
   const rootPk = RustModule.Wallet.Bip44RootPrivateKey.recover(entropy, '');
 
   const db = await loadLovefieldDB(true);
+
+  const tx = db.createTransaction();
+  const test = await NEW.ILovefieldRequest
+    .start({ db, tx })
+    .chain(NEW.AddKey, req => Promise.resolve({
+      Hash: '1',
+      IsEncrypted: false,
+      PasswordLastUpdate: null,
+    }))
+    .then(done => done
+      .chain(NEW.AddKey, req => Promise.resolve({
+        Hash: req.Hash + '1',
+        IsEncrypted: false,
+        PasswordLastUpdate: null,
+      })).then(asdf => asdf.run({ db, tx })));
+  console.log(test);
 
   let state;
   {
@@ -102,6 +120,7 @@ test('Can add and fetch address in wallet', async () => {
     );
     await WalletBuilder.commit(state);
   }
+  console.log('zxcv');
 
   const ConceptualWalletTable = db.getSchema().table(ConceptualWalletSchema.name);
   const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
