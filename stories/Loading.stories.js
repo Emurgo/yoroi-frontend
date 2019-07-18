@@ -15,4 +15,6 @@ story.add('Init', () => (
       onExternalLinkClick={() => {}}
       downloadLogs={() => {}}
     />
-  </CenteredLayout>));
+  </CenteredLayout>), {
+  notes: 'This is Loading Init page'
+});
