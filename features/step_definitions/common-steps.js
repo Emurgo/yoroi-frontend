@@ -195,6 +195,7 @@ Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
 
 Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
+  await migrateImportedSnapshot(this);
   await navigateToTransactionsList(this);
   await refreshWallet(this);
 });
@@ -259,4 +260,10 @@ async function importIndexedDB(client, importDir: string) {
     window.yoroi.api.ada.importLocalDatabase(data);
     // $FlowFixMe Flow thinks that indexedDBData is of type Buffer
   }, JSON.parse(indexedDBData));
+}
+
+async function migrateImportedSnapshot(client) {
+  return client.driver.executeScript(() => {
+    window.yoroi.actions.snapshot.migrateImportedSnapshot.trigger({});
+  });
 }

@@ -263,8 +263,8 @@ export default class LocalStorageApi {
   }
 
   setLocalStorage = (localStorageData: any): Promise<void> => new Promise((resolve) => {
-    Object.keys(localStorageData).forEach(async key => {
-      await localStorage.setItem(key, localStorageData[key]);
+    Object.keys(localStorageData).forEach(key => {
+      localStorage.setItem(key, localStorageData[key]);
     });
     resolve();
   });
