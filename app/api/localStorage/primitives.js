@@ -17,8 +17,6 @@ declare var chrome;
 const getStorageItemInExtension = (key: ?string) => new Promise((resolve, reject) => {
   chrome.storage.local.get(key, (data, error) => {
     if (error) reject(error);
-    console.log(data);
-    console.log(Object.keys(data).length);
     if (!key) resolve(data);
     const value = data[key];
     if (value === undefined) resolve('');
@@ -82,7 +80,9 @@ export async function isEmptyStorage(): Promise<boolean> {
   return new Promise((resolve) => {
     const isExtention = environment.userAgentInfo.isExtension;
     if (isExtention) {
-      return getStorageItemInExtension().then((data: Object) => Object.keys(data).length === 0);
+      return getStorageItemInExtension().then((data: Object) => {
+        return Object.keys(data).length === 0;
+      });
     }
     try {
       resolve(localStorage.length === 0);

@@ -620,7 +620,7 @@ export default class AdaApi {
     Logger.debug('AdaApi::getWallets called');
     try {
       const wallet = await getAdaWallet();
-      const account = getCurrentCryptoAccount();
+      const account = await getCurrentCryptoAccount();
       const wallets: Array<[AdaWallet, ?CryptoAccount]> = wallet
         ? [[wallet, account]]
         : [];
@@ -642,9 +642,9 @@ export default class AdaApi {
   ): Promise<GetAddressesResponse> {
     Logger.debug('AdaApi::getExternalAddresses called: ' + stringifyData(request));
     try {
-      const cuttoffIndex = getLastReceiveAddressIndex() + 1;
+      const cuttoffIndex = (await getLastReceiveAddressIndex()) + 1;
 
-      const accountIndex = getCurrentCryptoAccount();
+      const accountIndex = await getCurrentCryptoAccount();
       if (!accountIndex) {
         throw new Error('Internal Error! Cannot get addresses without current account.');
       }
@@ -694,7 +694,7 @@ export default class AdaApi {
     Logger.debug('AdaApi::refreshTransactions called: ' + stringifyData(request));
     const { skip = 0, limit } = request;
     try {
-      const account = getCurrentCryptoAccount();
+      const account = await getCurrentCryptoAccount();
       if (account && !request.isLocalRequest) {
         const existingTxs = await getTxsOrderedByLastUpdateDesc();
         const newTxs = await refreshTxs(
@@ -717,9 +717,10 @@ export default class AdaApi {
         ? txHistory.slice(skip, skip + limit)
         : txHistory;
 
+      const lastBlockNumber = await getLastBlockNumber();
       const mappedTransactions = transactions.map(async data => {
         const { type, amount, fee } = await _getTxFinancialInfo(data);
-        return _createTransactionFromServerData(data, type, amount, fee);
+        return _createTransactionFromServerData(data, type, amount, fee, lastBlockNumber);
       });
       return Promise.all(mappedTransactions).then(mappedTxs => Promise.resolve({
         transactions: mappedTxs,
@@ -735,10 +736,11 @@ export default class AdaApi {
     Logger.debug('AdaApi::refreshPendingTransactions called');
     try {
       const pendingTxs = await getPendingTxs();
+      const lastBlockNumber = await getLastBlockNumber();
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
       return Promise.all(pendingTxs.map(async data => {
         const { type, amount, fee } = await _getTxFinancialInfo(data);
-        return _createTransactionFromServerData(data, type, amount, fee);
+        return _createTransactionFromServerData(data, type, amount, fee, lastBlockNumber);
       }));
     } catch (error) {
       Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
@@ -764,12 +766,12 @@ export default class AdaApi {
     Logger.debug('AdaApi::signAndBroadcast called');
     const { password, signRequest } = request;
     try {
-      const masterKey = getWalletMasterKey();
+      const masterKey = await getWalletMasterKey();
       if (masterKey == null) {
         throw new Error('No master key stored');
       }
       const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
-      const currAccount = getCurrentAccountIndex();
+      const currAccount = await getCurrentAccountIndex();
       if (currAccount == null) {
         throw new Error('no account selected');
       }
@@ -882,7 +884,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
 
       const { ledgerSignTxResp, unsignedTx, sendTx } = request;
-      const currentCryptoAccount = getCurrentCryptoAccount();
+      const currentCryptoAccount = await getCurrentCryptoAccount();
       if (!currentCryptoAccount) {
         throw new Error('Internal Error! Cannot broadcast tx without current account.');
       }
@@ -979,7 +981,7 @@ export default class AdaApi {
     Logger.debug('AdaApi::saveLastReceiveAddressIndex called');
     try {
       // also needed as some tests inject fake used transactiosn without coresponding txs
-      saveLastReceiveAddressIndex(request.index);
+      await saveLastReceiveAddressIndex(request.index);
     } catch (error) {
       Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -1004,7 +1006,7 @@ export default class AdaApi {
   ): Promise<GetSelectedExplorerResponse> {
     Logger.debug('AdaApi::getSelectedExplorer called');
     try {
-      return getSelectedExplorer();
+      return await getSelectedExplorer();
     } catch (error) {
       Logger.error('AdaApi::getSelectedExplorer error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -1016,7 +1018,7 @@ export default class AdaApi {
   ): Promise<SaveSelectedExplorerResponse> {
     Logger.debug('AdaApi::saveSelectedExplorer called');
     try {
-      saveSelectedExplorer(request.explorer);
+      await saveSelectedExplorer(request.explorer);
     } catch (error) {
       Logger.error('AdaApi::saveSelectedExplorer error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -1106,8 +1108,8 @@ export default class AdaApi {
       const cryptoAccount = createCryptoAccount(masterKey, walletPassword, 0);
 
       // save wallet info in localstorage
-      saveCryptoAccount(cryptoAccount);
-      createStoredWallet(adaWallet, masterKey);
+      await saveCryptoAccount(cryptoAccount);
+      await createStoredWallet(adaWallet, masterKey);
       await restoreBip44Wallet(
         cryptoAccount.root_cached_key,
         cryptoAccount.account,
@@ -1118,7 +1120,7 @@ export default class AdaApi {
       );
 
       Logger.debug('AdaApi::restoreWallet success');
-      const account = getCurrentCryptoAccount();
+      const account = await getCurrentCryptoAccount();
       return _createWalletFromServerData(adaWallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::restoreWallet error: ' + stringifyError(error));
@@ -1153,7 +1155,7 @@ export default class AdaApi {
       if (!wallet) throw new Error('not persistent wallet');
 
       Logger.debug('AdaApi::updateWalletMeta success: ' + stringifyData(wallet));
-      const account = getCurrentCryptoAccount();
+      const account = await getCurrentCryptoAccount();
       return _createWalletFromServerData(wallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::updateWalletMeta error: ' + stringifyError(error));
@@ -1221,8 +1223,8 @@ export default class AdaApi {
       );
 
       // save wallet info in localstorage
-      saveCryptoAccount(cryptoAccount);
-      createStoredWallet(hardwareWallet, undefined);
+      await saveCryptoAccount(cryptoAccount);
+      await createStoredWallet(hardwareWallet, undefined);
       await restoreBip44Wallet(
         cryptoAccount.root_cached_key,
         cryptoAccount.account,
@@ -1233,7 +1235,7 @@ export default class AdaApi {
       );
 
       Logger.debug('AdaApi::createHardwareWallet success');
-      const account = getCurrentCryptoAccount();
+      const account = await getCurrentCryptoAccount();
       return _createWalletFromServerData(hardwareWallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::createHardwareWallet error: ' + stringifyError(error));
@@ -1255,7 +1257,7 @@ export default class AdaApi {
   ): Promise<GetTransactionRowsToExportResponse> {
     try {
       Logger.debug('AdaApi::getTransactionRowsToExport: called');
-      const account = getCurrentCryptoAccount();
+      const account = await getCurrentCryptoAccount();
       if (account) {
         const existingTxs = await getTxsOrderedByLastUpdateDesc();
         const newTxs = await refreshTxs(
@@ -1509,7 +1511,13 @@ const _conditionToTxState = (condition: AdaTransactionCondition) => {
 
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
-  (data: AdaTransaction, type: TransactionDirectionType, amount: BigNumber, fee: BigNumber) => {
+  (
+    data: AdaTransaction,
+    type: TransactionDirectionType,
+    amount: BigNumber,
+    fee: BigNumber,
+    lastBlockNumber: number,
+  ) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,
@@ -1519,7 +1527,7 @@ const _createTransactionFromServerData = action(
       fee: fee.dividedBy(LOVELACES_PER_ADA),
       date: new Date(ctmDate),
       description: ctmDescription || '',
-      numberOfConfirmations: getLastBlockNumber() - data.ctBlockNumber,
+      numberOfConfirmations: lastBlockNumber - data.ctBlockNumber,
       addresses: {
         from: data.ctInputs.map(address => address[0]),
         to: data.ctOutputs.map(address => address[0])

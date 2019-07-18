@@ -156,4 +156,7 @@ export default class LocalStorageApi {
     await this.unsetHideBalance();
   }
 
+  getItem = (key: string): Promise<string> => getLocalItem(key);
+
+  setItem = (key: string, value: string): Promise<void> => setLocalItem(key, value);
 }

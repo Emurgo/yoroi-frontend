@@ -83,7 +83,7 @@ async function bip44Migration(): Promise<void> {
   );
 
   // if we had more than one address, then the WALLET key must exist in localstorage
-  saveLastReceiveAddressIndex(maxIndex);
+  await saveLastReceiveAddressIndex(maxIndex);
 
   /**
    * Once we've saved the receive address, we dump the DB entirely

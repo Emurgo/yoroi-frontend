@@ -6,6 +6,7 @@ import type { AdaWallet } from '../../adaTypes';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 import type { ExplorerType } from '../../../../domain/Explorer';
 import { Explorer } from '../../../../domain/Explorer';
+import { getLocalItem, setLocalItem } from '../../../localStorage/primitives';
 
 export type CryptoAccount = {
   account: number,
@@ -37,19 +38,19 @@ const storageKeys = {
 
 /* Account storage */
 
-export function saveCryptoAccount(
+export async function saveCryptoAccount(
   ca: CryptoAccount
-): void {
+): Promise<void> {
   const localAccount: LocalStorageCryptoAccount = {
     account: ca.account,
     root_cached_key: ca.root_cached_key.key().to_hex(),
     derivation_scheme: ca.derivation_scheme
   };
-  _saveInStorage(storageKeys.ACCOUNT_KEY, localAccount);
+  await _saveInStorage(storageKeys.ACCOUNT_KEY, localAccount);
 }
 
-export function getCurrentCryptoAccount(): ?CryptoAccount {
-  const localAccount = _getFromStorage(storageKeys.ACCOUNT_KEY);
+export async function getCurrentCryptoAccount(): Promise<?CryptoAccount> {
+  const localAccount = await _getFromStorage(storageKeys.ACCOUNT_KEY);
   if (!localAccount) {
     return null;
   }
@@ -68,60 +69,60 @@ export function getCurrentCryptoAccount(): ?CryptoAccount {
   };
 }
 
-export function getCurrentAccountIndex(): ?number {
-  const localAccount = _getFromStorage(storageKeys.ACCOUNT_KEY);
+export async function getCurrentAccountIndex(): Promise<?number> {
+  const localAccount = await _getFromStorage(storageKeys.ACCOUNT_KEY);
   return localAccount ? localAccount.account : undefined;
 }
 
 /* Wallet storage */
 
-export function createStoredWallet(
+export async function createStoredWallet(
   adaWallet: AdaWallet,
   masterKey?: string
-): void {
-  _saveInStorage(storageKeys.WALLET_KEY, ({
+): Promise<void> {
+  await _saveInStorage(storageKeys.WALLET_KEY, ({
     adaWallet,
     masterKey,
     lastReceiveAddressIndex: 0 // always start by showing one address
   }: LocalStorageWallet));
 }
 
-export function getAdaWallet(): ?AdaWallet {
-  const stored = _getFromStorage(storageKeys.WALLET_KEY);
+export async function getAdaWallet(): Promise<?AdaWallet> {
+  const stored = await _getFromStorage(storageKeys.WALLET_KEY);
   return stored ? stored.adaWallet : null;
 }
 
-export function saveAdaWallet(adaWallet: AdaWallet): void {
-  const stored: ?LocalStorageWallet = _getFromStorage(storageKeys.WALLET_KEY);
+export async function saveAdaWallet(adaWallet: AdaWallet): Promise<void> {
+  const stored: ?LocalStorageWallet = await _getFromStorage(storageKeys.WALLET_KEY);
   if (!stored) {
     throw new Error('Need to create a wallet before saving wallet metadata');
   }
   stored.adaWallet = adaWallet;
-  _saveInStorage(storageKeys.WALLET_KEY, stored);
+  await _saveInStorage(storageKeys.WALLET_KEY, stored);
 }
 
-export function getWalletMasterKey(): ?string {
-  const stored = _getFromStorage(storageKeys.WALLET_KEY);
+export async function getWalletMasterKey(): Promise<?string> {
+  const stored = await _getFromStorage(storageKeys.WALLET_KEY);
   return stored ? stored.masterKey : undefined;
 }
 
-export function saveWalletMasterKey(masterKey: string): void {
-  const stored: ?LocalStorageWallet = _getFromStorage(storageKeys.WALLET_KEY);
+export async function saveWalletMasterKey(masterKey: string): Promise<void> {
+  const stored: ?LocalStorageWallet = await _getFromStorage(storageKeys.WALLET_KEY);
   if (!stored) {
     throw new Error('Need to create a wallet before saving wallet metadata');
   }
   stored.masterKey = masterKey;
-  _saveInStorage(storageKeys.WALLET_KEY, stored);
+  await _saveInStorage(storageKeys.WALLET_KEY, stored);
 }
 
 /* Last block number storage */
 
-export function saveLastBlockNumber(blockNumber: number): void {
-  _saveInStorage(storageKeys.LAST_BLOCK_NUMBER_KEY, blockNumber);
+export async function saveLastBlockNumber(blockNumber: number): Promise<void> {
+  await _saveInStorage(storageKeys.LAST_BLOCK_NUMBER_KEY, blockNumber);
 }
 
-export function getLastBlockNumber(): number {
-  const lastBlockNum = _getFromStorage(storageKeys.LAST_BLOCK_NUMBER_KEY);
+export async function getLastBlockNumber(): Promise<number> {
+  const lastBlockNum = await _getFromStorage(storageKeys.LAST_BLOCK_NUMBER_KEY);
   // Note: have to cast to number because an old version of Yoroi saved as a string
   return lastBlockNum
     ? Number(lastBlockNum)
@@ -130,39 +131,39 @@ export function getLastBlockNumber(): number {
 
 /* Selected explorer storage */
 
-export function saveSelectedExplorer(explorer: ExplorerType): void {
-  _saveInStorage(storageKeys.SELECTED_EXPLORER_KEY, explorer);
+export async function saveSelectedExplorer(explorer: ExplorerType): Promise<void> {
+  await _saveInStorage(storageKeys.SELECTED_EXPLORER_KEY, explorer);
 }
 
-export function getSelectedExplorer(): ExplorerType {
-  const explorer = _getFromStorage(storageKeys.SELECTED_EXPLORER_KEY);
+export async function getSelectedExplorer(): Promise<ExplorerType> {
+  const explorer = await _getFromStorage(storageKeys.SELECTED_EXPLORER_KEY);
   return explorer || Explorer.SEIZA;
 }
 
 /* Last receive index storage */
 
-export function saveLastReceiveAddressIndex(index: number): void {
-  const stored: ?LocalStorageWallet = _getFromStorage(storageKeys.WALLET_KEY);
+export async function saveLastReceiveAddressIndex(index: number): Promise<void> {
+  const stored: ?LocalStorageWallet = await _getFromStorage(storageKeys.WALLET_KEY);
   if (!stored) {
     throw new Error('Need to create a wallet before saving wallet metadata');
   }
   stored.lastReceiveAddressIndex = index;
-  _saveInStorage(storageKeys.WALLET_KEY, stored);
+  await _saveInStorage(storageKeys.WALLET_KEY, stored);
 }
 
-export function getLastReceiveAddressIndex(): number {
-  const stored = _getFromStorage(storageKeys.WALLET_KEY);
+export async function getLastReceiveAddressIndex(): Promise<number> {
+  const stored = await _getFromStorage(storageKeys.WALLET_KEY);
   return stored ? stored.lastReceiveAddressIndex : 0;
 }
 
 /* Util functions */
-
-function _saveInStorage(key: string, toSave: any): void {
-  localStorage.setItem(key, JSON.stringify(toSave));
+async function _saveInStorage(key: string, toSave: any): Promise<void> {
+  await setLocalItem(key, JSON.stringify(toSave));
 }
 
-function _getFromStorage(key: string): any | typeof undefined {
-  const result = localStorage.getItem(key);
-  if (result) return JSON.parse(result);
-  return undefined;
+async function _getFromStorage(key: string): any | typeof undefined {
+  return await getLocalItem(key).then((result) => {
+    if (result !== '') return JSON.parse(result);
+    return undefined;
+  });
 }
