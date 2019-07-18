@@ -1,8 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, FormattedHTMLMessage } from 'react-intl';
-import { ellipsis } from '../../../utils/strings';
+import { defineMessages } from 'react-intl';
 import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
@@ -39,6 +38,7 @@ type WalletRestoreDialogContainerState = {
   },
   submitValues?: WalletRestoreDialogValues,
   resolvedRecoveryPhrase?: string,
+  notificationElementId: string,
 }
 
 @observer
@@ -49,6 +49,7 @@ export default class WalletRestoreDialogContainer
     verifyRestore: undefined,
     submitValues: undefined,
     resolvedRecoveryPhrase: undefined,
+    notificationElementId: ''
   };
 
   onVerifiedSubmit = () => {
@@ -116,7 +117,6 @@ export default class WalletRestoreDialogContainer
     }
 
     const tooltipNotification = {
-      id: `copyTooltipNotification`,
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: messages.copyTooltipMessage,
     };
@@ -131,14 +131,19 @@ export default class WalletRestoreDialogContainer
           selectedExplorer={profile.selectedExplorer}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
-          onCopyAddressTooltip={(address) => {
-            actions.notifications.open.trigger({
-              id: tooltipNotification.id,
-              duration: tooltipNotification.duration,
-              message: messages.copyTooltipMessage
-            });
+          onCopyAddressTooltip={(address, elementId) => {
+            if (!uiNotifications.isOpen(elementId)) {
+              this.setState({ notificationElementId: elementId });
+              actions.notifications.open.trigger({
+                id: elementId,
+                duration: tooltipNotification.duration,
+                message: tooltipNotification.message,
+              });
+            }
           }}
-          showNotification={uiNotifications.getTooltipActiveNotification(tooltipNotification.id)}
+          getNotification={uiNotifications.getTooltipActiveNotification(
+            this.state.notificationElementId
+          )}
           isSubmitting={restoreRequest.isExecuting}
           classicTheme={this.props.classicTheme}
           error={restoreRequest.error}

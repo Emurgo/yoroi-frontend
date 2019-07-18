@@ -51,9 +51,8 @@ type Props = {|
   addresses: Array<string>,
   accountPlate: WalletAccountNumberPlate,
   selectedExplorer: ExplorerType,
-  onCopyAddress?: Function,
   onCopyAddressTooltip: Function,
-  showNotification: Function,
+  getNotification: Function,
   onNext: Function,
   onCancel: Function,
   isSubmitting: boolean,
@@ -64,7 +63,6 @@ type Props = {|
 @observer
 export default class WalletRestoreVerifyDialog extends Component<Props> {
   static defaultProps = {
-    onCopyAddress: undefined,
     error: undefined,
   };
 
@@ -82,9 +80,8 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       onCancel,
       onNext,
       classicTheme,
-      onCopyAddress,
       onCopyAddressTooltip,
-      showNotification,
+      getNotification,
     } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
@@ -142,27 +139,31 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
           <h2 className={styles.addressLabel}>
             {intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)}
           </h2>
-          {addresses.map(a => (
-            <CopyableAddress
-              hash={a}
-              onCopyAddress={onCopyAddressTooltip}
-              showNotification={showNotification}
-              tooltipOpensUpward
-              key={a}
-            >
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
-                hash={a}
-                light
+          {addresses.map((address, index) => {
+            const notificationElementId = `${address}-${index}`;
+            return (
+              <CopyableAddress
+                hash={address}
+                elementId={notificationElementId}
+                onCopyAddress={onCopyAddressTooltip.bind(this, address, notificationElementId)}
+                getNotification={getNotification}
                 tooltipOpensUpward
-                linkType="address"
+                key={address}
               >
-                <RawHash light>
-                  {a}
-                </RawHash>
-              </ExplorableHashContainer>
-            </CopyableAddress>
-          ))}
+                <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={address}
+                  light
+                  tooltipOpensUpward
+                  linkType="address"
+                >
+                  <RawHash light>
+                    {address}
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyableAddress>
+            );
+          })}
         </div>
         <div className={styles.postCopyMargin} />
 

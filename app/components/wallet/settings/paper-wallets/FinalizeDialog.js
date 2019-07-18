@@ -43,9 +43,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onCopyAddress?: Function,
   onCopyAddressTooltip: Function,
-  showNotification: Function,
+  getNotification: Function,
   selectedExplorer: ExplorerType,
   paper: AdaPaper,
   onNext: Function,
@@ -58,7 +57,6 @@ type Props = {|
 export default class FinalizeDialog extends Component<Props> {
   static defaultProps = {
     onBack: undefined,
-    onCopyAddress: undefined,
   };
 
   static contextTypes = {
@@ -73,9 +71,8 @@ export default class FinalizeDialog extends Component<Props> {
       onNext,
       onBack,
       classicTheme,
-      onCopyAddress,
       onCopyAddressTooltip,
-      showNotification,
+      getNotification,
     } = this.props;
 
     const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
@@ -130,30 +127,33 @@ export default class FinalizeDialog extends Component<Props> {
           <h2 className={styles.addressLabel}>
             {intl.formatMessage(messages.paperAddressesLabel)}
           </h2>
-          {paper.addresses.map(a => (
-            <CopyableAddress
-              hash={a}
-              onCopyAddress={onCopyAddressTooltip}
-              showNotification={showNotification}
-              tooltipOpensUpward
-              key={a}
-            >
-              <ExplorableHashContainer
-                hash={a}
-                selectedExplorer={this.props.selectedExplorer}
-                light
+          {paper.addresses.map((address, index) => {
+            const notificationElementId = `${address}-${index}`;
+            return (
+              <CopyableAddress
+                hash={address}
+                elementId={notificationElementId}
+                onCopyAddress={onCopyAddressTooltip.bind(this, address, notificationElementId)}
+                getNotification={getNotification}
                 tooltipOpensUpward
-                linkType="address"
+                key={address}
               >
-                <RawHash light>
-                  {a}
-                </RawHash>
-              </ExplorableHashContainer>
-            </CopyableAddress>
-          ))}
+                <ExplorableHashContainer
+                  hash={address}
+                  selectedExplorer={this.props.selectedExplorer}
+                  light
+                  tooltipOpensUpward
+                  linkType="address"
+                >
+                  <RawHash light>
+                    {address}
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyableAddress>
+            );
+          })}
           <div className={styles.postCopyMargin} />
         </div>
-
       </Dialog>
     );
   }

@@ -1,17 +1,16 @@
 // @flow
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import type { Node } from 'react';
-import type { Notification } from '../../types/notificationType';
-import type { InjectedProps } from '../../types/injectedPropsType';
 import SvgInline from 'react-svg-inline';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
+import iconCopy from '../../assets/images/copy.inline.svg';
+import iconCopied from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
-import type { StoresMap } from '../../stores/index';
+
 
 const messages = defineMessages({
   copyTooltipMessage: {
@@ -23,10 +22,11 @@ const messages = defineMessages({
 type Props = {
   children: Node,
   hash: string,
+  elementId?: string,
   onCopyAddress?: Function,
   tooltipOpensUpward?: boolean,
   arrowRelativeToTip?: boolean,
-  showNotification: Function,
+  getNotification: Function,
 };
 
 @observer
@@ -39,12 +39,13 @@ export default class CopyableAddress extends Component<Props> {
     onCopyAddress: undefined,
     tooltipOpensUpward: false,
     arrowRelativeToTip: true,
+    elementId: undefined,
   };
 
   render() {
-    const { hash, onCopyAddress, showNotification } = this.props;
+    const { hash, elementId, onCopyAddress, getNotification } = this.props;
     const { intl } = this.context;
-    const notification = showNotification;
+    const notification = getNotification;
 
     const tooltipComponent = (
       <Tooltip
@@ -52,12 +53,15 @@ export default class CopyableAddress extends Component<Props> {
         skin={TooltipSkin}
         isOpeningUpward={this.props.tooltipOpensUpward}
         arrowRelativeToTip={this.props.arrowRelativeToTip}
-        tip={!notification
-          ? intl.formatMessage(messages.copyTooltipMessage)
-          : intl.formatMessage(notification.message)
+        tip={notification && notification.id === elementId
+          ? intl.formatMessage(notification.message)
+          : intl.formatMessage(messages.copyTooltipMessage)
         }
       >
-        <SvgInline svg={iconCopy} className={styles.copyIconBig} />
+        <SvgInline
+          svg={notification && notification.id === elementId ? iconCopied : iconCopy}
+          className={styles.copyIconBig}
+        />
       </Tooltip>
     );
 

@@ -26,11 +26,19 @@ const messages = defineMessages({
   },
 });
 
+type State = {
+  notificationElementId: string,
+};
+
 @observer
-export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
+export default class CreatePaperWalletDialogContainer extends Component<InjectedProps, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired
+  };
+
+  state = {
+    notificationElementId: ''
   };
 
   render() {
@@ -52,7 +60,6 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
     };
 
     const tooltipNotification = {
-      id: `copyTooltipNotification`,
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: messages.copyTooltipMessage,
     };
@@ -124,14 +131,19 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
             classicTheme={profile.isClassicTheme}
-            onCopyAddressTooltip={(address) => {
-              actions.notifications.open.trigger({
-                id: tooltipNotification.id,
-                duration: tooltipNotification.duration,
-                message: messages.copyTooltipMessage
-              });
+            onCopyAddressTooltip={(address, elementId) => {
+              if (!uiNotifications.isOpen(elementId)) {
+                this.setState({ notificationElementId: elementId });
+                actions.notifications.open.trigger({
+                  id: elementId,
+                  duration: tooltipNotification.duration,
+                  message: tooltipNotification.message,
+                });
+              }
             }}
-            showNotification={uiNotifications.getTooltipActiveNotification(tooltipNotification.id)}
+            getNotification={uiNotifications.getTooltipActiveNotification(
+              this.state.notificationElementId
+            )}
           />
         );
       default:
