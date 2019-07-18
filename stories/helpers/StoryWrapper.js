@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { keys } from 'lodash';
-import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -15,51 +14,38 @@ import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import { yoroiPolymorphTheme } from '../../app/themes/PolymorphThemes';
 import { themeOverrides } from '../../app/themes/overrides';
-import translations from '../../app/i18n/translations';
+import { translations, LANGUAGES } from '../../app/i18n/translations';
 import { THEMES } from '../../app/themes';
 import ThemeManager from '../../app/ThemeManager';
 import YoroiClassic from '../../app/themes/prebuilt/YoroiClassic';
 import YoroiModern from '../../app/themes/prebuilt/YoroiModern';
 
+import { withKnobs, select } from '@storybook/addon-knobs';
+import { addDecorator } from '@storybook/react';
+
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
 
+addDecorator(withKnobs);
+
 const themes = {
-  YoroiClassic,
-  YoroiModern
+  YoroiModern,
+  YoroiClassic
 };
 const themeNames = keys(themes);
+
+const langCode = LANGUAGES.map(item => item.value);
 
 type Props = {
     children: any,
 };
 
-type State = {
-  themeName: string,
-  localeName: string,
-};
-
-@observer
-export default class StoryWrapper extends Component<Props, State> {
-  state = {
-    themeName: localStorage.getItem('currentTheme') || themeNames[0],
-    localeName: localStorage.getItem('currentLocale') || 'en-US',
-  };
-
-  setLocaleName = (localeName: string) => {
-    this.setState({ localeName });
-    localStorage.setItem('currentLocale', localeName);
-  };
-
-  setThemeName = (themeName: string) => {
-    this.setState({ themeName });
-    localStorage.setItem('currentTheme', themeName);
-  };
+export default class StoryWrapper extends Component<Props> {
 
   render() {
     const { children: Story } = this.props;
-    const locale = this.state.localeName;
-    const currentTheme = this.state.themeName;
+    const locale = select('Language', langCode, langCode[0]);
+    const currentTheme = select('Theme', themeNames, themeNames[0]);
 
     // Merged english messages with selected by user locale messages
     // In this case all english data would be overridden to user selected locale, but untranslated

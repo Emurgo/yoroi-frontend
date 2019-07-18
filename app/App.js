@@ -18,7 +18,7 @@ import it from 'react-intl/locale-data/it';
 import { Routes } from './Routes';
 import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
 import { themeOverrides } from './themes/overrides';
-import translations from './i18n/translations';
+import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
 import { THEMES } from './themes';
