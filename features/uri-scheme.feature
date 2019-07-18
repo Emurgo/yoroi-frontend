@@ -13,9 +13,9 @@ Feature: URI scheme
     And I generate a URI for 10 ADA
     Then I should see the URI displayed in a new dialog
     When I click on the copy to clipboard icon
-    Then I should see "URL successfully copied" notification:
-    | message                              |
-    | uri.display.dialog.copy.notification |
+    Then I should see URI "copied" tooltip message:
+    | message                                            |
+    | wallet.receive.page.addressCopyTooltipNotificationMessage |
 
   @it-108
   Scenario: Ensure user can send a tx from a URI link (IT-108)
