@@ -1,7 +1,7 @@
 // @flow
 
 // eslint-disable-next-line
-import typeof * as WalletType from 'CardanoWallet'
+import typeof * as WalletType from 'cardano-wallet-browser';
 
 class Module {
   _cardanoWallet: WalletType;
