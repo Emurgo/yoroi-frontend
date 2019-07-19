@@ -7,7 +7,7 @@ import { UnableToLoadError } from '../app/i18n/errors';
 
 const story = storiesOf('Loading', module);
 
-/** Normal Loading */
+/* Normal */
 story.add('Normal', () => (
   <Loading
     hasLoadedCurrentLocale
@@ -19,7 +19,7 @@ story.add('Normal', () => (
   notes: 'Normal Loading'
 });
 
-/** Error while loading */
+/* Error while loading */
 story.add('Error while loading', () => (
   <Loading
     hasLoadedCurrentLocale

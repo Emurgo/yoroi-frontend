@@ -7,11 +7,23 @@ import LanguageSelectionForm from '../app/components/profile/language-selection/
 import { LANGUAGES } from '../app/i18n/translations';
 
 const story = storiesOf('LanguageSelection', module);
-story.add('Init', () => (
+
+/* Normal */
+story.add('Normal', () => (
   <LanguageSelectionForm
-    onSelectLanguage={action('onSelectLanguage')}
-    onSubmit={action('submit')}
+    onSelectLanguage={action('SelectLanguage')}
+    onSubmit={action('Submit')}
     isSubmitting={false}
+    currentLocale="en-US"
+    languages={LANGUAGES}
+  />));
+
+/* Submitting */
+story.add('Submitting', () => (
+  <LanguageSelectionForm
+    onSelectLanguage={action('SelectLanguage')}
+    onSubmit={action('Submit')}
+    isSubmitting
     currentLocale="en-US"
     languages={LANGUAGES}
   />));
