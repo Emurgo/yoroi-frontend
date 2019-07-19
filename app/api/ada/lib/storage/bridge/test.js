@@ -1,7 +1,7 @@
 // @flow
 
 type StateConstraint<CurrentState, Input, Output> = $Call<
-  (Input => () => StateMachine<Output>) & () => {...},
+  (Input => (...any) => StateMachine<Output>) & () => {...},
   CurrentState
 >
 
