@@ -5,8 +5,9 @@
   .copyIconBig {
     cursor: pointer;
     object-fit: contain;
-    margin-left: 5px;
+    margin-left: 3px;
     & > svg {
+      margin-top: 4px;
       height: 28px;
       width: 28px;
       padding: 4px;
