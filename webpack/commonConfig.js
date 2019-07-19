@@ -10,15 +10,6 @@ const plugins = (folder) => ([
   /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
   new webpack.IgnorePlugin(/^\.\/(?!english)/, /bip39\/src\/wordlists$/),
   /**
-   * We need CardanoWallet for flow to get the WASM binding types.
-   * However, the flow definitions aren't available to webpack at runtime
-   * so we have to mock them out with a noop
-   */
-  new webpack.NormalModuleReplacementPlugin(
-    /CardanoWallet/,
-    'lodash/noop.js'
-  ),
-  /**
    * We use the HtmlWebpackPlugin to group back together the chunks inside the HTML
    */
   new HtmlWebpackPlugin({
