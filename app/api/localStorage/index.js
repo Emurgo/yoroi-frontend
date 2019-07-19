@@ -5,7 +5,8 @@ import environment from '../../environment';
 import {
   getLocalItem,
   setLocalItem,
-  removeLocalItem
+  removeLocalItem,
+  isEmptyStorage
 } from './primitives';
 
 const networkForLocalStorage = String(environment.NETWORK);
@@ -127,11 +128,7 @@ export default class LocalStorageApi {
 
   unsetLastLaunchVersion = (): Promise<void> => removeLocalItem(storageKeys.VERSION);
 
-  isEmpty = (): Promise<boolean> => new Promise((resolve) => {
-    try {
-      resolve(localStorage.length === 0);
-    } catch (error) {} // eslint-disable-line
-  });
+  isEmpty = (): Promise<boolean> => isEmptyStorage();
 
   // ========== Show/hide Balance ========== //
 
@@ -160,15 +157,19 @@ export default class LocalStorageApi {
 
   setItem = (key: string, value: string): Promise<void> => setLocalItem(key, value);
 
-  setLocalStorage = (localStorageData: any): Promise<void> => new Promise((resolve) => {
+  getOldStorage = (): Promise<string> => new Promise((resolve) => {
+    resolve(JSON.stringify(localStorage));
+  });
+
+  setStorage = (localStorageData: any): Promise<void> => new Promise((resolve) => {
     Object.keys(localStorageData).forEach(key => {
-      localStorage.setItem(key, localStorageData[key]);
+      setLocalItem(key, localStorageData[key]);
     });
     resolve();
   });
 
-  getLocalStorage = (): Promise<string> => new Promise((resolve) => {
-    resolve(JSON.stringify(localStorage));
+  getStorage = (): Promise<string> => new Promise((resolve) => {
+    resolve(getLocalItem(null));
   });
 
 }

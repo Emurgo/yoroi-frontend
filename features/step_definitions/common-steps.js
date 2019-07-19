@@ -219,7 +219,7 @@ async function exportYoroiSnapshot(client, exportDir: string) {
 async function exportLocalStorage(client, exportDir: string) {
   const localStoragePath = `${exportDir}/localStorage.json`;
   const localStorage = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.localStorage.getLocalStorage()
+    window.yoroi.api.localStorage.getStorage()
       .then(done)
       .catch(err => done(err));
   });
@@ -248,7 +248,7 @@ async function importLocalStorage(client, importDir: string) {
   const localStoragePath = `${importDir}/localStorage.json`;
   const localStorageData = fs.readFileSync(localStoragePath);
   await client.driver.executeScript((data) => {
-    window.yoroi.api.localStorage.setLocalStorage(data);
+    window.yoroi.api.localStorage.setStorage(data);
     // $FlowFixMe Flow thinks that localStorageData is of type Buffer
   }, JSON.parse(localStorageData));
 }

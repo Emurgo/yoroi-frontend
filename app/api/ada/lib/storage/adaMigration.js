@@ -16,7 +16,7 @@ import {
 
 const semver = require('semver');
 
-export async function migrateToLatest(localStorageApi: LocalStorageApi) {
+export async function migrateToLatest(localStorageApi: LocalStorageApi, isImported: boolean) {
   const lastLaunchVersion = await localStorageApi.getLastLaunchVersion();
   Logger.info(`Starting migration for ${lastLaunchVersion}`);
   /**
@@ -37,6 +37,7 @@ export async function migrateToLatest(localStorageApi: LocalStorageApi) {
 
   const migrationMap: { [ver: string]: (() => Promise<void>) } = {
     '=0.0.1': async () => await testMigration(localStorageApi),
+    '<1.9.0': async () => await moveStorage(localStorageApi, isImported),
     '<1.4.0': bip44Migration
   };
 
@@ -56,6 +57,17 @@ async function testMigration(localStorageApi: LocalStorageApi): Promise<void> {
   Logger.info(`Starting testMigration`);
   // Note: mobx will not notice this change until you refresh
   await localStorageApi.setUserLocale('ja-JP');
+}
+
+/**
+ * Previous version of Yoroi used window.localStorage
+ * since version 1.9 this storage needs to be moved to storage.local.
+ * This function must go before other modifications because they will work over storage.local.
+ */
+async function moveStorage(localStorageApi: LocalStorageApi, isImported: boolean): Promise<void> {
+  if (isImported) return;
+  const oldStorage = localStorageApi.getOldStorage();
+  localStorageApi.setStorage(oldStorage);
 }
 
 /**

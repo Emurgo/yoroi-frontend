@@ -24,8 +24,9 @@ const getStorageItemInExtension = (key: ?string) => new Promise((resolve, reject
   });
 });
 
-const getStorageItemInWeb = (key: string) => new Promise((resolve, reject) => {
+const getStorageItemInWeb = (key: ?string) => new Promise((resolve, reject) => {
   try {
+    if (!key) return resolve(JSON.stringify(localStorage));
     const value = localStorage.getItem(key);
     if (!value) return resolve('');
     resolve(value);
@@ -34,7 +35,7 @@ const getStorageItemInWeb = (key: string) => new Promise((resolve, reject) => {
   }
 });
 
-export async function getLocalItem(key: string): Promise<string> {
+export async function getLocalItem(key: ?string): Promise<string> {
   const isExtention = environment.userAgentInfo.isExtension;
   if (isExtention) return getStorageItemInExtension(key);
   return getStorageItemInWeb(key);
@@ -77,12 +78,13 @@ export async function removeLocalItem(key: string): Promise<void> {
 // =======
 
 export async function isEmptyStorage(): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     const isExtention = environment.userAgentInfo.isExtension;
     if (isExtention) {
-      return getStorageItemInExtension().then((data: Object) => {
-        return Object.keys(data).length === 0;
-      });
+      const isEmpty = await getStorageItemInExtension().then(
+        (data: Object) => Object.keys(data).length === 0
+      );
+      resolve(isEmpty);
     }
     try {
       resolve(localStorage.length === 0);

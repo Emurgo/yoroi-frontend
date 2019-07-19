@@ -63,7 +63,8 @@ export default class LoadingStore extends Store {
         closeOtherInstances();
         await this.migrationRequest.execute({
           api: this.api,
-          currVersion: environment.version
+          currVersion: environment.version,
+          isImported: false
         }).promise;
         await this.validateUriPath();
         runInAction(() => {
@@ -132,7 +133,8 @@ export default class LoadingStore extends Store {
   _migrateImported = (): void => {
     this.migrationRequest.execute({
       api: this.api,
-      currVersion: environment.version
+      currVersion: environment.version,
+      isImported: true
     }).promise;
   };
 }

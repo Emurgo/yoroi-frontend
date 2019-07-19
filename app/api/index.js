@@ -17,7 +17,8 @@ export const setupApi = (): Api => ({
 
 export type MigrationRequest = {
   api: Api,
-  currVersion: string
+  currVersion: string,
+  isImported: boolean
 }
 
 export const migrate = async (migrationRequest: MigrationRequest): Promise<void> => {
@@ -29,7 +30,10 @@ export const migrate = async (migrationRequest: MigrationRequest): Promise<void>
   // localstorage empty means the user is launching Yoroi for the first time. No need to migrate.
   const isEmpty = await migrationRequest.api.localStorage.isEmpty();
   if (!isEmpty) {
-    await migrationRequest.api.ada.migrate(migrationRequest.api.localStorage);
+    await migrationRequest.api.ada.migrate(
+      migrationRequest.api.localStorage,
+      migrationRequest.isImported
+    );
   }
 
   // update launch version in localstorage to avoid calling migration twice

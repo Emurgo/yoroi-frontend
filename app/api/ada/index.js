@@ -1381,8 +1381,8 @@ export default class AdaApi {
     await reset();
   }
 
-  migrate = async (localstorageApi: LocalStorageApi): Promise<void> => {
-    await migrateToLatest(localstorageApi);
+  migrate = async (localstorageApi: LocalStorageApi, isImported: boolean): Promise<void> => {
+    await migrateToLatest(localstorageApi, isImported);
   }
 
   importLocalDatabase = async (data: any): Promise<void> => {
