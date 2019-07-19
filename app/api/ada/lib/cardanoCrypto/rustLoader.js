@@ -1,8 +1,7 @@
 // @flow
 
-import * as CardanoWallet from 'CardanoWallet'; // eslint-disable-line
-
-export type WalletType = typeof CardanoWallet;
+// eslint-disable-next-line
+import typeof * as WalletType from 'CardanoWallet'
 
 class Module {
   _cardanoWallet: WalletType;
