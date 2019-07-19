@@ -180,7 +180,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         label: this.context.intl.formatMessage(messages.createPersonalWallet),
         primary: true,
         onClick: this.submit,
-        disabled: isSubmitting || (!classicTheme && disabledCondition)
+        disabled: isSubmitting || disabledCondition
       },
     ];
 

@@ -164,7 +164,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         onClick: this.submit,
         primary: true,
         className: confirmButtonClasses,
-        disabled: (!classicTheme && disabledCondition)
+        disabled: disabledCondition
       },
     ];
 

@@ -338,7 +338,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel
         ),
         primary: true,
-        disabled: isSubmitting || (!classicTheme && disabledCondition()),
+        disabled: isSubmitting || disabledCondition(),
         onClick: this.submit,
       },
     ];
