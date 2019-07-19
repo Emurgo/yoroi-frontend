@@ -101,7 +101,6 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         }}
         isActiveCategory={topbar.isActiveCategory}
         categories={topbar.categories}
-        activeTopbarCategory={topbar.activeTopbarCategory}
       />
     );
     const wallets = this._getWalletsStore();

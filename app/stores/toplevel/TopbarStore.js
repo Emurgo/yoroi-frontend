@@ -29,8 +29,12 @@ export default class TopbarStore extends Store {
     const { wallets } = this.stores.substores[environment.API];
     return [
       (wallets && !wallets.hasAnyLoaded) ? GO_BACK : WALLETS,
-      ...(wallets && wallets.first && wallets.first.isTrezorTWallet) ? [WITH_TREZOR_T] : [],
-      ...(wallets && wallets.first && wallets.first.isLedgerNanoSWallet) ? [WITH_LEDGER_NANO_S] : [],
+      ...(
+        wallets && wallets.first &&
+        wallets.first.isTrezorTWallet) ? [WITH_TREZOR_T] : [],
+      ...(
+        wallets && wallets.first &&
+        wallets.first.isLedgerNanoSWallet) ? [WITH_LEDGER_NANO_S] : [],
       SETTINGS,
       ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
     ];
@@ -38,11 +42,9 @@ export default class TopbarStore extends Store {
 
   // @computed decorator for methods with parameters are not supported in this
   // version of mobx. Instead, making a regular function that calls `computed`
-  isActiveCategory = category => {
-    return computed(
-      () => this.activeTopbarCategory && this.activeTopbarCategory === category.route
-    ).get();
-  }
+  isActiveCategory = category => computed(
+    () => this.activeTopbarCategory && this.activeTopbarCategory === category.route
+  ).get();
 
   @action _onActivateTopbarCategory = (
     params: { category: string, }

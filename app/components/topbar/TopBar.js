@@ -10,7 +10,6 @@ type Props = {|
   children?: ?Node,
   title: ?Node,
   categories?: Array<Category>,
-  activeTopbarCategory: string,
   isActiveCategory?: Function,
   onCategoryClicked?: Function,
 |};
@@ -28,7 +27,6 @@ export default class TopBar extends Component<Props> {
     const {
       title,
       categories,
-      activeTopbarCategory,
       isActiveCategory,
       onCategoryClicked,
     } = this.props;

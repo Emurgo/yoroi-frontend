@@ -41,7 +41,6 @@ export default class TopBarContainer extends Component<Props> {
         }}
         isActiveCategory={topbar.isActiveCategory}
         categories={topbar.categories}
-        activeTopbarCategory={topbar.activeTopbarCategory}
       />
     );
   }

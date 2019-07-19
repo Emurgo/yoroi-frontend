@@ -18,6 +18,10 @@ type Props = {|
 
 @observer
 export default class TopBarCategory extends Component<Props> {
+  static defaultProps = {
+    iconStyle: '',
+  };
+
   static contextTypes = {
     intl: intlShape.isRequired,
   };

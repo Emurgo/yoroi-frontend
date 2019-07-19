@@ -61,7 +61,6 @@ export default class Settings extends Component<InjectedContainerProps> {
             }}
             isActiveCategory={topbar.isActiveCategory}
             categories={topbar.categories}
-            activeTopbarCategory={topbar.activeTopbarCategory}
           />
         )}
         connectionErrorType={checkAdaServerStatus}
