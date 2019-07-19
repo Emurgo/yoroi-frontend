@@ -6,6 +6,7 @@ import Loading from '../app/components/loading/Loading';
 import { UnableToLoadError } from '../app/i18n/errors';
 
 const story = storiesOf('Loading', module);
+
 /** Normal Loading */
 story.add('Normal', () => (
   <Loading
@@ -17,6 +18,7 @@ story.add('Normal', () => (
   />), {
   notes: 'Normal Loading'
 });
+
 /** Error while loading */
 story.add('Error while loading', () => (
   <Loading
