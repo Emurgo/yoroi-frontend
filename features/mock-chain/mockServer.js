@@ -14,8 +14,6 @@ import type {
 import chai from 'chai';
 import mockImporter from './mockImporter';
 
-const middlewares = [...defaults(), bodyParser];
-
 const port = 8080;
 
 // MockData should always be consistent with the following values
@@ -65,10 +63,14 @@ export function getMockServer(
         send(arg: SignedResponse): any,
         status: Function
       }
-    ) => void
+    ) => void,
+    // Whether to output request logs. Defaults to false.
+    outputLog?: boolean
   }
 ) {
   if (!MockServer) {
+    const middlewares = [...defaults({ logger: !!settings.outputLog }), bodyParser];
+
     const server = create();
 
     server.use(middlewares);

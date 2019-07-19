@@ -7,12 +7,14 @@ import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import { resetChain, serverIssue, serverFixed } from '../mock-chain/mockImporter';
 import { expect } from 'chai';
+import { navigateToTransactionsList } from '../support/helpers/route-helpers';
 
 const { promisify } = require('util');
 const fs = require('fs');
 const rimraf = require('rimraf');
 
 const screenshotsDir = './screenshots/';
+const snapshotsDir = './features/yoroi_snapshots/';
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
@@ -187,11 +189,81 @@ Then(/^I click then button labeled (.*)$/, async function (buttonName) {
   await this.click(`//button[contains(text(), ${buttonName})]`, By.xpath);
 });
 
+Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
+  await exportYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
+});
+
+Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
+  await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
+  await migrateImportedSnapshot(this);
+  await navigateToTransactionsList(this);
+  await refreshWallet(this);
+});
 
 function refreshWallet(client) {
-  return client.driver.executeAsyncScript((done) => {
+  return client.driver.executeScript((done) => {
     window.yoroi.stores.substores.ada.wallets.refreshWalletsData()
       .then(done)
       .catch(err => done(err));
+  });
+}
+
+async function exportYoroiSnapshot(client, exportDir: string) {
+  if (!fs.existsSync(exportDir)) {
+    fs.mkdirSync(exportDir);
+  }
+  exportLocalStorage(client, exportDir);
+  exportIndexedDB(client, exportDir);
+}
+
+async function exportLocalStorage(client, exportDir: string) {
+  const localStoragePath = `${exportDir}/localStorage.json`;
+  const localStorage = await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.localStorage.getLocalStorage()
+      .then(done)
+      .catch(err => done(err));
+  });
+  await writeFile(localStoragePath, localStorage);
+}
+
+async function exportIndexedDB(client, exportDir: string) {
+  const indexedDBPath = `${exportDir}/indexedDB.json`;
+  const indexedDB = await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.ada.exportLocalDatabase()
+      .then(done)
+      .catch(err => done(err));
+  });
+  await writeFile(indexedDBPath, indexedDB);
+}
+
+async function importYoroiSnapshot(client, importDir: string) {
+  if (!fs.existsSync(importDir)) {
+    throw new Error('The directory must exists!');
+  }
+  importLocalStorage(client, importDir);
+  importIndexedDB(client, importDir);
+}
+
+async function importLocalStorage(client, importDir: string) {
+  const localStoragePath = `${importDir}/localStorage.json`;
+  const localStorageData = fs.readFileSync(localStoragePath);
+  await client.driver.executeScript((data) => {
+    window.yoroi.api.localStorage.setLocalStorage(data);
+    // $FlowFixMe Flow thinks that localStorageData is of type Buffer
+  }, JSON.parse(localStorageData));
+}
+
+async function importIndexedDB(client, importDir: string) {
+  const indexedDBPath = `${importDir}/indexedDB.json`;
+  const indexedDBData = fs.readFileSync(indexedDBPath);
+  await client.driver.executeScript((data) => {
+    window.yoroi.api.ada.importLocalDatabase(data);
+    // $FlowFixMe Flow thinks that indexedDBData is of type Buffer
+  }, JSON.parse(indexedDBData));
+}
+
+async function migrateImportedSnapshot(client) {
+  return client.driver.executeScript(() => {
+    window.yoroi.actions.snapshot.migrateImportedSnapshot.trigger({});
   });
 }

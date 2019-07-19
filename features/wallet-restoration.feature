@@ -34,7 +34,7 @@ Feature: Restore Wallet
     Then I delete recovery phrase by clicking "x" signs
   
   @it-86
-  Scenario: Successfully restoring a simple wallet
+  Scenario: Successfully restoring a simple wallet (IT-86)
     When I click the restore button
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
@@ -54,8 +54,8 @@ Feature: Restore Wallet
     | Ae2tdPwUPEZ7sn3AQhUFGHXiWuG5aU3XnMi2SNKeh94S9Pp17igo1RwzodB |
     | Ae2tdPwUPEZ73Nh3ALXKwtt9Wmb8bQHa9owoXtkvGEWK3AX6kXNHBK1D261 |
 
-  @it-86
-  Scenario: Ensure that wallet addresses are restored correctly (IT-86)
+  @it-87
+  Scenario: Ensure that wallet addresses are restored correctly (IT-87)
     When I click the restore button
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
@@ -80,7 +80,7 @@ Feature: Restore Wallet
     | Ae2tdPwUPEYzErSRwThtfVfBbhM87NCXDwkGHRqSYJcRVP4GS8Lgx3AxAXd |
 
   @it-11
-  Scenario: Fail to completely restore a wallet with addresses generated not following gap from BIP44 protocol
+  Scenario: Fail to completely restore a wallet with addresses generated not following gap from BIP44 protocol (IT-11)
     When I click the restore button
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
