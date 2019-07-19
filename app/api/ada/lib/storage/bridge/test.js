@@ -5,25 +5,34 @@ type StateConstraint<CurrentState, Input, Output> = $Call<
   CurrentState
 >
 
-class StateMachine<CurrentState>  {
+type StateOne = { one: 1 };
+const stateOne = { one: 1 };
+type StateTwo = { two: 2 };
+const stateTwo = { two: 2 };
+type StateThree = { three: 3 };
+const stateThree = { three: 3 };
+type StateFour = { four: 4 };
+const stateFour = { four: 4 };
+
+class StateMachine<CurrentState: {}>  {
   state: CurrentState;
 
   constructor(s: CurrentState) { this.state = s; }
 
-  toStateTwo: StateConstraint<CurrentState, 1, 2> = () => {
-    return new StateMachine(2);
+  toStateTwo: StateConstraint<CurrentState, StateOne, StateTwo> = () => {
+    return new StateMachine(stateTwo);
   }
 
-  toStateFour: StateConstraint<CurrentState, 1|2, 4> = () => {
-    return new StateMachine(4);
+  toStateFour: StateConstraint<CurrentState, StateOne|StateTwo, StateFour> = () => {
+    return new StateMachine(stateFour);
   }
 
-  toStateThree: StateConstraint<CurrentState, 2, 3> = () => {
-    return new StateMachine(3);
+  toStateThree: StateConstraint<CurrentState, StateTwo, StateThree> = () => {
+    return new StateMachine(stateThree);
   }
 
-  static start(): StateMachine<1> {
-    return new StateMachine(1);
+  static start(): StateMachine<StateOne> {
+    return new StateMachine(stateOne);
   }
 }
 
