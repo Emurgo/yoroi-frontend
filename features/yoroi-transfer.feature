@@ -5,9 +5,9 @@ Feature: Transfer Yoroi Wallet funds
     And I have completed the basic setup
     Then I should see the Create wallet screen
 
-  @it-110
-  Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-110)
-    Given There is a wallet stored named empty-wallet
+  @it-114
+  Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-114)
+    Given I import a snapshot named empty-wallet
     And I am on the Yoroi Transfer start screen
     And I should see the "CREATE YOROI WALLET" button disabled
     When I click on the next button on the Yoroi Transfer start screen
@@ -22,7 +22,7 @@ Feature: Transfer Yoroi Wallet funds
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js
-    Given There is a wallet stored named empty-wallet
+    Given I import a snapshot named empty-wallet
     And I am on the Yoroi Transfer start screen
     When I click on the next button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
@@ -44,7 +44,7 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-113
   Scenario: Wallet changes after transaction is generated (IT-113)
-    Given There is a wallet stored named empty-wallet
+    Given I import a snapshot named empty-wallet
     And I am on the Yoroi Transfer start screen
     When I click on the next button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
@@ -57,10 +57,4 @@ Feature: Transfer Yoroi Wallet funds
     Then I transfer some Ada out of the source wallet
     | fromAddress                                                 | amount     |   
     | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1000000000 |
-    When I confirm Yoroi transfer funds
-    Then I should see wallet changed notice
-    And I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |   
-    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1233567898765    |
-    When I confirm Yoroi transfer funds
-    Then I should see the Yoroi transfer success screen
+    Then I should see the Create wallet screen
