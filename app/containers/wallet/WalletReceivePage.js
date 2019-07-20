@@ -163,8 +163,8 @@ export default class WalletReceivePage extends Component<Props, State> {
             onCopy={(message) => actions.notifications.open.trigger({
               id: uriCopyNotificationId,
               duration: config.wallets.ADDRESS_COPY_NOTIFICATION_DURATION,
-              message})
-            }
+              message
+            })}
             classicTheme={profile.isClassicTheme}
           />
         ) : null}
