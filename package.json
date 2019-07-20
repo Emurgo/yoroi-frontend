@@ -142,7 +142,7 @@
     "jspdf": "1.5.3",
     "lodash": "4.17.14",
     "lovefield": "2.1.12",
-    "mobx": "5.11.0",
+    "mobx": "5.13.0",
     "mobx-react": "6.1.1",
     "mobx-react-form": "2.0.4",
     "mobx-react-router": "4.0.7",
