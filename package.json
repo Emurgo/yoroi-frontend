@@ -68,7 +68,7 @@
     "@babel/preset-flow": "7.0.0",
     "@babel/preset-react": "7.0.0",
     "@babel/register": "7.5.5",
-    "@babel/runtime": "7.5.4",
+    "@babel/runtime": "7.5.5",
     "@babel/runtime-corejs2": "7.5.5",
     "autoprefixer": "9.6.1",
     "babel-eslint": "10.0.2",
