@@ -47,9 +47,9 @@ export async function getLocalItem(key: ?string): Promise<string> {
 
 export async function setLocalItem(key: string, value: string): Promise<void> {
   const isExtention = environment.userAgentInfo.isExtension;
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      if (isExtention) chrome.storage.local.set({ [key]: value });
+      if (isExtention) await chrome.storage.local.set({ [key]: value });
       else localStorage.setItem(key, value);
       resolve();
     } catch (error) {

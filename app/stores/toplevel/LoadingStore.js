@@ -130,8 +130,8 @@ export default class LoadingStore extends Store {
     this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
   }
 
-  _migrateImported = (): void => {
-    this.migrationRequest.execute({
+  _migrateImported = async (): Promise<void> => {
+    await this.migrationRequest.execute({
       api: this.api,
       currVersion: environment.version,
       isImported: true

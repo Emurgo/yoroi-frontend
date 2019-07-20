@@ -66,8 +66,8 @@ async function testMigration(localStorageApi: LocalStorageApi): Promise<void> {
  */
 async function moveStorage(localStorageApi: LocalStorageApi, isImported: boolean): Promise<void> {
   if (isImported) return;
-  const oldStorage = localStorageApi.getOldStorage();
-  localStorageApi.setStorage(oldStorage);
+  const oldStorage = await localStorageApi.getOldStorage();
+  await localStorageApi.setStorage(oldStorage);
 }
 
 /**

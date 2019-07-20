@@ -44,10 +44,7 @@ export default class LocalStorageApi {
 
   getTermsOfUseAcceptance = (): Promise<boolean> => getLocalItem(
     storageKeys.TERMS_OF_USE_ACCEPTANCE
-  ).then((accepted) => {
-    if (accepted !== 'true') return false;
-    return JSON.parse(accepted);
-  });
+  ).then((accepted) => accepted === 'true');
 
   setTermsOfUseAcceptance = (): Promise<void> => setLocalItem(
     storageKeys.TERMS_OF_USE_ACCEPTANCE, JSON.stringify(true)
@@ -161,9 +158,9 @@ export default class LocalStorageApi {
     resolve(JSON.stringify(localStorage));
   });
 
-  setStorage = (localStorageData: any): Promise<void> => new Promise((resolve) => {
-    Object.keys(localStorageData).forEach(key => {
-      setLocalItem(key, localStorageData[key]);
+  setStorage = (localStorageData: any): Promise<void> => new Promise(async (resolve) => {
+    await Object.keys(localStorageData).forEach(async key => {
+      await setLocalItem(key, localStorageData[key]);
     });
     resolve();
   });

@@ -210,6 +210,12 @@ export default class WalletsStore extends Store {
     this.stores.substores[environment.API].transactions.updateObservedWallets(walletIds);
   };
 
+  /** Make all API calls required to setup imported wallet */
+  @action refreshImportedWalletData = async () => {
+    if (this.hasAnyLoaded) this._setActiveWallet({ walletId: this.all[0].id });
+    return await this.refreshWalletsData();
+  };
+
   // =================== ACTIVE WALLET ==================== //
 
   @action _setActiveWallet = (

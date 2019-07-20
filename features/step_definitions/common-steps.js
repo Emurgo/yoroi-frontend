@@ -196,13 +196,13 @@ Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
 Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
   await migrateImportedSnapshot(this);
-  await navigateToTransactionsList(this);
   await refreshWallet(this);
+  await navigateToTransactionsList(this);
 });
 
-function refreshWallet(client) {
-  return client.driver.executeScript((done) => {
-    window.yoroi.stores.substores.ada.wallets.refreshWalletsData()
+async function refreshWallet(client) {
+  await client.driver.executeAsyncScript((done) => {
+    window.yoroi.stores.substores.ada.wallets.refreshImportedWalletData()
       .then(done)
       .catch(err => done(err));
   });
@@ -240,30 +240,32 @@ async function importYoroiSnapshot(client, importDir: string) {
   if (!fs.existsSync(importDir)) {
     throw new Error('The directory must exists!');
   }
-  importLocalStorage(client, importDir);
-  importIndexedDB(client, importDir);
+  await importLocalStorage(client, importDir);
+  await importIndexedDB(client, importDir);
 }
 
 async function importLocalStorage(client, importDir: string) {
   const localStoragePath = `${importDir}/localStorage.json`;
-  const localStorageData = fs.readFileSync(localStoragePath);
-  await client.driver.executeScript((data) => {
-    window.yoroi.api.localStorage.setStorage(data);
-    // $FlowFixMe Flow thinks that localStorageData is of type Buffer
+  const localStorageData = fs.readFileSync(localStoragePath).toString();
+  await client.driver.executeAsyncScript((data, done) => {
+    window.yoroi.api.localStorage.setStorage(data)
+      .then(done)
+      .catch(err => done(err));
   }, JSON.parse(localStorageData));
 }
 
 async function importIndexedDB(client, importDir: string) {
   const indexedDBPath = `${importDir}/indexedDB.json`;
-  const indexedDBData = fs.readFileSync(indexedDBPath);
-  await client.driver.executeScript((data) => {
-    window.yoroi.api.ada.importLocalDatabase(data);
-    // $FlowFixMe Flow thinks that indexedDBData is of type Buffer
+  const indexedDBData = fs.readFileSync(indexedDBPath).toString();
+  await client.driver.executeAsyncScript((data, done) => {
+    window.yoroi.api.ada.importLocalDatabase(data)
+      .then(done)
+      .catch(err => done(err));
   }, JSON.parse(indexedDBData));
 }
 
 async function migrateImportedSnapshot(client) {
-  return client.driver.executeScript(() => {
+  await client.driver.executeScript(() => {
     window.yoroi.actions.snapshot.migrateImportedSnapshot.trigger({});
   });
 }
