@@ -95,7 +95,7 @@
     "eslint-plugin-jsx-a11y": "6.2.3",
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-react": "7.14.2",
-    "file-loader": "4.0.0",
+    "file-loader": "4.1.0",
     "flow-bin": "0.98.1",
     "flow-typed": "2.5.2",
     "geckodriver": "1.16.2",
