@@ -37,12 +37,6 @@ export default class WalletsStore extends Store {
   @observable restoreRequest: Request<RestoreWalletFunc>;
   @observable isImportActive: boolean = false;
 
-  _newWalletDetails: { name: string, mnemonic: string, password: string } = {
-    name: '',
-    mnemonic: '',
-    password: '',
-  };
-
   setup() {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     document.addEventListener('visibilitychange', _.debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
@@ -57,13 +51,16 @@ export default class WalletsStore extends Store {
     name: string,
     password: string,
   }) => {
-    Object.assign(this._newWalletDetails, params);
     try {
       const recoveryPhrase = await (
         this.generateWalletRecoveryPhraseRequest.execute({}).promise
       );
       if (recoveryPhrase != null) {
-        this.actions.walletBackup.initiateWalletBackup.trigger({ recoveryPhrase });
+        this.actions.walletBackup.initiateWalletBackup.trigger({
+          recoveryPhrase,
+          name: params.name,
+          password: params.password,
+        });
       }
     } catch (error) {
       throw error;
@@ -72,10 +69,11 @@ export default class WalletsStore extends Store {
 
   /** Create the wallet and go to wallet summary screen */
   _finishCreation = async () => {
-    this._newWalletDetails.mnemonic = this.stores.walletBackup.recoveryPhrase.join(' ');
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const wallet = await this.createWalletRequest.execute({
-      ...this._newWalletDetails,
+      name: this.stores.walletBackup.name,
+      password: this.stores.walletBackup.password,
+      mnemonic: this.stores.walletBackup.recoveryPhrase.join(' '),
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
     }).promise;
     if (wallet) {
@@ -85,6 +83,9 @@ export default class WalletsStore extends Store {
     } else {
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
+    const { wallets } = this.stores.substores[environment.API];
+    wallets.showWalletCreatedNotification();
+    this.stores.walletBackup.teardown();
   };
 
   /** Delete wallet and switch to another existing wallet (if another exists) */
