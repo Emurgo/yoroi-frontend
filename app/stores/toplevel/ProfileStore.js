@@ -65,9 +65,7 @@ export default class ProfileStore extends Store {
       },
     },
     {
-      isDone: () => {
-        return !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted;
-      },
+      isDone: () => !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted,
       action: () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
         if (this.stores.app.currentRoute === route) {

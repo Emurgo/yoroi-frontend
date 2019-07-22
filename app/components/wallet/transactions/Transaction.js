@@ -10,7 +10,6 @@ import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import WalletTransaction, { transactionStates, transactionTypes } from '../../../domain/WalletTransaction';
-import { assuranceLevels } from '../../../config/transactionAssuranceConfig';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionState, TransactionDirectionType } from '../../../domain/WalletTransaction';
 import environment from '../../../environment';

@@ -43,6 +43,7 @@ export default class LoadingStore extends Store {
     = new Request<void => Promise<void>>(this.api.ada.loadDB);
 
   setup() {
+    this.actions.snapshot.migrateImportedSnapshot.listen(this._migrateImported);
   }
 
   load() {
@@ -118,4 +119,11 @@ export default class LoadingStore extends Store {
     });
     this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
   }
+
+  _migrateImported = (): void => {
+    this.migrationRequest.execute({
+      api: this.api,
+      currVersion: environment.version
+    }).promise;
+  };
 }

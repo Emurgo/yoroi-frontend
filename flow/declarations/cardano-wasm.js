@@ -7,7 +7,7 @@
  * Author: [Joar Wilk](http://twitter.com/joarwilk)
  * Repo: http://github.com/joarwilk/flowgen
  */
-declare module CardanoWallet { // need to wrap flowgen output into module
+declare module 'cardano-wallet-browser' { // need to wrap flowgen output into module
   /**
    * @param {Entropy} entropy
    * @param {Uint8Array} iv

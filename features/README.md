@@ -10,6 +10,10 @@ Note: The JSON file is just miscellaneous faked data. It is
 - Not a blockchain
 - Not a valid state in Cardano
 
+## Exporting a Yoroi snapshot
+
+Yoroi snapshots are created by adding the step `I export a snapshot named SNAPSHOT_NAME` and running locally the escenario once. This creates the files `localStorage.json` and `indexedDB.json` in the folder `features/yoroi_snapshots/SNAPSHOT_NAME`. Then you can import the snapshot with the  step `I import a snapshot named SNAPSHOT_NAME`.
+
 ## Local CI
 
 Sometimes it is useful and faster to simulate running our CI on your local machine. We do this by creating the same docker container that our CI uses and locally copying your code to the docker container.

@@ -2,7 +2,7 @@
 const { getMockServer } = require('../features/mock-chain/mockServer');
 const  { resetChain } = require('../features/mock-chain/mockImporter');
 
-getMockServer({});
+getMockServer({ outputLog: true });
 resetChain();
 
 const tasks = require('./tasks');
