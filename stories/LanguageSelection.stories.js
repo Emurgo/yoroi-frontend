@@ -27,3 +27,16 @@ story.add('Submitting', () => (
     currentLocale="en-US"
     languages={LANGUAGES}
   />));
+
+
+/* Korean - Community supported language */
+story.add('Korean - Community supported language', () => (
+  <LanguageSelectionForm
+    onSelectLanguage={action('SelectLanguage')}
+    onSubmit={action('Submit')}
+    isSubmitting={false}
+    currentLocale="ko-KR"
+    languages={LANGUAGES}
+  />), {
+  notes: 'One of the example of Community supported language'
+});
