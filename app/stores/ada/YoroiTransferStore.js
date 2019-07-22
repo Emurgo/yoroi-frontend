@@ -1,6 +1,7 @@
 // @flow
 import { observable, action, runInAction } from 'mobx';
 import { defineMessages } from 'react-intl';
+import { isEqual } from 'lodash';
 import {
   Logger,
   stringifyError
@@ -44,8 +45,7 @@ export default class YoroiTransferStore extends Store {
     = new Request(this.api.ada.restoreWalletForTransfer);
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  // The addresses and their corresponding keys from which funds will be transferred.
-  addressKeysCache: ?{[addr: string]: RustModule.Wallet.PrivateKey} = null;
+  recoveryPhrase: string = '';
 
   _errorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
     try {
@@ -105,12 +105,11 @@ export default class YoroiTransferStore extends Store {
     }
   }
 
-  _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
-    this._updateStatus('checkingAddresses');
+  _generateTransferTxFromMnemonic = async (recoveryPhrase: string,
+    updateStatusCallback: void=>void) => {
+    const { masterKey, addresses } = await this._restoreWalletForTransfer(recoveryPhrase);
 
-    const { masterKey, addresses } = await this._restoreWalletForTransfer(payload.recoveryPhrase);
-
-    this._updateStatus('generatingTx');
+    updateStatusCallback();
 
     const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, '');
     const addressKeys = {};
@@ -122,18 +121,25 @@ export default class YoroiTransferStore extends Store {
       const keyPrv = chainPrv.address_key(RustModule.Wallet.AddressKeyIndex.new(index));
       addressKeys[address] = keyPrv;
     });
-    this.addressKeysCache = addressKeys;
 
     const outputAddr = await getReceiverAddress();
     // Possible exception: NotEnoughMoneyToSendError
-    const transferTx = await generateTransferTx({
+    return generateTransferTx({
       outputAddr,
       addressKeys,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       filterSenders: true
     });
+  }
 
+  _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
+    this._updateStatus('checkingAddresses');
+    this.recoveryPhrase = payload.recoveryPhrase;
+    const transferTx = await this._generateTransferTxFromMnemonic(
+      payload.recoveryPhrase,
+      () => this._updateStatus('generatingTx')
+    );
     runInAction(() => {
       this.transferTx = transferTx;
     });
@@ -155,59 +161,59 @@ export default class YoroiTransferStore extends Store {
   _transferFunds = async (payload: {
     next: void => void
   }): Promise<void> => {
+    /*
+     Always re-recover from the mnemonics to reduce the chance that the wallet
+     changes before the tx is submit (we can't really eliminate it).
+     */
+    const transferTx = await this._generateTransferTxFromMnemonic(
+      this.recoveryPhrase, () => {}
+    );
+    if (!this.transferTx) {
+      throw new NoTransferTxError();
+    }
+    if (this._isWalletChanged(transferTx, this.transferTx)) {
+      return this._handleWalletChanged(transferTx);
+    }
+
     try {
       const { next } = payload;
 
-      if (!this.transferTx) {
-        throw new NoTransferTxError();
-      }
       await this.transferFundsRequest.execute({
-        signedTx: this.transferTx.signedTx
+        signedTx: transferTx.signedTx
       });
       this._updateStatus('success');
       await next();
       this._reset();
     } catch (error) {
-      /* Determine and handle the scenario where the wallet has changed since
-         the tx has been generated.
-         Since the backend API returns a generic error message, we determine
-         the case by re-generate the transaction and compare with the previous
-         one.
-      */
-      let walletChanged = false;
-      let transferTx;
       if (error.id === 'api.errors.sendTransactionApiError') {
-        const outputAddr = await getReceiverAddress();
-        if (!this.addressKeysCache) {
-          // Should never happen but need to please flow
-          throw new Error('No address keys');
-        }
-        transferTx = await generateTransferTx({
-          outputAddr,
-          addressKeys: this.addressKeysCache,
-          getUTXOsForAddresses:
-            this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-          filterSenders: true
-        });
-        if (!this.transferTx) {
-          throw new NoTransferTxError();
-        }
-        if (!transferTx.recoveredBalance.isEqualTo(this.transferTx.recoveredBalance)) {
-          walletChanged = true;
+        /* See if the error is due to wallet change since last recovery.
+           This should be very rare because the window is short.
+        */
+        const newTransferTx = await this._generateTransferTxFromMnemonic(
+          this.recoveryPhrase, () => {}
+        );
+        if (this._isWalletChanged(newTransferTx, transferTx)) {
+          return this._handleWalletChanged(newTransferTx);
         }
       }
-      if (walletChanged) {
-        runInAction(() => {
-          this.transferTx = transferTx;
-          this.error = new WalletChangedError();
-        });
-      } else {
-        Logger.error(`YoroiTransferStore::transferFunds ${stringifyError(error)}`);
-        runInAction(() => {
-          this.error = new TransferFundsError();
-        });
-      }
+
+      Logger.error(`YoroiTransferStore::transferFunds ${stringifyError(error)}`);
+      runInAction(() => {
+        this.error = new TransferFundsError();
+      });
     }
+  }
+
+  _isWalletChanged(transferTx1: TransferTx, transferTx2: TransferTx): boolean {
+    return !transferTx1.recoveredBalance.isEqualTo(transferTx2.recoveredBalance) ||
+      !isEqual(transferTx1.senders, transferTx2.senders);
+  }
+
+  _handleWalletChanged(newTransferTx: TransferTx): void {
+    runInAction(() => {
+      this.transferTx = newTransferTx;
+      this.error = new WalletChangedError();
+    });
   }
 
   @action.bound
@@ -217,6 +223,7 @@ export default class YoroiTransferStore extends Store {
     this.transferTx = null;
     this.transferFundsRequest.reset();
     this.restoreForTransferRequest.reset();
+    this.recoveryPhrase = '';
   }
 
   _restoreWalletForTransfer = async (recoveryPhrase: string) :
