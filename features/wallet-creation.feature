@@ -52,8 +52,10 @@ Feature: Wallet creation
     | password   | repeatedPassword  |
     | asdfasdfasdf | asdfasdfasdf        |
     And I clear the created wallet password asdfasdfasdf
-    And I click the "Create personal wallet" button
-    Then I should stay in the create wallet dialog
+    Then I see the submit button is disabled
+    And I should see the invalid password error message:
+    | message                             |
+    | global.errors.invalidWalletPassword |
 
   @it-27
    Scenario: Users will be presented with a security warning prior to seed creation (IT-27)
@@ -75,12 +77,12 @@ Feature: Wallet creation
     | password   | repeatedPassword  |
     | asdfasdfasdf | asdfasdfasdf        |
     And I clear the name "Created Wallet"
-    And I click the "Create personal wallet" button
-    Then I should stay in the create wallet dialog
+    Then I see the submit button is disabled
+    And I should stay in the create wallet dialog
 
     And I enter the name "<invalidWalletName>"
-    And I click the "Create personal wallet" button
-    Then I should stay in the create wallet dialog
+    Then I see the submit button is disabled
+    And I should stay in the create wallet dialog
     And I should see "Wallet name requires at least 1 and at most 40 letters." error message:
     | message                             |
     | global.errors.invalidWalletName     |
@@ -95,8 +97,8 @@ Feature: Wallet creation
     And I enter the created wallet password:
     | password        | repeatedPassword  |
     | <wrongPassword> | <wrongPassword>   |
-    And I click the "Create personal wallet" button
-    Then I should see "Invalid Password" error message:
+    Then I see the submit button is disabled
+    And I should see "Invalid Password" error message:
     | message                             |
     | global.errors.invalidWalletPassword |
   Examples:
