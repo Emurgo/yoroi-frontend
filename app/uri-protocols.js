@@ -17,6 +17,16 @@ const registerProtocols = () => {
     return;
   }
   try {
+    // Unregistering the protocol before calling register again will make the browser
+    // to always show the allow/block dialog.
+    navigator.unregisterProtocolHandler(
+      cardanoURI.PROTOCOL,
+      cardanoURI.URL,
+    );
+  } catch (err) {
+    Logger.error(`uri-protocols:unregisterProtocols ${stringifyError(err)}`);
+  }
+  try {
     navigator.registerProtocolHandler(
       cardanoURI.PROTOCOL,
       cardanoURI.URL,
