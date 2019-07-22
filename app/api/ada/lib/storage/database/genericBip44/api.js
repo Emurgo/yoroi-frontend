@@ -1,4 +1,4 @@
-// @flow
+
 
 import type {
   lf$Database,
@@ -23,7 +23,6 @@ import * as Tables from './tables';
 import type { KeyInsert } from '../uncategorized/tables';
 import { addKey } from '../uncategorized/api';
 import { addToTable, getRowIn, getRowFromKey } from '../utils';
-import type { AddRowRequest } from '../utils';
 
 /**
  * A specific number means you only care about the specific index

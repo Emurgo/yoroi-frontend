@@ -42,4 +42,4 @@ let state1 = StateMachine.start();
 let state2 = state1.toStateTwo().toStateThree();
 
 // state is now '3' so template requirement isn't satisfied anymore
-let state3 = state2.toStateThree();
+// let state3 = state2.toStateThree();

@@ -17,7 +17,7 @@ export type Bip44DerivationRow = {|
   ...Bip44DerivationInsert,
 |};
 export const Bip44DerivationSchema: {
-  name: string,
+  name: 'Bip44Derivation',
   properties: $ObjMapi<Bip44DerivationRow, ToSchemaProp>
 } = {
   name: 'Bip44Derivation',
@@ -41,7 +41,7 @@ export type Bip44WrapperRow = {|
   ...Bip44WrapperInsert,
 |};
 export const Bip44WrapperSchema: {
-  name: string,
+  name: 'Bip44Wrapper',
   properties: $ObjMapi<Bip44WrapperRow, ToSchemaProp>
 } = {
   name: 'Bip44Wrapper',
@@ -64,7 +64,7 @@ export type Bip44DerivationMappingRow = {|
   ...Bip44DerivationMappingInsert,
 |};
 export const Bip44DerivationMappingSchema: {
-  name: string,
+  name: 'Bip44DerivationMapping',
   properties: $ObjMapi<Bip44DerivationMappingRow, ToSchemaProp>
 } = {
   name: 'Bip44DerivationMapping',
@@ -85,7 +85,7 @@ export type PrivateDeriverRow = {|
   ...PrivateDeriverInsert,
 |};
 export const PrivateDeriverSchema: {
-  name: string,
+  name: 'PrivateDeriver',
   properties: $ObjMapi<PrivateDeriverRow, ToSchemaProp>
 } = {
   name: 'PrivateDeriver',
@@ -107,7 +107,7 @@ export type PublicDeriverRow = {|
   ...PublicDeriverInsert,
 |};
 export const PublicDeriverSchema: {
-  name: string,
+  name: 'PublicDeriver',
   properties: $ObjMapi<PublicDeriverRow, ToSchemaProp>
 } = {
   name: 'PublicDeriver',
@@ -127,7 +127,7 @@ export type Bip44RootRow = {|
   ...Bip44RootInsert,
 |};
 export const Bip44RootSchema: {
-  name: string,
+  name: 'Bip44Root',
   properties: $ObjMapi<Bip44RootRow, ToSchemaProp>
 } = {
   name: 'Bip44Root',
@@ -144,7 +144,7 @@ export type Bip44PurposeRow = {|
   ...Bip44PurposeInsert,
 |};
 export const Bip44PurposeSchema: {
-  name: string,
+  name: 'Bip44Purpose',
   properties: $ObjMapi<Bip44PurposeRow, ToSchemaProp>
 } = {
   name: 'Bip44Purpose',
@@ -161,7 +161,7 @@ export type Bip44CoinTypeRow = {|
   ...Bip44CoinTypeInsert,
 |};
 export const Bip44CoinTypeSchema: {
-  name: string,
+  name:'Bip44CoinType',
   properties: $ObjMapi<Bip44CoinTypeRow, ToSchemaProp>
 } = {
   name: 'Bip44CoinType',
@@ -178,7 +178,7 @@ export type Bip44AccountRow = {|
   ...Bip44AccountInsert,
 |};
 export const Bip44AccountSchema: {
-  name: string,
+  name: 'Bip44Account',
   properties: $ObjMapi<Bip44AccountRow, ToSchemaProp>
 } = {
   name: 'Bip44Account',
@@ -196,7 +196,7 @@ export type Bip44ChainRow = {|
   ...Bip44ChainInsert,
 |};
 export const Bip44ChainSchema: {
-  name: string,
+  name: 'Bip44Chain',
   properties: $ObjMapi<Bip44ChainRow, ToSchemaProp>
 } = {
   name: 'Bip44Chain',
@@ -215,7 +215,7 @@ export type Bip44AddressRow = {|
   ...Bip44AddressInsert,
 |};
 export const Bip44AddressSchema: {
-  name: string,
+  name: 'Bip44Address',
   properties: $ObjMapi<Bip44AddressRow, ToSchemaProp>
 } = {
   name: 'Bip44Address',

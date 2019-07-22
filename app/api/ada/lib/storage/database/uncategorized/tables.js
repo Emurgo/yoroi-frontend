@@ -14,7 +14,7 @@ export type KeyRow = {|
   ...KeyInsert,
 |};
 export const KeySchema: {
-  name: string,
+  name: 'Key',
   properties: $ObjMapi<KeyRow, ToSchemaProp>
 } = {
   name: 'Key',
@@ -36,7 +36,7 @@ export type ConceptualWalletRow = {|
   ...ConceptualWalletInsert,
 |};
 export const ConceptualWalletSchema: {
-  name: string,
+  name: 'ConceptualWallet',
   properties: $ObjMapi<ConceptualWalletRow, ToSchemaProp>
 } = {
   name: 'ConceptualWallet',

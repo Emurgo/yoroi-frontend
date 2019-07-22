@@ -3,21 +3,14 @@
 import '../../test-config';
 import { loadLovefieldDB } from './index';
 import {
-  addKey,
-  addConceptualWallet,
   getAllBip44Wallets,
 } from './uncategorized/api';
 import {
   DerivationLevels,
-  addBip44Wrapper,
-  addBip44Root, addBip44Purpose, addBip44CoinType, addBip44Account,
-  addPrivateDeriver,
-  addPublicDeriver,
   deriveFromRoot, deriveFromPurpose,
   deriveFromAccount, deriveFromChain,
   getDerivationsByPath,
   getBip44Address,
-  TableMap,
 } from './genericBip44/api';
 import {
   Bip44WrapperSchema, PrivateDeriverSchema,
@@ -33,7 +26,8 @@ import { LovefieldDerive } from '../bridge/LovefieldDerive';
 import { WalletBuilder } from '../bridge/WalletBuilder';
 import { ConceptualWalletSchema, KeySchema } from './uncategorized/tables';
 
-import * as NEW from './genericBip44/newApi';
+import * as NEW from './genericBip44/wrapped';
+import { getAllTables } from './wrapper';
 
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 const password = 'greatest_password_ever';
@@ -53,21 +47,8 @@ test('Can add and fetch address in wallet', async () => {
 
   const db = await loadLovefieldDB(true);
 
-  const tx = db.createTransaction();
-  const test = await NEW.ILovefieldRequest
-    .start({ db, tx })
-    .chain(NEW.AddKey, req => Promise.resolve({
-      Hash: '1',
-      IsEncrypted: false,
-      PasswordLastUpdate: null,
-    }))
-    .then(done => done
-      .chain(NEW.AddKey, req => Promise.resolve({
-        Hash: req.Hash + '1',
-        IsEncrypted: false,
-        PasswordLastUpdate: null,
-      })).then(asdf => asdf.run({ db, tx })));
-  console.log(test);
+  console.log(getAllTables(NEW.AddDerivation));
+  // console.log(NEW.AddDerivation.func());
 
   let state;
   {
@@ -120,7 +101,6 @@ test('Can add and fetch address in wallet', async () => {
     );
     await WalletBuilder.commit(state);
   }
-  console.log('zxcv');
 
   const ConceptualWalletTable = db.getSchema().table(ConceptualWalletSchema.name);
   const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
