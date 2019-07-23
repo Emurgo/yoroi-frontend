@@ -1,0 +1,93 @@
+// @flow
+
+import type {
+  lf$Database,
+  lf$Transaction,
+} from 'lovefield';
+
+import type {
+  ConceptualWalletRow,
+} from '../tables';
+import * as Tables from '../tables';
+import { getRowFromKey } from '../../utils';
+import { Bip44WrapperSchema, } from '../../genericBip44/tables';
+import type { Bip44WrapperRow } from '../../genericBip44/tables';
+
+export class GetConceptualWallet {
+  static ownTables = Object.freeze({
+    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema.name,
+  });
+  static depTables = Object.freeze({});
+
+  static async func(
+    db: lf$Database,
+    tx: lf$Transaction,
+    key: number,
+  ): Promise<ConceptualWalletRow | void> {
+    return await getRowFromKey<ConceptualWalletRow>(
+      db, tx,
+      key,
+      GetConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name],
+      Tables.ConceptualWalletSchema.properties.ConceptualWalletId,
+    );
+  }
+}
+
+const WalletType = Object.freeze({
+  Bip44: 'bip44',
+});
+export class GetWalletByType {
+  static ownTables = Object.freeze({
+    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema.name,
+    [Bip44WrapperSchema.name]: Bip44WrapperSchema.name,
+  });
+  static depTables = Object.freeze({});
+
+  static async func<T>(
+    db: lf$Database,
+    tx: lf$Transaction,
+    type: $Values<typeof WalletType>,
+  ): Promise<Array<T & {
+    ConceptualWallet: ConceptualWalletRow,
+  }>> {
+    const conceptualWalletTable = db.getSchema().table(
+      GetWalletByType.ownTables[Tables.ConceptualWalletSchema.name]
+    );
+    const keyRowName = Tables.ConceptualWalletSchema.properties.ConceptualWalletId;
+
+    let tableName;
+    if (type === WalletType.Bip44) {
+      tableName = GetWalletByType.ownTables[Bip44WrapperSchema.name];
+    } else {
+      throw new Error('WalletType::func unexpected type');
+    }
+    const typeTable = db.getSchema().table(tableName);
+    return await tx.attach(db
+      .select()
+      .from(conceptualWalletTable)
+      .innerJoin(
+        typeTable,
+        typeTable[keyRowName].eq(conceptualWalletTable[keyRowName]),
+      ));
+  }
+}
+
+export class GetAllBip44Wallets {
+  static ownTables = Object.freeze({});
+  static depTables = Object.freeze({
+    GetWalletByType,
+  });
+
+  static async func(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<Array<{
+    ConceptualWallet: ConceptualWalletRow,
+    Bip44Wrapper: Bip44WrapperRow,
+  }>> {
+    return GetWalletByType.func<{Bip44Wrapper: Bip44WrapperRow}>(
+      db, tx,
+      WalletType.Bip44,
+    );
+  }
+}

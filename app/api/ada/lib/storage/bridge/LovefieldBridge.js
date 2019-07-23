@@ -33,15 +33,15 @@ export class LovefieldBridge implements IStorageBridge {
   }
 
   // TODO: maybe flatten these?
-  getConceptualWalletData = (key: number): Promise<ConceptualWalletRow | typeof undefined> => {
+  getConceptualWalletData = (key: number): Promise<ConceptualWalletRow | void> => {
     //return getConceptualWallet(this.db, key);
     return Promise.resolve(undefined);
   }
-  getPublicDeriverData = (key: number): Promise<PublicDeriverRow | typeof undefined> => {
+  getPublicDeriverData = (key: number): Promise<PublicDeriverRow | void> => {
     //return getPublicDeriver(this.db, key);
     return Promise.resolve(undefined);
   }
-  getBip44WrapperData = (key: number): Promise<Bip44WrapperRow | typeof undefined> => {
+  getBip44WrapperData = (key: number): Promise<Bip44WrapperRow | void> => {
     //return getBip44Wrapper(this.db, key);
     return Promise.resolve(undefined);
   }
