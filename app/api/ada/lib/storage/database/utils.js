@@ -31,7 +31,7 @@ export const getRowFromKey = async <T>(
   key: number,
   tableName: string,
   keyRowName: string,
-): Promise<T | typeof undefined> => {
+): Promise<T | void> => {
   const table = db.getSchema().table(tableName);
   const query = db
     .select()

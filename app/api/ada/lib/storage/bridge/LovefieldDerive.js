@@ -22,15 +22,19 @@ import type {
   Bip44WrapperRow,
 } from '../database/genericBip44/tables';
 import {
-  addPublicDeriver,
-  addByLevelWithParent,
+  AddPublicDeriver,
+  AddDerivationWithParent,
+} from '../database/genericBip44/api/add';
+import {
+  GetDerivationsByPath,
+} from '../database/genericBip44/api/get';
+import {
   TableMap,
-  getDerivationsByPath
-} from '../database/genericBip44/api';
+} from '../database/genericBip44/api/utils';
 
 import { KeySchema } from '../database/uncategorized/tables';
 import type { KeyInsert, KeyRow } from '../database/uncategorized/tables';
-import { addKey, } from '../database/uncategorized/api';
+import { AddKey, } from '../database/uncategorized/api/add';
 
 import { StaleStateError, WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
@@ -216,7 +220,7 @@ function _derive(
     let insertResult;
     {
       // add get parent of the new derivation
-      const newLevelParent = await getDerivationsByPath(
+      const newLevelParent = await GetDerivationsByPath.func(
         db,
         getKeyTx,
         privateDeriverRow.Bip44DerivationId,
@@ -229,7 +233,7 @@ function _derive(
       }
 
       // add derivation itself
-      insertResult = await addByLevelWithParent(
+      insertResult = await AddDerivationWithParent.func(
         db, getKeyTx,
         {
           privateKeyInfo: newPrivateKey,
@@ -252,12 +256,10 @@ function _derive(
     let pubDeriver: PublicDeriverRow;
     {
       // add the public deriver
-      pubDeriver = await addPublicDeriver(
+      pubDeriver = await AddPublicDeriver.func(
         db,
         getKeyTx,
-        {
-          row: body.publicDeriverInsert(insertResult.derivationTableResult.Bip44DerivationId),
-        }
+        body.publicDeriverInsert(insertResult.derivationTableResult.Bip44DerivationId),
       );
     }
 

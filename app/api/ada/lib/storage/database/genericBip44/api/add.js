@@ -38,7 +38,7 @@ export type AddDerivationRequest<Insert> = {|
 export class AddDerivation {
   static ownTables = Object.freeze({
     ...allDerivationTables,
-    [Bip44Tables.Bip44DerivationSchema.name]: (Bip44Tables.Bip44DerivationSchema.name: string),
+    [Bip44Tables.Bip44DerivationSchema.name]: Bip44Tables.Bip44DerivationSchema,
   });
   static depTables = Object.freeze({
     AddKey,
@@ -78,7 +78,7 @@ export class AddDerivation {
           private: privateKey ? privateKey.KeyId : null,
           public: publicKey ? publicKey.KeyId : null,
         }),
-        AddDerivation.ownTables[Bip44Tables.Bip44DerivationSchema.name],
+        AddDerivation.ownTables[Bip44Tables.Bip44DerivationSchema.name].name,
       );
 
     const specificDerivationResult =
@@ -103,7 +103,7 @@ export type DeriveFromRequest<T> = {|
 export class AddDerivationWithParent {
   static ownTables = Object.freeze({
     [Bip44Tables.Bip44DerivationMappingSchema.name]: (
-      Bip44Tables.Bip44DerivationMappingSchema.name: string
+      Bip44Tables.Bip44DerivationMappingSchema
     ),
   });
   static depTables = Object.freeze({
@@ -161,7 +161,7 @@ export type PrivateDeriverRequest<Insert> = {
 };
 export class AddPrivateDeriver {
   static ownTables = Object.freeze({
-    [Bip44Tables.PrivateDeriverSchema.name]: (Bip44Tables.PrivateDeriverSchema.name: string),
+    [Bip44Tables.PrivateDeriverSchema.name]: Bip44Tables.PrivateDeriverSchema,
   });
   static depTables = Object.freeze({
     AddDerivation,
@@ -186,7 +186,7 @@ export class AddPrivateDeriver {
     const privateDeriverResult = await addToTable<PrivateDeriverInsert, PrivateDeriverRow>(
       db, tx,
       request.addPrivateDeriverRequest(levelResult.derivationTableResult.Bip44DerivationId),
-      AddPrivateDeriver.ownTables[Bip44Tables.PrivateDeriverSchema.name],
+      AddPrivateDeriver.ownTables[Bip44Tables.PrivateDeriverSchema.name].name,
     );
     return {
       privateDeriverResult,
@@ -197,7 +197,7 @@ export class AddPrivateDeriver {
 
 export class AddBip44Wrapper {
   static ownTables = Object.freeze({
-    [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema.name,
+    [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema,
   });
   static depTables = Object.freeze({});
 
@@ -209,7 +209,7 @@ export class AddBip44Wrapper {
     return await addToTable<Bip44WrapperInsert, Bip44WrapperRow>(
       db, tx,
       request,
-      AddBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name],
+      AddBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name].name,
     );
   }
 }
@@ -217,7 +217,7 @@ export class AddBip44Wrapper {
 /** TODO: is more complicated than this */
 export class AddPublicDeriver {
   static ownTables = Object.freeze({
-    [Bip44Tables.PublicDeriverSchema.name]: Bip44Tables.PublicDeriverSchema.name,
+    [Bip44Tables.PublicDeriverSchema.name]: Bip44Tables.PublicDeriverSchema,
   });
   static depTables = Object.freeze({});
 
@@ -229,7 +229,7 @@ export class AddPublicDeriver {
     return await addToTable<PublicDeriverInsert, PublicDeriverRow>(
       db, tx,
       request,
-      AddPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name],
+      AddPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name].name,
     );
   }
 }

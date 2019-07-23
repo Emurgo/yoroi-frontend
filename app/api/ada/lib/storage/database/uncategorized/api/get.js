@@ -15,7 +15,7 @@ import type { Bip44WrapperRow } from '../../genericBip44/tables';
 
 export class GetConceptualWallet {
   static ownTables = Object.freeze({
-    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema.name,
+    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
   });
   static depTables = Object.freeze({});
 
@@ -27,7 +27,7 @@ export class GetConceptualWallet {
     return await getRowFromKey<ConceptualWalletRow>(
       db, tx,
       key,
-      GetConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name],
+      GetConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name].name,
       Tables.ConceptualWalletSchema.properties.ConceptualWalletId,
     );
   }
@@ -38,8 +38,8 @@ const WalletType = Object.freeze({
 });
 export class GetWalletByType {
   static ownTables = Object.freeze({
-    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema.name,
-    [Bip44WrapperSchema.name]: Bip44WrapperSchema.name,
+    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
+    [Bip44WrapperSchema.name]: Bip44WrapperSchema,
   });
   static depTables = Object.freeze({});
 
@@ -51,13 +51,13 @@ export class GetWalletByType {
     ConceptualWallet: ConceptualWalletRow,
   }>> {
     const conceptualWalletTable = db.getSchema().table(
-      GetWalletByType.ownTables[Tables.ConceptualWalletSchema.name]
+      GetWalletByType.ownTables[Tables.ConceptualWalletSchema.name].name
     );
     const keyRowName = Tables.ConceptualWalletSchema.properties.ConceptualWalletId;
 
     let tableName;
     if (type === WalletType.Bip44) {
-      tableName = GetWalletByType.ownTables[Bip44WrapperSchema.name];
+      tableName = GetWalletByType.ownTables[Bip44WrapperSchema.name].name;
     } else {
       throw new Error('WalletType::func unexpected type');
     }

@@ -15,7 +15,7 @@ import { addToTable, } from '../../utils';
 
 export class AddKey {
   static ownTables = Object.freeze({
-    [Tables.KeySchema.name]: Tables.KeySchema.name,
+    [Tables.KeySchema.name]: Tables.KeySchema,
   });
   static depTables = Object.freeze({});
 
@@ -27,14 +27,14 @@ export class AddKey {
     return await addToTable<KeyInsert, KeyRow>(
       db, tx,
       request,
-      AddKey.ownTables[Tables.KeySchema.name],
+      AddKey.ownTables[Tables.KeySchema.name].name,
     );
   }
 }
 
 export class AddConceptualWallet {
   static ownTables = Object.freeze({
-    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema.name,
+    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
   });
   static depTables = Object.freeze({});
 
@@ -42,11 +42,11 @@ export class AddConceptualWallet {
     db: lf$Database,
     tx: lf$Transaction,
     request: ConceptualWalletInsert,
-  ): Promise<KeyRow> {
+  ): Promise<ConceptualWalletRow> {
     return await addToTable<ConceptualWalletInsert, ConceptualWalletRow>(
       db, tx,
       request,
-      AddConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name],
+      AddConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name].name,
     );
   }
 }

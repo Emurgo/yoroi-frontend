@@ -20,13 +20,13 @@ import { getRowIn, getRowFromKey } from '../../utils';
 
 export class GetDerivation {
   static ownTables = Object.freeze({
-    [Bip44Tables.Bip44RootSchema.name]: (Bip44Tables.Bip44RootSchema.name: string),
-    [Bip44Tables.Bip44PurposeSchema.name]: (Bip44Tables.Bip44PurposeSchema.name: string),
-    [Bip44Tables.Bip44CoinTypeSchema.name]: (Bip44Tables.Bip44CoinTypeSchema.name: string),
-    [Bip44Tables.Bip44AccountSchema.name]: (Bip44Tables.Bip44AccountSchema.name: string),
-    [Bip44Tables.Bip44ChainSchema.name]: (Bip44Tables.Bip44ChainSchema.name: string),
-    [Bip44Tables.Bip44AddressSchema.name]: (Bip44Tables.Bip44AddressSchema.name: string),
-    [Bip44Tables.Bip44DerivationSchema.name]: (Bip44Tables.Bip44DerivationSchema.name: string),
+    [Bip44Tables.Bip44RootSchema.name]: Bip44Tables.Bip44RootSchema,
+    [Bip44Tables.Bip44PurposeSchema.name]: Bip44Tables.Bip44PurposeSchema,
+    [Bip44Tables.Bip44CoinTypeSchema.name]: Bip44Tables.Bip44CoinTypeSchema,
+    [Bip44Tables.Bip44AccountSchema.name]: Bip44Tables.Bip44AccountSchema,
+    [Bip44Tables.Bip44ChainSchema.name]: Bip44Tables.Bip44ChainSchema,
+    [Bip44Tables.Bip44AddressSchema.name]: Bip44Tables.Bip44AddressSchema,
+    [Bip44Tables.Bip44DerivationSchema.name]: Bip44Tables.Bip44DerivationSchema,
   });
   static depTables = Object.freeze({});
 
@@ -35,7 +35,7 @@ export class GetDerivation {
     tx: lf$Transaction,
     derivationIds: Array<number>,
     level: number,
-  ) {
+  ): Promise<Array<Row>> {
     const tableName = TableMap.get(level);
     if (tableName == null) {
       throw new Error('AddDerivation::func Unknown table queried');
@@ -60,9 +60,9 @@ type PathMapType = Map<number, Array<number>>;
 export class GetDerivationsByPath {
   static ownTables = Object.freeze({
     [Bip44Tables.Bip44DerivationMappingSchema.name]: (
-      Bip44Tables.Bip44DerivationMappingSchema.name: string
+      Bip44Tables.Bip44DerivationMappingSchema
     ),
-    [Bip44Tables.Bip44DerivationSchema.name]: (Bip44Tables.Bip44DerivationSchema.name: string),
+    [Bip44Tables.Bip44DerivationSchema.name]: Bip44Tables.Bip44DerivationSchema,
   });
   static depTables = Object.freeze({});
 
@@ -97,10 +97,10 @@ const _getDerivationsByPath = async (
   }
 
   const mappingTable = db.getSchema().table(
-    GetDerivationsByPath.ownTables[Bip44Tables.Bip44DerivationMappingSchema.name]
+    GetDerivationsByPath.ownTables[Bip44Tables.Bip44DerivationMappingSchema.name].name
   );
   const derivationTable = db.getSchema().table(
-    GetDerivationsByPath.ownTables[Bip44Tables.Bip44DerivationSchema.name]
+    GetDerivationsByPath.ownTables[Bip44Tables.Bip44DerivationSchema.name].name
   );
   const conditions = [
     mappingTable[Bip44Tables.Bip44DerivationMappingSchema.properties.Parent].in(
@@ -155,7 +155,7 @@ const _getDerivationsByPath = async (
 
 export class GetPublicDeriver {
   static ownTables = Object.freeze({
-    [Bip44Tables.PublicDeriverSchema.name]: Bip44Tables.PublicDeriverSchema.name,
+    [Bip44Tables.PublicDeriverSchema.name]: Bip44Tables.PublicDeriverSchema,
   });
   static depTables = Object.freeze({});
 
@@ -167,7 +167,7 @@ export class GetPublicDeriver {
     return await getRowFromKey<PublicDeriverRow>(
       db, tx,
       key,
-      GetPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name],
+      GetPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name].name,
       Bip44Tables.PublicDeriverSchema.properties.PublicDeriverId,
     );
   }
@@ -175,7 +175,7 @@ export class GetPublicDeriver {
 
 export class GetBip44Wrapper {
   static ownTables = Object.freeze({
-    [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema.name,
+    [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema,
   });
   static depTables = Object.freeze({});
 
@@ -187,7 +187,7 @@ export class GetBip44Wrapper {
     return await getRowFromKey<Bip44WrapperRow>(
       db, tx,
       key,
-      GetBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name],
+      GetBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name].name,
       Bip44Tables.Bip44WrapperSchema.properties.Bip44WrapperId,
     );
   }

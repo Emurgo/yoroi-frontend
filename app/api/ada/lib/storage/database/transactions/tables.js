@@ -19,7 +19,7 @@ export type TransactionRow = {|
   ...TransactionInsert,
 |};
 export const TransactionSchema: {
-  name: 'Transaction',
+  +name: 'Transaction',
   properties: $ObjMapi<TransactionRow, ToSchemaProp>
 } = {
   name: 'Transaction',
@@ -44,7 +44,7 @@ export type UtxoTransactionInputRow = {|
   ...UtxoTransactionInputInsert,
 |};
 export const UtxoTransactionInputSchema: {
-  name: 'UtxoTransactionInput',
+  +name: 'UtxoTransactionInput',
   properties: $ObjMapi<UtxoTransactionInputRow, ToSchemaProp>
 } = {
   name: 'UtxoTransactionInput',
@@ -69,7 +69,7 @@ export type UtxoTransactionOutputRow = {|
   ...UtxoTransactionOutputInsert,
 |};
 export const UtxoTransactionOutputSchema: {
-  name: 'UtxoTransactionOutput',
+  +name: 'UtxoTransactionOutput',
   properties: $ObjMapi<UtxoTransactionOutputRow, ToSchemaProp>
 } = {
   name: 'UtxoTransactionOutput',

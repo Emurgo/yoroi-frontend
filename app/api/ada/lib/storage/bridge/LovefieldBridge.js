@@ -13,8 +13,8 @@ import type {
 import { PrivateDeriverSchema } from '../database/genericBip44/tables';
 import type { ConceptualWalletRow } from '../database/uncategorized/tables';
 
-import { getConceptualWallet } from '../database/uncategorized/api';
-import { getPublicDeriver, getBip44Wrapper } from '../database/genericBip44/api';
+import { GetConceptualWallet } from '../database/uncategorized/api/get';
+import { GetPublicDeriver, GetBip44Wrapper } from '../database/genericBip44/api/get';
 
 import { Bip44Wallet } from '../models/Bip44Wallet';
 import { PublicDeriver } from '../models/PublicDeriver';

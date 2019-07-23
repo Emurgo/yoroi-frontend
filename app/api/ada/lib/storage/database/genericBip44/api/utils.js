@@ -44,11 +44,10 @@ export const TableMap = new Map<number, string>(
  * Since we cannot statically determine which level will be used, we just lock all tables.
  */
 export const allDerivationTables = {
-  [Bip44Tables.Bip44RootSchema.name]: (Bip44Tables.Bip44RootSchema.name: string),
-  [Bip44Tables.Bip44PurposeSchema.name]: (Bip44Tables.Bip44PurposeSchema.name: string),
-  [Bip44Tables.Bip44CoinTypeSchema.name]: (Bip44Tables.Bip44CoinTypeSchema.name: string),
-  [Bip44Tables.Bip44AccountSchema.name]: (Bip44Tables.Bip44AccountSchema.name: string),
-  [Bip44Tables.Bip44ChainSchema.name]: (Bip44Tables.Bip44ChainSchema.name: string),
-  [Bip44Tables.Bip44AddressSchema.name]: (Bip44Tables.Bip44AddressSchema.name: string),
-  [Bip44Tables.Bip44DerivationSchema.name]: (Bip44Tables.Bip44DerivationSchema.name: string),
+  [Bip44Tables.Bip44RootSchema.name]: Bip44Tables.Bip44RootSchema,
+  [Bip44Tables.Bip44PurposeSchema.name]: Bip44Tables.Bip44PurposeSchema,
+  [Bip44Tables.Bip44CoinTypeSchema.name]: Bip44Tables.Bip44CoinTypeSchema,
+  [Bip44Tables.Bip44AccountSchema.name]: Bip44Tables.Bip44AccountSchema,
+  [Bip44Tables.Bip44ChainSchema.name]: Bip44Tables.Bip44ChainSchema,
+  [Bip44Tables.Bip44AddressSchema.name]: Bip44Tables.Bip44AddressSchema,
 };

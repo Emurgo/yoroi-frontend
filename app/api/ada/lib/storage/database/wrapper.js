@@ -12,17 +12,21 @@
 
 import { size } from 'lodash';
 
-export type OwnTableType = { [key: string]: string };
+export type Schema = {
+  +name: string,
+  properties: any;
+};
+export type OwnTableType = { [key: string]: Schema };
 export type DepTableType = { [key: string]: TableClassType };
 export type TableClassType = {
-  ownTables: OwnTableType,
+  +ownTables: OwnTableType,
   /**
    * Recursively specify which tables will be required
    * We need to recursivley store this information
    * That way each wrapper only needs to care about the tables it specifically will access
    * and not what its dependencies will require
    */
-  depTables: DepTableType,
+  +depTables: DepTableType,
 }
 
 /** recursively get all tables required for a database query */
@@ -31,7 +35,9 @@ export function getAllTables(tableClass: TableClassType): Set<string> {
 }
 
 function _getAllTables(tableClass: TableClassType): Array<string> {
-  const ownTables = Object.keys(tableClass.ownTables).map(key => tableClass.ownTables[key]);
+  const ownTables = Object.keys(tableClass.ownTables)
+    .map(key => tableClass.ownTables[key])
+    .map(schema => schema.name);
   if (size(tableClass.depTables) === 0) {
     return ownTables;
   }

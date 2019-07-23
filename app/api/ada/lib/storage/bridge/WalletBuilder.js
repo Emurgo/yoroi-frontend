@@ -13,8 +13,8 @@ import {
   ConceptualWalletSchema,
 } from '../database/uncategorized/tables';
 import {
-  addConceptualWallet
-} from '../database/uncategorized/api';
+  AddConceptualWallet,
+} from '../database/uncategorized/api/add';
 import type {
   Bip44WrapperRow, Bip44WrapperInsert,
   PrivateDeriverRow, PrivateDeriverInsert,
@@ -26,12 +26,12 @@ import {
   Bip44RootSchema,
 } from '../database/genericBip44/tables';
 import {
-  addBip44Wrapper,
-  addPrivateDeriver,
-} from '../database/genericBip44/api';
+  AddBip44Wrapper,
+  AddPrivateDeriver,
+} from '../database/genericBip44/api/add';
 import type {
   PrivateDeriverRequest
-} from '../database/genericBip44/api';
+} from '../database/genericBip44/api/add';
 
 class BuilderState<Data> {
   db: lf$Database;
@@ -116,10 +116,10 @@ export class WalletBuilder {
       AsNotNull<HasConceptualWallet>({ conceptualWalletRow: null }),
       [ConceptualWalletSchema.name],
       async (finalData) => {
-        finalData.conceptualWalletRow = await addConceptualWallet(
+        finalData.conceptualWalletRow = await AddConceptualWallet.func(
           builderState.db,
           builderState.tx,
-          { row: insert(finalData) }
+          insert(finalData),
         );
       },
     );
@@ -136,10 +136,10 @@ export class WalletBuilder {
       AsNotNull<HasBip44Wrapper>({ bip44WrapperRow: null }),
       [Bip44WrapperSchema.name],
       async (finalData) => {
-        finalData.bip44WrapperRow = await addBip44Wrapper(
+        finalData.bip44WrapperRow = await AddBip44Wrapper.func(
           builderState.db,
           builderState.tx,
-          { row: insert(finalData) }
+          insert(finalData),
         );
       },
     );
@@ -162,7 +162,7 @@ export class WalletBuilder {
         Bip44RootSchema.name, // TODO: make more generic
       ],
       async (finalData) => {
-        finalData.privateDeriver = await addPrivateDeriver(
+        finalData.privateDeriver = await AddPrivateDeriver.func(
           builderState.db,
           builderState.tx,
           insert(finalData),
@@ -191,6 +191,12 @@ function AsNotNull<T: {}>(
 
 type Nullable = <K>(K) => K | null;
 // types to represent requirements
-type HasConceptualWallet = { conceptualWalletRow: PromisslessReturnType<typeof addConceptualWallet> };
-type HasBip44Wrapper = { bip44WrapperRow: PromisslessReturnType<typeof addBip44Wrapper> };
-type HasPrivateDeriver = { privateDeriver: PromisslessReturnType<typeof addPrivateDeriver> };
+type HasConceptualWallet = {
+  conceptualWalletRow: PromisslessReturnType<typeof AddConceptualWallet.func>
+};
+type HasBip44Wrapper = {
+  bip44WrapperRow: PromisslessReturnType<typeof AddBip44Wrapper.func>
+};
+type HasPrivateDeriver = {
+  privateDeriver: PromisslessReturnType<typeof AddPrivateDeriver.func>
+};
