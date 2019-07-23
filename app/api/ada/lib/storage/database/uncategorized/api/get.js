@@ -24,11 +24,12 @@ export class GetConceptualWallet {
     tx: lf$Transaction,
     key: number,
   ): Promise<ConceptualWalletRow | void> {
+    const walletSchema = GetConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name];
     return await getRowFromKey<ConceptualWalletRow>(
       db, tx,
       key,
-      GetConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name].name,
-      Tables.ConceptualWalletSchema.properties.ConceptualWalletId,
+      walletSchema.name,
+      walletSchema.properties.ConceptualWalletId,
     );
   }
 }
@@ -50,10 +51,11 @@ export class GetWalletByType {
   ): Promise<Array<T & {
     ConceptualWallet: ConceptualWalletRow,
   }>> {
+    const walletSchema = GetWalletByType.ownTables[Tables.ConceptualWalletSchema.name];
     const conceptualWalletTable = db.getSchema().table(
-      GetWalletByType.ownTables[Tables.ConceptualWalletSchema.name].name
+      walletSchema.name
     );
-    const keyRowName = Tables.ConceptualWalletSchema.properties.ConceptualWalletId;
+    const keyRowName = walletSchema.properties.ConceptualWalletId;
 
     let tableName;
     if (type === WalletType.Bip44) {

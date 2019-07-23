@@ -11,7 +11,7 @@ import type {
   Bip44WrapperRow,
   PublicDeriverRow,
 } from '../tables';
-import * as Bip44Tables from '../tables';
+import * as Tables from '../tables';
 
 import {
   TableMap,
@@ -20,13 +20,13 @@ import { getRowIn, getRowFromKey } from '../../utils';
 
 export class GetDerivation {
   static ownTables = Object.freeze({
-    [Bip44Tables.Bip44RootSchema.name]: Bip44Tables.Bip44RootSchema,
-    [Bip44Tables.Bip44PurposeSchema.name]: Bip44Tables.Bip44PurposeSchema,
-    [Bip44Tables.Bip44CoinTypeSchema.name]: Bip44Tables.Bip44CoinTypeSchema,
-    [Bip44Tables.Bip44AccountSchema.name]: Bip44Tables.Bip44AccountSchema,
-    [Bip44Tables.Bip44ChainSchema.name]: Bip44Tables.Bip44ChainSchema,
-    [Bip44Tables.Bip44AddressSchema.name]: Bip44Tables.Bip44AddressSchema,
-    [Bip44Tables.Bip44DerivationSchema.name]: Bip44Tables.Bip44DerivationSchema,
+    [Tables.Bip44RootSchema.name]: Tables.Bip44RootSchema,
+    [Tables.Bip44PurposeSchema.name]: Tables.Bip44PurposeSchema,
+    [Tables.Bip44CoinTypeSchema.name]: Tables.Bip44CoinTypeSchema,
+    [Tables.Bip44AccountSchema.name]: Tables.Bip44AccountSchema,
+    [Tables.Bip44ChainSchema.name]: Tables.Bip44ChainSchema,
+    [Tables.Bip44AddressSchema.name]: Tables.Bip44AddressSchema,
+    [Tables.Bip44DerivationSchema.name]: Tables.Bip44DerivationSchema,
   });
   static depTables = Object.freeze({});
 
@@ -43,7 +43,7 @@ export class GetDerivation {
     return await getRowIn<Row>(
       db, tx,
       tableName,
-      Bip44Tables.Bip44DerivationSchema.properties.Bip44DerivationId,
+      GetDerivation.ownTables[Tables.Bip44DerivationSchema.name].properties.Bip44DerivationId,
       derivationIds,
     );
   }
@@ -59,10 +59,10 @@ type PathMapType = Map<number, Array<number>>;
 
 export class GetDerivationsByPath {
   static ownTables = Object.freeze({
-    [Bip44Tables.Bip44DerivationMappingSchema.name]: (
-      Bip44Tables.Bip44DerivationMappingSchema
+    [Tables.Bip44DerivationMappingSchema.name]: (
+      Tables.Bip44DerivationMappingSchema
     ),
-    [Bip44Tables.Bip44DerivationSchema.name]: Bip44Tables.Bip44DerivationSchema,
+    [Tables.Bip44DerivationSchema.name]: Tables.Bip44DerivationSchema,
   });
   static depTables = Object.freeze({});
 
@@ -95,22 +95,20 @@ const _getDerivationsByPath = async (
   if (currPathIndex === queryPath.length) {
     return pathMap;
   }
+  const mappingSchema = GetDerivationsByPath.ownTables[Tables.Bip44DerivationMappingSchema.name];
+  const derivationSchema = GetDerivationsByPath.ownTables[Tables.Bip44DerivationSchema.name];
 
-  const mappingTable = db.getSchema().table(
-    GetDerivationsByPath.ownTables[Bip44Tables.Bip44DerivationMappingSchema.name].name
-  );
-  const derivationTable = db.getSchema().table(
-    GetDerivationsByPath.ownTables[Bip44Tables.Bip44DerivationSchema.name].name
-  );
+  const mappingTable = db.getSchema().table(mappingSchema.name);
+  const derivationTable = db.getSchema().table(derivationSchema.name);
   const conditions = [
-    mappingTable[Bip44Tables.Bip44DerivationMappingSchema.properties.Parent].in(
+    mappingTable[mappingSchema.properties.Parent].in(
       Array.from(pathMap.keys())
     ),
   ];
   // if the query is for a specific index, we need to add the condition to the SQL query
   if (queryPath[currPathIndex] !== null) {
     conditions.push(
-      derivationTable[Bip44Tables.Bip44DerivationSchema.properties.Index].eq(
+      derivationTable[derivationSchema.properties.Index].eq(
         queryPath[currPathIndex]
       ),
     );
@@ -121,8 +119,8 @@ const _getDerivationsByPath = async (
     .from(mappingTable)
     .innerJoin(
       derivationTable,
-      derivationTable[Bip44Tables.Bip44DerivationSchema.properties.Bip44DerivationId]
-        .eq(mappingTable[Bip44Tables.Bip44DerivationMappingSchema.properties.Child]),
+      derivationTable[derivationSchema.properties.Bip44DerivationId]
+        .eq(mappingTable[mappingSchema.properties.Child]),
     )
     .where(...conditions);
 
@@ -155,7 +153,7 @@ const _getDerivationsByPath = async (
 
 export class GetPublicDeriver {
   static ownTables = Object.freeze({
-    [Bip44Tables.PublicDeriverSchema.name]: Bip44Tables.PublicDeriverSchema,
+    [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
   });
   static depTables = Object.freeze({});
 
@@ -167,15 +165,15 @@ export class GetPublicDeriver {
     return await getRowFromKey<PublicDeriverRow>(
       db, tx,
       key,
-      GetPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name].name,
-      Bip44Tables.PublicDeriverSchema.properties.PublicDeriverId,
+      GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
+      GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.PublicDeriverId,
     );
   }
 }
 
 export class GetBip44Wrapper {
   static ownTables = Object.freeze({
-    [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema,
+    [Tables.Bip44WrapperSchema.name]: Tables.Bip44WrapperSchema,
   });
   static depTables = Object.freeze({});
 
@@ -187,8 +185,8 @@ export class GetBip44Wrapper {
     return await getRowFromKey<Bip44WrapperRow>(
       db, tx,
       key,
-      GetBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name].name,
-      Bip44Tables.Bip44WrapperSchema.properties.Bip44WrapperId,
+      GetBip44Wrapper.ownTables[Tables.Bip44WrapperSchema.name].name,
+      GetBip44Wrapper.ownTables[Tables.Bip44WrapperSchema.name].properties.Bip44WrapperId,
     );
   }
 }
