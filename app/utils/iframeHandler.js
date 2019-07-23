@@ -1,7 +1,7 @@
 // @flow
 import {
   LedgerBridge,
-  YOROI_LEDGER_BRIDGE_IFRAME_NAME
+  YOROI_LEDGER_BRIDGE_TARGET_NAME
 } from 'yoroi-extension-ledger-bridge';
 
 const LEDGER_BRIDGE_CHECK_INTERVAL = 500; // in ms (1000ms = 1sec)
@@ -37,9 +37,9 @@ export function getIFrame(id: string): ?HTMLIFrameElement {
 }
 
 /** In order to keep all iframe related logic in iframeHandler
-  * softly restricting YOROI_LEDGER_BRIDGE_IFRAME_NAME use from outside */
+  * softly restricting YOROI_LEDGER_BRIDGE_TARGET_NAME use from outside */
 export function disposeLedgerBridgeIFrame() {
-  disposeIFrame(YOROI_LEDGER_BRIDGE_IFRAME_NAME);
+  disposeIFrame(YOROI_LEDGER_BRIDGE_TARGET_NAME);
 }
 
 export function disposeIFrame(id: string): void {

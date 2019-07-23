@@ -5,6 +5,7 @@ import { observable, action } from 'mobx';
 
 import {
   LedgerBridge,
+  ConnectionTypeValue,
   makeCardanoAccountBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
 import type {
@@ -103,7 +104,7 @@ export default class LedgerConnectStore
     Logger.debug('LedgerConnectStore::_init called');
     if (this.ledgerBridge == null) {
       Logger.debug('LedgerConnectStore::_init new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
+      // this.ledgerBridge = new LedgerBridge();
     }
   }
 
@@ -156,32 +157,33 @@ export default class LedgerConnectStore
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     try {
-      if (this.ledgerBridge) {
-        // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
-        await prepareLedgerBridger(ledgerBridge);
+      // if (this.ledgerBridge) {
+      // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
+      const ledgerBridge: LedgerBridge = new LedgerBridge(undefined, ConnectionTypeValue.WEB_AUTHN);
+      // await prepareLedgerBridger(ledgerBridge);
 
-        const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
+      console.log('_checkAndStoreHWDeviceInfo');
+      const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
 
-        Logger.debug(stringifyData(versionResp));
+      Logger.debug(stringifyData(versionResp));
 
-        // TODO: assume single account in Yoroi
-        const accountPath = makeCardanoAccountBIP44Path(0);
-        // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
-        Logger.debug(stringifyData(accountPath));
+      // TODO: assume single account in Yoroi
+      const accountPath = makeCardanoAccountBIP44Path(0);
+      // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
+      Logger.debug(stringifyData(accountPath));
 
-        // get Cardano's first account's
-        // i.e hdPath = [2147483692, 2147485463, 2147483648]
-        const extendedPublicKeyResp: GetExtendedPublicKeyResponse
-          = await ledgerBridge.getExtendedPublicKey(accountPath);
+      // get Cardano's first account's
+      // i.e hdPath = [2147483692, 2147485463, 2147483648]
+      const extendedPublicKeyResp: GetExtendedPublicKeyResponse
+        = await ledgerBridge.getExtendedPublicKey(accountPath);
 
-        this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp });
+      this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp });
 
-        this._goToSaveLoad();
-        Logger.info('Ledger device OK');
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
-      }
+      this._goToSaveLoad();
+      Logger.info('Ledger device OK');
+      // } else {
+      //   throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
+      // }
     } catch (error) {
       this._handleConnectError(error);
     }
