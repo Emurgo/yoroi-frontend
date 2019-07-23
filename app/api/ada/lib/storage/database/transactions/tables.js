@@ -1,6 +1,6 @@
 // @flow
 
-import lf, { Type } from 'lovefield';
+import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
 import {

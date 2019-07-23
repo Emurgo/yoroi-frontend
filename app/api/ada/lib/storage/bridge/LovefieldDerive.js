@@ -2,8 +2,6 @@
 
 import type {
   lf$Database,
-  lf$Transaction,
-  lf$Row,
 } from 'lovefield';
 
 import { IDerive } from '../models/functionalities/IDerive';
@@ -19,7 +17,6 @@ import {
 import type {
   PrivateDeriverRow, Bip44DerivationRow,
   PublicDeriverInsert, PublicDeriverRow,
-  Bip44WrapperRow,
 } from '../database/genericBip44/tables';
 import {
   AddPublicDeriver,
@@ -34,7 +31,6 @@ import {
 
 import { KeySchema } from '../database/uncategorized/tables';
 import type { KeyInsert, KeyRow } from '../database/uncategorized/tables';
-import { AddKey, } from '../database/uncategorized/api/add';
 
 import { StaleStateError, WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
@@ -134,7 +130,7 @@ function _derive(
         PublicDeriverTable, Bip44DerivationMappingTable,
         // we don't know which level the public deriver will be
         // so we lock the table for every level
-        ...Array.from(TableMap, ([key, value]) => db.getSchema().table(value))
+        ...Array.from(TableMap, ([_key, value]) => db.getSchema().table(value))
       ]);
 
     let privateDeriverRow: PrivateDeriverRow;

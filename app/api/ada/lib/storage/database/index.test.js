@@ -17,7 +17,14 @@ import {
 } from './genericBip44/api/add';
 import {
   Bip44WrapperSchema, PrivateDeriverSchema,
-  Bip44RootSchema, Bip44PurposeSchema, Bip44CoinTypeSchema, Bip44DerivationSchema, Bip44AccountSchema, Bip44ChainSchema, Bip44AddressSchema, Bip44DerivationMappingSchema,
+  Bip44RootSchema,
+  Bip44PurposeSchema,
+  Bip44CoinTypeSchema,
+  Bip44DerivationSchema,
+  Bip44AccountSchema,
+  Bip44ChainSchema,
+  Bip44AddressSchema,
+  Bip44DerivationMappingSchema,
 } from './genericBip44/tables';
 import type {
   Bip44PurposeInsert, Bip44PurposeRow,
@@ -35,10 +42,10 @@ import { LovefieldDerive } from '../bridge/LovefieldDerive';
 import { WalletBuilder } from '../bridge/WalletBuilder';
 import { ConceptualWalletSchema, KeySchema } from './uncategorized/tables';
 
-import { getAllTables } from './wrapper';
+import { getAllTables } from './utils';
 
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
-const password = 'greatest_password_ever';
+const _password = 'greatest_password_ever';
 const coinTypeIndex = 0x80000000 + 1815;
 const purposeIndex = 0x80000000 + 44;
 
@@ -57,52 +64,50 @@ test('Can add and fetch address in wallet', async () => {
 
   let state;
   {
-    state = WalletBuilder.start(db);
-    state = WalletBuilder.addConceptualWallet(
-      state,
-      _finalState => ({
-        CoinType: coinTypeIndex,
-        Name: 'My Test Wallet',
-      })
-    );
-    state = WalletBuilder.addBip44Wrapper(
-      state,
-      finalState => ({
-        ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-        IsBundled: false,
-        SignerLevel: DerivationLevels.ACCOUNT.level,
-        PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
-        Version: 2,
-      })
-    );
-    state = WalletBuilder.addPrivateDeriver(
-      state,
-      finalState => ({
-        addLevelRequest: {
-          privateKeyInfo: {
-            Hash: rootPk.key().to_hex(),
-            IsEncrypted: false,
-            PasswordLastUpdate: null,
+    state = await WalletBuilder
+      .start(db)
+      .addConceptualWallet(
+        _finalState => ({
+          CoinType: coinTypeIndex,
+          Name: 'My Test Wallet',
+        })
+      )
+      .addBip44Wrapper(
+        finalState => ({
+          ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+          IsBundled: false,
+          SignerLevel: DerivationLevels.ACCOUNT.level,
+          PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
+          Version: 2,
+        })
+      )
+      .addPrivateDeriver(
+        finalState => ({
+          addLevelRequest: {
+            privateKeyInfo: {
+              Hash: rootPk.key().to_hex(),
+              IsEncrypted: false,
+              PasswordLastUpdate: null,
+            },
+            publicKeyInfo: null,
+            derivationInfo: keys => ({
+              PublicKeyId: keys.public,
+              PrivateKeyId: keys.private,
+              Index: 0,
+            }),
+            levelInfo: id => ({
+              Bip44DerivationId: id,
+            })
           },
-          publicKeyInfo: null,
-          derivationInfo: keys => ({
-            PublicKeyId: keys.public,
-            PrivateKeyId: keys.private,
-            Index: 0,
+          level: DerivationLevels.ROOT.level,
+          addPrivateDeriverRequest: derivationId => ({
+            Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
+            Bip44DerivationId: derivationId,
+            Level: DerivationLevels.ROOT.level,
           }),
-          levelInfo: id => ({
-            Bip44DerivationId: id,
-          })
-        },
-        level: DerivationLevels.ROOT.level,
-        addPrivateDeriverRequest: derivationId => ({
-          Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
-          Bip44DerivationId: derivationId,
-          Level: DerivationLevels.ROOT.level,
-        }),
-      })
-    );
-    await WalletBuilder.commit(state);
+        })
+      )
+      .commit();
   }
 
   const ConceptualWalletTable = db.getSchema().table(ConceptualWalletSchema.name);
@@ -143,7 +148,7 @@ test('Can add and fetch address in wallet', async () => {
         PrivateKeyId: keys.private,
         Index: purposeIndex,
       }),
-      parentDerivationId: state.data.privateDeriver.privateDeriverResult.Bip44DerivationId,
+      parentDerivationId: state.privateDeriver.privateDeriverResult.Bip44DerivationId,
       levelInfo: id => ({
         Bip44DerivationId: id,
       })
@@ -152,27 +157,28 @@ test('Can add and fetch address in wallet', async () => {
   );
 
   // Add coin type
-  const coinTypeKey = purposeKey.derive(
+  const _coinTypeKey = purposeKey.derive(
     RustModule.Wallet.DerivationScheme.v2(),
     coinTypeIndex,
   );
-  const addCoinTypeResult = await AddDerivationWithParent.func<Bip44CoinTypeInsert, Bip44CoinTypeRow>(
-    db, tx1,
-    {
-      privateKeyInfo: null,
-      publicKeyInfo: null,
-      derivationInfo: keys => ({
-        PublicKeyId: keys.public,
-        PrivateKeyId: keys.private,
-        Index: coinTypeIndex,
-      }),
-      parentDerivationId: addPurposeResult.derivationTableResult.Bip44DerivationId,
-      levelInfo: id => ({
-        Bip44DerivationId: id,
-      })
-    },
-    DerivationLevels.COIN_TYPE.level,
-  );
+  const _addCoinTypeResult =
+    await AddDerivationWithParent.func<Bip44CoinTypeInsert, Bip44CoinTypeRow>(
+      db, tx1,
+      {
+        privateKeyInfo: null,
+        publicKeyInfo: null,
+        derivationInfo: keys => ({
+          PublicKeyId: keys.public,
+          PrivateKeyId: keys.private,
+          Index: coinTypeIndex,
+        }),
+        parentDerivationId: addPurposeResult.derivationTableResult.Bip44DerivationId,
+        levelInfo: id => ({
+          Bip44DerivationId: id,
+        })
+      },
+      DerivationLevels.COIN_TYPE.level,
+    );
 
   await tx1.commit();
 
@@ -182,8 +188,8 @@ test('Can add and fetch address in wallet', async () => {
   );
   const bridge = new LovefieldBridge(db);
   const bipWallet = new Bip44Wallet(
-    state.data.conceptualWalletRow.ConceptualWalletId,
-    state.data.bip44WrapperRow.Bip44WrapperId,
+    state.conceptualWalletRow.ConceptualWalletId,
+    state.bip44WrapperRow.Bip44WrapperId,
   );
   await bridge.addBip44WalletFunctionality(bipWallet);
   expect(bipWallet instanceof LovefieldDerive).toEqual(true);
@@ -242,7 +248,7 @@ test('Can add and fetch address in wallet', async () => {
     },
     DerivationLevels.CHAIN.level,
   );
-  const internalChain = await AddDerivationWithParent.func<Bip44ChainInsert, Bip44ChainRow>(
+  const _internalChain = await AddDerivationWithParent.func<Bip44ChainInsert, Bip44ChainRow>(
     db, tx2,
     {
       parentDerivationId: pubDeriver.Bip44DerivationId,
@@ -261,9 +267,11 @@ test('Can add and fetch address in wallet', async () => {
     DerivationLevels.CHAIN.level,
   );
 
-  const addressPk = bip44AccountPk.bip44_chain(false).address_key(RustModule.Wallet.AddressKeyIndex.new(0));
+  const addressPk = bip44AccountPk
+    .bip44_chain(false)
+    .address_key(RustModule.Wallet.AddressKeyIndex.new(0));
   const addressHash = addressPk.public().bootstrap_era_address(setting).to_base58();
-  const address = await AddDerivationWithParent.func<Bip44AddressInsert, Bip44AddressRow>(
+  const _address = await AddDerivationWithParent.func<Bip44AddressInsert, Bip44AddressRow>(
     db, tx2,
     {
       parentDerivationId: externalChain.derivationTableResult.Bip44DerivationId,

@@ -6,81 +6,75 @@ import type {
 } from 'lovefield';
 
 import type {
-  ConceptualWalletRow, ConceptualWalletInsert,
-} from '../database/uncategorized/tables';
-import {
-  KeySchema,
-  ConceptualWalletSchema,
+  ConceptualWalletInsert,
 } from '../database/uncategorized/tables';
 import {
   AddConceptualWallet,
 } from '../database/uncategorized/api/add';
 import type {
-  Bip44WrapperRow, Bip44WrapperInsert,
-  PrivateDeriverRow, PrivateDeriverInsert,
-} from '../database/genericBip44/tables';
-import {
-  Bip44WrapperSchema,
-  Bip44DerivationSchema,
-  PrivateDeriverSchema,
-  Bip44RootSchema,
+  Bip44WrapperInsert,
 } from '../database/genericBip44/tables';
 import {
   AddBip44Wrapper,
   AddPrivateDeriver,
 } from '../database/genericBip44/api/add';
 import type {
-  PrivateDeriverRequest
+  PrivateDeriverRequest,
 } from '../database/genericBip44/api/add';
+import {
+  getAllTables,
+} from '../database/utils';
 
-class BuilderState<Data> {
+
+type StateConstraint<CurrentState, Requirement, Input, Output> = $Call<
+  (Requirement => Input => WalletBuilder<Output>) & () => {...},
+  CurrentState
+>
+
+export class WalletBuilder<CurrentState> {
   db: lf$Database;
   tx: lf$Transaction;
   tables: Array<string>;
-  buildSteps: Array<Data => Promise<void>>;
-  data: Data;
+  buildSteps: Array<CurrentState => Promise<void>>;
+  state: CurrentState;
 
   constructor(
     db: lf$Database,
     tx: lf$Transaction,
     tables: Array<string>,
-    buildSteps: Array<Data => Promise<void>>,
-    data: Data,
+    buildSteps: Array<CurrentState => Promise<void>>,
+    state: CurrentState,
   ) {
     this.db = db;
     this.tx = tx;
     this.tables = tables;
     this.buildSteps = buildSteps;
-    this.data = data;
+    this.state = state;
   }
-}
 
-function updateData<T, NewAddition>(
-  oldBuilder: BuilderState<T>,
-  addition: NewAddition,
-  newTables: Array<string>,
-  newStep: (T & NewAddition) => Promise<void>,
-): BuilderState<
-  T & NewAddition
-> {
-  return new BuilderState<
-    T & NewAddition
-  >(
-    oldBuilder.db,
-    oldBuilder.tx,
-    oldBuilder.tables.concat(newTables),
-    oldBuilder.buildSteps.concat(newStep),
-    {
-      ...oldBuilder.data,
-      ...addition,
-    },
-  );
-}
+  updateData<NewAddition>(
+    addition: NewAddition,
+    newTables: Array<string>,
+    newStep: (CurrentState & NewAddition) => Promise<void>,
+  ): WalletBuilder<
+    CurrentState & NewAddition
+  > {
+    return new WalletBuilder<
+      CurrentState & NewAddition
+    >(
+      this.db,
+      this.tx,
+      this.tables.concat(newTables),
+      this.buildSteps.concat(newStep),
+      {
+        ...this.state,
+        ...addition,
+      },
+    );
+  }
 
-export class WalletBuilder {
-
-  static start(db: lf$Database): BuilderState<$Shape<{||}>> {
-    return new BuilderState(
+  static start(db: lf$Database): WalletBuilder<$Shape<{||}>> {
+    return new WalletBuilder(
       db,
       db.createTransaction(),
       [],
@@ -89,82 +83,81 @@ export class WalletBuilder {
     );
   }
 
-  static async commit<T>(builderState: BuilderState<T>): Promise<void> {
+  async commit(): Promise<CurrentState> {
     // lock used tables
-    const usedTables = builderState.tables.map(
-      name => builderState.db.getSchema().table(name)
+    const usedTables = this.tables.map(
+      name => this.db.getSchema().table(name)
     );
-    await builderState.tx.begin(usedTables);
+    await this.tx.begin(usedTables);
 
     // perform all insertions
-    for (const step of builderState.buildSteps) {
-      await step(builderState.data);
+    for (const step of this.buildSteps) {
+      await step(this.state);
     }
 
     // commit result
-    await builderState.tx.commit();
+    await this.tx.commit();
+
+    return this.state;
   }
 
-  static addConceptualWallet<
-    T: {}
-  >(
-    builderState: BuilderState<T>,
-    insert: T => ConceptualWalletInsert,
-  ): BuilderState<T & HasConceptualWallet> {
-    return updateData(
-      builderState,
+  addConceptualWallet: StateConstraint<
+    CurrentState,
+    {},
+    CurrentState => ConceptualWalletInsert,
+    CurrentState & HasConceptualWallet,
+  > = (
+    insert: CurrentState => ConceptualWalletInsert,
+  ) => {
+    return this.updateData(
       AsNotNull<HasConceptualWallet>({ conceptualWalletRow: null }),
-      [ConceptualWalletSchema.name],
+      Array.from(getAllTables(AddConceptualWallet)),
       async (finalData) => {
         finalData.conceptualWalletRow = await AddConceptualWallet.func(
-          builderState.db,
-          builderState.tx,
+          this.db,
+          this.tx,
           insert(finalData),
         );
       },
     );
   }
 
-  static addBip44Wrapper<
-    T: HasConceptualWallet
-  >(
-    builderState: BuilderState<T>,
-    insert: T => Bip44WrapperInsert,
-  ): BuilderState<T & HasBip44Wrapper> {
-    return updateData(
-      builderState,
+  addBip44Wrapper: StateConstraint<
+    CurrentState,
+    HasConceptualWallet,
+    CurrentState => Bip44WrapperInsert,
+    CurrentState & HasBip44Wrapper,
+  > = (
+    insert: CurrentState => Bip44WrapperInsert,
+  ) => {
+    return this.updateData(
       AsNotNull<HasBip44Wrapper>({ bip44WrapperRow: null }),
-      [Bip44WrapperSchema.name],
+      Array.from(getAllTables(AddBip44Wrapper)),
       async (finalData) => {
         finalData.bip44WrapperRow = await AddBip44Wrapper.func(
-          builderState.db,
-          builderState.tx,
+          this.db,
+          this.tx,
           insert(finalData),
         );
       },
     );
   }
 
-  static addPrivateDeriver<
-    T: HasBip44Wrapper,
-    Insert,
-  >(
-    builderState: BuilderState<T>,
-    insert: T => PrivateDeriverRequest<Insert>,
-  ): BuilderState<T & HasPrivateDeriver> {
-    return updateData(
-      builderState,
+  addPrivateDeriver: StateConstraint<
+    CurrentState,
+    HasBip44Wrapper,
+    CurrentState => PrivateDeriverRequest<mixed>,
+    CurrentState & HasPrivateDeriver
+  > = <Insert>(
+    insert: CurrentState => PrivateDeriverRequest<Insert>,
+  ) => {
+    return this.updateData(
       AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
-      [
-        PrivateDeriverSchema.name,
-        KeySchema.name,
-        Bip44DerivationSchema.name,
-        Bip44RootSchema.name, // TODO: make more generic
-      ],
+      Array.from(getAllTables(AddPrivateDeriver)),
       async (finalData) => {
         finalData.privateDeriver = await AddPrivateDeriver.func(
-          builderState.db,
-          builderState.tx,
+          this.db,
+          this.tx,
           insert(finalData),
         );
       },
