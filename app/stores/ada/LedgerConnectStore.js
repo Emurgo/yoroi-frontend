@@ -159,7 +159,7 @@ export default class LedgerConnectStore
     try {
       // if (this.ledgerBridge) {
       // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
-      const ledgerBridge: LedgerBridge = new LedgerBridge(undefined, ConnectionTypeValue.WEB_AUTHN);
+      const ledgerBridge: LedgerBridge = new LedgerBridge();
       // await prepareLedgerBridger(ledgerBridge);
 
       console.log('_checkAndStoreHWDeviceInfo');
