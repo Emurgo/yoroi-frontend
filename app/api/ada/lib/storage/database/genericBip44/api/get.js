@@ -31,7 +31,7 @@ export class GetDerivation {
   });
   static depTables = Object.freeze({});
 
-  static async func<Row>(
+  static async get<Row>(
     db: lf$Database,
     tx: lf$Transaction,
     derivationIds: Array<number>,
@@ -39,7 +39,7 @@ export class GetDerivation {
   ): Promise<Array<Row>> {
     const tableName = TableMap.get(level);
     if (tableName == null) {
-      throw new Error('AddDerivation::func Unknown table queried');
+      throw new Error('AddDerivation::get Unknown table queried');
     }
     return await getRowIn<Row>(
       db, tx,
@@ -67,7 +67,7 @@ export class GetDerivationsByPath {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async get(
     db: lf$Database,
     tx: lf$Transaction,
     derivationId: number,
@@ -158,7 +158,7 @@ export class GetPublicDeriver {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async get(
     db: lf$Database,
     tx: lf$Transaction,
     key: number,
@@ -198,7 +198,7 @@ export class GetBip44Wrapper {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async get(
     db: lf$Database,
     tx: lf$Transaction,
     key: number,
@@ -218,7 +218,7 @@ export class GetBip44Derivation {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async get(
     db: lf$Database,
     tx: lf$Transaction,
     key: number,

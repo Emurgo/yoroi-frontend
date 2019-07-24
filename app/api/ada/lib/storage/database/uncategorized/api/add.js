@@ -19,7 +19,7 @@ export class AddKey {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async add(
     db: lf$Database,
     tx: lf$Transaction,
     request: KeyInsert,
@@ -38,7 +38,7 @@ export class AddConceptualWallet {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async add(
     db: lf$Database,
     tx: lf$Transaction,
     request: ConceptualWalletInsert,

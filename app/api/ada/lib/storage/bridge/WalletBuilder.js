@@ -132,7 +132,7 @@ export class WalletBuilder<CurrentState> {
       AsNotNull<HasConceptualWallet>({ conceptualWalletRow: null }),
       Array.from(getAllTables(AddConceptualWallet)),
       async (finalData) => {
-        finalData.conceptualWalletRow = await AddConceptualWallet.func(
+        finalData.conceptualWalletRow = await AddConceptualWallet.add(
           this.db,
           this.tx,
           insert(finalData),
@@ -153,7 +153,7 @@ export class WalletBuilder<CurrentState> {
       AsNotNull<HasBip44Wrapper>({ bip44WrapperRow: null }),
       Array.from(getAllTables(AddBip44Wrapper)),
       async (finalData) => {
-        finalData.bip44WrapperRow = await AddBip44Wrapper.func(
+        finalData.bip44WrapperRow = await AddBip44Wrapper.add(
           this.db,
           this.tx,
           insert(finalData),
@@ -174,7 +174,7 @@ export class WalletBuilder<CurrentState> {
       AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
       Array.from(getAllTables(AddPrivateDeriver)),
       async (finalData) => {
-        finalData.privateDeriver = await AddPrivateDeriver.func(
+        finalData.privateDeriver = await AddPrivateDeriver.add(
           this.db,
           this.tx,
           insert(finalData),
@@ -204,11 +204,11 @@ function AsNotNull<T: {}>(
 type Nullable = <K>(K) => K | null;
 // types to represent requirements
 type HasConceptualWallet = {
-  conceptualWalletRow: PromisslessReturnType<typeof AddConceptualWallet.func>
+  conceptualWalletRow: PromisslessReturnType<typeof AddConceptualWallet.add>
 };
 type HasBip44Wrapper = {
-  bip44WrapperRow: PromisslessReturnType<typeof AddBip44Wrapper.func>
+  bip44WrapperRow: PromisslessReturnType<typeof AddBip44Wrapper.add>
 };
 type HasPrivateDeriver = {
-  privateDeriver: PromisslessReturnType<typeof AddPrivateDeriver.func>
+  privateDeriver: PromisslessReturnType<typeof AddPrivateDeriver.add>
 };

@@ -20,7 +20,7 @@ export class GetConceptualWallet {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async get(
     db: lf$Database,
     tx: lf$Transaction,
     key: number,
@@ -41,7 +41,7 @@ export class GetKey {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async get(
     db: lf$Database,
     tx: lf$Transaction,
     key: number,
@@ -65,7 +65,7 @@ export class GetWalletByType {
   });
   static depTables = Object.freeze({});
 
-  static async func<T>(
+  static async get<T>(
     db: lf$Database,
     tx: lf$Transaction,
     type: $Values<typeof WalletType>,
@@ -82,7 +82,7 @@ export class GetWalletByType {
     if (type === WalletType.Bip44) {
       tableName = GetWalletByType.ownTables[Bip44WrapperSchema.name].name;
     } else {
-      throw new Error('WalletType::func unexpected type');
+      throw new Error('WalletType::get unexpected type');
     }
     const typeTable = db.getSchema().table(tableName);
     return await tx.attach(db
@@ -101,14 +101,14 @@ export class GetAllBip44Wallets {
     GetWalletByType,
   });
 
-  static async func(
+  static async get(
     db: lf$Database,
     tx: lf$Transaction,
   ): Promise<Array<{
     ConceptualWallet: ConceptualWalletRow,
     Bip44Wrapper: Bip44WrapperRow,
   }>> {
-    return GetWalletByType.func<{Bip44Wrapper: Bip44WrapperRow}>(
+    return GetWalletByType.get<{Bip44Wrapper: Bip44WrapperRow}>(
       db, tx,
       WalletType.Bip44,
     );

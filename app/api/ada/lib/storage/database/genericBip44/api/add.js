@@ -44,7 +44,7 @@ export class AddDerivation {
     AddKey,
   });
 
-  static async func<Insert, Row>(
+  static async add<Insert, Row>(
     db: lf$Database,
     tx: lf$Transaction,
     request: AddDerivationRequest<Insert>,
@@ -55,18 +55,18 @@ export class AddDerivation {
   }> {
     const tableName = TableMap.get(level);
     if (tableName == null) {
-      throw new Error('AddDerivation::func Unknown table queried');
+      throw new Error('AddDerivation::add Unknown table queried');
     }
 
     const privateKey = request.privateKeyInfo === null
       ? null
-      : await AddKey.func(
+      : await AddKey.add(
         db, tx,
         request.privateKeyInfo,
       );
     const publicKey = request.publicKeyInfo === null
       ? null
-      : await AddKey.func(
+      : await AddKey.add(
         db, tx,
         request.publicKeyInfo,
       );
@@ -110,7 +110,7 @@ export class AddDerivationWithParent {
     AddDerivation,
   });
 
-  static async func<Insert, Row>(
+  static async add<Insert, Row>(
     db: lf$Database,
     tx: lf$Transaction,
     request: DeriveFromRequest<Insert>,
@@ -121,9 +121,9 @@ export class AddDerivationWithParent {
     specificDerivationResult: Row,
   }> {
     if (level === DerivationLevels.ROOT.level) {
-      throw new Error('AddDerivationWithParent::func Root has no parent');
+      throw new Error('AddDerivationWithParent::add Root has no parent');
     }
-    const derivationResult = await AddDerivation.func<Insert, Row>(
+    const derivationResult = await AddDerivation.add<Insert, Row>(
       db, tx,
       {
         privateKeyInfo: request.privateKeyInfo,
@@ -160,7 +160,7 @@ export class AddBip44Wrapper {
   });
   static depTables = Object.freeze({});
 
-  static async func(
+  static async add(
     db: lf$Database,
     tx: lf$Transaction,
     request: Bip44WrapperInsert,
@@ -186,7 +186,7 @@ export class AddPrivateDeriver {
     AddDerivation,
   });
 
-  static async func<Insert, Row>(
+  static async add<Insert, Row>(
     db: lf$Database,
     tx: lf$Transaction,
     request: PrivateDeriverRequest<Insert>,
@@ -197,7 +197,7 @@ export class AddPrivateDeriver {
       specificDerivationResult: Row
     },
   }> {
-    const levelResult = await AddDerivation.func(
+    const levelResult = await AddDerivation.add(
       db, tx,
       request.addLevelRequest,
       request.level,
@@ -246,7 +246,7 @@ export class AddPublicDeriver {
       specificDerivationResult: Row
     },
   }> {
-    const levelResult = await AddDerivation.func<Insert, Row>(
+    const levelResult = await AddDerivation.add<Insert, Row>(
       db, tx,
       request.addLevelRequest,
       request.level,
@@ -278,7 +278,7 @@ export class AddPublicDeriver {
       specificDerivationResult: Row
     },
   }> {
-    const levelResult = await AddDerivationWithParent.func<Insert, Row>(
+    const levelResult = await AddDerivationWithParent.add<Insert, Row>(
       db, tx,
       request.addLevelRequest,
       request.level,

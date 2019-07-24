@@ -136,7 +136,7 @@ function _derive(
     let privateKeyId: number;
     {
       // Private Deriver => Bip44Derivation
-      const result = await GetBip44Derivation.func(
+      const result = await GetBip44Derivation.get(
         db,
         getKeyTx,
         privateDeriverRow.Bip44DerivationId,
@@ -153,7 +153,7 @@ function _derive(
     let privateKeyRow: KeyRow;
     {
       // Bip44Derivation => Private key
-      const result = await GetKey.func(
+      const result = await GetKey.get(
         db,
         getKeyTx,
         privateKeyId,
@@ -196,7 +196,7 @@ function _derive(
     let pubDeriver;
     {
       // get parent of the new derivation
-      const newLevelParent = await GetDerivationsByPath.func(
+      const newLevelParent = await GetDerivationsByPath.get(
         db,
         getKeyTx,
         privateDeriverRow.Bip44DerivationId,
