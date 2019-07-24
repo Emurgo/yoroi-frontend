@@ -52,7 +52,7 @@ async function derivePublicDeriver<Insert>(
   bip44WrapperId: number,
   body: LovefieldDeriveRequest,
   levelSpecificInsert: Insert,
-): Promise<PublicDeriverRow> {
+): ReturnType<typeof AddPublicDeriver.fromParent> {
   const getKeyTx = db.createTransaction();
   await getKeyTx
     .begin([
@@ -177,8 +177,8 @@ async function derivePublicDeriver<Insert>(
 
   await getKeyTx.commit();
 
-  return pubDeriver.publcDeriverResult;
-};
+  return pubDeriver;
+}
 
 function _derive(
   db: lf$Database,
@@ -196,7 +196,7 @@ function _derive(
 }
 
 export class LovefieldDerive
-  extends IDerive<LovefieldDeriveRequest, PublicDeriverRow> {
+  extends IDerive<LovefieldDeriveRequest, PromisslessReturnType<typeof AddPublicDeriver.fromParent>> {
 
   constructor(
     db: lf$Database,

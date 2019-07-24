@@ -38,7 +38,7 @@ import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 import { Bip44Wallet } from '../models/Bip44Wallet';
 import { LovefieldBridge } from '../bridge/LovefieldBridge';
-import { LovefieldDerive } from '../bridge/LovefieldDerive';
+import { LovefieldDerive } from '../bridge/lovefieldDerive';
 import { WalletBuilder } from '../bridge/WalletBuilder';
 import { ConceptualWalletSchema, KeySchema } from './uncategorized/tables';
 
@@ -235,7 +235,7 @@ test('Can add and fetch address in wallet', async () => {
   const externalChain = await AddDerivationWithParent.add<Bip44ChainInsert, Bip44ChainRow>(
     db, tx2,
     {
-      parentDerivationId: pubDeriver.Bip44DerivationId,
+      parentDerivationId: pubDeriver.publcDeriverResult.Bip44DerivationId,
       privateKeyInfo: null,
       publicKeyInfo: null,
       derivationInfo: keys => ({
@@ -253,7 +253,7 @@ test('Can add and fetch address in wallet', async () => {
   const _internalChain = await AddDerivationWithParent.add<Bip44ChainInsert, Bip44ChainRow>(
     db, tx2,
     {
-      parentDerivationId: pubDeriver.Bip44DerivationId,
+      parentDerivationId: pubDeriver.publcDeriverResult.Bip44DerivationId,
       privateKeyInfo: null,
       publicKeyInfo: null,
       derivationInfo: keys => ({
@@ -301,7 +301,7 @@ test('Can add and fetch address in wallet', async () => {
   const addressesForAccount = await GetDerivationsByPath.get(
     db,
     tx3,
-    pubDeriver.Bip44DerivationId,
+    pubDeriver.publcDeriverResult.Bip44DerivationId,
     [purposeIndex, coinTypeIndex, accountIndex],
     [null, null]
   );

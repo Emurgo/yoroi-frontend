@@ -13,6 +13,8 @@ import {
 } from '../database/uncategorized/api/add';
 import type {
   Bip44WrapperInsert,
+  PublicDeriverRow,
+  Bip44DerivationRow,
 } from '../database/genericBip44/tables';
 import {
   AddBip44Wrapper,
@@ -24,6 +26,9 @@ import type {
 import {
   getAllTables,
 } from '../database/utils';
+import type {
+  LovefieldDeriveRequest
+} from './lovefieldDerive';
 
 /**
  * We need to statically ensure that
@@ -182,6 +187,23 @@ export class WalletBuilder<CurrentState> {
       },
     );
   }
+
+  derivePublicDeriver: StateConstraint<
+    CurrentState,
+    HasPrivateDeriver,
+    CurrentState => LovefieldDeriveRequest,
+    CurrentState & HasPublicDeriver<mixed>
+  > = (
+    insert: CurrentState => LovefieldDeriveRequest,
+  ) => {
+    return this.updateData(
+      { publicDeriver: [] },
+      Array.from(getAllTables(AddPrivateDeriver /* TODO */)),
+      async (finalData) => {
+        finalData.publicDeriver = []; //TODO
+      },
+    );
+  }
 }
 
 /**
@@ -211,4 +233,14 @@ type HasBip44Wrapper = {
 };
 type HasPrivateDeriver = {
   privateDeriver: PromisslessReturnType<typeof AddPrivateDeriver.add>
+};
+
+type HasPublicDeriver<Row> = {
+  publicDeriver: Array<{
+    levelResult: {
+      derivationTableResult: Bip44DerivationRow,
+      specificDerivationResult: Row
+    },
+    publcDeriverResult: PublicDeriverRow
+  }>
 };

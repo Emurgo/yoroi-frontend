@@ -23,7 +23,7 @@ import { getRowFromKey } from '../database/utils';
 
 import { appendChain } from './appendChain';
 
-import { LovefieldDerive } from './LovefieldDerive';
+import { LovefieldDerive } from './lovefieldDerive';
 
 export class LovefieldBridge implements IStorageBridge {
   db: lf$Database;
