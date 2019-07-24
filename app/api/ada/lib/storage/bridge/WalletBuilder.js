@@ -25,17 +25,36 @@ import {
   getAllTables,
 } from '../database/utils';
 
-
+/**
+ * We need to statically ensure that
+ * each step in the builder is only called once requirements are met.
+ * Since Flow doesn't support constraints on the `this` variable,
+ * we instead encode function in such a way that that
+ * If the current state can be coerced into the requirements, the type is function
+ * Otherwise, the type of the function is an uncallable type (resulting in an error)
+ */
 type StateConstraint<CurrentState, Requirement, Input, Output> = $Call<
-  (Requirement => Input => WalletBuilder<Output>) & () => {...},
+  (Requirement => Input => WalletBuilder<Output>) // return callable function
+  &
+  () => {...}, // you can assign a function to {} but it cannot be called
   CurrentState
 >
 
+/**
+ * Allows to easily create a wallet with all the information you need in one transactional query
+ * Ensuring proper call order and proper database access is managed for you
+ */
 export class WalletBuilder<CurrentState> {
   db: lf$Database;
   tx: lf$Transaction;
+
+  /** keep track of all tables we need to lock to build this wallet */
   tables: Array<string>;
+
+  /** keep track of all functions we need to call to build each part of this wallet */
   buildSteps: Array<CurrentState => Promise<void>>;
+
+  /** Note the type of `state` is the type AFTER `commit` has been called */
   state: CurrentState;
 
   constructor(
