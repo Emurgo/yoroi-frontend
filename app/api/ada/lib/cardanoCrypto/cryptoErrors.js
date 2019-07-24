@@ -17,9 +17,3 @@ export class CreateRedeemTransactionError extends ExtendableError {
     super(message);
   }
 }
-
-export class StaleStateError extends ExtendableError {
-  constructor(message: ?string = 'Storage query using stale data') {
-    super(message);
-  }
-}

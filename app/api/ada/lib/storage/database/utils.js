@@ -7,6 +7,7 @@ import type {
   lf$schema$Table,
 } from 'lovefield';
 import { size } from 'lodash';
+import ExtendableError from 'es6-error';
 
 export async function addToTable<Insert, Row>(
   db: lf$Database,
@@ -59,6 +60,12 @@ export async function getRowIn<Row>(
     .from(table)
     .where(table[keyRowName].in(list));
   return await tx.attach(query);
+}
+
+export class StaleStateError extends ExtendableError {
+  constructor(message: ?string = 'Storage query using stale data') {
+    super(message);
+  }
 }
 
 /**

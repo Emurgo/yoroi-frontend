@@ -14,16 +14,23 @@ import type {
   Bip44WrapperInsert, Bip44WrapperRow,
 } from '../tables';
 import * as Bip44Tables from '../tables';
+import {
+  GetPrivateDeriver,
+  GetBip44Derivation,
+  GetDerivationsByPath,
+} from './get';
 
-import type { KeyInsert, } from '../../uncategorized/tables';
+import type { KeyInsert, KeyRow } from '../../uncategorized/tables';
 import { AddKey, } from '../../uncategorized/api/add';
+import { GetKey, } from '../../uncategorized/api/get';
+
 
 import {
   allDerivationTables,
   DerivationLevels,
   TableMap,
 } from './utils';
-import { addToTable, } from '../../utils';
+import { addToTable, StaleStateError, } from '../../utils';
 
 export type AddDerivationRequest<Insert> = {|
   privateKeyInfo: KeyInsert | null,
@@ -293,5 +300,131 @@ export class AddPublicDeriver {
       levelResult,
     };
   }
+}
 
+export type DerivePublicFromPrivateRequest = {
+  publicDeriverInsert: number => PublicDeriverInsert,
+  /**
+   * Path is relative to private deriver
+   * Last index should be the index you want for the public deriver
+   */
+  pathToPublic: Array<number>,
+  decryptPrivateDeriverPassword: ?string,
+};
+export class DerivePublicFromPrivate {
+  static ownTables = Object.freeze({});
+  static depTables = Object.freeze({
+    AddPublicDeriver,
+    GetPrivateDeriver,
+    GetBip44Derivation,
+    GetKey,
+  });
+
+  static async add<Insert, Row>(
+    db: lf$Database,
+    tx: lf$Transaction,
+    bip44WrapperId: number,
+    body: DerivePublicFromPrivateRequest,
+    levelSpecificInsert: Insert,
+    getKeyInserts: (
+      privateKeyRow: KeyRow,
+      password: ?string,
+    ) => {
+      newPrivateKey: KeyInsert | null,
+      newPublicKey: KeyInsert | null,
+    }
+  ): Promise<{
+    publcDeriverResult: PublicDeriverRow,
+    levelResult: {
+      derivationTableResult: Bip44DerivationRow,
+      mappingTableResult: Bip44DerivationMappingRow,
+      specificDerivationResult: Row
+    },
+  }> {
+    let privateDeriverRow: PrivateDeriverRow;
+    {
+      // Get Private Deriver
+      const result = await GetPrivateDeriver.fromBip44Wrapper(
+        db, tx,
+        bip44WrapperId,
+      );
+      if (result === undefined) {
+        throw new StaleStateError('LovefieldDerive::_derive privateDeriver');
+      }
+      privateDeriverRow = result;
+    }
+
+    let privateKeyId: number;
+    {
+      // Private Deriver => Bip44Derivation
+      const result = await GetBip44Derivation.get(
+        db, tx,
+        privateDeriverRow.Bip44DerivationId,
+      );
+      if (result === undefined) {
+        throw new StaleStateError('LovefieldDerive::_derive Bip44DerivationTable');
+      }
+      if (result.PrivateKeyId === null) {
+        throw new StaleStateError('LovefieldDerive::_derive PrivateKeyId');
+      }
+      privateKeyId = result.PrivateKeyId;
+    }
+
+    let privateKeyRow: KeyRow;
+    {
+      // Bip44Derivation => Private key
+      const result = await GetKey.get(
+        db, tx,
+        privateKeyId,
+      );
+      if (result === undefined) {
+        throw new StaleStateError('LovefieldDerive::_derive KeyTable');
+      }
+      privateKeyRow = result;
+    }
+
+    let newKeys = getKeyInserts(
+      privateKeyRow,
+      body.decryptPrivateDeriverPassword,
+    );
+
+    let pubDeriver;
+    {
+      // get parent of the new derivation
+      const newLevelParent = await GetDerivationsByPath.get(
+        db, tx,
+        privateDeriverRow.Bip44DerivationId,
+        [],
+        Array.from(body.pathToPublic.slice(0, body.pathToPublic.length - 1)),
+      );
+      const parentDerivationId = newLevelParent.keys().next().value;
+      if (parentDerivationId === undefined) {
+        throw new StaleStateError('LovefieldDerive::_derive newLevelParent');
+      }
+
+      pubDeriver = await AddPublicDeriver.fromParent(
+        db, tx,
+        {
+          addLevelRequest: {
+            privateKeyInfo: newKeys.newPrivateKey,
+            publicKeyInfo: newKeys.newPublicKey,
+            derivationInfo: keys => ({
+              PublicKeyId: keys.public,
+              PrivateKeyId: keys.private,
+              Index: body.pathToPublic[body.pathToPublic.length - 1],
+            }),
+            parentDerivationId,
+            levelInfo: id => ({
+              Bip44DerivationId: id,
+              ...levelSpecificInsert,
+            }),
+          },
+          level: privateDeriverRow.Level + body.pathToPublic.length,
+          addPublicDeriverRequest: body.publicDeriverInsert
+        }
+      );
+    }
+
+    return pubDeriver;
+  }
 }

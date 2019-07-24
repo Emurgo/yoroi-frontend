@@ -50,10 +50,10 @@ export type KeyInfo = {
   password: string | null,
   lastUpdate: Date | null
 };
-export async function toKeyInsert(
+export function toKeyInsert(
   keyInfo: KeyInfo,
   keyHex: string,
-): Promise<KeyInsert> {
+): KeyInsert {
   const hash = keyInfo.password
     ? encryptWithPassword(
       keyInfo.password,

@@ -6,10 +6,10 @@ import type {
 
 import { IDerive } from '../models/functionalities/IDerive';
 
-import { getAllSchemaTables, } from '../database/utils';
+import { getAllSchemaTables, StaleStateError, } from '../database/utils';
 import type {
   PrivateDeriverRow,
-  PublicDeriverInsert, PublicDeriverRow,
+  PublicDeriverInsert,
 } from '../database/genericBip44/tables';
 import {
   AddPublicDeriver,
@@ -23,8 +23,6 @@ import {
   GetKey,
 } from '../database/uncategorized/api/get';
 import type { KeyInsert, KeyRow } from '../database/uncategorized/tables';
-
-import { StaleStateError } from '../../cardanoCrypto/cryptoErrors';
 
 import {
   decryptKey,
@@ -46,7 +44,6 @@ export type LovefieldDeriveRequest = {
   publicDeriverPublicKey?: KeyInfo,
   publicDeriverPrivateKey?: KeyInfo,
 };
-
 async function derivePublicDeriver<Insert>(
   db: lf$Database,
   bip44WrapperId: number,
@@ -123,13 +120,13 @@ async function derivePublicDeriver<Insert>(
 
     // save new key
     newPrivateKey = body.publicDeriverPrivateKey
-      ? await toKeyInsert(
+      ? toKeyInsert(
         body.publicDeriverPrivateKey,
         newKey.to_hex(),
       )
       : null;
     newPublicKey = body.publicDeriverPublicKey
-      ? await toKeyInsert(
+      ? toKeyInsert(
         body.publicDeriverPublicKey,
         newKey.public().to_hex(),
       )
