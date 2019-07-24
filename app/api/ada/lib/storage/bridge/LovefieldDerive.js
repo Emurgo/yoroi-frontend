@@ -24,20 +24,17 @@ import {
 } from '../database/uncategorized/api/get';
 import type { KeyInsert, KeyRow } from '../database/uncategorized/tables';
 
-import { StaleStateError, WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
+import { StaleStateError } from '../../cardanoCrypto/cryptoErrors';
 
 import {
-  getCryptoWalletFromEncryptedMasterKey,
-  getCryptoWalletFromMasterKey,
-} from '../../cardanoCrypto/cryptoWallet';
-import { RustModule } from '../../cardanoCrypto/rustLoader';
+  decryptKey,
+  deriveKey,
+  toKeyInsert
+} from './utils';
+import type {
+  KeyInfo,
+} from './utils';
 
-import { encryptWithPassword } from '../../../../../utils/passwordCipher';
-
-type KeyInfo = {
-  password: string | null,
-  lastUpdate: Date | null
-};
 export type LovefieldDeriveRequest = {
   publicDeriverInsert: number => PublicDeriverInsert,
   /**
@@ -49,58 +46,6 @@ export type LovefieldDeriveRequest = {
   publicDeriverPublicKey?: KeyInfo,
   publicDeriverPrivateKey?: KeyInfo,
 };
-
-function _decryptKey(
-  privateKeyRow: KeyRow,
-  decryptPrivateDeriverPassword: ?string,
-): RustModule.Wallet.PrivateKey {
-  let rootPk;
-  if (privateKeyRow.IsEncrypted) {
-    if (decryptPrivateDeriverPassword == null) {
-      throw new WrongPassphraseError();
-    }
-    rootPk = getCryptoWalletFromEncryptedMasterKey(
-      privateKeyRow.Hash,
-      decryptPrivateDeriverPassword
-    );
-  } else {
-    rootPk = getCryptoWalletFromMasterKey(privateKeyRow.Hash);
-  }
-  return rootPk.key();
-}
-
-function _deriveKey(
-  startingKey: RustModule.Wallet.PrivateKey,
-  pathToPublic: Array<number>,
-): RustModule.Wallet.PrivateKey {
-  let currKey = startingKey;
-  for (let i = 0; i < pathToPublic.length; i++) {
-    currKey = currKey.derive(
-      RustModule.Wallet.DerivationScheme.v2(),
-      pathToPublic[i],
-    );
-  }
-
-  return currKey;
-}
-
-async function _toKeyInsert(
-  keyInfo: KeyInfo,
-  keyHex: string,
-): Promise<KeyInsert> {
-  const hash = keyInfo.password
-    ? encryptWithPassword(
-      keyInfo.password,
-      Buffer.from(keyHex, 'hex')
-    )
-    : keyHex;
-
-  return {
-    Hash: hash,
-    IsEncrypted: keyInfo.password != null,
-    PasswordLastUpdate: keyInfo.lastUpdate,
-  };
-}
 
 function _derive(
   db: lf$Database,
@@ -169,24 +114,24 @@ function _derive(
     {
       // Decrypt key and derive new key and save the result
 
-      const rootPrivateKey = _decryptKey(
+      const rootPrivateKey = decryptKey(
         privateKeyRow,
         body.decryptPrivateDeriverPassword,
       );
-      const newKey = _deriveKey(
+      const newKey = deriveKey(
         rootPrivateKey,
         body.pathToPublic,
       );
 
       // save new key
       newPrivateKey = body.publicDeriverPrivateKey
-        ? await _toKeyInsert(
+        ? await toKeyInsert(
           body.publicDeriverPrivateKey,
           newKey.to_hex(),
         )
         : null;
       newPublicKey = body.publicDeriverPublicKey
-        ? await _toKeyInsert(
+        ? await toKeyInsert(
           body.publicDeriverPublicKey,
           newKey.public().to_hex(),
         )
