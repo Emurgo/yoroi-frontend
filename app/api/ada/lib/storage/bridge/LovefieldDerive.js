@@ -40,7 +40,6 @@ type KeyInfo = {
 };
 export type LovefieldDeriveRequest = {
   publicDeriverInsert: number => PublicDeriverInsert,
-  levelSpecificInsert: Object,
   /**
    * Path is relative to private deriver
    * Last index should be the index you want for the public deriver
@@ -107,7 +106,10 @@ function _derive(
   db: lf$Database,
   bip44WrapperId: number,
 ) {
-  return async function (body: LovefieldDeriveRequest): Promise<PublicDeriverRow> {
+  return async function <Insert> (
+    body: LovefieldDeriveRequest,
+    levelSpecificInsert: Insert,
+  ): Promise<PublicDeriverRow> {
     const getKeyTx = db.createTransaction();
     await getKeyTx
       .begin([
@@ -221,7 +223,7 @@ function _derive(
             parentDerivationId,
             levelInfo: id => ({
               Bip44DerivationId: id,
-              ...body.levelSpecificInsert,
+              ...levelSpecificInsert,
             }),
           },
           level: privateDeriverRow.Level + body.pathToPublic.length,

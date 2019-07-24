@@ -196,26 +196,28 @@ test('Can add and fetch address in wallet', async () => {
   if (!(bipWallet instanceof LovefieldDerive)) {
     throw new Error('should never happen due to assertion above');
   }
-  const pubDeriver = await bipWallet.derive({
-    publicDeriverInsert: id => ({
-      Bip44DerivationId: id,
-      Name: 'Checking account',
-      LastBlockSync: 0,
-    }),
-    levelSpecificInsert: {},
-    pathToPublic: [
-      purposeIndex, coinTypeIndex, accountIndex
-    ],
-    decryptPrivateDeriverPassword: null,
-    publicDeriverPublicKey: {
-      password: null, // TODO
-      lastUpdate: null,
+  const pubDeriver = await bipWallet.derive(
+    {
+      publicDeriverInsert: id => ({
+        Bip44DerivationId: id,
+        Name: 'Checking account',
+        LastBlockSync: 0,
+      }),
+      pathToPublic: [
+        purposeIndex, coinTypeIndex, accountIndex
+      ],
+      decryptPrivateDeriverPassword: null,
+      publicDeriverPublicKey: {
+        password: null, // TODO
+        lastUpdate: null,
+      },
+      publicDeriverPrivateKey: {
+        password: null, // TODO
+        lastUpdate: null,
+      },
     },
-    publicDeriverPrivateKey: {
-      password: null, // TODO
-      lastUpdate: null,
-    },
-  });
+    {},
+  );
 
   const tx2 = db.createTransaction();
   const Bip44AccountTable = db.getSchema().table(Bip44AccountSchema.name);

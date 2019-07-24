@@ -1,12 +1,25 @@
 // @flow
 
-export class IDerive<Request, Result> {
-  forwardFunc: (body: Request) => Promise<Result>;
 
-  constructor(forwardFunc: (body: Request) => Promise<Result>) {
+export class IDerive<Request, Result> {
+  forwardFunc: <Insert>(
+    body: Request,
+    levelSpecific: Insert,
+  ) => Promise<Result>;
+
+  constructor(forwardFunc: <Insert>(
+    body: Request,
+    levelSpecific: Insert,
+  ) => Promise<Result>) {
     this.forwardFunc = forwardFunc;
   }
-  derive(body: Request): Promise<Result> {
-    return this.forwardFunc(body);
+  derive<Insert>(
+    body: Request,
+    levelSpecific: Insert,
+  ): Promise<Result> {
+    return this.forwardFunc<Insert>(
+      body,
+      levelSpecific
+    );
   }
 }
