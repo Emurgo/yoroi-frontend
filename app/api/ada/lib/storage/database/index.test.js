@@ -37,9 +37,9 @@ import { HARD_DERIVATION_START } from '../../../../../config/numbersConfig';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 import { Bip44Wallet } from '../models/Bip44Wallet';
-import { LovefieldBridge } from '../bridge/LovefieldBridge';
+import { LovefieldBridge } from '../bridge/lovefieldBridge';
 import { LovefieldDerive } from '../bridge/lovefieldDerive';
-import { WalletBuilder } from '../bridge/WalletBuilder';
+import { WalletBuilder } from '../bridge/walletBuilder';
 import { ConceptualWalletSchema, KeySchema } from './uncategorized/tables';
 
 import { getAllSchemaTables } from './utils';
