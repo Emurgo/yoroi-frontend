@@ -49,9 +49,13 @@
         font-family: var(--font-mono-regular);
       }
     }
-  }  
+  }
+
+  .amountField {
+    margin-bottom: 10px;
+  }
 
   .generateButton {
-    margin: 20px auto 0;
+    margin: 0 auto;
   }
 }

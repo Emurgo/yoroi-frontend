@@ -10,6 +10,7 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import WalletAccountIcon from '../topbar/WalletAccountIcon';
 import Dialog from '../widgets/Dialog';
+import DialogTextBlock from '../widgets/DialogTextBlock';
 import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
@@ -98,17 +99,8 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       },
     ];
 
-    return (
-      <Dialog
-        title={intl.formatMessage(messages.dialogTitleVerifyWalletRestoration)}
-        actions={actions}
-        closeOnOverlayClick={false}
-        onClose={onCancel}
-        className={dialogClasses}
-        backButton={<DialogBackButton onBack={onCancel} />}
-        classicTheme={classicTheme}
-      >
-
+    const introMessage = (
+      <div>
         <span>{intl.formatMessage(messages.walletRestoreVerifyIntroLine1)}</span><br />
         <ul>
           <li className={styles.smallTopMargin}>
@@ -121,43 +113,71 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
             <span><FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine4} /></span>
           </li>
         </ul>
+      </div>
+    );
 
-        <div>
-          <h2 className={styles.addressLabel}>
-            {intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)}
-          </h2>
-          <div className={styles.plateRowDiv}>
-            <WalletAccountIcon
-              iconSeed={accountPlate.hash}
-            />
-            <span className={styles.plateIdSpan}>{accountPlate.id}</span>
-          </div>
+    const walletPlate = (
+      <div>
+        <h2 className={styles.addressLabel}>
+          {intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)}
+        </h2>
+        <div className={styles.plateRowDiv}>
+          <WalletAccountIcon
+            iconSeed={accountPlate.hash}
+          />
+          <span className={styles.plateIdSpan}>{accountPlate.id}</span>
         </div>
+      </div>
+    );
 
-        <div>
-          <h2 className={styles.addressLabel}>
-            {intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)}
-          </h2>
-          {addresses.map(a => (
-            <CopyableAddress
+    const walletAddresses = (
+      <div>
+        <h2 className={styles.addressLabel}>
+          {intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)}
+        </h2>
+        {addresses.map(a => (
+          <CopyableAddress
+            hash={a}
+            onCopyAddress={onCopyAddress}
+            key={a}
+          >
+            <ExplorableHashContainer
+              selectedExplorer={this.props.selectedExplorer}
               hash={a}
-              onCopyAddress={onCopyAddress}
-              key={a}
+              light
+              tooltipOpensUpward
+              linkType="address"
             >
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
-                hash={a}
-                light
-                tooltipOpensUpward
-                linkType="address"
-              >
-                <RawHash light>
-                  {a}
-                </RawHash>
-              </ExplorableHashContainer>
-            </CopyableAddress>
-          ))}
-        </div>
+              <RawHash light>
+                {a}
+              </RawHash>
+            </ExplorableHashContainer>
+          </CopyableAddress>
+        ))}
+      </div>
+    );
+
+    return (
+      <Dialog
+        title={intl.formatMessage(messages.dialogTitleVerifyWalletRestoration)}
+        actions={actions}
+        closeOnOverlayClick={false}
+        onClose={onCancel}
+        className={dialogClasses}
+        backButton={<DialogBackButton onBack={onCancel} />}
+        classicTheme={classicTheme}
+      >
+        <DialogTextBlock>
+          {introMessage}
+        </DialogTextBlock>
+
+        <DialogTextBlock>
+          {walletPlate}
+        </DialogTextBlock>
+
+        <DialogTextBlock subclass='component-bottom'>
+          {walletAddresses}
+        </DialogTextBlock>
         <div className={styles.postCopyMargin} />
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}

@@ -76,7 +76,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     } = this.props;
 
     const dialogActions = !isHardware
-      ? []
+      ? null
       : [{
         className: isActionProcessing ? styles.processing : null,
         label: intl.formatMessage(messages.verifyAddressButtonLabel),

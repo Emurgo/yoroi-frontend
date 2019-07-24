@@ -75,7 +75,7 @@ export default class ExportTransactionDialog extends Component<Props> {
         classicTheme={this.props.classicTheme}
       >
         {infoBlock}
-        <ErrorBlock error={error} />
+        {error && <ErrorBlock error={error} />}
       </Dialog>);
   }
 }

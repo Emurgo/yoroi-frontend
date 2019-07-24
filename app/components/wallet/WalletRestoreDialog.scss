@@ -87,11 +87,12 @@
           width: 100%;
         }
       }
-    }
-    
-  }
-}
 
-:global .WalletRestoreDialog .Dialog_actions {
-  margin-top: 10px;
+      .paperPassword {
+        div:first-of-type {
+          padding-bottom: 0!important;
+        }
+      }
+    }
+  }
 }
