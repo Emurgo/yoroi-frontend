@@ -14,8 +14,8 @@ export async function prepareLedgerBridger(ledgerBridge: LedgerBridge): Promise<
 
   return new Promise((resolve, reject) => {
     let checkCounter = 0;
-    const checkInterval = setInterval(() => {
-      if (ledgerBridge.isReady) {
+    const checkInterval = setInterval(async () => {
+      if (await ledgerBridge.isBridgeReady()) {
         clearInterval(checkInterval);
         resolve();
       } else if (checkCounter > LEDGER_BRIDGE_CHECK_COUNT) {

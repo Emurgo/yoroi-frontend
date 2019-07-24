@@ -156,15 +156,12 @@ export default class LedgerConnectStore
   };
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
+    let ledgerBridge: LedgerBridge;
     try {
-      // if (this.ledgerBridge) {
-      // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
-      const ledgerBridge: LedgerBridge = new LedgerBridge();
-      // await prepareLedgerBridger(ledgerBridge);
+      ledgerBridge = new LedgerBridge({ connectionType: ConnectionTypeValue.WEB_AUTHN });
+      await prepareLedgerBridger(ledgerBridge);
 
-      console.log('_checkAndStoreHWDeviceInfo');
       const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
-
       Logger.debug(stringifyData(versionResp));
 
       // TODO: assume single account in Yoroi
@@ -181,11 +178,10 @@ export default class LedgerConnectStore
 
       this._goToSaveLoad();
       Logger.info('Ledger device OK');
-      // } else {
-      //   throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
-      // }
     } catch (error) {
       this._handleConnectError(error);
+    } finally {
+      ledgerBridge && ledgerBridge.dispose();
     }
   };
 
