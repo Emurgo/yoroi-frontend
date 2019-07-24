@@ -7,6 +7,7 @@ import type {
 
 import type {
   ConceptualWalletRow,
+  KeyRow,
 } from '../tables';
 import * as Tables from '../tables';
 import { getRowFromKey } from '../../utils';
@@ -30,6 +31,26 @@ export class GetConceptualWallet {
       key,
       walletSchema.name,
       walletSchema.properties.ConceptualWalletId,
+    );
+  }
+}
+
+export class GetKey {
+  static ownTables = Object.freeze({
+    [Tables.KeySchema.name]: Tables.KeySchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async func(
+    db: lf$Database,
+    tx: lf$Transaction,
+    key: number,
+  ): Promise<KeyRow | void> {
+    return await getRowFromKey<KeyRow>(
+      db, tx,
+      key,
+      GetKey.ownTables[Tables.KeySchema.name].name,
+      GetKey.ownTables[Tables.KeySchema.name].properties.KeyId,
     );
   }
 }

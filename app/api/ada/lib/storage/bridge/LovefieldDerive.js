@@ -6,16 +6,9 @@ import type {
 
 import { IDerive } from '../models/functionalities/IDerive';
 
-import { getRowFromKey, getAllSchemaTables, } from '../database/utils';
-import {
-  PrivateDeriverSchema,
-  Bip44DerivationSchema,
-  Bip44WrapperSchema,
-  PublicDeriverSchema,
-  Bip44DerivationMappingSchema
-} from '../database/genericBip44/tables';
+import { getAllSchemaTables, } from '../database/utils';
 import type {
-  PrivateDeriverRow, Bip44DerivationRow,
+  PrivateDeriverRow,
   PublicDeriverInsert, PublicDeriverRow,
 } from '../database/genericBip44/tables';
 import {
@@ -23,12 +16,12 @@ import {
 } from '../database/genericBip44/api/add';
 import {
   GetDerivationsByPath,
+  GetPrivateDeriver,
+  GetBip44Derivation,
 } from '../database/genericBip44/api/get';
 import {
-  TableMap,
-} from '../database/genericBip44/api/utils';
-
-import { KeySchema } from '../database/uncategorized/tables';
+  GetKey,
+} from '../database/uncategorized/api/get';
 import type { KeyInsert, KeyRow } from '../database/uncategorized/tables';
 
 import { StaleStateError, WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
@@ -115,33 +108,22 @@ function _derive(
   bip44WrapperId: number,
 ) {
   return async function (body: LovefieldDeriveRequest): Promise<PublicDeriverRow> {
-    const Bip44PrivateDeriverTable = db.getSchema().table(PrivateDeriverSchema.name);
-    const Bip44DerivationTable = db.getSchema().table(Bip44DerivationSchema.name);
-    const PublicDeriverTable = db.getSchema().table(PublicDeriverSchema.name);
-    const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
-    const KeyTable = db.getSchema().table(KeySchema.name);
-    const Bip44WrapperTable = db.getSchema().table(Bip44WrapperSchema.name);
-
     const getKeyTx = db.createTransaction();
     await getKeyTx
       .begin([
         ...getAllSchemaTables(db, AddPublicDeriver),
-        Bip44PrivateDeriverTable, Bip44DerivationTable, KeyTable, Bip44WrapperTable,
-        PublicDeriverTable, Bip44DerivationMappingTable,
-        // we don't know which level the public deriver will be
-        // so we lock the table for every level
-        ...Array.from(TableMap, ([_key, value]) => db.getSchema().table(value))
+        ...getAllSchemaTables(db, GetPrivateDeriver),
+        ...getAllSchemaTables(db, GetBip44Derivation),
+        ...getAllSchemaTables(db, GetKey),
       ]);
 
     let privateDeriverRow: PrivateDeriverRow;
     {
       // Get Private Deriver
-      const result = await getRowFromKey<PrivateDeriverRow>(
+      const result = await GetPrivateDeriver.fromBip44Wrapper(
         db,
         getKeyTx,
         bip44WrapperId,
-        PrivateDeriverSchema.name,
-        PrivateDeriverSchema.properties.Bip44WrapperId,
       );
       if (result === undefined) {
         throw new StaleStateError('LovefieldDerive::_derive privateDeriver');
@@ -152,12 +134,10 @@ function _derive(
     let privateKeyId: number;
     {
       // Private Deriver => Bip44Derivation
-      const result = await getRowFromKey<Bip44DerivationRow>(
+      const result = await GetBip44Derivation.func(
         db,
         getKeyTx,
         privateDeriverRow.Bip44DerivationId,
-        Bip44DerivationSchema.name,
-        Bip44DerivationSchema.properties.Bip44DerivationId,
       );
       if (result === undefined) {
         throw new StaleStateError('LovefieldDerive::_derive Bip44DerivationTable');
@@ -171,12 +151,10 @@ function _derive(
     let privateKeyRow: KeyRow;
     {
       // Bip44Derivation => Private key
-      const result = await getRowFromKey<KeyRow>(
+      const result = await GetKey.func(
         db,
         getKeyTx,
         privateKeyId,
-        KeySchema.name,
-        KeySchema.properties.KeyId,
       );
       if (result === undefined) {
         throw new StaleStateError('LovefieldDerive::_derive KeyTable');

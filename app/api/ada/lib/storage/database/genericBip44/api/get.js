@@ -10,6 +10,7 @@ import type {
   Bip44DerivationRow,
   Bip44WrapperRow,
   PublicDeriverRow,
+  PrivateDeriverRow,
 } from '../tables';
 import * as Tables from '../tables';
 
@@ -171,6 +172,26 @@ export class GetPublicDeriver {
   }
 }
 
+export class GetPrivateDeriver {
+  static ownTables = Object.freeze({
+    [Tables.PrivateDeriverSchema.name]: Tables.PrivateDeriverSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async fromBip44Wrapper(
+    db: lf$Database,
+    tx: lf$Transaction,
+    key: number,
+  ): Promise<PrivateDeriverRow | void> {
+    return await getRowFromKey<PrivateDeriverRow>(
+      db, tx,
+      key,
+      GetPrivateDeriver.ownTables[Tables.PrivateDeriverSchema.name].name,
+      GetPrivateDeriver.ownTables[Tables.PrivateDeriverSchema.name].properties.Bip44WrapperId,
+    );
+  }
+}
+
 export class GetBip44Wrapper {
   static ownTables = Object.freeze({
     [Tables.Bip44WrapperSchema.name]: Tables.Bip44WrapperSchema,
@@ -187,6 +208,26 @@ export class GetBip44Wrapper {
       key,
       GetBip44Wrapper.ownTables[Tables.Bip44WrapperSchema.name].name,
       GetBip44Wrapper.ownTables[Tables.Bip44WrapperSchema.name].properties.Bip44WrapperId,
+    );
+  }
+}
+
+export class GetBip44Derivation {
+  static ownTables = Object.freeze({
+    [Tables.Bip44DerivationSchema.name]: Tables.Bip44DerivationSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async func(
+    db: lf$Database,
+    tx: lf$Transaction,
+    key: number,
+  ): Promise<Bip44DerivationRow | void> {
+    return await getRowFromKey<Bip44DerivationRow>(
+      db, tx,
+      key,
+      GetBip44Derivation.ownTables[Tables.Bip44DerivationSchema.name].name,
+      GetBip44Derivation.ownTables[Tables.Bip44DerivationSchema.name].properties.Bip44DerivationId,
     );
   }
 }
