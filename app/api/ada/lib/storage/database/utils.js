@@ -71,7 +71,7 @@ export async function getRowIn<Row>(
  */
 export type Schema = {
   +name: string,
-  properties: any;
+  properties: any; // don't care about the type since we don't need it to inspect table names
 };
 export type OwnTableType = { [key: string]: Schema };
 export type DepTableType = { [key: string]: TableClassType };
