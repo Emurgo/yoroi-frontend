@@ -12,8 +12,8 @@ export default class StateFetchStore extends Store {
 
   setup() {
     this.fetcher = new BatchedFetcher(new RemoteFetcher(
-      lastLaunchVersion => this.stores.profile.lastLaunchVersion,
-      currentLocale => this.stores.profile.currentLocale
+      () => this.stores.profile.lastLaunchVersion,
+      () => this.stores.profile.currentLocale
     ));
   }
 }

@@ -59,6 +59,22 @@ When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
 
 When(/^I click on the next button in the wallet send form$/, async function () {
   await this.click('.WalletSendForm_nextButton');
+  /**
+   * Sometimes out tests fail because clicking this button isn't triggering a dialog
+   * However it works flawlessly both locally and on localci
+   *
+   * My only guess is that mobx re-disables this button in a way that only causes
+   * the condition to happen on low-resouruce machines like we use for CI
+   *
+   * I attempt to fix it by just clicking twice after a delay
+   */
+  await this.driver.sleep(500);
+  try {
+    await this.click('.WalletSendForm_nextButton');
+  } catch (e) {
+    // if the first click succeeded, the second will throw an exception
+    // saying that the button can't be clicked because a dialog is in the way
+  }
 });
 
 When(/^I click on "Send all my ADA" checkbox$/, async function () {

@@ -16,7 +16,7 @@ type Props = {|
   isSubmitting: boolean,
   recoveryPhrase: string,
   recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  enteredPhrase: Array<{ word: string }>,
+  enteredPhrase: Array<{ word: string, index: number }>,
   onCancelBackup: Function,
   onAcceptPrivacyNotice: Function,
   onContinue: Function,

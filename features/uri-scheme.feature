@@ -3,7 +3,7 @@ Feature: URI scheme
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
 
   @it-107
   Scenario: Ensure user can generate a wallet URI and copy it to clipboard (IT-107)

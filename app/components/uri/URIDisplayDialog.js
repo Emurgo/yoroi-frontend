@@ -24,7 +24,7 @@ const messages = defineMessages({
   },
   usabilityWarning: {
     id: 'uri.display.dialog.usabilityWarning',
-    defaultMessage: 'This link can only be opened by users with Yoroi installed on their browser',
+    defaultMessage: '!!!This link can only be opened by users with Yoroi installed on their browser',
   }
 });
 

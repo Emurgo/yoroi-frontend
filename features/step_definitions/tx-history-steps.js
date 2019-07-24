@@ -62,6 +62,7 @@ Then(
 
 
 Then(/^I should see no transactions$/, async function () {
+  await this.waitForElement('.WalletNoTransactions_component');
   const actualTxsList = await this.getElementsBy('.Transaction_component');
   chai.expect(actualTxsList.length).to.equal(0);
 });
@@ -71,6 +72,7 @@ Then(
   async function (txsNumber, txExpectedStatus) {
     const txsAmount = parseInt(txsNumber, 10);
 
+    await this.driver.sleep(500);
     // press the show more transaction button until all transactions are visible
     for (let i = 1; i < txsAmount; i++) {
       const webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
@@ -100,6 +102,7 @@ Then(
 Then(
   /^I verify top transaction content ([^"]*)$/,
   async function (walletName) {
+    await this.waitForElement('.Transaction_component');
     const actualTxsList = await this.getElementsBy('.Transaction_component');
     const topTx = actualTxsList[0];
 

@@ -75,9 +75,7 @@ export default class ProfileStore extends Store {
       },
     },
     {
-      isDone: () => {
-        return !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted;
-      },
+      isDone: () => !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted,
       action: () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
         if (this.stores.app.currentRoute === route) {
@@ -359,7 +357,7 @@ export default class ProfileStore extends Store {
   };
 
   getThemeVars = ({ theme }: { theme: string }) => {
-    if (theme) return require(`../../themes/prebuilt/${theme}.js`);
+    if (theme) return require(`../../themes/prebuilt/${theme}.js`).default;
     return require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`); // default
   };
 
@@ -381,7 +379,8 @@ export default class ProfileStore extends Store {
   // ========== Terms of Use ========== //
 
   @computed get termsOfUse(): string {
-    return require(`../../i18n/locales/terms-of-use/${environment.API}/${this.currentLocale}.md`);
+    const API = environment.API;
+    return require(`../../i18n/locales/terms-of-use/${API}/${this.currentLocale}.md`);
   }
 
   @computed get hasLoadedTermsOfUseAcceptance(): boolean {
