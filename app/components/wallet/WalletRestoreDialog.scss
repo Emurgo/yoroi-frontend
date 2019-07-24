@@ -26,10 +26,6 @@
 
       @include place-form-field-error-below-input;
     }
-
-    .paperPassword {
-      margin-top: 30px;
-    }
   }
 
   .error {
@@ -94,4 +90,8 @@
     }
     
   }
+}
+
+:global .WalletRestoreDialog .Dialog_actions {
+  margin-top: 10px;
 }

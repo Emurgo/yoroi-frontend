@@ -251,6 +251,9 @@ export default {
   '--theme-dialog-big-button-label-color': '#121327',
   '--theme-dialog-big-button-description-color': '#121327',
   '--theme-dialog-title-color': '#121327',
+  '--theme-dialog-title-margin': '0 0 20px 0',
+  '--theme-dialog-input-margin': '10px 0 20px',
+  '--theme-dialog-input-actions-margin': '20px 0 0 0',
 
   '--theme-input-border-color': '#c6cdd6',
   '--theme-input-text-color': '#121327',

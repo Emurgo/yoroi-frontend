@@ -70,3 +70,11 @@
     }
   }
 }
+
+:global .ConnectDialog .Dialog_title {
+  margin-bottom: 12px !important;
+}
+
+:global .ConnectDialog .Dialog_actions {
+  margin-top: 24px !important;
+}

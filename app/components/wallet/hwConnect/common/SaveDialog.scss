@@ -43,4 +43,10 @@
   }
 }
 
+:global .SaveDialog .Dialog_title {
+  margin-bottom: 12px !important;
+}
 
+:global .SaveDialog .Dialog_actions {
+  margin-top: 24px !important;
+}

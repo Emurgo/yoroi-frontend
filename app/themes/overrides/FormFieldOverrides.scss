@@ -1,7 +1,7 @@
 // Css module overrides go here …
 
 .root {
-  padding: 10px 0 20px;
+  padding: var(--theme-dialog-input-margin);
 }
 
 .error {
