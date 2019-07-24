@@ -4,6 +4,7 @@ import type {
   lf$Database,
   lf$Row,
   lf$Transaction,
+  lf$schema$Table,
 } from 'lovefield';
 import { size } from 'lodash';
 
@@ -84,6 +85,15 @@ export type TableClassType = {
    * and not what its dependencies will require
    */
   +depTables: DepTableType,
+}
+
+
+export function getAllSchemaTables(
+  db: lf$Database,
+  tableClass: TableClassType,
+): Array<lf$schema$Table> {
+  return _getAllTables(tableClass)
+    .map(table => db.getSchema().table(table));
 }
 
 /** recursively get all tables required for a database query */

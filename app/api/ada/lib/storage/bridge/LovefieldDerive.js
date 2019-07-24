@@ -6,7 +6,7 @@ import type {
 
 import { IDerive } from '../models/functionalities/IDerive';
 
-import { getRowFromKey } from '../database/utils';
+import { getRowFromKey, getAllSchemaTables, } from '../database/utils';
 import {
   PrivateDeriverSchema,
   Bip44DerivationSchema,
@@ -125,6 +125,7 @@ function _derive(
     const getKeyTx = db.createTransaction();
     await getKeyTx
       .begin([
+        ...getAllSchemaTables(db, AddPublicDeriver),
         Bip44PrivateDeriverTable, Bip44DerivationTable, KeyTable, Bip44WrapperTable,
         PublicDeriverTable, Bip44DerivationMappingTable,
         // we don't know which level the public deriver will be

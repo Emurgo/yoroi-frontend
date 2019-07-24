@@ -42,7 +42,7 @@ import { LovefieldDerive } from '../bridge/LovefieldDerive';
 import { WalletBuilder } from '../bridge/WalletBuilder';
 import { ConceptualWalletSchema, KeySchema } from './uncategorized/tables';
 
-import { getAllTables } from './utils';
+import { getAllSchemaTables } from './utils';
 
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 const _password = 'greatest_password_ever';
@@ -320,10 +320,7 @@ test('Can add and fetch address in wallet', async () => {
   expect(result[0].addressing).toEqual([purposeIndex, coinTypeIndex, accountIndex, 0, 0]);
 
   const tx4 = db.createTransaction();
-  await tx4.begin([
-    ...Array.from(getAllTables(GetAllBip44Wallets))
-      .map(table => db.getSchema().table(table)),
-  ]);
+  await tx4.begin(getAllSchemaTables(db, GetAllBip44Wallets));
 
   const bip44Wallets = await GetAllBip44Wallets.func(
     db,
