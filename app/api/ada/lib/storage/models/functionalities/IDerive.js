@@ -2,18 +2,18 @@
 
 
 export class IDerive<Request, Result> {
-  forwardFunc: <Insert>(
+  forwardFunc: <Insert: {}>(
     body: Request,
     levelSpecific: Insert,
   ) => Promise<Result>;
 
-  constructor(forwardFunc: <Insert>(
+  constructor(forwardFunc: <Insert: {}>(
     body: Request,
     levelSpecific: Insert,
   ) => Promise<Result>) {
     this.forwardFunc = forwardFunc;
   }
-  derive<Insert>(
+  derive<Insert: {}>(
     body: Request,
     levelSpecific: Insert,
   ): Promise<Result> {
