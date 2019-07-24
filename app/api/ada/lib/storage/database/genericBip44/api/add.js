@@ -154,6 +154,25 @@ export class AddDerivationWithParent {
   }
 }
 
+export class AddBip44Wrapper {
+  static ownTables = Object.freeze({
+    [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async func(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: Bip44WrapperInsert,
+  ): Promise<Bip44WrapperRow> {
+    return await addToTable<Bip44WrapperInsert, Bip44WrapperRow>(
+      db, tx,
+      request,
+      AddBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name].name,
+    );
+  }
+}
+
 export type PrivateDeriverRequest<Insert> = {
   addLevelRequest: AddDerivationRequest<Insert>,
   level: number,
@@ -195,41 +214,84 @@ export class AddPrivateDeriver {
   }
 }
 
-export class AddBip44Wrapper {
-  static ownTables = Object.freeze({
-    [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async func(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: Bip44WrapperInsert,
-  ): Promise<Bip44WrapperRow> {
-    return await addToTable<Bip44WrapperInsert, Bip44WrapperRow>(
-      db, tx,
-      request,
-      AddBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name].name,
-    );
-  }
-}
-
-/** TODO: is more complicated than this */
+export type PublicDeriverRequest<Insert> = {
+  addLevelRequest: AddDerivationRequest<Insert>,
+  level: number,
+  addPrivateDeriverRequest: number => PublicDeriverInsert,
+};
 export class AddPublicDeriver {
   static ownTables = Object.freeze({
     [Bip44Tables.PublicDeriverSchema.name]: Bip44Tables.PublicDeriverSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables = Object.freeze({
+    /** depending on the case, we may have to either
+     * derive with a parent or derive ad-hoc.
+     * Since we can't know ahead of time, we set both as dependencies. */
+    AddDerivation,
+    AddDerivationWithParent,
+  });
 
-  static async func(
+  static async adHoc<Insert, Row>(
     db: lf$Database,
     tx: lf$Transaction,
-    request: PublicDeriverInsert,
-  ): Promise<PublicDeriverRow> {
-    return await addToTable<PublicDeriverInsert, PublicDeriverRow>(
+    request: {
+      addLevelRequest: AddDerivationRequest<Insert>,
+      level: number,
+      addPublicDeriverRequest: number => PublicDeriverInsert,
+    },
+  ): Promise<{
+    publcDeriverResult: PublicDeriverRow,
+    levelResult: {
+      derivationTableResult: Bip44DerivationRow,
+      specificDerivationResult: Row
+    },
+  }> {
+    const levelResult = await AddDerivation.func<Insert, Row>(
       db, tx,
-      request,
+      request.addLevelRequest,
+      request.level,
+    );
+    const publcDeriverResult = await addToTable<PublicDeriverInsert, PublicDeriverRow>(
+      db, tx,
+      request.addPublicDeriverRequest(levelResult.derivationTableResult.Bip44DerivationId),
       AddPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name].name,
     );
+    return {
+      publcDeriverResult,
+      levelResult,
+    };
   }
+
+  static async fromParent<Insert, Row>(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      addLevelRequest: DeriveFromRequest<Insert>,
+      level: number,
+      addPublicDeriverRequest: number => PublicDeriverInsert,
+    },
+  ): Promise<{
+    publcDeriverResult: PublicDeriverRow,
+    levelResult: {
+      derivationTableResult: Bip44DerivationRow,
+      mappingTableResult: Bip44DerivationMappingRow,
+      specificDerivationResult: Row
+    },
+  }> {
+    const levelResult = await AddDerivationWithParent.func<Insert, Row>(
+      db, tx,
+      request.addLevelRequest,
+      request.level,
+    );
+    const publcDeriverResult = await addToTable<PublicDeriverInsert, PublicDeriverRow>(
+      db, tx,
+      request.addPublicDeriverRequest(levelResult.derivationTableResult.Bip44DerivationId),
+      AddPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name].name,
+    );
+    return {
+      publcDeriverResult,
+      levelResult,
+    };
+  }
+
 }

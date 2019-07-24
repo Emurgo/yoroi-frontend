@@ -20,7 +20,6 @@ import type {
 } from '../database/genericBip44/tables';
 import {
   AddPublicDeriver,
-  AddDerivationWithParent,
 } from '../database/genericBip44/api/add';
 import {
   GetDerivationsByPath,
@@ -213,9 +212,9 @@ function _derive(
         : null;
     }
 
-    let insertResult;
+    let pubDeriver;
     {
-      // add get parent of the new derivation
+      // get parent of the new derivation
       const newLevelParent = await GetDerivationsByPath.func(
         db,
         getKeyTx,
@@ -228,40 +227,33 @@ function _derive(
         throw new StaleStateError('LovefieldDerive::_derive newLevelParent');
       }
 
-      // add derivation itself
-      insertResult = await AddDerivationWithParent.func(
-        db, getKeyTx,
-        {
-          privateKeyInfo: newPrivateKey,
-          publicKeyInfo: newPublicKey,
-          derivationInfo: keys => ({
-            PublicKeyId: keys.public,
-            PrivateKeyId: keys.private,
-            Index: body.pathToPublic[body.pathToPublic.length - 1],
-          }),
-          parentDerivationId,
-          levelInfo: id => ({
-            Bip44DerivationId: id,
-            ...body.levelSpecificInsert,
-          }),
-        },
-        privateDeriverRow.Level + body.pathToPublic.length
-      );
-    }
-
-    let pubDeriver: PublicDeriverRow;
-    {
-      // add the public deriver
-      pubDeriver = await AddPublicDeriver.func(
+      pubDeriver = await AddPublicDeriver.fromParent(
         db,
         getKeyTx,
-        body.publicDeriverInsert(insertResult.derivationTableResult.Bip44DerivationId),
+        {
+          addLevelRequest: {
+            privateKeyInfo: newPrivateKey,
+            publicKeyInfo: newPublicKey,
+            derivationInfo: keys => ({
+              PublicKeyId: keys.public,
+              PrivateKeyId: keys.private,
+              Index: body.pathToPublic[body.pathToPublic.length - 1],
+            }),
+            parentDerivationId,
+            levelInfo: id => ({
+              Bip44DerivationId: id,
+              ...body.levelSpecificInsert,
+            }),
+          },
+          level: privateDeriverRow.Level + body.pathToPublic.length,
+          addPublicDeriverRequest: body.publicDeriverInsert
+        }
       );
     }
 
     await getKeyTx.commit();
 
-    return pubDeriver;
+    return pubDeriver.publcDeriverResult;
   };
 }
 
