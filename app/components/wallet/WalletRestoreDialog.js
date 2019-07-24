@@ -364,7 +364,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
         {isVerificationMode ? (
           introMessage &&
-            <DialogTextBlock message={introMessage} subclass='component-input' />
+            <DialogTextBlock message={introMessage} subclass="component-input" />
         ) : (
           <Input
             className={styles.walletName}

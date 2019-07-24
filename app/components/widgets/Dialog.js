@@ -78,7 +78,7 @@ export default class Dialog extends Component<Props> {
             </div>)
           }
 
-          {actions && (
+          {actions && actions.length > 0 && (
             <div className={styles.actions}>
               {_.map(actions, (action, i: number) => {
                 const buttonClasses = classnames([

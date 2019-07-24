@@ -175,7 +175,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
           {walletPlate}
         </DialogTextBlock>
 
-        <DialogTextBlock subclass='component-bottom'>
+        <DialogTextBlock subclass="component-bottom">
           {walletAddresses}
         </DialogTextBlock>
         <div className={styles.postCopyMargin} />
