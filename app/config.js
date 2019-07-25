@@ -1,3 +1,5 @@
+import { ConnectionTypeValue } from 'yoroi-extension-ledger-bridge';
+
 // @flow
 export default {
   wallets: {
@@ -24,7 +26,8 @@ export default {
         // Ledger doesn’t provide any device name so using hard-coded name
         DEFAULT_WALLET_NAME: 'Yoroi-Ledger',
         VENDOR: 'ledger.com',
-        MODEL: 'NanoS'
+        MODEL: 'NanoS',
+        DEFAULT_TRANSPORT_PROTOCOL: ConnectionTypeValue.WEB_AUTHN
       }
     }
   },

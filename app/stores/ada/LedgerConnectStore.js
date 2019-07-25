@@ -148,7 +148,9 @@ export default class LedgerConnectStore
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     let ledgerBridge: LedgerBridge;
     try {
-      ledgerBridge = new LedgerBridge();
+      ledgerBridge = new LedgerBridge({
+        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL
+      });
       await prepareLedgerBridger(ledgerBridge);
 
       const versionResp: GetVersionResponse = await ledgerBridge.getVersion();

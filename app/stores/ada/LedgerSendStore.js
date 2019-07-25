@@ -10,8 +10,9 @@ import type {
 
 import Store from '../base/Store';
 import environment from '../../environment';
-import LocalizedRequest from '../lib/LocalizedRequest';
+import Config from '../../config';
 
+import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 
 import type {
@@ -98,7 +99,9 @@ export default class LedgerSendStore extends Store {
     let ledgerBridge: LedgerBridge;
     try {
       Logger.debug('LedgerSendStore::_send::called: ' + stringifyData(params));
-      ledgerBridge = new LedgerBridge();
+      ledgerBridge = new LedgerBridge({
+        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL
+      });
 
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
