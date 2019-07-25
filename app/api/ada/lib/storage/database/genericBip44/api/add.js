@@ -302,15 +302,14 @@ export class AddPublicDeriver {
   }
 }
 
-export type DerivePublicFromPrivateRequest = {
+export type DerivePublicFromPrivateRequest = {|
   publicDeriverInsert: number => PublicDeriverInsert,
   /**
    * Path is relative to private deriver
    * Last index should be the index you want for the public deriver
    */
   pathToPublic: Array<number>,
-  decryptPrivateDeriverPassword: ?string,
-};
+|};
 export class DerivePublicFromPrivate {
   static ownTables = Object.freeze({});
   static depTables = Object.freeze({
@@ -328,7 +327,6 @@ export class DerivePublicFromPrivate {
     levelSpecificInsert: Insert,
     getKeyInserts: (
       privateKeyRow: KeyRow,
-      password: ?string,
     ) => {
       newPrivateKey: KeyInsert | null,
       newPublicKey: KeyInsert | null,
@@ -383,9 +381,8 @@ export class DerivePublicFromPrivate {
       privateKeyRow = result;
     }
 
-    let newKeys = getKeyInserts(
+    const newKeys = getKeyInserts(
       privateKeyRow,
-      body.decryptPrivateDeriverPassword,
     );
 
     let pubDeriver;
