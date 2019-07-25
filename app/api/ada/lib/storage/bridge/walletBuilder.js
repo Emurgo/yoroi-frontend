@@ -15,6 +15,7 @@ import type {
   Bip44WrapperInsert,
   PublicDeriverRow,
   Bip44DerivationRow,
+  Bip44DerivationMappingRow,
 } from '../database/genericBip44/tables';
 import {
   AddBip44Wrapper,
@@ -255,5 +256,13 @@ type HasPrivateDeriver = {
 };
 
 type HasPublicDeriver<Row> = {
-  publicDeriver: Array<PromisslessReturnType<typeof DerivePublicFromPrivate.add>>
+  // we have to re-specify the whole type since you can't use typeof on generic return types
+  publicDeriver: Array<{
+    publcDeriverResult: PublicDeriverRow,
+    levelResult: {
+      derivationTableResult: Bip44DerivationRow,
+      mappingTableResult: Bip44DerivationMappingRow,
+      specificDerivationResult: Row
+    }
+  }>,
 };
