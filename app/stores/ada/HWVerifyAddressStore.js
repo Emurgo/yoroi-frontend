@@ -4,8 +4,7 @@ import Store from '../base/Store';
 
 import {
   prepareLedgerBridger,
-  disposeLedgerBridgeIFrame
-} from '../../utils/iframeHandler';
+} from '../../utils/bridgeHandler';
 
 import {
   LedgerBridge,
@@ -37,8 +36,6 @@ export default class AddressesStore extends Store {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
   @observable selectedAddress: ?{ address: string, path: BIP32Path } = null;
-
-  ledgerBridge: ?LedgerBridge;
 
   setup() {
     const actions = this.actions[environment.API].hwVerifyAddress;
@@ -97,29 +94,22 @@ export default class AddressesStore extends Store {
   ledgerVerifyAddress = async (
     path: BIP32Path,
   ): Promise<void> => {
-    if (this.ledgerBridge == null) {
-      Logger.info('AddressStore::_verifyAddress new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
-    }
-
+    let ledgerBridge: LedgerBridge;
     try {
-      if (this.ledgerBridge) {
-        // trick to fix flow
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
+      // trick to fix flow
+      ledgerBridge = new LedgerBridge();
+      await prepareLedgerBridger(ledgerBridge);
 
-        await prepareLedgerBridger(ledgerBridge);
-        Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
-        // the next line is used to get an error when
-        // Ledger is not connected or has issues.
-        await ledgerBridge.getVersion();
-        await ledgerBridge.showAddress(path);
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
-      }
+      Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
+      // the next line is used to get an error when
+      // Ledger is not connected or has issues.
+      await ledgerBridge.getVersion();
+      await ledgerBridge.showAddress(path);
     } catch (error) {
       Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
       this._setError(ledgerErrorToLocalized(error));
     } finally {
+      ledgerBridge && ledgerBridge.dispose();
       Logger.info('HWVerifyStore::ledgerVerifyAddress finalized ');
     }
   }
@@ -141,8 +131,6 @@ export default class AddressesStore extends Store {
     this.selectedAddress = null;
     this._setError(null);
     this._setActionProcessing(false);
-    disposeLedgerBridgeIFrame();
-    this.ledgerBridge = null;
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 }

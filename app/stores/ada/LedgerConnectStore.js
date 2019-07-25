@@ -5,7 +5,6 @@ import { observable, action } from 'mobx';
 
 import {
   LedgerBridge,
-  ConnectionTypeValue,
   makeCardanoAccountBIP44Path,
 } from 'yoroi-extension-ledger-bridge';
 import type {
@@ -40,8 +39,7 @@ import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
   prepareLedgerBridger,
-  disposeLedgerBridgeIFrame
-} from '../../utils/iframeHandler';
+} from '../../utils/bridgeHandler';
 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -66,7 +64,6 @@ export default class LedgerConnectStore
   @observable progressInfo: ProgressInfo;
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
-  ledgerBridge: ?LedgerBridge;
 
   get defaultWalletName(): string {
     // Ledger doesn’t provide any device name so using hard-coded name
@@ -102,10 +99,6 @@ export default class LedgerConnectStore
     * _init() is called when connect dailog is about to show */
   _init = (): void => {
     Logger.debug('LedgerConnectStore::_init called');
-    if (this.ledgerBridge == null) {
-      Logger.debug('LedgerConnectStore::_init new LedgerBridge created');
-      // this.ledgerBridge = new LedgerBridge();
-    }
   }
 
   @action _cancel = (): void => {
@@ -118,9 +111,6 @@ export default class LedgerConnectStore
   }
 
   @action _reset = (): void => {
-    disposeLedgerBridgeIFrame();
-    this.ledgerBridge = undefined;
-
     this.progressInfo = {
       currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
@@ -158,7 +148,7 @@ export default class LedgerConnectStore
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     let ledgerBridge: LedgerBridge;
     try {
-      ledgerBridge = new LedgerBridge({ connectionType: ConnectionTypeValue.WEB_AUTHN });
+      ledgerBridge = new LedgerBridge();
       await prepareLedgerBridger(ledgerBridge);
 
       const versionResp: GetVersionResponse = await ledgerBridge.getVersion();

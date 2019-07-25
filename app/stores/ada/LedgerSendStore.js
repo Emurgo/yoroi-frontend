@@ -34,8 +34,7 @@ import {
 
 import {
   prepareLedgerBridger,
-  disposeLedgerBridgeIFrame
-} from '../../utils/iframeHandler';
+} from '../../utils/bridgeHandler';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -44,7 +43,6 @@ export default class LedgerSendStore extends Store {
   // =================== VIEW RELATED =================== //
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError;
-  ledgerBridge: ?LedgerBridge;
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
@@ -68,16 +66,9 @@ export default class LedgerSendStore extends Store {
     * _init() is called when Confirmation dailog is about to show */
   _init = (): void => {
     Logger.debug('LedgerSendStore::_init called');
-    if (this.ledgerBridge == null) {
-      Logger.debug('LedgerSendStore::_init new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
-    }
   }
 
   _reset() {
-    disposeLedgerBridgeIFrame();
-    this.ledgerBridge = undefined;
-
     this._setActionProcessing(false);
     this._setError(null);
   }
@@ -104,8 +95,10 @@ export default class LedgerSendStore extends Store {
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   _send = async (params: SendUsingLedgerParams): Promise<void> => {
+    let ledgerBridge: LedgerBridge;
     try {
       Logger.debug('LedgerSendStore::_send::called: ' + stringifyData(params));
+      ledgerBridge = new LedgerBridge();
 
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
@@ -115,41 +108,35 @@ export default class LedgerSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      if (this.ledgerBridge) {
-        // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
 
-        const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-        this.createLedgerSignTxDataRequest.execute({
-          ...params,
-          getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
-          getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
-        });
-        if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
-        const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      this.createLedgerSignTxDataRequest.execute({
+        ...params,
+        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
+      });
+      if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
+      const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
 
-        await prepareLedgerBridger(ledgerBridge);
+      await prepareLedgerBridger(ledgerBridge);
 
-        const ledgerSignTxResp: LedgerSignTxResponse =
-          await ledgerBridge.signTransaction(
-            ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
-            ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
-          );
-
-        await this._prepareAndBroadcastSignedTx(
-          ledgerSignTxResp,
-          params.signRequest.unsignedTx,
+      const ledgerSignTxResp: LedgerSignTxResponse =
+        await ledgerBridge.signTransaction(
+          ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
+          ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
         );
 
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
-      }
+      await this._prepareAndBroadcastSignedTx(
+        ledgerSignTxResp,
+        params.signRequest.unsignedTx,
+      );
     } catch (error) {
       Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
       this._setError(convertToLocalizableError(error));
     } finally {
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
+      ledgerBridge && ledgerBridge.dispose();
       this._setActionProcessing(false);
     }
   };
