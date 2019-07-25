@@ -2,6 +2,7 @@
 
 import type {
   lf$Database,
+  lf$Transaction,
 } from 'lovefield';
 
 import { IDerive } from '../models/functionalities/IDerive';
@@ -31,19 +32,16 @@ export type LovefieldDeriveRequest = {|
   publicDeriverPublicKey?: KeyInfo,
   publicDeriverPrivateKey?: KeyInfo,
 |};
-async function derivePublicDeriver<Insert>(
+export async function derivePublicDeriver<Insert>(
   db: lf$Database,
+  tx: lf$Transaction,
   bip44WrapperId: number,
   body: LovefieldDeriveRequest,
   levelSpecificInsert: Insert,
 ): ReturnType<typeof AddPublicDeriver.fromParent> {
-  const getKeyTx = db.createTransaction();
-  await getKeyTx
-    .begin(getAllSchemaTables(db, DerivePublicFromPrivate));
-
   const result = await DerivePublicFromPrivate.add(
     db,
-    getKeyTx,
+    tx,
     bip44WrapperId,
     {
       publicDeriverInsert: body.publicDeriverInsert,
@@ -82,8 +80,6 @@ async function derivePublicDeriver<Insert>(
     },
   );
 
-  await getKeyTx.commit();
-
   return result;
 }
 
@@ -91,19 +87,30 @@ function _derive(
   db: lf$Database,
   bip44WrapperId: number,
 ) {
-  return (
+  return async (
     body: LovefieldDeriveRequest,
     levelSpecificInsert: {},
-  ) => derivePublicDeriver(
-    db,
-    bip44WrapperId,
-    body,
-    levelSpecificInsert,
-  );
+  ) => {
+    const tx = db.createTransaction();
+    await tx.begin(
+      getAllSchemaTables(db, DerivePublicFromPrivate)
+    );
+    const result = await derivePublicDeriver(
+      db,
+      tx,
+      bip44WrapperId,
+      body,
+      levelSpecificInsert,
+    );
+    await tx.commit();
+    return result;
+  };
 }
 
-export class LovefieldDerive
-  extends IDerive<LovefieldDeriveRequest, PromisslessReturnType<typeof AddPublicDeriver.fromParent>> {
+export class LovefieldDerive extends IDerive<
+  LovefieldDeriveRequest,
+  PromisslessReturnType<typeof AddPublicDeriver.fromParent>
+> {
 
   constructor(
     db: lf$Database,

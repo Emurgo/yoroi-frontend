@@ -19,6 +19,7 @@ import type {
 import {
   AddBip44Wrapper,
   AddPrivateDeriver,
+  DerivePublicFromPrivate,
 } from '../database/genericBip44/api/add';
 import type {
   PrivateDeriverRequest,
@@ -27,7 +28,10 @@ import {
   getAllTables,
 } from '../database/utils';
 import type {
-  LovefieldDeriveRequest
+  LovefieldDeriveRequest,
+} from './lovefieldDerive';
+import {
+  derivePublicDeriver,
 } from './lovefieldDerive';
 
 /**
@@ -76,15 +80,15 @@ export class WalletBuilder<CurrentState> {
     this.state = state;
   }
 
-  updateData<NewAddition>(
+  updateData<Requirement: {}, NewAddition>(
     addition: NewAddition,
     newTables: Array<string>,
-    newStep: (CurrentState & NewAddition) => Promise<void>,
+    newStep: (CurrentState & NewAddition & Requirement) => Promise<void>,
   ): WalletBuilder<
-    CurrentState & NewAddition
+    CurrentState & NewAddition & Requirement
   > {
     return new WalletBuilder<
-      CurrentState & NewAddition
+      CurrentState & NewAddition & Requirement
     >(
       this.db,
       this.tx,
@@ -133,7 +137,7 @@ export class WalletBuilder<CurrentState> {
   > = (
     insert: CurrentState => ConceptualWalletInsert,
   ) => {
-    return this.updateData(
+    return this.updateData<{}, HasConceptualWallet>(
       AsNotNull<HasConceptualWallet>({ conceptualWalletRow: null }),
       Array.from(getAllTables(AddConceptualWallet)),
       async (finalData) => {
@@ -154,7 +158,7 @@ export class WalletBuilder<CurrentState> {
   > = (
     insert: CurrentState => Bip44WrapperInsert,
   ) => {
-    return this.updateData(
+    return this.updateData<HasConceptualWallet, HasBip44Wrapper>(
       AsNotNull<HasBip44Wrapper>({ bip44WrapperRow: null }),
       Array.from(getAllTables(AddBip44Wrapper)),
       async (finalData) => {
@@ -175,7 +179,7 @@ export class WalletBuilder<CurrentState> {
   > = <Insert>(
     insert: CurrentState => PrivateDeriverRequest<Insert>,
   ) => {
-    return this.updateData(
+    return this.updateData<HasBip44Wrapper, HasPrivateDeriver>(
       AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
       Array.from(getAllTables(AddPrivateDeriver)),
       async (finalData) => {
@@ -190,17 +194,32 @@ export class WalletBuilder<CurrentState> {
 
   derivePublicDeriver: StateConstraint<
     CurrentState,
-    HasPrivateDeriver,
-    CurrentState => LovefieldDeriveRequest,
+    HasBip44Wrapper & HasPrivateDeriver,
+    CurrentState => {
+      body: LovefieldDeriveRequest,
+      levelSpecificInsert: mixed,
+    },
     CurrentState & HasPublicDeriver<mixed>
-  > = (
-    insert: CurrentState => LovefieldDeriveRequest,
+  > = <Insert>(
+    request: CurrentState => {
+      body: LovefieldDeriveRequest,
+      levelSpecificInsert: Insert,
+    }
   ) => {
-    return this.updateData(
+    return this.updateData<HasBip44Wrapper & HasPrivateDeriver, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
-      Array.from(getAllTables(AddPrivateDeriver /* TODO */)),
+      Array.from(getAllTables(DerivePublicFromPrivate)),
       async (finalData) => {
-        finalData.publicDeriver = []; //TODO
+        finalData.publicDeriver = [
+          ...finalData.publicDeriver,
+          await derivePublicDeriver(
+            this.db,
+            this.tx,
+            finalData.bip44WrapperRow.Bip44WrapperId,
+            request.body,
+            request.levelSpecificInsert,
+          )
+        ];
       },
     );
   }
@@ -236,11 +255,5 @@ type HasPrivateDeriver = {
 };
 
 type HasPublicDeriver<Row> = {
-  publicDeriver: Array<{
-    levelResult: {
-      derivationTableResult: Bip44DerivationRow,
-      specificDerivationResult: Row
-    },
-    publcDeriverResult: PublicDeriverRow
-  }>
+  publicDeriver: Array<PromisslessReturnType<typeof DerivePublicFromPrivate.add>>
 };
