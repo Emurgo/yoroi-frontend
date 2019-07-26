@@ -13,8 +13,8 @@ import type {
 import { PrivateDeriverSchema } from '../database/genericBip44/tables';
 import type { ConceptualWalletRow } from '../database/uncategorized/tables';
 
-import { GetConceptualWallet } from '../database/uncategorized/api/get';
-import { GetPublicDeriver, GetBip44Wrapper } from '../database/genericBip44/api/get';
+// import { GetConceptualWallet } from '../database/uncategorized/api/get';
+// import { GetPublicDeriver, GetBip44Wrapper } from '../database/genericBip44/api/get';
 
 import { Bip44Wallet } from '../models/Bip44Wallet';
 import { PublicDeriver } from '../models/PublicDeriver';
@@ -32,24 +32,25 @@ export class LovefieldBridge implements IStorageBridge {
     this.db = db;
   }
 
-  // TODO: maybe flatten these?
-  getConceptualWalletData = (key: number): Promise<ConceptualWalletRow | void> => {
-    //return getConceptualWallet(this.db, key);
+  // TODO: need to decide the architecture for this part
+
+  getConceptualWalletData = (_key: number): Promise<ConceptualWalletRow | void> => {
+    // return getConceptualWallet(this.db, key);
     return Promise.resolve(undefined);
   }
-  getPublicDeriverData = (key: number): Promise<PublicDeriverRow | void> => {
-    //return getPublicDeriver(this.db, key);
+  getPublicDeriverData = (_key: number): Promise<PublicDeriverRow | void> => {
+    // return getPublicDeriver(this.db, key);
     return Promise.resolve(undefined);
   }
-  getBip44WrapperData = (key: number): Promise<Bip44WrapperRow | void> => {
-    //return getBip44Wrapper(this.db, key);
+  getBip44WrapperData = (_key: number): Promise<Bip44WrapperRow | void> => {
+    // return getBip44Wrapper(this.db, key);
     return Promise.resolve(undefined);
   }
 
-  addPublicDeriverFunctionality = (publicDeriver: PublicDeriver): Promise<void> => {
-    // TODO
+  addPublicDeriverFunctionality = (_publicDeriver: PublicDeriver): Promise<void> => {
     return Promise.resolve();
   }
+
   addBip44WalletFunctionality = async (bip44Wallet: Bip44Wallet): Promise<void> => {
     const Bip44PrivateDeriverTable = this.db.getSchema().table(PrivateDeriverSchema.name);
     const getFunctionalityTx = this.db.createTransaction();

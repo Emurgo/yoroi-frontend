@@ -12,9 +12,6 @@ import {
 import {
   DerivationLevels,
 } from './genericBip44/api/utils';
-import {
-  DeriveTree,
-} from './genericBip44/api/add';
 import type {
   Bip44AddressRow,
 } from './genericBip44/tables';
@@ -30,7 +27,8 @@ import { WalletBuilder } from '../bridge/walletBuilder';
 import { getAllSchemaTables } from './utils';
 
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
-const _password = 'greatest_password_ever';
+// TODO
+// const _password = 'greatest_password_ever';
 const coinTypeIndex = 0x80000000 + 1815;
 const purposeIndex = 0x80000000 + 44;
 
@@ -134,6 +132,7 @@ test('Can add and fetch address in wallet', async () => {
         })
       )
       .deriveFromPublic(
+        // TODO: should handle key derivation for you
         finalState => ({
           tree: {
             derivationId: finalState.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
@@ -165,10 +164,6 @@ test('Can add and fetch address in wallet', async () => {
   // test wallet functionality detection and usage
   {
     const accountIndex = 1 + HARD_DERIVATION_START;
-    // TODO: should be used
-    const bip44AccountPk = rootPk.bip44_account(
-      RustModule.Wallet.AccountIndex.new(accountIndex)
-    );
     const bridge = new LovefieldBridge(db);
     const bipWallet = new Bip44Wallet(
       state.conceptualWalletRow.ConceptualWalletId,
@@ -179,7 +174,7 @@ test('Can add and fetch address in wallet', async () => {
     if (!(bipWallet instanceof LovefieldDerive)) {
       throw new Error('should never happen due to assertion above');
     }
-    const pubDeriver = await bipWallet.derive(
+    await bipWallet.derive(
       {
         publicDeriverInsert: id => ({
           Bip44DerivationId: id,
