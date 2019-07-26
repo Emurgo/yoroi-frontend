@@ -213,7 +213,7 @@ export const mnemonicsToAddresses = (
   const masterKey = generateWalletMasterKey(mnemonic, '');
   const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, '');
   const account = cryptoWallet.bip44_account(
-    RustModule.Wallet.AccountIndex.new(accountIndex | HARD_DERIVATION_START)
+    RustModule.Wallet.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
   );
   const accountPublic = account.public();
   const accountPlate = createAccountPlate(accountPublic.key().to_hex());
