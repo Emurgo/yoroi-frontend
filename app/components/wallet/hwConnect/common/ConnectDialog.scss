@@ -16,14 +16,6 @@
       max-height: 100%;
     }
   }
-
-  & + .Dialog_title {
-    margin-bottom: 12px !important;
-  }
-
-  & + .Dialog_actions {
-    margin-top: 24px !important;
-  }
 }
 
 :global(.YoroiClassic) {
@@ -34,12 +26,4 @@
       text-align: center;
     }
   }
-}
-
-:global .CheckDialog .Dialog_title {
-  margin-bottom: 12px !important;
-}
-
-:global .CheckDialog .Dialog_actions {
-  margin-top: 24px !important;
 }
