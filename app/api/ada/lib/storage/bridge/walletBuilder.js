@@ -211,7 +211,7 @@ export class WalletBuilder<CurrentState> {
             this.db,
             this.tx,
             finalData.bip44WrapperRow.Bip44WrapperId,
-            request.body,
+            request(finalData),
           )
         ];
       },

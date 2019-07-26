@@ -56,6 +56,7 @@ test('Can add and fetch address in wallet', async () => {
 
   const db = await loadLovefieldDB(true);
 
+  const firstAccountIndex = 0 + HARD_DERIVATION_START;
   let state;
   {
     state = await WalletBuilder
@@ -101,6 +102,38 @@ test('Can add and fetch address in wallet', async () => {
           }),
         })
       )
+      .derivePublicDeriver(
+        _finalState => ({
+          decryptPrivateDeriverPassword: null, // TODO
+          publicDeriverPublicKey: {
+            password: null,
+            lastUpdate: new Date(),
+          },
+          publicDeriverPrivateKey: {
+            password: null, // TODO
+            lastUpdate: new Date(),
+          },
+          publicDeriverInsert: id => ({
+            Bip44DerivationId: id,
+            Name: 'First account',
+            LastBlockSync: 0,
+          }),
+          pathToPublic: [
+            {
+              index: purposeIndex,
+              insert: {},
+            },
+            {
+              index: coinTypeIndex,
+              insert: {},
+            },
+            {
+              index: firstAccountIndex,
+              insert: {},
+            },
+          ],
+        })
+      )
       .commit();
   }
 
@@ -108,7 +141,7 @@ test('Can add and fetch address in wallet', async () => {
   const KeyTable = db.getSchema().table(KeySchema.name);
   const Bip44DerivationTable = db.getSchema().table(Bip44DerivationSchema.name);
 
-  const accountIndex = 0 | HARD_DERIVATION_START;
+  const accountIndex = 1 + HARD_DERIVATION_START;
   const bip44AccountPk = rootPk.bip44_account(
     RustModule.Wallet.AccountIndex.new(accountIndex)
   );
