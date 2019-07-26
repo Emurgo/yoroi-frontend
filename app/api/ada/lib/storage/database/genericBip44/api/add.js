@@ -41,7 +41,7 @@ export type TreeStart = {|
 type InsertTree= Array<{|
   index: number,
   insert: {},
-  children: InsertTree,
+  children?: InsertTree,
 |}>;
 
 export type AddDerivationRequest<Insert> = {|
@@ -250,14 +250,16 @@ export class DeriveTree {
         },
         level + 1,
       );
-      await DeriveTree.derive(
-        db, tx,
-        {
-          derivationId: result.Bip44Derivation.Bip44DerivationId,
-          children: tree.children[i].children,
-        },
-        level + 1,
-      );
+      if (tree.children[i].children != null) {
+        await DeriveTree.derive(
+          db, tx,
+          {
+            derivationId: result.Bip44Derivation.Bip44DerivationId,
+            children: tree.children[i].children,
+          },
+          level + 1,
+        );
+      }
     }
     return {};
   }

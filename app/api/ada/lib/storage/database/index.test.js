@@ -132,7 +132,6 @@ test('Can add and fetch address in wallet', async () => {
         })
       )
       .deriveFromPublic(
-        // TODO: should handle key derivation for you
         finalState => ({
           tree: {
             derivationId: finalState.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
@@ -144,7 +143,6 @@ test('Can add and fetch address in wallet', async () => {
                   {
                     index: 0,
                     insert: { Hash: firstAddressHash },
-                    children: [],
                   }
                 ],
               },
