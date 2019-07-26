@@ -7,6 +7,8 @@ import {
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
+export type CommonLevelSpecific = { Bip44DerivationId: number };
+
 export type Bip44DerivationInsert = {|
   PublicKeyId: number | null,
   PrivateKeyId: number | null,
@@ -120,7 +122,7 @@ export const PublicDeriverSchema: {
 };
 
 export type Bip44RootInsert = {|
-  Bip44DerivationId: number,
+  ...$Exact<CommonLevelSpecific>,
 |};
 export type Bip44RootRow = {|
   Bip44RootId: number,
@@ -137,7 +139,7 @@ export const Bip44RootSchema: {
   }
 };
 export type Bip44PurposeInsert = {|
-  Bip44DerivationId: number,
+  ...$Exact<CommonLevelSpecific>,
 |};
 export type Bip44PurposeRow = {|
   Bip44PurposeId: number,
@@ -154,7 +156,7 @@ export const Bip44PurposeSchema: {
   }
 };
 export type Bip44CoinTypeInsert = {|
-  Bip44DerivationId: number,
+  ...$Exact<CommonLevelSpecific>,
 |};
 export type Bip44CoinTypeRow = {|
   Bip44CoinTypeId: number,
@@ -171,7 +173,7 @@ export const Bip44CoinTypeSchema: {
   }
 };
 export type Bip44AccountInsert = {|
-  Bip44DerivationId: number,
+  ...$Exact<CommonLevelSpecific>,
 |};
 export type Bip44AccountRow = {|
   Bip44AccountId: number,
@@ -188,7 +190,7 @@ export const Bip44AccountSchema: {
   }
 };
 export type Bip44ChainInsert = {|
-  Bip44DerivationId: number,
+  ...$Exact<CommonLevelSpecific>,
   LastReceiveIndex: number | null,
 |};
 export type Bip44ChainRow = {|
@@ -207,7 +209,7 @@ export const Bip44ChainSchema: {
   }
 };
 export type Bip44AddressInsert = {|
-  Bip44DerivationId: number,
+  ...$Exact<CommonLevelSpecific>,
   Hash: string,
 |};
 export type Bip44AddressRow = {|

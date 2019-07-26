@@ -3,6 +3,7 @@
 import type {
   lf$Database,
   lf$Transaction,
+  lf$Predicate,
 } from 'lovefield';
 
 import type {
@@ -50,6 +51,54 @@ export class GetDerivation {
   }
 }
 
+export class GetChildIfExists {
+  static ownTables = Object.freeze({
+    [Tables.Bip44DerivationMappingSchema.name]: (
+      Tables.Bip44DerivationMappingSchema
+    ),
+    [Tables.Bip44DerivationSchema.name]: Tables.Bip44DerivationSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+    parentId: number,
+    childIndex: number,
+  ): Promise<void | {
+      Bip44DerivationMapping: Bip44DerivationMappingRow,
+      Bip44Derivation: Bip44DerivationRow,
+    }> {
+    const mappingSchema = GetChildIfExists.ownTables[Tables.Bip44DerivationMappingSchema.name];
+    const derivationSchema = GetChildIfExists.ownTables[Tables.Bip44DerivationSchema.name];
+
+    const mappingTable = db.getSchema().table(mappingSchema.name);
+    const derivationTable = db.getSchema().table(derivationSchema.name);
+    const conditions: Array<lf$Predicate> = [
+      mappingTable[mappingSchema.properties.Parent].eq(parentId),
+      derivationTable[derivationSchema.properties.Index].eq(childIndex),
+    ];
+
+    const query = db
+      .select()
+      .from(mappingTable)
+      .innerJoin(
+        derivationTable,
+        derivationTable[derivationSchema.properties.Bip44DerivationId]
+          .eq(mappingTable[mappingSchema.properties.Child]),
+      )
+      .where(...conditions);
+
+    const queryResult: Array<{
+      Bip44DerivationMapping: Bip44DerivationMappingRow,
+      Bip44Derivation: Bip44DerivationRow,
+    }> = await tx.attach(query);
+
+    return queryResult.length === 1
+      ? queryResult[0]
+      : undefined;
+  }
+}
 
 /**
  * A specific number means you only care about the specific index

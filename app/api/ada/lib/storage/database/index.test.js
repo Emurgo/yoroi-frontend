@@ -110,77 +110,9 @@ test('Can add and fetch address in wallet', async () => {
       .commit();
   }
 
-  const ConceptualWalletTable = db.getSchema().table(ConceptualWalletSchema.name);
   const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
   const KeyTable = db.getSchema().table(KeySchema.name);
-  const Bip44WrapperTable = db.getSchema().table(Bip44WrapperSchema.name);
-  const PrivateDeriverTable = db.getSchema().table(PrivateDeriverSchema.name);
   const Bip44DerivationTable = db.getSchema().table(Bip44DerivationSchema.name);
-  const Bip44RootTable = db.getSchema().table(Bip44RootSchema.name);
-  const Bip44PurposeTable = db.getSchema().table(Bip44PurposeSchema.name);
-  const Bip44CoinTypeTable = db.getSchema().table(Bip44CoinTypeSchema.name);
-
-  const tx1 = db.createTransaction();
-  await tx1.begin([
-    ConceptualWalletTable,
-    KeyTable,
-    Bip44DerivationMappingTable,
-    Bip44WrapperTable,
-    PrivateDeriverTable,
-    Bip44DerivationTable,
-    Bip44RootTable,
-    Bip44PurposeTable,
-    Bip44CoinTypeTable,
-  ]);
-
-  // Add purpose
-  const purposeKey = rootPk.key().derive(
-    RustModule.Wallet.DerivationScheme.v2(),
-    purposeIndex,
-  );
-  const addPurposeResult = await AddDerivationWithParent.add<Bip44PurposeInsert, Bip44PurposeRow>(
-    db, tx1,
-    {
-      privateKeyInfo: null,
-      publicKeyInfo: null,
-      derivationInfo: keys => ({
-        PublicKeyId: keys.public,
-        PrivateKeyId: keys.private,
-        Index: purposeIndex,
-      }),
-      parentDerivationId: state.privateDeriver.privateDeriverResult.Bip44DerivationId,
-      levelInfo: id => ({
-        Bip44DerivationId: id,
-      })
-    },
-    DerivationLevels.PURPOSE.level,
-  );
-
-  // Add coin type
-  const _coinTypeKey = purposeKey.derive(
-    RustModule.Wallet.DerivationScheme.v2(),
-    coinTypeIndex,
-  );
-  const _addCoinTypeResult =
-    await AddDerivationWithParent.add<Bip44CoinTypeInsert, Bip44CoinTypeRow>(
-      db, tx1,
-      {
-        privateKeyInfo: null,
-        publicKeyInfo: null,
-        derivationInfo: keys => ({
-          PublicKeyId: keys.public,
-          PrivateKeyId: keys.private,
-          Index: coinTypeIndex,
-        }),
-        parentDerivationId: addPurposeResult.derivationTableResult.Bip44DerivationId,
-        levelInfo: id => ({
-          Bip44DerivationId: id,
-        })
-      },
-      DerivationLevels.COIN_TYPE.level,
-    );
-
-  await tx1.commit();
 
   const accountIndex = 0 | HARD_DERIVATION_START;
   const bip44AccountPk = rootPk.bip44_account(
@@ -204,7 +136,18 @@ test('Can add and fetch address in wallet', async () => {
         LastBlockSync: 0,
       }),
       pathToPublic: [
-        purposeIndex, coinTypeIndex, accountIndex
+        {
+          index: purposeIndex,
+          insert: {},
+        },
+        {
+          index: coinTypeIndex,
+          insert: {},
+        },
+        {
+          index: accountIndex,
+          insert: {},
+        },
       ],
       decryptPrivateDeriverPassword: null,
       publicDeriverPublicKey: {
@@ -276,7 +219,7 @@ test('Can add and fetch address in wallet', async () => {
   const _address = await AddDerivationWithParent.add<Bip44AddressInsert, Bip44AddressRow>(
     db, tx2,
     {
-      parentDerivationId: externalChain.derivationTableResult.Bip44DerivationId,
+      parentDerivationId: externalChain.Bip44Derivation.Bip44DerivationId,
       privateKeyInfo: null,
       publicKeyInfo: null,
       derivationInfo: keys => ({

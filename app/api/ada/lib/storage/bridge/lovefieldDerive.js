@@ -27,17 +27,16 @@ import type {
 } from './utils';
 
 export type LovefieldDeriveRequest = {|
-  ...DerivePublicFromPrivateRequest,
+  ...DerivePublicFromPrivateRequest<{}>,
   decryptPrivateDeriverPassword: ?string,
   publicDeriverPublicKey?: KeyInfo,
   publicDeriverPrivateKey?: KeyInfo,
 |};
-export async function derivePublicDeriver<Insert>(
+export async function derivePublicDeriver(
   db: lf$Database,
   tx: lf$Transaction,
   bip44WrapperId: number,
   body: LovefieldDeriveRequest,
-  levelSpecificInsert: Insert,
 ): ReturnType<typeof AddPublicDeriver.fromParent> {
   const result = await DerivePublicFromPrivate.add(
     db,
@@ -47,7 +46,6 @@ export async function derivePublicDeriver<Insert>(
       publicDeriverInsert: body.publicDeriverInsert,
       pathToPublic: body.pathToPublic,
     },
-    levelSpecificInsert,
     (
       privateKeyRow: KeyRow,
     ) => {
@@ -57,7 +55,7 @@ export async function derivePublicDeriver<Insert>(
       );
       const newKey = deriveKey(
         rootPrivateKey,
-        body.pathToPublic,
+        body.pathToPublic.map(step => step.index),
       );
 
       const newPrivateKey = body.publicDeriverPrivateKey
@@ -89,7 +87,6 @@ function _derive(
 ) {
   return async (
     body: LovefieldDeriveRequest,
-    levelSpecificInsert: {},
   ) => {
     const tx = db.createTransaction();
     await tx.begin(
@@ -100,7 +97,6 @@ function _derive(
       tx,
       bip44WrapperId,
       body,
-      levelSpecificInsert,
     );
     await tx.commit();
     return result;

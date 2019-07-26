@@ -196,16 +196,10 @@ export class WalletBuilder<CurrentState> {
   derivePublicDeriver: StateConstraint<
     CurrentState,
     HasBip44Wrapper & HasPrivateDeriver,
-    CurrentState => {
-      body: LovefieldDeriveRequest,
-      levelSpecificInsert: mixed,
-    },
+    CurrentState => LovefieldDeriveRequest,
     CurrentState & HasPublicDeriver<mixed>
-  > = <Insert>(
-    request: CurrentState => {
-      body: LovefieldDeriveRequest,
-      levelSpecificInsert: Insert,
-    }
+  > = (
+    request: CurrentState => LovefieldDeriveRequest,
   ) => {
     return this.updateData<HasBip44Wrapper & HasPrivateDeriver, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
@@ -218,7 +212,6 @@ export class WalletBuilder<CurrentState> {
             this.tx,
             finalData.bip44WrapperRow.Bip44WrapperId,
             request.body,
-            request.levelSpecificInsert,
           )
         ];
       },
@@ -260,8 +253,8 @@ type HasPublicDeriver<Row> = {
   publicDeriver: Array<{
     publcDeriverResult: PublicDeriverRow,
     levelResult: {
-      derivationTableResult: Bip44DerivationRow,
-      mappingTableResult: Bip44DerivationMappingRow,
+      Bip44Derivation: Bip44DerivationRow,
+      Bip44DerivationMapping: Bip44DerivationMappingRow,
       specificDerivationResult: Row
     }
   }>,
