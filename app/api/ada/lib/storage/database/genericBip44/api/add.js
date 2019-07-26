@@ -68,13 +68,13 @@ export class AddDerivation {
 
     const privateKey = request.privateKeyInfo === null
       ? null
-      : await AddKey.add(
+      : await AddDerivation.depTables.AddKey.add(
         db, tx,
         request.privateKeyInfo,
       );
     const publicKey = request.publicKeyInfo === null
       ? null
-      : await AddKey.add(
+      : await AddDerivation.depTables.AddKey.add(
         db, tx,
         request.publicKeyInfo,
       );
@@ -131,7 +131,7 @@ export class AddDerivationWithParent {
     if (level === DerivationLevels.ROOT.level) {
       throw new Error('AddDerivationWithParent::add Root has no parent');
     }
-    const derivationResult = await AddDerivation.add<Insert, Row>(
+    const derivationResult = await AddDerivationWithParent.depTables.AddDerivation.add<Insert, Row>(
       db, tx,
       {
         privateKeyInfo: request.privateKeyInfo,
@@ -181,13 +181,13 @@ export class GetOrAdd {
     Bip44DerivationMapping: Bip44DerivationMappingRow,
     specificDerivationResult: Row,
   }> {
-    const childResult = await GetChildIfExists.get(
+    const childResult = await GetOrAdd.depTables.GetChildIfExists.get(
       db, tx,
       request.parentDerivationId,
       childIndex,
     );
     if (childResult !== undefined) {
-      const specificDerivationResult = (await GetDerivation.get<Row>(
+      const specificDerivationResult = (await GetOrAdd.depTables.GetDerivation.get<Row>(
         db, tx,
         [childResult.Bip44Derivation.Bip44DerivationId],
         level,
@@ -197,7 +197,7 @@ export class GetOrAdd {
         specificDerivationResult
       };
     }
-    const addResult = await AddDerivationWithParent.add<Insert, Row>(
+    const addResult = await GetOrAdd.depTables.AddDerivationWithParent.add<Insert, Row>(
       db, tx,
       request,
       level,
@@ -249,7 +249,7 @@ export class AddPrivateDeriver {
       specificDerivationResult: Row
     },
   }> {
-    const levelResult = await AddDerivation.add(
+    const levelResult = await AddPrivateDeriver.depTables.AddDerivation.add(
       db, tx,
       request.addLevelRequest,
       request.level,
@@ -299,7 +299,7 @@ export class AddPublicDeriver {
       specificDerivationResult: Row
     },
   }> {
-    const levelResult = await AddDerivation.add<Insert, Row>(
+    const levelResult = await AddPublicDeriver.depTables.AddDerivation.add<Insert, Row>(
       db, tx,
       request.addLevelRequest,
       request.level,
@@ -327,7 +327,7 @@ export class AddPublicDeriver {
       specificDerivationResult: Row
     },
   }> {
-    const levelResult = await AddDerivationWithParent.add<Insert, Row>(
+    const levelResult = await AddPublicDeriver.depTables.AddDerivationWithParent.add<Insert, Row>(
       db, tx,
       request.addLevelRequest,
       request.level,
@@ -389,7 +389,7 @@ export class DerivePublicFromPrivate {
     let privateDeriverRow: PrivateDeriverRow;
     {
       // Get Private Deriver
-      const result = await GetPrivateDeriver.fromBip44Wrapper(
+      const result = await DerivePublicFromPrivate.depTables.GetPrivateDeriver.fromBip44Wrapper(
         db, tx,
         bip44WrapperId,
       );
@@ -402,7 +402,7 @@ export class DerivePublicFromPrivate {
     let privateKeyId: number;
     {
       // Private Deriver => Bip44Derivation
-      const result = await GetBip44Derivation.get(
+      const result = await DerivePublicFromPrivate.depTables.GetBip44Derivation.get(
         db, tx,
         privateDeriverRow.Bip44DerivationId,
       );
@@ -418,7 +418,7 @@ export class DerivePublicFromPrivate {
     let privateKeyRow: KeyRow;
     {
       // Bip44Derivation => Private key
-      const result = await GetKey.get(
+      const result = await DerivePublicFromPrivate.depTables.GetKey.get(
         db, tx,
         privateKeyId,
       );
@@ -440,7 +440,7 @@ export class DerivePublicFromPrivate {
       }
       let parentId = privateDeriverRow.Bip44DerivationId;
       for (let i = 0; i < body.pathToPublic.length - 1; i++) {
-        const nextLevel = await GetOrAdd.getOrAdd(
+        const nextLevel = await DerivePublicFromPrivate.depTables.GetOrAdd.getOrAdd(
           db, tx,
           body.pathToPublic[i].index,
           {
@@ -462,7 +462,7 @@ export class DerivePublicFromPrivate {
         );
         parentId = nextLevel.Bip44Derivation.Bip44DerivationId;
       }
-      pubDeriver = await AddPublicDeriver.fromParent(
+      pubDeriver = await DerivePublicFromPrivate.depTables.AddPublicDeriver.fromParent(
         db, tx,
         {
           addLevelRequest: {

@@ -108,7 +108,7 @@ export class GetAllBip44Wallets {
     ConceptualWallet: ConceptualWalletRow,
     Bip44Wrapper: Bip44WrapperRow,
   }>> {
-    return GetWalletByType.get<{Bip44Wrapper: Bip44WrapperRow}>(
+    return GetAllBip44Wallets.depTables.GetWalletByType.get<{Bip44Wrapper: Bip44WrapperRow}>(
       db, tx,
       WalletType.Bip44,
     );
