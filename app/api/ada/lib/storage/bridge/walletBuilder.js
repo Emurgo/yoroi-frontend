@@ -251,7 +251,7 @@ type HasPrivateDeriver = {
 type HasPublicDeriver<Row> = {
   // we have to re-specify the whole type since you can't use typeof on generic return types
   publicDeriver: Array<{
-    publcDeriverResult: PublicDeriverRow,
+    publicDeriverResult: PublicDeriverRow,
     levelResult: {
       Bip44Derivation: Bip44DerivationRow,
       Bip44DerivationMapping: Bip44DerivationMappingRow,

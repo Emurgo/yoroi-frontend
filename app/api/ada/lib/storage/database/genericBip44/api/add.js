@@ -33,6 +33,17 @@ import {
 } from './utils';
 import { addToTable, StaleStateError, } from '../../utils';
 
+type TreeStart = {|
+  derivationId: number,
+  children: InsertTree,
+|};
+
+type InsertTree= Array<{|
+  index: number,
+  insert: {},
+  children: InsertTree,
+|}>;
+
 export type AddDerivationRequest<Insert> = {|
   privateKeyInfo: KeyInsert | null,
   publicKeyInfo: KeyInsert | null,
@@ -175,7 +186,7 @@ export class GetOrAdd {
     tx: lf$Transaction,
     childIndex: number,
     request: DeriveFromRequest<Insert>,
-    level: number,
+    childLevel: number,
   ): Promise<{
     Bip44Derivation: Bip44DerivationRow,
     Bip44DerivationMapping: Bip44DerivationMappingRow,
@@ -190,7 +201,7 @@ export class GetOrAdd {
       const specificDerivationResult = (await GetOrAdd.depTables.GetDerivation.get<Row>(
         db, tx,
         [childResult.Bip44Derivation.Bip44DerivationId],
-        level,
+        childLevel,
       ))[0];
       return {
         ...childResult,
@@ -200,9 +211,55 @@ export class GetOrAdd {
     const addResult = await GetOrAdd.depTables.AddDerivationWithParent.add<Insert, Row>(
       db, tx,
       request,
-      level,
+      childLevel,
     );
     return addResult;
+  }
+}
+
+export class DeriveTree {
+  static ownTables = Object.freeze({});
+  static depTables = Object.freeze({
+    GetOrAdd,
+  });
+
+  static async derive(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: TreeStart,
+    level: number,
+  ): Promise<{}> {
+    const parentId = request.derivationId;
+    for (let i = 0; i < request.children.length; i++) {
+      const result = await DeriveTree.depTables.GetOrAdd.getOrAdd(
+        db, tx,
+        request.children[i].index,
+        {
+          parentDerivationId: parentId,
+          privateKeyInfo: null,
+          publicKeyInfo: null,
+          derivationInfo: keyInfo => ({
+            PublicKeyId: keyInfo.private,
+            PrivateKeyId: keyInfo.public,
+            Index: request.children[i].index,
+          }),
+          levelInfo: id => ({
+            Bip44DerivationId: id,
+            ...request.children[i].insert,
+          }),
+        },
+        level + 1,
+      );
+      await DeriveTree.derive(
+        db, tx,
+        {
+          derivationId: result.Bip44Derivation.Bip44DerivationId,
+          children: request.children[i].children,
+        },
+        level + 1,
+      );
+    }
+    return {};
   }
 }
 
@@ -293,7 +350,7 @@ export class AddPublicDeriver {
     tx: lf$Transaction,
     request: AdhocPublicDeriverRequest<Insert>,
   ): Promise<{
-    publcDeriverResult: PublicDeriverRow,
+    publicDeriverResult: PublicDeriverRow,
     levelResult: {
       Bip44Derivation: Bip44DerivationRow,
       specificDerivationResult: Row
@@ -304,13 +361,13 @@ export class AddPublicDeriver {
       request.addLevelRequest,
       request.level,
     );
-    const publcDeriverResult = await addToTable<PublicDeriverInsert, PublicDeriverRow>(
+    const publicDeriverResult = await addToTable<PublicDeriverInsert, PublicDeriverRow>(
       db, tx,
       request.addPublicDeriverRequest(levelResult.Bip44Derivation.Bip44DerivationId),
       AddPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name].name,
     );
     return {
-      publcDeriverResult,
+      publicDeriverResult,
       levelResult,
     };
   }
@@ -320,7 +377,7 @@ export class AddPublicDeriver {
     tx: lf$Transaction,
     request: DerivedPublicDeriverRequest<Insert>,
   ): Promise<{
-    publcDeriverResult: PublicDeriverRow,
+    publicDeriverResult: PublicDeriverRow,
     levelResult: {
       Bip44Derivation: Bip44DerivationRow,
       Bip44DerivationMapping: Bip44DerivationMappingRow,
@@ -332,13 +389,13 @@ export class AddPublicDeriver {
       request.addLevelRequest,
       request.level,
     );
-    const publcDeriverResult = await addToTable<PublicDeriverInsert, PublicDeriverRow>(
+    const publicDeriverResult = await addToTable<PublicDeriverInsert, PublicDeriverRow>(
       db, tx,
       request.addPublicDeriverRequest(levelResult.Bip44Derivation.Bip44DerivationId),
       AddPublicDeriver.ownTables[Bip44Tables.PublicDeriverSchema.name].name,
     );
     return {
-      publcDeriverResult,
+      publicDeriverResult,
       levelResult,
     };
   }
@@ -379,7 +436,7 @@ export class DerivePublicFromPrivate {
       newPublicKey: KeyInsert | null,
     }
   ): Promise<{
-    publcDeriverResult: PublicDeriverRow,
+    publicDeriverResult: PublicDeriverRow,
     levelResult: {
       Bip44Derivation: Bip44DerivationRow,
       Bip44DerivationMapping: Bip44DerivationMappingRow,

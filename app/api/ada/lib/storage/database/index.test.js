@@ -13,18 +13,10 @@ import {
   DerivationLevels,
 } from './genericBip44/api/utils';
 import {
-  AddDerivationWithParent,
+  DeriveTree,
 } from './genericBip44/api/add';
-import {
-  Bip44DerivationSchema,
-  Bip44AccountSchema,
-  Bip44ChainSchema,
-  Bip44AddressSchema,
-  Bip44DerivationMappingSchema,
-} from './genericBip44/tables';
 import type {
-  Bip44ChainInsert, Bip44ChainRow,
-  Bip44AddressInsert, Bip44AddressRow,
+  Bip44AddressRow,
 } from './genericBip44/tables';
 import { HARD_DERIVATION_START } from '../../../../../config/numbersConfig';
 
@@ -34,7 +26,6 @@ import { Bip44Wallet } from '../models/Bip44Wallet';
 import { LovefieldBridge } from '../bridge/lovefieldBridge';
 import { LovefieldDerive } from '../bridge/lovefieldDerive';
 import { WalletBuilder } from '../bridge/walletBuilder';
-import { KeySchema } from './uncategorized/tables';
 
 import { getAllSchemaTables } from './utils';
 
@@ -57,6 +48,10 @@ test('Can add and fetch address in wallet', async () => {
   const db = await loadLovefieldDB(true);
 
   const firstAccountIndex = 0 + HARD_DERIVATION_START;
+  const firstAccountPk = rootPk.bip44_account(
+    RustModule.Wallet.AccountIndex.new(firstAccountIndex)
+  );
+
   let state;
   {
     state = await WalletBuilder
@@ -137,183 +132,151 @@ test('Can add and fetch address in wallet', async () => {
       .commit();
   }
 
-  const Bip44DerivationMappingTable = db.getSchema().table(Bip44DerivationMappingSchema.name);
-  const KeyTable = db.getSchema().table(KeySchema.name);
-  const Bip44DerivationTable = db.getSchema().table(Bip44DerivationSchema.name);
-
-  const accountIndex = 1 + HARD_DERIVATION_START;
-  const bip44AccountPk = rootPk.bip44_account(
-    RustModule.Wallet.AccountIndex.new(accountIndex)
-  );
-  const bridge = new LovefieldBridge(db);
-  const bipWallet = new Bip44Wallet(
-    state.conceptualWalletRow.ConceptualWalletId,
-    state.bip44WrapperRow.Bip44WrapperId,
-  );
-  await bridge.addBip44WalletFunctionality(bipWallet);
-  expect(bipWallet instanceof LovefieldDerive).toEqual(true);
-  if (!(bipWallet instanceof LovefieldDerive)) {
-    throw new Error('should never happen due to assertion above');
+  // test wallet functionality detection and usage
+  {
+    const accountIndex = 1 + HARD_DERIVATION_START;
+    // TODO: should be used
+    const bip44AccountPk = rootPk.bip44_account(
+      RustModule.Wallet.AccountIndex.new(accountIndex)
+    );
+    const bridge = new LovefieldBridge(db);
+    const bipWallet = new Bip44Wallet(
+      state.conceptualWalletRow.ConceptualWalletId,
+      state.bip44WrapperRow.Bip44WrapperId,
+    );
+    await bridge.addBip44WalletFunctionality(bipWallet);
+    expect(bipWallet instanceof LovefieldDerive).toEqual(true);
+    if (!(bipWallet instanceof LovefieldDerive)) {
+      throw new Error('should never happen due to assertion above');
+    }
+    const pubDeriver = await bipWallet.derive(
+      {
+        publicDeriverInsert: id => ({
+          Bip44DerivationId: id,
+          Name: 'Checking account',
+          LastBlockSync: 0,
+        }),
+        pathToPublic: [
+          {
+            index: purposeIndex,
+            insert: {},
+          },
+          {
+            index: coinTypeIndex,
+            insert: {},
+          },
+          {
+            index: accountIndex,
+            insert: {},
+          },
+        ],
+        decryptPrivateDeriverPassword: null,
+        publicDeriverPublicKey: {
+          password: null, // TODO
+          lastUpdate: null,
+        },
+        publicDeriverPrivateKey: {
+          password: null, // TODO
+          lastUpdate: null,
+        },
+      },
+      {},
+    );
   }
-  const pubDeriver = await bipWallet.derive(
-    {
-      publicDeriverInsert: id => ({
-        Bip44DerivationId: id,
-        Name: 'Checking account',
-        LastBlockSync: 0,
-      }),
-      pathToPublic: [
-        {
-          index: purposeIndex,
-          insert: {},
-        },
-        {
-          index: coinTypeIndex,
-          insert: {},
-        },
-        {
-          index: accountIndex,
-          insert: {},
-        },
-      ],
-      decryptPrivateDeriverPassword: null,
-      publicDeriverPublicKey: {
-        password: null, // TODO
-        lastUpdate: null,
-      },
-      publicDeriverPrivateKey: {
-        password: null, // TODO
-        lastUpdate: null,
-      },
-    },
-    {},
-  );
 
-  const tx2 = db.createTransaction();
-  const Bip44AccountTable = db.getSchema().table(Bip44AccountSchema.name);
-  const Bip44ChainTable = db.getSchema().table(Bip44ChainSchema.name);
-  const Bip44AddressTable = db.getSchema().table(Bip44AddressSchema.name);
-  await tx2.begin([
-    KeyTable,
-    Bip44DerivationMappingTable,
-    Bip44DerivationTable,
-    Bip44AccountTable,
-    Bip44ChainTable,
-    Bip44AddressTable,
-  ]);
+  const newInsert = db.createTransaction();
+  await newInsert.begin(getAllSchemaTables(db, DeriveTree));
 
-  const externalChain = await AddDerivationWithParent.add<Bip44ChainInsert, Bip44ChainRow>(
-    db, tx2,
-    {
-      parentDerivationId: pubDeriver.publcDeriverResult.Bip44DerivationId,
-      privateKeyInfo: null,
-      publicKeyInfo: null,
-      derivationInfo: keys => ({
-        PublicKeyId: keys.public,
-        PrivateKeyId: keys.private,
-        Index: 0,
-      }),
-      levelInfo: id => ({
-        Bip44DerivationId: id,
-        LastReceiveIndex: 0,
-      }),
-    },
-    DerivationLevels.CHAIN.level,
-  );
-  const _internalChain = await AddDerivationWithParent.add<Bip44ChainInsert, Bip44ChainRow>(
-    db, tx2,
-    {
-      parentDerivationId: pubDeriver.publcDeriverResult.Bip44DerivationId,
-      privateKeyInfo: null,
-      publicKeyInfo: null,
-      derivationInfo: keys => ({
-        PublicKeyId: keys.public,
-        PrivateKeyId: keys.private,
-        Index: 1,
-      }),
-      levelInfo: id => ({
-        Bip44DerivationId: id,
-        LastReceiveIndex: null,
-      }),
-    },
-    DerivationLevels.CHAIN.level,
-  );
-
-  const addressPk = bip44AccountPk
+  const addressPk = firstAccountPk
     .bip44_chain(false)
     .address_key(RustModule.Wallet.AddressKeyIndex.new(0));
   const addressHash = addressPk.public().bootstrap_era_address(setting).to_base58();
-  const _address = await AddDerivationWithParent.add<Bip44AddressInsert, Bip44AddressRow>(
-    db, tx2,
+  await DeriveTree.derive(
+    db, newInsert,
     {
-      parentDerivationId: externalChain.Bip44Derivation.Bip44DerivationId,
-      privateKeyInfo: null,
-      publicKeyInfo: null,
-      derivationInfo: keys => ({
-        PublicKeyId: keys.public,
-        PrivateKeyId: keys.private,
-        Index: 0,
-      }),
-      levelInfo: id => ({
-        Bip44DerivationId: id,
-        Hash: addressHash,
-      }),
+      derivationId: state.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
+      children: [
+        {
+          index: 0, // external chain,
+          insert: { LastReceiveIndex: 0 },
+          children: [
+            {
+              index: 0,
+              insert: { Hash: addressHash },
+              children: [],
+            }
+          ],
+        },
+        {
+          index: 1, // internal chain,
+          insert: { LastReceiveIndex: null },
+          children: [],
+        }
+      ]
     },
-    DerivationLevels.ADDRESS.level,
+    state.bip44WrapperRow.PublicDeriverLevel,
   );
+  await newInsert.commit();
 
-  await tx2.commit();
+  // test that all derivations are presetn as expected
+  {
+    const tx3 = db.createTransaction();
+    await tx3.begin([
+      ...getAllSchemaTables(db, GetDerivationsByPath),
+      ...getAllSchemaTables(db, GetDerivation),
+    ]);
+    const addressesForAccount = await GetDerivationsByPath.get(
+      db,
+      tx3,
+      state.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
+      [purposeIndex, coinTypeIndex, firstAccountIndex],
+      [null, null]
+    );
+    const dbAddresses = await GetDerivation.get<Bip44AddressRow>(
+      db,
+      tx3,
+      Array.from(addressesForAccount.keys()),
+      DerivationLevels.ADDRESS.level,
+    );
+    const result = dbAddresses.map(row => (
+      { hash: row.Hash, addressing: addressesForAccount.get(row.Bip44DerivationId) }
+    ));
 
-  const tx3 = db.createTransaction();
-  await tx3.begin([
-    Bip44DerivationMappingTable, Bip44DerivationTable, Bip44AddressTable,
-  ]);
-  const addressesForAccount = await GetDerivationsByPath.get(
-    db,
-    tx3,
-    pubDeriver.publcDeriverResult.Bip44DerivationId,
-    [purposeIndex, coinTypeIndex, accountIndex],
-    [null, null]
-  );
-  const dbAddresses = await GetDerivation.get<Bip44AddressRow>(
-    db,
-    tx3,
-    Array.from(addressesForAccount.keys()),
-    DerivationLevels.ADDRESS.level,
-  );
-  const result = dbAddresses.map(row => (
-    { hash: row.Hash, addressing: addressesForAccount.get(row.Bip44DerivationId) }
-  ));
+    await tx3.commit();
 
-  await tx3.commit();
+    expect(result.length).toEqual(1);
+    expect(result[0].hash).toEqual(addressHash);
+    expect(result[0].addressing).toEqual([
+      purposeIndex, coinTypeIndex, firstAccountIndex, 0, 0
+    ]);
+  }
 
-  expect(result.length).toEqual(1);
-  expect(result[0].hash).toEqual(addressHash);
-  expect(result[0].addressing).toEqual([purposeIndex, coinTypeIndex, accountIndex, 0, 0]);
+  // test that top-level rows are present
+  {
+    const tx4 = db.createTransaction();
+    await tx4.begin(getAllSchemaTables(db, GetAllBip44Wallets));
 
-  const tx4 = db.createTransaction();
-  await tx4.begin(getAllSchemaTables(db, GetAllBip44Wallets));
+    const bip44Wallets = await GetAllBip44Wallets.get(
+      db,
+      tx4,
+    );
 
-  const bip44Wallets = await GetAllBip44Wallets.get(
-    db,
-    tx4,
-  );
-
-  expect(JSON.stringify(bip44Wallets)).toEqual(JSON.stringify([
-    {
-      ConceptualWallet: {
-        CoinType: 2147485463,
-        Name: 'My Test Wallet',
-        ConceptualWalletId: 1
-      },
-      Bip44Wrapper: {
-        ConceptualWalletId: 1,
-        IsBundled: false,
-        SignerLevel: 3,
-        PublicDeriverLevel: 3,
-        Version: 2,
-        Bip44WrapperId: 1
+    expect(JSON.stringify(bip44Wallets)).toEqual(JSON.stringify([
+      {
+        ConceptualWallet: {
+          CoinType: 2147485463,
+          Name: 'My Test Wallet',
+          ConceptualWalletId: 1
+        },
+        Bip44Wrapper: {
+          ConceptualWalletId: 1,
+          IsBundled: false,
+          SignerLevel: 3,
+          PublicDeriverLevel: 3,
+          Version: 2,
+          Bip44WrapperId: 1
+        }
       }
-    }
-  ]));
+    ]));
+  }
 });
