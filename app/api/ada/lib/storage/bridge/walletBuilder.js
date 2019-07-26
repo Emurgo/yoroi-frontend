@@ -21,9 +21,11 @@ import {
   AddBip44Wrapper,
   AddPrivateDeriver,
   DerivePublicFromPrivate,
+  DeriveTree,
 } from '../database/genericBip44/api/add';
 import type {
   PrivateDeriverRequest,
+  TreeStart,
 } from '../database/genericBip44/api/add';
 import {
   getAllTables,
@@ -214,6 +216,35 @@ export class WalletBuilder<CurrentState> {
             request(finalData),
           )
         ];
+      },
+    );
+  }
+
+  deriveFromPublic: StateConstraint<
+    CurrentState,
+    HasPublicDeriver<mixed>,
+    CurrentState => {
+      tree: TreeStart,
+      level: number,
+    },
+    CurrentState
+  > = (
+    request: CurrentState => {
+      tree: TreeStart,
+      level: number,
+    },
+  ) => {
+    return this.updateData<HasPublicDeriver<mixed>, {}>(
+      {},
+      Array.from(getAllTables(DeriveTree)),
+      async (finalData) => {
+        const { tree, level } = request(finalData);
+        await DeriveTree.derive(
+          this.db,
+          this.tx,
+          tree,
+          level,
+        );
       },
     );
   }

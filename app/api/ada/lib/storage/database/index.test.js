@@ -51,6 +51,10 @@ test('Can add and fetch address in wallet', async () => {
   const firstAccountPk = rootPk.bip44_account(
     RustModule.Wallet.AccountIndex.new(firstAccountIndex)
   );
+  const firstAddress = firstAccountPk
+    .bip44_chain(false)
+    .address_key(RustModule.Wallet.AddressKeyIndex.new(0));
+  const firstAddressHash = firstAddress.public().bootstrap_era_address(setting).to_base58();
 
   let state;
   {
@@ -129,6 +133,32 @@ test('Can add and fetch address in wallet', async () => {
           ],
         })
       )
+      .deriveFromPublic(
+        finalState => ({
+          tree: {
+            derivationId: finalState.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
+            children: [
+              {
+                index: 0, // external chain,
+                insert: { LastReceiveIndex: 0 },
+                children: [
+                  {
+                    index: 0,
+                    insert: { Hash: firstAddressHash },
+                    children: [],
+                  }
+                ],
+              },
+              {
+                index: 1, // internal chain,
+                insert: { LastReceiveIndex: null },
+                children: [],
+              }
+            ]
+          },
+          level: finalState.bip44WrapperRow.PublicDeriverLevel
+        })
+      )
       .commit();
   }
 
@@ -184,40 +214,6 @@ test('Can add and fetch address in wallet', async () => {
     );
   }
 
-  const newInsert = db.createTransaction();
-  await newInsert.begin(getAllSchemaTables(db, DeriveTree));
-
-  const addressPk = firstAccountPk
-    .bip44_chain(false)
-    .address_key(RustModule.Wallet.AddressKeyIndex.new(0));
-  const addressHash = addressPk.public().bootstrap_era_address(setting).to_base58();
-  await DeriveTree.derive(
-    db, newInsert,
-    {
-      derivationId: state.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
-      children: [
-        {
-          index: 0, // external chain,
-          insert: { LastReceiveIndex: 0 },
-          children: [
-            {
-              index: 0,
-              insert: { Hash: addressHash },
-              children: [],
-            }
-          ],
-        },
-        {
-          index: 1, // internal chain,
-          insert: { LastReceiveIndex: null },
-          children: [],
-        }
-      ]
-    },
-    state.bip44WrapperRow.PublicDeriverLevel,
-  );
-  await newInsert.commit();
-
   // test that all derivations are presetn as expected
   {
     const tx3 = db.createTransaction();
@@ -245,7 +241,7 @@ test('Can add and fetch address in wallet', async () => {
     await tx3.commit();
 
     expect(result.length).toEqual(1);
-    expect(result[0].hash).toEqual(addressHash);
+    expect(result[0].hash).toEqual(firstAddressHash);
     expect(result[0].addressing).toEqual([
       purposeIndex, coinTypeIndex, firstAccountIndex, 0, 0
     ]);

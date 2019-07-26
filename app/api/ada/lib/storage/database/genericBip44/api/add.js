@@ -33,7 +33,7 @@ import {
 } from './utils';
 import { addToTable, StaleStateError, } from '../../utils';
 
-type TreeStart = {|
+export type TreeStart = {|
   derivationId: number,
   children: InsertTree,
 |};
@@ -226,14 +226,14 @@ export class DeriveTree {
   static async derive(
     db: lf$Database,
     tx: lf$Transaction,
-    request: TreeStart,
+    tree: TreeStart,
     level: number,
   ): Promise<{}> {
-    const parentId = request.derivationId;
-    for (let i = 0; i < request.children.length; i++) {
+    const parentId = tree.derivationId;
+    for (let i = 0; i < tree.children.length; i++) {
       const result = await DeriveTree.depTables.GetOrAdd.getOrAdd(
         db, tx,
-        request.children[i].index,
+        tree.children[i].index,
         {
           parentDerivationId: parentId,
           privateKeyInfo: null,
@@ -241,11 +241,11 @@ export class DeriveTree {
           derivationInfo: keyInfo => ({
             PublicKeyId: keyInfo.private,
             PrivateKeyId: keyInfo.public,
-            Index: request.children[i].index,
+            Index: tree.children[i].index,
           }),
           levelInfo: id => ({
             Bip44DerivationId: id,
-            ...request.children[i].insert,
+            ...tree.children[i].insert,
           }),
         },
         level + 1,
@@ -254,7 +254,7 @@ export class DeriveTree {
         db, tx,
         {
           derivationId: result.Bip44Derivation.Bip44DerivationId,
-          children: request.children[i].children,
+          children: tree.children[i].children,
         },
         level + 1,
       );
