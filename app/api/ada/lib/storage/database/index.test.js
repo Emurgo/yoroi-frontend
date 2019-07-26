@@ -16,10 +16,6 @@ import {
   AddDerivationWithParent,
 } from './genericBip44/api/add';
 import {
-  Bip44WrapperSchema, PrivateDeriverSchema,
-  Bip44RootSchema,
-  Bip44PurposeSchema,
-  Bip44CoinTypeSchema,
   Bip44DerivationSchema,
   Bip44AccountSchema,
   Bip44ChainSchema,
@@ -27,8 +23,6 @@ import {
   Bip44DerivationMappingSchema,
 } from './genericBip44/tables';
 import type {
-  Bip44PurposeInsert, Bip44PurposeRow,
-  Bip44CoinTypeInsert, Bip44CoinTypeRow,
   Bip44ChainInsert, Bip44ChainRow,
   Bip44AddressInsert, Bip44AddressRow,
 } from './genericBip44/tables';
@@ -40,7 +34,7 @@ import { Bip44Wallet } from '../models/Bip44Wallet';
 import { LovefieldBridge } from '../bridge/lovefieldBridge';
 import { LovefieldDerive } from '../bridge/lovefieldDerive';
 import { WalletBuilder } from '../bridge/walletBuilder';
-import { ConceptualWalletSchema, KeySchema } from './uncategorized/tables';
+import { KeySchema } from './uncategorized/tables';
 
 import { getAllSchemaTables } from './utils';
 
