@@ -11,7 +11,6 @@ import LanguageSelectionForm from '../../components/profile/language-selection/L
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 
 const messages = defineMessages({
   title: {
@@ -67,17 +66,15 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         title={topBartitle}
         activeTopbarCategory={topbar.activeTopbarCategory}
       />) : undefined;
-    const displayedBanner = (connectionErrorType: ServerStatusErrorType) => {
-      connectionErrorType === 'healthy' ?
-        <TestnetWarningBanner /> :
-        <ServerErrorBanner errorType={connectionErrorType} />;
-    };
+    const displayedBanner = checkAdaServerStatus === 'healthy' ?
+      <TestnetWarningBanner /> :
+      <ServerErrorBanner errorType={checkAdaServerStatus} />;
     return (
       <TopBarLayout
         topbar={topBar}
         classicTheme={profile.isClassicTheme}
         languageSelectionBackground
-        banner={displayedBanner(checkAdaServerStatus)}
+        banner={displayedBanner}
       >
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
