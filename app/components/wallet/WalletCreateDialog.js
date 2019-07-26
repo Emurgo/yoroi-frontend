@@ -13,7 +13,6 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import config from '../../config';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import PasswordInstructions from '../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -224,8 +223,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
               error={repeatedPasswordField.error}
               skin={InputOwnSkin}
             />
-
-            <PasswordInstructions />
           </div>
         </div>
 
