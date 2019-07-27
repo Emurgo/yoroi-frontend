@@ -106,6 +106,7 @@ declare module 'lovefield' {
     declare(): Promise<Object>;
     getSchema(): lf$schema$Database;
     import(data: Object): Promise<void>;
+    export(): Promise<Object>;
     insertOrReplace(): lf$query$Insert;
     insert(): lf$query$Insert;
     observe(query: lf$query$Select, callback: Function): void;

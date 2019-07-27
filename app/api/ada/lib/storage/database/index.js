@@ -1,13 +1,15 @@
 // @flow
 
-import lf from 'lovefield';
+import {
+  schema
+} from 'lovefield';
 import type { lf$raw$BackStore, lf$Database } from 'lovefield';
 
 import { populateUncategorizedDb } from './uncategorized/tables';
 import { populateBip44Db } from './genericBip44/tables';
 
 export const loadLovefieldDB = async (inMemory: boolean): Promise<lf$Database> => {
-  const schemaBuilder = lf.schema.create('yoroi-schema', 2);
+  const schemaBuilder = schema.create('yoroi-schema', 2);
 
   populateUncategorizedDb(schemaBuilder);
   populateBip44Db(schemaBuilder);
@@ -15,8 +17,8 @@ export const loadLovefieldDB = async (inMemory: boolean): Promise<lf$Database> =
   return await schemaBuilder.connect({
     onUpgrade,
     storeType: inMemory
-      ? lf.schema.DataStoreType.MEMORY
-      : lf.schema.DataStoreType.INDEXED_DB
+      ? schema.DataStoreType.MEMORY
+      : schema.DataStoreType.INDEXED_DB
   });
 };
 

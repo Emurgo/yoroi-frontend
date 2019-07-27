@@ -1,20 +1,20 @@
 // @flow
 
 import '../../test-config';
-import { loadLovefieldDB } from './index';
+import { loadLovefieldDB } from '../database/index';
 import {
   GetAllBip44Wallets,
-} from './uncategorized/api/get';
+} from '../database/uncategorized/api/get';
 import {
   GetDerivationsByPath,
   GetDerivation,
-} from './genericBip44/api/get';
+} from '../database/genericBip44/api/get';
 import {
   DerivationLevels,
-} from './genericBip44/api/utils';
+} from '../database/genericBip44/api/utils';
 import type {
   Bip44AddressRow,
-} from './genericBip44/tables';
+} from '../database/genericBip44/tables';
 import { HARD_DERIVATION_START } from '../../../../../config/numbersConfig';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
@@ -24,7 +24,9 @@ import { LovefieldBridge } from '../bridge/lovefieldBridge';
 import { LovefieldDerive } from '../bridge/lovefieldDerive';
 import { WalletBuilder } from '../bridge/walletBuilder';
 
-import { getAllSchemaTables } from './utils';
+import { getAllSchemaTables } from '../database/utils';
+
+import { snapshot } from './snapshot';
 
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 // TODO
@@ -104,11 +106,11 @@ test('Can add and fetch address in wallet', async () => {
           decryptPrivateDeriverPassword: null, // TODO
           publicDeriverPublicKey: {
             password: null,
-            lastUpdate: new Date(),
+            lastUpdate: null, // purposely null to avoid  diff in test
           },
           publicDeriverPrivateKey: {
             password: null, // TODO
-            lastUpdate: new Date(),
+            lastUpdate: null, // purposely null to avoid  diff in test
           },
           publicDeriverInsert: id => ({
             Bip44DerivationId: id,
@@ -240,7 +242,7 @@ test('Can add and fetch address in wallet', async () => {
     ]);
   }
 
-  // test that top-level rows are present
+  // test GetAllBip44Wallets
   {
     const tx4 = db.createTransaction();
     await tx4.begin(getAllSchemaTables(db, GetAllBip44Wallets));
@@ -267,5 +269,8 @@ test('Can add and fetch address in wallet', async () => {
         }
       }
     ]));
+    await tx4.commit();
   }
+  // console.log(JSON.stringify(await db.export()));
+  expect(JSON.stringify(await db.export())).toEqual(JSON.stringify(snapshot));
 });
