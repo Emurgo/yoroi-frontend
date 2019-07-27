@@ -118,7 +118,7 @@
     "style-loader": "0.23.1",
     "svg-inline-loader": "0.8.0",
     "url-loader": "2.1.0",
-    "webpack": "4.36.1",
+    "webpack": "4.38.0",
     "webpack-cli": "3.3.6",
     "webpack-hot-middleware": "2.25.0",
     "webpack-httpolyglot-server": "0.3.0",
