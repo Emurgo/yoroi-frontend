@@ -166,7 +166,7 @@
     "react-svg-inline": "2.1.1",
     "ringbufferjs": "1.1.0",
     "route-parser": "0.0.5",
-    "semver": "6.2.0",
+    "semver": "6.3.0",
     "tinycolor2": "1.4.1",
     "trezor-connect": "7.0.5",
     "ua-parser-js": "0.7.20",
