@@ -406,8 +406,8 @@ export default {
   '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#ffffff',
 
   '--theme-widgets-progress-step-common-color': '#15d1aa',
-  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
-  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-underline-light-color': '#adaeB6',
+  '--theme-underline-dark-color': '#464749',
   '--theme-widgets-hash-dark-color': '#464749',
   '--theme-widgets-hash-light-color': '#adaeB6',
 

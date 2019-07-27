@@ -1,3 +1,4 @@
+@import '../../../themes/mixins/underline.scss';
 
 .component {
   :global(.SimpleBubble_bubble) {
@@ -31,13 +32,12 @@
 
 .darkColor {
   &:hover {
-    box-sizing: border-box;
-    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-dark-color);
+    @include underline(var(--theme-underline-dark-color));
   }
 }
+
 .lightColor {
   &:hover {
-    box-sizing: border-box;
-    border-bottom: 1px solid var(--theme-widgets-explorable-hash-underline-light-color);
+    @include underline(var(--theme-underline-light-color));
   }
 }
