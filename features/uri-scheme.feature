@@ -15,7 +15,7 @@ Feature: URI scheme
     When I click on the copy to clipboard icon
     Then I should see URI "copied" tooltip message:
     | message                                            |
-    | wallet.receive.page.addressCopyTooltipNotificationMessage |
+    | global.copyTooltipMessage |
 
   @it-108
   Scenario: Ensure user can send a tx from a URI link (IT-108)

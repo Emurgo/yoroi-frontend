@@ -14,7 +14,7 @@ import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 
 const messages = defineMessages({
   copyTooltipMessage: {
-    id: 'wallet.receive.page.addressCopyTooltipMessage',
+    id: 'widgets.copyableaddress.addressCopyTooltipMessage',
     defaultMessage: '!!!Copy to clipboard',
   },
 });

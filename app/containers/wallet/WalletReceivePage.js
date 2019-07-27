@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import { defineMessages } from 'react-intl';
 import { observer } from 'mobx-react';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
@@ -14,18 +13,7 @@ import {
   DECIMAL_PLACES_IN_ADA,
   MAX_INTEGER_PLACES_IN_ADA
 } from '../../config/numbersConfig';
-
-
-const messages = defineMessages({
-  message: {
-    id: 'wallet.receive.page.addressCopyNotificationMessage',
-    defaultMessage: '!!!You have successfully copied wallet address',
-  },
-  copyTooltipMessage: {
-    id: 'wallet.receive.page.addressCopyTooltipNotificationMessage',
-    defaultMessage: '!!!Coppied'
-  },
-});
+import globalMessages from '../../i18n/global-messages';
 
 type Props = InjectedProps;
 
@@ -89,12 +77,12 @@ export default class WalletReceivePage extends Component<Props, State> {
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
-      message: messages.copyTooltipMessage,
+      message: globalMessages.copyTooltipMessage,
     };
 
     const uriTooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
-      message: messages.copyTooltipMessage,
+      message: globalMessages.copyTooltipMessage,
     };
 
     return (
