@@ -85,7 +85,7 @@
     "chromedriver": "75.1.0",
     "config": "1.31.0",
     "config-webpack": "1.0.4",
-    "crx": "5.0.0",
+    "crx": "5.0.1",
     "css-loader": "3.1.0",
     "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
     "eslint": "5.16.0",
