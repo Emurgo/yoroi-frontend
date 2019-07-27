@@ -125,7 +125,7 @@
     "ws": "7.1.1"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "1.0.6",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "1.0.7",
     "@download/blockies": "1.0.3",
     "aes-js": "3.1.2",
     "axios": "0.19.0",
@@ -168,7 +168,7 @@
     "route-parser": "0.0.5",
     "semver": "6.2.0",
     "tinycolor2": "1.4.1",
-    "trezor-connect": "7.0.3",
+    "trezor-connect": "7.0.5",
     "ua-parser-js": "0.7.20",
     "unorm": "1.6.0",
     "validator": "11.1.0",

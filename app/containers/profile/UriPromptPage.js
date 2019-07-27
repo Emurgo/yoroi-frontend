@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
 import { intlShape } from 'react-intl';
 import environment from '../../environment';
-import { openSandboxedTab, handlersSettingUrl } from '../../utils/tabManager';
 
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
@@ -71,14 +70,12 @@ export default class UriPromptPage extends Component<InjectedProps> {
         return <UriAccept
           onConfirm={this.onFinalSubmit}
           onBack={this.onBack}
-          openSettingsPage={() => openSandboxedTab(handlersSettingUrl)}
           classicTheme={profile.isClassicTheme}
         />;
       case Choices.SKIP:
         return <UriSkip
           onConfirm={this.onFinalSubmit}
           onBack={this.onBack}
-          openSettingsPage={() => openSandboxedTab(handlersSettingUrl)}
           classicTheme={profile.isClassicTheme}
         />;
       default:

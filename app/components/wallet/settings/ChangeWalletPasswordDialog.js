@@ -14,7 +14,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import PasswordInstructions from '../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitleChangePassword: {
@@ -213,8 +212,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             error={repeatedPasswordField.error}
             skin={InputOwnSkin}
           />
-
-          <PasswordInstructions />
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

@@ -90,5 +90,5 @@ async function bip44Migration(): Promise<void> {
    * We need to do this since old wallets may have incorrect history
    * Due to desync issue caused by the incorrect bip44 implementation
    */
-  reset();
+  await reset();
 }
