@@ -7,7 +7,7 @@ import type {
 
 import { IDerive } from '../models/functionalities/IDerive';
 
-import { getAllSchemaTables, } from '../database/utils';
+import { getAllSchemaTables, raii, } from '../database/utils';
 import {
   AddPublicDeriver,
   DerivePublicFromPrivate,
@@ -87,18 +87,23 @@ function _derive(
 ) {
   return async (
     body: LovefieldDeriveRequest,
-  ) => {
-    const tx = db.createTransaction();
-    await tx.begin(
-      getAllSchemaTables(db, DerivePublicFromPrivate)
-    );
-    const result = await derivePublicDeriver(
+  ): ReturnType<typeof derivePublicDeriver> => {
+    const result = await raii<PromisslessReturnType<typeof derivePublicDeriver>>(
       db,
-      tx,
-      bip44WrapperId,
-      body,
+      getAllSchemaTables(db, DerivePublicFromPrivate),
+      async tx => {
+        return await derivePublicDeriver(
+          db,
+          tx,
+          bip44WrapperId,
+          body,
+        );
+      }
     );
-    await tx.commit();
+    if (result == null) {
+      throw new Error('Failed to derive for ' + bip44WrapperId);
+    }
+
     return result;
   };
 }

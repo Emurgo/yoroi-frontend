@@ -94,6 +94,26 @@ export type TableClassType = {
   +depTables: DepTableType,
 }
 
+/**
+ * Poor man's version of RAII in Javascript
+ * https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization
+ */
+export async function raii<T>(
+  db: lf$Database,
+  tables: Array<lf$schema$Table>,
+  scope: lf$Transaction => Promise<T>,
+): Promise<T | void> {
+  const tx = db.createTransaction();
+  await tx.begin(tables);
+  try {
+    const result = await scope(tx);
+    await tx.commit();
+    return result;
+  } catch (e) {
+    console.error(JSON.stringify(e));
+    await tx.rollback();
+  }
+}
 
 export function getAllSchemaTables(
   db: lf$Database,

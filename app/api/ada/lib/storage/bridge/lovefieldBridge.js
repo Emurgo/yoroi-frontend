@@ -19,7 +19,7 @@ import type { ConceptualWalletRow } from '../database/uncategorized/tables';
 import { Bip44Wallet } from '../models/Bip44Wallet';
 import { PublicDeriver } from '../models/PublicDeriver';
 
-import { getRowFromKey } from '../database/utils';
+import { getRowFromKey, raii } from '../database/utils';
 
 import { appendChain } from './appendChain';
 
@@ -52,30 +52,34 @@ export class LovefieldBridge implements IStorageBridge {
   }
 
   addBip44WalletFunctionality = async (bip44Wallet: Bip44Wallet): Promise<void> => {
+    // todo: should probably encapsulate
     const Bip44PrivateDeriverTable = this.db.getSchema().table(PrivateDeriverSchema.name);
-    const getFunctionalityTx = this.db.createTransaction();
-    await getFunctionalityTx
-      .begin([
-        Bip44PrivateDeriverTable,
-      ]);
 
-    const privateDeriver = await getRowFromKey<PrivateDeriverRow>(
+    await raii<void>(
       this.db,
-      getFunctionalityTx,
-      bip44Wallet.bip44WrapperId,
-      PrivateDeriverSchema.name,
-      PrivateDeriverSchema.properties.Bip44WrapperId,
-    );
-    getFunctionalityTx.commit();
-    if (privateDeriver !== undefined) {
-      appendChain(
-        bip44Wallet,
-        new LovefieldDerive(
+      [
+        Bip44PrivateDeriverTable,
+      ],
+      async tx => {
+        const privateDeriver = await getRowFromKey<PrivateDeriverRow>(
           this.db,
+          tx,
           bip44Wallet.bip44WrapperId,
-        ),
-      );
-    }
+          PrivateDeriverSchema.name,
+          PrivateDeriverSchema.properties.Bip44WrapperId,
+        );
+        if (privateDeriver !== undefined) {
+          appendChain(
+            bip44Wallet,
+            new LovefieldDerive(
+              this.db,
+              bip44Wallet.bip44WrapperId,
+            ),
+          );
+        }
+      }
+    );
+
     return Promise.resolve();
   }
 }

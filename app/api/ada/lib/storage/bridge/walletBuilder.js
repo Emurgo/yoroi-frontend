@@ -29,6 +29,7 @@ import type {
 } from '../database/genericBip44/api/add';
 import {
   getAllTables,
+  raii,
 } from '../database/utils';
 import type {
   LovefieldDeriveRequest,
@@ -53,12 +54,21 @@ type StateConstraint<CurrentState, Requirement, Input, Output> = $Call<
 >
 
 /**
+ * Wrapper around a Lovefield tranasction
+ * This is so we can capture the reference to the holder in a closure
+ * but only populate the actual transaction once `commit` is called.
+ */
+type TxHolder = {
+  tx: lf$Transaction,
+};
+
+/**
  * Allows to easily create a wallet with all the information you need in one transactional query
  * Ensuring proper call order and proper database access is managed for you
  */
 export class WalletBuilder<CurrentState> {
   db: lf$Database;
-  tx: lf$Transaction;
+  txHolder: TxHolder;
 
   /** keep track of all tables we need to lock to build this wallet */
   tables: Array<string>;
@@ -71,13 +81,13 @@ export class WalletBuilder<CurrentState> {
 
   constructor(
     db: lf$Database,
-    tx: lf$Transaction,
+    txHolder: TxHolder,
     tables: Array<string>,
     buildSteps: Array<CurrentState => Promise<void>>,
     state: CurrentState,
   ) {
     this.db = db;
-    this.tx = tx;
+    this.txHolder = txHolder;
     this.tables = tables;
     this.buildSteps = buildSteps;
     this.state = state;
@@ -94,7 +104,7 @@ export class WalletBuilder<CurrentState> {
       CurrentState & NewAddition & Requirement
     >(
       this.db,
-      this.tx,
+      this.txHolder,
       this.tables.concat(newTables),
       this.buildSteps.concat(newStep),
       {
@@ -107,7 +117,8 @@ export class WalletBuilder<CurrentState> {
   static start(db: lf$Database): WalletBuilder<$Shape<{||}>> {
     return new WalletBuilder(
       db,
-      db.createTransaction(),
+      // only create the tx once commit is called
+      AsNotNull<TxHolder>({ tx: null }),
       [],
       [],
       {},
@@ -119,15 +130,18 @@ export class WalletBuilder<CurrentState> {
     const usedTables = this.tables.map(
       name => this.db.getSchema().table(name)
     );
-    await this.tx.begin(usedTables);
 
-    // perform all insertions
-    for (const step of this.buildSteps) {
-      await step(this.state);
-    }
-
-    // commit result
-    await this.tx.commit();
+    await raii<void>(
+      this.db,
+      usedTables,
+      async tx => {
+        this.txHolder.tx = tx;
+        // perform all steps to build wallet
+        for (const step of this.buildSteps) {
+          await step(this.state);
+        }
+      }
+    );
 
     return this.state;
   }
@@ -146,7 +160,7 @@ export class WalletBuilder<CurrentState> {
       async (finalData) => {
         finalData.conceptualWalletRow = await AddConceptualWallet.add(
           this.db,
-          this.tx,
+          this.txHolder.tx,
           insert(finalData),
         );
       },
@@ -167,7 +181,7 @@ export class WalletBuilder<CurrentState> {
       async (finalData) => {
         finalData.bip44WrapperRow = await AddBip44Wrapper.add(
           this.db,
-          this.tx,
+          this.txHolder.tx,
           insert(finalData),
         );
       },
@@ -188,7 +202,7 @@ export class WalletBuilder<CurrentState> {
       async (finalData) => {
         finalData.privateDeriver = await AddPrivateDeriver.add(
           this.db,
-          this.tx,
+          this.txHolder.tx,
           insert(finalData),
         );
       },
@@ -211,7 +225,7 @@ export class WalletBuilder<CurrentState> {
           ...finalData.publicDeriver,
           await derivePublicDeriver(
             this.db,
-            this.tx,
+            this.txHolder.tx,
             finalData.bip44WrapperRow.Bip44WrapperId,
             request(finalData),
           )
@@ -241,7 +255,7 @@ export class WalletBuilder<CurrentState> {
         const { tree, level } = request(finalData);
         await DeriveTree.derive(
           this.db,
-          this.tx,
+          this.txHolder.tx,
           tree,
           level,
         );

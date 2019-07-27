@@ -24,7 +24,7 @@ import { LovefieldBridge } from '../bridge/lovefieldBridge';
 import { LovefieldDerive } from '../bridge/lovefieldDerive';
 import { WalletBuilder } from '../bridge/walletBuilder';
 
-import { getAllSchemaTables } from '../database/utils';
+import { getAllSchemaTables, raii } from '../database/utils';
 
 import { snapshot } from './snapshot';
 
@@ -210,67 +210,68 @@ test('Can add and fetch address in wallet', async () => {
   }
 
   // test that all derivations are presetn as expected
-  {
-    const tx3 = db.createTransaction();
-    await tx3.begin([
+  await raii(
+    db,
+    [
       ...getAllSchemaTables(db, GetDerivationsByPath),
       ...getAllSchemaTables(db, GetDerivation),
-    ]);
-    const addressesForAccount = await GetDerivationsByPath.get(
-      db,
-      tx3,
-      state.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
-      [purposeIndex, coinTypeIndex, firstAccountIndex],
-      [null, null]
-    );
-    const dbAddresses = await GetDerivation.get<Bip44AddressRow>(
-      db,
-      tx3,
-      Array.from(addressesForAccount.keys()),
-      DerivationLevels.ADDRESS.level,
-    );
-    const result = dbAddresses.map(row => (
-      { hash: row.Hash, addressing: addressesForAccount.get(row.Bip44DerivationId) }
-    ));
+    ],
+    async tx => {
+      const addressesForAccount = await GetDerivationsByPath.get(
+        db,
+        tx,
+        state.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
+        [purposeIndex, coinTypeIndex, firstAccountIndex],
+        [null, null]
+      );
+      const dbAddresses = await GetDerivation.get<Bip44AddressRow>(
+        db,
+        tx,
+        Array.from(addressesForAccount.keys()),
+        DerivationLevels.ADDRESS.level,
+      );
+      const result = dbAddresses.map(row => (
+        { hash: row.Hash, addressing: addressesForAccount.get(row.Bip44DerivationId) }
+      ));
 
-    await tx3.commit();
-
-    expect(result.length).toEqual(1);
-    expect(result[0].hash).toEqual(firstAddressHash);
-    expect(result[0].addressing).toEqual([
-      purposeIndex, coinTypeIndex, firstAccountIndex, 0, 0
-    ]);
-  }
+      expect(result.length).toEqual(1);
+      expect(result[0].hash).toEqual(firstAddressHash);
+      expect(result[0].addressing).toEqual([
+        purposeIndex, coinTypeIndex, firstAccountIndex, 0, 0
+      ]);
+    }
+  );
 
   // test GetAllBip44Wallets
-  {
-    const tx4 = db.createTransaction();
-    await tx4.begin(getAllSchemaTables(db, GetAllBip44Wallets));
+  await raii(
+    db,
+    getAllSchemaTables(db, GetAllBip44Wallets),
+    async tx => {
+      const bip44Wallets = await GetAllBip44Wallets.get(
+        db,
+        tx,
+      );
 
-    const bip44Wallets = await GetAllBip44Wallets.get(
-      db,
-      tx4,
-    );
-
-    expect(JSON.stringify(bip44Wallets)).toEqual(JSON.stringify([
-      {
-        ConceptualWallet: {
-          CoinType: 2147485463,
-          Name: 'My Test Wallet',
-          ConceptualWalletId: 1
-        },
-        Bip44Wrapper: {
-          ConceptualWalletId: 1,
-          IsBundled: false,
-          SignerLevel: 3,
-          PublicDeriverLevel: 3,
-          Version: 2,
-          Bip44WrapperId: 1
+      expect(JSON.stringify(bip44Wallets)).toEqual(JSON.stringify([
+        {
+          ConceptualWallet: {
+            CoinType: 2147485463,
+            Name: 'My Test Wallet',
+            ConceptualWalletId: 1
+          },
+          Bip44Wrapper: {
+            ConceptualWalletId: 1,
+            IsBundled: false,
+            SignerLevel: 3,
+            PublicDeriverLevel: 3,
+            Version: 2,
+            Bip44WrapperId: 1
+          }
         }
-      }
-    ]));
-    await tx4.commit();
-  }
+      ]));
+    }
+  );
+
   // console.log(JSON.stringify(await db.export()));
   expect(JSON.stringify(await db.export())).toEqual(JSON.stringify(snapshot));
 });

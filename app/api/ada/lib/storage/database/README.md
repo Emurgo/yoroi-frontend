@@ -79,4 +79,18 @@ const addressesForAccount = await GetDerivationsByPath.exec(
 await myTransactionalQuery.commit();
 ```
 
-Although this architecture makes it easier to detect mistakes, you should still avoid having to write transactions yourself inside an application. It is better to instead wrap any behavior you need inside a well-tested function that handles it for you.
+Although this architecture makes it easier to detect mistakes, you should still avoid having to write transactions yourself inside an application. It is better to instead wrap any behavior you need inside a well-tested function that handles it for you. If possible, you can at least use the `raii` wrapper to automatically handle transaction creation/commitment and rolling back in the case of an exception to avoid a deadlock
+
+```js
+await raii(
+  db,
+  getAllSchemaTables(db, MyTopLevelQuery),
+  async tx => {
+    // execute query
+    const addressesForAccount = await GetDerivationsByPath.exec(
+      db,
+      tx,
+    );
+  }
+);
+```
