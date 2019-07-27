@@ -56,7 +56,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
     const { stores } = this.props;
-    const { topbar, profile } = stores;
+    const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
@@ -64,7 +64,6 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     const topBar = profile.isClassicTheme ? (
       <TopBar
         title={topBartitle}
-        activeTopbarCategory={topbar.activeTopbarCategory}
       />) : undefined;
     const displayedBanner = checkAdaServerStatus === 'healthy' ?
       <TestnetWarningBanner /> :
