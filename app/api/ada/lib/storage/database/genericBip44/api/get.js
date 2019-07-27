@@ -5,6 +5,7 @@ import type {
   lf$Transaction,
   lf$Predicate,
 } from 'lovefield';
+import { op } from 'lovefield';
 
 import type {
   Bip44DerivationMappingRow,
@@ -75,8 +76,8 @@ export class GetChildIfExists {
     const mappingTable = db.getSchema().table(mappingSchema.name);
     const derivationTable = db.getSchema().table(derivationSchema.name);
     const conditions: Array<lf$Predicate> = [
-      mappingTable[mappingSchema.properties.Parent].eq(parentId),
       derivationTable[derivationSchema.properties.Index].eq(childIndex),
+      mappingTable[mappingSchema.properties.Parent].eq(parentId),
     ];
 
     const query = db
@@ -87,7 +88,7 @@ export class GetChildIfExists {
         derivationTable[derivationSchema.properties.Bip44DerivationId]
           .eq(mappingTable[mappingSchema.properties.Child]),
       )
-      .where(...conditions);
+      .where(op.and(...conditions));
 
     const queryResult: Array<{
       Bip44DerivationMapping: Bip44DerivationMappingRow,
@@ -172,7 +173,7 @@ const _getDerivationsByPath = async (
       derivationTable[derivationSchema.properties.Bip44DerivationId]
         .eq(mappingTable[mappingSchema.properties.Child]),
     )
-    .where(...conditions);
+    .where(op.and(...conditions));
 
   const queryResult: Array<{
     Bip44DerivationMapping: Bip44DerivationMappingRow,
