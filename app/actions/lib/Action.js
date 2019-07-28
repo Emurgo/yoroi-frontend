@@ -32,14 +32,6 @@ export default class Action<Params> {
     this.listeners.push(listener);
   }
 
-  /*
-   Add a listener that is fired first when the action is triggered (unless
-   another listener is added this way later).
-   */
-  listenWithPriority(listener: Listener<Params>) {
-    this.listeners.unshift(listener);
-  }
-
   trigger(params: Params) {
     this.listeners.forEach(listener => listener(params));
   }

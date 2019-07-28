@@ -23,8 +23,6 @@ import { getCryptoWalletFromMasterKey } from '../../api/ada/lib/cardanoCrypto/cr
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
-import { matchRoute } from '../../utils/routing';
-import { ROUTES } from '../../routes-config';
 
 type TransferFundsRequest = {
   signedTx: RustModule.Wallet.SignedTransaction,
@@ -72,10 +70,6 @@ export default class YoroiTransferStore extends Store {
     actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._errorWrapper(this._transferFunds));
     actions.cancelTransferFunds.listen(this._reset);
-    // Call .listenWithPriority here because we want this handler to be called
-    // before another listener actually changes the route,  so that we can get
-    // the current route.
-    this.actions.router.goToRoute.listenWithPriority(this._onRouteChange);
   }
 
   teardown(): void {
@@ -217,7 +211,7 @@ export default class YoroiTransferStore extends Store {
   }
 
   @action.bound
-  _reset(): void {
+  reset(): void {
     this.status = 'uninitialized';
     this.error = null;
     this.transferTx = null;
@@ -245,15 +239,6 @@ export default class YoroiTransferStore extends Store {
   }): Promise<SignedResponse> => (
     this.stores.substores.ada.stateFetchStore.fetcher.sendTx({ signedTx: request.signedTx })
   )
-
-  @action _onRouteChange = (options: { route: string, params: ?Object }): void => {
-    const currentRoute = this.stores.router.location.pathname;
-    // If we are leaving the transfer page, then reset the state.
-    if (matchRoute(ROUTES.TRANSFER.YOROI, currentRoute) &&
-      !matchRoute(ROUTES.TRANSFER.YOROI, options.route)) {
-      this._reset();
-    }
-  };
 
 }
 

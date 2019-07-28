@@ -26,6 +26,11 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
+  componentWillUnmount() {
+    const yoroiTransfer = this._getYoroiTransferStore();
+    yoroiTransfer.reset();
+  }
+
   goToCreateWallet = () => {
     this._getRouter().goToRoute.trigger({
       route: ROUTES.WALLETS.ADD
