@@ -99,8 +99,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         onCategoryClicked={category => {
           actions.topbar.activateTopbarCategory.trigger({ category });
         }}
-        categories={topbar.CATEGORIES}
-        activeTopbarCategory={topbar.activeTopbarCategory}
+        isActiveCategory={topbar.isActiveCategory}
+        categories={topbar.categories}
       />
     );
     const wallets = this._getWalletsStore();
