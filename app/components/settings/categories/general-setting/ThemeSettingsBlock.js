@@ -93,6 +93,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
 
     const blogLink = (
       <a
+        className={styles.link}
         href={intl.formatMessage(messages.blogLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >

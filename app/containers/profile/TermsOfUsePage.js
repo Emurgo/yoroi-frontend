@@ -33,7 +33,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
     const { stores } = this.props;
-    const { topbar, profile } = stores;
+    const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const displayedBanner = checkAdaServerStatus === 'healthy' ?
       <TestnetWarningBanner /> :
@@ -44,7 +44,6 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     const topbarElement = (
       <TopBar
         title={topbarTitle}
-        activeTopbarCategory={topbar.activeTopbarCategory}
       />);
     return (
       <TopBarLayout

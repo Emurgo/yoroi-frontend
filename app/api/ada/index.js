@@ -795,7 +795,7 @@ export default class AdaApi {
         throw new Error('no account selected');
       }
       const accountPrivateKey = cryptoWallet.bip44_account(
-        RustModule.Wallet.AccountIndex.new(currAccount | HARD_DERIVATION_START)
+        RustModule.Wallet.AccountIndex.new(currAccount + HARD_DERIVATION_START)
       );
       const signedTx = await signTransaction(
         signRequest,

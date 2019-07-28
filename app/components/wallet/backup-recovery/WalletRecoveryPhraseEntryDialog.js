@@ -44,7 +44,7 @@ const messages = defineMessages({
 
 type Props = {|
   recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  enteredPhrase: Array<{ word: string }>,
+  enteredPhrase: Array<{ word: string, index: number }>,
   isValid: boolean,
   isTermDeviceAccepted: boolean,
   isTermRecoveryAccepted: boolean,

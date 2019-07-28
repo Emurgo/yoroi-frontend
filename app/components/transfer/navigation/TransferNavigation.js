@@ -7,7 +7,7 @@ import TransferNavButton from './TransferNavButton';
 
 const messages = defineMessages({
   fromDaedalus: {
-    id: 'transfer.navigation.fromDaedalus',
+    id: 'daedalusTransfer.title',
     defaultMessage: '!!!Transfer funds from Daedalus',
   },
   fromYoroi: {

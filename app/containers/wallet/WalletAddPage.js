@@ -180,18 +180,12 @@ export default class WalletAddPage extends Component<Props> {
   }
 
   _goToSettingsRoot = (): void => {
-    // Dynamically update the topbar icons
-    this.props.stores.topbar.updateCategories();
-
     this._getRouter().goToRoute.trigger({
       route: ROUTES.SETTINGS.ROOT
     });
   }
 
   _goToDaedalusTransferRoot = (): void => {
-    // Dynamically update the topbar icons
-    this.props.stores.topbar.updateCategories();
-
     this._getRouter().goToRoute.trigger({
       route: ROUTES.TRANSFER.DAEDALUS
     });

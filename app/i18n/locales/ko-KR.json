@@ -478,6 +478,6 @@
   "wallet.transaction.type.exchange": "환율",
   "wallet.transaction.type.intrawallet": "{currency} 지갑내 거래",
   "wallet.transaction.type.multiparty": "{currency} 다중 거래",
-  "widgets.explorer.tooltip": "{websiteName}으로 가기",
+  "widgets.explorer.tooltip": "{websiteName} 로 가기",
   "widgets.warningBox.headerText": "주의:"
 }

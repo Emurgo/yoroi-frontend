@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
@@ -16,13 +16,6 @@ import { ROUTES } from '../../routes-config';
 import config from '../../config';
 
 import { formattedWalletAmount } from '../../utils/formatters';
-
-const messages = defineMessages({
-  title: {
-    id: 'daedalusTransfer.title',
-    defaultMessage: '!!!Transfer funds from Daedalus',
-  },
-});
 
 @observer
 export default class DaedalusTransferPage extends Component<InjectedProps> {
@@ -83,7 +76,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   }
 
   render() {
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     const { profile } = stores;
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();

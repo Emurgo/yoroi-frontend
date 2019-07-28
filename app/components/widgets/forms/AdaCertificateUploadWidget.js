@@ -62,8 +62,9 @@ export default class AdaCertificateUploadWidget extends Component<Props> {
               multiple={false}
               accept={acceptedFileTypes}
             >
-              {({ getRootProps }) => (
+              {({ getRootProps, getInputProps }) => (
                 <div {...getRootProps()}>
+                  <input {...getInputProps()} />
                   <div className={styles.instructions}>
                     <div className={styles.title}>
                       {intl.formatMessage(messages.orClickToUpload)}
