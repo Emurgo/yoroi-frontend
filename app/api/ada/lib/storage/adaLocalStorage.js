@@ -161,9 +161,11 @@ async function _saveInStorage(key: string, toSave: any): Promise<void> {
   await setLocalItem(key, JSON.stringify(toSave));
 }
 
-async function _getFromStorage(key: string): any | typeof undefined {
+async function _getFromStorage(key: string): any | void {
   return await getLocalItem(key).then((result) => {
-    if (result !== '') return JSON.parse(result);
-    return undefined;
+    if (result == null) {
+      return result;
+    }
+    return JSON.parse(result);
   });
 }

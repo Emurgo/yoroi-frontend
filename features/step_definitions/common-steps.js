@@ -7,7 +7,9 @@ import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import { resetChain, serverIssue, serverFixed } from '../mock-chain/mockImporter';
 import { expect } from 'chai';
-import { navigateToTransactionsList } from '../support/helpers/route-helpers';
+import {
+  satisfies,
+} from 'semver';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -195,9 +197,10 @@ Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
 
 Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
-  await migrateImportedSnapshot(this);
-  await refreshWallet(this);
-  await navigateToTransactionsList(this);
+
+  // refresh page to trigger migration
+  await this.driver.navigate().refresh();
+  await this.driver.sleep(500); // give time for page to reload
 });
 
 async function refreshWallet(client) {
@@ -247,11 +250,33 @@ async function importYoroiSnapshot(client, importDir: string) {
 async function importLocalStorage(client, importDir: string) {
   const localStoragePath = `${importDir}/localStorage.json`;
   const localStorageData = fs.readFileSync(localStoragePath).toString();
-  await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.api.localStorage.setStorage(data)
+  const storage = JSON.parse(localStorageData);
+  const version: string = storage['test-LAST-LAUNCH-VER'] || '0.0.0';
+
+  // Clear anything in memory to effectively override it with the snapshot
+  await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.localStorage.clear()
       .then(done)
       .catch(err => done(err));
-  }, JSON.parse(localStorageData));
+  });
+
+  if (satisfies(version, '<1.9.0')) {
+    /**
+     * Version of Yoroi <1.9.0 used localStorage exclusively
+     * we mimic this behavior when importing
+     */
+    await client.driver.executeScript(data => {
+      Object.keys(data).forEach(key => {
+        window.localStorage.setItem(key, data[key]);
+      });
+    }, storage);
+  } else {
+    await client.driver.executeAsyncScript((data, done) => {
+      window.yoroi.api.localStorage.setStorage(data)
+        .then(done)
+        .catch(err => done(err));
+    }, storage);
+  }
 }
 
 async function importIndexedDB(client, importDir: string) {
@@ -262,10 +287,4 @@ async function importIndexedDB(client, importDir: string) {
       .then(done)
       .catch(err => done(err));
   }, JSON.parse(indexedDBData));
-}
-
-async function migrateImportedSnapshot(client) {
-  await client.driver.executeScript(() => {
-    window.yoroi.actions.snapshot.migrateImportedSnapshot.trigger({});
-  });
 }

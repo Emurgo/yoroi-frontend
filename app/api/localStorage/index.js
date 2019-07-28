@@ -6,8 +6,12 @@ import {
   getLocalItem,
   setLocalItem,
   removeLocalItem,
-  isEmptyStorage
+  isEmptyStorage,
+  clear,
 } from './primitives';
+import {
+  OPEN_TAB_ID_KEY,
+} from '../../utils/tabManager';
 
 const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
@@ -34,7 +38,7 @@ export default class LocalStorageApi {
 
   // ========== Locale ========== //
 
-  getUserLocale = (): Promise<string> => getLocalItem(storageKeys.USER_LOCALE);
+  getUserLocale = (): Promise<?string> => getLocalItem(storageKeys.USER_LOCALE);
 
   setUserLocale = (locale: string): Promise<void> => setLocalItem(storageKeys.USER_LOCALE, locale);
 
@@ -73,7 +77,7 @@ export default class LocalStorageApi {
 
   // ========== User Theme ========== //
 
-  getUserTheme = (): Promise<string> => getLocalItem(storageKeys.THEME);
+  getUserTheme = (): Promise<?string> => getLocalItem(storageKeys.THEME);
 
   setUserTheme = (theme: string): Promise<void> => setLocalItem(storageKeys.THEME, theme);
 
@@ -81,7 +85,7 @@ export default class LocalStorageApi {
 
   // ========== Custom User Theme ========== //
 
-  getCustomUserTheme = (): Promise<string> => getLocalItem(storageKeys.CUSTOM_THEME);
+  getCustomUserTheme = (): Promise<?string> => getLocalItem(storageKeys.CUSTOM_THEME);
 
   setCustomUserTheme = (
     request: {
@@ -115,7 +119,7 @@ export default class LocalStorageApi {
   getLastLaunchVersion = (): Promise<string> => getLocalItem(
     storageKeys.VERSION
   ).then((versionNum) => {
-    if (versionNum === '') return '0.0.0';
+    if (versionNum == null) return '0.0.0';
     return versionNum;
   });
 
@@ -126,6 +130,16 @@ export default class LocalStorageApi {
   unsetLastLaunchVersion = (): Promise<void> => removeLocalItem(storageKeys.VERSION);
 
   isEmpty = (): Promise<boolean> => isEmptyStorage();
+
+  clear = async (): Promise<void> => {
+    const storage = JSON.parse(await this.getStorage());
+    await Object.keys(storage).forEach(async key => {
+      // changing this key would cause the tab to close
+      if (key !== OPEN_TAB_ID_KEY) {
+        await removeLocalItem(key);
+      }
+    });
+  }
 
   // ========== Show/hide Balance ========== //
 
@@ -150,23 +164,32 @@ export default class LocalStorageApi {
     await this.unsetHideBalance();
   }
 
-  getItem = (key: string): Promise<string> => getLocalItem(key);
+  getItem = (key: string): Promise<?string> => getLocalItem(key);
 
   setItem = (key: string, value: string): Promise<void> => setLocalItem(key, value);
 
-  getOldStorage = (): Promise<string> => new Promise((resolve) => {
-    resolve(JSON.stringify(localStorage));
+  getOldStorage = (): Promise<Storage> => new Promise((resolve) => {
+    resolve(localStorage);
   });
 
-  setStorage = (localStorageData: any): Promise<void> => new Promise(async (resolve) => {
+  setStorage = async (
+    localStorageData: { [key: string]: string }
+  ): Promise<void> => {
     await Object.keys(localStorageData).forEach(async key => {
-      await setLocalItem(key, localStorageData[key]);
+      // changing this key would cause the tab to close
+      if (key !== OPEN_TAB_ID_KEY) {
+        await setLocalItem(key, localStorageData[key]);
+      }
     });
-    resolve();
-  });
+  };
 
-  getStorage = (): Promise<string> => new Promise((resolve) => {
-    resolve(getLocalItem(null));
-  });
+  getStorage = (): Promise<string> => {
+    return getLocalItem(undefined).then(json => {
+      if (json == null) {
+        return '{}';
+      }
+      return json;
+    });
+  };
 
 }

@@ -14,31 +14,41 @@ declare var chrome;
 //  get
 // =====
 
-const getStorageItemInExtension = (key: ?string) => new Promise((resolve, reject) => {
-  chrome.storage.local.get(key, (data, error) => {
+const getStorageItemInExtension = async (
+  key: string | void
+): Promise<?string> => new Promise((resolve, reject) => {
+  chrome.storage.local.get(key, (data: {}, error) => {
     if (error) reject(error);
-    if (!key) resolve(data);
-    const value = data[key];
-    if (value === undefined) resolve('');
-    resolve(value);
+    if (key === undefined) {
+      resolve(JSON.stringify(data));
+    } else {
+      const value: any = data[key];
+      // need to ensure type is string to match localStorage API
+      if (value == null) {
+        resolve(value);
+      } else if (typeof value === 'string') {
+        resolve(value);
+      } else {
+        reject(new Error('getStorageItemInExtension cannot get non-string value'));
+      }
+    }
   });
 });
 
-const getStorageItemInWeb = (key: ?string) => new Promise((resolve, reject) => {
-  try {
-    if (!key) return resolve(JSON.stringify(localStorage));
-    const value = localStorage.getItem(key);
-    if (!value) return resolve('');
-    resolve(value);
-  } catch (error) {
-    return reject(error);
-  }
-});
+const getStorageItemInWeb = async (
+  key: string | void
+): Promise<?string> => {
+  if (!key) return Promise.resolve(JSON.stringify(localStorage));
+  return Promise.resolve(localStorage.getItem(key));
+};
 
-export async function getLocalItem(key: ?string): Promise<string> {
-  const isExtention = environment.userAgentInfo.isExtension;
-  if (isExtention) return getStorageItemInExtension(key);
-  return getStorageItemInWeb(key);
+/** passing undefined gives you the whole storage as a JSON string */
+export async function getLocalItem(key: string | void): Promise<?string> {
+  const isExtension = environment.userAgentInfo.isExtension;
+  if (isExtension) {
+    return await getStorageItemInExtension(key);
+  }
+  return await getStorageItemInWeb(key);
 }
 
 // =====
@@ -46,16 +56,12 @@ export async function getLocalItem(key: ?string): Promise<string> {
 // =====
 
 export async function setLocalItem(key: string, value: string): Promise<void> {
-  const isExtention = environment.userAgentInfo.isExtension;
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (isExtention) await chrome.storage.local.set({ [key]: value });
-      else localStorage.setItem(key, value);
-      resolve();
-    } catch (error) {
-      return reject(error);
-    }
-  });
+  const isExtension = environment.userAgentInfo.isExtension;
+  if (isExtension) {
+    await chrome.storage.local.set({ [key]: value });
+  } else {
+    localStorage.setItem(key, value);
+  }
 }
 
 // ========
@@ -63,14 +69,74 @@ export async function setLocalItem(key: string, value: string): Promise<void> {
 // ========
 
 export async function removeLocalItem(key: string): Promise<void> {
-  const isExtention = environment.userAgentInfo.isExtension;
-  return new Promise((resolve) => {
-    try {
-      if (isExtention) chrome.storage.local.remove(key);
-      else localStorage.removeItem(key);
-      resolve();
-    } catch (error) {} // eslint-disable-line
-  });
+  const isExtension = environment.userAgentInfo.isExtension;
+
+  if (isExtension) {
+    await chrome.storage.local.remove(key);
+  } else {
+    localStorage.removeItem(key);
+  }
+}
+
+export async function clear(): Promise<void> {
+  const isExtension = environment.userAgentInfo.isExtension;
+  if (isExtension) {
+    await chrome.storage.local.clear();
+  } else {
+    localStorage.clear();
+  }
+}
+
+// ==========
+//  listener
+// ==========
+
+type StorageChange = {
+  [key: string]: {
+    +oldValue?: any,
+    +newValue?: any,
+  }
+}
+/**
+ * Warning!
+ * There are a lof of differences between localStorage and storage.local listeners
+ * This API makes localStorage behave more like storage.local
+ * but some subtle parts can't be mapped to storage.local behavior
+ *
+ * When running as a webpage
+ * the listener is only called if storage is modified by a separate tab
+ *
+ * When running as an extension
+ * the listener is called even if even if it comes from the same tab
+ */
+export function addListener(
+  listener: StorageChange => void,
+): void {
+  const isExtension = environment.userAgentInfo.isExtension;
+  if (isExtension) {
+    chrome.storage.onChanged.addListener((changes, _area) => {
+      listener(changes);
+    });
+  } else {
+    window.addEventListener('storage', (e: StorageEvent) => {
+      // can't map behavior when key is null  (happens when .clear() is called)
+      if (e.key == null) {
+        return;
+      }
+      const oldValue = e.oldValue
+        ? { oldValue: JSON.parse(e.oldValue) }
+        : {};
+      const newValue = e.newValue
+        ? { newValue: JSON.parse(e.newValue) }
+        : {};
+      listener({
+        [e.key]: {
+          ...oldValue,
+          ...newValue,
+        }
+      })
+    });
+  }
 }
 
 // =======
@@ -78,16 +144,13 @@ export async function removeLocalItem(key: string): Promise<void> {
 // =======
 
 export async function isEmptyStorage(): Promise<boolean> {
-  return new Promise(async (resolve) => {
-    const isExtention = environment.userAgentInfo.isExtension;
-    if (isExtention) {
-      const isEmpty = await getStorageItemInExtension().then(
-        (data: Object) => Object.keys(data).length === 0
-      );
-      resolve(isEmpty);
-    }
-    try {
-      resolve(localStorage.length === 0);
-    } catch (error) {} // eslint-disable-line  
-  });
+  const isExtension = environment.userAgentInfo.isExtension;
+  if (isExtension) {
+    const isEmpty = await getStorageItemInExtension().then(
+      (data: Object) => Object.keys(data).length === 0
+    );
+    return isEmpty;
+  }
+
+  return localStorage.length === 0;
 }

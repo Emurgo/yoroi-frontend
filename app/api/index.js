@@ -18,7 +18,6 @@ export const setupApi = (): Api => ({
 export type MigrationRequest = {
   api: Api,
   currVersion: string,
-  isImported: boolean
 }
 
 export const migrate = async (migrationRequest: MigrationRequest): Promise<void> => {
@@ -27,15 +26,23 @@ export const migrate = async (migrationRequest: MigrationRequest): Promise<void>
     return;
   }
 
-  // localstorage empty means the user is launching Yoroi for the first time. No need to migrate.
-  const isEmpty = await migrationRequest.api.localStorage.isEmpty();
-  if (!isEmpty) {
-    await migrationRequest.api.ada.migrate(
-      migrationRequest.api.localStorage,
-      migrationRequest.isImported
-    );
-  }
+  const appliedMigration = await migrationRequest.api.ada.migrate(
+    migrationRequest.api.localStorage,
+  );
 
   // update launch version in localstorage to avoid calling migration twice
   await migrationRequest.api.localStorage.setLastLaunchVersion(migrationRequest.currVersion);
+
+  /**
+   * If a single migration step happened, then we have have to reload the UI
+   * Systems like mobx and react may not notice that the data has changed under their feed
+   */
+  if (appliedMigration) {
+    window.location.reload();
+    // we want to block until the refresh closes our page
+    // if we don't block forever here,
+    // then Yoroi would start and may get in a bad state with migrations partially applied
+    // since reload is not a blocking call we just await on a timeout
+    await (new Promise(resolve => setTimeout(resolve, 5000 /* aribtrary high number */)));
+  }
 };

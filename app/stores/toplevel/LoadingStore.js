@@ -52,7 +52,6 @@ export default class LoadingStore extends Store {
     = new Request<void => Promise<void>>(this.api.ada.loadDB);
 
   setup() {
-    this.actions.snapshot.migrateImportedSnapshot.listen(this._migrateImported);
   }
 
   load() {
@@ -60,11 +59,10 @@ export default class LoadingStore extends Store {
     Promise
       .all([this.loadRustRequest.execute().promise, this.loadDbRequest.execute().promise])
       .then(async () => {
-        closeOtherInstances();
+        await closeOtherInstances();
         await this.migrationRequest.execute({
           api: this.api,
           currVersion: environment.version,
-          isImported: false
         }).promise;
         await this.validateUriPath();
         runInAction(() => {
@@ -129,14 +127,6 @@ export default class LoadingStore extends Store {
     });
     this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
   }
-
-  _migrateImported = async (): Promise<void> => {
-    await this.migrationRequest.execute({
-      api: this.api,
-      currVersion: environment.version,
-      isImported: true
-    }).promise;
-  };
 }
 
 export class UnableToLoadError extends LocalizableError {
