@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
