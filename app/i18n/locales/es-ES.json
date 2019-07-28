@@ -5,7 +5,7 @@
   "api.errors.GenericApiError": "Se ha producido un error, inténtalo de nuevo más tarde.",
   "api.errors.IncorrectPasswordError": "Contraseña de billetera incorrecta.",
   "api.errors.NotEnoughMoneyToSendError": "No hay suficiente ADA para hacer esta transacción.",
-  "api.errors.PromiseNotCalledYetError": "You have to call Request::execute before you can access it as promise.",
+  "api.errors.PromiseNotCalledYetError": "Debes invocar Request::execute antes de poder accederlo como promesa.",
   "api.errors.RedeemAdaError": "Tu ADA no pudo ser redimida correctamente.",
   "api.errors.ReportRequestError": "Hubo un problema enviando la solicitud de ayuda.",
   "api.errors.WalletAlreadyImportedError": "La billetera que está intentando importar ya existe.",
