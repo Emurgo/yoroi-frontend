@@ -13,7 +13,11 @@ import globalMessages from '../../i18n/global-messages';
 const messages = defineMessages({
   text: {
     id: 'yoroiTransfer.start.instructions.text',
-    defaultMessage: '!!!Transfer funds from another wallet (Yoroi, AdaLite, etc.).',
+    defaultMessage: '!!!Transfer funds from a <strong>non-Daedalus</strong> wallet (Yoroi, AdaLite, etc.). <br />More specifically, this will work for any wallet whose addresses start with Ae2',
+  },
+  mnemonicLabel15: {
+    id: 'yoroiTransfer.start.instructions.mnemonic-15',
+    defaultMessage: '!!!15-word mnemonic',
   }
 });
 
@@ -87,15 +91,21 @@ export default class YoroiTransferStartPage extends Component<Props> {
             <div className={styles.body}>
 
               <div className={styles.infoBlock}>
+                <div className={styles.title}>
+                  {intl.formatMessage(globalMessages.attentionTitle)}
+                </div>
                 <div className={styles.text}>
                   <FormattedHTMLMessage {...messages.text} />
                 </div>
               </div>
 
               <div className={styles.operationBlock}>
+                <div className={styles.buttonTitle}>
+                  {intl.formatMessage(globalMessages.transferTitleText)}
+                </div>
                 <Button
                   className={`next ${commonClasses}`}
-                  label={intl.formatMessage(globalMessages.nextButtonLabel)}
+                  label={intl.formatMessage(messages.mnemonicLabel15)}
                   onClick={onNext}
                   skin={ButtonSkin}
                   disabled={disableTransferFunds}

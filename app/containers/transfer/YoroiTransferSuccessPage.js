@@ -11,7 +11,7 @@ const messages = defineMessages({
   },
   text: {
     id: 'yoroiTransfer.successPage.text',
-    defaultMessage: '!!!Your funds were successfully transfered.',
+    defaultMessage: '!!!Your funds were successfully transferred.',
   },
 
 });

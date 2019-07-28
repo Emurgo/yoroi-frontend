@@ -7,6 +7,14 @@
     margin-bottom: 30px;
   }
 
+  .buttonTitle {
+    font-size: 18px;
+    font-family: var(--font-semibold);
+    margin-bottom: 30px;
+    line-height: 1.38;
+    text-align: left;
+  }
+
   .body {
     display: flex;
     color: var(--theme-bordered-box-text-color);

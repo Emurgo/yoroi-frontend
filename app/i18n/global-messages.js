@@ -349,6 +349,14 @@ const globalMessages = defineMessages({
     id: 'transfer.instructions.instructions.button.label',
     defaultMessage: '!!!Create Yoroi wallet',
   },
+  attentionTitle: {
+    id: 'transfer.instructions.attention.title.label',
+    defaultMessage: '!!!Attention',
+  },
+  transferTitleText: {
+    id: 'daedalusTransfer.instructions.attention.title',
+    defaultMessage: '!!!Transfer all funds from'
+  },
 });
 export default globalMessages;
 
