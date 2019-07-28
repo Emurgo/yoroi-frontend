@@ -71,7 +71,7 @@
   "global.contact": "contacta soporte",
   "global.errors.fieldIsRequired": "Este campo es obligatorio.",
   "global.errors.invalidMasterKey": "Clave maestra inválida, por favor compruébela.",
-  "global.errors.invalidPaperPassword": "Paper Wallet password requires at least 12 characters.",
+  "global.errors.invalidPaperPassword": "La contraseña de la Billetera de Papel requiere al menos 12 caracteres.",
   "global.errors.invalidRepeatPassword": "No coincide.",
   "global.errors.invalidWalletName": "Nombre de la billetera necesita un mínimo de 1 y máximo 40 letras.",
   "global.errors.invalidWalletPassword": "La contraseña de gasto requiere al menos 12 caracteres.",
