@@ -69,12 +69,12 @@ export default class YoroiTransferStore extends Store {
     );
     actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._errorWrapper(this._transferFunds));
-    actions.cancelTransferFunds.listen(this._reset);
+    actions.cancelTransferFunds.listen(this.reset);
   }
 
   teardown(): void {
     super.teardown();
-    this._reset();
+    this.reset();
   }
 
   _startTransferFunds = () => {
@@ -177,7 +177,7 @@ export default class YoroiTransferStore extends Store {
       });
       this._updateStatus('success');
       await next();
-      this._reset();
+      this.reset();
     } catch (error) {
       if (error.id === 'api.errors.sendTransactionApiError') {
         /* See if the error is due to wallet change since last recovery.
