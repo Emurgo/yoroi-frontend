@@ -2,7 +2,6 @@
 import React from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
-import resolver from './utils/imports';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
 import type { Node } from 'react';
@@ -11,24 +10,26 @@ import type { Node } from 'react';
 import NoWalletsPage from './containers/wallet/NoWalletsPage';
 import WalletAddPage from './containers/wallet/WalletAddPage';
 import LanguageSelectionPage from './containers/profile/LanguageSelectionPage';
+import TermsOfUsePage from './containers/profile/TermsOfUsePage';
+import UriPromptPage from './containers/profile/UriPromptPage';
+
+// SETTINGS
 import Settings from './containers/settings/Settings';
 import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
-import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
-import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
-import TermsOfUsePage from './containers/profile/TermsOfUsePage';
-import DisplaySettingsPage from './containers/settings/categories/DisplaySettingsPage';
-import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
-import AboutYoroiSettings from './components/settings/categories/AboutYoroiSettings';
 import PaperWalletPage from './containers/settings/categories/PaperWalletPage';
+import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
+import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
+import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
-const LoadingPage = resolver('containers/LoadingPage');
-const Wallet = resolver('containers/wallet/Wallet');
-const WalletSummaryPage = resolver('containers/wallet/WalletSummaryPage');
-const WalletSendPage = resolver('containers/wallet/WalletSendPage');
-const WalletReceivePage = resolver('containers/wallet/WalletReceivePage');
-const DaedalusTransferPage = resolver('containers/transfer/DaedalusTransferPage');
-const AdaRedemptionPage = resolver('containers/wallet/AdaRedemptionPage');
+import LoadingPage from './containers/LoadingPage';
+import Wallet from './containers/wallet/Wallet';
+import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
+import WalletSendPage from './containers/wallet/WalletSendPage';
+import WalletReceivePage from './containers/wallet/WalletReceivePage';
+import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
+import AdaRedemptionPage from './containers/wallet/AdaRedemptionPage';
+import URILandingPage from './containers/uri/URILandingPage';
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -51,6 +52,11 @@ export const Routes = (
         exact
         path={ROUTES.PROFILE.TERMS_OF_USE}
         component={(props) => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.URI_PROMPT}
+        component={(props) => <UriPromptPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
@@ -82,6 +88,11 @@ export const Routes = (
         exact
         path={ROUTES.DAEDALUS_TRANFER.ROOT}
         component={(props) => <DaedalusTransferPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.SEND_FROM_URI.ROOT}
+        component={(props) => <URILandingPage {...props} stores={stores} actions={actions} />}
       />
       <Redirect to={ROUTES.WALLETS.ADD} />
     </Switch>
@@ -135,16 +146,6 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.SUPPORT}
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      path={ROUTES.SETTINGS.DISPLAY}
-      component={(props) => <DisplaySettingsPage {...props} stores={stores} actions={actions} />}
-      exact
-    />
-    <Route
-      path={ROUTES.SETTINGS.ABOUT_YOROI}
-      component={(props) => <AboutYoroiSettings {...props} stores={stores} actions={actions} />}
-      exact
     />
     <Route
       exact

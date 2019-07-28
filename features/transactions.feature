@@ -3,11 +3,10 @@ Feature: Send transaction
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And I am testing "Send transaction"
 
   @it-54 @it-52
   Scenario Outline: User can send funds from one Yoroi wallet to another (IT-54)
-    Given There is a wallet stored named Test
+    Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -16,21 +15,22 @@ Feature: Send transaction
     And The transaction fees are "<fee>"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
+    Then I should see no warning block
     And I enter the wallet password:
       | password   |
-      | aaSecret_123 |
+      | asdfasdfasdf |
     And I submit the wallet send form
     Then I should see the summary screen
 
     Examples:
-      | amount              | fee       | |
-      | 0.001000            | 0.168082  | # Sent tx to a valid adress|
-      | 9007199254.552484  | 0.168038  | # Sent all funds|
-      | 9007199253.720698  | 0.168170  | # Sent a big amount|
+      | amount              | fee       |
+      | 0.001000            | 0.199723  |
+      | 1.000000            | 0.207765  |
+      | 2.000000            | 0.215719  |
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
-    Given There is a wallet stored named Test
+    Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -52,7 +52,7 @@ Feature: Send transaction
 
   @it-48
   Scenario Outline: CONFIRM TRANSACTION Pop up displays properly (IT-48)
-    Given There is a wallet stored named Test
+    Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -66,11 +66,11 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.168082 | 
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.199723 | 
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
-    Given There is a wallet stored named Test
+    Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -81,7 +81,7 @@ Feature: Send transaction
 
   @it-47
   Scenario: User can't send more funds than he has (IT-47)
-    Given There is a wallet stored named Test
+    Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -90,32 +90,54 @@ Feature: Send transaction
     Then I should see a not enough ada error
     And I should not be able to submit
 
+  @it-55
+  Scenario Outline: User can send all funds from one Yoroi wallet to another (IT-55)
+    Given I import a snapshot named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+	And I click on "Send all my ADA" checkbox
+    And I fill the address of the form:
+      | address                                                     |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+    Examples:
+      | fee       |
+      | 0.221520  |
+
   @invalidWitnessTest @it-20
-  Scenario: Sending a Tx and receiving from the server an invalid signature error
-    Given There is a wallet stored named Test
+  Scenario: Sending a Tx and receiving from the server an invalid signature error (IT-20)
+    Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.168082"
+    And The transaction fees are "0.199723"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
       | password   |
-      | aaSecret_123 |
+      | asdfasdfasdf |
     And I submit the wallet send form
     Then I should see an invalid signature error message
 
   @it-42
   Scenario: User can't send funds with incorrect Spending password (IT-42)
-    Given There is a wallet stored named Test
+    Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.168082"
+    And The transaction fees are "0.199723"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -126,7 +148,7 @@ Feature: Send transaction
 
   @it-53
   Scenario: Sending a Tx changing a valid address for an invalid one (IT-53)
-    Given There is a wallet stored named Test
+    Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -143,16 +165,68 @@ Feature: Send transaction
 
   @it-89
   Scenario: Try to make a transactions from the empty wallet (IT-89)
-    # note: this test must be the last test in the file
-    # since we switch the wallet test code that is being run in order to get an empty wallet
-    And I am testing ""
-    Given There is a wallet stored named empty-wallet
-    # should not be necessary since we're using an empty wallet but just to be sure
-    Given I cleared my local balance
-    # need this for cleared wallet to take into affect properly
-    When I refresh the page
+    Given I import a snapshot named empty-wallet
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.100000 |
     Then I should see a not enough ada error
+
+  @it-59
+  Scenario: Display warning if wallet changes during confirmation (IT-59)
+    Given I import a snapshot named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
+    And The transaction fees are "0.215719"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    Then A successful tx gets sent from my wallet from another client
+    Then I should see a warning block
+    # cancelling the transaction and trying again should get rid of the rror
+    Then I click the back button
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    Then I should see no warning block
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+  @it-60
+  Scenario: User can send a tx after invalid password attempt (IT-60)
+    Given I import a snapshot named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
+    And The transaction fees are "0.199723"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password      |
+      | WrongPassword |
+    And I submit the wallet send form
+    Then I should see an incorrect wallet password error message
+    And I clear the wallet password WrongPassword
+    And I enter the wallet password:
+      | password      |
+      | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+  @it-61
+  Scenario: Display warning if wallet changes during send screen (IT-61)
+    Given I import a snapshot named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
+    And The transaction fees are "0.215719"
+    Then A pending tx gets sent from my wallet from another client
+    Then I should see a warning block

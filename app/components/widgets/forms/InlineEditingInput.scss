@@ -1,5 +1,4 @@
-.componentClassic {
-  margin-bottom: 10px;
+.component {
   position: relative;
 
   .disabled {
@@ -33,68 +32,6 @@
     &:hover {
       opacity: 1;
     }
-  }
-
-  @keyframes animateSavingResultLabel {
-    0% {
-      opacity: 0.5;
-    }
-    50% {
-      opacity: 0.5;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-
-  .savingResultLabel {
-    animation: animateSavingResultLabel 3s;
-    color: var(--theme-input-right-floating-text-color);
-    font-family: var(--font-light);
-    font-size: 14px;
-    opacity: 0;
-    position: absolute;
-    right: 0;
-    text-align: right;
-    top: 0;
-  }
-}
-
-.component {
-  position: relative;
-
-  .disabled {
-    background-color: transparent;
-    border-color: var(--theme-input-border-color);
-    color: var(--theme-input-text-color);
-  }
-
-  &.inactive {
-    &:hover {
-      input {
-        cursor: pointer;
-      }
-    }
-  }
-
-  // need this as Firefox disabled bubbling of click events on disabled inputs
-  input[disabled] {pointer-events:none}
-
-  .button {
-    bottom: 37px;
-    color: var(--theme-label-button-color);
-    cursor: pointer;
-    font-family: var(--font-light);
-    font-size: 16px;
-    line-height: 1.38;
-    opacity: 0.5;
-    position: absolute;
-    right: 22px;
-    text-transform: lowercase;
-    &:hover {
-      opacity: 1;
-    }
-
     &.error {
       right: 50px;
     }
@@ -122,5 +59,23 @@
     right: 0;
     text-align: right;
     top: 0;
+  }
+}
+
+:global(.YoroiClassic) .component {
+  margin-bottom: 10px;
+
+  .button {
+    bottom: 35px;
+  }
+}
+
+:global(.YoroiModern) .component {
+  .disabled {
+    background-color: transparent;
+  }
+
+  .button {
+    bottom: 37px;
   }
 }

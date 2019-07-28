@@ -5,6 +5,7 @@ import { observable, action } from 'mobx';
 
 import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
 import type { DeviceMessage, UiMessage } from 'trezor-connect';
+import type { CardanoGetPublicKey$ } from 'trezor-connect/lib/types/cardano';
 
 import Config from '../../config';
 import environment from '../../environment';
@@ -21,11 +22,11 @@ import { derivePathPrefix } from '../../api/ada/lib/utils';
 // This is actually just an interface
 import {
   HWConnectStoreTypes,
-  StepState,
   ProgressStep,
   ProgressInfo,
   HWDeviceInfo
 } from '../../types/HWConnectStoreTypes';
+import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
   Logger,
@@ -37,9 +38,14 @@ import type {
   CreateHardwareWalletFunc,
 } from '../../api/ada';
 
-/** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
-  * try to make a common base class */
-export default class TrezorConnectStore extends Store implements HWConnectStoreTypes {
+type TrezorConnectionResponse = {
+  trezorResp: CardanoGetPublicKey$,
+  trezorEventDevice: DeviceMessage
+};
+
+export default class TrezorConnectStore
+  extends Store
+  implements HWConnectStoreTypes<TrezorConnectionResponse> {
 
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
@@ -85,23 +91,29 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     const trezorConnectAction = this.actions.ada.trezorConnect;
     trezorConnectAction.init.listen(this._init);
     trezorConnectAction.cancel.listen(this._cancel);
-    trezorConnectAction.submitAbout.listen(this._submitAbout);
-    trezorConnectAction.goBackToAbout.listen(this._goBackToAbout);
+    trezorConnectAction.submitCheck.listen(this._submitCheck);
+    trezorConnectAction.goBackToCheck.listen(this._goBackToCheck);
     trezorConnectAction.submitConnect.listen(this._submitConnect);
     trezorConnectAction.submitSave.listen(this._submitSave);
 
     try {
       /** Starting from v7 Trezor Connect Manifest has been made mandatory
         * https://github.com/trezor/connect/blob/develop/docs/index.md#trezor-connect-manifest */
-      const trezorTConfig = Config.wallets.hardwareWallet.trezorT;
-      TrezorConnect.manifest({
-        email: trezorTConfig.manifest.EMAIL,
-        appUrl: trezorTConfig.manifest.APP_URL
-      });
+      const { manifest } = Config.wallets.hardwareWallet.trezorT;
+
+      const trezorManifest = {};
+      trezorManifest.email = manifest.EMAIL;
+      if (environment.userAgentInfo.isFirefox) {
+        // Set appUrl for `moz-extension:` protocol using browser (like Firefox)
+        trezorManifest.appUrl = manifest.appURL.FIREFOX;
+      } else {
+        // For all other browser supported that uses `chrome-extension:` protocol
+        // In future if other non chrome like browser is supported them we can consider updating
+        trezorManifest.appUrl = manifest.appURL.CHROME;
+      }
+      TrezorConnect.manifest(trezorManifest);
 
       /** Preinitialization of TrezorConnect API will result in faster first response */
-      // TODO [TREZOR]: sometimes when user does fast action initialization is still not complete
-      // try to use same approach as ledger [for now moving this from _init() to setup()]
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
@@ -128,7 +140,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
   @action _reset = (): void => {
     this.progressInfo = {
-      currentStep: ProgressStep.ABOUT,
+      currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
     };
     this.error = undefined;
@@ -140,9 +152,9 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     this.teardown();
   };
 
-  // =================== ABOUT =================== //
-  /** ABOUT dialog submit(Next button) */
-  @action _submitAbout = (): void => {
+  // =================== CHECK =================== //
+  /** CHECK dialog submit(Next button) */
+  @action _submitCheck = (): void => {
     this.error = undefined;
     this.trezorEventDevice = undefined;
     this._removeTrezorConnectEventListeners();
@@ -150,13 +162,13 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
   };
-  // =================== ABOUT =================== //
+  // =================== CHECK =================== //
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToAbout = (): void => {
+  @action _goBackToCheck = (): void => {
     this.error = undefined;
-    this.progressInfo.currentStep = ProgressStep.ABOUT;
+    this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
@@ -177,7 +189,6 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     try {
       this.hwDeviceInfo = undefined;
 
-      // TODO: [TREZOR] fix type if possible
       const trezorResp = await TrezorConnect.cardanoGetPublicKey({
         // TODO: only support Trezor wallest on account 0
         path: derivePathPrefix(0)
@@ -187,7 +198,7 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
       /** Converts a valid hardware wallet response to a common storable format
         * later the same format will be used to create wallet */
-      this.hwDeviceInfo = this._normalizeHWResponse(trezorResp, trezorEventDevice);
+      this.hwDeviceInfo = this._normalizeHWResponse({ trezorResp, trezorEventDevice });
 
       // It's a valid trezor device, go to Save Load state
       this._goToSaveLoad();
@@ -202,10 +213,14 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
   };
 
   _normalizeHWResponse = (
-    trezorResp: any,
-    trezorEventDevice: DeviceMessage
+    resp: TrezorConnectionResponse,
   ): HWDeviceInfo => {
-    this._validateHWResponse(trezorResp, trezorEventDevice);
+    this._validateHWResponse(resp);
+    if (!resp.trezorResp.success) {
+      throw new Error('TrezorConnectStore::_normalizeHWResponse should never happen');
+    }
+
+    const { trezorResp, trezorEventDevice } = resp;
 
     /** This check aready done in _validateHWResponse but flow needs this */
     if (trezorEventDevice == null
@@ -232,9 +247,9 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
 
   /** Validates the compatibility of data which we have received from Trezor device */
   _validateHWResponse = (
-    trezorResp: any,
-    trezorEventDevice: DeviceMessage
+    resp: TrezorConnectionResponse,
   ): boolean => {
+    const { trezorResp, trezorEventDevice } = resp;
 
     if (trezorResp && !trezorResp.success) {
       switch (trezorResp.payload.error) {
@@ -394,6 +409,9 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     const { wallets } = this.stores.substores[environment.API];
     await wallets._patchWalletRequestWithNewWallet(trezorWallet);
 
+    // Dynamically update the topbar icons
+    this.stores.topbar.updateCategories();
+
     // goto the wallet transactions page
     Logger.debug('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
     wallets.goToWalletRoute(trezorWallet.id);
@@ -401,9 +419,6 @@ export default class TrezorConnectStore extends Store implements HWConnectStoreT
     // fetch its data
     Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
     wallets.refreshWalletsData();
-
-    // Load the Yoroi with Trezor Icon
-    this.stores.topbar.initCategories();
 
     // show success notification
     wallets.showTrezorTWalletIntegratedNotification();

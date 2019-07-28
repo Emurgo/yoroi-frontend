@@ -4,9 +4,9 @@ import { observer } from 'mobx-react';
 import TermsOfUseText from '../../profile/terms-of-use/TermsOfUseText';
 import styles from './TermsOfUseSettings.scss';
 
-type Props = {
+type Props = {|
   localizedTermsOfUse: string,
-};
+|};
 
 @observer
 export default class TermsOfUseSettings extends Component<Props> {

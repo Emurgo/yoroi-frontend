@@ -1,61 +1,62 @@
-module.exports = function(api) {
+module.exports = function (api) {
   // when running jest we need to use nodejs and not browser configurations
   const nodePlugins = api.env('jest')
-    ? [ "dynamic-import-node" ]
+    ? ['dynamic-import-node']
     : [];
 
   return {
-    "presets": [
+    presets: [
       [
-        "@babel/preset-env",
+        '@babel/preset-env',
         {
-          "modules": "commonjs",
-          "useBuiltIns": "entry"
+          corejs: 2,
+          modules: api.env('jest') ? 'commonjs' : 'auto',
+          useBuiltIns: 'entry'
         }
       ],
-      "@babel/preset-flow",
-      "@babel/preset-react"
+      '@babel/preset-flow',
+      '@babel/preset-react'
     ],
-    "plugins": [
-      "react-hot-loader/babel",
+    plugins: [
       [
-        "@babel/plugin-proposal-decorators",
+        '@babel/plugin-proposal-decorators',
         {
-          "legacy": true
+          legacy: true
         }
       ],
       [
-        "@babel/plugin-transform-runtime",
+        '@babel/plugin-transform-runtime',
         {
-          "corejs": 2,
-          "helpers": true,
-          "regenerator": true
+          corejs: 2,
+          helpers: true,
+          regenerator: true
         }
       ],
       [
-        "react-intl",
+        'react-intl',
         {
-          "messagesDir": "./translations/messages/",
-          "enforceDescriptions": false,
-          "extractSourceLocation": true
+          messagesDir: './translations/messages/',
+          enforceDescriptions: false,
+          extractSourceLocationß: true
         }
       ],
-      "@babel/plugin-syntax-dynamic-import",
-      "add-module-exports",
+      '@babel/plugin-syntax-dynamic-import',
+      'add-module-exports',
       [
-        "@babel/plugin-proposal-class-properties",
+        '@babel/plugin-proposal-class-properties',
         {
-          "loose": true
+          loose: true
         }
       ],
-      "@babel/plugin-proposal-export-default-from",
-      "@babel/plugin-proposal-export-namespace-from",
+      '@babel/plugin-proposal-export-default-from',
+      '@babel/plugin-proposal-export-namespace-from',
       ...nodePlugins,
     ],
-    "env": {
-      "development": {
-        "plugins": [
-          "@babel/plugin-transform-runtime"
+    env: {
+      development: {
+        plugins: [
+          'react-hot-loader/babel',
+          '@babel/plugin-transform-runtime'
         ]
       }
     }

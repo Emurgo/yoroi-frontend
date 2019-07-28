@@ -5,11 +5,11 @@ import styles from './WalletAccountIcon.scss';
 import Blockies from 'react-blockies';
 import tinycolor from 'tinycolor2';
 
-type Props = {
+type Props = {|
   iconSeed: string,
   scalePx?: number,
   saturationFactor?: number,
-};
+|};
 
 const mkcolor = (primary, secondary, spots) => ({ primary, secondary, spots });
 const COLORS = [

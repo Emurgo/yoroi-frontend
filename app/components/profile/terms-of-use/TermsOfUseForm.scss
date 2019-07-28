@@ -14,14 +14,14 @@
 
   .centeredBox {
     margin: 0 auto;
-    width: 600px;
+    width: 800px;
   }
   
   .submitButton,
   .submitButtonSpinning {
     display: block !important;
-    margin: 0 auto;
-    width: 100% !important;
+    margin: 0;
+    width: 350px;
   }
   
   .submitButtonSpinning {
@@ -35,34 +35,14 @@
   }
   
   .checkbox {
-    margin-bottom: 30px;
-    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 15px;
+    padding-top: 40px;
   
     :global .SimpleCheckbox_label {
       font-family: var(--rp-theme-font-regular);
     }
-  
-    :global .SimpleCheckbox_root {
-      margin-bottom: 30px;
-    }
-  }  
-}
-
-:global(.YoroiModern) .component {
-  .centeredBox {
-    width: 660px;
-  }
-
-  .submitButton,
-  .submitButtonSpinning {
-    margin: 0;
-    width: 210px !important;
-  }
-
-  .checkbox {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 60px;
   }  
 }

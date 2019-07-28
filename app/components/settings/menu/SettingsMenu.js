@@ -6,7 +6,6 @@ import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
 import environment from '../../../environment';
-import { THEMES } from '../../../themes';
 import type { Theme } from '../../../themes';
 
 const messages = defineMessages({
@@ -30,27 +29,19 @@ const messages = defineMessages({
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
   },
-  display: {
-    id: 'settings.menu.display.link.label',
-    defaultMessage: '!!!Themes',
-  },
-  AboutYoroi: {
-    id: 'settings.menu.aboutYroi.link.label',
-    defaultMessage: '!!!About Yoroi',
-  },
   adaRedemption: {
     id: 'settings.menu.adaRedemption.link.label',
     defaultMessage: '!!!Ada Redemption',
   }
 });
 
-type Props = {
+type Props = {|
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
   currentLocale: string,
   currentTheme: Theme,
-};
+|};
 
 @observer
 export default class SettingsMenu extends Component<Props> {
@@ -61,10 +52,10 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale, currentTheme } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
 
     return (
-      <div className={currentTheme === THEMES.YOROI_CLASSIC ? '' : styles.componentWrapper}>
+      <div className={styles.componentWrapper}>
         <div className={styles.component}>
           <SettingsMenuItem
             label={intl.formatMessage(messages.general)}
@@ -106,13 +97,6 @@ export default class SettingsMenu extends Component<Props> {
             className="support"
           />
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.display)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.DISPLAY)}
-            active={isActiveItem(ROUTES.SETTINGS.DISPLAY)}
-            className="display"
-          />
-
           {(!environment.isMainnet() || currentLocale === 'ko-KR' || currentLocale === 'ja-JP') &&
             // all unredemed Ada is held being either Japanese or Korean people
             // avoid showing this menu option to all users to avoid confusing them
@@ -124,12 +108,6 @@ export default class SettingsMenu extends Component<Props> {
             />
           }
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.AboutYoroi)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.ABOUT_YOROI)}
-            active={isActiveItem(ROUTES.SETTINGS.ABOUT_YOROI)}
-            className="AboutYoroi"
-          />
         </div>
       </div>
     );

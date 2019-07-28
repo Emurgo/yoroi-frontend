@@ -1,7 +1,7 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/error-message';
 
-.componentClassic {
+.component {
   flex: 1;
   overflow-x: hidden;
   overflow-y: overlay;
@@ -9,393 +9,227 @@
   padding-right: 20px;
   padding-bottom: 20px;
   padding-left: 20px;
+
   &::-webkit-scrollbar-button {
     height: 7px;
     display: block;
   }
 
+  .qrCodeAndInstructions {
+    border-bottom: 1px solid var(--theme-separation-border-color);
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    position: relative;
+
+    .qrCode {
+      align-items: flex-start;
+      display: flex;
+      margin-left: 150px;
+
+      canvas {
+        border: 4px solid var(--theme-receive-qr-code-background-color);
+        box-sizing: content-box;
+      }
+    }
+
+    .instructions {
+      color: var(--theme-bordered-box-text-color);
+      display: flex;
+      flex-direction: column;
+      font-family: var(--font-regular);
+      font-size: 14px;
+      justify-content: space-between;
+      line-height: 19px;
+      letter-spacing: 0;
+
+      .postCopyMargin {
+        margin-bottom: 16px;
+      }
+
+      .copyableHash {
+        letter-spacing: 0px;
+        font-size: 17px;
+      }
+
+      .hashLabel {
+        font-size: 18px;
+        font-family: var(--font-medium);
+        line-height: 22px;
+        margin-bottom: 16px;
+      }
+
+      .instructionsText {
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        line-height: 22px;
+        margin-bottom: 40px;
+        word-break: break-word;
+      }
+
+      .submitWithPasswordButton {
+        max-width: 310px;
+        width: calc(50% - 10px);
+        &.spinning {
+          @include loading-spinner("../../assets/images/spinner-light.svg");
+        }
+      }
+
+      .error {
+        @include error-message;
+        text-align: left;
+        margin-top: 5px;
+      }
+    }
+  }
+
+  .generatedAddresses {
+    color: var(--theme-bordered-box-text-color);
+    font-family: var(--font-regular);
+    font-size: 15px;
+    line-height: 22px;
+
+    h2 {
+      font-size: 18px;
+      font-family: var(--font-medium);
+      margin-bottom: 10px;
+      line-height: 22px;
+
+      button {
+        color: var(--theme-label-button-color);
+        cursor: pointer;
+        float: right;
+        font-family: var(--font-medium);
+        font-size: 16px;
+        margin-left: 12px;
+        text-transform: uppercase;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .walletAddress {
+      box-sizing: border-box;
+      display: flex;
+      padding: 8.5px 0;
+      word-break: break-all;
+
+      & + .walletAddress {
+        border-top: 1px solid var(--theme-separation-border-color);
+      }
+
+      .addressMargin {
+        margin-right: 32.5px;
+        flex-grow: 1;
+      }
+
+      .addressActions {
+        display: inline-flex;
+        align-items: flex-start;
+
+        .addressActionItemBlock {
+          cursor: pointer;
+          letter-spacing: 0.5px;
+          margin-left: 24px;
+          line-height: 20px;
+          vertical-align: top;
+          white-space: nowrap;
+
+          * {
+            vertical-align: middle;
+          }
+
+          span {
+            color: var(--theme-label-button-color);
+            font-family: var(--font-regular);
+            font-size: 14px;
+            margin-left: 6px;
+          }
+
+          .verifyIcon,
+          .copyIcon, .generateURIIcon {
+            cursor: pointer;
+            display: inline-flex;
+            object-fit: contain;
+            margin-left: 4px;
+            & > svg {
+              height: 14.5px;
+              width: 11.5px;
+              path {
+                fill: var(--theme-icon-copy-address-color);
+              }
+            }
+          }
+
+          .verifyIcon, .generateURIIcon {
+            & > svg {
+              height: 20px;
+              width: 20px;
+            }
+          }
+
+          .btnGenerateURI {
+            cursor: pointer;
+          }
+        }
+
+        .verifyActionBlock, .generateURLActionBlock {
+          button {
+            cursor: pointer;
+          }
+        }
+
+        .generateURLActionBlock {
+          margin-left: unset;
+        }
+      }
+    }
+  }
+}
+
+:global(.YoroiClassic) .component {
   :global {
-    .BorderedBox_componentClassic {
+    .BorderedBox_component {
       padding-bottom: 6px;
     }
   }
 }
 
-.component {
-  flex: 1;
-  overflow-x: hidden;
-  overflow-y: overlay;
+:global(.YoroiModern) .component {
   padding: 30px;
-  &::-webkit-scrollbar-button {
-    height: 7px;
-    display: block;
-  }
-}
 
-.copyIcon {
-  cursor: pointer;
-  object-fit: contain;
-}
+  .qrCodeAndInstructions {
+    .instructions {
+      .copyableHash {
+        font-size: 14px;
+        line-height: 1.57;
+      }
 
-.copyIcon {
-  margin-left: 4px;
-  & > svg {
-    height: 12px;
-    width: 10px;
-    path {
-      fill: var(--theme-icon-copy-address-color);
-    }
-  }
-}
-
-.qrCodeAndInstructionsClassic {
-  border-bottom: 1px solid var(--theme-separation-border-color);
-  display: flex;
-  flex-direction: row;
-  margin: 0 0 18px;
-  padding-bottom: 26px;
-  position: relative;
-
-  .qrCode {
-    align-items: flex-start;
-    display: flex;
-    margin-left: 20px;
-
-    canvas {
-      border: 4px solid var(--theme-receive-qr-code-background-color);
-      box-sizing: content-box;
+      .instructionsText {
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: 1.57;
+      }
     }
   }
 
-  .instructions {
-    color: var(--theme-bordered-box-text-color);
-    display: flex;
-    flex-direction: column;
-    font-family: var(--font-regular);
+  .generatedAddresses {
     font-size: 14px;
-    justify-content: space-between;
-    line-height: 19px;
-    letter-spacing: 0;
 
-    .hash {
-      font-size: 14px;
-      font-family: var(--font-mono-medium);
-      line-height: 23px;
-      margin-bottom: 6px;
-      word-break: break-all;
-    }
+    .walletAddress {
+      padding: 12px 0;
 
-    .usedHash {
-      opacity: 0.4;
-    }
-
-    .hashLabel {
-      font-size: 11px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      opacity: 0.5;
-      text-transform: uppercase;
-    }
-
-    .instructionsText {
-      font-size: 15px;
-      letter-spacing: 0.5px;
-      line-height: 22px;
-      margin-bottom: 12px;
-      word-break: break-word;
-    }
-
-    .submitWithPasswordButton {
-      max-width: 310px;
-      width: calc(50% - 10px);
-      &.spinning {
-        @include loading-spinner("../../assets/images/spinner-light.svg");
+      & + .walletAddress {
+        border-top: 1px solid var(--theme-separation-border-color);
       }
-    }
 
-    .error {
-      text-align: left;
+      .addressMargin {
+        margin-right: 32.5px;
+      }
+
     }
   }
-}
-
-.qrCodeAndInstructions {
-  border-bottom: 1px solid var(--theme-separation-border-color);
-  display: flex;
-  flex-direction: row;
-  margin: 0 0 50px;
-  padding-bottom: 50px;
-  position: relative;
-
-  .qrCode {
-    align-items: flex-start;
-    display: flex;
-    margin-left: 56px;
-
-    canvas {
-      border: 4px solid var(--theme-receive-qr-code-background-color);
-      box-sizing: content-box;
-    }
-  }
-
-  .instructions {
-    color: var(--theme-bordered-box-text-color);
-    display: flex;
-    flex-direction: column;
-    font-family: var(--font-regular);
-    font-size: 14px;
-    justify-content: space-between;
-    line-height: 19px;
-    letter-spacing: 0;
-
-    .hash {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      font-family: var(--font-mono-medium);
-      line-height: 1.57;
-      margin-bottom: 6px;
-      word-break: break-all;
-    }
-
-    :global {
-      .NotificationMessage_component {
-        position: relative;
-        display: inline-block;
-        width: auto;
-        margin-left: 25px;
-        padding-left: 25px;
-        background: transparent;
-
-        svg {
-          position: absolute;
-          top: -10px;
-          left: -10px;
-        }
-      }
-
-      .NotificationMessage_show {
-        height: 21px;
-
-        path:last-child {
-          fill: var(--theme-notification-message-receive-text-color);
-        }
-      }
-
-      .NotificationMessage_message {
-        color: var(--theme-notification-message-receive-text-color);
-        line-height: 21px;
-        font-size: 13px;
-      }
-    }
-
-    .usedHash > span {
-      opacity: 0.4;
-    }
-
-    .hashLabel {
-      font-size: 16px;
-      font-family: var(--font-medium);
-      line-height: 1.31;
-      margin-bottom: 30px;
-      text-transform: uppercase;
-    }
-
-    .instructionsText {
-      font-size: 14px;
-      letter-spacing: 0;
-      line-height: 1.57;
-      margin-bottom: 25px;
-      word-break: break-word;
-    }
-
-    .submitWithPasswordButton {
-      max-width: 310px;
-      width: calc(50% - 10px);
-      &.spinning {
-        @include loading-spinner("../../assets/images/spinner-light.svg");
-      }
-    }
-
-    .error {
-      height: 21px;
-      margin-bottom: 53px;
-      text-align: left;
-    }
-  }
-}
-
-.generatedAddressesClassic {
-  color: var(--theme-bordered-box-text-color);
-  font-family: var(--font-regular);
-  font-size: 15px;
-  line-height: 22px;
-
-  h2 {
-    font-family: var(--font-medium);
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-
-    button {
-      color: var(--theme-label-button-color);
-      cursor: pointer;
-      float: right;
-      font-family: var(--font-regular);
-      font-size: 14px;
-      line-height: 22px;
-      margin-left: 12px;
-      opacity: 0.55;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  .walletAddress {
-    box-sizing: border-box;
-    display: flex;
-    padding: 8.5px 0;
-    word-break: break-all;
-
-    & + .walletAddress {
-      border-top: 1px solid var(--theme-separation-border-color);
-    }
-
-    .addressId {
-      font-family: var(--font-mono-regular);
-      flex-grow: 1;
-      margin-right: 32.5px;
-      letter-spacing: 0;
-    }
-
-    .addressActions {
-      .addressIcon {
-        cursor: pointer;
-        display: inline-block;
-        letter-spacing: 0.5px;
-        line-height: 20px;
-        vertical-align: top;
-        white-space: nowrap;
-
-        * {
-          vertical-align: middle;
-        }
-
-        span {
-          color: var(--theme-label-button-color);
-          font-size: 14px;
-          margin-left: 6px;
-          opacity: 0.65;
-        }
-      }
-    }
-  }
-
-  .usedWalletAddress {
-    .addressId,
-    .addressActions .addressIcon img {
-      opacity: 0.4;
-    }
-
-    .addressActions .addressIcon span {
-      opacity: 0.3;
-    }
-  }
-}
-
-.generatedAddresses {
-  color: var(--theme-bordered-box-text-color);
-  font-family: var(--font-regular);
-  font-size: 14px;
-  line-height: 22px;
-
-  h2 {
-    font-family: var(--font-medium);
-    font-size: 16px;
-    line-height: 1.31;
-    text-transform: uppercase;
-    letter-spacing: 0;
-    margin-bottom: 20px;
-
-    button {
-      color: var(--theme-label-button-color);
-      cursor: pointer;
-      float: right;
-      font-family: var(--font-medium);
-      font-size: 14px;
-      line-height: 22px;
-      margin-left: 12px;
-      text-transform: uppercase;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  .walletAddress {
-    box-sizing: border-box;
-    display: flex;
-    padding: 12px 0;
-    word-break: break-all;
-
-    & + .walletAddress {
-      border-top: 1px solid var(--theme-separation-border-color);
-    }
-
-    .addressId {
-      font-family: var(--font-mono-regular);
-      flex-grow: 1;
-      margin-right: 32.5px;
-      letter-spacing: 0;
-      color: var(--theme-transactions-received-address-color);
-    }
-
-    .addressActions {
-      .addressIcon {
-        cursor: pointer;
-        display: inline-block;
-        letter-spacing: 0.5px;
-        line-height: 20px;
-        vertical-align: top;
-        white-space: nowrap;
-
-        * {
-          vertical-align: middle;
-        }
-
-        span {
-          color: var(--theme-label-button-color);
-          font-family: var(--font-medium);
-          font-size: 14px;
-          margin-left: 6px;
-          opacity: 0.4;
-          text-transform: uppercase;
-        }
-      }
-
-      .copyIcon {
-        display: inline-flex;
-      }
-    }
-  }
-
-  .usedWalletAddress {
-    .addressId,
-    .addressActions .addressIcon img {
-      opacity: 0.4;
-    }
-
-    .addressActions .addressIcon span {
-      opacity: 0.2;
-    }
-  }
-}
-
-.error {
-  @include error-message;
-  margin-bottom: 1rem;
-  text-align: center;
 }

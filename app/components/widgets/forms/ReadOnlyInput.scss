@@ -1,4 +1,4 @@
-.componentClassic {
+.component {
   margin-bottom: 32px;
   position: relative;
 
@@ -23,35 +23,24 @@
       opacity: 1;
     }
   }
+
+  .icon svg {
+    vertical-align: bottom;
+  }  
 }
 
-.component {
-  margin-bottom: 32px;
-  position: relative;
-
+:global(.YoroiModern) .component {
   .disabled {
     background-color: transparent;
-    border-color: var(--theme-input-border-color);
-    color: var(--theme-input-text-color);
   }
 
   .button {
     bottom: 37px;
-    color: var(--theme-label-button-color);
-    cursor: pointer;
-    font-family: var(--font-light);
-    font-size: 16px;
-    line-height: 1.38;
-    opacity: 0.5;
-    position: absolute;
-    right: 22px;
-    text-transform: lowercase;
-    &:hover {
-      opacity: 1;
-    }
   }
 }
 
-.icon svg {
-  vertical-align: bottom;
+:global(.YoroiClassic) .component {
+  .button {
+    bottom: 35px;
+  }  
 }

@@ -1,6 +1,6 @@
 {
-  "version": "1.6.0",
-  "version_name": "tn-1.6.0",
+  "version": "1.8.2",
+  "version_name": "tn-1.8.2",
   "name": "yoroi",
   "manifest_version": 2,
   "description": "[testnet] Cardano ADA wallet",
@@ -35,5 +35,12 @@
       "js": ["js/trezor-content-script.js"]
     }
   ],
-  "content_security_policy": "default-src 'self'; frame-src https://connect.trezor.io/ https://emurgo.github.io/yoroi-extension-ledger-bridge; script-src 'self' 'unsafe-eval'; connect-src https://18.207.22.26:8080 wss://18.207.22.26:8080; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "content_security_policy": "default-src 'self'; frame-src https://connect.trezor.io/ https://emurgo.github.io/yoroi-extension-ledger-bridge; script-src 'self' 'unsafe-eval'; connect-src wss://testnet-yoroi-backend.yoroiwallet.com:443 https://testnet-yoroi-backend.yoroiwallet.com; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;",
+  "protocol_handlers": [
+    {
+      "protocol": "web+cardano",
+      "name": "Yoroi",
+      "uriTemplate": "main_window.html#/send-from-uri?q=%s"
+    }
+  ]
 }

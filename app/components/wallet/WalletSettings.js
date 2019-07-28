@@ -14,23 +14,19 @@ import type { Node } from 'react';
 const messages = defineMessages({
   name: {
     id: 'wallet.settings.name.label',
-    defaultMessage: '!!!Name',
+    defaultMessage: '!!!Wallet name',
   },
   passwordLabel: {
     id: 'wallet.settings.password',
-    defaultMessage: '!!!Password',
+    defaultMessage: '!!!Spending password',
   },
   passwordLastUpdated: {
     id: 'wallet.settings.passwordLastUpdated',
     defaultMessage: '!!!Last updated',
   },
-  exportButtonLabel: {
-    id: 'wallet.settings.exportWalletButtonLabel',
-    defaultMessage: '!!!Export wallet',
-  },
 });
 
-type Props = {
+type Props = {|
   walletName: string,
   walletPasswordUpdateDate: ?Date,
   error?: ?LocalizableError,
@@ -48,7 +44,7 @@ type Props = {
   lastUpdatedField: ?string,
   showPasswordBlock: boolean,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletSettings extends Component<Props> {

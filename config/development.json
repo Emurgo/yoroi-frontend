@@ -1,14 +1,15 @@
 {
   "network": {
-    "protocolMagic": 633343913,
-    "backendUrl": "https://iohk-staging.yoroiwallet.com",
-    "websocketUrl": "wss://iohk-staging.yoroiwallet.com:443",
-    "name": "staging"
+    "protocolMagic": 1097911063,
+    "backendUrl": "https://testnet-yoroi-backend.yoroiwallet.com",
+    "websocketUrl": "wss://testnet-yoroi-backend.yoroiwallet.com:443",
+    "name": "testnet"
   },
   "app": {
     "walletRefreshInterval": 20000,
+    "serverStatusRefreshInterval": 20000,
     "logsBufferSize": 500,
-    "logsFileSuffix": "-yoroi.log",
+    "logsFileSuffix": "-yoroi-testnet.log",
     "addressScanSize": 20,
     "addressRequestSize": 50,
     "txsBodiesRequestSize": 150

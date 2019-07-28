@@ -6,6 +6,10 @@
     left: calc(100% - 27px);
   }
 
+  label {
+    position: absolute;
+  }
+
   input {
     height: 52px;
     border-radius: 8px;

@@ -1,21 +1,34 @@
+// @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import _ from 'lodash';
 
+type Props = {|
+  variables: { [key: string]: string },
+  children?: Node,
+|};
+
 /** Allow to swap the CSS used at runtime to allow user-defined themes */
-export default class ThemeManager extends Component {
+export default class ThemeManager extends Component<Props> {
+  static defaultProps = {
+    children: undefined
+  };
+
   componentDidMount() {
     this.updateCSSVariables(this.props.variables);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (this.props.variables !== prevProps.variables) {
       this.updateCSSVariables(this.props.variables);
     }
   }
 
-  updateCSSVariables(variables) {
+  updateCSSVariables(variables: { [key: string]: string }) {
     _.map(variables, (value, prop) => {
-      document.documentElement.style.setProperty(prop, value);
+      if (document.documentElement) {
+        document.documentElement.style.setProperty(prop, value);
+      }
     });
   }
   render() {

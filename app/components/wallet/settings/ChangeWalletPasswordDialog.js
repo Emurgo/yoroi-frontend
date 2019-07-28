@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import Dialog from '../../widgets/Dialog';
 import { isValidWalletPassword, isValidRepeatPassword } from '../../../utils/validations';
@@ -17,45 +17,21 @@ import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import PasswordInstructions from '../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
-  dialogTitleSetPassword: {
-    id: 'wallet.settings.changePassword.dialog.title.setPassword',
-    defaultMessage: '!!!Password',
-  },
   dialogTitleChangePassword: {
     id: 'wallet.settings.changePassword.dialog.title.changePassword',
-    defaultMessage: '!!!Change password',
-  },
-  walletPasswordLabel: {
-    id: 'wallet.settings.changePassword.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Wallet password',
+    defaultMessage: '!!!Change spending password',
   },
   currentPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordLabel',
-    defaultMessage: '!!!Current password',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat password',
+    defaultMessage: '!!!Current spending password',
   },
   currentPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type current password',
-  },
-  newPasswordFieldPlaceholder: {
-    id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type new password',
-  },
-  newPasswordLabel: {
-    id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
-    defaultMessage: '!!!New password',
-  },
-  repeatPasswordFieldPlaceholder: {
-    id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Repeat new password',
+    defaultMessage: '!!!Type current spending password',
   },
 });
 
-type Props = {
+type Props = {|
   currentPasswordValue: string,
   newPasswordValue: string,
   repeatedPasswordValue: string,
@@ -66,7 +42,7 @@ type Props = {
   isSubmitting: boolean,
   error: ?LocalizableError,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class ChangeWalletPasswordDialog extends Component<Props> {
@@ -84,8 +60,8 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       },
       walletPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.newPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.newPasswordFieldPlaceholder),
+        label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
+        placeholder: this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -100,8 +76,8 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       },
       repeatPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
+        label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
+        placeholder: this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder),
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -117,6 +93,9 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -208,7 +187,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
         </div>
 
@@ -221,7 +200,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...newPasswordField.bind()}
             done={isValidWalletPassword(newPassword)}
             error={newPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
 
           <Input
@@ -232,10 +211,10 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...repeatedPasswordField.bind()}
             done={repeatedPassword && isValidRepeatPassword(newPassword, repeatedPassword)}
             error={repeatedPasswordField.error}
-            skin={classicTheme ? InputSkin : InputOwnSkin}
+            skin={InputOwnSkin}
           />
 
-          <PasswordInstructions isClassicThemeActive={classicTheme} />
+          <PasswordInstructions />
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

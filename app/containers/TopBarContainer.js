@@ -5,14 +5,17 @@ import TopBar from '../components/topbar/TopBar';
 import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
-import resolver from '../utils/imports';
 
-const { formattedWalletAmount } = resolver('utils/formatters');
+import { formattedWalletAmount } from '../utils/formatters';
 
 type Props = InjectedProps;
 
 @observer
 export default class TopBarContainer extends Component<Props> {
+
+  updateHideBalance = () => {
+    this.props.actions.profile.updateHideBalance.trigger();
+  }
 
   render() {
     const { actions, stores } = this.props;
@@ -27,6 +30,8 @@ export default class TopBarContainer extends Component<Props> {
       themeProperties={{
         identiconSaturationFactor: profile.isClassicTheme ? -5 : 0
       }}
+      onUpdateHideBalance={this.updateHideBalance}
+      shouldHideBalance={profile.shouldHideBalance}
     />);
     return (
       <TopBar
@@ -36,7 +41,6 @@ export default class TopBarContainer extends Component<Props> {
         }}
         categories={topbar.CATEGORIES}
         activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.isClassicTheme}
       />
     );
   }

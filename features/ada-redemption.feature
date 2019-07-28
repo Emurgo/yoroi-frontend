@@ -3,8 +3,7 @@ Feature: Ada Redemption
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And I am testing "Ada Redemption"
-    And There is a wallet stored named Test
+    Given I import a snapshot named empty-wallet
     And I go to the ada redemption screen
 
   Scenario: User accepts "Daedalus Redemption Disclaimer"
@@ -14,7 +13,7 @@ Feature: Ada Redemption
     Then I should not see the "Daedalus Redemption Disclaimer" overlay anymore
     And I should still be on the ada redemption screen
 
-  @it-73
+  @it-82
   Scenario: User redeems manually entered "Regular" redemption key
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I enter a valid "Regular" redemption key
@@ -40,15 +39,6 @@ Feature: Ada Redemption
   Scenario: User redeems "Regular" PDF certificate
     Given I have accepted "Daedalus Redemption Disclaimer"
     And I select a valid "Regular" PDF certificate
-    And ada redemption form submit button is no longer disabled
-    When I submit the ada redemption form
-    Then I should see the "Ada Redemption Success Overlay" and close the dialogue
-    And I should see the summary screen
-
-  Scenario: User redeems "Regular" encrypted PDF certificate
-    Given I have accepted "Daedalus Redemption Disclaimer"
-    And I select a valid "Regular" encrypted PDF certificate
-    And I enter a valid "Regular" encrypted PDF certificate passphrase
     And ada redemption form submit button is no longer disabled
     When I submit the ada redemption form
     Then I should see the "Ada Redemption Success Overlay" and close the dialogue

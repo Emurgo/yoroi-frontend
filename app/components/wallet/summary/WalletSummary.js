@@ -29,13 +29,12 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   numberOfTransactions: number,
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
   openExportTxToFileDialog: Function,
-  classicTheme: boolean,
-};
+|};
 
 @observer
 export default class WalletSummary extends Component<Props> {
@@ -50,23 +49,22 @@ export default class WalletSummary extends Component<Props> {
       numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
-      classicTheme,
     } = this.props;
     const { intl } = this.context;
-    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
+
     return (
-      <div className={componentClasses}>
+      <div className={styles.component}>
         <div className={styles.leftBlock} />
         <div className={styles.middleBlock}>
           <BorderedBox>
-            {pendingAmount.incoming.greaterThan(0) &&
+            {pendingAmount.incoming.isGreaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
                 : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
                 <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
               </div>
             }
-            {pendingAmount.outgoing.greaterThan(0) &&
+            {pendingAmount.outgoing.isGreaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
                 : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>

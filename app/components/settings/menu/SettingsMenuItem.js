@@ -4,13 +4,13 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SettingsMenuItem.scss';
 
-type Props = {
+type Props = {|
   label: string,
   active: boolean,
   onClick: Function,
   className: string,
   disabled?: boolean,
-};
+|};
 
 @observer
 export default class SettingsMenuItem extends Component<Props> {

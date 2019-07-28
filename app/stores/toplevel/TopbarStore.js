@@ -1,19 +1,21 @@
 // @flow
 import { observable, action } from 'mobx';
 import Store from '../base/Store';
-import resolver from '../../utils/imports';
 import environment from '../../environment';
+import { Logger } from '../../utils/logging';
 import {
   WITH_LEDGER_NANO_S_CATEGORIE as WITH_LEDGER_NANO_S,
   WITH_TREZOR_T_CATEGORIE as WITH_TREZOR_T,
+  GO_BACK_CATEGORIE as GO_BACK,
+  WALLETS_CATEGORIE as WALLETS,
+  CURRENCY_SPECIFIC_CATEGORIES,
+  COMMON_CATEGORIES,
 } from '../../config/topbarConfig';
 
-const topbarConfig = resolver('config/topbarConfig');
-
 export default class TopbarStore extends Store {
-  CATEGORIES = topbarConfig.CATEGORIES;
+  CATEGORIES = [...COMMON_CATEGORIES, ...CURRENCY_SPECIFIC_CATEGORIES[environment.API]];
 
-  @observable activeTopbarCategory: string = this.CATEGORIES[0].route;
+  @observable activeTopbarCategory: string = WALLETS.route;
 
   setup() {
     const actions = this.actions.topbar;
@@ -25,23 +27,40 @@ export default class TopbarStore extends Store {
   }
 
   /** Dynamic Initialization of Topbar Categories */
-  @action initCategories() {
-    this.CATEGORIES = topbarConfig.CATEGORIES;
-
+  @action updateCategories(): void {
     const { wallets } = this.stores.substores[environment.API];
-    // If active wallet is TrezorTWallet then show with Trezor T Icon
-    if (wallets && wallets.first && wallets.first.isTrezorTWallet
-      && !this.CATEGORIES.find(category => category.name === WITH_TREZOR_T.name)) {
-      this.CATEGORIES.push(WITH_TREZOR_T);
-    }
+    // set it to the default
+    this.CATEGORIES = [...COMMON_CATEGORIES, ...CURRENCY_SPECIFIC_CATEGORIES[environment.API]];
 
-    // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
-    if (wallets && wallets.first && wallets.first.isLedgerNanoSWallet
-      && !this.CATEGORIES.find(category => category.name === WITH_LEDGER_NANO_S.name)) {
-      this.CATEGORIES.push(WITH_LEDGER_NANO_S);
-    }
+    // For rare of the rare case, make sure wallets store is initialized
+    if (wallets) {
+      // If active wallet is TrezorTWallet then show with Trezor T Icon
+      if (wallets.first && wallets.first.isTrezorTWallet) {
+        this.CATEGORIES.push(WITH_TREZOR_T);
+      }
 
-    this.activeTopbarCategory = this.CATEGORIES[0].route;
+      // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
+      if (wallets.first && wallets.first.isLedgerNanoSWallet) {
+        this.CATEGORIES.push(WITH_LEDGER_NANO_S);
+      }
+
+      // If there is not any active wallets then replace WALLETS Category by GO_BACK Category
+      if (!wallets.hasAnyLoaded) {
+        // eslint-disable-next-line arrow-body-style
+        const walletCategoryIndex = this.CATEGORIES.findIndex((item) => {
+          return item.name === WALLETS.name;
+        });
+        this.CATEGORIES[walletCategoryIndex] = GO_BACK;
+      }
+    } else {
+      Logger.warn('TopbarStore::updateCategories::Wallets store is not ready yet');
+    }
+  }
+
+  /** Reset Categories to defaults */
+  @action _resetCategories(): void {
+    this.CATEGORIES = [...COMMON_CATEGORIES, ...CURRENCY_SPECIFIC_CATEGORIES[environment.API]];
+    this.activeTopbarCategory = WALLETS.route;
   }
 
   @action _onActivateTopbarCategory = (
@@ -49,6 +68,13 @@ export default class TopbarStore extends Store {
   ): void => {
     const { category } = params;
     if (category !== this.activeTopbarCategory) {
+
+      // Resetting Categories to defaults, as Categories are originally designed to be static
+      // but for making it dynamic this is the patch
+      if (category === GO_BACK.route) {
+        this._resetCategories();
+      }
+
       this.activeTopbarCategory = category;
       this.actions.router.goToRoute.trigger({ route: category });
     }

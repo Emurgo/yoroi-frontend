@@ -1,6 +1,6 @@
 @import '../../themes/mixins/error-message.scss';
 
-.errorBlockClassic {
+.component {
   @include error-message;
   margin-top: 10px;
   height: 20px;
@@ -11,12 +11,8 @@
   }
 }
 
-.errorBlock {
-  @include error-message;
-  margin-top: 10px;
-  height: 20px;
-  text-align: center;
+:global(.YoroiModern) .component {
   span {
     font-size: 12px;
-  }
+  }  
 }

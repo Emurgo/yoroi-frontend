@@ -1,3 +1,4 @@
+// @flow
 import { IDENTIFIERS } from 'react-polymorph/lib/themes/API';
 import AutocompleteOverrides from './AutocompleteOverrides.scss';
 import BubbleOverrides from './BubbleOverrides.scss';

@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import SVGInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
@@ -8,9 +7,6 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
 import styles from './CreatePaperDialog.scss';
-import headerMixin from '../../../mixins/HeaderBlock.scss';
-import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
-import download from '../../../../assets/images/import-ic.inline.svg';
 import { PdfGenSteps } from '../../../../api/ada/paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from '../../../../api/ada/paperWallet/paperWalletPdf';
 
@@ -23,17 +19,13 @@ const messages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.loader.label',
     defaultMessage: '!!!Rendering PDF Certificate',
   },
-  downloadPaperButtonLabel: {
-    id: 'settings.paperWallet.dialog.createPaper.download.label',
-    defaultMessage: '!!!Download Paper Wallet Certificate',
-  },
-  downloadPaperIntroLine1: {
-    id: 'settings.paperWallet.dialog.createPaper.download.intro.line1',
+  downloadReadyInfo: {
+    id: 'settings.paperWallet.dialog.createPaper.downloadReadyInfo',
     defaultMessage: '!!!Your paper wallet PDF is ready',
   },
-  downloadPaperIntroLine2: {
-    id: 'settings.paperWallet.dialog.createPaper.download.intro.line2',
-    defaultMessage: '!!!Download size (Mb)',
+  downloadSizeInfo: {
+    id: 'settings.paperWallet.dialog.createPaper.downloadSizeInfo',
+    defaultMessage: '!!!Download Paper Wallet Certificate. Size (MB):',
   },
   pdfGenInitializing: {
     id: 'settings.paperWallet.dialog.createPaper.initializing',
@@ -65,7 +57,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   renderStatus: ?PdfGenStepType,
   paperFile: ?Blob,
   onNext: Function,
@@ -73,7 +65,7 @@ type Props = {
   onDownload: Function,
   onDataChange: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class CreatePaperDialog extends Component<Props> {
@@ -124,20 +116,14 @@ export default class CreatePaperDialog extends Component<Props> {
       classicTheme,
     } = this.props;
 
-    const dialogClasses = classnames(['createPaperDialog', styles.dialog]);
-    const confirmButtonClasses = classnames(['confirmButton']);
-    const buttonClassNames = classnames(['primary', styles.button]);
-    const downloadPaperIntroLine1ClassNames = classnames([
-      classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock,
-      styles.downloadPaperIntroLine1,
-    ]);
+    const dialogClasses = classnames(['createPaperDialog', styles.component]);
 
     const actions = [
       {
         label: intl.formatMessage(globalMessages.nextButtonLabel),
         onClick: onNext,
         primary: true,
-        className: confirmButtonClasses,
+        className: 'confirmButton',
         disabled: !paperFile
       },
     ];
@@ -154,27 +140,21 @@ export default class CreatePaperDialog extends Component<Props> {
           closeButton={<DialogCloseButton onClose={onCancel} />}
           classicTheme={classicTheme}
         >
-          <div className={downloadPaperIntroLine1ClassNames}>
-            <span>{intl.formatMessage(messages.downloadPaperIntroLine1)}</span>
+          <div
+            role="button"
+            tabIndex={0}
+            className={styles.downloadIcon}
+            onClick={onDownload}
+            onKeyPress={() => null}
+          />
+          <div className={styles.labelDownload}>
+            {this.context.intl.formatMessage(messages.downloadReadyInfo)}
           </div>
-          <center>
-            <button
-              type="button"
-              className={buttonClassNames}
-              onClick={onDownload}
-            >
-              <SVGInline svg={download} className={styles.icon} /><br />
-              <span className={styles.label}>
-                {this.context.intl.formatMessage(messages.downloadPaperButtonLabel)}
-              </span><br />
-              <span className={styles.label}>
-                {intl.formatMessage(messages.downloadPaperIntroLine2)}: {pdfSizeMb}
-              </span>
-            </button>
-          </center>
+          <div className={styles.labelDownloadSize}>
+            {intl.formatMessage(messages.downloadSizeInfo)}: {pdfSizeMb}
+          </div>
         </Dialog>
       );
-
     }
 
     return (
@@ -182,15 +162,20 @@ export default class CreatePaperDialog extends Component<Props> {
         title={intl.formatMessage(messages.dialogTitleCreatePaperWallet)}
         actions={actions}
         closeOnOverlayClick={false}
-        onClose={onCancel}
         className={dialogClasses}
+        onClose={onCancel}
         closeButton={<DialogCloseButton onClose={onCancel} />}
         classicTheme={classicTheme}
       >
-        <AnnotatedLoader
-          title={this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
-          details={this.statusToMessage(renderStatus)}
-        />
+        <div className={styles.walletLoaderWrapper}>
+          <div className={styles.walletLoader} />
+          <div className={styles.walletLoaderTitle}>
+            {this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
+          </div>
+          <div className={styles.walletLoaderProgressInfo}>
+            {this.statusToMessage(renderStatus)}
+          </div>
+        </div>
       </Dialog>
     );
   }

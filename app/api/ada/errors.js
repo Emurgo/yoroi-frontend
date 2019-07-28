@@ -40,7 +40,7 @@ const messages = defineMessages({
     id: 'api.errors.pendingTransactionError',
     defaultMessage: '!!!Error while updating pending transactions.',
   },
-  getAddressesWithFundsError: {
+  getAddressesKeysError: {
     id: 'api.errors.getAddressesWithFundsError',
     defaultMessage: '!!!Error while getting addresses with funds.',
   },
@@ -139,6 +139,10 @@ const messages = defineMessages({
   redemptionKeyAlreadyUsedError: {
     id: 'api.errors.redemptionKeyAlreadyUsedError',
     defaultMessage: '!!!Redemption key has already been used.',
+  },
+  serverStatusError: {
+    id: 'api.errors.serverStatusError',
+    defaultMessage: '!!!Connection to the server failed. Please check your internet connection or our Twitter account (https://twitter.com/YoroiWallet).',
   }
 });
 
@@ -223,11 +227,11 @@ export class PendingTransactionError extends LocalizableError {
   }
 }
 
-export class GetAddressesWithFundsError extends LocalizableError {
+export class GetAddressesKeysError extends LocalizableError {
   constructor() {
     super({
-      id: messages.getAddressesWithFundsError.id,
-      defaultMessage: messages.getAddressesWithFundsError.defaultMessage || '',
+      id: messages.getAddressesKeysError.id,
+      defaultMessage: messages.getAddressesKeysError.defaultMessage || '',
     });
   }
 }
@@ -444,6 +448,15 @@ export class RedemptionKeyAlreadyUsedError extends LocalizableError {
     super({
       id: messages.redemptionKeyAlreadyUsedError.id,
       defaultMessage: messages.redemptionKeyAlreadyUsedError.defaultMessage || '',
+    });
+  }
+}
+
+export class ServerStatusError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.serverStatusError.id,
+      defaultMessage: messages.serverStatusError.defaultMessage || '',
     });
   }
 }

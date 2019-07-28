@@ -8,13 +8,13 @@ import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
 import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { InvalidMnemonicError, InvalidEmailError, FieldRequiredError } from '../../../i18n/errors';
 import globalMessages from '../../../i18n/global-messages';
@@ -157,7 +157,7 @@ where Ada should be redeemed and enter {adaRedemptionPassphraseLength} word mnem
   },
 });
 
-type Props = {
+type Props = {|
   wallets: Array<{ value: string, label: string }>,
   onAcceptRedemptionDisclaimer: Function,
   onChooseRedemptionType: Function,
@@ -187,7 +187,7 @@ type Props = {
   error: ?LocalizableError,
   suggestedMnemonics: Array<string>,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class AdaRedemptionForm extends Component<Props> {
@@ -313,6 +313,9 @@ export default class AdaRedemptionForm extends Component<Props> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -473,7 +476,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     }}
                     disabled={isRecovery || isCertificateSelected}
                     error={redemptionKeyField.error}
-                    skin={classicTheme ? InputSkin : InputOwnSkin}
+                    skin={InputOwnSkin}
                   />
                 ) : (
                   <Input
@@ -482,7 +485,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                     {...shieldedRedemptionKeyField.bind()}
                     disabled={isCertificateSelected}
                     error={shieldedRedemptionKeyField.error}
-                    skin={classicTheme ? InputSkin : InputOwnSkin}
+                    skin={InputOwnSkin}
                   />
                 )}
 
@@ -541,7 +544,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="decryption-key"
                   {...decryptionKeyField.bind()}
                   error={decryptionKeyField.error}
-                  skin={classicTheme ? InputSkin : InputOwnSkin}
+                  skin={InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -553,7 +556,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="email"
                   {...emailField.bind()}
                   error={emailField.error}
-                  skin={classicTheme ? InputSkin : InputOwnSkin}
+                  skin={InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -565,7 +568,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-passcode"
                   {...adaPasscodeField.bind()}
                   error={adaPasscodeField.error}
-                  skin={classicTheme ? InputSkin : InputOwnSkin}
+                  skin={InputOwnSkin}
                 />
               </div>
             ) : null}
@@ -577,7 +580,7 @@ export default class AdaRedemptionForm extends Component<Props> {
                   className="ada-amount"
                   {...adaAmountField.bind()}
                   error={adaAmountField.error}
-                  skin={classicTheme ? InputSkin : InputOwnSkin}
+                  skin={InputOwnSkin}
                 />
               </div>
             ) : null}

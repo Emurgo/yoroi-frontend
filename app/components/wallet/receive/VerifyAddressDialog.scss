@@ -1,0 +1,45 @@
+@import '../../../themes/mixins/loading-spinner.scss';
+
+.processing {
+  @include loading-spinner("../../../assets/images/spinner-light.svg");
+}
+
+.label {
+  color:  var(--rp-formfield-label-text-color);
+  display: block;
+  font-family: var(--rp-formfield-label-font-family);
+  font-size: var(--rp-formfield-label-font-size);
+  line-height: 1.38;
+  margin: var(--rp-formfield-label-margin);
+  text-align: left;
+}
+
+.header {
+  padding-left: 0px !important;
+  padding-right: 0px;
+}
+
+.derivation {
+  font-family: var(--font-mono-regular);
+  letter-spacing: 0;
+}
+
+.infoBlock {
+  font-size: 15px;
+  text-align: center;
+
+  .data {
+    color: var(--theme-default-color-grey-3);
+    line-height: 30px;
+    height: 30px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: var(--theme-bordered-box-background-color);
+    border: var(--theme-bordered-box-border);
+  }
+}
+
+:global(.YoroiModern) .component {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg); 
+}

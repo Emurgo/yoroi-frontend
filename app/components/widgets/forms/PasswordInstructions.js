@@ -1,12 +1,13 @@
+// @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import styles from './PasswordInstructions.scss';
-import { defineMessages, intlShape, MessageDescriptor } from 'react-intl';
+import { defineMessages, FormattedHTMLMessage } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 
-type Props = {
-  isClassicThemeActive: boolean,
+type Props = {|
   instructionDescriptor?: MessageDescriptor
-};
+|};
 
 const messages = defineMessages({
   passwordInstructions: {
@@ -21,25 +22,16 @@ export default class PasswordInstructions extends Component<Props> {
     instructionDescriptor: undefined
   };
 
-  static contextTypes = {
-    intl: intlShape.isRequired
-  };
-
   render() {
-    const { intl } = this.context;
-    const { isClassicThemeActive, instructionDescriptor } = this.props;
-
-    const passwordInstructionsClasses = isClassicThemeActive
-      ? styles.passwordInstructionsClassic
-      : styles.passwordInstructions;
+    const { instructionDescriptor } = this.props;
 
     const displayInstructionDescriptor = instructionDescriptor
       ? instructionDescriptor
       : messages.passwordInstructions;
 
     return (
-      <p className={passwordInstructionsClasses}>
-        {intl.formatMessage(displayInstructionDescriptor)}
+      <p className={styles.component}>
+        <FormattedHTMLMessage {...displayInstructionDescriptor} />
       </p>
     );
   }

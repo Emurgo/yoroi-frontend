@@ -16,7 +16,7 @@ export type PaperRequest = {
   network: Network,
 }
 
-export const PdfGenSteps = {
+export const PdfGenSteps = Object.freeze({
   initializing: 0,
   background: 1,
   frontpage: 2,
@@ -24,12 +24,12 @@ export const PdfGenSteps = {
   backpage: 4,
   mnemonic: 5,
   done: 6,
-};
+});
 export type PdfGenStepType = $Values<typeof PdfGenSteps>;
 
 export const generateAdaPaperPdf = async (
   request: PaperRequest,
-  updateStatus: (PdfGenStepType => ?any) = () => {}
+  updateStatus: (PdfGenStepType => void) = () => {}
 ): Promise<?Blob> => {
   // Prepare params
   // eslint-disable-next-line no-unused-vars

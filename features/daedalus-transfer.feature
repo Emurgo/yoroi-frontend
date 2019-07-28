@@ -3,11 +3,10 @@ Feature: Transfer Daedalus Wallet funds
   Background:
     Given I have opened the extension
     And I have completed the basic setup
+    Given I import a snapshot named empty-wallet
 
   @it-99
   Scenario: Daedalus transfer fails when user type invalid mnemonic phrase (IT-99)
-    Given I am testing "Daedalus transfer funds Screen"
-    When There is a wallet stored named Test
     And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
     And I enter the recovery phrase:
@@ -18,8 +17,6 @@ Feature: Transfer Daedalus Wallet funds
   
   @it-84
   Scenario: Daedalus transfer should fail to recover wallet if connection was lost (IT-84)
-    Given I am testing "Daedalus transfer funds Screen"
-    When There is a wallet stored named Test
     And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
     And I enter the recovery phrase:
@@ -31,8 +28,6 @@ Feature: Transfer Daedalus Wallet funds
 
   @it-35
   Scenario: Ensure user can not add more than 12 words to the Daedalus recovery phrase (IT-35)
-    Given I am testing "Daedalus transfer funds Screen"
-    When There is a wallet stored named Test
     And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
     And I enter the recovery phrase:
@@ -44,8 +39,6 @@ Feature: Transfer Daedalus Wallet funds
 
   @withWebSocketConnection @it-45
   Scenario: User can transfer Daedalus funds to Yoroi using 12-word mnemonic phrase (IT-45)
-    Given I am testing "Daedalus transfer funds Screen"
-    When There is a wallet stored named Test
     And My Daedalus wallet has funds
     And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
@@ -62,8 +55,6 @@ Feature: Transfer Daedalus Wallet funds
     
   @withWebSocketConnection @it-80
   Scenario: Daedalus transfer should fail if the 12-words mnemonics corresponds to an empty Daedalus wallet (IT-80)
-    Given I am testing "Daedalus transfer funds Screen"
-    When There is a wallet stored named Test
     And My Daedalus wallet hasn't funds
     And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus button
@@ -76,18 +67,12 @@ Feature: Transfer Daedalus Wallet funds
 
   @it-29 @withWebSocketConnection
   Scenario: Yoroi "TRANSFER FUNDS FROM DAEDALUS" screen validation (IT-29)
-    Given I am testing "Daedalus transfer funds Screen"
-    When There is a wallet stored named Test
     And My Daedalus wallet hasn't funds
     And I am on the Daedalus Transfer instructions screen
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
-    |instructionMessage                              | attentionMessage| 
-    |transfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
 
   @it-37 @withWebSocketConnection
   Scenario: "Daedalus-transfer" page buttons test (IT-37)
-    Given I am testing "Daedalus transfer funds Screen"
-    When There is a wallet stored named Test
     And My Daedalus wallet hasn't funds
     And I am on the Daedalus Transfer instructions screen
     And I click on the transfer funds from Daedalus button
@@ -95,15 +80,11 @@ Feature: Transfer Daedalus Wallet funds
     Then I should see "This field is required." error message:
     | message                                            |
     | global.errors.fieldIsRequired                      |
-    When I click back button on the Daedalus transfer page
+    When I click the back button
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
-    |instructionMessage                              | attentionMessage| 
-    |transfer.instructions.instructions.text | daedalusTransfer.instructions.attention.text|
 
   @withWebSocketConnection @it-19
   Scenario: User can transfer Daedalus funds to Yoroi using master key (IT-19)
-    Given I am testing "Daedalus transfer funds Screen"
-    When There is a wallet stored named Test
     And My Daedalus wallet has funds
     And I am on the Daedalus Transfer instructions screen
     When I click on the transfer funds from Daedalus master key button

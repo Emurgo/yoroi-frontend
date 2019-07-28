@@ -1,74 +1,17 @@
 @import '../../themes/mixins/buttons';
 
-.componentClassic {
-  @include button;
-  align-items: center;
-  color: var(--theme-topbar-category-text-color);
-  display: flex;
-  height: 64px;
-  justify-content: center;
-  width: 87px;
-
-  &:hover {
-    background-color: var(--theme-topbar-category-background-color-hover);
-  }
-}
-
 .component {
   @include button;
   align-items: center;
   color: var(--theme-topbar-category-text-color);
   display: flex;
-  height: 58px;
+  height: var(--cmn-topbar-height);
   justify-content: center;
-  width: 87px;
-
-  &:hover {
-    background-color: var(--theme-topbar-category-background-color-hover);
-  }
 }
 
-.active {
-  .icon:not(.withLedgerNanoSIcon):not(.withTrezorTIcon) path {
-    stroke: var(--theme-button-primary-background-color);
-    fill: var(--theme-button-primary-background-color);
-  }
-
-  .icon:not(.walletsIcon):not(.withLedgerNanoSIcon):not(.withTrezorTIcon) {
-    path, polygon {
-      fill: var(--theme-button-primary-background-color);
-    }
-  }
-
-  .withLedgerNanoSIcon {
-    & > svg {
-      // plus-logo
-      & > g > g:nth-child(1) {
-        stroke: none;
-        fill: var(--theme-button-primary-background-color);
-      }
-      // Ledger Nano S icon
-      & > g > g:nth-child(2) path {
-        stroke: none;
-        fill: var(--theme-button-primary-background-color);
-      }
-    }
-  }  
-
-  .withTrezorTIcon {
-    & > svg {
-      // plus-logo
-      & > g > g:nth-child(1) {
-        stroke: none;
-        fill: var(--theme-button-primary-background-color);
-      }
-      // Trezor Model T icon
-      & > g > g:nth-child(2) {
-        stroke: var(--theme-button-primary-background-color);
-      }
-    }
-  }
-
+.component.active {
+  border-top: var(--theme-topbar-active-item-top-border);
+  border-bottom: var(--theme-topbar-active-item-bottom-border);
   &:hover {
     cursor: default;
   }
@@ -87,6 +30,17 @@
   }
 }
 
+.iconInlineText {
+  font-size: 16px;
+  line-height: 22px;
+  font-family: var(--font-light);
+}
+
+.goBackIcon {
+  margin-left: 20px;
+  margin-right: 6px;
+}
+
 .walletsIcon {
   flex-shrink: 0;
   & > svg {
@@ -98,7 +52,7 @@
 .withLedgerNanoSIcon {
   flex-shrink: 0;
   & > svg {
-    width: 64px;
+    width: var(--cmn-topbar-icon-default-width);
     height: 42.5px;
     // plus-logo
     & > g > g:nth-child(1) {
@@ -116,7 +70,7 @@
 .withTrezorTIcon {
   flex-shrink: 0;
   & > svg {
-    width: 64px;
+    width: var(--cmn-topbar-icon-default-width);
     height: 42.5px;
     // plus-logo
     & > g > g:nth-child(1) {
@@ -131,28 +85,42 @@
 }
 
 :global {
-  .TopBarCategory_component, .TopBarCategory_componentClassic {
+  .TopBarCategory_component {
     position: absolute;
     top: 0;
 
-    &.wallets {
-      left: 0;
+    &.go-back {
+      left: 0px;
+      width: auto;
     }
 
-    &.with-trezor-t {
-      left: 64px;
+    &.wallets {
+      left: 0;
+      width: 56px;
+      margin-left: 14px;
     }
 
     &.with-ledger-nano-s {
-      left: 64px;
-    }    
+      left: 56px;
+      width: 72px;
+      margin-left: 14px;
+      padding-right: 8px;
+    }
+
+    &.with-trezor-t {
+      left: 56px;
+      width: 64px;
+      margin-left: 14px;
+    }
 
     &.daedalus-transfer {
-      right: 87px;
+      right: 86px;
+      width: 72px;
     }
 
     &.settings {
-      right: 0;
+      right: 14px;
+      width: 72px;
     }
   }
 }

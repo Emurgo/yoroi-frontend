@@ -3,8 +3,8 @@
 .autocompleteWrapper  {
   .autocompleteContent {
     border: none;
-    min-height: 160px;
-    padding: 10px 15px;
+    min-height: 140px;
+    padding: 0 40px 15px 15px;
     border-radius: 8px;
 
     &:hover {
@@ -12,7 +12,6 @@
     }
 
     &:focus, &:active, &.opened {
-      padding: 9px 14px;
       border-width: 2px;
     }
 

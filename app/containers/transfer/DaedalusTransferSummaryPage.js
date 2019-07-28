@@ -5,6 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   addressFromSubLabel: {
@@ -13,15 +14,16 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   formattedWalletAmount: Function,
+  selectedExplorer: ExplorerType,
   transferTx: TransferTx,
   onSubmit: Function,
   isSubmitting: boolean,
   onCancel: Function,
   error: ?LocalizableError,
   classicTheme: boolean
-};
+|};
 
 /** Show user what the transfer would do to get final confirmation */
 @observer
@@ -39,6 +41,7 @@ export default class DaedalusTransferSummaryPage extends Component<Props> {
     return (
       <TransferSummaryPage
         formattedWalletAmount={formattedWalletAmount}
+        selectedExplorer={this.props.selectedExplorer}
         transferTx={transferTx}
         onSubmit={onSubmit}
         isSubmitting={isSubmitting}

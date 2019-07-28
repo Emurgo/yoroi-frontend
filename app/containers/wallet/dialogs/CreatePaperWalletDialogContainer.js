@@ -12,11 +12,24 @@ import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog'
 import validWords from 'bip39/src/wordlists/english.json';
 import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/FinalizeDialog';
 import type { AdaPaper } from '../../../api/ada';
+import { defineMessages, intlShape } from 'react-intl';
+
+const messages = defineMessages({
+  verifyPaperWallet: {
+    id: 'settings.paperWallet.dialog.verify.message',
+    defaultMessage: '!!!Verify your paper wallet',
+  },
+});
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
 
+  static contextTypes = {
+    intl: intlShape.isRequired
+  };
+
   render() {
+    const { intl } = this.context;
     const { actions } = this.props;
     const { uiDialogs, profile } = this.props.stores;
     const { updateDataForActiveDialog } = actions.dialogs;
@@ -88,12 +101,14 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             showPaperPassword
             isVerificationMode
             classicTheme={profile.isClassicTheme}
+            introMessage={intl.formatMessage(messages.verifyPaperWallet)}
           />
         );
       case ProgressStep.FINALIZE:
         return (
           <FinalizeDialog
             paper={getPaperFromStore()}
+            selectedExplorer={this.props.stores.profile.selectedExplorer}
             onNext={onCancel}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}

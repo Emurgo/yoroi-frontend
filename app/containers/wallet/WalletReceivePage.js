@@ -7,9 +7,17 @@ import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
-import AddressDetailsDialog from '../../components/wallet/receive/AddressDetailsDialog';
+import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
+import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
+import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
 import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedProps } from '../../types/injectedPropsType';
+
+import {
+  DECIMAL_PLACES_IN_ADA,
+  MAX_INTEGER_PLACES_IN_ADA
+} from '../../config/numbersConfig';
+
 
 const messages = defineMessages({
   message: {
@@ -26,6 +34,7 @@ type State = {
 
 @observer
 export default class WalletReceivePage extends Component<Props, State> {
+
   state = {
     copiedAddress: '',
   };
@@ -60,8 +69,14 @@ export default class WalletReceivePage extends Component<Props, State> {
     const { copiedAddress } = this.state;
     const actions = this.props.actions;
     const { uiNotifications, uiDialogs, profile } = this.props.stores;
-    const { wallets, addresses, hwVerifyAddress } = this.props.stores.substores.ada;
+    const {
+      wallets,
+      addresses,
+      hwVerifyAddress,
+      transactions
+    } = this.props.stores.substores.ada;
     const wallet = wallets.active;
+    const { validateAmount } = transactions;
 
     // Guard against potential null values
     if (!wallet) throw new Error('Active wallet required for WalletReceivePage.');
@@ -70,7 +85,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     const walletAddress = addresses.active ? addresses.active.id : '';
     const isWalletAddressUsed = addresses.active ? addresses.active.isUsed : false;
 
-    const walletAddresses = addresses.all.reverse();
+    const walletAddresses = addresses.all.slice().reverse();
 
     const notification = {
       id: `${wallet.id}-copyNotification`,
@@ -91,10 +106,13 @@ export default class WalletReceivePage extends Component<Props, State> {
       </NotificationMessage>
     );
 
+    const uriCopyNotificationId = `${wallet.id}-uri-copyNotification`;
+
     return (
       <VerticalFlexContainer>
         <WalletReceive
           walletAddress={walletAddress}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
           isWalletAddressUsed={isWalletAddressUsed}
           walletAddresses={walletAddresses}
           onGenerateAddress={this.handleGenerateAddress}
@@ -106,21 +124,55 @@ export default class WalletReceivePage extends Component<Props, State> {
               message: messages.message
             });
           }}
-          onAddressDetail={({ address, path }) => {
+          onVerifyAddress={({ address, path }) => {
             actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
-            this.openAddressDetailsDialog();
+            this.openVerifyAddressDialog();
+          }}
+          onGeneratePaymentURI={(address) => {
+            this.openURIGenerateDialog(address);
           }}
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
-          classicTheme={profile.isClassicTheme}
-          notification={notificationComponent}
         />
 
-        {profile.isClassicTheme && notificationComponent}
+        {notificationComponent}
 
-        {uiDialogs.isOpen(AddressDetailsDialog) && hwVerifyAddress.selectedAddress ? (
-          <AddressDetailsDialog
+        {uiDialogs.isOpen(URIGenerateDialog) ? (
+          <URIGenerateDialog
+            walletAddress={uiDialogs.getParam('address')}
+            amount={uiDialogs.getParam('amount')}
+            onClose={() => actions.dialogs.closeActiveDialog.trigger()}
+            onGenerate={(address, amount) => { this.generateURI(address, amount); }}
+            classicTheme={profile.isClassicTheme}
+            currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
+            currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
+            validateAmount={validateAmount}
+          />
+        ) : null}
+
+        {uiDialogs.isOpen(URIDisplayDialog) ? (
+          <URIDisplayDialog
+            address={uiDialogs.getParam('address')}
+            amount={uiDialogs.getParam('amount')}
+            onClose={() => actions.dialogs.closeActiveDialog.trigger()}
+            onBack={() => this.openURIGenerateDialog(
+              uiDialogs.getParam('address'),
+              uiDialogs.getParam('amount'),
+            )}
+            showNotification={uiNotifications.isOpen(uriCopyNotificationId)}
+            onCopy={(message) => actions.notifications.open.trigger({
+              id: uriCopyNotificationId,
+              duration: config.wallets.ADDRESS_COPY_NOTIFICATION_DURATION,
+              message
+            })}
+            classicTheme={profile.isClassicTheme}
+          />
+        ) : null}
+
+        {uiDialogs.isOpen(VerifyAddressDialog) && hwVerifyAddress.selectedAddress ? (
+          <VerifyAddressDialog
             isActionProcessing={hwVerifyAddress.isActionProcessing}
+            selectedExplorer={this.props.stores.profile.selectedExplorer}
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
@@ -135,8 +187,24 @@ export default class WalletReceivePage extends Component<Props, State> {
     );
   }
 
-  openAddressDetailsDialog = (): void => {
+  openVerifyAddressDialog = (): void => {
     const { actions } = this.props;
-    actions.dialogs.open.trigger({ dialog: AddressDetailsDialog });
+    actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
+  }
+
+  openURIGenerateDialog = (address: string, amount?: number): void => {
+    const { actions } = this.props;
+    actions.dialogs.open.trigger({
+      dialog: URIGenerateDialog,
+      params: { address, amount }
+    });
+  }
+
+  generateURI = (address: string, amount: number) => {
+    const { actions } = this.props;
+    actions.dialogs.open.trigger({
+      dialog: URIDisplayDialog,
+      params: { address, amount }
+    });
   }
 }

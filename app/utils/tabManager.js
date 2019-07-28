@@ -1,3 +1,7 @@
+// @flow
+
+declare var chrome; // TODO: no type for chrome
+
 /**
  * We may run into bugs if the user has two copies of Yoroi running on the same localstorage
  * Since Yoroi data process is not transactional.
@@ -24,11 +28,12 @@ const OPEN_TAB_ID_KEY = 'openTabId';
  *
  * Note: this may cause two copies of Yoroi loading at the same time close each other
  */
-export function addCloseListener(window) {
-  window.onstorage = (e: StorageEvent) => {
+export function addCloseListener(yoroiWindow: typeof window) {
+  yoroiWindow.onstorage = (e: StorageEvent) => {
     // if another Yoroi tab open, close this tab
     if (e.key === OPEN_TAB_ID_KEY) {
       // note: we don't need "tabs" permission to get or remove our own tab
+      // $FlowFixMe
       chrome.tabs.getCurrent(id => chrome.tabs.remove(id.id));
     }
   };
@@ -59,4 +64,11 @@ export function addCloseListener(window) {
 */
 export function closeOtherInstances() {
   localStorage.setItem(OPEN_TAB_ID_KEY, Date.now().toString());
+}
+
+export const handlersSettingUrl: string = 'chrome://settings/handlers';
+
+/** To open special URLs like chrome://settings you need to use the Chrome API */
+export function openSandboxedTab(url: string) {
+  chrome.tabs.create({ url });
 }

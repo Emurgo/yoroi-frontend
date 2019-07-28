@@ -4,8 +4,8 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
@@ -25,7 +25,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   className?: string,
   isActive: boolean,
   inputFieldLabel: string,
@@ -38,7 +38,7 @@ type Props = {
   validationErrorMessage: string,
   successfullyUpdated: boolean,
   classicTheme: boolean,
-};
+|};
 
 type State = {
   isActive: boolean,
@@ -74,6 +74,9 @@ export default class InlineEditingInput extends Component<Props, State> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -135,13 +138,12 @@ export default class InlineEditingInput extends Component<Props, State> {
       isActive,
       inputFieldValue,
       successfullyUpdated,
-      classicTheme,
     } = this.props;
     const { intl } = this.context;
     const inputField = validator.$('inputField');
     const componentStyles = classnames([
       className,
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       isActive ? null : styles.inactive,
     ]);
     const inputStyles = classnames([
@@ -170,8 +172,8 @@ export default class InlineEditingInput extends Component<Props, State> {
           onKeyDown={event => this.handleInputKeyDown(event)}
           error={isActive ? inputField.error : null}
           disabled={!isActive}
-          ref={(input) => { this.inputField = input; }}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          inputRef={(input) => { this.inputField = input; }}
+          skin={InputOwnSkin}
         />
 
         {isActive && (

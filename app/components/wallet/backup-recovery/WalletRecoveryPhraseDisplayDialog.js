@@ -1,11 +1,11 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
+import DialogBackButton from '../../widgets/DialogBackButton';
 import Dialog from '../../widgets/Dialog';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
@@ -24,12 +24,13 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   recoveryPhrase: string,
   onStartWalletBackup: Function,
   onCancelBackup: Function,
+  onBack: Function,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> {
@@ -44,12 +45,9 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
       recoveryPhrase,
       onStartWalletBackup,
       onCancelBackup,
+      onBack,
       classicTheme
     } = this.props;
-    const dialogClasses = classnames([
-      styles.component,
-      'WalletRecoveryPhraseDisplayDialog',
-    ]);
 
     const actions = [
       {
@@ -61,12 +59,13 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
 
     return (
       <Dialog
-        className={dialogClasses}
+        className="WalletRecoveryPhraseDisplayDialog"
         title={intl.formatMessage(globalMessages.recoveryPhraseDialogTitle)}
         actions={actions}
         onClose={onCancelBackup}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
+        backButton={<DialogBackButton onBack={onBack} />}
         classicTheme={classicTheme}
       >
         {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryPhraseSvg} />}

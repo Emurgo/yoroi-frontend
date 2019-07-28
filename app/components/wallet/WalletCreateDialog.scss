@@ -1,52 +1,59 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/place-form-field-error-below-input';
 
-.walletPasswordClassic {
-  .walletPasswordFields {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 400ms ease;
-
-    &.show {
-      max-height: 250px;
-      opacity: 1;
-      overflow: visible;
+.component {
+  .walletPassword {
+    .walletPasswordFields {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 400ms ease;
+  
+      &.show {
+        max-height: 250px;
+        opacity: 1;
+      }
+  
+      & > div {
+        width: 350px;
+      }
     }
+  }
 
-    & > div {
-      margin-top: 30px;
-      width: 350px;
-    }
-
-    @include place-form-field-error-below-input;
+  .isSubmitting {
+    @include loading-spinner("../../assets/images/spinner-light.svg");
   }
 }
 
-.walletPassword {
-  .walletPasswordFields {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 400ms ease;
-
-    &.show {
-      max-height: 600px;
-      opacity: 1;
+:global(.YoroiClassic) .component {
+  .walletPassword {
+    .walletPasswordFields {
+      &.show {
+        overflow: visible;
+      }
+  
+      & > div {
+        margin-top: 0;
+      }
+  
+      @include place-form-field-error-below-input;
     }
-
-    & > div {
-      width: 100%;
-    }
-  }
+  }  
 }
 
-.isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
+:global(.YoroiModern) .component {
+  .walletPassword {
+    .walletPasswordFields {
+      &.show {
+        max-height: 600px;
+      }
+
+      & > div {
+        width: 100%;
+      }
+    }
+  }
 }

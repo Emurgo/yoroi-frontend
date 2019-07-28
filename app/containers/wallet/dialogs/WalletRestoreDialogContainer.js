@@ -14,7 +14,9 @@ import {
 import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
 
 type Props = InjectedDialogContainerProps & {
-  mode: "regular" | "paper"
+  mode: "regular" | "paper",
+  introMessage?: string,
+  onBack: void => void,
 };
 
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
@@ -64,8 +66,12 @@ export default class WalletRestoreDialogContainer
       }
       resolvedRecoveryPhrase = newPhrase;
     }
-    const { addresses, accountPlate } =  mnemonicsToAddresses(resolvedRecoveryPhrase,
-      isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES);
+    const { addresses, accountPlate } =  mnemonicsToAddresses(
+      resolvedRecoveryPhrase,
+      0, // show addresses for account #0
+      isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES,
+      'External',
+    );
     this.setState({
       verifyRestore: { addresses, accountPlate },
       submitValues: values,
@@ -105,9 +111,12 @@ export default class WalletRestoreDialogContainer
         <WalletRestoreVerifyDialog
           addresses={addresses}
           accountPlate={accountPlate}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
+          isSubmitting={restoreRequest.isExecuting}
           classicTheme={this.props.classicTheme}
+          error={restoreRequest.error}
         />
       );
     }
@@ -125,11 +134,13 @@ export default class WalletRestoreDialogContainer
         isSubmitting={restoreRequest.isExecuting}
         onSubmit={this.onSubmit}
         onCancel={this.onCancel}
+        onBack={this.props.onBack}
         error={restoreRequest.error}
         isPaper={isPaper}
         showPaperPassword={isPaper}
         classicTheme={this.props.classicTheme}
         initValues={submitValues || undefined}
+        introMessage={this.props.introMessage || ''}
       />
     );
   }

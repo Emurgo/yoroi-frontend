@@ -178,8 +178,8 @@ export function generateAddressBatch(
     protocol_magic: protocolMagic
   });
   return indices.map(i => {
-    const pubKey = cryptoAccount.address_key(
-      type === 'Internal',
+    const chain = cryptoAccount.bip44_chain(type === 'Internal');
+    const pubKey = chain.address_key(
       RustModule.Wallet.AddressKeyIndex.new(i)
     );
     const addr = pubKey.bootstrap_era_address(setting);

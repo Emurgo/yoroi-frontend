@@ -31,11 +31,11 @@ import {
 // This is actually just an interface
 import {
   HWConnectStoreTypes,
-  StepState,
   ProgressStep,
   ProgressInfo,
   HWDeviceInfo
 } from '../../types/HWConnectStoreTypes';
+import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
   prepareLedgerBridger,
@@ -52,9 +52,14 @@ import {
   stringifyError
 } from '../../utils/logging';
 
-/** TODO: TrezorConnectStore and LedgerConnectStore has many common methods
-  * try to make a common base class */
-export default class LedgerConnectStore extends Store implements HWConnectStoreTypes {
+type LedgerConnectionResponse = {
+  versionResp: GetVersionResponse,
+  extendedPublicKeyResp: GetExtendedPublicKeyResponse,
+};
+
+export default class LedgerConnectStore
+  extends Store
+  implements HWConnectStoreTypes<LedgerConnectionResponse> {
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
@@ -86,8 +91,8 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     const ledgerConnectAction = this.actions.ada.ledgerConnect;
     ledgerConnectAction.init.listen(this._init);
     ledgerConnectAction.cancel.listen(this._cancel);
-    ledgerConnectAction.submitAbout.listen(this._submitAbout);
-    ledgerConnectAction.goBackToAbout.listen(this._goBackToAbout);
+    ledgerConnectAction.submitCheck.listen(this._submitCheck);
+    ledgerConnectAction.goBackToCheck.listen(this._goBackToCheck);
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
   }
@@ -116,7 +121,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     this.ledgerBridge = undefined;
 
     this.progressInfo = {
-      currentStep: ProgressStep.ABOUT,
+      currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
     };
 
@@ -124,20 +129,20 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     this.hwDeviceInfo = undefined;
   };
 
-  // =================== ABOUT =================== //
-  /** ABOUT dialog submit(Next button) */
-  @action _submitAbout = (): void => {
+  // =================== CHECK =================== //
+  /** CHECK dialog submit(Next button) */
+  @action _submitCheck = (): void => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
   };
-  // =================== ABOUT =================== //
+  // =================== CHECK =================== //
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToAbout = (): void => {
+  @action _goBackToCheck = (): void => {
     this.error = undefined;
-    this.progressInfo.currentStep = ProgressStep.ABOUT;
+    this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
@@ -170,7 +175,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
         const extendedPublicKeyResp: GetExtendedPublicKeyResponse
           = await ledgerBridge.getExtendedPublicKey(accountPath);
 
-        this.hwDeviceInfo = this._normalizeHWResponse(versionResp, extendedPublicKeyResp);
+        this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp });
 
         this._goToSaveLoad();
         Logger.info('Ledger device OK');
@@ -183,10 +188,11 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   };
 
   _normalizeHWResponse = (
-    versionResp: GetVersionResponse,
-    extendedPublicKeyResp: GetExtendedPublicKeyResponse
+    resp: LedgerConnectionResponse,
   ): HWDeviceInfo => {
-    this._validateHWResponse(versionResp, extendedPublicKeyResp);
+    this._validateHWResponse(resp);
+
+    const { extendedPublicKeyResp, versionResp } = resp;
 
     return {
       publicMasterKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
@@ -204,9 +210,10 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
   }
 
   _validateHWResponse = (
-    versionResp: GetVersionResponse,
-    extendedPublicKeyResp: GetExtendedPublicKeyResponse
+    resp: LedgerConnectionResponse,
   ): boolean => {
+    const { extendedPublicKeyResp, versionResp } = resp;
+
     if (versionResp == null) {
       throw new Error('Ledger device version response is undefined');
     }
@@ -218,7 +225,7 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     return true;
   };
 
-  _handleConnectError = (error: any): void => {
+  _handleConnectError = (error: Error): void => {
     Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;
@@ -305,6 +312,9 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     const { wallets } = this.stores.substores[environment.API];
     await wallets._patchWalletRequestWithNewWallet(ledgerWallet);
 
+    // Dynamically update the topbar icons
+    this.stores.topbar.updateCategories();
+
     // goto the wallet transactions page
     Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');
     wallets.goToWalletRoute(ledgerWallet.id);
@@ -312,9 +322,6 @@ export default class LedgerConnectStore extends Store implements HWConnectStoreT
     // fetch its data
     Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
     wallets.refreshWalletsData();
-
-    // Load the Yoroi with Ledger Icon
-    this.stores.topbar.initCategories();
 
     // show success notification
     wallets.showLedgerNanoSWalletIntegratedNotification();

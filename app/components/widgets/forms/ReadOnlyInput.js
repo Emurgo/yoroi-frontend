@@ -5,19 +5,18 @@ import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import globalMessages from '../../../i18n/global-messages';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import editSvg from '../../../assets/images/edit.inline.svg';
 import styles from './ReadOnlyInput.scss';
 
-type Props = {
+type Props = {|
   label: string,
   value: string,
   isSet: boolean,
   onClick: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class ReadOnlyInput extends Component<Props> {
@@ -38,7 +37,7 @@ export default class ReadOnlyInput extends Component<Props> {
     const buttonLabel = intl.formatMessage(globalMessages[isSet ? 'change' : 'create']);
 
     const mainClasses = classnames([
-      classicTheme ? styles.componentClassic : styles.component,
+      styles.component,
       isSet ? 'changeLabel' : 'createLabel',
     ]);
 
@@ -51,7 +50,7 @@ export default class ReadOnlyInput extends Component<Props> {
           label={label}
           value={value}
           disabled
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
         />
 
         <button

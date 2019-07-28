@@ -1,7 +1,6 @@
 // @flow
-import { observable, computed, action, extendObservable } from 'mobx';
+import { observable, computed, action, runInAction } from 'mobx';
 import _ from 'lodash';
-import BigNumber from 'bignumber.js';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
@@ -30,7 +29,7 @@ export default class TransactionsStore extends Store {
     getBalanceRequest: CachedRequest<GetBalanceFunc>
   }> = [];
 
-  @observable _searchOptionsForWallets = {};
+  @observable _searchOptionsForWallets = observable.map();
 
   _hasAnyPending: boolean = false;
 
@@ -61,16 +60,19 @@ export default class TransactionsStore extends Store {
   @computed get searchOptions(): ?GetTransactionsRequestOptions {
     const wallet = this.stores.substores[environment.API].wallets.active;
     if (!wallet) return null;
-    let options = this._searchOptionsForWallets[wallet.id];
+    let options = this._searchOptionsForWallets.get(wallet.id);
     if (!options) {
       // Setup options for each requested wallet
-      extendObservable(this._searchOptionsForWallets, {
-        [wallet.id]: {
-          limit: this.INITIAL_SEARCH_LIMIT,
-          skip: this.SEARCH_SKIP
-        }
+      runInAction(() => {
+        this._searchOptionsForWallets.set(
+          wallet.id,
+          {
+            limit: this.INITIAL_SEARCH_LIMIT,
+            skip: this.SEARCH_SKIP
+          }
+        );
       });
-      options = this._searchOptionsForWallets[wallet.id];
+      options = this._searchOptionsForWallets.get(wallet.id);
     }
     return options;
   }
@@ -112,31 +114,14 @@ export default class TransactionsStore extends Store {
     const walletsActions = this.actions[environment.API].wallets;
     const allWallets = walletsStore.all;
     for (const wallet of allWallets) {
-      // Create transactions request for recent transactions
-      const limit = this.searchOptions
-        ? this.searchOptions.limit
-        : this.INITIAL_SEARCH_LIMIT;
-      const skip = this.searchOptions
-        ? this.searchOptions.skip
-        : this.SEARCH_SKIP;
-
+      // All Request
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-
-      const requestParams: GetTransactionsRequest = {
-        walletId: wallet.id,
-        limit,
-        skip,
-        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
-        checkAddressesInUse: stateFetcher.checkAddressesInUse,
-      };
-      const recentRequest = this._getTransactionsRecentRequest(wallet.id);
-      recentRequest.invalidate({ immediately: false });
-      recentRequest.execute(requestParams); // note: different params/cache than allRequests
 
       const allRequest = this._getTransactionsAllRequest(wallet.id);
       allRequest.invalidate({ immediately: false });
       allRequest.execute({
         walletId: wallet.id,
+        isLocalRequest: false,
         getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
         checkAddressesInUse: stateFetcher.checkAddressesInUse,
       });
@@ -154,15 +139,41 @@ export default class TransactionsStore extends Store {
 
           const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate();
           // Note: cache based on lastUpdateDate even though it's not used in balanceRequest
-          return this._getBalanceRequest(wallet.id).execute({
+          const req = this._getBalanceRequest(wallet.id);
+          req.execute({
             date: lastUpdateDate,
             getUTXOsSumsForAddresses: stateFetcher.getUTXOsSumsForAddresses,
           });
+          if (!req.promise) throw new Error('should never happen');
+          return req.promise;
         })
-        .then((updatedBalance: BigNumber) => {
+        .then((updatedBalance) => {
           if (walletsStore.active && walletsStore.active.id === wallet.id) {
             walletsActions.updateBalance.trigger(updatedBalance);
           }
+          return undefined;
+        })
+        .then(() => {
+          // Recent Request
+          // Here we are sure that allRequest was resolved and the local database was updated
+          const limit = this.searchOptions
+            ? this.searchOptions.limit
+            : this.INITIAL_SEARCH_LIMIT;
+          const skip = this.searchOptions
+            ? this.searchOptions.skip
+            : this.SEARCH_SKIP;
+
+          const requestParams: GetTransactionsRequest = {
+            walletId: wallet.id,
+            isLocalRequest: true,
+            limit,
+            skip,
+            getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+            checkAddressesInUse: stateFetcher.checkAddressesInUse,
+          };
+          const recentRequest = this._getTransactionsRecentRequest(wallet.id);
+          recentRequest.invalidate({ immediately: false });
+          recentRequest.execute(requestParams); // note: different params/cache than allRequests
           return undefined;
         })
         .catch(() => {}); // Do nothing. It's logged in the api call

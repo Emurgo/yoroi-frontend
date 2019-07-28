@@ -8,7 +8,7 @@ import languageSelection from '../support/helpers/language-selection-helpers';
 const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
 
 Given(/^I have selected English language$/, async function () {
-  await languageSelection.ensureLanguageIsSelected(this.driver, { language: 'en-US' });
+  await languageSelection.ensureLanguageIsSelected(this, { language: 'en-US' });
 });
 
 When(/^I am on the language selection screen$/, async function () {

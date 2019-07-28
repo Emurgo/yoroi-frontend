@@ -29,11 +29,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   activeChoice: RedemptionTypeChoices,
   onSelectChoice: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class AdaRedemptionChoices extends Component<Props> {

@@ -9,7 +9,7 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 const messages = defineMessages({
   stepAboutLabel: {
     id: 'wallet.connect.hw.dialog.step.about.label',
-    defaultMessage: '!!!ABOUT',
+    defaultMessage: '!!!CHECK',
   },
   stepConnectLabel: {
     id: 'wallet.connect.hw.dialog.step.connect.label',
@@ -21,10 +21,10 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class ProgressStepBlock extends Component<Props> {
@@ -44,7 +44,8 @@ export default class ProgressStepBlock extends Component<Props> {
           intl.formatMessage(messages.stepConnectLabel),
           intl.formatMessage(messages.stepSaveLabel)
         ]}
-        progressInfo={progressInfo}
+        currentStep={progressInfo.currentStep}
+        stepState={progressInfo.stepState}
         classicTheme={classicTheme}
       />);
   }

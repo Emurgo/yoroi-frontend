@@ -4,7 +4,7 @@ import { bindAll } from 'lodash';
 /**
  * Listener type as Function that takes specific params <P>
  */
-export type Listener<P> = (params: P) => any;
+export type Listener<P> = (params: P) => Promise<void>|void;
 
 /**
  * Action class with typed params
@@ -15,7 +15,7 @@ export default class Action<Params> {
    * Array of all defined actions in the system
    * @type {[Action]}
    */
-  static actions: Action<any>[] = [];
+  static actions: Action<Params>[] = [];
 
   static resetAllActions() {
     Action.actions.forEach(action => action.removeAll());

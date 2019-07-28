@@ -1,4 +1,7 @@
+// @flow
 //  ==== Theme: Yoroi Classic === //
+
+import common from './Common';
 
 // FONTS
 const rpFonts = {
@@ -25,6 +28,9 @@ const rpBubble = {
   '--rp-bubble-bg-color': '#f3f3f5',
   '--rp-bubble-border-color': '#c6cdd6',
   '--rp-bubble-border-radius': '2px',
+  // arrows are actually used by tooltips
+  '--rp-bubble-arrow-width': '14px',
+  '--rp-bubble-arrow-height': '4px',
 };
 
 // BUTTON
@@ -47,7 +53,7 @@ const rpCheckbox = {
   '--rp-checkbox-border': '1px solid #daa49a',
   '--rp-checkbox-border-color-disabled': 'rgba(218, 164, 154, 0.2)', // #DAA49A
   '--rp-checkbox-check-bg-color': '#daa49a',
-  '--rp-checkbox-label-text-color': '#121327',
+  '--rp-checkbox-label-text-color': common['--cmn-default-color-grey'],
   '--rp-checkbox-label-text-color-disabled': 'rgba(18, 19, 39, 0.3)', // #121327
 };
 
@@ -86,7 +92,7 @@ const rpInput = {
 const rpModal = {
   '--rp-modal-bg-color': '#fafbfc',
   '--rp-modal-max-height': '90%',
-  '--rp-modal-overlay-bg-color': 'rgba(0, 0, 0, 0.4)', // #000000
+  '--rp-modal-overlay-bg-color': 'rgba(11, 6, 6, 0.8)', // #0B0606
 };
 
 // OPTIONS
@@ -139,6 +145,25 @@ const rpTextArea = {
   '--rp-textarea-text-color': '#121327',
 };
 
+// TABS
+const tabs = {
+  '--tab-link-text-color': '#17D1AA',
+  '--tab-link-text-size': '16px',
+  '--tab-link-line-height': '19px',
+  '--tab-link-border-color': '#17D1AA',
+};
+
+// OPTION CARD
+const itemCard = {
+  '--card-bg-color': '#fff',
+  '--card-border-radius': '8px',
+  '--card-text-color': '#2b2c32',
+  '--card-text-color-hover': '#DAA49A',
+  '--card-text-size': '16px',
+  '--card-width': '250px',
+  '--card-height': '380px',
+};
+
 const rpYoroiTheme = {
   ...rpAutocomplete,
   ...rpBubble,
@@ -153,11 +178,24 @@ const rpYoroiTheme = {
   ...rpSelect,
   ...rpSwitch,
   ...rpTextArea,
+  ...tabs,
+  ...itemCard,
 };
 
+// Topbar gradient
+const topbarGradient = {
+  start: '#373f52',
+  end: '#373f52',
+};
 
 export default {
+  // COMMON-THEME-INDEPENDENT
+  ...common,
+
+  // REACT-POLYMORPH
   ...rpYoroiTheme,
+
+  // FONTS
   '--preferred-font': '"Times New Roman", serif',
 
   '--font-ultralight': 'SFUIDisplay-Ultralight',
@@ -178,6 +216,7 @@ export default {
 
   '--theme-input-hint-font': 'SFUIDisplay-Regular',
 
+  // COLORS
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
   '--theme-bordered-box-background-color': '#f3f3f5',
@@ -259,9 +298,12 @@ export default {
   '--theme-system-error-overlay-button-text-color-hover': '#ab1700',
   '--theme-system-error-overlay-text-color': '#fafbfc',
 
-  '--theme-topbar-category-background-color-hover': '#373f52',
+  '--theme-topbar-active-item-bottom-border': '5px solid #daa49a',
+  '--theme-topbar-active-item-top-border': '5px solid transparent',
   '--theme-topbar-category-text-color': '#fafbfc',
-  '--theme-topbar-background-color': '#373f52',
+  '--theme-topbar-background-color-gradient-start': topbarGradient.start,
+  '--theme-topbar-background-color-gradient-end': topbarGradient.end,
+  '--theme-topbar-background-color': `linear-gradient(to right, ${topbarGradient.start}, ${topbarGradient.end})`,
   '--theme-topbar-wallet-name-color': '#fafbfc',
   '--theme-topbar-wallet-info-color': '#fafbfc',
   '--theme-topbar-layout-body-background-color': '#ffffff',
@@ -282,7 +324,7 @@ export default {
   '--theme-transactions-icon-type-income-background-color': '#9ab2d9',
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
-  '--theme-transactions-sent-color': '#eb6d7a',
+  '--theme-transactions-sent-color': '#4a4a4a',
   '--theme-transactions-received-color': '#54ca87',
 
   '--theme-ada-redemption-headline-color': '#121327',
@@ -321,6 +363,12 @@ export default {
   '--theme-icon-transactions-ada-symbol-color': '#121327',
   '--theme-icon-transaction-type-color': '#fafbfc',
 
+  '--theme-wallet-add-title-color': '#141415',
+  '--theme-wallet-add-sub-title-color': '#888893',
+  '--theme-wallet-add-option-dialog-item-title-color': '#2B2C32',
+  '--theme-wallet-add-option-dialog-item-learn-more-block-bg-color': '#F5F7F9',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-color': '#ADAEB6',
+  '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',
   '--theme-backup-mnemonic-background-color': '#f3f3f5',
 
   '--theme-instructions-text-color': '#121327',
@@ -346,9 +394,22 @@ export default {
   '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
+  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
+  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-widgets-hash-dark-color': '#000000',
+  '--theme-widgets-hash-light-color': '#929293',
 
-  '--theme-footer-block-background-color': 'rgba(218, 164, 154, 0.06)',
-  '--theme-footer-block-background-color-hover': 'rgba(218, 164, 154, 0.16)',
+  '--theme-link-button-background-color-hover': '#D9DDE0',
+  '--theme-link-button-text-color': '#000',
 
   '--theme-export-transactions-to-file': '#f9f9fa',
+
+  '--theme-default-main-color': '#DAA49A',
+  '--theme-default-main-bg': '#F3F3F5',
+
+  '--theme-wallet-navigation-tab-height': '40px',
+
+  '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
+
+  '--theme-warning-color': `#E9483D`,
 };

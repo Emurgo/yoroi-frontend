@@ -4,18 +4,21 @@ import { observer } from 'mobx-react';
 
 import environment from '../../../environment';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
+import { Logger } from '../../../utils/logging';
+import { handleExternalLinkClick } from '../../../utils/routing';
 
-import AboutDialog from '../../../components/wallet/hwConnect/trezor/AboutDialog';
+import CheckDialog from '../../../components/wallet/hwConnect/trezor/CheckDialog';
 import ConnectDialog from '../../../components/wallet/hwConnect/trezor/ConnectDialog';
 import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
-
-import { Logger } from '../../../utils/logging';
 
 import TrezorConnectStore from '../../../stores/ada/TrezorConnectStore';
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import HWConnectActions from '../../../actions/ada/hw-connect-actions';
 
-type Props = InjectedDialogContainerProps;
+type Props = InjectedDialogContainerProps & {
+  onBack: void => void,
+};
+
 @observer
 export default class WalletTrezorConnectDialogContainer extends Component<Props> {
 
@@ -32,14 +35,16 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
     let component = null;
 
     switch (trezorConnectStore.progressInfo.currentStep) {
-      case ProgressStep.ABOUT:
+      case ProgressStep.CHECK:
         component = (
-          <AboutDialog
+          <CheckDialog
             progressInfo={trezorConnectStore.progressInfo}
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
-            submit={hwConnectActions.submitAbout.trigger}
+            onExternalLinkClick={handleExternalLinkClick}
+            submit={hwConnectActions.submitCheck.trigger}
             cancel={this.cancel}
+            onBack={this.props.onBack}
             classicTheme={profile.isClassicTheme}
           />);
         break;
@@ -49,7 +54,8 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             progressInfo={trezorConnectStore.progressInfo}
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
-            goBack={hwConnectActions.goBackToAbout.trigger}
+            onExternalLinkClick={handleExternalLinkClick}
+            goBack={hwConnectActions.goBackToCheck.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
@@ -62,6 +68,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
             defaultWalletName={trezorConnectStore.defaultWalletName}
+            onExternalLinkClick={handleExternalLinkClick}
             submit={hwConnectActions.submitSave.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}

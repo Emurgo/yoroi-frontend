@@ -138,7 +138,7 @@ export default class LedgerSendStore extends Store {
 
         await this._prepareAndBroadcastSignedTx(
           ledgerSignTxResp,
-          ledgerSignTxDataResp.unsignedTx,
+          params.signRequest.unsignedTx,
         );
 
       } else {

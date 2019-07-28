@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
 import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../utils/validations';
@@ -50,11 +50,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onCancel: Function,
   classicTheme: boolean
-};
+|};
 
 type State = {
   isSubmitting: boolean,
@@ -124,6 +124,9 @@ export default class WalletCreateDialog extends Component<Props, State> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -198,11 +201,11 @@ export default class WalletCreateDialog extends Component<Props, State> {
         <Input
           className="walletName"
           onKeyPress={this.checkForEnterKey.bind(this)}
-          ref={(input) => { this.walletNameInput = input; }}
+          inputRef={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
           done={isValidWalletName(walletName)}
           error={walletNameField.error}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
         />
 
         <div className={styles.walletPassword}>
@@ -212,22 +215,21 @@ export default class WalletCreateDialog extends Component<Props, State> {
               {...walletPasswordField.bind()}
               done={isValidWalletPassword(walletPassword)}
               error={walletPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={InputOwnSkin}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
               done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               error={repeatedPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={InputOwnSkin}
             />
 
-            <PasswordInstructions isClassicThemeActive={classicTheme} />
+            <PasswordInstructions />
           </div>
         </div>
 
       </Dialog>
     );
   }
-
 }

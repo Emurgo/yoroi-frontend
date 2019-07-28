@@ -5,38 +5,35 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './TopBarLayout.scss';
 
-type Props = {
-  topbar: Node,
+type Props = {|
+  banner?: Node,
+  topbar?: Node,
   children?: ?Node,
   notification?: ?Node,
-  banner?: Node,
-  noTopbarNoBanner?: boolean,
   languageSelectionBackground?: boolean,
-  classicTheme?: boolean,
   footer?: Node,
-};
+  classicTheme?: boolean,
+|};
 
 /** Adds a top bar above the wrapped node */
 @observer
 export default class TopBarLayout extends Component<Props> {
   static defaultProps = {
+    banner: undefined,
+    topbar: undefined,
     children: undefined,
     notification: undefined,
-    banner: undefined,
-    noTopbarNoBanner: undefined,
     languageSelectionBackground: false,
-    withFooter: false,
-    classicTheme: false,
     footer: undefined,
+    classicTheme: false,
   };
 
   render() {
     const {
       banner,
-      children,
       topbar,
+      children,
       notification,
-      noTopbarNoBanner,
       languageSelectionBackground,
       footer,
       classicTheme
@@ -44,9 +41,6 @@ export default class TopBarLayout extends Component<Props> {
     const componentClasses = classnames([
       styles.component,
       languageSelectionBackground && !classicTheme ? styles.languageSelectionBackground : '',
-    ]);
-    const topbarClasses = classnames([
-      classicTheme ? styles.topbarClassic : styles.topbar,
     ]);
     const contentClasses = classnames([
       styles.content,
@@ -56,13 +50,14 @@ export default class TopBarLayout extends Component<Props> {
     return (
       <div className={componentClasses}>
         <div className={styles.main}>
-          {noTopbarNoBanner ? null : (
-            <div className={topbarClasses}>
+
+          {banner}
+
+          {topbar && (
+            <div className={styles.topbar}>
               {topbar}
             </div>
           )}
-
-          {noTopbarNoBanner ? null : banner}
 
           {notification}
 

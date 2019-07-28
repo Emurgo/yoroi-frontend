@@ -5,7 +5,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
 
 import globalMessages from '../../../../i18n/global-messages';
@@ -18,16 +17,20 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import saveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-ledger-modern.inline.svg';
-import saveErrorImage from '../../../../assets/images/hardware-wallet/ledger/save-error-ledger-modern.inline.svg';
+import infoIconSVG from '../../../../assets/images/hardware-wallet/info-icon.inline.svg';
+
+import saveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-modern.inline.svg';
+import saveErrorImage from '../../../../assets/images/hardware-wallet/ledger/save-error-modern.inline.svg';
 
 import saveLoadSVG from '../../../../assets/images/hardware-wallet/ledger/save-load.inline.svg';
 import saveErrorSVG from '../../../../assets/images/hardware-wallet/ledger/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import { isValidWalletName } from '../../../../utils/validations';
 
-import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { StepState } from '../../../widgets/ProgressSteps';
 
 import { Logger } from '../../../../utils/logging';
 
@@ -44,15 +47,16 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   progressInfo: ProgressInfo,
   error: ?LocalizableError,
   isActionProcessing: boolean,
   defaultWalletName: string,
+  onExternalLinkClick: Function,
   submit: Function,
   cancel: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class SaveDialog extends Component<Props> {
@@ -63,7 +67,8 @@ export default class SaveDialog extends Component<Props> {
 
   form: typeof ReactToolboxMobxForm;
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     const { intl } = this.context;
     const { defaultWalletName } = this.props;
 
@@ -86,18 +91,26 @@ export default class SaveDialog extends Component<Props> {
         validateOnChange: true,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
+      plugins: {
+        vjf: vjf()
+      },
     });
   }
 
   render() {
+    const { form } = this;
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, cancel, classicTheme } = this.props;
 
-    const headerBlockClasses = classicTheme
-      ? classnames([headerMixin.headerBlockClassic, styles.headerSaveBlockClassic])
-      : headerMixin.headerBlock;
-    const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
-    const middleBlockErrorClasses = classicTheme ? styles.middleSaveErrorBlockClassic : null;
+    const { walletName } = form.values();
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      onExternalLinkClick,
+      cancel,
+      classicTheme
+    } = this.props;
+
     const walletNameFieldClasses = classnames([
       'walletName',
       styles.walletName,
@@ -105,14 +118,22 @@ export default class SaveDialog extends Component<Props> {
     const walletNameField = this.form.$('walletName');
 
     const walletNameBlock = (
-      <div className={headerBlockClasses}>
+      <div className={classnames([headerMixin.headerBlock, styles.headerSaveBlock])}>
+        <div className={styles.walletNameInfoWrapper}>
+          <div className={styles.walletNameInfoIcon}>
+            <SvgInline svg={infoIconSVG} width="20" height="20" />
+          </div>
+          <div className={styles.walletNameInfo}>
+            {intl.formatMessage(messages.saveWalletNameInputBottomInfo)}
+          </div>
+        </div>
         <Input
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={classicTheme ? InputSkin : InputOwnSkin}
+          skin={InputOwnSkin}
+          done={isValidWalletName(walletName)}
         />
-        <span>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</span>
       </div>);
 
     let middleBlock = null;
@@ -120,19 +141,19 @@ export default class SaveDialog extends Component<Props> {
     switch (progressInfo.stepState) {
       case StepState.LOAD:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleSaveLoadBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
             <SvgInline svg={classicTheme ? saveLoadSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleSaveStartProcessBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
             <SvgInline svg={classicTheme ? saveStartSVG : saveLoadImage} />
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
-          <div className={classnames([middleBlockClasses, middleBlockErrorClasses])}>
+          <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
             <SvgInline svg={classicTheme ? saveErrorSVG : saveErrorImage} />
           </div>);
         break;
@@ -162,8 +183,8 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {walletNameBlock}
         {middleBlock}
-        <HelpLinkBlock progressInfo={progressInfo} />
         <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 

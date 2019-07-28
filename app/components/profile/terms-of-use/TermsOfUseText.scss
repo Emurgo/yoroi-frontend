@@ -1,6 +1,12 @@
 .terms {
   text-align: justify;
 
+  &.fixedHeight {
+    padding-right: 10px;
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+  }
+
   h1, h2 {
     font-family: var(--rp-theme-font-medium);
     font-size: 17px;
@@ -9,6 +15,11 @@
 
   h2 {
     margin-top: 22px;
+  }
+
+  strong {
+    font-family: var(--rp-theme-font-regular);
+    font-size: 17px;
   }
 
   ul {
@@ -23,9 +34,6 @@
     line-height: 1.38;
     margin-bottom: 11px;
 
-    strong {
-      font-weight: 500;
-    }
   }
 }
 

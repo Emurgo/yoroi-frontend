@@ -6,9 +6,16 @@ const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
+  URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
   THEME: networkForLocalStorage + '-THEME',
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
-  VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER'
+  VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
+  HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
+};
+
+export type SetCustomUserThemeRequest = {
+  customThemeVars: string,
+  currentThemeVars: Object,
 };
 
 /**
@@ -74,6 +81,34 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== URI Scheme acceptance ========== //
+
+  getUriSchemeAcceptance = (): Promise<boolean> => new Promise((resolve, reject) => {
+    try {
+      const accepted = localStorage.getItem(storageKeys.URI_SCHEME_ACCEPTANCE);
+      if (!accepted) return resolve(false);
+      resolve(JSON.parse(accepted));
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setUriSchemeAcceptance = (): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.URI_SCHEME_ACCEPTANCE, JSON.stringify(true));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetUriSchemeAcceptance = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.URI_SCHEME_ACCEPTANCE);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
   // ========== User Theme ========== //
 
   getUserTheme = (): Promise<string> => new Promise((resolve, reject) => {
@@ -115,18 +150,20 @@ export default class LocalStorageApi {
   });
 
   setCustomUserTheme = (
-    customThemeVars: string,
-    currentThemeVars: Object
+    request: {
+      customThemeVars: string,
+      currentThemeVars: Object,
+    }
   ): Promise<void> => new Promise((resolve, reject) => {
     try {
       // Convert CSS String into Javascript Object
-      const vars = customThemeVars.split(';');
+      const vars = request.customThemeVars.split(';');
       const themeObject = {};
       vars.forEach(v => {
         const varData = v.split(':');
         const key = varData[0];
         const value = varData[1];
-        if (key && value && currentThemeVars[key.trim()] !== value.trim()) {
+        if (key && value && request.currentThemeVars[key.trim()] !== value.trim()) {
           themeObject[key.trim()] = value.trim();
         }
       });
@@ -188,10 +225,51 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== Show/hide Balance ========== //
+
+  getHideBalance = (): Promise<boolean> => new Promise((resolve, reject) => {
+    try {
+      const hideBalance = localStorage.getItem(storageKeys.HIDE_BALANCE);
+      if (!hideBalance) resolve(false);
+      else resolve(JSON.parse(hideBalance));
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setHideBalance = (hideBalance: boolean): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.HIDE_BALANCE, JSON.stringify(!hideBalance));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetHideBalance = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.HIDE_BALANCE);
+      resolve();
+    } catch (error) {} // eslint-disable-line
+  });
+
+
   async reset() {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
+    await this.unsetHideBalance();
   }
+
+  setLocalStorage = (localStorageData: any): Promise<void> => new Promise((resolve) => {
+    Object.keys(localStorageData).forEach(key => {
+      localStorage.setItem(key, localStorageData[key]);
+    });
+    resolve();
+  });
+
+  getLocalStorage = (): Promise<string> => new Promise((resolve) => {
+    resolve(JSON.stringify(localStorage));
+  });
 }

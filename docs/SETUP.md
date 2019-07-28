@@ -45,13 +45,13 @@ $ npm install
 Adding unsigned extensions is not supported for the regular version of Firefox.
 You can test Yoroi as a temporary extension, but the extension will disappear every time you close your browser.
 To avoid this, we recommend the following:
-1) [setting up Firefox-dev](https://askubuntu.com/questions/548003/how-do-i-install-the-firefox-developer-edition)
+1) [Setting up Firefox-dev](https://askubuntu.com/questions/548003/how-do-i-install-the-firefox-developer-edition) (note that the Aurora PPA has been deprecated, so you might want to try another installation method).
 2) Setting `xpinstall.signatures.required` to `false` in `about:config`.
-3) Make sure typing `firefox` in your terminal opens firefox-dev (otherwise the unittests will not pass)
+3) Make sure typing `firefox` in your terminal opens firefox-dev or set the path of the binary using `setBinary(path)` in `firefox.Options()` in webdriver.js (otherwise the unittests will not pass).
 
 ### Git hooks
 
-To regiter the githooks locally you must run this command
+To register the githooks locally you must run this command
 
 ```bash
 $ git config core.hooksPath .githooks

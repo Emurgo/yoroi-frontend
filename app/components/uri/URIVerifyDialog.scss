@@ -1,0 +1,48 @@
+.dialog {
+
+  font-family: var(--font-regular);
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 30px;
+    }
+  }
+
+  .label {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .address {
+    letter-spacing: 0px;
+    font-family: var(--font-mono-regular);
+    word-break: break-all;
+    font-size: 16px;
+    line-height: 23px;
+  }
+
+  .amount {
+    color: var(--theme-send-confirmation-dialog-send-values-color);
+    margin-bottom: 6px;
+    font-size: 16px;
+    line-height: 1.38;
+    display: block;
+  }
+
+  .textBlock {
+    font-family: var(--font-light);
+    margin-top: 10px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+}
+
+:global(.YoroiModern) .component {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg);
+
+  .address {
+    color: var(--theme-transactions-received-address-color);
+  }
+}

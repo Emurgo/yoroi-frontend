@@ -11,11 +11,13 @@ import DaedalusTransferStore from './DaedalusTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
 import AdaRedemptionStore from './AdaRedemptionStore';
+import AdaTransactionBuilderStore from './AdaTransactionBuilderStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
 import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import StateFetchStore from './StateFetchStore';
+import ServerConnectionStore from './ServerConnectionStore';
 
 export const adaStoreClasses = {
   adaRedemption: AdaRedemptionStore,
@@ -31,6 +33,8 @@ export const adaStoreClasses = {
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: StateFetchStore,
+  transactionBuilderStore: AdaTransactionBuilderStore,
+  serverConnectionStore: ServerConnectionStore,
 };
 
 export type AdaStoresMap = {
@@ -47,6 +51,8 @@ export type AdaStoresMap = {
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: StateFetchStore,
+  transactionBuilderStore: AdaTransactionBuilderStore,
+  serverConnectionStore: ServerConnectionStore,
 };
 
 const adaStores = observable({
@@ -63,6 +69,8 @@ const adaStores = observable({
   ledgerSend: null,
   hwVerifyAddress: null,
   stateFetchStore: null,
+  transactionBuilderStore: null,
+  serverConnectionStore: null,
 });
 
 /** See `stores` index for description of this weird behavior

@@ -17,10 +17,10 @@ import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 import { RustModule } from './rustLoader';
 import { generateAddressBatch } from '../adaAddressProcessing';
 import type { AddressType } from '../../adaTypes';
-import { createCryptoAccount } from '../../adaAccount';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../../../../domain/Wallet';
+import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 
 declare var CONFIG : ConfigType;
 
@@ -117,7 +117,7 @@ export const scramblePaperAdaMnemonic = (
   phrase: string,
   password: string,
 ): string => {
-  const salt = new Uint8Array(Buffer.from(cryptoRandomString(2 * 8), 'hex'));
+  const salt = new Uint8Array(Buffer.from(cryptoRandomString({ length: 2 * 8 }), 'hex'));
   const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(phrase);
   const bytes = RustModule.Wallet.paper_wallet_scramble(entropy, salt, password);
   return entropyToMnemonic(Buffer.from(bytes), wordlists.ENGLISH);
@@ -206,12 +206,17 @@ export function getCryptoDaedalusWalletFromMasterKey(
 
 export const mnemonicsToAddresses = (
   mnemonic: string,
-  count?: number = 1,
-  type?: AddressType = 'External'
+  accountIndex: number,
+  count: number,
+  type: AddressType = 'External'
 ): { addresses: Array<string>, accountPlate: WalletAccountNumberPlate } => {
   const masterKey = generateWalletMasterKey(mnemonic, '');
-  const { root_cached_key } = createCryptoAccount(masterKey, '', 0);
-  const accountPlate = createAccountPlate(root_cached_key.key().to_hex());
-  const addresses = generateAddressBatch([...Array(count).keys()], root_cached_key, type);
+  const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, '');
+  const account = cryptoWallet.bip44_account(
+    RustModule.Wallet.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
+  );
+  const accountPublic = account.public();
+  const accountPlate = createAccountPlate(accountPublic.key().to_hex());
+  const addresses = generateAddressBatch([...Array(count).keys()], accountPublic, type);
   return { addresses, accountPlate };
 };

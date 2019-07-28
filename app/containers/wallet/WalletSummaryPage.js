@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
@@ -13,19 +13,11 @@ import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
-import resolver from '../../utils/imports';
 import { Logger } from '../../utils/logging';
 
-const { formattedWalletAmount } = resolver('utils/formatters');
+import { formattedWalletAmount } from '../../utils/formatters';
 
 type Props = InjectedProps
-
-const messages = defineMessages({
-  noTransactions: {
-    id: 'wallet.summary.no.transactions',
-    defaultMessage: '!!!No recent transactions',
-  }
-});
 
 const targetNotificationIds = [
   globalMessages.walletCreatedNotificationMessage.id,
@@ -42,7 +34,6 @@ export default class WalletSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { profile } = this.props.stores;
     const actions = this.props.actions;
     const { wallets, transactions } = this.props.stores.substores.ada;
     const {
@@ -68,35 +59,27 @@ export default class WalletSummaryPage extends Component<Props> {
       closeExportTransactionDialog,
     } = actions[environment.API].transactions;
 
-    const { uiDialogs } = this.props.stores;
+    const { uiDialogs, profile } = this.props.stores;
     if (searchOptions) {
       const { limit } = searchOptions;
-      const noTransactionsLabel = intl.formatMessage(messages.noTransactions);
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (recentTransactionsRequest.isExecutingFirstTime || hasAny) {
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
+            selectedExplorer={this.props.stores.profile.selectedExplorer}
             isLoadingTransactions={recentTransactionsRequest.isExecuting}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
-            classicTheme={profile.isClassicTheme}
           />
         );
       } else if (!hasAny) {
         walletTransactions = (
           <WalletNoTransactions
             label={noTransactionsFoundLabel}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
-      } else if (!hasAny) {
-        walletTransactions = (
-          <WalletNoTransactions
-            label={noTransactionsLabel}
             classicTheme={profile.isClassicTheme}
           />
         );
@@ -119,7 +102,6 @@ export default class WalletSummaryPage extends Component<Props> {
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
-          classicTheme={profile.isClassicTheme}
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 
@@ -131,6 +113,7 @@ export default class WalletSummaryPage extends Component<Props> {
             error={exportError}
             submit={exportTransactionsToFile.trigger}
             cancel={closeExportTransactionDialog.trigger}
+            classicTheme={profile.isClassicTheme}
           />
         ) : null}
 

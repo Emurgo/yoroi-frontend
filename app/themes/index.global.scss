@@ -114,6 +114,7 @@ button {
 }
 
 // Electrolize
+// TODO: Not used anymore, delete when doing refactoring
 
 @font-face {
   font-family: Electrolize, 'Electrolize-Regular';
@@ -121,37 +122,11 @@ button {
 }
 
 // Montserrat
+// TODO: Not used anymore, delete when doing refactoring
 
 @font-face {
   font-family: 'Montserrat-Medium';
   src: url("../assets/fonts/Montserrat-Medium.ttf") format("truetype");
-}
-
-// Rubik
-
-@font-face {
-  font-family: 'Rubik-Light';
-  src: url("../assets/fonts/Rubik-Light.ttf") format("opentype");
-}
-
-@font-face {
-  font-family: 'Rubik-Regular';
-  src: url("../assets/fonts/Rubik-Regular.ttf") format("opentype");
-}
-
-@font-face {
-  font-family: 'Rubik-Medium';
-  src: url("../assets/fonts/Rubik-Medium.ttf") format("opentype");
-}
-
-@font-face {
-  font-family: 'Rubik-Bold';
-  src: url("../assets/fonts/Rubik-Bold.ttf") format("opentype");
-}
-
-@font-face {
-  font-family: 'Rubik-Black';
-  src: url("../assets/fonts/Rubik-Black.ttf") format("opentype");
 }
 
 // Helvetica
@@ -161,31 +136,58 @@ button {
   src: url("../assets/fonts/Helvetica-Regular.otf") format("opentype");
 }
 
-// RobotoMono
+// Rubik [https://fonts.google.com/specimen/Rubik]
+
+@font-face {
+  font-family: 'Rubik-Light';
+  src: url("../assets/fonts/Rubik-Light.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'Rubik-Regular';
+  src: url("../assets/fonts/Rubik-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'Rubik-Medium';
+  src: url("../assets/fonts/Rubik-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'Rubik-Bold';
+  src: url("../assets/fonts/Rubik-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'Rubik-Black';
+  src: url("../assets/fonts/Rubik-Black.ttf") format("truetype");
+}
+
+// RobotoMono [https://fonts.google.com/specimen/Roboto+Mono]
 
 @font-face {
   font-family: 'RobotoMono-Thin';
-  src: url("../assets/fonts/RobotoMono-Thin.ttf") format("opentype");
+  src: url("../assets/fonts/RobotoMono-Thin.ttf") format("truetype");
 }
 
 @font-face {
   font-family: 'RobotoMono-Light';
-  src: url("../assets/fonts/RobotoMono-Light.ttf") format("opentype");
+  src: url("../assets/fonts/RobotoMono-Light.ttf") format("truetype");
 }
 
 @font-face {
   font-family: 'RobotoMono-Regular';
-  src: url("../assets/fonts/RobotoMono-Regular.ttf") format("opentype");
+  src: url("../assets/fonts/RobotoMono-Regular.ttf") format("truetype");
 }
 
 @font-face {
   font-family: 'RobotoMono-Medium';
-  src: url("../assets/fonts/RobotoMono-Medium.ttf") format("opentype");
+  src: url("../assets/fonts/RobotoMono-Medium.ttf") format("truetype");
 }
 
 @font-face {
   font-family: 'RobotoMono-Bold';
-  src: url("../assets/fonts/RobotoMono-Bold.ttf") format("opentype");
+  src: url("../assets/fonts/RobotoMono-Bold.ttf") format("truetype");
 }
 
 // ============ BASE ===========
@@ -193,11 +195,13 @@ button {
 html, body, #root, #root > [data-reactroot] {
   width: 100%;
   height: 100%;
-  letter-spacing: 1px; // TODO: remove from modern theme
   // Make the default font ugly so we immediately see when something
   // is not yet defined correctly in our UI
-  font-family: "Times New Roman", serif;
+  font-family: var(--default-font), serif;
   -webkit-font-smoothing: antialiased;
+  :global(.YoroiClassic) {
+    letter-spacing: 1px; 
+  }
 }
 
 * {

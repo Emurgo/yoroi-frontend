@@ -7,6 +7,10 @@
   padding-bottom: 20px;
   padding-left: 20px;
 
+  .warningBox {
+    margin-bottom: 30px;
+  }
+
   .receiverInput {
     position: relative;
 
@@ -37,30 +41,10 @@
     margin: 30px auto 0;
   }
 
-  .contentWarning {
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    margin-bottom: 1em;
+  .checkbox {
+    font-family: var(--font-mono-light);
+    width: fit-content;
   }
-
-  .icon {
-    flex-shrink: 0;
-    & > svg {
-      width: 26px;
-      height: 26px;
-    }
-    margin: 1em 0;
-  }
-  
-  .warning {
-    font-family: var(--font-light);
-    text-transform: uppercase;
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 0.5em;
-    color: var(--rp-theme-color-error);
-  }  
 }
 
 :global(.YoroiClassic) .component {

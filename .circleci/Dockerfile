@@ -23,13 +23,13 @@ RUN /bin/bash -c 'set -e; \
     sudo chmod +x /usr/local/bin/chromedriver; \
     chromedriver --version'
 
-FROM circleci-node-8-browsers AS firefox-nightly
+FROM circleci-node-8-browsers AS firefox-dev
 
-ENV FIREFOX_NIGHTLY=67.0b8
+ENV FIREFOX_VERSION=67.0b9
 
-RUN /bin/bash -c 'set -e; \
-    curl -o /tmp/firefox-nightly.bz2 -sL https://download-installer.cdn.mozilla.net/pub/devedition/releases/${FIREFOX_NIGHTLY}/linux-x86_64/en-US/firefox-${FIREFOX_NIGHTLY}.tar.bz2; \
-    sudo tar -C /opt -jxf /tmp/firefox-nightly.bz2; \
+RUN /bin/bash -c 'set -xe; \
+    curl -o /tmp/firefox.bz2 -sL https://download-installer.cdn.mozilla.net/pub/devedition/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2; \
+    sudo tar -C /opt -jxf /tmp/firefox.bz2; \
     sudo rm -f /opt/firefox/firefox; \
     sudo rm -f /usr/local/bin/firefox; \
     sudo ln -s /opt/firefox/firefox-bin /usr/local/bin/firefox'

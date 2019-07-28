@@ -1,153 +1,244 @@
 .component {
-  overflow: overlay;
   height: 100%;
-  display: flex;
+  overflow: auto;
 
-  .buttonsContainerClassic {
-    padding-top: 18%;
+  .hero {
+    min-height: 100%;
+    max-width: 1366px;
+    margin: 0 auto;
+    padding: 20px 15px;
     display: flex;
-    flex: 1;
-    flex-direction: column;
     align-items: center;
-
-    button {
-      & + button {
-        margin-top: 20px;
-      }
+  
+    @media screen and (max-width: 1300px) {
+      max-width: 992px;
     }
   }
-
-  .buttonsContainer {
-    padding-top: 116px;
-    padding-left: 9%;
+  
+  .heroInner {
     display: flex;
-    flex: 1;
-    flex-direction: column;
+    position: relative;
     z-index: 1;
-    
-    :global {
-      .SimpleButton_root {
-        &.outlined:not([disabled]) {
-          color: var(--theme-wallet-add-color);
-          border: 2px solid var(--theme-wallet-add-color);
-          &:active {
-            background-color: var(--theme-wallet-add-translucent-color);
-          }
-        }
-      }
-    }
-    
-    button {
-      & + button {
-        margin-top: 20px;
-      }
+    justify-content: space-between;
+    width: 100%;
+  
+    @media screen and (max-width: 1300px) {
+      flex-direction: column;
+      padding: 0 15px;
     }
   }
-}
+  
+  .heroLogo {
+    margin-bottom: 48px;
+    width: 156px;
+    height: 50px;
+    display: block;
+  }
+  
+  .heroTitle {
+    font-family: var(--font-bold);
+    font-size: 54px;
+    letter-spacing: 0.5px;
+    line-height: 62px;
+    margin-bottom: 15px;
+    margin-right: 42px;
+    width: 432px;
+  }
+  
+  .heroSubTitle {
+    font-family: var(--font-regular);
+    font-size: 22px;
+    line-height: 27px;
+  
+    @media screen and (max-width: 1300px) {
+      margin-bottom: 30px;
+    }
+  }
+  
+  .heroCardsList {
+    display: flex;
+  }
+  
+  .heroCardsItem {
+    font-family: var(--font-regular);
+    padding: 32px 28px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    margin: 0 8px;
+    box-shadow: 0 5px 20px 0px rgba(24,26,30, .08);
+    margin-bottom: 15px;
+    cursor: pointer;
+  
+    &:hover {
+      box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
 
-.background {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 115px;
-  background-image: url(../../assets/images/add-wallet-bg.svg);
-  background-size: cover;
-  background-position-y: bottom;
-}
-
-.title {
-  font-family: var(--font-bold);
-  font-size: 65px;
-  line-height: 1.23;
-  color: var(--theme-wallet-add-color);
-  margin-bottom: 32px;
-}
-
-.walletImage {
-  position: absolute;
-  background-image: url(../../assets/images/add-wallet-picture.svg);
-  background-repeat: no-repeat;
-  background-position-x: right;
-
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0px;
-
-  span {
-    height: 100%;
+      .heroCardsItemTitle {
+        color: var(--card-text-color-hover);
+      }
+    }
+  
+    .heroCardsItemTitle {
+      letter-spacing: -0.03em;
+    }
+  
+    .heroCardsItemBg {
+      flex: 1 0 auto;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: contain;
+    }
+  
+    &.heroCardsItemLink {
+      flex: auto;
+      flex-direction: row;
+      align-items: center;
+      text-decoration: none;
+      padding: 24px 32px;
+    
+      .heroCardsItemLinkIcon {
+        margin-right: 30px;
+      }
+    }
   }
 
-  svg {
-    height: calc(100% - 3px);
+  .notification {
+    color: var(--theme-transactions-list-group-date-color);
+    font-family: var(--font-regular);
+    font-size: 16px;
+    line-height: 1.38;
+    margin-top: 10px;
+    opacity: 0.6;
+    text-align: center;
+  }
+
+  .settingsBar {
+    position: absolute;
+    right: 35px;
+    top: 16px;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+  }
+
+  .settingsBarLink {
+    display: block;
+    cursor: pointer;
+  
+    + .settingsBarLink {
+      margin-left: 50px;
+    }
   }
 }
 
-@media screen and (min-width: 1280px) {
-  .walletImage {
-    background-position-x: 70%;
+:global(.YoroiClassic) {
+  .component {
+    background-image: linear-gradient(to right, var(--theme-default-main-bg) 65%, var(--cmn-color-white) 65%);
+
+    .heroCardsItem {
+      width: var(--card-width);
+      height: var(--card-height);
+      border-radius: var(--card-border-radius);
+      background-color: var(--card-bg-color);
+      color: var(--card-text-color);
+      font-size: var(--card-text-size);
+    }
+
+    .heroCardsItemLink {
+      width: calc(var(--card-width) *2 + 15px);
+      height: auto;
+    }
+
+    .heroLogo,
+    .heroCardsItemLinkIcon,
+    .settingsBarLink {
+      path {
+        fill: var(--theme-default-main-color);
+      }
+    }
+
+    .heroTitle {
+      color: var(--theme-wallet-add-title-color);      
+    }
+
+    .heroSubTitle {
+      color: var(--theme-wallet-add-sub-title-color);      
+    }
+  
+    .heroCardsItemBg {
+      &.bgConnectHW {
+        background-image: url(../../assets/images/add-wallet/connect-hw-classic.inline.svg);
+      }
+
+      &.bgCreateWallet {
+        background-image: url(../../assets/images/add-wallet/create-wallet-classic.inline.svg);
+      }
+
+      &.bgRestoreWallet {
+        background-image: url(../../assets/images/add-wallet/restore-wallet-classic.inline.svg);
+      }
+    }
   }
 }
 
-.notification {
-  color: var(--theme-transactions-list-group-date-color);
-  font-family: var(--font-regular);
-  font-size: 16px;
-  line-height: 1.38;
-  margin-top: 10px;
-  opacity: 0.6;
-  text-align: center;
-}
+:global(.YoroiModern) {
+  .component {
+    background-image: url(../../assets/images/add-wallet/add-wallet-bg-modern.inline.svg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center -13vw;
 
-.footer {
-  height: 58px;
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  display: flex;
-  justify-content: space-around;
-  z-index: 2;
-}
+    @media screen and (max-width: 1400px) {
+      background-position: 0 0;
+    }
 
-.link {
-  display: flex;
-  height: 58px;
-  align-items: center;
-  text-decoration: none;
-  color: var(--theme-wallet-add-footer-text-color);
-  font-family: var(--theme-footer-text-font);
-  font-size: 14px;
+    .heroTitle {
+      color: var(--theme-wallet-add-title-color);      
+    }
 
-  span:last-child {
-    margin-left: 10px;
+    .heroSubTitle {
+      color: var(--theme-wallet-add-sub-title-color);      
+    }
+
+    .heroCardsItem {
+      width: var(--card-width);
+      height: var(--card-height);
+      border-radius: var(--card-border-radius);
+      background-color: var(--card-bg-color);
+      color: var(--card-text-color);
+      font-size: var(--card-text-size);
+    }
+
+    .heroCardsItemLink {
+      width: calc(var(--card-width) *2 + 15px);
+      height: auto;
+    }
+
+    .heroLogo,
+    .settingsBarLink {
+      path {
+        fill: var(--cmn-color-white);
+      }
+    }
+
+    .heroCardsItemLinkIcon {
+      path {
+        fill: var(--theme-default-color-blue);
+      }
+    }
+
+    .heroCardsItemBg {
+      &.bgConnectHW {
+        background-image: url(../../assets/images/add-wallet/connect-hw-modern.inline.svg);
+      }
+
+      &.bgCreateWallet {
+        background-image: url(../../assets/images/add-wallet/create-wallet-modern.inline.svg);
+      }
+
+      &.bgRestoreWallet {
+        background-image: url(../../assets/images/add-wallet/restore-wallet-modern.inline.svg);
+      }
+    }
   }
-
-  svg {
-    height: 18px;
-    width: 18px;
-  }
-}
-
-.footerIcon {
-  width: 18px;
-  height: 18px;
-  background-size: contain;
-}
-
-.buyIcon {
-  background-image: url(../../assets/images/footer/buy-trezor.inline.svg);
-}
-
-.connectIcon {
-  background-image: url(../../assets/images/footer/how-to-connect-trezor.inline.svg);
-}
-
-.createIcon {
-  background-image: url(../../assets/images/footer/how-to-create-wallet.inline.svg);
-}
-
-.restoreIcon {
-  background-image: url(../../assets/images/footer/how-to-restore-wallet.inline.svg);
-
 }

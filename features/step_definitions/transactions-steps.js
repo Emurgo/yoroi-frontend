@@ -3,12 +3,13 @@
 import { Given, When, Then } from 'cucumber';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
+import { addTransaction, postLaunchSuccessfulTx, postLaunchPendingTx } from '../mock-chain/mockImporter';
 
 Given(/^I have a wallet with funds$/, async function () {
   await this.driver.wait(async () => {
     try {
       const { adaWallet } = await this.getFromLocalStorage('WALLET');
-      expect(adaWallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
+      expect(Number(adaWallet.cwAmount.getCCoin), 'Available founds').to.be.above(0);
       return true;
     } catch (err) {
       return false;
@@ -26,6 +27,11 @@ When(/^I fill the form:$/, async function (table) {
   await this.input("input[name='amount']", fields.amount);
 });
 
+When(/^I fill the address of the form:$/, async function (table) {
+  const fields = table.hashes()[0];
+  await this.input("input[name='receiver']", fields.address);
+});
+
 When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const fields = table.hashes()[0];
   const total = parseFloat(fields.amount) + parseFloat(fields.fee);
@@ -39,16 +45,40 @@ When(/^I clear the receiver$/, async function () {
   await this.clearInput("input[name='receiver']");
 });
 
+When(/^I clear the wallet password ([^"]*)$/, async function (password) {
+  await this.clearInputUpdatingForm("input[name='walletPassword']", password.length);
+});
+
 When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
   await this.input("input[name='receiver']", receiver);
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  await this.waitUntilText('.AmountInputSkin_feesClassic', `+ ${fee} of fees`);
+  await this.waitUntilText('.AmountInputSkin_fees', `+ ${fee} of fees`);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
   await this.click('.WalletSendForm_nextButton');
+  /**
+   * Sometimes out tests fail because clicking this button isn't triggering a dialog
+   * However it works flawlessly both locally and on localci
+   *
+   * My only guess is that mobx re-disables this button in a way that only causes
+   * the condition to happen on low-resouruce machines like we use for CI
+   *
+   * I attempt to fix it by just clicking twice after a delay
+   */
+  await this.driver.sleep(500);
+  try {
+    await this.click('.WalletSendForm_nextButton');
+  } catch (e) {
+    // if the first click succeeded, the second will throw an exception
+    // saying that the button can't be clicked because a dialog is in the way
+  }
+});
+
+When(/^I click on "Send all my ADA" checkbox$/, async function () {
+  await this.click('.WalletSendForm_checkbox');
 });
 
 When(/^I see send money confirmation dialog$/, async function () {
@@ -65,7 +95,7 @@ When(/^I submit the wallet send form$/, async function () {
 });
 
 Then(/^I should see the summary screen$/, async function () {
-  await this.waitForElement('.WalletSummary_componentClassic');
+  await this.waitForElement('.WalletSummary_component');
 });
 
 Then(/^I should see an invalid address error$/, async function () {
@@ -91,20 +121,18 @@ Then(/^I should see an incorrect wallet password error message$/, async function
   await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
 });
 
-/**
- * This is a hack to generate a completely different wallet within a test file
- */
-Given(/^I cleared my local balance$/, async function () {
-  // first switch the xpub so the generated addresses are different
-  const myAccount = await this.getFromLocalStorage('ACCOUNT');
-  myAccount.root_cached_key = '815c1f331d4a7bbf2c1e15ee8983bf9b7abb980f15cecb1f868920ec2b7cf19cab1e147544a2a0550a3d5d3b527aeb0db8af42756e68572e1e96142990d27d6c';
-  await this.saveToLocalStorage('ACCOUNT', myAccount);
+Then(/^A successful tx gets sent from my wallet from another client$/, () => {
+  addTransaction(postLaunchSuccessfulTx);
+});
 
-  // then drop the DB state so all previous saved addresses are gone
-  await this.dropDB();
+Then(/^A pending tx gets sent from my wallet from another client$/, () => {
+  addTransaction(postLaunchPendingTx);
+});
 
-  // next clear the cached local balance
-  const myWallet = await this.getFromLocalStorage('WALLET');
-  myWallet.adaWallet.cwAmount = { getCCoin: '0' };
-  await this.saveToLocalStorage('WALLET', myWallet);
+Then(/^I should see a warning block$/, async function () {
+  await this.waitForElement('.WarningBox_warning');
+});
+
+Then(/^I should see no warning block$/, async function () {
+  await this.waitForElementNotPresent('.WarningBox_warning');
 });

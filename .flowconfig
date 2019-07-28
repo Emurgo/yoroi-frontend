@@ -2,9 +2,7 @@
 .*/node_modules/fbjs/.*
 .*/node_modules/electron-packager/.*
 .*/node_modules/npm/.*
-.*/node_modules/mobx/.*
 .*/node_modules/oboe/.*
-.*/node_modules/mobx/lib/mobx.js.flow
 .*/dist/.*
 .*/release/.*
 .*/.git/.*
@@ -15,7 +13,7 @@
 ../node_modules/eslint-plugin-jsx-a11y
 
 [untyped]
-.*/node_modules/trezor-connect/lib/popup/PopupManager.js
+.*/node_modules/trezor-connect/lib/utils/networkUtils.js
 
 [libs]
 flow/declarations/

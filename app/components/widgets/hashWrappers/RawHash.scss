@@ -1,0 +1,14 @@
+.hash {
+  word-break: break-all;
+  font-family: var(--font-mono-regular);
+  letter-spacing: 0;
+  line-height: 22px;
+}
+
+.lightColor {
+  color: var(--theme-widgets-hash-light-color);
+}
+
+.darkColor {
+  color: var(--theme-widgets-hash-dark-color);
+}

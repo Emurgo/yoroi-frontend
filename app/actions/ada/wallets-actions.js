@@ -1,6 +1,7 @@
 // @flow
 import BigNumber from 'bignumber.js';
 import Action from '../lib/Action';
+import type { BaseSignRequest } from '../../api/ada/adaTypes';
 
 export type WalletImportFromFileParams = {
   filePath: string,
@@ -16,6 +17,9 @@ export default class WalletsActions {
   restoreWallet: Action<{recoveryPhrase: string, walletName: string, walletPassword: string }> = new Action();
   importWalletFromFile: Action<WalletImportFromFileParams> = new Action();
   deleteWallet: Action<{ walletId: string }> = new Action();
-  sendMoney: Action<{ receiver: string, amount: string, password: string }> = new Action();
-  updateBalance: Action <{ amount: BigNumber }> = new Action();
+  sendMoney: Action<{
+    signRequest: BaseSignRequest,
+    password: string,
+  }> = new Action();
+  updateBalance: Action <BigNumber> = new Action();
 }

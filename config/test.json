@@ -7,10 +7,11 @@
   },
   "app": {
     "walletRefreshInterval": 2000,
+    "serverStatusRefreshInterval": 2000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi.log",
-    "addressScanSize": 3,
-    "addressRequestSize": 5,
+    "addressScanSize": 20,
+    "addressRequestSize": 50,
     "txsBodiesRequestSize": 150
   }
 }

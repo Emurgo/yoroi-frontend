@@ -10,22 +10,34 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 }
 
 When(/^I click the restore button$/, async function () {
-  await this.click('.restoreWalletButton');
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
 });
 
 When(/^I click the restore paper wallet button$/, async function () {
-  await this.click('.restorePaperWalletButton');
+  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restorePaperWallet');
+  await this.waitForElement('.WalletRestoreDialog');
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {
   const fields = table.hashes()[0];
-  const recoveryPhrase = fields.recoveryPhrase.split(' ');
+  await enterRecoveryPhrase(this, fields.recoveryPhrase);
+});
+
+export async function enterRecoveryPhrase(customWorld: any, phrase: string): Promise<void> {
+  const recoveryPhrase = phrase.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.input('.AutocompleteOverridesClassic_autocompleteWrapper input', word);
-    await this.click(`//li[contains(text(), '${word}')]`, By.xpath);
+    await customWorld.input('.AutocompleteOverridesClassic_autocompleteWrapper input', word);
+    await customWorld.click(`//li[contains(text(), '${word}')]`, By.xpath);
   }
-});
+}
 
 When(/^I enter the master key:$/, async function (table) {
   const fields = table.hashes()[0];
@@ -70,17 +82,21 @@ Then(/^I should see an "Invalid recovery phrase" error message$/, async function
 });
 
 Then(/^I should see a plate ([^"]*)$/, async function (plate) {
-  const plateElement = await this.driver.findElements(By.css('.WalletRestoreVerifyDialog_plateIdSpan'));
+  await assertPlate(this, plate);
+});
+
+export async function assertPlate(customWorld: any, plate: string): Promise<void> {
+  const plateElement = await customWorld.driver.findElements(By.css('.WalletRestoreVerifyDialog_plateIdSpan'));
   const plateText = await plateElement[0].getText();
   expect(plateText).to.be.equal(plate);
-});
+}
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.title.label' });
-  await this.waitUntilText('.Dialog_titleClassic', restoreMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.Dialog_title', restoreMessage.toUpperCase(), 2000);
 });
 
-Then(/^I delete recovery phrase by pressing "x" signs$/, async function () {
+Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
   const webElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
   for (let i = 0; i < webElements.length; i++) {
     await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);
@@ -102,6 +118,7 @@ Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async functi
   await this.waitForElementNotPresent(`//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`, By.xpath);
 });
 
+// eslint-disable-next-line no-unused-vars
 Then(/^I should see an "X words left" error message:$/, async function (data) {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase', values: { number: 1 } });
   const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .SimpleFormField_error';

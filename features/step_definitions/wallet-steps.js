@@ -11,7 +11,7 @@ When(/^I clear the name "([^"]*)"$/, async function (walletName) {
 });
 
 When(/^I navigate to wallet transactions screen$/, async function () {
-  await this.click('.TopBarCategory_componentClassic.wallets');
+  await this.click('.TopBarCategory_component.wallets');
   await this.waitForElement('.WalletTopbarTitle_walletName');
 });
 

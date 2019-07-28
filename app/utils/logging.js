@@ -23,13 +23,23 @@ export const Logger = {
   },
 
   error: (data : string) => {
-    logger.error(data);
-    logs.enq(`[${moment().format()}] ${data}\n`);
+    // fix format so it shows up properly in Chrome console
+    const fixedString = data.replace(/\\n/g, '\n');
+    logger.error(fixedString);
+    logs.enq(`[${moment().format()}] ${fixedString}\n`);
   },
 
   warn: (data : string) => {
     logger.warn(data);
   }
+};
+
+export const silenceLogsForTesting = () => {
+  // hack since we don't have log level filtering
+  Logger.debug = () => {};
+  Logger.info = () => {};
+  Logger.error = () => {};
+  Logger.warn = () => {};
 };
 
 export const downloadLogs = () => {
@@ -46,7 +56,11 @@ export const downloadLogs = () => {
 // ========== STRINGIFY =========
 
 export const generateLogHeader = () => (
-  `[INFO] Yoroi v.${environment.version}\r\n[INFO] Commit: ${environment.commit}\r\n[INFO] Network: ${environment.NETWORK}\r\n`
+  `[INFO] Yoroi v.${environment.version}\r\n`
+  + `[INFO] Commit: ${environment.commit}\r\n`
+  + `[INFO] Network: ${environment.NETWORK}\r\n`
+  + `[INFO] User Agent: ${stringifyData(environment.userAgentInfo.ua)}\r\n`
+  + `----\r\n` // this like should be always the last line of the header block
 );
 
 export const stringifyData = (data : any) => JSON.stringify(data, null, 2);

@@ -12,6 +12,7 @@ import WalletTransaction from '../../../domain/WalletTransaction';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 const messages = defineMessages({
   today: {
@@ -30,16 +31,16 @@ const messages = defineMessages({
 
 const dateFormat = 'YYYY-MM-DD';
 
-type Props = {
+type Props = {|
   transactions: Array<WalletTransaction>,
   isLoadingTransactions: boolean,
   hasMoreToLoad: boolean,
+  selectedExplorer: ExplorerType,
   assuranceMode: AssuranceMode,
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
-  classicTheme: boolean
-};
+|};
 
 @observer
 export default class WalletTransactionsList extends Component<Props> {
@@ -48,7 +49,8 @@ export default class WalletTransactionsList extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this.localizedDateFormat = moment.localeData().longDateFormat('L');
     // Localized dateFormat:
     // English - MM/DD/YYYY
@@ -109,17 +111,12 @@ export default class WalletTransactionsList extends Component<Props> {
       walletId,
       formattedWalletAmount,
       onLoadMore,
-      classicTheme
     } = this.props;
 
     const buttonClasses = classnames([
       'primary',
       styles.showMoreTransactionsButton,
     ]);
-    const componentClasses = classicTheme ? styles.componentClassic : styles.component;
-    const groupClasses = classicTheme ? styles.groupClassic : styles.group;
-    const groupDateClasses = classicTheme ? styles.groupDateClassic : styles.groupDate;
-    const listClasses = classicTheme ? styles.listClassic : styles.list;
 
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
@@ -128,20 +125,20 @@ export default class WalletTransactionsList extends Component<Props> {
     ) : null;
 
     return (
-      <div className={componentClasses}>
+      <div className={styles.component}>
         {transactionsGroups.map(group => (
-          <div className={groupClasses} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
-            <div className={groupDateClasses}>{this.localizedDate(group.date)}</div>
-            <div className={listClasses}>
+          <div className={styles.group} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
+            <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
+            <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
                 <Transaction
                   key={`${walletId}-${transaction.id}-${transaction.type}`}
+                  selectedExplorer={this.props.selectedExplorer}
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}
                   assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
                   formattedWalletAmount={formattedWalletAmount}
-                  classicTheme={classicTheme}
                 />
               ))}
             </div>

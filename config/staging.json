@@ -1,12 +1,13 @@
 {
   "network": {
     "protocolMagic": 633343913,
-    "backendUrl": "https://iohk-staging.yoroiwallet.com",
-    "websocketUrl": "wss://iohk-staging.yoroiwallet.com:443",
+    "backendUrl": "https://stg-yoroi-backend.yoroiwallet.com",
+    "websocketUrl": "wss://stg-yoroi-backend.yoroiwallet.com:443",
     "name": "staging"
   },
   "app": {
     "walletRefreshInterval": 20000,
+    "serverStatusRefreshInterval": 20000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi.log",
     "addressScanSize": 20,

@@ -1,7 +1,7 @@
 // @flow
 
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
+import { Builder, By, Key, until } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
@@ -27,32 +27,30 @@ const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
 
 function getBraveBuilder() {
-  return new seleniumWebdriver.Builder()
-    .withCapabilities({
-      chromeOptions: {
-        args: [
-          'start-maximized'
-        ]
-      }
-    })
+  return new Builder()
     .forBrowser('chrome')
     .setChromeOptions(new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
-      .addArguments('--start-maximized', '--disable-setuid-sandbox', '--no-sandbox')
+      .addArguments(
+        '--start-maximized',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      )
       .addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
 }
 
 function getChromeBuilder() {
-  return new seleniumWebdriver.Builder()
-    .withCapabilities({
-      chromeOptions: {
-        args: [
-          'start-maximized'
-        ]
-      }
-    })
+  return new Builder()
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
+    .setChromeOptions(new chrome.Options()
+      .addExtensions(path.resolve(__dirname, '../../yoroi-test.crx'))
+      .addArguments(
+        '--start-maximized',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      ));
 }
 
 function getFirefoxBuilder() {
@@ -69,7 +67,7 @@ function getFirefoxBuilder() {
   profile.addExtension(path.resolve(__dirname, '../../yoroi-test.xpi'));
   const options = new firefox.Options().setProfile(profile);
 
-  return new seleniumWebdriver.Builder()
+  return new Builder()
     .withCapabilities({
       chromeOptions: {
         args: [
@@ -107,6 +105,8 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   }
 
+  this.getBrowser = (): string => cmdInput.parameters.browser;
+
   this.getExtensionUrl = (): string => {
     if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
       /**
@@ -122,30 +122,33 @@ function CustomWorld(cmdInput: WorldInput) {
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
   this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
   this.getText = (locator) => this.getElementBy(locator).getText();
+  // $FlowFixMe Flow doesn't like that we add a new function to driver
   this.getValue = this.driver.getValue =
     async (locator) => this.getElementBy(locator).getAttribute('value');
 
   this.waitForElementLocated = (locator, method = By.css) => {
-    const isLocated = seleniumWebdriver.until.elementLocated(method(locator));
+    const isLocated = until.elementLocated(method(locator));
     return this.driver.wait(isLocated);
   };
 
   // Returns a promise that resolves to the element
+  // $FlowFixMe Flow doesn't like that we add a new function to driver
   this.waitForElement = this.driver.waitForElement = async (locator, method = By.css) => {
     await this.waitForElementLocated(locator, method);
     const element = await this.getElementBy(locator, method);
-    const condition = seleniumWebdriver.until.elementIsVisible(element);
+    const condition = until.elementIsVisible(element);
     return this.driver.wait(condition);
   };
 
   this.waitElementTextMatches = async (regex, locator, method = By.css) => {
     await this.waitForElement(locator, method);
     const element = await this.getElementBy(locator, method);
-    const condition = seleniumWebdriver.until.elementTextMatches(element, regex);
+    const condition = until.elementTextMatches(element, regex);
     await this.driver.wait(condition);
     return element;
   };
 
+  // $FlowFixMe Flow doesn't like that we add a new function to driver
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent =
     async (locator, method = By.css) => {
       await this.driver.wait(async () => {
@@ -156,11 +159,11 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.waitEnable = async (locator, method = By.css) => {
     const element = await this.getElementBy(locator, method);
-    const condition = seleniumWebdriver.until.elementIsEnabled(element);
+    const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
   };
 
-  this.waitUntilText = async (locator, text, timeout = 60000) => {
+  this.waitUntilText = async (locator, text, timeout = 75000) => {
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -171,7 +174,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
-  this.waitUntilContainsText = async (locator, text, timeout = 10000) => {
+  this.waitUntilContainsText = async (locator, text, timeout = 15000) => {
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -228,19 +231,10 @@ function CustomWorld(cmdInput: WorldInput) {
     this.driver.executeScript(() => window.yoroi.api.ada.dropDB())
   );
 
-  this.saveAddressesToDB = (addresses, type) => (
-    this.driver.executeScript((addrs, addrType) => {
-      addrs.forEach(addr => window.yoroi.api.ada.saveAddress({
-        address: addr,
-        addressType: addrType
-      }));
-    }, addresses, type)
-  );
-
-  this.saveTxsToDB = transactions => {
-    this.driver.executeScript(txs => {
-      window.yoroi.api.ada.saveTxs({ txs });
-    }, transactions);
+  this.saveLastReceiveAddressIndex = index => {
+    this.driver.executeScript(i => {
+      window.yoroi.api.ada.saveLastReceiveAddressIndex({ index: i });
+    }, index);
   };
 
   this.chooseFile = async (filePath, fileType) => {
@@ -264,6 +258,4 @@ function CustomWorld(cmdInput: WorldInput) {
 }
 
 setWorldConstructor(CustomWorld);
-// I'm setting this timeout to 10 seconds as usually it takes about 5 seconds
-// to startup
 setDefaultTimeout(60 * 1000);

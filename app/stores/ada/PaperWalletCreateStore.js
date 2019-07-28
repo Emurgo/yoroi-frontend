@@ -77,9 +77,14 @@ export default class PaperWalletCreateStore extends Store {
       throw new Error('User password is already initialized');
     }
     this.userPassword = userPassword;
-    this.actions.ada.paperWallets.createPaperWallet.trigger({});
-    this.actions.ada.paperWallets.createPdfDocument.trigger({});
     this.progressInfo = ProgressStep.CREATE;
+    this.actions.ada.paperWallets.createPaperWallet.trigger({});
+    // setTimeout is needed to fix:
+    // https://github.com/Emurgo/yoroi-frontend/pull/584#pullrequestreview-249311058
+    // createPdfDocument is heavyweight and blocking
+    setTimeout(() => {
+      this.actions.ada.paperWallets.createPdfDocument.trigger({});
+    }, 0);
   };
 
   @action _backToCreatePaper = async () => {
@@ -142,6 +147,7 @@ export default class PaperWalletCreateStore extends Store {
     super.teardown();
   }
 
+  @action
   _reset = () => {
     this.progressInfo = ProgressStep.INIT;
     this.error = undefined;

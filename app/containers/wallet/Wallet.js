@@ -2,12 +2,14 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import MainLayout from '../MainLayout';
+import TopBarContainer from '../TopBarContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 import AdaRedemptionSuccessOverlay from '../../components/wallet/ada-redemption/AdaRedemptionSuccessOverlay';
+import environment from '../../environment';
 
 type Props = InjectedContainerProps;
 
@@ -33,15 +35,20 @@ export default class Wallet extends Component<Props> {
 
   render() {
     const { wallets, adaRedemption } = this.props.stores.substores.ada;
-    const { actions, stores, } = this.props;
+    const { actions, stores } = this.props;
     const { profile } = stores;
+    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const { showAdaRedemptionSuccessMessage, amountRedeemed } = adaRedemption;
+    const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
+
     if (!wallets.active) {
       return (
         <MainLayout
+          topbar={topbarContainer}
           actions={actions}
           stores={stores}
           classicTheme={profile.isClassicTheme}
+          connectionErrorType={checkAdaServerStatus}
         >
           <LoadingSpinner />
         </MainLayout>
@@ -50,14 +57,15 @@ export default class Wallet extends Component<Props> {
 
     return (
       <MainLayout
+        topbar={topbarContainer}
         actions={actions}
         stores={stores}
         classicTheme={profile.isClassicTheme}
+        connectionErrorType={checkAdaServerStatus}
       >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
-          classicTheme={profile.isClassicTheme}
         >
           {this.props.children}
         </WalletWithNavigation>

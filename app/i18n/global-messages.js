@@ -1,3 +1,4 @@
+// @flow
 import { defineMessages } from 'react-intl';
 
 /*
@@ -6,7 +7,7 @@ import { defineMessages } from 'react-intl';
  * We instead store the shared messages in this file
 */
 
-export default defineMessages({
+const globalMessages = defineMessages({
   invalidMasterKey: {
     id: 'global.errors.invalidMasterKey',
     defaultMessage: '!!!Invalid master key entered, please check.',
@@ -47,6 +48,10 @@ export default defineMessages({
     id: 'global.labels.confirm',
     defaultMessage: '!!!Confirm',
   },
+  continue: {
+    id: 'global.labels.continue',
+    defaultMessage: '!!!Continue',
+  },
   finish: {
     id: 'global.labels.finish',
     defaultMessage: '!!!Finish',
@@ -71,45 +76,53 @@ export default defineMessages({
     id: 'global.labels.save',
     defaultMessage: '!!!Save',
   },
+  learnMore: {
+    id: 'global.labels.LearnMore',
+    defaultMessage: '!!!Learn more',
+  },
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
   },
   languageJapanese: {
     id: 'global.language.japanese',
-    defaultMessage: '!!!Japanese',
+    defaultMessage: '!!!日本語',
   },
   languageRussian: {
     id: 'global.language.russian',
-    defaultMessage: '!!!Russian',
+    defaultMessage: '!!!Pусский',
   },
   languageChineseSimplified: {
     id: 'global.language.chinese.simplified',
-    defaultMessage: '!!!Chinese Simplified',
+    defaultMessage: '!!!简体中文',
   },
   languageChineseTraditional: {
     id: 'global.language.chinese.traditional',
-    defaultMessage: '!!!Chinese Traditional',
+    defaultMessage: '!!!繁體中文',
   },
   languageKorean: {
     id: 'global.language.korean',
-    defaultMessage: '!!!Korean',
+    defaultMessage: '!!!한국어',
   },
   languageGerman: {
     id: 'global.language.german',
-    defaultMessage: '!!!German',
+    defaultMessage: '!!!Deutsch',
   },
   languageFrench: {
     id: 'global.language.french',
-    defaultMessage: '!!!French',
+    defaultMessage: '!!!Français',
   },
   languageIndonesian: {
     id: 'global.language.indonesian',
-    defaultMessage: '!!!Indonesian',
+    defaultMessage: '!!!Bahasa Indonesia',
   },
   languageSpanish: {
     id: 'global.language.spanish',
-    defaultMessage: '!!!Spanish',
+    defaultMessage: '!!!Español',
+  },
+  languageItalian: {
+    id: 'global.language.italian',
+    defaultMessage: '!!!Italiano',
   },
   unitAda: {
     id: 'global.unit.ada',
@@ -150,18 +163,6 @@ export default defineMessages({
   hwConnectDialogSaveButtonLabel: {
     id: 'wallet.connect.hw.dialog.save.button.label',
     defaultMessage: '!!!Save',
-  },
-  hwConnectDialogAboutIntroTextLine1: {
-    id: 'wallet.connect.hw.dialog.step.about.introText.line.1',
-    defaultMessage: '!!!A hardware wallet is a small USB device that adds an extra level of security to your wallet.',
-  },
-  hwConnectDialogAboutIntroTextLine2: {
-    id: 'wallet.connect.hw.dialog.step.about.introText.line.2',
-    defaultMessage: '!!!It is more secure because your private key never leaves the hardware wallet.',
-  },
-  hwConnectDialogAboutIntroTextLine3: {
-    id: 'wallet.connect.hw.dialog.step.about.introText.line.3',
-    defaultMessage: '!!!Protects your funds when using a computer compromised with viruses, phishing attempts, malware and others.',
   },
   hwConnectDialogAboutPrerequisite4: {
     id: 'wallet.connect.hw.dialog.step.about.prerequisite.4',
@@ -235,6 +236,27 @@ export default defineMessages({
     id: 'transfer.form.instructions.step1.text',
     defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
   },
+  languageSelectLabel: {
+    id: 'profile.languageSelect.form.languageSelectLabel',
+    defaultMessage: '!!!Select your language',
+  },
+  languageSelectLabelInfo: {
+    id: 'settings.general.languageSelect.labelInfo',
+    defaultMessage: '!!!Language Label Info',
+  },
+  languageSelectInfo: {
+    id: 'settings.general.languageSelect.info',
+    defaultMessage: '!!!Language Info',
+  },
+  translationAcknowledgment: {
+    id: 'settings.general.translation.acknowledgment',
+    defaultMessage: '!!!Thanks to the following',
+  },
+  translationContributors: {
+    id: 'settings.general.translation.contributors',
+    // empty string can't be translated in CrowdIn so we use underscore instead
+    defaultMessage: '_',
+  },
   passwordInstructionsPaperWallet: {
     id: 'global.passwordInstructionsPaperWallet',
     defaultMessage: '!!!Note: Paper Wallet password needs to be at least 12 characters long.',
@@ -243,7 +265,72 @@ export default defineMessages({
     id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase',
     defaultMessage: '!!!Short recovery phrase',
   },
+  goBack: {
+    id: 'global.labels.goBack',
+    defaultMessage: '!!!Go back label',
+  },
+  allowLabel: {
+    id: 'global.label.allow',
+    defaultMessage: '!!!Allow',
+  },
+  supportRequestLinkUrl: {
+    id: 'settings.support.faq.supportRequestLinkURL',
+    defaultMessage: '!!!https://yoroi-wallet.com/support/',
+  },
+  contactSupport: {
+    id: 'global.contact',
+    defaultMessage: '!!!contact support',
+  },
+  staleTxnWarningLine1: {
+    id: 'global.staleTxnWarningLine1',
+    defaultMessage: '!!!Your wallet has changed since you created this transaction.',
+  },
+  staleTxnWarningLine2: {
+    id: 'global.staleTxnWarningLine2',
+    defaultMessage: '!!!You can still send this transaction but it may fail.',
+  },
+  logsContent: {
+    id: 'settings.support.logs.content',
+    defaultMessage: '!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.',
+  },
+  downloadLogsLink: {
+    id: 'settings.support.logs.downloadLogsLink',
+    defaultMessage: '!!!download them here',
+  },
+  downloadLogsButtonLabel: {
+    id: 'settings.support.logs.downloadLogsButtonLabel',
+    defaultMessage: '!!!Download Logs',
+  },
+  blockchainExplorer: {
+    id: 'settings.general.explorer',
+    defaultMessage: '!!!Blockchain Explorer',
+  },
+  newPasswordLabel: {
+    id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
+    defaultMessage: '!!!New spending password',
+  },
+  newPasswordFieldPlaceholder: {
+    id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type new spending password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat new spending password',
+  },
+  repeatPasswordFieldPlaceholder: {
+    id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type new spending password',
+  },
+  uriSchemeLabel: {
+    id: 'global.uriSchemeTitleLabel',
+    defaultMessage: '!!!Cardano Payment URLs',
+  },
+  uriExplanation: {
+    id: 'global.uriExplanation',
+    defaultMessage: '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
+  },
 });
+export default globalMessages;
 
 export const environmentSpecificMessages = {
   ada: defineMessages({
@@ -261,3 +348,15 @@ export const environmentSpecificMessages = {
     },
   }),
 };
+
+export function listOfTranslators(
+  contributorsList: string,
+  contributorsAck: string,
+): string {
+  let output = '';
+  // append name of contributors only if the message is not empty
+  if (contributorsList !== globalMessages.translationContributors.defaultMessage) {
+    output = contributorsAck + contributorsList;
+  }
+  return output;
+}

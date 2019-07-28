@@ -6,16 +6,22 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './WalletSendConfirmationDialog.scss';
 import config from '../../../config';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+import type { ExplorerType } from '../../../domain/Explorer';
+
+import WarningBox from '../../widgets/WarningBox';
+import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -32,19 +38,22 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
+  staleTx: boolean,
+  selectedExplorer: ExplorerType,
   amount: string,
-  receiver: string,
+  receivers: Array<string>,
   totalAmount: string,
   transactionFee: string,
-  onSubmit: Function,
+  onSubmit: ({ password: string }) => void,
   amountToNaturalUnits: (amountWithFractions: string) => string,
+  signRequest: BaseSignRequest,
   onCancel: Function,
   isSubmitting: boolean,
   error: ?LocalizableError,
   currencyUnit: string,
-  classicTheme: boolean
-};
+  classicTheme: boolean,
+|};
 
 @observer
 export default class WalletSendConfirmationDialog extends Component<Props> {
@@ -73,16 +82,16 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
+    plugins: {
+      vjf: vjf()
+    },
   });
 
   submit() {
     this.form.submit({
       onSuccess: (form) => {
-        const { receiver, amount, amountToNaturalUnits } = this.props;
         const { walletPassword } = form.values();
         const transactionData = {
-          receiver,
-          amount: amountToNaturalUnits(amount),
           password: walletPassword,
         };
         this.props.onSubmit(transactionData);
@@ -98,7 +107,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     const {
       onCancel,
       amount,
-      receiver,
+      receivers,
       totalAmount,
       transactionFee,
       isSubmitting,
@@ -106,6 +115,15 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       currencyUnit,
       classicTheme
     } = this.props;
+
+    const staleTxWarning = (
+      <div className={styles.warningBox}>
+        <WarningBox>
+          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
+          {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+        </WarningBox>
+      </div>
+    );
 
     const confirmButtonClasses = classnames([
       'confirmButton',
@@ -138,12 +156,28 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
       >
+        {this.props.staleTx && staleTxWarning}
+
         <div className={styles.walletPasswordFields}>
           <div className={styles.addressToLabelWrapper}>
             <div className={styles.addressToLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
             </div>
-            <div className={styles.addressTo}>{receiver}</div>
+            {receivers.map((receiver, i) => (
+              <ExplorableHashContainer
+                key={receiver + i} // eslint-disable-line react/no-array-index-key
+                selectedExplorer={this.props.selectedExplorer}
+                hash={receiver}
+                light
+                linkType="address"
+              >
+                <RawHash light>
+                  <span className={styles.addressTo}>
+                    {receiver}
+                  </span>
+                </RawHash>
+              </ExplorableHashContainer>
+            ))}
           </div>
 
           <div className={styles.amountFeesWrapper}>
@@ -181,7 +215,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={InputOwnSkin}
             />
           }
         </div>

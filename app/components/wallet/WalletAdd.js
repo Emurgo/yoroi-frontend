@@ -1,37 +1,41 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import styles from './WalletAdd.scss';
+import classnames from 'classnames';
+
+import SvgInline from 'react-svg-inline';
+import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
+import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
+import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
+
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
+import styles from './WalletAdd.scss';
 
 const messages = defineMessages({
   title: {
-    id: 'wallet.add.dialog.title.label',
-    defaultMessage: '!!!Add wallet',
+    id: 'wallet.add.page.title',
+    defaultMessage: '!!!Gateway to the financial world',
   },
-  createDescription: {
-    id: 'wallet.add.dialog.create.description',
-    defaultMessage: '!!!Create a new wallet',
+  subTitle: {
+    id: 'wallet.add.page.subtitle.label',
+    defaultMessage: '!!!Yoroi light wallet for Cardano',
   },
-  useTrezorDescription: {
-    id: 'wallet.add.dialog.trezor.description',
-    defaultMessage: '!!!Connect to Trezor',
+  connectToHWTitle: {
+    id: 'wallet.add.page.hw.title',
+    defaultMessage: '!!!Connect to hardware wallet',
   },
-  useLedgerDescription: {
-    id: 'wallet.add.dialog.ledger.description',
-    defaultMessage: '!!!Connect to Ledger',
+  createTitle: {
+    id: 'wallet.add.page.create.title',
+    defaultMessage: '!!!Create wallet',
   },
-  restoreDescription: {
-    id: 'wallet.add.dialog.restore.description',
-    defaultMessage: '!!!Restore wallet from backup',
+  restoreTitle: {
+    id: 'wallet.add.page.restore.title',
+    defaultMessage: '!!!Restore wallet',
   },
-  restorePaperDescription: {
-    id: 'wallet.add.dialog.restore.paper.description',
-    defaultMessage: '!!!Restore Yoroi Paper Wallet',
+  transferFundsTitle: {
+    id: 'wallet.add.page.daedalusTransfer.title',
+    defaultMessage: '!!!Transfer funds from a Daedalus wallet to Yoroi',
   },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',
@@ -44,21 +48,18 @@ const messages = defineMessages({
   createLedgerWalletNotificationMessage: {
     id: 'wallet.add.dialog.createLedgerWalletNotificationMessage',
     defaultMessage: '!!!Ledger Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
-  }
+  },
 });
 
-type Props = {
-  onTrezor: Function,
-  isCreateTrezorWalletActive: boolean,
-  onLedger: Function,
-  isCreateLedgerWalletActive: boolean,
+type Props = {|
   onCreate: Function,
   onRestore: Function,
-  onPaperRestore: Function,
+  onHardwareConnect: Function,
+  onSettings: Function,
+  onDaedalusTransfer: Function,
   isRestoreActive: boolean,
   classicTheme: boolean,
-  title: string
-};
+|};
 
 @observer
 export default class WalletAdd extends Component<Props> {
@@ -69,91 +70,110 @@ export default class WalletAdd extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
-      onTrezor,
-      isCreateTrezorWalletActive,
-      onLedger,
-      isCreateLedgerWalletActive,
       onCreate,
       onRestore,
-      onPaperRestore,
+      onHardwareConnect,
+      onSettings,
+      onDaedalusTransfer,
       isRestoreActive,
-      classicTheme,
-      title
     } = this.props;
 
-    const componentClasses = classnames([styles.component, 'WalletAdd']);
-    const createWalletButtonClasses = classnames([
-      classicTheme ? 'primary' : 'outlined',
-      'createWalletButton'
-    ]);
-    const restoreWalletButtonClasses = classnames([
-      classicTheme ? 'primary' : 'outlined',
-      'restoreWalletButton'
-    ]);
-    const buttonsContainerClasses = classnames([
-      classicTheme ? styles.buttonsContainerClassic : styles.buttonsContainer
-    ]);
-
     let activeNotification = null;
-    if (isCreateTrezorWalletActive) {
-      activeNotification = 'createTrezorWalletNotificationMessage';
-    } else if (isCreateLedgerWalletActive) {
-      activeNotification = 'createLedgerWalletNotificationMessage';
-    } else if (isRestoreActive) {
+    if (isRestoreActive) {
       activeNotification = 'restoreNotificationMessage';
     }
 
     return (
-      <div className={componentClasses}>
-        <div className={buttonsContainerClasses}>
-          {!classicTheme && (
-            <div className={styles.title}>{title}</div>
-          )}
+      <div className={styles.component}>
+        {/* Setting button */}
+        <div className={styles.hero}>
+          <div className={styles.settingsBar}>
+            <button type="button" onClick={onSettings} className={styles.settingsBarLink}>
+              <SvgInline svg={settingsIcon} width="30" height="30" />
+            </button>
+          </div>
 
-          <Button
-            className="primary"
-            label={intl.formatMessage(messages.useLedgerDescription)}
-            onMouseUp={onLedger}
-            skin={ButtonSkin}
-          />
-          <Button
-            className="primary"
-            label={intl.formatMessage(messages.useTrezorDescription)}
-            onMouseUp={onTrezor}
-            skin={ButtonSkin}
-          />
-          <Button
-            className={createWalletButtonClasses}
-            label={intl.formatMessage(messages.createDescription)}
-            onMouseUp={onCreate}
-            skin={ButtonSkin}
-          />
-          <Button
-            className={restoreWalletButtonClasses}
-            label={intl.formatMessage(messages.restoreDescription)}
-            onMouseUp={onRestore}
-            skin={ButtonSkin}
-          />
-          <Button
-            className="primary restorePaperWalletButton"
-            label={intl.formatMessage(messages.restorePaperDescription)}
-            onMouseUp={onPaperRestore}
-            skin={ButtonSkin}
-          />
-          {activeNotification ? (
-            <div className={styles.notification}>
-              <FormattedHTMLMessage
-                {...messages[activeNotification]}
-                values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
-              />
+          <div className={styles.heroInner}>
+            {/* Left block  */}
+            <div className={styles.heroLeft}>
+              <SvgInline svg={logoIcon} className={styles.heroLogo} />
+              <h2 className={styles.heroTitle}>
+                <FormattedHTMLMessage {...(messages.title)} />
+              </h2>
+              <h3 className={styles.heroSubTitle}>{intl.formatMessage(messages.subTitle)}</h3>
             </div>
-          ) : null}
-
+            {/* Right block  */}
+            <div className={styles.heroRight}>
+              <div className={styles.heroCardsList}>
+                {/* Connect to hardware wallet */}
+                <button
+                  type="button"
+                  className="WalletAdd_btnConnectHW"
+                  onClick={onHardwareConnect}
+                >
+                  <div className={styles.heroCardsItem}>
+                    <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
+                    <div className={styles.heroCardsItemTitle}>
+                      {intl.formatMessage(messages.connectToHWTitle)}
+                    </div>
+                  </div>
+                </button>
+                {/* Create wallet */}
+                <button
+                  type="button"
+                  className="WalletAdd_btnCreateWallet"
+                  onClick={onCreate}
+                >
+                  <div className={styles.heroCardsItem}>
+                    <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
+                    <div className={styles.heroCardsItemTitle}>
+                      {intl.formatMessage(messages.createTitle)}
+                    </div>
+                  </div>
+                </button>
+                {/* Restore wallet */}
+                <button
+                  type="button"
+                  className="WalletAdd_btnRestoreWallet"
+                  onClick={onRestore}
+                >
+                  <div className={styles.heroCardsItem}>
+                    <div
+                      className={classnames([styles.heroCardsItemBg, styles.bgRestoreWallet])}
+                    />
+                    <div className={styles.heroCardsItemTitle}>
+                      {intl.formatMessage(messages.restoreTitle)}
+                    </div>
+                  </div>
+                </button>
+                {activeNotification ? (
+                  <div className={styles.notification}>
+                    <FormattedHTMLMessage
+                      {...messages[activeNotification]}
+                      values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
+                    />
+                  </div>
+                ) : null}
+              </div>
+              {/* Transfer funds from a Daedalus wallet to Yoroi */}
+              <button
+                type="button"
+                onClick={onDaedalusTransfer}
+                className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
+              >
+                <SvgInline
+                  svg={daedalusIcon}
+                  width="45"
+                  height="40"
+                  className={styles.heroCardsItemLinkIcon}
+                />
+                <div className={styles.heroCardsItemTitle}>
+                  {intl.formatMessage(messages.transferFundsTitle)}
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
-
-        {!classicTheme && <div className={styles.background} />}
-
-        {!classicTheme && <div className={styles.walletImage} />}
       </div>
     );
   }

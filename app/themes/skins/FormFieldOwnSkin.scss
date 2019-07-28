@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   height: 100%;
-  right: 13px;
+  right: 12px;
   top: 0;
   padding-top: 7px;
 
@@ -29,7 +29,6 @@
     line-height: 56px;
     padding: 0px 15px;
     border-radius: 8px;
-
     margin-top: 0px;
   }
 
@@ -46,46 +45,85 @@
       right: 12px;
     }
   }
+}
 
-  input:valid + .legend, input:focus + .legend, input:disabled + .legend {
-    transform: translate(-20px, -24px) scale(0.75);
-    opacity: 1;
+:global(.YoroiModern) {
+  .inputWrapper {
+    input:valid + .legend, input:focus + .legend, input:disabled + .legend {
+      color: var(--rp-formfield-label-text-color);
+      transform: translate(-10px, -24px);
+      font-size: 12px;
+      opacity: 1;
+      background: white;
+    }
+
+    &.focused .legend {
+      color: var(--rp-formfield-label-text-color);
+      z-index: 1;
+      display: block;
+      background: white;
+    }
+
+    input:focus::-webkit-input-placeholder {
+      color: var(--rp-input-placeholder-color);
+    }
+
+    input::-webkit-input-placeholder {
+      color: transparent;
+    }
   }
 
-  &.focused .legend {
-    transform: translate(-20px, -24px) scale(0.75);
-    color: var(--rp-formfield-label-text-color) !important;
+  .legend {
+    font-family: var(--rp-theme-font-regular);
+    color: var(--rp-input-placeholder-color);
+    font-size: 16px;
+    box-sizing: border-box;
+    left: 16px;
+    top: 16px;
+    position: absolute;
+    cursor: text;
     z-index: 1;
+    transition: color 400ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 400ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
     pointer-events: none;
     display: block;
-    vertical-align: baseline;
-    background: transparent;
+    margin: 0;
+    padding: 0 6px;
+  }
+
+    /* By default, Chrome's styling for autofill inputs overlaps with floating labels.
+   * The following fix delays webkit-autofill transition to avoid Chrome setting its
+   * own style and thus floating fields are not overlapped.
+   */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-transition-delay: 99999s;
+  }
+
+  .error {
+    border-color: var(--rp-theme-color-error);
+    color: var(--rp-theme-color-error)!important;
   }
 }
 
-.legend {
-  font-family: var(--rp-input-font-family, var(--rp-theme-font-regular, "NotoSans-Regular, NotoSansCJKjp-Regular"), sans-serif);
-  color: var(--rp-input-placeholder-color) !important;
-  font-size: 16px;
-  font-weight: 400;
-  box-sizing: border-box;
-  
-  left: 16px;
-  top: 16px;
-  position: absolute;
-  cursor: text;
-
-  z-index: 10;
-  transition: color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
-  
-  pointer-events: none;
-  display: block;
-
-  margin: 0;
-  padding: 0;
-}
-
-.error {
-  border-color: var(--rp-theme-color-error);
-  color: var(--rp-theme-color-error)!important;
+:global(.YoroiClassic) {
+  .inputWrapper {
+    border: 0;
+    padding: 0;
+    line-height: normal;
+  }
+  .iconsWrapper {
+    padding-top: 27px;
+  }
+  .legend {
+    font-family: var(--rp-theme-font-regular);
+    display: block;
+    font-size: 16px;
+    margin: 0 0 10px 0;
+  }
+  input {
+    margin: 0;
+    border-radius: 0;
+  }
 }

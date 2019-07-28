@@ -10,9 +10,12 @@ import {
   getCryptoDaedalusWalletFromMnemonics,
 } from './lib/cardanoCrypto/cryptoWallet';
 import {
-  getAddressesWithFunds,
+  getAddressesKeys,
 } from './daedalusTransfer';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import {
+  silenceLogsForTesting,
+} from '../../utils/logging';
 
 const VALID_DD_PAPER = {
   words: 'fire shaft radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree',
@@ -28,6 +31,7 @@ const UNEXPECTED_DD_ADDRESS =
 
 beforeAll(async () => {
   await RustModule.load();
+  silenceLogsForTesting();
 });
 
 test('Is valid Daedalus paper mnemonic', async () => {
@@ -50,7 +54,7 @@ test('Unscramble Daedalus paper matches expected address', async () => {
   if (words) {
     const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
     const checker = RustModule.Wallet.DaedalusAddressChecker.new(daedalusWallet);
-    const addressMap = getAddressesWithFunds({
+    const addressMap = getAddressesKeys({
       checker,
       fullUtxo: [VALID_DD_PAPER.address, UNEXPECTED_DD_ADDRESS]
     });

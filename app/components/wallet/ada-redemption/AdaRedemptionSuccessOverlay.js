@@ -21,11 +21,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
-  amount: number,
+type Props = {|
+  amount: string,
   onClose: Function,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class AdaRedemptionSuccessOverlay extends Component<Props> {

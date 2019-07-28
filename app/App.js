@@ -1,4 +1,5 @@
 // @flow
+import { hot } from 'react-hot-loader/root';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
@@ -13,18 +14,19 @@ import de from 'react-intl/locale-data/de';
 import fr from 'react-intl/locale-data/fr';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
+import it from 'react-intl/locale-data/it';
 import { Routes } from './Routes';
 import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
 import { themeOverrides } from './themes/overrides';
 import translations from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
+import { THEMES } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
-import { hot } from 'react-hot-loader';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
 
 @observer
 class App extends Component<{
@@ -32,17 +34,6 @@ class App extends Component<{
   actions: ActionsMap,
   history: Object,
 }> {
-
-  mobxDevToolsInstanceIfDevEnv(): ?React$Element<any> {
-    if (!environment.isDev()) return undefined;
-    try {
-      const mobxDevToolsPackage = require('mobx-react-devtools').default;
-      return React.createElement(mobxDevToolsPackage);
-    } catch (err) {
-      return undefined;
-    }
-  }
-
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -52,12 +43,30 @@ class App extends Component<{
     // (missed in object keys) just stay in english
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
-    const themeVars = stores.profile.currentThemeVars;
+    const themeVars = Object.assign(
+      stores.profile.currentThemeVars,
+      {
+        // show wingdings on dev builds when no font is set to easily find
+        // missing font bugshowever, on production, we use Times New Roman
+        // which looks ugly but at least it's readable.
+        '--default-font': environment.isDev() ? 'wingdings' : 'Times New Roman',
+      }
+    );
     const currentTheme = stores.profile.currentTheme;
-    const mobxDevTools = this.mobxDevToolsInstanceIfDevEnv();
+
+    // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
+    if (document && document.body instanceof HTMLBodyElement) {
+      // Flow give error when directly assesing document.body.classList.[remove()]|[add()]
+      const bodyClassList = document.body.classList;
+      // we can't simply set the className because there can be other classes present
+      // therefore we only remove & add those related to the theme
+      const allThemes: Array<string> = Object.keys(THEMES).map(key => THEMES[key]);
+      bodyClassList.remove(...allThemes);
+      bodyClassList.add(currentTheme);
+    }
 
     return (
-      <div className={currentTheme} style={{ height: '100%' }}>
+      <div style={{ height: '100%' }}>
         <ThemeManager variables={themeVars} />
 
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
@@ -72,10 +81,9 @@ class App extends Component<{
             </Router>
           </IntlProvider>
         </ThemeProvider>
-        {mobxDevTools}
       </div>
     );
   }
 }
 
-export default hot(module)(App);
+export default hot(App);

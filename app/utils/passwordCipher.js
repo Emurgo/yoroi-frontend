@@ -8,8 +8,8 @@ export function encryptWithPassword(
   password: string,
   bytes: Uint8Array
 ): string {
-  const salt = Buffer.from(cryptoRandomString(2 * 32), 'hex');
-  const nonce = Buffer.from(cryptoRandomString(2 * 12), 'hex');
+  const salt = Buffer.from(cryptoRandomString({ length: 2 * 32 }), 'hex');
+  const nonce = Buffer.from(cryptoRandomString({ length: 2 * 12 }), 'hex');
   const encryptedBytes = RustModule.Wallet.password_encrypt(password, salt, nonce, bytes);
   const encryptedHex = Buffer.from(encryptedBytes).toString('hex');
   return encryptedHex;

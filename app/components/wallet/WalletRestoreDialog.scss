@@ -2,71 +2,96 @@
 @import '../../themes/mixins/error-message';
 @import '../../themes/mixins/place-form-field-error-below-input';
 
-.walletNameClassic {
-  margin-bottom: 20px;
-}
+.component {
+  .walletPassword {
+    .walletPasswordFields {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 400ms ease;
 
-.walletName {
-  margin-bottom: 0;
-}
+      &.show {
+        max-height: 250px;
+        opacity: 1;
+        overflow: visible;
+      }
 
-.paperPassword {
-  margin-top: 30px;
-}
+      & > div {
+        margin-top: 30px;
+        width: 350px;
+      }
 
-.walletPasswordClassic {
-  .walletPasswordFields {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 400ms ease;
-
-    &.show {
-      max-height: 250px;
-      opacity: 1;
-      overflow: visible;
+      @include place-form-field-error-below-input;
     }
 
-    & > div {
+    .paperPassword {
       margin-top: 30px;
-      width: 350px;
     }
+  }
 
-    @include place-form-field-error-below-input;
+  .error {
+    @include error-message;
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .isSubmitting {
+    @include loading-spinner("../../assets/images/spinner-light.svg");
   }
 }
 
-.walletPassword {
-  .walletPasswordFields {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 400ms ease;
-
-    &.show {
-      max-height: 600px;
-      opacity: 1;
+:global(.YoroiClassic) {
+  .component {
+    .walletName {
+      margin-bottom: 10px;
     }
 
-    & > div {
-      margin-top: 0;
-      width: 100%;
+    .walletPassword {
+      .walletPasswordFields {
+        &.show {
+          max-height: 250px;
+          opacity: 1;
+          overflow: visible;
+        }
+    
+        & > div {
+          margin-top: 0;
+          width: 350px;
+        }
+    
+        @include place-form-field-error-below-input;
+      }
+    
+      .paperPassword {
+        margin-top: 0;
+      }
     }
   }
 }
 
-.error {
-  @include error-message;
-  margin-top: 30px;
-  text-align: center;
-}
+:global(.YoroiModern) {
+  .component {
+    .walletName {
+      margin-bottom: 0;
+    }
 
-.isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
+    .walletPassword {
+      .walletPasswordFields {
+    
+        &.show {
+          max-height: 600px;
+          opacity: 1;
+        }
+    
+        & > div {
+          margin-top: 0;
+          width: 100%;
+        }
+      }
+    }
+    
+  }
 }

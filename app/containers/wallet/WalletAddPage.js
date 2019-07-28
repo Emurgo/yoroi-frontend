@@ -1,36 +1,36 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
-import { ROUTES } from '../../routes-config';
-import WalletAdd from '../../components/wallet/WalletAdd';
-import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
-import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
-import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
-import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
-import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
-import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
-import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import TopBar from '../../components/topbar/TopBar';
+import { intlShape } from 'react-intl';
+
 import environment from '../../environment';
-import resolver from '../../utils/imports';
+import { ROUTES } from '../../routes-config';
+import RouterActions from '../../actions/router-actions';
 import type { InjectedProps } from '../../types/injectedPropsType';
+
 import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
 import TrezorConnectStore from '../../stores/ada/TrezorConnectStore';
 import LedgerConnectStore from '../../stores/ada/LedgerConnectStore';
-import AddWalletFooter from '../footer/AddWalletFooter';
+
+import MainLayout from '../MainLayout';
+import WalletAdd from '../../components/wallet/WalletAdd';
+
+import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
+import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
+import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
+import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
+
+import WalletRestoreOptionDialogContainer from './dialogs/WalletRestoreOptionDialogContainer';
+import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
+import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
+import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
+
+import WalletConnectHWOptionDialogContainer from './dialogs/WalletConnectHWOptionDialogContainer';
+import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
+import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
+import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 
 type Props = InjectedProps;
-const MainLayout = resolver('containers/MainLayout');
-
-const messages = defineMessages({
-  title: {
-    id: 'wallet.add.page.title',
-    defaultMessage: '!!!Add Wallet',
-  },
-});
 
 @observer
 export default class WalletAddPage extends Component<Props> {
@@ -46,28 +46,13 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   render() {
-    const { topbar, profile } = this.props.stores;
-    const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
-    const topBar = (
-      <TopBar
-        title={topbarTitle}
-        onCategoryClicked={category => {
-          actions.topbar.activateTopbarCategory.trigger({ category });
-        }}
-        categories={topbar.CATEGORIES}
-        activeTopbarCategory={topbar.activeTopbarCategory}
-        classicTheme={profile.isClassicTheme}
-        areCategoriesHidden={profile.isModernTheme}
-      />);
-
+    const { profile } = this.props.stores;
     const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
-    const { isRestoreActive } = wallets;
-    const isCreateTrezorWalletActive = this._getTrezorConnectStore().isCreateHWActive;
-    const isCreateLedgerWalletActive = this._getLedgerConnectStore().isCreateHWActive;
+    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+    const { restoreRequest } = wallets;
+
     const openTrezorConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
       this.props.actions[environment.API].trezorConnect.init.trigger();
@@ -77,10 +62,9 @@ export default class WalletAddPage extends Component<Props> {
       this.props.actions[environment.API].ledgerConnect.init.trigger();
     };
 
-    let content = null;
-    let isWalletAdd = false;
+    let activeDialog = null;
     if (uiDialogs.isOpen(WalletCreateDialog)) {
-      content = (
+      activeDialog = (
         <WalletCreateDialogContainer
           actions={actions}
           stores={stores}
@@ -88,19 +72,8 @@ export default class WalletAddPage extends Component<Props> {
           classicTheme={profile.isClassicTheme}
         />
       );
-    } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      const restoreType = uiDialogs.getParam('restoreType');
-      content = (
-        <WalletRestoreDialogContainer
-          actions={actions}
-          stores={stores}
-          onClose={this.onClose}
-          classicTheme={profile.isClassicTheme}
-          mode={restoreType || 'regular'}
-        />
-      );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
-      content = (
+      activeDialog = (
         <WalletBackupDialogContainer
           actions={actions}
           stores={stores}
@@ -108,52 +81,90 @@ export default class WalletAddPage extends Component<Props> {
           classicTheme={profile.isClassicTheme}
         />
       );
+    } else if (uiDialogs.isOpen(WalletRestoreOptionDialog)) {
+      activeDialog = (
+        <WalletRestoreOptionDialogContainer
+          onClose={this.onClose}
+          classicTheme={profile.isClassicTheme}
+          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
+        />
+      );
+    } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
+      const mode = uiDialogs.getParam('restoreType') || 'regular';
+      if ((mode !== 'regular') && (mode !== 'paper')) {
+        throw new Error('Invalid restore type');
+      }
+      activeDialog = (
+        <WalletRestoreDialogContainer
+          actions={actions}
+          stores={stores}
+          onClose={this.onClose}
+          onBack={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+          classicTheme={profile.isClassicTheme}
+          mode={mode}
+        />
+      );
+    } else if (uiDialogs.isOpen(WalletConnectHWOptionDialog)) {
+      activeDialog = (
+        <WalletConnectHWOptionDialogContainer
+          onClose={this.onClose}
+          classicTheme={profile.isClassicTheme}
+          onTrezor={openTrezorConnectDialog}
+          onLedger={openLedgerConnectDialog}
+        />
+      );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
-      content = (
+      activeDialog = (
         <WalletTrezorConnectDialogContainer
           actions={actions}
           stores={stores}
           onClose={this.onClose}
+          onBack={() => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })}
           classicTheme={profile.isClassicTheme}
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
-      content = (
+      activeDialog = (
         <WalletLedgerConnectDialogContainer
           actions={actions}
           stores={stores}
           onClose={this.onClose}
+          onBack={() => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })}
           classicTheme={profile.isClassicTheme}
-        />
-      );
-    } else {
-      isWalletAdd = true;
-      content = (
-        <WalletAdd
-          onTrezor={openTrezorConnectDialog}
-          isCreateTrezorWalletActive={isCreateTrezorWalletActive}
-          onLedger={openLedgerConnectDialog}
-          isCreateLedgerWalletActive={isCreateLedgerWalletActive}
-          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
-          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
-          isRestoreActive={isRestoreActive}
-          classicTheme={profile.isClassicTheme}
-          title={this.context.intl.formatMessage(messages.title)}
         />
       );
     }
 
+    const content = (
+      <WalletAdd
+        onHardwareConnect={
+          () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
+        }
+        onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+        onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+        isRestoreActive={restoreRequest.isExecuting}
+        onSettings={this._goToSettingsRoot}
+        onDaedalusTransfer={this._goToDaedalusTransferRoot}
+        classicTheme={profile.isClassicTheme}
+      />
+    );
+
     return (
       <MainLayout
-        topbar={topBar}
-        footer={<AddWalletFooter />}
-        noTopbarNoBanner={profile.isModernTheme && isWalletAdd}
+        actions={actions}
+        stores={stores}
         classicTheme={profile.isClassicTheme}
+        connectionErrorType={checkAdaServerStatus}
       >
         {content}
+        {activeDialog}
       </MainLayout>
     );
+  }
+
+  _getRouter(): RouterActions {
+    return this.props.actions.router;
   }
 
   _getWalletsStore(): AdaWalletsStore {
@@ -166,5 +177,23 @@ export default class WalletAddPage extends Component<Props> {
 
   _getLedgerConnectStore(): LedgerConnectStore {
     return this.props.stores.substores[environment.API].ledgerConnect;
+  }
+
+  _goToSettingsRoot = (): void => {
+    // Dynamically update the topbar icons
+    this.props.stores.topbar.updateCategories();
+
+    this._getRouter().goToRoute.trigger({
+      route: ROUTES.SETTINGS.ROOT
+    });
+  }
+
+  _goToDaedalusTransferRoot = (): void => {
+    // Dynamically update the topbar icons
+    this.props.stores.topbar.updateCategories();
+
+    this._getRouter().goToRoute.trigger({
+      route: ROUTES.DAEDALUS_TRANFER.ROOT
+    });
   }
 }

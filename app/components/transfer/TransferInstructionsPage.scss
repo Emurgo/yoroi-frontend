@@ -2,67 +2,48 @@
 
 .component {
   padding: 20px;
+  min-width: 650px;
 
   .buttonTitle {
-    margin-top: 30px;
+    font-size: 18px;
+    font-family: var(--font-semibold);
+    margin-bottom: 30px;
     line-height: 1.38;
-    text-align: center;
-    font-size: 11px;
-    font-family: var(--font-medium);
+    text-align: left;
   }
   
   .button {
     display: block !important;
-    margin: 30px auto 0;
+    margin-bottom: 30px;
   }
   
   .body {
+    display: flex;
     color: var(--theme-bordered-box-text-color);
     font-family: var(--font-regular);
     font-size: 14px;
     line-height: 19px;
   
-    .title {
-      line-height: 1.38;
-      margin-bottom: 4px;
-      font-size: 11px;
-      font-family: var(--font-medium);
-    }
-  
-    .text {
-      font-size: 16px;
-      line-height: 22px;
-      margin-bottom: 12px;
-      word-break: break-word;
-    }
-  }
-}
+    .infoBlock {
+      padding-right: 60px;
+      .title {
+        font-size: 18px;
+        font-family: var(--font-semibold);
+        line-height: 1.38;
+        margin-bottom: 16px;
+      }
 
-:global(.YoroiClassic) .component {
-  .buttonTitle {
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
-  .body {
-    .title {
-      font-weight: 600;
-      padding-left: 10px;
-      text-transform: uppercase;
+      .text {
+        font-size: 14px;
+        line-height: 22px;
+        margin-bottom: 12px;
+        word-break: break-word;
+      }
     }
-  }  
-}
 
-:global(.YoroiModern) .component {
-  .buttonTitle {
-    font-size: 18px;
-    font-family: var(--font-semibold);
-  }
-    
-  .body {
-    .title {
-      font-size: 18px;
-      font-family: var(--font-semibold);
+    .operationBlock {
+      padding-right: 40px;
+      margin-left: auto;
     }
   }
 }

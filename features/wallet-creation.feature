@@ -11,7 +11,7 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | aaSecret_123 | aaSecret_123        |
+    | asdfasdfasdf | asdfasdfasdf        |
     And I click the "Create personal wallet" button
     And I accept the creation terms
     And I copy and enter the displayed mnemonic phrase
@@ -23,7 +23,7 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | aaSecret_123 | aaSecret_123        |
+    | asdfasdfasdf | asdfasdfasdf        |
     And I click the "Create personal wallet" button
     And I accept the creation terms
     And I copy and enter the displayed mnemonic phrase
@@ -37,7 +37,7 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | aaSecret_123 | aaSecret_123        |
+    | asdfasdfasdf | asdfasdfasdf        |
     And I click the "Create personal wallet" button
     And I accept the creation terms
     And I enter random mnemonic phrase
@@ -50,8 +50,8 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | aaSecret_123 | aaSecret_123        |
-    And I clear the created wallet password aaSecret_123
+    | asdfasdfasdf | asdfasdfasdf        |
+    And I clear the created wallet password asdfasdfasdf
     And I click the "Create personal wallet" button
     Then I should stay in the create wallet dialog
 
@@ -61,7 +61,7 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | aaSecret_123 | aaSecret_123        |
+    | asdfasdfasdf | asdfasdfasdf        |
     And I click the "Create personal wallet" button
     Then I see the security warning prior:
     | message                             |
@@ -73,7 +73,7 @@ Feature: Wallet creation
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
-    | aaSecret_123 | aaSecret_123        |
+    | asdfasdfasdf | asdfasdfasdf        |
     And I clear the name "Created Wallet"
     And I click the "Create personal wallet" button
     Then I should stay in the create wallet dialog
