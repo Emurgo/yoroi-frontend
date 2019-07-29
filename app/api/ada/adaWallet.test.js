@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 // @flow
 import './lib/test-config';
+import { schema } from 'lovefield';
 import {
   isValidPaperMnemonic,
   unscramblePaperMnemonic
@@ -16,6 +17,9 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import {
   silenceLogsForTesting,
 } from '../../utils/logging';
+import {
+  loadLovefieldDB,
+} from './lib/storage/lovefieldDatabase';
 
 const VALID_DD_PAPER = {
   words: 'fire shaft radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree',
@@ -31,6 +35,9 @@ const UNEXPECTED_DD_ADDRESS =
 
 beforeAll(async () => {
   await RustModule.load();
+  await loadLovefieldDB({
+    storeType: schema.DataStoreType.MEMORY,
+  });
   silenceLogsForTesting();
 });
 
