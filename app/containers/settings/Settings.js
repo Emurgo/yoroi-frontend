@@ -59,8 +59,8 @@ export default class Settings extends Component<InjectedContainerProps> {
             onCategoryClicked={category => {
               actions.topbar.activateTopbarCategory.trigger({ category });
             }}
-            categories={topbar.CATEGORIES}
-            activeTopbarCategory={topbar.activeTopbarCategory}
+            isActiveCategory={topbar.isActiveCategory}
+            categories={topbar.categories}
           />
         )}
         connectionErrorType={checkAdaServerStatus}

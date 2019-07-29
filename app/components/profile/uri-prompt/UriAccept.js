@@ -5,11 +5,10 @@ import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './UriAccept.scss';
 import uriPrompt from '../../../assets/images/uri/uri-prompt.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
-import WarningBox from '../../widgets/WarningBox';
 
 const messages = defineMessages({
   seePrompt: {
@@ -21,7 +20,6 @@ const messages = defineMessages({
 type Props = {|
   onConfirm: void => void,
   onBack: void => void,
-  openSettingsPage: void => void,
   classicTheme: boolean
 |};
 
@@ -43,26 +41,8 @@ export default class UriAccept extends Component<Props> {
       styles.submitButton,
     ]);
 
-    const browserSettingsLink = (
-      <button
-        type="button"
-        onClick={_event => this.props.openSettingsPage()}
-      >
-        {intl.formatMessage(globalMessages.browserSettings)}
-      </button>
-    );
-    const noPromptWarning = (
-      <WarningBox>
-        {intl.formatMessage(globalMessages.promptWarningLine1)}<br />
-        <FormattedMessage {...globalMessages.promptWarningLine2} values={{ browserSettingsLink }} />
-      </WarningBox>
-    );
-
     return (
       <div className={styles.component}>
-        <div className={styles.warningBox}>
-          {noPromptWarning}
-        </div>
         <div className={styles.centeredBox}>
 
           <SvgInline svg={uriPrompt} className={styles.aboutSvg} />

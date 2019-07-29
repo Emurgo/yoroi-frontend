@@ -75,9 +75,7 @@ export default class ProfileStore extends Store {
       },
     },
     {
-      isDone: () => {
-        return !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted;
-      },
+      isDone: () => !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted,
       action: () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
         if (this.stores.app.currentRoute === route) {
@@ -93,9 +91,6 @@ export default class ProfileStore extends Store {
         await wallets.refreshWalletsData();
         if (wallets.first) {
           const firstWallet = wallets.first;
-
-          // Dynamic Initialization of Topbar Categories
-          this.stores.topbar.updateCategories();
 
           if (this.stores.loading.fromUriScheme) {
             this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });

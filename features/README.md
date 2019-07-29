@@ -10,6 +10,8 @@ Note: The JSON file is just miscellaneous faked data. It is
 - Not a blockchain
 - Not a valid state in Cardano
 
+Each scenario is tagged with `@it-<number>` so that we can use run specific scenarios by their tags, such as `npm run test-by-tag-chrome @it-99`. To add new scenarios, pick unique numbers as tags. This command may suggest from which number to start: `grep -oh '@it-[0-9]*' features/*.feature | sort -Vr | head`.
+
 ## Exporting a Yoroi snapshot
 
 Yoroi snapshots are created by adding the step `I export a snapshot named SNAPSHOT_NAME` and running locally the escenario once. This creates the files `localStorage.json` and `indexedDB.json` in the folder `features/yoroi_snapshots/SNAPSHOT_NAME`. Then you can import the snapshot with the  step `I import a snapshot named SNAPSHOT_NAME`.
