@@ -23,7 +23,7 @@ import {
 export async function migrateToLatest(
   localStorageApi: LocalStorageApi
 ): Promise<boolean> {
-  const lastLaunchVersion = await localStorageApi.getLastLaunchVersion();
+  let lastLaunchVersion = await localStorageApi.getLastLaunchVersion();
   Logger.info(`Starting migration for ${lastLaunchVersion}`);
   /**
    * Note: Although we don't start migration if the user is running a fresh installation
@@ -47,7 +47,14 @@ export async function migrateToLatest(
      * We changed the place where Yoroi data is stored so  we must process this migration first
      * to ensure other migrations look at the right place for storage
      */
-    ['<1.9.0', async () => await moveStorage(localStorageApi)],
+    ['<1.9.0', async () => {
+      const applied = await moveStorage(localStorageApi);
+      if (applied) {
+        // update last launch version to what's in the new storage location
+        lastLaunchVersion = await localStorageApi.getLastLaunchVersion();
+      }
+      return applied;
+    }],
     ['<1.4.0', bip44Migration],
   ];
 
