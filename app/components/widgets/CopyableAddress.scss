@@ -1,5 +1,5 @@
 .component {
-  * {
+  div, svg {
     vertical-align: middle;
   }
   .copyIconBig {
@@ -7,7 +7,7 @@
     object-fit: contain;
     margin-left: 3px;
     & > svg {
-      margin-top: 4px;
+      margin-top: -6px;
       height: 28px;
       width: 28px;
       padding: 4px;
