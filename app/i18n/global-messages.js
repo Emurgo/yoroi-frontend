@@ -325,18 +325,6 @@ const globalMessages = defineMessages({
     id: 'global.uriSchemeTitleLabel',
     defaultMessage: '!!!Cardano Payment URLs',
   },
-  promptWarningLine1: {
-    id: 'global.promptWarningLine1',
-    defaultMessage: '!!!You will not see a prompt if you have previously accepted or rejected it in the past.',
-  },
-  promptWarningLine2: {
-    id: 'global.promptWarningLine2',
-    defaultMessage: '!!!You can unblock or remove permission from your {browserSettingsLink}',
-  },
-  browserSettings: {
-    id: 'global.browserSettings',
-    defaultMessage: '!!!browser settings',
-  },
   uriExplanation: {
     id: 'global.uriExplanation',
     defaultMessage: '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
@@ -344,6 +332,22 @@ const globalMessages = defineMessages({
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
     defaultMessage: '!!!Copied',
+  },
+  transferInstructionsText: {
+    id: 'transfer.instructions.instructions.text',
+    defaultMessage: '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
+  },
+  transferInstructionsButton: {
+    id: 'transfer.instructions.instructions.button.label',
+    defaultMessage: '!!!Create Yoroi wallet',
+  },
+  attentionTitle: {
+    id: 'transfer.instructions.attention.title.label',
+    defaultMessage: '!!!Attention',
+  },
+  transferTitleText: {
+    id: 'daedalusTransfer.instructions.attention.title',
+    defaultMessage: '!!!Transfer all funds from'
   },
 });
 export default globalMessages;

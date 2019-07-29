@@ -467,6 +467,25 @@ export type RestoreWalletFunc = (
   request: RestoreWalletRequest
 ) => Promise<RestoreWalletResponse>;
 
+// restoreWalletForTransfer
+
+export type RestoreWalletForTransferRequest = {
+  recoveryPhrase: string,
+  checkAddressesInUse: FilterFunc,
+};
+export type RestoreWalletForTransferResponse = {
+  masterKey: string,
+  addresses: Array<{|
+    address: string,
+    accountIndex: number,
+    addressType: 'Internal' | 'External',
+    index: number
+  |}>
+};
+export type RestoreWalletForTransferFunc = (
+  request: RestoreWalletForTransferRequest
+) => Promise<RestoreWalletForTransferResponse>;
+
 // updateWalletMeta
 
 export type UpdateWalletRequest = {
@@ -776,7 +795,7 @@ export default class AdaApi {
         throw new Error('no account selected');
       }
       const accountPrivateKey = cryptoWallet.bip44_account(
-        RustModule.Wallet.AccountIndex.new(currAccount | HARD_DERIVATION_START)
+        RustModule.Wallet.AccountIndex.new(currAccount + HARD_DERIVATION_START)
       );
       const signedTx = await signTransaction(
         signRequest,
@@ -1124,6 +1143,86 @@ export default class AdaApi {
       return _createWalletFromServerData(adaWallet, [account]);
     } catch (error) {
       Logger.error('AdaApi::restoreWallet error: ' + stringifyError(error));
+      // TODO: backend will return something different here, if multiple wallets
+      // are restored from the key and if there are duplicate wallets we will get
+      // some kind of error and present the user with message that some wallets
+      // where not imported/restored if some where. if no wallets are imported
+      // we will error out completely with throw block below
+      // TODO: use error ID instead of error message
+      if (error.message.includes('Wallet with that mnemonics already exists')) {
+        throw new WalletAlreadyRestoredError();
+      }
+      // We don't know what the problem was -> throw generic error
+      throw new GenericApiError();
+    }
+  }
+
+  /**
+   * Restore all addresses like restoreWallet() but do not touch storage.
+   * TBD: this function is based on restoreWallet() and duplicate parts of it.
+   */
+  async restoreWalletForTransfer(
+    request: RestoreWalletForTransferRequest
+  ): Promise<RestoreWalletForTransferResponse> {
+    Logger.debug('AdaApi::restoreWalletForTransfer called');
+    const { recoveryPhrase, checkAddressesInUse } = request;
+
+    const walletName = '';
+    const walletPassword = '';
+    const assurance = 'CWANormal';
+    const unit = 0;
+
+    const walletInitData = {
+      cwInitMeta: {
+        cwName: walletName,
+        cwAssurance: assurance,
+        cwUnit: unit
+      },
+      cwBackupPhrase: {
+        bpToList: recoveryPhrase // array of mnemonic words
+      }
+    };
+
+    try {
+      // recover master key
+      const adaWallet = toAdaWallet(walletInitData);
+      const masterKey = generateWalletMasterKey(
+        walletInitData.cwBackupPhrase.bpToList,
+        walletPassword
+      );
+
+      // always create the 0th account
+      const cryptoAccount = createCryptoAccount(masterKey, walletPassword, 0);
+
+      const savedAddresses = [];
+      const _saveAsAdaAddresses = async ({ accountIndex, addresses, offset, addressType }) => {
+        addresses.forEach((address, i) => {
+          savedAddresses.push({
+            address,
+            accountIndex,
+            addressType,
+            index: offset + i,
+          });
+        });
+      };
+
+      await restoreBip44Wallet(
+        cryptoAccount.root_cached_key,
+        cryptoAccount.account,
+        adaWallet,
+        masterKey,
+        checkAddressesInUse,
+        _saveAsAdaAddresses
+      );
+
+      Logger.debug('AdaApi::restoreWalletForTransfer success');
+
+      return {
+        masterKey,
+        addresses: savedAddresses
+      };
+    } catch (error) {
+      Logger.error('AdaApi::restoreWalletForTransfer error: ' + stringifyError(error));
       // TODO: backend will return something different here, if multiple wallets
       // are restored from the key and if there are duplicate wallets we will get
       // some kind of error and present the user with message that some wallets

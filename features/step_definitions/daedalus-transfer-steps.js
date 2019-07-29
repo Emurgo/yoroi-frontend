@@ -2,11 +2,6 @@
 
 import { Before, Given, When, Then, After } from 'cucumber';
 import { By } from 'selenium-webdriver';
-import BigNumber from 'bignumber.js';
-import {
-  LOVELACES_PER_ADA,
-  DECIMAL_PLACES_IN_ADA
-} from '../../app/config/numbersConfig';
 import {
   getMockServer,
   closeMockServer
@@ -21,6 +16,10 @@ import {
   waitUntilUrlEquals
 } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
+import {
+  checkAddressesRecoveredAreCorrect,
+  checkTotalAmountIsCorrect
+} from '../support/helpers/transfer-helpers';
 
 Before({ tags: '@withWebSocketConnection' }, () => {
   closeMockServer();
@@ -53,8 +52,8 @@ Given(/^My Daedalus wallet hasn't funds/, () => {
 });
 
 Given(/^I am on the Daedalus Transfer instructions screen$/, async function () {
-  await navigateTo.call(this, '/daedalus-transfer');
-  await waitUntilUrlEquals.call(this, '/daedalus-transfer');
+  await navigateTo.call(this, '/transfer/daedalus');
+  await waitUntilUrlEquals.call(this, '/transfer/daedalus');
   await this.waitForElement('.transferInstructionsPageComponent');
 });
 
@@ -93,9 +92,7 @@ When(/^I confirm Daedalus transfer funds$/, async function () {
 });
 
 Then(/^I should see the Create wallet screen$/, async function () {
-  const createWalletTitle = await i18n.formatMessage(this.driver,
-    { id: 'wallet.add.page.title' });
-  await this.waitUntilText('.StaticTopbarTitle_topbarTitleText', createWalletTitle.toUpperCase());
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I should see the Receive screen$/, async function () {
@@ -124,8 +121,8 @@ Then(/^I should see 'Daedalus wallet without funds' error message$/, async funct
 
 Then(/^I should wait until funds are recovered:$/, async function (table) {
   const rows = table.hashes();
-  await _checkDaedalusAddressesRecoveredAreCorrect(rows, this);
-  await _checkTotalAmountIsCorrect(rows, this);
+  await checkAddressesRecoveredAreCorrect(rows, this);
+  await checkTotalAmountIsCorrect(rows, this);
 });
 
 Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/, async function () {
@@ -139,26 +136,3 @@ Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/,
   await this.waitForElement(`//button[contains(@class, 'fromDaedalusPaperWallet') and contains(text(), '${textDaedalusPaperWallet}')]`, By.xpath);
   await this.waitForElement(`//button[contains(@class, 'fromDaedalusMasterKey') and contains(text(), '${textDaedalusMasterKey}')]`, By.xpath);
 });
-
-async function _checkDaedalusAddressesRecoveredAreCorrect(rows, world) {
-  const waitUntilDaedalusAddressesRecoveredAppeared = rows.map((row, index) => (
-    world.waitUntilText(
-      `.addressRecovered-${index + 1}`,
-      row.daedalusAddress
-    )
-  ));
-  await Promise.all(waitUntilDaedalusAddressesRecoveredAppeared);
-}
-
-async function _checkTotalAmountIsCorrect(rows, world) {
-  const totalAmount = rows.reduce(
-    (acc, row) => acc.plus(new BigNumber(row.amount)), new BigNumber(0)
-  );
-  const totalAmountFormated = `${totalAmount
-    .dividedBy(LOVELACES_PER_ADA)
-    .toFormat(DECIMAL_PLACES_IN_ADA)} ADA`;
-  await world.waitUntilText(
-    '.TransferSummaryPage_amount',
-    totalAmountFormated
-  );
-}

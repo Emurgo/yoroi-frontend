@@ -109,8 +109,8 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | asdfasdfasdf | asdfasdfasdf       |
     And I clear the restored wallet password asdfasdfasdf
-    And I click the "Restore Wallet" button
-    Then I should stay in the restore wallet dialog
+    Then I see the submit button is disabled
+    And I should stay in the restore wallet dialog
     
     @it-70
     Scenario Outline: Wallet restoration Recovery Phrase test (IT-70)
@@ -122,8 +122,8 @@ Feature: Restore Wallet
     And I enter the restored wallet password:
     | password   | repeatedPassword |
     | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should stay in the restore wallet dialog
+    Then I see the submit button is disabled
+    And I should stay in the restore wallet dialog
     And I should see an "Invalid recovery phrase" error message:
     | message                                                 |
     | wallet.restore.dialog.form.errors.invalidRecoveryPhrase |

@@ -221,11 +221,8 @@ export default {
   '--font-mono-bold': 'RobotoMono-Bold',
 
   '--theme-input-hint-font': 'Rubik-Regular',
-  '--theme-footer-text-font': 'Helvetica-Regular',
 
   // COLORS
-  '--theme-footer-background-color': '#fff',
-
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
   '--theme-bordered-box-background-color': '#f0f3f5',
@@ -381,7 +378,6 @@ export default {
   '--theme-wallet-add-option-dialog-item-learn-more-button-color': '#ADAEB6',
   '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',
   '--theme-wallet-add-translucent-color': 'rgba(255, 255, 255, 0.5)',
-  '--theme-wallet-add-footer-text-color': '#353535',
 
   '--theme-instructions-text-color': '#adaeb6',
   '--theme-instructions-recovery-text-color': '#2b2c32',
@@ -407,8 +403,8 @@ export default {
   '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#ffffff',
 
   '--theme-widgets-progress-step-common-color': '#15d1aa',
-  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
-  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-underline-light-color': '#adaeB6',
+  '--theme-underline-dark-color': '#464749',
   '--theme-widgets-hash-dark-color': '#464749',
   '--theme-widgets-hash-light-color': '#adaeB6',
 

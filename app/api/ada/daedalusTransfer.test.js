@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 // @flow
 import './lib/test-config';
+import { schema } from 'lovefield';
 import {
   getCryptoDaedalusWalletFromMnemonics,
 } from './lib/cardanoCrypto/cryptoWallet';
@@ -15,10 +16,17 @@ import {
   silenceLogsForTesting,
 } from '../../utils/logging';
 
+import {
+  loadLovefieldDB,
+} from './lib/storage/lovefieldDatabase';
+
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 beforeAll(async () => {
   await RustModule.load();
+  await loadLovefieldDB({
+    storeType: schema.DataStoreType.MEMORY,
+  });
   silenceLogsForTesting();
 });
 

@@ -395,8 +395,8 @@ export default {
   '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
-  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
-  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-underline-light-color': '#adaeB6',
+  '--theme-underline-dark-color': '#464749',
   '--theme-widgets-hash-dark-color': '#000000',
   '--theme-widgets-hash-light-color': '#929293',
 

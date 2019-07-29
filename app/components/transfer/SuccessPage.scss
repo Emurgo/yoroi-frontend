@@ -1,0 +1,27 @@
+.component {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+
+  .title {
+    color: var(--theme-default-main-color);
+    text-transform: uppercase;
+    height: 19px;
+    font-family: var(--font-semibold);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 19px;
+    text-align: center;
+  }
+
+  .text {
+    color: var(--card-text-color);
+    height: 22px;
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+  }
+
+}

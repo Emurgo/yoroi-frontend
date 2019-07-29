@@ -28,8 +28,10 @@ import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
 import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
+import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import AdaRedemptionPage from './containers/wallet/AdaRedemptionPage';
 import URILandingPage from './containers/uri/URILandingPage';
+import Transfer from './containers/transfer/Transfer';
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -85,9 +87,12 @@ export const Routes = (
         )}
       />
       <Route
-        exact
-        path={ROUTES.DAEDALUS_TRANFER.ROOT}
-        component={(props) => <DaedalusTransferPage {...props} stores={stores} actions={actions} />}
+        path={ROUTES.TRANSFER.ROOT}
+        component={(props) => (
+          <Transfer {...props} stores={stores} actions={actions}>
+            {TransferSubpages(stores, actions)}
+          </Transfer>
+        )}
       />
       <Route
         exact
@@ -153,6 +158,22 @@ const SettingsSubpages = (stores, actions) => (
       component={(props) => <AdaRedemptionPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
+  </Switch>
+);
+
+const TransferSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.TRANSFER.YOROI}
+      component={(props) => <YoroiTransferPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.TRANSFER.DAEDALUS}
+      component={(props) => <DaedalusTransferPage {...props} stores={stores} actions={actions} />}
+    />
+    <Redirect to={ROUTES.TRANSFER.DAEDALUS} />
   </Switch>
 );
 
