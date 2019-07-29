@@ -210,6 +210,7 @@
   "transfer.instructions.instructions.button.label": "요로이 지갑 만들기",
   "transfer.instructions.instructions.text": "송금하기 전에 요로이 지갑을 생성하여 백업할 필요가 있습니다. <br>이를 완료하면, 언제라도 요로이 지갑을 복원할 수 있는 15단어로 구성된 복구 구절이 생성됩니다.",
   "transfer.instructions.instructions.title.label": "사용 설명",
+  "transfer.navigation.fromYoroi": "Transfer funds from another wallet",
   "transfer.summary.addressFrom.label": "보내는 사람",
   "transfer.summary.addressTo.label": "받는 사람",
   "transfer.summary.cancelTransferButton.label": "취소",
@@ -475,5 +476,19 @@
   "wallet.transaction.type.intrawallet": "{currency} 지갑내 거래",
   "wallet.transaction.type.multiparty": "{currency} 다중 거래",
   "widgets.explorer.tooltip": "{websiteName} 로 가기",
-  "widgets.warningBox.headerText": "주의:"
+  "widgets.warningBox.headerText": "주의:",
+  "yoroiTransfer.error.noTransferTxError": "There is no transfer transaction to send.",
+  "yoroiTransfer.error.transferFundsError": "Unable to transfer funds.",
+  "yoroiTransfer.error.walletChangedError": "The wallet has changed. Please re-confirm your transaction.",
+  "yoroiTransfer.errorPage.title.label": "Unable to transfer from another wallet",
+  "yoroiTransfer.form.instructions.step0.text": "Enter the 15-word recovery phrase used to back up your other wallet to restore the balance and transfer all the funds to current wallet.",
+  "yoroiTransfer.start.instructions.mnemonic-15": "15-word mnemonic",
+  "yoroiTransfer.start.instructions.text": "Transfer funds from a <strong>non-Daedalus</strong> wallet (Yoroi, AdaLite, etc.). <br />More specifically, this will work for any wallet whose addresses start with Ae2",
+  "yoroiTransfer.successPage.text": "Your funds were successfully transferred.",
+  "yoroiTransfer.successPage.title": "success",
+  "yoroiTransfer.summary.addressFrom.subLabel": "Wallet Addresses",
+  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
+  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
+  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
+  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
 }
