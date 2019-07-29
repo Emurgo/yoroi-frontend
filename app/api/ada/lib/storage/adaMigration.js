@@ -65,8 +65,10 @@ export async function migrateToLatest(
       const applied = await entry[1]();
       if (applied) {
         Logger.info(`Applied migration for ${entry[0]}`);
+        appliedMigration = true;
+      } else {
+        Logger.info(`No need to apply migration for ${entry[0]}`);
       }
-      appliedMigration = appliedMigration || applied;
     }
   }
 
