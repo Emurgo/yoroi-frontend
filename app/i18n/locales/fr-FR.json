@@ -483,12 +483,12 @@
   "yoroiTransfer.errorPage.title.label": "Impossible de transférer à partir d'un autre portefeuille",
   "yoroiTransfer.form.instructions.step0.text": "Entrez la phrase de récupération de 15 mots utilisée pour sauvegarder votre autre portefeuille afin de rétablir le solde et transférer tous les fonds dans votre portefeuille actuel.",
   "yoroiTransfer.start.instructions.mnemonic-15": "mnémonique de 15 mots",
-  "yoroiTransfer.start.instructions.text": "Transfer funds from a <strong>non-Daedalus</strong> wallet (Yoroi, AdaLite, etc.). <br />More specifically, this will work for any wallet whose addresses start with Ae2",
-  "yoroiTransfer.successPage.text": "Your funds were successfully transferred.",
-  "yoroiTransfer.successPage.title": "success",
-  "yoroiTransfer.summary.addressFrom.subLabel": "Wallet Addresses",
-  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
-  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
-  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
+  "yoroiTransfer.start.instructions.text": "Transférer des fonds d'un autre portefeuille <strong>pas-Daedalus</strong> (Yoroi, AdaLite, etc.). <br />Plus spécifiquement, cela fonctionnera pour tout portefeuille dont les adresses commencent par Ae2",
+  "yoroiTransfer.successPage.text": "Vos fonds ont été transférés avec succès.",
+  "yoroiTransfer.successPage.title": "succès",
+  "yoroiTransfer.summary.addressFrom.subLabel": "Adresses du portefeuille",
+  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Génération d'une transaction de transfert",
+  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Vérification des fonds des adresses",
+  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Obtention des adresses",
+  "yoroiTransfer.waiting.title.label": "Le portefeuille est en cours de restauration"
 }
