@@ -210,6 +210,7 @@
   "transfer.instructions.instructions.button.label": "Yoroi Wallet erstellen",
   "transfer.instructions.instructions.text": "Bevor Du Geldbeträge überweisen kannst, musst Du eine Yoroi-Wallet erstellen und sichern.<br>Nach Abschluss erhältst Du eine 15-Wort-Wiederherstellungsphrase, mit der Du Deine Yoroi-Wallet jederzeit wiederherstellen kannst.",
   "transfer.instructions.instructions.title.label": "Anleitungen",
+  "transfer.navigation.fromYoroi": "Transfer funds from another wallet",
   "transfer.summary.addressFrom.label": "Von",
   "transfer.summary.addressTo.label": "An",
   "transfer.summary.cancelTransferButton.label": "Abbrechen",
@@ -475,5 +476,19 @@
   "wallet.transaction.type.intrawallet": "{currency} interne Wallet-Transaktion",
   "wallet.transaction.type.multiparty": "{currency} mehrfach-Teilnehmer Transaktion",
   "widgets.explorer.tooltip": "Gehe zu {websiteName}",
-  "widgets.warningBox.headerText": "ACHTUNG:"
+  "widgets.warningBox.headerText": "ACHTUNG:",
+  "yoroiTransfer.error.noTransferTxError": "There is no transfer transaction to send.",
+  "yoroiTransfer.error.transferFundsError": "Unable to transfer funds.",
+  "yoroiTransfer.error.walletChangedError": "The wallet has changed. Please re-confirm your transaction.",
+  "yoroiTransfer.errorPage.title.label": "Unable to transfer from another wallet",
+  "yoroiTransfer.form.instructions.step0.text": "Enter the 15-word recovery phrase used to back up your other wallet to restore the balance and transfer all the funds to current wallet.",
+  "yoroiTransfer.start.instructions.mnemonic-15": "15-word mnemonic",
+  "yoroiTransfer.start.instructions.text": "Transfer funds from a <strong>non-Daedalus</strong> wallet (Yoroi, AdaLite, etc.). <br />More specifically, this will work for any wallet whose addresses start with Ae2",
+  "yoroiTransfer.successPage.text": "Your funds were successfully transferred.",
+  "yoroiTransfer.successPage.title": "success",
+  "yoroiTransfer.summary.addressFrom.subLabel": "Wallet Addresses",
+  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
+  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
+  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
+  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
 }
