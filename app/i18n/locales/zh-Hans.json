@@ -71,10 +71,10 @@
   "global.contact": "联系支持",
   "global.errors.fieldIsRequired": "该字段为必填字段。",
   "global.errors.invalidMasterKey": "输入的主密钥无效, 请再检查。",
-  "global.errors.invalidPaperPassword": "Paper Wallet password requires at least 12 characters.",
+  "global.errors.invalidPaperPassword": "纸钱包密码至少要12字符。",
   "global.errors.invalidRepeatPassword": "不匹配。",
   "global.errors.invalidWalletName": "钱包名称需要最少 1 个，最多 40 个字符。",
-  "global.errors.invalidWalletPassword": "Spending password requires at least 12 characters.",
+  "global.errors.invalidWalletPassword": "支付密码至少要12字符。",
   "global.label.allow": "允许",
   "global.labels.LearnMore": "了解更多",
   "global.labels.back": "返回",
@@ -487,8 +487,8 @@
   "yoroiTransfer.successPage.text": "已成功将余额转移。",
   "yoroiTransfer.successPage.title": "成功",
   "yoroiTransfer.summary.addressFrom.subLabel": "钱包地址",
-  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
-  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
-  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
+  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "正在生成转账交易",
+  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "正在检查资金地址",
+  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "正在获取地址",
+  "yoroiTransfer.waiting.title.label": "正在恢复钱包"
 }
