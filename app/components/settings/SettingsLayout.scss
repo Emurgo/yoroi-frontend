@@ -40,4 +40,8 @@
     padding: 30px 30px 20px 30px;
     border-radius: 8px;
   }
+
+  fieldset {
+    background: var(--theme-settings-pane-background-color);
+  }
 }

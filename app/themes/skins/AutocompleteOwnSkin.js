@@ -121,6 +121,7 @@ export const AutocompleteOwnSkin = (props: Props) => {
               value={props.inputValue}
               onChange={props.handleInputChange}
               onKeyDown={props.onKeyDown}
+              required="required"
             />
           </div>
         </div>

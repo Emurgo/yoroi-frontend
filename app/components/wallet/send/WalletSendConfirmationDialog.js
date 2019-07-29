@@ -67,7 +67,8 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.walletPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.walletPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.walletPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field }) => {
           if (field.value === '') {
