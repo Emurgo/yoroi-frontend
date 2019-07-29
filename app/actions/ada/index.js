@@ -5,6 +5,7 @@ import TransactionsActions from './transactions-actions';
 import WalletSettingsActions from './wallet-settings-actions';
 import AddressesActions from './addresses-actions';
 import DaedalusTransferActions from './daedalus-transfer-actions';
+import YoroiTransferActions from './yoroi-transfer-actions';
 import HWConnectActions from './hw-connect-actions';
 import TrezorSendActions from './trezor-send-actions';
 import AdaRedemptionActions from './ada-redemption-actions';
@@ -21,6 +22,7 @@ export type AdaActionsMap = {
   walletSettings: WalletSettingsActions,
   addresses: AddressesActions,
   daedalusTransfer: DaedalusTransferActions,
+  yoroiTransfer: YoroiTransferActions,
   trezorConnect: HWConnectActions,
   trezorSend: TrezorSendActions,
   ledgerConnect: HWConnectActions,
@@ -37,6 +39,7 @@ const adaActionsMap: AdaActionsMap = {
   walletSettings: new WalletSettingsActions(),
   addresses: new AddressesActions(),
   daedalusTransfer: new DaedalusTransferActions(),
+  yoroiTransfer: new YoroiTransferActions(),
   trezorConnect: new HWConnectActions(),
   trezorSend: new TrezorSendActions(),
   ledgerConnect: new HWConnectActions(),

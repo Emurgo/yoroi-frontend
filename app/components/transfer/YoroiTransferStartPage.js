@@ -2,43 +2,34 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 
 import BorderedBox from '../widgets/BorderedBox';
+import styles from './YoroiTransferStartPage.scss';
 import globalMessages from '../../i18n/global-messages';
-import styles from './TransferInstructionsPage.scss';
 
 const messages = defineMessages({
-  attentionText: {
-    id: 'daedalusTransfer.instructions.attention.text',
-    defaultMessage: '!!!Yoroi and Daedalus wallets use different key derivation scheme and they each have a separate format for addresses. For this reason, Daedalus wallets cannot be restored and continued to be used in Yoroi and vice versa. This will change in the future. For now, to use funds from your Daedalus wallet, you need to transfer them to your Yoroi wallet. Daedalus and Yoroi wallets are fully compatible for transferring of funds. If you don’t have a working copy of Daedalus, you can use your 12-word recovery phrase (or 27-words for a paper wallet) used to restore and transfer the balance from Daedalus into Yoroi.',
+  text: {
+    id: 'yoroiTransfer.start.instructions.text',
+    defaultMessage: '!!!Transfer funds from a <strong>non-Daedalus</strong> wallet (Yoroi, AdaLite, etc.). <br />More specifically, this will work for any wallet whose addresses start with Ae2',
   },
-  transferText: {
-    id: 'daedalusTransfer.instructions.attention.button.label',
-    defaultMessage: '!!!Daedalus Wallet',
-  },
-  transferPaperText: {
-    id: 'daedalusTransfer.instructions.attention.paper.button.label',
-    defaultMessage: '!!!Daedalus Paper Wallet',
-  },
-  transferMasterKeyText: {
-    id: 'daedalusTransfer.instructions.attention.masterKey.button.label',
-    defaultMessage: '!!!Daedalus Master Key',
-  },
+  mnemonicLabel15: {
+    id: 'yoroiTransfer.start.instructions.mnemonic-15',
+    defaultMessage: '!!!15-word mnemonic',
+  }
 });
 
 type Props = {|
-  onFollowInstructionsPrerequisites: Function,
-  onConfirm: Function,
-  onPaperConfirm: Function,
-  onMasterKeyConfirm: Function,
+  onNext: void => void,
+  classicTheme: boolean,
+  onFollowInstructionsPrerequisites: void => void,
   disableTransferFunds: boolean,
 |};
 
 @observer
-export default class TransferInstructionsPage extends Component<Props> {
+export default class YoroiTransferStartPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -47,10 +38,8 @@ export default class TransferInstructionsPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
+      onNext,
       onFollowInstructionsPrerequisites,
-      onConfirm,
-      onPaperConfirm,
-      onMasterKeyConfirm,
       disableTransferFunds,
     } = this.props;
 
@@ -60,7 +49,7 @@ export default class TransferInstructionsPage extends Component<Props> {
     ]);
 
     return (
-      <div className="transferInstructionsPageComponent">
+      <div className="yoroiTransferStartPageComponent">
 
         { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
         <div className={styles.component}>
@@ -96,7 +85,6 @@ export default class TransferInstructionsPage extends Component<Props> {
 
         </div>
 
-        { /* Confirm transferring funds */ }
         <div className={styles.component}>
           <BorderedBox>
 
@@ -107,7 +95,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                   {intl.formatMessage(globalMessages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
-                  <FormattedHTMLMessage {...messages.attentionText} />
+                  <FormattedHTMLMessage {...messages.text} />
                 </div>
               </div>
 
@@ -115,29 +103,12 @@ export default class TransferInstructionsPage extends Component<Props> {
                 <div className={styles.buttonTitle}>
                   {intl.formatMessage(globalMessages.transferTitleText)}
                 </div>
-
                 <Button
-                  className={`confirmButton fromDaedalusWallet ${commonClasses}`}
-                  label={intl.formatMessage(messages.transferText)}
-                  onClick={onConfirm}
-                  disabled={disableTransferFunds}
+                  className={`next ${commonClasses}`}
+                  label={intl.formatMessage(messages.mnemonicLabel15)}
+                  onClick={onNext}
                   skin={ButtonSkin}
-                />
-
-                <Button
-                  className={`confirmButton fromDaedalusPaperWallet ${commonClasses}`}
-                  label={intl.formatMessage(messages.transferPaperText)}
-                  onClick={onPaperConfirm}
                   disabled={disableTransferFunds}
-                  skin={ButtonSkin}
-                />
-
-                <Button
-                  className={`confirmButton fromDaedalusMasterKey ${commonClasses}`}
-                  label={intl.formatMessage(messages.transferMasterKeyText)}
-                  onClick={onMasterKeyConfirm}
-                  disabled={disableTransferFunds}
-                  skin={ButtonSkin}
                 />
               </div>
 
@@ -146,7 +117,6 @@ export default class TransferInstructionsPage extends Component<Props> {
           </BorderedBox>
 
         </div>
-
       </div>
     );
   }
