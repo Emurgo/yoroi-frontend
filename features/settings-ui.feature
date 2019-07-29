@@ -14,8 +14,8 @@ Feature: Wallet UI Settings
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword   |
     | <currentPassword>  | <password>   | <repeatedPassword> |
-    And I submit the wallet password dialog
-    Then I should see the following error messages:
+    Then I see the submit button is disabled
+    And I should see the following error messages:
     | message                             |
     | global.errors.invalidWalletPassword |
   Examples:
@@ -138,8 +138,8 @@ Feature: Wallet UI Settings
     | currentPassword    | password     | repeatedPassword |
     | aaSecret_123         | newSecret123 | newSecret123     |
     And I clear the current wallet repeat password newSecret123 
-    And I submit the wallet password dialog
-    Then I should stay in the change password dialog
+    Then I see the submit button is disabled
+    And I should stay in the change password dialog
     And I should see "Doesn't match" error message:
     | message                             |
     | global.errors.invalidRepeatPassword |

@@ -13,7 +13,6 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import config from '../../config';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import PasswordInstructions from '../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -183,7 +182,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         label: this.context.intl.formatMessage(messages.createPersonalWallet),
         primary: true,
         onClick: this.submit,
-        disabled: isSubmitting || (!classicTheme && disabledCondition)
+        disabled: isSubmitting || disabledCondition
       },
     ];
 
@@ -227,8 +226,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
               error={repeatedPasswordField.error}
               skin={InputOwnSkin}
             />
-
-            <PasswordInstructions />
           </div>
         </div>
 

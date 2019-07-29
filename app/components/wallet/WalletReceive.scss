@@ -1,5 +1,6 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/error-message';
+@import '../../themes/mixins/underline';
 
 .component {
   flex: 1;
@@ -106,7 +107,7 @@
         text-transform: uppercase;
 
         &:hover {
-          text-decoration: underline;
+          @include underline(var(--theme-underline-dark-color));
         }
       }
     }

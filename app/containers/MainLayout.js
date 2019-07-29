@@ -10,7 +10,6 @@ import type { ServerStatusErrorType } from '../types/serverStatusErrorType';
 
 export type MainLayoutProps = InjectedContainerProps & {
   topbar?: Node,
-  footer?: Node,
   classicTheme: boolean,
   connectionErrorType: ServerStatusErrorType,
 };
@@ -19,7 +18,6 @@ export type MainLayoutProps = InjectedContainerProps & {
 export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     topbar: null,
-    footer: null,
     connectionErrorType: null,
   };
 
@@ -34,7 +32,6 @@ export default class MainLayout extends Component<MainLayoutProps> {
         banner={displayedBanner}
         topbar={this.props.topbar}
         notification={<div />}
-        footer={this.props.footer}
         classicTheme={this.props.classicTheme}
       >
         {this.props.children}

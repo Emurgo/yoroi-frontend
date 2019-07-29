@@ -14,7 +14,6 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './UserPasswordDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
-import PasswordInstructions from '../../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitleUserPaperPassword: {
@@ -198,10 +197,6 @@ export default class UserPasswordDialog extends Component<Props> {
             skin={InputOwnSkin}
           />
         </div>
-        <PasswordInstructions
-          instructionDescriptor={globalMessages.passwordInstructionsPaperWallet}
-        />
-
       </Dialog>
     );
   }

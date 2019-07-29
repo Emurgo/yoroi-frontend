@@ -23,7 +23,6 @@ import headerMixin from '../mixins/HeaderBlock.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import PasswordInstructions from '../widgets/forms/PasswordInstructions';
 import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
@@ -343,7 +342,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel
         ),
         primary: true,
-        disabled: isSubmitting || (!classicTheme && disabledCondition()),
+        disabled: isSubmitting || disabledCondition(),
         onClick: this.submit,
       },
     ];
@@ -430,7 +429,6 @@ export default class WalletRestoreDialog extends Component<Props> {
                 error={repeatedPasswordField.error}
                 skin={InputOwnSkin}
               />
-              <PasswordInstructions />
             </div>
           </div>
         )}

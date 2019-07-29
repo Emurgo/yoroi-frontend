@@ -138,7 +138,6 @@ export default class SaveDialog extends Component<Props> {
 
     let middleBlock = null;
 
-
     switch (progressInfo.stepState) {
       case StepState.LOAD:
         middleBlock = (
@@ -163,11 +162,16 @@ export default class SaveDialog extends Component<Props> {
         break;
     }
 
-    const dailogActions = [{
+    const disabledCondition = (
+      isActionProcessing
+      || !isValidWalletName(walletName)
+    );
+
+    const dialogActions = [{
       className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(globalMessages.hwConnectDialogSaveButtonLabel),
       primary: true,
-      disabled: isActionProcessing,
+      disabled: disabledCondition,
       onClick: this.save
     }];
 
@@ -175,7 +179,7 @@ export default class SaveDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'SaveDialog'])}
         title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
-        actions={dailogActions}
+        actions={dialogActions}
         closeOnOverlayClick={false}
         onClose={cancel}
         closeButton={<DialogCloseButton />}

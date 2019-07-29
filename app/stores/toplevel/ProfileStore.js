@@ -92,9 +92,6 @@ export default class ProfileStore extends Store {
         if (wallets.first) {
           const firstWallet = wallets.first;
 
-          // Dynamic Initialization of Topbar Categories
-          this.stores.topbar.updateCategories();
-
           if (this.stores.loading.fromUriScheme) {
             this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
           } else {
