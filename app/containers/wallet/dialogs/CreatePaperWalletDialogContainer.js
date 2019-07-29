@@ -14,15 +14,12 @@ import validWords from 'bip39/src/wordlists/english.json';
 import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/FinalizeDialog';
 import type { AdaPaper } from '../../../api/ada';
 import { defineMessages, intlShape } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   verifyPaperWallet: {
     id: 'settings.paperWallet.dialog.verify.message',
     defaultMessage: '!!!Verify your paper wallet',
-  },
-  copyTooltipMessage: {
-    id: 'wallet.receive.page.addressCopyTooltipNotificationMessage',
-    defaultMessage: '!!!Coppied'
   },
 });
 
@@ -61,7 +58,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
-      message: messages.copyTooltipMessage,
+      message: globalMessages.copyTooltipMessage,
     };
 
     const onCancel = () => {

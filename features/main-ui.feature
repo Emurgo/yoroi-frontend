@@ -37,7 +37,7 @@ Feature: Main UI
     When I click on "copy to clipboard" button
     Then I should see "copied" tooltip message:
     | message                                            |
-    | wallet.receive.page.addressCopyTooltipNotificationMessage |
+    | global.copyTooltipMessage |
 
   @it-30
   Scenario: User can't restore Daedalus wallet in Yoroi if Yoroi wallet is not created (IT-30)

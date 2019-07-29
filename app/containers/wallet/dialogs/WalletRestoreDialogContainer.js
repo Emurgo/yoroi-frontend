@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages } from 'react-intl';
 import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
@@ -14,13 +13,7 @@ import {
   mnemonicsToAddresses,
 } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
-
-const messages = defineMessages({
-  copyTooltipMessage: {
-    id: 'wallet.receive.page.addressCopyTooltipNotificationMessage',
-    defaultMessage: '!!!Coppied'
-  },
-});
+import globalMessages from '../../../i18n/global-messages';
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper",
@@ -118,7 +111,7 @@ export default class WalletRestoreDialogContainer
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
-      message: messages.copyTooltipMessage,
+      message: globalMessages.copyTooltipMessage,
     };
 
     const { verifyRestore, submitValues } = this.state;

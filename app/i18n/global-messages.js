@@ -341,6 +341,10 @@ const globalMessages = defineMessages({
     id: 'global.uriExplanation',
     defaultMessage: '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
   },
+  copyTooltipMessage: {
+    id: 'global.copyTooltipMessage',
+    defaultMessage: '!!!Copied',
+  },
 });
 export default globalMessages;
 
