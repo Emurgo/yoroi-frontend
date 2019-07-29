@@ -54,14 +54,14 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       currentPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.currentPasswordLabel),
-        placeholder: this.props.classicTheme ? 
+        placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder) : '',
         value: '',
       },
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
-        placeholder: this.props.classicTheme ? 
+        placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
@@ -78,7 +78,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
-        placeholder: this.props.classicTheme ? 
+        placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {

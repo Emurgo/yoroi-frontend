@@ -70,7 +70,7 @@ export default class UserPasswordDialog extends Component<Props> {
       paperPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
-        placeholder: this.props.classicTheme ? 
+        placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(messages.paperPasswordPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
@@ -87,7 +87,7 @@ export default class UserPasswordDialog extends Component<Props> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.props.classicTheme ? 
+        placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(messages.repeatPasswordPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
