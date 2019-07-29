@@ -7,7 +7,6 @@ import {
   setLocalItem,
   removeLocalItem,
   isEmptyStorage,
-  clear,
 } from './primitives';
 import {
   OPEN_TAB_ID_KEY,

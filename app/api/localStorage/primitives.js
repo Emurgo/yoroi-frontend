@@ -134,7 +134,7 @@ export function addListener(
           ...oldValue,
           ...newValue,
         }
-      })
+      });
     });
   }
 }

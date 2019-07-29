@@ -230,7 +230,11 @@ export default class ProfileStore extends Store {
   }
 
   @computed get isCurrentLocaleSet(): boolean {
-    return (this.getProfileLocaleRequest.result !== null && this.getProfileLocaleRequest.result !== undefined);
+    return (
+      this.getProfileLocaleRequest.result !== null
+      &&
+      this.getProfileLocaleRequest.result !== undefined
+    );
   }
 
   @action
