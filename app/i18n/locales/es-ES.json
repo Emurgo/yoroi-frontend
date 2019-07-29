@@ -483,12 +483,12 @@
   "yoroiTransfer.errorPage.title.label": "No se pudo transferir desde otra billetera",
   "yoroiTransfer.form.instructions.step0.text": "Introduzca la frase de recuperación de 15 palabras utilizada para respaldar su otra billetera para restaurar el saldo y transferir todos los fondos a la billetera actual.",
   "yoroiTransfer.start.instructions.mnemonic-15": "Mnemónico de 15 palabras",
-  "yoroiTransfer.start.instructions.text": "Transfer funds from a <strong>non-Daedalus</strong> wallet (Yoroi, AdaLite, etc.). <br />More specifically, this will work for any wallet whose addresses start with Ae2",
-  "yoroiTransfer.successPage.text": "Your funds were successfully transferred.",
-  "yoroiTransfer.successPage.title": "success",
-  "yoroiTransfer.summary.addressFrom.subLabel": "Wallet Addresses",
-  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
-  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
-  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
+  "yoroiTransfer.start.instructions.text": "Transferir fondos desde otra billetera <strong> no Daedalus </strong> (Yoroi, AdaLite, etc.). <br />Más específicamente, esto funcionará para cualquier billetera cuyas direcciones empiecen con Ae2",
+  "yoroiTransfer.successPage.text": "Sus fondos fueron transferidos con éxito.",
+  "yoroiTransfer.successPage.title": "éxito",
+  "yoroiTransfer.summary.addressFrom.subLabel": "Direcciones de la billetera",
+  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generando transacción de transferencia",
+  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Comprobando los fondos de las direcciones",
+  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Adquiriendo direcciones",
+  "yoroiTransfer.waiting.title.label": "La billetera está siendo restaurada"
 }
