@@ -86,6 +86,10 @@
           margin-top: 0;
           width: 100%;
         }
+
+        & > div:last-child {
+          padding-bottom: 0;
+        }
       }
 
       .paperPassword {
