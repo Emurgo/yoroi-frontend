@@ -13,6 +13,7 @@ import { Options } from 'react-polymorph/lib/components/Options';
 // skins
 import { FormFieldOwnSkin } from './FormFieldOwnSkin';
 import { OptionsSkin } from 'react-polymorph/lib/skins/simple/OptionsSkin';
+import styles from './AutocompleteOwnSkin.scss';
 
 type GetSelectionPropsT = (...args: any) => Object;
 // This type should be kept open (not "exact") because it is a react-polymorph skin
@@ -107,7 +108,7 @@ export const AutocompleteOwnSkin = (props: Props) => {
             theme.autocompleteContent,
             props.isOpen ? theme.opened : null,
             props.selectedOptions.length
-              ? theme.hasSelectedWords
+              ? 'hasSelectedWords'
               : null,
             props.error ? theme.errored : null
           ])}
