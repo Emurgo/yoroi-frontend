@@ -41,6 +41,12 @@
 }
 
 :global(.YoroiModern) .component {
+  :global {
+    .Dialog_title {
+      margin-bottom: 38px;
+    }
+  }
+
   .receiverInput {
     letter-spacing: 0;
 
