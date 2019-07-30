@@ -39,7 +39,8 @@ const getStorageItemInWeb = async (
   key: string | void
 ): Promise<?string> => {
   if (!key) return Promise.resolve(JSON.stringify(localStorage));
-  return Promise.resolve(localStorage.getItem(key));
+  // careful: getItem returns null on missing key. Indexer returns undefined
+  return Promise.resolve(localStorage[key]);
 };
 
 /** passing undefined gives you the whole storage as a JSON string */
