@@ -485,10 +485,10 @@
   "yoroiTransfer.start.instructions.mnemonic-15": "15-Wort mnemonic",
   "yoroiTransfer.start.instructions.text": "Übertrage Guthaben von einer <strong>nicht-Daedalus</strong> Wallet (Yoroi, Adalite, etc.). <br />Genau genommen funktioniert das mit jeder Wallet dessen Adressen mit Ae2 beginnen",
   "yoroiTransfer.successPage.text": "Dein Guthaben wurde erfolgreich übertragen.",
-  "yoroiTransfer.successPage.title": "success",
-  "yoroiTransfer.summary.addressFrom.subLabel": "Wallet Addresses",
-  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
-  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
-  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
+  "yoroiTransfer.successPage.title": "Erfolg",
+  "yoroiTransfer.summary.addressFrom.subLabel": "Wallet-Adresse",
+  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generiere die Übertragungs-Transaktion",
+  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Überprüfe den Kontostand der Adressen",
+  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Adressen werden abgerufen",
+  "yoroiTransfer.waiting.title.label": "Die Wallet wird wieder hergestellt"
 }
