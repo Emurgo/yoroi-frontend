@@ -40,6 +40,19 @@ To install other Yoroi-frontend related dependencies use:
 $ npm install
 ```
 
+### Generating PEMs
+
+To build production versions of Yoroi that run on `testnet` (or any other network) you need a `pem` file (basically a key to sign your extension).
+Although the real `pem` is not uploaded to Github for security reasons, you can generate your own `pem` for testing purposes using the following steps:
+
+```
+openssl genrsa -out temp.pem 2048
+openssl pkcs8 -topk8 -nocrypt -in temp.pem -out your-key-name-here.pem
+rm temp.pem
+```
+
+Notably, I  recommend running this for `testnet` and `mainnet`.
+
 ### Firefox
 
 Adding unsigned extensions is not supported for the regular version of Firefox.
