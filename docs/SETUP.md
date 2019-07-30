@@ -46,9 +46,10 @@ To build production versions of Yoroi that run on `testnet` (or any other networ
 Although the real `pem` is not uploaded to Github for security reasons, you can generate your own `pem` for testing purposes using the following steps:
 
 ```
-openssl genrsa -out temp.pem 2048
-openssl pkcs8 -topk8 -nocrypt -in temp.pem -out your-key-name-here.pem
-rm temp.pem
+npm run compress-keygen
+mv key.pem testnet.pem
+npm run compress-keygen
+mv key.pem mainnet.pem
 ```
 
 Notably, I  recommend running this for `testnet` and `mainnet`.
