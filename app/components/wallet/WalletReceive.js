@@ -65,6 +65,7 @@ type Props = {|
   isWalletAddressUsed: boolean,
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
+  onCopyAddress: Function,
   onCopyAddressTooltip: Function,
   getNotification: Function,
   onVerifyAddress: Function,
@@ -106,7 +107,7 @@ export default class WalletReceive extends Component<Props, State> {
       walletAddress, walletAddresses,
       onVerifyAddress, onGeneratePaymentURI,
       isSubmitting, error, isWalletAddressUsed,
-      onCopyAddressTooltip, getNotification,
+      onCopyAddress, onCopyAddressTooltip, getNotification,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -261,7 +262,7 @@ export default class WalletReceive extends Component<Props, State> {
                     hash={address.id}
                     elementId={notificationElementId}
                     onCopyAddress={
-                      onCopyAddressTooltip.bind(this, address.id, notificationElementId)
+                      onCopyAddress.bind(this, address.id, notificationElementId)
                     }
                     getNotification={getNotification}
                   >
