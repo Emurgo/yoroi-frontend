@@ -33,10 +33,12 @@ This table lists places on the UI that need changes:
 |||output|transaction value & fee|Transaction|/components/wallet/transactions/Transaction.js|historical price|
 |Send|/wallets/1/send|input|amount to send|WalletSendForm|/components/wallet/send/WalletSendForm.js||
 |||output|fees & total|AmountInputSkin|/components/wallet/skins/AmountInputSkin.js|
-|||output|fees, amount & total|WalletSendConfirmationDialog|/components/wallet/send/WalletSendConfirmationDialog.js||
+|Send confirmation dialog||output|fees, amount & total|WalletSendConfirmationDialog|/components/wallet/send/WalletSendConfirmationDialog.js||
+|Hardware wallet send confirmation dialog||output||HWSendConfirmationDialog|app/components/wallet/send/HWSendConfirmationDialog.js||
 |Transfer summary page|/transfer/daedalus /transfer/yoroi|output|recovered balance, fees, final balance|TransferSummaryPage|/components/transfer/TransferSummaryPage.js||
 |Generate payment URL|/wallets/1/receive|input|amount|URIGenerateDialog|/components/uri/URIGenerateDialog.js||
 |Payment URL landing|/send-from-uri|output|amount to send by uri|URIVerifyDialog|/components/uri/URIVerifyDialog.js||
+|Transaction export|N/A|output||N/A|/api/export/index.js|historical|
 
 In addition a new setting will be added under "General" category to let the user selects the currency.
 
