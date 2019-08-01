@@ -1,31 +1,45 @@
 # Abstract
 
-Add a possibility to create "memos", the notification for transactions
-
+Add a feature to create "memos" for transactions. 
 
 # Motivation
 
-This feature can help our users to recollect why did they make some transactions. The users will be able to check anytime what did whey note for a particular transaction and in this way recollect what's it about. Users can use Latin and also Cyrillic, Japanese, traditional Chinese and simplified Chinese symbols. Currently we use Dropbox for saving memos, and it basically saves the file in ANSI encoding, if there are only Latin symbols, and UTF-8, if there are Cyrillic, Japanese ones and so on.
+A memo is a description or a brief note about a transaction, intended to help the user to identify the motive behind the transaction. E.g. "Debt payment to Bob". The Cardano blockchain does not have native support for transaction memos, thus there is the need for implementing an off-chain solution in Yoroi. With this feature, a user will be able to check the memo for a particular transaction at any time and recollect what the transaction was about. 
+
+A memo should be optional for the user, which means that transactions will not include memos by default. Also, a memo will be available only for its author. If Alice sends a transaction with the memo "Debt payment" to Bob, then only Alice will see this memo on her wallet and Bob will not be aware of it.
 
 # Background
 
-### Components and UI
-A new container was added: `/containers/settings/categories/AccountsSettingsPage.js`.
-It renders an AccountsSettings component.
+As stated before, the Cardano blockchain does not have native support for transaction memos, so there is the need for an off-chain solution using either a local-only storage scheme or a combined local-external storage scheme.
 
-A new component was added: `/components/settings/categories/AccountsSettings.js`.
-Here user can link his external storage account (only Dropbox for now) to Yoroi.
+Local storage lasts until the wallet is installed in the browser, and given that memos will be off-chain data, switching a wallet installation from one device to another (ie. restoring a wallet) will imply losing the memos. Also, using the same wallet on two or more devices at the same time will not reflect the memos on all the devices if local storage is used.
 
-A new route was added for the AccountsSettingsPage.
+On the other hand, an external storage is persistent, restorable and shareable across devices. This solution requires connecting to an external API such as Dropbox or Google Drive and periodically syncing to save and load memos. In this case, an "app" should be registered by Emurgo so the user will be asked to connect his/her account and grant read/write permissions to it.
 
-A new component was added: `/components/wallet/send/WalletCloseMemoDialog.js`.
-It serves for getting a confirmation if user wants to close a memo textarea when it's not empty.
+Note that a memo could include sensitive information about the sender, receiver or the transaction itself, so it's important to take into consideration confidentiality and privacy issues.
 
-A new textarea was added to `/components/wallet/send/WalletSendForm.js`
+# Privacy considerations
 
-### Flow
+In all cases, the file containing the memos must be locally encrypted before being sent to the external service. Thus, in the case of a third-pary gaining access to the file, the memos will not be readable. 
 
-The user flow is the following:
+The user must acknowledge, however, that using an external service not provided by Yoroi will be subject to its own security regulations and it will be at the user's own risk. If the user loses his/her external service account, it could expose the memo file and reveal metadata about the wallet's transactions history (transaction dates based on file editing activity).
+
+# Proposal
+
+The proposal is a combined local-external storage scheme. We consider the following requirements:
+
+* Memos will be saved to local storage and synced with an external service after a determined event. 
+* Memos will be saved in a file in JSON format as a dictionary, where each entry will be a mapping from a transaction id to a memo encoded as a UTF-8 string.
+* Before syncing with the external service, the file will be encrypted using the private key (SK) as a password. In terms of performance, the best option will be to use symmetric encryption algorithm.
+* The file will be named after a cryptographic hash of the wallet address (PK), specifically SHA1(PK). 
+* The external service will store a unique file per wallet (based in the above requirement).
+* If a user restores the same wallet on more than one device, then each device will ask for the same file from the external service (based in the above requirement).
+* If a transaction is not present in the file, then it can be assumed that the transaction does not have a memo.
+
+## User flow
+
+The proposed user flow is the following:
+
 1. User is going to make a transaction. He is looking at `/components/wallet/send/WalletSendForm.js`.
 2. The memo textarea is closed by default. User can click "Add memo" label.
 3. If user clicked "Add memo", he or she can see the following:
@@ -40,6 +54,20 @@ The user flow is the following:
 5. If user have entered the memo and makes a transaction, memo will be saved to localStorage and also to user's external storage.
 6. When user goes to his summary - `/containers/wallet/WalletSummaryPage.js` and clicks on the transaction to expand it, he or she will see his memo at the very bottom of Transaction item (if memo exists).
 7. When user links his external storage account to Yoroi, we check if there are some memos in his external storage. If there are, we download a content of each memo file via Dropbox API, read the content with FileReader object, then we save these memos to localStorage. In this way we can make user be able to install Yoroi on the another device, link his or her external storage account and get user's memos so they can be displayed in WalletSummary.
+
+### Components and UI
+A new container was added: `/containers/settings/categories/AccountsSettingsPage.js`.
+It renders an AccountsSettings component.
+
+A new component was added: `/components/settings/categories/AccountsSettings.js`.
+Here user can link his external storage account (only Dropbox for now) to Yoroi.
+
+A new route was added for the AccountsSettingsPage.
+
+A new component was added: `/components/wallet/send/WalletCloseMemoDialog.js`.
+It serves for getting a confirmation if user wants to close a memo textarea when it's not empty.
+
+A new textarea was added to `/components/wallet/send/WalletSendForm.js`
 
 ### Tech spec
 
