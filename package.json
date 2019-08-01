@@ -97,7 +97,7 @@
     "eslint-plugin-react": "7.14.3",
     "file-loader": "4.1.0",
     "flow-bin": "0.98.1",
-    "flow-typed": "2.6.0",
+    "flow-typed": "2.6.1",
     "geckodriver": "1.16.2",
     "html-loader": "0.5.5",
     "html-webpack-harddisk-plugin": "1.0.1",
