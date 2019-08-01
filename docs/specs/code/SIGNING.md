@@ -75,7 +75,7 @@ se
   .serialize(txid)
 ```
 
-and these are wrapped a `witness` (serialization logic [here](https://github.com/input-output-hk/rust-cardano/blob/103d15d2df17f6ffc055f4563da16c206e7ce135/cardano/src/tx.rs#L202))
+and these are wrapped in a `witness` (serialization logic [here](https://github.com/input-output-hk/rust-cardano/blob/103d15d2df17f6ffc055f4563da16c206e7ce135/cardano/src/tx.rs#L202))
 
 lastly, an array of witnesses is represented by a fixed-length CBOR array (call this function `FIXED_ARRAY`)
 
@@ -116,7 +116,7 @@ You can see all existing tags in Rust [here](https://github.com/input-output-hk/
 
 **Define**: uint8 `FormatVersion` which specifies the version number for the proposed format.
 
-**Define**: byte* `Recipient` which is a identifier for who you are signing this message for. This is to avoid replay attacks as dapps for example can specify their contract address as the recipient. It is still not fool-proof as if somebody can ask you to sign a message with the recipient the same as the contract they intend to pass your message along to.
+**Define**: byte* `Recipient` which is a identifier for who you are signing this message for. This is to avoid replay attacks as dapps for example can specify their contract address as the recipient. It is still not fool-proof as somebody can ask you to sign a message with the recipient set the same as the recipient field of the contract/person they intend to pass your message along to.
 
 ##### FormatVersion 1
 
