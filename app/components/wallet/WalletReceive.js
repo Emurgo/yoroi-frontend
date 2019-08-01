@@ -4,12 +4,10 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import classnames from 'classnames';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import QRCode from 'qrcode.react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
-import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
 import verifyIcon from '../../assets/images/verify-icon.inline.svg';
 import generateURIIcon from '../../assets/images/generate-uri.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
@@ -17,6 +15,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
+import CopyableActionLink from '../widgets/CopyableActionLink';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
@@ -67,6 +66,8 @@ type Props = {|
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
   onCopyAddress: Function,
+  onCopyAddressTooltip: Function,
+  getNotification: Function,
   onVerifyAddress: Function,
   onGeneratePaymentURI: Function,
   isSubmitting: boolean,
@@ -104,11 +105,13 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress, onVerifyAddress, onGeneratePaymentURI,
+      onVerifyAddress, onGeneratePaymentURI,
       isSubmitting, error, isWalletAddressUsed,
+      onCopyAddress, onCopyAddressTooltip, getNotification,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
+    const mainAddressNotificationId = 'mainAddress-copyNotification';
 
     const generateAddressButtonClasses = classnames([
       'primary',
@@ -145,7 +148,11 @@ export default class WalletReceive extends Component<Props, State> {
             </div>
             <CopyableAddress
               hash={walletAddress}
-              onCopyAddress={onCopyAddress}
+              elementId={mainAddressNotificationId}
+              onCopyAddress={
+                onCopyAddressTooltip.bind(this, walletAddress, mainAddressNotificationId)
+              }
+              getNotification={getNotification}
             >
               <ExplorableHashContainer
                 selectedExplorer={this.props.selectedExplorer}
@@ -192,6 +199,7 @@ export default class WalletReceive extends Component<Props, State> {
               styles.walletAddress,
               address.isUsed ? styles.usedWalletAddress : null,
             ]);
+            const notificationElementId = `address-${index}-copyNotification`;
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
                 {/* Address Id */}
@@ -250,15 +258,16 @@ export default class WalletReceive extends Component<Props, State> {
                     </button>
                   </div>
                   {/* Copy Address action */}
-                  <CopyToClipboard
-                    text={address.id}
-                    onCopy={onCopyAddress.bind(this, address.id)}
+                  <CopyableActionLink
+                    hash={address.id}
+                    elementId={notificationElementId}
+                    onCopyAddress={
+                      onCopyAddress.bind(this, address.id, notificationElementId)
+                    }
+                    getNotification={getNotification}
                   >
-                    <div className={styles.addressActionItemBlock}>
-                      <SvgInline svg={iconCopy} className={styles.copyIcon} />
-                      <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
-                    </div>
-                  </CopyToClipboard>
+                    {intl.formatMessage(messages.copyAddressLabel)}
+                  </CopyableActionLink>
                 </div>
                 {/* Action block end */}
               </div>

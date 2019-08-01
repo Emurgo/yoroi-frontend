@@ -365,6 +365,7 @@ export default {
   '--theme-icon-ada-summary-wallet-amount-symbol-color': '#2b2c32',
   '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#2b2c32',
   '--theme-icon-copy-address-color': '#353535',
+  '--theme-icon-copy-address-button-background-color': '#D9DDE0',
   '--theme-icon-back-button-color': '#353535',
   '--theme-icon-close-button-color': '#353535',
   '--theme-icon-transactions-ada-symbol-color': '#353535',

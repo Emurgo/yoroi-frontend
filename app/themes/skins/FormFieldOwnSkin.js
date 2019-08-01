@@ -69,6 +69,19 @@ export const FormFieldOwnSkin = class extends React.Component<Props, State> {
             this.props.error ? styles.error : '',
           ])}
         >
+
+          <div className={styles.iconsWrapper}>
+            {this.props.done && <SvgInline svg={SuccessSvg} />}
+            {this.props.type === 'password' && !this.props.error ? (
+              <button tabIndex="-1" type="button" onClick={this.showPassword}>
+                {isPasswordShown
+                  ? <SvgInline svg={PasswordSvg} />
+                  : <SvgInline svg={PasswordHiddenSvg} />}
+              </button>
+            ) : null}
+            {this.props.error && <SvgInline svg={ErrorSvg} />}
+          </div>
+          {this.props.render(omit(renderProps, ['themeId']))}
           {this.props.label && (
             // eslint-disable-next-line
             <legend
@@ -84,19 +97,6 @@ export const FormFieldOwnSkin = class extends React.Component<Props, State> {
               {this.props.label}
             </legend>
           )}
-
-          <div className={styles.iconsWrapper}>
-            {this.props.done && <SvgInline svg={SuccessSvg} />}
-            {this.props.error && <SvgInline svg={ErrorSvg} />}
-            {this.props.type === 'password' ? (
-              <button tabIndex="-1" type="button" onClick={this.showPassword}>
-                {isPasswordShown
-                  ? <SvgInline svg={PasswordSvg} />
-                  : <SvgInline svg={PasswordHiddenSvg} />}
-              </button>
-            ) : null}
-          </div>
-          {this.props.render(omit(renderProps, ['themeId']))}
         </fieldset>
       </div>
     );

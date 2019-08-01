@@ -47,7 +47,8 @@ export default class TransferMasterKeyPage extends Component<Props> {
     fields: {
       masterKey: {
         label: this.context.intl.formatMessage(messages.masterKeyInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.masterKeyInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.masterKeyInputHint) : '',
         value: '',
         validators: [({ field }) => {
           const value = field.value;

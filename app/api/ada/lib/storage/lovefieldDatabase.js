@@ -1,7 +1,7 @@
 // Client-side database to avoid having to query Yoroi servers when state doesn't change
 
 // $FlowFixMe Flow doesn't like lovefield
-import lf, { Type } from 'lovefield';
+import lf, { Type, schema } from 'lovefield';
 import type {
   AdaAddress,
   AdaAddresses,
@@ -64,7 +64,11 @@ const txAddressesTableSchema = {
 let db;
 
 /** Ensure we are only creating a single instance of the lovefield database */
-export const loadLovefieldDB = () => {
+export const loadLovefieldDB = (
+  options = {
+    storeType: schema.DataStoreType.INDEXED_DB,
+  },
+) => {
   if (db) return Promise.resolve(db);
 
   const schemaBuilder = lf.schema.create('yoroi-schema', 1);
@@ -100,8 +104,7 @@ export const loadLovefieldDB = () => {
       ref: `${txsTableSchema.name}.${txsTableSchema.properties.id}`
     });
 
-  return schemaBuilder.connect(
-  ).then(newDb => {
+  return schemaBuilder.connect(options).then(newDb => {
     db = newDb;
     return db;
   });

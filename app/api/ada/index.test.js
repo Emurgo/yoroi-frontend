@@ -1,5 +1,6 @@
 // @flow
 import './lib/test-config';
+import { schema } from 'lovefield';
 import AdaApi from './index';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import {
@@ -11,8 +12,15 @@ import type {
   FilterUsedResponse,
 } from './lib/state-fetch/types';
 
+import {
+  loadLovefieldDB,
+} from './lib/storage/lovefieldDatabase';
+
 beforeAll(async () => {
   await RustModule.load();
+  await loadLovefieldDB({
+    storeType: schema.DataStoreType.MEMORY,
+  });
   silenceLogsForTesting();
 });
 
