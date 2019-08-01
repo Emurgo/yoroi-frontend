@@ -1,31 +1,42 @@
 // @flow
 import React, { Component } from 'react';
+import { defineMessages, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
+import { ellipsis } from '../../utils/strings';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
+import NotificationMessage from '../../components/widgets/NotificationMessage';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
+import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedProps } from '../../types/injectedPropsType';
 
 import {
   DECIMAL_PLACES_IN_ADA,
   MAX_INTEGER_PLACES_IN_ADA
 } from '../../config/numbersConfig';
-import globalMessages from '../../i18n/global-messages';
+
+
+const messages = defineMessages({
+  message: {
+    id: 'wallet.receive.page.addressCopyNotificationMessage',
+    defaultMessage: '!!!You have successfully copied wallet address',
+  },
+});
 
 type Props = InjectedProps;
 
 type State = {
-  notificationElementId: string,
+  copiedAddress: string,
 };
 
 @observer
 export default class WalletReceivePage extends Component<Props, State> {
 
   state = {
-    notificationElementId: ''
+    copiedAddress: '',
   };
 
   componentWillUnmount() {
@@ -55,6 +66,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   };
 
   render() {
+    const { copiedAddress } = this.state;
     const actions = this.props.actions;
     const { uiNotifications, uiDialogs, profile } = this.props.stores;
     const {
@@ -76,14 +88,25 @@ export default class WalletReceivePage extends Component<Props, State> {
     const walletAddresses = addresses.all.slice().reverse();
 
     const notification = {
+      id: `${wallet.id}-copyNotification`,
       duration: config.wallets.ADDRESS_COPY_NOTIFICATION_DURATION,
-      message: globalMessages.copyTooltipMessage,
+      message: (
+        <FormattedHTMLMessage
+          {...messages.message}
+          values={{ walletAddress: ellipsis(copiedAddress, 8) }}
+        />
+      ),
     };
+    const notificationComponent = (
+      <NotificationMessage
+        icon={successIcon}
+        show={uiNotifications.isOpen(notification.id)}
+      >
+        {notification.message}
+      </NotificationMessage>
+    );
 
-    const tooltipNotification = {
-      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
-      message: globalMessages.copyTooltipMessage,
-    };
+    const uriCopyNotificationId = `${wallet.id}-uri-copyNotification`;
 
     return (
       <VerticalFlexContainer>
@@ -93,29 +116,14 @@ export default class WalletReceivePage extends Component<Props, State> {
           isWalletAddressUsed={isWalletAddressUsed}
           walletAddresses={walletAddresses}
           onGenerateAddress={this.handleGenerateAddress}
-          onCopyAddress={(address, elementId) => {
-            if (!uiNotifications.isOpen(elementId)) {
-              this.setState({ notificationElementId: elementId });
-              actions.notifications.open.trigger({
-                id: elementId,
-                duration: notification.duration,
-                message: notification.message,
-              });
-            }
+          onCopyAddress={(address) => {
+            this.setState({ copiedAddress: address });
+            actions.notifications.open.trigger({
+              id: notification.id,
+              duration: notification.duration,
+              message: messages.message
+            });
           }}
-          onCopyAddressTooltip={(address, elementId) => {
-            if (!uiNotifications.isOpen(elementId)) {
-              this.setState({ notificationElementId: elementId });
-              actions.notifications.open.trigger({
-                id: elementId,
-                duration: tooltipNotification.duration,
-                message: tooltipNotification.message,
-              });
-            }
-          }}
-          getNotification={uiNotifications.getTooltipActiveNotification(
-            this.state.notificationElementId
-          )}
           onVerifyAddress={({ address, path }) => {
             actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
             this.openVerifyAddressDialog();
@@ -126,6 +134,8 @@ export default class WalletReceivePage extends Component<Props, State> {
           isSubmitting={addresses.createAddressRequest.isExecuting}
           error={addresses.error}
         />
+
+        {notificationComponent}
 
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
@@ -149,19 +159,12 @@ export default class WalletReceivePage extends Component<Props, State> {
               uiDialogs.getParam('address'),
               uiDialogs.getParam('amount'),
             )}
-            onCopyAddressTooltip={(elementId) => {
-              if (!uiNotifications.isOpen(elementId)) {
-                this.setState({ notificationElementId: elementId });
-                actions.notifications.open.trigger({
-                  id: elementId,
-                  duration: tooltipNotification.duration,
-                  message: tooltipNotification.message,
-                });
-              }
-            }}
-            getNotification={uiNotifications.getTooltipActiveNotification(
-              this.state.notificationElementId
-            )}
+            showNotification={uiNotifications.isOpen(uriCopyNotificationId)}
+            onCopy={(message) => actions.notifications.open.trigger({
+              id: uriCopyNotificationId,
+              duration: config.wallets.ADDRESS_COPY_NOTIFICATION_DURATION,
+              message
+            })}
             classicTheme={profile.isClassicTheme}
           />
         ) : null}

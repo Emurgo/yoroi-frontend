@@ -2,14 +2,20 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
+import SvgInline from 'react-svg-inline';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import { intlShape, defineMessages } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 import QRCode from 'qrcode.react';
 import { buildURI } from '../../utils/URIHandling';
+
 import Dialog from '../widgets/Dialog';
 import DialogBackButton from '../widgets/DialogBackButton';
 import DialogCloseButton from '../widgets/DialogCloseButton';
+import NotificationMessage from '../widgets/NotificationMessage';
+import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
+import successIcon from '../../assets/images/success-small.inline.svg';
 import WarningBox from '../widgets/WarningBox';
-import CopyableAddress from '../widgets/CopyableAddress';
 
 import styles from './URIDisplayDialog.scss';
 
@@ -31,18 +37,31 @@ const messages = defineMessages({
 type Props = {
   onClose: void => void,
   classicTheme: boolean,
-  getNotification: Function,
-  onCopyAddressTooltip: Function,
+  showNotification: boolean,
+  onCopy: MessageDescriptor => void,
   onBack: void => void,
   address: string,
   amount: number,
 };
 
+type State = {
+  copiedURI: string,
+};
+
+
 @observer
-export default class URIDisplayDialog extends Component<Props> {
+export default class URIDisplayDialog extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
+  };
+
+  state = {
+    copiedURI: '',
+  };
+
+  saveUriToState = (uri: string): void => {
+    this.setState({ copiedURI: uri });
   };
 
   render() {
@@ -50,16 +69,16 @@ export default class URIDisplayDialog extends Component<Props> {
       onClose,
       onBack,
       classicTheme,
-      getNotification,
-      onCopyAddressTooltip,
+      showNotification,
+      onCopy,
       address,
       amount,
     } = this.props;
 
-    const { intl } = this.context;
-
     const uri = buildURI(address, amount);
-    const uriNotificationId = 'uri-copyNotification';
+    const { copiedURI } = this.state;
+
+    const { intl } = this.context;
 
     // Get QRCode color value from active theme's CSS variable
     const qrCodeBackgroundColor = document.documentElement ?
@@ -73,6 +92,7 @@ export default class URIDisplayDialog extends Component<Props> {
       </WarningBox>
     );
 
+    const message = intl.formatMessage(messages.uriDisplayDialogCopyNotification);
     return (
       <Dialog
         title={intl.formatMessage(messages.uriDisplayDialogTitle)}
@@ -83,7 +103,15 @@ export default class URIDisplayDialog extends Component<Props> {
         onClose={onClose}
         backButton={<DialogBackButton onBack={onBack} />}
       >
+        <NotificationMessage
+          icon={successIcon}
+          show={!!copiedURI && showNotification}
+        >
+          {message}
+        </NotificationMessage>
+
         {uriUsabilityWarning}
+
         <div className={styles.qrCode}>
           <QRCode
             value={uri}
@@ -93,15 +121,18 @@ export default class URIDisplayDialog extends Component<Props> {
           />
         </div>
         <div className={styles.uriDisplay}>
-          <CopyableAddress
-            hash={uri}
-            elementId={uriNotificationId}
-            onCopyAddress={onCopyAddressTooltip.bind(this, uriNotificationId)}
-            getNotification={getNotification}
-            tooltipOpensUpward
+          <span className={styles.uri}>{uri}</span>
+          <CopyToClipboard
+            text={uri}
+            onCopy={(uriText) => {
+              this.saveUriToState(uriText);
+              onCopy(message);
+            }}
           >
-            <span className={styles.uri}>{uri}</span>
-          </CopyableAddress>
+            <span>
+              <SvgInline svg={iconCopy} className={styles.copyIcon} />
+            </span>
+          </CopyToClipboard>
         </div>
       </Dialog>
 

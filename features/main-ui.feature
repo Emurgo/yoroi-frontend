@@ -35,9 +35,9 @@ Feature: Main UI
     When I go to the receive screen
     Then I should see the Receive screen
     When I click on "copy to clipboard" button
-    Then I should see "copied" tooltip message:
+    Then I should see "You have successfully copied wallet address" pop up:
     | message                                            |
-    | global.copyTooltipMessage |
+    | wallet.receive.page.addressCopyNotificationMessage |
 
   @it-30
   Scenario: User can't restore Daedalus wallet in Yoroi if Yoroi wallet is not created (IT-30)

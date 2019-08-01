@@ -6,16 +6,10 @@
     .Dialog_title {
       margin-bottom: 24px;
     }
-
-    .CopyableAddress_copyIconBig {
-      & > svg {
-        margin-top: -7px;
-      }
-    }
   }
 
   .uriDisplay {
-    width: 90%;
+    width: 75%;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 24px;
@@ -26,8 +20,20 @@
       font-family: var(--font-regular);
       word-break: break-all;
       font-size: 16px;
-      line-height: 24px;
+      line-height: 22px;
       text-align: center;
+    }
+
+    .copyIcon {
+      cursor: pointer;
+      margin-left: 6px;
+      & > svg {
+        height: 14.5px;
+        width: 11.5px;
+        path {
+          fill: var(--theme-icon-copy-address-color);
+        }
+      }
     }
   }
 

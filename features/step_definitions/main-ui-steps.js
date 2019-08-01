@@ -29,10 +29,10 @@ Then(/^I click on "copy to clipboard" button$/, async function () {
   await this.click('.CopyableAddress_copyIconBig');
 });
 
-Then(/^I should see "copied" tooltip message:$/, async function (data) {
-  const notification = data.hashes()[0];
-  const notificationMessage = await this.intl(notification.message);
-  await this.waitForElement(`//div[@class='SimpleBubble_bubble'][contains(text(), '${notificationMessage}')]`, By.xpath);
+Then(/^I should see "You have successfully copied wallet address" pop up:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorMessage = await this.intl(error.message);
+  await this.waitForElement(`//div[@class='VerticalFlexContainer_component']//span[contains(text(), '${errorMessage}')]`, By.xpath);
 });
 
 Then(/^I see transactions buttons are disabled$/, async function () {
