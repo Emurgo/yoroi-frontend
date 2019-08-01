@@ -157,18 +157,11 @@
             object-fit: contain;
             margin-left: 4px;
             & > svg {
-              height: 14.5px;
-              width: 11.5px;
+              height: 20px;
+              width: 20px;
               path {
                 fill: var(--theme-icon-copy-address-color);
               }
-            }
-          }
-
-          .verifyIcon, .generateURIIcon {
-            & > svg {
-              height: 20px;
-              width: 20px;
             }
           }
 
