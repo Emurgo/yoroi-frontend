@@ -68,5 +68,9 @@
 
   .nextButton {
     margin: 20px auto 0;
-  }  
+  }
+
+  fieldset {
+    background: var(--theme-settings-pane-background-color);
+  }
 }
