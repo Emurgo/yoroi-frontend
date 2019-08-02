@@ -57,7 +57,7 @@ export const CURRENCY_SPECIFIC_CATEGORIES = {
     {
       name: 'DAEDALUS_TRANSFER',
       className: 'daedalus-transfer',
-      route: ROUTES.DAEDALUS_TRANFER.ROOT,
+      route: ROUTES.TRANSFER.ROOT,
       icon: daedalusTransferIcon,
     }
   ]

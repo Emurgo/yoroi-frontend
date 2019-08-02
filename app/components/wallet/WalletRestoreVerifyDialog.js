@@ -52,7 +52,8 @@ type Props = {|
   addresses: Array<string>,
   accountPlate: WalletAccountNumberPlate,
   selectedExplorer: ExplorerType,
-  onCopyAddress?: Function,
+  onCopyAddressTooltip: Function,
+  getNotification: Function,
   onNext: Function,
   onCancel: Function,
   isSubmitting: boolean,
@@ -63,7 +64,6 @@ type Props = {|
 @observer
 export default class WalletRestoreVerifyDialog extends Component<Props> {
   static defaultProps = {
-    onCopyAddress: undefined,
     error: undefined,
   };
 
@@ -81,7 +81,8 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       onCancel,
       onNext,
       classicTheme,
-      onCopyAddress,
+      onCopyAddressTooltip,
+      getNotification,
     } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
@@ -178,6 +179,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         <DialogTextBlock subclass="component-bottom">
           {walletAddresses}
         </DialogTextBlock>
+
         <div className={styles.postCopyMargin} />
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}

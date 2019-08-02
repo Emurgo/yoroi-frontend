@@ -8,4 +8,7 @@ module.exports = {
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!yoroi-extension-ledger-bridge)'
   ],
+  setupFiles: [
+    'jest-canvas-mock'
+  ]
 };

@@ -163,6 +163,12 @@ function CustomWorld(cmdInput: WorldInput) {
     return this.driver.wait(condition);
   };
 
+  this.waitDisable = async (locator, method = By.css) => {
+    const element = await this.getElementBy(locator, method);
+    const condition = until.elementIsDisabled(element);
+    return this.driver.wait(condition);
+  };
+
   this.waitUntilText = async (locator, text, timeout = 75000) => {
     await this.driver.wait(async () => {
       try {

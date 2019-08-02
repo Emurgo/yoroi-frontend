@@ -75,7 +75,8 @@ export default class SaveDialog extends Component<Props> {
       fields: {
         walletName: {
           label: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputLabel),
-          placeholder: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputPH),
+          placeholder: this.props.classicTheme ?
+            intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputPH) : '',
           value: defaultWalletName,
           validators: [({ field }) => (
             [

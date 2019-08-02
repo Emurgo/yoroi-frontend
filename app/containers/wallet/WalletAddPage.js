@@ -187,7 +187,7 @@ export default class WalletAddPage extends Component<Props> {
 
   _goToDaedalusTransferRoot = (): void => {
     this._getRouter().goToRoute.trigger({
-      route: ROUTES.DAEDALUS_TRANFER.ROOT
+      route: ROUTES.TRANSFER.DAEDALUS
     });
   }
 }

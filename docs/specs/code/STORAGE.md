@@ -47,7 +47,7 @@ Ex: A Derived Account wallet is one with accounts all being derived from a known
 * Root level = 0
 * Purpose level = 1
 * [...]
-* Account level = 5
+* Address level = 5
 
 The reason we pick this order is because although bip44 mandates levels `[0,5]`, any cryptocurrency could use more or less levels. That means the number of derivations is unbounded to the right and the following is entirely possible
 ```
