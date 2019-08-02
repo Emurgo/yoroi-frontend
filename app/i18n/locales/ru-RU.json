@@ -478,7 +478,7 @@
   "widgets.copyableaddress.addressCopyTooltipMessage": "Скопировать в буфер обмена",
   "widgets.explorer.tooltip": "Перейти на {websiteName}",
   "widgets.warningBox.headerText": "ВНИМАНИЕ:",
-  "yoroiTransfer.error.noTransferTxError": "There is no transfer transaction to send.",
+  "yoroiTransfer.error.noTransferTxError": "Не найдено транзакций для отправки.",
   "yoroiTransfer.error.transferFundsError": "Не удается перевести средства.",
   "yoroiTransfer.error.walletChangedError": "Кошелек был изменен. Пожалуйста, подтвердите повторно Вашу транзакцию.",
   "yoroiTransfer.errorPage.title.label": "Не удалось перевести средства с другого кошелька",
@@ -486,10 +486,10 @@
   "yoroiTransfer.start.instructions.mnemonic-15": "мнемоническая фраза из 15 слов",
   "yoroiTransfer.start.instructions.text": "Перевести средства из <strong>не-Daedalus</strong> кошелька (Yoroi, AdaLite, и т. д.). <br />В частности, это будет работать для любого кошелька, адреса которого начинаются с Ae2",
   "yoroiTransfer.successPage.text": "Ваши средства были успешно переведены.",
-  "yoroiTransfer.successPage.title": "success",
-  "yoroiTransfer.summary.addressFrom.subLabel": "Wallet Addresses",
-  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
-  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
-  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
+  "yoroiTransfer.successPage.title": "успешно",
+  "yoroiTransfer.summary.addressFrom.subLabel": "Адрес кошелька",
+  "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Создание перевода транзакции",
+  "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Проверка средств на адресах",
+  "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Получение адресов",
+  "yoroiTransfer.waiting.title.label": "Происходит восстановление кошелька"
 }
