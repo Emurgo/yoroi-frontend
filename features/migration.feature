@@ -21,3 +21,10 @@ Feature: Migration
     Given I am on the "Terms of use" screen
     Then The Japanese language should be selected
     And Last launch version is updated
+
+  @it-85
+  Scenario: Version set on first launch (IT-83)
+    Then I am on the language selection screen
+    Given I import a snapshot named historical-versions/1_0_4/software
+    Then I am on the language selection screen
+    And I see send money confirmation dialog

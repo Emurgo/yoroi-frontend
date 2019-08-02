@@ -281,10 +281,12 @@ async function importLocalStorage(client, importDir: string) {
 
 async function importIndexedDB(client, importDir: string) {
   const indexedDBPath = `${importDir}/indexedDB.json`;
-  const indexedDBData = fs.readFileSync(indexedDBPath).toString();
-  await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.api.ada.importLocalDatabase(data)
-      .then(done)
-      .catch(err => done(err));
-  }, JSON.parse(indexedDBData));
+  try {
+    const indexedDBData = fs.readFileSync(indexedDBPath).toString();
+    await client.driver.executeAsyncScript((data, done) => {
+      window.yoroi.api.ada.importLocalDatabase(data)
+        .then(done)
+        .catch(err => done(err));
+    }, JSON.parse(indexedDBData));
+  } catch (e) {} // eslint-disable-line no-empty
 }
