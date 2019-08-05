@@ -1,6 +1,8 @@
 // @flow
 
 import environment from '../../environment';
+import { coinPriceCurrencyDisabledValue } from '../../types/coinPriceType';
+import type { CoinPriceCurrencySettingType } from '../../types/coinPriceType';
 
 const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
@@ -11,6 +13,7 @@ const storageKeys = {
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
+  COIN_PRICE_CURRENCY: networkForLocalStorage + '-COIN-PRICE-CURRENCY',
 };
 
 export type SetCustomUserThemeRequest = {
@@ -253,6 +256,33 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
+  // ========== Coin price currency ========== //
+
+  getCoinPriceCurrency = (): Promise<CoinPriceCurrencySettingType> => new Promise((resolve, reject) => {
+    try {
+      const coinPriceCurrency = localStorage.getItem(storageKeys.COIN_PRICE_CURRENCY);
+      if (!coinPriceCurrency) resolve(coinPriceCurrencyDisabledValue);
+      else resolve(JSON.parse(coinPriceCurrency));
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setCoinPriceCurrency = (currency: CoinPriceCurrencySettingType): Promise<void> => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.COIN_PRICE_CURRENCY, JSON.stringify(currency));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetCoinPriceCurrency = (): Promise<void> => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.COIN_PRICE_CURRENCY);
+    } catch (_error) {}
+    resolve();
+  });
 
   async reset() {
     await this.unsetUserLocale();
@@ -260,6 +290,7 @@ export default class LocalStorageApi {
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
+    await this.unsetCoinPriceCurrency();
   }
 
   setLocalStorage = (localStorageData: any): Promise<void> => new Promise((resolve) => {

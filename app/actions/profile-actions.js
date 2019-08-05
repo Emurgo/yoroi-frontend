@@ -1,6 +1,7 @@
 // @flow
 import Action from './lib/Action';
 import type { ExplorerType } from '../domain/Explorer';
+import type { CoinPriceCurrencySettingType } from '../types/coinPriceType';
 
 // ======= PROFILE ACTIONS =======
 
@@ -14,4 +15,5 @@ export default class ProfileActions {
   exportTheme: Action<void> = new Action();
   commitLocaleToStorage: Action<{ locale: string }> = new Action();
   updateHideBalance: Action<void> = new Action();
+  updateCoinPriceCurrency: Action<CoinPriceCurrencySettingType> = new Action();
 }

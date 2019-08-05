@@ -16,6 +16,8 @@ import type {
 import type {
   SetCustomUserThemeRequest
 } from '../../api/localStorage/index';
+import { coinPriceCurrencyDisabledValue } from '../../types/coinPriceType';
+import type { CoinPriceCurrencySettingType } from '../../types/coinPriceType';
 
 export default class ProfileStore extends Store {
 
@@ -36,6 +38,15 @@ export default class ProfileStore extends Store {
         // add any language that's mid-translation here
       ]
       : [])
+  ];
+
+  COIN_PRICE_CURRENCY_OPTIONS = [
+    { symbol: 'USD' },
+    { symbol: 'SGD' },
+    { symbol: 'JPY' },
+    { symbol: 'EUR' },
+    { symbol: 'GBP' },
+    { symbol: 'AUD' },
   ];
 
   /**
@@ -175,6 +186,12 @@ export default class ProfileStore extends Store {
   @observable setHideBalanceRequest: Request<boolean => Promise<void>>
     = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
 
+  @observable setCoinPriceCurrencyRequest: Request<CoinPriceCurrencySettingType => Promise<void>>
+    = new Request(this.api.localStorage.setCoinPriceCurrency);
+
+  @observable getCoinPriceCurrencyRequest: Request<void => Promise<CoinPriceCurrencySettingType>>
+    = new Request(this.api.localStorage.getCoinPriceCurrency);
+
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
@@ -185,6 +202,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
+    this.actions.profile.updateCoinPriceCurrency.listen(this._updateCoinPriceCurrency);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -488,4 +506,24 @@ export default class ProfileStore extends Store {
       }
     }
   }
+
+  // ========== Coin Price Currency ========== //
+
+  @computed get coinPriceCurrency(): CoinPriceCurrencySettingType {
+    const { result } = this.getCoinPriceCurrencyRequest.execute();
+    return result || coinPriceCurrencyDisabledValue;
+  }
+  
+  _updateCoinPriceCurrency = async (currency: CoinPriceCurrencySettingType) => {
+    await this.setCoinPriceCurrencyRequest.execute(currency);
+    await this.getCoinPriceCurrencyRequest.execute(); // eagerly cache
+  };
+
+  @computed get hasLoadedCoinPriceCurrency(): boolean {
+    return (
+      this.getCoinPriceCurrencyRequest.wasExecuted &&
+      this.getCoinPriceCurrencyRequest.result !== null
+    );
+  }
+
 }

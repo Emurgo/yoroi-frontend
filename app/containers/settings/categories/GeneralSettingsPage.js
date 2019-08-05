@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
+import CoinPriceCurrencySettings from '../../../components/settings/categories/general-setting/CoinPriceCurrencySettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
@@ -12,6 +13,7 @@ import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import type { ExplorerType } from '../../../domain/Explorer';
 import { Explorer, explorerInfo } from '../../../domain/Explorer';
+import { coinPriceCurrencyDisabledValue } from '../../../types/coinPriceType';
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
@@ -40,6 +42,13 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
     this.props.stores.profile.hasCustomTheme()
   )
 
+  onSelectCoinPriceCurrency = (value: { selected: string }) => {
+    const currency = (value === '---') ? 
+      coinPriceCurrencyDisabledValue :
+      { enabled: true, currency: value };
+    this.props.actions.profile.updateCoinPriceCurrency.trigger(currency);
+  };
+
   render() {
     const {
       setSelectedExplorerRequest,
@@ -47,9 +56,13 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       LANGUAGE_OPTIONS,
       currentLocale,
       selectedExplorer,
+      COIN_PRICE_CURRENCY_OPTIONS,
+      coinPriceCurrency,
+      setCoinPriceCurrencyRequest,
     } = this.props.stores.profile;
     const isSubmittingLocale = setProfileLocaleRequest.isExecuting;
     const isSubmittingExplorer = setSelectedExplorerRequest.isExecuting;
+    const isSubmittingCoinPriceCurrency = setCoinPriceCurrencyRequest.isExecuting;
     const explorerOptions = Object.keys(Explorer)
       .map(key => ({
         value: Explorer[key],
@@ -66,8 +79,22 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       )
       : null;
 
+    const currencies = COIN_PRICE_CURRENCY_OPTIONS.map(o => (
+      { value: o.symbol, label: o.symbol }
+    ));
+    currencies.unshift({ value: '---', label: 'disabled' });
+
+    const coinPriceCurrencyValue = coinPriceCurrency.enabled ? coinPriceCurrency.currency : '---';
+      
     return (
       <div>
+        <CoinPriceCurrencySettings
+          onSelect={this.onSelectCoinPriceCurrency}
+          isSubmitting={isSubmittingCoinPriceCurrency}
+          currencies={currencies}
+          currentValue={coinPriceCurrencyValue}
+          error={setCoinPriceCurrencyRequest.error}
+        />
         <GeneralSettings
           onSelectLanguage={this.onSelectLanguage}
           isSubmitting={isSubmittingLocale}
