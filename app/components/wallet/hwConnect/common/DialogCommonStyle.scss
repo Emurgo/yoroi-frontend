@@ -34,6 +34,16 @@ $opacityCommon: 0.7;
   .middleBlock {
     object-fit: contain;
   }
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 12px;
+    }
+
+    .Dialog_actions {
+      margin-top: 24px;
+    }
+  }
 }
 
 

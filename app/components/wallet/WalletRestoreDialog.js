@@ -9,7 +9,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import InformativeMessage from '../widgets/InformativeMessage';
+import DialogTextBlock from '../widgets/DialogTextBlock';
 import Dialog from '../widgets/Dialog';
 import {
   isValidWalletName,
@@ -367,9 +367,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       >
 
         {isVerificationMode ? (
-          introMessage && <InformativeMessage
-            message={introMessage}
-          />
+          introMessage &&
+            <DialogTextBlock message={introMessage} subclass="component-input" />
         ) : (
           <Input
             className={styles.walletName}
