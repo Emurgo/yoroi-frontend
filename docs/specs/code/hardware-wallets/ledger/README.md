@@ -224,11 +224,20 @@ In order fix UI problem, support for [WebAuthn Transport](https://www.npmjs.com/
 
 As WebAuthn Transport supports all [targetted browsers](https://caniuse.com/#search=Web%20Authentication%20API) it will be used as the default protocol. U2F transport will still be available.
 
-## UI
+## Ledger bridge page
+WebAuthn-Transport-URL: https://ledger-bridge.yoroi-wallet.com/ or https://ledger-bridge.yoroi-wallet.com/?transport=webauthn<br>
+U2F-Transport-URL: https://ledger-bridge.yoroi-wallet.com/?transport=u2f
+
+Here we need to change the default github URL to [custom github URL](https://help.github.com/en/articles/setting-up-a-custom-subdomain) and also need to change yoroi-wallet.com DNS's CNAME record.
+
+For WebAuthn new tab is needed to process but for U2F it's not compulsury but still proposing processing in new tab for U2F transport as well just to keep it consistent.
+
+## Ledger bridge page UI design
 TBD
 
 ## Implementation
-TBD
+Specification: https://github.com/Emurgo/yoroi-frontend/pull/696<br>
+Code: TBD
 
 # Iteration-4
 
