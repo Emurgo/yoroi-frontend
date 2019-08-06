@@ -57,6 +57,10 @@
           margin-top: 0;
           width: 350px;
         }
+
+        :global .walletPassword {
+          margin-right: 25px;
+        }
     
         @include place-form-field-error-below-input;
       }

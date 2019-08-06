@@ -38,6 +38,10 @@
       & > div {
         margin-top: 0;
       }
+
+      :global .walletPassword {
+        margin-right: 25px;
+      }
   
       @include place-form-field-error-below-input;
     }
