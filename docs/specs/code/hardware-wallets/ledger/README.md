@@ -208,8 +208,11 @@ app/components => View base components
 
 # Iteration-2
 
-[Updated UI to for Ledger Nano X support using USB cable.](https://github.com/Emurgo/yoroi-frontend/pull/660)
+## Proposal
+Updated UI to for Ledger Nano X support using USB cable.
 
+## Implementation
+https://github.com/Emurgo/yoroi-frontend/pull/660
 
 # Iteration-3
 
