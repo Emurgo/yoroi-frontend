@@ -216,6 +216,18 @@ https://github.com/Emurgo/yoroi-frontend/pull/660
 
 # Iteration-3
 
+## Proposal
+As in Windows 10, version 1903 (10th May 2019 update) native support for U2F has been added and it's affecting current Yoroi UI.
+Demo can be found here: https://youtu.be/Hlo6wOA16MA
+
+In order fix UI problem, support for [WebAuthn Transport](https://www.npmjs.com/package/@ledgerhq/hw-transport-webusb) is proposed.
+
+As WebAuthn Transport supports all [targetted browsers](https://caniuse.com/#search=Web%20Authentication%20API) it will be used as the default protocol. U2F transport will still be available.
+
+## UI
+TBD
+
+## Implementation
 TBD
 
 # Iteration-4
