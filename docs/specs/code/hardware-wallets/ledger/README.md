@@ -217,16 +217,33 @@ https://github.com/Emurgo/yoroi-frontend/pull/660
 # Iteration-3
 
 ## Proposal
-As in Windows 10, version 1903 (10th May 2019 update) native support for U2F has been added and it's affecting current Yoroi UI.
+As in Windows 10, version 1903 (10th May 2019 update) native support for U2F has been added and it's affecting current Yoroi UI.<br>
 Demo can be found here: https://youtu.be/Hlo6wOA16MA
 
 In order fix UI problem, support for [WebAuthn Transport](https://www.npmjs.com/package/@ledgerhq/hw-transport-webusb) is proposed.
 
 As WebAuthn Transport supports all [targetted browsers](https://caniuse.com/#search=Web%20Authentication%20API) it will be used as the default protocol. U2F transport will still be available.
 
+## Module structure
+Till now we have two modules and one repository at: https://github.com/Emurgo/yoroi-extension-ledger-bridge<br>
+`master` branch acts as connector module<br>
+`gh-pages` branch is the actual `iframe` which communicates with the Ledger device<br>
+making one repository per module feels more better now and it will help proper testing of new URL before release.<br>
+Hence proposing two new repository like:<br>
+1. `yoroi-extension-ledger-bridge-connector` as connector
+2. `yoroi-extension-ledger-bridge-website` as website which will communicate with the Ledger device
+
 ## Ledger bridge page
-WebAuthn-Transport-URL: https://ledger-bridge.yoroi-wallet.com/ or https://ledger-bridge.yoroi-wallet.com/?transport=webauthn<br>
-U2F-Transport-URL: https://ledger-bridge.yoroi-wallet.com/?transport=u2f
+WebAuthn-Transport-URL:<br>
+https://ledger-bridge.yoroi-wallet.com/ or<br>
+https://ledger-bridge.yoroi-wallet.com/?transport=webauthn or<br>
+https://ledger-bridge.yoroi-wallet.com/?transport=webauthn&language=en-US or<br>
+
+U2F-Transport-URL:<br>
+https://ledger-bridge.yoroi-wallet.com/?transport=u2f or<br>
+https://ledger-bridge.yoroi-wallet.com/?transport=u2f&language=ja-JP  
+
+As this page will have i18n texts, language can be set using query parameter `language=LANGUAGE-CODE`. If no language is provided then language will be `en-US` by default.
 
 Here we need to change the default github URL to [custom github URL](https://help.github.com/en/articles/setting-up-a-custom-subdomain) and also need to change yoroi-wallet.com DNS's CNAME record.
 
