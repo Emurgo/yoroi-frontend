@@ -254,7 +254,7 @@ TBD
 
 ## Implementation
 Specification: https://github.com/Emurgo/yoroi-frontend/pull/696<br>
-Code: TBD
+Code: https://github.com/Emurgo/yoroi-frontend/pull/884
 
 # Iteration-4
 
