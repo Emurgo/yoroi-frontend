@@ -230,8 +230,8 @@ Till now we have two modules and one repository at: https://github.com/Emurgo/yo
 `gh-pages` branch is the actual `iframe` which communicates with the Ledger device<br>
 making one repository per module feels more better now and it will help proper testing of new URL before release.<br>
 Hence proposing two new repository like:<br>
-1. `yoroi-extension-ledger-bridge-connector` as connector
-2. `yoroi-extension-ledger-bridge-website` as website which will communicate with the Ledger device
+1. `yoroi-extension-ledger-connector` as connector
+2. `yoroi-extension-ledger-connector-website` as website which will communicate with the Ledger device
 
 ## Ledger bridge page
 WebAuthn-Transport-URL:<br>
