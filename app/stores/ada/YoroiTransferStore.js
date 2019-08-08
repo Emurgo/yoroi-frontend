@@ -105,7 +105,7 @@ export default class YoroiTransferStore extends Store {
 
     updateStatusCallback();
 
-    const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, '');
+    const cryptoWallet = getCryptoWalletFromMasterKey(masterKey);
     const addressKeys = {};
     addresses.forEach(({ address, accountIndex, addressType, index }) => {
       const account = cryptoWallet.bip44_account(
