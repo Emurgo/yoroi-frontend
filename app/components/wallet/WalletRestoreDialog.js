@@ -9,7 +9,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import InformativeMessage from '../widgets/InformativeMessage';
+import DialogTextBlock from '../widgets/DialogTextBlock';
 import Dialog from '../widgets/Dialog';
 import {
   isValidWalletName,
@@ -23,7 +23,6 @@ import headerMixin from '../mixins/HeaderBlock.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import PasswordInstructions from '../widgets/forms/PasswordInstructions';
 import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
@@ -141,7 +140,8 @@ export default class WalletRestoreDialog extends Component<Props> {
     fields: {
       walletName: this.props.isVerificationMode ? undefined : {
         label: this.context.intl.formatMessage(messages.walletNameInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.walletNameInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.walletNameInputHint) : '',
         value: (this.props.initValues && this.props.initValues.walletName) || '',
         validators: [({ field }) => (
           [
@@ -152,7 +152,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       },
       recoveryPhrase: {
         label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.recoveryPhraseInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
         value: this.getInitRecoveryPhrase(),
         validators: [({ field }) => {
           const value = join(field.value, ' ');
@@ -174,7 +175,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       paperPassword: this.props.showPaperPassword ? {
         type: 'password',
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.paperPasswordLabel),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.paperPasswordLabel) : '',
         value: (this.props.initValues && this.props.initValues.paperPassword) || '',
         validators: [({ field }) => {
           const validatePassword = p => (
@@ -197,7 +199,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       walletPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
-        placeholder: this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder) : '',
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -213,7 +216,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       repeatPassword: this.props.isVerificationMode ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder) : '',
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -338,7 +342,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel
         ),
         primary: true,
-        disabled: isSubmitting || (!classicTheme && disabledCondition()),
+        disabled: isSubmitting || disabledCondition(),
         onClick: this.submit,
       },
     ];
@@ -363,9 +367,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       >
 
         {isVerificationMode ? (
-          introMessage && <InformativeMessage
-            message={introMessage}
-          />
+          introMessage &&
+            <DialogTextBlock message={introMessage} subclass="component-input" />
         ) : (
           <Input
             className={styles.walletName}
@@ -425,7 +428,7 @@ export default class WalletRestoreDialog extends Component<Props> {
                 error={repeatedPasswordField.error}
                 skin={InputOwnSkin}
               />
-              <PasswordInstructions />
+              <div />
             </div>
           </div>
         )}

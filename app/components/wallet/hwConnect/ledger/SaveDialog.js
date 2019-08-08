@@ -76,7 +76,8 @@ export default class SaveDialog extends Component<Props> {
       fields: {
         walletName: {
           label: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputLabel),
-          placeholder: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputPH),
+          placeholder: this.props.classicTheme ?
+            intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputPH) : '',
           value: defaultWalletName,
           validators: [({ field }) => (
             [
@@ -162,11 +163,16 @@ export default class SaveDialog extends Component<Props> {
         break;
     }
 
-    const dailogActions = [{
+    const disabledCondition = (
+      isActionProcessing
+      || !isValidWalletName(walletName)
+    );
+
+    const dialogActions = [{
       className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(globalMessages.hwConnectDialogSaveButtonLabel),
       primary: true,
-      disabled: isActionProcessing,
+      disabled: disabledCondition,
       onClick: this.save
     }];
 
@@ -174,7 +180,7 @@ export default class SaveDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'SaveDialog'])}
         title={intl.formatMessage(globalMessages.ledgerConnectAllDialogTitle)}
-        actions={dailogActions}
+        actions={dialogActions}
         closeOnOverlayClick={false}
         onClose={cancel}
         closeButton={<DialogCloseButton />}
@@ -183,7 +189,9 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {walletNameBlock}
         {middleBlock}
-        <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }

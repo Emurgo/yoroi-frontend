@@ -1,7 +1,7 @@
 // Client-side database to avoid having to query Yoroi servers when state doesn't change
 
 // $FlowFixMe Flow doesn't like lovefield
-import lf, { Type } from 'lovefield';
+import lf, { Type, schema } from 'lovefield';
 import type {
   AdaAddress,
   AdaAddresses,
@@ -64,7 +64,11 @@ const txAddressesTableSchema = {
 let db;
 
 /** Ensure we are only creating a single instance of the lovefield database */
-export const loadLovefieldDB = () => {
+export const loadLovefieldDB = (
+  options = {
+    storeType: schema.DataStoreType.INDEXED_DB,
+  },
+) => {
   if (db) return Promise.resolve(db);
 
   const schemaBuilder = lf.schema.create('yoroi-schema', 1);
@@ -75,7 +79,9 @@ export const loadLovefieldDB = () => {
     .addColumn(txsTableSchema.properties.date, Type.DATE_TIME)
     .addColumn(txsTableSchema.properties.lastUpdated, Type.DATE_TIME)
     .addColumn(txsTableSchema.properties.value, Type.OBJECT)
-    .addPrimaryKey([txsTableSchema.properties.id])
+    .addPrimaryKey(
+      ([txsTableSchema.properties.id]: Array<string>),
+    )
     .addIndex('idxDate', [txsTableSchema.properties.date], false, lf.Order.DESC);
 
   schemaBuilder.createTable(addressesTableSchema.name)
@@ -88,7 +94,9 @@ export const loadLovefieldDB = () => {
     .addColumn(txAddressesTableSchema.properties.id, Type.STRING)
     .addColumn(txAddressesTableSchema.properties.address, Type.STRING)
     .addColumn(txAddressesTableSchema.properties.tx, Type.STRING)
-    .addPrimaryKey([txAddressesTableSchema.properties.id])
+    .addPrimaryKey(
+      ([txAddressesTableSchema.properties.id]: Array<string>),
+    )
     // Address must also be part of the AddressesTable
     .addForeignKey('fkAddress', {
       local: txAddressesTableSchema.properties.address,
@@ -100,8 +108,7 @@ export const loadLovefieldDB = () => {
       ref: `${txsTableSchema.name}.${txsTableSchema.properties.id}`
     });
 
-  return schemaBuilder.connect(
-  ).then(newDb => {
+  return schemaBuilder.connect(options).then(newDb => {
     db = newDb;
     return db;
   });

@@ -52,3 +52,9 @@
     margin: 0 auto 0;
   }
 }
+
+:global(.YoroiModern) .component {
+  fieldset {
+    background: var(--theme-settings-pane-background-color);
+  }
+}

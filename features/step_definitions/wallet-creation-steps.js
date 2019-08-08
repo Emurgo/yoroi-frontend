@@ -27,6 +27,19 @@ When(/^I click the "Create personal wallet" button$/, async function () {
   await this.click('.WalletCreateDialog .primary');
 });
 
+Then(/^I should see the invalid password error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.walletPassword .SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
+});
+
+Then(/^I see the submit button is disabled$/, async function () {
+  const disabledButton = await this.driver.findElement(By.xpath("//div[@class='Dialog_actions']//button[contains(@class, 'SimpleButton_root') and contains(@class, 'disabled')]"));
+  const pageUrl = await this.driver.getCurrentUrl();
+  disabledButton.click();
+  expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
+});
+
 When(/^I accept the creation terms$/, async function () {
   await this.click('.SimpleCheckbox_check');
   await this.click('.WalletBackupPrivacyWarningDialog .primary');

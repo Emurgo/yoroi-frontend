@@ -47,7 +47,7 @@ Feature: Transfer Daedalus Wallet funds
     | leaf immune metal phrase river cool domain snow year below result three |
     And I proceed with the recovery
     Then I should wait until funds are recovered:
-    | daedalusAddress                                                                                          | amount |   
+    | fromAddress                                                                                              | amount |   
     | DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb | 500000 |
     | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm | 500000 |
     When I confirm Daedalus transfer funds
@@ -95,7 +95,7 @@ Feature: Transfer Daedalus Wallet funds
     | 50d1b52581adefa3e99025ade8f7189318e1e9ac2f0a1d66d9a1c86f3908ca5fe1a5e08866b500a9a0e11d48c41dbb4957c550b418e7b5c6c9a531ab37037c35d0e9ecaab457c8dea556bb2ef43ec59cc943b12adb39c9d38d4d90563b9014a7 |
     And I proceed with the recovery
     Then I should wait until funds are recovered:
-    | daedalusAddress                                                                                          | amount |   
+    | fromAddress                                                                                          | amount |   
     | DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb | 500000 |
     | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm | 500000 |
     When I confirm Daedalus transfer funds

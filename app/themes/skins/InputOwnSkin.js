@@ -92,6 +92,7 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
             readOnly={this.props.readOnly}
             onFocus={this.handleFocus}
             onBlur={this.handleBlur}
+            required="required"
           />
         )}
       />

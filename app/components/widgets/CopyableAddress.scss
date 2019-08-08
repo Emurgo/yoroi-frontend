@@ -1,14 +1,30 @@
 .component {
+  div, svg {
+    vertical-align: middle;
+  }
   .copyIconBig {
     cursor: pointer;
     object-fit: contain;
-    margin-left: 6px;
+    margin-left: 3px;
     & > svg {
-      height: 14.5px;
-      width: 11.5px;
+      margin-top: -6px;
+      height: 28px;
+      width: 28px;
+      padding: 4px;
+      border-radius: 15px;
       path {
         fill: var(--theme-icon-copy-address-color);
       }
     }
+  }
+  .copyIconBig svg:hover {
+    background-color: var(--theme-icon-copy-address-button-background-color);
+  }
+}
+
+.SimpleTooltip {
+  div[data-bubble-container] {
+    transform: translate(-50%, 0); // center the tooltip no matter how long is the text inside
+    margin-left: 20px; // offset = horizontal padding of icon and tooltip
   }
 }

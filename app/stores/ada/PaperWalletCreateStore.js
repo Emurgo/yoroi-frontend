@@ -147,6 +147,7 @@ export default class PaperWalletCreateStore extends Store {
     super.teardown();
   }
 
+  @action
   _reset = () => {
     this.progressInfo = ProgressStep.INIT;
     this.error = undefined;

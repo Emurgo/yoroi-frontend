@@ -55,7 +55,8 @@ export default class TransferMnemonicPage extends Component<Props> {
     fields: {
       recoveryPhrase: {
         label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.recoveryPhraseInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
         value: '',
         validators: [({ field }) => {
           const value = join(field.value, ' ');
@@ -140,6 +141,7 @@ export default class TransferMnemonicPage extends Component<Props> {
                 {
                   <div className={styles.text}>
                     {step0}
+                    &nbsp;
                     {intl.formatMessage(globalMessages.step1)}
                   </div>
                 }

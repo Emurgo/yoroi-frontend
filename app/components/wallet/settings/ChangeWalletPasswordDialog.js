@@ -14,7 +14,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import PasswordInstructions from '../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitleChangePassword: {
@@ -55,13 +54,15 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       currentPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.currentPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder) : '',
         value: '',
       },
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
-        placeholder: this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -77,7 +78,8 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -164,7 +166,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         onClick: this.submit,
         primary: true,
         className: confirmButtonClasses,
-        disabled: (!classicTheme && disabledCondition)
+        disabled: disabledCondition
       },
     ];
 
@@ -213,8 +215,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             error={repeatedPasswordField.error}
             skin={InputOwnSkin}
           />
-
-          <PasswordInstructions />
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

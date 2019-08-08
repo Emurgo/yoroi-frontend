@@ -251,6 +251,9 @@ export default {
   '--theme-dialog-big-button-label-color': '#121327',
   '--theme-dialog-big-button-description-color': '#121327',
   '--theme-dialog-title-color': '#121327',
+  '--theme-dialog-title-margin': '0 0 20px 0',
+  '--theme-dialog-input-margin': '10px 0 20px',
+  '--theme-dialog-input-actions-margin': '20px 0 0 0',
 
   '--theme-input-border-color': '#c6cdd6',
   '--theme-input-text-color': '#121327',
@@ -358,6 +361,7 @@ export default {
   '--theme-icon-ada-redemption-certificate-color': '#9eabbb',
   '--theme-icon-ada-redemption-no-wallets': '#121327',
   '--theme-icon-copy-address-color': '#121327',
+  '--theme-icon-copy-address-button-background-color': '#D9DDE0',
   '--theme-icon-back-button-color': '#121327',
   '--theme-icon-close-button-color': '#121327',
   '--theme-icon-transactions-ada-symbol-color': '#121327',
@@ -394,8 +398,8 @@ export default {
   '--theme-hw-connect-dialog-middle-block-common-error-background-color': '#fdf1f0',
 
   '--theme-widgets-progress-step-common-color': '#daa49a',
-  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
-  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-underline-light-color': '#adaeB6',
+  '--theme-underline-dark-color': '#464749',
   '--theme-widgets-hash-dark-color': '#000000',
   '--theme-widgets-hash-light-color': '#929293',
 
