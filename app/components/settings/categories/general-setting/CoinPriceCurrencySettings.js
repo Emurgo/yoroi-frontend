@@ -36,7 +36,6 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
   });
 
   render () {
-    console.log('>>>render');
     const { currencies, isSubmitting, error, currentValue } = this.props;
     const { intl } = this.context;
     const { form } = this;

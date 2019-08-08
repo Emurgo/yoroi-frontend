@@ -509,7 +509,7 @@ export default class ProfileStore extends Store {
 
   // ========== Coin Price Currency ========== //
 
-  @computed get coinPriceCurrency(): CoinPriceCurrencySettingType {
+  @computed.struct get coinPriceCurrency(): CoinPriceCurrencySettingType {
     const { result } = this.getCoinPriceCurrencyRequest.execute();
     return result || coinPriceCurrencyDisabledValue;
   }
