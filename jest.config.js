@@ -5,7 +5,7 @@ module.exports = {
     '\\.png$': 'lodash/noop.js',
   },
   transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!yoroi-extension-ledger-bridge)'
+    '<rootDir>/node_modules/(?!yoroi-extension-ledger-connector)'
   ],
   setupFiles: [
     'jest-canvas-mock'

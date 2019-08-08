@@ -1,7 +1,7 @@
 // @flow
 import {
   LedgerBridge,
-} from 'yoroi-extension-ledger-bridge';
+} from 'yoroi-extension-ledger-connector';
 
 const LEDGER_BRIDGE_CHECK_INTERVAL = 500; // in ms (1000ms = 1sec)
 const LEDGER_BRIDGE_CHECK_COUNT = 10;

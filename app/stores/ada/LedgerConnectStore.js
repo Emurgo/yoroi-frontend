@@ -6,7 +6,7 @@ import { observable, action } from 'mobx';
 import {
   LedgerBridge,
   makeCardanoAccountBIP44Path,
-} from 'yoroi-extension-ledger-bridge';
+} from 'yoroi-extension-ledger-connector';
 import type {
   GetVersionResponse,
   GetExtendedPublicKeyResponse,
