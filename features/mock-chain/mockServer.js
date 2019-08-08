@@ -13,6 +13,7 @@ import type {
 } from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
 import mockImporter from './mockImporter';
+import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';
 
 const port = 8080;
 
@@ -170,6 +171,8 @@ export function getMockServer(
       const isServerOk = mockImporter.getApiStatus();
       res.send({ isServerOk });
     });
+
+    installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(port, () => {
       console.log(`JSON Server is running at ${port}`);
