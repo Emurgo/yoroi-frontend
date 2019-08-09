@@ -19,7 +19,7 @@ import { generateTransferTx } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
 import { getReceiverAddress } from '../../api/ada/lib/storage/adaAddress';
-import { getCryptoWalletFromMasterKey } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { getCryptoWalletFromEncryptedMasterKey } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
@@ -105,7 +105,7 @@ export default class YoroiTransferStore extends Store {
 
     updateStatusCallback();
 
-    const cryptoWallet = getCryptoWalletFromMasterKey(masterKey);
+    const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(masterKey, '');
     const addressKeys = {};
     addresses.forEach(({ address, accountIndex, addressType, index }) => {
       const account = cryptoWallet.bip44_account(
