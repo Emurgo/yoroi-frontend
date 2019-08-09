@@ -7,7 +7,7 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
-import type { CoinPriceResponse } from '../../api/ada/lib/state-fetch/types';
+import type { CurrentCoinPriceResponse } from '../../api/ada/lib/state-fetch/types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -43,8 +43,7 @@ export default class CoinPriceStore extends Store {
   @action _refreshCoinPrice = async (): Promise<void> => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
-      const response: CoinPriceResponse = await stateFetcher.getCoinPrice({
-        time: 'current',
+      const response: CurrntCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
         from: 'ADA',
       });
       if (response.error !== null) {

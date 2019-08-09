@@ -9,6 +9,7 @@ import type {
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
   ServerStatusResponse,
+  CurrentCoinPriceRequest, CurrentCoinPriceResponse,
   AddressUtxoFunc,
   FilterFunc,
   HistoryFunc,
@@ -86,8 +87,8 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher.checkServerStatus()
   )
 
-  getCoinPrice = (body: CoinPriceRequest): Promise<CoinPriceResponse> => (
-    this.baseFetcher.getCoinPrice(body)
+  getCurrentCoinPrice = (body: CoinPriceRequest): Promise<CoinPriceResponse> => (
+    this.baseFetcher.getCurrentCoinPrice(body)
   )
 }
 

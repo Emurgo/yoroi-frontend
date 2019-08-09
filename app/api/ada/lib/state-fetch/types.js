@@ -65,3 +65,21 @@ export type ServerStatusResponse = {
   isServerOk: boolean
 };
 export type ServerStatusFunc = () => Promise<ServerStatusResponse>;
+
+// getCurrentCoinPrice
+
+type Ticker = {|
+  from: string,
+  to: string,
+  price: number
+|};
+
+export type CurrentCoinPriceRequest = {|
+  from: string
+|};
+export CurrentCoinPriceResponse = {|
+  error: string,
+  timestamp?: number,
+  tickers?: Array<Ticker>
+|};
+export type CoinPriceFunc = (body: CurrentPriceRequest) => Promise<CurrentCoinPriceResponse>;
