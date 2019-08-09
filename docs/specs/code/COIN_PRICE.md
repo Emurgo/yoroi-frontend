@@ -71,7 +71,7 @@ The frontend refreshes the current ADA price at 15 minute interval by querying t
 
 The backend refreshes the current ADA price at 15 minute interval by querying the API. So the freshness of the price data from the user's perspective is 15 minutes + 15 minutes = 30 minutes. The backend stores the timestamped price data in a historical price database.
 
-At deployment time, a script will be run and it will query the API for historical price data, since the day when ADA began be traded (Oct 2, 2017), and store the data in the historical price database.
+At deployment time, a script will be run and it will query the API for historical price data, since the day when ADA began to be traded (Oct 2, 2017), and store the data in the historical price database.
 
 When the frontend shows a transaction it will query the backend for the price at the moment of the transaction. The backend will look into the historical price database and use the price at the closest time point. The frontend will cache the price data in web storage.
 
@@ -86,6 +86,13 @@ and https://exchangeratesapi.io/ for the exchange rate between USD and every fia
 # Risk
 
 This feature does open new attack vector, for example: an attacker can engage a transaction with a victim and by hacking the backend and manipulate the conversion rate, trick the victim into transferring more Ada than the intended amount.
+
+To reduce the risk, the backend will be divided into two components: a service and a data-fetcher. The service:
+1. Serves coin price queries from the frontend, using data out of its database.
+2. Accepts price data updates from the data-fetcher.
+
+The data-fetcher fetches price data from the API and notifies the service. The data-fetcher signs the data with a private key and the signatures are passed along the service to the frontend. Upon receiving price data, the frontend verifies the signatures with the corresponding public key. This scheme improve security because in case the service is comporised, because it doesn't have the private key used to sign data, the forgery will be detected by the frontend. In order to forge price data, an attack will have to comprise the data-fetcher, which is harder because the data-fetcher is not exposed to the network.
+
 
 # Principles
 
