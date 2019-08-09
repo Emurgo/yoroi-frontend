@@ -9,6 +9,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse,
   ServerStatusResponse,
   CurrentCoinPriceRequest, CurrentCoinPriceResponse,
+  HistoricalCoinPriceRequest, HistoricalCoinPriceResponse,
 } from './types';
 
 import type { IFetcher } from './IFetcher';
@@ -28,6 +29,7 @@ import {
   InvalidWitnessError,
   ServerStatusError,
   CurrentCoinPriceError,
+  HistoricalCoinPriceError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -204,4 +206,16 @@ export class RemoteFetcher implements IFetcher {
         throw new CurrentCoinPriceError();
       })
   )
+
+  getHistoricalCoinPrice = (body: HistoricalCoinPriceRequest): Promise<HistoricalCoinPriceResponse> => (
+    axios(`${priceBackendUrl}/price/${body.from}/${body.timestamps.join(',')}`, 
+      { 
+        method: 'get' 
+      }).then(response => response.data)
+      .catch(error => {
+        Logger.error('RemoteFetcher::getHistoricalCoinPrice error: ' + stringifyError(error));
+        throw new HistoricalCoinPriceError();
+      })
+  )
+
 }

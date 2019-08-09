@@ -74,6 +74,7 @@ export default class WalletSummaryPage extends Component<Props> {
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
+            coinPriceCurrencySetting={profile.coinPriceCurrency}o
           />
         );
       } else if (!hasAny) {

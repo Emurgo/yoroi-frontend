@@ -148,6 +148,10 @@ const messages = defineMessages({
     id: 'api.errors.currentCoinPriceError',
     defaultMessage: '!!!Current coin price data not available now.',
   },
+  historicalCoinPriceError: {
+    id: 'api.errors.histoicalCoinPriceError',
+    defaultMessage: '!!!Historical coin price data not available now.',
+  },
 });
 
 export class WalletAlreadyImportedError extends LocalizableError {
@@ -470,6 +474,15 @@ export class CurrentCoinPriceError extends LocalizableError {
     super({
       id: messages.currentCoinPriceError.id,
       defaultMessage: messages.currentCoinPriceError.defaultMessage || '',
+    });
+  }
+}
+
+export class HistoricalCoinPriceError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.historicalCoinPriceError.id,
+      defaultMessage: messages.historicalCoinPriceError.defaultMessage || '',
     });
   }
 }

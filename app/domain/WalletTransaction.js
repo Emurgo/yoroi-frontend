@@ -3,6 +3,7 @@ import { observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
+import type { Ticker } from '../types/coinPriceType';
 
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
 
@@ -36,6 +37,8 @@ export default class WalletTransaction {
   @observable numberOfConfirmations: number = 0;
   @observable addresses: TrasactionAddresses = { from: [], to: [] };
   @observable state: TransactionState;
+  // Price data at the moment of the transaction. Used to show amount and fee in other currencies.
+  @observable tickers: Array<Ticker> = null;
 
   constructor(data: {
     id: string,

@@ -119,6 +119,7 @@ type Props = {|
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
+  coinPriceCurrencySetting: CoinPriceCurrencySettingType,
 |};
 
 type State = {
@@ -177,7 +178,13 @@ export default class Transaction extends Component<Props, State> {
 
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
+    const {
+      isLastInList,
+      state,
+      assuranceLevel,
+      formattedWalletAmount,
+      coinPriceCurrencySetting,
+    } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state === transactionStates.FAILED;
@@ -219,6 +226,18 @@ export default class Transaction extends Component<Props, State> {
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
     const symbol = adaSymbol;
 
+    let amountInSelectCurrency = null;
+    if (coinPriceCurrencySetting.enabled) {
+      let amount = '?';
+      if (data.tickers) {
+        const price = data.tickers.find(ticker => ticker.to === coinPriceCurrencySetting.currency).price;
+        amount = data.amount.multipliedBy(price).toString();
+      }
+      amountInSelectCurrency = (<div>
+        { amount + ' ' + coinPriceCurrencySetting.currency } 
+      </div>);
+    }
+
     return (
       <div className={componentStyles}>
 
@@ -246,6 +265,9 @@ export default class Transaction extends Component<Props, State> {
                   formattedWalletAmount(data.amount, false)
                 }
                 <SvgInline svg={symbol} className={styles.currencySymbol} />
+                {
+                  amountInSelectCurrency
+                }
               </div>
 
               <div className={styles.expandArrowBox}>

@@ -8,7 +8,6 @@ import type { GetTransactionsFunc, GetBalanceFunc,
   GetTransactionsRequest, GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc } from '../../api/ada';
 import environment from '../../environment';
-
 export default class TransactionsStore extends Store {
 
   /** How many transactions to display */
@@ -81,6 +80,13 @@ export default class TransactionsStore extends Store {
     const wallet = this.stores.substores[environment.API].wallets.active;
     if (!wallet) return [];
     const result = this._getTransactionsRecentRequest(wallet.id).result;
+    if (result) {
+      const transactionsWithoutPriceData = result.transactions.filter(tx => !tx.tickers);
+      if (transactionsWithoutPriceData.length) {
+        const coinPriceStore = this.stores.substores[environment.API].coinPriceStore;
+        coinPriceStore.updateTransactionPriceData(transactionsWithoutPriceData);
+      }
+    }
     return result ? result.transactions : [];
   }
 

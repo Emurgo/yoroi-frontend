@@ -78,8 +78,23 @@ export type CurrentCoinPriceRequest = {|
   from: string
 |};
 export CurrentCoinPriceResponse = {|
-  error: string,
+  error: ?string,
   timestamp?: number,
   tickers?: Array<Ticker>
+|};
+export type CoinPriceFunc = (body: CurrentPriceRequest) => Promise<CurrentCoinPriceResponse>;
+
+// getHistoricalCoinPrice
+
+export type HistoricalCoinPriceRequest = {|
+  from: string,
+  timestamps: Array<number>
+|};
+export HistoricalCoinPriceResponse = {|
+  error: ?string,
+  timestamped_tickers?: Array<{|
+    timestamp?: number,
+    tickers?: Array<Ticker>
+  |}
 |};
 export type CoinPriceFunc = (body: CurrentPriceRequest) => Promise<CurrentCoinPriceResponse>;
