@@ -22,7 +22,6 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
-import { calcMaxBeforeDot } from '../../../utils/validations';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
@@ -201,16 +200,11 @@ export default class DelegationTxDialog extends Component<Props> {
           <NumericInput
             className="amount"
             label={intl.formatMessage(globalMessages.amountLabel)}
-            maxBeforeDot={calcMaxBeforeDot(
-              this.props.getTokenInfo(
+            numberLocaleOptions={{
+              minimumFractionDigits: this.props.getTokenInfo(
                 this.props.amountToDelegate.getDefaultEntry()
-              ).Metadata.numberOfDecimals
-            )}
-            maxAfterDot={
-              this.props.getTokenInfo(
-                this.props.amountToDelegate.getDefaultEntry()
-              ).Metadata.numberOfDecimals
-            }
+              ).Metadata.numberOfDecimals,
+            }}
             disabled
             // AmountInputSkin props
             currency={getTokenName(
@@ -222,7 +216,7 @@ export default class DelegationTxDialog extends Component<Props> {
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
             total=""
-            value={formatValue(this.props.amountToDelegate.getDefaultEntry())}
+            value={this.props.amountToDelegate.getDefaultEntry().amount.toNumber()}
             skin={AmountInputSkin}
             classicTheme={this.props.classicTheme}
           />

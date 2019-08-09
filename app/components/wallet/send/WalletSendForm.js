@@ -11,7 +11,7 @@ import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import { isValidMemoOptional, isValidMemo, calcMaxBeforeDot } from '../../../utils/validations';
+import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import AmountInputSkin from '../skins/AmountInputSkin';
@@ -202,20 +202,20 @@ export default class WalletSendForm extends Component<Props> {
             ? formatValue(
               this.props.uriParams.amount.getDefaultEntry(),
             )
-            : ''
+            : null
         })(),
         validators: [async ({ field }) => {
           if (this.props.shouldSendAll) {
             // sendall doesn't depend on the amount so always succeed
             return true;
           }
-          const amountValue = field.value;
-          if (amountValue === '') {
+
+          if (field.value === null) {
             this.props.updateAmount();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           const formattedAmount = formattedAmountToNaturalUnits(
-            amountValue,
+            field.value.toString(),
             this.props.defaultToken.Metadata.numberOfDecimals,
           );
           const isValidAmount = await this.props.validateAmount(
@@ -336,8 +336,9 @@ export default class WalletSendForm extends Component<Props> {
               {...amountFieldProps}
               className="amount"
               label={intl.formatMessage(globalMessages.amountLabel)}
-              maxBeforeDot={calcMaxBeforeDot(this.props.defaultToken.Metadata.numberOfDecimals)}
-              maxAfterDot={this.props.defaultToken.Metadata.numberOfDecimals}
+              numberLocaleOptions={{
+                minimumFractionDigits: this.props.defaultToken.Metadata.numberOfDecimals,
+              }}
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props

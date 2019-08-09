@@ -18,7 +18,6 @@ import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { formattedAmountToNaturalUnits } from '../../utils/formatters';
 import config from '../../config';
-import { calcMaxBeforeDot } from '../../utils/validations';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 
 import styles from './URIGenerateDialog.scss';
@@ -83,14 +82,13 @@ export default class URIGenerateDialog extends Component<Props> {
       amount: {
         label: this.getAmountLabel(),
         placeholder: `0.${'0'.repeat(this.props.tokenInfo.Metadata.numberOfDecimals)}`,
-        value: '',
+        value: null,
         validators: [async ({ field }) => {
-          const amountValue = field.value;
-          if (amountValue === '') {
+          if (field.value === null) {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           const formattedAmount = formattedAmountToNaturalUnits(
-            amountValue,
+            field.value.toString(),
             this.props.tokenInfo.Metadata.numberOfDecimals
           );
           return await this.props.validateAmount(formattedAmount, this.props.tokenInfo);
@@ -158,8 +156,9 @@ export default class URIGenerateDialog extends Component<Props> {
               {...amountField.bind()}
               label={this.getAmountLabel()}
               error={amountField.error}
-              maxBeforeDot={calcMaxBeforeDot(this.props.tokenInfo.Metadata.numberOfDecimals)}
-              maxAfterDot={this.props.tokenInfo.Metadata.numberOfDecimals}
+              numberLocaleOptions={{
+                minimumFractionDigits: this.props.tokenInfo.Metadata.numberOfDecimals,
+              }}
               skin={InputOwnSkin}
               done={amountField.isValid}
               classicTheme={classicTheme}

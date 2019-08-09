@@ -23,7 +23,6 @@ import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
-import { calcMaxBeforeDot, } from '../../../utils/validations';
 import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
@@ -148,8 +147,9 @@ export default class VotingRegTxDialog extends Component<Props> {
           <NumericInput
             className="amount"
             label={intl.formatMessage(globalMessages.amountLabel)}
-            maxBeforeDot={calcMaxBeforeDot(tokenInfo.Metadata.numberOfDecimals)}
-            maxAfterDot={tokenInfo.Metadata.numberOfDecimals}
+            numberLocaleOptions={{
+              minimumFractionDigits: tokenInfo.Metadata.numberOfDecimals,
+            }}
             disabled
             // AmountInputSkin props
             currency={getTokenName(tokenInfo)}
@@ -157,8 +157,7 @@ export default class VotingRegTxDialog extends Component<Props> {
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
             total=""
-            value={new BigNumber(0).toFormat(tokenInfo.Metadata.numberOfDecimals)
-            }
+            value={new BigNumber(0).toNumber()}
             skin={AmountInputSkin}
             classicTheme={this.props.classicTheme}
           />

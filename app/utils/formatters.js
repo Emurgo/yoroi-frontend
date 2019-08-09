@@ -27,9 +27,12 @@ export const formattedAmountWithoutLovelace = (amount: BigNumber): string => (
 );
 
 /** removes commas */
-export const formattedAmountToBigNumber = (amount: string): BigNumber => {
-  const cleanedAmount = amount.replace(/,/g, '');
-  return new BigNumber(cleanedAmount !== '' ? cleanedAmount : 0);
+export const formattedAmountToBigNumber: string => BigNumber = (amount) => {
+  try {
+    return new BigNumber(amount);
+  } catch (error) {
+    return new BigNumber(0);
+  }
 };
 
 /**
