@@ -81,11 +81,9 @@ export default class TransactionsStore extends Store {
     if (!wallet) return [];
     const result = this._getTransactionsRecentRequest(wallet.id).result;
     if (result) {
-      const transactionsWithoutPriceData = result.transactions.filter(tx => !tx.tickers);
-      if (transactionsWithoutPriceData.length) {
-        const coinPriceStore = this.stores.substores[environment.API].coinPriceStore;
-        coinPriceStore.updateTransactionPriceData(transactionsWithoutPriceData);
-      }
+      const coinPriceStore = this.stores.substores[environment.API].coinPriceStore;
+      coinPriceStore.updateTransactionPriceData(result.transactions);
+
     }
     return result ? result.transactions : [];
   }

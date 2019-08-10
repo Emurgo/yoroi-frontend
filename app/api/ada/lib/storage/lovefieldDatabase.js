@@ -61,6 +61,18 @@ const txAddressesTableSchema = {
   }
 };
 
+export type PriceDataCacheTableRow = {
+  timestamp: number,
+  dataJson: string
+}
+const priceDataCacheTableSchema = {
+  name: 'PriceDataCache',
+  properties: {
+    timestamp: 'timestamp',
+    dataJson: 'dataJson'
+  }
+};
+
 let db;
 
 /** Ensure we are only creating a single instance of the lovefield database */
@@ -108,6 +120,11 @@ export const loadLovefieldDB = (
       ref: `${txsTableSchema.name}.${txsTableSchema.properties.id}`
     });
 
+  schemaBuilder.createTable(priceDataCacheTableSchema.name)
+    .addColumn(priceDataCacheTableSchema.properties.timestamp, Type.NUMBER)
+    .addColumn(priceDataCacheTableSchema.properties.dataJson, Type.STRING)
+    .addPrimaryKey([priceDataCacheTableSchema.properties.timestamp]);
+
   return schemaBuilder.connect(options).then(newDb => {
     db = newDb;
     return db;
@@ -125,12 +142,14 @@ export const reset = (): Promise<void> => {
   const txsTable = _getTxsTable();
   const addressesTable = _getAddressesTable();
   const txAddressesTable = _getTxAddressesTable();
+  const priceDataCacheTable = _getPriceDataCacheTable();
 
   // have to drop txAddresses first because of foreign keys
   return db.delete().from(txAddressesTable).exec().then(() => (
     Promise.all([
       db.delete().from(addressesTable).exec(),
       db.delete().from(txsTable).exec(),
+      db.delete().from(priceDataCacheTable).exec(),
     ])
   ));
 };
@@ -327,6 +346,28 @@ const _addressToRow = (
   return _getAddressesTable().createRow(newRow);
 };
 
+export const cachePriceData = async (timestamp: number, data: mixed): void => {
+  const rows = [
+    _getPriceDataCacheTable().createRow({
+      timestamp,
+      dataJson: JSON.stringify(data) 
+    })
+  ];
+  await db.insert().into(_getPriceDataCacheTable()).values(rows).exec();
+}
+
+export const getCachedPriceData = async (timestamp: number): mixed => {
+  const table = _getPriceDataCacheTable()
+  const rows = await db.select().from(table)
+    .where(table[priceDataCacheTableSchema.properties.timestamp].eq(timestamp))
+    .exec();
+
+  if (rows.length) {
+    return JSON.parse(rows[0].dataJson);
+  }
+  return null;
+}
+
 /* Helper functions */
 
 const _insertOrReplaceQuery = (rows: Array<AddressesTableRow|TxsTableRow>, table) => (
@@ -340,3 +381,5 @@ const _getTxsTable = () => _getTable(txsTableSchema.name);
 const _getAddressesTable = () => _getTable(addressesTableSchema.name);
 
 const _getTxAddressesTable = () => _getTable(txAddressesTableSchema.name);
+
+const _getPriceDataCacheTable = () => _getTable(priceDataCacheTableSchema.name);

@@ -12,6 +12,9 @@ import type {
   HistoricalCoinPriceResponse,
 } from '../../api/ada/lib/state-fetch/types';
 import WalletTransaction from '../../domain/WalletTransaction';
+import {
+  cachePriceData
+} from '../../api/ada/lib/storage/lovefieldDatabase.js';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -77,6 +80,11 @@ export default class CoinPriceStore extends Store {
   }
 
   async updateTransactionPriceData(transactions: Array<WalletTransaction>): void {
+    transactions = transactions.filter(tx => tx.tickers === null);
+    if (!transactions.length) {
+      return;
+    }
+
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const timestamps = transactions.map(tx => tx.date.valueOf());
     try {
@@ -88,10 +96,13 @@ export default class CoinPriceStore extends Store {
       if (response.timestamped_tickers.length !== transactions.length) {
         throw new Error('historical coin price query error: data length mismatch');
       }
-      runInAction(() => {
-        transactions.forEach((tx, i) => {
-          tx.tickers = response.timestamped_tickers[i].tickers;
+      
+      transactions.forEach((tx, i) => {
+        const tickers = response.timestamped_tickers[i].tickers
+        runInAction(() => {
+          tx.tickers = tickers;
         });
+        cachePriceData(tx.date.valueOf(), tickers); 
       });
     } catch (error) {
       Logger.error('CoinPriceStore::updateTransactionPriceData: ' + stringifyError(error))

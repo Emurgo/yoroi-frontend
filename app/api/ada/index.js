@@ -113,6 +113,7 @@ import {
   reset,
   importLovefieldDatabase,
   exportLovefieldDatabase,
+  getCachedPriceData,
 } from './lib/storage/lovefieldDatabase';
 import type {
   FilterFunc,
@@ -740,7 +741,8 @@ export default class AdaApi {
 
       const mappedTransactions = transactions.map(async data => {
         const { type, amount, fee } = await _getTxFinancialInfo(data);
-        return _createTransactionFromServerData(data, type, amount, fee);
+        const tickers = await getCachedPriceData(data.ctMeta.ctmDate);
+        return _createTransactionFromServerData(data, type, amount, fee, tickers);
       });
       return Promise.all(mappedTransactions).then(mappedTxs => Promise.resolve({
         transactions: mappedTxs,
@@ -759,7 +761,8 @@ export default class AdaApi {
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
       return Promise.all(pendingTxs.map(async data => {
         const { type, amount, fee } = await _getTxFinancialInfo(data);
-        return _createTransactionFromServerData(data, type, amount, fee);
+        const tickers = await getCachedPriceData(data.ctMeta.ctmDate);
+        return _createTransactionFromServerData(data, type, amount, fee, tickers);
       }));
     } catch (error) {
       Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
@@ -1619,7 +1622,7 @@ const _conditionToTxState = (condition: AdaTransactionCondition) => {
 
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
-  (data: AdaTransaction, type: TransactionDirectionType, amount: BigNumber, fee: BigNumber) => {
+  (data: AdaTransaction, type: TransactionDirectionType, amount: BigNumber, fee: BigNumber, tickers: Array<Ticker>) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,
@@ -1634,7 +1637,8 @@ const _createTransactionFromServerData = action(
         from: data.ctInputs.map(address => address[0]),
         to: data.ctOutputs.map(address => address[0])
       },
-      state: _conditionToTxState(data.ctCondition)
+      state: _conditionToTxState(data.ctCondition),
+      tickers
     });
   }
 );
