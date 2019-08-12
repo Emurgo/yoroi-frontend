@@ -18,6 +18,7 @@ import type {
 } from '../../api/localStorage/index';
 import { coinPriceCurrencyDisabledValue } from '../../types/coinPriceType';
 import type { CoinPriceCurrencySettingType } from '../../types/coinPriceType';
+import { SUPPORTED_CURRENCIES } from '../../config/coinPrice';
 
 export default class ProfileStore extends Store {
 
@@ -40,14 +41,7 @@ export default class ProfileStore extends Store {
       : [])
   ];
 
-  COIN_PRICE_CURRENCY_OPTIONS = [
-    { symbol: 'USD' },
-    { symbol: 'SGD' },
-    { symbol: 'JPY' },
-    { symbol: 'EUR' },
-    { symbol: 'GBP' },
-    { symbol: 'AUD' },
-  ];
+  COIN_PRICE_CURRENCY_OPTIONS = SUPPORTED_CURRENCIES;
 
   /**
    * Need to store the selected language in-memory for when the user
