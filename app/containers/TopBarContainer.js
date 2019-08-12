@@ -35,6 +35,7 @@ export default class TopBarContainer extends Component<Props> {
       }}
       onUpdateHideBalance={this.updateHideBalance}
       shouldHideBalance={profile.shouldHideBalance}
+      coinPriceCurrencySetting={profile.coinPriceCurrency}
     />);
     return (
       <TopBar

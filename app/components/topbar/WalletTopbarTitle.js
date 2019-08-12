@@ -13,7 +13,7 @@ import type { WalletAccount } from '../../domain/Wallet';
 import { defineMessages, intlShape } from 'react-intl';
 import hideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
 import showBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
-
+import type { CoinPriceCurrencySettingType } from '../../../types/coinPriceType';
 
 const messages = defineMessages({
   totalBalance: {
@@ -31,7 +31,8 @@ type Props = {|
     identiconSaturationFactor: number,
   },
   onUpdateHideBalance: Function,
-  shouldHideBalance: boolean
+  shouldHideBalance: boolean,
+  coinPriceCurrencySetting: CoinPriceCurrencySettingType,
 |};
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<'div'>] {
@@ -63,7 +64,7 @@ export default class WalletTopbarTitle extends Component<Props> {
   render() {
     const {
       wallet, coinPrice, account, currentRoute, formattedWalletAmount, themeProperties,
-      shouldHideBalance, onUpdateHideBalance
+      shouldHideBalance, onUpdateHideBalance, coinPriceCurrencySetting
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
     const { intl } = this.context;
@@ -93,8 +94,13 @@ export default class WalletTopbarTitle extends Component<Props> {
               wallet && formattedWalletAmount(wallet.amount)
             }
             { ' '+currency }
-            /
-            { wallet.amount.multipliedBy(coinPrice.getCurrentPrice(currency, 'USD')).toString() + ' USD'  }
+            {coinPriceCurrencySetting.enabled ? 
+              (<span>
+                / {wallet.amount.multipliedBy(coinPrice.getCurrentPrice(currency, coinPriceCurrencySetting.currency)).toString()}
+                {coinPriceCurrencySetting.currency}
+              </span>) :
+              null
+            }
           </div>
           <div className={styles.walletAmountLabelBlock}>
             <div className={styles.walletAmountLabel}>
