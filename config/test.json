@@ -3,7 +3,8 @@
     "protocolMagic": 633343913,
     "backendUrl": "http://localhost:8080",
     "websocketUrl": "ws://localhost:8080",
-    "name": "test"
+    "name": "test",
+    "priceBackendUrl": "http://localhost:8081"
   },
   "app": {
     "walletRefreshInterval": 2000,
@@ -12,6 +13,9 @@
     "logsFileSuffix": "-yoroi.log",
     "addressScanSize": 20,
     "addressRequestSize": 50,
-    "txsBodiesRequestSize": 150
+    "txsBodiesRequestSize": 150,
+    "coinPriceRefreshInterval": 600000,
+    "coinPriceFreshnessThreshold": 1800000,
+    "coinPriceRequestRetryDelay": 10000
   }
 }

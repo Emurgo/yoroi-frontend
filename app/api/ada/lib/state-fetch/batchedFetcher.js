@@ -85,6 +85,10 @@ export class BatchedFetcher implements IFetcher {
   checkServerStatus = (): Promise<ServerStatusResponse> => (
     this.baseFetcher.checkServerStatus()
   )
+
+  getCoinPrice = (body: CoinPriceRequest): Promise<CoinPriceResponse> => (
+    this.baseFetcher.getCoinPrice(body)
+  )
 }
 
 /** Sum up the UTXO for a list of addresses by batching backend requests */

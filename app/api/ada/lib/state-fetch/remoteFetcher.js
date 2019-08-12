@@ -26,12 +26,14 @@ import {
   CheckAdressesInUseApiError,
   InvalidWitnessError,
   ServerStatusError,
+  CoinPriceError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
+const priceBackendUrl = CONFIG.network.priceBackendUrl;
 
 /**
  * Makes calls to Yoroi backend service
@@ -188,6 +190,17 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::checkServerStatus error: ' + stringifyError(error));
         throw new ServerStatusError();
+      })
+  )
+
+  getCoinPrice = (body: CoinPriceRequest): Promise<CoinPriceResponse> => (
+    axios(`${priceBackendUrl}/price/${body.time}/${body.from}`, 
+      { 
+        method: 'get' 
+      }).then(response => response.data)
+      .catch(error => {
+        Logger.error('RemoteFetcher::getCoinPrice error: ' + stringifyError(error));
+        throw new CoinPriceError();
       })
   )
 }

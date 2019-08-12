@@ -62,7 +62,7 @@ export default class WalletTopbarTitle extends Component<Props> {
 
   render() {
     const {
-      wallet, account, currentRoute, formattedWalletAmount, themeProperties,
+      wallet, coinPrice, account, currentRoute, formattedWalletAmount, themeProperties,
       shouldHideBalance, onUpdateHideBalance
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
@@ -73,7 +73,7 @@ export default class WalletTopbarTitle extends Component<Props> {
     const showWalletInfo = walletRoutesMatch && wallet;
 
     const isHardwareWallet = (wallet && wallet.type) === WalletTypeOption.HARDWARE_WALLET;
-    const currency = ' ADA';
+    const currency = 'ADA';
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
     const [accountPlateId, iconComponent] = account ?
       constructPlate(account, identiconSaturationFactor, iconDivClass)
@@ -92,7 +92,9 @@ export default class WalletTopbarTitle extends Component<Props> {
               <span className={styles.hiddenWalletAmount}>******</span> :
               wallet && formattedWalletAmount(wallet.amount)
             }
-            { currency }
+            { ' '+currency }
+            /
+            { wallet.amount.multipliedBy(coinPrice.getCurrentPrice(currency, 'USD')).toString() + ' USD'  }
           </div>
           <div className={styles.walletAmountLabelBlock}>
             <div className={styles.walletAmountLabel}>

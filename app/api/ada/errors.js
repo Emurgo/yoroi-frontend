@@ -143,7 +143,11 @@ const messages = defineMessages({
   serverStatusError: {
     id: 'api.errors.serverStatusError',
     defaultMessage: '!!!Connection to the server failed. Please check your internet connection or our Twitter account (https://twitter.com/YoroiWallet).',
-  }
+  },
+  coinPriceError: {
+    id: 'api.errors.coinPriceError',
+    defaultMessage: '!!!Coin price data not available now.',
+  },
 });
 
 export class WalletAlreadyImportedError extends LocalizableError {
@@ -457,6 +461,15 @@ export class ServerStatusError extends LocalizableError {
     super({
       id: messages.serverStatusError.id,
       defaultMessage: messages.serverStatusError.defaultMessage || '',
+    });
+  }
+}
+
+export class CoinPriceError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.coinPriceError.id,
+      defaultMessage: messages.coinPriceError.defaultMessage || '',
     });
   }
 }
