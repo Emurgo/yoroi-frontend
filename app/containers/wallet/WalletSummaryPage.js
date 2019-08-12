@@ -104,6 +104,7 @@ export default class WalletSummaryPage extends Component<Props> {
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
           openExportTxToFileDialog={this.openExportTransactionDialog}
+          coinPriceCurrencySetting={profile.coinPriceCurrency}
         />
 
         {walletTransactions}

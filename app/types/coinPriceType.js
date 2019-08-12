@@ -15,3 +15,8 @@ export const coinPriceCurrencyDisabledValue: CoinPriceCurrencySettingType = {
   enabled: false,
   currency: null
 };
+
+export function getPrice(fromCurrency: string, toCurrency: string, tickers: Array<Ticker>) {
+  return tickers.find(ticker => (ticker.from === fromCurrency) &&
+    (ticker.to === toCurrency)).price;
+};

@@ -9,6 +9,7 @@ import BorderedBox from '../../widgets/BorderedBox';
 import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import styles from './WalletSummary.scss';
+import type { CoinPriceCurrencySettingType } from '../../../types/coinPriceType';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -34,6 +35,7 @@ type Props = {|
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
   openExportTxToFileDialog: Function,
+  coinPriceCurrencySetting: CoinPriceCurrencySettingType,
 |};
 
 @observer
@@ -49,6 +51,7 @@ export default class WalletSummary extends Component<Props> {
       numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
+      coinPriceCurrencySetting,
     } = this.props;
     const { intl } = this.context;
 
@@ -62,6 +65,12 @@ export default class WalletSummary extends Component<Props> {
                 {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
                 : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
                 <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
+                {pendingAmount.incomingInSelectedCurrency && coinPriceCurrencySetting.enabled ? 
+                  (<span>
+                    / {pendingAmount.incomingInSelectedCurrency.toString()}
+                    {coinPriceCurrencySetting.currency}
+                  </span>) : ''
+                }
               </div>
             }
             {pendingAmount.outgoing.isGreaterThan(0) &&
@@ -69,6 +78,12 @@ export default class WalletSummary extends Component<Props> {
                 {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
                 : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
                 <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
+                {pendingAmount.outgoingInSelectedCurrency && coinPriceCurrencySetting.enabled ? 
+                  (<span>
+                    / {pendingAmount.outgoingInSelectedCurrency.toString()}
+                    {coinPriceCurrencySetting.currency}
+                  </span>) : ''
+                }
               </div>
             }
             {!isLoadingTransactions ? (

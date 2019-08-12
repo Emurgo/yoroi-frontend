@@ -16,6 +16,7 @@ import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
 import { transactionTypes } from '../../domain/WalletTransaction';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
+import { getPrice } from '../../types/coinPriceType';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
@@ -54,6 +55,11 @@ export default class AdaTransactionsStore extends TransactionsStore {
       total: new BigNumber(0),
       incoming: new BigNumber(0),
       outgoing: new BigNumber(0),
+      // If any of the below values becomes null, it means price data are
+      // unavailable for at least one of the transaction in the category
+      // and we just give up calculating the value.
+      incomingInSelectedCurrency: new BigNumber(0),
+      outgoingInSelectedCurrency: new BigNumber(0),
     };
 
     // Get current wallet
@@ -63,6 +69,8 @@ export default class AdaTransactionsStore extends TransactionsStore {
     // Get current transactions for wallet
     const result = this._getTransactionsAllRequest(wallet.id).result;
     if (!result || !result.transactions) return unconfirmedAmount;
+
+    const coinPriceCurrency = this.stores.profile.coinPriceCurrency;
 
     for (const transaction of result.transactions) {
       if (transaction.getAssuranceLevelForMode(wallet.assuranceMode) !== assuranceLevels.HIGH) {
@@ -74,6 +82,17 @@ export default class AdaTransactionsStore extends TransactionsStore {
           unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.plus(
             transaction.amount.absoluteValue()
           );
+
+          if (coinPriceCurrency.enabled && unconfirmedAmount.outgoingInSelectedCurrency) {
+            if (transaction.tickers) {
+              const price = getPrice('ADA', coinPriceCurrency.currency, transaction.tickers);
+              unconfirmedAmount.outgoingInSelectedCurrency =
+                unconfirmedAmount.outgoingInSelectedCurrency.plus(
+                  transaction.amount.absoluteValue().multipliedBy(price));
+            } else {
+              unconfirmedAmount.outgoingInSelectedCurrency = null;
+            }
+          }
         }
 
         // incoming
@@ -81,6 +100,16 @@ export default class AdaTransactionsStore extends TransactionsStore {
           unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
             transaction.amount.absoluteValue()
           );
+          if (coinPriceCurrency.enabled && unconfirmedAmount.incomingInSelectedCurrency) {
+            if (transaction.tickers) {
+              const price = getPrice('ADA', coinPriceCurrency.currency, transaction.tickers);
+              unconfirmedAmount.incomingInSelectedCurrency =
+                unconfirmedAmount.incomingInSelectedCurrency.plus(
+                  transaction.amount.absoluteValue().multipliedBy(price));
+            } else {
+              unconfirmedAmount.incomingInSelectedCurrency = null;
+            }
+          }
         }
       }
     }

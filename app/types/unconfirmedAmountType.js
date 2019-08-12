@@ -5,4 +5,7 @@ export type UnconfirmedAmount = {
   total: BigNumber,
   incoming: BigNumber,
   outgoing: BigNumber,
+
+  incomingInSelectedCurrency: ?BigNumber,
+  outgoingInSelectedCurrency: ?BigNumber,
 }
