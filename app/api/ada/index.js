@@ -46,7 +46,7 @@ import {
   signTransaction,
 } from './adaTransactions/adaNewTransactions';
 import {
-  getCryptoWalletFromMasterKey,
+  getCryptoWalletFromEncryptedMasterKey,
   createAccountPlate,
   generateWalletMasterKey,
 } from './lib/cardanoCrypto/cryptoWallet';
@@ -789,7 +789,7 @@ export default class AdaApi {
       if (masterKey == null) {
         throw new Error('No master key stored');
       }
-      const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
+      const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(masterKey, password);
       const currAccount = getCurrentAccountIndex();
       if (currAccount == null) {
         throw new Error('no account selected');

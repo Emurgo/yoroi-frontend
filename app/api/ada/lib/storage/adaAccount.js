@@ -2,7 +2,7 @@
 
 // Wrapper for creating "accounts" as defined by bip44
 
-import { getCryptoWalletFromMasterKey } from '../cardanoCrypto/cryptoWallet';
+import { getCryptoWalletFromEncryptedMasterKey } from '../cardanoCrypto/cryptoWallet';
 
 import { RustModule } from '../cardanoCrypto/rustLoader';
 import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
@@ -13,7 +13,7 @@ export function createCryptoAccount(
   walletPassword: string,
   accountIndex: number
 ): CryptoAccount {
-  const cryptoWallet = getCryptoWalletFromMasterKey(encryptedMasterKey, walletPassword);
+  const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(encryptedMasterKey, walletPassword);
   // create a hardened account
   const account = cryptoWallet.bip44_account(
     RustModule.Wallet.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
