@@ -17,7 +17,6 @@
     "flow": "flow --show-all-errors .",
     "flow-install": "flow-typed install",
     "eslint": "eslint app features chrome scripts webpack/*.js",
-    "test-unit": "jest",
     "test-prepare": "npm run clean && npm run build -- --env 'test' && npm run compress-e2e-tests",
     "jest": "NODE_ENV=jest jest",
     "test-common": "cucumber-js --require-module '@babel/register' --compiler es6:@babel/register",

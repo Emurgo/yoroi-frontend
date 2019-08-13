@@ -79,7 +79,9 @@ export const loadLovefieldDB = (
     .addColumn(txsTableSchema.properties.date, Type.DATE_TIME)
     .addColumn(txsTableSchema.properties.lastUpdated, Type.DATE_TIME)
     .addColumn(txsTableSchema.properties.value, Type.OBJECT)
-    .addPrimaryKey([txsTableSchema.properties.id])
+    .addPrimaryKey(
+      ([txsTableSchema.properties.id]: Array<string>),
+    )
     .addIndex('idxDate', [txsTableSchema.properties.date], false, lf.Order.DESC);
 
   schemaBuilder.createTable(addressesTableSchema.name)
@@ -92,7 +94,9 @@ export const loadLovefieldDB = (
     .addColumn(txAddressesTableSchema.properties.id, Type.STRING)
     .addColumn(txAddressesTableSchema.properties.address, Type.STRING)
     .addColumn(txAddressesTableSchema.properties.tx, Type.STRING)
-    .addPrimaryKey([txAddressesTableSchema.properties.id])
+    .addPrimaryKey(
+      ([txAddressesTableSchema.properties.id]: Array<string>),
+    )
     // Address must also be part of the AddressesTable
     .addForeignKey('fkAddress', {
       local: txAddressesTableSchema.properties.address,
