@@ -71,7 +71,6 @@ We base our construction on COSE because all Cardano libraries already depend on
 Note that we do NOT follow the COSE specification exactly for the following reason:
 
 - We need to restrict the number of algorithms used to only ones that would already be required to provide base Cardano functionality (see E1).
-- We need to enforce the usage of a digest if the input string is not ASCII (see E3)
 - We need to prepend a CBOR tag to the beginning of the data we will sign (see S1)
 
 ### *CBOR Web Token (CWT)* [[RFC 8392](https://tools.ietf.org/html/rfc8392)]
@@ -112,6 +111,38 @@ Blake2b is a hash algorithm used commonly in Cardano. Notably, Blake2b-224, Blak
 ### base64url [[RFC 4648 section 5](https://tools.ietf.org/html/rfc4648#section-5)]
 
 `base64url` allows to encode bytes in a human-readable format that is also safe to pass in URLs.
+
+### Other blockchain standards
+
+Other blockchains have existing specifications for message signing, but they mostly revolve around scripts trying to validate messages. We don't leverage any of their work in particular but it may be of interest.
+
+- [BIP-137](https://github.com/bitcoin/bips/blob/master/bip-0137.mediawiki) - simply scheme for message signing that works with P2PKH, P2PSH and bech32
+- [BIP-322](https://github.com/kallewoof/bips/blob/master/bip-0322.mediawiki) - reuses Bitcoin script to process a generic signed message format
+
+- [EIP-191](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-191.md) - encode data for Ethereum contracts
+- [EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md) - encode structs for Ethereum contracts
+
+# Existing Code
+
+### Cryptography
+
+Cardano already allows message signing within the WASM bindings. Notably,
+
+1) [sign](https://github.com/input-output-hk/js-cardano-wasm/blob/master/cardano-wallet/src/lib.rs#L177)
+2) [verify](https://github.com/input-output-hk/js-cardano-wasm/blob/master/cardano-wallet/src/lib.rs#L232)
+
+You can see an example of these two functions [here](https://repl.it/repls/GlossyDarkgreenMethod)
+
+Even if you use cryptographically sound `sign` and `verify` functions, you still have the following problems:
+
+1) No human-recognizable prefix
+0) No error detection
+0) User could accidentally sign a transaction or a block thinking it's harmless data
+
+We also have a risk of a few different kinds of replay attacks
+
+4) A dapp asks person A to sign "BOB" and then another dapp asks user B to sign "BOB". B can just use the signature from A
+0) A dapp asks person A to sign "BOB" on testnet chain. Person B then sends this signed message to the same dapp running on mainnet (same argument applies to sidechains)
 
 # Message Signing Format
 
@@ -373,21 +404,25 @@ TODO
 
 ## More headers
 
+### Version
+
+The `Headers` for the body MUST have `version: uint` in the `unprotected` field. See Changelog section for possible versions.
+
 ### CWT
 
-CWT tags MAY be introduced inside `protected` headers as a CBOR map with the key `cwt`.
+CWT tags MAY be introduced inside `protected` headers as a CBOR map with the key `cwt`. It is RECOMMENDED to use these to avoid replay attacks
 
 ### Payload encoding
 
-To solve `E3`, `signed_message` body header MUST `is_ascii: bool` as a `protected` header which defined whether or not the bytes the `payload` should be considered as ASCII .
+To solve `E3`, `signed_message` body header MUST contain `is_ascii: bool` as a `protected` header which defined whether or not the bytes the `payload` should be considered as ASCII (note: is `is_ascii` is `false`, then the payload is UTF-8 as specified in the COSE spec)
 
 If the `payload` is not ASCII, hardware wallets MAY instead show the `Blake2b244` hash of the `payload` to users. `244` is used to produce a smaller hash (easier to verify on small screen).
 
 ## User-Facing Encoding
 
-Once we have our top-level `encrypted_message` or `signed_message` we need to encode them in way that can be displayed to users.
+Once we have our top-level `encrypted_message` or `signed_message` we need to encode them in way that can be displayed to users (doesn't need to be stored and can be inferred just from the data)
 
-We define the encoding in three parts `prefix || data || checksum`.
+We define the encoding in three parts `prefix || data || checksum` (where || means append)
 
 ### Prefix
 
@@ -403,7 +438,7 @@ Data is simply the `base64url` encoding of the message
 
 ### Checksum
 
-We use `CRC32` on the data for the checksum 
+We use `CRC32` on the data for the checksum
 
 # Other remarks
 
@@ -422,3 +457,9 @@ This specification leaves the following unresolved
 # Examples
 
 TODO
+
+# Changelog
+
+| version | description     |
+|---------|-----------------|
+| 1       | initial version |
