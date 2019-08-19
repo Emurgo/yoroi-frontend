@@ -1,9 +1,8 @@
 // @flow
-import { hot } from 'react-hot-loader/root';
+
 import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import { keys } from 'lodash';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
-import { Router } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
@@ -15,44 +14,51 @@ import fr from 'react-intl/locale-data/fr';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
-import { Routes } from './Routes';
-import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
-import { themeOverrides } from './themes/overrides';
-import { translations } from './i18n/translations';
-import type { StoresMap } from './stores';
-import type { ActionsMap } from './actions';
-import { changeToplevelTheme } from './themes';
-import ThemeManager from './ThemeManager';
-import environment from './environment';
+import { yoroiPolymorphTheme } from '../../app/themes/PolymorphThemes';
+import { themeOverrides } from '../../app/themes/overrides';
+import { translations, LANGUAGES } from '../../app/i18n/translations';
+import ThemeManager from '../../app/ThemeManager';
+import YoroiClassic from '../../app/themes/prebuilt/YoroiClassic';
+import YoroiModern from '../../app/themes/prebuilt/YoroiModern';
+import { changeToplevelTheme } from '../../app/themes';
+
+import { withKnobs, select } from '@storybook/addon-knobs';
+import { addDecorator } from '@storybook/react';
+
+/**
+ * This whole file is meant to mirror code in App.js
+ */
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
 
-@observer
-class App extends Component<{
-  stores: StoresMap,
-  actions: ActionsMap,
-  history: Object,
-}> {
+addDecorator(withKnobs);
+
+const themes = {
+  YoroiModern,
+  YoroiClassic
+};
+const themeNames = keys(themes);
+
+const langCode = LANGUAGES.map(item => item.value);
+
+type Props = {
+    children: any,
+};
+
+export default class StoryWrapper extends Component<Props> {
+
   render() {
-    const { stores, actions, history } = this.props;
-    const locale = stores.profile.currentLocale;
+    const { children: Story } = this.props;
+    const locale = select('Language', langCode, langCode[0]);
+    const currentTheme = select('Theme', themeNames, themeNames[0]);
 
     // Merged english messages with selected by user locale messages
     // In this case all english data would be overridden to user selected locale, but untranslated
     // (missed in object keys) just stay in english
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
-    const themeVars = Object.assign(
-      stores.profile.currentThemeVars,
-      {
-        // show wingdings on dev builds when no font is set to easily find
-        // missing font bugshowever, on production, we use Times New Roman
-        // which looks ugly but at least it's readable.
-        '--default-font': environment.isDev() ? 'wingdings' : 'Times New Roman',
-      }
-    );
-    const currentTheme = stores.profile.currentTheme;
+    const themeVars = Object.assign({}, themes[currentTheme]);
 
     changeToplevelTheme(currentTheme);
 
@@ -67,14 +73,10 @@ class App extends Component<{
           themeOverrides={themeOverrides(currentTheme)}
         >
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            <Router history={history}>
-              {Routes(stores, actions)}
-            </Router>
+            <Story />
           </IntlProvider>
         </ThemeProvider>
       </div>
     );
   }
 }
-
-export default hot(App);

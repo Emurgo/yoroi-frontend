@@ -1,15 +1,13 @@
 // @flow
 import { action, observable, computed, when, runInAction } from 'mobx';
-import { defineMessages } from 'react-intl';
 import Store from '../base/Store';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import { matchRoute } from '../../utils/routing';
 import { getURIParameters } from '../../utils/URIHandling';
 import type { UriParams } from '../../utils/URIHandling';
-import LocalizableError, {
-  localizedError
-} from '../../i18n/LocalizableError';
+import LocalizableError from '../../i18n/LocalizableError';
+import { UnableToLoadError } from '../../i18n/errors';
 import Request from '../lib/LocalizedRequest';
 import type { MigrationRequest } from '../../api';
 import { migrate } from '../../api';
@@ -17,13 +15,6 @@ import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-
-const messages = defineMessages({
-  unableToLoad: {
-    id: 'app.errors.unableToLoad',
-    defaultMessage: '!!!Unable to load!',
-  },
-});
 
 /** Load dependencies before launching the app */
 export default class LoadingStore extends Store {
@@ -74,7 +65,7 @@ export default class LoadingStore extends Store {
       }).catch((error) => {
         Logger.error('LoadingStore::setup Unable to load libraries ' + stringifyError(error));
         runInAction(() => {
-          this.error = localizedError(new UnableToLoadError());
+          this.error = new UnableToLoadError();
           this._loading = false;
         });
       });
@@ -135,13 +126,4 @@ export default class LoadingStore extends Store {
       currVersion: environment.version
     }).promise;
   };
-}
-
-export class UnableToLoadError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.unableToLoad.id,
-      defaultMessage: messages.unableToLoad.defaultMessage || '',
-    });
-  }
 }
