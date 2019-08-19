@@ -284,7 +284,7 @@ In the `v3` scheme, the public key is not encrypted or hashed in any way so it's
 For `P2`, the algorithm that is used is uniquely determined by the public key used. *COSE* defines the `alg` pre-defined header to indicate which algorithm was used to sign/verify but we don't use this for the following reasons
 
 1) We want to limit the number of allowed signing algorithms to exactly the set used in Cardano because of `E2`.
-1) There is a 1-1 mapping between `key_tag` and what signing algorithm was used and so this information would be redundant.
+1) There is a 1-1 mapping between the pair `address`, `address_meta` and what signing algorithm is used and so this information would be redundant.
 1) Allowed values in the `alg` field must be present in the [IANA COSE Algorithms registry](https://www.iana.org/assignments/cose/cose.xhtml#key-type) (and new entries have to be manually approved). This is not sufficient for us as we often have to use cutting edge cryptography specialized for our domain.
 
 ## Encryption
