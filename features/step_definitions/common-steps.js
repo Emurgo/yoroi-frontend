@@ -181,13 +181,15 @@ Given(/^I have opened the extension$/, async function () {
 
 Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
-  await this.driver.sleep(500); // give time for page to reload
+  // wait for page to refresh
+  await this.waitForElement('.YoroiClassic');
 });
 
 Given(/^I restart the browser$/, async function () {
   await this.driver.manage().deleteAllCookies();
   await this.driver.navigate().refresh();
-  await this.driver.sleep(500); // give time for page to reload
+  // wait for page to refresh
+  await this.waitForElement('.YoroiClassic');
 });
 
 Given(/^There is no wallet stored$/, async function () {
@@ -208,7 +210,8 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
 
   // refresh page to trigger migration
   await this.driver.navigate().refresh();
-  await this.driver.sleep(1000); // give time for page to reload
+  // wait for page to refresh
+  await this.waitForElement('.YoroiClassic');
 });
 
 async function refreshWallet(client) {
