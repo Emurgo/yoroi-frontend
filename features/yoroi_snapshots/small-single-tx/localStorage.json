@@ -1,1 +1,9 @@
-{"test-USER-LOCALE":"en-US","WALLET":"{\"adaWallet\":{\"cwAmount\":{\"getCCoin\":\"0\"},\"cwId\":\"1\",\"cwMeta\":{\"cwAssurance\":\"CWANormal\",\"cwName\":\"small-single-tx\",\"cwUnit\":0},\"cwType\":\"CWTWeb\",\"cwPassphraseLU\":\"2019-07-09T19:53:59-04:00\"},\"masterKey\":\"048872bb5a6ab80537f986788fcc2cfce4c679c753e222000d78d9c0bbad3f19cd7d67217c9cd3d0ed7f69faee31ea3ed6446d78161c1dc0dc7638d2234c011e9fdca936ac582b3a993869a2495221d83020dd692f00307ad8a93b3841ca00b483d760c712826d814c1c821314eb6425b544b8b9f6d7a6910b471f3fcd7e4ca1cae1cbca7df57d67cf9d459c5b6085a5c833485695b719e84f9bcf22\",\"lastReceiveAddressIndex\":0}","test-URI-SCHEME-ACCEPTANCE":"true","openTabId":"1562716435071","ACCOUNT":"{\"account\":0,\"root_cached_key\":\"c926351ca58e9a4575899968585f44a12d144df792d536f92aa07d37ffc7400baa3c34e291f9f1b4a3386445ab5430689034d5a2e30086197e5867f0a243a4b3\",\"derivation_scheme\":\"V2\"}","test-LAST-LAUNCH-VER":"1.7.0","test-TERMS-OF-USE-ACCEPTANCE":"true"}
+{
+  "test-USER-LOCALE":"en-US",
+  "WALLET":"{\"adaWallet\":{\"cwAmount\":{\"getCCoin\":\"0\"},\"cwId\":\"1\",\"cwMeta\":{\"cwAssurance\":\"CWANormal\",\"cwName\":\"small-single-tx\",\"cwUnit\":0},\"cwType\":\"CWTWeb\",\"cwPassphraseLU\":\"2019-07-09T19:53:59-04:00\"},\"masterKey\":\"048872bb5a6ab80537f986788fcc2cfce4c679c753e222000d78d9c0bbad3f19cd7d67217c9cd3d0ed7f69faee31ea3ed6446d78161c1dc0dc7638d2234c011e9fdca936ac582b3a993869a2495221d83020dd692f00307ad8a93b3841ca00b483d760c712826d814c1c821314eb6425b544b8b9f6d7a6910b471f3fcd7e4ca1cae1cbca7df57d67cf9d459c5b6085a5c833485695b719e84f9bcf22\",\"lastReceiveAddressIndex\":0}",
+  "test-URI-SCHEME-ACCEPTANCE":"true",
+  "openTabId":"1562716435071",
+  "ACCOUNT":"{\"account\":0,\"root_cached_key\":\"c926351ca58e9a4575899968585f44a12d144df792d536f92aa07d37ffc7400baa3c34e291f9f1b4a3386445ab5430689034d5a2e30086197e5867f0a243a4b3\",\"derivation_scheme\":\"V2\"}",
+  "test-LAST-LAUNCH-VER":"1.9.0",
+  "test-TERMS-OF-USE-ACCEPTANCE":"true"
+}
