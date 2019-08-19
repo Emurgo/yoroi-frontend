@@ -159,13 +159,21 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.click('.TermsOfUseForm_submitButton');
 
   // uri prompt page
-  if (this.getBrowser() !== 'firefox') {
-    await this.waitForElement('.UriPromptForm_component');
-    await this.click('.allowButton');
-    await this.waitForElement('.UriAccept_component');
-    await this.click('.finishButton');
-  }
+  await acceptUriPrompt(this);
 });
+
+Then(/^I accept uri registration$/, async function () {
+  await acceptUriPrompt(this);
+});
+
+async function acceptUriPrompt(world: any) {
+  if (world.getBrowser() !== 'firefox') {
+    await world.waitForElement('.UriPromptForm_component');
+    await world.click('.allowButton');
+    await world.waitForElement('.UriAccept_component');
+    await world.click('.finishButton');
+  }
+}
 
 Given(/^I have opened the extension$/, async function () {
   await this.driver.get(this.getExtensionUrl());
