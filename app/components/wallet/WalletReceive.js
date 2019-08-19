@@ -15,7 +15,6 @@ import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
-import CopyableActionLink from '../widgets/CopyableActionLink';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
@@ -65,7 +64,6 @@ type Props = {|
   isWalletAddressUsed: boolean,
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
-  onCopyAddress: Function,
   onCopyAddressTooltip: Function,
   getNotification: Function,
   onVerifyAddress: Function,
@@ -107,7 +105,7 @@ export default class WalletReceive extends Component<Props, State> {
       walletAddress, walletAddresses,
       onVerifyAddress, onGeneratePaymentURI,
       isSubmitting, error, isWalletAddressUsed,
-      onCopyAddress, onCopyAddressTooltip, getNotification,
+      onCopyAddressTooltip, getNotification,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -203,16 +201,25 @@ export default class WalletReceive extends Component<Props, State> {
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
                 {/* Address Id */}
-                <ExplorableHashContainer
-                  selectedExplorer={this.props.selectedExplorer}
+                <CopyableAddress
                   hash={address.id}
-                  light={address.isUsed}
-                  linkType="address"
+                  elementId={notificationElementId}
+                  onCopyAddress={
+                    onCopyAddressTooltip.bind(this, address.id, notificationElementId)
+                  }
+                  getNotification={getNotification}
                 >
-                  <RawHash light={address.isUsed}>
-                    {address.id}
-                  </RawHash>
-                </ExplorableHashContainer>
+                  <ExplorableHashContainer
+                    selectedExplorer={this.props.selectedExplorer}
+                    hash={address.id}
+                    light={address.isUsed}
+                    linkType="address"
+                  >
+                    <RawHash light={address.isUsed}>
+                      {address.id}
+                    </RawHash>
+                  </ExplorableHashContainer>
+                </CopyableAddress>
                 <div className={styles.addressMargin} />
                 {/* Address Action block start */}
                 <div className={styles.addressActions}>
@@ -257,17 +264,6 @@ export default class WalletReceive extends Component<Props, State> {
                       </div>
                     </button>
                   </div>
-                  {/* Copy Address action */}
-                  <CopyableActionLink
-                    hash={address.id}
-                    elementId={notificationElementId}
-                    onCopyAddress={
-                      onCopyAddress.bind(this, address.id, notificationElementId)
-                    }
-                    getNotification={getNotification}
-                  >
-                    {intl.formatMessage(messages.copyAddressLabel)}
-                  </CopyableActionLink>
                 </div>
                 {/* Action block end */}
               </div>

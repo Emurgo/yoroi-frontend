@@ -26,10 +26,6 @@
 
       @include place-form-field-error-below-input;
     }
-
-    .paperPassword {
-      margin-top: 30px;
-    }
   }
 
   .error {
@@ -90,8 +86,17 @@
           margin-top: 0;
           width: 100%;
         }
+
+        & > div:last-child {
+          padding-bottom: 0;
+        }
+      }
+
+      .paperPassword {
+        div:first-of-type {
+          padding-bottom: 0!important;
+        }
       }
     }
-    
   }
 }

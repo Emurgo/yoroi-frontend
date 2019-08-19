@@ -130,7 +130,7 @@
 
   .addressToLabelWrapper,
   .amountFeesWrapper {
-    margin-bottom: 23px;
+    margin-bottom: 34px;
   }
 
   .addressToLabel {
@@ -145,6 +145,15 @@
     font-size: 14px;
     line-height: 1.57;
     margin-top: 2px;
+  }
+
+  .totalAmount {
+    margin-bottom: 24px;
+  }
+
+  .walletPassword {
+    margin-top: 0;
+    padding-bottom: 0;
   }
 
   .amountFeesWrapper {

@@ -46,7 +46,7 @@ import {
   signTransaction,
 } from './adaTransactions/adaNewTransactions';
 import {
-  getCryptoWalletFromMasterKey,
+  getCryptoWalletFromEncryptedMasterKey,
   createAccountPlate,
   generateWalletMasterKey,
 } from './lib/cardanoCrypto/cryptoWallet';
@@ -791,7 +791,7 @@ export default class AdaApi {
       if (masterKey == null) {
         throw new Error('No master key stored');
       }
-      const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
+      const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(masterKey, password);
       const currAccount = await getCurrentAccountIndex();
       if (currAccount == null) {
         throw new Error('no account selected');
@@ -1001,7 +1001,6 @@ export default class AdaApi {
   ): Promise<SaveLastReceiveAddressIndexResponse> {
     Logger.debug('AdaApi::saveLastReceiveAddressIndex called');
     try {
-      // also needed as some tests inject fake used transactiosn without coresponding txs
       await saveLastReceiveAddressIndex(request.index);
     } catch (error) {
       Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));

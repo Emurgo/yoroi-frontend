@@ -86,7 +86,8 @@
     "flowtype/use-flow-type": 1,
     "global-require": "off",
     "no-await-in-loop": 0,
-    "no-unused-expressions": 0
+    "no-unused-expressions": 0,
+    "no-lone-blocks": 0,
   },
   "plugins": [
     "import",

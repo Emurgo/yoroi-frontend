@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import ReactMarkdown from 'react-markdown';
 import classNames from 'classnames';
-import styles from './InformativeMessage.scss';
+import styles from './DialogTextBlock.scss';
 
 type Props = {|
   title?: string,
@@ -14,7 +14,7 @@ type Props = {|
 |};
 
 @observer
-export default class InformativeMessage extends Component<Props> {
+export default class DialogTextBlock extends Component<Props> {
   static defaultProps = {
     title: '',
     message: '',

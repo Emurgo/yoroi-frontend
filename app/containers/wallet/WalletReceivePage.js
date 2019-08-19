@@ -75,11 +75,6 @@ export default class WalletReceivePage extends Component<Props, State> {
 
     const walletAddresses = addresses.all.slice().reverse();
 
-    const notification = {
-      duration: config.wallets.ADDRESS_COPY_NOTIFICATION_DURATION,
-      message: globalMessages.copyTooltipMessage,
-    };
-
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
@@ -93,16 +88,6 @@ export default class WalletReceivePage extends Component<Props, State> {
           isWalletAddressUsed={isWalletAddressUsed}
           walletAddresses={walletAddresses}
           onGenerateAddress={this.handleGenerateAddress}
-          onCopyAddress={(address, elementId) => {
-            if (!uiNotifications.isOpen(elementId)) {
-              this.setState({ notificationElementId: elementId });
-              actions.notifications.open.trigger({
-                id: elementId,
-                duration: notification.duration,
-                message: notification.message,
-              });
-            }
-          }}
           onCopyAddressTooltip={(address, elementId) => {
             if (!uiNotifications.isOpen(elementId)) {
               this.setState({ notificationElementId: elementId });
