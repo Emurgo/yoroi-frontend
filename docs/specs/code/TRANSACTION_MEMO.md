@@ -58,7 +58,50 @@ To safely store data in the external service we have to use encryption and digit
 * Use a public key child derivation function with the key pair from the previous step to derive 2 new child keys.
 * From the resulting key pairs, use one to encrypt and the other to sign.
 
-For both encrypting and signing we refer to the corresponding Yoroi specifications for [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md) and [message signing](https://github.com/Emurgo/yoroi-frontend/blob/336f763a7b7085e2887b4965a979ccd24719787a/docs/specs/code/SIGNING.md).
+For both encrypting and signing we refer the reader to the corresponding Yoroi specifications for [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md) and [message signing](https://github.com/Emurgo/yoroi-frontend/blob/336f763a7b7085e2887b4965a979ccd24719787a/docs/specs/code/SIGNING.md). More specifically, the signing specification describes an adapted version of the [CBOR](https://tools.ietf.org/html/rfc7049) Object Signing and Encryption ([COSE](https://tools.ietf.org/html/rfc8152)) specification. In our particular case, we must consider the following assumptions:
+
+* A1: We sign with a single key (SIGN_TAG = 18)
+* A2: We use the `sign` and `verify` methods provided by Cardano WASM bindings.
+* A3: Based in A2 we don't need to include the optional parameteres described in point `P1` (from the signing spec) as we already know which algorithm is used.
+* A4: Encryption with the recipient's public key (COSE_Encrypt) is better suited for multiple receivers. For the sake of simplicty, we will use password-based encryption (COSE_Encrypt0) where the ciphertext is obtained as described in the Yoroi [encryption spec](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md) with the hash of the shared secret as the password.
+
+The following are examples of signing and then encrypting a memo using COSE. To make the examples easier to read, they are presented using the extended CBOR diagnostic notation (CDDL).
+
+**COSE structure for signed message**
+```
+18(
+  [
+    / protected / h'' / {
+      \ is_ascii \ is_ascii:false \
+    } / , 
+    / unprotected / {
+      \ version \ version:1 \
+    } / , 
+    / payload / 'This is the content.', 
+    / signature / h'8eb33e4ca31d1c465ab05aac34cc6b23d58fef5c083106c4d25a91aef0b0117e2af9a291aa32e14ab834dc56ed2a223444547e01f11d3b0916e5a4c345cacb36'
+  ]
+)
+```
+
+The `payload` is signed with the `sign` WASM binding using one of the key pairs obtained from the private key chain. Then, the output is added in the `signature` field. After the COSE structure is constructed, it is encrypted as described in the encryption specification, and the resulting output is used as a value for the ciphertext field in the COSE structure for encrypted messages.
+
+**COSE structure for encrypted message**
+```
+16(
+  [
+    / protected / h'' / {
+      \ is_ascii \ is_ascii:false \
+    } / ,
+    / unprotected / {
+      \ enc_type \ enc_type:1 \
+      \ version \ version:1 \
+    } /, 
+    / ciphertext / h'8eb33e4ca31d1c465ab05aac34cc6b23d58fef5c083106c4d25a91aef0b0117e2af9a291aa32e14ab834dc56ed2a223444547e01f11d3b0916e5a4c345cacb36'
+  ]
+)
+```
+
+The above output is saved to a file named after the `Blake2b` hash of the corresponding transaction id and uploaded to the external storage. To decrypt we do the opposite process.
 
 ## External service
 
@@ -111,4 +154,3 @@ We consider the following requirements:
 * When querying for the transactions history, the user must be able to see the existing memo for the transactions, and be able to delete them.
 * For a given transaction, if the corresponding memo file doesn't exist, then it can be assumed that the transaction does not have a memo.
 * The user must be able to revoke the permissions granted to the Yoroi Dropbox app.
-
