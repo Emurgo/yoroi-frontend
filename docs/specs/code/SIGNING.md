@@ -297,10 +297,10 @@ Although COSE defines multiple ways to encrypt, we simplify out spec to the two 
 In order to facilitate implementations in wallets, we limit the usage of these to the following
 
 ```
-Ed25519PubKey = 1
-ChachaPoly = 2
+ChachaPoly = 1
+Ed25519PubKey = 2
 
-EncryptionType : uint = Ed25519PubKey / ChachaPoly
+EncryptionType : uint = ChachaPoly / Ed25519PubKey
 ```
 
 We will explain what this means shortly but you can find the full list of the types of encryption allowed by COSE at [RFC 8152 section 5.1.1](https://tools.ietf.org/html/rfc8152#section-5.1.1)
