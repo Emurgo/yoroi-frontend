@@ -213,7 +213,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   // refresh page to trigger migration
   await this.driver.navigate().refresh();
   // wait for page to refresh
-  await this.driver.sleep(1000);
+  await this.driver.sleep(1500);
   await this.waitForElement('.YoroiClassic');
 });
 
