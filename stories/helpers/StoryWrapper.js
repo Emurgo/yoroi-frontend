@@ -1,3 +1,5 @@
+// @flow
+
 import React, { Component } from 'react';
 import { keys } from 'lodash';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
@@ -15,13 +17,17 @@ import it from 'react-intl/locale-data/it';
 import { yoroiPolymorphTheme } from '../../app/themes/PolymorphThemes';
 import { themeOverrides } from '../../app/themes/overrides';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
-import { THEMES } from '../../app/themes';
 import ThemeManager from '../../app/ThemeManager';
 import YoroiClassic from '../../app/themes/prebuilt/YoroiClassic';
 import YoroiModern from '../../app/themes/prebuilt/YoroiModern';
+import { changeToplevelTheme } from '../../app/themes';
 
 import { withKnobs, select } from '@storybook/addon-knobs';
 import { addDecorator } from '@storybook/react';
+
+/**
+ * This whole file is meant to mirror code in App.js
+ */
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
@@ -54,16 +60,7 @@ export default class StoryWrapper extends Component<Props> {
 
     const themeVars = Object.assign({}, themes[currentTheme]);
 
-    // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
-    if (document && document.body instanceof HTMLBodyElement) {
-      // Flow give error when directly assesing document.body.classList.[remove()]|[add()]
-      const bodyClassList = document.body.classList;
-      // we can't simply set the className because there can be other classes present
-      // therefore we only remove & add those related to the theme
-      const allThemes: Array<string> = Object.keys(THEMES).map(key => THEMES[key]);
-      bodyClassList.remove(...allThemes);
-      bodyClassList.add(currentTheme);
-    }
+    changeToplevelTheme(currentTheme);
 
     return (
       <div style={{ height: '100%' }}>

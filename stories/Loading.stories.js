@@ -1,3 +1,5 @@
+// @flow
+
 import React from 'react';
 
 import { storiesOf } from '@storybook/react';
@@ -10,11 +12,13 @@ const story = storiesOf('Loading', module);
 /* Normal */
 story.add('Normal', () => (
   <Loading
+    api="ada"
     hasLoadedCurrentLocale
     hasLoadedCurrentTheme
     isLoadingDataForNextScreen
     onExternalLinkClick={() => {}}
     downloadLogs={() => {}}
+    error={undefined}
   />), {
   notes: 'Normal Loading'
 });
@@ -22,6 +26,7 @@ story.add('Normal', () => (
 /* Error while loading */
 story.add('Error while loading', () => (
   <Loading
+    api="ada"
     hasLoadedCurrentLocale
     hasLoadedCurrentTheme
     isLoadingDataForNextScreen={false}
