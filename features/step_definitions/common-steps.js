@@ -208,7 +208,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
 
   // refresh page to trigger migration
   await this.driver.navigate().refresh();
-  await this.driver.sleep(500); // give time for page to reload
+  await this.driver.sleep(1000); // give time for page to reload
 });
 
 async function refreshWallet(client) {
