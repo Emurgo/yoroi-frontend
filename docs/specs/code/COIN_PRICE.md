@@ -136,6 +136,34 @@ Since we need to query the price of 3 cryptos, for APIs that only support one pa
 |https://p.nomics.com/pricing|Personal Use (Only)|Free|No rate limits||
 |https://www.cryptonator.com/api/|N/A|Free|No rate limits||
 |https://developers.shrimpy.io/#pricing|Data|Free|No rate limits||
-|https://cryptoapis.io/products/market-data/#plans|Personal Use|Free|500 calls/day||
+|https://cryptoapis.io/products/market-data/#plans|Free|Free|500 calls/day|Attribution required|
+
+At 5 minutes refresh interval, the required frequency is 288 /day or 8928 /month and 26784 /month for 3 cryptos.
+
+|API provider|Minimal plan|Price/month|Rate limit|
+|-|-|-|-|
+|cryptocompare|Personal|Free|100,000 calls/month|
+|coinlayer|Professional|$39.99| 30,000 calls/month|
+|coinmarketcap|Hobbyist|$29|40,000 calls/month|
+|coinapi|Startup|$79|1000 calls/day|
+|nomics|Personal Use (Only)|Free|No rate limits|
+|cryptonator|N/A|Free|No rate limits|
+|shrimpy|Data|Free|No rate limits|
+|cryptoapis|Growth|$75|2500 calls/day|
+
+At 1 minute refresh interval, the required frequency is 1,440 /day or 44,640 /month and 133,920 /month for 3 cryptos.
+
+|API provider|Minimal plan|Price/month|Rate limit|
+|-|-|-|-|
+|cryptocompare|Commercial|$79.99|250,000 calls/month|
+|coinlayer|Enterprise|Contact||
+|coinmarketcap|Standard|$299|500,000 calls/month|
+|coinapi|Streamer|$249|10,000 calls/day|
+|nomics|Personal Use (Only)|Free|No rate limits|
+|cryptonator|N/A|Free|No rate limits|
+|shrimpy|Data|Free|No rate limits|
+|cryptoapis|Start-up|$241|7500 calls/day|
+
+
 
 Coin gecko is buggy during the survey. Coinbase doesn't provide ADA price data. Bitcoinaverage and bitrex only provide crypto-crypto price data thus don't satisfy the needs.
