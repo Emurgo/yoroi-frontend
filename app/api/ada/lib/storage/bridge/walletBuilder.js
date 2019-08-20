@@ -14,7 +14,7 @@ import {
 import type {
   Bip44WrapperInsert,
   PublicDeriverRow,
-  Bip44DerivationRow,
+  KeyDerivationRow,
 } from '../database/genericBip44/tables';
 import {
   AddBip44Wrapper,
@@ -297,7 +297,7 @@ type HasPublicDeriver<Row> = {
   publicDeriver: Array<{
     publicDeriverResult: PublicDeriverRow,
     levelResult: {
-      Bip44Derivation: Bip44DerivationRow,
+      KeyDerivation: KeyDerivationRow,
       specificDerivationResult: Row
     }
   }>,
