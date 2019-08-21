@@ -211,8 +211,8 @@ app/components => View base components
 ## Proposal
 Updated UI to for Ledger Nano X support using USB cable.
 
-## Implementation
-https://github.com/Emurgo/yoroi-frontend/pull/660
+## Related PRs
+Implementation: https://github.com/Emurgo/yoroi-frontend/pull/660
 
 # Iteration-3
 
@@ -268,7 +268,7 @@ For WebAuthn new tab is needed to process but for U2F it's not compulsury but st
 
 ## Related PRs
 Specification: https://github.com/Emurgo/yoroi-frontend/pull/696<br>
-Code: https://github.com/Emurgo/yoroi-frontend/pull/884
+Implementation: https://github.com/Emurgo/yoroi-frontend/pull/884
 
 # Iteration-4
 
