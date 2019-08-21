@@ -40,9 +40,9 @@ Price data: the conversion rates between ADA and all supported currencies.
 
 # Architecture
 
-The frontend refreshes the current ADA price at 15 minute interval by querying the backend.
+The frontend refreshes the current ADA price at 5 minute interval by querying the backend.
 
-The backend refreshes the current ADA price at 15 minute interval by querying the API. So the freshness of the price data from the user's perspective is 15 minutes + 15 minutes = 30 minutes. The backend stores the timestamped price data in a historical price database.
+The backend refreshes the current ADA price at 5 minute interval by querying the API. So the freshness of the price data from the user's perspective is 5 minutes + 5 minutes = 10 minutes. The backend stores the timestamped price data in a historical price database.
 
 At deployment time, a script will be run and it will query the API for historical price data, since the day when ADA began to be traded (Oct 2, 2017), and store the data in the historical price database.
 
@@ -56,16 +56,30 @@ To support the price conversions listed above, the backend queries crypto-price 
 
 and https://exchangeratesapi.io/ for the exchange rate between USD and every fiat.
 
-# Risk
+# Risks and security measures
 
 This feature does open new attack vector, for example: an attacker can engage a transaction with a victim and by hacking the backend and manipulate the conversion rate, trick the victim into transferring more Ada than the intended amount.
 
-To reduce the risk, the backend will be divided into two components: a service and a data-fetcher. The service:
+To reduce the risk, the backend will be divided into three independently deployed components: a service, a data-fetcher and a monitor. The service:
 1. Serves coin price queries from the frontend, using data out of its database.
 2. Accepts price data updates from the data-fetcher.
 
-The data-fetcher fetches price data from the API and notifies the service. The data-fetcher signs the data with a private key and the signatures are passed along the service to the frontend. Upon receiving price data, the frontend verifies the signatures with the corresponding public key. This scheme improve security because in case the service is comporised, because it doesn't have the private key used to sign data, the forgery will be detected by the frontend. In order to forge price data, an attack will have to comprise the data-fetcher, which is harder because the data-fetcher is not exposed to the network.
+The monitor independently fetches price data from the API and also queries the service for current prices. If the discrepency between the two is above certain threhold, it sends an alarm for manual investigation.
 
+
+The data-fetcher fetches price data from the API and notifies the service. The data-fetcher signs the data with a private key PrivKey<sub>data</sub> and the signatures are passed along the service to the frontend. Upon receiving price data, the frontend verifies the signatures with the corresponding public key PubKey<sub>data</sub>. This scheme improves security because in case the service is compromised, because it doesn't have the private key used to sign data, the forgery will be detected by the frontend. In order to forge price data, an attack will have to compromise the data-fetcher, which is harder because the data-fetcher is not a network service.
+
+If the data-fetcher is compromised and the private key used to sign the price data PrivKey<sub>data</sub> is leaked, then we must change the key pair. To accomplish this, a special instruction for changing public key PubKey<sub>data</sub> can be piggybacked to the response of price data query. The instruction contains a new public key PubKey'<sub>data</sub> and is signed with a private key PrivKey<sub>master</sub>. Upon receiving this intruction and having verified its authenticity with public key PubKey<sub>master</sub>, the front-send replaces PubKey<sub>data</sub> with PubKey'<sub>data</sub>. The private key PrivKey<sub>master</sub> should be permanently offline and is assumed to be safe. 
+
+To mitigate the possibility that the source API is compromised, the data-fetcher fetches price data from multiple APIs and tiggers an alarm if the discrepency is above a threshold.
+
+This table summerizes the incident types, their consequences, and recovery actions.
+
+|Compromised component|Discovery mechanism|Consequence|Recovery actions|
+|-|-|-|-|
+|The price service|The monitor|Denial of service|Restore the service|
+|The data-fetcher|The monitor|Data forgery attack|1. Restore the data-fetcher 2. Change price data verification public key|
+|API|The data fetcher|The system should be safe against 1 compromised API|Stop using the compromised API and report.|
 
 # Principles
 
@@ -103,6 +117,8 @@ In the profile store a new property will be added to record whether this feature
 A price store will be added. On creation the store loads the user-selected currency from the profile store and periodically queries the backend for the conversion rate between ADA and this currency. The stores exposes two state variables:
 1. A boolean variable indicating whether the current conversion rate is available.
 2. A numeric variable for the conversion rate.
+
+The store also maintains the public key used to verify price data, which has an intial hard-coded value and can be changed by a special instruction piggybacked on the response data of price query.
 
 The TransactionsStore will be extended so that when it returns a list of transactions, it will also query the price data at the time points of the transactions, either from the web storage-backed cache, or from the backend.
 
@@ -167,3 +183,4 @@ At 1 minute refresh interval, the required frequency is 1,440 /day or 44,640 /mo
 
 
 Coin gecko is buggy during the survey. Coinbase doesn't provide ADA price data. Bitcoinaverage and bitrex only provide crypto-crypto price data thus don't satisfy the needs.
+
