@@ -30,8 +30,8 @@ We propose a combined local-external storage scheme. Specifically, we propose to
 
 The first strategy is to store memos in a single file per wallet. The file would contain a JSON dictionary in which each entry is a mapping from a transaction ID to a UTF-8 encoded memo. The advantage of this strategy is the simplicity of having a single file to be encrypted, signed, uploaded and downloaded. Nevertheless, this also has a few notably disadvantages:
 
- * The file will eventually get bigger and bigger as memos are added, and it could eventually surpass the local storage limits (~10MB). A file versioning scheme could be considered in that case.
- * Querying for a subset of memos (ie. last 10 memos) would require querying for the entire file (from the external service).
+ * The file will eventually get bigger and bigger as memos are added. A file versioning scheme could be considered in that case.
+ * Querying for a subset of memos (ie. last 10 memos) would require querying for the entire file from the external service.
  * If two instances of the same wallet upload a memo at the same time, there will be a merge conflict. In the case of Dropbox, they handle this scenario by creating a **conflicting copy** of the file and maintining both files, passing on the responsability of merging them to the app.
 
 ### Single folder per wallet, single file per transaction.
@@ -141,9 +141,9 @@ Finally, we use the COSE structure for encrypted messages in the same way as bef
 
 The above output is saved to a file named after the `Blake2b` hash of the corresponding transaction id and uploaded to the external storage. To decrypt we do the opposite process.
 
-## External service
+## External storage
 
-The proposed external service is Dropbox. Based on its [Javascript SDK](https://github.com/dropbox/dropbox-sdk-js#readme), the API endpoints of our interest are:
+The proposed external storage is Dropbox. Based on its [Javascript SDK](https://github.com/dropbox/dropbox-sdk-js#readme), the API endpoints of our interest are:
 
 * [Create folder](https://dropbox.github.io/dropbox-sdk-js/Dropbox.html#filesCreateFolder__anchor): Create a folder at a given path.
 * [Upload single file](https://dropbox.github.io/dropbox-sdk-js/Dropbox.html#filesUpload__anchor): Create a new file with the contents provided in the request.
@@ -160,15 +160,29 @@ Note: API rate limits will apply in a [per user/app basis](https://www.dropbox.c
 In the case of a failure in the external service, we must consider to keep the memos in local storage until they can be successfuly uploaded. There could be several sources of failure for a memo to be uploaded:
 
 * External storage is unavailable
-* The access token is expired or the external storage app lost access to the user account
+* The access token is expired
+* The user revoked access for the Yoroi app registered in the external service
 * The file already exists
 * The user exceeded the limit of API calls to the external storage
 
-Then, we should consider adding an error message field along with the memo when saving to local storage. Also, notice that when a memo fails to be uploaded, another instance of the same wallet but in a different device could add a memo for the same transation. In this case, we apply the *first come, first served* principle and we keep the first memo that was uploaded. 
+Therefore, we must consider storing an error message field along with the memo when saving it to local storage. Also, notice that when a memo fails to be uploaded, another instance of the same wallet but in a different device could add a memo for the same transation. In this case, we apply the *first come, first served* principle and keep the first memo that was uploaded. 
+
+## Local storage
+
+We need to save the following items into local storage:
+
+* LS1: `memoPassword` (string): encrypted memo password. This password is used to encrypt/decrypt memo files. The memo password itself is encrypted/decrypted using the spending password (password-based strategy).
+* LS2: `dropboxAccessToken` (string): access token provided by Dropbox after the user granted access to the Yoroi app. This token is used to connect to Dropbox API on behalf of the user.
+
+As for the memo, the easiest would be to save it (encrypted) in a new column in the transactions table. Every time a transaction is made, the memo is encrypted an saved along with the transaction and then uploaded to Dropbox. Every time a transaction is received, there is an API call to check for a memo for that transaction, in which case is downloaded and saved. Lastly, as mentioned in the previous sections, there could be several sources of error when trying to save the memo to the external storage. In that case, the fields would be:
+
+* LS3: `Memo`: string
+* LS4: `IsMemoPending`: boolean
+* LS5: `MemoErrorMessage`: string
 
 ## User flow
 
-The proposed user flow is the following: (TODO update according to chosen encryption strategy)
+The proposed user flow is the following: (TODO update according to the chosen encryption strategy)
 
 1. The user opens the send transaction dialog.
 2. The memo textarea is closed by default. The user can click *"Add memo"* label and one of the following scenarios occurs:
@@ -189,7 +203,7 @@ The proposed user flow is the following: (TODO update according to chosen encryp
 
 # Requirements
 
-We consider the following requirements:
+Based on the previous sections, we consider the following requirements: (TODO update according to the chosen encryption strategy)
 
 * The user must be able to connect Yoroi to Dropbox, which will ask to grant permissions and it will return a new access token if the permission is granted. The access token must be encrypted and saved to local storage.
 * The user must be able to add or dismiss memos when sending a transaction.
@@ -199,8 +213,8 @@ We consider the following requirements:
 * The name of the folder in the external storage is given by the wallet's account number plate. If a user synchronizes the same wallet on more than one device, then each device must sync with the same folder.
 * Memos must be uploaded/downloaded after any of the following events:
 	* A new transaction is sent (upload).
-	* A new transaction is received (download), in which the originating address is the current account. This is intended for transactions that are originated from other devices but in the same wallet.
-	* Querying transactions history (download).
+	* A new transaction is received (download).
+	* Querying transactions history (download), in which the originating address is the current account. This is intended for transactions that are originated from other devices but in the same wallet.
 * When querying for the transactions history, the user must be able to see the existing memo for the transactions, and be able to delete them.
 * For a given transaction, if the corresponding memo file doesn't exist, then it can be assumed that the transaction does not have a memo.
 * The user must be able to revoke the permissions granted to the Yoroi Dropbox app.
