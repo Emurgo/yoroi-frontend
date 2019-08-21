@@ -27,7 +27,7 @@ import type {
 } from './utils';
 
 export type LovefieldDeriveRequest = {|
-  ...DerivePublicFromPrivateRequest<{}>,
+  ...DerivePublicFromPrivateRequest,
   decryptPrivateDeriverPassword: ?string,
   publicDeriverPublicKey?: KeyInfo,
   publicDeriverPrivateKey?: KeyInfo,

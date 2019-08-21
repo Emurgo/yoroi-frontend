@@ -77,7 +77,8 @@ test('Can add and fetch address in wallet', async () => {
       )
       .addPrivateDeriver(
         finalState => ({
-          addLevelRequest: {
+          pathToPrivate: [],
+          addLevelRequest: parent => ({
             privateKeyInfo: {
               Hash: rootPk.key().to_hex(),
               IsEncrypted: false,
@@ -87,14 +88,13 @@ test('Can add and fetch address in wallet', async () => {
             derivationInfo: keys => ({
               PublicKeyId: keys.public,
               PrivateKeyId: keys.private,
-              Parent: null, // TODO
-              Index: 0,
+              Parent: parent,
+              Index: null,
             }),
             levelInfo: id => ({
               KeyDerivationId: id,
             })
-          },
-          level: DerivationLevels.ROOT.level,
+          }),
           addPrivateDeriverRequest: derivationId => ({
             Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
             KeyDerivationId: derivationId,

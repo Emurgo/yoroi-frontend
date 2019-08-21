@@ -42,6 +42,11 @@ type InsertTree= Array<{|
   children?: InsertTree,
 |}>;
 
+type InsertPath = Array<{
+  index: number,
+  insert: {},
+}>;
+
 export type AddDerivationRequest<Insert> = {|
   privateKeyInfo: KeyInsert | null,
   publicKeyInfo: KeyInsert | null,
@@ -226,8 +231,13 @@ export class AddBip44Wrapper {
 }
 
 export type PrivateDeriverRequest<Insert> = {
-  addLevelRequest: AddDerivationRequest<Insert>,
-  level: number,
+  /**
+   * Path from root to the private deriver
+   * Path should NOT include the level for private deriver
+   * For ROOT, the index passed in is disregarded
+   */
+  pathToPrivate: InsertPath,
+  addLevelRequest: (number | null) => AddDerivationRequest<Insert>,
   addPrivateDeriverRequest: number => PrivateDeriverInsert,
 };
 export class AddPrivateDeriver {
@@ -249,16 +259,42 @@ export class AddPrivateDeriver {
       specificDerivationResult: Row
     },
   }> {
+    let parentId: number | null = null;
+    for (let i = 0; i < request.pathToPrivate.length - 1; i++) {
+      const levelResult = await AddPrivateDeriver.depTables.AddDerivation.add(
+        db, tx,
+        {
+          privateKeyInfo: null,
+          publicKeyInfo: null,
+          // eslint-disable-next-line no-loop-func
+          derivationInfo: keyInfo => ({
+            PublicKeyId: keyInfo.private,
+            PrivateKeyId: keyInfo.public,
+            Parent: parentId,
+            // explicitly ignore index for ROOT since it has no index
+            Index: i === 0  ? null : request.pathToPrivate[i].index,
+          }),
+          levelInfo: id => ({
+            KeyDerivationId: id,
+            ...request.pathToPrivate[i].insert,
+          }),
+        },
+        i,
+      );
+      parentId = levelResult.KeyDerivation.KeyDerivationId;
+    }
+
     const levelResult = await AddPrivateDeriver.depTables.AddDerivation.add(
       db, tx,
-      request.addLevelRequest,
-      request.level,
+      request.addLevelRequest(parentId),
+      request.pathToPrivate.length,
     );
     const privateDeriverResult = await addToTable<PrivateDeriverInsert, PrivateDeriverRow>(
       db, tx,
       request.addPrivateDeriverRequest(levelResult.KeyDerivation.KeyDerivationId),
       AddPrivateDeriver.ownTables[Bip44Tables.PrivateDeriverSchema.name].name,
     );
+
     return {
       privateDeriverResult,
       levelResult,
@@ -312,18 +348,13 @@ export class AddPublicDeriver {
   }
 }
 
-export type DerivePublicFromPrivateRequest<
-  Insert: {},
-> = {|
+export type DerivePublicFromPrivateRequest= {|
   publicDeriverInsert: number => PublicDeriverInsert,
   /**
    * Path is relative to private deriver
    * Last index should be the index you want for the public deriver
    */
-  pathToPublic: Array<{
-    index: number,
-    insert: Insert,
-  }>,
+  pathToPublic: InsertPath,
 |};
 export class DerivePublicFromPrivate {
   static ownTables = Object.freeze({});
@@ -335,11 +366,11 @@ export class DerivePublicFromPrivate {
     GetOrAdd,
   });
 
-  static async add<Insert: {}, Row>(
+  static async add<Row>(
     db: lf$Database,
     tx: lf$Transaction,
     bip44WrapperId: number,
-    body: DerivePublicFromPrivateRequest<Insert>,
+    body: DerivePublicFromPrivateRequest,
     getKeyInserts: (
       privateKeyRow: KeyRow,
     ) => {
