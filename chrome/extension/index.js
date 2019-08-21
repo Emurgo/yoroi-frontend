@@ -7,7 +7,7 @@ import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { createHashHistory } from 'history';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
-import translations from '../../app/i18n/translations';
+import { translations } from '../../app/i18n/translations';
 import actions from '../../app/actions/index';
 import Action from '../../app/actions/lib/Action';
 import App from '../../app/App';

@@ -6,9 +6,10 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
+import adaLogo from '../../assets/images/ada-logo.inline.svg';
+import cardanoLogo from '../../assets/images/cardano-logo.inline.svg';
 import yoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
-import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 
@@ -24,8 +25,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  currencyIcon: string,
-  apiIcon: string,
+  api: string,
   isLoadingDataForNextScreen: boolean,
   hasLoadedCurrentLocale: boolean,
   hasLoadedCurrentTheme: boolean,
@@ -44,8 +44,7 @@ export default class Loading extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
-      currencyIcon,
-      apiIcon,
+      api,
       isLoadingDataForNextScreen,
       hasLoadedCurrentLocale,
       hasLoadedCurrentTheme,
@@ -60,15 +59,15 @@ export default class Loading extends Component<Props> {
       styles.yoroiLogo
     ]);
     const currencyLogoStyles = classNames([
-      styles[`${environment.API}-logo`],
+      styles[`${api}-logo`],
     ]);
     const apiLogoStyles = classNames([
-      styles[`${environment.API}-apiLogo`],
+      styles[`${api}-apiLogo`],
     ]);
 
     const yoroiLoadingLogo = yoroiLogo;
-    const currencyLoadingLogo = currencyIcon;
-    const apiLoadingLogo = apiIcon;
+    const currencyLoadingLogo = adaLogo;
+    const apiLoadingLogo = cardanoLogo;
 
     return (
       <div className={componentStyles}>

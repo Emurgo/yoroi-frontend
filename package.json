@@ -33,7 +33,9 @@
     "localci-newbuild": "sudo /bin/bash ./features/localCI/new_build.sh",
     "localci-test": "sudo /bin/bash ./features/localCI/wrap_command.sh",
     "manage-translations": "node ./translations/translation-runner.js",
-    "purge-translations": "rimraf ./translations/messages"
+    "purge-translations": "rimraf ./translations/messages",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "repository": {
     "type": "git",
@@ -69,6 +71,13 @@
     "@babel/register": "7.5.5",
     "@babel/runtime": "7.5.5",
     "@babel/runtime-corejs2": "7.5.5",
+    "@storybook/addon-actions": "5.1.9",
+    "@storybook/addon-knobs": "5.1.9",
+    "@storybook/addon-links": "5.1.9",
+    "@storybook/addon-notes": "5.1.9",
+    "@storybook/addon-storysource": "5.1.9",
+    "@storybook/addons": "5.1.9",
+    "@storybook/react": "5.1.9",
     "autoprefixer": "9.6.1",
     "babel-eslint": "10.0.2",
     "babel-jest": "24.8.0",
