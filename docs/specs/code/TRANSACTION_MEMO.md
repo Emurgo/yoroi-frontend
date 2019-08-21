@@ -53,7 +53,7 @@ A memo could include sensitive or personal information about either the sender, 
 
 To safely store data in the external service we have to use encryption and digital signatures. However, before going any further we must notice an important limitation about **hardware wallets**. For security reasons, hardware wallets only provide access to the device's public keys, **NOT** private keys. To address this, we discuss two approaches:
 
-### Public key encryption
+### Public key encryption & password encryption
 
 This approach relies on using solely the *account* public key (available in all wallets) as input to create a new private key chain. More specifically:
 
@@ -67,9 +67,13 @@ For both encrypting and signing we refer the reader to the corresponding Yoroi s
 * A1: We sign with a single key (SIGN_TAG = 18)
 * A2: We use the `sign` and `verify` methods provided by Cardano WASM bindings.
 * A3: Based in A2 we don't need to include the optional parameteres described in point `P1` (from the signing spec) as we already know which algorithm is used.
-* A4: Encryption with the recipient's public key (COSE_Encrypt).
+* A4: Encryption with the recipient's public key (COSE_Encrypt) is better suited for multiple receivers. For the sake of simplicty, we use password-based encryption (COSE_Encrypt0) with the private key as the password for symmetric encryption.
 
-The following are examples of signing and then encrypting a memo following the siging specification. To make the examples easier to read, they are presented using the extended CBOR diagnostic notation (CDDL).
+A Proof-of-Concept can be found [here](https://repl.it/repls/CorruptInexperiencedLinuxpc).
+
+Observation: the encryption method described in the Yoroi encryption specification is implemented in the Cardano JS WASM bindings and it's called `password_encrypt`.
+
+The following are examples of signing and then encrypting a memo following the Cardano signed message format. To make the examples easier to read, they are represented using the extended CBOR diagnostic notation (CDDL).
 
 **Cardano signed message**
 ```
@@ -81,13 +85,13 @@ The following are examples of signing and then encrypting a memo following the s
     / unprotected / {
       \ version \ version:1 \
     } / , 
-    / payload / 'This is the content.', 
-    / signature / h'8eb33e4ca31d1c465ab05aac34cc6b23d58fef5c083106c4d25a91aef0b0117e2af9a291aa32e14ab834dc56ed2a223444547e01f11d3b0916e5a4c345cacb36'
+    / payload / 'test message', 
+    / signature / h'af74d407b62c673dc1c8a591f32406e171172bf47069a20b4d2fb42ffa8672b473df8bb7abf3e7671e2523856f2f9971ac3817d48a116c62a878de069c63d30f'
   ]
 )
 ```
 
-The `payload` is signed with the `sign` WASM binding using one of the key pairs obtained from the private key chain. Then, the output is added in the `signature` field. After the COSE structure is constructed, it is encrypted as described in the encryption specification, and the resulting output is used as a value for the ciphertext field in the COSE structure for encrypted messages.
+In this case, the `payload` is signed with the `sign` WASM binding using one of the key pairs obtained from the private key chain. Then, the output is added in the `signature` field. After the COSE structure is constructed, it is encrypted using `password_encrypt`, and the resulting output is used as a value for the ciphertext field in the COSE structure for encrypted messages.
 
 **Cardano encrypted message**
 ```
@@ -100,16 +104,16 @@ The `payload` is signed with the `sign` WASM binding using one of the key pairs 
       \ enc_type \ enc_type:1 \
       \ version \ version:1 \
     } /, 
-    / ciphertext / h'8eb33e4ca31d1c465ab05aac34cc6b23d58fef5c083106c4d25a91aef0b0117e2af9a291aa32e14ab834dc56ed2a223444547e01f11d3b0916e5a4c345cacb36'
+    / ciphertext / h'3d21b0d8c16a132c59f4f65a9bba41a3ec7002ea0eee255870839f8a2a158efa0972325d527cee06e5bf13c936e188fd9962de5866319bac3e8b581a8b16f8fd0393fc6a1a84e72dcd6e773a04a7bd6baa7e99e741b8c713decb3b05af32c3a897f4a68d274e527eaf9ffca7971b5d9d0c5caeb4a500344d6db4bba2a4cdfd8838d509e40d215645342cd6705d6d199b1b0914d96b42602b7f3125f6bfea1b7acb7c72871118628d41df17a3e6b6d56d362292f3f4fc9b4d2b3c68653d9dc385f0edeb426422390f76'
   ]
 )
 ```
 
 The above output is saved to a file named after the `Blake2b` hash of the corresponding transaction id and uploaded to the external storage. To decrypt we do the opposite process.
 
-### Symmetric encryption
+### User password encryption
 
-The second approach is based on the Yoroi [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md#encryption) specification, which uses `PBKDF2` and `ChaCha20Poly1305` to encrypt and decrypt a message with a user-provided password. This password must be used to encrypt at the time of sending a transaction with a memo and to decrypt at the time of showing an existing memo. 
+The second approach is also based on the Yoroi [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md#encryption) specification, which uses `password_encrypt` implementation from WASM bindings. The password encryption is used to encrypt at the time of sending a transaction with a memo and to decrypt at the time of showing an existing memo. 
 
 Currently, the user-flow for a standard Yoroi wallet already uses a **spending password** to decrypt the encrypted master key of the wallet. On hardware wallets, however, the spending password is not required as the wallet handles the private keys internally. That being said, we propose to use the existing spending password to derive a new **memo password** for symmetric encryption/decryption. We prefer not to use the *spending password* itself to encrypt/decrypt memos because we want to avoid compromising the security of the spending password in any way. 
 
@@ -121,7 +125,9 @@ For hardware wallets, we propose to imitate the user-flow used in standard walle
 
 Regarding the signing process, notice that `ChaCha20Poly1305` includes a MAC which can be used to verify *integrity* and *authenticity* of the data. For the sake of simplicity, we consider that signing the memo to prove *ownership* is not necessary, as having a valid memo password implies having access to the spending password and the specific wallet (with its account public key).
 
-Finally, we use the COSE structure for encrypted messages in the same way as before, but only for encryption. In this case, the ciphertext is the result of applying the encryption method proposed in the Yoroi [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md#encryption) specification to the content of the memo.
+A Proof-of-Concept can be found [here](https://repl.it/repls/DimgreyImmaterialDebuggers).
+
+We use the Cardano encrypted message format in the same way as before. Similarly, the ciphertext is the result of applying 'password_ecnrypt' to the content of the memo.
 
 **Cardano encrypted message**
 ```
@@ -134,12 +140,25 @@ Finally, we use the COSE structure for encrypted messages in the same way as bef
       \ enc_type \ enc_type:1 \
       \ version \ version:1 \
     } /, 
-    / ciphertext / h'8eb33e4ca31d1c465ab05aac34cc6b23d58fef5c083106c4d25a91aef0b0117e2af9a291aa32e14ab834dc56ed2a223444547e01f11d3b0916e5a4c345cacb36'
+    / ciphertext / h'56294e41264b6eeaf9952f7e452ef05bdbeb8b3985a5ca05a88e848ce989483edb3783d92ba0c04cbdd4911825a3c0aebab032513ca4caea553d741434582969d356cd380587361b'
   ]
 )
 ```
 
 The above output is saved to a file named after the `Blake2b` hash of the corresponding transaction id and uploaded to the external storage. To decrypt we do the opposite process.
+
+### Public key vs User password
+
+We make a brief comparison of both methods advantages/disadvantages.
+
+| # | Description           | Public key | User password |
+ |-------|-----------------------|------------|-------|
+ | 1  | Stores seed/password encrypted | NO | YES |
+ | 2  | Signs the data to prove ownership | YES | NO |
+ | 3  | Verifies authenticity & integrity | YES | YES |
+ | 4  | Requires the user to enter a password to add/view memos | NO | YES |
+ | 4  | Adds extra steps to hardware wallets users | NO | YES |
+ | 5  | Available in Yoroi existing libraries | YES | YES |
 
 ## External storage
 
