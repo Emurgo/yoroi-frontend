@@ -1,20 +1,17 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
 import { addTransaction, postLaunchSuccessfulTx, postLaunchPendingTx } from '../mock-chain/mockImporter';
 
 Given(/^I have a wallet with funds$/, async function () {
-  await this.driver.wait(async () => {
-    try {
-      const { adaWallet } = await this.getFromLocalStorage('WALLET');
-      expect(Number(adaWallet.cwAmount.getCCoin), 'Available founds').to.be.above(0);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  });
+  const amountWithCurrency = await this.driver.findElements(By.xpath("//div[@class='WalletTopbarTitle_walletAmount']"));
+  const matchedAmount = /^"([0-9]*\.[0-9]*)".*$/.exec(amountWithCurrency);
+  if (!matchedAmount) return false;
+  const amount = parseFloat(matchedAmount[1]);
+  expect(Number(amount), 'Available funds').to.be.above(0);
 });
 
 When(/^I go to the send transaction screen$/, async function () {

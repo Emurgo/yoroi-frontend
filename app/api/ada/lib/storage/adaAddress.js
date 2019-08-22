@@ -84,12 +84,12 @@ async function popBip44InternalAddress(): Promise<AdaAddress> {
 
 async function popBip44ExternalAddress(): Promise<AdaAddress> {
   const existingAddresses = await getAdaAddressesByType('External');
-  const nextAddressIndex = getLastReceiveAddressIndex() + 1;
+  const nextAddressIndex = (await getLastReceiveAddressIndex()) + 1;
   if (nextAddressIndex === existingAddresses.length) {
     throw new UnusedAddressesError();
   }
   const poppedAddress = existingAddresses[nextAddressIndex];
-  saveLastReceiveAddressIndex(nextAddressIndex);
+  await saveLastReceiveAddressIndex(nextAddressIndex);
 
   return poppedAddress;
 }
