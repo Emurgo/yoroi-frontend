@@ -10,6 +10,7 @@ import type { lf$schema$Builder } from 'lovefield';
 export type Bip44DerivationInsert = {|
   PublicKeyId: number | null,
   PrivateKeyId: number | null,
+  Parent: number | null,
   Index: number | null,
 |};
 export type Bip44DerivationRow = {|
@@ -25,6 +26,7 @@ export const Bip44DerivationSchema: {
     Bip44DerivationId: 'Bip44DerivationId',
     PrivateKeyId: 'PrivateKeyId',
     PublicKeyId: 'PublicKeyId',
+    Parent: 'Parent',
     Index: 'Index',
   }
 };
@@ -52,26 +54,6 @@ export const Bip44WrapperSchema: {
     SignerLevel: 'SignerLevel',
     PublicDeriverLevel: 'PublicDeriverLevel',
     Version: 'Version',
-  }
-};
-
-export type Bip44DerivationMappingInsert = {|
-  Parent: number,
-  Child: number,
-|};
-export type Bip44DerivationMappingRow = {|
-  Bip44DerivationMappingId: number, // serial
-  ...Bip44DerivationMappingInsert,
-|};
-export const Bip44DerivationMappingSchema: {
-  +name: 'Bip44DerivationMapping',
-  properties: $ObjMapi<Bip44DerivationMappingRow, ToSchemaProp>
-} = {
-  name: 'Bip44DerivationMapping',
-  properties: {
-    Bip44DerivationMappingId: 'Bip44DerivationMappingId',
-    Parent: 'Parent',
-    Child: 'Child',
   }
 };
 
@@ -233,11 +215,16 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(Bip44DerivationSchema.properties.Bip44DerivationId, Type.INTEGER)
     .addColumn(Bip44DerivationSchema.properties.PrivateKeyId, Type.INTEGER)
     .addColumn(Bip44DerivationSchema.properties.PublicKeyId, Type.INTEGER)
+    .addColumn(Bip44DerivationSchema.properties.Parent, Type.INTEGER)
     .addColumn(Bip44DerivationSchema.properties.Index, Type.INTEGER)
     .addPrimaryKey(
       ([Bip44DerivationSchema.properties.Bip44DerivationId]: Array<string>),
       true
     )
+    .addForeignKey('Bip44Derivation_Parent', {
+      local: Bip44DerivationSchema.properties.Parent,
+      ref: `${Bip44DerivationSchema.name}.${Bip44DerivationSchema.properties.Bip44DerivationId}`
+    })
     .addForeignKey('Bip44Derivation_PrivateKeyId', {
       local: Bip44DerivationSchema.properties.PrivateKeyId,
       ref: `${KeySchema.name}.${KeySchema.properties.KeyId}`
@@ -249,6 +236,7 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
     .addNullable([
       Bip44DerivationSchema.properties.PrivateKeyId,
       Bip44DerivationSchema.properties.PublicKeyId,
+      Bip44DerivationSchema.properties.Parent,
       Bip44DerivationSchema.properties.Index,
     ]);
 
@@ -271,29 +259,6 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
     .addNullable([
       Bip44WrapperSchema.properties.SignerLevel,
     ]);
-
-  // Bip44DerivationMappingTable
-  schemaBuilder.createTable(Bip44DerivationMappingSchema.name)
-    .addColumn(Bip44DerivationMappingSchema.properties.Bip44DerivationMappingId, Type.INTEGER)
-    .addColumn(Bip44DerivationMappingSchema.properties.Parent, Type.INTEGER)
-    .addColumn(Bip44DerivationMappingSchema.properties.Child, Type.INTEGER)
-    .addPrimaryKey(
-      ([Bip44DerivationMappingSchema.properties.Bip44DerivationMappingId]: Array<string>),
-      true
-    )
-    .addForeignKey('Bip44DerivationMapping_Parent', {
-      local: Bip44DerivationMappingSchema.properties.Parent,
-      ref: `${Bip44DerivationSchema.name}.${Bip44DerivationSchema.properties.Bip44DerivationId}`
-    })
-    .addForeignKey('Bip44DerivationMapping_Child', {
-      local: Bip44DerivationMappingSchema.properties.Child,
-      ref: `${Bip44DerivationSchema.name}.${Bip44DerivationSchema.properties.Bip44DerivationId}`
-    })
-    .addIndex(
-      'Bip44DerivationMapping_ParentId',
-      ([Bip44DerivationMappingSchema.properties.Parent]: Array<string>),
-      false,
-    );
 
   // PrivateDeriver
   schemaBuilder.createTable(PrivateDeriverSchema.name)

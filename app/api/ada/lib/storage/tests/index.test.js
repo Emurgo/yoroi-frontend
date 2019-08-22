@@ -87,6 +87,7 @@ test('Can add and fetch address in wallet', async () => {
             derivationInfo: keys => ({
               PublicKeyId: keys.public,
               PrivateKeyId: keys.private,
+              Parent: null, // TODO
               Index: 0,
             }),
             levelInfo: id => ({
