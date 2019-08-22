@@ -17,16 +17,14 @@ declare var chrome;
 const getStorageItemInExtension = async (
   key: string | void
 ): Promise<?string> => new Promise((resolve, reject) => {
-  chrome.storage.local.get(key, (data: {}, error) => {
-    if (error) reject(error);
+  chrome.storage.local.get(key, (data: {}) => {
+    if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
     if (key === undefined) {
       resolve(JSON.stringify(data));
     } else {
       const value: any = data[key];
       // need to ensure type is string to match localStorage API
-      if (value == null) {
-        resolve(value);
-      } else if (typeof value === 'string') {
+      if (value == null || typeof value === 'string') {
         resolve(value);
       } else {
         reject(new Error('getStorageItemInExtension cannot get non-string value'));
@@ -59,7 +57,15 @@ export async function getLocalItem(key: string | void): Promise<?string> {
 export async function setLocalItem(key: string, value: string): Promise<void> {
   const isExtension = environment.userAgentInfo.isExtension;
   if (isExtension) {
-    await chrome.storage.local.set({ [key]: value });
+    await new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        { [key]: value },
+        () => {
+          if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+          resolve();
+        }
+      );
+    });
   } else {
     localStorage.setItem(key, value);
   }
@@ -73,7 +79,15 @@ export async function removeLocalItem(key: string): Promise<void> {
   const isExtension = environment.userAgentInfo.isExtension;
 
   if (isExtension) {
-    await chrome.storage.local.remove(key);
+    await new Promise((resolve, reject) => {
+      chrome.storage.local.remove(
+        key,
+        () => {
+          if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+          resolve();
+        }
+      );
+    });
   } else {
     localStorage.removeItem(key);
   }
@@ -82,7 +96,14 @@ export async function removeLocalItem(key: string): Promise<void> {
 export async function clear(): Promise<void> {
   const isExtension = environment.userAgentInfo.isExtension;
   if (isExtension) {
-    await chrome.storage.local.clear();
+    await new Promise((resolve, reject) => {
+      chrome.storage.local.clear(
+        () => {
+          if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+          resolve();
+        }
+      );
+    });
   } else {
     localStorage.clear();
   }
