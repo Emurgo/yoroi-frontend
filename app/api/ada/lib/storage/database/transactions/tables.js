@@ -116,7 +116,7 @@ export const populateTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
     })
     .addForeignKey('UtxoTransactionInput_Bip44Address', {
       local: UtxoTransactionInputSchema.properties.Bip44AddressId,
-      ref: `${Bip44AddressSchema.name}.${Bip44AddressSchema.properties.Bip44DerivationId}`
+      ref: `${Bip44AddressSchema.name}.${Bip44AddressSchema.properties.KeyDerivationId}`
     });
 
   // UtxoTransactionOutput Table
@@ -134,6 +134,6 @@ export const populateTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
     })
     .addForeignKey('UtxoTransactionOutput_Bip44Address', {
       local: UtxoTransactionOutputSchema.properties.Bip44AddressId,
-      ref: `${Bip44AddressSchema.name}.${Bip44AddressSchema.properties.Bip44DerivationId}`
+      ref: `${Bip44AddressSchema.name}.${Bip44AddressSchema.properties.KeyDerivationId}`
     });
 };
