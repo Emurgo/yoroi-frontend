@@ -1,6 +1,6 @@
 {
-  "ImageUploadWidget.clickToUploadLabel": "ou clique para fazer upload",
-  "ImageUploadWidget.dropFileHint": "Drop file here",
+  "ImageUploadWidget.clickToUploadLabel": "ou clique para enviar anexo",
+  "ImageUploadWidget.dropFileHint": "Arraste o arquivo aqui",
   "api.errors.ApiMethodNotYetImplementedError": "This API method is not yet implemented.",
   "api.errors.GenericApiError": "An error occurred, please try again later.",
   "api.errors.IncorrectPasswordError": "Incorrect wallet password.",
