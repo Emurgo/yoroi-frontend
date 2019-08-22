@@ -7,7 +7,7 @@
   "api.errors.NotEnoughMoneyToSendError": "Saldo insuficiente para realizar essa transação.",
   "api.errors.PromiseNotCalledYetError": "You have to call Request::execute before you can access it as promise.",
   "api.errors.RedeemAdaError": "do not translate",
-  "api.errors.ReportRequestError": "There was a problem sending the support request.",
+  "api.errors.ReportRequestError": "Houve um problema ao enviar a solicitação para o suporte.",
   "api.errors.WalletAlreadyImportedError": "The wallet you are trying to import already exists.",
   "api.errors.WalletAlreadyRestoredError": "The wallet you are trying to restore already exists.",
   "api.errors.WalletFileImportError": "Wallet could not be imported. Please make sure you are providing the correct file.",
