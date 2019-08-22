@@ -45,7 +45,7 @@ export const snapshot = {
       PublicKeyId: null,
       PrivateKeyId: 1,
       Parent: null,
-      Index: 0,
+      Index: null,
       KeyDerivationId: 1
     }, {
       // Bip44PurposeId: 1
