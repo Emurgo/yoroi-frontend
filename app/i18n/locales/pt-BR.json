@@ -74,7 +74,7 @@
   "global.errors.invalidMasterKey": "Chave mestra digitada está inválida, por favor verifique.",
   "global.errors.invalidPaperPassword": "A senha da Carteira de Papel requer pelo menos 12 caracteres.",
   "global.errors.invalidRepeatPassword": "Não corresponde.",
-  "global.errors.invalidWalletName": "Wallet name requires at least 1 and at most 40 letters.",
+  "global.errors.invalidWalletName": "O nome da Wallet precisa de 1 á 40 caracteres.",
   "global.errors.invalidWalletPassword": "Spending password requires at least 12 characters.",
   "global.label.allow": "Allow",
   "global.labels.LearnMore": "Learn more",
