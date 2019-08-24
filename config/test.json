@@ -16,6 +16,7 @@
     "txsBodiesRequestSize": 150,
     "coinPriceRefreshInterval": 600000,
     "coinPriceFreshnessThreshold": 1800000,
-    "coinPriceRequestRetryDelay": 10000
+    "coinPriceRequestRetryDelay": 10000,
+    "pubKeyData": "43d0c0e05acfd2608dd392ad7add6b8a41a3d182387f3ee17f1e9b165c2431680000000000000000000000000000000000000000000000000000000000000000"
   }
 }

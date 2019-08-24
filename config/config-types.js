@@ -14,7 +14,10 @@ export type AppConfigType = {
    * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit */
   addressScanSize: number,
   addressRequestSize: number,
-  txsBodiesRequestSize: number
+  txsBodiesRequestSize: number,
+  coinPriceFreshnessThreshold: number,
+  coinPriceRequestRetryDelay: number,
+  pubKeyData: string,
 }
 
 export type NetworkConfigType = {

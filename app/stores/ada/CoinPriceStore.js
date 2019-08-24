@@ -15,6 +15,9 @@ import WalletTransaction from '../../domain/WalletTransaction';
 import {
   cachePriceData
 } from '../../api/ada/lib/storage/lovefieldDatabase.js';
+import type { Ticker } from '../../types/coinPriceType';
+import { getPrice } from '../../types/coinPriceType';
+import { verifyTicker } from '../../api/verify';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -33,35 +36,45 @@ export default class CoinPriceStore extends Store {
     if (Date.now() - this.lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
       return null;
     }
-    const ticker = this.tickers.find(ticker => (
-      (ticker.from.toUpperCase() === from.toUpperCase()) && 
-      (ticker.to.toUpperCase() === to.toUpperCase())
-    ));
-    if (!ticker) {
+    const price = getPrice(from, to, this.tickers);
+    if (!price) {
       return null;
     }
-    return ticker.price;
+    return price;
   }
 
   getTargetCurrencies(): Array<string> {
     return tickers.map(ticker => ticker.to);
   }
 
+  _waitForRustModule = async (): void => {
+    await this.stores.loading.loadRustRequest.promise;
+  }
+
   @action _refreshCoinPrice = async (): Promise<void> => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
-      const response: CurrntCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
+      const response: CurrentCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
         from: 'ADA',
       });
+
       if (response.error !== null) {
         throw new Error('coin price backend error: '+response.error);
       }
+
+      // Must wait for the asynchronous loading of the Rust module before calling verifyTicker
+      await this._waitForRustModule();
+      if (!verifyTicker(response.ticker)) {
+        throw new Error('Invalid ticker signature: '+JSON.stringify(reponse.ticker));
+      }
+
       this.nextRefreshTimeout = CONFIG.app.coinPriceRefreshInterval;
       if (this.expirePriceDataTimeoutId) {
         clearTimeout(this.expirePriceDataTimeoutId);
       }
       this.expirePriceDataTimeoutId = setTimeout(this._expirePriceData, CONFIG.app.coinPriceFreshnessThreshold);
-      this._updatePriceData(response.tickers);
+
+      this._updatePriceData(response);
     } catch (error) {
       Logger.error('CoinPriceStore::_refreshCoinPrice: ' + stringifyError(error));
       this.nextRefreshTimeout = CONFIG.app.coinPriceRequestRetryDelay;
@@ -73,10 +86,12 @@ export default class CoinPriceStore extends Store {
     this.tickers.splice(0);
   }
 
-  @action _updatePriceData = (tickers): void => {
-    // This essential assigns `tickers` to `this.tickers` but retains the array object
-    Array.prototype.splice.bind(this.tickers, 0, this.tickers.length).apply(null, tickers);
-    this.lastUpdateTimestamp = Date.now();
+  @action _updatePriceData = (response: CurrentCoinPriceResponse): void => {
+    const tickers = Object.entries(response.ticker.prices).map(
+      ([to, price]) => ({ from: response.ticker.from, to, price }));
+
+    this.tickers.splice(0, this.tickers.length, ...tickers);
+    this.lastUpdateTimestamp = response.ticker.timestamp;
   }
 
   async updateTransactionPriceData(transactions: Array<WalletTransaction>): void {
@@ -93,12 +108,20 @@ export default class CoinPriceStore extends Store {
       if (response.error !== null) {
         throw new Error('historical coin price query error: '+response.error);
       }
-      if (response.timestamped_tickers.length !== transactions.length) {
+      if (response.tickers.length !== transactions.length) {
         throw new Error('historical coin price query error: data length mismatch');
       }
-      
+
+      // Must wait for the asynchronous loading of the Rust module before calling verifyTicker
+      await this._waitForRustModule();
       transactions.forEach((tx, i) => {
-        const tickers = response.timestamped_tickers[i].tickers
+        const ticker = response.tickers[i];
+        if (!verifyTicker(ticker)) {
+          throw new Error('Invalid ticker signature: '+JSON.stringify(ticker));
+        }
+
+        const tickers = Object.entries(ticker.prices).map(([to, price]) =>
+          ({ from: response.tickers[i].from, to, price }));
         runInAction(() => {
           tx.tickers = tickers;
         });
