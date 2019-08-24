@@ -30,7 +30,7 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
   form = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {
-        label: 'coin prince currency', //this.context.intl.formatMessage(),
+        label: 'unit of account currency', //this.context.intl.formatMessage(),
     }
     }
   });

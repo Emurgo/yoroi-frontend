@@ -56,8 +56,8 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       LANGUAGE_OPTIONS,
       currentLocale,
       selectedExplorer,
-      COIN_PRICE_CURRENCY_OPTIONS,
-      coinPriceCurrency,
+      UNIT_OF_ACCOUNT_OPTIONS,
+      unitOfAccount,
       setCoinPriceCurrencyRequest,
     } = this.props.stores.profile;
     const isSubmittingLocale = setProfileLocaleRequest.isExecuting;
@@ -79,12 +79,12 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       )
       : null;
 
-    const currencies = COIN_PRICE_CURRENCY_OPTIONS.map(o => (
+    const currencies = UNIT_OF_ACCOUNT_OPTIONS.map(o => (
       { value: o.symbol, label: o.symbol }
     ));
     currencies.unshift({ value: '---', label: 'disabled' });
 
-    const coinPriceCurrencyValue = coinPriceCurrency.enabled ? coinPriceCurrency.currency : '---';
+    const coinPriceCurrencyValue = unitOfAccount.enabled ? unitOfAccount.currency : '---';
       
     return (
       <div>

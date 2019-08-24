@@ -70,7 +70,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
     const result = this._getTransactionsAllRequest(wallet.id).result;
     if (!result || !result.transactions) return unconfirmedAmount;
 
-    const coinPriceCurrency = this.stores.profile.coinPriceCurrency;
+    const coinPriceCurrency = this.stores.profile.unitOfAccount;
 
     for (const transaction of result.transactions) {
       if (transaction.getAssuranceLevelForMode(wallet.assuranceMode) !== assuranceLevels.HIGH) {

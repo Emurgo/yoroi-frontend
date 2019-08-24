@@ -74,7 +74,7 @@ export default class WalletSummaryPage extends Component<Props> {
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
-            coinPriceCurrencySetting={profile.coinPriceCurrency}
+            coinPriceCurrencySetting={profile.unitOfAccount}
           />
         );
       } else if (!hasAny) {
@@ -104,7 +104,7 @@ export default class WalletSummaryPage extends Component<Props> {
           pendingAmount={unconfirmedAmount}
           isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
           openExportTxToFileDialog={this.openExportTransactionDialog}
-          coinPriceCurrencySetting={profile.coinPriceCurrency}
+          coinPriceCurrencySetting={profile.unitOfAccount}
         />
 
         {walletTransactions}

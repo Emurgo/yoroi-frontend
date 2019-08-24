@@ -41,7 +41,7 @@ export default class ProfileStore extends Store {
       : [])
   ];
 
-  COIN_PRICE_CURRENCY_OPTIONS = SUPPORTED_CURRENCIES;
+  UNIT_OF_ACCOUNT_OPTIONS = SUPPORTED_CURRENCIES;
 
   /**
    * Need to store the selected language in-memory for when the user
@@ -503,7 +503,7 @@ export default class ProfileStore extends Store {
 
   // ========== Coin Price Currency ========== //
 
-  @computed.struct get coinPriceCurrency(): CoinPriceCurrencySettingType {
+  @computed.struct get unitOfAccount(): CoinPriceCurrencySettingType {
     const { result } = this.getCoinPriceCurrencyRequest.execute();
     return result || coinPriceCurrencyDisabledValue;
   }
