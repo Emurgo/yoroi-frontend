@@ -109,7 +109,7 @@
   "inline.editing.input.cancel.label": "cancele",
   "inline.editing.input.change.label": "mudança",
   "inline.editing.input.changesSaved": "Suas mudanças foram salvas",
-  "loading.screen.error": "For more help, you can {supportRequestLink}",
+  "loading.screen.error": "Para mais informações, você pode {supportRequestLink}",
   "loading.screen.loading": "Carregando componentes",
   "networkError.label.message": "WARNING: Connection to the server failed.<br>Please check your internet connection or <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.",
   "profile.languageSelect.form.languageSelectLabel": "Selecione seu idioma",
