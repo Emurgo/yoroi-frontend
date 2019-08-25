@@ -166,7 +166,7 @@
   "settings.paperWallet.dialog.createPaper.loader.label": "Formulando o certificado PDF",
   "settings.paperWallet.dialog.createPaper.mnemonic": "Imprimindo mnemônicos",
   "settings.paperWallet.dialog.createPaper.title": "Criar carteira de papel",
-  "settings.paperWallet.dialog.finalize.intro.line1": "Make sure:",
+  "settings.paperWallet.dialog.finalize.intro.line1": "Certificar-se de que:",
   "settings.paperWallet.dialog.finalize.intro.line2": "to <strong>keep the paper document</strong> and secret words safe.",
   "settings.paperWallet.dialog.finalize.intro.line3": "to <strong>remember the password</strong>, or write it down and keep it safe!",
   "settings.paperWallet.dialog.finalize.title": "Yoroi Paper Wallet is created",
