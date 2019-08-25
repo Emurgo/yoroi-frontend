@@ -100,7 +100,7 @@
   "global.language.korean": "한국어",
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
-  "global.passwordInstructionsPaperWallet": "Note: Paper Wallet password needs to be at least <strong>12 characters</strong> long.",
+  "global.passwordInstructionsPaperWallet": "Nota: a senha da Carteira de papel precisa ter pelo menos <strong> 12 caracteres </strong> de comprimento.",
   "global.staleTxnWarningLine1": "Sua carteira foi alterada desde a criação dessa transação.",
   "global.staleTxnWarningLine2": "Você ainda pode enviar essa transação mas ela deve falhar.",
   "global.unit.ada": "Ada",
