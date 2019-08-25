@@ -122,7 +122,7 @@
   "profile.uriPrompt.form.skipLabel": "Pular",
   "profile.uriSkip.descriptionLine1": "Embora você não possa usar as URLs de pagamento, ainda poderá gerá-las.",
   "profile.uriSkip.descriptionLine2": "Você pode ativar esse recurso a qualquer momento no menu de configurações.",
-  "serverError.label.message": "WARNING: Server experiencing difficulties.<br>Please check <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.",
+  "serverError.label.message": "AVISO: Problemas de conexão do servidor. <br>Por favor, verifique <a target='blank' href='https://twitter.com/YoroiWallet'>nossa conta no Twitter</a>.<br> O saldo exibido e o histórico de transações podem aparecem incorretas até que nossos servidores voltem ao normal, mas seu saldo real não é afetado.",
   "settings.display.blog": "You can read our {blogLink} on how to use this feature.",
   "settings.display.themeExportButton": "EXPORT THEME",
   "settings.display.themeLabel": "Theme",
