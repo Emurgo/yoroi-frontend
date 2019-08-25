@@ -1,0 +1,639 @@
+// @flow
+
+import type {
+  lf$Database, lf$Transaction,
+} from 'lovefield';
+
+import {
+  groupBy,
+  mapValues,
+} from 'lodash';
+
+import {
+  BigNumber
+} from 'bignumber.js';
+
+import type {
+  IPublicDeriver,
+  PathWithAddrAndRow,
+  IGetAllAddresses,
+  IGetAllUtxosResponse,
+  IGetUtxoBalanceResponse,
+  IHasChainsRequest,
+  IGetNextUnusedForChainResponse,
+  IHasChains,
+  IDisplayCutoff,
+} from './PublicDeriver/interfaces';
+import { asDisplayCutoff, } from './PublicDeriver/index';
+
+import type {
+  IChangePasswordRequest, IChangePasswordResponse,
+  Address, Value, Addressing, UsedStatus,
+} from './common/interfaces';
+
+import type { AddressRow, KeyInsert, KeyRow, } from '../database/uncategorized/tables';
+import {
+  UpdateGet, GetOrAddAddress,
+} from '../database/uncategorized/api/write';
+import {
+  GetAddress,
+} from '../database/uncategorized/api/read';
+import {
+  getAllSchemaTables,
+  raii,
+} from '../database/utils';
+import {
+  GetAllBip44Wallets,
+  GetAllPublicDerivers,
+  GetPathWithSpecific,
+} from '../database/bip44/api/read';
+import type { GetPathWithSpecificByTreeRequest } from '../database/bip44/api/read';
+import type {
+  Bip44AddressRow,
+  Bip44WrapperRow,
+  PublicDeriverRow,
+} from '../database/bip44/tables';
+import {
+  GetUtxoTxOutputsWithTx,
+} from '../database/transactions/api/read';
+import { TxStatusCodes } from '../database/transactions/tables';
+
+import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
+
+import { RustModule } from '../../cardanoCrypto/rustLoader';
+
+import { EXTERNAL, INTERNAL, } from  '../../../../../config/numbersConfig';
+import {
+  encryptWithPassword,
+  decryptWithPassword,
+} from '../../../../../utils/passwordCipher';
+
+export type ToAbsoluteSlotNumberRequest = {
+  epoch: number,
+  slot: number,
+};
+export type ToAbsoluteSlotNumberResponse = number;
+export type ToAbsoluteSlotNumberFunc = (
+  request: ToAbsoluteSlotNumberRequest
+) => ToAbsoluteSlotNumberResponse;
+
+export async function genToAbsoluteSlotNumber(): Promise<ToAbsoluteSlotNumberFunc> {
+  // TODO: Cardano in the future will have a variable epoch size
+  // and sidechains/networks can have different epoch sizes
+  // so this needs to come from a DB
+  return (request: ToAbsoluteSlotNumberRequest) => {
+    return (21600 * request.epoch) + request.slot;
+  };
+}
+
+export type TimeSinceGenesisRequest = {
+  absoluteSlot: number,
+};
+export type TimeSinceGenesisResponse = number;
+export type TimeSinceGenesisRequestFunc = (
+  request: TimeSinceGenesisRequest
+) => TimeSinceGenesisResponse;
+export async function genTimeSinceGenesis(): Promise<TimeSinceGenesisRequestFunc> {
+  // TODO: Cardano in the future will have a variable slot length
+  // and sidechains/networks can have different epoch sizes
+  // so this needs to come from a DB
+  return (request: TimeSinceGenesisRequest) => {
+    return (20 * request.absoluteSlot);
+  };
+}
+
+export function normalizeToPubDeriverLevel(request: {
+  privateKeyRow: $ReadOnly<KeyRow>,
+  password: null | string,
+  path: Array<number>,
+  version: number,
+}): {
+  prvKeyHex: string,
+  pubKeyHex: string,
+} {
+  if (request.version === 2) {
+    const prvKey = decryptKey(
+      request.privateKeyRow,
+      request.password,
+    );
+    const wasmKey = RustModule.Wallet.PrivateKey.from_hex(prvKey);
+    const newKey = deriveKeyV2(
+      wasmKey,
+      request.path,
+    );
+    return {
+      prvKeyHex: newKey.to_hex(),
+      pubKeyHex: newKey.public().to_hex()
+    };
+  }
+  throw new Error('normalizeToPubDeriverLevel Only v2 supported for now');
+}
+
+export function decryptKey(
+  keyRow: $ReadOnly<KeyRow>,
+  password: null | string,
+): string {
+  let rawKey;
+  if (keyRow.IsEncrypted) {
+    if (password === null) {
+      throw new WrongPassphraseError();
+    }
+    const keyBytes = decryptWithPassword(password, keyRow.Hash);
+    rawKey = Buffer.from(keyBytes).toString('hex');
+
+  } else {
+    rawKey = keyRow.Hash;
+  }
+  return rawKey;
+}
+
+
+export function deriveKeyV2(
+  startingKey: RustModule.Wallet.PrivateKey,
+  pathToPublic: Array<number>,
+): RustModule.Wallet.PrivateKey {
+  let currKey = startingKey;
+  for (let i = 0; i < pathToPublic.length; i++) {
+    currKey = currKey.derive(
+      RustModule.Wallet.DerivationScheme.v2(),
+      pathToPublic[i],
+    );
+  }
+
+  return currKey;
+}
+
+export type KeyInfo = {
+  password: string | null,
+  lastUpdate: Date | null
+};
+export function toKeyInsert(
+  keyInfo: KeyInfo,
+  keyHex: string,
+): KeyInsert {
+  const hash = keyInfo.password != null
+    ? encryptWithPassword(
+      keyInfo.password,
+      Buffer.from(keyHex, 'hex')
+    )
+    : keyHex;
+
+  return {
+    Hash: hash,
+    IsEncrypted: keyInfo.password != null,
+    PasswordLastUpdate: keyInfo.lastUpdate,
+  };
+}
+
+
+export async function rawGetDerivationsByPath<
+  Row: { +KeyDerivationId: number }
+>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  depTables: { GetPathWithSpecific: Class<GetPathWithSpecific>, },
+  request: GetPathWithSpecificByTreeRequest,
+): Promise<Array<{|
+  row: $ReadOnly<Row>,
+  ...Addressing,
+|}>> {
+  const pathWithSpecific = await depTables.GetPathWithSpecific.getTree<Row>(
+    db, tx,
+    request,
+  );
+  const result = pathWithSpecific.rows.map(row => {
+    const path = pathWithSpecific.pathMap.get(row.KeyDerivationId);
+    if (path == null) {
+      throw new Error('getDerivationsByPath should never happen');
+    }
+    return {
+      row,
+      addressing: {
+        path,
+        startLevel: request.startingDerivation - request.commonPrefix.length,
+      },
+    };
+  });
+  return result;
+}
+
+export type HashToIdsFunc = Array<string> => Promise<Map<string, number>>;
+export function rawGenHashToIdsFunc(
+  db: lf$Database,
+  tx: lf$Transaction,
+  depTables: {| GetOrAddAddress: Class<GetOrAddAddress> |},
+  ownAddressIds: Set<number>,
+): HashToIdsFunc {
+  return async (
+    hashes: Array<string>
+  ): Promise<Map<string, number>> => {
+    const rows = await depTables.GetOrAddAddress.getByHash(db, tx, hashes);
+    const addressRowMap: Map<string, Array<$ReadOnly<AddressRow>>> = rows.reduce(
+      (map, nextElement) => {
+        const array = map.get(nextElement.Hash) || [];
+        map.set(
+          nextElement.Hash,
+          [...array, nextElement]
+        );
+        return map;
+      },
+      new Map()
+    );
+    const notFound = [];
+    const finalMapping: Map<string, number> = new Map();
+    for (const address of hashes) {
+      if (addressRowMap.has(address)) {
+        const ids = addressRowMap.get(address);
+        if (ids == null) throw new Error('should never happen');
+        const ownId = ids.filter(id => ownAddressIds.has(id.AddressId));
+        if (ownId.length > 1) {
+          throw new Error('Address associated multiple times with same wallet');
+        }
+        if (ownId.length === 1) {
+          finalMapping.set(address, ownId[0].AddressId);
+          continue;
+        }
+        // length = 0
+        notFound.push(address);
+      } else {
+        notFound.push(address);
+      }
+    }
+    const newEntries = await depTables.GetOrAddAddress.addByHash(db, tx, notFound);
+    for (let i = 0; i < newEntries.length; i++) {
+      finalMapping.set(notFound[i], newEntries[i].AddressId);
+    }
+    return finalMapping;
+  };
+}
+
+export async function rawGetBip44AddressesByPath(
+  db: lf$Database,
+  tx: lf$Transaction,
+  depTables: {
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+  },
+  request: GetPathWithSpecificByTreeRequest,
+): Promise<Array<{|
+  row: $ReadOnly<Bip44AddressRow>,
+  ...Addressing,
+  addr: $ReadOnly<AddressRow>
+|}>> {
+  const bip44Addresses = await rawGetDerivationsByPath<Bip44AddressRow>(
+    db, tx,
+    { GetPathWithSpecific: depTables.GetPathWithSpecific, },
+    request,
+  );
+  // Note: simple get since we know these addresses exist
+  const addressRows = await depTables.GetAddress.getById(
+    db, tx,
+    bip44Addresses.map(row => row.row.AddressId),
+  );
+  const infoMap = new Map<number, $ReadOnly<AddressRow>>(
+    addressRows.map(row => [row.AddressId, row])
+  );
+
+  return bip44Addresses.map(row => {
+    const info = infoMap.get(row.row.AddressId);
+    if (info == null) {
+      throw new Error('getBip44AddressesByPath should never happen');
+    }
+    return {
+      ...row,
+      addr: info,
+    };
+  });
+}
+
+export function getLastUsedIndex(request: {
+  singleChainAddresses: Array<PathWithAddrAndRow>,
+  usedStatus: Set<number>,
+}): number {
+  request.singleChainAddresses.sort((a1, a2) => {
+    const index1 = a1.addressing.path[a1.addressing.path.length - 1];
+    const index2 = a2.addressing.path[a2.addressing.path.length - 1];
+    return index1 - index2;
+  });
+
+  let lastUsedIndex = -1;
+  for (let i = 0; i < request.singleChainAddresses.length; i++) {
+    if (request.usedStatus.has(request.singleChainAddresses[i].row.AddressId)) {
+      lastUsedIndex = i;
+    }
+  }
+  return lastUsedIndex;
+}
+
+export async function rawGetUtxoUsedStatus(
+  db: lf$Database,
+  tx: lf$Transaction,
+  depTables: {| GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>, |},
+  request: {
+    addressIds: Array<number>,
+  },
+): Promise<Set<number>> {
+  const outputs = await depTables.GetUtxoTxOutputsWithTx.getOutputsForAddresses(
+    db, tx,
+    request.addressIds,
+    [TxStatusCodes.IN_BLOCK]
+  );
+  return new Set(outputs.map(output => output.UtxoTransactionOutput.AddressId));
+}
+
+export async function rawGetAddressesForDisplay(
+  db: lf$Database,
+  tx: lf$Transaction,
+  depTables: {|
+    GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+  |},
+  request: {
+    addresses: Array<PathWithAddrAndRow>,
+  },
+): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+  const addressIds = request.addresses.map(address => address.addr.AddressId);
+  const utxosForAddresses = await rawGetUtxoUsedStatus(
+    db, tx,
+    { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx },
+    { addressIds },
+  );
+  const utxoForAddresses = await depTables.GetUtxoTxOutputsWithTx.getUtxo(
+    db, tx,
+    addressIds,
+  );
+  const balanceForAddresses = getUtxoBalanceForAddresses(utxoForAddresses);
+
+  const usedStatus = new Set(Object.keys(utxosForAddresses));
+  return request.addresses.map(info => ({
+    address: info.addr.Hash,
+    value: balanceForAddresses[info.addr.AddressId],
+    addressing: info.addressing,
+    isUsed: usedStatus.has(info.addr.AddressId),
+  }));
+}
+
+export async function rawGetChainAddressesForDisplay(
+  tx: lf$Transaction,
+  depTables: {|
+    GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+    GetAddress: Class<GetAddress>,
+    GetPathWithSpecific: Class<GetPathWithSpecific>
+  |},
+  request: {
+    publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
+    chainsRequest: IHasChainsRequest,
+  },
+): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+  const addresses = await request.publicDeriver.rawGetAddressesForChain(
+    tx,
+    {
+      GetAddress: depTables.GetAddress,
+      GetPathWithSpecific: depTables.GetPathWithSpecific,
+    },
+    request.chainsRequest
+  );
+  let belowCutoff = addresses;
+  if (request.chainsRequest.chainId === EXTERNAL) {
+    const cutoff = await request.publicDeriver.rawGetCutoff(
+      tx,
+      { GetPathWithSpecific: depTables.GetPathWithSpecific },
+      undefined,
+    );
+    belowCutoff = addresses.filter(address => (
+      address.addressing.path[address.addressing.path.length - 1] <= cutoff
+    ));
+  }
+  let addressResponse = await rawGetAddressesForDisplay(
+    request.publicDeriver.getDb(), tx,
+    { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx },
+    { addresses: belowCutoff },
+  );
+  if (request.chainsRequest.chainId === INTERNAL) {
+    let bestUsed = -1;
+    for (const address of addressResponse) {
+      if (address.isUsed) {
+        const index = address.addressing.path[address.addressing.path.length - 1];
+        if (index > bestUsed) {
+          bestUsed = index;
+        }
+      }
+    }
+    addressResponse = addressResponse.filter(address => (
+      address.addressing.path[address.addressing.path.length - 1] <= bestUsed + 1
+    ));
+  }
+  return addressResponse;
+}
+export async function getChainAddressesForDisplay(
+  request: {
+    publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
+    chainsRequest: IHasChainsRequest,
+  },
+): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+  const deps = Object.freeze({
+    GetUtxoTxOutputsWithTx,
+    GetAddress,
+    GetPathWithSpecific
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
+  return await raii(
+    request.publicDeriver.getDb(),
+    depTables,
+    async tx => await rawGetChainAddressesForDisplay(
+      tx,
+      deps,
+      request,
+    )
+  );
+}
+export async function rawGetAllAddressesForDisplay(
+  tx: lf$Transaction,
+  depTables: {|
+    GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+    GetAddress: Class<GetAddress>,
+    GetPathWithSpecific: Class<GetPathWithSpecific>
+  |},
+  request: {
+    publicDeriver: IPublicDeriver & IGetAllAddresses,
+  },
+): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+  let addresses = await request.publicDeriver.rawGetAllAddresses(
+    tx,
+    {
+      GetAddress: depTables.GetAddress,
+      GetPathWithSpecific: depTables.GetPathWithSpecific,
+    },
+    undefined,
+  );
+  // when public deriver level = chain we still have a display cutoff
+  const hasCutoff = asDisplayCutoff(request.publicDeriver);
+  if (hasCutoff != null) {
+    const cutoff = await hasCutoff.rawGetCutoff(
+      tx,
+      { GetPathWithSpecific: depTables.GetPathWithSpecific },
+      undefined,
+    );
+    addresses = addresses.filter(address => (
+      address.addressing.path[address.addressing.path.length - 1] <= cutoff
+    ));
+  }
+  return await rawGetAddressesForDisplay(
+    request.publicDeriver.getDb(), tx,
+    { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx },
+    { addresses },
+  );
+}
+export async function getAllAddressesForDisplay(
+  request: {
+    publicDeriver: IPublicDeriver & IGetAllAddresses,
+  },
+): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+  const deps = Object.freeze({
+    GetUtxoTxOutputsWithTx,
+    GetAddress,
+    GetPathWithSpecific
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
+  return await raii(
+    request.publicDeriver.getDb(),
+    depTables,
+    async tx => await rawGetAllAddressesForDisplay(
+      tx,
+      deps,
+      request,
+    )
+  );
+}
+
+export async function rawGetNextUnusedIndex(
+  db: lf$Database,
+  tx: lf$Transaction,
+  depTables: {|
+    GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+  |},
+  request:  {|
+    addressesForChain: Array<PathWithAddrAndRow>,
+  |}
+): Promise<IGetNextUnusedForChainResponse> {
+  const usedStatus = await rawGetUtxoUsedStatus(
+    db, tx,
+    { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx },
+    { addressIds: request.addressesForChain.map(address => address.addr.AddressId) }
+  );
+  const lastUsedIndex = getLastUsedIndex({
+    singleChainAddresses: request.addressesForChain,
+    usedStatus,
+  });
+
+  const nextInternalAddress = request.addressesForChain[lastUsedIndex + 1];
+  if (nextInternalAddress === undefined) {
+    return {
+      addressInfo: undefined,
+      index: lastUsedIndex + 1,
+    };
+  }
+  return {
+    addressInfo: {
+      ...nextInternalAddress
+    },
+    index: lastUsedIndex + 1,
+  };
+}
+
+export function getUtxoBalanceForAddresses(
+  utxos: IGetAllUtxosResponse,
+): { [key: number]: IGetUtxoBalanceResponse } {
+  const groupByAddress = groupBy(
+    utxos,
+    utxo => utxo.UtxoTransactionOutput.AddressId
+  );
+  const mapping = mapValues(
+    groupByAddress,
+    utxoList => getBalanceForUtxos(utxoList)
+  );
+  return mapping;
+}
+
+
+export function getBalanceForUtxos(
+  utxos: IGetAllUtxosResponse,
+): IGetUtxoBalanceResponse {
+  const amounts = utxos.map(utxo => new BigNumber(utxo.UtxoTransactionOutput.Amount));
+  const total = amounts.reduce(
+    (acc, amount) => acc.plus(amount),
+    new BigNumber(0)
+  );
+  return total;
+}
+
+export async function rawChangePassword(
+  db: lf$Database,
+  tx: lf$Transaction,
+  depTables: { UpdateGet: Class<UpdateGet> },
+  request: IChangePasswordRequest & {
+    oldKeyRow: $ReadOnly<KeyRow>,
+  },
+): Promise<IChangePasswordResponse> {
+  const decryptedKey = decryptKey(
+    request.oldKeyRow,
+    request.oldPassword,
+  );
+
+  let newKey = decryptedKey;
+  if (request.newPassword !== null) {
+    newKey = encryptWithPassword(
+      request.newPassword,
+      Buffer.from(decryptedKey, 'hex'),
+    );
+  }
+
+  const newRow: KeyRow = {
+    KeyId: request.oldKeyRow.KeyId,
+    Hash: newKey,
+    IsEncrypted: request.newPassword !== null,
+    PasswordLastUpdate: request.currentTime,
+  };
+
+  return await depTables.UpdateGet.update(
+    db, tx,
+    newRow,
+  );
+}
+
+export async function getAllBip44Wallets(
+  db: lf$Database,
+): Promise<$ReadOnlyArray<$ReadOnly<Bip44WrapperRow>>> {
+  return await raii(
+    db,
+    getAllSchemaTables(db, GetAllBip44Wallets),
+    async tx => {
+      return await GetAllBip44Wallets.get(
+        db,
+        tx,
+      );
+    }
+  );
+}
+
+export async function getPublicDeriversFor(
+  db: lf$Database,
+  wrapperId: number,
+): Promise<$ReadOnlyArray<$ReadOnly<PublicDeriverRow>>> {
+  return await raii(
+    db,
+    getAllSchemaTables(db, GetAllPublicDerivers),
+    async tx => {
+      return await GetAllPublicDerivers.forBip44Wallet(
+        db,
+        tx,
+        wrapperId,
+      );
+    }
+  );
+}

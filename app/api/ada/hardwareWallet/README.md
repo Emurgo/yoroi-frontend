@@ -1,4 +1,4 @@
-# newTransaction.js
+# hwTransactions.js
 This module is responsible for managing hardware wallet device sign transaction, and it's two step process.
 - Prepare the payload data format to be consume by respective hawrdware wallets(Trezor/Ledger).
 - Propagate the hardware wallet signed transaction to the blockchain.

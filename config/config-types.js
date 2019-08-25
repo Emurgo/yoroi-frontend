@@ -10,9 +10,6 @@ export type AppConfigType = {
   serverStatusRefreshInterval: number,
   logsBufferSize: number,
   logsFileSuffix: string,
-  /** Defined by bip44
-   * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit */
-  addressScanSize: number,
   addressRequestSize: number,
   txsBodiesRequestSize: number,
 }

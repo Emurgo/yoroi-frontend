@@ -99,7 +99,6 @@ export default class AdaTransactionBuilderStore extends Store {
 
     runInAction(() => {
       this.plannedTx = {
-        addressesMap: result.addressesMap,
         senderUtxos: result.senderUtxos,
         unsignedTx: result.txBuilder.make_transaction(),
         changeAddr: result.changeAddr,

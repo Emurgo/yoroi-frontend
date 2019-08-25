@@ -3,7 +3,7 @@
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import cryptoRandomString from 'crypto-random-string';
-import type { AdaTxsState, Transaction, UTXO } from '../../app/api/ada/adaTypes';
+import type { RemoteTxState, RemoteTransaction, RemoteUnspentOutput } from '../../app/api/ada/adaTypes';
 
 // based on abandon x 14 + share
 const genesisTransaction = '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b35';
@@ -19,7 +19,7 @@ type MockTx = {
   block_num: ?string, // null if transaction pending/failed
   time: string, // timestamp with timezone
   last_update: string, // timestamp with timezone
-  tx_state: AdaTxsState
+  tx_state: RemoteTxState
 }
 
 type ServerStatus = {
@@ -363,7 +363,7 @@ export function serverFixed() {
 //   Recalculate state
 // =====================
 
-function calcUtxoMap(): { [key: string]: $Exact<UTXO> }  {
+function calcUtxoMap(): { [key: string]: $Exact<RemoteUnspentOutput> }  {
   const utxoMap = {};
   for (const tx of transactions) {
     for (let j = 0; j < tx.inputs.length; j++) {
@@ -412,7 +412,7 @@ function history(): Array<Transaction> {
 }
 
 
-function utxoForAddresses(): { [key: string]: Array<UTXO> } {
+function utxoForAddresses(): { [key: string]: Array<RemoteUnspentOutput> } {
   const utxoMap = calcUtxoMap();
   const utxos = Object.keys(utxoMap).map(key => utxoMap[key]);
   const regularUtxoMapping = _.groupBy(utxos, utxo => utxo.receiver);

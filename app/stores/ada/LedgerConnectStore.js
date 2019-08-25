@@ -16,13 +16,14 @@ import Config from '../../config';
 import environment from '../../environment';
 
 import Store from '../base/Store';
-import Wallet from '../../domain/Wallet';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
   CreateHardwareWalletRequest,
   CreateHardwareWalletFunc,
 } from '../../api/ada';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 import {
   convertToLocalizableError
@@ -304,7 +305,10 @@ export default class LedgerConnectStore
     };
   };
 
-  async _onSaveSucess(ledgerWallet: Wallet): Promise<void> {
+  async _onSaveSucess(
+    conceptualWallet: ConceptualWallet,
+    publicDerivers: PublicDeriver,
+  ): Promise<void> {
     // close the active dialog
     Logger.debug('LedgerConnectStore::_onSaveSucess success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();

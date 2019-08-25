@@ -21,7 +21,7 @@ import {
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
-import { getReceiverAddress } from '../../api/ada/lib/storage/adaAddress';
+import { nextInternalFor } from '../../api/ada/lib/storage/models/utils';
 import {
   getCryptoDaedalusWalletFromMnemonics,
   getCryptoDaedalusWalletFromMasterKey
@@ -140,9 +140,16 @@ export default class DaedalusTransferStore extends Store {
           const checker = RustModule.Wallet.DaedalusAddressChecker.new(wallet);
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
-          const outputAddr = await getReceiverAddress();
+
+          // TODO: should be done in Request
+          const internal = await nextInternalFor(
+            walletId, // todo: turn to pubderiver
+            {
+              commonPrefix: []
+            }
+          );
           const transferTx = await generateTransferTx({
-            outputAddr,
+            outputAddr: internal.row.Hash,
             addressKeys,
             getUTXOsForAddresses:
               this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,

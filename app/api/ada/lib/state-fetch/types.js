@@ -1,8 +1,8 @@
 // @flow
 
 import type {
-  UTXO,
-  Transaction
+  RemoteUnspentOutput,
+  RemoteTransaction
 } from '../../adaTypes';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
@@ -11,7 +11,7 @@ import { RustModule } from '../cardanoCrypto/rustLoader';
 export type AddressUtxoRequest = {
   addresses: Array<string>,
 };
-export type AddressUtxoResponse = Array<UTXO>;
+export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
 // getTxsBodiesForUTXOs
@@ -34,12 +34,28 @@ export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
 
 // getTransactionsHistoryForAddresses
 
-export type HistoryRequest = {
+export type HistoryRequest = {|
   addresses: Array<string>,
-  dateFrom: Date
-};
-export type HistoryResponse = Array<Transaction>;
+  after?: {|
+    block: string,
+    tx: string,
+  |},
+  untilBlock: string,
+|};
+export type HistoryResponse = Array<RemoteTransaction>;
 export type HistoryFunc = (body: HistoryRequest) => Promise<HistoryResponse>;
+
+// getBestBlock
+
+export type BestBlockRequest = void;
+export type BestBlockResponse = {
+  height: number, // 0 if no blocks in db
+  // null when no blocks in db
+  epoch: null | number,
+  slot: null | number,
+  hash: null | string,
+};
+export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockResponse>;
 
 // sendTx
 
@@ -61,7 +77,8 @@ export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse
 
 // checkServer
 
+export type ServerStatusRequest = void;
 export type ServerStatusResponse = {
   isServerOk: boolean
 };
-export type ServerStatusFunc = () => Promise<ServerStatusResponse>;
+export type ServerStatusFunc = (body: ServerStatusRequest) => Promise<ServerStatusResponse>;

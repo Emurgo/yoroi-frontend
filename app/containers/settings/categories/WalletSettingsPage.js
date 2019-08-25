@@ -17,7 +17,7 @@ export default class WalletSettingsPage extends Component<Props> {
     const { actions, stores } = this.props;
     const activeWallet = wallets.active;
     const {
-      updateWalletMetaRequest,
+      renameModelRequest,
       lastUpdatedWalletField,
       walletFieldBeingEdited,
     } = walletSettings;
@@ -39,14 +39,18 @@ export default class WalletSettingsPage extends Component<Props> {
     );
     return (
       <WalletSettings
-        error={updateWalletMetaRequest.error}
+        error={renameModelRequest.error}
         openDialogAction={actions.dialogs.open.trigger}
         walletPasswordUpdateDate={activeWallet.passwordUpdateDate}
         isDialogOpen={uiDialogs.isOpen}
         dialog={changeDialog}
         walletName={activeWallet.name}
-        isSubmitting={updateWalletMetaRequest.isExecuting}
-        isInvalid={updateWalletMetaRequest.wasExecuted && updateWalletMetaRequest.result === false}
+        isSubmitting={renameModelRequest.isExecuting}
+        isInvalid={
+          renameModelRequest.wasExecuted
+          &&
+          renameModelRequest.result === false
+        }
         lastUpdatedField={lastUpdatedWalletField}
         onFieldValueChange={(field, value) => updateWalletField.trigger({ field, value })}
         onStartEditing={field => startEditingWalletField.trigger({ field })}

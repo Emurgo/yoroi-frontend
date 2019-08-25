@@ -4,18 +4,119 @@ import _ from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
-import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
-import type { GetAddressesFunc, CreateAddressFunc } from '../../api/ada';
+import type {
+  CreateAddressFunc,
+} from '../../api/ada';
 import environment from '../../environment';
+import {
+  PublicDeriver, asGetAllAddresses, asHasChains, asDisplayCutoff,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type {
+  IHasChainsRequest
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  Address, Addressing, UsedStatus, Value,
+} from '../../api/ada/lib/storage/models/common/interfaces';
+import type { StoresMap } from '../index';
+import {
+  Logger,
+} from '../../utils/logging';
+import { EXTERNAL, INTERNAL } from '../../config/numbersConfig';
+
+type StandardAddress = {|
+  ...Address, ...Value, ...Addressing, ...UsedStatus
+|};
+
+type SubRequestType<T> = { publicDeriver: PublicDeriver } => Promise<Array<T>>;
+class AddressTypeStore<T> {
+
+  @observable addressesRequests: Array<{
+    publicDeriver: PublicDeriver,
+    cachedRequest: CachedRequest<SubRequestType<T>>,
+  }> = [];
+
+  stores: StoresMap;
+  request: SubRequestType<T>;
+  constructor(
+    stores: StoresMap,
+    request: SubRequestType<T>,
+  ) {
+    this.stores = stores;
+    this.request = request;
+  }
+
+  @computed get all(): Array<T> {
+    const publicDeriver = this.stores.substores[environment.API].wallets.selected;
+    if (!publicDeriver) return [];
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    if (result == null) return [];
+    return result;
+  }
+
+  @computed get hasAny(): boolean {
+    const publicDeriver = this.stores.substores[environment.API].wallets.selected;
+    if (!publicDeriver) return false;
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    return result ? result.length > 0 : false;
+  }
+
+  @computed get active(): ?T {
+    const publicDeriver = this.stores.substores[environment.API].wallets.selected;
+    if (!publicDeriver) return;
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    return result ? result[result.length - 1] : null;
+  }
+
+  @computed get totalAvailable(): number {
+    const publicDeriver = this.stores.substores[environment.API].wallets.selected;
+    if (!publicDeriver) return 0;
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    return result ? result.length : 0;
+  }
+
+  /** Refresh addresses for all wallets */
+  @action refreshAddresses = () => {
+    const publicDeriver = this.stores.substores[environment.API].wallets.selected;
+    if (publicDeriver == null) return;
+    const allRequest = this._getRequest(publicDeriver);
+    allRequest.invalidate({ immediately: false });
+    allRequest.execute({ publicDeriver });
+  };
+
+  _flowCoerceResult: CachedRequest<SubRequestType<T>> => ?Array<T> = (request) => {
+    // Flow fails when resolving types so this is the best we can check
+    (request.result: ?Array<any>);
+    return (request.result: any);
+  }
+
+  _getRequest: (PublicDeriver) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
+    const foundRequest = _.find(this.addressesRequests, { publicDeriver });
+    if (foundRequest && foundRequest.cachedRequest) {
+      return foundRequest.cachedRequest;
+    }
+    return new CachedRequest<SubRequestType<T>>(this.request);
+  };
+
+  @action addObservedWallet = (
+    publicDeriver: PublicDeriver
+  ): void => {
+    this.addressesRequests.push({
+      publicDeriver,
+      cachedRequest: this._getRequest(publicDeriver),
+    });
+    this.refreshAddresses();
+  }
+}
 
 export default class AddressesStore extends Store {
 
-  /** Track addresses for a set of wallets */
-  @observable addressesRequests: Array<{
-    walletId: string,
-    allRequest: CachedRequest<GetAddressesFunc>
-  }> = [];
+  /** warning: do NOT use this if public deriver level < Account */
+  allAddressesForDisplay: AddressTypeStore<StandardAddress>;
+
+  externalForDisplay: AddressTypeStore<StandardAddress>;
+  internalForDisplay: AddressTypeStore<StandardAddress>;
+
   @observable error: ?LocalizableError = null;
 
   // REQUESTS
@@ -25,13 +126,41 @@ export default class AddressesStore extends Store {
     const actions = this.actions[environment.API].addresses;
     actions.createAddress.listen(this._createAddress);
     actions.resetErrors.listen(this._resetErrors);
+
+    this.allAddressesForDisplay = new AddressTypeStore(
+      this.stores,
+      (request) => this._wrapForAllAddresses(request)
+    );
+    this.externalForDisplay = new AddressTypeStore(
+      this.stores,
+      (request) => this._wrapForChainAddresses({
+        ...request,
+        chainsRequest: { chainId: EXTERNAL },
+      })
+    );
+    this.internalForDisplay = new AddressTypeStore(
+      this.stores,
+      (request) => this._wrapForChainAddresses({
+        ...request,
+        chainsRequest: { chainId: INTERNAL },
+      })
+    );
   }
 
   _createAddress = async () => {
     try {
-      const address: ?WalletAddress = await this.createAddressRequest.execute({}).promise;
+      const publicDeriver = this.stores.substores[environment.API].wallets.selected;
+      if (publicDeriver == null) return;
+      const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+      if (withDisplayCutoff == null) {
+        Logger.error(`_createAddress incorrect public deriver`);
+        return;
+      }
+      const address = await this.createAddressRequest.execute({
+        popFunc: withDisplayCutoff.popAddress
+      }).promise;
       if (address != null) {
-        this._refreshAddresses();
+        this.refreshAddresses(publicDeriver);
         runInAction('reset error', () => { this.error = null; });
       }
     } catch (error) {
@@ -39,68 +168,56 @@ export default class AddressesStore extends Store {
     }
   };
 
-  @computed get all(): Array<WalletAddress> {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return [];
-    const result = this._getAddressesAllRequest(wallet.id).result;
-    return result ? result.addresses : [];
-  }
-
-  @computed get hasAny(): boolean {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return false;
-    const result = this._getAddressesAllRequest(wallet.id).result;
-    return result ? result.addresses.length > 0 : false;
-  }
-
-  @computed get active(): ?WalletAddress {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return;
-    const result = this._getAddressesAllRequest(wallet.id).result;
-    return result ? result.addresses[result.addresses.length - 1] : null;
-  }
-
-  @computed get totalAvailable(): number {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return 0;
-    const result = this._getAddressesAllRequest(wallet.id).result;
-    return result ? result.addresses.length : 0;
-  }
-
-  /** Refresh addresses for all wallets */
-  @action _refreshAddresses = () => {
-    const allWallets = this.stores.substores[environment.API].wallets.all;
-    for (const wallet of allWallets) {
-      const allRequest = this._getAddressesAllRequest(wallet.id);
-      allRequest.invalidate({ immediately: false });
-      allRequest.execute({ walletId: wallet.id });
-    }
-  };
-
-  /** Update which walletIds to track and refresh the data */
-  @action updateObservedWallets = (
-    walletIds: Array<string>
-  ): void => {
-    this.addressesRequests = walletIds.map(walletId => ({
-      walletId,
-      allRequest: this.stores.substores.ada.addresses._getAddressesAllRequest(walletId),
-    }));
-    this._refreshAddresses();
-  }
-
   @action _resetErrors = () => {
     this.error = null;
   };
 
-  _getAccountIdByWalletId = (walletId: string): (?string) => {
-    // Note: assume single account in Yoroi
-    const result = this._getAddressesAllRequest(walletId).result;
-    return result ? result.accountId : null;
-  };
+  addObservedWallet = (publicDeriver: PublicDeriver) => {
+    const withHasChains = asHasChains(publicDeriver);
+    if (withHasChains == null) {
+      this.allAddressesForDisplay.addObservedWallet(publicDeriver);
+    } else {
+      this.externalForDisplay.addObservedWallet(publicDeriver);
+      this.internalForDisplay.addObservedWallet(publicDeriver);
+    }
+  }
 
-  _getAddressesAllRequest = (walletId: string): CachedRequest<GetAddressesFunc> => {
-    const foundRequest = _.find(this.addressesRequests, { walletId });
-    if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
-    return new CachedRequest<GetAddressesFunc>(this.api[environment.API].getExternalAddresses);
-  };
+  refreshAddresses = (publicDeriver: PublicDeriver) => {
+    const withHasChains = asHasChains(publicDeriver);
+    if (withHasChains == null) {
+      this.allAddressesForDisplay.refreshAddresses();
+    } else {
+      this.externalForDisplay.refreshAddresses();
+      this.internalForDisplay.refreshAddresses();
+    }
+  }
+
+  _wrapForAllAddresses = (request: {
+    publicDeriver: PublicDeriver
+  }): Promise<Array<StandardAddress>> => {
+    const withGetAllAddresses = asGetAllAddresses(request.publicDeriver);
+    if (withGetAllAddresses == null) {
+      Logger.error(`_wrapForAllAddresses incorrect public deriver`);
+      return Promise.resolve([]);
+    }
+    return this.api[environment.API].getAllAddressesForDisplay({
+      publicDeriver: withGetAllAddresses
+    });
+  }
+  _wrapForChainAddresses = (request: {
+    publicDeriver: PublicDeriver,
+    chainsRequest: IHasChainsRequest,
+  }): Promise<Array<StandardAddress>> => {
+    const withHasChains = asHasChains(
+      request.publicDeriver
+    );
+    if (withHasChains == null) {
+      Logger.error(`_wrapForChainAddresses incorrect public deriver`);
+      return Promise.resolve([]);
+    }
+    return this.api[environment.API].getChainAddressesForDisplay({
+      publicDeriver: withHasChains,
+      chainsRequest: request.chainsRequest,
+    });
+  }
 }

@@ -1,33 +1,104 @@
 // @flow
 
+import crypto from 'crypto';
 import {
-  schema
+  schema,
 } from 'lovefield';
-import type { lf$raw$BackStore, lf$Database } from 'lovefield';
+import type {
+  lf$Database,
+  lf$raw$BackStore,
+} from 'lovefield';
+import {
+  getAllSchemaTables,
+  raii,
+} from './utils';
+import { GetEncryptionMeta, } from './uncategorized/api/read';
+import { ModifyEncryptionMeta, } from './uncategorized/api/write';
 
 import { populateUncategorizedDb } from './uncategorized/tables';
-import { populateBip44Db } from './genericBip44/tables';
+import { populateBip44Db } from './bip44/tables';
+import { populateTransactionsDb } from './transactions/tables';
+import { populateWalletDb } from './wallet/tables';
+import environment from '../../../../../environment';
 
-export const loadLovefieldDB = async (inMemory: boolean): Promise<lf$Database> => {
+export const loadLovefieldDB = async (
+  storeType: $Values<typeof schema.DataStoreType>
+): Promise<lf$Database> => {
+  const db = await populateAndCreate(storeType);
+
+  await raii(
+    db,
+    [
+      ...getAllSchemaTables(db, GetEncryptionMeta),
+      ...getAllSchemaTables(db, ModifyEncryptionMeta),
+    ],
+    async tx => {
+      const hasMeta = await GetEncryptionMeta.exists(
+        db, tx,
+      );
+      if (!hasMeta) {
+        await ModifyEncryptionMeta.setInitial(
+          db, tx,
+          {
+            EncryptionMetaId: 0,
+            AddressSeed: environment.isJest()
+              ? 1690513609
+              : crypto.randomBytes(4).readUInt32BE(0),
+            TransactionSeed: environment.isJest()
+              ? 769388545
+              : crypto.randomBytes(4).readUInt32BE(0),
+            BlockSeed: environment.isJest()
+              ? 371536492
+              : crypto.randomBytes(4).readUInt32BE(0),
+          }
+        );
+      }
+    }
+  );
+
+  return db;
+};
+
+const populateAndCreate = async (
+  storeType: $Values<typeof schema.DataStoreType>
+): Promise<lf$Database> => {
   const schemaBuilder = schema.create('yoroi-schema', 2);
 
   populateUncategorizedDb(schemaBuilder);
   populateBip44Db(schemaBuilder);
+  populateTransactionsDb(schemaBuilder);
+  populateWalletDb(schemaBuilder);
 
   return await schemaBuilder.connect({
+    storeType,
     onUpgrade,
-    storeType: inMemory
-      ? schema.DataStoreType.MEMORY
-      : schema.DataStoreType.INDEXED_DB
   });
 };
 
-async function onUpgrade(rawDb: lf$raw$BackStore) {
+export async function clear(
+  db: lf$Database,
+): Promise<void> {
+  const tx = db.createTransaction();
+  await tx.begin(db.getSchema().tables());
+
+  for (const table of db.getSchema().tables()) {
+    tx.attach(db.delete().from(table));
+  }
+  await tx.commit();
+}
+
+async function onUpgrade(
+  rawDb: lf$raw$BackStore,
+): Promise<void> {
   const version = rawDb.getVersion();
   if (version === 1) {
-    // v1 of the DB did not store any information that can't be inferred from the blockchain
-    await rawDb.dropTable('Addresses');
-    await rawDb.dropTable('Txs');
-    await rawDb.dropTable('TxAddresses');
+    // TODO: expose dump for migration
+    const dump = rawDb.dump();
+
+    rawDb.dropTable('TxAddresses');
+    rawDb.dropTable('Txs');
+    rawDb.dropTable('Addresses');
+  } else {
+    throw new Error('unexpected version number');
   }
 }

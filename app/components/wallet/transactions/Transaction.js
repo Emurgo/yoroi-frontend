@@ -9,15 +9,18 @@ import classNames from 'classnames';
 import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
-import WalletTransaction, { transactionStates, transactionTypes } from '../../../domain/WalletTransaction';
+import WalletTransaction from '../../../domain/WalletTransaction';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
-import type { TransactionState, TransactionDirectionType } from '../../../domain/WalletTransaction';
+import type {TransactionDirectionType, } from '../../../api/ada/adaTypes';
+import { transactionTypes } from '../../../api/ada/adaTypes';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
 import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
+import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/transactions/tables';
+import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/transactions/tables';
 
 const messages = defineMessages({
   type: {
@@ -114,7 +117,7 @@ const stateTranslations = defineMessages({
 
 type Props = {|
   data: WalletTransaction,
-  state: TransactionState,
+  state: TxStatusCodesType,
   selectedExplorer: ExplorerType,
   assuranceLevel: string,
   isLastInList: boolean,
@@ -180,8 +183,8 @@ export default class Transaction extends Component<Props, State> {
     const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
-    const isFailedTransaction = state === transactionStates.FAILED;
-    const isPendingTransaction = state === transactionStates.PENDING;
+    const isFailedTransaction = state < 0;
+    const isPendingTransaction = state === TxStatusCodes.PENDING;
 
     const componentStyles = classNames([
       styles.component,
@@ -211,7 +214,7 @@ export default class Transaction extends Component<Props, State> {
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = state === transactionStates.OK
+    const status = state === TxStatusCodes.IN_BLOCK
       ? intl.formatMessage(assuranceLevelTranslations[assuranceLevel])
       // $FlowFixMe flow doesn't support type refinments with enums
       : intl.formatMessage(stateTranslations[state]);
@@ -232,7 +235,7 @@ export default class Transaction extends Component<Props, State> {
               <div className={styles.time}>
                 {moment(data.date).format('hh:mm:ss A')}
               </div>
-              {state === transactionStates.OK ? (
+              {state === TxStatusCodes.IN_BLOCK ? (
                 <div className={labelOkClasses}>{status}</div>
               ) : (
                 <div className={labelClasses}>
@@ -317,7 +320,7 @@ export default class Transaction extends Component<Props, State> {
               {environment.isAdaApi() ? (
                 <div className={styles.row}>
                   <h2>{intl.formatMessage(messages.assuranceLevel)}</h2>
-                  {state === transactionStates.OK ? (
+                  {state === TxStatusCodes.IN_BLOCK ? (
                     <span className={styles.rowData}>
                       <span className={styles.assuranceLevel}>{status}</span>
                       . {data.numberOfConfirmations} {intl.formatMessage(messages.confirmations)}.

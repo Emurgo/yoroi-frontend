@@ -15,7 +15,6 @@ import type {
   GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
-import type { DeleteWalletFunc } from '../../api/common';
 import type { BaseSignRequest } from '../../api/ada/adaTypes';
 
 export default class AdaWalletsStore extends WalletStore {
@@ -29,9 +28,6 @@ export default class AdaWalletsStore extends WalletStore {
 
   @observable createWalletRequest: Request<CreateWalletFunc>
     = new Request<CreateWalletFunc>(this.api.ada.createWallet.bind(this.api.ada));
-
-  @observable deleteWalletRequestt: Request<DeleteWalletFunc>
-    = new Request<DeleteWalletFunc>(() => Promise.resolve(true));
 
   @observable sendMoneyRequest: Request<SignAndBroadcastFunc>
     = new Request<SignAndBroadcastFunc>(this.api.ada.signAndBroadcast);
@@ -47,7 +43,6 @@ export default class AdaWalletsStore extends WalletStore {
     const { router, walletBackup, ada } = this.actions;
     const { wallets } = ada;
     wallets.createWallet.listen(this._create);
-    wallets.deleteWallet.listen(this._delete);
     wallets.sendMoney.listen(this._sendMoney);
     wallets.restoreWallet.listen(this._restoreWallet);
     wallets.importWalletFromFile.listen(this._importWalletFromFile);
@@ -109,8 +104,6 @@ export default class AdaWalletsStore extends WalletStore {
     walletPassword: string,
   }) => {
     await this._restore(params);
-
-    this.showWalletRestoredNotification();
   };
 
   // =================== WALLET IMPORTING ==================== //

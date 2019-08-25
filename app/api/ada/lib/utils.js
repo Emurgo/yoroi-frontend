@@ -1,152 +1,119 @@
 // @flow
-import _ from 'lodash';
+import { groupBy, keyBy, mapValues } from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
-  AdaTransactionInputOutput,
   BaseSignRequest,
-  Transaction,
-  AdaTransaction,
-  AdaTransactionCondition,
-  UTXO,
+  RemoteUnspentOutput,
+  UtxoAnnotatedTransaction,
+  UserAnnotation,
 } from '../adaTypes';
+import {
+  transactionTypes,
+} from '../adaTypes';
+import type {
+  UtxoTransactionInputRow,
+  UtxoTransactionOutputRow,
+} from './storage/database/transactions/tables';
 import type { TransactionExportRow } from '../../export';
-import { DECIMAL_PLACES_IN_ADA, LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+import {
+  DECIMAL_PLACES_IN_ADA,
+  LOVELACES_PER_ADA,
+  HARD_DERIVATION_START,
+} from '../../../config/numbersConfig';
 import { RustModule } from './cardanoCrypto/rustLoader';
+import type {
+  Addressing,
+} from './storage/models/common/interfaces';
+import {
+  DerivationLevels,
+} from './storage/database/bip44/api/utils';
 
-export const toAdaTx = function (
-  amount: BigNumber,
-  tx: Transaction,
-  inputs: Array<AdaTransactionInputOutput>,
-  isOutgoing: boolean,
-  outputs: Array<AdaTransactionInputOutput>
-): AdaTransaction {
-  return {
-    ctAmount: {
-      getCCoin: amount.toString()
-    },
-    ctBlockNumber: Number(tx.block_num || ''),
-    ctId: tx.hash,
-    ctInputs: inputs,
-    ctIsOutgoing: isOutgoing,
-    ctMeta: {
-      ctmDate: new Date(tx.time),
-      ctmDescription: undefined,
-      ctmTitle: undefined,
-      ctmUpdate: new Date(tx.last_update)
-    },
-    ctOutputs: outputs,
-    ctCondition: _getTxCondition(tx.tx_state)
-  };
-};
+export function getFromUserPerspective(data: {
+  txInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
+  txOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
+  allOwnedAddressIds: Set<number>,
+}): UserAnnotation {
+  // Note: logic taken from the mobile version of Yoroi
+  // https://github.com/Emurgo/yoroi-mobile/blob/a3d72218b1e63f6362152aae2f03c8763c168795/src/crypto/transactionUtils.js#L73-L103
 
-/** Map database format to AdaTransaction format */
-export function mapToAdaTxs(
-  txs: Array<Transaction>,
-  accountAddresses: Array<string>
-): Array<AdaTransaction> {
-  return txs.map(tx => {
-    // all of these depend on the set of all addresses in the user's wallet
-    // so we calculate it here instead
-    const inputs = _mapInputOutput(tx.inputs_address, tx.inputs_amount);
-    const outputs = _mapInputOutput(tx.outputs_address, tx.outputs_amount);
-    const { isOutgoing, amount } = _spenderData(inputs, outputs, accountAddresses);
+  const ownInputs = data.txInputs.filter(input => (
+    data.allOwnedAddressIds.has(input.AddressId)
+  ));
 
-    return toAdaTx(amount, tx, inputs, isOutgoing, outputs);
-  });
-}
+  const ownOutputs = data.txOutputs.filter(output => (
+    data.allOwnedAddressIds.has(output.AddressId)
+  ));
 
-/** Map database format for historic transactions to AdaTransactionInputOutput format */
-function _mapInputOutput(
-  addresses: Array<string>,
-  amounts: Array<string>
-): Array<AdaTransactionInputOutput> {
-  return addresses.map((address, index) => [address, { getCCoin: amounts[index] }]);
-}
+  const totalIn = sumInputsOutputs(data.txInputs);
+  const totalOut = sumInputsOutputs(data.txOutputs);
+  const ownIn = sumInputsOutputs(ownInputs);
+  const ownOut = sumInputsOutputs(ownOutputs);
 
-/** Calculate whether transaction is ingoing/outgoing and how was sent out */
-function _spenderData(
-  txInputs: Array<AdaTransactionInputOutput>,
-  txOutputs: Array<AdaTransactionInputOutput>,
-  addresses: Array<string>
-): {
-  isOutgoing: boolean,
-  amount: BigNumber
-} {
-  // Utility func to sum & count up all inputs (or outputs) of a transaction that belong to user
-  const sum = toSum => (
-    toSum.reduce(
-      ({ totalAmount, count }, [address, { getCCoin }]) => {
-        // if it doesn't belong to the user, just skip
-        if (addresses.indexOf(address) < 0) return { totalAmount, count };
+  const hasOnlyOwnInputs = ownInputs.length === data.txInputs.length;
+  const hasOnlyOwnOutputs = ownOutputs.length === data.txOutputs.length;
+  const isIntraWallet = hasOnlyOwnInputs && hasOnlyOwnOutputs;
+  const isMultiParty =
+    ownInputs.length > 0 && ownInputs.length !== data.txInputs.length;
 
-        return {
-          totalAmount: totalAmount.plus(new BigNumber(getCCoin)),
-          count: count + 1
-        };
-      },
-      {
-        totalAmount: new BigNumber(0),
-        count: 0
-      }
-    )
-  );
+  const brutto = ownOut.minus(ownIn);
+  const totalFee = totalOut.minus(totalIn); // should be negative
 
-  const incoming = sum(txOutputs);
-  const outgoing = sum(txInputs);
-
-  const isOutgoing = outgoing.totalAmount.isGreaterThanOrEqualTo(
-    incoming.totalAmount
-  );
-
-  // Note: this also counts redemption transactions as self transactions
-  const isSelfTransaction =
-    incoming.count === txInputs.length &&
-    outgoing.count === txOutputs.length;
-
-  let amount; // represents how much sender sent out
-  if (isOutgoing || isSelfTransaction) amount = outgoing.totalAmount.minus(incoming.totalAmount);
-  else amount = incoming.totalAmount.minus(outgoing.totalAmount);
+  if (isIntraWallet) {
+    return {
+      type: transactionTypes.SELF,
+      amount: new BigNumber(0),
+      fee: totalFee,
+    };
+  }
+  if (isMultiParty) {
+    return {
+      type: transactionTypes.MULTI,
+      amount: brutto,
+      // note: fees not accurate but no logical way of finding which UTXO paid the fees
+      fee: new BigNumber(0),
+    };
+  }
+  if (hasOnlyOwnInputs) {
+    return {
+      type: transactionTypes.EXPEND,
+      amount: brutto.minus(totalFee),
+      fee: totalFee,
+    };
+  }
 
   return {
-    isOutgoing,
-    amount
+    type: transactionTypes.INCOME,
+    amount: brutto,
+    fee: new BigNumber(0),
   };
 }
-
-/** Convert TxState from icarus-importer to AdaTransactionCondition */
-const _getTxCondition = (state: string): AdaTransactionCondition => {
-  if (state === 'Successful') return 'CPtxInBlocks';
-  if (state === 'Pending') return 'CPtxApplying';
-  return 'CPtxWontApply';
-};
 
 export function convertAdaTransactionsToExportRows(
-  transactions: Array<AdaTransaction>
+  transactions: $ReadOnlyArray<$ReadOnly<UtxoAnnotatedTransaction>>
 ): Array<TransactionExportRow> {
-  return transactions
-    .filter(tx => tx.ctCondition === 'CPtxInBlocks')
-    .map(tx => {
-      const fullValue = new BigNumber(tx.ctAmount.getCCoin);
-      const sumInputs: BigNumber = sumInputsOutputs(tx.ctInputs);
-      const sumOutputs: BigNumber = sumInputsOutputs(tx.ctOutputs);
-      const fee: BigNumber = tx.ctIsOutgoing ? sumInputs.minus(sumOutputs) : new BigNumber(0);
-      const value: BigNumber = tx.ctIsOutgoing ? fullValue.minus(fee) : fullValue;
-      return {
-        date: tx.ctMeta.ctmDate,
-        type: tx.ctIsOutgoing ? 'out' : 'in',
-        amount: formatBigNumberToFloatString(value.dividedBy(LOVELACES_PER_ADA)),
-        fee: formatBigNumberToFloatString(fee.dividedBy(LOVELACES_PER_ADA)),
-      };
-    });
+  const result = [];
+  for (const tx of transactions) {
+    if (tx.block != null) {
+      result.push({
+        date: tx.block.BlockTime,
+        type: tx.type === transactionTypes.INCOME ? 'in' : 'out',
+        amount: formatBigNumberToFloatString(tx.amount.abs().dividedBy(LOVELACES_PER_ADA)),
+        fee: formatBigNumberToFloatString(tx.fee.abs().dividedBy(LOVELACES_PER_ADA)),
+      });
+    }
+  }
+  return result;
 }
 
-/**
- * Ignore first string parts of inputs/outputs and just sum coin values.
- */
-export function sumInputsOutputs(ios: Array<AdaTransactionInputOutput>): BigNumber {
-  return ios
-    .map(io => new BigNumber(io[1].getCCoin))
-    .reduce((a: BigNumber, b: BigNumber) => a.plus(b), new BigNumber(0));
+export function sumInputsOutputs(
+  ios: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow | UtxoTransactionOutputRow>>
+): BigNumber {
+  const amounts = ios.map(utxo => new BigNumber(utxo.Amount));
+  const total = amounts.reduce(
+    (acc, amount) => acc.plus(amount),
+    new BigNumber(0)
+  );
+  return total;
 }
 
 /**
@@ -157,17 +124,17 @@ export function formatBigNumberToFloatString(x: BigNumber): string {
   return x.isInteger() ? x.toFixed(1) : x.toString();
 }
 
-export type UtxoLookupMap = { [string]: { [number]: UTXO }};
+export type UtxoLookupMap = { [string]: { [number]: RemoteUnspentOutput }};
 export function utxosToLookupMap(
-  utxos: Array<UTXO>
+  utxos: Array<RemoteUnspentOutput>
 ): UtxoLookupMap {
   // first create 1-level map of (tx_hash -> [UTXO])
-  const txHashMap = _.groupBy(utxos, utxo => utxo.tx_hash);
+  const txHashMap = groupBy(utxos, utxo => utxo.tx_hash);
 
   // now create 2-level map of (tx_hash -> index -> UTXO)
-  const lookupMap = _.mapValues(
+  const lookupMap = mapValues(
     txHashMap,
-    utxoList => _.keyBy(
+    utxoList => keyBy(
       utxoList,
       utxo => utxo.tx_index
     )
@@ -180,13 +147,38 @@ export function derivePathAsString(
   chain: number,
   addressIndex: number
 ): string {
+  if (accountIndex < HARD_DERIVATION_START) {
+    throw new Error('derivePathAsString accountIndex < 0x80000000');
+  }
+  if (chain >= HARD_DERIVATION_START) {
+    throw new Error('derivePathAsString chain >= 0x80000000');
+  }
+  if (addressIndex >= HARD_DERIVATION_START) {
+    throw new Error('derivePathAsString addressIndex >= 0x80000000');
+  }
   // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
-  return `m/44'/1815'/${accountIndex}'/${chain}/${addressIndex}`;
+  return `m/44'/1815'/${accountIndex - HARD_DERIVATION_START}'/${chain}/${addressIndex}`;
 }
 
 export function derivePathPrefix(accountIndex: number): string {
+  if (accountIndex < HARD_DERIVATION_START) {
+    throw new Error('derivePathAsString accountIndex < 0x80000000');
+  }
   // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
   return `m/44'/1815'/${accountIndex}'`;
+}
+
+export function verifyAccountLevel(
+  addressingInfo: Addressing,
+): void {
+  const { addressing } = addressingInfo;
+  if (addressing.startLevel !== DerivationLevels.ACCOUNT.level) {
+    throw new Error('_transformToTrezorInputs only accounts are supported');
+  }
+  const lastLevelSpecified = addressing.startLevel + addressing.path.length - 1;
+  if (lastLevelSpecified !== DerivationLevels.ADDRESS.level) {
+    throw new Error('_transformToTrezorInputs incorrect addressing size');
+  }
 }
 
 export function coinToBigNumber(coin: RustModule.Wallet.Coin): BigNumber {
@@ -256,7 +248,6 @@ export function signRequestReceivers(req: BaseSignRequest, includeChange: boolea
  */
 export function copySignRequest(req: BaseSignRequest): BaseSignRequest {
   return {
-    addressesMap: req.addressesMap,
     changeAddr: req.changeAddr,
     senderUtxos: req.senderUtxos,
     unsignedTx: req.unsignedTx.clone(),

@@ -24,7 +24,7 @@ BigNumber.DEBUG = true;
 
 // Entry point into our application
 const initializeYoroi = async () => {
-  const api = setupApi();
+  const api = await setupApi();
   const router = new RouterStore();
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);

@@ -4,14 +4,31 @@ import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
 import {
-  Bip44AddressSchema,
-} from '../genericBip44/tables';
+  BlockSchema,
+  AddressSchema,
+} from '../uncategorized/tables';
+import type { DbBlock, } from '../uncategorized/tables';
+
+export const TxStatusCodes = Object.freeze({
+  NOT_IN_REMOTE: -3,
+  ROLLBACK_FAIL: -2,
+  FAIL_RESPONSE: -1,
+  PENDING: 0,
+  IN_BLOCK: 1,
+});
+export type TxStatusCodesType = $Values<typeof TxStatusCodes>
 
 export type TransactionInsert = {|
+  Digest: number,
   Hash: string,
-  BlockNumber: number,
-  IsPending: boolean,
-  ErrorCode: number | null,
+  BlockId: null | number,
+  Ordinal: null | number,
+  /**
+   * Need this otherwise we wouldn't be able to sort transactions by time
+   * Can't only use slot+epoch as these aren't available for pending/failed txs
+   */
+  LastUpdateTime: number,
+  Status: TxStatusCodesType,
   ErrorMessage: string | null,
 |};
 export type TransactionRow = {|
@@ -25,18 +42,26 @@ export const TransactionSchema: {
   name: 'Transaction',
   properties: {
     TransactionId: 'TransactionId',
+    Digest: 'Digest',
     Hash: 'Hash',
-    BlockNumber: 'BlockNumber',
-    IsPending: 'IsPending',
-    ErrorCode: 'ErrorCode',
+    BlockId: 'BlockId',
+    Ordinal: 'Ordinal',
+    LastUpdateTime: 'LastUpdateTime',
+    Status: 'Status',
     ErrorMessage: 'ErrorMessage',
   }
 };
 
 export type UtxoTransactionInputInsert = {|
+  /**
+   * The TX where this input occurred
+   * NOT the tx that generated the UTXO
+   */
   TransactionId: number,
-  Bip44AddressId: number,
-  InputIndex: number,
+  AddressId: number,
+  IndexInParentTx: number,
+  ParentTxHash: string,
+  IndexInOwnTx: number,
   Amount: string,
 |};
 export type UtxoTransactionInputRow = {|
@@ -51,15 +76,17 @@ export const UtxoTransactionInputSchema: {
   properties: {
     UtxoTransactionInputId: 'UtxoTransactionInputId',
     TransactionId: 'TransactionId',
-    Bip44AddressId: 'Bip44AddressId',
-    InputIndex: 'InputIndex',
+    AddressId: 'AddressId',
+    ParentTxHash: 'ParentTxHash',
+    IndexInParentTx: 'IndexInParentTx',
+    IndexInOwnTx: 'IndexInOwnTx',
     Amount: 'Amount',
   }
 };
 
 export type UtxoTransactionOutputInsert = {|
   TransactionId: number,
-  Bip44AddressId: number,
+  AddressId: number,
   OutputIndex: number,
   Amount: string,
   IsUnspent: boolean,
@@ -68,6 +95,11 @@ export type UtxoTransactionOutputRow = {|
   UtxoTransactionOutputId: number,
   ...UtxoTransactionOutputInsert,
 |};
+/**
+ * For outputs that belong to you,
+ * utxo outputs are a super-set of inputs because for an address to be an input,
+ * it must have received coins (been an output) previously
+ */
 export const UtxoTransactionOutputSchema: {
   +name: 'UtxoTransactionOutput',
   properties: $ObjMapi<UtxoTransactionOutputRow, ToSchemaProp>
@@ -76,35 +108,64 @@ export const UtxoTransactionOutputSchema: {
   properties: {
     UtxoTransactionOutputId: 'UtxoTransactionOutputId',
     TransactionId: 'TransactionId',
-    Bip44AddressId: 'Bip44AddressId',
+    AddressId: 'AddressId',
     OutputIndex: 'OutputIndex',
     Amount: 'Amount',
     IsUnspent: 'IsUnspent',
   }
 };
 
+export type DbTransaction = {|
+  +transaction: $ReadOnly<TransactionRow>,
+|};
+export type DbUtxoInputs = {|
+  +utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>;
+|};
+export type DbUtxoOutputs = {|
+  +utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>;
+|};
+export type DbTxIO = {| ...DbTransaction, ...DbUtxoInputs, ...DbUtxoOutputs |};
+export type DbTxInChain = {| ...DbTxIO, ...DbBlock |};
+
+
 export const populateTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
   // Transaction table
   schemaBuilder.createTable(TransactionSchema.name)
     .addColumn(TransactionSchema.properties.TransactionId, Type.INTEGER)
+    .addColumn(TransactionSchema.properties.Digest, Type.NUMBER)
     .addColumn(TransactionSchema.properties.Hash, Type.STRING)
-    .addColumn(TransactionSchema.properties.BlockNumber, Type.INTEGER)
-    .addColumn(TransactionSchema.properties.IsPending, Type.BOOLEAN)
-    .addColumn(TransactionSchema.properties.ErrorCode, Type.INTEGER)
+    .addColumn(TransactionSchema.properties.BlockId, Type.INTEGER)
+    .addColumn(TransactionSchema.properties.Ordinal, Type.INTEGER)
+    .addColumn(TransactionSchema.properties.LastUpdateTime, Type.NUMBER)
+    .addColumn(TransactionSchema.properties.Status, Type.INTEGER)
     .addColumn(TransactionSchema.properties.ErrorMessage, Type.STRING)
     .addPrimaryKey(
       ([TransactionSchema.properties.TransactionId]: Array<string>),
       true,
     )
+    .addForeignKey('Transaction_Block', {
+      local: TransactionSchema.properties.BlockId,
+      ref: `${BlockSchema.name}.${BlockSchema.properties.BlockId}`
+    })
     .addNullable([
-      TransactionSchema.properties.ErrorCode,
+      TransactionSchema.properties.BlockId,
+      TransactionSchema.properties.Ordinal,
       TransactionSchema.properties.ErrorMessage,
-    ]);
+    ])
+    .addIndex(
+      'Transaction_Digest_Index',
+      ([TransactionSchema.properties.Digest]: Array<string>),
+      false // not unique. There is a (very small) chance of collisions
+    );
 
   // UtxoTransactionInput Table
   schemaBuilder.createTable(UtxoTransactionInputSchema.name)
     .addColumn(UtxoTransactionInputSchema.properties.UtxoTransactionInputId, Type.INTEGER)
-    .addColumn(UtxoTransactionInputSchema.properties.InputIndex, Type.INTEGER)
+    .addColumn(UtxoTransactionInputSchema.properties.TransactionId, Type.INTEGER)
+    .addColumn(UtxoTransactionInputSchema.properties.AddressId, Type.INTEGER)
+    .addColumn(UtxoTransactionInputSchema.properties.ParentTxHash, Type.STRING)
+    .addColumn(UtxoTransactionInputSchema.properties.IndexInParentTx, Type.INTEGER)
+    .addColumn(UtxoTransactionInputSchema.properties.IndexInOwnTx, Type.INTEGER)
     .addColumn(UtxoTransactionInputSchema.properties.Amount, Type.STRING)
     .addPrimaryKey(
       ([UtxoTransactionInputSchema.properties.UtxoTransactionInputId]: Array<string>),
@@ -114,16 +175,19 @@ export const populateTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
       local: UtxoTransactionInputSchema.properties.TransactionId,
       ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`
     })
-    .addForeignKey('UtxoTransactionInput_Bip44Address', {
-      local: UtxoTransactionInputSchema.properties.Bip44AddressId,
-      ref: `${Bip44AddressSchema.name}.${Bip44AddressSchema.properties.KeyDerivationId}`
+    .addForeignKey('UtxoTransactionInput_Address', {
+      local: UtxoTransactionInputSchema.properties.AddressId,
+      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
     });
 
   // UtxoTransactionOutput Table
   schemaBuilder.createTable(UtxoTransactionOutputSchema.name)
     .addColumn(UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId, Type.INTEGER)
+    .addColumn(UtxoTransactionOutputSchema.properties.TransactionId, Type.INTEGER)
+    .addColumn(UtxoTransactionOutputSchema.properties.AddressId, Type.INTEGER)
     .addColumn(UtxoTransactionOutputSchema.properties.OutputIndex, Type.INTEGER)
     .addColumn(UtxoTransactionOutputSchema.properties.Amount, Type.STRING)
+    .addColumn(UtxoTransactionOutputSchema.properties.IsUnspent, Type.BOOLEAN)
     .addPrimaryKey(
       ([UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId]: Array<string>),
       true
@@ -132,8 +196,8 @@ export const populateTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
       local: UtxoTransactionOutputSchema.properties.TransactionId,
       ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`
     })
-    .addForeignKey('UtxoTransactionOutput_Bip44Address', {
-      local: UtxoTransactionOutputSchema.properties.Bip44AddressId,
-      ref: `${Bip44AddressSchema.name}.${Bip44AddressSchema.properties.KeyDerivationId}`
+    .addForeignKey('UtxoTransactionOutput_Address', {
+      local: UtxoTransactionOutputSchema.properties.AddressId,
+      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
     });
 };

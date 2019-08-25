@@ -3,51 +3,40 @@ import { observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
+import type {
+  TransactionDirectionType,
+  UserAnnotation,
+} from '../api/ada/adaTypes';
+import type {
+  TxStatusCodesType,
+  DbTxIO,
+} from '../api/ada/lib/storage/database/transactions/tables';
+import type { DbBlock, } from '../api/ada/lib/storage/database/uncategorized/tables';
 
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
-
-export const transactionStates = Object.freeze({
-  PENDING: 'pending',
-  FAILED: 'failed',
-  OK: 'ok',
-});
-export type TransactionState =  $Values<typeof transactionStates>;
-
-export const transactionTypes = Object.freeze({
-  CARD: 'card',
-  EXPEND: 'expend',
-  INCOME: 'income',
-  EXCHANGE: 'exchange',
-  SELF: 'self',
-  MULTI: 'multi',
-});
-export type TransactionDirectionType = $Values<typeof transactionTypes>;
-
 
 export default class WalletTransaction {
 
   @observable id: string = '';
   @observable type: TransactionDirectionType;
-  @observable title: string = '';
   @observable amount: BigNumber; // fee included
   @observable fee: BigNumber;
   @observable date: Date;
-  @observable description: string = '';
   @observable numberOfConfirmations: number = 0;
   @observable addresses: TrasactionAddresses = { from: [], to: [] };
-  @observable state: TransactionState;
+  @observable state: TxStatusCodesType;
+  @observable errorMsg: null | string;
 
   constructor(data: {
     id: string,
     type: TransactionDirectionType,
-    title: string,
     amount: BigNumber,
     fee: BigNumber,
     date: Date,
-    description: string,
     numberOfConfirmations: number,
     addresses: TrasactionAddresses,
-    state: TransactionState,
+    state: TxStatusCodesType,
+    errorMsg: null | string,
   }) {
     Object.assign(this, data);
   }
@@ -60,5 +49,34 @@ export default class WalletTransaction {
       return assuranceLevels.MEDIUM;
     }
     return assuranceLevels.HIGH;
+  }
+
+  static fromAnnotatedUtxoTx(request: {
+    data: {|
+      ...DbTxIO,
+      ...WithNullableFields<DbBlock>,
+      ...UserAnnotation,
+    |},
+    lastBlockNumber: null | number,
+  }): WalletTransaction {
+    const { data } = request;
+    return new WalletTransaction({
+      id: data.transaction.TransactionId.toString(),
+      type: data.type,
+      amount: data.amount,
+      fee: data.fee,
+      date: data.block != null
+        ? data.block.BlockTime
+        : new Date(data.transaction.LastUpdateTime),
+      numberOfConfirmations: request.lastBlockNumber != null && data.block != null
+        ? request.lastBlockNumber - data.block.SlotNum
+        : 0,
+      addresses: {
+        from: [],
+        to: [],
+      },
+      state: data.transaction.Status,
+      errorMsg: data.transaction.ErrorMessage,
+    });
   }
 }

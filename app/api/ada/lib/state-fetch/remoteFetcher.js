@@ -5,9 +5,10 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
-  ServerStatusResponse
+  ServerStatusRequest, ServerStatusResponse
 } from './types';
 
 import type { IFetcher } from './IFetcher';
@@ -22,6 +23,7 @@ import {
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetBestBlockError,
   SendTransactionApiError,
   CheckAdressesInUseApiError,
   InvalidWitnessError,
@@ -109,13 +111,10 @@ export class RemoteFetcher implements IFetcher {
 
   getTransactionsHistoryForAddresses = (body: HistoryRequest): Promise<HistoryResponse> => (
     axios(
-      `${backendUrl}/api/txs/history`,
+      `${backendUrl}/api/v2/txs/history`,
       {
         method: 'post',
-        data: {
-          addresses: body.addresses,
-          dateFrom: body.dateFrom
-        },
+        data: body,
         headers: {
           'yoroi-version': this.lastLaunchVersion(),
           'yoroi-locale': this.currentLocale()
@@ -125,6 +124,19 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::getTransactionsHistoryForAddresses error: ' + stringifyError(error));
         throw new GetTxHistoryForAddressesApiError();
+      })
+  )
+
+  getBestBlock = (_body: BestBlockRequest): Promise<BestBlockResponse> => (
+    axios(
+      `${backendUrl}/api/v2/bstblock`,
+      {
+        method: 'get'
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error('RemoteFetcher::getBestBlock error: ' + stringifyError(error));
+        throw new GetBestBlockError();
       })
   )
 
@@ -178,7 +190,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  checkServerStatus = (): Promise<ServerStatusResponse> => (
+  checkServerStatus = (_body: ServerStatusRequest): Promise<ServerStatusResponse> => (
     axios(
       `${backendUrl}/api/status`,
       {

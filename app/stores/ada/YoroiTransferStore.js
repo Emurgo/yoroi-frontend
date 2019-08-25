@@ -18,7 +18,7 @@ import type {
 import { generateTransferTx } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
-import { getReceiverAddress } from '../../api/ada/lib/storage/adaAddress';
+import { nextInternalFor } from '../../api/ada/lib/storage/models/utils';
 import { getCryptoWalletFromEncryptedMasterKey } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
@@ -109,17 +109,20 @@ export default class YoroiTransferStore extends Store {
     const addressKeys = {};
     addresses.forEach(({ address, accountIndex, addressType, index }) => {
       const account = cryptoWallet.bip44_account(
-        RustModule.Wallet.AccountIndex.new(accountIndex | HARD_DERIVATION_START)
+        RustModule.Wallet.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
       );
       const chainPrv = account.bip44_chain(addressType === 'Internal');
       const keyPrv = chainPrv.address_key(RustModule.Wallet.AddressKeyIndex.new(index));
       addressKeys[address] = keyPrv;
     });
 
-    const outputAddr = await getReceiverAddress();
+    // TODO: should be done in Request
+    const internal = await nextInternalFor(
+      walletId, // todo: turn to pubderiver
+    );
     // Possible exception: NotEnoughMoneyToSendError
     return generateTransferTx({
-      outputAddr,
+      outputAddr: internal.row.Hash,
       addressKeys,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,

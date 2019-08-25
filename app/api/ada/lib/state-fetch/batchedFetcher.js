@@ -8,7 +8,8 @@ import type {
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
-  ServerStatusResponse,
+  BestBlockRequest, BestBlockResponse,
+  ServerStatusRequest, ServerStatusResponse,
   AddressUtxoFunc,
   FilterFunc,
   HistoryFunc,
@@ -17,7 +18,7 @@ import type {
 } from './types';
 
 import type {
-  Transaction
+  RemoteTransaction
 } from '../../adaTypes';
 
 import type { IFetcher } from './IFetcher';
@@ -72,6 +73,11 @@ export class BatchedFetcher implements IFetcher {
     )(body)
   )
 
+  getBestBlock = (body: BestBlockRequest): Promise<BestBlockResponse> => (
+    // We don't batch transaction sending (it's just a single requeset)
+    this.baseFetcher.getBestBlock(body)
+  )
+
   sendTx = (body: SignedRequest): Promise<SignedResponse> => (
     // We don't batch transaction sending (it's just a single requeset)
     // TODO: Should we support batching a list of transactions?
@@ -82,8 +88,8 @@ export class BatchedFetcher implements IFetcher {
     batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
   )
 
-  checkServerStatus = (): Promise<ServerStatusResponse> => (
-    this.baseFetcher.checkServerStatus()
+  checkServerStatus = (body: ServerStatusRequest): Promise<ServerStatusResponse> => (
+    this.baseFetcher.checkServerStatus(body)
   )
 }
 
@@ -185,20 +191,24 @@ export function batchGetUTXOsSumsForAddresses(
 export function batchGetTransactionsHistoryForAddresses(
   getTransactionsHistoryForAddresses: HistoryFunc,
 ): HistoryFunc {
-  return async function (body) {
+  return async function (body: HistoryRequest) {
     try {
       // we need two levels of batching: addresses and then transactions
-      return await _batchHistoryByAddresses(
+      const transactions = await _batchHistoryByAddresses(
         body.addresses,
-        async (adddresses) => (
-          await _batchHistoryByTransactiona(
+        async (addresses) => (
+          await _batchHistoryByTransaction(
             [],
-            adddresses,
-            body.dateFrom,
+            {
+              ...body,
+              addresses,
+            },
             getTransactionsHistoryForAddresses,
           )
         )
       );
+      // TODO: deduplicate
+      return transactions;
     } catch (error) {
       Logger.error('batchedFetcher::batchGetTransactionsHistoryForAddresses error: ' + stringifyError(error));
       throw new GetTxHistoryForAddressesApiError();
@@ -209,30 +219,21 @@ export function batchGetTransactionsHistoryForAddresses(
 async function _batchHistoryByAddresses(
   addresses: Array<string>,
   apiCall: (Array<string>) => Promise<HistoryResponse>,
-): Promise<Array<Transaction>> {
+): Promise<Array<RemoteTransaction>> {
   const groupsOfAddresses = _.chunk(addresses, addressesLimit);
   const groupedTxsPromises = groupsOfAddresses.map(apiCall);
   const groupedTxs = await Promise.all(groupedTxsPromises);
+  // TODO: verify the latest block of each group is still in the blockchain
   return groupedTxs.reduce((accum, chunkTxs) => accum.concat(chunkTxs), []);
 }
 
-async function _batchHistoryByTransactiona(
-  previousTxs: Array<Transaction>,
-  groupOfAddresses: Array<string>,
-  dateFrom: Date,
+async function _batchHistoryByTransaction(
+  previousTxs: Array<RemoteTransaction>,
+  request: HistoryRequest,
   getTransactionsHistoryForAddresses: HistoryFunc,
 ): Promise<HistoryResponse> {
-
-  // Move cutoff date forward to make progress on recursive calls
-  const updatedDateFrom = previousTxs.length > 0
-    ? new Date(previousTxs[previousTxs.length - 1].last_update)
-    : dateFrom;
-
   // Get historic transactions from backend API
-  const history = await getTransactionsHistoryForAddresses({
-    addresses: groupOfAddresses,
-    dateFrom: updatedDateFrom
-  });
+  const history = await getTransactionsHistoryForAddresses(request);
 
   // No more history left to fetch
   if (history.length === 0) {
@@ -243,10 +244,21 @@ async function _batchHistoryByTransactiona(
 
   // If we reached the API limit, call API again to get more results
   if (history.length === transactionsLimit) {
-    return await _batchHistoryByTransactiona(
+    const newBest = getLatestTransaction(history);
+    if (newBest === undefined) {
+      // if we don't have a single tx in a block
+      // we can't advance in pagination
+      throw new Error('_batchHistoryByTransaction only pending/failed tx returned');
+    }
+    return await _batchHistoryByTransaction(
       transactions,
-      groupOfAddresses,
-      dateFrom,
+      {
+        ...request,
+        after: {
+          block: newBest.blockHash,
+          tx: newBest.txHash,
+        }
+      },
       getTransactionsHistoryForAddresses,
     );
   }
@@ -270,4 +282,43 @@ export function batchCheckAddressesInUse(
       throw new CheckAdressesInUseApiError();
     }
   };
+}
+
+export type TimeForTx = {|
+  blockHash: string,
+  height: number,
+  txHash: string,
+  txOrdinal: number
+|};
+function getLatestTransaction(
+  txs: Array<RemoteTransaction>,
+): void | TimeForTx {
+  const blockInfo : Array<TimeForTx> = [];
+  for (const tx of txs) {
+    if (tx.block_hash != null && tx.tx_ordinal != null && tx.height != null) {
+      blockInfo.push({
+        blockHash: tx.block_hash,
+        txHash: tx.hash,
+        txOrdinal: tx.tx_ordinal,
+        height: tx.height,
+      });
+    }
+  }
+  if (blockInfo.length === 0) {
+    return undefined;
+  }
+  let best = blockInfo[0];
+  for (let i = 1; i < txs.length; i++) {
+    if (blockInfo[i].height > best.height) {
+      best = blockInfo[i];
+      continue;
+    }
+    if (blockInfo[i].height === best.height) {
+      if (blockInfo[i].txOrdinal > best.txOrdinal) {
+        best = blockInfo[i];
+        continue;
+      }
+    }
+  }
+  return best;
 }

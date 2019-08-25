@@ -3,15 +3,15 @@ import { observable, action } from 'mobx';
 import _ from 'lodash';
 import WalletSettingsStore from '../base/WalletSettingsStore';
 import Request from '../lib/LocalizedRequest';
-import type { UpdateWalletPasswordFunc, UpdateWalletFunc } from '../../api/ada';
+import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
-  @observable updateWalletMetaRequest: Request<UpdateWalletFunc>
-    = new Request<UpdateWalletFunc>(this.api.ada.updateWalletMeta);
+  @observable renameModelRequest: Request<RenameModelFunc>
+    = new Request<RenameModelFunc>(this.api.ada.renameModel);
 
-  @observable updateWalletPasswordRequest: Request<UpdateWalletPasswordFunc>
-    = new Request<UpdateWalletPasswordFunc>(this.api.ada.updateWalletPassword);
+  @observable changeModelPasswordRequest: Request<ChangeModelPasswordFunc>
+    = new Request<ChangeModelPasswordFunc>(this.api.ada.changeModelPassword);
 
   setup() {
     const a = this.actions.ada.walletSettings;
@@ -19,10 +19,10 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     a.stopEditingWalletField.listen(this._stopEditingWalletField);
     a.cancelEditingWalletField.listen(this._cancelEditingWalletField);
     a.updateWalletField.listen(this._updateWalletField);
-    a.updateWalletPassword.listen(this._updateWalletPassword);
+    a.changeModelPassword.listen(this._changeModelPassword);
   }
 
-  @action _updateWalletPassword = async (
+  @action _changeModelPassword = async (
     {
       walletId,
       oldPassword,
@@ -33,9 +33,9 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       newPassword: string
     }
   ): Promise<void> => {
-    await this.updateWalletPasswordRequest.execute({ walletId, oldPassword, newPassword });
+    await this.changeModelPasswordRequest.execute({ walletId, oldPassword, newPassword });
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.updateWalletPasswordRequest.reset();
+    this.changeModelPasswordRequest.reset();
     await this.stores.substores.ada.wallets.refreshWalletsData();
   };
 
@@ -53,7 +53,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     walletData[field] = value;
 
     // update the meta-parameters in the internal wallet representation
-    const wallet = await this.updateWalletMetaRequest.execute(walletData).promise;
+    const wallet = await this.renameModelRequest.execute(walletData).promise;
     if (!wallet) return;
 
     // replace wallet with new modified version

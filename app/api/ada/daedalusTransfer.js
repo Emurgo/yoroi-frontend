@@ -17,7 +17,7 @@ import {
 } from './errors';
 import {
   sendAllUnsignedTxFromUtxo,
-} from './adaTransactions/adaNewTransactions';
+} from './adaTransactions/transactionsV2';
 import type {
   AddressUtxoFunc
 } from './lib/state-fetch/types';
@@ -26,7 +26,7 @@ import type {
 } from '../../types/TransferTypes';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import type {
-  UTXO
+  RemoteUnspentOutput
 } from './adaTypes';
 
 import type { ConfigType } from '../../../config/config-types';
@@ -102,7 +102,7 @@ export async function generateTransferTx(
 export async function buildTransferTx(
   payload: {
     addressKeys: AddressKeyMap,
-    senderUtxos: Array<UTXO>,
+    senderUtxos: Array<RemoteUnspentOutput>,
     outputAddr: string,
     filterSenders?: boolean
   }
