@@ -143,42 +143,45 @@ or maximal
 Since we need to query the price of 3 cryptos, for APIs that only support one pair of rates per query, the numbers becomes:
 288 /day or 8928 /month.
 
-|API provider|Minimal plan|Price/month|Rate limit|Comments
-|-|-|-|-|-|
-|https://min-api.cryptocompare.com/pricing|Personal|Free|100,000 calls/month|Also used by Seiza. Terms: https://www.cryptocompare.com/free-api-use/|
-|https://coinlayer.com/product|Basic|$9.99| 5,000 calls/month||
-|https://coinmarketcap.com/api/pricing/|Basic|Free|10,000 calls/month||
-|https://www.coinapi.io/Pricing|Startup|$79|1000 calls/day||
-|https://p.nomics.com/pricing|Personal Use (Only)|Free|No rate limits||
-|https://www.cryptonator.com/api/|N/A|Free|No rate limits||
-|https://developers.shrimpy.io/#pricing|Data|Free|No rate limits||
-|https://cryptoapis.io/products/market-data/#plans|Free|Free|500 calls/day|Attribution required|
+|API provider|Requirement|Minimal plan|Fee/month|Rate limit|Comments
+|-|-|-|-|-|-|
+|https://min-api.cryptocompare.com/pricing|Personal|96 /day or 2976/month|Free|100,000 calls/month|Also used by Seiza. Terms: https://www.cryptocompare.com/free-api-use/|
+|https://coinlayer.com/product|96 /day or 2976/month|Basic|$9.99| 5,000 calls/month||
+|https://coinmarketcap.com/api/pricing/|96 /day or 2976/month|Basic|Free|10,000 calls/month||
+|https://www.coinapi.io/Pricing|288 /day or 8928 /month|Startup|$79|1000 calls/day||
+|https://coinpaprika.com/api/||N/A|Free|Virtually no limits||
+|https://p.nomics.com/pricing||Personal Use (Only)|Free|No rate limits||
+|https://www.cryptonator.com/api/||N/A|Free|No rate limits||
+|https://developers.shrimpy.io/#pricing||Data|Free|No rate limits||
+|https://cryptoapis.io/products/market-data/#plans|288 /day or 8928 /month|Free|Free|500 calls/day|Attribution required|
 
 At 5 minutes refresh interval, the required frequency is 288 /day or 8928 /month and 26784 /month for 3 cryptos.
 
-|API provider|Minimal plan|Price/month|Rate limit|
-|-|-|-|-|
-|cryptocompare|Personal|Free|100,000 calls/month|
-|coinlayer|Professional|$39.99| 30,000 calls/month|
-|coinmarketcap|Hobbyist|$29|40,000 calls/month|
-|coinapi|Startup|$79|1000 calls/day|
-|nomics|Personal Use (Only)|Free|No rate limits|
-|cryptonator|N/A|Free|No rate limits|
-|shrimpy|Data|Free|No rate limits|
-|cryptoapis|Growth|$75|2500 calls/day|
+|API provider|Requirement|Minimal plan|Fee/month|Rate limit|
+|-|-|-|-|-|
+|cryptocompare|288 /day or 8928 /month|Personal|Free|100,000 calls/month|
+|coinlayer|288 /day or 8928 /month|Professional|$39.99| 30,000 calls/month|
+|coinmarketcap|288 /day or 8928 /month|Hobbyist|$29|40,000 calls/month|
+|coinapi|864 /day or 26784 /month|Startup|$79|1000 calls/day|
+|coinpaprika||N/A|Free|Virtually no limits|
+|nomics||Personal Use (Only)|Free|No rate limits|
+|cryptonator||N/A|Free|No rate limits|
+|shrimpy||Data|Free|No rate limits|
+|cryptoapis|864 /day or 26784 /month|Growth|$75|2500 calls/day|
 
 At 1 minute refresh interval, the required frequency is 1,440 /day or 44,640 /month and 133,920 /month for 3 cryptos.
 
-|API provider|Minimal plan|Price/month|Rate limit|
-|-|-|-|-|
-|cryptocompare|Commercial|$79.99|250,000 calls/month|
-|coinlayer|Enterprise|Contact||
-|coinmarketcap|Standard|$299|500,000 calls/month|
-|coinapi|Streamer|$249|10,000 calls/day|
-|nomics|Personal Use (Only)|Free|No rate limits|
-|cryptonator|N/A|Free|No rate limits|
-|shrimpy|Data|Free|No rate limits|
-|cryptoapis|Start-up|$241|7500 calls/day|
+|API provider|Requirement|Minimal plan|Fee/month|Rate limit|
+|-|-|-|-|-|
+|cryptocompare|1,440 /day or 44,640 /month|Commercial|$79.99|250,000 calls/month|
+|coinlayer|1,440 /day or 44,640 /month|Professional Plus|$79.99|100,000 calls / month|
+|coinmarketcap|1,440 /day or 44,640 /month|Startup|$79|120,000 calls/month|
+|coinapi|4,320 /day or 133,920 /month|Streamer|$249|10,000 calls/day|
+|coinpaprika||N/A|Free|Virtually no limits|
+|nomics|Personal Use (Only)||Free|No rate limits|
+|cryptonator||N/A|Free|No rate limits|
+|shrimpy||Data|Free|No rate limits|
+|cryptoapis|4,320 /day or 133,920 /month|Start-up|$241|7500 calls/day|
 
 
 
