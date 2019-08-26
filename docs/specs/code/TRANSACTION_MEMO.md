@@ -51,27 +51,16 @@ A memo could include sensitive or personal information about either the sender, 
 
 ## Encryption
 
-To safely store data in the external service we have to use encryption and digital signatures. However, before going any further we must notice an important limitation about **hardware wallets**. For security reasons, hardware wallets only provide access to the device's public keys, **NOT** private keys. To address this, we discuss two approaches:
+To safely store data in the external service we have to use encryption and digital signatures. For this purpose, we refer to the [key derivation]() specification to create a private key chain that allows us to sign and encrypt with different keys.
 
-### Public key encryption & password encryption
+Once the keys are generated, we refer to the corresponding Yoroi specifications for [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md) and [message signing](https://github.com/Emurgo/yoroi-frontend/blob/336f763a7b7085e2887b4965a979ccd24719787a/docs/specs/code/SIGNING.md). 
 
-This approach relies on using solely the *account* public key (available in all wallets) as input to create a new private key chain. More specifically:
-
-* Take the **Public Deriver** public key (*aka* account public key) and hash it with `Blake2b`.
-* Use the result from the previous step as a seed to a key derivation function, which will generate a new key pair. 
-* Use a public key child derivation function with the key pair from the previous step to derive 2 new child keys.
-* From the resulting key pairs, use one to encrypt and the other to sign.
-
-For both encrypting and signing we refer the reader to the corresponding Yoroi specifications for [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md) and [message signing](https://github.com/Emurgo/yoroi-frontend/blob/336f763a7b7085e2887b4965a979ccd24719787a/docs/specs/code/SIGNING.md). More specifically, the signing specification describes an adapted version of the [CBOR](https://tools.ietf.org/html/rfc7049) Object Signing and Encryption ([COSE](https://tools.ietf.org/html/rfc8152)) specification. In our particular case, we must consider the following assumptions:
+The signing specification describes an adapted version of the [CBOR](https://tools.ietf.org/html/rfc7049) Object Signing and Encryption ([COSE](https://tools.ietf.org/html/rfc8152)) specification. In our particular case, we must consider the following assumptions. Let `SK` and `EK` be the keys from the private key chain with the purpose of signing and encrypting, then:
 
 * A1: We sign with a single key (SIGN_TAG = 18)
-* A2: We use the `sign` and `verify` methods provided by Cardano WASM bindings.
-* A3: Based in A2 we don't need to include the optional parameteres described in point `P1` (from the signing spec) as we already know which algorithm is used.
-* A4: Encryption with the recipient's public key (COSE_Encrypt) is better suited for multiple receivers. For the sake of simplicty, we use password-based encryption (COSE_Encrypt0) with the private key as the password for symmetric encryption.
-
-A Proof-of-Concept can be found [here](https://repl.it/repls/CorruptInexperiencedLinuxpc).
-
-Observation: the encryption method described in the Yoroi encryption specification is implemented in the Cardano JS WASM bindings and it's called `password_encrypt`.
+* A2: We use `SK` along with the `sign` and `verify` methods provided by Cardano WASM bindings.
+* A3: Based in A2, we don't need to include the optional parameteres described in point `P1` from the signing spec as we already know which algorithm is used.
+* A4: Encryption with the recipient's public key (COSE_Encrypt) is better suited for multiple receivers. For the sake of simplicty, we use password-based encryption (COSE_Encrypt0) with `EK` as the password for symmetric encryption. Note that the encryption method described in the Yoroi encryption specification is implemented in the Cardano JS WASM bindings and it's called `password_encrypt`.
 
 The following are examples of signing and then encrypting a memo following the Cardano signed message format. To make the examples easier to read, they are represented using the extended CBOR diagnostic notation (CDDL).
 
@@ -91,7 +80,7 @@ The following are examples of signing and then encrypting a memo following the C
 )
 ```
 
-In this case, the `payload` is signed with the `sign` WASM binding using one of the key pairs obtained from the private key chain. Then, the output is added in the `signature` field. After the COSE structure is constructed, it is encrypted using `password_encrypt`, and the resulting output is used as a value for the ciphertext field in the COSE structure for encrypted messages.
+The `payload` is signed with the `sign` WASM binding using `SK`. The signature is added in the `signature` field and the structure is encrypted using `password_encrypt` and `EK` as a password. The result is used as a value for the ciphertext field in the COSE structure for encrypted messages. 
 
 **Cardano encrypted message**
 ```
@@ -109,56 +98,9 @@ In this case, the `payload` is signed with the `sign` WASM binding using one of 
 )
 ```
 
-The above output is saved to a file named after the `Blake2b` hash of the corresponding transaction id and uploaded to the external storage. To decrypt we do the opposite process.
+The structure is saved to a file named after the `Blake2b` hash of the transaction id for which the memo is intended and uploaded to the external storage. To decrypt we do the opposite process. 
 
-### User password encryption
-
-The second approach is also based on the Yoroi [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md#encryption) specification, which uses `password_encrypt` implementation from WASM bindings. The password encryption is used to encrypt at the time of sending a transaction with a memo and to decrypt at the time of showing an existing memo. 
-
-Currently, the user-flow for a standard Yoroi wallet already uses a **spending password** to decrypt the encrypted master key of the wallet. On hardware wallets, however, the spending password is not required as the wallet handles the private keys internally. That being said, we propose to use the existing spending password to derive a new **memo password** for symmetric encryption/decryption. We prefer not to use the *spending password* itself to encrypt/decrypt memos because we want to avoid compromising the security of the spending password in any way. 
-
-We define the memo password as the result of `Blake2b` applied to the concatenation of the wallet account public key and the spending password. The memo password is encrypted using the spending password and saved to local storage.
-
-In terms of user interaction in standard Yoroi wallets, the user will continue to use the spending password to send transactions with memos without noticing any change, as the same password will decrypt the master key for create the transaction and decrypt the memo password used to encrypt memos. To read the memo of an existing transaction, the user will have to introduce his/her spending password.
-
-For hardware wallets, we propose to imitate the user-flow used in standard wallets. That is, the user will have to introduce his/her spending password at the time of sending a transaction **if and only if** he/she decides to add a memo. Similarly, the user will be asked for the spending password when reading a memo associated with a transaction.
-
-Regarding the signing process, notice that `ChaCha20Poly1305` includes a MAC which can be used to verify *integrity* and *authenticity* of the data. For the sake of simplicity, we consider that signing the memo to prove *ownership* is not necessary, as having a valid memo password implies having access to the spending password and the specific wallet (with its account public key).
-
-A Proof-of-Concept can be found [here](https://repl.it/repls/DimgreyImmaterialDebuggers).
-
-We use the Cardano encrypted message format in the same way as before. Similarly, the ciphertext is the result of applying 'password_ecnrypt' to the content of the memo.
-
-**Cardano encrypted message**
-```
-16(
-  [
-    / protected / h'' / {
-      \ is_ascii \ is_ascii:false \
-    } / ,
-    / unprotected / {
-      \ enc_type \ enc_type:1 \
-      \ version \ version:1 \
-    } /, 
-    / ciphertext / h'56294e41264b6eeaf9952f7e452ef05bdbeb8b3985a5ca05a88e848ce989483edb3783d92ba0c04cbdd4911825a3c0aebab032513ca4caea553d741434582969d356cd380587361b'
-  ]
-)
-```
-
-The above output is saved to a file named after the `Blake2b` hash of the corresponding transaction id and uploaded to the external storage. To decrypt we do the opposite process.
-
-### Public key vs User password
-
-We make a brief comparison of both methods advantages/disadvantages.
-
-| # | Description           | Public key | User password |
- |-------|-----------------------|------------|-------|
- | 1  | Stores seed/password encrypted | NO | YES |
- | 2  | Signs the data to prove ownership | YES | NO |
- | 3  | Verifies authenticity & integrity | YES | YES |
- | 4  | Requires the user to enter a password to add/view memos | NO | YES |
- | 4  | Adds extra steps to hardware wallets users | NO | YES |
- | 5  | Available in Yoroi existing libraries | YES | YES |
+**Observation**: Note that if the user needs to decrypt the file on his/her own, we only need to provide him/her with the `EK` used to encrypt, along with the file and a description of the algorithms involved. There is no need to give information about the private key chain itself, such as the master key or the mnemonics used to generate it.
 
 ## External storage
 
@@ -173,6 +115,18 @@ The proposed external storage is Dropbox. Based on its [Javascript SDK](https://
 Using Dropbox will require to [create an app](https://www.dropbox.com/developers/reference/developer-guide). The user will have to connect his/her account and grant permissions, after which an [access token](https://www.dropbox.com/developers/reference/oauth-guide) will be generated. This access token must be safely stored locally in order to make authorized requests on behalf of the user (refer to the [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md) spec). 
 
 Note: API rate limits will apply in a [per user/app basis](https://www.dropbox.com/developers/reference/data-ingress-guide), so it shouldn't be a concern for Yoroi itself.
+
+As for the folder structure, we propose the following:
+
+```
+cardano / network_name / feature
+```
+
+For example:
+
+```
+cardano / mainnet / transaction-memos
+```
 
 ### Fault tolerance
 
@@ -190,20 +144,22 @@ Therefore, we must consider storing an error message field along with the memo w
 
 We need to save the following items into local storage:
 
-* LS1: `memoPassword` (string): encrypted memo password. This password is used to encrypt/decrypt memo files. The memo password itself is encrypted/decrypted using the spending password (password-based strategy).
-* LS2: `dropboxAccessToken` (string): access token provided by Dropbox after the user granted access to the Yoroi app. This token is used to connect to Dropbox API on behalf of the user.
+* LS1: `EXTERNAL_STORAGE` (JSON): dictionary with the supported external services, in which each element is named after the service (e.g. `dropbox`) and has a `token` field in it. In the case Dropbox, this will be the access token provided after the user granted access to the Yoroi app, used to connect to Dropbox API on behalf of the user.
 
-As for the memo, the easiest would be to save it (encrypted) in a new column in the transactions table. Every time a transaction is made, the memo is encrypted an saved along with the transaction and then uploaded to Dropbox. Every time a transaction is received, there is an API call to check for a memo for that transaction, in which case is downloaded and saved. Lastly, as mentioned in the previous sections, there could be several sources of error when trying to save the memo to the external storage. In that case, the fields would be:
+As for the memos, to avoid unnecessary coupling of data, we propose a new IndexDB table with the following set of columns:
 
-* LS3: `Memo`: string
-* LS4: `IsMemoPending`: boolean
-* LS5: `MemoErrorMessage`: string
+* `MemoId`: serial (PK)
+* `TransactionId`: int (FK)
+* `Memo`: varchar(256)
+* `IsPending`: boolean
+* `ErrorMessage`: varchar(256)
+
 
 ## User flow
 
-The proposed user flow is the following: (TODO update according to the chosen encryption strategy)
+The proposed user flow is the following: 
 
-1. The user opens the send transaction dialog.
+1. The user opens the send transaction dialog or clicks on the summary of a received transaction.
 2. The memo textarea is closed by default. The user can click *"Add memo"* label and one of the following scenarios occurs:
    - If the user hasn't synced his external storage account yet, he/she will see the text "In order to add private memos to   transactions you need to link Yoroi to a Dropbox account." and a link to the settings page.
    		- In the settings page, the user can click *"Connect Yoroi to Dropbox"*.
@@ -213,12 +169,12 @@ The proposed user flow is the following: (TODO update according to the chosen en
    - If it isn't empty, the user will see a dialog window with the text *"Do you want to discard this memo?"* and two buttons showing "Yes/No".
      - If the user clicks *"No"*, the dialog closes and the memo textarea remains opened with the same content.
      - If the user clicks *"Yes"*, the dialog window closes and the textarea become cleared.
-4. If user has entered the memo and makes a transaction, the memo will be saved to local storage and then to external storage. If there is a problem saving to external storage, then the user will see an error message: *"An error occurred while syncing with your Dropbox account. You can try to sync again or discard the memo"*. In that case, one of the following scenarios occurs:
+4. If user has entered the memo and makes a transaction, the memo will be saved to local storage and then to external storage. Note that there is a limit of 256 characters per memo. If there is a problem saving to external storage, then the user will see an error message: *"An error occurred while syncing with your Dropbox account. You can try to sync again or discard the memo"*. In that case, one of the following scenarios occurs:
 	- If the user clicks on *"Discard the memo"*, the memo will be removed from local storage.
 	- If the user clicks on *"Try again"* Yoroi will try to upload the file again. The message will remain until the message is successfully uploaded.
 5. When the user goes to his summary of transactions and clicks on a transaction to expand it, he/she will see the transaction memo at the very bottom of the transaction item (if the memo exists). The user will also see an option to remove the memo. If the user clicks it, a dialog message will show up with a message and two buttons showing *"Yes/No"*. The message is: *"Are you sure you want to remove the memo for this transaction? Doing so will erase all copies of it and you will not be able to restore it in the future"*.
-6. When the user goes to the "Connect Yoroi to Dropbox" subsection in the settings page, he/she will see a button to connect his/her account if it's not connected already. 
-7. When the user restores a wallet, he/she will be shown a message: *"If you previously connected your Dropbox account to use transactions memos, then you can restore them by going to Settings -> Connect Yoroi to Dropbox"*
+6. When the user goes to the "Connect Yoroi to Dropbox" subsection in the settings page, he/she will see a button to connect his/her account if it's not connected already. The user will also see a button to reveal the password used for encryption, in case he/she wants to decrypt the files without using Yoroi.
+8. When the user restores a wallet, he/she will be shown a message: *"If you previously connected your Dropbox account to use transactions memos, then you can restore them by going to Settings -> Connect Yoroi to Dropbox"*
 
 # Requirements
 
@@ -229,11 +185,12 @@ Based on the previous sections, we consider the following requirements: (TODO up
 * The memo must be encrypted and saved to local storage after the transaction is sent. The stored object consists on the encrypted content of the memo along with a *boolean* value indicating if the memo has been successfuly synchronized.
 * After the memo is saved to local storage, it must be uploaded to the external storage. To upload a file, a [FilesCommitInfo](https://dropbox.github.io/dropbox-sdk-js/global.html#FilesCommitInfo) object must be constructed, where `contents` is the stored encrypted content of the memo and `path` is a concatenation of the wallet folder and the hash of the transaction.
 * Memos must be uploaded with a **first come, first served** strategy. That is, if an out-of-sync wallet uploads a duplicated memo, the first copy is kept and the conflicting copy is discarded.
-* The name of the folder in the external storage is given by the wallet's account number plate. If a user synchronizes the same wallet on more than one device, then each device must sync with the same folder.
+* The folder structure in the external service is as follows: `cardano / network_name / transaction-memos /`.
+* The name of the wallet folder in the external storage is given by the wallet's account number plate. If a user synchronizes the same wallet on more than one device, then each device must sync with the same folder.
 * Memos must be uploaded/downloaded after any of the following events:
 	* A new transaction is sent (upload).
 	* A new transaction is received (download).
-	* Querying transactions history (download), in which the originating address is the current account. This is intended for transactions that are originated from other devices but in the same wallet.
+	* Querying transactions history (download).
 * When querying for the transactions history, the user must be able to see the existing memo for the transactions, and be able to delete them.
 * For a given transaction, if the corresponding memo file doesn't exist, then it can be assumed that the transaction does not have a memo.
 * The user must be able to revoke the permissions granted to the Yoroi Dropbox app.
