@@ -51,7 +51,13 @@ A memo could include sensitive or personal information about either the sender, 
 
 ## Encryption
 
-To safely store data in the external service we have to use encryption and digital signatures. For this purpose, we refer to the [key derivation]() specification to create a private key chain that allows us to sign and encrypt with different keys.
+To safely store data in the external service we have to use encryption and digital signatures. For this purpose, we refer to the [key derivation](https://github.com/Emurgo/yoroi-frontend/pull/899) specification to create a private key chain that allows us to sign and encrypt with different keys. In short, the private key chain allows to generate different key pairs for signing and encrypting, with the following derivation path:
+
+```
+m / 190822' /  sign_or_encrypt / header_index
+``` 
+
+Here, `190822` is the purpose of the new key chain, `sign_or_encrypt` index indicates if we are signing or encrypting, and `header_index` is used in case we need to sign with different keys, in which case the index is included in the header of the signed file.
 
 Once the keys are generated, we refer to the corresponding Yoroi specifications for [encryption](https://github.com/Emurgo/yoroi-frontend/blob/737595fec5a89409aacef827d356c9a1605515c0/docs/specs/code/ENCRYPT.md) and [message signing](https://github.com/Emurgo/yoroi-frontend/blob/336f763a7b7085e2887b4965a979ccd24719787a/docs/specs/code/SIGNING.md). 
 
