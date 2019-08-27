@@ -1,4 +1,4 @@
-import { ConnectionTypeValue } from 'yoroi-extension-ledger-connector';
+import { ConnectionTypeValue } from 'yoroi-extension-ledger-connect-handler';
 
 // @flow
 export default {

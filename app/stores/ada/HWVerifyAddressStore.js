@@ -8,7 +8,7 @@ import {
 
 import {
   LedgerBridge,
-} from 'yoroi-extension-ledger-connector';
+} from 'yoroi-extension-ledger-connect-handler';
 import TrezorConnect from 'trezor-connect';
 
 import LocalizableError from '../../i18n/LocalizableError';

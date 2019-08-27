@@ -3,7 +3,7 @@ import { action, observable } from 'mobx';
 
 import {
   LedgerBridge,
-} from 'yoroi-extension-ledger-connector';
+} from 'yoroi-extension-ledger-connect-handler';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';

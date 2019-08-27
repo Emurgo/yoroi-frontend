@@ -137,7 +137,7 @@ import { convertAdaTransactionsToExportRows } from './lib/utils';
 import { migrateToLatest } from './lib/storage/adaMigration';
 import {
   makeCardanoBIP44Path,
-} from 'yoroi-extension-ledger-connector';
+} from 'yoroi-extension-ledger-connect-handler';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 import type { TransactionExportRow } from '../export';
