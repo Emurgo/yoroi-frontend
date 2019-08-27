@@ -414,9 +414,14 @@ CWT tags MAY be introduced inside `protected` headers as a CBOR map with the key
 
 ### Payload encoding
 
-To solve `E3`, `signed_message` body header MUST contain `is_ascii: bool` as a `protected` header which defined whether or not the bytes the `payload` should be considered as ASCII (note: is `is_ascii` is `false`, then the payload is UTF-8 as specified in the COSE spec)
+To solve `E3`, `signed_message` body header MUST contain `hashed: bool` as an `unprotected` header which defined whether or not we signed the `payload` OR the `Blake2b224` hash of the `payload`. The hash MUST be used in the following two cases
 
-If the `payload` is not ASCII, hardware wallets MAY instead show the `Blake2b244` hash of the `payload` to users. `244` is used to produce a smaller hash (easier to verify on small screen).
+1) The size of the raw `payload` would otherwise be too big to fit in hardware wallet memory (see E1). Note that the exact size for which this is the case depends on the device.
+1) The payload characters (ex: non-ASCII) that cannot be displayed on the hardware wallet device (see E3)
+
+We RECOMMEND showing the user the full payload on the device if possible because it lowers the attack surface (otherwise the user has to trust that the hash of the payload was calculated correctly).
+
+`Blake2b224` was chosen specifically because `224` bits is already a long string for hardware wallets.
 
 ## User-Facing Encoding
 
@@ -438,9 +443,11 @@ Data is simply the `base64url` encoding of the message
 
 ### Checksum
 
-We use `CRC32` on the data for the checksum
+We use `CRC32` on the data for the checksum and store it as the `base64url` encoding of its network byte order representation.
 
 # Other remarks
+
+In this specification strongly prefer usage of unprotected headers vs protected headers when possible. This is because we have to limit the amount of data passed to a hardware wallet  to satisfy E1. If the only affect of an adversary changing an unprotected header only leads to the signature not matching, then it's best to leave it unprotected.
 
 A public key SHOULD NOT be revealed if you plan to use its child non-hardened keys. It is both a privacy and a security risk (see [here](https://bitcoin.org/en/wallets-guide#hierarchical-deterministic-key-creation) for more detail).
 
