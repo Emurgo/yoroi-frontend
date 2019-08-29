@@ -149,7 +149,8 @@ export default class LedgerConnectStore
     let ledgerBridge: LedgerBridge;
     try {
       ledgerBridge = new LedgerBridge({
-        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL
+        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
+        locale: this.stores.profile.currentLocale
       });
       await prepareLedgerBridger(ledgerBridge);
 

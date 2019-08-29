@@ -100,7 +100,8 @@ export default class AddressesStore extends Store {
     try {
       // trick to fix flow
       ledgerBridge = new LedgerBridge({
-        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL
+        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
+        locale: this.stores.profile.currentLocale
       });
       await prepareLedgerBridger(ledgerBridge);
 
