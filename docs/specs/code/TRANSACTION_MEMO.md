@@ -74,11 +74,9 @@ The following are examples of signing and then encrypting a memo following the C
 ```
 18(
   [
-    / protected / h'' / {
-      \ is_ascii \ is_ascii:false \
-    } / , 
     / unprotected / {
-      \ version \ version:1 \
+      \ version \ version:1 \,
+      \ hashed \ hashed:false \
     } / , 
     / payload / 'test message', 
     / signature / h'af74d407b62c673dc1c8a591f32406e171172bf47069a20b4d2fb42ffa8672b473df8bb7abf3e7671e2523856f2f9971ac3817d48a116c62a878de069c63d30f'
@@ -92,12 +90,10 @@ The `payload` is signed with the `sign` WASM binding using `SK`. The signature i
 ```
 16(
   [
-    / protected / h'' / {
-      \ is_ascii \ is_ascii:false \
-    } / ,
     / unprotected / {
-      \ enc_type \ enc_type:1 \
-      \ version \ version:1 \
+      \ enc_type \ enc_type:1 \,
+      \ version \ version:1 \,
+      \ hashed \ hashed:false \
     } /, 
     / ciphertext / h'3d21b0d8c16a132c59f4f65a9bba41a3ec7002ea0eee255870839f8a2a158efa0972325d527cee06e5bf13c936e188fd9962de5866319bac3e8b581a8b16f8fd0393fc6a1a84e72dcd6e773a04a7bd6baa7e99e741b8c713decb3b05af32c3a897f4a68d274e527eaf9ffca7971b5d9d0c5caeb4a500344d6db4bba2a4cdfd8838d509e40d215645342cd6705d6d199b1b0914d96b42602b7f3125f6bfea1b7acb7c72871118628d41df17a3e6b6d56d362292f3f4fc9b4d2b3c68653d9dc385f0edeb426422390f76'
   ]
