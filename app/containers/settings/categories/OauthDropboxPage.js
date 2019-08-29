@@ -7,10 +7,6 @@ import type { InjectedProps } from '../../../types/injectedPropsType';
 export default class OauthDropboxPage extends Component<InjectedProps> {
 
   render() {
-    return (
-      <div>
-      	<p>Dropbox</p>
-      </div>
-    );
+    return (<div><p>Dropbox</p></div>);
   }
 }

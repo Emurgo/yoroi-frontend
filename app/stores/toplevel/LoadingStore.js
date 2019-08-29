@@ -129,7 +129,7 @@ export default class LoadingStore extends Store {
   _isRefresh = (): boolean => this.isLoading;
 
   _redirectToLoading = (): void => {
-    if(this._redirectRegex.test(this.stores.app.currentRoute)) {
+    if (this._redirectRegex.test(this.stores.app.currentRoute)) {
       this._shouldRedirect = true;
       this._redirectUri = this.stores.app.currentRoute;
     }

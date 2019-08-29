@@ -1,6 +1,5 @@
 // @flow
 import Action from './lib/Action';
-import type { ExplorerType } from '../domain/Explorer';
 
 // ======= PROFILE ACTIONS =======
 
