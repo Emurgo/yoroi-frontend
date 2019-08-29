@@ -93,6 +93,9 @@ export default class ProfileStore extends Store {
         } else {
           this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
         }
+        if (this.stores.loading.shouldRedirect) {
+          this.actions.loading.redirect.trigger();
+        }
         runInAction(() => {
           this.hasRedirected = true;
         });

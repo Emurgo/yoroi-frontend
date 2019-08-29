@@ -32,7 +32,11 @@ const messages = defineMessages({
   adaRedemption: {
     id: 'settings.menu.adaRedemption.link.label',
     defaultMessage: '!!!Ada Redemption',
-  }
+  },
+  externalStorage: {
+    id: 'settings.menu.externalStorage.link.label',
+    defaultMessage: '!!!External Storage',
+  },
 });
 
 type Props = {|
@@ -81,6 +85,13 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.WALLET)}
             className="wallet"
             disabled={!hasActiveWallet}
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.externalStorage)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
+            active={isActiveItem(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
+            className="externalStorage"
           />
 
           <SettingsMenuItem

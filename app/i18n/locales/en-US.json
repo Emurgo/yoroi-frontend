@@ -154,6 +154,7 @@
   "settings.menu.support.link.label": "Support / Logs",
   "settings.menu.termsOfUse.link.label": "Terms of use",
   "settings.menu.wallet.link.label": "Wallet",
+  "settings.menu.externalStorage.link.label": "External Storage",
   "settings.paperWallet.createPaper.label": "Create Paper Wallet",
   "settings.paperWallet.dialog.createPaper.addresses": "Drawing the address",
   "settings.paperWallet.dialog.createPaper.background": "Drawing pretty background",

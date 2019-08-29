@@ -5,6 +5,7 @@ import WalletBackupActions from './wallet-backup-actions';
 import ProfileActions from './profile-actions';
 import DialogsActions from './dialogs-actions';
 import NotificationsActions from './notifications-actions';
+import LoadingActions from './loading-actions';
 import adaActionsMap from './ada/index';
 import type { AdaActionsMap } from './ada/index';
 
@@ -15,6 +16,7 @@ export type ActionsMap = {
   profile: ProfileActions,
   dialogs: DialogsActions,
   notifications: NotificationsActions,
+  loading: LoadingActions,
   ada: AdaActionsMap
 };
 
@@ -25,6 +27,7 @@ const actionsMap: ActionsMap = {
   profile: new ProfileActions(),
   dialogs: new DialogsActions(),
   notifications: new NotificationsActions(),
+  loading: new LoadingActions(),
   ada: adaActionsMap
 };
 

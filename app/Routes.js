@@ -18,6 +18,8 @@ import Settings from './containers/settings/Settings';
 import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
 import PaperWalletPage from './containers/settings/categories/PaperWalletPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
+import ExternalStorageSettingsPage from './containers/settings/categories/ExternalStorageSettingsPage';
+import OauthDropboxPage from './containers/settings/categories/OauthDropboxPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 
@@ -99,6 +101,11 @@ export const Routes = (
         path={ROUTES.SEND_FROM_URI.ROOT}
         component={(props) => <URILandingPage {...props} stores={stores} actions={actions} />}
       />
+      <Route
+        exact
+        path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
+        component={(props) => <OauthDropboxPage {...props} stores={stores} actions={actions} />}
+      />
       <Redirect to={ROUTES.WALLETS.ADD} />
     </Switch>
   </div>
@@ -146,6 +153,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.WALLET}
       component={(props) => <WalletSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
+      component={(props) => <ExternalStorageSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
