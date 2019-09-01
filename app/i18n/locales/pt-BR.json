@@ -255,7 +255,7 @@
   "wallet.add.page.daedalusTransfer.title": "Transferir fundos de uma wallet Daedalus para uma Yoroi",
   "wallet.add.page.hw.title": "Conecte a hardware wallet",
   "wallet.add.page.restore.title": "Restaurar wallet",
-  "wallet.add.page.subtitle.label": "Yoroi light wallet for Cardano",
+  "wallet.add.page.subtitle.label": "Yoroi é uma carteira leve para Cardano",
   "wallet.add.page.title": "Gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount} of fees",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Tenha certeza de que não há ninguém olhando para sua tela, a menos que seja da sua vontade que essa pessoa tenha acesso a seus fundos.",
