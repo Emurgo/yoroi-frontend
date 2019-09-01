@@ -98,7 +98,7 @@
     "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
     "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
-    "eslint-plugin-flowtype": "3.10.4",
+    "eslint-plugin-flowtype": "3.13.0",
     "eslint-plugin-import": "2.16.0",
     "eslint-plugin-jsx-a11y": "6.2.3",
     "eslint-plugin-promise": "4.2.1",
