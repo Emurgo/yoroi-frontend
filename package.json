@@ -79,7 +79,7 @@
     "@storybook/addons": "5.1.9",
     "@storybook/react": "5.1.11",
     "autoprefixer": "9.6.1",
-    "babel-eslint": "10.0.2",
+    "babel-eslint": "10.0.3",
     "babel-jest": "24.8.0",
     "babel-loader": "8.0.6",
     "babel-plugin-add-module-exports": "1.0.2",
