@@ -256,7 +256,7 @@
   "wallet.add.page.hw.title": "Conecte a hardware wallet",
   "wallet.add.page.restore.title": "Restaurar wallet",
   "wallet.add.page.subtitle.label": "Yoroi é uma carteira leve para Cardano",
-  "wallet.add.page.title": "Gateway <br> to the <br> financial world",
+  "wallet.add.page.title": "Porta de entrada <br> para o <br> mundo financeiro",
   "wallet.amountInput.feesLabel": "+ {amount} of fees",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Tenha certeza de que não há ninguém olhando para sua tela, a menos que seja da sua vontade que essa pessoa tenha acesso a seus fundos.",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order to back up or restore your wallet’s funds and private key.",
