@@ -77,7 +77,7 @@
     "@storybook/addon-notes": "5.1.9",
     "@storybook/addon-storysource": "5.1.9",
     "@storybook/addons": "5.1.9",
-    "@storybook/react": "5.1.9",
+    "@storybook/react": "5.1.11",
     "autoprefixer": "9.6.1",
     "babel-eslint": "10.0.2",
     "babel-jest": "24.8.0",
