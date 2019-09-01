@@ -121,7 +121,7 @@
     "raw-loader": "3.1.0",
     "react-intl-translations-manager": "5.0.3",
     "rimraf": "3.0.0",
-    "sass-loader": "7.1.0",
+    "sass-loader": "7.3.1",
     "selenium-webdriver": "git+https://github.com/SebastienGllmt/selenium-webdriver-fix.git",
     "shelljs": "0.8.3",
     "style-loader": "0.23.1",
