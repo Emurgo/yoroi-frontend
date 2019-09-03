@@ -45,9 +45,6 @@ const rules = [
     use: [
       {
         loader: 'style-loader',
-        options: {
-          hmr: false,
-        },
       },
       {
         loader: 'css-loader',
@@ -73,10 +70,6 @@ const rules = [
     use: [
       {
         loader: 'style-loader',
-        options: {
-          hmr: false,
-          sourceMap: true,
-        },
       },
       {
         loader: 'css-loader',
@@ -95,10 +88,6 @@ const rules = [
     use: [
       {
         loader: 'style-loader',
-        options: {
-          hmr: false,
-          sourceMap: true,
-        },
       },
       {
         loader: 'css-loader',
