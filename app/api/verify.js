@@ -14,17 +14,26 @@ function verify(
   obj: any,
   serializer: any => Buffer,
   signatureHex: string,
-  publicKey: publicKey): string {
-
+  publicKey: RustModule.Wallet.PublicKey
+): string {
   return publicKey.verify(serializer(obj), RustModule.Wallet.Signature.from_hex(signatureHex));
 }
 
-let pubKeyData;
-
-export function verifyTicker(ticker: ResponseTicker): boolean {
-  if (!pubKeyData) {
-    pubKeyData = RustModule.Wallet.PublicKey.from_hex(CONFIG.app.pubKeyData);
-  }
+export function verifyTicker(
+  ticker: ResponseTicker,
+  pubKeyData: RustModule.Wallet.PublicKey
+): boolean {
   return verify(ticker, serializeTicker, ticker.signature, pubKeyData);
 }
 
+export function verifyPubKeyDataReplacement(
+  pubKeyData: string,
+  pubKeyDataSignature: string,
+  pubKeyMaster: string
+): boolean {
+  return verify(pubKeyData,
+    s => new Buffer(s),
+    pubKeyDataSignature,
+    RustModule.Wallet.PublicKey.from_hex(pubKeyMaster)
+  );
+}

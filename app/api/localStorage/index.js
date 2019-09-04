@@ -14,6 +14,7 @@ const storageKeys = {
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
   COIN_PRICE_CURRENCY: networkForLocalStorage + '-COIN-PRICE-CURRENCY',
+  COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN_PRICE_PUB_KEY_DATA', 
 };
 
 export type SetCustomUserThemeRequest = {
@@ -284,6 +285,23 @@ export default class LocalStorageApi {
     resolve();
   });
 
+  // ========== Coin price data public key  ========== //
+  
+  getCoinPricePubKeyData = async (): Promise<?string> => {
+    return localStorage.getItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+  }
+
+  setCoinPricePubKeyData = async (pubKeyData: string): Promise<void> => {
+    localStorage.setItem(storageKeys.COIN_PRICE_PUB_KEY_DATA, pubKeyData);
+  }
+
+  unsetCoinPricePubKeyData = async (): Promise<void> => {
+    try {
+      localStorage.removeItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+    } catch (_) {
+    }
+  }
+
   async reset() {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
@@ -291,6 +309,7 @@ export default class LocalStorageApi {
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
     await this.unsetCoinPriceCurrency();
+    await this.unsetCoinPricePubKeyData();
   }
 
   setLocalStorage = (localStorageData: any): Promise<void> => new Promise((resolve) => {

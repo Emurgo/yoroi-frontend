@@ -1,5 +1,6 @@
 // @flow
 
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { action, observable, computed, runInAction } from 'mobx';
 import Store from '../base/Store';
 import environment from '../../environment';
@@ -17,15 +18,16 @@ import {
 } from '../../api/ada/lib/storage/lovefieldDatabase.js';
 import type { Ticker } from '../../types/coinPriceType';
 import { getPrice } from '../../types/coinPriceType';
-import { verifyTicker } from '../../api/verify';
+import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 export default class CoinPriceStore extends Store {
   @observable tickers: Array<{| from: string, to: string, price: number |}> = [];
-  nextRereshDelay: number;
   expirePriceDataTimeoutId: ?number = null;
+  // Cached public key to verify the price data.
+  pubKeyData: RustModule.Wallet.PublicKey = null;
 
   setup() {
     this.nextRefreshTimeout = CONFIG.app.coinPriceRefreshInterval;
@@ -62,9 +64,14 @@ export default class CoinPriceStore extends Store {
         throw new Error('coin price backend error: '+response.error);
       }
 
-      // Must wait for the asynchronous loading of the Rust module before calling verifyTicker
-      await this._waitForRustModule();
-      if (!verifyTicker(response.ticker)) {
+      await this._loadPubKeyData();
+      if (response.pubKeyData && response.pubKeyDataSignature) {
+        await this._replacePubKeyData(
+          response.pubKeyData,
+          response.pubKeyDataSignature
+        );
+      }
+      if (!verifyTicker(response.ticker, this.pubKeyData)) {
         throw new Error('Invalid ticker signature: '+JSON.stringify(reponse.ticker));
       }
 
@@ -112,11 +119,10 @@ export default class CoinPriceStore extends Store {
         throw new Error('historical coin price query error: data length mismatch');
       }
 
-      // Must wait for the asynchronous loading of the Rust module before calling verifyTicker
-      await this._waitForRustModule();
+      await this._loadPubKeyData();
       transactions.forEach((tx, i) => {
         const ticker = response.tickers[i];
-        if (!verifyTicker(ticker)) {
+        if (!verifyTicker(ticker, this.pubKeyData)) {
           throw new Error('Invalid ticker signature: '+JSON.stringify(ticker));
         }
 
@@ -132,4 +138,32 @@ export default class CoinPriceStore extends Store {
     }
   }
 
+  _loadPubKeyData = async (): Promise<void> => {
+    if (this.pubKeyData) {
+      return;
+    }
+    await this._waitForRustModule();
+    const storedKey = await this.api.localStorage.getCoinPricePubKeyData();
+    Logger.debug(`CoinPriceStore: stored pubKeyData ${storedKey}`);    
+    this.pubKeyData = RustModule.Wallet.PublicKey.from_hex(
+      storedKey || CONFIG.app.pubKeyData
+    );
+  }
+
+  _replacePubKeyData = async (pubKeyData: string, pubKeyDataSignature: string): Promise<void> => {
+    if (this.pubKeyData.to_hex() === pubKeyData) {
+      return;
+    }
+    Logger.debug(`CoinPriceStore: replace with pubKeyData ${pubKeyData} signature ${pubKeyDataSignature}.`);
+    if (!verifyPubKeyDataReplacement(
+      pubKeyData,
+      pubKeyDataSignature,
+      CONFIG.app.pubKeyMaster
+    )) {
+      Logger.debug('CoinPriceStore: new pubKeyData signature is invalid.;');
+      return;
+    }
+    this.pubKeyData = RustModule.Wallet.PublicKey.from_hex(pubKeyData);
+    await this.api.localStorage.setCoinPricePubKeyData(pubKeyData);
+  }
 }
