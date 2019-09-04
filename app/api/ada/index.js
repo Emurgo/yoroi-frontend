@@ -1196,14 +1196,18 @@ export default class AdaApi {
       const cryptoAccount = createCryptoAccount(masterKey, walletPassword, 0);
 
       const savedAddresses = [];
+      const seenAddresses = new Set<string>();
       const _saveAsAdaAddresses = async ({ accountIndex, addresses, offset, addressType }) => {
         addresses.forEach((address, i) => {
-          savedAddresses.push({
-            address,
-            accountIndex,
-            addressType,
-            index: offset + i,
-          });
+          if (!seenAddresses.has(address)) {
+            seenAddresses.add(address);
+            savedAddresses.push({
+              address,
+              accountIndex,
+              addressType,
+              index: offset + i,
+            });
+          }
         });
       };
 
