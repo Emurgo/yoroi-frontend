@@ -29,7 +29,7 @@ import type {
   AddressType
 } from '../../adaTypes';
 import type {
-  SaveAsAdaAddressesRequeat,
+  SaveAsAdaAddressesRequest,
   SaveAsAdaAddressesResponse,
 } from './types';
 
@@ -108,7 +108,7 @@ export async function saveAdaAddress(
  * Also updates lastReceiveAddressIndex
  */
 export async function saveAsAdaAddresses(
-  request: SaveAsAdaAddressesRequeat,
+  request: SaveAsAdaAddressesRequest,
 ): Promise<SaveAsAdaAddressesResponse> {
   const mappedAddresses: Array<AdaAddress> = request.addresses.map((hash, index) => (
     toAdaAddress(
