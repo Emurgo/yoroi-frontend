@@ -33,6 +33,7 @@ type Props = {|
   onUpdateHideBalance: Function,
   shouldHideBalance: boolean,
   coinPriceCurrencySetting: CoinPriceCurrencySettingType,
+  getCoinPrice: void => number,
 |};
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<'div'>] {
@@ -63,7 +64,7 @@ export default class WalletTopbarTitle extends Component<Props> {
 
   render() {
     const {
-      wallet, coinPrice, account, currentRoute, formattedWalletAmount, themeProperties,
+      wallet, getCoinPrice, account, currentRoute, formattedWalletAmount, themeProperties,
       shouldHideBalance, onUpdateHideBalance, coinPriceCurrencySetting
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
@@ -80,6 +81,19 @@ export default class WalletTopbarTitle extends Component<Props> {
       constructPlate(account, identiconSaturationFactor, iconDivClass)
       : [];
 
+    let totalBalance: ?Component;
+    if (wallet && shouldHideBalance) {
+      totalBalance = (<span className={styles.hiddenWalletAmount}>******</span>);
+    } else if (coinPriceCurrencySetting.enabled) {
+      totalBalance = wallet && (
+        <span>
+          {wallet.amount.multipliedBy(getCoinPrice()).toString()}
+        </span>
+      );
+    } else {
+      totalBalance = wallet && formattedWalletAmount(wallet.amount);
+    }
+
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
         {iconComponent}
@@ -89,18 +103,10 @@ export default class WalletTopbarTitle extends Component<Props> {
         </div>
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
-            { wallet && shouldHideBalance ?
-              <span className={styles.hiddenWalletAmount}>******</span> :
-              wallet && formattedWalletAmount(wallet.amount)
-            }
-            { ' '+currency }
-            {coinPriceCurrencySetting.enabled ? 
-              (<span>
-                / {wallet.amount.multipliedBy(coinPrice.getCurrentPrice(currency, coinPriceCurrencySetting.currency)).toString()}
-                {coinPriceCurrencySetting.currency}
-              </span>) :
-              null
-            }
+            { totalBalance }
+            { ' ' + (coinPriceCurrencySetting.enabled ?
+                coinPriceCurrencySetting.currency : currency)
+             }
           </div>
           <div className={styles.walletAmountLabelBlock}>
             <div className={styles.walletAmountLabel}>

@@ -72,7 +72,7 @@ export default class CoinPriceStore extends Store {
         );
       }
       if (!verifyTicker(response.ticker, this.pubKeyData)) {
-        throw new Error('Invalid ticker signature: '+JSON.stringify(reponse.ticker));
+        throw new Error('Invalid ticker signature: '+JSON.stringify(response.ticker));
       }
 
       this.nextRefreshTimeout = CONFIG.app.coinPriceRefreshInterval;

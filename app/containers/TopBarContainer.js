@@ -24,9 +24,12 @@ export default class TopBarContainer extends Component<Props> {
     const walletsStore = stores.substores[environment.API].wallets;
     const coinPriceStore = stores.substores[environment.API].coinPriceStore;
 
+    const getCoinPrice = () =>
+      coinPriceStore.getCurrentPrice('ADA', profile.unitOfAccount.currency);
+
     const title = (<WalletTopbarTitle
       wallet={walletsStore.active}
-      coinPrice={coinPriceStore}
+      getCoinPrice={getCoinPrice}
       account={walletsStore.activeAccount}
       currentRoute={app.currentRoute}
       formattedWalletAmount={formattedWalletAmount}
