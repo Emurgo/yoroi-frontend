@@ -8,7 +8,7 @@ import environment from '../../environment';
 import { THEMES } from '../../themes';
 import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
-import globalMessages from '../../i18n/global-messages';
+import { LANGUAGES } from '../../i18n/translations';
 import type { ExplorerType } from '../../domain/Explorer';
 import type {
   GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
@@ -20,17 +20,7 @@ import type {
 export default class ProfileStore extends Store {
 
   LANGUAGE_OPTIONS = [
-    { value: 'en-US', label: globalMessages.languageEnglish, svg: require('../../assets/images/flags/english.inline.svg') },
-    { value: 'ja-JP', label: globalMessages.languageJapanese, svg: require('../../assets/images/flags/japanese.inline.svg') },
-    { value: 'ko-KR', label: globalMessages.languageKorean, svg: require('../../assets/images/flags/korean.inline.svg') },
-    { value: 'zh-Hans', label: globalMessages.languageChineseSimplified, svg: require('../../assets/images/flags/chinese.inline.svg') },
-    { value: 'zh-Hant', label: globalMessages.languageChineseTraditional, svg: require('../../assets/images/flags/chinese.inline.svg') },
-    { value: 'ru-RU', label: globalMessages.languageRussian, svg: require('../../assets/images/flags/russian.inline.svg') },
-    { value: 'de-DE', label: globalMessages.languageGerman, svg: require('../../assets/images/flags/german.inline.svg') },
-    { value: 'fr-FR', label: globalMessages.languageFrench, svg: require('../../assets/images/flags/french.inline.svg') },
-    { value: 'es-ES', label: globalMessages.languageSpanish, svg: require('../../assets/images/flags/spanish.inline.svg') },
-    { value: 'it-IT', label: globalMessages.languageItalian, svg: require('../../assets/images/flags/italian.inline.svg') },
-    { value: 'id-ID', label: globalMessages.languageIndonesian, svg: require('../../assets/images/flags/indonesian.inline.svg') },
+    ...LANGUAGES,
     ...(!environment.isMainnet()
       ? [
         // add any language that's mid-translation here
@@ -119,8 +109,8 @@ export default class ProfileStore extends Store {
     fractionGroupSize: 0
   };
 
-  @observable getProfileLocaleRequest: Request<void => Promise<string>>
-    = new Request<void => Promise<string>>(this.api.localStorage.getUserLocale);
+  @observable getProfileLocaleRequest: Request<void => Promise<?string>>
+    = new Request<void => Promise<?string>>(this.api.localStorage.getUserLocale);
 
   @observable setProfileLocaleRequest: Request<string => Promise<void>>
     = new Request<string => Promise<void>>(this.api.localStorage.setUserLocale);
@@ -128,14 +118,14 @@ export default class ProfileStore extends Store {
   @observable unsetProfileLocaleRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.localStorage.unsetUserLocale);
 
-  @observable getThemeRequest: Request<void => Promise<string>>
-    = new Request<void => Promise<string>>(this.api.localStorage.getUserTheme);
+  @observable getThemeRequest: Request<void => Promise<?string>>
+    = new Request<void => Promise<?string>>(this.api.localStorage.getUserTheme);
 
   @observable setThemeRequest: Request<string => Promise<void>>
     = new Request<string => Promise<void>>(this.api.localStorage.setUserTheme);
 
-  @observable getCustomThemeRequest: Request<void => Promise<string>>
-    = new Request<void => Promise<string>>(this.api.localStorage.getCustomUserTheme);
+  @observable getCustomThemeRequest: Request<void => Promise<?string>>
+    = new Request<void => Promise<?string>>(this.api.localStorage.getCustomUserTheme);
 
   @observable setCustomThemeRequest: Request<SetCustomUserThemeRequest => Promise<void>>
     = new Request<SetCustomUserThemeRequest => Promise<void>>(
@@ -230,7 +220,11 @@ export default class ProfileStore extends Store {
   }
 
   @computed get isCurrentLocaleSet(): boolean {
-    return (this.getProfileLocaleRequest.result !== null && this.getProfileLocaleRequest.result !== '');
+    return (
+      this.getProfileLocaleRequest.result !== null
+      &&
+      this.getProfileLocaleRequest.result !== undefined
+    );
   }
 
   @action
@@ -311,7 +305,7 @@ export default class ProfileStore extends Store {
     const { result } = this.getCustomThemeRequest.execute();
     const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
     let customThemeVars = {};
-    if (result && result !== '') customThemeVars = JSON.parse(result);
+    if (result && result !== undefined) customThemeVars = JSON.parse(result);
     // Merge Custom Theme and Current Theme
     return { ...currentThemeVars, ...customThemeVars };
   }
@@ -319,7 +313,7 @@ export default class ProfileStore extends Store {
   @computed get isCurrentThemeSet(): boolean {
     return (
       this.getThemeRequest.result !== null &&
-      this.getThemeRequest.result !== ''
+      this.getThemeRequest.result !== undefined
     );
   }
 
@@ -360,7 +354,7 @@ export default class ProfileStore extends Store {
 
   hasCustomTheme = (): boolean => {
     const { result } = this.getCustomThemeRequest.execute();
-    return result !== '';
+    return result !== undefined;
   };
 
   // ========== Paper Wallets ========== //
