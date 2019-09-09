@@ -2,7 +2,7 @@
 
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
@@ -22,6 +22,7 @@ import type { ExplorerType } from '../../../domain/Explorer';
 
 import WarningBox from '../../widgets/WarningBox';
 import type { BaseSignRequest } from '../../../api/ada/adaTypes';
+import { formattedWalletAmount } from '../../../utils/formatters';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -53,6 +54,8 @@ type Props = {|
   error: ?LocalizableError,
   currencyUnit: string,
   classicTheme: boolean,
+  unitOfAccountSetting: unitOfAccountSettingType,
+  getCoinPrice: () => ?number
 |};
 
 @observer
@@ -114,7 +117,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       isSubmitting,
       error,
       currencyUnit,
-      classicTheme
+      classicTheme,
+      unitOfAccountSetting,
+      getCoinPrice,
     } = this.props;
 
     const staleTxWarning = (
@@ -186,18 +191,48 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               <div className={styles.amountLabel}>
                 {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
               </div>
-              <div className={styles.amount}>{amount}
-                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-              </div>
+              {unitOfAccountSetting.enabled ? (
+                <Fragment>
+                  <div className={styles.amount}>
+                    {getCoinPrice() ? 
+                       formattedWalletAmount(amount.multipliedBy(getCoinPrice())) :
+                       '-'
+                    }
+                    <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
+                  </div>
+                  <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
+                    <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                  </div>
+                </Fragment>
+              ) : (
+                <div className={styles.amount}>{formattedWalletAmount(amount)}
+                  <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.feesWrapper}>
               <div className={styles.feesLabel}>
                 {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
               </div>
-              <div className={styles.fees}>+{transactionFee}
+              {unitOfAccountSetting.enabled ? (
+                <Fragment>
+                  <div className={styles.fees}>+
+                    {getCoinPrice() ? 
+                       formattedWalletAmount(transactionFee.multipliedBy(getCoinPrice())) :
+                       '-'
+                    }
+                    <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
+                  </div>
+                  <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
+                    <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                  </div>
+                </Fragment>
+              ) : (
+              <div className={styles.fees}>+{formattedWalletAmount(transactionFee)}
                 <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
               </div>
+              )}
             </div>
           </div>
 
@@ -205,9 +240,25 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             <div className={styles.totalAmountLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
             </div>
-            <div className={styles.totalAmount}>{totalAmount}
-              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-            </div>
+            {unitOfAccountSetting.enabled ? (
+              <Fragment>
+                <div className={styles.totalAmount}>
+                  {getCoinPrice() ? 
+                     formattedWalletAmount(totalAmount.multipliedBy(getCoinPrice())) :
+                     '-'
+                  }
+                  <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
+                </div>
+                <div className={styles.totalAmountSmall}>
+                  {formattedWalletAmount(totalAmount)}
+                  <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                </div>
+              </Fragment>
+            ) : (
+              <div className={styles.totalAmount}>{formattedWalletAmount(totalAmount)}
+                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              </div>
+            )}
           </div>
 
           {

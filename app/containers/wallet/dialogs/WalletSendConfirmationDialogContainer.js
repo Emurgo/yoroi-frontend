@@ -42,14 +42,18 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const totalInput = signRequestTotalInput(signRequest, true);
     const fee = signRequestFee(signRequest, true);
     const receivers = signRequestReceivers(signRequest, false);
+    const getCoinPrice = () =>
+      this.props.stores.substores[environment.API].coinPriceStore
+        .getCurrentPrice('ADA', profile.unitOfAccount.currency);
+
     return (
       <WalletSendConfirmationDialog
         staleTx={this.props.staleTx}
         selectedExplorer={this.props.stores.profile.selectedExplorer}
-        amount={formattedWalletAmount(totalInput.minus(fee))}
+        amount={totalInput.minus(fee)}
         receivers={receivers}
-        totalAmount={formattedWalletAmount(totalInput)}
-        transactionFee={formattedWalletAmount(fee)}
+        totalAmount={totalInput}
+        transactionFee={fee}
         amountToNaturalUnits={formattedAmountToNaturalUnits}
         signRequest={signRequest}
         onSubmit={({ password }) => {
@@ -67,6 +71,8 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
         classicTheme={profile.isClassicTheme}
+        unitOfAccountSetting={profile.unitOfAccount}
+        getCoinPrice={getCoinPrice}
       />
     );
   }
