@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -18,6 +18,7 @@ import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
+import { getPrice } from '../../../types/coinPriceType';
 
 const messages = defineMessages({
   type: {
@@ -119,7 +120,7 @@ type Props = {|
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
-  coinPriceCurrencySetting: CoinPriceCurrencySettingType,
+  unitOfAccountSetting: CoinPriceCurrencySettingType,
 |};
 
 type State = {
@@ -183,7 +184,7 @@ export default class Transaction extends Component<Props, State> {
       state,
       assuranceLevel,
       formattedWalletAmount,
-      coinPriceCurrencySetting,
+      unitOfAccountSetting,
     } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
@@ -226,16 +227,10 @@ export default class Transaction extends Component<Props, State> {
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
     const symbol = adaSymbol;
 
-    let amountInSelectCurrency = null;
-    if (coinPriceCurrencySetting.enabled) {
-      let amount = '?';
-      if (data.tickers) {
-        const price = data.tickers.find(ticker => ticker.to === coinPriceCurrencySetting.currency).price;
-        amount = data.amount.multipliedBy(price).toString();
-      }
-      amountInSelectCurrency = (<div>
-        { amount + ' ' + coinPriceCurrencySetting.currency } 
-      </div>);
+    const price = getPrice('ADA', unitOfAccountSetting.currency, data.tickers);
+    let amountInSelectedCurrency: ?BigNumber = null;
+    if (unitOfAccountSetting.enabled && price) {
+      amountInSelectedCurrency = data.amount.multipliedBy(price);
     }
 
     return (
@@ -259,17 +254,22 @@ export default class Transaction extends Component<Props, State> {
                 </div>
               )}
 
-              <div className={this.getAmountStyle(data.amount)}>
-                {
-                  // hide currency (we are showing symbol instead)
-                  formattedWalletAmount(data.amount, false)
-                }
-                <SvgInline svg={symbol} className={styles.currencySymbol} />
-                {
-                  amountInSelectCurrency
-                }
-              </div>
-
+              {(unitOfAccountSetting.enabled && price) ? (
+                <div className={this.getAmountStyle(amountInSelectedCurrency)}>
+                    { amountInSelectedCurrency.toString() + ' ' + unitOfAccountSetting.currency }
+                  <div className={styles.amountSmall}>
+                    { formattedWalletAmount(data.amount) } ADA
+                  </div>
+                </div>
+              ) : (
+                <div className={this.getAmountStyle(data.amount)}>
+                  {
+                    // hide currency (we are showing symbol instead)
+                    formattedWalletAmount(data.amount, false)
+                  }
+                  <SvgInline svg={symbol} className={styles.currencySymbol} />
+                </div>
+              )}
               <div className={styles.expandArrowBox}>
                 <SvgInline className={arrowClasses} svg={expandArrow} />
               </div>
@@ -297,9 +297,23 @@ export default class Transaction extends Component<Props, State> {
                   <h2>
                     {intl.formatMessage(messages.fee)}
                   </h2>
-                  <span className={styles.rowData}>
-                    {formattedWalletAmount(data.fee.abs(), false)}
-                  </span>
+                  {unitOfAccountSetting.enabled && price ? (
+                    <Fragment>
+                      <div className={styles.rowData}>
+                        {data.fee.abs().multipliedBy(price).toString()}
+                        {' ' + unitOfAccountSetting.currency}
+                      </div>
+                      <div className={styles.rowDataSmall}>
+                        {formattedWalletAmount(data.fee.abs(), false)} ADA
+                      </div>
+                    </Fragment>
+                  ) : (
+                    <Fragment>
+                      <div className={styles.rowData}>
+                        {formattedWalletAmount(data.fee.abs(), false)}
+                      </div>
+                    </Fragment>
+                  )}
                 </div>
               )}
               <h2>

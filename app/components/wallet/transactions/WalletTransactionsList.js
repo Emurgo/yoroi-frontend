@@ -40,7 +40,7 @@ type Props = {|
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
-  coinPriceCurrencySetting: CoinPriceCurrencySettingType,
+  unitOfAccountSetting: coinPriceCurrencySettingType,
 |};
 
 @observer
@@ -112,7 +112,7 @@ export default class WalletTransactionsList extends Component<Props> {
       walletId,
       formattedWalletAmount,
       onLoadMore,
-      coinPriceCurrencySetting,
+      unitOfAccountSetting,
     } = this.props;
 
     const buttonClasses = classnames([
@@ -141,7 +141,7 @@ export default class WalletTransactionsList extends Component<Props> {
                   state={transaction.state}
                   assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
                   formattedWalletAmount={formattedWalletAmount}
-                  coinPriceCurrencySetting={coinPriceCurrencySetting}
+                  unitOfAccountSetting={unitOfAccountSetting}
                 />
               ))}
             </div>

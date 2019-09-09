@@ -103,6 +103,11 @@
     }
   }
 
+  .amountSmall {
+    color: var(--theme-widgets-hash-light-color);
+    font-size: 14px;
+  }
+
   .failedLabel {
     background-color: var(--theme-transactions-state-failed-background-color);
   }
@@ -178,6 +183,11 @@
       font-family: var(--font-regular);
       word-break: break-all;
       line-height: 22px;
+    }
+
+    .rowDataSmall {
+      @extend .rowData;
+      font-size: 12px;
     }
   }
 
@@ -365,6 +375,11 @@
     .rowData {
       color: var(--theme-widgets-hash-light-color);
       line-height: 1.57;
+    }
+
+    .rowDataSmall {
+      @extend .rowData;
+      font-size: 12px;
     }
   }
 
