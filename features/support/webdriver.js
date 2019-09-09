@@ -216,7 +216,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   };
 
-  this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
+  this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
 
   this.getFromLocalStorage = async (key) => {
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);

@@ -7,7 +7,9 @@ import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import { resetChain, serverIssue, serverFixed } from '../mock-chain/mockImporter';
 import { expect } from 'chai';
-import { navigateToTransactionsList } from '../support/helpers/route-helpers';
+import {
+  satisfies,
+} from 'semver';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -157,13 +159,21 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.click('.TermsOfUseForm_submitButton');
 
   // uri prompt page
-  if (this.getBrowser() !== 'firefox') {
-    await this.waitForElement('.UriPromptForm_component');
-    await this.click('.allowButton');
-    await this.waitForElement('.UriAccept_component');
-    await this.click('.finishButton');
-  }
+  await acceptUriPrompt(this);
 });
+
+Then(/^I accept uri registration$/, async function () {
+  await acceptUriPrompt(this);
+});
+
+async function acceptUriPrompt(world: any) {
+  if (world.getBrowser() !== 'firefox') {
+    await world.waitForElement('.UriPromptForm_component');
+    await world.click('.allowButton');
+    await world.waitForElement('.UriAccept_component');
+    await world.click('.finishButton');
+  }
+}
 
 Given(/^I have opened the extension$/, async function () {
   await this.driver.get(this.getExtensionUrl());
@@ -171,13 +181,17 @@ Given(/^I have opened the extension$/, async function () {
 
 Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
-  await this.driver.sleep(500); // give time for page to reload
+  // wait for page to refresh
+  await this.driver.sleep(500);
+  await this.waitForElement('.YoroiClassic');
 });
 
 Given(/^I restart the browser$/, async function () {
   await this.driver.manage().deleteAllCookies();
   await this.driver.navigate().refresh();
-  await this.driver.sleep(500); // give time for page to reload
+  // wait for page to refresh
+  await this.driver.sleep(500);
+  await this.waitForElement('.YoroiClassic');
 });
 
 Given(/^There is no wallet stored$/, async function () {
@@ -195,14 +209,17 @@ Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
 
 Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
-  await migrateImportedSnapshot(this);
-  await navigateToTransactionsList(this);
-  await refreshWallet(this);
+
+  // refresh page to trigger migration
+  await this.driver.navigate().refresh();
+  // wait for page to refresh
+  await this.driver.sleep(1500);
+  await this.waitForElement('.YoroiClassic');
 });
 
-function refreshWallet(client) {
-  return client.driver.executeScript((done) => {
-    window.yoroi.stores.substores.ada.wallets.refreshWalletsData()
+async function refreshWallet(client) {
+  await client.driver.executeAsyncScript((done) => {
+    window.yoroi.stores.substores.ada.wallets.refreshImportedWalletData()
       .then(done)
       .catch(err => done(err));
   });
@@ -219,7 +236,7 @@ async function exportYoroiSnapshot(client, exportDir: string) {
 async function exportLocalStorage(client, exportDir: string) {
   const localStoragePath = `${exportDir}/localStorage.json`;
   const localStorage = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.localStorage.getLocalStorage()
+    window.yoroi.api.localStorage.getStorage()
       .then(done)
       .catch(err => done(err));
   });
@@ -240,30 +257,50 @@ async function importYoroiSnapshot(client, importDir: string) {
   if (!fs.existsSync(importDir)) {
     throw new Error('The directory must exists!');
   }
-  importLocalStorage(client, importDir);
-  importIndexedDB(client, importDir);
+  await importLocalStorage(client, importDir);
+  await importIndexedDB(client, importDir);
 }
 
 async function importLocalStorage(client, importDir: string) {
   const localStoragePath = `${importDir}/localStorage.json`;
-  const localStorageData = fs.readFileSync(localStoragePath);
-  await client.driver.executeScript((data) => {
-    window.yoroi.api.localStorage.setLocalStorage(data);
-    // $FlowFixMe Flow thinks that localStorageData is of type Buffer
-  }, JSON.parse(localStorageData));
+  const localStorageData = fs.readFileSync(localStoragePath).toString();
+  const storage = JSON.parse(localStorageData);
+  const version: string = storage['test-LAST-LAUNCH-VER'] || '0.0.0';
+
+  // Clear anything in memory to effectively override it with the snapshot
+  await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.localStorage.clear()
+      .then(done)
+      .catch(err => done(err));
+  });
+
+  if (satisfies(version, '<1.9.0')) {
+    /**
+     * Version of Yoroi <1.9.0 used localStorage exclusively
+     * we mimic this behavior when importing
+     */
+    await client.driver.executeScript(data => {
+      Object.keys(data).forEach(key => {
+        window.localStorage.setItem(key, data[key]);
+      });
+    }, storage);
+  } else {
+    await client.driver.executeAsyncScript((data, done) => {
+      window.yoroi.api.localStorage.setStorage(data)
+        .then(done)
+        .catch(err => done(err));
+    }, storage);
+  }
 }
 
 async function importIndexedDB(client, importDir: string) {
   const indexedDBPath = `${importDir}/indexedDB.json`;
-  const indexedDBData = fs.readFileSync(indexedDBPath);
-  await client.driver.executeScript((data) => {
-    window.yoroi.api.ada.importLocalDatabase(data);
-    // $FlowFixMe Flow thinks that indexedDBData is of type Buffer
-  }, JSON.parse(indexedDBData));
-}
-
-async function migrateImportedSnapshot(client) {
-  return client.driver.executeScript(() => {
-    window.yoroi.actions.snapshot.migrateImportedSnapshot.trigger({});
-  });
+  try {
+    const indexedDBData = fs.readFileSync(indexedDBPath).toString();
+    await client.driver.executeAsyncScript((data, done) => {
+      window.yoroi.api.ada.importLocalDatabase(data)
+        .then(done)
+        .catch(err => done(err));
+    }, JSON.parse(indexedDBData));
+  } catch (e) {} // eslint-disable-line no-empty
 }

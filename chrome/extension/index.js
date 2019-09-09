@@ -51,6 +51,6 @@ const initializeYoroi = async () => {
   );
 };
 
-addCloseListener(window);
+addCloseListener();
 
 window.addEventListener('load', initializeYoroi);

@@ -77,7 +77,8 @@ test('Can add and fetch address in wallet', async () => {
       )
       .addPrivateDeriver(
         finalState => ({
-          addLevelRequest: {
+          pathToPrivate: [],
+          addLevelRequest: parent => ({
             privateKeyInfo: {
               Hash: rootPk.key().to_hex(),
               IsEncrypted: false,
@@ -87,16 +88,16 @@ test('Can add and fetch address in wallet', async () => {
             derivationInfo: keys => ({
               PublicKeyId: keys.public,
               PrivateKeyId: keys.private,
-              Index: 0,
+              Parent: parent,
+              Index: null,
             }),
             levelInfo: id => ({
-              Bip44DerivationId: id,
+              KeyDerivationId: id,
             })
-          },
-          level: DerivationLevels.ROOT.level,
+          }),
           addPrivateDeriverRequest: derivationId => ({
             Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
-            Bip44DerivationId: derivationId,
+            KeyDerivationId: derivationId,
             Level: DerivationLevels.ROOT.level,
           }),
         })
@@ -113,7 +114,7 @@ test('Can add and fetch address in wallet', async () => {
             lastUpdate: null, // purposely null to avoid  diff in test
           },
           publicDeriverInsert: id => ({
-            Bip44DerivationId: id,
+            KeyDerivationId: id,
             Name: 'First account',
             LastBlockSync: 0,
           }),
@@ -136,7 +137,7 @@ test('Can add and fetch address in wallet', async () => {
       .deriveFromPublic(
         finalState => ({
           tree: {
-            derivationId: finalState.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
+            derivationId: finalState.publicDeriver[0].levelResult.KeyDerivation.KeyDerivationId,
             children: [
               {
                 index: 0, // external chain,
@@ -177,7 +178,7 @@ test('Can add and fetch address in wallet', async () => {
     await bipWallet.derive(
       {
         publicDeriverInsert: id => ({
-          Bip44DerivationId: id,
+          KeyDerivationId: id,
           Name: 'Checking account',
           LastBlockSync: 0,
         }),
@@ -220,7 +221,7 @@ test('Can add and fetch address in wallet', async () => {
       const addressesForAccount = await GetDerivationsByPath.get(
         db,
         tx,
-        state.publicDeriver[0].levelResult.Bip44Derivation.Bip44DerivationId,
+        state.publicDeriver[0].levelResult.KeyDerivation.KeyDerivationId,
         [purposeIndex, coinTypeIndex, firstAccountIndex],
         [null, null]
       );
@@ -231,7 +232,7 @@ test('Can add and fetch address in wallet', async () => {
         DerivationLevels.ADDRESS.level,
       );
       const result = dbAddresses.map(row => (
-        { hash: row.Hash, addressing: addressesForAccount.get(row.Bip44DerivationId) }
+        { hash: row.Hash, addressing: addressesForAccount.get(row.KeyDerivationId) }
       ));
 
       expect(result.length).toEqual(1);

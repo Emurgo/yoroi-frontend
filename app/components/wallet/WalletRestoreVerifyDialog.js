@@ -97,6 +97,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         onClick: onNext,
         primary: true,
         className: classnames(['confirmButton', isSubmitting ? styles.isSubmitting : null]),
+        disabled: isSubmitting,
       },
     ];
 

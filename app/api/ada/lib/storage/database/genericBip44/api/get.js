@@ -8,8 +8,7 @@ import type {
 import { op } from 'lovefield';
 
 import type {
-  Bip44DerivationMappingRow,
-  Bip44DerivationRow,
+  KeyDerivationRow,
   Bip44WrapperRow,
   PublicDeriverRow,
   PrivateDeriverRow,
@@ -29,7 +28,7 @@ export class GetDerivation {
     [Tables.Bip44AccountSchema.name]: Tables.Bip44AccountSchema,
     [Tables.Bip44ChainSchema.name]: Tables.Bip44ChainSchema,
     [Tables.Bip44AddressSchema.name]: Tables.Bip44AddressSchema,
-    [Tables.Bip44DerivationSchema.name]: Tables.Bip44DerivationSchema,
+    [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
   static depTables = Object.freeze({});
 
@@ -46,7 +45,7 @@ export class GetDerivation {
     return await getRowIn<Row>(
       db, tx,
       tableName,
-      GetDerivation.ownTables[Tables.Bip44DerivationSchema.name].properties.Bip44DerivationId,
+      GetDerivation.ownTables[Tables.KeyDerivationSchema.name].properties.KeyDerivationId,
       derivationIds,
     );
   }
@@ -54,10 +53,7 @@ export class GetDerivation {
 
 export class GetChildIfExists {
   static ownTables = Object.freeze({
-    [Tables.Bip44DerivationMappingSchema.name]: (
-      Tables.Bip44DerivationMappingSchema
-    ),
-    [Tables.Bip44DerivationSchema.name]: Tables.Bip44DerivationSchema,
+    [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
   static depTables = Object.freeze({});
 
@@ -66,34 +62,21 @@ export class GetChildIfExists {
     tx: lf$Transaction,
     parentId: number,
     childIndex: number,
-  ): Promise<void | {
-      Bip44DerivationMapping: Bip44DerivationMappingRow,
-      Bip44Derivation: Bip44DerivationRow,
-    }> {
-    const mappingSchema = GetChildIfExists.ownTables[Tables.Bip44DerivationMappingSchema.name];
-    const derivationSchema = GetChildIfExists.ownTables[Tables.Bip44DerivationSchema.name];
+  ): Promise<void | KeyDerivationRow> {
+    const derivationSchema = GetChildIfExists.ownTables[Tables.KeyDerivationSchema.name];
 
-    const mappingTable = db.getSchema().table(mappingSchema.name);
     const derivationTable = db.getSchema().table(derivationSchema.name);
     const conditions: Array<lf$Predicate> = [
       derivationTable[derivationSchema.properties.Index].eq(childIndex),
-      mappingTable[mappingSchema.properties.Parent].eq(parentId),
+      derivationTable[derivationSchema.properties.Parent].eq(parentId),
     ];
 
     const query = db
       .select()
-      .from(mappingTable)
-      .innerJoin(
-        derivationTable,
-        derivationTable[derivationSchema.properties.Bip44DerivationId]
-          .eq(mappingTable[mappingSchema.properties.Child]),
-      )
+      .from(derivationTable)
       .where(op.and(...conditions));
 
-    const queryResult: Array<{
-      Bip44DerivationMapping: Bip44DerivationMappingRow,
-      Bip44Derivation: Bip44DerivationRow,
-    }> = await tx.attach(query);
+    const queryResult: Array<KeyDerivationRow> = await tx.attach(query);
 
     return queryResult.length === 1
       ? queryResult[0]
@@ -110,10 +93,7 @@ type PathMapType = Map<number, Array<number>>;
 
 export class GetDerivationsByPath {
   static ownTables = Object.freeze({
-    [Tables.Bip44DerivationMappingSchema.name]: (
-      Tables.Bip44DerivationMappingSchema
-    ),
-    [Tables.Bip44DerivationSchema.name]: Tables.Bip44DerivationSchema,
+    [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
   static depTables = Object.freeze({});
 
@@ -146,13 +126,11 @@ const _getDerivationsByPath = async (
   if (currPathIndex === queryPath.length) {
     return pathMap;
   }
-  const mappingSchema = GetDerivationsByPath.ownTables[Tables.Bip44DerivationMappingSchema.name];
-  const derivationSchema = GetDerivationsByPath.ownTables[Tables.Bip44DerivationSchema.name];
+  const derivationSchema = GetDerivationsByPath.ownTables[Tables.KeyDerivationSchema.name];
 
-  const mappingTable = db.getSchema().table(mappingSchema.name);
   const derivationTable = db.getSchema().table(derivationSchema.name);
   const conditions = [
-    mappingTable[mappingSchema.properties.Parent].in(
+    derivationTable[derivationSchema.properties.Parent].in(
       Array.from(pathMap.keys())
     ),
   ];
@@ -167,25 +145,18 @@ const _getDerivationsByPath = async (
 
   const query = db
     .select()
-    .from(mappingTable)
-    .innerJoin(
-      derivationTable,
-      derivationTable[derivationSchema.properties.Bip44DerivationId]
-        .eq(mappingTable[mappingSchema.properties.Child]),
-    )
+    .from(derivationTable)
     .where(op.and(...conditions));
 
-  const queryResult: Array<{
-    Bip44DerivationMapping: Bip44DerivationMappingRow,
-    Bip44Derivation: Bip44DerivationRow,
-  }> = await tx.attach(query);
+  const queryResult: Array<KeyDerivationRow> = await tx.attach(query);
   const nextPathMap = new Map(queryResult.map(row => {
-    const path = pathMap.get(row.Bip44DerivationMapping.Parent);
-    if (!path) throw new Error('genericBip44::_getDerivationsByPath Should never happen');
-    if (row.Bip44Derivation.Index === null) throw new Error('genericBip44::_getDerivationsByPath null child index');
+    if (row.Parent == null) throw new Error('genericBip44::_getDerivationsByPath Should never happen');
+    const path = pathMap.get(row.Parent);
+    if (path == null) throw new Error('genericBip44::_getDerivationsByPath Should never happen');
+    if (row.Index === null) throw new Error('genericBip44::_getDerivationsByPath null child index');
     return [
-      row.Bip44DerivationMapping.Child,
-      path.concat([row.Bip44Derivation.Index])
+      row.KeyDerivationId,
+      path.concat([row.Index])
     ];
   }));
   if (nextPathMap.size === 0) {
@@ -262,9 +233,9 @@ export class GetBip44Wrapper {
   }
 }
 
-export class GetBip44Derivation {
+export class GetKeyDerivation {
   static ownTables = Object.freeze({
-    [Tables.Bip44DerivationSchema.name]: Tables.Bip44DerivationSchema,
+    [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
   static depTables = Object.freeze({});
 
@@ -272,12 +243,12 @@ export class GetBip44Derivation {
     db: lf$Database,
     tx: lf$Transaction,
     key: number,
-  ): Promise<Bip44DerivationRow | void> {
-    return await getRowFromKey<Bip44DerivationRow>(
+  ): Promise<KeyDerivationRow | void> {
+    return await getRowFromKey<KeyDerivationRow>(
       db, tx,
       key,
-      GetBip44Derivation.ownTables[Tables.Bip44DerivationSchema.name].name,
-      GetBip44Derivation.ownTables[Tables.Bip44DerivationSchema.name].properties.Bip44DerivationId,
+      GetKeyDerivation.ownTables[Tables.KeyDerivationSchema.name].name,
+      GetKeyDerivation.ownTables[Tables.KeyDerivationSchema.name].properties.KeyDerivationId,
     );
   }
 }

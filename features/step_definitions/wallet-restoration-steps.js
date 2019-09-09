@@ -86,7 +86,13 @@ Then(/^I should see a plate ([^"]*)$/, async function (plate) {
 });
 
 export async function assertPlate(customWorld: any, plate: string): Promise<void> {
-  const plateElement = await customWorld.driver.findElements(By.css('.WalletRestoreVerifyDialog_plateIdSpan'));
+  // check plate in confirmation dialog
+  let plateElement = await customWorld.driver.findElements(By.css('.WalletRestoreVerifyDialog_plateIdSpan'));
+
+  // this makes this function also work for wallets that already exist
+  if (plateElement.length === 0) {
+    plateElement = await customWorld.driver.findElements(By.css('.WalletTopbarTitle_walletPlate'));
+  }
   const plateText = await plateElement[0].getText();
   expect(plateText).to.be.equal(plate);
 }

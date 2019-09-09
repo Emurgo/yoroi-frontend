@@ -33,6 +33,7 @@ When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async func
   const uri = this.getExtensionUrl() + '#/send-from-uri?q=web+cardano:' + address + '?amount=' + amount;
   await this.driver.get('about:blank'); // dummy step, but needed
   await this.driver.get(uri);
+  await this.driver.sleep(500);
 });
 
 Then(/^I should see and accept a warning dialog$/, async function () {
