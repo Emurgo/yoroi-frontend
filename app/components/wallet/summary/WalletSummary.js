@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SvgInline from 'react-svg-inline';
@@ -35,7 +35,7 @@ type Props = {|
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
   openExportTxToFileDialog: Function,
-  coinPriceCurrencySetting: CoinPriceCurrencySettingType,
+  unitOfAccountSetting: unitOfAccountSettingType,
 |};
 
 @observer
@@ -51,7 +51,7 @@ export default class WalletSummary extends Component<Props> {
       numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
-      coinPriceCurrencySetting,
+      unitOfAccountSetting,
     } = this.props;
     const { intl } = this.context;
 
@@ -63,26 +63,32 @@ export default class WalletSummary extends Component<Props> {
             {pendingAmount.incoming.isGreaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
-                : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
-                {pendingAmount.incomingInSelectedCurrency && coinPriceCurrencySetting.enabled ? 
+                :&nbsp;
+                {pendingAmount.incomingInSelectedCurrency && unitOfAccountSetting.enabled ? 
                   (<span>
-                    / {pendingAmount.incomingInSelectedCurrency.toString()}
-                    {coinPriceCurrencySetting.currency}
-                  </span>) : ''
+                    {pendingAmount.incomingInSelectedCurrency.toString()}
+                    {' ' + unitOfAccountSetting.currency}
+                  </span>) : 
+                  (<Fragment>
+                    <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
+                    <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
+                  </Fragment>)
                 }
               </div>
             }
             {pendingAmount.outgoing.isGreaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
-                : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
-                {pendingAmount.outgoingInSelectedCurrency && coinPriceCurrencySetting.enabled ? 
+                :&nbsp;
+                {pendingAmount.outgoingInSelectedCurrency && unitOfAccountSetting.enabled ? 
                   (<span>
-                    / {pendingAmount.outgoingInSelectedCurrency.toString()}
-                    {coinPriceCurrencySetting.currency}
-                  </span>) : ''
+                    {pendingAmount.outgoingInSelectedCurrency.toString()}
+                    {' ' + unitOfAccountSetting.currency}
+                  </span>) : 
+                  (<Fragment>
+                    <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
+                    <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
+                  </Fragment>)
                 }
               </div>
             }
