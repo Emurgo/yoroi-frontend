@@ -81,6 +81,10 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     const wallets = this._getWalletsStore();
     const yoroiTransfer = this._getYoroiTransferStore();
 
+    const getCoinPrice = () => 
+      stores.substores[environment.API].coinPriceStore
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency);
+
     switch (yoroiTransfer.status) {
       case 'uninitialized':
         return (
@@ -132,6 +136,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               onCancel={this.cancelTransferFunds}
               error={yoroiTransfer.error}
               classicTheme={profile.isClassicTheme}
+              getCoinPrice={getCoinPrice}
+              unitOfAccountSetting={stores.profile.unitOfAccount}
             />
           </TransferLayout>
         );

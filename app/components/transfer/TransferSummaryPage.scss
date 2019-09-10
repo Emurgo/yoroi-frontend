@@ -82,6 +82,16 @@
     .fees {
       opacity: 0.5;
     }
+
+    .amountSmall {
+      @extend .amount;
+      font-size: 12px;
+    }
+
+    .feesSmall {
+      @extend .fees;
+      font-size: 12px;
+    }
   }
 
   .totalAmountLabel {
@@ -97,6 +107,11 @@
     line-height: 1.38;
     margin-top: 6px;
     word-break: break-word;
+  }
+
+  .totalAmountSmall {
+    @extend .totalAmount;
+    font-size: 12px;
   }
 
   .buttonsWrapper {

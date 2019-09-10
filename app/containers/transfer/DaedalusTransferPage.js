@@ -81,6 +81,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
 
+    const getCoinPrice = () => 
+      stores.substores[environment.API].coinPriceStore
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency);
+
     switch (daedalusTransfer.status) {
       case 'uninitialized':
         return (
@@ -156,6 +160,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
               onCancel={this.cancelTransferFunds}
               error={daedalusTransfer.error}
               classicTheme={profile.isClassicTheme}
+              getCoinPrice={getCoinPrice}
+              unitOfAccountSetting={stores.profile.unitOfAccount}
             />
           </TransferLayout>
         );

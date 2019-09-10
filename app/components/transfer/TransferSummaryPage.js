@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -53,7 +53,9 @@ type Props = {|
   onCancel: Function,
   error: ?LocalizableError,
   addressFromSubLabel: string,
-  classicTheme: boolean
+  classicTheme: boolean,
+  unitOfAccountSetting: unitOfAccountSettingType,
+  getCoinPrice: () => ?number,
 |};
 
 /** Show user what the transfer would do to get final confirmation */
@@ -66,7 +68,9 @@ export default class TransferSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, addressFromSubLabel, classicTheme } = this.props;
+    const { transferTx, isSubmitting, error, addressFromSubLabel, classicTheme,
+      unitOfAccountSetting, getCoinPrice,
+    } = this.props;
 
     const receiver = transferTx.receiver;
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
@@ -149,18 +153,52 @@ export default class TransferSummaryPage extends Component<Props> {
                 <div className={styles.amountLabel}>
                   {intl.formatMessage(messages.recoveredBalanceLabel)}
                 </div>
-                <div className={styles.amount}>{recoveredBalance}
-                  <span className={styles.currencySymbol}>&nbsp;ADA</span>
-                </div>
+                {unitOfAccountSetting.enabled ? (
+                  <Fragment>
+                    <div className={styles.amount}>
+                      {getCoinPrice() ? 
+                        transferTx.recoveredBalance.multipliedBy(getCoinPrice()).toString() :
+                        '-'
+                      }
+                      <span className={styles.currencySymbol}>&nbsp;
+                        {unitOfAccountSetting.currency}
+                      </span>
+                    </div>
+                    <div className={styles.amountSmall}>{recoveredBalance}
+                      <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                    </div>
+                  </Fragment>
+                ) : (
+                  <div className={styles.amount}>{recoveredBalance}
+                    <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                  </div>
+                 )}
               </div>
 
               <div className={styles.feesWrapper}>
                 <div className={styles.feesLabel}>
                   {intl.formatMessage(messages.transactionFeeLabel)}
                 </div>
-                <div className={styles.fees}>+{transactionFee}
-                  <span className={styles.currencySymbol}>&nbsp;ADA</span>
-                </div>
+                {unitOfAccountSetting.enabled ? (
+                  <Fragment>
+                    <div className={styles.fees}>
+                      {'+' + (getCoinPrice() ? 
+                        transferTx.fee.multipliedBy(getCoinPrice()).toString() :
+                        '-')
+                      }
+                      <span className={styles.currencySymbol}>&nbsp;
+                        {unitOfAccountSetting.currency}
+                      </span>
+                    </div>
+                    <div className={styles.feesSmall}>+{transactionFee}
+                      <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                    </div>
+                  </Fragment>
+                ) : (
+                  <div className={styles.fees}>+{transactionFee}
+                    <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -168,9 +206,27 @@ export default class TransferSummaryPage extends Component<Props> {
               <div className={styles.totalAmountLabel}>
                 {intl.formatMessage(messages.finalBalanceLabel)}
               </div>
-              <div className={styles.totalAmount}>{finalBalance}
-                <span className={styles.currencySymbol}>&nbsp;ADA</span>
-              </div>
+              {unitOfAccountSetting.enabled ? (
+                <Fragment>
+                  <div className={styles.totalAmount}>
+                    {getCoinPrice() ? 
+                      transferTx.recoveredBalance.minus(transferTx.fee)
+                        .multipliedBy(getCoinPrice()).toString() :
+                      '-'
+                    }
+                    <span className={styles.currencySymbol}>&nbsp;
+                      {unitOfAccountSetting.currency}
+                    </span>
+                  </div>
+                  <div className={styles.totalAmountSmall}>{finalBalance}
+                    <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                  </div>
+                </Fragment>
+              ) : (
+                <div className={styles.totalAmount}>{finalBalance}
+                  <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.errorWrapper}>
