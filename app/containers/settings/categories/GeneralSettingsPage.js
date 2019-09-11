@@ -43,7 +43,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
   )
 
   onSelectCoinPriceCurrency = (value: { selected: string }) => {
-    const currency = (value === '---') ? 
+    const currency = (value === 'ADA') ? 
       coinPriceCurrencyDisabledValue :
       { enabled: true, currency: value };
     this.props.actions.profile.updateCoinPriceCurrency.trigger(currency);
@@ -79,22 +79,20 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       )
       : null;
 
-    const currencies = UNIT_OF_ACCOUNT_OPTIONS.map(o => (
-      { value: o.symbol, label: o.symbol }
-    ));
-    currencies.unshift({ value: '---', label: 'disabled' });
+    const coinPriceStore = this.props.stores.substores[environment.API].coinPriceStore;
 
-    const coinPriceCurrencyValue = unitOfAccount.enabled ? unitOfAccount.currency : '---';
+    const currencies = UNIT_OF_ACCOUNT_OPTIONS.map(c => (
+      { value: c.symbol, label: `${c.symbol} - ${c.label}`, name: c.label,
+        price: coinPriceStore.getCurrentPrice('ADA', c.symbol), svg: c.svg
+      }
+    ));
+    currencies.unshift({ value: 'ADA', label: 'ADA - Cardano', name: 'Cardano',
+      native: true, svg: require('../../../assets/images/currencies/ADA.inline.svg') });
+
+    const coinPriceCurrencyValue = unitOfAccount.enabled ? unitOfAccount.currency : 'ADA';
       
     return (
       <div>
-        <CoinPriceCurrencySettings
-          onSelect={this.onSelectCoinPriceCurrency}
-          isSubmitting={isSubmittingCoinPriceCurrency}
-          currencies={currencies}
-          currentValue={coinPriceCurrencyValue}
-          error={setCoinPriceCurrencyRequest.error}
-        />
         <GeneralSettings
           onSelectLanguage={this.onSelectLanguage}
           isSubmitting={isSubmittingLocale}
@@ -110,6 +108,14 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
           error={setSelectedExplorerRequest.error}
         />
         {uriSettings}
+        <CoinPriceCurrencySettings
+          onSelect={this.onSelectCoinPriceCurrency}
+          isSubmitting={isSubmittingCoinPriceCurrency}
+          currencies={currencies}
+          currentValue={coinPriceCurrencyValue}
+          error={setCoinPriceCurrencyRequest.error}
+          lastUpdatedDate={new Date(coinPriceStore.lastUpdateTimestamp)}
+        />
         <ThemeSettingsBlock
           currentTheme={currentTheme}
           selectTheme={this.selectTheme}
