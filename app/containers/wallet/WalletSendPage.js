@@ -157,6 +157,8 @@ export default class WalletSendPage extends Component<Props> {
       signRequest={signRequest}
       staleTx={transactionBuilderStore.txMismatch}
       currencyUnit={intl.formatMessage(globalMessages.unitAda)}
+      unitOfAccountSetting={stores.profile.unitOfAccount}
+      getCoinPrice={this.getCoinPrice}
     />);
   };
 
@@ -188,10 +190,10 @@ export default class WalletSendPage extends Component<Props> {
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
           selectedExplorer={this.props.stores.profile.selectedExplorer}
-          amount={formattedWalletAmount(totalInput.minus(fee))}
+          amount={totalInput.minus(fee)}
           receivers={receivers}
-          totalAmount={formattedWalletAmount(totalInput)}
-          transactionFee={formattedWalletAmount(fee)}
+          totalAmount={totalInput}
+          transactionFee={fee}
           amountToNaturalUnits={formattedAmountToNaturalUnits}
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           messages={messagesLedger}
@@ -204,6 +206,8 @@ export default class WalletSendPage extends Component<Props> {
           }
           onCancel={ledgerSendAction.cancel.trigger}
           classicTheme={this.props.stores.profile.isClassicTheme}
+          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
+          getCoinPrice={this.getCoinPrice}
         />);
     } else if (active.isTrezorTWallet) {
       const trezorSendAction = this.props.actions[environment.API].trezorSend;
@@ -212,10 +216,10 @@ export default class WalletSendPage extends Component<Props> {
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
           selectedExplorer={this.props.stores.profile.selectedExplorer}
-          amount={formattedWalletAmount(totalInput.minus(fee))}
+          amount={totalInput.minus(fee)}
           receivers={receivers}
-          totalAmount={formattedWalletAmount(totalInput)}
-          transactionFee={formattedWalletAmount(fee)}
+          totalAmount={totalInput}
+          transactionFee={fee}
           amountToNaturalUnits={formattedAmountToNaturalUnits}
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           messages={messagesTrezor}
@@ -228,6 +232,8 @@ export default class WalletSendPage extends Component<Props> {
           }
           onCancel={trezorSendAction.cancel.trigger}
           classicTheme={this.props.stores.profile.isClassicTheme}
+          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
+          getCoinPrice={this.getCoinPrice}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');
@@ -235,4 +241,10 @@ export default class WalletSendPage extends Component<Props> {
 
     return hwSendConfirmationDialog;
   };
+
+  getCoinPrice = () : ?number => {
+    const { stores } = this.props;
+    return stores.substores[environment.API].coinPriceStore
+      .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency);
+  }
 }

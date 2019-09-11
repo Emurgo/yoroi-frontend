@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
@@ -19,6 +19,8 @@ import type { ExplorerType } from '../../../domain/Explorer';
 
 import styles from './HWSendConfirmationDialog.scss';
 
+import { formattedWalletAmount } from '../../../utils/formatters';
+
 type ExpectedMessages = {
   infoLine1: MessageDescriptor,
   infoLine2: MessageDescriptor,
@@ -28,10 +30,10 @@ type ExpectedMessages = {
 type Props = {|
   staleTx: boolean,
   selectedExplorer: ExplorerType,
-  amount: string,
+  amount: BigNumber,
   receivers: Array<string>,
-  totalAmount: string,
-  transactionFee: string,
+  totalAmount: BigNumber,
+  transactionFee: BigNumber,
   currencyUnit: string,
   amountToNaturalUnits: Function,
   messages: ExpectedMessages,
@@ -40,6 +42,8 @@ type Props = {|
   onSubmit: void => void,
   onCancel: Function,
   classicTheme: boolean,
+  unitOfAccountSetting: UnitOfAccountSettingType,
+  getCoinPrice: () => ?number
 |};
 
 @observer
@@ -62,6 +66,8 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       error,
       onCancel,
       classicTheme,
+      unitOfAccountSetting,
+      getCoinPrice,
     } = this.props;
 
     const staleTxWarning = (
@@ -109,18 +115,42 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           <div className={styles.amountLabel}>
             {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
           </div>
-          <div className={styles.amount}>{amount}
-            <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-          </div>
+          {unitOfAccountSetting.enabled ? (
+            <Fragment>
+              <div className={styles.amount}>
+                {getCoinPrice() ? amount.multipliedBy(getCoinPrice()).toString() : '-'}
+                &nbsp;{unitOfAccountSetting.currency}
+              </div>
+              <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
+                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              </div>
+            </Fragment>
+          ) : (
+            <div className={styles.amount}>{formattedWalletAmount(amount)}
+              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+            </div>
+          )}
         </div>
 
         <div className={styles.feesWrapper}>
           <div className={styles.feesLabel}>
             {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
           </div>
-          <div className={styles.fees}>+{transactionFee}
-            <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-          </div>
+          {unitOfAccountSetting.enabled ? (
+            <Fragment>
+              <div className={styles.fees}>+
+                {getCoinPrice() ? transactionFee.multipliedBy(getCoinPrice()).toString() : '-'}
+                &nbsp;{unitOfAccountSetting.currency}
+              </div>
+              <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
+                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              </div>
+            </Fragment>
+          ) : (          
+            <div className={styles.fees}>+{formattedWalletAmount(transactionFee)}
+              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+            </div>
+          )}
         </div>
       </div>);
 
@@ -129,9 +159,21 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         <div className={styles.totalAmountLabel}>
           {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
         </div>
-        <div className={styles.totalAmount}>{totalAmount}
-          <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-        </div>
+          {unitOfAccountSetting.enabled ? (
+            <Fragment>
+              <div className={styles.totalAmount}>
+                {getCoinPrice() ? totalAmount.multipliedBy(getCoinPrice()).toString() : '-'}
+                &nbsp;{unitOfAccountSetting.currency}
+              </div>
+              <div className={styles.totalAmountSmall}>{formattedWalletAmount(totalAmount)}
+                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              </div>
+            </Fragment>
+          ) : (
+            <div className={styles.totalAmount}>{formattedWalletAmount(totalAmount)}
+              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+            </div>
+          )}
       </div>);
 
     const confirmButtonClasses = classnames([

@@ -20,6 +20,8 @@ type DialogProps = {
   signRequest: BaseSignRequest,
   currencyUnit: string,
   staleTx: boolean,
+  unitOfAccountSetting: UnitOfAccountSettingType,
+  getCoinPrice: () => ?number,
 };
 type Props = InjectedProps & DialogProps;
 
@@ -30,6 +32,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const {
       actions, currencyUnit,
       signRequest, stores,
+      unitOfAccountSetting, getCoinPrice,
     } = this.props;
     const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
@@ -42,9 +45,6 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const totalInput = signRequestTotalInput(signRequest, true);
     const fee = signRequestFee(signRequest, true);
     const receivers = signRequestReceivers(signRequest, false);
-    const getCoinPrice = () =>
-      this.props.stores.substores[environment.API].coinPriceStore
-        .getCurrentPrice('ADA', profile.unitOfAccount.currency);
 
     return (
       <WalletSendConfirmationDialog
@@ -71,7 +71,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
         classicTheme={profile.isClassicTheme}
-        unitOfAccountSetting={profile.unitOfAccount}
+        unitOfAccountSetting={unitOfAccountSetting}
         getCoinPrice={getCoinPrice}
       />
     );
