@@ -10,6 +10,11 @@ const config = require(`../webpack/devConfig`);
 process.env.NODE_CONFIG_ENV = argv.env;
 
 tasks.replaceWebpack();
+
+console.log('[Build manifest]');
+console.log('-'.repeat(80));
+tasks.buildManifests();
+
 console.log('[Copy assets]');
 console.log('-'.repeat(80));
 tasks.copyAssets('dev', argv.env);

@@ -10,5 +10,7 @@ module.exports = {
   ],
   setupFiles: [
     'jest-canvas-mock'
-  ]
+  ],
+  // ignore manifest.test.js file, because it isn't a test
+  testPathIgnorePatterns: ['manifest.test.js']
 };

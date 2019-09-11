@@ -151,7 +151,8 @@ const definePlugin = (networkName, isProd) => ({
   'process.env': {
     NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
-    BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim())
+    BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
+    SEIZA_URL: JSON.stringify(process.env.SEIZA_URL || 'localhost:3001'),
   }
 });
 
