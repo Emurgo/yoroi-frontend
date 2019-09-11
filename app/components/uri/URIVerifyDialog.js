@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -39,6 +39,8 @@ type Props = {
   uriParams: UriParams,
   classicTheme: boolean,
   selectedExplorer: ExplorerType,
+  unitOfAccountSetting: unitOfAccountSettingType,
+  getCoinPrice: () => ?number,
 };
 
 @observer
@@ -49,7 +51,7 @@ export default class URIVerifyDialog extends Component<Props> {
   };
 
   render() {
-    const { onCancel, onSubmit, classicTheme } = this.props;
+    const { onCancel, onSubmit, classicTheme, unitOfAccountSetting, getCoinPrice } = this.props;
     const { intl } = this.context;
 
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
@@ -71,6 +73,7 @@ export default class URIVerifyDialog extends Component<Props> {
       },
     ];
 
+    const amount = this.props.uriParams.amount;
     // TODO: in the future, we will need to confirm which wallet/account to use for this transaction
     return (
       <Dialog
@@ -102,9 +105,21 @@ export default class URIVerifyDialog extends Component<Props> {
           <h2 className={styles.label}>
             {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}:
           </h2>
-          <span className={styles.amount}>
-            {formattedWalletAmount(this.props.uriParams.amount)} {currency}
-          </span>
+          {unitOfAccountSetting.enabled ? (
+            <Fragment> 
+              <div className={styles.amount}>
+                {getCoinPrice() ? amount.multipliedBy(getCoinPrice()).toString() : '-'}&nbsp;
+                {unitOfAccountSetting.currency}
+              </div>
+              <div className={styles.amountSmall}>
+                {formattedWalletAmount(amount)} {currency}
+              </div>
+            </Fragment>
+          ) : (
+            <div className={styles.amount}>
+              {formattedWalletAmount(amount)} {currency}
+            </div>
+          )}
         </div>
         <p className={styles.textBlock}>
           {intl.formatMessage(messages.uriVerifyDialogText)}

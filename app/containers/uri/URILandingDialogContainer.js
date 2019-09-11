@@ -11,6 +11,8 @@ import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 
 import type { UriParams } from '../../utils/URIHandling';
 
+import environment from '../../environment';
+
 type Props = InjectedDialogContainerProps & {
   onConfirm: void => void,
   uriParams: ?UriParams,
@@ -52,6 +54,10 @@ export default class URILandingDialogContainer extends Component<Props> {
     // assert not null
     const uriParams = this.props.uriParams;
 
+    const getCoinPrice = () => 
+      this.props.stores.substores[environment.API].coinPriceStore
+        .getCurrentPrice('ADA', this.props.stores.profile.unitOfAccount.currency);
+
     if (!this.showDisclaimer) {
       return (
         <URIVerifyDialog
@@ -60,6 +66,8 @@ export default class URILandingDialogContainer extends Component<Props> {
           uriParams={uriParams}
           classicTheme={this.props.classicTheme}
           selectedExplorer={this.props.stores.profile.selectedExplorer}
+          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
+          getCoinPrice={getCoinPrice}
         />
       );
     }
