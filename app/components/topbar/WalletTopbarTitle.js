@@ -33,7 +33,7 @@ type Props = {|
   onUpdateHideBalance: Function,
   shouldHideBalance: boolean,
   coinPriceCurrencySetting: CoinPriceCurrencySettingType,
-  getCoinPrice: void => number,
+  getCoinPrice: void => ?number,
 |};
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<'div'>] {
@@ -87,7 +87,8 @@ export default class WalletTopbarTitle extends Component<Props> {
     } else if (coinPriceCurrencySetting.enabled) {
       totalBalance = wallet && (
         <span>
-          {wallet.amount.multipliedBy(getCoinPrice()).toString()}
+          {getCoinPrice() ?
+            wallet.amount.multipliedBy(getCoinPrice()).toString() : '-'}
         </span>
       );
     } else {

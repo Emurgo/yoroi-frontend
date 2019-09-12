@@ -35,7 +35,7 @@ type Props = {|
   currencies: string,
   currentValue: string,
   error?: ?LocalizableError,
-  lastUpdatedDate: Date,
+  lastUpdatedTimestamp: ?number,
 |};
 
 @observer
@@ -57,7 +57,7 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
   });
 
   render () {
-    const { currencies, isSubmitting, error, currentValue, lastUpdatedDate } = this.props;
+    const { currencies, isSubmitting, error, currentValue, lastUpdatedTimestamp } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const coinPriceCurrencyId = form.$('coinPriceCurrencyId');
@@ -87,7 +87,8 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
       );
     }
 
-    const lastUpdated = lastUpdatedDate.toLocaleString();
+    const lastUpdated = lastUpdatedTimestamp ?
+      new Date(lastUpdatedTimestamp).toLocaleString() : '-';
 
     return (
       <div className={componentClassNames}>

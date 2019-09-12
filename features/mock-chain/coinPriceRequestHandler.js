@@ -1,8 +1,7 @@
 // @flow
-import { SUPPORTED_CURRENCIES } from '../../app/config/coinPrice';
 import { PrivateKey } from 'cardano-wallet';
 
-const CURRENCIES = SUPPORTED_CURRENCIES.map(o => o.symbol);
+const CURRENCIES = [ 'BTC', 'ETH', 'USD', 'KRW', 'JPY', 'EUR', 'CNY' ];
 let privKey = PrivateKey.from_hex('c8fc9467abae3c3396854ed25c59cc1d9a8ef3db9772f4cb0f074181ba4cad57eaa923bc58cbf6aff0aa34541e015d6cb6cf74b48d35f05f0ec4a907df64bad20000000000000000000000000000000000000000000000000000000000000000');
 
 let pubKeyDataReplacement;
@@ -16,8 +15,20 @@ function serializeTicker(ticker: ResponseTicker): Buffer {
   );
 }
 
+let serviceDisabled = false;
+
+export function disableService() {
+  serviceDisabled = true;
+};
+
 export function installCoinPriceRequestHandlers(server) {
   server.get('/price/:from/current', (req, res) => {
+    if (serviceDisabled) {
+      res.sendStatus(404);
+      res.end();
+      return;
+    }
+
     let prices = {};
     for (const currency of CURRENCIES) {
       prices[currency] = 1;
@@ -38,6 +49,12 @@ export function installCoinPriceRequestHandlers(server) {
   });
 
   server.get('/price/:from/:timestamps', (req, res) => {
+    if (serviceDisabled) {
+      res.sendStatus(404);
+      res.end();
+      return;
+    }
+
     const timestamps = req.params.timestamps.split(',').map(Number);
     res.send({
       error: null,

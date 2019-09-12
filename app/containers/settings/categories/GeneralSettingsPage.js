@@ -114,7 +114,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
           currencies={currencies}
           currentValue={coinPriceCurrencyValue}
           error={setCoinPriceCurrencyRequest.error}
-          lastUpdatedDate={new Date(coinPriceStore.lastUpdateTimestamp)}
+          lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
         <ThemeSettingsBlock
           currentTheme={currentTheme}
