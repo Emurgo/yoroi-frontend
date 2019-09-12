@@ -16,18 +16,22 @@ import WalletTransaction from '../../domain/WalletTransaction';
 import {
   cachePriceData
 } from '../../api/ada/lib/storage/lovefieldDatabase.js';
-import type { Ticker } from '../../types/coinPriceType';
+import type { Ticker } from '../../types/unitOfAccountType';
 import { getPrice } from '../../types/unitOfAccountType';
 import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
+import type { ConfigType } from '../../../config/config-types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 export default class CoinPriceStore extends Store {
   @observable tickers: Array<{| from: string, to: string, price: number |}> = [];
-  expirePriceDataTimeoutId: ?number = null;
+  @observable lastUpdateTimestamp: number|null = null;;
+
+  nextRefreshTimeout: number = 0;
+  expirePriceDataTimeoutId: ?TimeoutID = null;
   // Cached public key to verify the price data.
-  pubKeyData: RustModule.Wallet.PublicKey = null;
+  pubKeyData: ?RustModule.Wallet.PublicKey = null;
 
   setup() {
     this.nextRefreshTimeout = CONFIG.app.coinPriceRefreshInterval;
@@ -35,7 +39,11 @@ export default class CoinPriceStore extends Store {
   }
 
   getCurrentPrice(from: string, to: string): ?number {
-    if (Date.now() - this.lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
+    if (this.lastUpdateTimestamp === null) {
+      return null;
+    }
+    const lastUpdateTimestamp: number = this.lastUpdateTimestamp;
+    if (Date.now() - lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
       return null;
     }
     const price = getPrice(from, to, this.tickers);
@@ -45,11 +53,7 @@ export default class CoinPriceStore extends Store {
     return price;
   }
 
-  getTargetCurrencies(): Array<string> {
-    return tickers.map(ticker => ticker.to);
-  }
-
-  _waitForRustModule = async (): void => {
+  _waitForRustModule = async (): Promise<void> => {
     await this.stores.loading.loadRustRequest.promise;
   }
 
@@ -60,8 +64,8 @@ export default class CoinPriceStore extends Store {
         from: 'ADA',
       });
 
-      if (response.error !== null) {
-        throw new Error('coin price backend error: '+response.error);
+      if (response.error) {
+        throw new Error('coin price backend error: ' + response.error);
       }
 
       await this._loadPubKeyData();
@@ -71,8 +75,11 @@ export default class CoinPriceStore extends Store {
           response.pubKeyDataSignature
         );
       }
+      if (!this.pubKeyData) {
+        throw new Error('missing pubKeyData - should never happen');
+      }
       if (!verifyTicker(response.ticker, this.pubKeyData)) {
-        throw new Error('Invalid ticker signature: '+JSON.stringify(response.ticker));
+        throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
       }
 
       this.nextRefreshTimeout = CONFIG.app.coinPriceRefreshInterval;
@@ -94,14 +101,14 @@ export default class CoinPriceStore extends Store {
   }
 
   @action _updatePriceData = (response: CurrentCoinPriceResponse): void => {
-    const tickers = Object.entries(response.ticker.prices).map(
-      ([to, price]) => ({ from: response.ticker.from, to, price }));
+    const tickers: Array<Ticker> = Object.entries(response.ticker.prices).map(
+      ([to, price]) => ({ from: response.ticker.from, to, price: ((price: any) : number)}));
 
     this.tickers.splice(0, this.tickers.length, ...tickers);
     this.lastUpdateTimestamp = response.ticker.timestamp;
   }
 
-  async updateTransactionPriceData(transactions: Array<WalletTransaction>): void {
+  async updateTransactionPriceData(transactions: Array<WalletTransaction>): Promise<void> {
     transactions = transactions.filter(tx => tx.tickers === null);
     if (!transactions.length) {
       return;
@@ -112,8 +119,8 @@ export default class CoinPriceStore extends Store {
     try {
       const response: HistoricalCoinPriceResponse = 
         await stateFetcher.getHistoricalCoinPrice({ from: 'ADA', timestamps });
-      if (response.error !== null) {
-        throw new Error('historical coin price query error: '+response.error);
+      if (response.error) {
+        throw new Error('historical coin price query error: ' + response.error);
       }
       if (response.tickers.length !== transactions.length) {
         throw new Error('historical coin price query error: data length mismatch');
@@ -122,12 +129,15 @@ export default class CoinPriceStore extends Store {
       await this._loadPubKeyData();
       transactions.forEach((tx, i) => {
         const ticker = response.tickers[i];
+        if (!this.pubKeyData) {
+          throw new Error('missing pubKeyData - should never happen');
+        }
         if (!verifyTicker(ticker, this.pubKeyData)) {
-          throw new Error('Invalid ticker signature: '+JSON.stringify(ticker));
+          throw new Error('Invalid ticker signature: ' + JSON.stringify(ticker));
         }
 
-        const tickers = Object.entries(ticker.prices).map(([to, price]) =>
-          ({ from: response.tickers[i].from, to, price }));
+        const tickers: Array<Ticker> = Object.entries(ticker.prices).map(([to, price]) =>
+          ({ from: response.tickers[i].from, to, price: ((price: any): number) }));
         runInAction(() => {
           tx.tickers = tickers;
         });
@@ -143,14 +153,17 @@ export default class CoinPriceStore extends Store {
       return;
     }
     await this._waitForRustModule();
-    const storedKey = await this.api.localStorage.getCoinPricePubKeyData();
-    Logger.debug(`CoinPriceStore: stored pubKeyData ${storedKey}`);    
+    const storedKey: ?string = await this.api.localStorage.getCoinPricePubKeyData();
+    Logger.debug(`CoinPriceStore: stored pubKeyData ${storedKey || 'null'}`);    
     this.pubKeyData = RustModule.Wallet.PublicKey.from_hex(
       storedKey || CONFIG.app.pubKeyData
     );
   }
 
   _replacePubKeyData = async (pubKeyData: string, pubKeyDataSignature: string): Promise<void> => {
+    if (!this.pubKeyData) {
+      throw new Error('missing pubKeyData - should never happen');
+    }
     if (this.pubKeyData.to_hex() === pubKeyData) {
       return;
     }

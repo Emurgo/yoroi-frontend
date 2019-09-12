@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
+import type { Node } from 'react';
 import styles from './WalletTopbarTitle.scss';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -13,7 +14,7 @@ import type { WalletAccount } from '../../domain/Wallet';
 import { defineMessages, intlShape } from 'react-intl';
 import hideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
 import showBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
-import type { CoinPriceCurrencySettingType } from '../../../types/coinPriceType';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 const messages = defineMessages({
   totalBalance: {
@@ -32,8 +33,8 @@ type Props = {|
   },
   onUpdateHideBalance: Function,
   shouldHideBalance: boolean,
-  coinPriceCurrencySetting: CoinPriceCurrencySettingType,
-  getCoinPrice: void => ?number,
+  unitOfAccountSetting: UnitOfAccountSettingType,
+  coinPrice: ?number,
 |};
 
 function constructPlate(account, saturationFactor, divClass): [string, React$Element<'div'>] {
@@ -64,8 +65,8 @@ export default class WalletTopbarTitle extends Component<Props> {
 
   render() {
     const {
-      wallet, getCoinPrice, account, currentRoute, formattedWalletAmount, themeProperties,
-      shouldHideBalance, onUpdateHideBalance, coinPriceCurrencySetting
+      wallet, coinPrice, account, currentRoute, formattedWalletAmount, themeProperties,
+      shouldHideBalance, onUpdateHideBalance, unitOfAccountSetting
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
     const { intl } = this.context;
@@ -81,20 +82,6 @@ export default class WalletTopbarTitle extends Component<Props> {
       constructPlate(account, identiconSaturationFactor, iconDivClass)
       : [];
 
-    let totalBalance: ?Component;
-    if (wallet && shouldHideBalance) {
-      totalBalance = (<span className={styles.hiddenWalletAmount}>******</span>);
-    } else if (coinPriceCurrencySetting.enabled) {
-      totalBalance = wallet && (
-        <span>
-          {getCoinPrice() ?
-            wallet.amount.multipliedBy(getCoinPrice()).toString() : '-'}
-        </span>
-      );
-    } else {
-      totalBalance = wallet && formattedWalletAmount(wallet.amount);
-    }
-
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
         {iconComponent}
@@ -104,9 +91,19 @@ export default class WalletTopbarTitle extends Component<Props> {
         </div>
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
-            { totalBalance }
-            { ' ' + (coinPriceCurrencySetting.enabled ?
-                coinPriceCurrencySetting.currency : currency)
+            {wallet && shouldHideBalance ? (
+              <span className={styles.hiddenWalletAmount}>******</span>
+            ) : unitOfAccountSetting.enabled ? (
+              wallet ? (
+                <span>
+                  {coinPrice ? wallet.amount.multipliedBy(coinPrice).toString() : '-'}
+                </span>
+              ) : null
+            ) : (
+              wallet ? formattedWalletAmount(wallet.amount) : null
+            ) }
+            { ' ' + (unitOfAccountSetting.enabled ?
+                unitOfAccountSetting.currency : currency)
              }
           </div>
           <div className={styles.walletAmountLabelBlock}>

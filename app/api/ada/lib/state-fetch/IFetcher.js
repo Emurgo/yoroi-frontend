@@ -7,7 +7,9 @@ import type {
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
-  ServerStatusResponse
+  ServerStatusResponse,
+  CurrentCoinPriceRequest, CurrentCoinPriceResponse,
+  HistoricalCoinPriceRequest, HistoricalCoinPriceResponse,
 } from './types';
 
 export interface IFetcher {
@@ -18,4 +20,6 @@ export interface IFetcher {
   sendTx(body: SignedRequest): Promise<SignedResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
   checkServerStatus(): Promise<ServerStatusResponse>;
+  getCurrentCoinPrice(body: CurrentCoinPriceRequest): Promise<CurrentCoinPriceResponse>;
+  getHistoricalCoinPrice(body: HistoricalCoinPriceRequest): Promise<HistoricalCoinPriceResponse>;
 }

@@ -15,13 +15,14 @@ import {
   formattedWalletAmount,
   formattedAmountToNaturalUnits,
 } from '../../../utils/formatters';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 type DialogProps = {
   signRequest: BaseSignRequest,
   currencyUnit: string,
   staleTx: boolean,
   unitOfAccountSetting: UnitOfAccountSettingType,
-  getCoinPrice: () => ?number,
+  coinPrice: ?number,
 };
 type Props = InjectedProps & DialogProps;
 
@@ -32,7 +33,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const {
       actions, currencyUnit,
       signRequest, stores,
-      unitOfAccountSetting, getCoinPrice,
+      unitOfAccountSetting, coinPrice,
     } = this.props;
     const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
@@ -72,7 +73,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         currencyUnit={currencyUnit}
         classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
-        getCoinPrice={getCoinPrice}
+        coinPrice={coinPrice}
       />
     );
   }

@@ -1,7 +1,7 @@
 // @flow
 import Action from './lib/Action';
 import type { ExplorerType } from '../domain/Explorer';
-import type { UnitOfAccountSettingType } from '../types/UnitOfAccountType';
+import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
 
 // ======= PROFILE ACTIONS =======
 

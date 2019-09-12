@@ -151,6 +151,11 @@ export default class WalletSendPage extends Component<Props> {
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
+    const coinPrice: ?number = stores.profile.unitOfAccount.enabled ? (
+      stores.substores[environment.API].coinPriceStore
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency) 
+    ) : null;
+
     return (<WalletSendConfirmationDialogContainer
       actions={actions}
       stores={stores}
@@ -158,7 +163,7 @@ export default class WalletSendPage extends Component<Props> {
       staleTx={transactionBuilderStore.txMismatch}
       currencyUnit={intl.formatMessage(globalMessages.unitAda)}
       unitOfAccountSetting={stores.profile.unitOfAccount}
-      getCoinPrice={this.getCoinPrice}
+      coinPrice={coinPrice}
     />);
   };
 
@@ -180,6 +185,12 @@ export default class WalletSendPage extends Component<Props> {
     const totalInput = signRequestTotalInput(signRequest, true);
     const fee = signRequestFee(signRequest, true);
     const receivers = signRequestReceivers(signRequest, false);
+
+    const { stores } = this.props;
+    const coinPrice: ?number = stores.profile.unitOfAccount.enabled ? (
+      stores.substores[environment.API].coinPriceStore
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency) 
+    ) : null;
 
     let hwSendConfirmationDialog: Node = null;
     if (active.isLedgerNanoSWallet) {
@@ -207,7 +218,7 @@ export default class WalletSendPage extends Component<Props> {
           onCancel={ledgerSendAction.cancel.trigger}
           classicTheme={this.props.stores.profile.isClassicTheme}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          getCoinPrice={this.getCoinPrice}
+          coinPrice={coinPrice}
         />);
     } else if (active.isTrezorTWallet) {
       const trezorSendAction = this.props.actions[environment.API].trezorSend;
@@ -233,7 +244,7 @@ export default class WalletSendPage extends Component<Props> {
           onCancel={trezorSendAction.cancel.trigger}
           classicTheme={this.props.stores.profile.isClassicTheme}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          getCoinPrice={this.getCoinPrice}
+          coinPrice={coinPrice}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');
@@ -241,10 +252,4 @@ export default class WalletSendPage extends Component<Props> {
 
     return hwSendConfirmationDialog;
   };
-
-  getCoinPrice = () : ?number => {
-    const { stores } = this.props;
-    return stores.substores[environment.API].coinPriceStore
-      .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency);
-  }
 }

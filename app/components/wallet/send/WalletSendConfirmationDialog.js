@@ -6,6 +6,7 @@ import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
+import BigNumber from 'bignumber.js'
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -23,6 +24,7 @@ import type { ExplorerType } from '../../../domain/Explorer';
 import WarningBox from '../../widgets/WarningBox';
 import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 import { formattedWalletAmount } from '../../../utils/formatters';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -42,10 +44,10 @@ const messages = defineMessages({
 type Props = {|
   staleTx: boolean,
   selectedExplorer: ExplorerType,
-  amount: string,
+  amount: BigNumber,
   receivers: Array<string>,
-  totalAmount: string,
-  transactionFee: string,
+  totalAmount: BigNumber,
+  transactionFee: BigNumber,
   onSubmit: ({ password: string }) => void,
   amountToNaturalUnits: (amountWithFractions: string) => string,
   signRequest: BaseSignRequest,
@@ -54,8 +56,8 @@ type Props = {|
   error: ?LocalizableError,
   currencyUnit: string,
   classicTheme: boolean,
-  unitOfAccountSetting: unitOfAccountSettingType,
-  getCoinPrice: () => ?number
+  unitOfAccountSetting: UnitOfAccountSettingType,
+  coinPrice: ?number
 |};
 
 @observer
@@ -119,7 +121,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       currencyUnit,
       classicTheme,
       unitOfAccountSetting,
-      getCoinPrice,
+      coinPrice,
     } = this.props;
 
     const staleTxWarning = (
@@ -194,8 +196,8 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               {unitOfAccountSetting.enabled ? (
                 <Fragment>
                   <div className={styles.amount}>
-                    {getCoinPrice() ? 
-                       formattedWalletAmount(amount.multipliedBy(getCoinPrice())) :
+                    {coinPrice ? 
+                       formattedWalletAmount(amount.multipliedBy(coinPrice)) :
                        '-'
                     }
                     <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
@@ -218,8 +220,8 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               {unitOfAccountSetting.enabled ? (
                 <Fragment>
                   <div className={styles.fees}>+
-                    {getCoinPrice() ? 
-                       formattedWalletAmount(transactionFee.multipliedBy(getCoinPrice())) :
+                    {coinPrice ? 
+                       formattedWalletAmount(transactionFee.multipliedBy(coinPrice)) :
                        '-'
                     }
                     <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
@@ -243,8 +245,8 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             {unitOfAccountSetting.enabled ? (
               <Fragment>
                 <div className={styles.totalAmount}>
-                  {getCoinPrice() ? 
-                     formattedWalletAmount(totalAmount.multipliedBy(getCoinPrice())) :
+                  {coinPrice ? 
+                     formattedWalletAmount(totalAmount.multipliedBy(coinPrice)) :
                      '-'
                   }
                   <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>

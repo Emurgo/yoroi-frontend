@@ -24,12 +24,11 @@ export default class TopBarContainer extends Component<Props> {
     const walletsStore = stores.substores[environment.API].wallets;
     const coinPriceStore = stores.substores[environment.API].coinPriceStore;
 
-    const getCoinPrice = () =>
-      coinPriceStore.getCurrentPrice('ADA', profile.unitOfAccount.currency);
+    const coinPrice = profile.unitOfAccount.enabled ?
+      coinPriceStore.getCurrentPrice('ADA', profile.unitOfAccount.currency) : null;
 
     const title = (<WalletTopbarTitle
       wallet={walletsStore.active}
-      getCoinPrice={getCoinPrice}
       account={walletsStore.activeAccount}
       currentRoute={app.currentRoute}
       formattedWalletAmount={formattedWalletAmount}
@@ -38,7 +37,8 @@ export default class TopBarContainer extends Component<Props> {
       }}
       onUpdateHideBalance={this.updateHideBalance}
       shouldHideBalance={profile.shouldHideBalance}
-      coinPriceCurrencySetting={profile.unitOfAccount}
+      coinPrice={coinPrice}
+      unitOfAccountSetting={profile.unitOfAccount}
     />);
     return (
       <TopBar

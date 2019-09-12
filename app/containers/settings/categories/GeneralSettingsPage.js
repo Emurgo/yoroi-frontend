@@ -78,7 +78,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
     this.props.stores.profile.hasCustomTheme()
   )
 
-  onSelectUnitOfAccount = (value: { selected: string }) => {
+  onSelectUnitOfAccount = (value: string) => {
     const unitOfAccount = (value === 'ADA') ? 
       unitOfAccountDisabledValue :
       { enabled: true, currency: value };

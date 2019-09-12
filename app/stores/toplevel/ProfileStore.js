@@ -183,7 +183,7 @@ export default class ProfileStore extends Store {
   @observable setUnitOfAccountRequest: Request<UnitOfAccountSettingType => Promise<void>>
     = new Request(this.api.localStorage.setUnitOfAccount);
 
-  @observable getUnitOfAccountRequest: Request<void => Promise<CoinPriceCurrencySettingType>>
+  @observable getUnitOfAccountRequest: Request<void => Promise<UnitOfAccountSettingType>>
     = new Request(this.api.localStorage.getUnitOfAccount);
 
   setup() {

@@ -12,6 +12,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -54,8 +55,8 @@ type Props = {|
   error: ?LocalizableError,
   addressFromSubLabel: string,
   classicTheme: boolean,
-  unitOfAccountSetting: unitOfAccountSettingType,
-  getCoinPrice: () => ?number,
+  unitOfAccountSetting: UnitOfAccountSettingType,
+  coinPrice: ?number,
 |};
 
 /** Show user what the transfer would do to get final confirmation */
@@ -69,7 +70,7 @@ export default class TransferSummaryPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { transferTx, isSubmitting, error, addressFromSubLabel, classicTheme,
-      unitOfAccountSetting, getCoinPrice,
+      unitOfAccountSetting, coinPrice,
     } = this.props;
 
     const receiver = transferTx.receiver;
@@ -156,8 +157,8 @@ export default class TransferSummaryPage extends Component<Props> {
                 {unitOfAccountSetting.enabled ? (
                   <Fragment>
                     <div className={styles.amount}>
-                      {getCoinPrice() ? 
-                        transferTx.recoveredBalance.multipliedBy(getCoinPrice()).toString() :
+                      {coinPrice ? 
+                        transferTx.recoveredBalance.multipliedBy(coinPrice).toString() :
                         '-'
                       }
                       <span className={styles.currencySymbol}>&nbsp;
@@ -182,8 +183,8 @@ export default class TransferSummaryPage extends Component<Props> {
                 {unitOfAccountSetting.enabled ? (
                   <Fragment>
                     <div className={styles.fees}>
-                      {'+' + (getCoinPrice() ? 
-                        transferTx.fee.multipliedBy(getCoinPrice()).toString() :
+                      {'+' + (coinPrice ? 
+                        transferTx.fee.multipliedBy(coinPrice).toString() :
                         '-')
                       }
                       <span className={styles.currencySymbol}>&nbsp;
@@ -209,9 +210,9 @@ export default class TransferSummaryPage extends Component<Props> {
               {unitOfAccountSetting.enabled ? (
                 <Fragment>
                   <div className={styles.totalAmount}>
-                    {getCoinPrice() ? 
+                    {coinPrice ? 
                       transferTx.recoveredBalance.minus(transferTx.fee)
-                        .multipliedBy(getCoinPrice()).toString() :
+                        .multipliedBy(coinPrice).toString() :
                       '-'
                     }
                     <span className={styles.currencySymbol}>&nbsp;

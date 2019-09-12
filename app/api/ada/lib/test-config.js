@@ -6,7 +6,8 @@ const CONFIG: ConfigType = {
     protocolMagic: 764824073,
     backendUrl: '',
     websocketUrl: '',
-    name: 'mainnet'
+    name: 'mainnet',
+    priceBackendUrl: '',
   },
   app: {
     walletRefreshInterval: 10,
@@ -15,7 +16,12 @@ const CONFIG: ConfigType = {
     logsFileSuffix: 'log',
     addressScanSize: 20,
     addressRequestSize: 20,
-    txsBodiesRequestSize: 20
+    txsBodiesRequestSize: 20,
+    coinPriceRefreshInterval: 60000,
+    coinPriceFreshnessThreshold: 120000,
+    coinPriceRequestRetryDelay: 10000,
+    pubKeyData: '',
+    pubKeyMaster: '',
   },
 };
 

@@ -3,6 +3,7 @@ import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
+import BigNumber from 'bignumber.js'
 import type { MessageDescriptor } from 'react-intl';
 
 import Dialog from '../../widgets/Dialog';
@@ -15,11 +16,12 @@ import LocalizableError from '../../../i18n/LocalizableError';
 
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
+import { formattedWalletAmount } from '../../../utils/formatters';
+
 import type { ExplorerType } from '../../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 import styles from './HWSendConfirmationDialog.scss';
-
-import { formattedWalletAmount } from '../../../utils/formatters';
 
 type ExpectedMessages = {
   infoLine1: MessageDescriptor,
@@ -43,7 +45,7 @@ type Props = {|
   onCancel: Function,
   classicTheme: boolean,
   unitOfAccountSetting: UnitOfAccountSettingType,
-  getCoinPrice: () => ?number
+  coinPrice: ?number
 |};
 
 @observer
@@ -67,7 +69,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       onCancel,
       classicTheme,
       unitOfAccountSetting,
-      getCoinPrice,
+      coinPrice,
     } = this.props;
 
     const staleTxWarning = (
@@ -118,7 +120,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <Fragment>
               <div className={styles.amount}>
-                {getCoinPrice() ? amount.multipliedBy(getCoinPrice()).toString() : '-'}
+                {coinPrice ? amount.multipliedBy(coinPrice).toString() : '-'}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
@@ -139,7 +141,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <Fragment>
               <div className={styles.fees}>+
-                {getCoinPrice() ? transactionFee.multipliedBy(getCoinPrice()).toString() : '-'}
+                {coinPrice ? transactionFee.multipliedBy(coinPrice).toString() : '-'}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
               <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
@@ -162,7 +164,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <Fragment>
               <div className={styles.totalAmount}>
-                {getCoinPrice() ? totalAmount.multipliedBy(getCoinPrice()).toString() : '-'}
+                {coinPrice ? totalAmount.multipliedBy(coinPrice).toString() : '-'}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
               <div className={styles.totalAmountSmall}>{formattedWalletAmount(totalAmount)}

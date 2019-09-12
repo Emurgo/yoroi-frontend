@@ -13,6 +13,7 @@ import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
 import type { ExplorerType } from '../../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 const messages = defineMessages({
   today: {
@@ -40,7 +41,7 @@ type Props = {|
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
-  unitOfAccountSetting: coinPriceCurrencySettingType,
+  unitOfAccountSetting: UnitOfAccountSettingType,
 |};
 
 @observer

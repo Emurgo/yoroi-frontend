@@ -1,5 +1,10 @@
 // @flow
 import { PrivateKey } from 'cardano-wallet';
+import type {
+  ResponseTicker,
+  CurrentCoinPriceResponse,
+  HistoricalCoinPriceRequest,
+} from '../../app/api/ada/lib/state-fetch/types';
 
 const CURRENCIES = [ 'BTC', 'ETH', 'USD', 'KRW', 'JPY', 'EUR', 'CNY' ];
 let privKey = PrivateKey.from_hex('c8fc9467abae3c3396854ed25c59cc1d9a8ef3db9772f4cb0f074181ba4cad57eaa923bc58cbf6aff0aa34541e015d6cb6cf74b48d35f05f0ec4a907df64bad20000000000000000000000000000000000000000000000000000000000000000');
@@ -21,7 +26,7 @@ export function disableService() {
   serviceDisabled = true;
 };
 
-export function installCoinPriceRequestHandlers(server) {
+export function installCoinPriceRequestHandlers(server: Object) {
   server.get('/price/:from/current', (req, res) => {
     if (serviceDisabled) {
       res.sendStatus(404);
@@ -34,13 +39,13 @@ export function installCoinPriceRequestHandlers(server) {
       prices[currency] = 1;
     }
 
-    const ticker = {
+    const ticker: ResponseTicker = {
         from: 'ADA',
         timestamp: Date.now(),
         prices 
     };
     ticker.signature = privKey.sign(serializeTicker(ticker)).to_hex();
-    const response = { error: null, ticker };
+    const response : CurrentCoinPriceResponse = { error: null, ticker };
     if (pubKeyDataReplacement) {
       response.pubKeyData = pubKeyDataReplacement;
       response.pubKeyDataSignature = pubKeyDataSignature;
@@ -64,7 +69,7 @@ export function installCoinPriceRequestHandlers(server) {
           prices[currency] = 1;
         }
 
-        const ticker = {
+        const ticker: ResponseTicker = {
           from: 'ADA',
           timestamp,
           prices
@@ -76,7 +81,7 @@ export function installCoinPriceRequestHandlers(server) {
   });
 }
 
-export function replaceKey(privKeyMaster, pubKeyData, privKeyData) {
+export function replaceKey(privKeyMaster: string, pubKeyData: string, privKeyData: string) {
   if (!privKeyMaster) {
     privKeyMaster = '7807bddb94f762ced05d2c65a954bba0c5b1972c7c90a04816fb3ce94613424fab23010c273d3d0e34ae3b644cc795d349439b8ead339cfbf35f0816038a7d4b0000000000000000000000000000000000000000000000000000000000000000';
   }

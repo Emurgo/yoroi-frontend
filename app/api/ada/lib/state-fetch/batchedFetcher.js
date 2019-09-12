@@ -88,7 +88,7 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher.checkServerStatus()
   )
 
-  getCurrentCoinPrice = (body: CoinPriceRequest): Promise<CoinPriceResponse> => (
+  getCurrentCoinPrice = (body: CurrentCoinPriceRequest): Promise<CurrentCoinPriceResponse> => (
     this.baseFetcher.getCurrentCoinPrice(body)
   )
 

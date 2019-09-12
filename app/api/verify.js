@@ -15,7 +15,7 @@ function verify(
   serializer: any => Buffer,
   signatureHex: string,
   publicKey: RustModule.Wallet.PublicKey
-): string {
+): boolean {
   return publicKey.verify(serializer(obj), RustModule.Wallet.Signature.from_hex(signatureHex));
 }
 
@@ -23,6 +23,9 @@ export function verifyTicker(
   ticker: ResponseTicker,
   pubKeyData: RustModule.Wallet.PublicKey
 ): boolean {
+  if (!ticker.signature) {
+    throw new Error('ticker has no signature');
+  }
   return verify(ticker, serializeTicker, ticker.signature, pubKeyData);
 }
 

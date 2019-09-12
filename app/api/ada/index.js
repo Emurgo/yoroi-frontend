@@ -155,6 +155,7 @@ import { HWFeatures } from '../../types/HWConnectStoreTypes';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import type { WalletAccountNumberPlate } from '../../domain/Wallet';
+import type { Ticker } from '../../types/unitOfAccountType';
 
 // ADA specific Request / Response params
 

@@ -54,9 +54,11 @@ export default class URILandingDialogContainer extends Component<Props> {
     // assert not null
     const uriParams = this.props.uriParams;
 
-    const getCoinPrice = () => 
-      this.props.stores.substores[environment.API].coinPriceStore
-        .getCurrentPrice('ADA', this.props.stores.profile.unitOfAccount.currency);
+    const { stores } = this.props;
+    const coinPrice: ?number = stores.profile.unitOfAccount.enabled ? (
+      stores.substores[environment.API].coinPriceStore
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency) 
+    ) : null;
 
     if (!this.showDisclaimer) {
       return (
@@ -67,7 +69,7 @@ export default class URILandingDialogContainer extends Component<Props> {
           classicTheme={this.props.classicTheme}
           selectedExplorer={this.props.stores.profile.selectedExplorer}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          getCoinPrice={getCoinPrice}
+          coinPrice={coinPrice}
         />
       );
     }

@@ -19,6 +19,7 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
 import { getPrice } from '../../../types/unitOfAccountType';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 const messages = defineMessages({
   type: {
@@ -120,7 +121,7 @@ type Props = {|
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
-  unitOfAccountSetting: CoinPriceCurrencySettingType,
+  unitOfAccountSetting: UnitOfAccountSettingType,
 |};
 
 type State = {
@@ -227,10 +228,13 @@ export default class Transaction extends Component<Props, State> {
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
     const symbol = adaSymbol;
 
-    const price = getPrice('ADA', unitOfAccountSetting.currency, data.tickers);
-    let amountInSelectedCurrency: ?BigNumber = null;
-    if (unitOfAccountSetting.enabled && price) {
-      amountInSelectedCurrency = data.amount.multipliedBy(price);
+    let amountInSelectedCurrency = new BigNumber(0);
+    let price: ?number = null;
+    if (unitOfAccountSetting.enabled) {
+      price = getPrice('ADA', unitOfAccountSetting.currency, data.tickers);
+      if (typeof price === 'number') {
+        amountInSelectedCurrency = data.amount.multipliedBy(price);
+      }
     }
 
     return (
@@ -254,7 +258,7 @@ export default class Transaction extends Component<Props, State> {
                 </div>
               )}
 
-              {(unitOfAccountSetting.enabled && price) ? (
+              {(unitOfAccountSetting.enabled && (typeof price === 'number')) ? (
                 <div className={this.getAmountStyle(amountInSelectedCurrency)}>
                     { amountInSelectedCurrency.toString() + ' ' + unitOfAccountSetting.currency }
                   <div className={styles.amountSmall}>

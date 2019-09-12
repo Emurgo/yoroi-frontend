@@ -14,7 +14,7 @@ import { formattedWalletAmount } from '../../utils/formatters';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../domain/Explorer';
-
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 import styles from './URIVerifyDialog.scss';
 
@@ -39,8 +39,8 @@ type Props = {
   uriParams: UriParams,
   classicTheme: boolean,
   selectedExplorer: ExplorerType,
-  unitOfAccountSetting: unitOfAccountSettingType,
-  getCoinPrice: () => ?number,
+  unitOfAccountSetting: UnitOfAccountSettingType,
+  coinPrice: ?number,
 };
 
 @observer
@@ -51,7 +51,7 @@ export default class URIVerifyDialog extends Component<Props> {
   };
 
   render() {
-    const { onCancel, onSubmit, classicTheme, unitOfAccountSetting, getCoinPrice } = this.props;
+    const { onCancel, onSubmit, classicTheme, unitOfAccountSetting, coinPrice } = this.props;
     const { intl } = this.context;
 
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
@@ -108,7 +108,7 @@ export default class URIVerifyDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <Fragment> 
               <div className={styles.amount}>
-                {getCoinPrice() ? amount.multipliedBy(getCoinPrice()).toString() : '-'}&nbsp;
+                {coinPrice ? amount.multipliedBy(coinPrice).toString() : '-'}&nbsp;
                 {unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>

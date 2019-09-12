@@ -70,7 +70,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
     const result = this._getTransactionsAllRequest(wallet.id).result;
     if (!result || !result.transactions) return unconfirmedAmount;
 
-    const coinPriceCurrency = this.stores.profile.unitOfAccount;
+    const unitOfAccount = this.stores.profile.unitOfAccount;
 
     for (const transaction of result.transactions) {
       if (transaction.getAssuranceLevelForMode(wallet.assuranceMode) !== assuranceLevels.HIGH) {
@@ -83,9 +83,9 @@ export default class AdaTransactionsStore extends TransactionsStore {
             transaction.amount.absoluteValue()
           );
 
-          if (coinPriceCurrency.enabled && unconfirmedAmount.outgoingInSelectedCurrency) {
-            if (transaction.tickers) {
-              const price = getPrice('ADA', coinPriceCurrency.currency, transaction.tickers);
+          if (unitOfAccount.enabled) {
+            const price = getPrice('ADA', unitOfAccount.currency, transaction.tickers);
+            if (price !== null && unconfirmedAmount.outgoingInSelectedCurrency) {
               unconfirmedAmount.outgoingInSelectedCurrency =
                 unconfirmedAmount.outgoingInSelectedCurrency.plus(
                   transaction.amount.absoluteValue().multipliedBy(price));
@@ -100,9 +100,9 @@ export default class AdaTransactionsStore extends TransactionsStore {
           unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
             transaction.amount.absoluteValue()
           );
-          if (coinPriceCurrency.enabled && unconfirmedAmount.incomingInSelectedCurrency) {
-            if (transaction.tickers) {
-              const price = getPrice('ADA', coinPriceCurrency.currency, transaction.tickers);
+          if (unitOfAccount.enabled) {
+            const price = getPrice('ADA', unitOfAccount.currency, transaction.tickers);
+            if (price !== null && unconfirmedAmount.incomingInSelectedCurrency) {
               unconfirmedAmount.incomingInSelectedCurrency =
                 unconfirmedAmount.incomingInSelectedCurrency.plus(
                   transaction.amount.absoluteValue().multipliedBy(price));

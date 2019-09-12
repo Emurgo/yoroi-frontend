@@ -15,9 +15,11 @@ export type AppConfigType = {
   addressScanSize: number,
   addressRequestSize: number,
   txsBodiesRequestSize: number,
+  coinPriceRefreshInterval: number,
   coinPriceFreshnessThreshold: number,
   coinPriceRequestRetryDelay: number,
   pubKeyData: string,
+  pubKeyMaster: string,
 }
 
 export type NetworkConfigType = {
@@ -27,7 +29,8 @@ export type NetworkConfigType = {
     | 1097911063, // testnet protocol magic
   backendUrl: string,
   websocketUrl: string,
-  name: Network
+  name: Network,
+  priceBackendUrl: string,
 };
 
 export type Network = 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';

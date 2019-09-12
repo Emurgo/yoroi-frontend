@@ -6,6 +6,7 @@ import type { TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import type { ExplorerType } from '../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 const messages = defineMessages({
   addressFromSubLabel: {
@@ -23,8 +24,8 @@ type Props = {|
   onCancel: Function,
   error: ?LocalizableError,
   classicTheme: boolean,
-  getCoinPrice: () => ?number,
-  unitOfAccountSetting: unitOfAccountSettingType,
+  coinPrice: ?number,
+  unitOfAccountSetting: UnitOfAccountSettingType,
 |};
 
 /** Show user what the transfer would do to get final confirmation */
@@ -38,7 +39,7 @@ export default class YoroiTransferSummaryPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { transferTx, isSubmitting, error, formattedWalletAmount,
-      onSubmit, onCancel, classicTheme, getCoinPrice, unitOfAccountSetting } = this.props;
+      onSubmit, onCancel, classicTheme, coinPrice, unitOfAccountSetting } = this.props;
 
     return (
       <TransferSummaryPage
@@ -51,7 +52,7 @@ export default class YoroiTransferSummaryPage extends Component<Props> {
         error={error}
         addressFromSubLabel={intl.formatMessage(messages.addressFromSubLabel)}
         classicTheme={classicTheme}
-        getCoinPrice={getCoinPrice}
+        coinPrice={coinPrice}
         unitOfAccountSetting={unitOfAccountSetting}
       />
     );

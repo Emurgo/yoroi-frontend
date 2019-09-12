@@ -9,7 +9,7 @@ import BorderedBox from '../../widgets/BorderedBox';
 import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import styles from './WalletSummary.scss';
-import type { CoinPriceCurrencySettingType } from '../../../types/coinPriceType';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -35,7 +35,7 @@ type Props = {|
   pendingAmount: UnconfirmedAmount,
   isLoadingTransactions: boolean,
   openExportTxToFileDialog: Function,
-  unitOfAccountSetting: unitOfAccountSettingType,
+  unitOfAccountSetting: UnitOfAccountSettingType,
 |};
 
 @observer
