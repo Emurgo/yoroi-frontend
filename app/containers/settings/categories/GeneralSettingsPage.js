@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
@@ -15,8 +16,43 @@ import type { ExplorerType } from '../../../domain/Explorer';
 import { Explorer, explorerInfo } from '../../../domain/Explorer';
 import { coinPriceCurrencyDisabledValue } from '../../../types/coinPriceType';
 
+const currencyLabels = defineMessages({
+  USD: {
+    id: 'settings.unitOfAccount.currency.usd',
+    defaultMessage: '!!!US dollar',
+  },
+  JPY: {
+    id: 'settings.unitOfAccount.currency.jpy',
+    defaultMessage: '!!!Japanese yen',
+  },
+  EUR: {
+    id: 'settings.unitOfAccount.currency.eur',
+    defaultMessage: '!!!Euro',
+  },
+  CNY: {
+    id: 'settings.unitOfAccount.currency.cny',
+    defaultMessage: '!!!Chinese Renminbi yuan',
+  },
+  KRW: {
+    id: 'settings.unitOfAccount.currency.krw',
+    defaultMessage: '!!!South Korean won',
+  },
+  BTC: {
+    id: 'settings.unitOfAccount.currency.btc',
+    defaultMessage: '!!!Bitcoin',
+  },
+  ETH: {
+    id: 'settings.unitOfAccount.currency.eth',
+    defaultMessage: '!!!Ethereum',
+  },
+});
+
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
+
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
 
   onSelectLanguage = (values: { locale: string }) => {
     this.props.actions.profile.updateLocale.trigger(values);
@@ -81,11 +117,13 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
 
     const coinPriceStore = this.props.stores.substores[environment.API].coinPriceStore;
 
-    const currencies = UNIT_OF_ACCOUNT_OPTIONS.map(c => (
-      { value: c.symbol, label: `${c.symbol} - ${c.label}`, name: c.label,
+    const currencies = UNIT_OF_ACCOUNT_OPTIONS.map(c => {
+      const name = this.context.intl.formatMessage(currencyLabels[c.symbol]);
+      return { 
+        value: c.symbol, label: `${c.symbol} - ${name}`, name: name,
         price: coinPriceStore.getCurrentPrice('ADA', c.symbol), svg: c.svg
-      }
-    ));
+      };
+    });
     currencies.unshift({ value: 'ADA', label: 'ADA - Cardano', name: 'Cardano',
       native: true, svg: require('../../../assets/images/currencies/ADA.inline.svg') });
 
