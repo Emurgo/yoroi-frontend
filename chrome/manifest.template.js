@@ -1,8 +1,8 @@
-export default ({description, defaultTitle, contentSecurityPolicy, versionName }) => ({
+export default ({ description, defaultTitle, contentSecurityPolicy, versionName }) => ({
   version: '1.9.0',
   name: 'yoroi',
   manifest_version: 2,
-  ...(versionName ? {version_name: versionName } : {}),
+  ...(versionName ? { version_name: versionName } : {}),
   description,
   browser_action: {
     default_title: defaultTitle,
