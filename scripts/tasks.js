@@ -3,9 +3,8 @@ import { rm, mkdir, cp } from 'shelljs';
 import { NetworkType } from '../config/config-types';
 import type { Network } from '../config/config-types';
 import _ from 'lodash';
-
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 exports.replaceWebpack = () => {
   const replaceTasks = [{
@@ -30,13 +29,14 @@ exports.copyAssets = (type: string, env: string) => {
 };
 
 const buildManifest = (type: Network) => {
-  const manifestContent = JSON.stringify(require(`../chrome/manifest.${type}`), null, 4);
+  const manifestContent = require(`../chrome/manifest.${type}`);
+  const manifestContentJSON = JSON.stringify(manifestContent, null, 4);
 
   const OUTPUT_FILE_NAME = `manifest.${type}.json`;
   const manifestDestPath = path.resolve(`${__dirname}/../chrome`, OUTPUT_FILE_NAME);
 
   try {
-    fs.writeFileSync(manifestDestPath, manifestContent);
+    fs.writeFileSync(manifestDestPath, manifestContentJSON);
     console.log(`File ${OUTPUT_FILE_NAME} has been created`);
   } catch (err) {
     console.error(err);
