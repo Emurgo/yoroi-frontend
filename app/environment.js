@@ -13,7 +13,7 @@ declare type Currency = 'ada';
 export const environment = (Object.assign({
   /** Network used to connect */
   NETWORK: CONFIG.network.name,
-  version: require('../chrome/manifest.' + CONFIG.network.name + '.json').version,
+  version: require('../chrome/manifest.' + CONFIG.network.name).version,
   /** Environment used during webpack build */
   env_type: process.env.NODE_ENV,
 
