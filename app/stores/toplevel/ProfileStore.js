@@ -16,9 +16,9 @@ import type {
 import type {
   SetCustomUserThemeRequest
 } from '../../api/localStorage/index';
-import { coinPriceCurrencyDisabledValue } from '../../types/coinPriceType';
-import type { CoinPriceCurrencySettingType } from '../../types/coinPriceType';
-import { SUPPORTED_CURRENCIES } from '../../config/coinPrice';
+import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 
 export default class ProfileStore extends Store {
 
@@ -180,11 +180,11 @@ export default class ProfileStore extends Store {
   @observable setHideBalanceRequest: Request<boolean => Promise<void>>
     = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
 
-  @observable setCoinPriceCurrencyRequest: Request<CoinPriceCurrencySettingType => Promise<void>>
-    = new Request(this.api.localStorage.setCoinPriceCurrency);
+  @observable setUnitOfAccountRequest: Request<UnitOfAccountSettingType => Promise<void>>
+    = new Request(this.api.localStorage.setUnitOfAccount);
 
-  @observable getCoinPriceCurrencyRequest: Request<void => Promise<CoinPriceCurrencySettingType>>
-    = new Request(this.api.localStorage.getCoinPriceCurrency);
+  @observable getUnitOfAccountRequest: Request<void => Promise<CoinPriceCurrencySettingType>>
+    = new Request(this.api.localStorage.getUnitOfAccount);
 
   setup() {
     this.actions.profile.updateLocale.listen(this._updateLocale);
@@ -196,7 +196,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
-    this.actions.profile.updateCoinPriceCurrency.listen(this._updateCoinPriceCurrency);
+    this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -503,20 +503,20 @@ export default class ProfileStore extends Store {
 
   // ========== Coin Price Currency ========== //
 
-  @computed.struct get unitOfAccount(): CoinPriceCurrencySettingType {
-    const { result } = this.getCoinPriceCurrencyRequest.execute();
-    return result || coinPriceCurrencyDisabledValue;
+  @computed.struct get unitOfAccount(): UnitOfAccountSettingType {
+    const { result } = this.getUnitOfAccountRequest.execute();
+    return result || unitOfAccountDisabledValue;
   }
   
-  _updateCoinPriceCurrency = async (currency: CoinPriceCurrencySettingType) => {
-    await this.setCoinPriceCurrencyRequest.execute(currency);
-    await this.getCoinPriceCurrencyRequest.execute(); // eagerly cache
+  _updateUnitOfAccount = async (currency: UnitOfAccountSettingType) => {
+    await this.setUnitOfAccountRequest.execute(currency);
+    await this.getUnitOfAccountRequest.execute(); // eagerly cache
   };
 
-  @computed get hasLoadedCoinPriceCurrency(): boolean {
+  @computed get hasLoadedUnitOfAccount(): boolean {
     return (
-      this.getCoinPriceCurrencyRequest.wasExecuted &&
-      this.getCoinPriceCurrencyRequest.result !== null
+      this.getUnitOfAccountRequest.wasExecuted &&
+      this.getUnitOfAccountRequest.result !== null
     );
   }
 

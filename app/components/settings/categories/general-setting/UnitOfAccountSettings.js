@@ -7,7 +7,7 @@ import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } fro
 import SvgInline from 'react-svg-inline';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import styles from './CoinPriceCurrencySettings.scss';
+import styles from './UnitOfAccountSettings.scss';
 import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({

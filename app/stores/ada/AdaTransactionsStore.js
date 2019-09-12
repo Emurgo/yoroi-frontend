@@ -16,7 +16,7 @@ import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
 import { transactionTypes } from '../../domain/WalletTransaction';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
-import { getPrice } from '../../types/coinPriceType';
+import { getPrice } from '../../types/unitOfAccountType';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';

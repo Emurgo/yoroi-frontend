@@ -5,7 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
-import CoinPriceCurrencySettings from '../../../components/settings/categories/general-setting/CoinPriceCurrencySettings';
+import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
@@ -14,7 +14,7 @@ import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import type { ExplorerType } from '../../../domain/Explorer';
 import { Explorer, explorerInfo } from '../../../domain/Explorer';
-import { coinPriceCurrencyDisabledValue } from '../../../types/coinPriceType';
+import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -78,11 +78,11 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
     this.props.stores.profile.hasCustomTheme()
   )
 
-  onSelectCoinPriceCurrency = (value: { selected: string }) => {
-    const currency = (value === 'ADA') ? 
-      coinPriceCurrencyDisabledValue :
+  onSelectUnitOfAccount = (value: { selected: string }) => {
+    const unitOfAccount = (value === 'ADA') ? 
+      unitOfAccountDisabledValue :
       { enabled: true, currency: value };
-    this.props.actions.profile.updateCoinPriceCurrency.trigger(currency);
+    this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
   render() {
@@ -94,11 +94,11 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       selectedExplorer,
       UNIT_OF_ACCOUNT_OPTIONS,
       unitOfAccount,
-      setCoinPriceCurrencyRequest,
+      setUnitOfAccountRequest,
     } = this.props.stores.profile;
     const isSubmittingLocale = setProfileLocaleRequest.isExecuting;
     const isSubmittingExplorer = setSelectedExplorerRequest.isExecuting;
-    const isSubmittingCoinPriceCurrency = setCoinPriceCurrencyRequest.isExecuting;
+    const isSubmittingUnitOfAccount = setUnitOfAccountRequest.isExecuting;
     const explorerOptions = Object.keys(Explorer)
       .map(key => ({
         value: Explorer[key],
@@ -127,7 +127,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
     currencies.unshift({ value: 'ADA', label: 'ADA - Cardano', name: 'Cardano',
       native: true, svg: require('../../../assets/images/currencies/ADA.inline.svg') });
 
-    const coinPriceCurrencyValue = unitOfAccount.enabled ? unitOfAccount.currency : 'ADA';
+    const unitOfAccountValue = unitOfAccount.enabled ? unitOfAccount.currency : 'ADA';
       
     return (
       <div>
@@ -146,12 +146,12 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
           error={setSelectedExplorerRequest.error}
         />
         {uriSettings}
-        <CoinPriceCurrencySettings
-          onSelect={this.onSelectCoinPriceCurrency}
-          isSubmitting={isSubmittingCoinPriceCurrency}
+        <UnitOfAccountSettings
+          onSelect={this.onSelectUnitOfAccount}
+          isSubmitting={isSubmittingUnitOfAccount}
           currencies={currencies}
-          currentValue={coinPriceCurrencyValue}
-          error={setCoinPriceCurrencyRequest.error}
+          currentValue={unitOfAccountValue}
+          error={setUnitOfAccountRequest.error}
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
         <ThemeSettingsBlock

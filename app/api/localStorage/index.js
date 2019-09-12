@@ -1,8 +1,8 @@
 // @flow
 
 import environment from '../../environment';
-import { coinPriceCurrencyDisabledValue } from '../../types/coinPriceType';
-import type { CoinPriceCurrencySettingType } from '../../types/coinPriceType';
+import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
@@ -13,8 +13,8 @@ const storageKeys = {
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
-  COIN_PRICE_CURRENCY: networkForLocalStorage + '-COIN-PRICE-CURRENCY',
-  COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN_PRICE_PUB_KEY_DATA', 
+  UNIT_OF_ACCOUNT: networkForLocalStorage + '-UNIT-OF-ACCOUNT',
+  COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA', 
 };
 
 export type SetCustomUserThemeRequest = {
@@ -257,30 +257,30 @@ export default class LocalStorageApi {
     } catch (error) {} // eslint-disable-line
   });
 
-  // ========== Coin price currency ========== //
+  // ========== Unit of account ========== //
 
-  getCoinPriceCurrency = (): Promise<CoinPriceCurrencySettingType> => new Promise((resolve, reject) => {
+  getUnitOfAccount = (): Promise<UnitOfAccountSettingType> => new Promise((resolve, reject) => {
     try {
-      const coinPriceCurrency = localStorage.getItem(storageKeys.COIN_PRICE_CURRENCY);
-      if (!coinPriceCurrency) resolve(coinPriceCurrencyDisabledValue);
-      else resolve(JSON.parse(coinPriceCurrency));
+      const unitOfAccount = localStorage.getItem(storageKeys.UNIT_OF_ACCOUNT);
+      if (!unitOfAccount) resolve(unitOfAccountDisabledValue);
+      else resolve(JSON.parse(unitOfAccount));
     } catch (error) {
       return reject(error);
     }
   });
 
-  setCoinPriceCurrency = (currency: CoinPriceCurrencySettingType): Promise<void> => new Promise((resolve, reject) => {
+  setUnitOfAccount = (currency: UnitOfAccountSettingType): Promise<void> => new Promise((resolve, reject) => {
     try {
-      localStorage.setItem(storageKeys.COIN_PRICE_CURRENCY, JSON.stringify(currency));
+      localStorage.setItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
       resolve();
     } catch (error) {
       return reject(error);
     }
   });
 
-  unsetCoinPriceCurrency = (): Promise<void> => new Promise((resolve) => {
+  unsetUnitOfAccount = (): Promise<void> => new Promise((resolve) => {
     try {
-      localStorage.removeItem(storageKeys.COIN_PRICE_CURRENCY);
+      localStorage.removeItem(storageKeys.UNIT_OF_ACCOUNT);
     } catch (_error) {}
     resolve();
   });
@@ -308,7 +308,7 @@ export default class LocalStorageApi {
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
-    await this.unsetCoinPriceCurrency();
+    await this.unsetUnitOfAccount();
     await this.unsetCoinPricePubKeyData();
   }
 

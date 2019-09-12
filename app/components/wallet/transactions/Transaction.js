@@ -18,7 +18,7 @@ import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
-import { getPrice } from '../../../types/coinPriceType';
+import { getPrice } from '../../../types/unitOfAccountType';
 
 const messages = defineMessages({
   type: {

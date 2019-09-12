@@ -17,7 +17,7 @@ import {
   cachePriceData
 } from '../../api/ada/lib/storage/lovefieldDatabase.js';
 import type { Ticker } from '../../types/coinPriceType';
-import { getPrice } from '../../types/coinPriceType';
+import { getPrice } from '../../types/unitOfAccountType';
 import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
 
 // populated by ConfigWebpackPlugin

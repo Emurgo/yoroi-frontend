@@ -1,6 +1,6 @@
 // @flow
 
-export type CoinPriceCurrencySettingType = {|
+export type UnitOfAccountSettingType = {|
   enabled: boolean,
   currency: ?string,
 |};
@@ -11,7 +11,7 @@ export type Ticker = {|
   price: number,
 |};
 
-export const coinPriceCurrencyDisabledValue: CoinPriceCurrencySettingType = {
+export const unitOfAccountDisabledValue: UnitOfAccountSettingType = {
   enabled: false,
   currency: null
 };
