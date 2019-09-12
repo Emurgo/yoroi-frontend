@@ -42,7 +42,7 @@ const Staking = (props) => {
       actions={actions}
       stores={stores}
     >
-      <iframe ref={iframeRef} title="Staking" src={`${process.env.SEIZA_URL}/staking`} frameBorder="0" width="100%" height="100%" />;
+      <iframe ref={iframeRef} title="Staking" src={`${process.env.SEIZA_URL}/staking?locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />;
       {children}
     </MainLayout>
   );
