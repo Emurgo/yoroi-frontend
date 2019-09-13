@@ -19,7 +19,7 @@ const messages = defineMessages({
 class LocalizableError extends ExtendableError {
 
   id: string;
-  defaultMessage: string;
+  defaultMessage: string | null;
   values: Object;
 
   constructor(
