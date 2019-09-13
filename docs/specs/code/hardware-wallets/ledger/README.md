@@ -257,19 +257,32 @@ As this page will have i18n texts, locale can be set using query parameter `loca
 
 For WebAuthn new tab is needed to process but for U2F it's not compulsury but still proposing processing in new tab for U2F transport as well just to keep it consistent and utilize rich and helpful UI for Ledger button oparations.
 
-## Ledger Connect page UI design [TBD]
-### For Ledger Nano S
-1. Connect Ledger device with Yoroi (same as Creating or Restoring Wallet)
-<img src="https://user-images.githubusercontent.com/19986226/63401587-cbd99300-c412-11e9-85e4-6ffd19482ee5.png" alt="Connect Ledger device with Yoroi" >
+## Ledger Connect page UI design
+### Ledger Nano S [WebAuthn]
+1. Common to all oparation - Checking ledger device<br>
+https://projects.invisionapp.com/d/main#/console/18169679/383606610/preview<br>
+![image](https://user-images.githubusercontent.com/19986226/64831834-714ae580-d612-11e9-90c4-b78a7f580a14.png)
 
-2. Send Transaction using Ledger device
-![image](https://user-images.githubusercontent.com/19986226/63401791-92555780-c413-11e9-8810-323ecf4a18a7.png)
+2. Connect Ledger device with Yoroi (same as Creating or Restoring Wallet)<br>
+https://projects.invisionapp.com/d/main#/console/18169679/383606604/preview<br>
+![image](https://user-images.githubusercontent.com/19986226/64831958-e0283e80-d612-11e9-88a0-b93f91531402.png)
 
-3. Verify Address
-![image](https://user-images.githubusercontent.com/19986226/63401928-17407100-c414-11e9-8614-a0bd9eceb182.png)
+3. Send Transaction using Ledger device<br>
+https://projects.invisionapp.com/d/main#/console/18169679/383606605/preview<br>
+![image](https://user-images.githubusercontent.com/19986226/64832357-9b050c00-d614-11e9-8516-674aeea62da1.png)
 
-### For Ledger Nano X
-TBD
+4. Verify Address<br>
+https://projects.invisionapp.com/d/main#/console/18169679/383606606/preview<br>
+![image](https://user-images.githubusercontent.com/19986226/64832473-15359080-d615-11e9-9148-d97ff75feadf.png)
+
+### Ledger Nano X [WebAuthn]
+Similar with **Ledger Nano S [WebAuthn]** but gif will be updated according to **Ledger Nano X**.
+
+### Ledger Nano S [U2F]
+Similar with **Ledger Nano S [WebAuthn]** but no pop-up dialog and no top blackish block.
+
+### Ledger Nano X [U2F]
+Similar with **Ledger Nano X [WebAuthn]** but no pop-up dialog and no top blackish block.
 
 ## Related PRs
 Specification: https://github.com/Emurgo/yoroi-frontend/pull/696<br>
