@@ -232,7 +232,7 @@ export type GetTransactionsRequestOptions = {
   limit: number,
 };
 export type GetTransactionsRequest = {
-  ...$Shape<GetTransactionsRequestOptions>,
+  ...Inexact<GetTransactionsRequestOptions>,
   walletId: string,
   isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
