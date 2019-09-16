@@ -3,19 +3,18 @@ import { PrivateKey } from 'cardano-wallet';
 import type {
   ResponseTicker,
   CurrentCoinPriceResponse,
-  HistoricalCoinPriceRequest,
 } from '../../app/api/ada/lib/state-fetch/types';
 
-const CURRENCIES = [ 'BTC', 'ETH', 'USD', 'KRW', 'JPY', 'EUR', 'CNY' ];
+const CURRENCIES = ['BTC', 'ETH', 'USD', 'KRW', 'JPY', 'EUR', 'CNY'];
 let privKey = PrivateKey.from_hex('c8fc9467abae3c3396854ed25c59cc1d9a8ef3db9772f4cb0f074181ba4cad57eaa923bc58cbf6aff0aa34541e015d6cb6cf74b48d35f05f0ec4a907df64bad20000000000000000000000000000000000000000000000000000000000000000');
 
 let pubKeyDataReplacement;
 let pubKeyDataSignature;
 
 function serializeTicker(ticker: ResponseTicker): Buffer {
-  return new Buffer(ticker.from +
-    ticker.timestamp +
-    Object.keys(ticker.prices).sort().map(to => to + ticker.prices[to]).join(''),
+  return Buffer.from(
+    ticker.from + ticker.timestamp +
+      Object.keys(ticker.prices).sort().map(to => to + ticker.prices[to]).join(''),
     'utf8'
   );
 }
@@ -24,7 +23,7 @@ let serviceDisabled = false;
 
 export function disableService() {
   serviceDisabled = true;
-};
+}
 
 export function installCoinPriceRequestHandlers(server: Object) {
   server.get('/price/:from/current', (req, res) => {
@@ -34,15 +33,15 @@ export function installCoinPriceRequestHandlers(server: Object) {
       return;
     }
 
-    let prices = {};
+    const prices = {};
     for (const currency of CURRENCIES) {
       prices[currency] = 1;
     }
 
     const ticker: ResponseTicker = {
-        from: 'ADA',
-        timestamp: Date.now(),
-        prices 
+      from: 'ADA',
+      timestamp: Date.now(),
+      prices
     };
     ticker.signature = privKey.sign(serializeTicker(ticker)).to_hex();
     const response : CurrentCoinPriceResponse = { error: null, ticker };
@@ -64,7 +63,7 @@ export function installCoinPriceRequestHandlers(server: Object) {
     res.send({
       error: null,
       tickers: timestamps.map(timestamp => {
-        let prices = {};
+        const prices = {};
         for (const currency of CURRENCIES) {
           prices[currency] = 1;
         }
@@ -94,6 +93,6 @@ export function replaceKey(privKeyMaster: string, pubKeyData: string, privKeyDat
   privKey = PrivateKey.from_hex(privKeyData);
   pubKeyDataReplacement = pubKeyData;
   pubKeyDataSignature = PrivateKey.from_hex(privKeyMaster)
-    .sign(new Buffer(pubKeyData))
+    .sign(Buffer.from(pubKeyData))
     .to_hex();
 }

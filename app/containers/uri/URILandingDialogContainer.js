@@ -57,7 +57,7 @@ export default class URILandingDialogContainer extends Component<Props> {
     const { stores } = this.props;
     const coinPrice: ?number = stores.profile.unitOfAccount.enabled ? (
       stores.substores[environment.API].coinPriceStore
-        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency) 
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency)
     ) : null;
 
     if (!this.showDisclaimer) {

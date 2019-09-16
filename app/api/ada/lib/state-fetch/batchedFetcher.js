@@ -92,7 +92,9 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher.getCurrentCoinPrice(body)
   )
 
-  getHistoricalCoinPrice = (body: HistoricalCoinPriceRequest): Promise<HistoricalCoinPriceResponse> => (
+  getHistoricalCoinPrice = (
+    body: HistoricalCoinPriceRequest
+  ): Promise<HistoricalCoinPriceResponse> => (
     this.baseFetcher.getHistoricalCoinPrice(body)
   )
 }

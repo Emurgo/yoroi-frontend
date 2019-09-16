@@ -350,14 +350,14 @@ export const cachePriceData = async (timestamp: number, data: mixed): void => {
   const rows = [
     _getPriceDataCacheTable().createRow({
       timestamp,
-      dataJson: JSON.stringify(data) 
+      dataJson: JSON.stringify(data)
     })
   ];
   await db.insert().into(_getPriceDataCacheTable()).values(rows).exec();
-}
+};
 
 export const getCachedPriceData = async (timestamp: number): mixed => {
-  const table = _getPriceDataCacheTable()
+  const table = _getPriceDataCacheTable();
   const rows = await db.select().from(table)
     .where(table[priceDataCacheTableSchema.properties.timestamp].eq(timestamp))
     .exec();
@@ -366,7 +366,7 @@ export const getCachedPriceData = async (timestamp: number): mixed => {
     return JSON.parse(rows[0].dataJson);
   }
   return null;
-}
+};
 
 /* Helper functions */
 

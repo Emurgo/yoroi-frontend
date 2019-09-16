@@ -12,7 +12,6 @@ import {
 } from '../../../api/ada/lib/utils';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import {
-  formattedWalletAmount,
   formattedAmountToNaturalUnits,
 } from '../../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';

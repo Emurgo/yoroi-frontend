@@ -1623,7 +1623,11 @@ const _conditionToTxState = (condition: AdaTransactionCondition) => {
 
 const _createTransactionFromServerData = action(
   'AdaApi::_createTransactionFromServerData',
-  (data: AdaTransaction, type: TransactionDirectionType, amount: BigNumber, fee: BigNumber, tickers: Array<Ticker>) => {
+  (data: AdaTransaction,
+    type: TransactionDirectionType,
+    amount: BigNumber,
+    fee: BigNumber,
+    tickers: Array<Ticker>) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
     return new WalletTransaction({
       id: data.ctId,

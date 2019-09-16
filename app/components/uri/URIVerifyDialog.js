@@ -106,7 +106,7 @@ export default class URIVerifyDialog extends Component<Props> {
             {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}:
           </h2>
           {unitOfAccountSetting.enabled ? (
-            <Fragment> 
+            <Fragment>
               <div className={styles.amount}>
                 {coinPrice ? amount.multipliedBy(coinPrice).toString() : '-'}&nbsp;
                 {unitOfAccountSetting.currency}

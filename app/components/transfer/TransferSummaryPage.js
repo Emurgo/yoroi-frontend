@@ -157,7 +157,7 @@ export default class TransferSummaryPage extends Component<Props> {
                 {unitOfAccountSetting.enabled ? (
                   <Fragment>
                     <div className={styles.amount}>
-                      {coinPrice ? 
+                      {coinPrice ?
                         transferTx.recoveredBalance.multipliedBy(coinPrice).toString() :
                         '-'
                       }
@@ -173,7 +173,7 @@ export default class TransferSummaryPage extends Component<Props> {
                   <div className={styles.amount}>{recoveredBalance}
                     <span className={styles.currencySymbol}>&nbsp;ADA</span>
                   </div>
-                 )}
+                )}
               </div>
 
               <div className={styles.feesWrapper}>
@@ -183,7 +183,7 @@ export default class TransferSummaryPage extends Component<Props> {
                 {unitOfAccountSetting.enabled ? (
                   <Fragment>
                     <div className={styles.fees}>
-                      {'+' + (coinPrice ? 
+                      {'+' + (coinPrice ?
                         transferTx.fee.multipliedBy(coinPrice).toString() :
                         '-')
                       }
@@ -210,7 +210,7 @@ export default class TransferSummaryPage extends Component<Props> {
               {unitOfAccountSetting.enabled ? (
                 <Fragment>
                   <div className={styles.totalAmount}>
-                    {coinPrice ? 
+                    {coinPrice ?
                       transferTx.recoveredBalance.minus(transferTx.fee)
                         .multipliedBy(coinPrice).toString() :
                       '-'

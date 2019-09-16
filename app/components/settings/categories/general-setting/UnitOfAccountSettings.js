@@ -3,12 +3,11 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
-import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UnitOfAccountSettings.scss';
-import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   unitOfAccountTitle: {
@@ -56,7 +55,7 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
     }
   });
 
-  render () {
+  render() {
     const { currencies, isSubmitting, error, currentValue, lastUpdatedTimestamp } = this.props;
     const { intl } = this.context;
     const { form } = this;
@@ -85,7 +84,7 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
           </div>
         </div>
       );
-    }
+    };
 
     const lastUpdated = lastUpdatedTimestamp ?
       new Date(lastUpdatedTimestamp).toLocaleString() : '-';

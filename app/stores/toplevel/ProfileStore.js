@@ -507,7 +507,7 @@ export default class ProfileStore extends Store {
     const { result } = this.getUnitOfAccountRequest.execute();
     return result || unitOfAccountDisabledValue;
   }
-  
+
   _updateUnitOfAccount = async (currency: UnitOfAccountSettingType) => {
     await this.setUnitOfAccountRequest.execute(currency);
     await this.getUnitOfAccountRequest.execute(); // eagerly cache

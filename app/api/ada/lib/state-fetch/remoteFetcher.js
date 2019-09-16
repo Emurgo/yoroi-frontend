@@ -197,9 +197,9 @@ export class RemoteFetcher implements IFetcher {
   )
 
   getCurrentCoinPrice = (body: CurrentCoinPriceRequest): Promise<CurrentCoinPriceResponse> => (
-    axios(`${priceBackendUrl}/price/${body.from}/current`, 
-      { 
-        method: 'get' 
+    axios(`${priceBackendUrl}/price/${body.from}/current`,
+      {
+        method: 'get'
       }).then(response => response.data)
       .catch(error => {
         Logger.error('RemoteFetcher::getCurrentCoinPrice error: ' + stringifyError(error));
@@ -207,10 +207,12 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getHistoricalCoinPrice = (body: HistoricalCoinPriceRequest): Promise<HistoricalCoinPriceResponse> => (
-    axios(`${priceBackendUrl}/price/${body.from}/${body.timestamps.join(',')}`, 
-      { 
-        method: 'get' 
+  getHistoricalCoinPrice = (
+    body: HistoricalCoinPriceRequest
+  ): Promise<HistoricalCoinPriceResponse> => (
+    axios(`${priceBackendUrl}/price/${body.from}/${body.timestamps.join(',')}`,
+      {
+        method: 'get'
       }).then(response => response.data)
       .catch(error => {
         Logger.error('RemoteFetcher::getHistoricalCoinPrice error: ' + stringifyError(error));

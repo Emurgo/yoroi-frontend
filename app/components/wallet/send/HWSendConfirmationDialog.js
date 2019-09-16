@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
 import type { MessageDescriptor } from 'react-intl';
 
 import Dialog from '../../widgets/Dialog';
@@ -148,7 +148,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
                 <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
               </div>
             </Fragment>
-          ) : (          
+          ) : (
             <div className={styles.fees}>+{formattedWalletAmount(transactionFee)}
               <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
             </div>
@@ -161,21 +161,21 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         <div className={styles.totalAmountLabel}>
           {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
         </div>
-          {unitOfAccountSetting.enabled ? (
-            <Fragment>
-              <div className={styles.totalAmount}>
-                {coinPrice ? totalAmount.multipliedBy(coinPrice).toString() : '-'}
-                &nbsp;{unitOfAccountSetting.currency}
-              </div>
-              <div className={styles.totalAmountSmall}>{formattedWalletAmount(totalAmount)}
-                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-              </div>
-            </Fragment>
-          ) : (
-            <div className={styles.totalAmount}>{formattedWalletAmount(totalAmount)}
+        {unitOfAccountSetting.enabled ? (
+          <Fragment>
+            <div className={styles.totalAmount}>
+              {coinPrice ? totalAmount.multipliedBy(coinPrice).toString() : '-'}
+              &nbsp;{unitOfAccountSetting.currency}
+            </div>
+            <div className={styles.totalAmountSmall}>{formattedWalletAmount(totalAmount)}
               <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
             </div>
-          )}
+          </Fragment>
+        ) : (
+          <div className={styles.totalAmount}>{formattedWalletAmount(totalAmount)}
+            <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+          </div>
+        )}
       </div>);
 
     const confirmButtonClasses = classnames([

@@ -64,32 +64,34 @@ export default class WalletSummary extends Component<Props> {
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
                 :&nbsp;
-                {pendingAmount.incomingInSelectedCurrency && unitOfAccountSetting.enabled ? 
-                  (<span>
+                {pendingAmount.incomingInSelectedCurrency && unitOfAccountSetting.enabled ? (
+                  <span>
                     {pendingAmount.incomingInSelectedCurrency.toString()}
                     {' ' + unitOfAccountSetting.currency}
-                  </span>) : 
-                  (<Fragment>
+                  </span>
+                ) : (
+                  <Fragment>
                     <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
                     <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
-                  </Fragment>)
-                }
+                  </Fragment>
+                )}
               </div>
             }
             {pendingAmount.outgoing.isGreaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
                 :&nbsp;
-                {pendingAmount.outgoingInSelectedCurrency && unitOfAccountSetting.enabled ? 
-                  (<span>
+                {pendingAmount.outgoingInSelectedCurrency && unitOfAccountSetting.enabled ? (
+                  <span>
                     {pendingAmount.outgoingInSelectedCurrency.toString()}
                     {' ' + unitOfAccountSetting.currency}
-                  </span>) : 
-                  (<Fragment>
+                  </span>
+                ) : (
+                  <Fragment>
                     <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
                     <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
-                  </Fragment>)
-                }
+                  </Fragment>
+                )}
               </div>
             }
             {!isLoadingTransactions ? (

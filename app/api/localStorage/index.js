@@ -14,7 +14,7 @@ const storageKeys = {
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
   UNIT_OF_ACCOUNT: networkForLocalStorage + '-UNIT-OF-ACCOUNT',
-  COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA', 
+  COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
 };
 
 export type SetCustomUserThemeRequest = {
@@ -269,7 +269,9 @@ export default class LocalStorageApi {
     }
   });
 
-  setUnitOfAccount = (currency: UnitOfAccountSettingType): Promise<void> => new Promise((resolve, reject) => {
+  setUnitOfAccount = (
+    currency: UnitOfAccountSettingType
+  ): Promise<void> => new Promise((resolve, reject) => {
     try {
       localStorage.setItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
       resolve();
@@ -281,12 +283,14 @@ export default class LocalStorageApi {
   unsetUnitOfAccount = (): Promise<void> => new Promise((resolve) => {
     try {
       localStorage.removeItem(storageKeys.UNIT_OF_ACCOUNT);
-    } catch (_error) {}
+    } catch (_error) {
+      // ignore the error
+    }
     resolve();
   });
 
   // ========== Coin price data public key  ========== //
-  
+
   getCoinPricePubKeyData = async (): Promise<?string> => {
     return localStorage.getItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
   }
@@ -299,6 +303,7 @@ export default class LocalStorageApi {
     try {
       localStorage.removeItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
     } catch (_) {
+      // ignore the error
     }
   }
 

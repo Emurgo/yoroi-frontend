@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
-import type { Node } from 'react';
 import styles from './WalletTopbarTitle.scss';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -91,9 +90,9 @@ export default class WalletTopbarTitle extends Component<Props> {
         </div>
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
-            {wallet && shouldHideBalance ? (
+            {wallet && shouldHideBalance ? ( // eslint-disable-line no-nested-ternary
               <span className={styles.hiddenWalletAmount}>******</span>
-            ) : unitOfAccountSetting.enabled ? (
+            ) : unitOfAccountSetting.enabled ? ( // eslint-disable-line no-nested-ternary
               wallet ? (
                 <span>
                   {coinPrice ? wallet.amount.multipliedBy(coinPrice).toString() : '-'}
@@ -102,9 +101,9 @@ export default class WalletTopbarTitle extends Component<Props> {
             ) : (
               wallet ? formattedWalletAmount(wallet.amount) : null
             ) }
-            { ' ' + (unitOfAccountSetting.enabled ?
-                unitOfAccountSetting.currency : currency)
-             }
+            {' ' + (unitOfAccountSetting.enabled ?
+              unitOfAccountSetting.currency : currency)
+            }
           </div>
           <div className={styles.walletAmountLabelBlock}>
             <div className={styles.walletAmountLabel}>

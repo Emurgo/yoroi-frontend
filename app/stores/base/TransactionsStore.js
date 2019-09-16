@@ -4,10 +4,13 @@ import _ from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
+import environment from '../../environment';
+
 import type { GetTransactionsFunc, GetBalanceFunc,
   GetTransactionsRequest, GetTransactionsRequestOptions,
-  RefreshPendingTransactionsFunc } from '../../api/ada';
-import environment from '../../environment';
+  RefreshPendingTransactionsFunc
+} from '../../api/ada';
+
 export default class TransactionsStore extends Store {
 
   /** How many transactions to display */

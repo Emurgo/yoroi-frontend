@@ -260,7 +260,7 @@ export default class Transaction extends Component<Props, State> {
 
               {(unitOfAccountSetting.enabled && (typeof price === 'number')) ? (
                 <div className={this.getAmountStyle(amountInSelectedCurrency)}>
-                    { amountInSelectedCurrency.toString() + ' ' + unitOfAccountSetting.currency }
+                  { amountInSelectedCurrency.toString() + ' ' + unitOfAccountSetting.currency }
                   <div className={styles.amountSmall}>
                     { formattedWalletAmount(data.amount) } ADA
                   </div>

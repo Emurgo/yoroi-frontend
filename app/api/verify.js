@@ -1,11 +1,11 @@
 // @flow
-import { RustModule } from './ada/lib/cardanoCrypto/rustLoader'
-import type { ResponseTicker } from './ada/lib/state-fetch/types.js';
+import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
+import type { ResponseTicker } from './ada/lib/state-fetch/types';
 
 function serializeTicker(ticker: ResponseTicker): Buffer {
-  return new Buffer(ticker.from +
-    ticker.timestamp +
-    Object.keys(ticker.prices).sort().map(to => to + ticker.prices[to]).join(''),
+  return Buffer.from(
+    ticker.from + ticker.timestamp +
+      Object.keys(ticker.prices).sort().map(to => to + ticker.prices[to]).join(''),
     'utf8'
   );
 }
@@ -34,8 +34,9 @@ export function verifyPubKeyDataReplacement(
   pubKeyDataSignature: string,
   pubKeyMaster: string
 ): boolean {
-  return verify(pubKeyData,
-    s => new Buffer(s),
+  return verify(
+    pubKeyData,
+    s => Buffer.from(s),
     pubKeyDataSignature,
     RustModule.Wallet.PublicKey.from_hex(pubKeyMaster)
   );

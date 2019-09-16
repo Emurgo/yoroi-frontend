@@ -79,7 +79,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
   )
 
   onSelectUnitOfAccount = (value: string) => {
-    const unitOfAccount = (value === 'ADA') ? 
+    const unitOfAccount = (value === 'ADA') ?
       unitOfAccountDisabledValue :
       { enabled: true, currency: value };
     this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
@@ -119,16 +119,24 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
 
     const currencies = UNIT_OF_ACCOUNT_OPTIONS.map(c => {
       const name = this.context.intl.formatMessage(currencyLabels[c.symbol]);
-      return { 
-        value: c.symbol, label: `${c.symbol} - ${name}`, name: name,
-        price: coinPriceStore.getCurrentPrice('ADA', c.symbol), svg: c.svg
+      return {
+        value: c.symbol,
+        label: `${c.symbol} - ${name}`,
+        name,
+        price: coinPriceStore.getCurrentPrice('ADA', c.symbol),
+        svg: c.svg
       };
     });
-    currencies.unshift({ value: 'ADA', label: 'ADA - Cardano', name: 'Cardano',
-      native: true, svg: require('../../../assets/images/currencies/ADA.inline.svg') });
+    currencies.unshift({
+      value: 'ADA',
+      label: 'ADA - Cardano',
+      name: 'Cardano',
+      native: true,
+      svg: require('../../../assets/images/currencies/ADA.inline.svg')
+    });
 
     const unitOfAccountValue = unitOfAccount.enabled ? unitOfAccount.currency : 'ADA';
-      
+
     return (
       <div>
         <GeneralSettings

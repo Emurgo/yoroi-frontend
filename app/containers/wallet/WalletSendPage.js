@@ -18,7 +18,6 @@ import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import {
-  formattedWalletAmount,
   formattedAmountToNaturalUnits,
 } from '../../utils/formatters';
 import {
@@ -153,7 +152,7 @@ export default class WalletSendPage extends Component<Props> {
 
     const coinPrice: ?number = stores.profile.unitOfAccount.enabled ? (
       stores.substores[environment.API].coinPriceStore
-        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency) 
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency)
     ) : null;
 
     return (<WalletSendConfirmationDialogContainer
@@ -189,7 +188,7 @@ export default class WalletSendPage extends Component<Props> {
     const { stores } = this.props;
     const coinPrice: ?number = stores.profile.unitOfAccount.enabled ? (
       stores.substores[environment.API].coinPriceStore
-        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency) 
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency)
     ) : null;
 
     let hwSendConfirmationDialog: Node = null;

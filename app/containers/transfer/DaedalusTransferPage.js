@@ -83,7 +83,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
     const coinPrice: ?number = stores.profile.unitOfAccount.enabled ? (
       stores.substores[environment.API].coinPriceStore
-        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency) 
+        .getCurrentPrice('ADA', stores.profile.unitOfAccount.currency)
     ) : null;
 
     switch (daedalusTransfer.status) {

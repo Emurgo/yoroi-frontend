@@ -6,7 +6,7 @@ import React, { Component, Fragment } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -196,11 +196,13 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               {unitOfAccountSetting.enabled ? (
                 <Fragment>
                   <div className={styles.amount}>
-                    {coinPrice ? 
-                       formattedWalletAmount(amount.multipliedBy(coinPrice)) :
-                       '-'
+                    {coinPrice ?
+                      formattedWalletAmount(amount.multipliedBy(coinPrice)) :
+                      '-'
                     }
-                    <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
+                    <span className={styles.currencySymbol}>
+                      &nbsp;{unitOfAccountSetting.currency}
+                    </span>
                   </div>
                   <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
                     <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
@@ -220,20 +222,23 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               {unitOfAccountSetting.enabled ? (
                 <Fragment>
                   <div className={styles.fees}>+
-                    {coinPrice ? 
-                       formattedWalletAmount(transactionFee.multipliedBy(coinPrice)) :
-                       '-'
+                    {coinPrice ?
+                      formattedWalletAmount(transactionFee.multipliedBy(coinPrice)) :
+                      '-'
                     }
-                    <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
+                    <span className={styles.currencySymbol}>
+                      &nbsp;{unitOfAccountSetting.currency}
+                    </span>
                   </div>
                   <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
                     <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
                   </div>
                 </Fragment>
               ) : (
-              <div className={styles.fees}>+{formattedWalletAmount(transactionFee)}
-                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-              </div>
+                <div className={styles.fees}>
+                  +{formattedWalletAmount(transactionFee)}
+                  <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                </div>
               )}
             </div>
           </div>
@@ -245,11 +250,13 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             {unitOfAccountSetting.enabled ? (
               <Fragment>
                 <div className={styles.totalAmount}>
-                  {coinPrice ? 
-                     formattedWalletAmount(totalAmount.multipliedBy(coinPrice)) :
-                     '-'
+                  {coinPrice ?
+                    formattedWalletAmount(totalAmount.multipliedBy(coinPrice)) :
+                    '-'
                   }
-                  <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
+                  <span className={styles.currencySymbol}>
+                    &nbsp;{unitOfAccountSetting.currency}
+                  </span>
                 </div>
                 <div className={styles.totalAmountSmall}>
                   {formattedWalletAmount(totalAmount)}
