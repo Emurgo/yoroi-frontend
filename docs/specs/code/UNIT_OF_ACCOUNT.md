@@ -1,6 +1,6 @@
 # Abstract
 
-Describe the ability to see and input ADA amount in another currency.
+Describe the ability to let the user see and input ADA amount in another currency.
 
 # Proposal
 
@@ -22,8 +22,6 @@ The following fiat currencies will be supported:
 - CNY	Chinese yuan renminbi
 - KRW	South Korean won
 
-These are the currencies supported by https://exchangeratesapi.io/. See the Architecture section for details.
-
 The following cryptos will be supported:
 - BTC
 - ETH
@@ -32,19 +30,19 @@ The following cryptos will be supported:
 
 Frontend: yoroi-frontend.
 
-Backend: yoroi-backend-service, partically the extensions that are required to implement this proposal.
+Backend: the service that provides current and historical prices to the frontend.
 
-API: third-party services that provide the price data.
+API (provider): third-party services that provide the price data.
 
 Price data: the conversion rates between ADA and all supported currencies.
 
 # Architecture
 
-The frontend refreshes the current ADA price at 5 minute interval by querying the backend.
+The frontend refreshes the current ADA price at 1 minute interval by querying the backend.
 
-The backend refreshes the current ADA price at 5 minute interval by querying the API. So the freshness of the price data from the user's perspective is 5 minutes + 5 minutes = 10 minutes. The backend stores the timestamped price data in a historical price database.
+The backend refreshes the current ADA price at 1 minute interval by querying the API. So the freshness of the price data from the user's perspective is 1 minutes + 1 minutes = 2 minutes. The backend stores the timestamped price data in a historical price database.
 
-At deployment time, a script will be run and it will query the API for historical price data, since the day when ADA began to be traded (Oct 2, 2017), and store the data in the historical price database.
+At deployment time, a script will be run and it will query the API for historical price data since the day when ADA began to be traded (Oct 2, 2017), and store the data in the historical price database.
 
 When the frontend shows a transaction it will query the backend for the price at the moment of the transaction. The backend will look into the historical price database and use the price at the closest time point. The frontend will cache the price data in web storage.
 
@@ -54,20 +52,20 @@ To support the price conversions listed above, the backend queries crypto-price 
 - BTC-USD
 - ETH-USD
 
-and https://exchangeratesapi.io/ for the exchange rate between USD and every fiat.
+and https://openexchangerates.org for the exchange rates between USD and every fiat.
 
 # Risks and security measures
 
 This feature does open new attack vector, for example: an attacker can engage a transaction with a victim and by hacking the backend and manipulate the conversion rate, trick the victim into transferring more Ada than the intended amount.
 
-To reduce the risk, the backend will be divided into three independently deployed components: a service, a data-fetcher and a monitor. The service:
+To reduce the risks, the backend will be divided into three independently deployed components: a service, a data-fetcher and a monitor. The service:
 1. Serves coin price queries from the frontend, using data out of its database.
 2. Accepts price data updates from the data-fetcher.
 
 The monitor independently fetches price data from the API and also queries the service for current prices. If the discrepency between the two is above certain threhold, it sends an alarm for manual investigation.
 
 
-The data-fetcher fetches price data from the API and notifies the service. The data-fetcher signs the data with a private key PrivKey<sub>data</sub> and the signatures are passed along the service to the frontend. Upon receiving price data, the frontend verifies the signatures with the corresponding public key PubKey<sub>data</sub>. This scheme improves security because in case the service is compromised, because it doesn't have the private key used to sign data, the forgery will be detected by the frontend. In order to forge price data, an attack will have to compromise the data-fetcher, which is harder because the data-fetcher is not a network service.
+The data-fetcher fetches price data from the API and feeds the service. The data-fetcher signs the data with a private key PrivKey<sub>data</sub> and the signatures are passed along the service to the frontend. Upon receiving price data, the frontend verifies the signatures with the corresponding public key PubKey<sub>data</sub>. This scheme improves security because in case the service is compromised, because it doesn't have the private key used to sign data, the forgery will be detected by the frontend. In order to forge price data, an attack will have to compromise the data-fetcher, which is harder because the data-fetcher is not a network service.
 
 If the data-fetcher is compromised and the private key used to sign the price data PrivKey<sub>data</sub> is leaked, then we must change the key pair. To accomplish this, a special instruction for changing public key PubKey<sub>data</sub> can be piggybacked to the response of price data query. The instruction contains a new public key PubKey'<sub>data</sub> and is signed with a private key PrivKey<sub>master</sub>. Upon receiving this intruction and having verified its authenticity with public key PubKey<sub>master</sub>, the front-send replaces PubKey<sub>data</sub> with PubKey'<sub>data</sub>. The private key PrivKey<sub>master</sub> should be permanently offline and is assumed to be safe. 
 
