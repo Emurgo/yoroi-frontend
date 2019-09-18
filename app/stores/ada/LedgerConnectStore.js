@@ -52,7 +52,8 @@ import {
 } from '../../utils/logging';
 
 type LedgerConnectionResponse = {
-  versionResp: GetVersionResponse,
+  // versionResp: GetVersionResponse, // TODO: temporarily set hardcoded version info
+  versionResp?: GetVersionResponse, // TODO: temporarily set hardcoded version info
   extendedPublicKeyResp: GetExtendedPublicKeyResponse,
 };
 
@@ -154,8 +155,10 @@ export default class LedgerConnectStore
       });
       await prepareLedgerBridger(ledgerBridge);
 
-      const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
-      Logger.debug(stringifyData(versionResp));
+      // TODO: temporarily set hardcoded version info
+      // const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
+      // Logger.debug(stringifyData(versionResp));
+      // TODO: temporarily set hardcoded version info
 
       // TODO: assume single account in Yoroi
       const accountPath = makeCardanoAccountBIP44Path(0);
@@ -167,7 +170,8 @@ export default class LedgerConnectStore
       const extendedPublicKeyResp: GetExtendedPublicKeyResponse
         = await ledgerBridge.getExtendedPublicKey(accountPath);
 
-      this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp });
+      // this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp }); // TODO: temporarily set hardcoded version info
+      this.hwDeviceInfo = this._normalizeHWResponse({ extendedPublicKeyResp }); // TODO: temporarily set hardcoded version info
 
       this._goToSaveLoad();
       Logger.info('Ledger device OK');
@@ -183,7 +187,8 @@ export default class LedgerConnectStore
   ): HWDeviceInfo => {
     this._validateHWResponse(resp);
 
-    const { extendedPublicKeyResp, versionResp } = resp;
+    // const { extendedPublicKeyResp, versionResp } = resp; // TODO: temporarily set hardcoded version info
+    const { extendedPublicKeyResp } = resp; // TODO: temporarily set hardcoded version info
 
     return {
       publicMasterKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
@@ -193,9 +198,12 @@ export default class LedgerConnectStore
         label: '',
         deviceId: '',
         language: '',
-        majorVersion: parseInt(versionResp.major, 10),
-        minorVersion: parseInt(versionResp.minor, 10),
-        patchVersion: parseInt(versionResp.patch, 10),
+        // majorVersion: parseInt(versionResp.major, 10), // TODO: temporarily set hardcoded version info
+        // minorVersion: parseInt(versionResp.minor, 10), // TODO: temporarily set hardcoded version info
+        // patchVersion: parseInt(versionResp.patch, 10), // TODO: temporarily set hardcoded version info
+        majorVersion: 1, // TODO: temporarily set hardcoded version info
+        minorVersion: 0, // TODO: temporarily set hardcoded version info
+        patchVersion: 0, // TODO: temporarily set hardcoded version info
       }
     };
   }
@@ -203,11 +211,14 @@ export default class LedgerConnectStore
   _validateHWResponse = (
     resp: LedgerConnectionResponse,
   ): boolean => {
-    const { extendedPublicKeyResp, versionResp } = resp;
+    // const { extendedPublicKeyResp, versionResp } = resp; // TODO: temporarily set hardcoded version info
+    const { extendedPublicKeyResp } = resp; // TODO: temporarily set hardcoded version info
 
-    if (versionResp == null) {
-      throw new Error('Ledger device version response is undefined');
-    }
+    // TODO: temporarily set hardcoded version info
+    // if (versionResp == null) {
+    //   throw new Error('Ledger device version response is undefined');
+    // }
+    // TODO: temporarily set hardcoded version info
 
     if (extendedPublicKeyResp == null) {
       throw new Error('Ledger device extended public key response is undefined');
