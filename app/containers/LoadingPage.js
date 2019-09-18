@@ -1,10 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import environment from '../environment';
 import CenteredLayout from '../components/layout/CenteredLayout';
 import Loading from '../components/loading/Loading';
-import adaLogo from '../assets/images/ada-logo.inline.svg';
-import cardanoLogo from '../assets/images/cardano-logo.inline.svg';
 import type { InjectedProps } from '../types/injectedPropsType';
 import { handleExternalLinkClick } from '../utils/routing';
 import { downloadLogs } from '../utils/logging';
@@ -18,8 +17,7 @@ export default class LoadingPage extends Component<InjectedProps> {
     return (
       <CenteredLayout>
         <Loading
-          currencyIcon={adaLogo}
-          apiIcon={cardanoLogo}
+          api={environment.API}
           hasLoadedCurrentLocale={hasLoadedCurrentLocale}
           hasLoadedCurrentTheme={hasLoadedCurrentTheme}
           isLoadingDataForNextScreen={loading.isLoading}

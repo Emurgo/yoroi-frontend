@@ -155,7 +155,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     const newPassword = newPasswordField.value;
     const repeatedPassword = repeatedPasswordField.value;
 
-    const disabledCondition = !(
+    const disabledCondition = isSubmitting || !(
       isValidWalletPassword(newPassword)
       && isValidRepeatPassword(newPassword, repeatedPassword)
     );

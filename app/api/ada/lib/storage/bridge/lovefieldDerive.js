@@ -27,7 +27,7 @@ import type {
 } from './utils';
 
 export type LovefieldDeriveRequest = {|
-  ...DerivePublicFromPrivateRequest<{}>,
+  ...DerivePublicFromPrivateRequest,
   decryptPrivateDeriverPassword: ?string,
   publicDeriverPublicKey?: KeyInfo,
   publicDeriverPrivateKey?: KeyInfo,
@@ -37,7 +37,7 @@ export async function derivePublicDeriver(
   tx: lf$Transaction,
   bip44WrapperId: number,
   body: LovefieldDeriveRequest,
-): ReturnType<typeof AddPublicDeriver.fromParent> {
+): ReturnType<typeof AddPublicDeriver.add> {
   const result = await DerivePublicFromPrivate.add(
     db,
     tx,
@@ -110,7 +110,7 @@ function _derive(
 
 export class LovefieldDerive extends IDerive<
   LovefieldDeriveRequest,
-  PromisslessReturnType<typeof AddPublicDeriver.fromParent>
+  PromisslessReturnType<typeof AddPublicDeriver.add>
 > {
 
   constructor(

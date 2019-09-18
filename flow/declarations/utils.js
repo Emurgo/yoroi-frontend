@@ -1,4 +1,7 @@
-declare type $Inexact<T: {}> = {...T};
+// @flow
+
+declare type Inexact<T: {}> = $Rest<T, {}>;
+
 declare type ExtractReturnType = <R>((...arg: any) => R) => R;
 declare type ReturnType<Func> = $Call<ExtractReturnType, Func>;
 

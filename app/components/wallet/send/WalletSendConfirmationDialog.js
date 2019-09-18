@@ -150,7 +150,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         onClick: this.submit.bind(this),
         primary: true,
         className: confirmButtonClasses,
-        disabled: !walletPasswordField.isValid,
+        disabled: !walletPasswordField.isValid || isSubmitting,
       },
     ];
 
@@ -275,6 +275,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               type="password"
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
+              disabled={isSubmitting}
               error={walletPasswordField.error}
               skin={InputOwnSkin}
             />

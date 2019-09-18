@@ -40,54 +40,62 @@ export const snapshot = {
       PasswordLastUpdate: null,
       KeyId: 5
     }],
-    Bip44Derivation: [{
+    KeyDerivation: [{
       // Bip44RootId: 1
       PublicKeyId: null,
       PrivateKeyId: 1,
-      Index: 0,
-      Bip44DerivationId: 1
+      Parent: null,
+      Index: null,
+      KeyDerivationId: 1
     }, {
       // Bip44PurposeId: 1
       PublicKeyId: null,
       PrivateKeyId: null,
+      Parent: 1,
       Index: 2147483692,
-      Bip44DerivationId: 2
+      KeyDerivationId: 2
     }, {
       // Bip44CoinTypeId: 1
       PublicKeyId: null,
       PrivateKeyId: null,
+      Parent: 2,
       Index: 2147485463,
-      Bip44DerivationId: 3
+      KeyDerivationId: 3
     }, {
       // Bip44AccountId: 1
       PublicKeyId: 3,
       PrivateKeyId: 2,
+      Parent: 3,
       Index: 2147483648,
-      Bip44DerivationId: 4
+      KeyDerivationId: 4
     }, {
       // Bip44ChainId: 1
       PublicKeyId: null,
       PrivateKeyId: null,
+      Parent: 4,
       Index: 0,
-      Bip44DerivationId: 5
+      KeyDerivationId: 5
     }, {
       // Bip44AddressId: 1
       PublicKeyId: null,
       PrivateKeyId: null,
+      Parent: 5,
       Index: 0,
-      Bip44DerivationId: 6
+      KeyDerivationId: 6
     }, {
       // Bip44ChainId: 2
       PublicKeyId: null,
       PrivateKeyId: null,
+      Parent: 4,
       Index: 1,
-      Bip44DerivationId: 7
+      KeyDerivationId: 7
     }, {
       // Bip44AccountId: 2
       PublicKeyId: 5,
       PrivateKeyId: 4,
+      Parent: 3,
       Index: 2147483649,
-      Bip44DerivationId: 8
+      KeyDerivationId: 8
     }],
     Bip44Wrapper: [{
       ConceptualWalletId: 1,
@@ -97,93 +105,57 @@ export const snapshot = {
       Version: 2,
       Bip44WrapperId: 1
     }],
-    Bip44DerivationMapping: [{
-      // Bip44RootId: 1 => Bip44PurposeId: 1
-      Parent: 1,
-      Child: 2,
-      Bip44DerivationMappingId: 1
-    }, {
-      // Bip44PurposeId: 1 => Bip44CoinTypeId: 1
-      Parent: 2,
-      Child: 3,
-      Bip44DerivationMappingId: 2
-    }, {
-      // Bip44CoinTypeId: 1 => Bip44AccountId: 1
-      Parent: 3,
-      Child: 4,
-      Bip44DerivationMappingId: 3
-    }, {
-      // Bip44AccountId: 1 => Bip44ChainId: 1
-      Parent: 4,
-      Child: 5,
-      Bip44DerivationMappingId: 4
-    }, {
-      // Bip44ChainId: 1 => Bip44AddressId: 1
-      Parent: 5,
-      Child: 6,
-      Bip44DerivationMappingId: 5
-    }, {
-      // Bip44AccountId: 1 => Bip44ChainId: 2
-      Parent: 4,
-      Child: 7,
-      Bip44DerivationMappingId: 6
-    }, {
-      // Bip44CoinTypeId: 1 => Bip44AccountId: 2
-      Parent: 3,
-      Child: 8,
-      Bip44DerivationMappingId: 7
-    }],
     PrivateDeriver: [{
       Bip44WrapperId: 1,
-      Bip44DerivationId: 1,
+      KeyDerivationId: 1,
       Level: 0,
       PrivateDeriverId: 1
     }],
     PublicDeriver: [{
-      Bip44DerivationId: 4,
+      KeyDerivationId: 4,
       Name: 'First account',
       LastBlockSync: 0,
       PublicDeriverId: 1
     }, {
-      Bip44DerivationId: 8,
+      KeyDerivationId: 8,
       Name: 'Checking account',
       LastBlockSync: 0,
       PublicDeriverId: 2
     }],
     Bip44Root: [{
-      Bip44DerivationId: 1,
+      KeyDerivationId: 1,
       Bip44RootId: 1
     }],
     Bip44Purpose: [{
-      Bip44DerivationId: 2,
+      KeyDerivationId: 2,
       Bip44PurposeId: 1
     }],
     Bip44CoinType: [{
-      Bip44DerivationId: 3,
+      KeyDerivationId: 3,
       Bip44CoinTypeId: 1
     }],
     Bip44Account: [{
       // First account
-      Bip44DerivationId: 4,
+      KeyDerivationId: 4,
       Bip44AccountId: 1
     }, {
       // Checking account
-      Bip44DerivationId: 8,
+      KeyDerivationId: 8,
       Bip44AccountId: 2
     }],
     Bip44Chain: [{
       // external chain
-      Bip44DerivationId: 5,
+      KeyDerivationId: 5,
       LastReceiveIndex: 0,
       Bip44ChainId: 1
     }, {
       // internal chain
-      Bip44DerivationId: 7,
+      KeyDerivationId: 7,
       LastReceiveIndex: null,
       Bip44ChainId: 2
     }],
     Bip44Address: [{
-      Bip44DerivationId: 6,
+      KeyDerivationId: 6,
       Hash: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
       Bip44AddressId: 1
     }]
