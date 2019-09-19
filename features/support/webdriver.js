@@ -58,18 +58,17 @@ function getChromeBuilder() {
 }
 
 function getFirefoxBuilder() {
-  const profile = new firefox.Profile();
-
-  /**
-   * Firefox disallows unsigned extensions by default. We solve this through a config change
-   * The proper way to do this is to use the "temporary addon" feature of Firefox
-   * However, our version of selenium doesn't support this yet
-   * The config is deprecated and may be removed in the future.
-   */
-  profile.setPreference('xpinstall.signatures.required', false);
-  profile.setPreference('extensions.webextensions.uuids', firefoxUuidMapping);
-  profile.addExtension(path.resolve(__dirname, '../../yoroi-test.xpi'));
-  const options = new firefox.Options().setProfile(profile);
+  const options = new firefox.Options()
+    // .setBinary(firefox.Channel.NIGHTLY)
+    .addExtensions(path.resolve(__dirname, '../../yoroi-test.xpi'))
+    /**
+     * Firefox disallows unsigned extensions by default. We solve this through a config change
+     * The proper way to do this is to use the "temporary addon" feature of Firefox
+     * However, our version of selenium doesn't support this yet
+     * The config is deprecated and may be removed in the future.
+     */
+    .setPreference('xpinstall.signatures.required', false)
+    .setPreference('extensions.webextensions.uuids', firefoxUuidMapping);
 
   return new Builder()
     .withCapabilities({
