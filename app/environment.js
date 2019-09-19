@@ -10,10 +10,17 @@ declare var CONFIG: ConfigType;
 
 declare type Currency = 'ada';
 
+function getVersion(): string {
+  const manifest = require('../chrome/manifest.' + CONFIG.network.name);
+  const content = manifest.default !== undefined
+    ? manifest.default
+    : manifest;
+  return content.version;
+}
 export const environment = (Object.assign({
   /** Network used to connect */
   NETWORK: CONFIG.network.name,
-  version: require('../chrome/manifest.' + CONFIG.network.name).default.version,
+  version: getVersion(),
   /** Environment used during webpack build */
   env_type: process.env.NODE_ENV,
 
