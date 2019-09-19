@@ -36,6 +36,7 @@ export default class WalletTransaction {
   @observable numberOfConfirmations: number = 0;
   @observable addresses: TrasactionAddresses = { from: [], to: [] };
   @observable state: TransactionState;
+  @observable memo: ?string = '';
 
   constructor(data: {
     id: string,
@@ -48,6 +49,7 @@ export default class WalletTransaction {
     numberOfConfirmations: number,
     addresses: TrasactionAddresses,
     state: TransactionState,
+    memo: ?string,
   }) {
     Object.assign(this, data);
   }

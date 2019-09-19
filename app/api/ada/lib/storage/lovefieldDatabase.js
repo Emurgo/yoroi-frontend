@@ -7,7 +7,8 @@ import type {
   AdaAddresses,
   AdaTransaction,
   AdaTransactionCondition,
-  AddressType
+  AddressType,
+  TransactionMemo,
 } from '../../adaTypes';
 
 // Note: Schemes are inspired (but !=) to schemes used by importer & postgresDB
@@ -43,6 +44,21 @@ const txsTableSchema = {
     value: 'value',
     state: 'state',
     lastUpdated: 'lastUpdated'
+  }
+};
+
+// Goal: Save memos for transactions
+export type TxMemosTableRow = {
+  id: string,
+  value: string,
+  tx: string // AdaTransaction.ctId
+}
+const txMemosTableSchema = {
+  name: 'TxMemos',
+  properties: {
+    id: 'id',
+    value: 'value',
+    tx: 'tx'
   }
 };
 
@@ -83,6 +99,21 @@ export const loadLovefieldDB = (
       ([txsTableSchema.properties.id]: Array<string>),
     )
     .addIndex('idxDate', [txsTableSchema.properties.date], false, lf.Order.DESC);
+
+  schemaBuilder.createTable(txMemosTableSchema.name)
+    .addColumn(txMemosTableSchema.properties.id, Type.STRING)
+    .addColumn(txMemosTableSchema.properties.value, Type.STRING)
+    .addColumn(txMemosTableSchema.properties.tx, Type.STRING)
+    .addPrimaryKey(
+      ([txMemosTableSchema.properties.id]: Array<string>),
+    );
+  // Transaction must also be part of the TxsTable
+  /*
+  .addForeignKey('fkMemoTx', {
+    local: txMemosTableSchema.properties.tx,
+    ref: `${txsTableSchema.name}.${txsTableSchema.properties.id}`
+  });
+  */
 
   schemaBuilder.createTable(addressesTableSchema.name)
     .addColumn(addressesTableSchema.properties.id, Type.STRING)
@@ -222,6 +253,22 @@ export const saveTxs = async (
   return dbTransaction.exec([txQuery, txAddressesQuery]);
 };
 
+export const saveTxMemos = async (
+  request: Array<TransactionMemo>
+): Promise<txMemosTableRow> => {
+  const txMemosTableInsertRows = request.memos.map(memo => _txMemoToRow(memo));
+  return _insertOrReplaceSingleQuery(txMemosTableInsertRows, _getTxMemosTable())
+    .exec();
+};
+
+export const deleteTxMemos = async (
+  request: Array<string>
+): Promise<txMemosTableRow> => {
+  /*const txMemosTableDeleteRows = request.memos.map(memo => _txMemoToRow(memo));
+  return _deleteSingleQuery(txMemosTableDeleteRows, _getTxMemosTable())
+    .exec();*/
+};
+
 export const getTxsOrderedByLastUpdateDesc = function (): Promise<Array<AdaTransaction>> {
   return _getTxsOrderedBy(txsTableSchema.properties.lastUpdated, lf.Order.DESC);
 };
@@ -260,11 +307,24 @@ const _getTxsOrderedBy = (
   lfOrder
 ): Promise<Array<AdaTransaction>> => {
   const txsTable = _getTxsTable();
+  const txMemosTable = _getTxMemosTable();
   return db.select()
     .from(txsTable)
+    // join memos associated with transactions
+    .leftOuterJoin(
+      txMemosTable,
+      txsTable[txsTableSchema.properties.id]
+        .eq(txMemosTable[txMemosTableSchema.properties.tx])
+    )
     .orderBy(txsTable[orderField], lfOrder)
     .exec()
-    .then(rows => rows.map(row => row[txsTableSchema.properties.value]));
+    .then(rows => {
+      return rows.map(row => Object.assign(
+        {},
+        row[txsTableSchema.name][txsTableSchema.properties.value],
+        row[txMemosTableSchema.name][txMemosTableSchema.properties.value]
+      ));
+    });
 };
 
 /** Create a list of rows that can be then added to the TxAddressesTable */
@@ -327,10 +387,30 @@ const _addressToRow = (
   return _getAddressesTable().createRow(newRow);
 };
 
-/* Helper functions */
+const _txMemoToRow = (
+  memo: TransactionMemo
+) : txMemosTableRow => {
+  const newRow: TxMemosTableRow =
+  {
+    id: memo.tx,
+    tx: memo.tx,
+    value: memo,
+  };
+  return _getTxMemosTable().createRow(newRow);
+};
 
-const _insertOrReplaceQuery = (rows: Array<AddressesTableRow|TxsTableRow>, table) => (
+/* Helper functions */
+// eslint-disable-next-line max-len
+const _insertOrReplaceQuery = (rows: Array<AddressesTableRow|TxsTableRow|TxMemosTableRow>, table) => (
   db.insertOrReplace().into(table).values(rows)
+);
+
+const _insertOrReplaceSingleQuery = (row: AddressesTableRow|TxsTableRow|TxMemosTableRow, table) => (
+  db.insertOrReplace().into(table).values(row)
+);
+
+const _deleteSingleQuery = (row: TxMemosTableRow, table) => (
+  db.delete().from(table).where(table.tx.eq(row.tx))
 );
 
 const _getTable = (name) => db.getSchema().table(name);
@@ -340,3 +420,5 @@ const _getTxsTable = () => _getTable(txsTableSchema.name);
 const _getAddressesTable = () => _getTable(addressesTableSchema.name);
 
 const _getTxAddressesTable = () => _getTable(txAddressesTableSchema.name);
+
+const _getTxMemosTable = () => _getTable(txMemosTableSchema.name);

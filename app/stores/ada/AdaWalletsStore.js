@@ -7,6 +7,10 @@ import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
 import WalletStore from '../base/WalletStore';
 import { matchRoute, buildRoute } from '../../utils/routing';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
@@ -71,7 +75,21 @@ export default class AdaWalletsStore extends WalletStore {
     await this.sendMoneyRequest.execute({
       ...transactionDetails,
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-    });
+    })
+      .then((response) => {
+        const memo = this.stores.substores.ada.transactionBuilderStore.memo;
+        if (memo !== '' && memo !== undefined) {
+          this.actions.memos.saveTxMemo.trigger({
+            memo,
+            tx: response.txId
+          });
+        }
+        return response;
+      })
+      .catch(error => {
+        Logger.error('AdaWalletsStore::_sendMoney error: ' + stringifyError(error));
+        throw new Error('An error has ocurred when saving the transaction memo.');
+      });
 
     this.refreshWalletsData();
     this.actions.dialogs.closeActiveDialog.trigger();

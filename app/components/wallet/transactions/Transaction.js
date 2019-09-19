@@ -9,6 +9,8 @@ import classNames from 'classnames';
 import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
+import addMemoSvg from '../../../assets/images/add-memo.inline.svg';
+import editSvg from '../../../assets/images/edit.inline.svg';
 import WalletTransaction, { transactionStates, transactionTypes } from '../../../domain/WalletTransaction';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionState, TransactionDirectionType } from '../../../domain/WalletTransaction';
@@ -84,6 +86,14 @@ const messages = defineMessages({
     id: 'wallet.transaction.transactionAmount',
     defaultMessage: '!!!Transaction amount',
   },
+  memoTitle: {
+    id: 'wallet.transaction.memo.title',
+    defaultMessage: '!!!Memo',
+  },
+  addMemoLabel: {
+    id: 'wallet.transaction.memo.add.label',
+    defaultMessage: '!!!Add memo',
+  },
 });
 
 const assuranceLevelTranslations = defineMessages({
@@ -119,6 +129,8 @@ type Props = {|
   assuranceLevel: string,
   isLastInList: boolean,
   formattedWalletAmount: Function,
+  onAddMemo: Function,
+  onEditMemo: Function,
 |};
 
 type State = {
@@ -177,7 +189,14 @@ export default class Transaction extends Component<Props, State> {
 
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
+    const {
+      isLastInList,
+      state,
+      assuranceLevel,
+      formattedWalletAmount,
+      onAddMemo,
+      onEditMemo,
+    } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state === transactionStates.FAILED;
@@ -337,6 +356,47 @@ export default class Transaction extends Component<Props, State> {
                   {data.id}
                 </RawHash>
               </ExplorableHashContainer>
+
+              {data.memo ? (
+                <div className={styles.row}>
+                  <h2>
+                    {intl.formatMessage(messages.memoTitle)}
+
+                    <button
+                      type="button"
+                      onClick={onEditMemo.bind(this, data)}
+                      className={styles.editButton}
+                    >
+                      <div>
+                        <SvgInline
+                          svg={editSvg}
+                          className={styles.editMemoIcon}
+                        />
+                      </div>
+                    </button>
+                  </h2>
+                  <span className={styles.rowData}>
+                    {data.memo}
+                  </span>
+                </div>
+              ) : (
+                <div className={styles.row}>
+                  <div className={styles.memoActionItemBlock}>
+                    <button
+                      type="button"
+                      onClick={onAddMemo.bind(this, data)}
+                    >
+                      <div>
+                        <SvgInline
+                          svg={addMemoSvg}
+                          className={styles.addMemoIcon}
+                        />
+                        <span>{intl.formatMessage(messages.addMemoLabel)}</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

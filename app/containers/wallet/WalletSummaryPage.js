@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, FormattedHTMLMessage } from 'react-intl';
+import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
@@ -13,6 +14,10 @@ import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
+import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
+import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
+import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
+import ConnectExternalStorageDialog from '../../components/wallet/memos/ConnectExternalStorageDialog';
 import { Logger } from '../../utils/logging';
 
 import { formattedWalletAmount } from '../../utils/formatters';
@@ -59,7 +64,7 @@ export default class WalletSummaryPage extends Component<Props> {
       closeExportTransactionDialog,
     } = actions[environment.API].transactions;
 
-    const { uiDialogs, profile } = this.props.stores;
+    const { uiDialogs, profile, memos } = this.props.stores;
     if (searchOptions) {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
@@ -74,6 +79,20 @@ export default class WalletSummaryPage extends Component<Props> {
             assuranceMode={wallet.assuranceMode}
             walletId={wallet.id}
             formattedWalletAmount={formattedWalletAmount}
+            onAddMemo={(transaction) => {
+              if (memos.hasSetSelectedExternalStorageProvider) {
+                actions.memos.selectTransaction.trigger({ tx: transaction });
+                this.openAddMemoDialog();
+              } else {
+                this.openConnectExternalStorageDialog();
+              }
+            }}
+            onEditMemo={(transaction) => {
+              if (memos.hasSetSelectedExternalStorageProvider) {
+                actions.memos.selectTransaction.trigger({ tx: transaction });
+                this.openEditMemoDialog();
+              }
+            }}
           />
         );
       } else if (!hasAny) {
@@ -117,6 +136,58 @@ export default class WalletSummaryPage extends Component<Props> {
           />
         ) : null}
 
+        {uiDialogs.isOpen(AddMemoDialog) ? (
+          <AddMemoDialog
+            selectedTransaction={memos.selectedTransaction}
+            error={memos.error}
+            onCancel={actions.memos.closeAddMemoDialog.trigger}
+            onSubmit={(values: { memo: string, tx: string }) => {
+              actions.memos.saveTxMemo.trigger(values);
+            }}
+            classicTheme={profile.isClassicTheme}
+          />
+        ) : null}
+
+        {uiDialogs.isOpen(ConnectExternalStorageDialog) ? (
+          <ConnectExternalStorageDialog
+            onCancel={actions.memos.closeConnectExternalStorageDialog.trigger}
+            onConnect={() => {
+              actions.memos.closeConnectExternalStorageDialog.trigger();
+              actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+            }}
+            classicTheme={profile.isClassicTheme}
+          />
+        ) : null}
+
+        {uiDialogs.isOpen(EditMemoDialog) ? (
+          <EditMemoDialog
+            selectedTransaction={memos.selectedTransaction}
+            error={memos.error}
+            onCancel={actions.memos.closeEditMemoDialog.trigger}
+            onClickDelete={this.openDeleteMemoDialog}
+            onSubmit={(values: { memo: string, tx: string }) => {
+              actions.memos.updateTxMemo.trigger(values);
+            }}
+            classicTheme={profile.isClassicTheme}
+          />
+        ) : null}
+
+        {uiDialogs.isOpen(DeleteMemoDialog) ? (
+          <DeleteMemoDialog
+            selectedTransaction={memos.selectedTransaction}
+            error={memos.error}
+            onCancel={() => {
+              actions.memos.goBackDeleteMemoDialog.trigger();
+              this.openEditMemoDialog();
+            }}
+            onClose={actions.memos.closeDeleteMemoDialog.trigger}
+            onDelete={(values: { tx: string }) => {
+              actions.memos.deleteTxMemo.trigger(values);
+            }}
+            classicTheme={profile.isClassicTheme}
+          />
+        ) : null}
+
       </VerticalFlexContainer>
     );
   }
@@ -138,5 +209,25 @@ export default class WalletSummaryPage extends Component<Props> {
   openExportTransactionDialog = (): void => {
     const { actions } = this.props;
     actions.dialogs.open.trigger({ dialog: ExportTransactionDialog });
+  }
+
+  openAddMemoDialog = (): void => {
+    const { actions } = this.props;
+    actions.dialogs.open.trigger({ dialog: AddMemoDialog });
+  }
+
+  openEditMemoDialog = (): void => {
+    const { actions } = this.props;
+    actions.dialogs.open.trigger({ dialog: EditMemoDialog });
+  }
+
+  openDeleteMemoDialog = (): void => {
+    const { actions } = this.props;
+    actions.dialogs.open.trigger({ dialog: DeleteMemoDialog });
+  }
+
+  openConnectExternalStorageDialog = (): void => {
+    const { actions } = this.props;
+    actions.dialogs.open.trigger({ dialog: ConnectExternalStorageDialog });
   }
 }

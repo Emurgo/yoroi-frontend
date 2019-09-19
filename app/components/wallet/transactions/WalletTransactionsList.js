@@ -40,6 +40,8 @@ type Props = {|
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
+  onAddMemo: Function,
+  onEditMemo: Function,
 |};
 
 @observer
@@ -111,6 +113,8 @@ export default class WalletTransactionsList extends Component<Props> {
       walletId,
       formattedWalletAmount,
       onLoadMore,
+      onAddMemo,
+      onEditMemo,
     } = this.props;
 
     const buttonClasses = classnames([
@@ -139,6 +143,8 @@ export default class WalletTransactionsList extends Component<Props> {
                   state={transaction.state}
                   assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
                   formattedWalletAmount={formattedWalletAmount}
+                  onAddMemo={onAddMemo}
+                  onEditMemo={onEditMemo}
                 />
               ))}
             </div>

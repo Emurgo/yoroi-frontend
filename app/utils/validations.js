@@ -25,6 +25,15 @@ export const isValidRepeatPassword = (
 
 export const isNotEmptyString = (value: string) => value !== '';
 
+export const isValidMemo = (memo: string) => (
+  memo !== ''
+  && memo.length <= 128
+);
+
+export const isValidMemoOptional = (memo: string) => (
+  memo.length <= 128
+);
+
 export const isValidAmountInLovelaces = (value: string) => {
   const isNumeric = isInt(value, { allow_leading_zeroes: false });
   if (!isNumeric) return false;

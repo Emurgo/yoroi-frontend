@@ -179,6 +179,62 @@
       word-break: break-all;
       line-height: 22px;
     }
+
+    .rowData {
+      font-size: 14px;
+      font-family: var(--font-regular);
+      word-break: break-all;
+      line-height: 22px;
+    }
+
+    .editButton {
+      cursor: pointer;
+      margin-left: 6px;
+    }
+
+    .memoActionItemBlock {
+      letter-spacing: 0.5px;
+      margin: 10px 0;
+      line-height: 20px;
+      vertical-align: top;
+      white-space: nowrap;
+
+      * {
+        vertical-align: middle;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      span {
+        color: var(--theme-label-button-color);
+        font-family: var(--font-regular);
+        font-size: 14px;
+        margin-left: 6px;
+      }
+
+      .addMemoIcon {
+        cursor: pointer;
+        display: inline-flex;
+        object-fit: contain;
+        margin-left: 4px;
+        & > svg {
+          height: 20px;
+          width: 20px;
+        }
+      }
+
+      .editMemoIcon {
+        cursor: pointer;
+        display: inline-flex;
+        object-fit: contain;
+        & > svg {
+          height: 15px;
+          width: 15px;
+        }
+      }
+    }
   }
 
   .closed {
