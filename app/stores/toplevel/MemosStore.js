@@ -155,12 +155,12 @@ export default class MemosStore extends Store {
     }
   };
 
-  @action _deleteTxMemo = async (params: { tx: string}) => {
+  @action _deleteTxMemo = async (tx: string) => {
     const { wallets } = this.stores.substores[environment.API];
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.deleteTxMemoRequest.execute({ tx: params });
+      await this.deleteTxMemoRequest.execute(tx);
       wallets.refreshWalletsData();
-      await this.deleteExternalTxMemoRequest.execute({ tx: params });
+      await this.deleteExternalTxMemoRequest.execute(tx);
       this._closeDeleteMemoDialog();
     }
   };

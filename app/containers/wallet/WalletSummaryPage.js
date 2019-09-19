@@ -181,8 +181,8 @@ export default class WalletSummaryPage extends Component<Props> {
               this.openEditMemoDialog();
             }}
             onClose={actions.memos.closeDeleteMemoDialog.trigger}
-            onDelete={(values: { tx: string }) => {
-              actions.memos.deleteTxMemo.trigger(values);
+            onDelete={(tx: string) => {
+              actions.memos.deleteTxMemo.trigger(tx);
             }}
             classicTheme={profile.isClassicTheme}
           />

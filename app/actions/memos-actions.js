@@ -16,5 +16,5 @@ export default class MemosActions {
   selectTransaction: Action<{ tx: WalletTransaction }> = new Action();
   saveTxMemo: Action<TransactionMemo> = new Action();
   updateTxMemo: Action<TransactionMemo> = new Action();
-  deleteTxMemo: Action<{ tx: string }> = new Action();
+  deleteTxMemo: Action<string> = new Action();
 }

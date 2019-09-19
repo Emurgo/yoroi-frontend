@@ -11,9 +11,7 @@ export type UploadExternalTxMemoFunc = (
 ) => Promise<UploadExternalTxMemoResponse>;
 
 // DeleteExternal
-export type DeleteExternalTxMemoRequest = {
-  tx: string,
-};
+export type DeleteExternalTxMemoRequest = string;
 export type DeleteExternalTxMemoResponse = boolean;
 export type DeleteExternalTxMemoFunc = (
   request: DeleteExternalTxMemoRequest

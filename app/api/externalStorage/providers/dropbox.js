@@ -135,9 +135,8 @@ export default class DropboxApi {
   }
 
   async deleteFile(
-    request: DeleteExternalTxMemoRequest
+    txHash: string
   ): Promise<DeleteExternalTxMemoResponse> {
-    const txHash = request.tx;
     const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
     try {
       this.api.filesDelete({
