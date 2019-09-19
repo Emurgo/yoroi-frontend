@@ -12,7 +12,7 @@ export type UploadExternalTxMemoFunc = (
 
 // DeleteExternal
 export type DeleteExternalTxMemoRequest = {
-  memos: Array<string>,
+  tx: string,
 };
 export type DeleteExternalTxMemoResponse = boolean;
 export type DeleteExternalTxMemoFunc = (

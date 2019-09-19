@@ -137,25 +137,21 @@ export default class DropboxApi {
   async deleteFile(
     request: DeleteExternalTxMemoRequest
   ): Promise<DeleteExternalTxMemoResponse> {
-    const self = this;
-    const memos: Array<string> = request.memos;
+    const txHash = request.tx;
+    const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
     try {
-      for (let i = 0; i < memos.length; i++) {
-        const txHash = memos[i];
-        const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
-        this.api.filesDelete({
-          fullPath
+      this.api.filesDelete({
+        path: fullPath
+      })
+        .then((response) => {
+          Logger.info('DropboxApi::deleteFile success: ' + txHash + ' file deleted');
+          return true;
         })
-          .then((response) => {
-            Logger.info('DropboxApi::deleteFile success: ' + txHash + ' file deleted');
-            return true;
-          })
-          .catch((error) => {
-            self.errorCode = error.status;
-            self.errorMessage = 'An error ocurred when deleting the file';
-            return false;
-          });
-      }
+        .catch((error) => {
+          self.errorCode = error.status;
+          self.errorMessage = 'An error ocurred when deleting the file';
+          return false;
+        });
     } catch (error) {
       Logger.error('DropboxApi::deleteFile error: ' + stringifyError(error));
       throw new GenericApiError();

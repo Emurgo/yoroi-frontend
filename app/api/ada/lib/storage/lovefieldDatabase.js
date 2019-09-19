@@ -262,11 +262,13 @@ export const saveTxMemos = async (
 };
 
 export const deleteTxMemos = async (
-  request: Array<string>
+  tx: string
 ): Promise<txMemosTableRow> => {
-  /*const txMemosTableDeleteRows = request.memos.map(memo => _txMemoToRow(memo));
-  return _deleteSingleQuery(txMemosTableDeleteRows, _getTxMemosTable())
-    .exec();*/
+  const txMemosTable = _getTxMemosTable();
+  return db.delete()
+    .from(txMemosTable)
+    .where(txMemosTable[txMemosTableSchema.properties.tx].eq(tx))
+    .exec();
 };
 
 export const getTxsOrderedByLastUpdateDesc = function (): Promise<Array<AdaTransaction>> {
@@ -407,10 +409,6 @@ const _insertOrReplaceQuery = (rows: Array<AddressesTableRow|TxsTableRow|TxMemos
 
 const _insertOrReplaceSingleQuery = (row: AddressesTableRow|TxsTableRow|TxMemosTableRow, table) => (
   db.insertOrReplace().into(table).values(row)
-);
-
-const _deleteSingleQuery = (row: TxMemosTableRow, table) => (
-  db.delete().from(table).where(table.tx.eq(row.tx))
 );
 
 const _getTable = (name) => db.getSchema().table(name);

@@ -400,7 +400,7 @@ export type SaveTxMemoFunc = (
 // deleteTxMemos
 
 export type DeleteTxMemoRequest = {
-  memos: Array<string>,
+  tx: string,
 };
 export type DeleteTxMemoResponse = void;
 export type DeleteTxMemoFunc = (
@@ -1059,7 +1059,7 @@ export default class AdaApi {
     request: DeleteTxMemoRequest
   ): Promise<void> {
     try {
-      await deleteTxMemos({ tx: request });
+      await deleteTxMemos(request.tx);
     } catch (error) {
       Logger.error('AdaApi::deleteTxMemo error: ' + stringifyError(error));
       throw new GenericApiError();

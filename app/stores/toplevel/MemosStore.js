@@ -135,8 +135,10 @@ export default class MemosStore extends Store {
 
   @action _saveTxMemo = async (params: TransactionMemo) => {
     const memos: Array<TransactionMemo> = [params];
+    const { wallets } = this.stores.substores[environment.API];
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.saveTxMemoRequest.execute({ memos });
+      wallets.refreshWalletsData();
       await this.uploadExternalTxMemoRequest.execute({ memos });
       this._closeAddMemoDialog();
     }
@@ -147,19 +149,18 @@ export default class MemosStore extends Store {
     const { wallets } = this.stores.substores[environment.API];
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.saveTxMemoRequest.execute({ memos });
-      await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memos });
       wallets.refreshWalletsData();
+      await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memos });
       this._closeEditMemoDialog();
     }
   };
 
   @action _deleteTxMemo = async (params: { tx: string}) => {
-    const memos: Array<string> = [params.tx];
     const { wallets } = this.stores.substores[environment.API];
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.deleteTxMemoRequest.execute({ memos });
-      await this.deleteExternalTxMemoRequest.execute({ memos });
+      await this.deleteTxMemoRequest.execute({ tx: params });
       wallets.refreshWalletsData();
+      await this.deleteExternalTxMemoRequest.execute({ tx: params });
       this._closeDeleteMemoDialog();
     }
   };
