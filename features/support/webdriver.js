@@ -245,17 +245,6 @@ function CustomWorld(cmdInput: WorldInput) {
       window.yoroi.api.ada.saveLastReceiveAddressIndex({ index: i });
     }, index);
   };
-
-  // Note: unused but may come in handy in the future
-  this.chooseFile = async (filePath, fileType) => {
-    const rawFileContent = fs.readFileSync(filePath);
-    await this.driver.executeScript((fileContent, type) => {
-      const content = new Uint8Array(fileContent.data);
-      // eslint-disable-next-line no-unused-vars
-      const contentBlog = new Blob([content], { type });
-      // trigger action here
-    }, rawFileContent, fileType);
-  };
 }
 
 setWorldConstructor(CustomWorld);
