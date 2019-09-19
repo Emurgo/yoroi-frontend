@@ -3,7 +3,8 @@
     "protocolMagic": 1097911063,
     "backendUrl": "https://testnet-yoroi-backend.yoroiwallet.com",
     "websocketUrl": "wss://testnet-yoroi-backend.yoroiwallet.com:443",
-    "name": "testnet"
+    "name": "testnet",
+    "priceBackendUrl": "https://testnet-yoroi-coin-price-feed.yoroiwallet.com"
   },
   "app": {
     "walletRefreshInterval": 20000,
@@ -12,6 +13,11 @@
     "logsFileSuffix": "-yoroi-testnet.log",
     "addressScanSize": 20,
     "addressRequestSize": 50,
-    "txsBodiesRequestSize": 150
+    "txsBodiesRequestSize": 150,
+    "coinPriceRefreshInterval": 60000,
+    "coinPriceFreshnessThreshold": 120000,
+    "coinPriceRequestRetryDelay": 10000,
+    "pubKeyData": "43d0c0e05acfd2608dd392ad7add6b8a41a3d182387f3ee17f1e9b165c2431680000000000000000000000000000000000000000000000000000000000000000",
+    "pubKeyMaster": "ab9e4f1c4d996a0e9cdda8546bf5ee1dd8397fd7ab287c331ff171c7e4e0e9e20000000000000000000000000000000000000000000000000000000000000000"
   }
 }
