@@ -1,7 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import React from 'react';
 import MainLayout from '../MainLayout';
 import TopBarContainer from '../TopBarContainer';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
@@ -33,33 +32,32 @@ const useIframeMessageReceiver = () => {
   }, []);
 };
 
-@observer
-export default class Staking extends Component<InjectedContainerProps> {
+const Staking = (props: InjectedContainerProps) => {
+  const iframeRef = React.useRef(null);
+  const { actions, stores, children } = props;
+  const { profile } = stores;
+  const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
 
-  render() {
-    const iframeRef = React.useRef(null);
-    const { actions, stores, children } = this.props;
-    const { profile } = stores;
-    const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
+  useIframeMessageReceiver();
 
-    useIframeMessageReceiver();
-
-    const seizaUrl = process.env.SEIZA_FOR_YOROI_URL;
-    if (seizaUrl == null) {
-      throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
-    }
-    return (
-      <MainLayout
-        topbar={topbarContainer}
-        // TODO: Check Seiza server connection
-        connectionErrorType="healthy"
-        classicTheme={profile.isClassicTheme}
-        actions={actions}
-        stores={stores}
-      >
-        <iframe ref={iframeRef} title="Staking" src={`${seizaUrl}/staking?locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />;
-        {children}
-      </MainLayout>
-    );
+  const seizaUrl = process.env.SEIZA_FOR_YOROI_URL;
+  if (seizaUrl == null) {
+    throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
   }
-}
+  return (
+    <MainLayout
+      topbar={topbarContainer}
+      // TODO: Check Seiza server connection
+      connectionErrorType="healthy"
+      classicTheme={profile.isClassicTheme}
+      actions={actions}
+      stores={stores}
+    >
+      <iframe ref={iframeRef} title="Staking" src={`${seizaUrl}/staking?locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />;
+      {children}
+    </MainLayout>
+  );
+
+};
+
+export default Staking;
