@@ -17,25 +17,28 @@ function getVersion(): string {
     : manifest;
   return content.version;
 }
-export const environment = (Object.assign({
-  /** Network used to connect */
-  NETWORK: CONFIG.network.name,
-  version: getVersion(),
-  /** Environment used during webpack build */
-  env_type: process.env.NODE_ENV,
+export const environment = ((
+  {
+    ...process.env,
+    /** Network used to connect */
+    NETWORK: CONFIG.network.name,
+    version: getVersion(),
+    /** Environment used during webpack build */
+    env_type: process.env.NODE_ENV,
 
-  API: ('ada': Currency), // Note: can't change at runtime
-  MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
-  commit: process.env.COMMIT || '',
-  branch: process.env.BRANCH || '',
-  isDev: () => CONFIG.network.name === NetworkType.DEVELOPMENT,
-  isTest: () => CONFIG.network.name === NetworkType.TEST,
-  isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
-  isAdaApi: () => environment.API === 'ada',
-  walletRefreshInterval: CONFIG.app.walletRefreshInterval,
-  serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
-  userAgentInfo,
-}, process.env): {
+    API: ('ada': Currency), // Note: can't change at runtime
+    MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
+    commit: process.env.COMMIT || '',
+    branch: process.env.BRANCH || '',
+    isDev: () => CONFIG.network.name === NetworkType.DEVELOPMENT,
+    isTest: () => CONFIG.network.name === NetworkType.TEST,
+    isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
+    isAdaApi: () => environment.API === 'ada',
+    walletRefreshInterval: CONFIG.app.walletRefreshInterval,
+    serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
+    userAgentInfo,
+  }
+): {
   NETWORK: Network,
   version: string,
   env_type: ?string,

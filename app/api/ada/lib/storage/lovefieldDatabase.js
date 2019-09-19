@@ -185,11 +185,10 @@ export const getAddressesListByType = (
     .groupBy(addressesTable[addressesTableSchema.properties.id])
     .exec()
     // Note: not good separation of concerns that we use this function to also calculate isUsed
-    .then(rows => rows.map(row => Object.assign(
-      {},
-      row[addressesTableSchema.name][addressesTableSchema.properties.value],
-      { cadIsUsed: !!row.timesUsed }
-    )));
+    .then(rows => rows.map(row => ({
+      ...row[addressesTableSchema.name][addressesTableSchema.properties.value],
+      cadIsUsed: !!row.timesUsed,
+    })));
 };
 
 export const saveAddresses = async (
