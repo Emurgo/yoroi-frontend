@@ -51,19 +51,15 @@ export default class WalletsStore extends Store {
     name: string,
     password: string,
   }) => {
-    try {
-      const recoveryPhrase = await (
-        this.generateWalletRecoveryPhraseRequest.execute({}).promise
-      );
-      if (recoveryPhrase != null) {
-        this.actions.walletBackup.initiateWalletBackup.trigger({
-          recoveryPhrase,
-          name: params.name,
-          password: params.password,
-        });
-      }
-    } catch (error) {
-      throw error;
+    const recoveryPhrase = await (
+      this.generateWalletRecoveryPhraseRequest.execute({}).promise
+    );
+    if (recoveryPhrase != null) {
+      this.actions.walletBackup.initiateWalletBackup.trigger({
+        recoveryPhrase,
+        name: params.name,
+        password: params.password,
+      });
     }
   };
 
