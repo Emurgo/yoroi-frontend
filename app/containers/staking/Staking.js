@@ -3,8 +3,12 @@
 import React from 'react';
 import MainLayout from '../MainLayout';
 import TopBarContainer from '../TopBarContainer';
+import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
-const prettifyReceivedPools = (pools) => {
+const prettifyReceivedPools = (pools: Array<{
+  name: string,
+  poolHash: string,
+}>) => {
   return pools.map(({ name, poolHash }) => `${name}\n${poolHash}\n`)
     .join('\n');
 };
@@ -28,7 +32,7 @@ const useIframeMessageReceiver = () => {
   }, []);
 };
 
-const Staking = (props) => {
+const Staking = (props: InjectedContainerProps) => {
   const iframeRef = React.useRef(null);
   const { actions, stores, children } = props;
   const { profile } = stores;
@@ -36,16 +40,20 @@ const Staking = (props) => {
 
   useIframeMessageReceiver();
 
+  const seizaUrl = process.env.SEIZA_FOR_YOROI_URL;
+  if (seizaUrl == null) {
+    throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
+  }
   return (
     <MainLayout
       topbar={topbarContainer}
       // TODO: Check Seiza server connection
-      // connectionErrorType={checkSeizaServerStatus}
+      connectionErrorType="healthy"
       classicTheme={profile.isClassicTheme}
       actions={actions}
       stores={stores}
     >
-      <iframe ref={iframeRef} title="Staking" src={`${process.env.SEIZA_FOR_YOROI_URL}/staking?locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />;
+      <iframe ref={iframeRef} title="Staking" src={`${seizaUrl}/staking?locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />;
       {children}
     </MainLayout>
   );
