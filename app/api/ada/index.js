@@ -764,6 +764,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(pendingTxs));
       return Promise.all(pendingTxs.map(async data => {
         const { type, amount, fee } = await _getTxFinancialInfo(data);
+        const tickers = await getCachedPriceData(data.ctMeta.ctmDate);
         return _createTransactionFromServerData(data, type, amount, fee, lastBlockNumber, tickers);
       }));
     } catch (error) {
