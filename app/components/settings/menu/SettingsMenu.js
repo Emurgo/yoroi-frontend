@@ -28,10 +28,6 @@ const messages = defineMessages({
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
   },
-  adaRedemption: {
-    id: 'settings.menu.adaRedemption.link.label',
-    defaultMessage: '!!!Ada Redemption',
-  }
 });
 
 type Props = {|

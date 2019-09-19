@@ -156,7 +156,6 @@
     "mobx-react-router": "4.0.7",
     "moment": "2.21.0",
     "pbkdf2": "3.0.17",
-    "pdfjs-dist": "2.1.266",
     "qr-image": "3.2.0",
     "qrcode.react": "0.9.3",
     "react": "16.9.0",
