@@ -387,7 +387,7 @@
   "wallet.restore.dialog.title.paper.label": "Restaurar carteira de papel Yoroi",
   "wallet.restore.dialog.title.verify.label": "Verifique a carteira Yoroi",
   "wallet.restore.dialog.title.verify.paper.label": "Verifique a carteira de papel Yoroi",
-  "wallet.restore.dialog.verify.accountId.label": "Your Wallet Account checksum:",
+  "wallet.restore.dialog.verify.accountId.label": "Verifique a soma de suas carteiras:",
   "wallet.restore.dialog.verify.addressesLabel": "Your Wallet address[es]:",
   "wallet.restore.dialog.verify.intro.line1": "Be careful about wallet restoration:",
   "wallet.restore.dialog.verify.intro.line2": "Make sure account checksum and icon match what you remember.",
