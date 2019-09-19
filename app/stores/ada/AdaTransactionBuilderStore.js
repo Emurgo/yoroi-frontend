@@ -22,7 +22,7 @@ export default class AdaTransactionBuilderStore extends Store {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfo: Array<{ ...$Shape<TxOutType> }>;
+  @observable plannedTxInfo: Array<{ ...Inexact<TxOutType> }>;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | BaseSignRequest;
   /** Stores the tx that will be sent if the user confirms sending */
