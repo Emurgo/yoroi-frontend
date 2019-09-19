@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
-
+import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
@@ -17,6 +17,7 @@ import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 // Web Wallet Confirmation
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
+import ConnectExternalStorageDialog from '../../components/wallet/memos/ConnectExternalStorageDialog';
 import {
   formattedWalletAmount,
   formattedAmountToNaturalUnits,
@@ -63,11 +64,24 @@ const messagesTrezor = defineMessages({
 
 
 type Props = InjectedProps;
+
+type State = {
+  showMemo: boolean,
+};
+
 @observer
-export default class WalletSendPage extends Component<Props> {
+export default class WalletSendPage extends Component<Props, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
+  };
+
+  state = {
+    showMemo: false,
+  };
+
+  toggleShowMemo = () => {
+    this.setState(prevState => ({ showMemo: !prevState.showMemo }));
   };
 
   render() {
@@ -77,7 +91,7 @@ export default class WalletSendPage extends Component<Props> {
     if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
 
     const { intl } = this.context;
-    const { uiDialogs, profile } = this.props.stores;
+    const { uiDialogs, profile, memos } = this.props.stores;
     const { actions } = this.props;
     const { isValidAddress } = wallets;
     const { validateAmount, hasAnyPending } = transactions;
@@ -113,6 +127,7 @@ export default class WalletSendPage extends Component<Props> {
           classicTheme={profile.isClassicTheme}
           updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
           updateAmount={(value: void | number) => txBuilderActions.updateAmount.trigger(value)}
+          updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
           toggleSendAll={() => txBuilderActions.toggleSendAll.trigger()}
           fee={transactionBuilderStore.fee}
@@ -121,6 +136,14 @@ export default class WalletSendPage extends Component<Props> {
           error={transactionBuilderStore.createUnsignedTx.error}
           uriParams={this.props.stores.loading.uriParams}
           resetUriParams={this.props.stores.loading.resetUriParams}
+          showMemo={this.state.showMemo}
+          onAddMemo={() => {
+            if (memos.hasSetSelectedExternalStorageProvider) {
+              this.toggleShowMemo();
+            } else {
+              this.openConnectExternalStorageDialog();
+            }
+          }}
         />
         {this.renderDialog()}
       </div>
@@ -135,6 +158,9 @@ export default class WalletSendPage extends Component<Props> {
     }
     if (uiDialogs.isOpen(HWSendConfirmationDialog)) {
       return this.hardwareWalletDoConfirmation();
+    }
+    if (uiDialogs.isOpen(ConnectExternalStorageDialog)) {
+      return this.connectExternalStorageDialog();
     }
     return '';
   }
@@ -235,4 +261,21 @@ export default class WalletSendPage extends Component<Props> {
 
     return hwSendConfirmationDialog;
   };
+
+  connectExternalStorageDialog = (): Node => {
+    const { actions, stores } = this.props;
+    return (<ConnectExternalStorageDialog
+      onCancel={actions.memos.closeConnectExternalStorageDialog.trigger}
+      onConnect={() => {
+        actions.memos.closeConnectExternalStorageDialog.trigger();
+        actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+      }}
+      classicTheme={stores.profile.isClassicTheme}
+    />);
+  }
+
+  openConnectExternalStorageDialog = (): void => {
+    const { actions } = this.props;
+    actions.dialogs.open.trigger({ dialog: ConnectExternalStorageDialog });
+  }
 }

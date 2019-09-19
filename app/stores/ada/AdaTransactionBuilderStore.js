@@ -35,12 +35,15 @@ export default class AdaTransactionBuilderStore extends Store {
   @observable createUnsignedTx: LocalizedRequest<CreateUnsignedTxFunc>
     = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx);
 
+  @observable memo: void | string;
+
   setup() {
     super.setup();
     this._reset();
     const actions = this.actions.ada.txBuilderActions;
     actions.updateReceiver.listen(this._updateReceiver);
     actions.updateAmount.listen(this._updateAmount);
+    actions.updateMemo.listen(this._updateMemo);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.toggleSendAll.listen(this._toggleSendAll);
     actions.reset.listen(this._reset);
@@ -199,6 +202,11 @@ export default class AdaTransactionBuilderStore extends Store {
   }
 
   @action
+  _updateMemo = (content: void | string) => {
+    this.memo = content;
+  }
+
+  @action
   _updateTentativeTx = () => {
     if (!this.plannedTx) {
       this.tentativeTx = null;
@@ -211,6 +219,7 @@ export default class AdaTransactionBuilderStore extends Store {
   _reset = async () => {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.shouldSendAll = false;
+    this.memo = '';
 
     // creation of unsigned tx may still be running when we try and reset
     // we need to wait for it to finish then clear the result since we can't cancel the promise
