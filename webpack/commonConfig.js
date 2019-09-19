@@ -5,6 +5,7 @@ const ConfigWebpackPlugin = require('config-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
+const manifestEnvs = require('../chrome/manifestEnvs');
 
 const plugins = (folder) => ([
   /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
@@ -152,7 +153,7 @@ const definePlugin = (networkName, isProd) => ({
     NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
     BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
-    SEIZA_FOR_YOROI_URL: JSON.stringify(process.env.SEIZA_FOR_YOROI_URL || 'http://localhost:3001'),
+    SEIZA_FOR_YOROI_URL: JSON.stringify(manifestEnvs.SEIZA_FOR_YOROI_URL),
   }
 });
 

@@ -1,3 +1,5 @@
+// @flow
+
 import React from 'react';
 import MainLayout from '../MainLayout';
 import TopBarContainer from '../TopBarContainer';
@@ -11,6 +13,7 @@ const messageHandler = (event) => {
   if (event.origin !== process.env.SEIZA_FOR_YOROI_URL) return;
   console.log('Received message from Seiza:', event.data);
 
+  // eslint-disable-next-line no-alert
   alert('You have selected following pools:\n' + prettifyReceivedPools(event.data));
 };
 
