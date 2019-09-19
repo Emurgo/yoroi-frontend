@@ -136,7 +136,6 @@
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "1.0.7",
     "@download/blockies": "1.0.3",
-    "aes-js": "3.1.2",
     "axios": "0.19.0",
     "bignumber.js": "9.0.0",
     "bip39": "3.0.2",

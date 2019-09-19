@@ -8,10 +8,6 @@ const messages = defineMessages({
     id: 'api.errors.WalletAlreadyImportedError',
     defaultMessage: '!!!Wallet you are trying to import already exists.',
   },
-  redeemAdaError: {
-    id: 'api.errors.RedeemAdaError',
-    defaultMessage: '!!!Your ADA could not be redeemed correctly.',
-  },
   walletFileImportError: {
     id: 'api.errors.WalletFileImportError',
     defaultMessage: '!!!Wallet could not be imported, please make sure you are providing a correct file.',
@@ -151,15 +147,6 @@ export class WalletAlreadyImportedError extends LocalizableError {
     super({
       id: messages.walletAlreadyImportedError.id,
       defaultMessage: messages.walletAlreadyImportedError.defaultMessage || '',
-    });
-  }
-}
-
-export class RedeemAdaError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.redeemAdaError.id,
-      defaultMessage: messages.redeemAdaError.defaultMessage || '',
     });
   }
 }

@@ -5,7 +5,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
-import environment from '../../../environment';
 import type { Theme } from '../../../themes';
 
 const messages = defineMessages({
@@ -52,7 +51,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, } = this.props;
 
     return (
       <div className={styles.componentWrapper}>
@@ -96,18 +95,6 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
           />
-
-          {(!environment.isMainnet() || currentLocale === 'ko-KR' || currentLocale === 'ja-JP') &&
-            // all unredemed Ada is held being either Japanese or Korean people
-            // avoid showing this menu option to all users to avoid confusing them
-            <SettingsMenuItem
-              label={intl.formatMessage(messages.adaRedemption)}
-              onClick={() => onItemClick(ROUTES.SETTINGS.ADA_REDEMPTION)}
-              active={isActiveItem(ROUTES.SETTINGS.ADA_REDEMPTION)}
-              className="adaRedemption"
-            />
-          }
-
         </div>
       </div>
     );
