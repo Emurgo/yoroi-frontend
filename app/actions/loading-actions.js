@@ -1,7 +1,7 @@
 // @flow
 import Action from './lib/Action';
 
-// ======= PROFILE ACTIONS =======
+// ======= LOADING ACTIONS =======
 
 export default class LoadingActions {
   redirect: Action<void> = new Action();

@@ -77,6 +77,7 @@ import type {
   AdaAssurance,
   BaseSignRequest,
   UnsignedTxResponse,
+  TransactionMemo,
 } from './adaTypes';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -109,6 +110,8 @@ import {
   getTxsOrderedByDateDesc,
   getTxsOrderedByLastUpdateDesc,
   saveTxs,
+  saveTxMemos,
+  deleteTxMemos,
   loadLovefieldDB,
   reset,
   importLovefieldDatabase,
@@ -383,6 +386,26 @@ export type SaveTxResponse = void;
 export type SaveTxFunc = (
   request: SaveTxRequest
 ) => Promise<SaveTxResponse>;
+
+// saveTxMemos
+
+export type SaveTxMemoRequest = {
+  memos: Array<TransactionMemo>,
+};
+export type SaveTxMemoResponse = void;
+export type SaveTxMemoFunc = (
+  request: SaveTxMemoRequest
+) => Promise<SaveTxMemoResponse>;
+
+// deleteTxMemos
+
+export type DeleteTxMemoRequest = {
+  memos: Array<string>,
+};
+export type DeleteTxMemoResponse = void;
+export type DeleteTxMemoFunc = (
+  request: DeleteTxMemoRequest
+) => Promise<DeleteTxMemoResponse>;
 
 // getSelectedExplorer
 
@@ -1021,6 +1044,28 @@ export default class AdaApi {
     }
   }
 
+  async saveTxMemos(
+    request: SaveTxMemoRequest
+  ): Promise<void> {
+    try {
+      await saveTxMemos(request);
+    } catch (error) {
+      Logger.error('AdaApi::saveTxMemo error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async deleteTxMemos(
+    request: DeleteTxMemoRequest
+  ): Promise<void> {
+    try {
+      await deleteTxMemos({ tx: request });
+    } catch (error) {
+      Logger.error('AdaApi::deleteTxMemo error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
   async getSelectedExplorer(
     _request: GetSelectedExplorerRequest
   ): Promise<GetSelectedExplorerResponse> {
@@ -1641,7 +1686,8 @@ const _createTransactionFromServerData = action(
         from: data.ctInputs.map(address => address[0]),
         to: data.ctOutputs.map(address => address[0])
       },
-      state: _conditionToTxState(data.ctCondition)
+      state: _conditionToTxState(data.ctCondition),
+      memo: data.memo
     });
   }
 );

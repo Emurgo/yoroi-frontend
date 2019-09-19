@@ -19,7 +19,7 @@ import GeneralSettingsPage from './containers/settings/categories/GeneralSetting
 import PaperWalletPage from './containers/settings/categories/PaperWalletPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
 import ExternalStorageSettingsPage from './containers/settings/categories/ExternalStorageSettingsPage';
-import OauthDropboxPage from './containers/settings/categories/OauthDropboxPage';
+import OAuthDropboxPage from './containers/settings/categories/OAuthDropboxPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 
@@ -104,7 +104,7 @@ export const Routes = (
       <Route
         exact
         path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
-        component={(props) => <OauthDropboxPage {...props} stores={stores} actions={actions} />}
+        component={(props) => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
       />
       <Redirect to={ROUTES.WALLETS.ADD} />
     </Switch>

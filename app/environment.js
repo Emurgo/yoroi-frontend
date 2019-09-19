@@ -10,6 +10,12 @@ declare var CONFIG: ConfigType;
 
 declare type Currency = 'ada';
 
+function getBaseUrl() {
+  const location = window.location.href;
+  const index = location.indexOf('#');
+  return (index === -1) ? location : location.substr(0, index).replace(/\/$/, '');
+}
+
 export const environment = (Object.assign({
   /** Network used to connect */
   NETWORK: CONFIG.network.name,
@@ -28,6 +34,7 @@ export const environment = (Object.assign({
   walletRefreshInterval: CONFIG.app.walletRefreshInterval,
   serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
   userAgentInfo,
+  baseUrl: getBaseUrl(),
 }, process.env): {
   NETWORK: Network,
   version: string,
@@ -42,7 +49,8 @@ export const environment = (Object.assign({
   isAdaApi: void => boolean,
   walletRefreshInterval: number,
   serverStatusRefreshInterval: number,
-  userAgentInfo: UserAgentInfo
+  userAgentInfo: UserAgentInfo,
+  baseUrl: string,
 });
 
 export default environment;

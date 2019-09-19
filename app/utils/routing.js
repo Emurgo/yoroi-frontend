@@ -126,3 +126,8 @@ export const handleExternalLinkClick = (event: MouseEvent) => {
     window.open(target.href, '_blank');
   }
 };
+
+/** open a link from an element other than an anchor */
+export const handleExternalClick = (link: string) => {
+  window.open(link);
+};

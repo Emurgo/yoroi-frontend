@@ -112,6 +112,7 @@ export type AdaTransaction = {
   },
   ctOutputs: Array<AdaTransactionInputOutput>,
   ctCondition: AdaTransactionCondition,
+  memo?: string,
 };
 
 export type AdaTransactionInputOutput = [
@@ -190,3 +191,8 @@ export type PDF = {
 }
 
 export type AddressType = "External" | "Internal";
+
+export type TransactionMemo = {
+  memo: string,
+  tx: string
+}
