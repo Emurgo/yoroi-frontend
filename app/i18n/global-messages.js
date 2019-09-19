@@ -349,6 +349,10 @@ const globalMessages = defineMessages({
     id: 'daedalusTransfer.instructions.attention.title',
     defaultMessage: '!!!Transfer all funds from'
   },
+  invalidMemo: {
+    id: 'wallet.transaction.memo.invalid',
+    defaultMessage: '!!!Wallet name requires at least 1 and at most 40 letters.',
+  },
 });
 export default globalMessages;
 

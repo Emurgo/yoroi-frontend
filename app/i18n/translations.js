@@ -16,7 +16,7 @@ export const LANGUAGES = [
   {
     value: 'en-US',
     label: globalMessages.languageEnglish,
-    svg: require('../assets/images/flags/english.inline.svg') 
+    svg: require('../assets/images/flags/english.inline.svg')
   },
   {
     value: 'ja-JP',
