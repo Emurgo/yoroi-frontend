@@ -61,17 +61,25 @@ export function getAddressesKeys(payload: {
   }
 }
 
-/** Generate transaction including all addresses with no change */
-export async function generateTransferTx(payload: {
-  outputAddr: string,
-  addressKeys: AddressKeyMap,
-  getUTXOsForAddresses: AddressUtxoFunc,
-}): Promise<TransferTx> {
-  const { outputAddr, addressKeys, getUTXOsForAddresses } = payload;
+/**
+ Generate transaction including all addresses with no change.
+ If filterSenders is true, only include addresses that have outstanding
+ UTXOs in the senders property.
+*/
+export async function generateTransferTx(
+  payload: {
+    outputAddr: string,
+    addressKeys: AddressKeyMap,
+    getUTXOsForAddresses: AddressUtxoFunc,
+    filterSenders?: boolean
+  }
+): Promise<TransferTx> {
+  const { outputAddr, addressKeys, getUTXOsForAddresses, filterSenders = false } = payload;
 
   // fetch data to make transaction
   const senders = Object.keys(addressKeys);
   const senderUtxos = await getUTXOsForAddresses({ addresses: senders });
+
   if (_.isEmpty(senderUtxos)) {
     const error = new NoInputsError();
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
@@ -82,17 +90,25 @@ export async function generateTransferTx(payload: {
     addressKeys,
     senderUtxos,
     outputAddr,
+    filterSenders,
   });
 }
 
-/** Generate transaction including all addresses with no change */
-export async function buildTransferTx(payload: {
-  addressKeys: AddressKeyMap,
-  senderUtxos: Array<UTXO>,
-  outputAddr: string,
-}): Promise<TransferTx> {
+/**
+  Generate transaction including all addresses with no change.
+  If filterSenders is true, only include addresses that have outstanding
+  UTXOs in the senders property.
+*/
+export async function buildTransferTx(
+  payload: {
+    addressKeys: AddressKeyMap,
+    senderUtxos: Array<UTXO>,
+    outputAddr: string,
+    filterSenders?: boolean
+  }
+): Promise<TransferTx> {
   try {
-    const { addressKeys, senderUtxos, outputAddr } = payload;
+    const { addressKeys, senderUtxos, outputAddr, filterSenders = false } = payload;
 
     const totalBalance = senderUtxos
       .map(utxo => new BigNumber(utxo.amount))
@@ -126,12 +142,17 @@ export async function buildTransferTx(payload: {
 
     const signedTx = txFinalizer.finalize();
 
+    let senders = Object.keys(addressKeys);
+
+    if (filterSenders) {
+      senders = senders.filter(addr => senderUtxos.some(({ receiver }) => receiver === addr));
+    }
     // return summary of transaction
     return {
       recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
       fee: fee.dividedBy(LOVELACES_PER_ADA),
       signedTx,
-      senders: Object.keys(addressKeys),
+      senders,
       receiver: outputAddr,
     };
   } catch (error) {

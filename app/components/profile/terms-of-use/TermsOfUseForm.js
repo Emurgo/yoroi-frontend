@@ -10,24 +10,21 @@ import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import TermsOfUseText from './TermsOfUseText';
 import styles from './TermsOfUseForm.scss';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   checkboxLabel: {
     id: 'profile.termsOfUse.checkboxLabel',
     defaultMessage: '!!!I agree with the terms of use',
   },
-  submitLabel: {
-    id: 'profile.termsOfUse.submitLabel',
-    defaultMessage: '!!!Continue',
-  },
 });
 
-type Props = {
+type Props = {|
   localizedTermsOfUse: string,
   onSubmit: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 type State = {
   areTermsOfUseAccepted: boolean,
@@ -82,7 +79,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
 
             <Button
               className={buttonClasses}
-              label={intl.formatMessage(messages.submitLabel)}
+              label={intl.formatMessage(globalMessages.continue)}
               onMouseUp={this.submit}
               disabled={!areTermsOfUseAccepted}
               skin={ButtonSkin}

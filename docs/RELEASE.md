@@ -7,9 +7,9 @@ To create a release candidate you must compress a local build.
 Zip files can be shared
 
 ```bash
-# compress build folder to {manifest.name}.zip and crx
-$ npm run build -- --env "${network}"
-$ npm run compress -- --env "${network}" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx"
+# compress build folder to {manifest.name}.zip
+# if CARDANO_NETWORK is not provided, it defaults to "testnet"
+$ CARDANO_NETWORK=staging npm run build-compress
 ```
 
 ## (Chrome) Signed build

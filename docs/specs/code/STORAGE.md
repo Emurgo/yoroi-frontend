@@ -47,7 +47,7 @@ Ex: A Derived Account wallet is one with accounts all being derived from a known
 * Root level = 0
 * Purpose level = 1
 * [...]
-* Account level = 5
+* Address level = 5
 
 The reason we pick this order is because although bip44 mandates levels `[0,5]`, any cryptocurrency could use more or less levels. That means the number of derivations is unbounded to the right and the following is entirely possible
 ```
@@ -134,6 +134,8 @@ Note: we don't enfroce a checksum in the storage layer. Deciding whether or not 
 ### Bip44Derivation Table
 
 This table represents a specific instance of a derivation level. We need this to represent the relation between a private key and a public key, and also need this to store whether or not a level is hardened.
+
+Note: You can implicitly figure out if a derivation is hardened or not by the index. However, we have no index in the ad-hoc case so it needs to be stored explicitly somewhere and this felt like an appropriate places.
 
 Note: This allows our storage to represent any combination of hardened & unhardened levels for a wallet and not just the one recommended by bip44.
 

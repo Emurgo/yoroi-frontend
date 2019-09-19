@@ -8,12 +8,11 @@ import type {
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
-  FilterUsedRequest, FilterUsedResponse
+  FilterUsedRequest, FilterUsedResponse,
+  ServerStatusResponse
 } from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
 import mockImporter from './mockImporter';
-
-const middlewares = [...defaults(), bodyParser];
 
 const port = 8080;
 
@@ -51,6 +50,9 @@ function _defaultSignedTransaction(
 
 let MockServer = null;
 
+export const signedTransactionHandler = [];
+export const utxoForAddressesHook = [];
+
 export function getMockServer(
   settings: {
     signedTransaction?: (
@@ -61,10 +63,14 @@ export function getMockServer(
         send(arg: SignedResponse): any,
         status: Function
       }
-    ) => void
+    ) => void,
+    // Whether to output request logs. Defaults to false.
+    outputLog?: boolean
   }
 ) {
   if (!MockServer) {
+    const middlewares = [...defaults({ logger: !!settings.outputLog }), bodyParser];
+
     const server = create();
 
     server.use(middlewares);
@@ -77,13 +83,16 @@ export function getMockServer(
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
       const utxoForAddresses = mockImporter.utxoForAddresses();
-      const filteredUtxos = Object.keys(utxoForAddresses)
+      let filteredUtxos = Object.keys(utxoForAddresses)
         .filter(addr => req.body.addresses.includes(addr))
         .map(addr => utxoForAddresses[addr])
         .reduce((utxos, arr) => {
           utxos.push(...arr);
           return utxos;
         }, []);
+      if (utxoForAddressesHook.length) {
+        filteredUtxos = utxoForAddressesHook.pop()(filteredUtxos);
+      }
       res.send(filteredUtxos);
     });
 
@@ -127,8 +136,20 @@ export function getMockServer(
       res.send(filteredTxs.slice(0, txsLimit));
     });
 
-    server.post('/api/txs/signed', settings.signedTransaction ?
-      settings.signedTransaction : _defaultSignedTransaction);
+    server.post('/api/txs/signed', (
+      req: {
+        body: SignedRequest
+      },
+      res: { send(arg: SignedResponse): any, status: Function }
+    ): void => {
+      if (signedTransactionHandler.length) {
+        signedTransactionHandler.pop()(req, res);
+      } else if (settings.signedTransaction) {
+        settings.signedTransaction(req, res);
+      } else {
+        _defaultSignedTransaction(req, res);
+      }
+    });
 
     server.post('/api/addresses/filterUsed', (
       req: {
@@ -140,6 +161,14 @@ export function getMockServer(
       const filteredAddresses = req.body.addresses
         .filter((address) => usedAddresses.has(address));
       res.send(filteredAddresses);
+    });
+
+    server.get('/api/status', (
+      req,
+      res: { send(arg: ServerStatusResponse): any }
+    ): void => {
+      const isServerOk = mockImporter.getApiStatus();
+      res.send({ isServerOk });
     });
 
     MockServer = server.listen(port, () => {

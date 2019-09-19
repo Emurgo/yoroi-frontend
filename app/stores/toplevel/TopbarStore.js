@@ -1,82 +1,56 @@
 // @flow
-import { observable, action } from 'mobx';
+import { observable, computed, action } from 'mobx';
 import Store from '../base/Store';
-import resolver from '../../utils/imports';
 import environment from '../../environment';
-import { Logger } from '../../utils/logging';
+import type { Category } from '../../config/topbarConfig';
 import {
-  WITH_LEDGER_NANO_S_CATEGORIE as WITH_LEDGER_NANO_S,
-  WITH_TREZOR_T_CATEGORIE as WITH_TREZOR_T,
-  GO_BACK_CATEGORIE as GO_BACK,
-  WALLETS_CATEGORIE as WALLETS,
+  WITH_LEDGER_NANO_S,
+  WITH_TREZOR_T,
+  GO_BACK,
+  WALLETS,
+  CURRENCY_SPECIFIC_CATEGORIES,
+  SETTINGS
 } from '../../config/topbarConfig';
 
-const topbarConfig = resolver('config/topbarConfig');
-
 export default class TopbarStore extends Store {
-  CATEGORIES = [...topbarConfig.CATEGORIES];
 
   @observable activeTopbarCategory: string = WALLETS.route;
 
   setup() {
-    const actions = this.actions.topbar;
-    actions.activateTopbarCategory.listen(this._onActivateTopbarCategory);
-    actions.walletSelected.listen(this._onWalletSelected);
+    this.isActiveCategory = this.isActiveCategory.bind(this);
+    this.actions.topbar.activateTopbarCategory.listen(this._onActivateTopbarCategory);
+    this.actions.topbar.walletSelected.listen(this._onWalletSelected);
     this.registerReactions([
       this._syncTopbarRouteWithRouter,
     ]);
   }
 
-  /** Dynamic Initialization of Topbar Categories */
-  @action updateCategories(): void {
+  @computed get categories(): Array<Category> {
     const { wallets } = this.stores.substores[environment.API];
-    // set it to the default
-    this.CATEGORIES = [...topbarConfig.CATEGORIES];
-
-    // For rare of the rare case, make sure wallets store is initialized
-    if (wallets) {
-      // If active wallet is TrezorTWallet then show with Trezor T Icon
-      if (wallets.first && wallets.first.isTrezorTWallet) {
-        this.CATEGORIES.push(WITH_TREZOR_T);
-      }
-
-      // If active wallet is LedgerNanoSWallet then show with Ledger Nano S Icon
-      if (wallets.first && wallets.first.isLedgerNanoSWallet) {
-        this.CATEGORIES.push(WITH_LEDGER_NANO_S);
-      }
-
-      // If there is not any active wallets then replace WALLETS Category by GO_BACK Category
-      if (!wallets.hasAnyLoaded) {
-        // eslint-disable-next-line arrow-body-style
-        const walletCategoryIndex = this.CATEGORIES.findIndex((item) => {
-          return item.name === WALLETS.name;
-        });
-        this.CATEGORIES[walletCategoryIndex] = GO_BACK;
-      }
-    } else {
-      Logger.warn('TopbarStore::updateCategories::Wallets store is not ready yet');
-    }
+    return [
+      (wallets && !wallets.hasAnyLoaded) ? GO_BACK : WALLETS,
+      ...(
+        wallets && wallets.first &&
+        wallets.first.isTrezorTWallet) ? [WITH_TREZOR_T] : [],
+      ...(
+        wallets && wallets.first &&
+        wallets.first.isLedgerNanoSWallet) ? [WITH_LEDGER_NANO_S] : [],
+      SETTINGS,
+      ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
+    ];
   }
 
-  /** Reset Categories to defaults */
-  @action _resetCategories(): void {
-    this.CATEGORIES = [...topbarConfig.CATEGORIES];
-    this.activeTopbarCategory = WALLETS.route;
-  }
+  // @computed decorator for methods with parameters are not supported in this
+  // version of mobx. Instead, making a regular function that calls `computed`
+  isActiveCategory = category => computed(
+    () => this.activeTopbarCategory && this.activeTopbarCategory === category.route
+  ).get();
 
   @action _onActivateTopbarCategory = (
     params: { category: string, }
   ): void => {
     const { category } = params;
     if (category !== this.activeTopbarCategory) {
-
-      // Resetting Categories to defaults, as Categories are originally designed to be static
-      // but for making it dynamic this is the patch
-      if (category === GO_BACK.route) {
-        this._resetCategories();
-      }
-
-      this.activeTopbarCategory = category;
       this.actions.router.goToRoute.trigger({ route: category });
     }
   };
@@ -95,8 +69,9 @@ export default class TopbarStore extends Store {
 
   _syncTopbarRouteWithRouter = (): void => {
     const route = this.stores.app.currentRoute;
-    this.CATEGORIES.forEach((category) => {
-      // If the current route starts with the root of the category
+    this.categories.forEach((category) => {
+      // If the current route starts with the route of the category
+      // E.g. category could be settings, and route could be settings/general
       if (route.indexOf(category.route) === 0) this._setActivateTopbarCategory(category.route);
     });
   };

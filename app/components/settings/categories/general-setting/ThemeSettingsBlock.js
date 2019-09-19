@@ -4,12 +4,11 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../themes';
 import type { Theme } from '../../../../themes';
 import ThemeThumbnail from '../display/ThemeThumbnail';
-import environment from '../../../../environment';
 
 const messages = defineMessages({
   themeLabel: {
@@ -50,14 +49,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   currentTheme: Theme,
   selectTheme: Function,
   exportTheme: Function,
   getThemeVars: Function,
   hasCustomTheme: Function,
   onExternalLinkClick: Function,
-};
+|};
 
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
@@ -94,6 +93,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
 
     const blogLink = (
       <a
+        className={styles.link}
         href={intl.formatMessage(messages.blogLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
@@ -108,7 +108,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
           {intl.formatMessage(messages.themeLabel)}
         </h2>
 
-        <p>{intl.formatMessage(messages.themeNote)}</p>
+        <p><FormattedHTMLMessage {...messages.themeNote} /></p>
         <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
 
         <div className={styles.main}>

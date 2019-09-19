@@ -1,0 +1,9 @@
+{
+  "test-USER-LOCALE":"en-US",
+  "WALLET":"{\"adaWallet\":{\"cwAmount\":{\"getCCoin\":\"0\"},\"cwId\":\"1\",\"cwMeta\":{\"cwAssurance\":\"CWANormal\",\"cwName\":\"simple-pending-wallet\",\"cwUnit\":0},\"cwType\":\"CWTWeb\",\"cwPassphraseLU\":\"2019-07-09T19:47:26-04:00\"},\"masterKey\":\"8a4dbdad82d03b56c76d5b3184970860da7c255a89657331b1a102e4d27a71c0e9e190bb311486b32e3f36c7366b8084c7f9d58bf3bd55adadf4da2756248444063fecd7805563d424e1aab7654b698985ee07e3505119aaab873295a30b232dbff339fd4be60f96f773353becae11905522f991c326977e73eb2db8b00a7ec786073416fec438d1424b953e486babfa5e357080a59f7c2a15a48eb2\",\"lastReceiveAddressIndex\":0}",
+  "test-URI-SCHEME-ACCEPTANCE":"true",
+  "openTabId":"1562716041656",
+  "ACCOUNT":"{\"account\":0,\"root_cached_key\":\"6951f47ec8272208e970de38c55c0098d064ee3eb0161e769e61166ac72b029cef0caf73f59803dd7e9b187274da2933d1e0f0613eff3ac571003816bfb5eccb\",\"derivation_scheme\":\"V2\"}",
+  "test-LAST-LAUNCH-VER":"1.9.0",
+  "test-TERMS-OF-USE-ACCEPTANCE":"true"
+}

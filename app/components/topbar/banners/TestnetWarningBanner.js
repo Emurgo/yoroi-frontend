@@ -16,8 +16,8 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
-};
+type Props = {|
+|};
 
 @observer
 export default class TestnetWarningBanner extends Component<Props> {

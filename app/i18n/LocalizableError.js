@@ -19,7 +19,7 @@ const messages = defineMessages({
 class LocalizableError extends ExtendableError {
 
   id: string;
-  defaultMessage: string;
+  defaultMessage: string | null;
   values: Object;
 
   constructor(
@@ -28,7 +28,8 @@ class LocalizableError extends ExtendableError {
   ) {
     if (!id) throw new Error('id:string is required.');
     if (!defaultMessage) throw new Error('defaultMessage:string is required.');
-    super(`${id}: ${JSON.stringify(values)}`);
+    const json = values === undefined ? 'undefined' : JSON.stringify(values);
+    super(`${id}: ${json}`);
     this.id = id;
     this.defaultMessage = defaultMessage;
     this.values = values || {};
@@ -55,7 +56,7 @@ export class UnexpectedError extends LocalizableError {
   }
 }
 
-export function localizedError(error: any): LocalizableError {
+export function localizedError(error: Error): LocalizableError {
   if (error instanceof LocalizableError) {
     return error;
   }

@@ -1,5 +1,6 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/error-message';
+@import '../../themes/mixins/underline';
 
 .component {
   flex: 1;
@@ -22,18 +23,18 @@
     margin-bottom: 30px;
     padding-bottom: 30px;
     position: relative;
-  
+
     .qrCode {
       align-items: flex-start;
       display: flex;
       margin-left: 150px;
-  
+
       canvas {
         border: 4px solid var(--theme-receive-qr-code-background-color);
         box-sizing: content-box;
       }
     }
-  
+
     .instructions {
       color: var(--theme-bordered-box-text-color);
       display: flex;
@@ -45,20 +46,21 @@
       letter-spacing: 0;
 
       .postCopyMargin {
-        margin-bottom: 6px;
+        margin-bottom: 16px;
       }
 
       .copyableHash {
         letter-spacing: 0px;
         font-size: 17px;
       }
-  
+
       .hashLabel {
-        font-size: 11px;
-        margin-bottom: 6px;
-        text-transform: uppercase;
+        font-size: 18px;
+        font-family: var(--font-medium);
+        line-height: 22px;
+        margin-bottom: 16px;
       }
-  
+
       .instructionsText {
         font-size: 15px;
         letter-spacing: 0.5px;
@@ -66,7 +68,7 @@
         margin-bottom: 40px;
         word-break: break-word;
       }
-  
+
       .submitWithPasswordButton {
         max-width: 310px;
         width: calc(50% - 10px);
@@ -79,7 +81,7 @@
         @include error-message;
         text-align: left;
         margin-top: 5px;
-      }      
+      }
     }
   }
 
@@ -88,43 +90,43 @@
     font-family: var(--font-regular);
     font-size: 15px;
     line-height: 22px;
-  
+
     h2 {
+      font-size: 18px;
       font-family: var(--font-medium);
-      text-transform: uppercase;
-      font-size: 11px;
-  
+      margin-bottom: 10px;
+      line-height: 22px;
+
       button {
         color: var(--theme-label-button-color);
         cursor: pointer;
         float: right;
-        font-family: var(--font-regular);
-        font-size: 14px;
-        line-height: 22px;
+        font-family: var(--font-medium);
+        font-size: 16px;
         margin-left: 12px;
-        opacity: 0.55;
-  
+        text-transform: uppercase;
+
         &:hover {
-          text-decoration: underline;
+          @include underline(var(--theme-underline-dark-color));
         }
       }
     }
-  
+
     .walletAddress {
       box-sizing: border-box;
       display: flex;
       padding: 8.5px 0;
       word-break: break-all;
-  
+
       & + .walletAddress {
         border-top: 1px solid var(--theme-separation-border-color);
       }
-  
+
       .addressMargin {
         margin-right: 32.5px;
         flex-grow: 1;
       }
-  
+
       .addressActions {
         display: inline-flex;
         align-items: flex-start;
@@ -136,51 +138,46 @@
           line-height: 20px;
           vertical-align: top;
           white-space: nowrap;
-  
+
           * {
             vertical-align: middle;
           }
-  
+
           span {
             color: var(--theme-label-button-color);
-            font-family: var(--font-regular);            
+            font-family: var(--font-regular);
             font-size: 14px;
             margin-left: 6px;
           }
-          
-          .actionIconText {
-             opacity: 0.5;
-          }
 
           .verifyIcon,
-          .copyIcon {
+          .copyIcon, .generateURIIcon {
             cursor: pointer;
             display: inline-flex;
             object-fit: contain;
             margin-left: 4px;
             & > svg {
-              height: 14.5px;
-              width: 11.5px;
+              height: 20px;
+              width: 20px;
               path {
                 fill: var(--theme-icon-copy-address-color);
               }
             }
           }
-        
-          .verifyIcon {
-            & > svg {
-              height: 20px;
-              width: 20px;
-            }
-          }        
+
+          .btnGenerateURI {
+            cursor: pointer;
+          }
         }
 
-        .verifyActionBlock {
-          margin-left: unset;
-          
+        .verifyActionBlock, .generateURLActionBlock {
           button {
             cursor: pointer;
           }
+        }
+
+        .generateURLActionBlock {
+          margin-left: unset;
         }
       }
     }
@@ -191,23 +188,6 @@
   :global {
     .BorderedBox_component {
       padding-bottom: 6px;
-    }
-  }
-
-  .qrCodeAndInstructions {
-    .instructions {
-      .hashLabel {
-        font-family: var(--font-medium);
-        font-weight: 600;
-        margin-bottom: 10px;
-      }      
-    }
-  }
-
-  .generatedAddresses {
-    h2 {
-      font-weight: 600;
-      margin-bottom: 10px;
     }
   }
 }
@@ -221,14 +201,7 @@
         font-size: 14px;
         line-height: 1.57;
       }
-  
-      .hashLabel {
-        font-size: 16px;
-        margin-bottom: 30px;
-        line-height: 1.31;
-        font-family: var(--font-medium);
-      }
-  
+
       .instructionsText {
         font-size: 14px;
         letter-spacing: 0;
@@ -239,22 +212,10 @@
 
   .generatedAddresses {
     font-size: 14px;
-  
-    h2 {
-      font-size: 16px;
-      line-height: 1.31;
-      letter-spacing: 0;
-      margin-bottom: 20px;
-  
-      button {
-        font-family: var(--font-medium);
-        text-transform: uppercase;
-      }
-    }
-  
+
     .walletAddress {
       padding: 12px 0;
-  
+
       & + .walletAddress {
         border-top: 1px solid var(--theme-separation-border-color);
       }
@@ -262,6 +223,7 @@
       .addressMargin {
         margin-right: 32.5px;
       }
+
     }
-  }  
+  }
 }

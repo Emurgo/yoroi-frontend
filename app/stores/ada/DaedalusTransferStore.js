@@ -50,7 +50,7 @@ export default class DaedalusTransferStore extends Store {
   @observable transferFundsRequest: Request<TransferFundsFunc>
     = new Request<TransferFundsFunc>(this._transferFundsRequest);
 
-  @observable ws: any = null;
+  @observable ws: ?WebSocket = null;
 
   setup(): void {
     this.registerReactions([
@@ -110,9 +110,15 @@ export default class DaedalusTransferStore extends Store {
     wallet: RustModule.Wallet.DaedalusWallet,
   ): void => {
     this._updateStatus('restoringAddresses');
-    this.ws = new WebSocket(websocketUrl);
-    this.ws.addEventListener('open', () => {
+    runInAction(() => {
+      this.ws = new WebSocket(websocketUrl);
+    });
+    if (!this.ws) { throw new Error('Invalid WebSocket'); }
+    const ws = this.ws; // assert non-null
+
+    ws.addEventListener('open', () => {
       Logger.info('[ws::connected]');
+      if (!this.ws) { throw new Error('Invalid WebSocket'); }
       this.ws.send(JSON.stringify({
         msg: MSG_TYPE_RESTORE,
       }));
@@ -120,10 +126,11 @@ export default class DaedalusTransferStore extends Store {
     /*  TODO: Remove 'any' from event
         There is an open issue with this https://github.com/facebook/flow/issues/3116
     */
-    this.ws.addEventListener('message', async (event: any) => {
+    ws.addEventListener('message', async (event: any) => {
       try {
         // Note: we only expect a single message from our WS so we can close it right away.
         // Not closing it right away will cause a WS timeout as we don't keep the connection alive.
+        if (!this.ws) { throw new Error('Invalid WebSocket'); }
         this.ws.close(WS_CODE_NORMAL_CLOSURE);
 
         const data = JSON.parse(event.data);
@@ -154,6 +161,7 @@ export default class DaedalusTransferStore extends Store {
       }
     });
 
+    if (!this.ws) { throw new Error('Invalid WebSocket'); }
     this.ws.addEventListener('close', (event: any) => {
       if (event.code !== WS_CODE_NORMAL_CLOSURE) {
         // if connection was not closed normally, we log this as an error. Otherwise it's an info

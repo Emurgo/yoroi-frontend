@@ -49,7 +49,8 @@ export default class WalletTransactionsList extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this.localizedDateFormat = moment.localeData().longDateFormat('L');
     // Localized dateFormat:
     // English - MM/DD/YYYY

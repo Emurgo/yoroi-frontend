@@ -44,7 +44,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   formattedWalletAmount: Function,
   selectedExplorer: ExplorerType,
   transferTx: TransferTx,
@@ -54,7 +54,7 @@ type Props = {
   error: ?LocalizableError,
   addressFromSubLabel: string,
   classicTheme: boolean
-};
+|};
 
 /** Show user what the transfer would do to get final confirmation */
 @observer

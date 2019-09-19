@@ -1,3 +1,4 @@
+// @flow
 import LocalizableError from './LocalizableError';
 
 export class InvalidMnemonicError extends LocalizableError {
@@ -32,6 +33,15 @@ export class AdaRedemptionCertificateParseError extends LocalizableError {
     super({
       id: 'api.errors.AdaRedemptionCertificateParseError',
       defaultMessage: '!!!The ADA redemption code could not be parsed from the given document.',
+    });
+  }
+}
+
+export class UnableToLoadError extends LocalizableError {
+  constructor() {
+    super({
+      id: 'app.errors.unableToLoad',
+      defaultMessage: '!!!Unable to load!',
     });
   }
 }

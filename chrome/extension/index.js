@@ -1,19 +1,26 @@
+// @flow
+
 import React from 'react';
 import { render } from 'react-dom';
-import { action, useStrict } from 'mobx';
+import { action, configure } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { createHashHistory } from 'history';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
-import translations from '../../app/i18n/translations';
+import { translations } from '../../app/i18n/translations';
 import actions from '../../app/actions/index';
 import Action from '../../app/actions/lib/Action';
 import App from '../../app/App';
 import '../../app/themes/index.global.scss';
+import BigNumber from 'bignumber.js';
 import { addCloseListener } from '../../app/utils/tabManager';
 
 // run MobX in strict mode
-useStrict(true);
+configure({ enforceActions: 'always' });
+
+// Only throw on an invalid BigNumber value if BigNumber.DEBUG is true
+// Since Yoroi handles money, it's better to error our than proceed if an error occurs
+BigNumber.DEBUG = true;
 
 // Entry point into our application
 const initializeYoroi = async () => {
@@ -34,12 +41,16 @@ const initializeYoroi = async () => {
     })
   };
 
+  const root = document.querySelector('#root');
+  if (root == null) {
+    throw new Error('Root element not found.');
+  }
   render(
     <App stores={stores} actions={actions} history={history} />,
-    document.querySelector('#root')
+    root
   );
 };
 
-addCloseListener(window);
+addCloseListener();
 
 window.addEventListener('load', initializeYoroi);

@@ -11,7 +11,7 @@ import closeCrossIcon from '../../../assets/images/close-cross.inline.svg';
 import styles from './AdaCertificateUploadWidget.scss';
 import { messages } from './ImageUploadWidget';
 
-type Props = {
+type Props = {|
   label: string,
   onFileSelected: Function,
   onRemoveCertificate: Function,
@@ -19,7 +19,7 @@ type Props = {
   isCertificateEncrypted: boolean,
   isCertificateSelected: boolean,
   isCertificateInvalid: boolean,
-};
+|};
 
 @observer
 export default class AdaCertificateUploadWidget extends Component<Props> {
@@ -62,8 +62,9 @@ export default class AdaCertificateUploadWidget extends Component<Props> {
               multiple={false}
               accept={acceptedFileTypes}
             >
-              {({ getRootProps }) => (
+              {({ getRootProps, getInputProps }) => (
                 <div {...getRootProps()}>
+                  <input {...getInputProps()} />
                   <div className={styles.instructions}>
                     <div className={styles.title}>
                       {intl.formatMessage(messages.orClickToUpload)}

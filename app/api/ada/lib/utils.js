@@ -94,7 +94,7 @@ function _spenderData(
   const incoming = sum(txOutputs);
   const outgoing = sum(txInputs);
 
-  const isOutgoing = outgoing.totalAmount.greaterThanOrEqualTo(
+  const isOutgoing = outgoing.totalAmount.isGreaterThanOrEqualTo(
     incoming.totalAmount
   );
 
@@ -129,8 +129,8 @@ export function convertAdaTransactionsToExportRows(
       const fullValue = new BigNumber(tx.ctAmount.getCCoin);
       const sumInputs: BigNumber = sumInputsOutputs(tx.ctInputs);
       const sumOutputs: BigNumber = sumInputsOutputs(tx.ctOutputs);
-      const fee: BigNumber = tx.ctIsOutgoing ? sumInputs.sub(sumOutputs) : new BigNumber(0);
-      const value: BigNumber = tx.ctIsOutgoing ? fullValue.sub(fee) : fullValue;
+      const fee: BigNumber = tx.ctIsOutgoing ? sumInputs.minus(sumOutputs) : new BigNumber(0);
+      const value: BigNumber = tx.ctIsOutgoing ? fullValue.minus(fee) : fullValue;
       return {
         date: tx.ctMeta.ctmDate,
         type: tx.ctIsOutgoing ? 'out' : 'in',
@@ -146,7 +146,7 @@ export function convertAdaTransactionsToExportRows(
 export function sumInputsOutputs(ios: Array<AdaTransactionInputOutput>): BigNumber {
   return ios
     .map(io => new BigNumber(io[1].getCCoin))
-    .reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
+    .reduce((a: BigNumber, b: BigNumber) => a.plus(b), new BigNumber(0));
 }
 
 /**
@@ -191,7 +191,7 @@ export function derivePathPrefix(accountIndex: number): string {
 
 export function coinToBigNumber(coin: RustModule.Wallet.Coin): BigNumber {
   const ada = new BigNumber(coin.ada());
-  const lovelace = ada.times(LOVELACES_PER_ADA).add(coin.lovelace());
+  const lovelace = ada.times(LOVELACES_PER_ADA).plus(coin.lovelace());
   return lovelace;
 }
 
@@ -217,7 +217,7 @@ export function signRequestFee(req: BaseSignRequest, shift: boolean): BigNumber 
 
   let result = inputTotal.minus(outputTotal);
   if (shift) {
-    result = result.shift(-DECIMAL_PLACES_IN_ADA);
+    result = result.shiftedBy(-DECIMAL_PLACES_IN_ADA);
   }
   return result;
 }
@@ -233,7 +233,7 @@ export function signRequestTotalInput(req: BaseSignRequest, shift: boolean): Big
 
   let result = inputTotal.minus(change);
   if (shift) {
-    result = result.shift(-DECIMAL_PLACES_IN_ADA);
+    result = result.shiftedBy(-DECIMAL_PLACES_IN_ADA);
   }
   return result;
 }

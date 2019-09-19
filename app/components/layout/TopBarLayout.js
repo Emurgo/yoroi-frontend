@@ -5,15 +5,14 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './TopBarLayout.scss';
 
-type Props = {
+type Props = {|
   banner?: Node,
   topbar?: Node,
   children?: ?Node,
   notification?: ?Node,
   languageSelectionBackground?: boolean,
-  footer?: Node,
   classicTheme?: boolean,
-};
+|};
 
 /** Adds a top bar above the wrapped node */
 @observer
@@ -24,8 +23,6 @@ export default class TopBarLayout extends Component<Props> {
     children: undefined,
     notification: undefined,
     languageSelectionBackground: false,
-    withFooter: false,
-    footer: undefined,
     classicTheme: false,
   };
 
@@ -36,16 +33,11 @@ export default class TopBarLayout extends Component<Props> {
       children,
       notification,
       languageSelectionBackground,
-      footer,
       classicTheme
     } = this.props;
     const componentClasses = classnames([
       styles.component,
       languageSelectionBackground && !classicTheme ? styles.languageSelectionBackground : '',
-    ]);
-    const contentClasses = classnames([
-      styles.content,
-      footer ? styles.contentWithFooter : null,
     ]);
 
     return (
@@ -63,16 +55,11 @@ export default class TopBarLayout extends Component<Props> {
           {notification}
 
           <div className={styles.contentWrapper}>
-            <div className={contentClasses}>
+            <div className={styles.content}>
               {children}
             </div>
           </div>
 
-          {footer ? (
-            <div className={styles.footer}>
-              {footer}
-            </div>
-          ) : null}
         </div>
       </div>
     );

@@ -119,6 +119,8 @@ export default class WalletSendPage extends Component<Props> {
           isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
           reset={() => txBuilderActions.reset.trigger()}
           error={transactionBuilderStore.createUnsignedTx.error}
+          uriParams={this.props.stores.loading.uriParams}
+          resetUriParams={this.props.stores.loading.resetUriParams}
         />
         {this.renderDialog()}
       </div>

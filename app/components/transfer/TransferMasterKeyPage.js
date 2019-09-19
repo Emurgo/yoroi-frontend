@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMasterKeyPage.scss';
@@ -29,12 +29,12 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onBack: Function,
   step0: string,
   classicTheme: boolean,
-};
+|};
 
 @observer
 export default class TransferMasterKeyPage extends Component<Props> {
@@ -47,7 +47,8 @@ export default class TransferMasterKeyPage extends Component<Props> {
     fields: {
       masterKey: {
         label: this.context.intl.formatMessage(messages.masterKeyInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.masterKeyInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.masterKeyInputHint) : '',
         value: '',
         validators: [({ field }) => {
           const value = field.value;
@@ -68,6 +69,9 @@ export default class TransferMasterKeyPage extends Component<Props> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -131,7 +135,7 @@ export default class TransferMasterKeyPage extends Component<Props> {
               autoComplete="off"
               {...masterKeyField.bind()}
               error={masterKeyField.error}
-              skin={classicTheme ? InputSkin : InputOwnSkin}
+              skin={InputOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>

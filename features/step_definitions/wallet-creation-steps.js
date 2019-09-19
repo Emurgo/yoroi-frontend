@@ -27,6 +27,19 @@ When(/^I click the "Create personal wallet" button$/, async function () {
   await this.click('.WalletCreateDialog .primary');
 });
 
+Then(/^I should see the invalid password error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.walletPassword .SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
+});
+
+Then(/^I see the submit button is disabled$/, async function () {
+  const disabledButton = await this.driver.findElement(By.xpath("//div[@class='Dialog_actions']//button[contains(@class, 'SimpleButton_root') and contains(@class, 'disabled')]"));
+  const pageUrl = await this.driver.getCurrentUrl();
+  disabledButton.click();
+  expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
+});
+
 When(/^I accept the creation terms$/, async function () {
   await this.click('.SimpleCheckbox_check');
   await this.click('.WalletBackupPrivacyWarningDialog .primary');
@@ -35,7 +48,7 @@ When(/^I accept the creation terms$/, async function () {
 When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
   const mnemonicElement = await this.waitElementTextMatches(
     /^.*$/,
-    '.WalletRecoveryPhraseMnemonic_componentClassic'
+    '.WalletRecoveryPhraseMnemonic_component'
   );
 
   const mnemonic = await mnemonicElement.getText();
@@ -59,9 +72,9 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 When(/^I enter random mnemonic phrase$/, async function () {
   await this.click('.WalletRecoveryPhraseDisplayDialog .primary');
   for (let i = 1; i < 16; i++) {
-    await this.click(`//div[@class='WalletRecoveryPhraseEntryDialog_wordsClassic']//button[${i}]`, By.xpath);
+    await this.click(`//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${i}]`, By.xpath);
   }
-  const words = await this.driver.findElement(By.xpath("//div[@class='WalletRecoveryPhraseMnemonic_componentClassic']"));
+  const words = await this.driver.findElement(By.xpath("//div[@class='WalletRecoveryPhraseMnemonic_component']"));
   words.getText().then(text => (
     expect(text).to.not.equal('')
   )).catch(err => assert.fail(err.message));
@@ -72,7 +85,7 @@ Then(/^I click Clear button$/, async function () {
 });
 
 Then(/^I see All selected words are cleared$/, async function () {
-  await this.waitUntilText('.WalletRecoveryPhraseMnemonic_componentClassic', '', 5000);
+  await this.waitUntilText('.WalletRecoveryPhraseMnemonic_component', '', 5000);
 });
 
 Then(/^I should stay in the create wallet dialog$/, async function () {

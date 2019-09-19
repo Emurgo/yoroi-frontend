@@ -8,9 +8,9 @@ import { Logger, stringifyError } from '../../utils/logging';
 
 import styles from './ErrorBlock.scss';
 
-type Props = {
+type Props = {|
   error: ?LocalizableError,
-};
+|};
 
 @observer
 export default class ErrorBlock extends Component<Props> {

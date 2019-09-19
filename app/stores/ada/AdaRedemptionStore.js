@@ -45,7 +45,7 @@ export default class AdaRedemptionStore extends Store {
   @observable redeemPaperVendedAdaRequest: Request<RedeemPaperVendedAdaFunc>
     = new Request<RedeemPaperVendedAdaFunc>(this.api.ada.redeemPaperVendedAda);
 
-  @observable amountRedeemed: number = 0;
+  @observable amountRedeemed: string = '0';
   @observable showAdaRedemptionSuccessMessage: boolean = false;
 
   setup() {
@@ -222,12 +222,14 @@ export default class AdaRedemptionStore extends Store {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
       const receiverAddress = await getReceiverAddress();
-      const transactionAmountInLovelace: BigNumber = await this.redeemAdaRequest.execute({
+      this.redeemAdaRequest.execute({
         receiverAddress,
         redemptionCode: this.redemptionCode,
         getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
         sendTx: stateFetcher.sendTx,
       });
+      if (!this.redeemAdaRequest.promise) throw new Error('should never happen');
+      const transactionAmountInLovelace = await this.redeemAdaRequest.promise;
       this._reset();
       const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
@@ -249,14 +251,15 @@ export default class AdaRedemptionStore extends Store {
     try {
       const receiverAddress = await getReceiverAddress();
       if (!this.passPhrase) throw new Error('should never happen');
-      const transactionAmountInLovelace =
-        await this.redeemPaperVendedAdaRequest.execute({
-          receiverAddress,
-          redemptionCode: shieldedRedemptionKey,
-          mnemonics: this.passPhrase.split(' '),
-          getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
-          sendTx: stateFetcher.sendTx,
-        });
+      this.redeemPaperVendedAdaRequest.execute({
+        receiverAddress,
+        redemptionCode: shieldedRedemptionKey,
+        mnemonics: this.passPhrase.split(' '),
+        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        sendTx: stateFetcher.sendTx,
+      });
+      if (!this.redeemPaperVendedAdaRequest.promise) throw new Error('should never happen');
+      const transactionAmountInLovelace = await this.redeemPaperVendedAdaRequest.promise;
       this._reset();
       const transactionAmountInAda = this._getTransactionAmountInAda(transactionAmountInLovelace);
       this.actions.ada.adaRedemption.adaSuccessfullyRedeemed.trigger({
@@ -271,7 +274,7 @@ export default class AdaRedemptionStore extends Store {
   @action
   _onAdaSuccessfullyRedeemed = ({ walletId, amount } : {
     walletId: string,
-    amount: number,
+    amount: string,
   }) => {
     const { wallets } = this.stores.substores[environment.API];
 
@@ -322,7 +325,7 @@ export default class AdaRedemptionStore extends Store {
   };
 
   _getTransactionAmountInAda = (transactionAmountInLovelace: BigNumber): BigNumber => (
-    transactionAmountInLovelace.shift(-DECIMAL_PLACES_IN_ADA)
+    transactionAmountInLovelace.shiftedBy(-DECIMAL_PLACES_IN_ADA)
   );
 
 }

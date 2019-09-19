@@ -50,7 +50,7 @@ const txExt = {
             "isChange": true,
             "fullAddress": {
                  "cadAmount": {
-                      "getCCoin": 0
+                      "getCCoin": '0'
                  },
                  "cadId": "Ae2tdPwUPEZAa8d3kFZEJeSZvHk2EnWsnJ4mCowMD8NX8aStpuryFxunt9m",
                  "cadIsUsed": false,

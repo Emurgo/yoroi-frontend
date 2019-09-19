@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -19,10 +19,6 @@ const messages = defineMessages({
     defaultMessage: `!!!On the following screen, you will see a set of 15 random words. This is
     your wallet backup phrase. It can be entered in any version of Daedalus application in order
     to back up or restore your wallet’s funds and private key.`,
-  },
-  buttonLabelContinue: {
-    id: 'wallet.backup.privacy.warning.dialog..button.labelContinue', // TODO: fix translation key path 'dialog..button'
-    defaultMessage: '!!!Continue',
   },
   termNobodyWatching: {
     id: 'wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching',
@@ -63,11 +59,10 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       styles.component,
       'WalletBackupPrivacyWarningDialog',
     ]);
-    const checkboxClasses = classicTheme ? styles.checkboxClassic : styles.checkbox;
 
     const actions = [
       {
-        label: intl.formatMessage(messages.buttonLabelContinue) + countdownDisplay,
+        label: intl.formatMessage(globalMessages.continue) + countdownDisplay,
         onClick: onContinue,
         disabled: !canPhraseBeShown,
         primary: true
@@ -86,10 +81,10 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       >
         {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} />}
         <WalletRecoveryInstructions
-          instructionsText={intl.formatMessage(messages.recoveryPhraseInstructions)}
+          instructionsText={<FormattedHTMLMessage {...messages.recoveryPhraseInstructions} />}
           classicTheme={classicTheme}
         />
-        <div className={checkboxClasses}>
+        <div className={styles.checkbox}>
           <Checkbox
             label={intl.formatMessage(messages.termNobodyWatching)}
             onChange={onAcceptPrivacyNotice}

@@ -31,11 +31,11 @@ import {
 // This is actually just an interface
 import {
   HWConnectStoreTypes,
-  StepState,
   ProgressStep,
   ProgressInfo,
   HWDeviceInfo
 } from '../../types/HWConnectStoreTypes';
+import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
   prepareLedgerBridger,
@@ -225,7 +225,7 @@ export default class LedgerConnectStore
     return true;
   };
 
-  _handleConnectError = (error: any): void => {
+  _handleConnectError = (error: Error): void => {
     Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;
@@ -311,9 +311,6 @@ export default class LedgerConnectStore
 
     const { wallets } = this.stores.substores[environment.API];
     await wallets._patchWalletRequestWithNewWallet(ledgerWallet);
-
-    // Dynamically update the topbar icons
-    this.stores.topbar.updateCategories();
 
     // goto the wallet transactions page
     Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');

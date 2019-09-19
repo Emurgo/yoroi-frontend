@@ -1,9 +1,13 @@
 // Css module overrides go here …
 
 .autocompleteWrapper  {
+  input {
+    background: var(--rp-autocomplete-input-bg-color, transparent);
+    border: var(--rp-autocomplete-input-border, 0);
+  }
   .autocompleteContent {
     min-height: 73px;
-    padding: 0 10px;
+    padding: 0 40px 10px 10px;
 
     .selectedWords {
       input {

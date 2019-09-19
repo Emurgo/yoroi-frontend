@@ -9,7 +9,8 @@ $blockHeight: 27px;
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: #ADAEB6;
+    font-family: var(--font-regular);
+    color: var(--theme-link-button-text-color);
   }
 }
 
@@ -35,6 +36,6 @@ $blockHeight: 27px;
 };
 
 .block:hover {
-  background-color: var(--theme-footer-block-background-color-hover);
+  background-color: var(--theme-link-button-background-color-hover);
   cursor: pointer;
 };

@@ -1,3 +1,12 @@
+// @flow
+
+import {
+  setLocalItem,
+  addListener,
+} from '../api/localStorage/primitives';
+
+declare var chrome; // TODO: no type for chrome
+
 /**
  * We may run into bugs if the user has two copies of Yoroi running on the same localstorage
  * Since Yoroi data process is not transactional.
@@ -13,9 +22,10 @@
 */
 
 /**
- * Name of key we use in localstorage
+ * Name of key we use in localstorage to specify which tab is currently active
  */
-const OPEN_TAB_ID_KEY = 'openTabId';
+export const OPEN_TAB_ID_KEY = 'openTabId';
+const thisWindowId = Date.now().toString();
 
 /**
  * It's possible to have two copies of Yoroi loading at the same time by going to the URL directly
@@ -24,14 +34,14 @@ const OPEN_TAB_ID_KEY = 'openTabId';
  *
  * Note: this may cause two copies of Yoroi loading at the same time close each other
  */
-export function addCloseListener(window) {
-  window.onstorage = (e: StorageEvent) => {
-    // if another Yoroi tab open, close this tab
-    if (e.key === OPEN_TAB_ID_KEY) {
+export function addCloseListener() {
+  addListener(changes => {
+    const newId = changes[OPEN_TAB_ID_KEY];
+    if (newId != null && newId.newValue !== thisWindowId) {
       // note: we don't need "tabs" permission to get or remove our own tab
-      chrome.tabs.getCurrent(id => chrome.tabs.remove(id.id));
+      chrome.tabs.getCurrent(tab => chrome.tabs.remove(tab.id));
     }
-  };
+  });
 }
 
 /**
@@ -57,6 +67,13 @@ export function addCloseListener(window) {
  *
  * WARNING: You should call this function BEFORE making any other changes to localstorage
 */
-export function closeOtherInstances() {
-  localStorage.setItem(OPEN_TAB_ID_KEY, Date.now().toString());
+export async function closeOtherInstances() {
+  await setLocalItem(OPEN_TAB_ID_KEY, thisWindowId);
+}
+
+export const handlersSettingUrl: string = 'chrome://settings/handlers';
+
+/** To open special URLs like chrome://settings you need to use the Chrome API */
+export function openSandboxedTab(url: string) {
+  chrome.tabs.create({ url });
 }

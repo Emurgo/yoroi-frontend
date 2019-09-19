@@ -22,7 +22,8 @@ import connectErrorImage from '../../../../assets/images/hardware-wallet/trezor/
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
 import connectErrorSVG from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
 
-import { ProgressInfo, StepState } from '../../../../types/HWConnectStoreTypes';
+import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import { StepState } from '../../../widgets/ProgressSteps';
 
 import { Logger } from '../../../../utils/logging';
 
@@ -46,6 +47,7 @@ type Props = {|
   progressInfo: ProgressInfo,
   isActionProcessing: boolean,
   error: ?LocalizableError,
+  onExternalLinkClick: Function,
   goBack: Function,
   submit: Function,
   cancel: Function,
@@ -64,21 +66,15 @@ export default class ConnectDialog extends Component<Props> {
       progressInfo,
       isActionProcessing,
       error,
+      onExternalLinkClick,
       goBack,
       submit,
       cancel,
       classicTheme
     } = this.props;
-    const headerBlockClasses = classicTheme
-      ? classnames([headerMixin.headerBlockClassic, styles.headerBlockClassic])
-      : classnames([headerMixin.headerBlock, styles.headerBlock]);
-    const middleBlockClasses = classicTheme ? styles.middleBlockClassic : styles.middleBlock;
-    const middleConnectErrorBlockClasses = classicTheme
-      ? styles.middleConnectErrorBlockClassic
-      : null;
 
     const introBlock = classicTheme ? (
-      <div className={headerBlockClasses}>
+      <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
         <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span>
         <br />
         <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span>
@@ -87,7 +83,7 @@ export default class ConnectDialog extends Component<Props> {
         <br />
       </div>
     ) : (
-      <div className={headerBlockClasses}>
+      <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
         <span>
           {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
           {intl.formatMessage(messages.connectIntroTextLine2) + ' '}
@@ -103,21 +99,21 @@ export default class ConnectDialog extends Component<Props> {
       case StepState.LOAD:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleConnectLoadBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
             <img src={classicTheme ? connectLoadGIF : connectLoadImage} alt="" />
           </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
-          <div className={classnames([middleBlockClasses, styles.middleConnectProcessBlock])}>
+          <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
             <img src={classicTheme ? connectStartGIF : connectLoadImage} alt="" />
           </div>);
         break;
       case StepState.ERROR:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
-          <div className={classnames([middleBlockClasses, middleConnectErrorBlockClasses])}>
+          <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
             <SvgInline svg={classicTheme ? connectErrorSVG : connectErrorImage} />
           </div>);
         break;
@@ -148,8 +144,10 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}
         {middleBlock}
-        <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        <HelpLinkBlock />
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        }
+        <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }
 }

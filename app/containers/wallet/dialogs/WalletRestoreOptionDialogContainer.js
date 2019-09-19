@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletRestoreOptionDialog from '../../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
 
-type Props = {
+type Props = {|
   onClose: Function,
   classicTheme: boolean,
   onRestore: Function,
   onPaperRestore: Function,
-};
+|};
 @observer
 export default class WalletRestoreOptionDialogContainer extends Component<Props> {
 

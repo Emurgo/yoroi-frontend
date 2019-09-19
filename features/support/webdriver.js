@@ -32,32 +32,29 @@ const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefox
 
 function getBraveBuilder() {
   return new Builder()
-    .withCapabilities({
-      chromeOptions: {
-        args: [
-          'start-maximized'
-        ]
-      }
-    })
     .forBrowser('chrome')
     .setChromeOptions(new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
-      .addArguments('--start-maximized', '--disable-setuid-sandbox', '--no-sandbox')
+      .addArguments(
+        '--start-maximized',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      )
       .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx'))));
 }
 
 function getChromeBuilder() {
   return new Builder()
-    .withCapabilities({
-      chromeOptions: {
-        args: [
-          'start-maximized'
-        ]
-      }
-    })
     .forBrowser('chrome')
     .setChromeOptions(new chrome.Options()
-      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx'))));
+      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+      .addArguments(
+        '--start-maximized',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      ));
 }
 
 function getFirefoxBuilder() {
@@ -111,6 +108,8 @@ function CustomWorld(cmdInput: WorldInput) {
       break;
     }
   }
+
+  this.getBrowser = (): string => cmdInput.parameters.browser;
 
   this.getExtensionUrl = (): string => {
     if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
@@ -168,6 +167,12 @@ function CustomWorld(cmdInput: WorldInput) {
     return this.driver.wait(condition);
   };
 
+  this.waitDisable = async (locator, method = By.css) => {
+    const element = await this.getElementBy(locator, method);
+    const condition = until.elementIsDisabled(element);
+    return this.driver.wait(condition);
+  };
+
   this.waitUntilText = async (locator, text, timeout = 75000) => {
     await this.driver.wait(async () => {
       try {
@@ -215,7 +220,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   };
 
-  this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
+  this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
 
   this.getFromLocalStorage = async (key) => {
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);

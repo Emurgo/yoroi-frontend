@@ -18,3 +18,9 @@ export const navigateTo = function (requestedRoute: string) {
     window.yoroi.actions.router.goToRoute.trigger({ route });
   }, requestedRoute);
 };
+
+export const navigateToTransactionsList = function (client: any) {
+  return client.driver.executeScript(() => {
+    window.yoroi.actions.router.goToTransactionsList.trigger({});
+  });
+};

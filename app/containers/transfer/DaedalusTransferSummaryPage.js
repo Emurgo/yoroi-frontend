@@ -14,7 +14,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   formattedWalletAmount: Function,
   selectedExplorer: ExplorerType,
   transferTx: TransferTx,
@@ -23,7 +23,7 @@ type Props = {
   onCancel: Function,
   error: ?LocalizableError,
   classicTheme: boolean
-};
+|};
 
 /** Show user what the transfer would do to get final confirmation */
 @observer

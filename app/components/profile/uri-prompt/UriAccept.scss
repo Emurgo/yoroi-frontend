@@ -1,0 +1,51 @@
+.component {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-start;
+  align-content: center;
+  overflow: overlay;
+
+  .centeredBox {
+    width: 594px;
+    margin: 0 auto;
+  }
+
+  .explanation {
+    margin-bottom: 34px;
+    font-family: var(--font-regular);
+    color: var(--cmn-default-color-grey);
+    font-size: 14px;
+    line-height: 22px;
+     // align image with URI prompt page
+     margin-top: 90px;
+     margin-bottom: 55px
+  }
+
+  .aboutSvg {
+    & > svg {
+      transform: scale(1.4, 1.4);
+      border: 1px solid var(--cmn-default-color-grey-4);
+      display: block;
+      margin: auto;
+      height: 128px;
+      width: 319px;
+      margin-bottom: 24px;
+      // align image with URI prompt page
+      margin-top: 75px;
+    }
+  }
+
+  .submitButton {
+    display: block !important;
+    margin: 0;
+    width: 287px !important;
+  }
+
+  .buttonsWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 34px;
+  }
+}

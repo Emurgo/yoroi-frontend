@@ -1,0 +1,44 @@
+.component {  
+  min-width: var(--theme-modal-min-max-width-lg) !important;
+  max-width: var(--theme-modal-min-max-width-lg) !important;
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 24px;
+    }
+
+    .CopyableAddress_copyIconBig {
+      & > svg {
+        margin-top: -7px;
+      }
+    }
+  }
+
+  .uriDisplay {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+
+    .uri {
+      font-family: var(--font-regular);
+      word-break: break-all;
+      font-size: 16px;
+      line-height: 24px;
+      text-align: center;
+    }
+  }
+
+  .qrCode {
+    margin: 34px auto 20px auto;
+    text-align: center;
+  }
+}
+
+:global(.YoroiModern) .component {
+  .uri {
+    color: var(--theme-transactions-received-address-color);
+  }
+}

@@ -6,7 +6,6 @@ import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
 import environment from '../../../environment';
-import { THEMES } from '../../../themes';
 import type { Theme } from '../../../themes';
 
 const messages = defineMessages({
@@ -36,13 +35,13 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
   currentLocale: string,
   currentTheme: Theme,
-};
+|};
 
 @observer
 export default class SettingsMenu extends Component<Props> {
@@ -53,10 +52,10 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale, currentTheme } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, currentLocale } = this.props;
 
     return (
-      <div className={currentTheme === THEMES.YOROI_CLASSIC ? '' : styles.componentWrapper}>
+      <div className={styles.componentWrapper}>
         <div className={styles.component}>
           <SettingsMenuItem
             label={intl.formatMessage(messages.general)}

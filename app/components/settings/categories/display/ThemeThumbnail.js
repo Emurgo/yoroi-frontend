@@ -2,10 +2,10 @@
 
 import React, { Component } from 'react';
 
-type Props = {
+type Props = {|
   themeVars: Object,
   themeKey: string,
-};
+|};
 
 export default class ThemeThumbnail extends Component<Props> {
   render() {

@@ -59,12 +59,43 @@
       word-break: break-all;
     }
 
+    .hiddenWalletAmount {
+      letter-spacing: 2px;
+    }
+
+    .walletAmountLabelBlock {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .walletAmountLabel {
       text-transform: none;
-      padding-top: 2px;
       font-size: 14px;
       font-weight: 300;
       opacity: 0.7;
+    }
+
+    .hideBalanceButton {
+      cursor: pointer;
+    }
+
+    .showHideBalanceIcon {
+      & > svg {
+        margin-left: 5px;
+        margin-top: 3px;
+        height: 20px;
+        width: 20px;
+      }
+    }
+  }
+}
+
+:global(.YoroiClassic) .withWallet {
+
+  .showHideBalanceIcon {
+    & > svg {
+      margin-top: 5px;
     }
   }
 }

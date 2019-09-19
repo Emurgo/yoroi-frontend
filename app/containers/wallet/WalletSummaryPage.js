@@ -13,10 +13,9 @@ import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
-import resolver from '../../utils/imports';
 import { Logger } from '../../utils/logging';
 
-const { formattedWalletAmount } = resolver('utils/formatters');
+import { formattedWalletAmount } from '../../utils/formatters';
 
 type Props = InjectedProps
 
@@ -64,12 +63,12 @@ export default class WalletSummaryPage extends Component<Props> {
     if (searchOptions) {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
-      if (recentTransactionsRequest.isExecutingFirstTime || hasAny) {
+      if (!recentTransactionsRequest.wasExecuted || hasAny) {
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
             selectedExplorer={this.props.stores.profile.selectedExplorer}
-            isLoadingTransactions={recentTransactionsRequest.isExecuting}
+            isLoadingTransactions={!recentTransactionsRequest.wasExecuted}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
             assuranceMode={wallet.assuranceMode}
@@ -114,6 +113,7 @@ export default class WalletSummaryPage extends Component<Props> {
             error={exportError}
             submit={exportTransactionsToFile.trigger}
             cancel={closeExportTransactionDialog.trigger}
+            classicTheme={profile.isClassicTheme}
           />
         ) : null}
 

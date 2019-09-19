@@ -7,20 +7,14 @@ import LocalizedRequest from '../stores/lib/LocalizedRequest';
 import LocalizableError from '../i18n/LocalizableError';
 
 import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../api/ada';
+import type { StepStateEnum } from '../components/widgets/ProgressSteps';
 
-export type ProgressStepEnum = 0 | 1 | 2;
-export const ProgressStep = {
+export const ProgressStep = Object.freeze({
   CHECK: 0,
   CONNECT: 1,
   SAVE: 2,
-};
-
-export type StepStateEnum = 0 | 1 | 9;
-export const StepState = {
-  LOAD: 0,
-  PROCESS: 1,
-  ERROR: 9,
-};
+});
+export type ProgressStepEnum = $Values<typeof ProgressStep>;
 
 export interface ProgressInfo {
   currentStep: ProgressStepEnum,

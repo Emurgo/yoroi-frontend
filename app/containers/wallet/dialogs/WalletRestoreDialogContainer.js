@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
@@ -12,10 +13,12 @@ import {
   mnemonicsToAddresses,
 } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
+import globalMessages from '../../../i18n/global-messages';
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper",
   introMessage?: string,
+  onBack: void => void,
 };
 
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
@@ -28,6 +31,7 @@ type WalletRestoreDialogContainerState = {
   },
   submitValues?: WalletRestoreDialogValues,
   resolvedRecoveryPhrase?: string,
+  notificationElementId: string,
 }
 
 @observer
@@ -38,6 +42,7 @@ export default class WalletRestoreDialogContainer
     verifyRestore: undefined,
     submitValues: undefined,
     resolvedRecoveryPhrase: undefined,
+    notificationElementId: ''
   };
 
   onVerifiedSubmit = () => {
@@ -93,7 +98,8 @@ export default class WalletRestoreDialogContainer
   };
 
   render() {
-
+    const actions = this.props.actions;
+    const { uiNotifications, profile } = this.props.stores;
     const wallets = this._getWalletsStore();
     const { restoreRequest } = wallets;
 
@@ -103,6 +109,11 @@ export default class WalletRestoreDialogContainer
       throw new Error('Unexpected restore mode: ' + this.props.mode);
     }
 
+    const tooltipNotification = {
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: globalMessages.copyTooltipMessage,
+    };
+
     const { verifyRestore, submitValues } = this.state;
     if (verifyRestore) {
       const { addresses, accountPlate } = verifyRestore;
@@ -110,9 +121,22 @@ export default class WalletRestoreDialogContainer
         <WalletRestoreVerifyDialog
           addresses={addresses}
           accountPlate={accountPlate}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={profile.selectedExplorer}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
+          onCopyAddressTooltip={(address, elementId) => {
+            if (!uiNotifications.isOpen(elementId)) {
+              this.setState({ notificationElementId: elementId });
+              actions.notifications.open.trigger({
+                id: elementId,
+                duration: tooltipNotification.duration,
+                message: tooltipNotification.message,
+              });
+            }
+          }}
+          getNotification={uiNotifications.getTooltipActiveNotification(
+            this.state.notificationElementId
+          )}
           isSubmitting={restoreRequest.isExecuting}
           classicTheme={this.props.classicTheme}
           error={restoreRequest.error}
@@ -133,6 +157,7 @@ export default class WalletRestoreDialogContainer
         isSubmitting={restoreRequest.isExecuting}
         onSubmit={this.onSubmit}
         onCancel={this.onCancel}
+        onBack={this.props.onBack}
         error={restoreRequest.error}
         isPaper={isPaper}
         showPaperPassword={isPaper}

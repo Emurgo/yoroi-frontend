@@ -16,10 +16,11 @@ type Props = {|
   isSubmitting: boolean,
   recoveryPhrase: string,
   recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  enteredPhrase: Array<{ word: string }>,
+  enteredPhrase: Array<{ word: string, index: number }>,
   onCancelBackup: Function,
   onAcceptPrivacyNotice: Function,
   onContinue: Function,
+  onBack: Function,
   onStartWalletBackup: Function,
   onAcceptTermDevice: Function,
   onAcceptTermRecovery: Function,
@@ -40,7 +41,7 @@ export default class WalletBackupDialog extends Component<Props> {
       currentStep, onCancelBackup,
       canPhraseBeShown, isPrivacyNoticeAccepted,
       countdownRemaining, onAcceptPrivacyNotice,
-      onContinue, recoveryPhrase,
+      onContinue, onBack, recoveryPhrase,
       onStartWalletBackup, isTermDeviceAccepted,
       enteredPhrase, removeWord, hasWord,
       isTermRecoveryAccepted, isValid, isSubmitting,
@@ -69,6 +70,7 @@ export default class WalletBackupDialog extends Component<Props> {
           recoveryPhrase={recoveryPhrase}
           onStartWalletBackup={onStartWalletBackup}
           onCancelBackup={onCancelBackup}
+          onBack={onBack}
           classicTheme={classicTheme}
         />
       );

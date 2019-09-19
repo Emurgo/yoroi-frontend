@@ -12,6 +12,7 @@
   }
 
   .settingsPane {
+    min-height: 100%;
     background-color: var(--theme-settings-pane-background-color);
     border: var(--theme-settings-pane-border);
     overflow: visible;
@@ -36,8 +37,11 @@
     padding: 30px 20px 30px 0;
   }
   .settingsPane {
-    min-height: 100%;
     padding: 30px 30px 20px 30px;
     border-radius: 8px;
+  }
+
+  fieldset {
+    background: var(--theme-settings-pane-background-color);
   }
 }

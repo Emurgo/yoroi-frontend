@@ -1,0 +1,40 @@
+.component {
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 30px;
+    }
+  }
+
+  .warningText {
+
+    font-family: var(--font-regular);
+    font-size: 13px;
+
+    li::before {
+      content: "●";
+      margin-right:0.4em;
+      font-size:0.8em;
+      color: var(--theme-bullet-point-color);
+    }
+
+    li {
+      display: list-item;
+      margin-left: 12px;
+      margin-top: 12px;
+      line-height: 1.38;
+    }
+
+  }
+
+  .urlImage {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  .confirmButton {
+    display: block !important;
+    margin: 30px auto 0;
+  }
+}

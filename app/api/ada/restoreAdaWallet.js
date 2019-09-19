@@ -43,11 +43,11 @@ export async function restoreBip44Wallet(
    * If we throw, no new addresses will be added
    * so the user's balance would be stuck at 0 until they reinstall Yoroi.
    */
-  saveInitialAddresses(accountPublicKey, accountIndex, 'External', saveAsAdaAddresses);
-  saveInitialAddresses(accountPublicKey, accountIndex, 'Internal', saveAsAdaAddresses);
+  await saveInitialAddresses(accountPublicKey, accountIndex, 'External', saveAsAdaAddresses);
+  await saveInitialAddresses(accountPublicKey, accountIndex, 'Internal', saveAsAdaAddresses);
 
-  scanAndSaveAddresses(accountPublicKey, accountIndex, 'External', -1, checkAddressesInUse, saveAsAdaAddresses);
-  scanAndSaveAddresses(accountPublicKey, accountIndex, 'Internal', -1, checkAddressesInUse, saveAsAdaAddresses);
+  await scanAndSaveAddresses(accountPublicKey, accountIndex, 'External', -1, checkAddressesInUse, saveAsAdaAddresses);
+  await scanAndSaveAddresses(accountPublicKey, accountIndex, 'Internal', -1, checkAddressesInUse, saveAsAdaAddresses);
 }
 
 async function saveInitialAddresses(

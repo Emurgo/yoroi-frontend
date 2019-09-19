@@ -1,0 +1,28 @@
+$margin: 20px;
+
+.component {
+  margin: $margin;
+  height: calc(100% - var(--theme-wallet-navigation-tab-height));
+
+  .annotatedLoaderWrapper {
+    :global(.LoadingSpinner_component) {
+      width: 60px;
+      height: 60px;
+      background-size: 60px;
+      margin-bottom: 40px;
+    }
+    
+    display: flex;
+    flex-flow: column;
+    margin: $margin;
+    height: calc(100% - #{#{$margin}*2} - var(--theme-wallet-navigation-tab-height));
+  }
+}
+
+:global(.YoroiClassic) {
+  .component {
+    .annotatedLoaderWrapper {
+      height: calc(100% - #{#{$margin}*3} - var(--theme-wallet-navigation-tab-height));
+    }
+  }
+}

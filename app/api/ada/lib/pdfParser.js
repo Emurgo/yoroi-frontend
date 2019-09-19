@@ -52,7 +52,9 @@ export const readFile = (file: ?Blob): Promise<Uint8Array> => new Promise((resol
       reader.onload = function () {
         const { result } = reader;
         const buffer = typeof result === 'string' ? JSON.parse(result) : result;
-        const fileBuffer = new Uint8Array(buffer);
+        const fileBuffer = buffer === null
+          ? new Uint8Array(0)
+          : new Uint8Array(buffer);
         resolve(fileBuffer);
       };
       reader.readAsArrayBuffer(file);

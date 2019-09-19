@@ -6,6 +6,9 @@ import GeneralSettings from '../../../components/settings/categories/general-set
 import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
+import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
+import registerProtocols from '../../../uri-protocols';
+import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import type { ExplorerType } from '../../../domain/Explorer';
 import { Explorer, explorerInfo } from '../../../domain/Explorer';
@@ -53,6 +56,16 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
         label: explorerInfo[Explorer[key]].name,
       }));
     const { currentTheme } = this.props.stores.profile;
+
+    const uriSettings = environment.userAgentInfo.canRegisterProtocol()
+      ? (
+        <UriSettingsBlock
+          registerUriScheme={() => registerProtocols()}
+          isFirefox={environment.userAgentInfo.isFirefox}
+        />
+      )
+      : null;
+
     return (
       <div>
         <GeneralSettings
@@ -69,6 +82,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
           selectedExplorer={selectedExplorer}
           error={setSelectedExplorerRequest.error}
         />
+        {uriSettings}
         <ThemeSettingsBlock
           currentTheme={currentTheme}
           selectTheme={this.selectTheme}

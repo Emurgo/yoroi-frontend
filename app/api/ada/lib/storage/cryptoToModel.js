@@ -15,7 +15,7 @@ export function toAdaWallet(walletInitData : AdaWalletInitData): AdaWallet {
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
     cwAmount: {
-      getCCoin: 0
+      getCCoin: '0'
     },
     cwId: '1',
     cwMeta: {
@@ -33,7 +33,7 @@ export function toAdaHardwareWallet(walletInitData : AdaHardwareWalletInitData):
   const { cwAssurance, cwName, cwUnit } = walletInitData.cwInitMeta;
   return {
     cwAmount: {
-      getCCoin: 0
+      getCCoin: '0'
     },
     cwId: '1',
     cwMeta: {
@@ -55,7 +55,7 @@ export function toAdaAddress(
 ): AdaAddress {
   return {
     cadAmount: {
-      getCCoin: 0
+      getCCoin: '0'
     },
     cadId: addresHash,
     cadIsUsed: false,

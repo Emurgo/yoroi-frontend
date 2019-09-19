@@ -4,11 +4,11 @@ import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
-import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMnemonicPage.scss';
@@ -34,7 +34,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onBack: Function,
   mnemonicValidator: Function,
@@ -42,7 +42,7 @@ type Props = {
   step0: string,
   mnemonicLength: number,
   classicTheme: boolean
-};
+|};
 
 @observer
 export default class TransferMnemonicPage extends Component<Props> {
@@ -55,7 +55,8 @@ export default class TransferMnemonicPage extends Component<Props> {
     fields: {
       recoveryPhrase: {
         label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.recoveryPhraseInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
         value: '',
         validators: [({ field }) => {
           const value = join(field.value, ' ');
@@ -79,6 +80,9 @@ export default class TransferMnemonicPage extends Component<Props> {
     options: {
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -137,6 +141,7 @@ export default class TransferMnemonicPage extends Component<Props> {
                 {
                   <div className={styles.text}>
                     {step0}
+                    &nbsp;
                     {intl.formatMessage(globalMessages.step1)}
                   </div>
                 }
@@ -152,7 +157,7 @@ export default class TransferMnemonicPage extends Component<Props> {
               error={recoveryPhraseField.error}
               maxVisibleOptions={5}
               noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={classicTheme ? AutocompleteSkin : AutocompleteOwnSkin}
+              skin={AutocompleteOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>

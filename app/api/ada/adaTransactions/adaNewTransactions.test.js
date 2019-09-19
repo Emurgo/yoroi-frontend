@@ -1,7 +1,7 @@
 
 // @flow
-import BigNumber from 'bignumber.js';
 import '../lib/test-config';
+import { schema } from 'lovefield';
 import type { UTXO, AdaAddress } from '../adaTypes';
 import {
   newAdaUnsignedTx,
@@ -12,6 +12,10 @@ import {
 import {
   NotEnoughMoneyToSendError,
 } from '../errors';
+
+import {
+  loadLovefieldDB,
+} from '../lib/storage/lovefieldDatabase';
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
@@ -58,7 +62,7 @@ const sampleUtxos: Array<UTXO> = [
 
 const sampleAdaAddresses: Array<AdaAddress> = [
   {
-    cadAmount: { getCCoin: new BigNumber(0) },
+    cadAmount: { getCCoin: '0' },
     cadId: 'Ae2tdPwUPEZEtwz7LKtJn9ub8y7ireuj3sq2yUCZ57ccj6ZkJKn7xEiApV9',
     cadIsUsed: false,
     account: 0,
@@ -66,7 +70,7 @@ const sampleAdaAddresses: Array<AdaAddress> = [
     index: 11,
   },
   {
-    cadAmount: { getCCoin: new BigNumber(0) },
+    cadAmount: { getCCoin: '0' },
     cadId: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
     cadIsUsed: false,
     account: 0,
@@ -77,6 +81,9 @@ const sampleAdaAddresses: Array<AdaAddress> = [
 
 beforeAll(async () => {
   await RustModule.load();
+  await loadLovefieldDB({
+    storeType: schema.DataStoreType.MEMORY,
+  });
 });
 
 describe('Create unsigned TX from UTXO', () => {

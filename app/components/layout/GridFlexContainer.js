@@ -6,10 +6,10 @@ import _ from 'lodash';
 
 import HorizontalFlexContainer from './HorizontalFlexContainer';
 
-type Props = {
+type Props = {|
   children: ?Node,
   rowSize: number
-};
+|};
 
 @observer
 export default class GridFlexContainer extends Component<Props> {

@@ -1,13 +1,13 @@
 // @flow
-import { observable, computed, when, runInAction } from 'mobx';
-import { defineMessages } from 'react-intl';
+import { action, observable, computed, when, runInAction } from 'mobx';
 import Store from '../base/Store';
-import Wallet from '../../domain/Wallet';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
-import LocalizableError, {
-  localizedError
-} from '../../i18n/LocalizableError';
+import { matchRoute } from '../../utils/routing';
+import { getURIParameters } from '../../utils/URIHandling';
+import type { UriParams } from '../../utils/URIHandling';
+import LocalizableError from '../../i18n/LocalizableError';
+import { UnableToLoadError } from '../../i18n/errors';
 import Request from '../lib/LocalizedRequest';
 import type { MigrationRequest } from '../../api';
 import { migrate } from '../../api';
@@ -16,18 +16,21 @@ import { closeOtherInstances } from '../../utils/tabManager';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
-const messages = defineMessages({
-  unableToLoad: {
-    id: 'app.errors.unableToLoad',
-    defaultMessage: '!!!Unable to load!',
-  },
-});
-
 /** Load dependencies before launching the app */
 export default class LoadingStore extends Store {
 
   @observable error: ?LocalizableError = null;
   @observable _loading: boolean = true;
+
+  /**
+   * null if app not opened from URI Scheme OR URI scheme was invalid
+   */
+  @observable _uriParams: ?UriParams = null;
+
+  _originRoute: {
+    route: string, // internal route
+    location: string, // full URL
+  } = { route: '', location: '' };
 
   @observable loadRustRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(RustModule.load.bind(RustModule));
@@ -47,12 +50,12 @@ export default class LoadingStore extends Store {
     Promise
       .all([this.loadRustRequest.execute().promise, this.loadDbRequest.execute().promise])
       .then(async () => {
-        closeOtherInstances();
+        await closeOtherInstances();
         await this.migrationRequest.execute({
           api: this.api,
-          currVersion: environment.version
+          currVersion: environment.version,
         }).promise;
-        await this._openPageAfterLoad();
+        await this.validateUriPath();
         runInAction(() => {
           this.error = null;
           this._loading = false;
@@ -61,7 +64,7 @@ export default class LoadingStore extends Store {
       }).catch((error) => {
         Logger.error('LoadingStore::setup Unable to load libraries ' + stringifyError(error));
         runInAction(() => {
-          this.error = localizedError(new UnableToLoadError());
+          this.error = new UnableToLoadError();
           this._loading = false;
         });
       });
@@ -71,40 +74,48 @@ export default class LoadingStore extends Store {
     return !!this._loading;
   }
 
-  _isRefresh = (): boolean => this.isLoading;
+  @computed get fromUriScheme(): boolean {
+    return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route);
+  }
 
-  _redirectToLoading = (): void => (
-    this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT })
-  );
+  @computed get uriParams(): ?UriParams {
+    return this._uriParams;
+  }
 
-  /** Select which page to open after app is done loading */
-  _openPageAfterLoad = async (): Promise<void> => {
-    const { app } = this.stores;
-    const { wallets } = this.stores.substores[environment.API];
-    await wallets.refreshWalletsData();
-    if (app.currentRoute === ROUTES.ROOT) {
-      if (wallets.first) {
-        const firstWallet: Wallet = wallets.first;
-
-        // Dynamic Initialization of Topbar Categories
-        this.stores.topbar.updateCategories();
-
-        this.actions.router.goToRoute.trigger({
-          route: ROUTES.WALLETS.TRANSACTIONS,
-          params: { id: firstWallet.id }
-        });
-      } else {
-        this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-      }
+  @action
+  validateUriPath = async (): Promise<void> => {
+    if (this.fromUriScheme) {
+      const uriParams = await getURIParameters(
+        decodeURIComponent(this._originRoute.location),
+        this.stores.substores.ada.wallets.isValidAddress
+      );
+      runInAction(() => {
+        this._uriParams = uriParams;
+      });
     }
   }
-}
 
-export class UnableToLoadError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.unableToLoad.id,
-      defaultMessage: messages.unableToLoad.defaultMessage || '',
+  /**
+   * Need to clear any data inijected by the URI after we've applied it
+   */
+  @action
+  resetUriParams = (): void => {
+    this._uriParams = null;
+    this._originRoute = { route: '', location: '' };
+  }
+
+  _isRefresh = (): boolean => this.isLoading;
+
+  _redirectToLoading = (): void => {
+    // before redirecting, save origin route in case we need to come back to
+    // it later (this is the case when user comes from a URI link)
+    runInAction(() => {
+      this._originRoute = {
+        route: this.stores.app.currentRoute,
+        location: window.location.href,
+      };
+      // note: we don't validate the path since we need to wait for the WASM bindings to load first
     });
+    this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
   }
 }

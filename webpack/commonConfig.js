@@ -10,15 +10,6 @@ const plugins = (folder) => ([
   /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
   new webpack.IgnorePlugin(/^\.\/(?!english)/, /bip39\/src\/wordlists$/),
   /**
-   * We need CardanoWallet for flow to get the WASM binding types.
-   * However, the flow definitions aren't available to webpack at runtime
-   * so we have to mock them out with a noop
-   */
-  new webpack.NormalModuleReplacementPlugin(
-    /CardanoWallet/,
-    'lodash/noop.js'
-  ),
-  /**
    * We use the HtmlWebpackPlugin to group back together the chunks inside the HTML
    */
   new HtmlWebpackPlugin({
@@ -39,6 +30,7 @@ const plugins = (folder) => ([
    * But we need this written to disk so the extension can be loaded by Chrome
    */
   new HtmlWebpackHarddiskPlugin(),
+  // populates the CONFIG global based on ENV
   new ConfigWebpackPlugin(),
 ]);
 
@@ -51,12 +43,24 @@ const rules = [
   {
     test: /\.css$/,
     use: [
-      'style-loader',
-      'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+      {
+        loader: 'style-loader',
+      },
+      {
+        loader: 'css-loader',
+        options: {
+          importLoaders: 1,
+          sourceMap: true,
+          modules: {
+            mode: 'local',
+            localIdentName: '[name]__[local]___[hash:base64:5]',
+          }
+        },
+      },
       {
         loader: 'postcss-loader',
         options: {
-          plugins: () => [autoprefixer]
+          plugins: () => [autoprefixer],
         }
       }
     ]
@@ -64,16 +68,38 @@ const rules = [
   {
     test: /\.global\.scss$/,
     use: [
-      'style-loader?sourceMap',
-      'css-loader?sourceMap',
+      {
+        loader: 'style-loader',
+      },
+      {
+        loader: 'css-loader',
+        options: {
+          sourceMap: true,
+          modules: {
+            mode: 'global',
+          },
+        },
+      },
       'sass-loader?sourceMap'
     ]
   },
   {
     test: /^((?!\.global).)*\.scss$/,
     use: [
-      'style-loader?sourceMap',
-      'css-loader?sourceMap&modules&localIdentName=[name]_[local]&importLoaders=1',
+      {
+        loader: 'style-loader',
+      },
+      {
+        loader: 'css-loader',
+        options: {
+          importLoaders: 1,
+          sourceMap: true,
+          modules: {
+            mode: 'local',
+            localIdentName: '[name]_[local]',
+          }
+        },
+      },
       'sass-loader?sourceMap'
     ]
   },
@@ -121,9 +147,9 @@ const resolve = {
   extensions: ['*', '.js', '.wasm']
 };
 
-const definePlugin = (networkName) => ({
+const definePlugin = (networkName, isProd) => ({
   'process.env': {
-    NODE_ENV: JSON.stringify(networkName),
+    NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
     BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim())
   }

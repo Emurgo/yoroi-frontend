@@ -1,6 +1,7 @@
+// @flow
 import RouteParser from 'route-parser';
 
-export const matchRoute = (pattern, path) => new RouteParser(pattern).match(path);
+export const matchRoute = (pattern: string, path: string) => new RouteParser(pattern).match(path);
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
@@ -14,9 +15,10 @@ export const matchRoute = (pattern, path) => new RouteParser(pattern).match(path
  * @param pattern
  * @param params
  */
-export const buildRoute = (pattern, params) => {
+type ParamsT = ?{ [key: string]: Array<number|string>|number|string };
+export const buildRoute = (pattern: string, params: ParamsT) => {
   function toArray(val) {
-    return Object.prototype.toString.call(val) !== '[object Array]' ? [val] : val;
+    return Array.isArray(val) ? val : [val];
   }
   const reRepeatingSlashes = /\/+/g; // '/some//path'
   const reSplatParams = /\*{1,2}/g;  // '/some/*/complex/**/path'
@@ -30,22 +32,24 @@ export const buildRoute = (pattern, params) => {
   const tokens = {};
 
   if (params) {
+    // assert not null
+    const paramsArgs = params;
     Object.keys(params).forEach((paramName) => {
-      let paramValue = params[paramName];
+      const paramValue = paramsArgs[paramName];
 
       // special param name in RR, used for '*' and '**' placeholders
       if (paramName === 'splat') {
         // when there are multiple globs, RR defines 'splat' param as array.
-        paramValue = toArray(paramValue);
+        const paramValueArray = toArray(paramValue);
         let i = 0;
         routePath = routePath.replace(reSplatParams, (match) => {
-          const val = paramValue[i++];
-          if (val == null) {
+          const val = paramValueArray[i++];
+          if (val === undefined) {
             return '';
           }
           const tokenName = `splat${i}`;
           if (match === '*') {
-            tokens[tokenName] = encodeURIComponent(val);
+            tokens[tokenName] = encodeURIComponent(String(val));
           } else {
             // don't escape slashes for double star, as '**' considered greedy by RR spec
             tokens[tokenName] = encodeURIComponent(
@@ -65,6 +69,7 @@ export const buildRoute = (pattern, params) => {
         // - '/path(/:param/:another_param)'
         const paramRegex = new RegExp('(/|\\(|\\)|^):' + paramName + '(/|\\)|\\(|$)');
         routePath = routePath.replace(paramRegex, (match, g1, g2) => {
+          // $FlowFixMe
           tokens[paramName] = encodeURIComponent(paramValue);
           return `${g1}<${paramName}>${g2}`;
         });
@@ -97,7 +102,7 @@ export const buildRoute = (pattern, params) => {
  * @param url
  * @returns {string}
  */
-export const getUrlParameterByName = (name, url) => {
+export const getUrlParameterByName = (name: string, url?: string) => {
   if (!url) url = window.location.href;
   name = name.replace(/[[\]]/g, '\\$&');
   const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
