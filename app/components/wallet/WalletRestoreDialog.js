@@ -256,10 +256,17 @@ export default class WalletRestoreDialog extends Component<Props> {
   };
 
   componentDidMount() {
-    setTimeout(() => { this.walletNameInput.focus(); });
+    setTimeout(() => {
+      if (this.props.isVerificationMode) {
+        this.recoveryPhraseInput.focus();
+      } else {
+        this.walletNameInput.focus();
+      }
+    });
   }
 
   walletNameInput: Input;
+  recoveryPhraseInput: Autocomplete;
 
   render() {
     const { intl } = this.context;
@@ -383,6 +390,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         <Autocomplete
           options={validWords}
           maxSelections={this.props.numberOfMnemonics}
+          inputRef={(input) => { this.recoveryPhraseInput = input; }}
           {...recoveryPhraseField.bind()}
           done={mnemonicValidator(join(recoveryPhrase, ' '))}
           error={recoveryPhraseField.error}
