@@ -65,6 +65,22 @@ export default class DropboxApi {
     });
   }
 
+  async revokeToken(): Promise<void> {
+    try {
+      this.api.authTokenRevoke()
+        .then((response) => {
+          Logger.info('DropboxApi::revokeToken success');
+        })
+        .catch((error) => {
+          self.errorCode = error.status;
+          self.errorMessage = 'An error ocurred when revoking the token';
+        });
+    } catch (error) {
+      Logger.error('DropboxApi::revokeToken error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
   getError() {
     return sprintf('[%s] %s', this.errorCode, this.errorMessage);
   }

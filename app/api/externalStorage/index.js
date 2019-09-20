@@ -44,6 +44,8 @@ export default class ExternalStorageApi {
     this.uploadAndOverwriteFile = this.uploadAndOverwriteFile.bind(this);
     // $FlowFixMe
     this.deleteFile = this.deleteFile.bind(this);
+    // $FlowFixMe
+    this.revokeToken = this.revokeToken.bind(this);
   }
 
   // Setup all available providers. Usually a setup should involve
@@ -66,6 +68,16 @@ export default class ExternalStorageApi {
       this.selectedProvider.auth(selected.token);
     } catch (error) {
       Logger.error('ExternalStorageApi::setSelectedProvider error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  // Revoke current token
+  async revokeToken(): Promise<void> {
+    try {
+      this.selectedProvider.revokeToken();
+    } catch (error) {
+      Logger.error('ExternalStorageApi::revokeToken error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

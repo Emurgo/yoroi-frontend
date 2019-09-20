@@ -36,7 +36,6 @@ export default class MemosStore extends Store {
 
   @observable
   unsetExternalStorageProviderRequest: Request<void => Promise<void>>
-    // eslint-disable-next-line max-len
     = new Request<void => Promise<void>>(this.api.localStorage.unsetExternalStorage);
 
   @observable
@@ -58,6 +57,10 @@ export default class MemosStore extends Store {
 
   @observable deleteTxMemoRequest: Request<DeleteTxMemoFunc>
     = new Request<DeleteTxMemoFunc>(this.api.ada.deleteTxMemos);
+
+   @observable
+  revokeTokenStorageProvideRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.externalStorage.revokeToken);
 
   _hasAnyPending: boolean = false;
 
@@ -95,6 +98,8 @@ export default class MemosStore extends Store {
   @action _unsetExternalStorageProvider = async () => {
     await this.unsetExternalStorageProviderRequest.execute();
     await this.getExternalStorageProviderRequest.execute(); // eagerly cache
+    // Revoke current token
+    await this.revokeTokenStorageProvideRequest.execute();
   };
 
   @computed get hasLoadedExternalStorageProvider(): boolean {
