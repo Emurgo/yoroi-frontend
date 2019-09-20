@@ -31,6 +31,7 @@ import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
 import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
+import Staking from './containers/staking/Staking';
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -83,6 +84,13 @@ export const Routes = (
           <Settings {...props} stores={stores} actions={actions}>
             {SettingsSubpages(stores, actions)}
           </Settings>
+        )}
+      />
+      <Route
+        exact
+        path={ROUTES.STAKING.ROOT}
+        component={(props) => (
+          <Staking {...props} stores={stores} actions={actions} />
         )}
       />
       <Route
