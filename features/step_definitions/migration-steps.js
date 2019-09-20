@@ -2,12 +2,12 @@
 
 import { Then } from 'cucumber';
 
-const lastestVersion = require('../../chrome/manifest.test.json').version;
+const latestVersion = require('../../chrome/manifest.test').version;
 
 Then(/^Last launch version is updated$/, async function () {
   await this.driver.wait(async () => {
     const lastLaunchVersion = await getLastLaunchVersion(this.driver);
-    return lastLaunchVersion === lastestVersion;
+    return lastLaunchVersion === latestVersion;
   });
 });
 

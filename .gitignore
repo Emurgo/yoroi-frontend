@@ -26,3 +26,9 @@ Yoroi
 # IntelliJ IDEA config
 .idea
 **/*.iml
+
+# manifests are built dynamically
+chrome/manifest.*.json
+
+# history plugin for vscode
+.history

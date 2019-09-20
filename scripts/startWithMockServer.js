@@ -1,6 +1,6 @@
 // @flow
 const { getMockServer } = require('../features/mock-chain/mockServer');
-const  { resetChain } = require('../features/mock-chain/mockImporter');
+const { resetChain } = require('../features/mock-chain/mockImporter');
 
 getMockServer({ outputLog: true });
 resetChain();
@@ -15,6 +15,11 @@ const config = require(`../webpack/devConfig`);
 process.env.NODE_CONFIG_ENV = ENV;
 
 tasks.replaceWebpack();
+
+console.log('[Build manifest]');
+console.log('-'.repeat(80));
+tasks.buildManifests();
+
 console.log('[Copy assets]');
 console.log('-'.repeat(80));
 tasks.copyAssets('dev', ENV);

@@ -15,7 +15,7 @@ const CONFIG: ConfigType = {
     logsFileSuffix: 'log',
     addressScanSize: 20,
     addressRequestSize: 20,
-    txsBodiesRequestSize: 20
+    txsBodiesRequestSize: 20,
   },
 };
 
