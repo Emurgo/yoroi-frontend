@@ -22,8 +22,12 @@ export const unitOfAccountDisabledValue: UnitOfAccountSettingType = {
 export function getPrice(
   fromCurrency: string,
   toCurrency: string,
-  tickers: Array<Ticker>
+  tickers: ?Array<Ticker>
 ): number|null {
+  if (!tickers) {
+    return null;
+  }
+
   const ticker = tickers.find(t => (t.from === fromCurrency) && (t.to === toCurrency));
   if (!ticker) {
     return null;

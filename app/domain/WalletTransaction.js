@@ -38,7 +38,7 @@ export default class WalletTransaction {
   @observable addresses: TrasactionAddresses = { from: [], to: [] };
   @observable state: TransactionState;
   // Price data at the moment of the transaction. Used to show amount and fee in other currencies.
-  @observable tickers: Array<Ticker> = [];
+  @observable tickers: ?Array<Ticker>;
 
   constructor(data: {
     id: string,
