@@ -7,7 +7,6 @@ class Module {
   _cardanoWallet: WalletType;
 
   async load() {
-    // $FlowFixMe flow fails on dynamic imports
     this._cardanoWallet = await import('cardano-wallet-browser');  // eslint-disable-line
   }
 

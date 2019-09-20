@@ -542,7 +542,7 @@ export default class AdaApi {
     const { addresses, accountPlate } = mnemonicsToExternalAddresses(
       words.join(' '),
       0, // paper wallets always use account 0
-      numAddresses || DEFAULT_ADDRESSES_PER_PAPER,
+      numAddresses != null ? numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
     );
     return { addresses, scrambledWords, accountPlate };
   }
@@ -560,7 +560,7 @@ export default class AdaApi {
     const res : Promise<CreateAdaPaperPdfResponse> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
-      accountPlate: printAccountPlate ? accountPlate : undefined,
+      accountPlate: printAccountPlate === true ? accountPlate : undefined,
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
@@ -668,7 +668,7 @@ export default class AdaApi {
       }
       const txHistory = await getTxsOrderedByDateDesc();
       Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(history));
-      const transactions = limit
+      const transactions = limit != null
         ? txHistory.slice(skip, skip + limit)
         : txHistory;
 
@@ -1486,9 +1486,10 @@ const _createTransactionFromServerData = action(
     lastBlockNumber: number,
   ) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
+    const directionMessage = data.ctIsOutgoing ? 'Ada sent' : 'Ada received';
     return new WalletTransaction({
       id: data.ctId,
-      title: ctmTitle || data.ctIsOutgoing ? 'Ada sent' : 'Ada received',
+      title: ctmTitle != null ? ctmTitle : directionMessage,
       type,
       amount: amount.dividedBy(LOVELACES_PER_ADA).plus(fee.dividedBy(LOVELACES_PER_ADA)),
       fee: fee.dividedBy(LOVELACES_PER_ADA),

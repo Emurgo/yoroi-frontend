@@ -242,7 +242,7 @@ function textCenter(
   const scaleFactor = doc.internal.scaleFactor;
   const textWidth = unit * fontSize / scaleFactor;
   const pageWidth = doc.internal.pageSize.width;
-  const textOffset = ((pageWidth / 2) - ((textWidth / 2) * (isReverseCentering ? -1 : +1)));
+  const textOffset = ((pageWidth / 2) - ((textWidth / 2) * (isReverseCentering === true ? -1 : +1)));
   doc.text(textOffset + (xShift || 0), y, text, m, r);
 }
 

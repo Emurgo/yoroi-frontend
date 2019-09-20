@@ -189,7 +189,7 @@ export default class DaedalusTransferStore extends Store {
           mnemonic: secretWords,
           numberOfWords: 27
         });
-      if (!newSecretWords || !unscrambledLen) {
+      if (newSecretWords == null || !unscrambledLen) {
         throw new Error('Failed to unscramble paper mnemonics!');
       }
       secretWords = newSecretWords;

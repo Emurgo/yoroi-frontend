@@ -96,7 +96,7 @@ export default class LedgerSendStore extends Store {
     }
 
     const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
-    if (!accountId) {
+    if (accountId == null) {
       // this Error will be converted to LocalizableError()
       throw new Error('Active account required before sending.');
     }

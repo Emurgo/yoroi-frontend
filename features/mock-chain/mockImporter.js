@@ -394,7 +394,7 @@ function calcUtxoMap(): { [key: string]: $Exact<UTXO> }  {
 
 function history(): Array<Transaction> {
   const bestBlockNum = Math.max(...transactions.map(
-    tx => (tx.block_num ? Number(tx.block_num) : 0)
+    tx => (tx.block_num != null ? Number(tx.block_num) : 0)
   )).toString();
 
   return transactions.map(tx => ({

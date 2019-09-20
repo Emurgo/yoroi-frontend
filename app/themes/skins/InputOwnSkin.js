@@ -84,10 +84,10 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
             type={inputType}
             className={classnames([
               this.props.theme[this.props.themeId].input,
-              this.props.disabled ? this.props.theme[this.props.themeId].disabled : null,
-              this.props.error ? this.props.theme[this.props.themeId].errored : null,
-              (this.props.error || this.props.type === 'password' || this.props.done) ? styles.icon : null,
-              ((this.props.error || this.props.type === 'password') && this.props.done) ? styles.doubleIcon : null
+              this.props.disabled === true ? this.props.theme[this.props.themeId].disabled : null,
+              this.props.error != null ? this.props.theme[this.props.themeId].errored : null,
+              (this.props.error != null || this.props.type === 'password' || this.props.done === true) ? styles.icon : null,
+              ((this.props.error != null || this.props.type === 'password') && this.props.done === true) ? styles.doubleIcon : null
             ])}
             readOnly={this.props.readOnly}
             onFocus={this.handleFocus}

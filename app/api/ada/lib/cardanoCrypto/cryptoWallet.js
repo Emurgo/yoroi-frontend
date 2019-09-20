@@ -49,7 +49,7 @@ export const isValidEnglishAdaPaperMnemonic = (
   const fakePassword = numberOfWords === 21 ? 'xxx' : undefined;
   const [unscrambled, unscrambledLen] =
     unscramblePaperAdaMnemonic(phrase, numberOfWords, fakePassword);
-  if (unscrambled && unscrambledLen) {
+  if (unscrambled != null && unscrambledLen) {
     return isValidEnglishAdaMnemonic(unscrambled, unscrambledLen);
   }
   return false;
@@ -64,7 +64,7 @@ export const unscramblePaperAdaMnemonic = (
   const words = phrase.split(' ');
   if (words.length === numberOfWords) {
     if (numberOfWords === 27) {
-      if (password) {
+      if (password != null) {
         throw new Error('Password is not expected for a 27-word paper!');
       }
       const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 18), words.slice(18)];
@@ -85,7 +85,7 @@ export const unscramblePaperAdaMnemonic = (
       }
     }
     if (numberOfWords === 21) {
-      if (!password) {
+      if (password == null) {
         throw new Error('Password is expected for a 21-word paper!');
       }
       try {
