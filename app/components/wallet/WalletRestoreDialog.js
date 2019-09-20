@@ -257,7 +257,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
   componentDidMount() {
     setTimeout(() => {
-      if (this.props.isVerificationMode) {
+      if (this.props.isVerificationMode === true) {
         this.recoveryPhraseInput.focus();
       } else {
         this.walletNameInput.focus();
