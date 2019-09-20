@@ -18,18 +18,19 @@ const messages = defineMessages({
     id: 'settings.externalStorage.intro',
     defaultMessage: '!!!Select an external storage service to connect your account and save your memo notes.'
   },
-  buttonDropbox: {
-    id: 'settings.externalStorage.button.dropbox',
-    defaultMessage: '!!!Dropbox',
+  buttonConnect: {
+    id: 'settings.externalStorage.button.connect',
+    defaultMessage: '!!!Connect',
   },
-  buttonConnected: {
-    id: 'settings.externalStorage.button.connected',
-    defaultMessage: '!!!Connected',
+  buttonDisconnect: {
+    id: 'settings.externalStorage.button.disconnect',
+    defaultMessage: '!!!Disconnect',
   }
 });
 
 type Props = {|
-  onExternalClick: Function,
+  onConnect: Function,
+  onDisconnect: Function,
   externalStorageProviders: { [key: string] : ProvidersType },
   selectedExternalStorage: ?SelectedExternalStorageProvider,
 |};
@@ -42,8 +43,12 @@ export default class ExternalStorageSettings extends Component<Props> {
   };
 
   render() {
-    const { onExternalClick, externalStorageProviders,
-      selectedExternalStorage } = this.props;
+    const {
+      onConnect,
+      onDisconnect,
+      externalStorageProviders,
+      selectedExternalStorage,
+    } = this.props;
     const { intl } = this.context;
 
     const buttonClasses = classnames([
@@ -55,20 +60,25 @@ export default class ExternalStorageSettings extends Component<Props> {
     // eslint-disable-next-line
     for (const provider in externalStorageProviders) {
       const authorizeUrl = externalStorageProviders[provider].authorizeUrl;
-      const disabledCondition = (
+      const showDisconnect = (
         selectedExternalStorage
         && selectedExternalStorage.provider === provider
+      );
+      const disabledCondition = (
+        selectedExternalStorage
+        && selectedExternalStorage.provider !== provider
       );
       providersButtons.push(
         <Button
           key={provider}
           className={buttonClasses}
-          label={disabledCondition ?
-            intl.formatMessage(messages.buttonConnected) :
-            externalStorageProviders[provider].name
+          label={showDisconnect ?
+            intl.formatMessage(messages.buttonDisconnect) :
+            // externalStorageProviders[provider].name
+            intl.formatMessage(messages.buttonConnect)
           }
           skin={ButtonSkin}
-          onClick={() => onExternalClick(authorizeUrl)}
+          onClick={() => showDisconnect ? onDisconnect() : onConnect(authorizeUrl)}
           disabled={disabledCondition}
         />
       );

@@ -8,6 +8,7 @@ import type { TransactionMemo } from '../api/ada/adaTypes';
 
 export default class MemosActions {
   updateExternalStorageProvider: Action<SelectedExternalStorageProvider> = new Action();
+  unsetExternalStorageProvider: Action<void> = new Action();
   closeAddMemoDialog: Action<void> = new Action();
   closeEditMemoDialog: Action<void> = new Action();
   goBackDeleteMemoDialog: Action<void> = new Action();

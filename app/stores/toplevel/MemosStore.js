@@ -35,6 +35,11 @@ export default class MemosStore extends Store {
     = new Request<SelectedExternalStorageProvider => Promise<void>>(this.api.localStorage.setExternalStorage);
 
   @observable
+  unsetExternalStorageProviderRequest: Request<void => Promise<void>>
+    // eslint-disable-next-line max-len
+    = new Request<void => Promise<void>>(this.api.localStorage.unsetExternalStorage);
+
+  @observable
   setSelectedProviderRequest: Request<SelectedExternalStorageProvider => Promise<void>>
     // eslint-disable-next-line max-len
     = new Request<SelectedExternalStorageProvider => Promise<void>>(this.api.externalStorage.setSelectedProvider);
@@ -59,6 +64,7 @@ export default class MemosStore extends Store {
   setup() {
     this._getSelectedProvider(); // eagerly cache
     this.actions.memos.updateExternalStorageProvider.listen(this._setExternalStorageProvider);
+    this.actions.memos.unsetExternalStorageProvider.listen(this._unsetExternalStorageProvider);
     this.actions.memos.closeAddMemoDialog.listen(this._closeAddMemoDialog);
     this.actions.memos.closeEditMemoDialog.listen(this._closeEditMemoDialog);
     this.actions.memos.goBackDeleteMemoDialog.listen(this._goBackDeleteMemoDialog);
@@ -83,6 +89,11 @@ export default class MemosStore extends Store {
 
   @action _setExternalStorageProvider = async (provider : SelectedExternalStorageProvider) => {
     await this.setExternalStorageProviderRequest.execute(provider);
+    await this.getExternalStorageProviderRequest.execute(); // eagerly cache
+  };
+
+  @action _unsetExternalStorageProvider = async () => {
+    await this.unsetExternalStorageProviderRequest.execute();
     await this.getExternalStorageProviderRequest.execute(); // eagerly cache
   };
 

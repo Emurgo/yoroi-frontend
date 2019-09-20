@@ -8,6 +8,15 @@ import type { InjectedProps } from '../../../types/injectedPropsType';
 @observer
 export default class ExternalStorageSettingsPage extends Component<InjectedProps> {
 
+  onConnect = (authorizeUrl: string) => {
+    // Open authorize url
+    handleExternalClick(authorizeUrl);
+  };
+
+  onDisconnect = () => {
+    this.props.actions.memos.unsetExternalStorageProvider.trigger();
+  };
+
   render() {
     const {
       providers,
@@ -16,7 +25,8 @@ export default class ExternalStorageSettingsPage extends Component<InjectedProps
 
     return (
       <ExternalStorageSettings
-        onExternalClick={handleExternalClick}
+        onConnect={this.onConnect}
+        onDisconnect={this.onDisconnect}
         externalStorageProviders={providers}
         selectedExternalStorage={selectedProvider}
       />
