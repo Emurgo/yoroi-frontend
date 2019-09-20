@@ -13,6 +13,7 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -158,7 +159,7 @@ export default class TransferSummaryPage extends Component<Props> {
                   <Fragment>
                     <div className={styles.amount}>
                       {coinPrice ?
-                        transferTx.recoveredBalance.multipliedBy(coinPrice).toString() :
+                        calculateAndFormatValue(transferTx.recoveredBalance, coinPrice) :
                         '-'
                       }
                       <span className={styles.currencySymbol}>&nbsp;
@@ -184,7 +185,7 @@ export default class TransferSummaryPage extends Component<Props> {
                   <Fragment>
                     <div className={styles.fees}>
                       {'+' + (coinPrice ?
-                        transferTx.fee.multipliedBy(coinPrice).toString() :
+                        calculateAndFormatValue(transferTx.fee, coinPrice) :
                         '-')
                       }
                       <span className={styles.currencySymbol}>&nbsp;
@@ -211,8 +212,10 @@ export default class TransferSummaryPage extends Component<Props> {
                 <Fragment>
                   <div className={styles.totalAmount}>
                     {coinPrice ?
-                      transferTx.recoveredBalance.minus(transferTx.fee)
-                        .multipliedBy(coinPrice).toString() :
+                      calculateAndFormatValue(
+                        transferTx.recoveredBalance.minus(transferTx.fee),
+                        coinPrice
+                      ) :
                       '-'
                     }
                     <span className={styles.currencySymbol}>&nbsp;

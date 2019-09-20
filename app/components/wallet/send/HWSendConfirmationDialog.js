@@ -17,6 +17,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import { formattedWalletAmount } from '../../../utils/formatters';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 import type { ExplorerType } from '../../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
@@ -120,7 +121,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <Fragment>
               <div className={styles.amount}>
-                {coinPrice ? amount.multipliedBy(coinPrice).toString() : '-'}
+                {coinPrice ? calculateAndFormatValue(amount, coinPrice) : '-'}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
@@ -141,7 +142,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <Fragment>
               <div className={styles.fees}>+
-                {coinPrice ? transactionFee.multipliedBy(coinPrice).toString() : '-'}
+                {coinPrice ? calculateAndFormatValue(transactionFee, coinPrice) : '-'}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
               <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
@@ -164,7 +165,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         {unitOfAccountSetting.enabled ? (
           <Fragment>
             <div className={styles.totalAmount}>
-              {coinPrice ? totalAmount.multipliedBy(coinPrice).toString() : '-'}
+              {coinPrice ? calculateAndFormatValue(totalAmount, coinPrice) : '-'}
               &nbsp;{unitOfAccountSetting.currency}
             </div>
             <div className={styles.totalAmountSmall}>{formattedWalletAmount(totalAmount)}

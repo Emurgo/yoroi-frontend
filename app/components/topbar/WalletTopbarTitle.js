@@ -14,6 +14,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import hideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
 import showBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
 
 const messages = defineMessages({
   totalBalance: {
@@ -95,7 +96,7 @@ export default class WalletTopbarTitle extends Component<Props> {
             ) : unitOfAccountSetting.enabled ? ( // eslint-disable-line no-nested-ternary
               wallet ? (
                 <span>
-                  {coinPrice ? wallet.amount.multipliedBy(coinPrice).toString() : '-'}
+                  {coinPrice ? calculateAndFormatValue(wallet.amount, coinPrice) : '-'}
                 </span>
               ) : null
             ) : (

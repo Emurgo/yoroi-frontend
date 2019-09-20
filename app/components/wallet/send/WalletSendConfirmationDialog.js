@@ -25,6 +25,7 @@ import WarningBox from '../../widgets/WarningBox';
 import type { BaseSignRequest } from '../../../api/ada/adaTypes';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -197,7 +198,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
                 <Fragment>
                   <div className={styles.amount}>
                     {coinPrice ?
-                      formattedWalletAmount(amount.multipliedBy(coinPrice)) :
+                      calculateAndFormatValue(amount, coinPrice) :
                       '-'
                     }
                     <span className={styles.currencySymbol}>
@@ -223,7 +224,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
                 <Fragment>
                   <div className={styles.fees}>+
                     {coinPrice ?
-                      formattedWalletAmount(transactionFee.multipliedBy(coinPrice)) :
+                      calculateAndFormatValue(transactionFee, coinPrice) :
                       '-'
                     }
                     <span className={styles.currencySymbol}>
@@ -251,7 +252,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               <Fragment>
                 <div className={styles.totalAmount}>
                   {coinPrice ?
-                    formattedWalletAmount(totalAmount.multipliedBy(coinPrice)) :
+                    calculateAndFormatValue(totalAmount, coinPrice) :
                     '-'
                   }
                   <span className={styles.currencySymbol}>

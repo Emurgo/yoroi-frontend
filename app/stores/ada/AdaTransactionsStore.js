@@ -88,7 +88,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
             if (price !== null && unconfirmedAmount.outgoingInSelectedCurrency) {
               unconfirmedAmount.outgoingInSelectedCurrency =
                 unconfirmedAmount.outgoingInSelectedCurrency.plus(
-                  transaction.amount.absoluteValue().multipliedBy(price)
+                  transaction.amount.absoluteValue().multipliedBy(String(price))
                 );
             } else {
               unconfirmedAmount.outgoingInSelectedCurrency = null;
@@ -106,7 +106,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
             if (price !== null && unconfirmedAmount.incomingInSelectedCurrency) {
               unconfirmedAmount.incomingInSelectedCurrency =
                 unconfirmedAmount.incomingInSelectedCurrency.plus(
-                  transaction.amount.absoluteValue().multipliedBy(price)
+                  transaction.amount.absoluteValue().multipliedBy(String(price))
                 );
             } else {
               unconfirmedAmount.incomingInSelectedCurrency = null;

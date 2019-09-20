@@ -10,6 +10,7 @@ import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import styles from './WalletSummary.scss';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { formatValue } from '../../../utils/unit-of-account';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -66,7 +67,7 @@ export default class WalletSummary extends Component<Props> {
                 :&nbsp;
                 {pendingAmount.incomingInSelectedCurrency && unitOfAccountSetting.enabled ? (
                   <span>
-                    {pendingAmount.incomingInSelectedCurrency.toString()}
+                    {formatValue(pendingAmount.incomingInSelectedCurrency)}
                     {' ' + unitOfAccountSetting.currency}
                   </span>
                 ) : (
@@ -83,7 +84,7 @@ export default class WalletSummary extends Component<Props> {
                 :&nbsp;
                 {pendingAmount.outgoingInSelectedCurrency && unitOfAccountSetting.enabled ? (
                   <span>
-                    {pendingAmount.outgoingInSelectedCurrency.toString()}
+                    {formatValue(pendingAmount.outgoingInSelectedCurrency)}
                     {' ' + unitOfAccountSetting.currency}
                   </span>
                 ) : (

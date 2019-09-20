@@ -15,6 +15,7 @@ import ExplorableHashContainer from '../../containers/widgets/ExplorableHashCont
 import RawHash from '../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
 
 import styles from './URIVerifyDialog.scss';
 
@@ -108,7 +109,7 @@ export default class URIVerifyDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <Fragment>
               <div className={styles.amount}>
-                {coinPrice ? amount.multipliedBy(coinPrice).toString() : '-'}&nbsp;
+                {coinPrice ? calculateAndFormatValue(amount, coinPrice) : '-'}&nbsp;
                 {unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>

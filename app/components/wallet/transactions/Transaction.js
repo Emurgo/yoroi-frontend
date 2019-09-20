@@ -20,6 +20,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import type { ExplorerType } from '../../../domain/Explorer';
 import { getPrice } from '../../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 const messages = defineMessages({
   type: {
@@ -228,13 +229,9 @@ export default class Transaction extends Component<Props, State> {
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
     const symbol = adaSymbol;
 
-    let amountInSelectedCurrency = new BigNumber(0);
     let price: ?number = null;
     if (unitOfAccountSetting.enabled) {
       price = getPrice('ADA', unitOfAccountSetting.currency, data.tickers);
-      if (typeof price === 'number') {
-        amountInSelectedCurrency = data.amount.multipliedBy(price);
-      }
     }
 
     return (
@@ -259,8 +256,8 @@ export default class Transaction extends Component<Props, State> {
               )}
 
               {(unitOfAccountSetting.enabled && (typeof price === 'number')) ? (
-                <div className={this.getAmountStyle(amountInSelectedCurrency)}>
-                  { amountInSelectedCurrency.toString() + ' ' + unitOfAccountSetting.currency }
+                <div className={this.getAmountStyle(data.amount)}>
+                  { calculateAndFormatValue(data.amount, price) + ' ' + unitOfAccountSetting.currency }
                   <div className={styles.amountSmall}>
                     { formattedWalletAmount(data.amount) } ADA
                   </div>
@@ -304,7 +301,7 @@ export default class Transaction extends Component<Props, State> {
                   {unitOfAccountSetting.enabled && price ? (
                     <Fragment>
                       <div className={styles.rowData}>
-                        {data.fee.abs().multipliedBy(price).toString()}
+                        {calculateAndFormatValue(data.fee.abs(), price)}
                         {' ' + unitOfAccountSetting.currency}
                       </div>
                       <div className={styles.rowDataSmall}>
