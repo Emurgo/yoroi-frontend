@@ -29,7 +29,6 @@ import WalletSendPage from './containers/wallet/WalletSendPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
 import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
 import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
-import AdaRedemptionPage from './containers/wallet/AdaRedemptionPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
 
@@ -151,11 +150,6 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.SUPPORT}
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.SETTINGS.ADA_REDEMPTION}
-      component={(props) => <AdaRedemptionPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
