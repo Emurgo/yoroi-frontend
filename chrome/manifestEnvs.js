@@ -1,7 +1,8 @@
 // @flow
 
 // URL of Seiza for Yoroi
-const SEIZA_FOR_YOROI_URL = process.env.SEIZA_FOR_YOROI_URL || 'https://seiza.com';
+const SEIZA_FOR_YOROI_URL = process.env.SEIZA_FOR_YOROI_URL != null ?
+  process.env.SEIZA_FOR_YOROI_URL : 'https://seiza.com';
 // export const SEIZA_FOR_YOROI_URL = process.env.SEIZA_FOR_YOROI_URL || 'http://localhost:3001';
 
 /**
@@ -10,7 +11,7 @@ const SEIZA_FOR_YOROI_URL = process.env.SEIZA_FOR_YOROI_URL || 'https://seiza.co
  * that opens a new tab with original Seiza URL, which is a different URL than Seiza for Yoroi.
  * Therefore we also need to have SEIZA_URL in manifest.json (frame-src)
  */
-const SEIZA_URL = process.env.SEIZA_URL || 'https://seiza.com';
+const SEIZA_URL = process.env.SEIZA_URL != null ? process.env.SEIZA_URL : 'https://seiza.com';
 // export const SEIZA_URL = process.env.SEIZA_URL || 'http://localhost:3001';
 
 module.exports = {
