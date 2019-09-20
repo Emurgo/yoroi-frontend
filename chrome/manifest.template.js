@@ -1,4 +1,4 @@
-export default ({ description, defaultTitle, contentSecurityPolicy, versionName }) => ({
+export default ({ description, defaultTitle, contentSecurityPolicy, versionName, extensionKey }) => ({
   version: '1.9.0',
   name: 'yoroi',
   manifest_version: 2,
@@ -33,7 +33,7 @@ export default ({ description, defaultTitle, contentSecurityPolicy, versionName 
     },
   ],
   content_security_policy: contentSecurityPolicy,
-  key: 'pojejnpjgcacmnpkdiklhlnlbkjechfh',
+  ...(extensionKey ? { key: extensionKey } : {}),
   protocol_handlers: [
     {
       protocol: 'web+cardano',
