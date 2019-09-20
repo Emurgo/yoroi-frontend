@@ -22,7 +22,6 @@ export const ROUTES = {
     WALLET: '/settings/wallet',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
-    ADA_REDEMPTION: '/settings/ada-redemption',
   },
   TRANSFER: {
     ROOT: '/transfer',

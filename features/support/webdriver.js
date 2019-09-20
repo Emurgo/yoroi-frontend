@@ -245,25 +245,6 @@ function CustomWorld(cmdInput: WorldInput) {
       window.yoroi.api.ada.saveLastReceiveAddressIndex({ index: i });
     }, index);
   };
-
-  this.chooseFile = async (filePath, fileType) => {
-    const certificateFileContent = fs.readFileSync(filePath);
-    await this.driver.executeScript((fileContent, type) => {
-      const content = new Uint8Array(fileContent.data);
-      const certificate = new Blob([content], { type });
-      window.yoroi.actions.ada.adaRedemption.setCertificate.trigger({ certificate });
-    }, certificateFileContent, fileType);
-  };
-
-  this.enterPassphrase = async passphrase => {
-    for (let i = 0; i < passphrase.length; i++) {
-      const word = passphrase[i];
-      await this.input('.AdaRedemptionForm_scrollableContent .pass-phrase input', word);
-      await this.waitForElement(`//li[contains(text(), '${word}')]`, By.xpath);
-      await this.click(`//li[contains(text(), '${word}')]`, By.xpath);
-      await this.waitForElement(`//span[contains(text(), '${word}')]`, By.xpath);
-    }
-  };
 }
 
 setWorldConstructor(CustomWorld);

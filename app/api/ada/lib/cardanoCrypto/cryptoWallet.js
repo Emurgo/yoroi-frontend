@@ -36,15 +36,6 @@ export const isValidEnglishAdaMnemonic = (
   if (split.length !== numberOfWords) {
     return false;
   }
-  /**
-   * Redemption mnemonics use 0-word menmonics.
-   * However, 9-word mnemonics were disallowed in a later version of BIP39
-   * Since our bip39 library now considers all 9-word mnemonics invalid
-   * we just return true for backwards compatibility
-   */
-  if (split.length === 9) {
-    return true;
-  }
   return validateMnemonic(phrase);
 };
 

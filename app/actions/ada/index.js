@@ -8,13 +8,11 @@ import DaedalusTransferActions from './daedalus-transfer-actions';
 import YoroiTransferActions from './yoroi-transfer-actions';
 import HWConnectActions from './hw-connect-actions';
 import TrezorSendActions from './trezor-send-actions';
-import AdaRedemptionActions from './ada-redemption-actions';
 import TxBuilderActions from './tx-builder-actions';
 import LedgerSendActions from './ledger-send-actions';
 import HWVerifyAddressActions from './hw-verify-address-actions';
 
 export type AdaActionsMap = {
-  adaRedemption: AdaRedemptionActions,
   txBuilderActions: TxBuilderActions,
   wallets: WalletsActions,
   paperWallets: PaperWalletsActions,
@@ -31,7 +29,6 @@ export type AdaActionsMap = {
 };
 
 const adaActionsMap: AdaActionsMap = {
-  adaRedemption: new AdaRedemptionActions(),
   txBuilderActions: new TxBuilderActions(),
   wallets: new WalletsActions(),
   paperWallets: new PaperWalletsActions(),

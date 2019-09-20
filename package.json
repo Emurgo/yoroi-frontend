@@ -136,7 +136,6 @@
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "1.0.7",
     "@download/blockies": "1.0.3",
-    "aes-js": "3.1.2",
     "axios": "0.19.0",
     "bignumber.js": "9.0.0",
     "bip39": "3.0.2",
@@ -157,7 +156,6 @@
     "mobx-react-router": "4.0.7",
     "moment": "2.21.0",
     "pbkdf2": "3.0.17",
-    "pdfjs-dist": "2.1.266",
     "qr-image": "3.2.0",
     "qrcode.react": "0.9.3",
     "react": "16.9.0",
@@ -165,7 +163,6 @@
     "react-copy-to-clipboard": "5.0.1",
     "react-css-themr": "2.1.2",
     "react-dom": "16.9.0",
-    "react-dropzone": "10.1.8",
     "react-hot-loader": "4.12.12",
     "react-intl": "2.9.0",
     "react-markdown": "4.2.2",
