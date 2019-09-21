@@ -138,7 +138,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
   form = new ReactToolboxMobxForm({
     fields: {
-      walletName: this.props.isVerificationMode ? undefined : {
+      walletName: this.props.isVerificationMode === true ? undefined : {
         label: this.context.intl.formatMessage(messages.walletNameInputLabel),
         placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(messages.walletNameInputHint) : '',
@@ -172,7 +172,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
-      paperPassword: this.props.showPaperPassword ? {
+      paperPassword: this.props.showPaperPassword === true ? {
         type: 'password',
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
         placeholder: this.props.classicTheme ?
@@ -196,7 +196,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         ]),
         ],
       } : undefined,
-      walletPassword: this.props.isVerificationMode ? undefined : {
+      walletPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
         placeholder: this.props.classicTheme ?
@@ -213,7 +213,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
-      repeatPassword: this.props.isVerificationMode ? undefined : {
+      repeatPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
         placeholder: this.props.classicTheme ?
@@ -257,7 +257,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
   componentDidMount() {
     setTimeout(() => {
-      if (this.props.isVerificationMode) {
+      if (this.props.isVerificationMode === true) {
         this.recoveryPhraseInput.focus();
       } else {
         this.walletNameInput.focus();
@@ -318,7 +318,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const disabledCondition = () => {
       let condition = mnemonicValidator(join(recoveryPhrase, ' '));
-      if (!isVerificationMode) {
+      if (isVerificationMode !== true) {
         condition = condition &&
           isValidWalletName(walletName) &&
           isValidWalletPassword(walletPassword) &&
@@ -346,7 +346,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(
-          isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel
+          isVerificationMode === true ? messages.verifyButtonLabel : messages.importButtonLabel
         ),
         primary: true,
         disabled: isSubmitting || disabledCondition(),
@@ -355,12 +355,15 @@ export default class WalletRestoreDialog extends Component<Props> {
     ];
 
     const dialogTitle = () => {
-      if (isPaper) {
-        return isVerificationMode ? messages.titleVerifyPaper : messages.titlePaper;
+      if (isPaper === true) {
+        return isVerificationMode === true ? messages.titleVerifyPaper : messages.titlePaper;
       }
-      return isVerificationMode ? messages.titleVerify : messages.title;
+      return isVerificationMode === true ? messages.titleVerify : messages.title;
     };
 
+    const introMessageBlock = introMessage != null
+      ? (<DialogTextBlock message={introMessage} subclass="component-input" />)
+      : null;
     return (
       <Dialog
         className={dialogClasses}
@@ -373,19 +376,19 @@ export default class WalletRestoreDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
 
-        {isVerificationMode ? (
-          introMessage &&
-            <DialogTextBlock message={introMessage} subclass="component-input" />
-        ) : (
-          <Input
-            className={styles.walletName}
-            inputRef={(input) => { this.walletNameInput = input; }}
-            {...walletNameField.bind()}
-            done={isValidWalletName(walletName)}
-            error={walletNameField.error}
-            skin={InputOwnSkin}
-          />
-        )}
+        {isVerificationMode === true
+          ? introMessageBlock
+          : (
+            <Input
+              className={styles.walletName}
+              inputRef={(input) => { this.walletNameInput = input; }}
+              {...walletNameField.bind()}
+              done={isValidWalletName(walletName)}
+              error={walletNameField.error}
+              skin={InputOwnSkin}
+            />
+          )
+        }
 
         <Autocomplete
           options={validWords}
@@ -400,10 +403,10 @@ export default class WalletRestoreDialog extends Component<Props> {
           preselectedOptions={recoveryPhraseField.value}
         />
 
-        {showPaperPassword ? (
+        {showPaperPassword === true ? (
           <div className={styles.walletPassword}>
             <div className={paperPasswordFieldClasses}>
-              {isVerificationMode ? '' : (
+              {isVerificationMode === true ? '' : (
                 <div className={headerBlockClasses}>
                   {intl.formatMessage(messages.passwordDisclaimer)}
                 </div>
@@ -419,7 +422,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           </div>
         ) : ''}
 
-        {isVerificationMode ? '' : (
+        {isVerificationMode === true ? '' : (
           <div className={styles.walletPassword}>
             <div className={walletPasswordFieldsClasses}>
               <Input

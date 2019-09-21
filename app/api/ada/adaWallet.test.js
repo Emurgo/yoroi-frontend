@@ -58,7 +58,7 @@ test('Unscramble Daedalus paper produces 12 valid words', async () => {
 test('Unscramble Daedalus paper matches expected address', async () => {
   const [words] = unscramblePaperMnemonic(VALID_DD_PAPER.words, 27);
   expect(words).toBeTruthy();
-  if (words) {
+  if (words != null) {
     const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
     const checker = RustModule.Wallet.DaedalusAddressChecker.new(daedalusWallet);
     const addressMap = getAddressesKeys({

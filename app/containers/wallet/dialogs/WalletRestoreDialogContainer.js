@@ -50,7 +50,7 @@ export default class WalletRestoreDialogContainer
     if (!submitValues) {
       throw new Error('Cannot submit wallet restoration! No values are available in context!');
     }
-    if (resolvedRecoveryPhrase) {
+    if (resolvedRecoveryPhrase != null) {
       submitValues.recoveryPhrase = resolvedRecoveryPhrase;
     }
     this.props.actions[environment.API].wallets.restoreWallet.trigger(submitValues);
@@ -65,7 +65,7 @@ export default class WalletRestoreDialogContainer
         getWordsCount(this.props.mode),
         values.paperPassword
       );
-      if (!newPhrase) {
+      if (newPhrase == null) {
         throw new Error('Failed to restore a paper wallet! Invalid recovery phrase!');
       }
       resolvedRecoveryPhrase = newPhrase;

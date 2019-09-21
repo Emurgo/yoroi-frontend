@@ -103,7 +103,7 @@ export const buildRoute = (pattern: string, params: ParamsT) => {
  * @returns {string}
  */
 export const getUrlParameterByName = (name: string, url?: string) => {
-  if (!url) url = window.location.href;
+  if (url == null) url = window.location.href;
   name = name.replace(/[[\]]/g, '\\$&');
   const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
   const results = regex.exec(url);

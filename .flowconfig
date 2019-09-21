@@ -18,7 +18,12 @@
 [libs]
 flow/declarations/
 
+[lints]
+sketchy-null=warn
+sketchy-number=warn
+
 [options]
+include_warnings=true
 server.max_workers=1
 esproposal.class_static_fields=enable
 esproposal.class_instance_fields=enable

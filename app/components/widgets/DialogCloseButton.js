@@ -19,7 +19,7 @@ export default class DialogCloseButton extends Component<Props> {
     const { onClose, icon } = this.props;
     return (
       <button tabIndex="-1" type="button" onClick={onClose} className={styles.component}>
-        <SvgInline svg={icon || closeCross} />
+        <SvgInline svg={icon != null ? icon : closeCross} />
       </button>
     );
   }

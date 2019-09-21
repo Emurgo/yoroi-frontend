@@ -12,7 +12,7 @@ export default class WalletSettingsStore extends Store {
   };
 
   @action _stopEditingWalletField = () => {
-    if (this.walletFieldBeingEdited) {
+    if (this.walletFieldBeingEdited != null) {
       this.lastUpdatedWalletField = this.walletFieldBeingEdited;
     }
     this.walletFieldBeingEdited = null;

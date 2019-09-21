@@ -128,10 +128,10 @@ export default class AdaTransactionBuilderStore extends Store {
   _canCompute(): boolean {
     for (let i = 0; i < this.plannedTxInfo.length; i++) {
       // we only care about the value in non-sendall case
-      if (!this.shouldSendAll && !this.plannedTxInfo[i].value) {
+      if (!this.shouldSendAll && this.plannedTxInfo[i].value == null) {
         return false;
       }
-      if (!this.plannedTxInfo[i].address) {
+      if (this.plannedTxInfo[i].address == null) {
         return false;
       }
     }

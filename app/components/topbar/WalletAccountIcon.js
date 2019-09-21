@@ -48,7 +48,7 @@ export default class WalletAccountIcon extends Component<Props> {
     return (<Blockies
       seed={iconSeed}
       size={7}
-      scale={scalePx || 5}
+      scale={scalePx != null ? scalePx : 5}
       bgColor={saturation(color.primary, saturationFactor)}
       color={saturation(color.secondary, saturationFactor)}
       spotColor={saturation(color.spots, saturationFactor)}
