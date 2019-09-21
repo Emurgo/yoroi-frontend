@@ -138,7 +138,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
   form = new ReactToolboxMobxForm({
     fields: {
-      walletName: this.props.isVerificationMode !== true ? undefined : {
+      walletName: this.props.isVerificationMode === true ? undefined : {
         label: this.context.intl.formatMessage(messages.walletNameInputLabel),
         placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(messages.walletNameInputHint) : '',
@@ -196,7 +196,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         ]),
         ],
       } : undefined,
-      walletPassword: this.props.isVerificationMode === false ? undefined : {
+      walletPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
         placeholder: this.props.classicTheme ?
@@ -213,7 +213,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
-      repeatPassword: this.props.isVerificationMode === false ? undefined : {
+      repeatPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
         placeholder: this.props.classicTheme ?
