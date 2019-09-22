@@ -88,7 +88,7 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   _goBackToCheck(): void;
 
   /** CONNECT dialog submit (Connect button) */
-  _submitConnect(): void;
+  _submitConnect(): Promise<void>;
 
   _goToConnectError(): void;
 
@@ -106,7 +106,7 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   _goToSaveLoad(): void;
 
   /** SAVE dialog submit (Save button) */
-  _submitSave(walletName: string): void;
+  _submitSave(walletName: string): Promise<void>;
 
   _goToSaveError(): void;
 

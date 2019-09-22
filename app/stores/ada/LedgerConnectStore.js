@@ -147,11 +147,11 @@ export default class LedgerConnectStore
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect = (): void => {
+  @action _submitConnect = async (): Promise<void> => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
-    this._checkAndStoreHWDeviceInfo();
+    await this._checkAndStoreHWDeviceInfo();
   };
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
@@ -248,11 +248,11 @@ export default class LedgerConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = (walletName: string): void => {
+  @action _submitSave = async (walletName: string): Promise<void> => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
-    this._saveHW(walletName);
+    await this._saveHW(walletName);
   };
 
   /** creates new wallet and loads it */
@@ -318,7 +318,7 @@ export default class LedgerConnectStore
 
     // fetch its data
     Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
-    wallets.refreshWalletsData();
+    await wallets.refreshWalletsData();
 
     // show success notification
     wallets.showLedgerNanoSWalletIntegratedNotification();

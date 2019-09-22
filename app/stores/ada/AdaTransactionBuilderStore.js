@@ -37,7 +37,8 @@ export default class AdaTransactionBuilderStore extends Store {
 
   setup() {
     super.setup();
-    this._reset();
+    this._preWaitReset();
+    this._postWaitReset();
     const actions = this.actions.ada.txBuilderActions;
     actions.updateReceiver.listen(this._updateReceiver);
     actions.updateAmount.listen(this._updateAmount);
@@ -208,9 +209,22 @@ export default class AdaTransactionBuilderStore extends Store {
   }
 
   @action
-  _reset = async () => {
+  _preWaitReset = () => {
+    // resets that have to happen BEFORE waiting for createUnsignedTx to finish
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.shouldSendAll = false;
+  }
+  @action
+  _postWaitReset = () => {
+    // resets that have to happen AFTER waiting for createUnsignedTx to finish
+    this.createUnsignedTx.reset();
+    this.plannedTx = null;
+    this.tentativeTx = null;
+  }
+
+  @action
+  _reset = async () => {
+    this._preWaitReset();
 
     // creation of unsigned tx may still be running when we try and reset
     // we need to wait for it to finish then clear the result since we can't cancel the promise
@@ -219,11 +233,8 @@ export default class AdaTransactionBuilderStore extends Store {
     } catch (err) {
       // ignore
     }
-    this.createUnsignedTx.reset();
-    runInAction(() => {
-      this.plannedTx = null;
-      this.tentativeTx = null;
-    });
+
+    this._postWaitReset();
   }
 
   // =======================================

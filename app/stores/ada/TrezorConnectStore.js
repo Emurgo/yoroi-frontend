@@ -114,6 +114,7 @@ export default class TrezorConnectStore
       TrezorConnect.manifest(trezorManifest);
 
       /** Preinitialization of TrezorConnect API will result in faster first response */
+      // $FlowFixMe we purposely don't want to wait for execution. Safe in practice.
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
@@ -173,11 +174,11 @@ export default class TrezorConnectStore
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect = (): void => {
+  @action _submitConnect = async (): Promise<void> => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
-    this._checkAndStoreHWDeviceInfo();
+    await this._checkAndStoreHWDeviceInfo();
   };
 
   @action _goToConnectError = (): void => {
@@ -338,12 +339,12 @@ export default class TrezorConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = (walletName: string): void => {
+  @action _submitSave = async (walletName: string): Promise<void> => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
 
-    this._saveHW(walletName);
+    await this._saveHW(walletName);
   };
 
   /** creates new wallet and loads it */
@@ -415,7 +416,7 @@ export default class TrezorConnectStore
 
     // fetch its data
     Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
-    wallets.refreshWalletsData();
+    await wallets.refreshWalletsData();
 
     // show success notification
     wallets.showTrezorTWalletIntegratedNotification();

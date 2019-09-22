@@ -107,7 +107,7 @@ export default class WalletsStore extends Store {
       }
     });
     this.deleteWalletRequest.reset();
-    this.refreshWalletsData();
+    await this.refreshWalletsData();
   };
 
   /** Restore wallet and move to wallet summary screen */
@@ -128,7 +128,7 @@ export default class WalletsStore extends Store {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.restoreRequest.reset();
     this.goToWalletRoute(restoredWallet.id);
-    this.refreshWalletsData();
+    await this.refreshWalletsData();
   };
 
   // =================== PUBLIC API ==================== //
