@@ -229,8 +229,8 @@ async function exportYoroiSnapshot(client, exportDir: string) {
   if (!fs.existsSync(exportDir)) {
     fs.mkdirSync(exportDir);
   }
-  exportLocalStorage(client, exportDir);
-  exportIndexedDB(client, exportDir);
+  await exportLocalStorage(client, exportDir);
+  await exportIndexedDB(client, exportDir);
 }
 
 async function exportLocalStorage(client, exportDir: string) {
