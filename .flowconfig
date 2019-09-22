@@ -21,7 +21,8 @@ flow/declarations/
 [lints]
 sketchy-null=warn
 sketchy-number=warn
-no-floating-promises=warn
+# re-enable this if it's ever shipped as part of Flow
+# no-floating-promises=warn
 
 [options]
 include_warnings=true
