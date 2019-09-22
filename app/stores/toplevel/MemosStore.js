@@ -53,7 +53,7 @@ export default class MemosStore extends Store {
     = new Request<DeleteExternalTxMemoFunc>(this.api.externalStorage.deleteFile);
 
   @observable saveTxMemoRequest: Request<SaveTxMemoFunc>
-    = new Request<SaveTxMemoFunc>(this.api.ada.saveTxMemos);
+    = new Request<SaveTxMemoFunc>(this.api.ada.saveTxMemo);
 
   @observable deleteTxMemoRequest: Request<DeleteTxMemoFunc>
     = new Request<DeleteTxMemoFunc>(this.api.ada.deleteTxMemos);
@@ -149,34 +149,32 @@ export default class MemosStore extends Store {
     this.error = error;
   }
 
-  @action _saveTxMemo = async (params: TransactionMemo) => {
-    const memos: Array<TransactionMemo> = [params];
+  @action _saveTxMemo = async (memo: TransactionMemo) => {
     const { wallets } = this.stores.substores[environment.API];
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.saveTxMemoRequest.execute({ memos });
+      await this.saveTxMemoRequest.execute({ memo });
       wallets.refreshWalletsData();
-      await this.uploadExternalTxMemoRequest.execute({ memos });
+      await this.uploadExternalTxMemoRequest.execute({ memo });
       this._closeAddMemoDialog();
     }
   };
 
-  @action _updateTxMemo = async (params: TransactionMemo) => {
-    const memos: Array<TransactionMemo> = [params];
+  @action _updateTxMemo = async (memo: TransactionMemo) => {
     const { wallets } = this.stores.substores[environment.API];
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.saveTxMemoRequest.execute({ memos });
+      await this.saveTxMemoRequest.execute({ memo });
       wallets.refreshWalletsData();
-      await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memos });
+      await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memo });
       this._closeEditMemoDialog();
     }
   };
 
-  @action _deleteTxMemo = async (tx: string) => {
+  @action _deleteTxMemo = async (memoTxHash: string) => {
     const { wallets } = this.stores.substores[environment.API];
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.deleteTxMemoRequest.execute(tx);
+      await this.deleteTxMemoRequest.execute(memoTxHash);
       wallets.refreshWalletsData();
-      await this.deleteExternalTxMemoRequest.execute(tx);
+      await this.deleteExternalTxMemoRequest.execute(memoTxHash);
       this._closeDeleteMemoDialog();
     }
   };

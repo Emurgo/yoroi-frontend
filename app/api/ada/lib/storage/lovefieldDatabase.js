@@ -253,11 +253,11 @@ export const saveTxs = async (
   return dbTransaction.exec([txQuery, txAddressesQuery]);
 };
 
-export const saveTxMemos = async (
-  request: Array<TransactionMemo>
+export const saveTxMemo = async (
+  request: TransactionMemo
 ): Promise<txMemosTableRow> => {
-  const txMemosTableInsertRows = request.memos.map(memo => _txMemoToRow(memo));
-  return _insertOrReplaceSingleQuery(txMemosTableInsertRows, _getTxMemosTable())
+  const txMemosTableInsertRow = [request.memo].map(memo => _txMemoToRow(memo));
+  return _insertOrReplaceSingleQuery(txMemosTableInsertRow, _getTxMemosTable())
     .exec();
 };
 

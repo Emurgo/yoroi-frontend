@@ -110,7 +110,7 @@ import {
   getTxsOrderedByDateDesc,
   getTxsOrderedByLastUpdateDesc,
   saveTxs,
-  saveTxMemos,
+  saveTxMemo,
   deleteTxMemos,
   loadLovefieldDB,
   reset,
@@ -387,10 +387,10 @@ export type SaveTxFunc = (
   request: SaveTxRequest
 ) => Promise<SaveTxResponse>;
 
-// saveTxMemos
+// saveTxMemo
 
 export type SaveTxMemoRequest = {
-  memos: Array<TransactionMemo>,
+  memo: TransactionMemo,
 };
 export type SaveTxMemoResponse = void;
 export type SaveTxMemoFunc = (
@@ -1042,11 +1042,11 @@ export default class AdaApi {
     }
   }
 
-  async saveTxMemos(
+  async saveTxMemo(
     request: SaveTxMemoRequest
   ): Promise<void> {
     try {
-      await saveTxMemos(request);
+      await saveTxMemo(request);
     } catch (error) {
       Logger.error('AdaApi::saveTxMemo error: ' + stringifyError(error));
       throw new GenericApiError();

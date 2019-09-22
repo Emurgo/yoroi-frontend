@@ -3,7 +3,7 @@ import type { TransactionMemo } from '../ada/adaTypes';
 
 // UploadExternal
 export type UploadExternalTxMemoRequest = {
-  memos: Array<TransactionMemo>,
+  memo: TransactionMemo,
 };
 export type UploadExternalTxMemoResponse = boolean;
 export type UploadExternalTxMemoFunc = (
@@ -18,9 +18,7 @@ export type DeleteExternalTxMemoFunc = (
 ) => Promise<DeleteExternalTxMemoResponse>;
 
 // DownloadExternal
-export type DownloadExternalTxMemoRequest = {
-  memos: Array<string>,
-};
+export type DownloadExternalTxMemoRequest = string;
 export type DownloadExternalTxMemoResponse = boolean;
 export type DownloadExternalTxMemoFunc = (
   request: DownloadExternalTxMemoRequest
