@@ -111,7 +111,8 @@ import {
   getTxsOrderedByLastUpdateDesc,
   saveTxs,
   saveTxMemo,
-  deleteTxMemos,
+  deleteTxMemo,
+  getTxMemoLastUpdateDate,
   loadLovefieldDB,
   reset,
   importLovefieldDatabase,
@@ -397,13 +398,21 @@ export type SaveTxMemoFunc = (
   request: SaveTxMemoRequest
 ) => Promise<SaveTxMemoResponse>;
 
-// deleteTxMemos
+// deleteTxMemo
 
 export type DeleteTxMemoRequest = string;
 export type DeleteTxMemoResponse = void;
 export type DeleteTxMemoFunc = (
   request: DeleteTxMemoRequest
 ) => Promise<DeleteTxMemoResponse>;
+
+// getTxMemoLastUpdateDate
+
+export type GetTxMemoLastUpdateDateRequest = string;
+export type GetTxMemoLastUpdateDateResponse = Date;
+export type GetTxMemoLastUpdateDateFunc = (
+  request: GetTxMemoLastUpdateDateRequest
+) => Promise<GetTxMemoLastUpdateDateResponse>;
 
 // getSelectedExplorer
 
@@ -1044,7 +1053,7 @@ export default class AdaApi {
 
   async saveTxMemo(
     request: SaveTxMemoRequest
-  ): Promise<void> {
+  ): Promise<SaveTxMemoResponse> {
     try {
       await saveTxMemo(request);
     } catch (error) {
@@ -1053,13 +1062,24 @@ export default class AdaApi {
     }
   }
 
-  async deleteTxMemos(
+  async deleteTxMemo(
     tx: DeleteTxMemoRequest
-  ): Promise<void> {
+  ): Promise<DeleteTxMemoResponse> {
     try {
-      await deleteTxMemos(tx);
+      await deleteTxMemo(tx);
     } catch (error) {
       Logger.error('AdaApi::deleteTxMemo error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getTxMemoLastUpdateDate(
+    request: GetTxMemoLastUpdateDateRequest
+  ): Promise<GetTxMemoLastUpdateDateResponse> {
+    try {
+      return await getTxMemoLastUpdateDate(request);
+    } catch (error) {
+      Logger.error('AdaApi::getTxMemoLastUpdateDate error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

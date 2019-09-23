@@ -2,16 +2,18 @@
 import { observable, computed, action } from 'mobx';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
+import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
 import LocalizableError from '../../i18n/LocalizableError';
 import environment from '../../environment';
 import type {
-  SaveTxMemoFunc, DeleteTxMemoFunc,
+  SaveTxMemoFunc, DeleteTxMemoFunc, GetTxMemoLastUpdateDateFunc
 } from '../../api/ada';
 import type { TransactionMemo } from '../../api/ada/adaTypes';
 import type { ProvidersType } from '../../api/externalStorage/index';
 import type {
   UploadExternalTxMemoFunc, DeleteExternalTxMemoFunc,
+  DownloadExternalTxMemoFunc, FetchFilenameExternalTxMemoFunc,
 } from '../../api/externalStorage/types';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 
@@ -49,14 +51,23 @@ export default class MemosStore extends Store {
   @observable uploadAndOverwriteExternalTxMemoRequest: Request<UploadExternalTxMemoFunc>
     = new Request<UploadExternalTxMemoFunc>(this.api.externalStorage.uploadAndOverwriteFile);
 
-    @observable deleteExternalTxMemoRequest: Request<DeleteExternalTxMemoFunc>
+  @observable deleteExternalTxMemoRequest: Request<DeleteExternalTxMemoFunc>
     = new Request<DeleteExternalTxMemoFunc>(this.api.externalStorage.deleteFile);
+
+  @observable downloadExternalTxMemoRequest: Request<DownloadExternalTxMemoFunc>
+    = new Request<DownloadExternalTxMemoFunc>(this.api.externalStorage.downloadFile);
+
+  @observable fetchFilenamesExternalTxMemoRequest: Request<FetchFilenameExternalTxMemoFunc>
+    = new Request<FetchFilenameExternalTxMemoFunc>(this.api.externalStorage.fetchFilenames);
 
   @observable saveTxMemoRequest: Request<SaveTxMemoFunc>
     = new Request<SaveTxMemoFunc>(this.api.ada.saveTxMemo);
 
   @observable deleteTxMemoRequest: Request<DeleteTxMemoFunc>
-    = new Request<DeleteTxMemoFunc>(this.api.ada.deleteTxMemos);
+    = new Request<DeleteTxMemoFunc>(this.api.ada.deleteTxMemo);
+
+  @observable getTxMemoLastUpdateDateRequest: Request<GetTxMemoLastUpdateDateFunc>
+    = new Request<GetTxMemoLastUpdateDateFunc>(this.api.ada.getTxMemoLastUpdateDate);
 
    @observable
   revokeTokenStorageProvideRequest: Request<void => Promise<void>>
@@ -78,6 +89,8 @@ export default class MemosStore extends Store {
     this.actions.memos.saveTxMemo.listen(this._saveTxMemo);
     this.actions.memos.updateTxMemo.listen(this._updateTxMemo);
     this.actions.memos.deleteTxMemo.listen(this._deleteTxMemo);
+    this.actions.memos.syncTxMemos.listen(this._syncTxMemos);
+    this.actions.memos.downloadTxMemo.listen(this._downloadTxMemo);
     this.api.externalStorage.setup();
     this.registerReactions([
       this._setSelectedProvider,
@@ -178,6 +191,41 @@ export default class MemosStore extends Store {
       this._closeDeleteMemoDialog();
     }
   };
+
+  @action _downloadTxMemo = async (memoTxHash: string) => {
+    if (this.hasSetSelectedExternalStorageProvider) {
+      await this.downloadExternalTxMemoRequest.execute(memoTxHash)
+        .then(async memo => {
+          await this.saveTxMemoRequest.execute({
+            memo: {
+              memo: memo.content,
+              tx: memoTxHash,
+              lastUpdated: memo.lastUpdated
+            }
+          });
+        });
+    }
+  };
+
+  @action _syncTxMemos = async () => {
+    const { wallets } = this.stores.substores[environment.API];
+    if (this.hasSetSelectedExternalStorageProvider) {
+      const memos = await this.fetchFilenamesExternalTxMemoRequest.execute();
+      for(const memo of memos) {
+        // First, check if memo already exists
+        const lastUpdated = await this.getTxMemoLastUpdateDateRequest.execute(memo.tx);
+        if(memo.deleted === true) {
+          // delete local copy if file was deleted on external storage
+          await this.deleteTxMemoRequest.execute(memo.tx);
+        } else {
+          // only update if the file is newer
+          if(lastUpdated < memo.lastUpdated) {
+            await this._downloadTxMemo(memo.tx);
+          }
+        }
+      }
+    }
+  }
 
   @computed get selectedProvider(): ?SelectedExternalStorageProvider {
     const { result } = this.getExternalStorageProviderRequest.execute();

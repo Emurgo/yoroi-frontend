@@ -81,7 +81,8 @@ export default class AdaWalletsStore extends WalletStore {
         if (memo !== '' && memo !== undefined) {
           this.actions.memos.saveTxMemo.trigger({
             memo,
-            tx: response.txId
+            tx: response.txId,
+            lastUpdated: new Date()
           });
         }
         return response;

@@ -9,9 +9,9 @@ import {
 import DropboxApi from './providers/dropbox';
 import type {
   UploadExternalTxMemoRequest, DeleteExternalTxMemoRequest,
-  DownloadExternalTxMemoRequest,
+  DownloadExternalTxMemoRequest, FetchFilenameExternalTxMemoRequest,
   UploadExternalTxMemoResponse, DeleteExternalTxMemoResponse,
-  DownloadExternalTxMemoResponse
+  DownloadExternalTxMemoResponse, FetchFilenameExternalTxMemoResponse,
 } from './types';
 import { ExternalStorageList, ExternalStorageProviders } from '../../domain/ExternalStorage';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
@@ -39,11 +39,15 @@ export default class ExternalStorageApi {
     // $FlowFixMe
     this.setup = this.setup.bind(this);
     // $FlowFixMe
+    this.fetchFilenames = this.fetchFilenames.bind(this);
+    // $FlowFixMe
     this.uploadFile = this.uploadFile.bind(this);
     // $FlowFixMe
     this.uploadAndOverwriteFile = this.uploadAndOverwriteFile.bind(this);
     // $FlowFixMe
     this.deleteFile = this.deleteFile.bind(this);
+    // $FlowFixMe
+    this.downloadFile = this.downloadFile.bind(this);
     // $FlowFixMe
     this.revokeToken = this.revokeToken.bind(this);
   }
@@ -78,6 +82,30 @@ export default class ExternalStorageApi {
       this.selectedProvider.revokeToken();
     } catch (error) {
       Logger.error('ExternalStorageApi::revokeToken error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  // Get metadata. It's an easy and quick way to check if a file exists
+  /*async getFileMetadata(
+    request: GetFileMetadataExternalTxMemoRequest
+  ): Promise<GetFileMetadataExternalTxMemoResponse> {
+    try {
+      return this.selectedProvider.getFileMetadata(request);
+    } catch (error) {
+      Logger.error('ExternalStorageApi::getFileMetadada error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }*/
+
+  // Sync with external storage folder to catch up with changes (updated/deleted files)
+  async fetchFilenames(
+    request: FetchFilenameExternalTxMemoRequest
+  ): Promise<FetchFilenameExternalTxMemoResponse> {
+    try {
+      return this.selectedProvider.fetchFilenames();
+    } catch (error) {
+      Logger.error('ExternalStorageApi::fetchFilenames error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

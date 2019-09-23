@@ -194,5 +194,6 @@ export type AddressType = "External" | "Internal";
 
 export type TransactionMemo = {
   memo: string,
-  tx: string
+  tx: string,
+  lastUpdated: Date
 }

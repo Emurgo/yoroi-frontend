@@ -51,14 +51,16 @@ const txsTableSchema = {
 export type TxMemosTableRow = {
   id: string,
   value: string,
-  tx: string // AdaTransaction.ctId
+  tx: string, // AdaTransaction.ctId
+  lastUpdated: Date
 }
 const txMemosTableSchema = {
   name: 'TxMemos',
   properties: {
     id: 'id',
     value: 'value',
-    tx: 'tx'
+    tx: 'tx',
+    lastUpdated: 'lastUpdated'
   }
 };
 
@@ -104,6 +106,7 @@ export const loadLovefieldDB = (
     .addColumn(txMemosTableSchema.properties.id, Type.STRING)
     .addColumn(txMemosTableSchema.properties.value, Type.STRING)
     .addColumn(txMemosTableSchema.properties.tx, Type.STRING)
+    .addColumn(txsTableSchema.properties.lastUpdated, Type.DATE_TIME)
     .addPrimaryKey(
       ([txMemosTableSchema.properties.id]: Array<string>),
     );
@@ -261,7 +264,7 @@ export const saveTxMemo = async (
     .exec();
 };
 
-export const deleteTxMemos = async (
+export const deleteTxMemo = async (
   tx: string
 ): Promise<txMemosTableRow> => {
   const txMemosTable = _getTxMemosTable();
@@ -269,6 +272,20 @@ export const deleteTxMemos = async (
     .from(txMemosTable)
     .where(txMemosTable[txMemosTableSchema.properties.tx].eq(tx))
     .exec();
+};
+
+export const getTxMemoLastUpdateDate = async (
+  request: string
+): Promise<Date> => {
+  const table = _getTxMemosTable();
+  const result = await db.select(table[txMemosTableSchema.properties.lastUpdated])
+    .from(table)
+    .orderBy(table[txMemosTableSchema.properties.lastUpdated], lf.Order.DESC)
+    .limit(1)
+    .exec();
+  return result.length === 1
+    ? result[0].lastUpdated
+    : new Date(0);
 };
 
 export const getTxsOrderedByLastUpdateDesc = function (): Promise<Array<AdaTransaction>> {
@@ -396,6 +413,7 @@ const _txMemoToRow = (
   {
     id: memo.tx,
     tx: memo.tx,
+    lastUpdated: memo.lastUpdated,
     value: memo,
   };
   return _getTxMemosTable().createRow(newRow);

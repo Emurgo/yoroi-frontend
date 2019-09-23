@@ -141,7 +141,7 @@ export default class WalletSummaryPage extends Component<Props> {
             selectedTransaction={memos.selectedTransaction}
             error={memos.error}
             onCancel={actions.memos.closeAddMemoDialog.trigger}
-            onSubmit={(values: { memo: string, tx: string }) => {
+            onSubmit={(values: { memo: string, tx: string, lastUpdated: Date }) => {
               actions.memos.saveTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
@@ -165,7 +165,7 @@ export default class WalletSummaryPage extends Component<Props> {
             error={memos.error}
             onCancel={actions.memos.closeEditMemoDialog.trigger}
             onClickDelete={this.openDeleteMemoDialog}
-            onSubmit={(values: { memo: string, tx: string }) => {
+            onSubmit={(values: { memo: string, tx: string, lastUpdated: Date }) => {
               actions.memos.updateTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}

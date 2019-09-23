@@ -2,6 +2,7 @@
 import { observable } from 'mobx';
 import { sprintf } from 'sprintf-js';
 import { Dropbox } from 'dropbox';
+import moment from 'moment';
 import { DROPBOX_CLIENT_ID } from '../../../config/externalStorage';
 import type { TransactionMemo } from '../../ada/adaTypes';
 import {
@@ -14,9 +15,11 @@ import {
 import environment from '../../../environment';
 import type {
   UploadExternalTxMemoRequest, DeleteExternalTxMemoRequest,
-  DownloadExternalTxMemoRequest,
+  DownloadExternalTxMemoRequest, GetFileMetadaExternalTxMemoRequest,
+  FetchFilenameExternalTxMemoRequest,
   UploadExternalTxMemoResponse, DeleteExternalTxMemoResponse,
-  DownloadExternalTxMemoResponse
+  DownloadExternalTxMemoResponse, GetFileMetadaExternalTxMemoResponse,
+  FetchFilenameExternalTxMemoResponse,
 } from '../types';
 import {
   ExternalStorageList,
@@ -45,11 +48,15 @@ export default class DropboxApi {
     // $FlowFixMe
     this.auth = this.auth.bind(this);
     // $FlowFixMe
+    this.fetchFilenames = this.fetchFilenames.bind(this);
+    // $FlowFixMe
     this.uploadFile = this.uploadFile.bind(this);
     // $FlowFixMe
     this.uploadAndOverwriteFile = this.uploadAndOverwriteFile.bind(this);
     // $FlowFixMe
     this.deleteFile = this.deleteFile.bind(this);
+    // $FlowFixMe
+    this.downloadFile = this.downloadFile.bind(this);
   }
 
   setup() {
@@ -66,161 +73,147 @@ export default class DropboxApi {
   }
 
   async revokeToken(): Promise<void> {
-    try {
-      this.api.authTokenRevoke()
-        .then((response) => {
-          Logger.info('DropboxApi::revokeToken success');
-        })
-        .catch((error) => {
-          self.errorCode = error.status;
-          self.errorMessage = 'An error ocurred when revoking the token';
-        });
-    } catch (error) {
-      Logger.error('DropboxApi::revokeToken error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
+    return this.api.authTokenRevoke()
+      .then((response) => {
+        Logger.debug('DropboxApi::revokeToken success');
+        return true;
+      })
+      .catch((e) => {
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while revoking the token';
+        Logger.error('DropboxApi::revokeToken error: ' + stringifyError(e.error));
+        return false;
+      });
   }
 
   getError() {
     return sprintf('[%s] %s', this.errorCode, this.errorMessage);
   }
 
+  async fetchFilenames(
+    request: FetchFilenameExternalTxMemoRequest
+  ): Promise<FetchFilenameExternalTxMemoResponse> {
+    const self = this;
+    return await this.api.filesListFolder({
+      path: this.folderPath,
+      include_deleted: true,
+    })
+      .then((response) => {
+        return response.entries.map(entry => {
+          if(entry.hasOwnProperty('.tag') && entry.hasOwnProperty('name')) {
+            return {
+              tx: entry.name.substr(0, entry.name.length-this.memoExt.length),
+              deleted: entry['.tag'] === 'deleted',
+              lastUpdated: entry.hasOwnProperty('server_modified') ?
+                moment(entry.server_modified, "YYYY-MM-DDTHH:mm:ssZ").toDate() : ''
+            }
+          }
+        });
+      })
+      .catch((e) => {
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while fetching filenames';
+        Logger.error('DropboxApi::fetchFilenames error: ' + stringifyError(e.error));
+      });
+  }
+
   async uploadFile(
     request: UploadExternalTxMemoRequest
   ): Promise<UploadExternalTxMemoResponse> {
     const self = this;
-    try {
-      const txHash = request.memo.tx;
-      const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
-      this.api.filesUpload({
-        path: fullPath,
-        contents: request.memo.memo,
+    const txHash = request.memo.tx;
+    const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
+    return this.api.filesUpload({
+      path: fullPath,
+      contents: request.memo.memo,
+    })
+      .then((response) => {
+        Logger.debug('DropboxApi::uploadFile success: ' + txHash + ' file uploaded');
+        return true;
       })
-        .then((response) => {
-          Logger.info('DropboxApi::uploadFile success: ' + txHash + ' file uploaded');
-          return true;
-        })
-        .catch((error) => {
-          if (error.status === 409) {
-            console.log('file already exists');
-            // TODO: download existing memo and update in local db
-          }
-          self.errorCode = error.status;
-          self.errorMessage = 'An error ocurred when uploading the file';
+      .catch((e) => {
+        // Memo already exists for this trx, don't overwrite.
+        // Wallet auto-sync should update with the correct version
+        if (e.status === 409) {
           return false;
-        });
-    } catch (error) {
-      Logger.error('DropboxApi::uploadFile error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-    return false;
+        }
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while uploading the file';
+        Logger.error('DropboxApi::uploadFile error: ' + stringifyError(e.error));
+        return false;
+      });
   }
 
   async uploadAndOverwriteFile(
     request: UploadExternalTxMemoRequest
   ): Promise<UploadExternalTxMemoResponse> {
     const self = this;
-    try {
-      const txHash = request.memo.tx;
-      const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
-      this.api.filesUpload({
-        path: fullPath,
-        contents: request.memo.memo,
-        mode: 'overwrite'
+    const txHash = request.memo.tx;
+    const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
+    return this.api.filesUpload({
+      path: fullPath,
+      contents: request.memo.memo,
+      mode: 'overwrite'
+    })
+      .then((response) => {
+        Logger.debug('DropboxApi::uploadAndOverwriteFile success: ' + txHash + ' file uploaded');
+        return true;
       })
-        .then((response) => {
-          Logger.info('DropboxApi::uploadAndOverwriteFile success: ' + txHash + ' file uploaded');
-          return true;
-        })
-        .catch((error) => {
-          self.errorCode = error.status;
-          self.errorMessage = 'An error ocurred when uploading the file';
-          return false;
-        });
-    } catch (error) {
-      Logger.error('DropboxApi::uploadAndOverwrite error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-    return false;
+      .catch((e) => {
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while uploading the file';
+        Logger.error('DropboxApi::uploadAndOverwrite error: ' + stringifyError(e.error));
+        return false;
+      });
   }
 
   async deleteFile(
-    txHash: string
+    txHash: DeleteExternalTxMemoRequest
   ): Promise<DeleteExternalTxMemoResponse> {
     const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
-    try {
-      this.api.filesDelete({
-        path: fullPath
+    return this.api.filesDelete({
+      path: fullPath
+    })
+      .then((response) => {
+        Logger.debug('DropboxApi::deleteFile success: ' + txHash + ' file deleted');
+        return true;
       })
-        .then((response) => {
-          Logger.info('DropboxApi::deleteFile success: ' + txHash + ' file deleted');
-          return true;
-        })
-        .catch((error) => {
-          self.errorCode = error.status;
-          self.errorMessage = 'An error ocurred when deleting the file';
-          return false;
-        });
-    } catch (error) {
-      Logger.error('DropboxApi::deleteFile error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-    return false;
+      .catch((e) => {
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while deleting the file';
+        Logger.error('DropboxApi::deleteFile error: ' + stringifyError(e.error));
+        return false;
+      });
   }
 
   async downloadFile(
-    request: DownloadExternalTxMemoRequest
+    txHash: DownloadExternalTxMemoRequest
   ): Promise<DownloadExternalTxMemoResponse> {
     const self = this;
-    try {
-      const txHash = request.memo;
-      const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
-      this.api.filesDownload({
-        fullPath
-      })
-        .then((response) => {
-          Logger.info('DropboxApi::downloadFile success: ' + txHash + ' file downloaded');
-          return true;
-        })
-        .catch((error) => {
-          self.errorCode = error.status;
-          self.errorMessage = 'An error ocurred when downloading the file';
-          return false;
-        });
-    } catch (error) {
-      Logger.error('DropboxApi::downloadFile error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-    return false;
-  }
-
-  /*
-  async searchFile(
-    request: SearchExternalTxMemoRequest
-  ): Promise<SearchExternalTxMemoResponse> {
-    const self = this;
-    const memos: Array<string> = request.memos;
-    try {
-      for (let i = 0; i < memos.length; i++) {
-        const txHash = memos[i];
-        const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
-        this.api.filesSearch({
-          fullPath
-        })
-          .then((response) => {
-            Logger.info('DropboxApi::searchFile success: ' + txHash + ' file found');
-            return true;
+    const defaultResponse = { content: '', lastUpdated: '' };
+    const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
+    return this.api.filesDownload({
+      path: fullPath
+    })
+      .then((response) => {
+        Logger.debug('DropboxApi::downloadFile success: ' + txHash + ' file downloaded');
+        return response.fileBlob.text()
+          .then(content => {
+            return {
+              content,
+              lastUpdated: moment(response.server_modified, "YYYY-MM-DDTHH:mm:ssZ").toDate()
+            };
           })
           .catch((error) => {
-            self.errorCode = error.status;
-            self.errorMessage = 'An error ocurred when searching the file';
-            return false;
+            Logger.error('DropboxApi::downloadFile error while parsing the file: ' + stringifyError(error));
+            return defaultResponse;
           });
-      }
-    } catch (error) {
-      Logger.error('DropboxApi::searchFile error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-    return false;
-  }*/
+      })
+      .catch((e) => {
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while downloading the file';
+        Logger.error('DropboxApi::downloadFile error: ' + stringifyError(e.error));
+        return defaultResponse;
+      });
+  }
 }

@@ -173,7 +173,11 @@ export default class TransactionsStore extends Store {
           };
           const recentRequest = this._getTransactionsRecentRequest(wallet.id);
           recentRequest.invalidate({ immediately: false });
-          recentRequest.execute(requestParams); // note: different params/cache than allRequests
+          recentRequest.execute(requestParams) // note: different params/cache than allRequests
+            .then((response) => {
+              // Sync with memos stored externally
+              this.actions.memos.syncTxMemos.trigger();
+            });
           return undefined;
         })
         .catch(() => {}); // Do nothing. It's logged in the api call
