@@ -280,8 +280,7 @@ export const getTxMemoLastUpdateDate = async (
   const table = _getTxMemosTable();
   const result = await db.select(table[txMemosTableSchema.properties.lastUpdated])
     .from(table)
-    .orderBy(table[txMemosTableSchema.properties.lastUpdated], lf.Order.DESC)
-    .limit(1)
+    .where(table[txMemosTableSchema.properties.tx].eq(request))
     .exec();
   return result.length === 1
     ? result[0].lastUpdated

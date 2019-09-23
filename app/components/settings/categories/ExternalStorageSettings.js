@@ -78,7 +78,7 @@ export default class ExternalStorageSettings extends Component<Props> {
             intl.formatMessage(messages.buttonConnect)
           }
           skin={ButtonSkin}
-          onClick={() => showDisconnect ? onDisconnect() : onConnect(authorizeUrl)}
+          onClick={() => (showDisconnect ? onDisconnect() : onConnect(authorizeUrl))}
           disabled={disabledCondition}
         />
       );

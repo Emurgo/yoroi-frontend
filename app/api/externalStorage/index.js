@@ -9,7 +9,7 @@ import {
 import DropboxApi from './providers/dropbox';
 import type {
   UploadExternalTxMemoRequest, DeleteExternalTxMemoRequest,
-  DownloadExternalTxMemoRequest, FetchFilenameExternalTxMemoRequest,
+  DownloadExternalTxMemoRequest,
   UploadExternalTxMemoResponse, DeleteExternalTxMemoResponse,
   DownloadExternalTxMemoResponse, FetchFilenameExternalTxMemoResponse,
 } from './types';
@@ -86,22 +86,8 @@ export default class ExternalStorageApi {
     }
   }
 
-  // Get metadata. It's an easy and quick way to check if a file exists
-  /*async getFileMetadata(
-    request: GetFileMetadataExternalTxMemoRequest
-  ): Promise<GetFileMetadataExternalTxMemoResponse> {
-    try {
-      return this.selectedProvider.getFileMetadata(request);
-    } catch (error) {
-      Logger.error('ExternalStorageApi::getFileMetadada error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }*/
-
   // Sync with external storage folder to catch up with changes (updated/deleted files)
-  async fetchFilenames(
-    request: FetchFilenameExternalTxMemoRequest
-  ): Promise<FetchFilenameExternalTxMemoResponse> {
+  async fetchFilenames(): Promise<FetchFilenameExternalTxMemoResponse> {
     try {
       return this.selectedProvider.fetchFilenames();
     } catch (error) {

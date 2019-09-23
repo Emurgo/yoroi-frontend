@@ -17,7 +17,7 @@ export type DeleteExternalTxMemoFunc = (
   request: DeleteExternalTxMemoRequest
 ) => Promise<DeleteExternalTxMemoResponse>;
 
-// Fetch Filenames 
+// Fetch Filenames
 export type FetchFilenameExternalTxMemoRequest = void;
 export type FetchFilenameExternalTxMemoResponse = Array<{
     tx: string,
@@ -37,4 +37,3 @@ export type DownloadExternalTxMemoResponse = {
 export type DownloadExternalTxMemoFunc = (
   request: DownloadExternalTxMemoRequest
 ) => Promise<DownloadExternalTxMemoResponse>;
-

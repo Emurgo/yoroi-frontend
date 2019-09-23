@@ -177,7 +177,9 @@ export default class TransactionsStore extends Store {
             .then((response) => {
               // Sync with memos stored externally
               this.actions.memos.syncTxMemos.trigger();
-            });
+              return response;
+            })
+            .catch(() => {}); // Things are logged in the memo store
           return undefined;
         })
         .catch(() => {}); // Do nothing. It's logged in the api call

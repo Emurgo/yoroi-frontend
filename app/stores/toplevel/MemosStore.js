@@ -2,7 +2,6 @@
 import { observable, computed, action } from 'mobx';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
 import LocalizableError from '../../i18n/LocalizableError';
 import environment from '../../environment';
@@ -14,6 +13,7 @@ import type { ProvidersType } from '../../api/externalStorage/index';
 import type {
   UploadExternalTxMemoFunc, DeleteExternalTxMemoFunc,
   DownloadExternalTxMemoFunc, FetchFilenameExternalTxMemoFunc,
+  FetchFilenameExternalTxMemoResponse,
 } from '../../api/externalStorage/types';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 
@@ -196,7 +196,7 @@ export default class MemosStore extends Store {
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.downloadExternalTxMemoRequest.execute(memoTxHash)
         .then(async memo => {
-          await this.saveTxMemoRequest.execute({
+          return await this.saveTxMemoRequest.execute({
             memo: {
               memo: memo.content,
               tx: memoTxHash,
@@ -208,22 +208,28 @@ export default class MemosStore extends Store {
   };
 
   @action _syncTxMemos = async () => {
-    const { wallets } = this.stores.substores[environment.API];
     if (this.hasSetSelectedExternalStorageProvider) {
-      const memos = await this.fetchFilenamesExternalTxMemoRequest.execute();
-      for(const memo of memos) {
-        // First, check if memo already exists
-        const lastUpdated = await this.getTxMemoLastUpdateDateRequest.execute(memo.tx);
-        if(memo.deleted === true) {
-          // delete local copy if file was deleted on external storage
-          await this.deleteTxMemoRequest.execute(memo.tx);
-        } else {
+      await this.fetchFilenamesExternalTxMemoRequest.execute()
+        .then(async memos => {
+          return await this._queryAndUpdateMemos(memos);
+        });
+    }
+  }
+
+  _queryAndUpdateMemos = async (memos: FetchFilenameExternalTxMemoResponse) => {
+    for (const memo of memos) {
+      // First, check if memo already exists
+      await this.getTxMemoLastUpdateDateRequest.execute(memo.tx)
+        .then(async lastUpdated => {
+          if (memo.deleted === true) {
+            // delete local copy if file was deleted on external storage
+            await this.deleteTxMemoRequest.execute(memo.tx);
           // only update if the file is newer
-          if(lastUpdated < memo.lastUpdated) {
+          } else if (lastUpdated < memo.lastUpdated) {
             await this._downloadTxMemo(memo.tx);
           }
-        }
-      }
+          return lastUpdated;
+        });
     }
   }
 

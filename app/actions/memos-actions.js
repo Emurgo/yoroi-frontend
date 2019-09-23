@@ -18,6 +18,6 @@ export default class MemosActions {
   saveTxMemo: Action<TransactionMemo> = new Action();
   updateTxMemo: Action<TransactionMemo> = new Action();
   deleteTxMemo: Action<string> = new Action();
-  syncTxMemos: Action<> = new Action();
+  syncTxMemos: Action<void> = new Action();
   downloadTxMemo: Action<string> = new Action();
 }

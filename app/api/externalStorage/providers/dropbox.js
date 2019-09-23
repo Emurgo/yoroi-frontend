@@ -4,22 +4,16 @@ import { sprintf } from 'sprintf-js';
 import { Dropbox } from 'dropbox';
 import moment from 'moment';
 import { DROPBOX_CLIENT_ID } from '../../../config/externalStorage';
-import type { TransactionMemo } from '../../ada/adaTypes';
 import {
   Logger,
   stringifyError
 } from '../../../utils/logging';
-import {
-  GenericApiError,
-} from '../../common';
 import environment from '../../../environment';
 import type {
   UploadExternalTxMemoRequest, DeleteExternalTxMemoRequest,
-  DownloadExternalTxMemoRequest, GetFileMetadaExternalTxMemoRequest,
-  FetchFilenameExternalTxMemoRequest,
+  DownloadExternalTxMemoRequest,
   UploadExternalTxMemoResponse, DeleteExternalTxMemoResponse,
-  DownloadExternalTxMemoResponse, GetFileMetadaExternalTxMemoResponse,
-  FetchFilenameExternalTxMemoResponse,
+  DownloadExternalTxMemoResponse, FetchFilenameExternalTxMemoResponse
 } from '../types';
 import {
   ExternalStorageList,
@@ -36,11 +30,11 @@ export default class DropboxApi {
   errorMessage: string = '';
   errorCode: string = '';
   api: Dropbox;
-  /*setup: Function;
+  /* setup: Function;
   auth: Function;
   uploadFile: Function;
   uploadAndOverwriteFile: Function;
-  deleteFile: Function;*/
+  deleteFile: Function; */
 
   constructor() {
     // $FlowFixMe
@@ -74,7 +68,7 @@ export default class DropboxApi {
 
   async revokeToken(): Promise<void> {
     return this.api.authTokenRevoke()
-      .then((response) => {
+      .then(() => {
         Logger.debug('DropboxApi::revokeToken success');
         return true;
       })
@@ -90,9 +84,7 @@ export default class DropboxApi {
     return sprintf('[%s] %s', this.errorCode, this.errorMessage);
   }
 
-  async fetchFilenames(
-    request: FetchFilenameExternalTxMemoRequest
-  ): Promise<FetchFilenameExternalTxMemoResponse> {
+  async fetchFilenames(): Promise<FetchFilenameExternalTxMemoResponse> {
     const self = this;
     return await this.api.filesListFolder({
       path: this.folderPath,
@@ -100,14 +92,18 @@ export default class DropboxApi {
     })
       .then((response) => {
         return response.entries.map(entry => {
-          if(entry.hasOwnProperty('.tag') && entry.hasOwnProperty('name')) {
+          if (
+            Object.prototype.hasOwnProperty.call(entry, '.tag')
+            && Object.prototype.hasOwnProperty.call(entry, 'name')
+          ) {
             return {
-              tx: entry.name.substr(0, entry.name.length-this.memoExt.length),
+              tx: entry.name.substr(0, entry.name.length - this.memoExt.length),
               deleted: entry['.tag'] === 'deleted',
-              lastUpdated: entry.hasOwnProperty('server_modified') ?
-                moment(entry.server_modified, "YYYY-MM-DDTHH:mm:ssZ").toDate() : ''
-            }
+              lastUpdated: Object.prototype.hasOwnProperty.call(entry, 'server_modified')
+                ? moment(entry.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate() : ''
+            };
           }
+          return '';
         });
       })
       .catch((e) => {
@@ -127,7 +123,7 @@ export default class DropboxApi {
       path: fullPath,
       contents: request.memo.memo,
     })
-      .then((response) => {
+      .then(() => {
         Logger.debug('DropboxApi::uploadFile success: ' + txHash + ' file uploaded');
         return true;
       })
@@ -155,7 +151,7 @@ export default class DropboxApi {
       contents: request.memo.memo,
       mode: 'overwrite'
     })
-      .then((response) => {
+      .then(() => {
         Logger.debug('DropboxApi::uploadAndOverwriteFile success: ' + txHash + ' file uploaded');
         return true;
       })
@@ -174,7 +170,7 @@ export default class DropboxApi {
     return this.api.filesDelete({
       path: fullPath
     })
-      .then((response) => {
+      .then(() => {
         Logger.debug('DropboxApi::deleteFile success: ' + txHash + ' file deleted');
         return true;
       })
@@ -201,7 +197,7 @@ export default class DropboxApi {
           .then(content => {
             return {
               content,
-              lastUpdated: moment(response.server_modified, "YYYY-MM-DDTHH:mm:ssZ").toDate()
+              lastUpdated: moment(response.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate()
             };
           })
           .catch((error) => {
