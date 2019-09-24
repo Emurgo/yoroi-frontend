@@ -229,6 +229,11 @@ export default class WalletsStore extends Store {
       this.activeAccount = newActiveWallet &&
         newActiveWallet.accounts &&
         newActiveWallet.accounts[0];
+      if (this.activeAccount) {
+        // Pass account plate id to memo class to use it as a folder name
+        const { plate: { id } } = this.activeAccount;
+        this.actions.memos.updateAccountNumberPlate.trigger(id);
+      }
     }
   };
 

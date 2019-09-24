@@ -9,9 +9,11 @@ import {
 import DropboxApi from './providers/dropbox';
 import type {
   UploadExternalTxMemoRequest, DeleteExternalTxMemoRequest,
-  DownloadExternalTxMemoRequest,
+  DownloadExternalTxMemoRequest, FetchFolderExternalTxMemoRequest,
+  CreateFolderExternalTxMemoRequest,
   UploadExternalTxMemoResponse, DeleteExternalTxMemoResponse,
   DownloadExternalTxMemoResponse, FetchFilenameExternalTxMemoResponse,
+  FetchFolderExternalTxMemoResponse, CreateFolderExternalTxMemoResponse
 } from './types';
 import { ExternalStorageList, ExternalStorageProviders } from '../../domain/ExternalStorage';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
@@ -31,15 +33,21 @@ export default class ExternalStorageApi {
 
   getProviders = (): { [key: string]: ProvidersType } => providers;
   selectedProvider: ProvidersType;
-  // setSelectedProvider: Function;
+  wallet: string;
 
   constructor() {
     // $FlowFixMe
     this.setSelectedProvider = this.setSelectedProvider.bind(this);
     // $FlowFixMe
+    this.setWalletAccountNumberPlate = this.setWalletAccountNumberPlate.bind(this);
+    // $FlowFixMe
     this.setup = this.setup.bind(this);
     // $FlowFixMe
+    this.fetchFolder = this.fetchFolder.bind(this);
+    // $FlowFixMe
     this.fetchFilenames = this.fetchFilenames.bind(this);
+    // $FlowFixMe
+    this.createFolder = this.createFolder.bind(this);
     // $FlowFixMe
     this.uploadFile = this.uploadFile.bind(this);
     // $FlowFixMe
@@ -76,12 +84,49 @@ export default class ExternalStorageApi {
     }
   }
 
+  // Set the current account number plate. It's used by all methods to save/delete/fetch memos
+  // from a specific wallet
+  async setWalletAccountNumberPlate(
+    numberPlateId: string
+  ): Promise<void> {
+    try {
+      this.selectedProvider.setWallet(numberPlateId);
+    } catch (error) {
+      Logger.error('ExternalStorageApi::setWallet error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
   // Revoke current token
   async revokeToken(): Promise<void> {
     try {
       this.selectedProvider.revokeToken();
     } catch (error) {
       Logger.error('ExternalStorageApi::revokeToken error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  // Fetch folder to check if exists
+  async fetchFolder(
+    request: FetchFolderExternalTxMemoRequest
+  ): Promise<FetchFolderExternalTxMemoResponse> {
+    try {
+      return this.selectedProvider.fetchFolder(request);
+    } catch (error) {
+      Logger.error('ExternalStorageApi::fetchFolder error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  // Create a folder
+  async createFolder(
+    request: CreateFolderExternalTxMemoRequest
+  ): Promise<CreateFolderExternalTxMemoResponse> {
+    try {
+      return this.selectedProvider.createFolder(request);
+    } catch (error) {
+      Logger.error('ExternalStorageApi::createFolder error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

@@ -13,7 +13,8 @@ import type { ProvidersType } from '../../api/externalStorage/index';
 import type {
   UploadExternalTxMemoFunc, DeleteExternalTxMemoFunc,
   DownloadExternalTxMemoFunc, FetchFilenameExternalTxMemoFunc,
-  FetchFilenameExternalTxMemoResponse,
+  FetchFilenameExternalTxMemoResponse, FetchFolderExternalTxMemoFunc,
+  CreateFolderExternalTxMemoFunc
 } from '../../api/externalStorage/types';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 
@@ -45,6 +46,10 @@ export default class MemosStore extends Store {
     // eslint-disable-next-line max-len
     = new Request<SelectedExternalStorageProvider => Promise<void>>(this.api.externalStorage.setSelectedProvider);
 
+  @observable
+  setWalletAccountNumberPlateRequest: Request<string => Promise<void>>
+    = new Request<string => Promise<void>>(this.api.externalStorage.setWalletAccountNumberPlate);
+
   @observable uploadExternalTxMemoRequest: Request<UploadExternalTxMemoFunc>
     = new Request<UploadExternalTxMemoFunc>(this.api.externalStorage.uploadFile);
 
@@ -59,6 +64,12 @@ export default class MemosStore extends Store {
 
   @observable fetchFilenamesExternalTxMemoRequest: Request<FetchFilenameExternalTxMemoFunc>
     = new Request<FetchFilenameExternalTxMemoFunc>(this.api.externalStorage.fetchFilenames);
+
+  @observable fetchFolderExternalTxMemoRequest: Request<FetchFolderExternalTxMemoFunc>
+    = new Request<FetchFolderExternalTxMemoFunc>(this.api.externalStorage.fetchFolder);
+
+  @observable createFolderExternalTxMemoRequest: Request<CreateFolderExternalTxMemoFunc>
+    = new Request<CreateFolderExternalTxMemoFunc>(this.api.externalStorage.createFolder);
 
   @observable saveTxMemoRequest: Request<SaveTxMemoFunc>
     = new Request<SaveTxMemoFunc>(this.api.ada.saveTxMemo);
@@ -78,6 +89,7 @@ export default class MemosStore extends Store {
   setup() {
     this._getSelectedProvider(); // eagerly cache
     this.actions.memos.updateExternalStorageProvider.listen(this._setExternalStorageProvider);
+    this.actions.memos.updateAccountNumberPlate.listen(this._updateAccountNumberPlate);
     this.actions.memos.unsetExternalStorageProvider.listen(this._unsetExternalStorageProvider);
     this.actions.memos.closeAddMemoDialog.listen(this._closeAddMemoDialog);
     this.actions.memos.closeEditMemoDialog.listen(this._closeEditMemoDialog);
@@ -108,6 +120,12 @@ export default class MemosStore extends Store {
     await this.getExternalStorageProviderRequest.execute(); // eagerly cache
   };
 
+  @action _updateAccountNumberPlate = async (numberPlateId : string) => {
+    if (this.hasSetSelectedExternalStorageProvider && !this.hasSetAccountNumberPlate) {
+      await this.setWalletAccountNumberPlateRequest.execute(numberPlateId);
+    }
+  }
+
   @action _unsetExternalStorageProvider = async () => {
     await this.unsetExternalStorageProviderRequest.execute();
     await this.getExternalStorageProviderRequest.execute(); // eagerly cache
@@ -126,6 +144,13 @@ export default class MemosStore extends Store {
     return (
       this.setSelectedProviderRequest.wasExecuted &&
       this.setSelectedProviderRequest.result !== null
+    );
+  }
+
+  @computed get hasSetAccountNumberPlate(): boolean {
+    return (
+      this.setWalletAccountNumberPlateRequest.wasExecuted &&
+      this.setWalletAccountNumberPlateRequest.result !== null
     );
   }
 
@@ -209,9 +234,17 @@ export default class MemosStore extends Store {
 
   @action _syncTxMemos = async () => {
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.fetchFilenamesExternalTxMemoRequest.execute()
-        .then(async memos => {
-          return await this._queryAndUpdateMemos(memos);
+      // Check if wallet folder exists
+      await this.fetchFolderExternalTxMemoRequest.execute('')
+        .then(async response => {
+          // If folder exists, fetch files. Otherwise, create it.
+          if (response === true) {
+            return await this.fetchFilenamesExternalTxMemoRequest.execute()
+              .then(async memos => {
+                return await this._queryAndUpdateMemos(memos);
+              });
+          }
+          return await this.createFolderExternalTxMemoRequest.execute('');
         });
     }
   }

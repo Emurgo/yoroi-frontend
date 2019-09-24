@@ -28,6 +28,30 @@ export type FetchFilenameExternalTxMemoFunc = (
   request: FetchFilenameExternalTxMemoRequest
 ) => Promise<FetchFilenameExternalTxMemoResponse>;
 
+// Fetch Folder (to check if exists)
+export type FetchFolderExternalTxMemoRequest = string;
+export type FetchFolderExternalTxMemoResponse = boolean;
+export type FetchFolderExternalTxMemoFunc = (
+  request: FetchFolderExternalTxMemoRequest
+) => Promise<FetchFolderExternalTxMemoResponse>;
+
+// Create Folder
+export type CreateFolderExternalTxMemoRequest = string;
+export type CreateFolderExternalTxMemoResponse = boolean;
+export type CreateFolderExternalTxMemoFunc = (
+  request: CreateFolderExternalTxMemoRequest
+) => Promise<CreateFolderExternalTxMemoResponse>;
+
+// Get Metadata
+export type GetMetadataExternalTxMemoRequest = string;
+export type GetMetadataExternalTxMemoResponse = {
+    tag: string,
+    lastUpdated: Date
+};
+export type GetMetadataExternalTxMemoFunc = (
+  request: GetMetadataExternalTxMemoRequest
+) => Promise<GetMetadataExternalTxMemoResponse>;
+
 // Download
 export type DownloadExternalTxMemoRequest = string;
 export type DownloadExternalTxMemoResponse = {

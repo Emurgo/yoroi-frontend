@@ -11,9 +11,12 @@ import {
 import environment from '../../../environment';
 import type {
   UploadExternalTxMemoRequest, DeleteExternalTxMemoRequest,
-  DownloadExternalTxMemoRequest,
+  DownloadExternalTxMemoRequest, GetMetadataExternalTxMemoRequest,
+  FetchFolderExternalTxMemoRequest, CreateFolderExternalTxMemoRequest,
   UploadExternalTxMemoResponse, DeleteExternalTxMemoResponse,
-  DownloadExternalTxMemoResponse, FetchFilenameExternalTxMemoResponse
+  DownloadExternalTxMemoResponse, FetchFilenameExternalTxMemoResponse,
+  GetMetadataExternalTxMemoResponse, FetchFolderExternalTxMemoResponse,
+  CreateFolderExternalTxMemoResponse
 } from '../types';
 import {
   ExternalStorageList,
@@ -42,6 +45,14 @@ export default class DropboxApi {
     // $FlowFixMe
     this.auth = this.auth.bind(this);
     // $FlowFixMe
+    this.setWallet = this.setWallet.bind(this);
+    // $FlowFixMe
+    this.getMetadata = this.getMetadata.bind(this);
+    // $FlowFixMe
+    this.fetchFolder = this.fetchFolder.bind(this);
+    // $FlowFixMe
+    this.createFolder = this.createFolder.bind(this);
+    // $FlowFixMe
     this.fetchFilenames = this.fetchFilenames.bind(this);
     // $FlowFixMe
     this.uploadFile = this.uploadFile.bind(this);
@@ -66,6 +77,13 @@ export default class DropboxApi {
     });
   }
 
+  // Update folder path with wallet account plate id
+  setWallet(numberPlateId: string) {
+    if (numberPlateId !== '' && numberPlateId !== undefined) {
+      this.folderPath = this.folderPath.concat('/').concat(numberPlateId);
+    }
+  }
+
   async revokeToken(): Promise<void> {
     return this.api.authTokenRevoke()
       .then(() => {
@@ -82,6 +100,72 @@ export default class DropboxApi {
 
   getError() {
     return sprintf('[%s] %s', this.errorCode, this.errorMessage);
+  }
+
+  async getMetadata(
+    path: GetMetadataExternalTxMemoRequest
+  ): Promise<GetMetadataExternalTxMemoResponse> {
+    const self = this;
+    const defaultResponse = { tag: '', lastUpdated: '' };
+    return await this.api.filesGetMetadata({
+      path,
+    })
+      .then((response) => {
+        if (
+          Object.prototype.hasOwnProperty.call(response, '.tag')
+          && Object.prototype.hasOwnProperty.call(response, 'name')
+        ) {
+          return {
+            tag: response['.tag'],
+            lastUpdated: Object.prototype.hasOwnProperty.call(response, 'server_modified')
+              ? moment(response.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate() : ''
+          };
+        }
+        return defaultResponse;
+      })
+      .catch((e) => {
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while fetching metadata';
+        Logger.error('DropboxApi::getMetadata error: ' + stringifyError(e.error));
+        return defaultResponse;
+      });
+  }
+
+  async fetchFolder(
+    folder: FetchFolderExternalTxMemoRequest
+  ): Promise<FetchFolderExternalTxMemoResponse> {
+    const fullPath = (folder !== '' && folder !== undefined)
+      ? this.folderPath.concat('/').concat(folder) : this.folderPath;
+    return await this.getMetadata(fullPath)
+      .then(response => {
+        return response.tag === 'folder';
+      })
+      .catch((e) => {
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while fetching folder';
+        Logger.error('DropboxApi::fetchFolder error: ' + stringifyError(e.error));
+        return false;
+      });
+  }
+
+  async createFolder(
+    folder: CreateFolderExternalTxMemoRequest
+  ): Promise<CreateFolderExternalTxMemoResponse> {
+    const fullPath = (folder !== '' && folder !== undefined)
+      ? this.folderPath.concat('/').concat(folder) : this.folderPath;
+    return this.api.filesCreateFolderV2({
+      path: fullPath,
+    })
+      .then(() => {
+        Logger.debug('DropboxApi::createFolder success: ' + fullPath + ' created');
+        return true;
+      })
+      .catch((e) => {
+        self.errorCode = e.status;
+        self.errorMessage = 'An error ocurred while creating the folder';
+        Logger.error('DropboxApi::createFolder error: ' + stringifyError(e.error));
+        return false;
+      });
   }
 
   async fetchFilenames(): Promise<FetchFilenameExternalTxMemoResponse> {
