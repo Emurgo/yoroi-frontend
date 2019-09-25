@@ -211,7 +211,7 @@ export default class ProfileStore extends Store {
       return this.inMemoryLanguage;
     }
     const { result } = this.getProfileLocaleRequest.execute();
-    if (this.isCurrentLocaleSet && result) return result;
+    if (this.isCurrentLocaleSet && result != null) return result;
 
     return ProfileStore.getDefaultLocale();
   }
@@ -243,7 +243,7 @@ export default class ProfileStore extends Store {
   _acceptLocale = async () => {
     // commit in-memory language to storage
     await this.setProfileLocaleRequest.execute(
-      this.inMemoryLanguage
+      this.inMemoryLanguage != null
         ? this.inMemoryLanguage
         : ProfileStore.getDefaultLocale()
     );
@@ -283,7 +283,7 @@ export default class ProfileStore extends Store {
     }
 
     const { result } = this.getThemeRequest.execute();
-    if (this.isCurrentThemeSet && result) {
+    if (this.isCurrentThemeSet && result != null) {
       // verify content is an actual theme
       if (Object.values(THEMES).find(theme => theme === result)) {
         // $FlowFixMe: can safely cast
@@ -308,7 +308,7 @@ export default class ProfileStore extends Store {
     const { result } = this.getCustomThemeRequest.execute();
     const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
     let customThemeVars = {};
-    if (result && result !== undefined) customThemeVars = JSON.parse(result);
+    if (result != null) customThemeVars = JSON.parse(result);
     // Merge Custom Theme and Current Theme
     return { ...currentThemeVars, ...customThemeVars };
   }
@@ -423,7 +423,7 @@ export default class ProfileStore extends Store {
 
   @computed get lastLaunchVersion(): string {
     const { result } = this.getLastLaunchVersionRequest.execute();
-    return result || '0.0.0';
+    return result != null ? result : '0.0.0';
   }
 
   setLastLaunchVersion = async (version: string) => {

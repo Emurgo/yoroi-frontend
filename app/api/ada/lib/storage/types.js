@@ -27,7 +27,7 @@ export type GetAddressListFunc = (
 
 // saveAsAdaAddresses
 
-export type SaveAsAdaAddressesRequeat = {
+export type SaveAsAdaAddressesRequest = {
   accountIndex: number,
   addresses: Array<string>,
   offset: number,
@@ -35,5 +35,5 @@ export type SaveAsAdaAddressesRequeat = {
 };
 export type SaveAsAdaAddressesResponse = void;
 export type SaveAsAdaAddressesFunc = (
-  request: SaveAsAdaAddressesRequeat
+  request: SaveAsAdaAddressesRequest
 ) => Promise<SaveAsAdaAddressesResponse>;

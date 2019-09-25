@@ -309,37 +309,6 @@ function inputoToValue(input: TxoPointerType): string {
 //   Special UTXOs
 // =================
 
-const redemptionUtxoForAddresses = {
-  Ae2tdPwUPEZ2XP4BGUHeMDRohtbLMm8MgwwwW86a2Mozyh3oMhza2f1H6Lz: [{
-    utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
-    tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
-    tx_index: 1,
-    receiver: 'Ae2tdPwUPEZ2XP4BGUHeMDRohtbLMm8MgwwwW86a2Mozyh3oMhza2f1H6Lz',
-    amount: '1000'
-  }],
-  Ae2tdPwUPEZ8dx9F8nGyRmLCQEHjSjbL8pBVwPsiL5tiCLqZiYD5poMCUwJ: [{
-    utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
-    tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
-    tx_index: 1,
-    receiver: 'Ae2tdPwUPEZ8dx9F8nGyRmLCQEHjSjbL8pBVwPsiL5tiCLqZiYD5poMCUwJ',
-    amount: '1000'
-  }],
-  Ae2tdPwUPEZ2UnSp2Px3wqZGJs3AUn5vcRQCTpPrcxGBWkAnAvB9JNNEtAb: [{
-    utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
-    tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
-    tx_index: 1,
-    receiver: 'Ae2tdPwUPEZ2UnSp2Px3wqZGJs3AUn5vcRQCTpPrcxGBWkAnAvB9JNNEtAb',
-    amount: '1000'
-  }],
-  Ae2tdPwUPEZFS38pQd5nbC5vqyicSHSgRkjr5p3mFxRrVgVn2fMKSxDR1qY: [{
-    utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
-    tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
-    tx_index: 1,
-    receiver: 'Ae2tdPwUPEZFS38pQd5nbC5vqyicSHSgRkjr5p3mFxRrVgVn2fMKSxDR1qY',
-    amount: '1000'
-  }],
-};
-
 const daedalusUtxoForAddresses = {
   // eslint-disable-next-line max-len
   DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb: [{
@@ -425,7 +394,7 @@ function calcUtxoMap(): { [key: string]: $Exact<UTXO> }  {
 
 function history(): Array<Transaction> {
   const bestBlockNum = Math.max(...transactions.map(
-    tx => (tx.block_num ? Number(tx.block_num) : 0)
+    tx => (tx.block_num != null ? Number(tx.block_num) : 0)
   )).toString();
 
   return transactions.map(tx => ({
@@ -449,7 +418,6 @@ function utxoForAddresses(): { [key: string]: Array<UTXO> } {
   const regularUtxoMapping = _.groupBy(utxos, utxo => utxo.receiver);
   return Object.assign(
     regularUtxoMapping,
-    redemptionUtxoForAddresses,
     daedalusUtxoForAddresses
   );
 }

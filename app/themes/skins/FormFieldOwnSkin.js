@@ -73,7 +73,7 @@ export const FormFieldOwnSkin = class extends React.Component<Props, State> {
         >
 
           <div className={styles.iconsWrapper}>
-            {this.props.done && <SvgInline svg={SuccessSvg} />}
+            {this.props.done === true && <SvgInline svg={SuccessSvg} />}
             {this.props.type === 'password' && !this.props.error ? (
               <button tabIndex="-1" type="button" onClick={this.showPassword}>
                 {isPasswordShown

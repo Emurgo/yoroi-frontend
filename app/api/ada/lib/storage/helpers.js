@@ -71,7 +71,10 @@ export const updateAdaWalletMetaParams = async (
   if (!persistentWallet) return Promise.resolve();
 
   // Swap out meta parameters
-  const updatedWallet = Object.assign({}, persistentWallet, { cwMeta: walletMeta });
+  const updatedWallet = {
+    ...persistentWallet,
+    cwMeta: walletMeta
+  };
 
   // Update the meta params cached in localstorage
   await saveAdaWallet(updatedWallet);
@@ -104,11 +107,10 @@ export const changeAdaWalletSpendingPassword = async (
   if (!wallet) {
     return Promise.resolve(null);
   }
-  const updatedWallet = Object.assign(
-    {},
-    wallet,
-    { cwPassphraseLU: moment().format() }
-  );
+  const updatedWallet = {
+    ...wallet,
+    cwPassphraseLU: moment().format()
+  };
 
   // save result in cache
   await saveAdaWallet(updatedWallet);
@@ -152,11 +154,12 @@ export const updateAdaWalletBalance = async (
   if (!persistentWallet) return Promise.resolve();
 
   // Calculate and set new user balance
-  const updatedWallet = Object.assign({}, persistentWallet, {
+  const updatedWallet = {
+    ...persistentWallet,
     cwAmount: {
       getCCoin: balance.toString()
     }
-  });
+  };
 
   // Update the balance cached in localstorage
   await saveAdaWallet(updatedWallet);

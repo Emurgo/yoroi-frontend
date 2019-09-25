@@ -15,7 +15,7 @@ export const Link = Object.freeze({
 export type LinkType = $Values<typeof Link>;
 
 export type ExplorerInfo = {
-  ...$Shape<$Inexact<typeof Link>>,
+  ...Inexact<typeof Link>,
   name: string,
 }
 const seiza = {
@@ -28,7 +28,7 @@ export const explorerInfo: {
   [key: ExplorerType]: ExplorerInfo,
   // assert that Seiza always has a URL for every type
   seiza: {
-    ...$Shape<typeof Link>,
+    ...typeof Link,
     name: string,
   }
 } = Object.freeze({

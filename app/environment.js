@@ -15,27 +15,36 @@ function getBaseUrl() {
   const index = location.indexOf('#');
   return (index === -1) ? location : location.substr(0, index).replace(/\/$/, '');
 }
+function getVersion(): string {
+  const manifest = require('../chrome/manifest.' + CONFIG.network.name);
+  const content = manifest.default !== undefined
+    ? manifest.default
+    : manifest;
+  return content.version;
+}
+export const environment = ((
+  {
+    ...process.env,
+    /** Network used to connect */
+    NETWORK: CONFIG.network.name,
+    version: getVersion(),
+    /** Environment used during webpack build */
+    env_type: process.env.NODE_ENV,
 
-export const environment = (Object.assign({
-  /** Network used to connect */
-  NETWORK: CONFIG.network.name,
-  version: require('../chrome/manifest.' + CONFIG.network.name + '.json').version,
-  /** Environment used during webpack build */
-  env_type: process.env.NODE_ENV,
-
-  API: ('ada': Currency), // Note: can't change at runtime
-  MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
-  commit: process.env.COMMIT || '',
-  branch: process.env.BRANCH || '',
-  isDev: () => CONFIG.network.name === NetworkType.DEVELOPMENT,
-  isTest: () => CONFIG.network.name === NetworkType.TEST,
-  isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
-  isAdaApi: () => environment.API === 'ada',
-  walletRefreshInterval: CONFIG.app.walletRefreshInterval,
-  serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
-  userAgentInfo,
-  baseUrl: getBaseUrl(),
-}, process.env): {
+    API: ('ada': Currency), // Note: can't change at runtime
+    MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
+    commit: process.env.COMMIT || '',
+    branch: process.env.BRANCH || '',
+    isDev: () => CONFIG.network.name === NetworkType.DEVELOPMENT,
+    isTest: () => CONFIG.network.name === NetworkType.TEST,
+    isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
+    isAdaApi: () => environment.API === 'ada',
+    walletRefreshInterval: CONFIG.app.walletRefreshInterval,
+    serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
+    userAgentInfo,
+    baseUrl: getBaseUrl(),
+  }
+): {
   NETWORK: Network,
   version: string,
   env_type: ?string,

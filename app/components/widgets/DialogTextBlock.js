@@ -26,7 +26,7 @@ export default class DialogTextBlock extends Component<Props> {
     const { title, message, subclass, children } = this.props;
 
     const messageStyle = classNames([
-      subclass ? styles[subclass] : styles.component
+      subclass != null ? styles[subclass] : styles.component
     ]);
 
     if (children !== null) {
@@ -38,8 +38,8 @@ export default class DialogTextBlock extends Component<Props> {
     }
     return (
       <div className={messageStyle}>
-        {title && <h1>{title}</h1>}
-        {message && <ReactMarkdown source={message} escapeHtml={false} />}
+        {title != null ? (<h1>{title}</h1>) : null}
+        {message != null ? (<ReactMarkdown source={message} escapeHtml={false} />) : null}
       </div>
     );
   }

@@ -23,7 +23,6 @@ export const ROUTES = {
     EXTERNAL_STORAGE: '/settings/external-storage',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
-    ADA_REDEMPTION: '/settings/ada-redemption',
   },
   TRANSFER: {
     ROOT: '/transfer',
@@ -32,6 +31,9 @@ export const ROUTES = {
   },
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
+  },
+  STAKING: {
+    ROOT: '/staking'
   },
   OAUTH_FROM_EXTERNAL: {
     DROPBOX: '/access_token=:token&token_type=:token_type&uid=:uid&account_id=:account_id',

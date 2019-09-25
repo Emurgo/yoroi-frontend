@@ -54,6 +54,10 @@
     "react/prop-types": 0,
     "react/require-default-props": 1,
     "react/sort-comp": 0,
+    "react/static-property-placement": ["warn", "static public field"],
+    "react/state-in-constructor": ["warn", "never"],
+    "react/jsx-props-no-spreading": 0,
+    "react/jsx-curly-newline": 0,
     "class-methods-use-this": 0,
     "no-continue": 0,
     "no-duplicate-imports": 0,
@@ -84,16 +88,21 @@
     "react/jsx-indent": 1,
     "flowtype/define-flow-type": 1,
     "flowtype/use-flow-type": 1,
+    "flowtype/require-valid-file-annotation": 1,
     "global-require": "off",
     "no-await-in-loop": 0,
     "no-unused-expressions": 0,
     "no-lone-blocks": 0,
+    "import/no-cycle": 0, // doesn't work with Flow unfortunately
+    "max-classes-per-file": 0,
+    "no-floating-promise/no-floating-promise": 2
   },
   "plugins": [
     "import",
     "promise",
     "react",
-    "flowtype"
+    "flowtype",
+    "no-floating-promise"
   ],
   "globals": {
     "chrome": true,

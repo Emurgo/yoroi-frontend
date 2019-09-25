@@ -3,12 +3,13 @@ module.exports = {
     // mock out the browser version of WASM bindings with the nodejs bindings
     'cardano-wallet-browser': 'cardano-wallet',
     '\\.png$': 'lodash/noop.js',
-    pdfParser$: 'lodash/noop.js',
   },
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!yoroi-extension-ledger-bridge)'
   ],
   setupFiles: [
     'jest-canvas-mock'
-  ]
+  ],
+  // ignore manifest.test.js file, because it isn't a test
+  testPathIgnorePatterns: ['manifest.test.js']
 };
