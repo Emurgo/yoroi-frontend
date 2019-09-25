@@ -357,7 +357,7 @@ export default class Transaction extends Component<Props, State> {
                 </RawHash>
               </ExplorableHashContainer>
 
-              {data.memo ? (
+              {data.memo != null ? (
                 <div className={styles.row}>
                   <h2>
                     {intl.formatMessage(messages.memoTitle)}

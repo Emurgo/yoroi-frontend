@@ -72,13 +72,13 @@ export default class ExternalStorageSettings extends Component<Props> {
         <Button
           key={provider}
           className={buttonClasses}
-          label={showDisconnect ?
+          label={showDisconnect === true ?
             intl.formatMessage(messages.buttonDisconnect) :
             // externalStorageProviders[provider].name
             intl.formatMessage(messages.buttonConnect)
           }
           skin={ButtonSkin}
-          onClick={() => (showDisconnect ? onDisconnect() : onConnect(authorizeUrl))}
+          onClick={() => (showDisconnect === true ? onDisconnect() : onConnect(authorizeUrl))}
           disabled={disabledCondition}
         />
       );
