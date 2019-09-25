@@ -35,12 +35,15 @@
       "js": ["js/trezor-content-script.js"]
     }
   ],
-  "content_security_policy": "default-src 'self'; frame-src https://connect.trezor.io/ https://emurgo.github.io/yoroi-extension-ledger-bridge; script-src 'self' 'unsafe-eval'; connect-src wss://testnet-yoroi-backend.yoroiwallet.com:443 https://testnet-yoroi-backend.yoroiwallet.com; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;",
+  "content_security_policy": "default-src 'self'; frame-src https://connect.trezor.io/ https://emurgo.github.io/yoroi-extension-ledger-bridge; script-src 'self' 'unsafe-eval'; connect-src wss://testnet-yoroi-backend.yoroiwallet.com:443 https://testnet-yoroi-backend.yoroiwallet.com https://api.dropboxapi.com https://content.dropboxapi.com; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;",
   "protocol_handlers": [
     {
       "protocol": "web+cardano",
       "name": "Yoroi",
       "uriTemplate": "main_window.html#/send-from-uri?q=%s"
     }
+  ],
+  "web_accessible_resources": [
+    "main_window.html/"
   ]
 }
