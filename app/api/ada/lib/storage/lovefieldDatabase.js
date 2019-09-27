@@ -337,8 +337,8 @@ const _getTxsOrderedBy = (
     .exec()
     .then(rows => {
       return rows.map(row => Object.assign(
-        ...row[txsTableSchema.name][txsTableSchema.properties.value],
-        ...row[txMemosTableSchema.name][txMemosTableSchema.properties.value]
+        row[txsTableSchema.name][txsTableSchema.properties.value],
+        {...row[txMemosTableSchema.name][txMemosTableSchema.properties.value]}
       ));
     });
 };

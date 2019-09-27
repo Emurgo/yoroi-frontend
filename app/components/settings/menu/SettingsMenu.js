@@ -84,7 +84,11 @@ export default class SettingsMenu extends Component<Props> {
 
           <SettingsMenuItem
             label={intl.formatMessage(messages.externalStorage)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
+            onClick={() => {
+              if (hasActiveWallet) {
+                onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE);
+              }
+            }}
             active={isActiveItem(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
             className="externalStorage"
             disabled={!hasActiveWallet}
