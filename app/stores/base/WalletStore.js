@@ -229,6 +229,8 @@ export default class WalletsStore extends Store {
         // Pass account plate id to memo class to use it as a folder name
         const { plate: { id } } = this.activeAccount;
         this.actions.memos.updateAccountNumberPlate.trigger(id);
+        // Generate private key chain by seeding the account public key
+        this.actions.utilityKeys.setRootKey.trigger();
       }
     }
   };

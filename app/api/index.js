@@ -3,12 +3,14 @@ import AdaApi from './ada/index';
 import LocalStorageApi from './localStorage/index';
 import ExternalStorageApi from './externalStorage/index';
 import ExportApi from './export/index';
+import UtilityKeyApi from './utilityKey/index';
 
 export type Api = {
   ada: AdaApi,
   localStorage: LocalStorageApi,
   externalStorage: ExternalStorageApi,
   export: ExportApi,
+  utilityKey: UtilityKeyApi,
 };
 
 export const setupApi = (): Api => ({
@@ -16,6 +18,7 @@ export const setupApi = (): Api => ({
   localStorage: new LocalStorageApi(),
   externalStorage: new ExternalStorageApi(),
   export: new ExportApi(),
+  utilityKey: new UtilityKeyApi(),
 });
 
 export type MigrationRequest = {

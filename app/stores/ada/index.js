@@ -18,6 +18,7 @@ import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import StateFetchStore from './StateFetchStore';
 import ServerConnectionStore from './ServerConnectionStore';
+import UtilityKeyStore from './UtilityKeyStore';
 
 export const adaStoreClasses = {
   wallets: AdaWalletsStore,
@@ -35,6 +36,7 @@ export const adaStoreClasses = {
   stateFetchStore: StateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
   serverConnectionStore: ServerConnectionStore,
+  utilityKey: UtilityKeyStore,
 };
 
 export type AdaStoresMap = {
@@ -53,6 +55,7 @@ export type AdaStoresMap = {
   stateFetchStore: StateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
   serverConnectionStore: ServerConnectionStore,
+  utilityKey: UtilityKeyStore,
 };
 
 const adaStores = observable({
@@ -71,6 +74,7 @@ const adaStores = observable({
   stateFetchStore: null,
   transactionBuilderStore: null,
   serverConnectionStore: null,
+  utilityKey: null,
 });
 
 /** See `stores` index for description of this weird behavior
