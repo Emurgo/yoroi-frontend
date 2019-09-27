@@ -26,6 +26,9 @@ import type { SelectedExternalStorageProvider } from '../../domain/ExternalStora
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import {
+  encryptMemoMessage, decryptMemoMessage
+} from '../../api/common/lib/crypto/keys/utilityKey';
 
 export type MemosForWallet = Map<string, $ReadOnly<TxMemoTableRow>>;
 
@@ -205,7 +208,20 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
       WalletId: walletId,
     };
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.uploadExternalTxMemoRequest.execute({ memo });
+      const withPubKey = asGetPublicKey(request.publicDeriver);
+      const memoContent = withPubKey == null
+        ? memo.Content
+        : (await encryptMemoMessage({
+          rootKey: this.stores.wallets.getPublicKeyCache(withPubKey).rootUtilityKey,
+          content: memo.Content,
+          headerIndex: 0
+        })).content;
+      await this.uploadExternalTxMemoRequest.execute({
+        memo: {
+          ...memo,
+          Content: memoContent,
+        },
+      });
     }
     const savedMemo = await this.saveTxMemoRequest.execute({
       db: request.publicDeriver.getDb(),
@@ -225,7 +241,20 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
       WalletId: walletId,
     };
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memo });
+      const withPubKey = asGetPublicKey(request.publicDeriver);
+      const memoContent = withPubKey == null
+        ? memo.Content
+        : (await encryptMemoMessage({
+          rootKey: this.stores.wallets.getPublicKeyCache(withPubKey).rootUtilityKey,
+          content: memo.Content,
+          headerIndex: 0
+        })).content;
+      await this.uploadAndOverwriteExternalTxMemoRequest.execute({
+        memo: {
+          ...memo,
+          Content: memoContent,
+        }
+      });
     }
     const savedMemo = await this.saveTxMemoRequest.execute({
       db: request.publicDeriver.getDb(),
@@ -267,11 +296,20 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
         txHash: request.txHash,
       }).promise;
       if (memo == null) throw new Error('Should never happen');
+
+      const withPubKey = asGetPublicKey(request.publicDeriver);
+      const memoContent = withPubKey == null
+        ? memo.content
+        : (await decryptMemoMessage({
+          rootKey: this.stores.wallets.getPublicKeyCache(withPubKey).rootUtilityKey,
+          content: memo.content,
+          headerIndex: 0
+        })).content;
       const memoRow = await this.saveTxMemoRequest.execute({
         db: request.publicDeriver.getDb(),
         memo: {
           WalletId: walletId,
-          Content: memo.content,
+          Content: memoContent,
           TransactionHash: request.txHash,
           LastUpdated: memo.lastUpdated
         }

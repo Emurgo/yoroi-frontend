@@ -42,6 +42,7 @@ import {
 } from '../../../app/stores/toplevel/TokenInfoStore';
 import { sendAllUnsignedTxFromUtxo } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 import { replaceMockBoxId } from '../../../app/api/ergo/lib/transactions/utils';
+import { genRootKeyFromPublicKey } from '../../../app/api/common/lib/crypto/keys/utilityKey';
 
 function genMockErgoCache(dummyWallet: PublicDeriver<>) {
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
@@ -68,6 +69,9 @@ function genMockErgoCache(dummyWallet: PublicDeriver<>) {
         TextPart: 'AZTH-1588',
       },
       publicKey: '0488b21e000000000000000000b9433af1acee90cab083bca7d59bc6fa65dbbfbbe0406cee9d11f48cced4fae903595503bb7c9b8d897078384ba49a0700e110440d844aea7610ca6e4e5526248d',
+      rootUtilityKey: genRootKeyFromPublicKey({
+        publicKey: '0488b21e000000000000000000b9433af1acee90cab083bca7d59bc6fa65dbbfbbe0406cee9d11f48cced4fae903595503bb7c9b8d897078384ba49a0700e110440d844aea7610ca6e4e5526248d',
+      }),
     }),
     getTransactions: (wallet) => ({
       publicDeriver: wallet,
