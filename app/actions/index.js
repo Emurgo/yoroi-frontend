@@ -7,7 +7,7 @@ import DialogsActions from './dialogs-actions';
 import NotificationsActions from './notifications-actions';
 import LoadingActions from './loading-actions';
 import MemosActions from './memos-actions';
-import UtilityKeys from './utility-keys-actions'
+import UtilityKeys from './utility-keys-actions';
 import adaActionsMap from './ada/index';
 import type { AdaActionsMap } from './ada/index';
 

@@ -8,7 +8,7 @@ import {
 import {
   GenericApiError,
 } from '../common';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../ada/lib/cardanoCrypto/rustLoader';
 
 /* m / utility' / purpose' / header */
 const MEMO_UTILITY_INDEX = 0x80000000 + 190822;
@@ -42,23 +42,23 @@ export default class UtilityKeyApi {
 
   _setRootKeyFromPublicKey = async (
     publicKey: string
-  ): setUtilityKeyResponse => {
+  ): Promise<setUtilityKeyResponse> => {
     try {
       const blakeHash = blakejs.blake2bHex(publicKey, null, 32);
-      const mnemonicFromSeed = entropyToMnemonic(blakeHash)
-      let entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonicFromSeed);
-      this.rootKey = RustModule.Wallet.PrivateKey.new(entropy);
+      const mnemonicFromSeed = entropyToMnemonic(blakeHash);
+      const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonicFromSeed);
+      this.rootKey = RustModule.Wallet.PrivateKey.new(entropy, '');
     } catch (error) {
       Logger.error('UtilityKeyApi::rootKeyFromPublicKey error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   };
 
-  _setRootKeyFromRandom = async (): setUtilityKeyResponse => {
+  _setRootKeyFromRandom = async (): Promise<setUtilityKeyResponse> => {
     try {
       const randomMnemonic = generateMnemonic(160);
-      let entropy = RustModule.Wallet.Entropy.from_english_mnemonics(randomMnemonic);
-      this.rootKey = RustModule.Wallet.PrivateKey.new(entropy);
+      const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(randomMnemonic);
+      this.rootKey = RustModule.Wallet.PrivateKey.new(entropy, '');
     } catch (error) {
       Logger.error('UtilityKeyApi::randomRootKey error: ' + stringifyError(error));
       throw new GenericApiError();
@@ -69,11 +69,12 @@ export default class UtilityKeyApi {
     utilityIndex: number,
     purposeIndex: number,
     headerIndex: number
-  ): getUtilityKeyResponse => {
+  ): Promise<getUtilityKeyResponse> => {
     try {
       const key = await this.rootKey
         .derive(RustModule.Wallet.DerivationScheme.v2(), utilityIndex)
-        .derive(RustModule.Wallet.DerivationScheme.v2(), purposeIndex);
+        .derive(RustModule.Wallet.DerivationScheme.v2(), purposeIndex)
+        .derive(RustModule.Wallet.DerivationScheme.v2(), headerIndex);
       return { key };
     } catch (error) {
       Logger.error('UtilityKeyApi::_getKey error: ' + stringifyError(error));
@@ -83,31 +84,30 @@ export default class UtilityKeyApi {
 
   setRootKey = async (
     request: setUtilityKeyRequest
-  ): setUtilityKeyResponse => {
+  ): Promise<setUtilityKeyResponse> => {
     if (request.publicKey !== undefined) {
       return this._setRootKeyFromPublicKey(request.publicKey);
-    } else {
-      return this._setRootKeyFromRandom();
     }
+    return this._setRootKeyFromRandom();
   };
 
   getMemoEncryptionKey = async (
-    headerIndex: number
-  ): getUtilityKeyResponse => {
+    request: getUtilityKeyRequest
+  ): Promise<getUtilityKeyResponse> => {
     return this._getKey(
       MEMO_UTILITY_INDEX,
       ENCRYPTION_PURPOSE_INDEX,
-      headerIndex
+      request.headerIndex
     );
   }
 
   getMemoSigningKey = async (
-    headerIndex: number
-  ): getUtilityKeyResponse => {
+    request: getUtilityKeyRequest
+  ): Promise<getUtilityKeyResponse> => {
     return this._getKey(
       MEMO_UTILITY_INDEX,
       SIGNING_PURPOSE_INDEX,
-      headerIndex
+      request.headerIndex
     );
   }
 }

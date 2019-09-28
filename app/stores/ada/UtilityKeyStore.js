@@ -1,10 +1,8 @@
 // @flow
 import { observable, computed, action } from 'mobx';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import environment from '../../environment';
-import {
+import type {
   setUtilityKeyFunc,
   getUtilityKeyFunc,
   getUtilityKeyResponse,
@@ -40,27 +38,31 @@ export default class UtilityKeyStore extends Store {
   }
 
   @action _setRootKey = async () => {
-    const { root_cached_key } = await getCurrentCryptoAccount();
-    const publicKey = root_cached_key.key().to_hex();
-    await this.setRootKeyRequest.execute({ publicKey });
+    const account = await getCurrentCryptoAccount();
+    if (account) {
+      // eslint-disable-next-line
+      const { root_cached_key } = account;
+      const publicKey = root_cached_key.key().to_hex();
+      await this.setRootKeyRequest.execute({ publicKey });
+    }
   };
 
   // TODO: update to support more than one header index
   @computed get getMemoSigningKey(): ?getUtilityKeyResponse {
-    const result = null;
     if (this.hasSetRootKey) {
-      result = this.getMemoSigningKeyRequest.execute(0);
+      const { result } = this.getMemoSigningKeyRequest.execute({ headerIndex: 0 });
+      return result;
     }
-    return result;
+    return undefined;
   }
 
   // TODO: update to support more than one header index
   @computed get getMemoEncryptionKey(): ?getUtilityKeyResponse {
-    const result = null;
     if (this.hasSetRootKey) {
-      result = this.getMemoEncryptionKeyRequest.execute(0);
+      const { result } = this.getMemoEncryptionKeyRequest.execute({ headerIndex: 0 });
+      return result;
     }
-    return result;
+    return undefined;
   }
 
 }
