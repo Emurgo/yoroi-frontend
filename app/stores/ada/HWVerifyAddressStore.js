@@ -66,7 +66,7 @@ export default class AddressesStore extends Store {
     this._setActionProcessing(true);
 
     if (params.wallet.isLedgerNanoSWallet) {
-      await this.ledgerVerifyAddress(path);
+      await this.ledgerVerifyAddress(path, address);
     } else if (params.wallet.isTrezorTWallet) {
       await this.trezorVerifyAddress(path, address);
     } else {
@@ -95,6 +95,7 @@ export default class AddressesStore extends Store {
 
   ledgerVerifyAddress = async (
     path: BIP32Path,
+    address: string,
   ): Promise<void> => {
     let ledgerBridge: LedgerBridge;
     try {
@@ -108,8 +109,8 @@ export default class AddressesStore extends Store {
       Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
       // the next line is used to get an error when
       // Ledger is not connected or has issues.
-      await ledgerBridge.getVersion();
-      await ledgerBridge.showAddress(path);
+      // await ledgerBridge.getVersion();
+      await ledgerBridge.showAddress(path, address);
     } catch (error) {
       Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
       this._setError(ledgerErrorToLocalized(error));
