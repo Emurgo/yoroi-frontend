@@ -1,13 +1,9 @@
 // @flow
 import blakejs from 'blakejs';
 import { entropyToMnemonic, generateMnemonic } from 'bip39';
-import {
-  Logger,
-  stringifyError,
-} from '../../utils/logging';
-import {
-  GenericApiError,
-} from '../common';
+import { Logger, stringifyError } from '../../utils/logging';
+import { encryptWithPassword, decryptWithPassword } from '../../utils/passwordCipher';
+import { GenericApiError } from '../common';
 import { RustModule } from '../ada/lib/cardanoCrypto/rustLoader';
 
 /* m / utility' / purpose' / header */
@@ -32,6 +28,28 @@ export type setUtilityKeyResponse = void;
 export type setUtilityKeyFunc = (
   request: setUtilityKeyRequest
 ) => Promise<setUtilityKeyResponse>;
+
+export type encryptMemoMessageRequest = {
+  content: string,
+  headerIndex: number
+}
+export type encryptMemoMessageResponse = {
+  content: string
+}
+export type encryptMemoMessageFunc = (
+  request: encryptMemoMessageRequest
+) => Promise<encryptMemoMessageResponse>;
+
+export type decryptMemoMessageRequest = {
+  content: string,
+  headerIndex: number
+}
+export type decryptMemoMessageResponse = {
+  content: string
+}
+export type decryptMemoMessageFunc = (
+  request: decryptMemoMessageRequest
+) => Promise<decryptMemoMessageResponse>;
 
 // Note: RustModule methods are exposed through RustModule.Wallet
 // but that doesn't mean the methods are wallet-specific
@@ -65,6 +83,15 @@ export default class UtilityKeyApi {
     }
   };
 
+  setRootKey = async (
+    request: setUtilityKeyRequest
+  ): Promise<setUtilityKeyResponse> => {
+    if (request.publicKey !== undefined) {
+      return this._setRootKeyFromPublicKey(request.publicKey);
+    }
+    return this._setRootKeyFromRandom();
+  };
+
   _getKey = async (
     utilityIndex: number,
     purposeIndex: number,
@@ -82,16 +109,7 @@ export default class UtilityKeyApi {
     }
   }
 
-  setRootKey = async (
-    request: setUtilityKeyRequest
-  ): Promise<setUtilityKeyResponse> => {
-    if (request.publicKey !== undefined) {
-      return this._setRootKeyFromPublicKey(request.publicKey);
-    }
-    return this._setRootKeyFromRandom();
-  };
-
-  getMemoEncryptionKey = async (
+  _getMemoEncryptionKey = async (
     request: getUtilityKeyRequest
   ): Promise<getUtilityKeyResponse> => {
     return this._getKey(
@@ -101,7 +119,7 @@ export default class UtilityKeyApi {
     );
   }
 
-  getMemoSigningKey = async (
+  _getMemoSigningKey = async (
     request: getUtilityKeyRequest
   ): Promise<getUtilityKeyResponse> => {
     return this._getKey(
@@ -109,5 +127,31 @@ export default class UtilityKeyApi {
       SIGNING_PURPOSE_INDEX,
       request.headerIndex
     );
+  }
+
+  encryptMemoMessage = async (
+    request: encryptMemoMessageRequest
+  ): Promise<encryptMemoMessageResponse> => {
+    // Get key and use its hash as a password
+    const encryptionKey = await this._getMemoEncryptionKey({ headerIndex: request.headerIndex });
+    const password = blakejs.blake2bHex(encryptionKey.key.to_hex(), null, 16);
+    const encodedMessage = Buffer.from(request.content);
+    const encryptedHex = encryptWithPassword(password, encodedMessage);
+    return {
+      content: encryptedHex
+    };
+  }
+
+  decryptMemoMessage = async (
+    request: decryptMemoMessageRequest
+  ): Promise<decryptMemoMessageResponse> => {
+    // Get key and use its hash as a password
+    const encryptionKey = await this._getMemoEncryptionKey({ headerIndex: request.headerIndex });
+    const password = blakejs.blake2bHex(encryptionKey.key.to_hex(), null, 16);
+    const decryptedHex = decryptWithPassword(password, request.content);
+    const decryptedMessage = Buffer.from(decryptedHex).toString();
+    return {
+      content: decryptedMessage
+    };
   }
 }

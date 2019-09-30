@@ -6,7 +6,9 @@ import WalletTransaction from '../../domain/WalletTransaction';
 import LocalizableError from '../../i18n/LocalizableError';
 import environment from '../../environment';
 import type {
-  SaveTxMemoFunc, DeleteTxMemoFunc, GetTxMemoLastUpdateDateFunc
+  SaveTxMemoFunc,
+  DeleteTxMemoFunc,
+  GetTxMemoLastUpdateDateFunc
 } from '../../api/ada';
 import type { TransactionMemo } from '../../api/ada/adaTypes';
 import type { ProvidersType } from '../../api/externalStorage/index';
@@ -16,6 +18,10 @@ import type {
   FetchFilenameExternalTxMemoResponse, FetchFolderExternalTxMemoFunc,
   CreateFolderExternalTxMemoFunc
 } from '../../api/externalStorage/types';
+import type {
+  encryptMemoMessageFunc,
+  decryptMemoMessageFunc,
+} from '../../api/utilityKey/index';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 
 export default class MemosStore extends Store {
@@ -83,6 +89,12 @@ export default class MemosStore extends Store {
    @observable
   revokeTokenStorageProvideRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.externalStorage.revokeToken);
+
+  @observable encryptMemoMessageRequest: Request<encryptMemoMessageFunc>
+    = new Request<encryptMemoMessageFunc>(this.api.utilityKey.encryptMemoMessage);
+
+  @observable decryptMemoMessageRequest: Request<decryptMemoMessageFunc>
+    = new Request<decryptMemoMessageFunc>(this.api.utilityKey.decryptMemoMessage);
 
   _hasAnyPending: boolean = false;
 
@@ -192,7 +204,19 @@ export default class MemosStore extends Store {
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.saveTxMemoRequest.execute({ memo });
       wallets.refreshWalletsData();
-      await this.uploadExternalTxMemoRequest.execute({ memo });
+      await this.encryptMemoMessageRequest.execute({
+        content: memo.memo,
+        headerIndex: 0
+      })
+        .then(async encryptedMemo => {
+          return await this.uploadExternalTxMemoRequest.execute({
+            memo: {
+              memo: encryptedMemo.content,
+              tx: memo.tx,
+              lastUpdated: memo.lastUpdated
+            }
+          });
+        });
       this._closeAddMemoDialog();
     }
   };
@@ -202,7 +226,19 @@ export default class MemosStore extends Store {
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.saveTxMemoRequest.execute({ memo });
       wallets.refreshWalletsData();
-      await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memo });
+      await this.encryptMemoMessageRequest.execute({
+        content: memo.memo,
+        headerIndex: 0
+      })
+        .then(async encryptedMemo => {
+          return await this.uploadAndOverwriteExternalTxMemoRequest.execute({
+            memo: {
+              memo: encryptedMemo.content,
+              tx: memo.tx,
+              lastUpdated: memo.lastUpdated
+            }
+          });
+        });
       this._closeEditMemoDialog();
     }
   };
@@ -221,13 +257,19 @@ export default class MemosStore extends Store {
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.downloadExternalTxMemoRequest.execute(memoTxHash)
         .then(async memo => {
-          return await this.saveTxMemoRequest.execute({
-            memo: {
-              memo: memo.content,
-              tx: memoTxHash,
-              lastUpdated: memo.lastUpdated
-            }
-          });
+          return await this.decryptMemoMessageRequest.execute({
+            content: memo.content,
+            headerIndex: 0
+          })
+            .then(async decryptedMemo => {
+              return await this.saveTxMemoRequest.execute({
+                memo: {
+                  memo: decryptedMemo.content,
+                  tx: memoTxHash,
+                  lastUpdated: memo.lastUpdated
+                }
+              });
+            });
         });
     }
   };
