@@ -3,14 +3,11 @@
 
 import { observable, action } from 'mobx';
 
+import type { ExtenedPublicKeyResp } from 'yoroi-extension-ledger-connect-handler';
 import {
   LedgerBridge,
   makeCardanoAccountBIP44Path,
 } from 'yoroi-extension-ledger-connect-handler';
-import type {
-  GetVersionResponse,
-  GetExtendedPublicKeyResponse,
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import Config from '../../config';
 import environment from '../../environment';
@@ -51,15 +48,9 @@ import {
   stringifyError
 } from '../../utils/logging';
 
-type LedgerConnectionResponse = {
-  // versionResp: GetVersionResponse, // TODO: temporarily set hardcoded version info
-  versionResp?: GetVersionResponse, // TODO: temporarily set hardcoded version info
-  extendedPublicKeyResp: GetExtendedPublicKeyResponse,
-};
-
 export default class LedgerConnectStore
   extends Store
-  implements HWConnectStoreTypes<LedgerConnectionResponse> {
+  implements HWConnectStoreTypes<ExtenedPublicKeyResp> {
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
@@ -155,11 +146,6 @@ export default class LedgerConnectStore
       });
       await prepareLedgerBridger(ledgerBridge);
 
-      // TODO: temporarily set hardcoded version info
-      // const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
-      // Logger.debug(stringifyData(versionResp));
-      // TODO: temporarily set hardcoded version info
-
       // TODO: assume single account in Yoroi
       const accountPath = makeCardanoAccountBIP44Path(0);
       // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
@@ -167,11 +153,13 @@ export default class LedgerConnectStore
 
       // get Cardano's first account's
       // i.e hdPath = [2147483692, 2147485463, 2147483648]
-      const extendedPublicKeyResp: GetExtendedPublicKeyResponse
+      const extendedPublicKeyResp: ExtenedPublicKeyResp
         = await ledgerBridge.getExtendedPublicKey(accountPath);
 
-      // this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp }); // TODO: temporarily set hardcoded version info
-      this.hwDeviceInfo = this._normalizeHWResponse({ extendedPublicKeyResp }); // TODO: temporarily set hardcoded version info
+      this.hwDeviceInfo = this._normalizeHWResponse({
+        ePublicKey: extendedPublicKeyResp.ePublicKey,
+        deviceVersion: extendedPublicKeyResp.deviceVersion
+      });
 
       this._goToSaveLoad();
       Logger.info('Ledger device OK');
@@ -183,44 +171,37 @@ export default class LedgerConnectStore
   };
 
   _normalizeHWResponse = (
-    resp: LedgerConnectionResponse,
+    resp: ExtenedPublicKeyResp,
   ): HWDeviceInfo => {
     this._validateHWResponse(resp);
 
-    // const { extendedPublicKeyResp, versionResp } = resp; // TODO: temporarily set hardcoded version info
-    const { extendedPublicKeyResp } = resp; // TODO: temporarily set hardcoded version info
+    const { ePublicKey, deviceVersion } = resp;
 
     return {
-      publicMasterKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
+      publicMasterKey: ePublicKey.publicKeyHex + ePublicKey.chainCodeHex,
       hwFeatures: {
         vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
         model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
         label: '',
         deviceId: '',
         language: '',
-        // majorVersion: parseInt(versionResp.major, 10), // TODO: temporarily set hardcoded version info
-        // minorVersion: parseInt(versionResp.minor, 10), // TODO: temporarily set hardcoded version info
-        // patchVersion: parseInt(versionResp.patch, 10), // TODO: temporarily set hardcoded version info
-        majorVersion: 1, // TODO: temporarily set hardcoded version info
-        minorVersion: 0, // TODO: temporarily set hardcoded version info
-        patchVersion: 0, // TODO: temporarily set hardcoded version info
+        majorVersion: parseInt(deviceVersion.major, 10),
+        minorVersion: parseInt(deviceVersion.minor, 10),
+        patchVersion: parseInt(deviceVersion.patch, 10),
       }
     };
   }
 
   _validateHWResponse = (
-    resp: LedgerConnectionResponse,
+    resp: ExtenedPublicKeyResp,
   ): boolean => {
-    // const { extendedPublicKeyResp, versionResp } = resp; // TODO: temporarily set hardcoded version info
-    const { extendedPublicKeyResp } = resp; // TODO: temporarily set hardcoded version info
+    const { ePublicKey, deviceVersion } = resp;
 
-    // TODO: temporarily set hardcoded version info
-    // if (versionResp == null) {
-    //   throw new Error('Ledger device version response is undefined');
-    // }
-    // TODO: temporarily set hardcoded version info
+    if (deviceVersion == null) {
+      throw new Error('Ledger device version response is undefined');
+    }
 
-    if (extendedPublicKeyResp == null) {
+    if (ePublicKey == null) {
       throw new Error('Ledger device extended public key response is undefined');
     }
 
