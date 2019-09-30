@@ -3,7 +3,7 @@
 
 import { observable, action } from 'mobx';
 
-import type { ExtenedPublicKeyResp } from 'yoroi-extension-ledger-connect-handler';
+import type { ExtendedPublicKeyResp } from 'yoroi-extension-ledger-connect-handler';
 import {
   LedgerBridge,
   makeCardanoAccountBIP44Path,
@@ -50,7 +50,7 @@ import {
 
 export default class LedgerConnectStore
   extends Store
-  implements HWConnectStoreTypes<ExtenedPublicKeyResp> {
+  implements HWConnectStoreTypes<ExtendedPublicKeyResp> {
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
@@ -153,7 +153,7 @@ export default class LedgerConnectStore
 
       // get Cardano's first account's
       // i.e hdPath = [2147483692, 2147485463, 2147483648]
-      const extendedPublicKeyResp: ExtenedPublicKeyResp
+      const extendedPublicKeyResp: ExtendedPublicKeyResp
         = await ledgerBridge.getExtendedPublicKey(accountPath);
 
       this.hwDeviceInfo = this._normalizeHWResponse({
@@ -171,7 +171,7 @@ export default class LedgerConnectStore
   };
 
   _normalizeHWResponse = (
-    resp: ExtenedPublicKeyResp,
+    resp: ExtendedPublicKeyResp,
   ): HWDeviceInfo => {
     this._validateHWResponse(resp);
 
@@ -193,7 +193,7 @@ export default class LedgerConnectStore
   }
 
   _validateHWResponse = (
-    resp: ExtenedPublicKeyResp,
+    resp: ExtendedPublicKeyResp,
   ): boolean => {
     const { ePublicKey, deviceVersion } = resp;
 
