@@ -73,7 +73,7 @@ export default class PaperWalletCreateStore extends Store {
   };
 
   @action _submitUserPassword = async ({ userPassword }: { userPassword: string }) => {
-    if (this.userPassword) {
+    if (this.userPassword != null) {
       throw new Error('User password is already initialized');
     }
     this.userPassword = userPassword;
@@ -100,7 +100,7 @@ export default class PaperWalletCreateStore extends Store {
   };
 
   @action _createPaperWallet = async () => {
-    if (this.numAddresses && this.userPassword) {
+    if (this.numAddresses != null && this.userPassword != null) {
       this.paper = this.api.ada.createAdaPaper({
         numAddresses: this.numAddresses,
         password: this.userPassword,

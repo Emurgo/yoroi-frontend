@@ -8,10 +8,6 @@ const messages = defineMessages({
     id: 'api.errors.WalletAlreadyImportedError',
     defaultMessage: '!!!Wallet you are trying to import already exists.',
   },
-  redeemAdaError: {
-    id: 'api.errors.RedeemAdaError',
-    defaultMessage: '!!!Your ADA could not be redeemed correctly.',
-  },
   walletFileImportError: {
     id: 'api.errors.WalletFileImportError',
     defaultMessage: '!!!Wallet could not be imported, please make sure you are providing a correct file.',
@@ -96,49 +92,9 @@ const messages = defineMessages({
     id: 'api.errors.invalidWitnessError',
     defaultMessage: '!!!The signature is invalid.',
   },
-  invalidCertificateError: {
-    id: 'api.errors.invalidCertificateError',
-    defaultMessage: '!!!Invalid certificate.',
-  },
-  readFileError: {
-    id: 'api.errors.readFileError',
-    defaultMessage: '!!!Error while reading file.',
-  },
-  decryptionError: {
-    id: 'api.errors.decryptionError',
-    defaultMessage: '!!!Error while decrypting file.',
-  },
-  parsePDFFileError: {
-    id: 'api.errors.parsePDFFileError',
-    defaultMessage: '!!!Error while parsing PDF file.',
-  },
-  parsePDFPageError: {
-    id: 'api.errors.parsePDFPageError',
-    defaultMessage: '!!!Error while parsing PDF file page.',
-  },
-  parsePDFKeyError: {
-    id: 'api.errors.parsePDFKeyError',
-    defaultMessage: '!!!Error while parsing secret key.',
-  },
   invalidMnemonicError: {
     id: 'api.errors.invalidMnemonicError',
     defaultMessage: '!!!Invalid phrase entered, please check.',
-  },
-  adaRedemptionEncryptedCertificateParseError: {
-    id: 'api.errors.adaRedemptionEncryptedCertificateParseError',
-    defaultMessage: '!!!The ADA redemption code could not be parsed, please check your passphrase.',
-  },
-  adaRedemptionCertificateParseError: {
-    id: 'api.errors.adaRedemptionCertificateParseError',
-    defaultMessage: '!!!The ADA redemption code could not be parsed from the given document.',
-  },
-  noCertificateError: {
-    id: 'api.errors.noCertificateError',
-    defaultMessage: '!!!Certificate File is required for parsing.',
-  },
-  redemptionKeyAlreadyUsedError: {
-    id: 'api.errors.redemptionKeyAlreadyUsedError',
-    defaultMessage: '!!!Redemption key has already been used.',
   },
   serverStatusError: {
     id: 'api.errors.serverStatusError',
@@ -151,15 +107,6 @@ export class WalletAlreadyImportedError extends LocalizableError {
     super({
       id: messages.walletAlreadyImportedError.id,
       defaultMessage: messages.walletAlreadyImportedError.defaultMessage || '',
-    });
-  }
-}
-
-export class RedeemAdaError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.redeemAdaError.id,
-      defaultMessage: messages.redeemAdaError.defaultMessage || '',
     });
   }
 }
@@ -353,101 +300,11 @@ export class InvalidWitnessError extends LocalizableError {
   }
 }
 
-export class InvalidCertificateError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.invalidCertificateError.id,
-      defaultMessage: messages.invalidCertificateError.defaultMessage || '',
-    });
-  }
-}
-
-export class ReadFileError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.readFileError.id,
-      defaultMessage: messages.readFileError.defaultMessage || '',
-    });
-  }
-}
-
-export class DecryptionError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.decryptionError.id,
-      defaultMessage: messages.decryptionError.defaultMessage || '',
-    });
-  }
-}
-
-export class ParsePDFFileError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.parsePDFFileError.id,
-      defaultMessage: messages.parsePDFFileError.defaultMessage || '',
-    });
-  }
-}
-
-export class ParsePDFPageError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.parsePDFPageError.id,
-      defaultMessage: messages.parsePDFPageError.defaultMessage || '',
-    });
-  }
-}
-
-export class ParsePDFKeyError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.parsePDFKeyError.id,
-      defaultMessage: messages.parsePDFKeyError.defaultMessage || '',
-    });
-  }
-}
-
 export class InvalidMnemonicError extends LocalizableError {
   constructor() {
     super({
       id: messages.invalidMnemonicError.id,
       defaultMessage: messages.invalidMnemonicError.defaultMessage || '',
-    });
-  }
-}
-
-export class AdaRedemptionEncryptedCertificateParseError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.adaRedemptionEncryptedCertificateParseError.id,
-      defaultMessage: messages.adaRedemptionEncryptedCertificateParseError.defaultMessage || '',
-    });
-  }
-}
-
-export class AdaRedemptionCertificateParseError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.adaRedemptionCertificateParseError.id,
-      defaultMessage: messages.adaRedemptionCertificateParseError.defaultMessage || '',
-    });
-  }
-}
-
-export class NoCertificateError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.noCertificateError.id,
-      defaultMessage: messages.noCertificateError.defaultMessage || '',
-    });
-  }
-}
-
-export class RedemptionKeyAlreadyUsedError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.redemptionKeyAlreadyUsedError.id,
-      defaultMessage: messages.redemptionKeyAlreadyUsedError.defaultMessage || '',
     });
   }
 }

@@ -11,7 +11,6 @@ import DaedalusTransferStore from './DaedalusTransferStore';
 import YoroiTransferStore from './YoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
-import AdaRedemptionStore from './AdaRedemptionStore';
 import AdaTransactionBuilderStore from './AdaTransactionBuilderStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
@@ -21,7 +20,6 @@ import StateFetchStore from './StateFetchStore';
 import ServerConnectionStore from './ServerConnectionStore';
 
 export const adaStoreClasses = {
-  adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
@@ -40,7 +38,6 @@ export const adaStoreClasses = {
 };
 
 export type AdaStoresMap = {
-  adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
@@ -59,7 +56,6 @@ export type AdaStoresMap = {
 };
 
 const adaStores = observable({
-  adaRedemption: null,
   wallets: null,
   paperWallets: null,
   transactions: null,

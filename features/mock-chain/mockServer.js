@@ -107,7 +107,7 @@ export function getMockServer(
       const sumUtxos = Object.keys(utxoSumForAddresses)
         .filter(addr => req.body.addresses.includes(addr))
         .map(addr => utxoSumForAddresses[addr])
-        .map(val => (val ? new BigNumber(val) : new BigNumber(0)))
+        .map(val => (val != null ? new BigNumber(val) : new BigNumber(0)))
         .reduce((sum, value) => value.plus(sum), new BigNumber(0));
       const result = sumUtxos.isZero() ? null : sumUtxos.toString();
       res.send({ sum: result });

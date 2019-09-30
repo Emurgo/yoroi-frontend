@@ -31,7 +31,4 @@ export default {
   forms: {
     FORM_VALIDATION_DEBOUNCE_WAIT: 250
   },
-  adaRedemption: {
-    ADA_REDEMPTION_PASSPHRASE_LENGTH: 9
-  }
 };

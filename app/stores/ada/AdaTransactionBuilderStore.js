@@ -22,7 +22,7 @@ export default class AdaTransactionBuilderStore extends Store {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfo: Array<{ ...$Shape<TxOutType> }>;
+  @observable plannedTxInfo: Array<{ ...Inexact<TxOutType> }>;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | BaseSignRequest;
   /** Stores the tx that will be sent if the user confirms sending */
@@ -128,10 +128,10 @@ export default class AdaTransactionBuilderStore extends Store {
   _canCompute(): boolean {
     for (let i = 0; i < this.plannedTxInfo.length; i++) {
       // we only care about the value in non-sendall case
-      if (!this.shouldSendAll && !this.plannedTxInfo[i].value) {
+      if (!this.shouldSendAll && this.plannedTxInfo[i].value == null) {
         return false;
       }
-      if (!this.plannedTxInfo[i].address) {
+      if (this.plannedTxInfo[i].address == null) {
         return false;
       }
     }

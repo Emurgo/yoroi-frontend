@@ -36,7 +36,7 @@ const getStorageItemInExtension = async (
 const getStorageItemInWeb = async (
   key: string | void
 ): Promise<?string> => {
-  if (!key) return Promise.resolve(JSON.stringify(localStorage));
+  if (key === undefined) return Promise.resolve(JSON.stringify(localStorage));
   // careful: getItem returns null on missing key. Indexer returns undefined
   return Promise.resolve(localStorage[key]);
 };
@@ -145,10 +145,10 @@ export function addListener(
       if (e.key == null) {
         return;
       }
-      const oldValue = e.oldValue
+      const oldValue = e.oldValue != null
         ? { oldValue: JSON.parse(e.oldValue) }
         : {};
-      const newValue = e.newValue
+      const newValue = e.newValue != null
         ? { newValue: JSON.parse(e.newValue) }
         : {};
       listener({

@@ -117,7 +117,7 @@ export default class URIGenerateDialog extends Component<Props> {
     const amountField = this.form.$('amount');
     amountField.set(
       'value',
-      this.props.amount ? this.props.amount.toString() : ''
+      this.props.amount != null ? this.props.amount.toString() : ''
     );
   }
 

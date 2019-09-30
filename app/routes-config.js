@@ -22,7 +22,6 @@ export const ROUTES = {
     WALLET: '/settings/wallet',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
-    ADA_REDEMPTION: '/settings/ada-redemption',
   },
   TRANSFER: {
     ROOT: '/transfer',
@@ -32,4 +31,7 @@ export const ROUTES = {
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
   },
+  STAKING: {
+    ROOT: '/staking'
+  }
 };

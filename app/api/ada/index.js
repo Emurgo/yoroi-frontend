@@ -81,7 +81,7 @@ import type {
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { InvalidWitnessError, RedeemAdaError, RedemptionKeyAlreadyUsedError } from './errors';
+import { InvalidWitnessError, } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import {
   getAdaWallet,
@@ -134,14 +134,6 @@ import {
   updateTransactionList,
 } from './lib/storage/helpers';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
-import { readFile, decryptFile, parsePDFFile, getSecretKey } from './lib/pdfParser';
-import {
-  isValidRedemptionKey,
-  isValidPaperVendRedemptionKey
-} from '../../utils/redemption-key-validation';
-import { redeemAda, redeemPaperVendedAda } from './adaRedemption';
-import type { RedeemPaperVendedAdaParams, RedeemAdaParams } from './adaRedemption';
-import config from '../../config';
 import { migrateToLatest } from './lib/storage/adaMigration';
 import {
   makeCardanoBIP44Path,
@@ -232,7 +224,7 @@ export type GetTransactionsRequestOptions = {
   limit: number,
 };
 export type GetTransactionsRequest = {
-  ...$Shape<GetTransactionsRequestOptions>,
+  ...Inexact<GetTransactionsRequestOptions>,
   walletId: string,
   isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
@@ -535,64 +527,6 @@ export type GetTransactionRowsToExportFunc = (
   request: GetTransactionRowsToExportRequest
 ) => Promise<GetTransactionRowsToExportResponse>;
 
-// getPDFSecretKey
-
-export type GetPdfSecretKeyRequest = {
-  file: ?Blob,
-  decryptionKey: ?string,
-  redemptionType: string
-};
-export type GetPdfSecretKeyResponse = string;
-export type GetPdfSecretKeyFunc = (
-  request: GetPdfSecretKeyRequest
-) => Promise<GetPdfSecretKeyResponse>;
-
-// isValidRedemptionKey
-
-export type IsValidRedemptionKeyRequest = {
-  mnemonic: string,
-};
-export type IsValidRedemptionKeyResponse = boolean;
-export type IsValidRedemptionKeyFunc = (
-  request: IsValidRedemptionKeyRequest
-) => Promise<IsValidRedemptionKeyResponse>;
-
-// isValidPaperVendRedemptionKey
-
-export type IsValidPaperVendRedemptionKeyRequest = {
-  mnemonic: string,
-};
-export type IsValidPaperVendRedemptionKeyResponse = boolean;
-export type IsValidPaperVendRedemptionKeyFunc = (
-  request: IsValidPaperVendRedemptionKeyRequest
-) => Promise<IsValidPaperVendRedemptionKeyResponse>;
-
-// isValidRedemptionMnemonic
-
-export type IsValidRedemptionMnemonicRequest = {
-  mnemonic: string,
-};
-export type IsValidRedemptionMnemonicResponse = boolean;
-export type IsValidRedemptionMnemonicFunc = (
-  request: IsValidRedemptionMnemonicRequest
-) => Promise<IsValidRedemptionMnemonicResponse>;
-
-// redeemAda
-
-export type RedeemAdaRequest = RedeemAdaParams;
-export type RedeemAdaResponse = BigNumber;
-export type RedeemAdaFunc = (
-  request: RedeemAdaRequest
-) => Promise<RedeemAdaResponse>;
-
-// redeemPaperVendedAda
-
-export type RedeemPaperVendedAdaRequest = RedeemPaperVendedAdaParams;
-export type RedeemPaperVendedAdaResponse = BigNumber;
-export type RedeemPaperVendedAdaFunc = (
-  request: RedeemPaperVendedAdaRequest
-) => Promise<RedeemPaperVendedAdaResponse>;
-
 export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 
 export default class AdaApi {
@@ -608,7 +542,7 @@ export default class AdaApi {
     const { addresses, accountPlate } = mnemonicsToExternalAddresses(
       words.join(' '),
       0, // paper wallets always use account 0
-      numAddresses || DEFAULT_ADDRESSES_PER_PAPER,
+      numAddresses != null ? numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
     );
     return { addresses, scrambledWords, accountPlate };
   }
@@ -626,7 +560,7 @@ export default class AdaApi {
     const res : Promise<CreateAdaPaperPdfResponse> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
-      accountPlate: printAccountPlate ? accountPlate : undefined,
+      accountPlate: printAccountPlate === true ? accountPlate : undefined,
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);
@@ -734,7 +668,7 @@ export default class AdaApi {
       }
       const txHistory = await getTxsOrderedByDateDesc();
       Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(history));
-      const transactions = limit
+      const transactions = limit != null
         ? txHistory.slice(skip, skip + limit)
         : txHistory;
 
@@ -1395,86 +1329,6 @@ export default class AdaApi {
     }
   }
 
-  async getPDFSecretKey(
-    request: GetPdfSecretKeyRequest
-  ): Promise<GetPdfSecretKeyResponse> {
-    Logger.debug('AdaApi::getPDFSecretKey called');
-    try {
-      const fileBuffer = await readFile(request.file);
-      const decryptedFileBuffer = decryptFile(
-        request.decryptionKey,
-        request.redemptionType,
-        fileBuffer
-      );
-      const parsedPDFString = await parsePDFFile(decryptedFileBuffer);
-      return getSecretKey(parsedPDFString);
-    } catch (error) {
-      Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  isValidRedemptionKey(
-    request: IsValidRedemptionKeyRequest
-  ): Promise<IsValidRedemptionKeyResponse> {
-    return Promise.resolve(
-      isValidRedemptionKey(request.mnemonic)
-    );
-  }
-
-  isValidPaperVendRedemptionKey(
-    request: IsValidPaperVendRedemptionKeyRequest
-  ): Promise<IsValidPaperVendRedemptionKeyResponse> {
-    return Promise.resolve(
-      isValidPaperVendRedemptionKey(request.mnemonic)
-    );
-  }
-
-  isValidRedemptionMnemonic(
-    request: IsValidRedemptionMnemonicRequest
-  ): Promise<IsValidRedemptionMnemonicResponse> {
-    return Promise.resolve(
-      isValidMnemonic(
-        request.mnemonic,
-        config.adaRedemption.ADA_REDEMPTION_PASSPHRASE_LENGTH
-      )
-    );
-  }
-
-  redeemAda = async (
-    request: RedeemAdaRequest
-  ): Promise<RedeemAdaResponse> => {
-    Logger.debug('AdaApi::redeemAda called');
-    try {
-      const transactionAmount = await redeemAda(request);
-      Logger.debug('AdaApi::redeemAda success');
-      return transactionAmount;
-    } catch (error) {
-      Logger.error('AdaApi::redeemAda error: ' + stringifyError(error));
-      if (error instanceof RedemptionKeyAlreadyUsedError) {
-        throw error;
-      }
-      throw new RedeemAdaError();
-    }
-  };
-
-  redeemPaperVendedAda = async (
-    request: RedeemPaperVendedAdaRequest
-  ): Promise<RedeemPaperVendedAdaResponse> => {
-    Logger.debug('AdaApi::redeemAdaPaperVend called');
-    try {
-      const transactionAmount = await redeemPaperVendedAda(request);
-      Logger.debug('AdaApi::redeemAdaPaperVend success');
-      return transactionAmount;
-    } catch (error) {
-      Logger.error('AdaApi::redeemAdaPaperVend error: ' + stringifyError(error));
-      if (error instanceof RedemptionKeyAlreadyUsedError) {
-        throw error;
-      }
-      throw new RedeemAdaError();
-    }
-  };
-
   loadDB = async (): Promise<void> => {
     await loadLovefieldDB();
   };
@@ -1632,9 +1486,10 @@ const _createTransactionFromServerData = action(
     lastBlockNumber: number,
   ) => {
     const { ctmTitle, ctmDescription, ctmDate } = data.ctMeta;
+    const directionMessage = data.ctIsOutgoing ? 'Ada sent' : 'Ada received';
     return new WalletTransaction({
       id: data.ctId,
-      title: ctmTitle || data.ctIsOutgoing ? 'Ada sent' : 'Ada received',
+      title: ctmTitle != null ? ctmTitle : directionMessage,
       type,
       amount: amount.dividedBy(LOVELACES_PER_ADA).plus(fee.dividedBy(LOVELACES_PER_ADA)),
       fee: fee.dividedBy(LOVELACES_PER_ADA),

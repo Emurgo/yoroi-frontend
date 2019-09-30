@@ -4,6 +4,8 @@ const path = require('path');
 const ChromeExtension = require('crx');
 const argv = require('minimist')(process.argv.slice(2));
 /* eslint import/no-unresolved: 0 */
+
+// Ignore FlowLint telling you to delete this. CI needs it
 // $FlowFixMe this file is generated at build time so Flow fails to find it
 const name = require('../build/manifest.json').name;
 
@@ -20,8 +22,7 @@ if (!argv.codebase || (isCrx && !existsKey)) {
 const crx = new ChromeExtension({
   appId: argv['app-id'],
   codebase: argv.codebase,
-  // https://github.com/oncletom/crx/issues/108
-  version: 2,
+  version: 3,
   privateKey: existsKey
     ? fs.readFileSync(keyPath)
     : null

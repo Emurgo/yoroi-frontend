@@ -69,7 +69,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         stores={stores}
       >
         <SettingsLayout menu={menu}>
-          {children || null /* the "|| null" part keeps flow happy */}
+          {children != null ? children : null}
         </SettingsLayout>
       </MainLayout>
     );

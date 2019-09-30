@@ -141,6 +141,7 @@ export default class CreatePaperDialog extends Component<Props> {
           classicTheme={classicTheme}
         >
           <div
+            aria-label="download button"
             role="button"
             tabIndex={0}
             className={styles.downloadIcon}

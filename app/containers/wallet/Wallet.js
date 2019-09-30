@@ -8,7 +8,6 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
-import AdaRedemptionSuccessOverlay from '../../components/wallet/ada-redemption/AdaRedemptionSuccessOverlay';
 import environment from '../../environment';
 
 type Props = InjectedContainerProps;
@@ -34,11 +33,10 @@ export default class Wallet extends Component<Props> {
   };
 
   render() {
-    const { wallets, adaRedemption } = this.props.stores.substores.ada;
+    const { wallets, } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
     const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const { showAdaRedemptionSuccessMessage, amountRedeemed } = adaRedemption;
     const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
 
     if (!wallets.active) {
@@ -69,14 +67,6 @@ export default class Wallet extends Component<Props> {
         >
           {this.props.children}
         </WalletWithNavigation>
-
-        {showAdaRedemptionSuccessMessage ? (
-          <AdaRedemptionSuccessOverlay
-            amount={amountRedeemed}
-            onClose={() => actions.ada.adaRedemption.closeAdaRedemptionSuccessOverlay.trigger()}
-            classicTheme={profile.isClassicTheme}
-          />
-        ) : null}
       </MainLayout>
     );
   }

@@ -35,7 +35,7 @@ export default class TopBarCategory extends Component<Props> {
       className
     ]);
     const iconStyles = classNames([
-      iconStyle ? iconStyle : null,
+      iconStyle != null ? iconStyle : null,
       styles.icon
     ]);
     return (

@@ -54,7 +54,7 @@ export function toKeyInsert(
   keyInfo: KeyInfo,
   keyHex: string,
 ): KeyInsert {
-  const hash = keyInfo.password
+  const hash = keyInfo.password !== null
     ? encryptWithPassword(
       keyInfo.password,
       Buffer.from(keyHex, 'hex')
