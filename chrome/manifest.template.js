@@ -47,4 +47,7 @@ export default ({
       uriTemplate: 'main_window.html#/send-from-uri?q=%s',
     },
   ],
+  web_accessible_resources: [
+    "main_window.html/"
+  ]
 });
