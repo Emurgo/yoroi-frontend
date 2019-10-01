@@ -70,7 +70,7 @@
     "@babel/preset-react": "7.0.0",
     "@babel/register": "7.5.5",
     "@babel/runtime": "7.5.5",
-    "@babel/runtime-corejs2": "7.5.5",
+    "@babel/runtime-corejs2": "7.6.2",
     "@storybook/addon-actions": "5.1.11",
     "@storybook/addon-knobs": "5.1.11",
     "@storybook/addon-links": "5.1.11",
