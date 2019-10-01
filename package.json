@@ -165,7 +165,7 @@
     "react-css-themr": "2.1.2",
     "react-dom": "16.9.0",
     "react-hot-loader": "4.12.12",
-    "react-intl": "2.9.0",
+    "react-intl": "3.3.2",
     "react-markdown": "4.2.2",
     "react-polymorph": "git+https://github.com/SebastienGllmt/react-polymorph-fix.git",
     "react-router": "5.0.1",
