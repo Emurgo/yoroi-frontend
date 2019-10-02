@@ -2,6 +2,7 @@
 import BigNumber from 'bignumber.js';
 import isInt from 'validator/lib/isInt';
 import { TOTAL_SUPPLY } from '../config/numbersConfig';
+import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
 
 export const isValidWalletName = (walletName: string) => {
   const nameLength = walletName.length;
@@ -27,11 +28,11 @@ export const isNotEmptyString = (value: string) => value !== '';
 
 export const isValidMemo = (memo: string) => (
   memo !== ''
-  && memo.length <= 128
+  && memo.length <= MAX_MEMO_SIZE
 );
 
 export const isValidMemoOptional = (memo: string) => (
-  memo.length <= 128
+  memo.length <= MAX_MEMO_SIZE
 );
 
 export const isValidAmountInLovelaces = (value: string) => {

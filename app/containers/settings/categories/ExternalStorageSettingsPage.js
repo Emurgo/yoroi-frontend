@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { handleExternalClick } from '../../../utils/routing';
+import { ROUTES } from '../../../routes-config';
 import ExternalStorageSettings from '../../../components/settings/categories/ExternalStorageSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 
@@ -15,6 +16,9 @@ export default class ExternalStorageSettingsPage extends Component<InjectedProps
 
   onDisconnect = () => {
     this.props.actions.memos.unsetExternalStorageProvider.trigger();
+    this.props.actions.router.goToRoute.trigger({
+      route: ROUTES.SETTINGS.EXTERNAL_STORAGE
+    });
   };
 
   render() {

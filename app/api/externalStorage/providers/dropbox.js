@@ -3,7 +3,10 @@ import { observable } from 'mobx';
 import { sprintf } from 'sprintf-js';
 import { Dropbox } from 'dropbox';
 import moment from 'moment';
-import { DROPBOX_CLIENT_ID } from '../../../config/externalStorage';
+import {
+  DROPBOX_CLIENT_ID,
+  MAX_MEMO_SIZE
+} from '../../../config/externalStorageConfig';
 import {
   Logger,
   stringifyError
@@ -280,7 +283,7 @@ export default class DropboxApi {
         return response.fileBlob.text()
           .then(content => {
             return {
-              content,
+              content: content.substr(0, MAX_MEMO_SIZE),
               lastUpdated: moment(response.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate()
             };
           })

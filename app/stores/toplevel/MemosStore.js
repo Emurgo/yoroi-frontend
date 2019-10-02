@@ -131,6 +131,8 @@ export default class MemosStore extends Store {
     await this.getExternalStorageProviderRequest.execute(); // eagerly cache
     // Revoke current token
     await this.revokeTokenStorageProvideRequest.execute();
+    // Reset SET requests
+    this.setSelectedProviderRequest.reset();
   };
 
   @computed get hasLoadedExternalStorageProvider(): boolean {

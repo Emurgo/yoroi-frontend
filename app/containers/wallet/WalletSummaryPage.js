@@ -91,6 +91,8 @@ export default class WalletSummaryPage extends Component<Props> {
               if (memos.hasSetSelectedExternalStorageProvider) {
                 actions.memos.selectTransaction.trigger({ tx: transaction });
                 this.openEditMemoDialog();
+              } else {
+                this.openConnectExternalStorageDialog();
               }
             }}
           />

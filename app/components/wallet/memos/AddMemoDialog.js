@@ -93,7 +93,7 @@ export default class AddMemoDialog extends Component<Props, State> {
         this.setState({ isSubmitting: true });
         const { memoContent } = form.values();
         const memoData = {
-          memo: memoContent,
+          memo: memoContent.replace(/ +/g, ' '),
           tx: this.props.selectedTransaction.id,
           lastUpdated: new Date()
         };

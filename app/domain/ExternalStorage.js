@@ -1,5 +1,5 @@
 // @flow
-import { DROPBOX_CLIENT_ID } from '../config/externalStorage';
+import { DROPBOX_CLIENT_ID } from '../config/externalStorageConfig';
 
 export const ExternalStorageList = {
   DROPBOX: 'dropbox',

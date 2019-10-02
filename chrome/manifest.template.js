@@ -48,6 +48,6 @@ export default ({
     },
   ],
   web_accessible_resources: [
-    "main_window.html/"
+    'main_window.html/'
   ]
 });
