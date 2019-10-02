@@ -16,9 +16,6 @@ export default class ExternalStorageSettingsPage extends Component<InjectedProps
 
   onDisconnect = () => {
     this.props.actions.memos.unsetExternalStorageProvider.trigger();
-    this.props.actions.router.goToRoute.trigger({
-      route: ROUTES.SETTINGS.EXTERNAL_STORAGE
-    });
   };
 
   render() {
