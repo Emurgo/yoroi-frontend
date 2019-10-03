@@ -22,7 +22,7 @@ export const ExternalStorageProviders: {
 } = Object.freeze({
   [ExternalStorageList.DROPBOX]: {
     name: 'Dropbox',
-    authorize_url: `https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_CLIENT_ID}&response_type=token&redirect_uri=%s/#`,
+    authorize_url: `https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_CLIENT_ID}&response_type=token&redirect_uri=%s#/`,
   },
   // [ExternalStorageList.GOOGLE_DRIVE]: {
   //   name: 'Google Drive'
