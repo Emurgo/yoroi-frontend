@@ -179,7 +179,7 @@
     "ua-parser-js": "0.7.20",
     "unorm": "1.6.0",
     "validator": "11.1.0",
-    "yoroi-extension-ledger-connect-handler": "git+https://github.com/Emurgo/yoroi-extension-ledger-connect-handler.git"
+    "yoroi-extension-ledger-connect-handler": "github:Emurgo/yoroi-extension-ledger-connect-handler#shin/try-message-passing"
   },
   "engineStrict": true,
   "engine": {

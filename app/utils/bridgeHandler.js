@@ -3,7 +3,7 @@ import {
   LedgerBridge,
 } from 'yoroi-extension-ledger-connect-handler';
 
-const LEDGER_BRIDGE_CHECK_INTERVAL = 500; // in ms (1000ms = 1sec)
+const LEDGER_BRIDGE_CHECK_INTERVAL = 800; // in ms (1000ms = 1sec)
 const LEDGER_BRIDGE_CHECK_COUNT = 10;
 
 export async function prepareLedgerBridger(ledgerBridge: LedgerBridge): Promise<void> {
@@ -14,7 +14,7 @@ export async function prepareLedgerBridger(ledgerBridge: LedgerBridge): Promise<
   return new Promise((resolve, reject) => {
     let checkCounter = 0;
     const checkInterval = setInterval(async () => {
-      if (await ledgerBridge.isBridgeReady()) {
+      if (ledgerBridge.isConnectorReady()) {
         clearInterval(checkInterval);
         resolve();
       } else if (checkCounter > LEDGER_BRIDGE_CHECK_COUNT) {
