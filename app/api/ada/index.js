@@ -116,6 +116,7 @@ import type {
 import {
   getChainAddressesForDisplay,
   getAllAddressesForDisplay,
+  loadWalletsFromStorage,
 } from './lib/storage/models/utils';
 import { convertAdaTransactionsToExportRows } from './lib/utils';
 import { migrateToLatest } from './lib/storage/adaMigration';
@@ -162,7 +163,9 @@ export type CreateAdaPaperPdfFunc = (
 
 // getWallets
 
-export type GetWalletsRequest = {};
+export type GetWalletsRequest = {
+  db: lf$Database,
+};
 export type GetWalletsResponse = Array<PublicDeriver>;
 export type GetWalletsFunc = (
   request: GetWalletsRequest
@@ -550,6 +553,20 @@ export default class AdaApi {
       }
     });
     return res;
+  }
+
+  async getWallets(
+    request: GetWalletsRequest,
+  ): Promise<GetWalletsResponse> {
+    Logger.debug('AdaApi::getWallets called');
+    try {
+      const wallets = await loadWalletsFromStorage(request.db);
+      Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
+      return wallets;
+    } catch (error) {
+      Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
   }
 
   /**
@@ -1016,7 +1033,6 @@ export default class AdaApi {
 
       const bip44Wallet = await Bip44Wallet.createBip44Wallet(
         request.db,
-        wallet.conceptualWalletRow.ConceptualWalletId,
         wallet.bip44WrapperRow,
         protocolMagic,
       );
@@ -1173,7 +1189,6 @@ export default class AdaApi {
 
       const bip44Wallet = await Bip44Wallet.createBip44Wallet(
         request.db,
-        wallet.conceptualWalletRow.ConceptualWalletId,
         wallet.bip44WrapperRow,
         protocolMagic,
       );

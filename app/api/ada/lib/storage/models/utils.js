@@ -24,7 +24,8 @@ import type {
   IHasChains,
   IDisplayCutoff,
 } from './PublicDeriver/interfaces';
-import { asDisplayCutoff, } from './PublicDeriver/index';
+import { PublicDeriver, asDisplayCutoff, } from './PublicDeriver/index';
+import { Bip44Wallet, } from './Bip44Wallet/index';
 
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
@@ -44,13 +45,11 @@ import {
 } from '../database/utils';
 import {
   GetAllBip44Wallets,
-  GetAllPublicDerivers,
   GetPathWithSpecific,
 } from '../database/bip44/api/read';
 import type { GetPathWithSpecificByTreeRequest } from '../database/bip44/api/read';
 import type {
   Bip44AddressRow,
-  Bip44WrapperRow,
   PublicDeriverRow,
 } from '../database/bip44/tables';
 import {
@@ -67,6 +66,10 @@ import {
   encryptWithPassword,
   decryptWithPassword,
 } from '../../../../../utils/passwordCipher';
+import type { ConfigType } from '../../../../../../config/config-types';
+
+declare var CONFIG: ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
 
 export type ToAbsoluteSlotNumberRequest = {
   epoch: number,
@@ -606,34 +609,40 @@ export async function rawChangePassword(
   );
 }
 
-export async function getAllBip44Wallets(
+export async function loadWalletsFromStorage(
   db: lf$Database,
-): Promise<$ReadOnlyArray<$ReadOnly<Bip44WrapperRow>>> {
+): Promise<Array<PublicDeriver>> {
+  const deps = Object.freeze({
+    GetAllBip44Wallets,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
   return await raii(
     db,
-    getAllSchemaTables(db, GetAllBip44Wallets),
+    depTables,
     async tx => {
-      return await GetAllBip44Wallets.get(
-        db,
-        tx,
-      );
-    }
-  );
-}
-
-export async function getPublicDeriversFor(
-  db: lf$Database,
-  wrapperId: number,
-): Promise<$ReadOnlyArray<$ReadOnly<PublicDeriverRow>>> {
-  return await raii(
-    db,
-    getAllSchemaTables(db, GetAllPublicDerivers),
-    async tx => {
-      return await GetAllPublicDerivers.forBip44Wallet(
-        db,
-        tx,
-        wrapperId,
-      );
+      const bip44Wallets = await GetAllBip44Wallets.get(db, tx);
+      const bip44Map = new Map<number, Bip44Wallet>();
+      const result: Array<PublicDeriver> = [];
+      for (const entry of bip44Wallets) {
+        let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.Bip44WrapperId);
+        if (bip44Wallet == null) {
+          bip44Wallet = await Bip44Wallet.createBip44Wallet(
+            db,
+            entry.Bip44Wrapper,
+            protocolMagic,
+          );
+          bip44Map.set(entry.Bip44Wrapper.Bip44WrapperId, bip44Wallet);
+        }
+        const publicDeriver = await PublicDeriver.createPublicDeriver(
+          entry.PublicDeriver,
+          bip44Wallet,
+        );
+        result.push(publicDeriver);
+      }
+      return result;
     }
   );
 }

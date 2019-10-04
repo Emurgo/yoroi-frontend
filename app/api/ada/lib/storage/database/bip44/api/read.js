@@ -26,16 +26,13 @@ import {
 
 import {
   GetKey,
-  GetWalletByType,
 } from '../../uncategorized/api/read';
 import type {
-  ConceptualWalletRow,
   KeyRow,
   KeyDerivationRow,
 } from '../../uncategorized/tables';
 import {
   KeyDerivationSchema,
-  WalletType,
 } from '../../uncategorized/tables';
 import {
   ReadLastSyncInfo,
@@ -437,26 +434,6 @@ export class GetPrivateDeriver {
   }
 }
 
-export class GetBip44Wrapper {
-  static ownTables = Object.freeze({
-    [Tables.Bip44WrapperSchema.name]: Tables.Bip44WrapperSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async get(
-    db: lf$Database,
-    tx: lf$Transaction,
-    key: number,
-  ): Promise<$ReadOnly<Bip44WrapperRow> | void> {
-    return await getRowFromKey<Bip44WrapperRow>(
-      db, tx,
-      key,
-      GetBip44Wrapper.ownTables[Tables.Bip44WrapperSchema.name].name,
-      GetBip44Wrapper.ownTables[Tables.Bip44WrapperSchema.name].properties.Bip44WrapperId,
-    );
-  }
-}
-
 export class GetKeyForDerivation {
   static ownTables = Object.freeze({});
   static depTables = Object.freeze({
@@ -598,46 +575,36 @@ export class GetKeyForPublicDeriver {
 }
 
 export class GetAllBip44Wallets {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
-    GetWalletByType,
+  static ownTables = Object.freeze({
+    [Tables.Bip44WrapperSchema.name]: Tables.Bip44WrapperSchema,
+    [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
   });
+  static depTables = Object.freeze({});
 
   static async get(
     db: lf$Database,
     tx: lf$Transaction,
   ): Promise<$ReadOnlyArray<{
-    ConceptualWallet: $ReadOnly<ConceptualWalletRow>,
     Bip44Wrapper: $ReadOnly<Bip44WrapperRow>,
-  }>> {
-    return GetAllBip44Wallets.depTables.GetWalletByType.get<
-      {Bip44Wrapper: $ReadOnly<Bip44WrapperRow>}
-    >(
-      db, tx,
-      WalletType.Bip44,
-    );
-  }
-}
-
-export class GetAllPublicDerivers {
-  static ownTables = Object.freeze({
-    [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async forBip44Wallet(
-    db: lf$Database,
-    tx: lf$Transaction,
-    wrapperId: number,
-  ): Promise<$ReadOnlyArray<{
     PublicDeriver: $ReadOnly<PublicDeriverRow>,
   }>> {
-    return await getRowIn<PublicDeriverRow>(
-      db, tx,
-      GetAllPublicDerivers.ownTables[Tables.PublicDeriverSchema.name].name,
-      GetAllPublicDerivers.ownTables[Tables.PublicDeriverSchema.name].properties.Bip44WrapperId,
-      [wrapperId],
+    const publicDeriverTable = db.getSchema().table(
+      GetAllBip44Wallets.ownTables[Tables.PublicDeriverSchema.name].name
     );
+    const bip44WrapperTable = db.getSchema().table(
+      GetAllBip44Wallets.ownTables[Tables.Bip44WrapperSchema.name].name
+    );
+    const query = db
+      .select()
+      .from(bip44WrapperTable)
+      .innerJoin(
+        publicDeriverTable,
+        publicDeriverTable[Tables.PublicDeriverSchema.properties.Bip44WrapperId].eq(
+          bip44WrapperTable[Tables.Bip44WrapperSchema.properties.Bip44WrapperId]
+        )
+      );
+
+    return await tx.attach(query);
   }
 }
 

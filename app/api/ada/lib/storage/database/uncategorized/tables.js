@@ -3,10 +3,6 @@
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
-export const WalletType = Object.freeze({
-  Bip44: 'bip44',
-});
-
 export type KeyInsert = {|
   Hash: string,
   IsEncrypted: boolean,

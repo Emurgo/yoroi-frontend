@@ -117,13 +117,11 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
 
   static async createBip44Wallet(
     db: lf$Database,
-    conceptualWalletId: number,
     row: $ReadOnly<Bip44WrapperRow>,
     protocolMagic: number,
   ): Promise<Bip44Wallet> {
     return await refreshBip44WalletFunctionality(
       db,
-      conceptualWalletId,
       row,
       protocolMagic
     );
@@ -132,13 +130,12 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
 
 export async function refreshBip44WalletFunctionality(
   db: lf$Database,
-  conceptualWalletId: number,
   row: $ReadOnly<Bip44WrapperRow>,
   protocolMagic: number, // TODO: should be stored in a table somewhere in the future
 ): Promise<IBip44Wallet> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
-    conceptualWalletId,
+    row.ConceptualWalletId,
   );
 
   let privateDeriverLevel = null;

@@ -57,43 +57,6 @@ export class GetKey {
   }
 }
 
-export class GetWalletByType {
-  static ownTables = Object.freeze({
-    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
-    [Bip44WrapperSchema.name]: Bip44WrapperSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async get<T>(
-    db: lf$Database,
-    tx: lf$Transaction,
-    type: $Values<typeof Tables.WalletType>,
-  ): Promise<$ReadOnlyArray<T & {
-    ConceptualWallet: $ReadOnly<ConceptualWalletRow>,
-  }>> {
-    const walletSchema = GetWalletByType.ownTables[Tables.ConceptualWalletSchema.name];
-    const conceptualWalletTable = db.getSchema().table(
-      walletSchema.name
-    );
-    const keyRowName = walletSchema.properties.ConceptualWalletId;
-
-    let tableName;
-    if (type === Tables.WalletType.Bip44) {
-      tableName = GetWalletByType.ownTables[Bip44WrapperSchema.name].name;
-    } else {
-      throw new Error('WalletType::get unexpected type');
-    }
-    const typeTable = db.getSchema().table(tableName);
-    return await tx.attach(db
-      .select()
-      .from(conceptualWalletTable)
-      .innerJoin(
-        typeTable,
-        typeTable[keyRowName].eq(conceptualWalletTable[keyRowName]),
-      ));
-  }
-}
-
 export class GetBlock {
   static ownTables = Object.freeze({
     [Tables.BlockSchema.name]: Tables.BlockSchema,

@@ -59,7 +59,6 @@ export async function setup(
 
   const bipWallet = await Bip44Wallet.createBip44Wallet(
     db,
-    state.conceptualWalletRow.ConceptualWalletId,
     state.bip44WrapperRow,
     protocolMagic,
   );

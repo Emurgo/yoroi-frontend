@@ -1,32 +1,24 @@
 // @flow
-
-import {
-  schema,
-} from 'lovefield';
-import type { lf$Database } from 'lovefield';
+import type { lf$Database, } from 'lovefield';
 import AdaApi from './ada/index';
 import LocalStorageApi from './localStorage/index';
 import ExportApi from './export/index';
-import {
-  loadLovefieldDB,
-} from './ada/lib/storage/database/index';
 
 export type Api = {
   ada: AdaApi,
   localStorage: LocalStorageApi,
   export: ExportApi,
-  persistentDb: lf$Database,
 };
 
 export const setupApi = async (): Promise<Api> => ({
   ada: new AdaApi(),
   localStorage: new LocalStorageApi(),
   export: new ExportApi(),
-  persistentDb: await loadLovefieldDB(schema.DataStoreType.INDEXED_DB),
 });
 
 export type MigrationRequest = {
   api: Api,
+  persistentDb: lf$Database,
   currVersion: string,
 }
 
@@ -38,7 +30,7 @@ export const migrate = async (migrationRequest: MigrationRequest): Promise<void>
 
   const appliedMigration = await migrationRequest.api.ada.migrate(
     migrationRequest.api.localStorage,
-    migrationRequest.api.persistentDb,
+    migrationRequest.persistentDb,
   );
 
   // update launch version in localstorage to avoid calling migration twice

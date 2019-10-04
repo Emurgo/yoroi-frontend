@@ -39,11 +39,6 @@ import {
 } from '../models/PublicDeriver/index';
 
 import {
-  getAllBip44Wallets,
-  getPublicDeriversFor,
-} from '../models/utils';
-
-import {
   createStandardBip44Wallet,
 } from '../bridge/walletHelper';
 
@@ -104,7 +99,6 @@ test('Can add and fetch address in wallet', async (done) => {
     const accountIndex = 1 + HARD_DERIVATION_START;
     bipWallet = await Bip44Wallet.createBip44Wallet(
       db,
-      state.conceptualWalletRow.ConceptualWalletId,
       state.bip44WrapperRow,
       protocolMagic,
     );
@@ -335,49 +329,6 @@ test('Can add and fetch address in wallet', async (done) => {
     if (asAddFromPublicInstance != null) {
       // TODO
     }
-  }
-
-  // test getAllBip44Wallets
-  {
-    const bip44Wallets = await getAllBip44Wallets(db);
-    expect(JSON.stringify(bip44Wallets)).toEqual(JSON.stringify([
-      {
-        ConceptualWallet: {
-          CoinType: 2147485463,
-          Name: 'My Test Wallet',
-          ConceptualWalletId: 1
-        },
-        Bip44Wrapper: {
-          ConceptualWalletId: 1,
-          IsBundled: false,
-          SignerLevel: 0,
-          PublicDeriverLevel: 3,
-          Version: 2,
-          Bip44WrapperId: 1
-        }
-      }
-    ]));
-  }
-
-  // test getPublicDeriversFor
-  {
-    const pubDerivers = await getPublicDeriversFor(
-      db,
-      state.bip44WrapperRow.Bip44WrapperId,
-    );
-    expect(pubDerivers).toEqual([{
-      Bip44WrapperId: 1,
-      KeyDerivationId: 4,
-      Name: '',
-      LastSyncInfoId: 1,
-      PublicDeriverId: 1
-    }, {
-      Bip44WrapperId: 1,
-      KeyDerivationId: 47,
-      Name: 'Checking account',
-      LastSyncInfoId: 2,
-      PublicDeriverId: 2
-    }]);
   }
 
   // test renaming conceptual wallet

@@ -106,8 +106,12 @@ export default class WalletsStore extends Store {
 
   /** Create the wallet and go to wallet summary screen */
   _finishCreation = async () => {
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error('_finishCreation db not loaded. Should never happen');
+    }
     const createdWallet = await this.createWalletRequest.execute({
-      db: this.api.persistentDb,
+      db: persistentDb,
       walletName: this.stores.walletBackup.name,
       walletPassword: this.stores.walletBackup.password,
       recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
@@ -127,8 +131,12 @@ export default class WalletsStore extends Store {
   }) => {
     this.restoreRequest.reset();
 
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error('_finishCreation db not loaded. Should never happen');
+    }
     const createdWallet = await this.restoreRequest.execute({
-      db: this.api.persistentDb,
+      db: persistentDb,
       ...params,
     }).promise;
     if (!createdWallet) throw new Error('Restored wallet was not received correctly');
@@ -168,7 +176,7 @@ export default class WalletsStore extends Store {
       : this.publicDerivers[0];
   }
 
-  @computed get hasAnyLoaded(): boolean {
+  @computed get hasAnyPublicDeriver(): boolean {
     return this.publicDerivers.length > 0;
   }
 
@@ -198,14 +206,14 @@ export default class WalletsStore extends Store {
   // ACTIONS
 
   /** Make all API calls required to setup/update wallet */
-  @action restoreWalletsFromStorage = async () => {
+  @action restoreWalletsFromStorage = async (): Promise<void> => {
     // TODO
     // const result = await this.walletsRequest.execute({}).promise;
     const result: Array<PublicDeriver> = [];
     if (!result) return;
     runInAction('refresh active wallet', () => {
       if (this.selected != null) {
-        this._setActiveWallet({ 
+        this._setActiveWallet({
           wallet: this.selected
         });
       }
@@ -225,7 +233,7 @@ export default class WalletsStore extends Store {
 
   /** Make all API calls required to setup imported wallet */
   @action refreshImportedWalletData = async () => {
-    if (this.hasAnyLoaded) this._setActiveWallet({ wallet: this.publicDerivers[0] });
+    if (this.hasAnyPublicDeriver) this._setActiveWallet({ wallet: this.publicDerivers[0] });
     return await this.restoreWalletsFromStorage();
   };
 
@@ -274,10 +282,10 @@ export default class WalletsStore extends Store {
   */
   _updateActiveWalletOnRouteChanges = () => {
     const currentRoute = this.stores.app.currentRoute;
-    const hasAnyWalletLoaded = this.hasAnyLoaded;
+    const hasAnyPublicDeriver = this.hasAnyPublicDeriver;
     runInAction('WalletsStore::_updateActiveWalletOnRouteChanges', () => {
       // There are not wallets loaded (yet) -> unset active and return
-      if (!hasAnyWalletLoaded) {
+      if (!hasAnyPublicDeriver) {
         return this._unsetActiveWallet();
       }
       const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
@@ -292,7 +300,7 @@ export default class WalletsStore extends Store {
         if (publicDeriverForRoute != null) {
           // The wallet exists, we are done
           this._setActiveWallet({ wallet: publicDeriverForRoute });
-        } else if (hasAnyWalletLoaded) {
+        } else if (hasAnyPublicDeriver) {
           // There is no wallet with given id -> pick first wallet
           this._setActiveWallet({ wallet: this.publicDerivers[0] });
           if (this.selected != null) {
@@ -301,7 +309,7 @@ export default class WalletsStore extends Store {
         }
       } else if (this._canRedirectToWallet) {
         // The route does not specify any wallet -> pick first wallet
-        if (!this.hasActiveWallet && hasAnyWalletLoaded) {
+        if (!this.hasActiveWallet && hasAnyPublicDeriver) {
           this._setActiveWallet({ wallet: this.publicDerivers[0] });
         }
         if (this.selected != null) {
