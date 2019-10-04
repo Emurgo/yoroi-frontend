@@ -1342,7 +1342,7 @@ export default class AdaApi {
   }
 
   importLocalDatabase = async (data: any): Promise<void> => {
-    importLovefieldDatabase(data);
+    await importLovefieldDatabase(data);
   }
 
   exportLocalDatabase = async (): Promise<string> => {

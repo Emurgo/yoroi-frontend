@@ -170,7 +170,7 @@ export default class LedgerSendStore extends Store {
 
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
-    wallets.refreshWalletsData();
+    await wallets.refreshWalletsData();
 
     const activeWallet = wallets.active;
     if (activeWallet) {

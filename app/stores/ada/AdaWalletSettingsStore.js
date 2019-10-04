@@ -36,7 +36,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     await this.updateWalletPasswordRequest.execute({ walletId, oldPassword, newPassword });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.updateWalletPasswordRequest.reset();
-    this.stores.substores.ada.wallets.refreshWalletsData();
+    await this.stores.substores.ada.wallets.refreshWalletsData();
   };
 
   /** Updates meta-parameters for the internal wallet representation */

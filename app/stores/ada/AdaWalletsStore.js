@@ -62,7 +62,7 @@ export default class AdaWalletsStore extends WalletStore {
   _sendMoney = async (transactionDetails: {
     signRequest: BaseSignRequest,
     password: string,
-  }) => {
+  }): Promise<void> => {
     const wallet = this.active;
     if (!wallet) throw new Error('Active wallet required before sending.');
     const accountId = this.stores.substores.ada.addresses._getAccountIdByWalletId(wallet.id);
@@ -73,7 +73,7 @@ export default class AdaWalletsStore extends WalletStore {
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
     });
 
-    this.refreshWalletsData();
+    await this.refreshWalletsData();
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
@@ -129,7 +129,7 @@ export default class AdaWalletsStore extends WalletStore {
     if (!importedWallet) throw new Error('Imported wallet was not received correctly');
     this.importFromFileRequest.reset();
     await this._patchWalletRequestWithNewWallet(importedWallet);
-    this.refreshWalletsData();
+    await this.refreshWalletsData();
   };
 
   // =================== NOTIFICATION ==================== //

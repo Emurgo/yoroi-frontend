@@ -19,7 +19,7 @@ const languageSelection = {
     { language }: { language: string } = {}
   ) => {
     await languageSelection.waitForVisible(client.driver);
-    i18n.setActiveLanguage(client.driver, { language });
+    await i18n.setActiveLanguage(client.driver, { language });
     client.click('.LanguageSelectionForm_submitButton');
     await languageSelection.waitForVisible(client.driver, { isHidden: true });
   }
