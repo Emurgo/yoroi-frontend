@@ -210,16 +210,14 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             </div>
           </div>
 
-          {
-            <Input
-              type="password"
-              className={styles.walletPassword}
-              {...walletPasswordField.bind()}
-              disabled={isSubmitting}
-              error={walletPasswordField.error}
-              skin={InputOwnSkin}
-            />
-          }
+          <Input
+            type="password"
+            className={styles.walletPassword}
+            {...walletPasswordField.bind()}
+            disabled={isSubmitting}
+            error={walletPasswordField.error}
+            skin={InputOwnSkin}
+          />
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

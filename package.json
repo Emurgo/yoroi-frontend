@@ -102,7 +102,7 @@
     "eslint-plugin-import": "2.18.2",
     "eslint-plugin-jsx-a11y": "6.2.3",
     "eslint-plugin-promise": "4.2.1",
-    "eslint-plugin-react": "7.14.3",
+    "eslint-plugin-react": "7.15.1",
     "eslint-plugin-no-floating-promise": "git+https://github.com/SebastienGllmt/eslint-plugin-no-floating-promise.git",
     "file-loader": "4.2.0",
     "flow-bin": "0.108.0",

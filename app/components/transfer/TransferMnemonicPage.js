@@ -138,13 +138,11 @@ export default class TransferMnemonicPage extends Component<Props> {
               </div>
 
               <ul className={styles.instructionsList}>
-                {
-                  <div className={styles.text}>
-                    {step0}
-                    &nbsp;
-                    {intl.formatMessage(globalMessages.step1)}
-                  </div>
-                }
+                <div className={styles.text}>
+                  {step0}
+                  &nbsp;
+                  {intl.formatMessage(globalMessages.step1)}
+                </div>
               </ul>
             </div>
 
