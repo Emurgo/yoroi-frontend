@@ -15,7 +15,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
     const dialogData = uiDialogs.dataForActiveDialog;
     const { updateDataForActiveDialog } = actions.dialogs;
     const activeWallet = wallets.active;
-    const { changeModelPasswordRequest } = walletSettings;
+    const { changeSigningKeyRequest } = walletSettings;
 
     if (!activeWallet) throw new Error('Active wallet required for ChangeWalletPasswordDialogContainer.');
 
@@ -27,22 +27,22 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
         onSave={(values: { oldPassword: string, newPassword: string }) => {
           const walletId = activeWallet.id;
           const { oldPassword, newPassword } = values;
-          actions[environment.API].walletSettings.changeModelPassword.trigger({
+          actions[environment.API].walletSettings.changeSigningPassword.trigger({
             walletId, oldPassword, newPassword
           });
         }}
         onCancel={() => {
           actions.dialogs.closeActiveDialog.trigger();
-          changeModelPasswordRequest.reset();
+          changeSigningKeyRequest.reset();
         }}
         onPasswordSwitchToggle={() => {
-          changeModelPasswordRequest.reset();
+          changeSigningKeyRequest.reset();
         }}
         onDataChange={data => {
           updateDataForActiveDialog.trigger({ data });
         }}
-        isSubmitting={changeModelPasswordRequest.isExecuting}
-        error={changeModelPasswordRequest.error}
+        isSubmitting={changeSigningKeyRequest.isExecuting}
+        error={changeSigningKeyRequest.error}
         classicTheme={profile.isClassicTheme}
       />
     );

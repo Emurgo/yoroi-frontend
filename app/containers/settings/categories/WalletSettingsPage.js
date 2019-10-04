@@ -25,7 +25,7 @@ export default class WalletSettingsPage extends Component<Props> {
       startEditingWalletField,
       stopEditingWalletField,
       cancelEditingWalletField,
-      updateWalletField,
+      renameConceptualWallet,
     } = actions.ada.walletSettings;
 
     // Guard against potential null values
@@ -52,7 +52,7 @@ export default class WalletSettingsPage extends Component<Props> {
           renameModelRequest.result === false
         }
         lastUpdatedField={lastUpdatedWalletField}
-        onFieldValueChange={(field, value) => updateWalletField.trigger({ field, value })}
+        onFieldValueChange={(field, value) => renameConceptualWallet.trigger({ field, value })}
         onStartEditing={field => startEditingWalletField.trigger({ field })}
         onStopEditing={() => stopEditingWalletField.trigger()}
         onCancelEditing={() => cancelEditingWalletField.trigger()}

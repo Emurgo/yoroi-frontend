@@ -4,7 +4,6 @@ import type {
   lf$Database, lf$Transaction,
 } from 'lovefield';
 
-import type { IBip44Wallet } from '../Bip44Wallet/interfaces';
 import { Bip44Wallet } from '../Bip44Wallet';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
@@ -93,7 +92,7 @@ import {
   UnusedAddressesError,
 } from '../../../../../common';
 
-import { INTERNAL, EXTERNAL, BIP44_SCAN_SIZE, } from  '../../../../../../config/numbersConfig'; 
+import { INTERNAL, EXTERNAL, BIP44_SCAN_SIZE, } from  '../../../../../../config/numbersConfig';
 
 // https://github.com/babel/babel-eslint/issues/688#issuecomment-531608020
 type Foo = Array<number>; // eslint-disable-line no-unused-vars
