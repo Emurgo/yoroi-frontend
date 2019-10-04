@@ -2,7 +2,7 @@
 import { action, observable } from 'mobx';
 
 import {
-  LedgerBridge,
+  LedgerConnect,
 } from 'yoroi-extension-ledger-connect-handler';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -34,8 +34,8 @@ import {
 } from '../../utils/logging';
 
 import {
-  prepareLedgerBridger,
-} from '../../utils/bridgeHandler';
+  prepareLedgerConnect,
+} from '../../utils/hwConnectHandler';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -96,10 +96,10 @@ export default class LedgerSendStore extends Store {
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   _send = async (params: SendUsingLedgerParams): Promise<void> => {
-    let ledgerBridge: LedgerBridge;
+    let ledgerConnect: LedgerConnect;
     try {
       Logger.debug('LedgerSendStore::_send::called: ' + stringifyData(params));
-      ledgerBridge = new LedgerBridge({
+      ledgerConnect = new LedgerConnect({
         connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
@@ -122,10 +122,10 @@ export default class LedgerSendStore extends Store {
       if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
       const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
 
-      await prepareLedgerBridger(ledgerBridge);
+      await prepareLedgerConnect(ledgerConnect);
 
       const ledgerSignTxResp: LedgerSignTxResponse =
-        await ledgerBridge.signTransaction(
+        await ledgerConnect.signTransaction(
           ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
           ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
         );
@@ -140,7 +140,7 @@ export default class LedgerSendStore extends Store {
     } finally {
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
-      ledgerBridge && ledgerBridge.dispose();
+      ledgerConnect && ledgerConnect.dispose();
       this._setActionProcessing(false);
     }
   };

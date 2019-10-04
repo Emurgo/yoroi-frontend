@@ -3,11 +3,11 @@ import { observable, action, toJS } from 'mobx';
 import Store from '../base/Store';
 
 import {
-  prepareLedgerBridger,
-} from '../../utils/bridgeHandler';
+  prepareLedgerConnect,
+} from '../../utils/hwConnectHandler';
 
 import {
-  LedgerBridge,
+  LedgerConnect,
 } from 'yoroi-extension-ledger-connect-handler';
 import TrezorConnect from 'trezor-connect';
 
@@ -97,25 +97,25 @@ export default class AddressesStore extends Store {
     path: BIP32Path,
     address: string,
   ): Promise<void> => {
-    let ledgerBridge: LedgerBridge;
+    let ledgerConnent: LedgerConnect;
     try {
       // trick to fix flow
-      ledgerBridge = new LedgerBridge({
+      ledgerConnent = new LedgerConnect({
         connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
-      await prepareLedgerBridger(ledgerBridge);
+      await prepareLedgerConnect(ledgerConnent);
 
       Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
       // the next line is used to get an error when
       // Ledger is not connected or has issues.
-      // await ledgerBridge.getVersion();
-      await ledgerBridge.showAddress(path, address);
+      // await LedgerConnect.getVersion();
+      await ledgerConnent.showAddress(path, address);
     } catch (error) {
       Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
       this._setError(ledgerErrorToLocalized(error));
     } finally {
-      ledgerBridge && ledgerBridge.dispose();
+      ledgerConnent && ledgerConnent.dispose();
       Logger.info('HWVerifyStore::ledgerVerifyAddress finalized ');
     }
   }

@@ -5,7 +5,7 @@ import { observable, action } from 'mobx';
 
 import type { ExtendedPublicKeyResp } from 'yoroi-extension-ledger-connect-handler';
 import {
-  LedgerBridge,
+  LedgerConnect,
   makeCardanoAccountBIP44Path,
 } from 'yoroi-extension-ledger-connect-handler';
 
@@ -35,8 +35,8 @@ import {
 import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
-  prepareLedgerBridger,
-} from '../../utils/bridgeHandler';
+  prepareLedgerConnect,
+} from '../../utils/hwConnectHandler';
 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -138,13 +138,13 @@ export default class LedgerConnectStore
   };
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
-    let ledgerBridge: LedgerBridge;
+    let ledgerConnect: LedgerConnect;
     try {
-      ledgerBridge = new LedgerBridge({
+      ledgerConnect = new LedgerConnect({
         connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
-      await prepareLedgerBridger(ledgerBridge);
+      await prepareLedgerConnect(ledgerConnect);
 
       // TODO: assume single account in Yoroi
       const accountPath = makeCardanoAccountBIP44Path(0);
@@ -154,7 +154,7 @@ export default class LedgerConnectStore
       // get Cardano's first account's
       // i.e hdPath = [2147483692, 2147485463, 2147483648]
       const extendedPublicKeyResp: ExtendedPublicKeyResp
-        = await ledgerBridge.getExtendedPublicKey(accountPath);
+        = await ledgerConnect.getExtendedPublicKey(accountPath);
 
       this.hwDeviceInfo = this._normalizeHWResponse({
         ePublicKey: extendedPublicKeyResp.ePublicKey,
@@ -166,7 +166,7 @@ export default class LedgerConnectStore
     } catch (error) {
       this._handleConnectError(error);
     } finally {
-      ledgerBridge && ledgerBridge.dispose();
+      ledgerConnect && ledgerConnect.dispose();
     }
   };
 
