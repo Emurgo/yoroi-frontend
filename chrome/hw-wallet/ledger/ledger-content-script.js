@@ -11,8 +11,9 @@ browserPort.onMessage.addListener(msg => {
   window.postMessage(msg, window.location.origin);
 });
 
-// De-refer when port is closed
+// De-refer and close window when port is closed
 browserPort.onDisconnect.addListener(d => {
+  window.close();
   browserPort = null;
 });
 
