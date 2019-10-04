@@ -119,14 +119,12 @@ export default class TransferMasterKeyPage extends Component<Props> {
               </div>
 
               <ul className={styles.instructionsList}>
-                {
-                  <div className={styles.text}>
-                    {step0}
-                    {intl.formatMessage(globalMessages.step1)}
-                    <br /><br />
-                    {intl.formatMessage(messages.masterKeyRequirements)}
-                  </div>
-                }
+                <div className={styles.text}>
+                  {step0}
+                  {intl.formatMessage(globalMessages.step1)}
+                  <br /><br />
+                  {intl.formatMessage(messages.masterKeyRequirements)}
+                </div>
               </ul>
             </div>
 
