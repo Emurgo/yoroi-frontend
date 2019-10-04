@@ -7,6 +7,7 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
+import { transactionTypes } from '../../api/ada/adaTypes';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
@@ -14,11 +15,11 @@ import globalMessages from '../../i18n/global-messages';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
-import { transactionTypes } from '../../domain/WalletTransaction';
-import { assuranceLevels } from '../../config/transactionAssuranceConfig';
+import { assuranceLevels, assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
+import { asGetAllAddresses, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 import type {
   ExportTransactionsRequest,
@@ -56,16 +57,16 @@ export default class AdaTransactionsStore extends TransactionsStore {
       outgoing: new BigNumber(0),
     };
 
-    // Get current wallet
-    const wallet = this.stores.substores.ada.wallets.active;
-    if (!wallet) return unconfirmedAmount;
+    // Get current public deriver
+    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    if (!publicDeriver) return unconfirmedAmount;
 
-    // Get current transactions for wallet
-    const result = this._getTransactionsAllRequest(wallet.id).result;
+    // Get current transactions for public deriver
+    const result = this._getTransactionsAllRequest(publicDeriver).result;
     if (!result || !result.transactions) return unconfirmedAmount;
 
     for (const transaction of result.transactions) {
-      if (transaction.getAssuranceLevelForMode(wallet.assuranceMode) !== assuranceLevels.HIGH) {
+      if (transaction.getAssuranceLevelForMode(assuranceModes.NORMAL) !== assuranceLevels.HIGH) {
         // total
         unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
 
@@ -101,11 +102,14 @@ export default class AdaTransactionsStore extends TransactionsStore {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      const publicDeriver = this.stores.substores.ada.wallets.selected;
+      if (!publicDeriver) return;
+      const withGetAddresses = asGetAllAddresses(publicDeriver);
+      if (!withGetAddresses) return;
+
       this.getTransactionRowsToExportRequest.execute({
+        publicDeriver: withGetAddresses,
         ...params,
-        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
-        checkAddressesInUse: stateFetcher.checkAddressesInUse,
       });
       if (!this.getTransactionRowsToExportRequest.promise) throw new Error('should never happen');
 
