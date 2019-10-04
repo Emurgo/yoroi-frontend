@@ -114,7 +114,7 @@ export default class TrezorConnectStore
       TrezorConnect.manifest(trezorManifest);
 
       /** Preinitialization of TrezorConnect API will result in faster first response */
-      // $FlowFixMe we purposely don't want to wait for execution. Safe in practice.
+      // we purposely don't want to await. Safe in practice.
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
