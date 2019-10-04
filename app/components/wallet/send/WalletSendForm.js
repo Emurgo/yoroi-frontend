@@ -11,7 +11,7 @@ import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import { isValidMemoOptional } from '../../../utils/validations';
+import { isValidMemoOptional, isValidMemo } from '../../../utils/validations';
 import BigNumber from 'bignumber.js';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -249,12 +249,12 @@ export default class WalletSendForm extends Component<Props> {
         value: '',
         validators: [({ field }) => {
           const memoContent = field.value;
-          const isValidMemo = isValidMemoOptional(memoContent);
-          if (isValidMemo) {
+          const isValid = isValidMemoOptional(memoContent);
+          if (isValid) {
             this.props.updateMemo(memoContent);
           }
           return [
-            isValidMemo,
+            isValid,
             this.context.intl.formatMessage(messages.memoInvalidOptional)
           ];
         }],
@@ -276,6 +276,7 @@ export default class WalletSendForm extends Component<Props> {
   render() {
     const { form } = this;
     const { intl } = this.context;
+    const { memo } = this.form.values();
     const {
       currencyUnit,
       currencyMaxIntegerDigits,
@@ -370,7 +371,7 @@ export default class WalletSendForm extends Component<Props> {
                 {...memoField.bind()}
                 error={memoField.error}
                 skin={InputOwnSkin}
-                done={isValidMemoOptional}
+                done={isValidMemo(memo)}
               />
             </div>
           ) : (
