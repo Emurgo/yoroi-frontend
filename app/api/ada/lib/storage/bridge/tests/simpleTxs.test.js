@@ -151,7 +151,8 @@ const twoTxsRegularSpend = [{
 test('Syncing simple transaction', async (done) => {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db);
-  const startTime = new Date();
+  // subtract 1ms to avoid test failing if tx history syncs in <1ms (so clock doesn't increase)
+  const startTime = ((new Date()).getTime() - 1);
 
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
@@ -229,7 +230,7 @@ test('Syncing simple transaction', async (done) => {
       const { Time, ...rest } = response;
       // need to test the time separately since time gets set to new Date()
       expect(Time != null ? Time.getTime() : Time).toBeGreaterThan(
-        startTime.getTime()
+        startTime
       );
       expect(rest).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
@@ -336,7 +337,7 @@ test('Syncing simple transaction', async (done) => {
       const { Time, ...rest } = response;
       // need to test the time separately since time gets set to new Date()
       expect(Time != null ? Time.getTime() : Time).toBeGreaterThan(
-        startTime.getTime()
+        startTime
       );
       expect(rest).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
@@ -418,7 +419,7 @@ test('Syncing simple transaction', async (done) => {
       const { Time, ...rest } = response;
       // need to test the time separately since time gets set to new Date()
       expect(Time != null ? Time.getTime() : Time).toBeGreaterThan(
-        startTime.getTime()
+        startTime
       );
       expect(rest).toEqual({
         BlockHash: null,
