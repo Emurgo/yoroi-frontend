@@ -192,15 +192,22 @@ export default class WalletsStore extends Store {
 
 
   getWalletRoute = (
-    wallet: PublicDeriver,
+    publicDeriver: PublicDeriver,
     page: string = 'transactions'
   ): string => (
-    buildRoute(ROUTES.WALLETS.PAGE, { id: wallet.getPublicDeriverId(), page })
+    buildRoute(ROUTES.WALLETS.PAGE, { id: publicDeriver.getPublicDeriverId(), page })
   );
 
-  goToWalletRoute(wallet: PublicDeriver) {
-    const route = this.getWalletRoute(wallet);
+  goToWalletRoute(publicDeriver: PublicDeriver) {
+    const route = this.getWalletRoute(publicDeriver);
     this.actions.router.goToRoute.trigger({ route });
+  }
+
+  refreshWallet(
+    publicDeriver: PublicDeriver
+  ): void {
+    this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
+    this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
   }
 
   // ACTIONS
@@ -263,8 +270,7 @@ export default class WalletsStore extends Store {
     if (!document.hidden) {
       const selected = this.selected;
       if (selected) {
-        await this.stores.substores[environment.API].transactions.refreshTransactionData(selected);
-        await this.stores.substores[environment.API].addresses.refreshAddresses(selected);
+        this.refreshWallet(selected);
       }
     }
   };
