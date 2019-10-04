@@ -14,6 +14,7 @@
 
 [untyped]
 .*/node_modules/trezor-connect/lib/utils/networkUtils.js
+.*/node_modules/trezor-connect/lib/index.js
 
 [libs]
 flow/declarations/
