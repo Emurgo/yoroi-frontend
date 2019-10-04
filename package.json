@@ -69,7 +69,7 @@
     "@babel/preset-flow": "7.0.0",
     "@babel/preset-react": "7.0.0",
     "@babel/register": "7.6.2",
-    "@babel/runtime": "7.5.5",
+    "@babel/runtime": "7.6.2",
     "@babel/runtime-corejs2": "7.6.2",
     "@storybook/addon-actions": "5.2.1",
     "@storybook/addon-knobs": "5.1.11",
