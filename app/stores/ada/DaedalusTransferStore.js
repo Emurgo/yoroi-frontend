@@ -21,12 +21,14 @@ import {
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
-import { nextInternalFor } from '../../api/ada/lib/storage/models/utils';
 import {
   getCryptoDaedalusWalletFromMnemonics,
   getCryptoDaedalusWalletFromMasterKey
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import {
+  asHasChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -106,9 +108,19 @@ export default class DaedalusTransferStore extends Store {
    * Call the backend service to fetch all the UTXO then find which belong to the Daedalus wallet.
    * Finally, generate the tx to transfer the wallet to Yoroi
    */
-  _setupTransferWebSocket = (
+  _setupTransferWebSocket = async (
     wallet: RustModule.Wallet.DaedalusWallet,
-  ): void => {
+  ): Promise<void> => {
+    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    if (!publicDeriver) throw new Error('_setupTransferWebSocket no wallet selected');
+    const withChains = asHasChains(publicDeriver);
+    if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
+    const nextInternal = await withChains.nextInternal();
+    if (nextInternal.addressInfo == null) {
+      throw new Error('_setupTransferWebSocket no internal addresses left. Should never happen');
+    }
+    const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
+
     this._updateStatus('restoringAddresses');
     runInAction(() => {
       this.ws = new WebSocket(websocketUrl);
@@ -141,15 +153,8 @@ export default class DaedalusTransferStore extends Store {
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
 
-          // TODO: should be done in Request
-          const internal = await nextInternalFor(
-            walletId, // todo: turn to pubderiver
-            {
-              commonPrefix: []
-            }
-          );
           const transferTx = await generateTransferTx({
-            outputAddr: internal.row.Hash,
+            outputAddr: nextInternalAddress,
             addressKeys,
             getUTXOsForAddresses:
               this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
@@ -202,15 +207,15 @@ export default class DaedalusTransferStore extends Store {
       secretWords = newSecretWords;
     }
 
-    this._setupTransferWebSocket(
+    await this._setupTransferWebSocket(
       getCryptoDaedalusWalletFromMnemonics(secretWords)
     );
   }
 
-  _setupTransferFundsWithMasterKey = (payload: { masterKey: string }): void => {
+  _setupTransferFundsWithMasterKey = async (payload: { masterKey: string }): Promise<void> => {
     const { masterKey: key } = payload;
 
-    this._setupTransferWebSocket(
+    await this._setupTransferWebSocket(
       getCryptoDaedalusWalletFromMasterKey(key)
     );
   }

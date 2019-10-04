@@ -1,6 +1,5 @@
 // @flow
 import { observable, action } from 'mobx';
-import _ from 'lodash';
 import WalletSettingsStore from '../base/WalletSettingsStore';
 import Request from '../lib/LocalizedRequest';
 import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
