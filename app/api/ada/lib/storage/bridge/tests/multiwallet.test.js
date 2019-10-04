@@ -16,8 +16,6 @@ import { loadLovefieldDB } from '../../database/index';
 
 import {
   asGetAllAddresses,
-  asGetAllUtxos,
-  asGetBalance,
   asGetUtxoBalance,
   asDisplayCutoff,
   PublicDeriver,
@@ -94,17 +92,12 @@ const mnemonic2 = 'eight country switch draw meat scout mystery blade tip drift 
 async function checkPub1HasTx(
   publicDeriver1: PublicDeriver,
 ): Promise<void> {
-  const basePubDeriver = asDisplayCutoff(
-    asGetUtxoBalance(
-      asGetBalance(
-        asGetAllUtxos(
-          asGetAllAddresses(
-            publicDeriver1
-          )
-        )
-      )
-    )
-  );
+  const withDisplayCutoff = asDisplayCutoff(publicDeriver1);
+  if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
+  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
+  const basePubDeriver = withUtxoBalance;
+
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {
     throw new Error('basePubDeriver missing a functionality');
@@ -152,17 +145,12 @@ async function checkPub1HasTx(
 async function checkPub2IsEmpty(
   publicDeriver2: PublicDeriver,
 ): Promise<void> {
-  const basePubDeriver = asDisplayCutoff(
-    asGetUtxoBalance(
-      asGetBalance(
-        asGetAllUtxos(
-          asGetAllAddresses(
-            publicDeriver2
-          )
-        )
-      )
-    )
-  );
+  const withDisplayCutoff = asDisplayCutoff(publicDeriver2);
+  if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
+  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
+  const basePubDeriver = withUtxoBalance;
+
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {
     throw new Error('basePubDeriver missing a functionality');
@@ -191,17 +179,12 @@ async function checkPub2IsEmpty(
 async function checkPub2HasTx(
   publicDeriver2: PublicDeriver,
 ): Promise<void> {
-  const basePubDeriver = asDisplayCutoff(
-    asGetUtxoBalance(
-      asGetBalance(
-        asGetAllUtxos(
-          asGetAllAddresses(
-            publicDeriver2
-          )
-        )
-      )
-    )
-  );
+  const withDisplayCutoff = asDisplayCutoff(publicDeriver2);
+  if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
+  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
+  const basePubDeriver = withUtxoBalance;
+
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {
     throw new Error('basePubDeriver missing a functionality');
@@ -283,6 +266,7 @@ test('Syncing simple transaction', async (done) => {
     await checkPub1HasTx(publicDeriver1);
 
     {
+      // const foo: IGetLastSyncInfo = publicDeriver1;
       const response = await publicDeriver1.getLastSyncInfo();
       const { Time, ...rest } = response;
       // need to test the time separately since time gets set to new Date()

@@ -338,7 +338,7 @@ export const Bip44ParentInstance = (
   (Bip44Parent: any): ReturnType<typeof Bip44ParentMixin>
 );
 export function asBip44Parent<T>(
-  obj: void | T
+  obj: T
 ): void | (IBip44Parent & Bip44ParentDependencies & T) {
   if (obj instanceof Bip44ParentInstance) {
     return obj;
@@ -444,7 +444,7 @@ const AddFromPublicInstance = (
   (AddFromPublic: any): ReturnType<typeof AddFromPublicMixin>
 );
 export function asAddFromPublic<T>(
-  obj: void | T
+  obj: T
 ): void | (IAddFromPublic & AddFromPublicDependencies & T) {
   if (obj instanceof AddFromPublicInstance) {
     return obj;
@@ -534,7 +534,7 @@ const GetPublicKeyInstance = (
   (GetPublicKey: any): ReturnType<typeof GetPublicKeyMixin>
 );
 export function asGetPublicKey<T>(
-  obj: void | T
+  obj: T
 ): void | (IGetPublic & GetPublicKeyDependencies & T) {
   if (obj instanceof GetPublicKeyInstance) {
     return obj;
@@ -706,7 +706,7 @@ const GetSigningKeyInstance = (
   (GetSigningKey: any): ReturnType<typeof GetSigningKeyMixin>
 );
 export function asGetSigningKey<T>(
-  obj: void | T
+  obj: T
 ): void | (IGetSigningKey & GetSigningKeyDependencies & T) {
   if (obj instanceof GetSigningKeyInstance) {
     return obj;
@@ -769,7 +769,7 @@ const GetAllAddressesInstance = (
   (GetAllAddresses: any): ReturnType<typeof GetAllAddressesMixin>
 );
 export function asGetAllAddresses<T>(
-  obj: void | T
+  obj: T
 ): void | (IGetAllAddresses & GetAllAddressesDependencies & T) {
   if (obj instanceof GetAllAddressesInstance) {
     return obj;
@@ -833,7 +833,7 @@ const GetAllUtxosInstance = (
   (GetAllUtxos: any): ReturnType<typeof GetAllUtxosMixin>
 );
 export function asGetAllUtxos<T>(
-  obj: void | T
+  obj: T
 ): void | (IGetAllUtxos & GetAllUtxosDependencies & T) {
   if (obj instanceof GetAllUtxosInstance) {
     return obj;
@@ -986,7 +986,7 @@ const DisplayCutoffInstance = (
   (DisplayCutoff: any): ReturnType<typeof DisplayCutoffMixin>
 );
 export function asDisplayCutoff<T>(
-  obj: void | T
+  obj: T
 ): void | (IDisplayCutoff & DisplayCutoffDependencies & T) {
   if (obj instanceof DisplayCutoffInstance) {
     return obj;
@@ -1086,7 +1086,7 @@ const HasChainsInstance = (
   (HasChains: any): ReturnType<typeof HasChainsMixin>
 );
 export function asHasChains<T>(
-  obj: void | T
+  obj: T
 ): void | (IHasChains & HasChainsDependencies & T) {
   if (obj instanceof HasChainsInstance) {
     return obj;
@@ -1112,7 +1112,7 @@ const GetBalanceInstance = (
   (GetBalance: any): ReturnType<typeof GetBalanceMixin>
 );
 export function asGetBalance<T>(
-  obj: void | T
+  obj: T
 ): void | (IGetBalance & GetBalanceDependencies & T) {
   if (obj instanceof GetBalanceInstance) {
     return obj;
@@ -1177,7 +1177,7 @@ const GetUtxoBalanceInstance = (
   (GetUtxoBalance: any): ReturnType<typeof GetUtxoBalanceMixin>
 );
 export function asGetUtxoBalance<T>(
-  obj: void | T
+  obj: T
 ): void | (IGetUtxoBalance & GetUtxoBalanceDependencies & T) {
   if (obj instanceof GetUtxoBalanceInstance) {
     return obj;
@@ -1203,7 +1203,7 @@ export const ScanAddressesInstance = (
   (ScanAddresses: any): ReturnType<typeof ScanAddressesMixin>
 );
 export function asScanAddresses<T>(
-  obj: void | T
+  obj: T
 ): void | (IScanAddresses & ScanAddressesDependencies & T) {
   if (obj instanceof ScanAddressesInstance) {
     return obj;
@@ -1327,7 +1327,7 @@ const ScanUtxoAccountAddressesInstance = (
   (ScanUtxoAccountAddresses: any): ReturnType<typeof ScanUtxoAccountAddressesMixin>
 );
 export function asScanUtxoAccountAddressesInstance<T>(
-  obj: void | T
+  obj: T
 ): void | (IScanAddresses & ScanUtxoAccountAddressesDependencies & T) {
   if (obj instanceof ScanUtxoAccountAddressesInstance) {
     return obj;

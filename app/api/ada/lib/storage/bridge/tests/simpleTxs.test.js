@@ -17,8 +17,6 @@ import { loadLovefieldDB } from '../../database/index';
 
 import {
   asGetAllAddresses,
-  asGetAllUtxos,
-  asGetBalance,
   asGetUtxoBalance,
   asDisplayCutoff,
 } from '../../models/PublicDeriver/index';
@@ -160,17 +158,14 @@ test('Syncing simple transaction', async (done) => {
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
 
-  const basePubDeriver = asDisplayCutoff(
-    asGetUtxoBalance(
-      asGetBalance(
-        asGetAllUtxos(
-          asGetAllAddresses(
-            publicDeriver
-          )
-        )
-      )
-    )
-  );
+  const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+  if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
+  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
+  const withGetAllAddresses = asGetAllAddresses(withUtxoBalance);
+  if (!withGetAllAddresses) throw new Error('missing get all addresses functionality');
+  const basePubDeriver = withGetAllAddresses;
+
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {
     throw new Error('basePubDeriver missing a functionality');
