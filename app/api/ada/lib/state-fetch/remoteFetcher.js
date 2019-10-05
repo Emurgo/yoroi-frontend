@@ -129,7 +129,7 @@ export class RemoteFetcher implements IFetcher {
 
   getBestBlock = (_body: BestBlockRequest): Promise<BestBlockResponse> => (
     axios(
-      `${backendUrl}/api/v2/bstblock`,
+      `${backendUrl}/api/v2/bestblock`,
       {
         method: 'get'
       }
