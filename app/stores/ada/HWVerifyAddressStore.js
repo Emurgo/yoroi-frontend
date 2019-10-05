@@ -30,6 +30,10 @@ import {
 import {
   convertToLocalizableError as trezorErrorToLocalized
 } from '../../domain/TrezorLocalizedError';
+import {
+  isTrezorTWallet,
+  isLedgerNanoSWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 export default class AddressesStore extends Store {
   @observable isActionProcessing: boolean = false;
@@ -45,7 +49,7 @@ export default class AddressesStore extends Store {
     actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
-  @action _verifyAddress = async (params: { wallet: Wallet }): Promise<void> => {
+  @action _verifyAddress = async (): Promise<void> => {
     Logger.info('AddressStore::_verifyAddress called');
 
     if (!this.selectedAddress) {
@@ -57,16 +61,20 @@ export default class AddressesStore extends Store {
     const path = toJS(selectedAddress.path);
     const address = toJS(selectedAddress.address);
 
-    if (!params.wallet.hardwareInfo) {
-      throw new Error('AddressStore::_verifyAddress called with no hardware wallet active');
+    const { wallets } = this.stores.substores[environment.API];
+    const publicDeriver = wallets.selected;
+    if (!publicDeriver) {
+      // this Error will be converted to LocalizableError()
+      throw new Error('_verifyAddress Active wallet required before verifying address.');
     }
+    const conceptualWallet = publicDeriver.getConceptualWallet();
 
     this._setError(null);
     this._setActionProcessing(true);
 
-    if (params.wallet.isLedgerNanoSWallet) {
+    if (isLedgerNanoSWallet(conceptualWallet)) {
       await this.ledgerVerifyAddress(path);
-    } else if (params.wallet.isTrezorTWallet) {
+    } else if (isTrezorTWallet(conceptualWallet)) {
       await this.trezorVerifyAddress(path, address);
     } else {
       throw new Error('AddressStore::_verifyAddress called with unrecognized hardware wallet');

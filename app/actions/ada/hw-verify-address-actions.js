@@ -10,5 +10,5 @@ import type {
 export default class HWVerifyAddressActions {
   closeAddressDetailDialog: Action<void> = new Action();
   selectAddress: Action<{ address: string, path: BIP32Path }> = new Action();
-  verifyAddress: Action<{ wallet: Wallet }> = new Action();
+  verifyAddress: Action<void> = new Action();
 }
