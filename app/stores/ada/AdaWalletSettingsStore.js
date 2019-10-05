@@ -64,7 +64,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       },
     }).promise;
 
-    // TODO: invalidate cached wallet name
+    publicDeriver.publicDeriverName = request.newName;
   };
 
   @action _renameConceptualWallet = async (request: {
@@ -83,7 +83,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       },
     }).promise;
 
-    // TODO: invalidate cached wallet name
+    publicDeriver.conceptualWalletName = request.newName;
   };
 
 }

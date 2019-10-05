@@ -52,7 +52,8 @@ export type PublicDeriverWithCachedMeta = {|
   self: PublicDeriver,
   // no plate if no public key
   plate: null | WalletAccountNumberPlate,
-  name: string,
+  publicDeriverName: string,
+  conceptualWalletName: string,
   amount: BigNumber,
 |};
 
@@ -114,12 +115,16 @@ export default class WalletsStore extends Store {
       plate = createAccountPlate(publicKey.Hash);
     }
 
-    const info = await publicDeriver.getFullPublicDeriverInfo();
+    const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();
+    const conceptualWalletInfo = await publicDeriver
+      .getConceptualWallet()
+      .getFullConceptualWalletInfo();
 
     return {
       self: publicDeriver,
       plate,
-      name: info.Name,
+      publicDeriverName: publicDeriverInfo.Name,
+      conceptualWalletName: conceptualWalletInfo.Name,
       amount: new BigNumber(0), // assume 0 for now. Updated later if necessary
     };
   }
