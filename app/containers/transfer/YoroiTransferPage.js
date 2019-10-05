@@ -15,9 +15,6 @@ import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
-import type {
-  PublicDeriverWithCachedMeta
-} from '../../stores/base/WalletStore';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -46,9 +43,16 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
 
   setupTransferFundsWithMnemonic = (payload: {
     recoveryPhrase: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
   }) => {
-    this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
+    this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger({
+      ...payload,
+      publicDeriver,
+    });
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */

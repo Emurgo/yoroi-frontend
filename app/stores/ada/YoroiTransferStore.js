@@ -104,7 +104,7 @@ export default class YoroiTransferStore extends Store {
 
   _generateTransferTxFromMnemonic = async (
     recoveryPhrase: string,
-    updateStatusCallback: void=>void,
+    updateStatusCallback: void => void,
     publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<TransferTx> => {
     // 1) get receive address
