@@ -21,6 +21,8 @@ import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWal
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { createAccountPlate } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
+import type { AssuranceMode, } from '../../types/transactionAssuranceTypes';
+import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriverWithCachedMeta>;
@@ -55,6 +57,7 @@ export type PublicDeriverWithCachedMeta = {|
   publicDeriverName: string,
   conceptualWalletName: string,
   amount: BigNumber,
+  assuranceMode: AssuranceMode,
 |};
 
 /**
@@ -126,6 +129,7 @@ export default class WalletsStore extends Store {
       publicDeriverName: publicDeriverInfo.Name,
       conceptualWalletName: conceptualWalletInfo.Name,
       amount: new BigNumber(0), // assume 0 for now. Updated later if necessary
+      assuranceMode: assuranceModes.NORMAL,
     };
   }
 

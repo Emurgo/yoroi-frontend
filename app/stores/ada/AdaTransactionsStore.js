@@ -15,7 +15,7 @@ import globalMessages from '../../i18n/global-messages';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
-import { assuranceLevels, assuranceModes, } from '../../config/transactionAssuranceConfig';
+import { assuranceLevels, } from '../../config/transactionAssuranceConfig';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
@@ -66,7 +66,8 @@ export default class AdaTransactionsStore extends TransactionsStore {
     if (!result || !result.transactions) return unconfirmedAmount;
 
     for (const transaction of result.transactions) {
-      if (transaction.getAssuranceLevelForMode(assuranceModes.NORMAL) !== assuranceLevels.HIGH) {
+      const assuranceForTx = transaction.getAssuranceLevelForMode(publicDeriver.assuranceMode);
+      if (assuranceForTx !== assuranceLevels.HIGH) {
         // total
         unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
 
